@@ -15,7 +15,7 @@ module.exports = function (grunt) {
                     optimization: 2
                 },
                 files: {
-                    "public/static/style.css": "public/stylesheets/main.less"
+                    "assets/static/style.css": "assets/stylesheets/main.less"
                 }
             }
         }
