@@ -5,8 +5,11 @@ var _ = require('lodash');
 var path = require('path');
 var prog = require('commander');
 
+var fs = require('fs');
+
 var pkg = require('../package.json');
 var generate = require("../lib/generate");
+var parse = require("../lib/parse");
 
 var utils = require('./utils');
 
@@ -52,6 +55,16 @@ prog
         console.log(err.stack, err);
     });
 });
+
+prog
+.command('lex <page_file>')
+.description('Parse a page file into sections, display JSON dump')
+.action(function(page_file) {
+    var parsed = parse.page(fs.readFileSync(page_file, 'utf-8'));
+
+    console.log(JSON.stringify(parsed, null, 4));
+});
+
 
 
 // Parse and fallback to help if no args
