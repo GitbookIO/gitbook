@@ -1,20 +1,20 @@
 <div class="book-summary">
     <ul class="summary">
     <li>
-        <a href="/book/{{ book.attributes.full_name }}/README.md">Introduction</a>
+        <a href="{{ basePath }}/README.html">Introduction</a>
     </li>
     <li>
-        <a href="https://github.com/{{ book.attributes.owner.login }}" target="blank">About the author</a>
+        <a href="https://github.com/{{ owner }}" target="blank">About the author</a>
     </li>
     <li class="divider"></li>
     {% for item in summary.chapters %}
         <li>
-            <a href="{{ item.chapter.path }}">{{ item.chapter.title }}</a>
+            <a href="{{ basePath }}/{{ item.chapter.path }}">{{ item.chapter.title }}</a>
             {% if item.articles.length > 0 %}
             <ul class="articles">
             {% for article in item.articles %}
                 <li>
-                    <a href="{{ article.path }}">{{ article.title }}</a>
+                    <a href="{{ basePath }}/{{ article.path }}">{{ article.title }}</a>
                 </li>
             {% endfor %}
             </ul>

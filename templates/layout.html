@@ -9,8 +9,8 @@
         {% else %}
         <meta name="robots" content="{% block robots %}noindex, nofollow{% endblock %}">
         {% endif %}
-        <link rel="icon" href="gitbook/images/icons/32.png">
-        <link rel="stylesheet" href="gitbook/style.css">
+        <link rel="icon" href="{{ staticBase }}/images/icons/32.png">
+        <link rel="stylesheet" href="{{ staticBase }}/style.css">
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="{% block description %}{% endblock %}">
         <meta name="keywords" content="{% block keywords %}{% endblock %}" >
@@ -19,7 +19,7 @@
         <meta name="og:site_name" content="GitBook">
         <meta name="og:url" content="{{ config.web.url }}">
         <meta name="og:description" content="{% block description %}{% endblock %}">
-        <meta name="og:image" content="gitbook/images/icons/ios.png" >
+        <meta name="og:image" content="{{ staticBase }}/images/icons/ios.png" >
         <meta name="application-name" content="Gitbook">
         <meta name="application-url" content="{{ config.web.url }}">
         <meta name="msapplication-tooltip" content="{% block description %}{% endblock %}">
