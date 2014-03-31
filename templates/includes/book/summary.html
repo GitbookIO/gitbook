@@ -9,7 +9,7 @@
     <li class="divider"></li>
     {% for item in summary.chapters %}
         <li>
-            <a href="{{ basePath }}/{{ item.chapter.path }}">{{ item.chapter.title }}</a>
+            <a href="{{ basePath }}/{{ item.path }}">{{ item.title }}</a>
             {% if item.articles.length > 0 %}
             <ul class="articles">
             {% for article in item.articles %}
