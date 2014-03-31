@@ -12,7 +12,7 @@
 <div class="message">
     {% autoescape false %}{{ section.content }}{% endautoescape %}
 </div>
-<div class="editor" style="height: {{ section.content.split("\n").length*20 }};">{{ section.code.base }}</div>
+<div class="editor" style="height: {{ section.code.solution|lines*20 }}px">{{ section.code.base }}</div>
 
 <pre class="hidden code-solution">{{ section.code.solution }}</pre>
 <pre class="hidden code-validation">{{ section.code.validation }}</pre>
