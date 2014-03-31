@@ -1,0 +1,23 @@
+{
+    "name": "gitbook",
+    "version": "0.0.0",
+    "description": "Library and cmd utility to generate GitBooks",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/GitbookIO/gitbook.git"
+    },
+    "keywords": [
+        "git",
+        "book",
+        "gitbook"
+    ],
+    "author": "Aaron O'Mullan <aaron.omullan@friendco.de>",
+    "license": "Apache 2",
+    "bugs": {
+        "url": "https://github.com/GitbookIO/gitbook/issues"
+    }
+}
