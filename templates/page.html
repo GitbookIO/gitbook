@@ -11,11 +11,11 @@
     <div class="book-body">
         <div class="page-inner">
         {% for section in content %}
-            <section class="{{ section.type }}">
+            <section class="{{ section.type }}" id="section-{{ section.id }}">
             {% if section.type == "normal" %}
                 {% autoescape false %}{{ section.content }}{% endautoescape %}
             {% elif section.type == "exercise" %}
-                
+                {% include "./includes/book/exercise.html" with {section: section} %}
             {% endif %}
             </section>
         {% endfor %}
