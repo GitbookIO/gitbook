@@ -22,4 +22,30 @@
         </div>
     </div>
 </div>
+
+<script>
+$(document).ready(function() {
+    $("section.exercise").each(function() {
+        var $exercise = $(this);
+
+        var codeSolution = $exercise.find(".code-solution").html();
+        var codeValidation = $exercise.find(".code-validation").html();
+
+        var editor = ace.edit($exercise.find(".editor").get(0));
+        editor.setTheme("ace/theme/tomorrow");
+        editor.getSession().setMode("ace/mode/javascript");
+
+        $exercise.find(".action-submit").click(function(e) {
+            e.preventDefault();
+
+            alert("submit");
+        });
+        $exercise.find(".action-solution").click(function(e) {
+            e.preventDefault();
+
+            editor.setValue(codeSolution);
+        });
+    })
+});
+</script>
 {% endblock %}
