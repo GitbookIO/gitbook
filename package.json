@@ -2,7 +2,7 @@
     "name": "gitbook",
     "version": "0.0.0",
     "description": "Library and cmd utility to generate GitBooks",
-    "main": "index.js",
+    "main": "lib/index.js",
     "dependencies": {
         "q": "1.0.1",
         "lodash": "2.4.1",
