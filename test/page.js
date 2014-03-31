@@ -12,4 +12,10 @@ describe('Page parsing', function() {
     it('should detection sections', function() {
         assert.equal(LEXED.length, 3);
     });
+
+    it('should detection section types', function() {
+        assert.equal(LEXED[0].type, 'normal');
+        assert.equal(LEXED[1].type, 'exercise');
+        assert.equal(LEXED[2].type, 'normal');
+    });
 });
