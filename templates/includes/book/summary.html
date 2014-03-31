@@ -9,12 +9,12 @@
     <li class="divider"></li>
     {% for item in summary.chapters %}
         <li>
-            <a href="/book/{{ book.attributes.full_name }}/{{ item.chapter.path }}">{{ item.chapter.title }}</a>
+            <a href="{{ item.chapter.path }}">{{ item.chapter.title }}</a>
             {% if item.articles.length > 0 %}
             <ul class="articles">
             {% for article in item.articles %}
                 <li>
-                    <a href="/book/{{ book.attributes.full_name }}/{{ article.path }}">{{ article.title }}</a>
+                    <a href="{{ article.path }}">{{ article.title }}</a>
                 </li>
             {% endfor %}
             </ul>
