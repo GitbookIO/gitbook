@@ -4,8 +4,8 @@
     <a href="#" class="btn pull-left toggle-summary"><i class="fa fa-align-justify"></i> Summary</a>
 
     <!-- Actions Right -->
-    <a href="/star/{{ githubId }}" class="btn pull-right"><i class="fa fa-star-o"></i> Star (0)</a>
-    <a href="/watch/{{ githubId }}" class="btn pull-right"><i class="fa fa-eye"></i> Watch (0)</a>
+    <a href="/star/{{ githubId }}" class="btn pull-right count-star"><i class="fa fa-star-o"></i> Star (<span>-</span>)</a>
+    <a href="/watch/{{ githubId }}" class="btn pull-right count-watch"><i class="fa fa-eye"></i> Watch (<span>-</span>)</a>
 
 
     <!-- Title -->
@@ -14,9 +14,18 @@
 <script>
 $(document).ready(function() {
     var $book = $(".book");
+
+    // Toggle summary
     $book.find(".book-header .toggle-summary").click(function(e) {
         e.preventDefault();
         $book.toggleClass("with-summary");
+    });
+
+    // Star and watch count
+    $.getJSON("https://api.github.com/repos/{{ githubId }}")
+    .done(function(repo) {
+        $book.find(".count-star span").text(repo.stargazers_count);
+        $book.find(".count-watch span").text(repo.subscribers_count);
     });
 });
 </script>
