@@ -21,7 +21,14 @@ describe('Page parsing', function() {
 
     it('should gen content for normal sections', function() {
         assert(LEXED[0].content);
-        assert(!LEXED[1].content);
         assert(LEXED[2].content);
+    });
+
+    it('should gen code and content for exercise sections', function() {
+        assert(LEXED[1].content);
+        assert(LEXED[1].code);
+        assert(LEXED[1].code.base);
+        assert(LEXED[1].code.solution);
+        assert(LEXED[1].code.validation);
     });
 });
