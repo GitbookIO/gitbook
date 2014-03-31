@@ -1,0 +1,22 @@
+<div class="book-header">
+    <!-- Actions Left -->
+    <a href="https://github.com/{{ githubId }}" target="_blank" class="btn pull-left"><i class="fa fa-github-alt"></i></a>
+    <a href="#" class="btn pull-left toggle-summary"><i class="fa fa-align-justify"></i> Summary</a>
+
+    <!-- Actions Right -->
+    <a href="/star/{{ githubId }}" class="btn pull-right"><i class="fa fa-star-o"></i> Star (0)</a>
+    <a href="/watch/{{ githubId }}" class="btn pull-right"><i class="fa fa-eye"></i> Watch (0)</a>
+
+
+    <!-- Title -->
+    <h1><a href="/book/{{ book.attributes.full_name }}" >{{ title }}</a></h1>
+</div>
+<script>
+$(document).ready(function() {
+    var $book = $(".book");
+    $book.find(".book-header .toggle-summary").click(function(e) {
+        e.preventDefault();
+        $book.toggleClass("with-summary");
+    });
+});
+</script>

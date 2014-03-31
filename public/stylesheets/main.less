@@ -1,0 +1,32 @@
+@import "vendors/bootstrap/bootstrap.less";
+@import "vendors/fontawesome/font-awesome.less";
+
+@import "mixins.less";
+@import "variables.less";
+@import "fonts.less";
+
+@import "book/header.less";
+@import "book/summary.less";
+@import "book/body.less";
+
+* {
+    -webkit-overflow-scrolling: touch;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: none;
+    -webkit-touch-callout: none;   
+    -webkit-font-smoothing: antialiased;
+}
+
+.form-control {
+	.box-shadow(none);
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+	
+	font-smoothing: antialiased;
+	font-family: 'appNormal';
+}

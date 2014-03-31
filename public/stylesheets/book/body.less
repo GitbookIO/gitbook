@@ -1,0 +1,33 @@
+.book {
+   .book-body {
+        position: fixed;
+        top: 40px;
+        right: 0px;
+        left: 0px;
+        bottom: 0px;
+        overflow-y: auto;
+
+        .transition(left 0.5s ease);
+
+        background: #edece4;
+
+        .page-inner {
+            max-width: 800px;
+            margin: 0px auto;
+        
+            section {
+                margin: 10px 0px;
+                padding: 5px 15px;
+                background: #fff;
+            }
+        }
+    }
+
+    &.with-summary {
+        @media (min-width: 800px) {
+            .book-body {
+                left: 250px;
+            }
+        }
+    }
+}

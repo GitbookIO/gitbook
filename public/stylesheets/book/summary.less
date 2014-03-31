@@ -1,0 +1,60 @@
+.book {
+    .book-summary {
+        @width: 250px;
+
+        position: fixed;
+        top: 40px;
+        left: -@width;
+        bottom: 0px;
+        z-index: 1;
+
+        overflow-y: auto;
+
+        width: @width;
+        background: #2e3133;
+        color: #e2edf2;
+
+        .transition(all 0.5s ease);
+
+        ul.summary {
+            list-style: none;
+            margin: 0px;
+            padding: 0px;
+
+            li {
+                &.divider {
+                    height: 1px;
+                    margin: 7px 0;
+                    overflow: hidden;
+                    background: #35393b;
+                }
+                
+                a {
+                    display: block;
+                    height: 40px;
+                    padding: 11px 15px;
+                    border-bottom: none;
+                    text-transform: uppercase;
+                    color: #e2edf2;
+
+                    &:hover {
+                        background: #242628;
+                        text-decoration: none;
+                    }
+                }
+            }
+        }
+
+        @media (max-width: 600px) {
+            width: 100%;
+            bottom: 0px;
+            left: -100%;
+        }
+    }
+
+    &.with-summary {
+        .book-summary {
+            left: 0px;
+        }        
+    }
+}

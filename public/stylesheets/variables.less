@@ -1,0 +1,42 @@
+/* Base static */
+@staticPath: "/static";
+
+/* Colors */
+@codeboxMainColor: #F16956; /* red */
+@codeboxMainColorDarker: darken(@codeboxMainColor, 15%);
+
+@codeboxMainColor2: #353D48;
+
+// Basics of a navbar
+@navbar-height:                    50px;
+@navbar-margin-bottom:             @line-height-computed;
+@navbar-default-border:            #d5d5d5;
+@navbar-border-radius:             0px;
+@navbar-padding-horizontal:        floor(@grid-gutter-width / 2);
+@navbar-padding-vertical:          ((@navbar-height - @line-height-computed) / 2);
+
+// Navbar brand label
+@navbar-default-color: #333;
+@navbar-default-link-color: #333;
+@navbar-default-brand-color:               @navbar-default-link-color;
+@navbar-default-brand-hover-color:         @navbar-default-link-color;
+@navbar-default-brand-hover-bg:            transparent;
+
+// Navbar toggle
+@navbar-default-toggle-hover-bg:           #fff;
+@navbar-default-toggle-icon-bar-bg:        @codeboxMainColorDarker;
+@navbar-default-toggle-border-color:       @codeboxMainColorDarker;
+@navbar-default-link-active-color:         @codeboxMainColor;
+@navbar-default-link-active-bg:            #fff;
+
+@border-radius-base:  1px;
+@border-radius-large: 3px;
+@border-radius-small: 1px;
+
+/* Fonts */
+@font-family-base: 'appNormal';
+
+
+/* Fonts */
+@FontPath: '@{staticPath}/fonts';
+@FontAwesomePath: "@{FontPath}/fontawesome";

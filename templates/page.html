@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ input }} {{ title }}{% parent %}{% endblock %}
+{% block description %}{% endblock %}
+{% block robots %}index, follow{% endblock %}
+{% block content %}
+<div class="book {% if input == "README.md" %}with-summary{% endif %}">
+    {% include "includes/book/header.html" %}
+    {% include "includes/book/summary.html" %}
+
+    <div class="book-body">
+        <div class="page-inner">
+        {% for section in content %}
+            <section class="{{ section.type }}">
+            {% if section.type == "normal" %}
+                {% autoescape false %}{{ section.content }}{% endautoescape %}
+            {% elif section.type == "exercise" %}
+                
+            {% endif %}
+            </section>
+        {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
