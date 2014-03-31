@@ -1,10 +1,10 @@
 {% extends "layout.html" %}
 
-{% block title %}{{ input }} {{ title }}{% parent %}{% endblock %}
+{% block title %}{{ _input }} {{ title }}{% parent %}{% endblock %}
 {% block description %}{% endblock %}
 {% block robots %}index, follow{% endblock %}
 {% block content %}
-<div class="book {% if input == "README.md" %}with-summary{% endif %}">
+<div class="book {% if _input == "README.md" %}with-summary{% endif %}">
     {% include "includes/book/header.html" %}
     {% include "includes/book/summary.html" %}
 
