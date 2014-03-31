@@ -18,4 +18,10 @@ describe('Page parsing', function() {
         assert.equal(LEXED[1].type, 'exercise');
         assert.equal(LEXED[2].type, 'normal');
     });
+
+    it('should gen content for normal sections', function() {
+        assert(LEXED[0].content);
+        assert(!LEXED[1].content);
+        assert(LEXED[2].content);
+    });
 });
