@@ -28,3 +28,5 @@ assert(c, 3)
 Some more nice content ....
 
 [Cool stuff](http://gitbook.io)
+
+[Link to another Markdown file](./xyz/file.md)
