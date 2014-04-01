@@ -37,7 +37,11 @@
                     <a href="{{ basePath }}/{{ navigation.next.path }}" class="navigation-link">Start this book</a>
                 {% else %}
                     {% if navigation.next %}
-                    <a href="{{ basePath }}/{{ navigation.next.path }}" class="navigation-link next">Next: <span>{{ navigation.next.title }}</span></a>
+                        {% if navigation.next.path %}
+                        <a href="{{ basePath }}/{{ navigation.next.path }}" class="navigation-link next">Next<span>: {{ navigation.next.title }}</span></a>
+                        {% else %}
+                        <div class="navigation-link coming-soon">Coming soon</div>
+                        {% endif %}
                     {% else %}
                     <div class="navigation-link finished">Finished!</div>
                     {% endif %}

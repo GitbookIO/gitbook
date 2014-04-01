@@ -15,7 +15,7 @@
             text-align: center;
             width: 100%;
             height: 100%;
-            font-size: 26px;
+            font-size: 24px;
             line-height: 80px;
 
             background: @brand-success;
@@ -26,6 +26,19 @@
             &:hover {
                 background: darken(@btn-success-bg, 5%);
                 text-decoration: none;
+            }
+
+            &.coming-soon, &.coming-soon:hover {
+                background: #f0ad4e;
+            }
+            &.finished, &.finished:hover {
+                background: darken(@btn-success-bg, 5%);
+            }
+
+            @media (max-width: 600px) {
+                span {
+                    display: none;
+                }
             }
         }
     }
