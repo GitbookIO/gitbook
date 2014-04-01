@@ -12,7 +12,7 @@ define([
     var getLevels = function() {
         var levels = $(".book-summary li[data-level]");
         return _.map(levels, function(level) {
-            return $(level).data("level");
+            return $(level).data("level").toString();
         });
     };
 
@@ -37,6 +37,8 @@ define([
 
         var progress = getProgress();
         progress[level] = state? Date.now() : 0;
+
+        storage.set("progress", progress);
     };
 
     // Show progress

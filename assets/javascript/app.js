@@ -41,5 +41,8 @@ require([
                 editor.setValue(codeSolution);
             });
         });
+
+        // Show progress
+        progress.show();
     });
 });
