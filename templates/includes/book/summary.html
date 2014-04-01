@@ -13,7 +13,7 @@
             {% if item.articles.length > 0 %}
             <ul class="articles">
             {% for article in item.articles %}
-                <li>
+                <li {% if article._path == _input %}class="active"{% endif %}>
                     <a href="{{ basePath }}/{{ article.path }}">{{ article.title }}</a>
                 </li>
             {% endfor %}
