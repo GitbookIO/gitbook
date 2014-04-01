@@ -46,7 +46,7 @@
                     }
                 }
                 
-                a {
+                a, span {
                     display: block;
                     height: 40px;
                     padding: 11px 15px;
@@ -58,6 +58,11 @@
                     white-space: nowrap;
                     position: relative;
                     padding-left: 26px;
+                }
+
+                span {
+                    cursor: not-allowed;
+                    .opacity(0.3);
                 }
 
                 &.active > a, a:hover {

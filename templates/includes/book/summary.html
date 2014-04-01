@@ -12,16 +12,24 @@
         </li>
         {% for item in summary.chapters %}
             <li {% if item._path == _input %}class="active"{% endif %} data-level="{{ item.level }}">
+                {% if item.path %}
                 <a href="{{ basePath }}/{{ item.path }}">
                     <i class="fa fa-check"></i> <b>{{ item.level }})</b> {{ item.title }}
                 </a>
+                {% else %}
+                <span><b>{{ item.level }})</b> {{ item.title }}</span>
+                {% endif %}
                 {% if item.articles.length > 0 %}
                 <ul class="articles">
                     {% for article in item.articles %}
                         <li {% if article._path == _input %}class="active"{% endif %} data-level="{{ article.level }}">
+                            {% if article.path %}
                             <a href="{{ basePath }}/{{ article.path }}">
                                 <i class="fa fa-check"></i> <b>{{ article.level }})</b> {{ article.title }}
                             </a>
+                            {% else %}
+                            <span><b>{{ article.level }})</b> {{ article.title }}</span>
+                            {% endif %}
                         </li>
                     {% endfor %}
                 </ul>
