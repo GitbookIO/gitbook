@@ -26,11 +26,12 @@ prog
 .description('Build a gitbook from a directory')
 .option('-o, --output <directory>', 'Path to output directory, defaults to ./_book')
 .option('-t, --title <name>', 'Name of the book to generate, defaults to repo name')
+.option('-i, --intro <intro>', 'Description of the book to generate')
 .option('-g, --github <repo_path>', 'ID of github repo like : username/repo')
 .action(buildFunc = function(dir, options) {
     dir = dir || process.cwd();
     outputDir = options.output || path.join(dir, '_book');
-
+    
     console.log('Starting build ...');
     // Get repo's URL
     return utils.gitURL(dir)
@@ -47,6 +48,7 @@ prog
             outputDir,
             {
                 title: options.title || utils.titleCase(repo),
+                description: options.intro,
                 github: options.github || repoID
             }
         );
