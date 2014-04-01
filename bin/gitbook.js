@@ -20,18 +20,20 @@ prog
 .option('-d, --dir <source_directory>', 'Source directory of book, containing Markdown files');
 
 
+var buildFunc;
 prog
 .command('build [source_dir]')
 .description('Build a gitbook from a directory')
 .option('-o, --output <directory>', 'Path to output directory, defaults to ./_book')
 .option('-t, --title <name>', 'Name of the book to generate, defaults to repo name')
 .option('-g, --github <repo_path>', 'ID of github repo like : username/repo')
-.action(function(dir, options) {
+.action(buildFunc = function(dir, options) {
     dir = dir || process.cwd();
     outputDir = options.output || path.join(dir, '_book');
 
+    console.log('Starting build ...');
     // Get repo's URL
-    utils.gitURL(dir)
+    return utils.gitURL(dir)
     .then(function(url) {
         // Get ID of repo
         return utils.githubID(url);
@@ -50,9 +52,35 @@ prog
         );
     })
     .then(function(output) {
-        console.log("Done!");
+        console.log("Successfuly built !");
     }, function(err) {
         console.log(err.stack || err);
+        throw err;
+    })
+    .then(_.constant(outputDir));
+});
+
+prog
+.command('serve [source_dir]')
+.description('Build then serve a gitbook from a directory')
+.option('-p, --port <port>', 'Port for server to listen on', 4000)
+.option('-o, --output <directory>', 'Path to output directory, defaults to ./_book')
+.option('-t, --title <name>', 'Name of the book to generate, defaults to repo name')
+.option('-g, --github <repo_path>', 'ID of github repo like : username/repo')
+.action(function(dir, options) {
+    buildFunc(dir, options)
+    .then(function(outputDir) {
+        console.log();
+        console.log('Starting server ...');
+        return utils.serveDir(outputDir, options.port);
+    })
+    .then(function() {
+        console.log('Serving book on http://localhost:'+options.port);
+        console.log();
+        console.log('Press CTRL+C to quit ...');
+    })
+    .fail(function(err) {
+        console.error(err);
     });
 });
 
