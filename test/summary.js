@@ -13,7 +13,7 @@ describe('Summary parsing', function () {
     console.log(LEXED);
 
     it('should detect chapters', function() {
-        assert.equal(LEXED.chapters.length, 3);
+        assert.equal(LEXED.chapters.length, 5);
     });
 
     it('should support articles', function() {
@@ -26,10 +26,14 @@ describe('Summary parsing', function () {
         assert(LEXED.chapters[0].path);
         assert(LEXED.chapters[1].path);
         assert(LEXED.chapters[2].path);
+        assert(LEXED.chapters[3].path);
+        assert.equal(LEXED.chapters[4].path, null);
 
         assert(LEXED.chapters[0].title);
         assert(LEXED.chapters[1].title);
         assert(LEXED.chapters[2].title);
+        assert(LEXED.chapters[3].title);
+        assert(LEXED.chapters[4].title);
     });
 
     it('should normalize paths from .md to .html', function() {
