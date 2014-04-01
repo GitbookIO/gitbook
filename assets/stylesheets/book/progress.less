@@ -1,0 +1,51 @@
+.book .book-body {
+    @chapter-size: 16px;
+    @bar-background: #eee;
+
+    .book-progress {
+        height: 30px;
+        width: 100%;
+        position: relative;
+        background: #fff;
+
+        .bar {
+            height: 10px;
+            position: absolute;
+            right: 20px;
+            left: 20px;
+            top: 10px;
+
+            background: @bar-background;
+            border-radius: 5px;
+            overflow: hidden;
+
+            .inner {
+                height: 100%;
+                width: 0%;
+                background: @brand-success;
+            }
+        }
+
+        .chapters {
+            position: absolute;
+            right: 50px;
+            left: 50px - @chapter-size;
+            top: 7px;
+
+            .chapter {
+                position: absolute;
+                width: @chapter-size;
+                height: @chapter-size;
+                border-radius: @chapter-size;
+
+                background: @bar-background;
+                box-shadow: 0px 0px 1px #bbb;
+
+                &.done {
+                    background: @brand-success;
+                    box-shadow: none;
+                }
+            }
+        }
+    }
+}

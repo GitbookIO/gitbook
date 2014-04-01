@@ -7,8 +7,18 @@
 <div class="book {% if _input == "README.md" %}with-summary{% endif %}" data-github="{{ githubId }}" data-level="{{ navigation.level }}">
     {% include "includes/book/header.html" %}
     {% include "includes/book/summary.html" %}
-
     <div class="book-body">
+        <div class="book-progress">
+            <div class="bar">
+                <div class="inner" style="width: {{ progress.percent }}%;"></div>
+            </div>
+            <div class="chapters">
+            {% for p in progress.chapters %}
+                <div class="chapter {% if p.done %}done{% endif %}" data-progress="{{ p.level }}" style="left: {{ p.percent }}%;"></div>
+            {% endfor %}
+            </div>
+        </div>
+
         <div class="page-wrapper">
             <div class="page-inner">
             {% for section in content %}
