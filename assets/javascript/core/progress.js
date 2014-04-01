@@ -1,11 +1,12 @@
 define([
     "lodash",
     "jQuery",
-    "utils/storage"
-], function(_, $, storage) {
+    "utils/storage",
+    "core/state"
+], function(_, $, storage, state) {
     // Get current level
     var getCurrentLevel = function() {
-        return $(".book").data("level");
+        return state().level;
     };
 
     // Return all levels
@@ -43,6 +44,10 @@ define([
 
     // Show progress
     var showProgress = function() {
+        // Mark current progress
+        markProgress(getCurrentLevel(), true);
+        
+        // Update progress
         var progress = getProgress();
         var $summary = $(".book-summary");
 

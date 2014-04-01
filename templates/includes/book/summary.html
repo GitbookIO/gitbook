@@ -1,25 +1,32 @@
 <div class="book-summary">
     <ul class="summary">
-    <li data-level="0">
-        <a href="{{ basePath }}/README.html">Introduction</a>
-    </li>
-    <li>
-        <a href="https://github.com/{{ githubAuthor }}" target="blank">About the author</a>
-    </li>
-    <li class="divider"></li>
-    {% for item in summary.chapters %}
-        <li {% if item._path == _input %}class="active"{% endif %} data-level="{{ item.level }}">
-            <a href="{{ basePath }}/{{ item.path }}">{{ item.title }}</a>
-            {% if item.articles.length > 0 %}
-            <ul class="articles">
-            {% for article in item.articles %}
-                <li {% if article._path == _input %}class="active"{% endif %} data-level="{{ article.level }}">
-                    <a href="{{ basePath }}/{{ article.path }}">{{ article.title }}</a>
-                </li>
-            {% endfor %}
-            </ul>
-            {% endif %}
+        <li>
+            <a href="https://github.com/{{ githubAuthor }}" target="blank">About the author</a>
         </li>
-    {% endfor %}
+        <li>
+            <a href="https://github.com/{{ githubAuthor }}/issues" target="blank">Questions and Issues</a>
+        </li>
+        <li class="divider"></li>
+        <li data-level="0">
+            <a href="{{ basePath }}/README.html"><i class="fa fa-check"></i> Introduction</a>
+        </li>
+        {% for item in summary.chapters %}
+            <li {% if item._path == _input %}class="active"{% endif %} data-level="{{ item.level }}">
+                <a href="{{ basePath }}/{{ item.path }}">
+                    <i class="fa fa-check"></i> {{ item.title }}
+                </a>
+                {% if item.articles.length > 0 %}
+                <ul class="articles">
+                    {% for article in item.articles %}
+                        <li {% if article._path == _input %}class="active"{% endif %} data-level="{{ article.level }}">
+                            <a href="{{ basePath }}/{{ article.path }}">
+                                <i class="fa fa-check"></i> {{ article.title }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </li>
+        {% endfor %}
     </ul>
 </div>

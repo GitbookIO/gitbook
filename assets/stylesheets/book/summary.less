@@ -29,9 +29,17 @@
                     background: #35393b;
                 }
 
+                i.fa-check {
+                    display: none;
+                }
+
                 &.done {
                     > a {
-                        color: green;
+                        color: @brand-success;
+
+                        i {
+                            display: inline;
+                        }
                     }
                 }
                 

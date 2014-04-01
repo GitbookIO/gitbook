@@ -1,10 +1,11 @@
 require([
     "jQuery",
-    "progress"
-], function($, progress){
+    "core/state",
+    "core/progress"
+], function($, _state, progress){
     $(document).ready(function() {
-        var $book = $(".book");
-        var githubId = $book.data("github");
+        var state = _state();
+        var $book = state.$book;
 
         // Toggle summary
         $book.find(".book-header .toggle-summary").click(function(e) {
@@ -13,7 +14,7 @@ require([
         });
 
         // Star and watch count
-        $.getJSON("https://api.github.com/repos/"+githubId)
+        $.getJSON("https://api.github.com/repos/"+state.githubId)
         .done(function(repo) {
             $book.find(".count-star span").text(repo.stargazers_count);
             $book.find(".count-watch span").text(repo.subscribers_count);

@@ -4,7 +4,7 @@
 {% block description %}{% endblock %}
 {% block robots %}index, follow{% endblock %}
 {% block content %}
-<div class="book {% if _input == "README.md" %}with-summary{% endif %}" data-github="{{ githubId }}">
+<div class="book {% if _input == "README.md" %}with-summary{% endif %}" data-github="{{ githubId }}" data-level="{{ navigation.level }}">
     {% include "includes/book/header.html" %}
     {% include "includes/book/summary.html" %}
 
