@@ -50,9 +50,9 @@ prog
         );
     })
     .then(function(output) {
-        console.log(output);
+        console.log("Done!");
     }, function(err) {
-        console.log(err.stack, err);
+        console.log(err.stack || err);
     });
 });
 
