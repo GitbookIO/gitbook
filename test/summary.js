@@ -40,4 +40,15 @@ describe('Summary parsing', function () {
         assert.equal(LEXED.chapters[2].path,'chapter-3/README.html');
         assert.equal(LEXED.chapters[2]._path,'chapter-3/README.md');
     });
+
+    it('should detect levels correctly', function() {
+        var c = LEXED.chapters;
+
+        assert.equal(c[0].level, '1');
+        assert.equal(c[1].level, '2');
+        assert.equal(c[2].level, '3');
+
+        assert.equal(c[0].articles[0].level, '1.1');
+        assert.equal(c[0].articles[1].level, '1.2');
+    });
 });
