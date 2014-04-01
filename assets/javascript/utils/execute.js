@@ -74,16 +74,12 @@ define(function(){
     };    
 
     var execute = function(solution, validation, callback) {
-        evalJS(solution + ass + validation, function(err, res) {
-            if(err) {
-                return callback(err);
-            }
-            console.log('validation =', res);
-            if (res.type == "error") {
-                callback(new Error(res.value));
-            } else {
-                callback(null, res.value);
-            }
+        // Validate with validation code
+        evalJS([solution, ass, validation].join(";\n"), function(err, res) {
+            if(err) return callback(err);
+
+            if (res.type == "error") callback(new Error(res.value));
+            else callback(null, res.value);
         });
     };
 
