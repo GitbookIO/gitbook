@@ -9,16 +9,33 @@
     {% include "includes/book/summary.html" %}
 
     <div class="book-body">
-        <div class="page-inner">
-        {% for section in content %}
-            <section class="{{ section.type }}" id="section-{{ section.id }}">
-            {% if section.type == "normal" %}
-                {% autoescape false %}{{ section.content }}{% endautoescape %}
-            {% elif section.type == "exercise" %}
-                {% include "./includes/book/exercise.html" with {section: section} %}
-            {% endif %}
-            </section>
-        {% endfor %}
+        <div class="page-wrapper">
+            <div class="page-inner">
+            {% for section in content %}
+                <section class="{{ section.type }}" id="section-{{ section.id }}">
+                {% if section.type == "normal" %}
+                    {% autoescape false %}{{ section.content }}{% endautoescape %}
+                {% elif section.type == "exercise" %}
+                    {% include "./includes/book/exercise.html" with {section: section} %}
+                {% endif %}
+                </section>
+            {% endfor %}
+            </div>
+
+            <div class="page-footer">
+                <div class="navigation">
+                {% if _input == "README.md" %}
+                    <a href="{{ navigation.next.path }}" class="navigation-link">Start this book</a>
+                {% else %}
+                    {% if navigation.prev %}
+                        <a href="{{ navigation.prev.path }}" class="navigation-link"><i class="fa fa-chevron-left"></i> {{ navigation.prev.title }}</a>
+                    {% endif %}
+                    {% if navigation.next %}
+                    <a href="{{ navigation.next.path }}" class="navigation-link">{{ navigation.next.title }} <i class="fa fa-chevron-right"></i></a>
+                    {% endif %}
+                {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 </div>
