@@ -54,4 +54,15 @@ describe('Summary navigation', function() {
         assert(nav['chapter-2/README.html']);
         assert(nav['chapter-3/README.html']);
     });
+
+    it('should detect levels correctly', function() {
+        var nav = navigation(LEXED);
+
+        assert.equal(nav['README.html'].level, '0');
+        assert.equal(nav['chapter-1/README.html'].level, '1');
+        assert.equal(nav['chapter-1/ARTICLE1.html'].level, '1.1');
+        assert.equal(nav['chapter-1/ARTICLE2.html'].level, '1.2');
+        assert.equal(nav['chapter-2/README.html'].level, '2');
+        assert.equal(nav['chapter-3/README.html'].level, '3');
+    });
 });
