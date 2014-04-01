@@ -31,6 +31,9 @@
 
                 i.fa-check {
                     display: none;
+                    position: absolute;
+                    left: 7px;
+                    top: 14px;
                 }
 
                 &.done {
@@ -53,11 +56,17 @@
                     text-overflow: ellipsis;
                     overflow: hidden;
                     white-space: nowrap;
+                    position: relative;
+                    padding-left: 26px;
                 }
 
                 &.active > a, a:hover {
                     background: #242628;
                     text-decoration: none;
+                }
+
+                ul {
+                    padding-left: 35px;
                 }
             }
         }
