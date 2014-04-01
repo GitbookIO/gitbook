@@ -11,7 +11,7 @@
         <div class="page-wrapper">
             <div class="book-progress">
                 <div class="bar">
-                    <div class="inner" style="width: {{ progress.percent }}%;"></div>
+                    <div class="inner" style="width: {{ progress.percent }}%;min-width: {{ progress.prevPercent }}%;"></div>
                 </div>
                 <div class="chapters">
                 {% for p in progress.chapters %}
@@ -19,7 +19,7 @@
                 {% endfor %}
                 </div>
             </div>
-        
+
             <div class="page-inner">
             {% for section in content %}
                 <section class="{{ section.type }}" id="section-{{ section.id }}">
