@@ -20,16 +20,49 @@
                 .opacity(0.4);
                 text-transform: uppercase;
                 .transition(opacity 0.5s ease);
+                
                 max-width: 40%;
+                min-width: 30px;
+                height: 80px;
+
                 display: inline-block;
                 text-overflow: ellipsis;
                 overflow: hidden;
                 white-space: nowrap;
-                padding: 0px 30px;
+                padding: 0px 40px;
+                position: relative;
+
+                i {
+                    position: absolute;
+                    top: 0px;
+                    line-height: 80px;
+                }
+
+                span {
+
+                }
+
+                &.prev {
+                    i {
+                        left: 0px;
+                    }
+                }
+
+                &.next {
+                    i {
+                        right: 0px;
+                    }
+                }
 
                 &:hover {
                     text-decoration: none;
                     .opacity(1);
+                }
+
+                @media (max-width: 600px) {
+                    span {
+                        display: none;
+                    }
                 }
             }
         }
