@@ -65,4 +65,10 @@ describe('Summary navigation', function() {
         assert.equal(nav['chapter-2/README.html'].level, '2');
         assert.equal(nav['chapter-3/README.html'].level, '3');
     });
+
+    it('should not accept null paths', function() {
+        var nav = navigation(LEXED);
+
+        assert(!nav[null]);
+    });
 });
