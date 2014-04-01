@@ -31,7 +31,7 @@ describe('Summary navigation', function() {
         assert.equal(nav['README.html'].prev, null);
         assert.equal(nav['README.html'].next.path, 'chapter-1/README.html');
 
-        assert.equal(nav['chapter-1/README.html'].prev, null);
+        assert.equal(nav['chapter-1/README.html'].prev.path, 'README.html');
         assert.equal(nav['chapter-1/README.html'].next.path, 'chapter-1/ARTICLE1.html');
 
         assert.equal(nav['chapter-1/ARTICLE1.html'].prev.path, 'chapter-1/README.html');
