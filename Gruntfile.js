@@ -3,6 +3,7 @@ module.exports = function (grunt) {
 
     // Load NPM tasks
     grunt.loadNpmTasks('grunt-contrib-less');
+    grunt.loadNpmTasks('grunt-contrib-requirejs');
 
     // Init GRUNT configuraton
     grunt.initConfig({
@@ -18,12 +19,33 @@ module.exports = function (grunt) {
                     "assets/static/style.css": "assets/stylesheets/main.less"
                 }
             }
+        },
+        requirejs: {
+            compile: {
+                options: {
+                    name: "app",
+                    baseUrl: "assets/javascript/",
+                    out: "assets/static/app.js",
+                    preserveLicenseComments: false,
+                    optimize: "uglify",
+                    include: ["requireLib"],
+                    paths: {
+                        "requireLib": 'vendors/require',
+                    },
+                    shim: {
+                        'jQuery': {
+                            exports: '$'
+                        }
+                    }
+                }
+            }
         }
     });
 
     // Build
     grunt.registerTask('build', [
-        'less'
+        'less',
+        'requirejs'
     ]);
 
     grunt.registerTask('default', [
