@@ -1,13 +1,17 @@
 require([
     "jQuery",
+    "utils/analytic",
     "core/state",
     "core/exercise",
     "core/progress",
     "core/sidebar"
-], function($, _state, exercise, progress, sidebar){
+], function($, analytic, _state, exercise, progress, sidebar){
     $(document).ready(function() {
         var state = _state();
         var $book = state.$book;
+
+        // Tract page view
+        analytic.track("View");
 
         // Init sidebar
         sidebar.init();
