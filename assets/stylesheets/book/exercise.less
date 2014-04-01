@@ -24,5 +24,24 @@
             border-top: 1px solid #ddd;
             border-bottom: 1px solid #ddd;
         }
+
+
+        .alert {
+            display: none;
+            margin: 0px;
+            margin-bottom: 10px;
+            padding: 8px 15px;
+        }
+
+        &.return-error {
+            .alert-danger {
+                display: block;
+            }
+        }
+        &.return-success {
+            .alert-success {
+                display: block;
+            }
+        }
     }
 }

@@ -1,8 +1,9 @@
 require([
     "jQuery",
     "core/state",
-    "core/progress"
-], function($, _state, progress){
+    "core/exercise",
+    "core/progress",
+], function($, _state, exercise, progress){
     $(document).ready(function() {
         var state = _state();
         var $book = state.$book;
@@ -20,28 +21,8 @@ require([
             $book.find(".count-watch span").text(repo.subscribers_count);
         });
 
-        // Bind exercises
-        $book.find("section.exercise").each(function() {
-            var $exercise = $(this);
-
-            var codeSolution = $exercise.find(".code-solution").html();
-            var codeValidation = $exercise.find(".code-validation").html();
-
-            var editor = ace.edit($exercise.find(".editor").get(0));
-            editor.setTheme("ace/theme/tomorrow");
-            editor.getSession().setMode("ace/mode/javascript");
-
-            $exercise.find(".action-submit").click(function(e) {
-                e.preventDefault();
-
-                alert("submit");
-            });
-            $exercise.find(".action-solution").click(function(e) {
-                e.preventDefault();
-
-                editor.setValue(codeSolution);
-            });
-        });
+        // Bind exercise
+        exercise.init();
 
         // Show progress
         progress.show();
