@@ -33,18 +33,15 @@
             </div>
 
             <div class="page-footer">
-                <div class="navigation">
                 {% if _input == "README.md" %}
                     <a href="{{ basePath }}/{{ navigation.next.path }}" class="navigation-link">Start this book</a>
                 {% else %}
-                    {% if navigation.prev %}
-                        <a href="{{ basePath }}/{{ navigation.prev.path }}" class="navigation-link prev"><i class="fa fa-chevron-left"></i> <span>{{ navigation.prev.title }}</span></a>
-                    {% endif %}
                     {% if navigation.next %}
-                    <a href="{{ basePath }}/{{ navigation.next.path }}" class="navigation-link next"><span>{{ navigation.next.title }}</span> <i class="fa fa-chevron-right"></i></a>
+                    <a href="{{ basePath }}/{{ navigation.next.path }}" class="navigation-link next">Next: <span>{{ navigation.next.title }}</span></a>
+                    {% else %}
+                    <div class="navigation-link finished">Finished!</div>
                     {% endif %}
                 {% endif %}
-                </div>
             </div>
         </div>
     </div>
