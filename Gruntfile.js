@@ -30,6 +30,7 @@ module.exports = function (grunt) {
                     optimize: "uglify",
                     include: ["requireLib"],
                     paths: {
+                        "jQuery": 'vendors/jquery',
                         "requireLib": 'vendors/require',
                     },
                     shim: {

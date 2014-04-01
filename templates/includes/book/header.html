@@ -11,21 +11,3 @@
     <!-- Title -->
     <h1><a href="{{ basePath }}/README.html" >{{ title }}</a></h1>
 </div>
-<script>
-$(document).ready(function() {
-    var $book = $(".book");
-
-    // Toggle summary
-    $book.find(".book-header .toggle-summary").click(function(e) {
-        e.preventDefault();
-        $book.toggleClass("with-summary");
-    });
-
-    // Star and watch count
-    $.getJSON("https://api.github.com/repos/{{ githubId }}")
-    .done(function(repo) {
-        $book.find(".count-star span").text(repo.stargazers_count);
-        $book.find(".count-watch span").text(repo.subscribers_count);
-    });
-});
-</script>
