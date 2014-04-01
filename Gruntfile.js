@@ -31,11 +31,15 @@ module.exports = function (grunt) {
                     include: ["requireLib"],
                     paths: {
                         "jQuery": 'vendors/jquery',
+                        "lodash": 'vendors/lodash',
                         "requireLib": 'vendors/require',
                     },
                     shim: {
                         'jQuery': {
                             exports: '$'
+                        },
+                        'lodash': {
+                            exports: '_'
                         }
                     }
                 }

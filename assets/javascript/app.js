@@ -1,6 +1,7 @@
 require([
-    "jQuery"
-], function($){
+    "jQuery",
+    "progress"
+], function($, progress){
     $(document).ready(function() {
         var $book = $(".book");
         var githubId = $book.data("github");
