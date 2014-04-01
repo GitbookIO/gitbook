@@ -14,17 +14,22 @@ describe('Summary navigation', function() {
     it('should provide next & prev entries for a file', function() {
         var nav = navigation(LEXED, [
             'README.html',
+            'chapter-1/README.html',
             'chapter-1/ARTICLE1.html',
             'chapter-1/ARTICLE2.html'
         ]);
 
         // Make sure it found the files we gave it
         assert(nav['README.html']);
+        assert(nav['chapter-1/README.html']);
         assert(nav['chapter-1/ARTICLE1.html']);
         assert(nav['chapter-1/ARTICLE2.html']);
 
         assert.equal(nav['README.html'].prev, null);
         assert.equal(nav['README.html'].next.path, 'chapter-1/README.html');
+
+        assert.equal(nav['chapter-1/README.html'].prev, null);
+        assert.equal(nav['chapter-1/README.html'].next.path, 'chapter-1/ARTICLE1.html');
 
         assert.equal(nav['chapter-1/ARTICLE1.html'].prev.path, 'chapter-1/README.html');
         assert.equal(nav['chapter-1/ARTICLE1.html'].next.path, 'chapter-1/ARTICLE2.html');
