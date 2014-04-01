@@ -3,16 +3,14 @@ require([
     "core/state",
     "core/exercise",
     "core/progress",
-], function($, _state, exercise, progress){
+    "core/sidebar"
+], function($, _state, exercise, progress, sidebar){
     $(document).ready(function() {
         var state = _state();
         var $book = state.$book;
 
-        // Toggle summary
-        $book.find(".book-header .toggle-summary").click(function(e) {
-            e.preventDefault();
-            $book.toggleClass("with-summary");
-        });
+        // Init sidebar
+        sidebar.init();
 
         // Star and watch count
         $.getJSON("https://api.github.com/repos/"+state.githubId)
