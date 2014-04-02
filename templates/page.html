@@ -1,10 +1,10 @@
 {% extends "layout.html" %}
 
-{% block title %}{{ _input }} {{ title }}{% parent %}{% endblock %}
+{% block title %}{{ progress.current.title }}{% parent %}{% endblock %}
 {% block description %}{% endblock %}
 {% block robots %}index, follow{% endblock %}
 {% block content %}
-<div class="book {% if _input == "README.md" %}with-summary{% endif %}" data-github="{{ githubId }}" data-level="{{ navigation.level }}">
+<div class="book {% if _input == "README.md" %}with-summary{% endif %}" data-github="{{ githubId }}" data-level="{{ progress.current.level }}">
     {% include "includes/book/header.html" %}
     {% include "includes/book/summary.html" %}
     <div class="book-body">
@@ -34,11 +34,11 @@
 
             <div class="page-footer">
                 {% if _input == "README.md" %}
-                    <a href="{{ basePath }}/{{ navigation.next.path }}" class="navigation-link">Start</a>
+                    <a href="{{ basePath }}/{{ progress.current.next.path }}" class="navigation-link">Start</a>
                 {% else %}
-                    {% if navigation.next %}
-                        {% if navigation.next.path %}
-                        <a href="{{ basePath }}/{{ navigation.next.path }}" class="navigation-link next">Next</a>
+                    {% if progress.current.next %}
+                        {% if progress.current.next.path %}
+                        <a href="{{ basePath }}/{{ progress.current.next.path }}" class="navigation-link next">Next</a>
                         {% else %}
                         <div class="navigation-link coming-soon">Coming soon</div>
                         {% endif %}

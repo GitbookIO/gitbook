@@ -3,7 +3,7 @@
     <head>
         {% block head %}
         <meta charset="UTF-8">
-        <title>{% block title %} | GitBook{% endblock %}</title>
+        <title>{% block title %} | {{ title }}{% endblock %}</title>
         <meta name="robots" content="{% block robots %}noindex, nofollow{% endblock %}">
         <link rel="shortcut icon" href="{{ staticBase }}/images/favicon.ico" type="image/x-icon">
         <link rel="stylesheet" href="{{ staticBase }}/style.css">
