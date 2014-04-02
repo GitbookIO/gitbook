@@ -8,6 +8,9 @@ var page = require('../').parse.page;
 var CONTENT = fs.readFileSync(path.join(__dirname, './fixtures/PAGE.md'), 'utf8');
 var LEXED = page(CONTENT);
 
+var HR_CONTENT = fs.readFileSync(path.join(__dirname, './fixtures/HR_PAGE.md'), 'utf8');
+var HR_LEXED = page(HR_CONTENT);
+
 describe('Page parsing', function() {
     it('should detection sections', function() {
         assert.equal(LEXED.length, 3);
@@ -30,5 +33,13 @@ describe('Page parsing', function() {
         assert(LEXED[1].code.base);
         assert(LEXED[1].code.solution);
         assert(LEXED[1].code.validation);
+    });
+
+    it('should merge sections correctly', function() {
+        // One big section
+        assert.equal(HR_LEXED.length, 1);
+
+        // HRs inserted correctly
+        assert.equal(HR_LEXED[0].content.match(/<hr>/g).length, 2);
     });
 });
