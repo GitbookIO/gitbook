@@ -65,17 +65,12 @@ define(function(){
     };
 
 
-    var ass = "function assert(condition, message) { \nif (!condition) { \n throw message || \"Assertion failed\"; \n } \n }\n";
-
-    var code = {
-        "base": "var firstName = \"John\";\nvar middleName = \"James\";\nvar lastName = \"Smith\";\n\nvar fullName =",
-        "solution": "var firstName = \"John\";\nvar middleName = \"James\";\nvar lastName = \"Smith\";\n\nvar fullName = firstName + \" \" + middleName + \" \" + lastName;",
-        "validation": "console.log(fullName); assert(fullName == 'John James Smith');"
-    };    
+    var ass = "function assert(condition, message) { \nif (!condition) { \n throw message || \"Assertion failed\"; \n } \n }\n";   
 
     var execute = function(solution, validation, callback) {
         // Validate with validation code
-        evalJS([solution, ass, validation].join(";\n"), function(err, res) {
+        var code = [solution, ass, validation].join(";\n");
+        evalJS(code, function(err, res) {
             if(err) return callback(err);
 
             if (res.type == "error") callback(new Error(res.value));

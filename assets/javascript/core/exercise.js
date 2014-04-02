@@ -6,8 +6,8 @@ define([
 ], function($, execute, analytic, state){
     // Bind an exercise
     var prepareExercise = function($exercise) {
-        var codeSolution = $exercise.find(".code-solution").html();
-        var codeValidation = $exercise.find(".code-validation").html();
+        var codeSolution = $exercise.find(".code-solution").text();
+        var codeValidation = $exercise.find(".code-validation").text();
 
         var editor = ace.edit($exercise.find(".editor").get(0));
         editor.setTheme("ace/theme/tomorrow");
