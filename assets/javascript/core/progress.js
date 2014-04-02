@@ -43,10 +43,7 @@ define([
     };
 
     // Show progress
-    var showProgress = function() {
-        // Mark current progress
-        markProgress(getCurrentLevel(), true);
-        
+    var showProgress = function() {        
         // Update progress
         var progress = getProgress();
         var $summary = $(".book-summary");
@@ -54,6 +51,9 @@ define([
         _.each(progress, function(value, level) {
             $summary.find("li[data-level='"+level+"']").toggleClass("done", value > 0);
         });
+
+        // Mark current progress
+        markProgress(getCurrentLevel(), true);
     };
 
     return {
