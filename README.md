@@ -70,28 +70,22 @@ An exercise is defined by 3 different parts:
 * Solution to show to the user when he gives up
 * Validation code for testing the result of the user input
 
-Exercises are defined in the markdown using the following format:
+Exercises need to start and finish with a separation bar (````---``` or ```***```). It should contain 3 code elements (base, solution and validation).
 
-
----
-
-Define a variable `c` as the modulus of the decremented value of `x` by 3.
-
-```js
-var x = 10;
-
-var c = 
-```
-
-```js
-var x = 10;
-
-var c = (x--) % 3;
-```
-
-```js
-assert(c == 1);
-```
-
----
-
+    ---
+    
+    Define a variable `x` which equal to 10.
+    
+    ```js
+    var x = 
+    ```
+    
+    ```js
+    var x = 10;
+    ```
+    
+    ```js
+    assert(x == 10);
+    ```
+    
+    ---
