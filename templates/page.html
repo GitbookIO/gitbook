@@ -1,8 +1,6 @@
 {% extends "layout.html" %}
 
 {% block title %}{{ progress.current.title }}{% parent %}{% endblock %}
-{% block description %}{% endblock %}
-{% block robots %}index, follow{% endblock %}
 {% block content %}
 <div class="book {% if _input == "README.md" %}with-summary{% endif %}" data-github="{{ githubId }}" data-level="{{ progress.current.level }}">
     {% include "includes/book/header.html" %}
