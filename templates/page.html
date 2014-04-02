@@ -34,11 +34,11 @@
 
             <div class="page-footer">
                 {% if _input == "README.md" %}
-                    <a href="{{ basePath }}/{{ navigation.next.path }}" class="navigation-link">Start this book</a>
+                    <a href="{{ basePath }}/{{ navigation.next.path }}" class="navigation-link">Start</a>
                 {% else %}
                     {% if navigation.next %}
                         {% if navigation.next.path %}
-                        <a href="{{ basePath }}/{{ navigation.next.path }}" class="navigation-link next">Next<span>: {{ navigation.next.title }}</span></a>
+                        <a href="{{ basePath }}/{{ navigation.next.path }}" class="navigation-link next">Next</a>
                         {% else %}
                         <div class="navigation-link coming-soon">Coming soon</div>
                         {% endif %}
