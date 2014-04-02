@@ -15,7 +15,7 @@
                 </div>
                 <div class="chapters">
                 {% for p in progress.chapters %}
-                    <div class="chapter {% if p.done %}done{% endif %}" data-progress="{{ p.level }}" style="left: {{ p.percent }}%;"></div>
+                    <a href="{{ basePath }}/{{ p.path }}" title="{{ p.title }}" class="chapter {% if p.done %}done{% endif %} {% if p.level.length == 1 %}new-chapter{% endif %}" data-progress="{{ p.level }}" style="left: {{ p.percent }}%;"></a>
                 {% endfor %}
                 </div>
             </div>
