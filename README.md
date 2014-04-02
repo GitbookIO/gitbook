@@ -1,7 +1,7 @@
 GitBook
 =======
 
-GiBook is a command line tool (and Node.js library) for building beautiful programming books and exercises using GitHub/Git and Markdown.
+GiBook is a command line tool (and Node.js library) for building beautiful programming books and exercises using GitHub/Git and Markdown. You can see an example: [Learn Javascript](http://gitbookio.github.io/javascript/).
 
 ## How to use it:
 
@@ -35,9 +35,13 @@ Options for commands `build` and `serve` are:
 
 A book is a GitHub repository containing at least 2 files: `README.md` and `SUMMARY.md`.
 
+#### README.md
+
+As usual, it should contains an introduction for your book. It will be automatically added to the final summary.
+
 #### SUMMARY.md
 
-The SUMMARY.md is used for getting the complete summary of the book. It should contains a list of items (deep items are allowed) with links to the different pages.
+The `SUMMARY.md` is used for getting the complete summary of the book. It should contains a list of items (deep items are allowed) with links to the different pages.
 
 Example:
 
@@ -54,4 +58,40 @@ This is the summary of my book.
 ```
 
 All the other content than the summary list will be ignored.
+
+#### Exercises
+
+A book can contains interactive exercises (currently only in Javascript but Python and Ruby are coming soon ;) ).
+
+An exercise is defined by 3 different parts:
+
+* Exercise Message/Goals (in markdown/text)
+* Base code to show to the user
+* Solution to show to the user when he gives up
+* Validation code for testing the result of the user input
+
+Exercises are defined in the markdown using the following format:
+
+
+---
+
+Define a variable `c` as the modulus of the decremented value of `x` by 3.
+
+```js
+var x = 10;
+
+var c = 
+```
+
+```js
+var x = 10;
+
+var c = (x--) % 3;
+```
+
+```js
+assert(c == 1);
+```
+
+---
 
