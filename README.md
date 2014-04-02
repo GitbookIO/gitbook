@@ -41,7 +41,7 @@ As usual, it should contains an introduction for your book. It will be automatic
 
 #### SUMMARY.md
 
-The `SUMMARY.md` is used for getting the complete summary of the book. It should contains a list of items (deep items are allowed) with links to the different pages.
+The `SUMMARY.md` defines your book's structure. It should contain a list of chapters, linking to their respective pages.
 
 Example:
 
@@ -57,24 +57,24 @@ This is the summary of my book.
     * [example 1](section2/example1.md)
 ```
 
-All the other content than the summary list will be ignored.
+Files that are not included in the `SUMMARY.md` will not be processed by `gitbook`.
 
 #### Exercises
 
-A book can contains interactive exercises (currently only in Javascript but Python and Ruby are coming soon ;) ).
+A book can contain interactive exercises (currently only in Javascript but Python and Ruby are coming soon ;) ). An exercise is a code challenge provided to the reader, which is given a code editor to write a solution which is checked against the book author's validation code.
 
-An exercise is defined by 3 different parts:
+An exercise is defined by 4 simple parts:
 
-* Exercise Message/Goals (in markdown/text)
-* Base code to show to the user
-* Solution to show to the user when he gives up
-* Validation code for testing the result of the user input
+* Exercise **Message**/Goals (in markdown/text)
+* **Initial** code to show to the user, providing a starting point
+* **Solution** code, being a correct solution to the exercise
+* **Validation** code that tests the correctness of the user's input
 
-Exercises need to start and finish with a separation bar (````---``` or ```***```). It should contain 3 code elements (base, solution and validation).
+Exercises need to start and finish with a separation bar (```---``` or ```***```). It should contain 3 code elements (**base**, **solution** and **validation**).
 
     ---
     
-    Define a variable `x` which equal to 10.
+    Define a variable `x` equal to 10.
     
     ```js
     var x = 
