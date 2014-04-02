@@ -11,6 +11,7 @@ define([
 
         var editor = ace.edit($exercise.find(".editor").get(0));
         editor.setTheme("ace/theme/tomorrow");
+        editor.getSession().setUseWorker(false);
         editor.getSession().setMode("ace/mode/javascript");
 
         // Submit: test code
