@@ -1,8 +1,9 @@
 define([
     "jQuery",
     "Mousetrap",
-    "core/navigation"
-], function($, Mousetrap, navigation){
+    "core/navigation",
+    "core/sidebar"
+], function($, Mousetrap, navigation, sidebar){
     // Bind keyboard shortcuts
     var init = function() {
         // Next
@@ -14,6 +15,12 @@ define([
         // Prev
         Mousetrap.bind(['left'], function(e) {
             navigation.goPrev();
+            return false;
+        });
+
+        // Toggle Summary
+        Mousetrap.bind(['s'], function(e) {
+            sidebar.toggle();
             return false;
         });
     };
