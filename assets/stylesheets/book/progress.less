@@ -74,6 +74,14 @@
                     background: @brand-success;
                     box-shadow: none;
                 }
+
+                @media (max-width: 800px) {
+                    display: none;
+
+                    &.new-chapter {
+                        display: block;
+                    }
+                }
             }
         }
     }
