@@ -31,32 +31,41 @@ prog
 .action(buildFunc = function(dir, options) {
     dir = dir || process.cwd();
     outputDir = options.output || path.join(dir, '_book');
-    
+
     console.log('Starting build ...');
     // Get repo's URL
     return utils.gitURL(dir)
     .then(function(url) {
         // Get ID of repo
         return utils.githubID(url);
+    }, function(err) {
+        return null;
     })
     .then(function(repoID) {
-        var parts = repoID.split('/', 2);
+        var githubID = options.github || repoID;
+
+        if(!githubID) {
+            throw new Error('Needs a githubID (username/repo). Either set repo origin to a github repo or use the -g flag');
+        }
+
+        var parts = githubID.split('/', 2);
         var user = parts[0], repo = parts[1];
+
+        var title = options.title || utils.titleCase(repo);
 
         return generate.folder(
             dir,
             outputDir,
             {
-                title: options.title || utils.titleCase(repo),
+                title: title,
                 description: options.intro,
-                github: options.github || repoID
+                github: githubID
             }
         );
     })
     .then(function(output) {
         console.log("Successfuly built !");
     }, function(err) {
-        console.log(err.stack || err);
         throw err;
     })
     .then(_.constant(outputDir));
