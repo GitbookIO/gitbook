@@ -5,10 +5,11 @@ require([
     "utils/sharing",
 
     "core/state",
+    "core/keyboard",
     "core/exercise",
     "core/progress",
     "core/sidebar"
-], function($, storage, analytic, sharing, _state, exercise, progress, sidebar){
+], function($, storage, analytic, sharing, _state, keyboard, exercise, progress, sidebar){
     $(document).ready(function() {
         var state = _state();
         var $book = state.$book;
@@ -21,6 +22,9 @@ require([
 
         // Init sidebar
         sidebar.init();
+
+        // Init keyboard
+        keyboard.init();
 
         // Star and watch count
         $.getJSON("https://api.github.com/repos/"+state.githubId)

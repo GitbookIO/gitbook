@@ -33,6 +33,7 @@ module.exports = function (grunt) {
                         "jQuery": 'vendors/jquery',
                         "lodash": 'vendors/lodash',
                         "requireLib": 'vendors/require',
+                        "Mousetrap": 'vendors/mousetrap'
                     },
                     shim: {
                         'jQuery': {
@@ -40,6 +41,9 @@ module.exports = function (grunt) {
                         },
                         'lodash': {
                             exports: '_'
+                        },
+                        'Mousetrap': {
+                            exports: 'Mousetrap'
                         }
                     }
                 }

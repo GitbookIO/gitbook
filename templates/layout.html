@@ -12,6 +12,13 @@
         <meta name="keywords" content="gitbook,github" >
         <meta name="generator" content="www.gitbook.io">
 
+        {% if progress.current.next and progress.current.next.path %}
+        <link rel="next" href="{{ basePath }}/{{ progress.current.next.path }}" />
+        {% endif %}
+        {% if progress.current.prev and progress.current.prev.path %}
+        <link rel="prev" href="{{ basePath }}/{{ progress.current.prev.path }}" />
+        {% endif %}
+
         <meta property="og:title" content="{% block title %} | {{ title }}{% endblock %}">
         <meta property="og:site_name" content="{{ title }}">
         <meta property="og:type" content="book">
