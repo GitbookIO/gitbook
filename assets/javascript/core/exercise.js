@@ -32,6 +32,7 @@ define([
             e.preventDefault();
 
             editor.setValue(codeSolution);
+            editor.gotoLine(0);
         });
     };
 
