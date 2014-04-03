@@ -1,14 +1,18 @@
 require([
     "jQuery",
+    "utils/storage",
     "utils/analytic",
     "core/state",
     "core/exercise",
     "core/progress",
     "core/sidebar"
-], function($, analytic, _state, exercise, progress, sidebar){
+], function($, storage, analytic, _state, exercise, progress, sidebar){
     $(document).ready(function() {
         var state = _state();
         var $book = state.$book;
+
+        // Initialize storage
+        storage.setBaseKey(state.githubId);
 
         // Tract page view
         analytic.track("View");
