@@ -11,6 +11,9 @@ var LEXED = page(CONTENT);
 var HR_CONTENT = fs.readFileSync(path.join(__dirname, './fixtures/HR_PAGE.md'), 'utf8');
 var HR_LEXED = page(HR_CONTENT);
 
+var LINKS_CONTENT = fs.readFileSync(path.join(__dirname, './fixtures/GITHUB_LINKS.md'), 'utf8');
+
+
 describe('Page parsing', function() {
     it('should detection sections', function() {
         assert.equal(LEXED.length, 3);
@@ -41,5 +44,20 @@ describe('Page parsing', function() {
 
         // HRs inserted correctly
         assert.equal(HR_LEXED[0].content.match(/<hr>/g).length, 2);
+    });
+});
+
+
+describe('Relative links', function() {
+    it('should be resolved to their GitHub counterparts', function() {
+        var LEXED = page(LINKS_CONTENT, {
+            // GitHub repo ID
+            repo: 'GitBookIO/javascript',
+
+            // Imaginary folder of markdown file
+            dir: 'course',
+        });
+
+        assert(LEXED[0].content.indexOf('https://github.com/GitBookIO/javascript/blob/src/something.cpp') !== -1);
     });
 });
