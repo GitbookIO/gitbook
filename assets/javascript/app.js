@@ -41,5 +41,8 @@ require([
 
         // Show progress
         progress.show();
+
+        // Focus on content
+        $(".book-body").focus();
     });
 });
