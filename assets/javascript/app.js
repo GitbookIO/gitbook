@@ -2,11 +2,13 @@ require([
     "jQuery",
     "utils/storage",
     "utils/analytic",
+    "utils/sharing",
+
     "core/state",
     "core/exercise",
     "core/progress",
     "core/sidebar"
-], function($, storage, analytic, _state, exercise, progress, sidebar){
+], function($, storage, analytic, sharing, _state, exercise, progress, sidebar){
     $(document).ready(function() {
         var state = _state();
         var $book = state.$book;
@@ -29,6 +31,9 @@ require([
 
         // Bind exercise
         exercise.init();
+
+        // Bind sharing button
+        sharing.init();
 
         // Show progress
         progress.show();
