@@ -2,7 +2,7 @@
 
 {% block title %}{{ progress.current.title }}{% parent %}{% endblock %}
 {% block content %}
-<div class="book {% if _input == "README.md" %}with-summary{% endif %}" data-github="{{ githubId }}" data-level="{{ progress.current.level }}">
+<div class="book with-summary" data-github="{{ githubId }}" data-level="{{ progress.current.level }}">
     {% include "includes/book/header.html" %}
     {% include "includes/book/summary.html" %}
     <div class="book-body">

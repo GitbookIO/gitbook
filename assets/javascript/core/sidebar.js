@@ -6,6 +6,7 @@ define([
 
     // Toggle sidebar with or withour animation
     var toggleSidebar = function(_state, animation) {
+        if (-state != null && isOpen() == _state) return;
         if (animation == null) animation = true;
 
         var $book = state().$book;
@@ -31,7 +32,7 @@ define([
         });
 
         // Init last state if not mobile and not homepage
-        if (!isOpen()) toggleSidebar(platform.isMobile ? false : storage.get("sidebar", false), false);
+        toggleSidebar(platform.isMobile ? false : storage.get("sidebar", true), false);
     };
 
     return {
