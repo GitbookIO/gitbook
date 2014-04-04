@@ -25,6 +25,7 @@ prog
 .command('build [source_dir]')
 .description('Build a gitbook from a directory')
 .option('-o, --output <directory>', 'Path to output directory, defaults to ./_book')
+.option('-tp, --templatePath <directory>', 'Path to the template directory, defaults to the templates directory')
 .option('-t, --title <name>', 'Name of the book to generate, defaults to repo name')
 .option('-i, --intro <intro>', 'Description of the book to generate')
 .option('-g, --github <repo_path>', 'ID of github repo like : username/repo')
@@ -76,6 +77,7 @@ prog
 .description('Build then serve a gitbook from a directory')
 .option('-p, --port <port>', 'Port for server to listen on', 4000)
 .option('-o, --output <directory>', 'Path to output directory, defaults to ./_book')
+.option('-tp, --templatePath <directory>', 'Path to the template directory, defaults to the templates directory')
 .option('-t, --title <name>', 'Name of the book to generate, defaults to repo name')
 .option('-g, --github <repo_path>', 'ID of github repo like : username/repo')
 .action(function(dir, options) {

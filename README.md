@@ -28,6 +28,7 @@ $ gitbook build ./repository --output=./outputFolder
 Options for commands `build` and `serve` are:
 
 ```
+-tp, --templatePath <directory> Path to the template directory, defaults to the templates directory
 -t, --title <name> Name of the book to generate, defaults to repo name
 -i, --intro <intro> Description of the book to generate
 -g, --github <repo_path> ID of github repo like : username/repo
@@ -75,19 +76,19 @@ An exercise is defined by 4 simple parts:
 Exercises need to start and finish with a separation bar (```---``` or ```***```). It should contain 3 code elements (**base**, **solution** and **validation**).
 
     ---
-    
+
     Define a variable `x` equal to 10.
-    
+
     ```js
-    var x = 
+    var x =
     ```
-    
+
     ```js
     var x = 10;
     ```
-    
+
     ```js
     assert(x == 10);
     ```
-    
+
     ---
