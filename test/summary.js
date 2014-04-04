@@ -37,12 +37,9 @@ describe('Summary parsing', function () {
     });
 
     it('should normalize paths from .md to .html', function() {
-        assert.equal(LEXED.chapters[0].path,'chapter-1/README.html');
-        assert.equal(LEXED.chapters[0]._path,'chapter-1/README.md');
-        assert.equal(LEXED.chapters[1].path,'chapter-2/README.html');
-        assert.equal(LEXED.chapters[1]._path,'chapter-2/README.md');
-        assert.equal(LEXED.chapters[2].path,'chapter-3/README.html');
-        assert.equal(LEXED.chapters[2]._path,'chapter-3/README.md');
+        assert.equal(LEXED.chapters[0].path,'chapter-1/README.md');
+        assert.equal(LEXED.chapters[1].path,'chapter-2/README.md');
+        assert.equal(LEXED.chapters[2].path,'chapter-3/README.md');
     });
 
     it('should detect levels correctly', function() {

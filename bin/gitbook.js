@@ -1,6 +1,7 @@
 #! /usr/bin/env node
 
 // Requires
+var Q = require('q');
 var _ = require('lodash');
 var path = require('path');
 var prog = require('commander');
@@ -10,9 +11,14 @@ var fs = require('fs');
 var pkg = require('../package.json');
 var generate = require("../lib/generate");
 var parse = require("../lib/parse");
+var generators = require("../lib/generate").generators;
 
 var utils = require('./utils');
 
+var logError = function(err) {
+    console.log(err.message || err);
+    return Q.reject(err);
+};
 
 // General options
 prog
@@ -25,6 +31,7 @@ prog
 .command('build [source_dir]')
 .description('Build a gitbook from a directory')
 .option('-o, --output <directory>', 'Path to output directory, defaults to ./_book')
+.option('-g, --generator <name>', 'Change generator, defaults to site, availables are: '+_.keys(generators).join(", "))
 .option('-t, --title <name>', 'Name of the book to generate, defaults to repo name')
 .option('-i, --intro <intro>', 'Description of the book to generate')
 .option('-g, --github <repo_path>', 'ID of github repo like : username/repo')
@@ -55,20 +62,19 @@ prog
         var title = options.title || utils.titleCase(repo);
 
         return generate.folder(
-            dir,
-            outputDir,
             {
+                input: dir,
+                output: outputDir,
                 title: title,
                 description: options.intro,
-                github: githubID
+                github: githubID,
+                generator: options.generator
             }
         );
     })
     .then(function(output) {
         console.log("Successfuly built !");
-    }, function(err) {
-        throw err;
-    })
+    }, logError)
     .then(_.constant(outputDir));
 });
 
@@ -85,15 +91,13 @@ prog
     .then(function(outputDir) {
         console.log();
         console.log('Starting server ...');
-        return utils.serveDir(outputDir, options.port);
+        return utils.serveDir(outputDir, options.port)
+        .fail(logError);
     })
     .then(function() {
         console.log('Serving book on http://localhost:'+options.port);
         console.log();
         console.log('Press CTRL+C to quit ...');
-    })
-    .fail(function(err) {
-        console.error(err);
     });
 });
 

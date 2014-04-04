@@ -16,7 +16,7 @@
         {% for item in summary.chapters %}
             <li {% if item._path == _input %}class="active"{% endif %} data-level="{{ item.level }}">
                 {% if item.path %}
-                <a href="{{ basePath }}/{{ item.path }}">
+                <a href="{{ basePath }}/{{ item.path|mdLink }}">
                     <i class="fa fa-check"></i> <b>{{ item.level }})</b> {{ item.title }}
                 </a>
                 {% else %}
@@ -27,7 +27,7 @@
                     {% for article in item.articles %}
                         <li {% if article._path == _input %}class="active"{% endif %} data-level="{{ article.level }}">
                             {% if article.path %}
-                            <a href="{{ basePath }}/{{ article.path }}">
+                            <a href="{{ basePath }}/{{ article.path|mdLink }}">
                                 <i class="fa fa-check"></i> <b>{{ article.level }})</b> {{ article.title }}
                             </a>
                             {% else %}

@@ -1,10 +1,10 @@
 <div class="page-footer">
     {% if _input == "README.md" %}
-        <a href="{{ basePath }}/{{ progress.current.next.path }}" class="navigation-link">Start</a>
+        <a href="{{ basePath }}/{{ progress.current.next.path|mdLink }}" class="navigation-link">Start</a>
     {% else %}
         {% if progress.current.next %}
             {% if progress.current.next.path %}
-            <a href="{{ basePath }}/{{ progress.current.next.path }}" class="navigation-link next">Next</a>
+            <a href="{{ basePath }}/{{ progress.current.next.path|mdLink }}" class="navigation-link next">Next</a>
             {% else %}
             <div class="navigation-link coming-soon">Coming soon</div>
             {% endif %}
