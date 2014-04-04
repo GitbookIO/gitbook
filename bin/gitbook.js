@@ -101,15 +101,6 @@ prog
     });
 });
 
-prog
-.command('lex <page_file>')
-.description('Parse a page file into sections, display JSON dump')
-.action(function(page_file) {
-    var parsed = parse.page(fs.readFileSync(page_file, 'utf-8'));
-
-    console.log(JSON.stringify(parsed, null, 4));
-});
-
 
 
 // Parse and fallback to help if no args
