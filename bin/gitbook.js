@@ -57,9 +57,9 @@ prog
         var title = options.title || utils.titleCase(repo);
 
         return generate.folder(
-            dir,
-            outputDir,
             {
+                input: dir,
+                output: outputDir,
                 title: title,
                 description: options.intro,
                 github: githubID,
