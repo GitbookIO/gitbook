@@ -4,8 +4,7 @@
 
 {% block content %}
     {% for page in pages %}
-    <hr>
-    <article id="{{ page.path }}">
+    <article id="{{ page.path }}" style="page-break-after: always;">
     {% for section in page.content %}
         {% if section.type == "normal" %}
             {% autoescape false %}{{ section.content }}{% endautoescape %}
