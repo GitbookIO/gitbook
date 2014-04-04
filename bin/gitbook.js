@@ -28,6 +28,7 @@ prog
 .option('-t, --title <name>', 'Name of the book to generate, defaults to repo name')
 .option('-i, --intro <intro>', 'Description of the book to generate')
 .option('-g, --github <repo_path>', 'ID of github repo like : username/repo')
+.option('-gh, --githubHost <url>', 'The url of the github host (defaults to https://github.com/')
 .action(buildFunc = function(dir, options) {
     dir = dir || process.cwd();
     outputDir = options.output || path.join(dir, '_book');
@@ -78,6 +79,7 @@ prog
 .option('-o, --output <directory>', 'Path to output directory, defaults to ./_book')
 .option('-t, --title <name>', 'Name of the book to generate, defaults to repo name')
 .option('-g, --github <repo_path>', 'ID of github repo like : username/repo')
+.option('-gh, --githubHost <url>', 'The url of the github host (defaults to https://github.com/')
 .action(function(dir, options) {
     buildFunc(dir, options)
     .then(function(outputDir) {
