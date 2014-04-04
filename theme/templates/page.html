@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    {% for page in pages %}
+    <hr>
+    <article id="{{ page.path }}">
+    {% for section in page.content %}
+        {% if section.type == "normal" %}
+            {% autoescape false %}{{ section.content }}{% endautoescape %}
+        {% endif %}
+    {% endfor %}
+    </article>
+    {% endfor %}
+{% endblock %}
+
+{% block javascript %}{% endblock %}
