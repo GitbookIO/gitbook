@@ -1,7 +1,7 @@
 GitBook
 =======
 
-GiBook is a command line tool (and Node.js library) for building beautiful programming books and exercises using GitHub/Git and Markdown. You can see an example: [Learn Javascript](http://gitbookio.github.io/javascript/).
+GitBook is a command line tool (and Node.js library) for building beautiful programming books and exercises using GitHub/Git and Markdown. You can see an example: [Learn Javascript](http://gitbookio.github.io/javascript/).
 
 ![Image](https://raw.github.com/GitbookIO/gitbook/master/preview.png)
 
