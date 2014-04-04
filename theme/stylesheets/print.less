@@ -8,3 +8,13 @@ body {
 @page {
     margin: 1.5cm;
 }
+
+section {
+    page-break-after: always;
+
+    article {
+        &:after {
+            border-bottom: 1px solid #ccc;
+        }
+    }
+}

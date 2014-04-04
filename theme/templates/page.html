@@ -9,13 +9,37 @@
 
 {% block content %}
     {# Cover #}
+    <section id="cover">
+        <h1>{{ title }}</h1>
+        <h2>By @{{ githubAuthor }}</h2>
+    </section>
 
     {# Summary #}
-
+    <section id="summary">
+        <ul class="summary">
+            <li>
+                <a href="#README.md">Introduction</a>
+            </li>
+            {% for item in summary.chapters %}
+                <li>
+                    <a href="#{{ item.path }}"><b>{{ item.level }})</b> {{ item.title }}</a>
+                    {% if item.articles.length > 0 %}
+                    <ul>
+                        {% for article in item.articles %}
+                            <li>
+                                <a href="#{{ article.path }}"><b>{{ article.level }})</b> {{ article.title }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
 
     {# Pages content #}
     {% for page in pages %}
-    <article id="{{ page.path }}" style="page-break-after: always;">
+    <article id="{{ page.path }}">
     {% for section in page.content %}
         {% if section.type == "normal" %}
             {% autoescape false %}{{ section.content }}{% endautoescape %}
