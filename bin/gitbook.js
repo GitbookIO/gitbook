@@ -1,6 +1,7 @@
 #! /usr/bin/env node
 
 // Requires
+var Q = require('q');
 var _ = require('lodash');
 var path = require('path');
 var prog = require('commander');
@@ -14,6 +15,10 @@ var generators = require("../lib/generate").generators;
 
 var utils = require('./utils');
 
+var logError = function(err) {
+    console.log(err.message || err);
+    return Q.reject(err);
+};
 
 // General options
 prog
@@ -69,9 +74,7 @@ prog
     })
     .then(function(output) {
         console.log("Successfuly built !");
-    }, function(err) {
-        throw err;
-    })
+    }, logError)
     .then(_.constant(outputDir));
 });
 
@@ -88,15 +91,13 @@ prog
     .then(function(outputDir) {
         console.log();
         console.log('Starting server ...');
-        return utils.serveDir(outputDir, options.port);
+        return utils.serveDir(outputDir, options.port)
+        .fail(logError);
     })
     .then(function() {
         console.log('Serving book on http://localhost:'+options.port);
         console.log();
         console.log('Press CTRL+C to quit ...');
-    })
-    .fail(function(err) {
-        console.error(err);
     });
 });
 
