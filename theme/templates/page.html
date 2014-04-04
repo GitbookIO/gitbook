@@ -2,7 +2,18 @@
 
 {% block title %}{{ title }}{% endblock %}
 
+{% block style %}
+<link rel="stylesheet" href="{{ staticBase }}/print.css">
+{% endblock %}
+
+
 {% block content %}
+    {# Cover #}
+
+    {# Summary #}
+
+
+    {# Pages content #}
     {% for page in pages %}
     <article id="{{ page.path }}" style="page-break-after: always;">
     {% for section in page.content %}
