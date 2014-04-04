@@ -15,8 +15,10 @@ define(function(){
         get: function(key, def) {
             key = baseKey+":"+key;
             try {
-                return JSON.parse(localStorage[key]) || def;
+                var v = JSON.parse(localStorage[key]);
+                return v == null ? def : v;;
             } catch(err) {
+                console.error(err);
                 return localStorage[key] || def;
             }
         },
