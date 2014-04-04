@@ -7,16 +7,7 @@
     {% include "includes/book/summary.html" %}
     <div class="book-body" tabindex="-1">
         <div class="page-wrapper">
-            <div class="book-progress">
-                <div class="bar">
-                    <div class="inner" style="width: {{ progress.percent }}%;min-width: {{ progress.prevPercent }}%;"></div>
-                </div>
-                <div class="chapters">
-                {% for p in progress.chapters %}
-                    <a href="{{ basePath }}/{{ p.path }}" title="{{ p.title }}" class="chapter {% if p.done %}done{% endif %} {% if p.level.length == 1 %}new-chapter{% endif %}" data-progress="{{ p.level }}" style="left: {{ p.percent }}%;"></a>
-                {% endfor %}
-                </div>
-            </div>
+            {% include "includes/book/progress.html" %}
 
             <div class="page-inner">
             {% for section in content %}
@@ -30,21 +21,7 @@
             {% endfor %}
             </div>
 
-            <div class="page-footer">
-                {% if _input == "README.md" %}
-                    <a href="{{ basePath }}/{{ progress.current.next.path }}" class="navigation-link">Start</a>
-                {% else %}
-                    {% if progress.current.next %}
-                        {% if progress.current.next.path %}
-                        <a href="{{ basePath }}/{{ progress.current.next.path }}" class="navigation-link next">Next</a>
-                        {% else %}
-                        <div class="navigation-link coming-soon">Coming soon</div>
-                        {% endif %}
-                    {% else %}
-                    <div class="navigation-link finished">Finished!</div>
-                    {% endif %}
-                {% endif %}
-            </div>
+            {% include "includes/book/footer.html" %}
         </div>
     </div>
 </div>
