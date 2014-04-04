@@ -33,7 +33,8 @@ module.exports = function (grunt) {
                         "jQuery": 'vendors/jquery',
                         "lodash": 'vendors/lodash',
                         "requireLib": 'vendors/require',
-                        "Mousetrap": 'vendors/mousetrap'
+                        "Mousetrap": 'vendors/mousetrap',
+                        "mixpanel": 'vendors/mixpanel'
                     },
                     shim: {
                         'jQuery': {
@@ -44,6 +45,9 @@ module.exports = function (grunt) {
                         },
                         'Mousetrap': {
                             exports: 'Mousetrap'
+                        },
+                        'mixpanel': {
+                            exports: 'mixpanel'
                         }
                     }
                 }

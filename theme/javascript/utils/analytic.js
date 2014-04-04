@@ -1,4 +1,8 @@
-define([], function() {
+define([
+    "mixpanel"
+], function(mixpanel) {
+    mixpanel.init("01eb2b950ae09a5fdb15a98dcc5ff20e");
+
     var isAvailable = function() {
         return (typeof mixpanel !== "undefined");
     };
