@@ -31,7 +31,7 @@ prog
 .command('build [source_dir]')
 .description('Build a gitbook from a directory')
 .option('-o, --output <directory>', 'Path to output directory, defaults to ./_book')
-.option('-g, --generator <name>', 'Change generator, defaults to site, availables are: '+_.keys(generators).join(", "))
+.option('-f, --format <name>', 'Change generation format, defaults to site, availables are: '+_.keys(generators).join(", "))
 .option('-t, --title <name>', 'Name of the book to generate, defaults to repo name')
 .option('-i, --intro <intro>', 'Description of the book to generate')
 .option('-g, --github <repo_path>', 'ID of github repo like : username/repo')
@@ -69,7 +69,7 @@ prog
                 title: title,
                 description: options.intro,
                 github: githubID,
-                generator: options.generator,
+                generator: options.format,
                 theme: options.theme
             }
         );
@@ -85,7 +85,7 @@ prog
 .description('Build then serve a gitbook from a directory')
 .option('-p, --port <port>', 'Port for server to listen on', 4000)
 .option('-o, --output <directory>', 'Path to output directory, defaults to ./_book')
-.option('-g, --generator <name>', 'Change generator, defaults to site, availables are: '+_.keys(generators).join(", "))
+.option('-f, --format <name>', 'Change generation format, defaults to site, availables are: '+_.keys(generators).join(", "))
 .option('-t, --title <name>', 'Name of the book to generate, defaults to repo name')
 .option('-g, --github <repo_path>', 'ID of github repo like : username/repo')
 .option('-gh, --githubHost <url>', 'The url of the github host (defaults to https://github.com/')
