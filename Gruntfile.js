@@ -16,7 +16,7 @@ module.exports = function (grunt) {
                     optimization: 2
                 },
                 files: {
-                    "assets/static/style.css": "assets/stylesheets/main.less"
+                    "theme/assets/style.css": "theme/stylesheets/main.less"
                 }
             }
         },
@@ -24,8 +24,8 @@ module.exports = function (grunt) {
             compile: {
                 options: {
                     name: "app",
-                    baseUrl: "assets/javascript/",
-                    out: "assets/static/app.js",
+                    baseUrl: "theme/javascript/",
+                    out: "theme/assets/app.js",
                     preserveLicenseComments: false,
                     optimize: "uglify",
                     include: ["requireLib"],
