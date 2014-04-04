@@ -10,6 +10,7 @@ var fs = require('fs');
 var pkg = require('../package.json');
 var generate = require("../lib/generate");
 var parse = require("../lib/parse");
+var generators = require("../lib/generate").generators;
 
 var utils = require('./utils');
 
@@ -25,6 +26,7 @@ prog
 .command('build [source_dir]')
 .description('Build a gitbook from a directory')
 .option('-o, --output <directory>', 'Path to output directory, defaults to ./_book')
+.option('-g, --generator <name>', 'Change generator, defaults to site, availables are: '+_.keys(generators).join(", "))
 .option('-t, --title <name>', 'Name of the book to generate, defaults to repo name')
 .option('-i, --intro <intro>', 'Description of the book to generate')
 .option('-g, --github <repo_path>', 'ID of github repo like : username/repo')
@@ -60,7 +62,8 @@ prog
             {
                 title: title,
                 description: options.intro,
-                github: githubID
+                github: githubID,
+                generator: options.generator
             }
         );
     })
