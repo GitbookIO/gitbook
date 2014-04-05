@@ -44,7 +44,7 @@
     {% for item in summary.chapters %}
         {% if item.articles.length > 0 %}
         <section>
-            <article class="new-chapter">
+            <article id="{{ item.path }}" class="new-chapter">
                 <h1>{{ item.title }}</h1>
             </article>
 
