@@ -1,18 +1,26 @@
 define([
+    "lodash",
     "mixpanel"
-], function(mixpanel) {
-    mixpanel.init("01eb2b950ae09a5fdb15a98dcc5ff20e");
+], function(_, mixpanel) {
+    mixpanel.init("01eb2b950ae09a5fdb15a98dcc5ff20e", {
+        loaded: function() {
+            track("View");
+        }
+    });
 
     var isAvailable = function() {
         return (typeof mixpanel !== "undefined");
     };
 
-    var track = function(event, data) {
+    var track = function(e, data) {
         if (!isAvailable()) {
-            console.log("tracking not available!");
+            console.warn("tracking not available!");
             return;
         }
-        mixpanel.track(event, data);
+        console.log("track", e);
+        mixpanel.track(e, _.extend(data || {}, {
+            'domain': window.location.host
+        }));
     };
 
     return {

@@ -14,6 +14,7 @@ define(function(){
         },
         get: function(key, def) {
             key = baseKey+":"+key;
+            if (localStorage[key] === undefined) return def;
             try {
                 var v = JSON.parse(localStorage[key]);
                 return v == null ? def : v;;

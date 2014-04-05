@@ -17,9 +17,6 @@ require([
         // Initialize storage
         storage.setBaseKey(state.githubId);
 
-        // Tract page view
-        analytic.track("View");
-
         // Init sidebar
         sidebar.init();
 
