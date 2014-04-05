@@ -3,6 +3,7 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block style %}
+{% parent %}
 <link rel="stylesheet" href="{{ staticBase }}/print.css">
 {% endblock %}
 
@@ -11,23 +12,25 @@
     {# Cover #}
     <section id="cover">
         <h1>{{ title }}</h1>
-        <h2>By @{{ githubAuthor }}</h2>
+        <h2>By <a href="{{ githubHost }}{{ githubAuthor }}">@{{ githubAuthor }}</a></h2>
     </section>
 
     {# Summary #}
     <section id="summary">
+        <h1>Summary</h1>
+
         <ul class="summary">
             <li>
                 <a href="#README.md">Introduction</a>
             </li>
             {% for item in summary.chapters %}
                 <li>
-                    <a href="#{{ item.path }}"><b>{{ item.level }})</b> {{ item.title }}</a>
+                    <a href="#{{ item.path }}">{{ item.level }}) {{ item.title }}</a>
                     {% if item.articles.length > 0 %}
                     <ul>
                         {% for article in item.articles %}
                             <li>
-                                <a href="#{{ article.path }}"><b>{{ article.level }})</b> {{ article.title }}</a>
+                                <a href="#{{ article.path }}">{{ article.level }}) {{ article.title }}</a>
                             </li>
                         {% endfor %}
                     </ul>
@@ -38,14 +41,24 @@
     </section>
 
     {# Pages content #}
-    {% for page in pages %}
-    <article id="{{ page.path }}">
-    {% for section in page.content %}
-        {% if section.type == "normal" %}
-            {% autoescape false %}{{ section.content }}{% endautoescape %}
+    {% for item in summary.chapters %}
+        {% if item.articles.length > 0 %}
+        <section>
+            <article class="new-chapter">
+                <h1>{{ item.title }}</h1>
+            </article>
+
+            {% for article in item.articles %}
+                <article id="{{ article.path }}">
+                {% for section in pages[article.path].content %}
+                        {% if section.type == "normal" %}
+                            {% autoescape false %}{{ section.content }}{% endautoescape %}
+                        {% endif %}
+                    {% endfor %}
+                </article>
+            {% endfor %}
+        </section>
         {% endif %}
-    {% endfor %}
-    </article>
     {% endfor %}
 {% endblock %}
 
