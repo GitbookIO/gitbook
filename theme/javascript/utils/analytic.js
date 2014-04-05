@@ -9,7 +9,10 @@ define([
     });
 
     var isAvailable = function() {
-        return (typeof mixpanel !== "undefined");
+        return (
+            typeof mixpanel !== "undefined" &&
+            typeof mixpanel.track === "function"
+        );
     };
 
     var track = function(e, data) {
