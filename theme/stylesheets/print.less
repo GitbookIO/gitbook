@@ -1,5 +1,6 @@
 @import "highlight.less";
 
+
 body {
     font: 12pt Georgia, "Times New Roman", Times, serif;
     line-height: 1.3;
@@ -57,11 +58,18 @@ section {
     article {
         margin: 1.5cm;
 
+        /* Big centered title */
         &.new-chapter {
             page-break-after: always;
             font-size: 0.6cm;
             text-align: center;
             padding: 3cm 0cm;
+
+            border-top: 1px solid #ccc;
+
+            @media print {
+                border: none;
+            }
         }
     }
 }
