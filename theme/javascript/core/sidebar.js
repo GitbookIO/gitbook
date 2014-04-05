@@ -31,8 +31,10 @@ define([
             toggleSidebar();
         });
 
-        // Init last state if not mobile and not homepage
-        toggleSidebar(platform.isMobile ? false : storage.get("sidebar", true), false);
+        // Init last state if not mobile
+        if (!platform.isMobile) {
+            toggleSidebar(storage.get("sidebar", true), false);
+        }
     };
 
     return {
