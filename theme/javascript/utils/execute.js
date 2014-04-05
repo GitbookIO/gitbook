@@ -1,5 +1,12 @@
-define(function(){
-    var evalJS = function(code, callback) {
+define([
+    "execute/javascript"
+], function(javascript) {
+    var LANGUAGES = {
+        "javascript": javascript
+    };
+
+
+    var evalJS = function(lang, code, callback) {
         var ready = false;
         var finished = false;
 
@@ -11,7 +18,7 @@ define(function(){
             return callback.apply(null, arguments);
         };
 
-        var jsrepl;
+        var repl;
 
         // Handles all our events
         var eventHandler = function(data, eventType) {
@@ -42,14 +49,14 @@ define(function(){
                     // We're good to get results and stuff back now
                     ready = true;
                     // Eval our code now that the runtime is ready
-                    jsrepl.eval(code);
+                    repl.eval(code);
                     break;
                 default:
                     console.log('Unhandled event =', eventType, 'data =', data);
             }
         };
 
-        jsrepl = new JSREPL({
+        repl = new lang.REPL({
             input: eventHandler,
             output: eventHandler,
             result: eventHandler,
@@ -61,16 +68,16 @@ define(function(){
             }
         });
 
-        jsrepl.loadLanguage('javascript', eventHandler);
+        repl.loadLanguage(lang.id, eventHandler);
     };
 
+    var execute = function(lang, solution, validation, callback) {
+        // Check language is supported
+        if (!LANGUAGES[lang]) return callback(new Error("Language '"+lang+"' not available for execution"));
 
-    var ass = "function assert(condition, message) { \nif (!condition) { \n throw message || \"Assertion failed\"; \n } \n }\n";   
-
-    var execute = function(solution, validation, callback) {
         // Validate with validation code
-        var code = [solution, ass, validation].join(";\n");
-        evalJS(code, function(err, res) {
+        var code = [solution, LANGUAGES[lang].assertCode, validation].join(";\n");
+        evalJS(LANGUAGES[lang], code, function(err, res) {
             if(err) return callback(err);
 
             if (res.type == "error") callback(new Error(res.value));

@@ -20,7 +20,7 @@ define([
 
             analytic.track("exercise.submit");
 
-            execute(editor.getValue(), codeValidation, function(err, result) {
+            execute("javascript", editor.getValue(), codeValidation, function(err, result) {
                 $exercise.toggleClass("return-error", err != null);
                 $exercise.toggleClass("return-success", err == null);
                 if (err) $exercise.find(".alert-danger").text(err.message || err);
