@@ -45,6 +45,10 @@ describe('Page parsing', function() {
         // HRs inserted correctly
         assert.equal(HR_LEXED[0].content.match(/<hr>/g).length, 2);
     });
+
+    it('should detect an exercise\'s language', function() {
+        assert.equal(LEXED[1].lang, 'py');
+    });
 });
 
 
