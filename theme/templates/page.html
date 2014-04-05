@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="{{ staticBase }}/print.css">
 {% endblock %}
 
-
+{% set exercise = 0 %}
 {% block content %}
     {# Cover #}
     <section id="cover">
@@ -53,6 +53,17 @@
                 {% for section in pages[article.path].content %}
                         {% if section.type == "normal" %}
                             {% autoescape false %}{{ section.content }}{% endautoescape %}
+                        {% elif section.type == "exercise" %}
+                            <div class="exercise">
+                                <div class="exercise-header">Exercise #{{ exercise }}</div>
+                                {% autoescape false %}{{ section.content }}{% endautoescape %}
+                                <pre>
+                                    <code>
+                                    {% autoescape false %}{{ section.code.base|code }}{% endautoescape %}
+                                    </code>
+                                </pre>
+                                {% set exercise = exercise + 1 %}
+                            </div>
                         {% endif %}
                     {% endfor %}
                 </article>
