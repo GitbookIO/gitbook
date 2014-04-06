@@ -1,15 +1,17 @@
 <div class="page-footer">
-    {% if _input == "README.md" %}
-        <a href="{{ basePath }}/{{ progress.current.next.path|mdLink }}" class="navigation-link">Start</a>
-    {% else %}
-        {% if progress.current.next %}
-            {% if progress.current.next.path %}
-            <a href="{{ basePath }}/{{ progress.current.next.path|mdLink }}" class="navigation-link next">Next</a>
+    {% if progress.current.next %}
+        {% if progress.current.next.path %}
+        <a href="{{ basePath }}/{{ progress.current.next.path|mdLink }}" class="navigation-link next">
+            {% if _input == "README.md" %}
+            Start
             {% else %}
-            <div class="navigation-link coming-soon">Coming soon</div>
+            Next
             {% endif %}
+        </a>
         {% else %}
-        <div class="navigation-link finished">Finished!</div>
+        <div class="navigation-link coming-soon">Coming soon</div>
         {% endif %}
+    {% else %}
+    <div class="navigation-link finished">Finished!</div>
     {% endif %}
 </div>
