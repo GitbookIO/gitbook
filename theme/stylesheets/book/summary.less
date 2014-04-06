@@ -1,7 +1,8 @@
 .book {
+    @searchHeight: 41px;
+
     .book-summary {
         @width: 250px;
-        @searchHeight: 41px;
 
         position: fixed;
         top: 40px;
@@ -36,16 +37,6 @@
                 .box-shadow(none);
             }
         }
-
-        &.with-search {
-            .book-search {
-                top: 0px;
-            }
-
-            ul.summary {
-                top: @searchHeight;
-            }
-        } 
 
         ul.summary {
             position: absolute;
@@ -135,6 +126,18 @@
     &.without-animation {
         .book-summary {
             .transition(none) !important;
+        }
+    }
+
+    &.with-search {
+        .book-summary {
+            .book-search {
+                top: 0px;
+            }
+
+            ul.summary {
+                top: @searchHeight;
+            }
         }
     }
 }

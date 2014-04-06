@@ -2,11 +2,11 @@ define([
     "jQuery",
     "lodash",
     "lunr",
-    "core/state",
-    "core/sidebar"
-], function($, _, lunr, state, sidebar) {
+    "core/state"
+], function($, _, lunr, state) {
     var index = null;
-    var $searchInput = sidebar.$el.find(".book-search input");
+    var $searchBar = state.$book.find(".book-search");
+    var $searchInput = $searchBar.find("input");
 
     // Load complete index
     var loadIndex = function() {
@@ -37,7 +37,7 @@ define([
         if (state != null && isSearchOpen() == _state) return;
 
         
-        sidebar.$el.toggleClass("with-search", _state);
+        state.$book.toggleClass("with-search", _state);
 
         // If search bar is open: focus input
         if (isSearchOpen()) {
@@ -49,7 +49,7 @@ define([
 
     // Return true if search bar is open
     var isSearchOpen = function() {
-        return sidebar.$el.hasClass("with-search");
+        return state.$book.hasClass("with-search");
     };
 
 
