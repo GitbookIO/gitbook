@@ -38,7 +38,7 @@ define([
 
     // Prepare all exercise
     var init = function() {
-        state().$book.find("section.exercise").each(function() {
+        state.$book.find("section.exercise").each(function() {
             prepareExercise($(this));
         });
     };

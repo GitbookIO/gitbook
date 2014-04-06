@@ -6,7 +6,7 @@ define([
 ], function(_, $, storage, state) {
     // Get current level
     var getCurrentLevel = function() {
-        return state().level;
+        return state.level;
     };
 
     // Return all levels

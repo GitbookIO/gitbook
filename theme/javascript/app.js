@@ -10,9 +10,8 @@ require([
     "core/progress",
     "core/sidebar",
     "core/search"
-], function($, storage, analytic, sharing, _state, keyboard, exercise, progress, sidebar, search){
+], function($, storage, analytic, sharing, state, keyboard, exercise, progress, sidebar, search){
     $(document).ready(function() {
-        var state = _state();
         var $book = state.$book;
 
         // Initialize storage

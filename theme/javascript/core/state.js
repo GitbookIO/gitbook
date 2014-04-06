@@ -1,14 +1,12 @@
 define([
     "jQuery"
 ], function() {
-    return function() {
-        var $book = $(".book");
+    var $book = $(".book");
 
-        return {
-            '$book': $book,
+    return {
+        '$book': $book,
 
-            'githubId': $book.data("github"),
-            'level': $book.data("level")
-        };
+        'githubId': $book.data("github"),
+        'level': $book.data("level")
     };
 });
