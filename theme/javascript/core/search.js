@@ -37,11 +37,11 @@ define([
     var toggleSearch = function(_state) {
         if (state != null && isSearchOpen() == _state) return;
 
-        
         state.$book.toggleClass("with-search", _state);
 
         // If search bar is open: focus input
         if (isSearchOpen()) {
+            sidebar.toggle(true);
             $searchInput.focus();
         } else {
             $searchInput.blur();
