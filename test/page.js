@@ -47,7 +47,7 @@ describe('Page parsing', function() {
     });
 
     it('should detect an exercise\'s language', function() {
-        assert.equal(LEXED[1].lang, 'py');
+        assert.equal(LEXED[1].lang, 'python');
     });
 });
 
