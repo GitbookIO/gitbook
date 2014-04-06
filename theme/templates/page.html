@@ -87,6 +87,33 @@
         </section>
         {% endif %}
     {% endfor %}
+
+
+    {# Exercise solutions #}
+    {% if exercise > 0 %}
+        {% set exercise = 0 %}
+        <section>
+            <article class="new-chapter">
+                <h1>Exercise Solutions</h1>
+            </article>
+            <article>
+            {% for item in summary.chapters %}
+                {% for article in item.articles %}
+                    {% for section in pages[article.path].content %}
+                        {% if section.type == "exercise" %}
+                            <div class="exercise">
+                                <div class="exercise-header">Exercise #{{ exercise }}</div>
+                                {% autoescape false %}{{ section.content }}{% endautoescape %}
+                                <pre><code>{% autoescape false %}{{ section.code.solution|code }}{% endautoescape %}</code></pre>
+                                {% set exercise = exercise + 1 %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            {% endfor %}
+            </article>
+        </section>
+    {% endif %}
 {% endblock %}
 
 {% block javascript %}{% endblock %}
