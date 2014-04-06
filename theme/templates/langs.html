@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="book-langs-index">
+    <h1>{{ title }}</h1>
+
+    <ul class="languages">
+    {%  for lang in langs %}
+        <li>
+            <a href="{{ basePath}}/{{ lang.path }}">{{ lang.title }}</a>
+        </li>
+    {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+
+{% block javascript %}{% endblock %}
