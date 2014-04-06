@@ -23,6 +23,9 @@ define([
 
         var $summary = state().$book.find(".book-summary");
         $summary.toggleClass("with-search", _state);
+
+        // If search bar is open: focus input
+        if (isSearchOpen()) $summary.find(".book-search input").focus();
     };
 
     // Return true if sidebar is open
