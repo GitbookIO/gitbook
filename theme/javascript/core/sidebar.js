@@ -1,12 +1,9 @@
 define([
     "utils/storage",
     "utils/platform",
-    "core/state",
-    "core/search"
-], function(storage, platform, state, search) {
+    "core/state"
+], function(storage, platform, state) {
     var $summary = state.$book.find(".book-summary");
-    var $searchInput = $summary.find(".book-search input")
-
 
     // Toggle sidebar with or withour animation
     var toggleSidebar = function(_state, animation) {
@@ -19,29 +16,9 @@ define([
         storage.set("sidebar", isOpen());
     };
 
-    // Toggle search
-    var toggleSearch = function(_state) {
-        if (state != null && isSearchOpen() == _state) return;
-
-        
-        $summary.toggleClass("with-search", _state);
-
-        // If search bar is open: focus input
-        if (isSearchOpen()) {
-            $searchInput.focus();
-        } else {
-
-        }
-    };
-
     // Return true if sidebar is open
     var isOpen = function() {
         return state.$book.hasClass("with-summary");
-    };
-
-    // Return true if search bar is open
-    var isSearchOpen = function() {
-        return $summary.hasClass("with-search");
     };
 
     // Prepare sidebar: state and toggle button
@@ -56,29 +33,11 @@ define([
         if (!platform.isMobile) {
             toggleSidebar(storage.get("sidebar", true), false);
         }
-
-        // Toggle search
-        state.$book.find(".book-header .toggle-search").click(function(e) {
-            e.preventDefault();
-            toggleSearch();
-        });
-
-        $searchInput.keyup(function(e) {
-            var key = (e.keyCode ? e.keyCode : e.which);
-            var q = $(this).val();
-
-            if (key == 27) {
-                e.preventDefault();
-                toggleSearch(false);
-                return;
-            }
-            console.log("search", q);
-        });
     };
 
     return {
+        $el: $summary,
         init: init,
-        toggle: toggleSidebar,
-        toggleSearch: toggleSearch
+        toggle: toggleSidebar
     }
 });

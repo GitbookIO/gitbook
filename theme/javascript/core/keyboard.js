@@ -2,8 +2,9 @@ define([
     "jQuery",
     "Mousetrap",
     "core/navigation",
-    "core/sidebar"
-], function($, Mousetrap, navigation, sidebar){
+    "core/sidebar",
+    "core/search"
+], function($, Mousetrap, navigation, sidebar, search){
     // Bind keyboard shortcuts
     var init = function() {
         // Next
@@ -26,12 +27,13 @@ define([
 
         // Toggle Search
         Mousetrap.bind(['f'], function(e) {
-            sidebar.toggleSearch();
+            search.toggle();
             return false;
         });
     };
 
     return {
-        init: init
+        init: init,
+        search: search
     };
 });

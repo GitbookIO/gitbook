@@ -19067,6 +19067,49 @@ define('utils/platform',[], function() {
         isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
     };
 });
+define('core/sidebar',[
+    "utils/storage",
+    "utils/platform",
+    "core/state"
+], function(storage, platform, state) {
+    var $summary = state.$book.find(".book-summary");
+
+    // Toggle sidebar with or withour animation
+    var toggleSidebar = function(_state, animation) {
+        if (state != null && isOpen() == _state) return;
+        if (animation == null) animation = true;
+
+        state.$book.toggleClass("without-animation", !animation);
+        state.$book.toggleClass("with-summary", _state);
+
+        storage.set("sidebar", isOpen());
+    };
+
+    // Return true if sidebar is open
+    var isOpen = function() {
+        return state.$book.hasClass("with-summary");
+    };
+
+    // Prepare sidebar: state and toggle button
+    var init = function() {
+        // Toggle summary
+        state.$book.find(".book-header .toggle-summary").click(function(e) {
+            e.preventDefault();
+            toggleSidebar();
+        });
+
+        // Init last state if not mobile
+        if (!platform.isMobile) {
+            toggleSidebar(storage.get("sidebar", true), false);
+        }
+    };
+
+    return {
+        $el: $summary,
+        init: init,
+        toggle: toggleSidebar
+    }
+});
 /**
  * lunr - http://lunrjs.com - A bit like Solr, but much smaller and not as bright - 0.5.2
  * Copyright (C) 2014 Oliver Nightingale
@@ -20952,8 +20995,11 @@ define('core/search',[
     "jQuery",
     "lodash",
     "lunr",
-], function($, _, lunr) {
+    "core/state",
+    "core/sidebar"
+], function($, _, lunr, state, sidebar) {
     var index = null;
+    var $searchInput = sidebar.$el.find(".book-search input");
 
     // Load complete index
     var loadIndex = function() {
@@ -20979,74 +21025,29 @@ define('core/search',[
         return results;
     };
 
-
-    var init = function() {
-        loadIndex();
-    };
-
-    return {
-        init: init,
-        search: search
-    };
-});
-define('core/sidebar',[
-    "utils/storage",
-    "utils/platform",
-    "core/state",
-    "core/search"
-], function(storage, platform, state, search) {
-    var $summary = state.$book.find(".book-summary");
-    var $searchInput = $summary.find(".book-search input")
-
-
-    // Toggle sidebar with or withour animation
-    var toggleSidebar = function(_state, animation) {
-        if (state != null && isOpen() == _state) return;
-        if (animation == null) animation = true;
-
-        state.$book.toggleClass("without-animation", !animation);
-        state.$book.toggleClass("with-summary", _state);
-
-        storage.set("sidebar", isOpen());
-    };
-
-    // Toggle search
+    // Toggle search bar
     var toggleSearch = function(_state) {
         if (state != null && isSearchOpen() == _state) return;
 
         
-        $summary.toggleClass("with-search", _state);
+        sidebar.$el.toggleClass("with-search", _state);
 
         // If search bar is open: focus input
         if (isSearchOpen()) {
             $searchInput.focus();
         } else {
-
+            $searchInput.blur();
         }
-    };
-
-    // Return true if sidebar is open
-    var isOpen = function() {
-        return state.$book.hasClass("with-summary");
     };
 
     // Return true if search bar is open
     var isSearchOpen = function() {
-        return $summary.hasClass("with-search");
+        return sidebar.$el.hasClass("with-search");
     };
 
-    // Prepare sidebar: state and toggle button
-    var init = function() {
-        // Toggle summary
-        state.$book.find(".book-header .toggle-summary").click(function(e) {
-            e.preventDefault();
-            toggleSidebar();
-        });
 
-        // Init last state if not mobile
-        if (!platform.isMobile) {
-            toggleSidebar(storage.get("sidebar", true), false);
-        }
+    var init = function() {
+        loadIndex();
 
         // Toggle search
         state.$book.find(".book-header .toggle-search").click(function(e) {
@@ -21069,16 +21070,17 @@ define('core/sidebar',[
 
     return {
         init: init,
-        toggle: toggleSidebar,
-        toggleSearch: toggleSearch
-    }
+        search: search,
+        toggle: toggleSearch
+    };
 });
 define('core/keyboard',[
     "jQuery",
     "Mousetrap",
     "core/navigation",
-    "core/sidebar"
-], function($, Mousetrap, navigation, sidebar){
+    "core/sidebar",
+    "core/search"
+], function($, Mousetrap, navigation, sidebar, search){
     // Bind keyboard shortcuts
     var init = function() {
         // Next
@@ -21101,13 +21103,14 @@ define('core/keyboard',[
 
         // Toggle Search
         Mousetrap.bind(['f'], function(e) {
-            sidebar.toggleSearch();
+            search.toggle();
             return false;
         });
     };
 
     return {
-        init: init
+        init: init,
+        search: search
     };
 });
 define('execute/javascript',[],function() {
