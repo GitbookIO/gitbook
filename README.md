@@ -108,3 +108,14 @@ Exercises need to start and finish with a separation bar (```---``` or ```***```
     
     ---
 
+#### Multi-Languages
+
+GitBook supports generation of books written in multiple languages. Each languages should be a sub-directory with a normal GitBook format, and a file named `LANGS.md` should be present at the root of the repository with the following format:
+
+```
+* [English](en/)
+* [French](fr/)
+* [Español](es/)
+```
+
+You can see a complete example with the [Learn Git](https://github.com/GitbookIO/git) book.
