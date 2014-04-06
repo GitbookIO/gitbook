@@ -82,6 +82,11 @@ function serveDir(dir, port) {
     return d.promise;
 }
 
+function logError(err) {
+    console.log(err.message || err);
+    return Q.reject(err);
+};
+
 
 // Exports
 module.exports = {
@@ -89,4 +94,5 @@ module.exports = {
     githubID: githubID,
     titleCase: titleCase,
     serveDir: serveDir,
+    logError: logError
 };

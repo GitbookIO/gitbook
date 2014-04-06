@@ -12,7 +12,8 @@
         "fstream-ignore": "0.0.7",
         "commander": "2.2.0",
         "fs-extra": "0.8.1",
-        "highlight.js": "8.0.0"
+        "highlight.js": "8.0.0",
+        "tmp": "0.0.23"
     },
     "devDependencies": {
         "mocha": "1.18.2",
