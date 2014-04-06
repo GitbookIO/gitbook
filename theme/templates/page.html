@@ -65,20 +65,22 @@
             </article>
 
             {% for article in item.articles %}
-                <article id="{{ article.path }}">
-                {% for section in pages[article.path].content %}
-                        {% if section.type == "normal" %}
-                            {% autoescape false %}{{ section.content }}{% endautoescape %}
-                        {% elif section.type == "exercise" %}
-                            <div class="exercise">
-                                <div class="exercise-header">Exercise #{{ exercise }}</div>
+                {% if pages[article.path] %}
+                    <article id="{{ article.path }}">
+                    {% for section in pages[article.path].content %}
+                            {% if section.type == "normal" %}
                                 {% autoescape false %}{{ section.content }}{% endautoescape %}
-                                <pre><code>{% autoescape false %}{{ section.code.base|code }}{% endautoescape %}</code></pre>
-                                {% set exercise = exercise + 1 %}
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                </article>
+                            {% elif section.type == "exercise" %}
+                                <div class="exercise">
+                                    <div class="exercise-header">Exercise #{{ exercise }}</div>
+                                    {% autoescape false %}{{ section.content }}{% endautoescape %}
+                                    <pre><code>{% autoescape false %}{{ section.code.base|code }}{% endautoescape %}</code></pre>
+                                    {% set exercise = exercise + 1 %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </article>
+                {% endif %}
             {% endfor %}
         </section>
         {% endif %}
@@ -95,16 +97,18 @@
             <article>
             {% for item in summary.chapters %}
                 {% for article in item.articles %}
-                    {% for section in pages[article.path].content %}
-                        {% if section.type == "exercise" %}
-                            <div class="exercise">
-                                <div class="exercise-header">Exercise #{{ exercise }}</div>
-                                {% autoescape false %}{{ section.content }}{% endautoescape %}
-                                <pre><code>{% autoescape false %}{{ section.code.solution|code }}{% endautoescape %}</code></pre>
-                                {% set exercise = exercise + 1 %}
-                            </div>
-                        {% endif %}
-                    {% endfor %}
+                    {% if pages[article.path] %}
+                        {% for section in pages[article.path].content %}
+                            {% if section.type == "exercise" %}
+                                <div class="exercise">
+                                    <div class="exercise-header">Exercise #{{ exercise }}</div>
+                                    {% autoescape false %}{{ section.content }}{% endautoescape %}
+                                    <pre><code>{% autoescape false %}{{ section.code.solution|code }}{% endautoescape %}</code></pre>
+                                    {% set exercise = exercise + 1 %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
                 {% endfor %}
             {% endfor %}
             </article>
