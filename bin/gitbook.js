@@ -29,7 +29,7 @@ var buildFunc;
 prog
 .command('build [source_dir]')
 .description('Build a gitbook from a directory')
-.action();
+.action(buildFunc);
 
 prog
 .command('serve [source_dir]')
