@@ -91,21 +91,21 @@ An exercise is defined by 4 simple parts:
 Exercises need to start and finish with a separation bar (```---``` or ```***```). It should contain 3 code elements (**base**, **solution** and **validation**).
 
     ---
-    
+
     Define a variable `x` equal to 10.
-    
+
     ```js
-    var x = 
+    var x =
     ```
-    
+
     ```js
     var x = 10;
     ```
-    
+
     ```js
     assert(x == 10);
     ```
-    
+
     ---
 
 #### Multi-Languages
@@ -119,3 +119,7 @@ GitBook supports generation of books written in multiple languages. Each languag
 ```
 
 You can see a complete example with the [Learn Git](https://github.com/GitbookIO/git) book.
+
+#### Ignoring files & folders
+
+GitBook will read the `.gitignore`, `.bookignore` and `.gitignore` files to get a list of files and folders to skip. (The format inside those files, follows the same convention as `.gitignore`)
