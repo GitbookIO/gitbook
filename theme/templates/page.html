@@ -41,6 +41,26 @@
     </section>
 
     {# Pages content #}
+    <section>
+        <article class="new-chapter">
+            <h1>Introduction</h1>
+        </article>
+
+        <article id="#README.md">
+        {% for section in pages["README.md"].content %}
+            {% if section.type == "normal" %}
+                {% autoescape false %}{{ section.content }}{% endautoescape %}
+            {% elif section.type == "exercise" %}
+                <div class="exercise">
+                    <div class="exercise-header">Exercise #{{ exercise }}</div>
+                    {% autoescape false %}{{ section.content }}{% endautoescape %}
+                    <pre><code>{% autoescape false %}{{ section.code.base|code }}{% endautoescape %}</code></pre>
+                    {% set exercise = exercise + 1 %}
+                </div>
+            {% endif %}
+        {% endfor %}
+        </article>
+    </section>
     {% for item in summary.chapters %}
         {% if item.articles.length > 0 %}
         <section>
