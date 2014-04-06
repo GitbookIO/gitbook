@@ -4,15 +4,17 @@
 
 {% block content %}
 <div class="book-langs-index">
-    <h1>{{ title }}</h1>
+    <div class="inner">
+        <h1>{{ title }}</h1>
 
-    <ul class="languages">
-    {%  for lang in langs %}
-        <li>
-            <a href="{{ basePath}}/{{ lang.path }}">{{ lang.title }}</a>
-        </li>
-    {% endfor %}
-    </ul>
+        <ul class="languages">
+        {%  for lang in langs %}
+            <li>
+                <a href="{{ basePath}}/{{ lang.path }}">{{ lang.title }}</a>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
 </div>
 {% endblock %}
 
