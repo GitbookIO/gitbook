@@ -71,13 +71,40 @@ function(dir, outputFile, options) {
                 format: "pdf"
             })
         )
-        .then(function() {
-            console.log("Generating PDF in", outputFile);
-            return fs.copy(
-                path.join(tmpDir, "index.pdf"),
-                outputFile
-            )
-            return fs.remove(tmpDir)
+        .then(function(_options) {
+            var copyPDF = function(lang) {
+                var _outputFile = outputFile;
+                var _tmpDir = tmpDir;
+
+                if (lang) {
+                    _outputFile = _outputFile.slice(0, -path.extname(_outputFile).length)+"_"+lang+path.extname(_outputFile);
+                    _tmpDir = path.join(_tmpDir, lang);
+                }
+
+                console.log("Generating PDF in", _outputFile);
+                return fs.copy(
+                    path.join(_tmpDir, "index.pdf"),
+                    _outputFile
+                );
+            };
+
+            // Multi-langs book
+            return Q()
+            .then(function() {
+                if (_options.langsSummary) {
+                    console.log("Generating PDFs for all the languages");
+                    return Q.all(
+                        _.map(_options.langsSummary.list, function(lang) {
+                            return copyPDF(lang.lang);
+                        })
+                    );
+                } else {
+                    return copyPDF();
+                }
+            })
+            .then(function() {
+                return fs.remove(tmpDir);
+            })
             .fail(utils.logError);
         });
     })
