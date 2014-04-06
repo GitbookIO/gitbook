@@ -42,11 +42,7 @@
 
     {# Pages content #}
     <section>
-        <article class="new-chapter">
-            <h1>Introduction</h1>
-        </article>
-
-        <article id="#README.md">
+        <article id="README.md">
         {% for section in pages["README.md"].content %}
             {% if section.type == "normal" %}
                 {% autoescape false %}{{ section.content }}{% endautoescape %}
