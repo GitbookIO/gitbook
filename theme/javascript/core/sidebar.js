@@ -1,8 +1,9 @@
 define([
+    "lodash",
     "utils/storage",
     "utils/platform",
     "core/state"
-], function(storage, platform, state) {
+], function(_, storage, platform, state) {
     var $summary = state.$book.find(".book-summary");
 
     // Toggle sidebar with or withour animation
@@ -35,9 +36,22 @@ define([
         }
     };
 
+    // Filter summary with a list of path
+    var filterSummary = function(paths) {
+        console.log("filter with", paths);
+        $summary.find("li").each(function() {
+            var path = $(this).data("path");
+            var st = paths == null || _.contains(paths, path);
+
+            $(this).toggle(st);
+            if (st) $(this).parents("li").show();
+        });
+    };
+
     return {
         $el: $summary,
         init: init,
-        toggle: toggleSidebar
+        toggle: toggleSidebar,
+        filter: filterSummary
     }
 });

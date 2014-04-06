@@ -2,8 +2,9 @@ define([
     "jQuery",
     "lodash",
     "lunr",
-    "core/state"
-], function($, _, lunr, state) {
+    "core/state",
+    "core/sidebar"
+], function($, _, lunr, state, sidebar) {
     var index = null;
     var $searchBar = state.$book.find(".book-search");
     var $searchInput = $searchBar.find("input");
@@ -71,7 +72,14 @@ define([
                 toggleSearch(false);
                 return;
             }
-            console.log("search", q);
+            if (q.length == 0) {
+                sidebar.filter(null);
+            } else {
+                var results = search(q);
+                sidebar.filter(
+                    _.pluck(results, "path")
+                );
+            }
         });
     };
 

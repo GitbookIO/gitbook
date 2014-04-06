@@ -19068,10 +19068,11 @@ define('utils/platform',[], function() {
     };
 });
 define('core/sidebar',[
+    "lodash",
     "utils/storage",
     "utils/platform",
     "core/state"
-], function(storage, platform, state) {
+], function(_, storage, platform, state) {
     var $summary = state.$book.find(".book-summary");
 
     // Toggle sidebar with or withour animation
@@ -19104,10 +19105,23 @@ define('core/sidebar',[
         }
     };
 
+    // Filter summary with a list of path
+    var filterSummary = function(paths) {
+        console.log("filter with", paths);
+        $summary.find("li").each(function() {
+            var path = $(this).data("path");
+            var st = paths == null || _.contains(paths, path);
+
+            $(this).toggle(st);
+            if (st) $(this).parents("li").show();
+        });
+    };
+
     return {
         $el: $summary,
         init: init,
-        toggle: toggleSidebar
+        toggle: toggleSidebar,
+        filter: filterSummary
     }
 });
 /**
@@ -20995,8 +21009,9 @@ define('core/search',[
     "jQuery",
     "lodash",
     "lunr",
-    "core/state"
-], function($, _, lunr, state) {
+    "core/state",
+    "core/sidebar"
+], function($, _, lunr, state, sidebar) {
     var index = null;
     var $searchBar = state.$book.find(".book-search");
     var $searchInput = $searchBar.find("input");
@@ -21064,7 +21079,14 @@ define('core/search',[
                 toggleSearch(false);
                 return;
             }
-            console.log("search", q);
+            if (q.length == 0) {
+                sidebar.filter(null);
+            } else {
+                var results = search(q);
+                sidebar.filter(
+                    _.pluck(results, "path")
+                );
+            }
         });
     };
 
