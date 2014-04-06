@@ -47,8 +47,8 @@ var buildFunc = function(dir, options) {
     })
     .then(function(output) {
         console.log("Successfuly built !");
-    }, utils.logError)
-    .then(_.constant(outputDir));
+        return output;
+    }, utils.logError);
 };
 
 module.exports = buildFunc;

@@ -42,10 +42,10 @@ buildCommand(prog
 .option('-p, --port <port>', 'Port for server to listen on', 4000),
 function(dir, options) {
     buildFunc(dir, options)
-    .then(function(outputDir) {
+    .then(function(_options) {
         console.log();
         console.log('Starting server ...');
-        return utils.serveDir(outputDir, options.port)
+        return utils.serveDir(_options.output, options.port)
         .fail(utils.logError);
     })
     .then(function() {
