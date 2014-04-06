@@ -83,7 +83,7 @@ function serveDir(dir, port) {
 }
 
 function logError(err) {
-    console.log(err.message || err);
+    console.log(err.stack || err.message || err);
     return Q.reject(err);
 };
 
