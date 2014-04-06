@@ -21052,6 +21052,8 @@ define('core/search',[
             $searchInput.focus();
         } else {
             $searchInput.blur();
+            $searchInput.val("");
+            sidebar.filter(null);
         }
     };
 

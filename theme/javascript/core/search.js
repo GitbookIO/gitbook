@@ -45,6 +45,8 @@ define([
             $searchInput.focus();
         } else {
             $searchInput.blur();
+            $searchInput.val("");
+            sidebar.filter(null);
         }
     };
 
