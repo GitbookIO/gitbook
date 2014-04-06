@@ -15,27 +15,32 @@ var buildFunc = require('./build');
 
 // General options
 prog
-.version(pkg.version)
-.option('-o, --output <directory>', 'Path to output directory, defaults to ./_book')
-.option('-f, --format <name>', 'Change generation format, defaults to site, availables are: '+_.keys(generators).join(", "))
-.option('-t, --title <name>', 'Name of the book to generate, defaults to repo name')
-.option('-i, --intro <intro>', 'Description of the book to generate')
-.option('-g, --github <repo_path>', 'ID of github repo like : username/repo')
-.option('-gh, --githubHost <url>', 'The url of the github host (defaults to https://github.com/')
-.option('--theme <path>', 'Path to theme directory');
+.version(pkg.version);
+
+var buildCommand = function(command, action) {
+    return command
+    .option('-o, --output <directory>', 'Path to output directory, defaults to ./_book')
+    .option('-f, --format <name>', 'Change generation format, defaults to site, availables are: '+_.keys(generators).join(", "))
+    .option('-t, --title <name>', 'Name of the book to generate, defaults to repo name')
+    .option('-i, --intro <intro>', 'Description of the book to generate')
+    .option('-g, --github <repo_path>', 'ID of github repo like : username/repo')
+    .option('-gh, --githubHost <url>', 'The url of the github host (defaults to https://github.com/')
+    .option('--theme <path>', 'Path to theme directory')
+    .action(action);
+}
 
 
 var buildFunc;
-prog
-.command('build [source_dir]')
-.description('Build a gitbook from a directory')
-.action();
 
-prog
+buildCommand(prog
+.command('build [source_dir]')
+.description('Build a gitbook from a directory'), buildFunc);
+
+buildCommand(prog
 .command('serve [source_dir]')
 .description('Build then serve a gitbook from a directory')
-.option('-p, --port <port>', 'Port for server to listen on', 4000)
-.action(function(dir, options) {
+.option('-p, --port <port>', 'Port for server to listen on', 4000),
+function(dir, options) {
     buildFunc(dir, options)
     .then(function(outputDir) {
         console.log();
@@ -50,11 +55,11 @@ prog
     });
 });
 
-prog
+buildCommand(prog
 .command('pdf [source_dir] [output_file]')
 .description('Build a gitbook as a PDF')
-.option('-pf, --paperformat <format>', 'PDF paper format (default is A4): "5in*7.5in", "10cm*20cm", "A4", "Letter"')
-.action(function(dir, outputFile, options) {
+.option('-pf, --paperformat <format>', 'PDF paper format (default is A4): "5in*7.5in", "10cm*20cm", "A4", "Letter"'),
+function(dir, outputFile, options) {
     outputFile = outputFile || path.resolve(dir, "book.pdf");
 
     Q.nfcall(tmp.dir)
