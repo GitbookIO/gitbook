@@ -33,7 +33,21 @@ Options for commands `build` and `serve` are:
 -t, --title <name> Name of the book to generate, defaults to repo name
 -i, --intro <intro> Description of the book to generate
 -g, --github <repo_path> ID of github repo like : username/repo
+-o, --output <directory>  Path to output directory, defaults to ./_book
+-f, --format <name>       Change generation format, defaults to site, availables are: site, page, pdf, json
+-i, --intro <intro>       Description of the book to generate
+-gh, --githubHost <url>   The url of the github host (defaults to https://github.com/)
+--theme <path>            Path to theme directory
 ```
+
+## Output Formats
+
+GitBook can generate your book in the following formats:
+
+* **Static Website**: This is the default format, it generates a complete interactive static website that can be for example hosted on GitHub Pages.
+* **PDF**: A complete PDF book with exercise solutions at the end of the book. Generate to this format using: ```gitbook pdf ./myrepo```, you need to have [gitbook-pdf](https://github.com/GitbookIO/gitbook-pdf) installed.
+* **Single Page**: The book will be stored in a single printable HTML page, this format is used for conversion to PDF or eBook. Generate to this format using: ```gitbook build ./myrepo -f page```.
+* **JSON**: This format is used for debugging or extracting metadata from a book. Generate to this format using: ```gitbook build ./myrepo -f json```.
 
 ## Book Format
 
@@ -93,3 +107,4 @@ Exercises need to start and finish with a separation bar (```---``` or ```***```
     ```
     
     ---
+
