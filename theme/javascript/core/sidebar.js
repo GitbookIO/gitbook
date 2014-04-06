@@ -48,16 +48,28 @@ define([
             toggleSidebar();
         });
 
+        // Init last state if not mobile
+        if (!platform.isMobile) {
+            toggleSidebar(storage.get("sidebar", true), false);
+        }
+
         // Toggle search
         $book.find(".book-header .toggle-search").click(function(e) {
             e.preventDefault();
             toggleSearch();
         });
 
-        // Init last state if not mobile
-        if (!platform.isMobile) {
-            toggleSidebar(storage.get("sidebar", true), false);
-        }
+        $book.find(".book-summary .book-search input").keyup(function(e) {
+            var key = (e.keyCode ? e.keyCode : e.which);
+            var q = $(this).val();
+
+            if (key == 27) {
+                e.preventDefault();
+                toggleSearch(false);
+                return;
+            }
+            console.log("search", q);
+        });
     };
 
     return {
