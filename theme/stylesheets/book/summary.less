@@ -1,6 +1,7 @@
 .book {
     .book-summary {
         @width: 250px;
+        @searchHeight: 41px;
 
         position: fixed;
         top: 40px;
@@ -8,18 +9,58 @@
         bottom: 0px;
         z-index: 1;
 
-        overflow-y: auto;
-
         width: @width;
         background: #2e3133;
         color: #e2edf2;
 
         .transition(all 0.5s ease);
 
+        .search {
+            padding: 6px;
+            padding-top: 0px;
+
+            background: #242628;
+            border-bottom: 1px solid #333;
+
+            position: absolute;
+            top: -@searchHeight;
+            left: 0px;
+            right: 0px;
+
+            .transition(top 0.5s ease);
+
+
+            input, input:focus {
+                width: 100%;
+                border: none;
+                .box-shadow(none);
+            }
+        }
+
+        &.with-search {
+            .search {
+                top: 0px;
+            }
+
+            ul.summary {
+                top: @searchHeight;
+            }
+        } 
+
         ul.summary {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            bottom: 0px;
+
+            overflow-y: auto;
+
             list-style: none;
             margin: 0px;
             padding: 0px;
+
+            .transition(top 0.5s ease);
 
             li {
                 list-style: none;

@@ -35,7 +35,8 @@ module.exports = function (grunt) {
                         "lodash": 'vendors/lodash',
                         "requireLib": 'vendors/require',
                         "Mousetrap": 'vendors/mousetrap',
-                        "mixpanel": 'vendors/mixpanel'
+                        "mixpanel": 'vendors/mixpanel',
+                        "lunr": path.join(__dirname, "node_modules/lunr/lunr")
                     },
                     shim: {
                         'jQuery': {
@@ -49,6 +50,9 @@ module.exports = function (grunt) {
                         },
                         'mixpanel': {
                             exports: 'mixpanel'
+                        },
+                        'lunr': {
+                            exports: 'lunr'
                         }
                     }
                 }

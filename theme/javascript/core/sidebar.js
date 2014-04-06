@@ -1,12 +1,13 @@
 define([
     "utils/storage",
     "utils/platform",
-    "core/state"
-], function(storage, platform, state) {
+    "core/state",
+    "core/search"
+], function(storage, platform, state, search) {
 
     // Toggle sidebar with or withour animation
     var toggleSidebar = function(_state, animation) {
-        if (-state != null && isOpen() == _state) return;
+        if (state != null && isOpen() == _state) return;
         if (animation == null) animation = true;
 
         var $book = state().$book;
@@ -16,9 +17,22 @@ define([
         storage.set("sidebar", isOpen());
     };
 
+    // Toggle search
+    var toggleSearch = function(_state) {
+        if (state != null && isSearchOpen() == _state) return;
+
+        var $summary = state().$book.find(".book-summary");
+        $summary.toggleClass("with-search", _state);
+    };
+
     // Return true if sidebar is open
     var isOpen = function() {
         return state().$book.hasClass("with-summary");
+    };
+
+    // Return true if search bar is open
+    var isSearchOpen = function() {
+        return state().$book.find(".book-summary").hasClass("with-search");
     };
 
     // Prepare sidebar: state and toggle button
@@ -29,6 +43,12 @@ define([
         $book.find(".book-header .toggle-summary").click(function(e) {
             e.preventDefault();
             toggleSidebar();
+        });
+
+        // Toggle search
+        $book.find(".book-header .toggle-search").click(function(e) {
+            e.preventDefault();
+            toggleSearch();
         });
 
         // Init last state if not mobile
