@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="{{ staticBase }}/print.css">
 {% endblock %}
 
-{% set exercise = 0 %}
+{% set exercise = 1 %}
 {% block content %}
     {# Cover #}
     <section id="cover">
@@ -90,8 +90,8 @@
 
 
     {# Exercise solutions #}
-    {% if exercise > 0 %}
-        {% set exercise = 0 %}
+    {% if exercise > 1 %}
+        {% set exercise = 1 %}
         <section>
             <article class="new-chapter">
                 <h1>Exercise Solutions</h1>
