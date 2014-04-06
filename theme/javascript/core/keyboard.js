@@ -23,6 +23,12 @@ define([
             sidebar.toggle();
             return false;
         });
+
+        // Toggle Search
+        Mousetrap.bind(['f'], function(e) {
+            sidebar.toggleSearch();
+            return false;
+        });
     };
 
     return {

@@ -62,6 +62,7 @@ define([
 
     return {
         init: init,
-        toggle: toggleSidebar
+        toggle: toggleSidebar,
+        toggleSearch: toggleSearch
     }
 });
