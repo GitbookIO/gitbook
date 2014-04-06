@@ -10,7 +10,6 @@ var LEXED = summary(CONTENT);
 
 
 describe('Summary parsing', function () {
-    console.log(LEXED);
 
     it('should detect chapters', function() {
         assert.equal(LEXED.chapters.length, 5);
