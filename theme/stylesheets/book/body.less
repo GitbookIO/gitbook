@@ -5,7 +5,15 @@
         right: 0px;
         left: 0px;
         bottom: 0px;
-        overflow-y: auto;
+
+        .body-inner {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            left: 0px;
+            bottom: 0px;
+            overflow-y: auto;
+        }
 
         .transition(left 0.5s ease);
 
@@ -14,7 +22,6 @@
         .page-wrapper {
             position: relative;
             min-height: 100%;
-            padding-bottom: 100px;
 
             .page-inner {
                 max-width: 800px;

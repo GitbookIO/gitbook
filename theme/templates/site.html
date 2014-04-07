@@ -6,23 +6,30 @@
     {% include "includes/book/header.html" %}
     {% include "includes/book/summary.html" %}
     <div class="book-body" tabindex="-1">
-        <div class="page-wrapper">
-            {% include "includes/book/progress.html" %}
+        <div class="body-inner">
+            <div class="page-wrapper">
+                {% include "includes/book/progress.html" %}
 
-            <div class="page-inner">
-            {% for section in content %}
-                <section class="{{ section.type }}" id="section-{{ section.id }}">
-                {% if section.type == "normal" %}
-                    {% autoescape false %}{{ section.content }}{% endautoescape %}
-                {% elif section.type == "exercise" %}
-                    {% include "./includes/book/exercise.html" with {section: section} %}
-                {% endif %}
-                </section>
-            {% endfor %}
+                <div class="page-inner">
+                {% for section in content %}
+                    <section class="{{ section.type }}" id="section-{{ section.id }}">
+                    {% if section.type == "normal" %}
+                        {% autoescape false %}{{ section.content }}{% endautoescape %}
+                    {% elif section.type == "exercise" %}
+                        {% include "./includes/book/exercise.html" with {section: section} %}
+                    {% endif %}
+                    </section>
+                {% endfor %}
+                </div>
             </div>
-
-            {% include "includes/book/footer.html" %}
         </div>
+
+        {% if progress.current.prev and progress.current.prev.path %}
+        <a href="{{ basePath }}/{{ progress.current.prev.path|mdLink }}" class="navigation navigation-prev"><i class="fa fa-angle-left"></i></a>
+        {% endif %}
+        {% if progress.current.next and progress.current.next.path %}
+        <a href="{{ basePath }}/{{ progress.current.next.path|mdLink }}" class="navigation navigation-next"><i class="fa fa-angle-right"></i></a>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
