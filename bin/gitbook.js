@@ -23,7 +23,7 @@ var buildCommand = function(command, action) {
     .option('-t, --title <name>', 'Name of the book to generate, defaults to repo name')
     .option('-i, --intro <intro>', 'Description of the book to generate')
     .option('-g, --github <repo_path>', 'ID of github repo like : username/repo')
-    .option('-gh, --githubHost <url>', 'The url of the github host (defaults to https://github.com/')
+    .option('--githubHost <url>', 'The url of the github host (defaults to https://github.com/')
     .option('--theme <path>', 'Path to theme directory')
     .action(action);
 }

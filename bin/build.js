@@ -42,6 +42,7 @@ var buildFunc = function(dir, options) {
                 title: title,
                 description: options.intro,
                 github: githubID,
+                githubHost: options.githubHost,
                 generator: options.format,
                 theme: options.theme
             })
