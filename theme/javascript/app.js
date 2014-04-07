@@ -14,9 +14,6 @@ require([
     $(document).ready(function() {
         var $book = state.$book;
 
-        // Initialize storage
-        storage.setBaseKey(state.githubId);
-
         // Init sidebar
         sidebar.init();
 
@@ -26,12 +23,17 @@ require([
         // Init keyboard
         keyboard.init();
 
-        // Star and watch count
-        $.getJSON("https://api.github.com/repos/"+state.githubId)
-        .done(function(repo) {
-            $book.find(".count-star span").text(repo.stargazers_count);
-            $book.find(".count-watch span").text(repo.subscribers_count);
-        });
+        if (state.githubId) {
+            // Initialize storage
+            storage.setBaseKey(state.githubId);
+
+            // Star and watch count
+            $.getJSON("https://api.github.com/repos/"+state.githubId)
+            .done(function(repo) {
+                $book.find(".count-star span").text(repo.stargazers_count);
+                $book.find(".count-watch span").text(repo.subscribers_count);
+            });
+        }
 
         // Bind exercise
         exercise.init();
