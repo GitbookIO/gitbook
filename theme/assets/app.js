@@ -18088,7 +18088,8 @@ define('core/state',[
         '$book': $book,
 
         'githubId': $book.data("github"),
-        'level': $book.data("level")
+        'level': $book.data("level"),
+        'basePath': $book.data("basepath")
     };
 });
 /*global define:false */
@@ -19107,7 +19108,6 @@ define('core/sidebar',[
 
     // Filter summary with a list of path
     var filterSummary = function(paths) {
-        console.log("filter with", paths);
         $summary.find("li").each(function() {
             var path = $(this).data("path");
             var st = paths == null || _.contains(paths, path);
@@ -21018,7 +21018,7 @@ define('core/search',[
 
     // Load complete index
     var loadIndex = function() {
-        return $.getJSON("search_index.json")
+        return $.getJSON(state.basePath+"/search_index.json")
         .then(function(data) {
             index = lunr.Index.load(data);
         });

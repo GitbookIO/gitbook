@@ -11,7 +11,7 @@ define([
 
     // Load complete index
     var loadIndex = function() {
-        return $.getJSON("search_index.json")
+        return $.getJSON(state.basePath+"/search_index.json")
         .then(function(data) {
             index = lunr.Index.load(data);
         });

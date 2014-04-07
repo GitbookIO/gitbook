@@ -38,7 +38,6 @@ define([
 
     // Filter summary with a list of path
     var filterSummary = function(paths) {
-        console.log("filter with", paths);
         $summary.find("li").each(function() {
             var path = $(this).data("path");
             var st = paths == null || _.contains(paths, path);
