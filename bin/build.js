@@ -24,16 +24,20 @@ var buildFunc = function(dir, options) {
         return null;
     })
     .then(function(repoID) {
-        var githubID = options.github || repoID;
+        var title = options.title;
 
-        if(!githubID) {
-            throw new Error('Needs a githubID (username/repo). Either set repo origin to a github repo or use the -g flag');
+        if (!title) {
+            var githubID = options.github || repoID;
+
+            if(!githubID) {
+                throw new Error('Needs a githubID (username/repo). Either set repo origin to a github repo or use the -g flag');
+            }
+
+            var parts = githubID.split('/', 2);
+            var user = parts[0], repo = parts[1];
+
+            title = options.title || utils.titleCase(repo);
         }
-
-        var parts = githubID.split('/', 2);
-        var user = parts[0], repo = parts[1];
-
-        var title = options.title || utils.titleCase(repo);
 
         return generate.folder(
             _.extend(options.options || {}, {
