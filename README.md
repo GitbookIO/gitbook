@@ -36,7 +36,7 @@ Options for commands `build` and `serve` are:
 -o, --output <directory>  Path to output directory, defaults to ./_book
 -f, --format <name>       Change generation format, defaults to site, availables are: site, page, pdf, json
 -i, --intro <intro>       Description of the book to generate
--gh, --githubHost <url>   The url of the github host (defaults to https://github.com/)
+--githubHost <url>   The url of the github host (defaults to https://github.com/)
 --theme <path>            Path to theme directory
 ```
 
