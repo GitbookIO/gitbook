@@ -4,14 +4,13 @@ var Q = require('q');
 var _ = require('lodash');
 var path = require('path');
 var prog = require('commander');
-var tmp = require('tmp');
 
 var pkg = require('../package.json');
 var generators = require("../lib/generate").generators;
 var fs = require('../lib/generate/fs');
 
 var utils = require('./utils');
-var buildFunc = require('./build');
+var build = require('./build');
 
 // General options
 prog
@@ -29,19 +28,16 @@ var buildCommand = function(command, action) {
     .action(action);
 }
 
-
-var buildFunc;
-
 buildCommand(prog
 .command('build [source_dir]')
-.description('Build a gitbook from a directory'), buildFunc);
+.description('Build a gitbook from a directory'), build.folder);
 
 buildCommand(prog
 .command('serve [source_dir]')
 .description('Build then serve a gitbook from a directory')
 .option('-p, --port <port>', 'Port for server to listen on', 4000),
 function(dir, options) {
-    buildFunc(dir, options)
+    build.folder(dir, options)
     .then(function(_options) {
         console.log();
         console.log('Starting server ...');
@@ -59,59 +55,32 @@ buildCommand(prog
 .command('pdf [source_dir] [output_file]')
 .description('Build a gitbook as a PDF')
 .option('-pf, --paperformat <format>', 'PDF paper format (default is A4): "5in*7.5in", "10cm*20cm", "A4", "Letter"'),
-function(dir, outputFile, options) {
-    outputFile = outputFile || path.resolve(dir, "book.pdf");
-
-    Q.nfcall(tmp.dir)
-    .then(function(tmpDir) {
-        return buildFunc(
-            dir,
-            _.extend(options, {
-                output: tmpDir,
-                format: "pdf"
-            })
-        )
-        .then(function(_options) {
-            var copyPDF = function(lang) {
-                var _outputFile = outputFile;
-                var _tmpDir = tmpDir;
-
-                if (lang) {
-                    _outputFile = _outputFile.slice(0, -path.extname(_outputFile).length)+"_"+lang+path.extname(_outputFile);
-                    _tmpDir = path.join(_tmpDir, lang);
-                }
-
-                console.log("Generating PDF in", _outputFile);
-                return fs.copy(
-                    path.join(_tmpDir, "index.pdf"),
-                    _outputFile
-                );
-            };
-
-            // Multi-langs book
-            return Q()
-            .then(function() {
-                if (_options.langsSummary) {
-                    console.log("Generating PDFs for all the languages");
-                    return Q.all(
-                        _.map(_options.langsSummary.list, function(lang) {
-                            return copyPDF(lang.lang);
-                        })
-                    );
-                } else {
-                    return copyPDF();
-                }
-            })
-            .then(function() {
-                return fs.remove(tmpDir);
-            })
-            .fail(utils.logError);
-        });
-    })
-    
+function(dir, output, options) {
+    build.files(dir, output, options, {
+        extension: "pdf",
+        format: "pdf",
+        options: {
+            paperformat: options.paperformat
+        }
+    });
 });
 
-
+buildCommand(prog
+.command('ebook [source_dir] [output_file]')
+.description('Build a gitbook as a eBook')
+.option('-c, --cover <path>', 'Cover image, default is cover.png if exists'),
+function(dir, output, options) {
+    var ext = output ? path.extname(output) : "epub";
+    
+    build.files(dir, output, options, {
+        extension: ext,
+        format: "ebook",
+        options: {
+            extension: ext,
+            cover: options.cover
+        }
+    });
+});
 
 // Parse and fallback to help if no args
 if(_.isEmpty(prog.parse(process.argv).args) && process.argv.length === 2) {

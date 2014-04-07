@@ -46,6 +46,7 @@ GitBook can generate your book in the following formats:
 
 * **Static Website**: This is the default format, it generates a complete interactive static website that can be for example hosted on GitHub Pages.
 * **PDF**: A complete PDF book with exercise solutions at the end of the book. Generate to this format using: ```gitbook pdf ./myrepo```, you need to have [gitbook-pdf](https://github.com/GitbookIO/gitbook-pdf) installed.
+* **eBook**: A complete eBook with exercise solutions at the end of the book. Generate to this format using: ```gitbook ebook ./myrepo```, you need to have [ebook-convert](http://manual.calibre-ebook.com/cli/ebook-convert.html) installed.
 * **Single Page**: The book will be stored in a single printable HTML page, this format is used for conversion to PDF or eBook. Generate to this format using: ```gitbook build ./myrepo -f page```.
 * **JSON**: This format is used for debugging or extracting metadata from a book. Generate to this format using: ```gitbook build ./myrepo -f json```.
 
