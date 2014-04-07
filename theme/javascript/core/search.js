@@ -17,16 +17,7 @@ define([
 
     // Load complete index
     var loadIndex = function() {
-        var cacheKey = state.revision+":"+"searchIndex";
-        var cache = storage.get(cacheKey);
-
-        if (cache) return useIndex(cache);
-
         $.getJSON(state.basePath+"/search_index.json")
-        .then(function(index) {
-            storage.set(cacheKey, index);
-            return index;
-        })
         .then(useIndex);
     };
 
