@@ -8,10 +8,10 @@ require([
     "core/keyboard",
     "core/exercise",
     "core/progress",
-    "core/sidebar"
-], function($, storage, analytic, sharing, _state, keyboard, exercise, progress, sidebar){
+    "core/sidebar",
+    "core/search"
+], function($, storage, analytic, sharing, state, keyboard, exercise, progress, sidebar, search){
     $(document).ready(function() {
-        var state = _state();
         var $book = state.$book;
 
         // Initialize storage
@@ -19,6 +19,9 @@ require([
 
         // Init sidebar
         sidebar.init();
+
+        // Load search
+        search.init();
 
         // Init keyboard
         keyboard.init();

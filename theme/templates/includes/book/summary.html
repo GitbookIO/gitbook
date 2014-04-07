@@ -1,4 +1,7 @@
 <div class="book-summary">
+    <div class="book-search">
+        <input type="text" placeholder="Search" class="form-control" />
+    </div>
     <ul class="summary">
         <li>
             <a href="{{ githubHost }}{{ githubAuthor }}" target="blank">About the author</a>
@@ -10,11 +13,11 @@
             <a href="{{ githubHost }}{{ githubId }}/edit/master/{{ _input }}" target="blank">Edit and Contribute</a>
         </li>
         <li class="divider"></li>
-        <li data-level="0">
+        <li data-level="0" data-path="index.html">
             <a href="{{ basePath }}/"><i class="fa fa-check"></i> Introduction</a>
         </li>
         {% for item in summary.chapters %}
-            <li {% if item._path == _input %}class="active"{% endif %} data-level="{{ item.level }}">
+            <li {% if item._path == _input %}class="active"{% endif %} data-level="{{ item.level }}" {% if item.path %}data-path="{{ item.path|mdLink }}"{% endif %}>
                 {% if item.path %}
                 <a href="{{ basePath }}/{{ item.path|mdLink }}">
                     <i class="fa fa-check"></i> <b>{{ item.level }})</b> {{ item.title }}
@@ -25,7 +28,7 @@
                 {% if item.articles.length > 0 %}
                 <ul class="articles">
                     {% for article in item.articles %}
-                        <li {% if article._path == _input %}class="active"{% endif %} data-level="{{ article.level }}">
+                        <li {% if article._path == _input %}class="active"{% endif %} data-level="{{ article.level }}" {% if article.path %}data-path="{{ article.path|mdLink }}"{% endif %}>
                             {% if article.path %}
                             <a href="{{ basePath }}/{{ article.path|mdLink }}">
                                 <i class="fa fa-check"></i> <b>{{ article.level }})</b> {{ article.title }}

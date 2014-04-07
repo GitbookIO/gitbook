@@ -28,14 +28,15 @@ module.exports = function (grunt) {
                     baseUrl: "theme/javascript/",
                     out: "theme/assets/app.js",
                     preserveLicenseComments: false,
-                    optimize: "uglify",
+                    optimize: "none", //"uglify",
                     include: ["requireLib"],
                     paths: {
                         "jQuery": 'vendors/jquery',
                         "lodash": 'vendors/lodash',
                         "requireLib": 'vendors/require',
                         "Mousetrap": 'vendors/mousetrap',
-                        "mixpanel": 'vendors/mixpanel'
+                        "mixpanel": 'vendors/mixpanel',
+                        "lunr": path.join(__dirname, "node_modules/lunr/lunr")
                     },
                     shim: {
                         'jQuery': {
@@ -49,6 +50,9 @@ module.exports = function (grunt) {
                         },
                         'mixpanel': {
                             exports: 'mixpanel'
+                        },
+                        'lunr': {
+                            exports: 'lunr'
                         }
                     }
                 }
