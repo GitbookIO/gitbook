@@ -8,6 +8,7 @@ define([
 
         'githubId': $book.data("github"),
         'level': $book.data("level"),
-        'basePath': $book.data("basepath")
+        'basePath': $book.data("basepath"),
+        'revision': $book.data("revision")
     };
 });

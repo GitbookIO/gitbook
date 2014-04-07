@@ -2,19 +2,32 @@ define([
     "jQuery",
     "lodash",
     "lunr",
+    "utils/storage",
     "core/state",
     "core/sidebar"
-], function($, _, lunr, state, sidebar) {
+], function($, _, lunr, storage, state, sidebar) {
     var index = null;
     var $searchBar = state.$book.find(".book-search");
     var $searchInput = $searchBar.find("input");
 
+    // Use a specific idnex
+    var useIndex = function(data) {
+        index = lunr.Index.load(data);
+    };
+
     // Load complete index
     var loadIndex = function() {
-        return $.getJSON(state.basePath+"/search_index.json")
-        .then(function(data) {
-            index = lunr.Index.load(data);
-        });
+        var cacheKey = state.revision+":"+"searchIndex";
+        var cache = storage.get(cacheKey);
+
+        if (cache) return useIndex(cache);
+
+        $.getJSON(state.basePath+"/search_index.json")
+        .then(function(index) {
+            storage.set(cacheKey, index);
+            return index;
+        })
+        .then(useIndex);
     };
 
     // Search for a term
