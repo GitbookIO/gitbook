@@ -4,28 +4,27 @@ var assert = require('assert');
 
 var page = require('../').parse.page;
 
+function loadPage (name, options) {
+    var CONTENT = fs.readFileSync(path.join(__dirname, './fixtures/' + name + '.md'), 'utf8');
+    return page(CONTENT, options);
+}
 
-var CONTENT = fs.readFileSync(path.join(__dirname, './fixtures/PAGE.md'), 'utf8');
-var LEXED = page(CONTENT, {
-    dir: 'course',
-    outdir: '_book'
-});
-
-var HR_CONTENT = fs.readFileSync(path.join(__dirname, './fixtures/HR_PAGE.md'), 'utf8');
-var HR_LEXED = page(HR_CONTENT);
-
-var LINKS_CONTENT = fs.readFileSync(path.join(__dirname, './fixtures/GITHUB_LINKS.md'), 'utf8');
-
+var LEXED = loadPage('PAGE');
+var QUIZ_LEXED = loadPage('QUIZ_PAGE');
+var HR_LEXED = loadPage('HR_PAGE');
 
 describe('Page parsing', function() {
-    it('should detection sections', function() {
+    it('should detect sections', function() {
         assert.equal(LEXED.length, 4);
     });
 
-    it('should detection section types', function() {
+    it('should detect section types', function() {
         assert.equal(LEXED[0].type, 'normal');
         assert.equal(LEXED[1].type, 'exercise');
         assert.equal(LEXED[2].type, 'normal');
+        assert.equal(QUIZ_LEXED[0].type, 'normal');
+        assert.equal(QUIZ_LEXED[1].type, 'quiz');
+        assert.equal(QUIZ_LEXED[2].type, 'normal');
     });
 
     it('should gen content for normal sections', function() {
@@ -64,12 +63,20 @@ describe('Page parsing', function() {
     it('should detect an exercise\'s language', function() {
         assert.equal(LEXED[1].lang, 'python');
     });
+
+    it('should render a quiz', function() {
+        assert(QUIZ_LEXED[1].content);
+        assert(QUIZ_LEXED[1].quiz);
+        assert(QUIZ_LEXED[1].quiz.base);
+        assert(QUIZ_LEXED[1].quiz.solution);
+        assert(QUIZ_LEXED[1].quiz.feedback);
+    });
 });
 
 
 describe('Relative links', function() {
     it('should be resolved to their GitHub counterparts', function() {
-        var LEXED = page(LINKS_CONTENT, {
+        var LEXED = loadPage('GITHUB_LINKS', {
             // GitHub repo ID
             repo: 'GitBookIO/javascript',
 
