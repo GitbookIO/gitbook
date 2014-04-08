@@ -16,7 +16,7 @@ var LINKS_CONTENT = fs.readFileSync(path.join(__dirname, './fixtures/GITHUB_LINK
 
 describe('Page parsing', function() {
     it('should detection sections', function() {
-        assert.equal(LEXED.length, 3);
+        assert.equal(LEXED.length, 4);
     });
 
     it('should detection section types', function() {
@@ -36,6 +36,14 @@ describe('Page parsing', function() {
         assert(LEXED[1].code.base);
         assert(LEXED[1].code.solution);
         assert(LEXED[1].code.validation);
+        assert(LEXED[1].code.context === null);
+
+        assert(LEXED[3].content);
+        assert(LEXED[3].code);
+        assert(LEXED[3].code.base);
+        assert(LEXED[3].code.solution);
+        assert(LEXED[3].code.validation);
+        assert(LEXED[3].code.context);
     });
 
     it('should merge sections correctly', function() {
