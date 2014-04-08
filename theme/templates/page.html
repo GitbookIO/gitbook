@@ -55,6 +55,13 @@
                     <pre><code>{% autoescape false %}{{ section.code.base|code }}{% endautoescape %}</code></pre>
                     {% set exercise = exercise + 1 %}
                 </div>
+            {% elif section.type == "quiz" %}
+            <div class="quiz">
+              <div class="exercise-header">Exercise #{{ exercise }}</div>
+              {% autoescape false %}{{ section.content }}{% endautoescape %}
+              {% autoescape false %}{{ section.quiz.base }}{% endautoescape %}
+              {% set exercise = exercise + 1 %}
+            </div>
             {% endif %}
         {% endfor %}
         </article>
@@ -77,6 +84,13 @@
                                     <div class="exercise-header">Exercise #{{ exercise }}</div>
                                     {% autoescape false %}{{ section.content }}{% endautoescape %}
                                     <pre><code>{% autoescape false %}{{ section.code.base|code }}{% endautoescape %}</code></pre>
+                                    {% set exercise = exercise + 1 %}
+                                </div>
+                            {% elif section.type == "quiz" %}
+                                <div class="quiz">
+                                    <div class="exercise-header">Exercise #{{ exercise }}</div>
+                                    {% autoescape false %}{{ section.content }}{% endautoescape %}
+                                    {% autoescape false %}{{ section.quiz.base }}{% endautoescape %}
                                     {% set exercise = exercise + 1 %}
                                 </div>
                             {% endif %}
@@ -106,6 +120,13 @@
                                     <div class="exercise-header">Exercise #{{ exercise }}</div>
                                     {% autoescape false %}{{ section.content }}{% endautoescape %}
                                     <pre><code>{% autoescape false %}{{ section.code.solution|code }}{% endautoescape %}</code></pre>
+                                    {% set exercise = exercise + 1 %}
+                                </div>
+                            {% elif section.type == "quiz" %}
+                                <div class="quiz">
+                                    <div class="exercise-header">Exercise #{{ exercise }}</div>
+                                    {% autoescape false %}{{ section.content }}{% endautoescape %}
+                                    {% autoescape false %}{{ section.quiz.solution }}{% endautoescape %}
                                     {% set exercise = exercise + 1 %}
                                 </div>
                             {% endif %}
