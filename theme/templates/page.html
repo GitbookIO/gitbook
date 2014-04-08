@@ -12,7 +12,9 @@
     {# Cover #}
     <section id="cover">
         <h1>{{ title }}</h1>
+        {% if githubId %}
         <h2>By <a href="{{ githubHost }}{{ githubAuthor }}">@{{ githubAuthor }}</a></h2>
+        {% endif %}
     </section>
 
     {# Summary #}
