@@ -21146,9 +21146,11 @@ define('execute/javascript',[],function() {
     return {
         id: "javascript",
         assertCode: "function assert(condition, message) { \nif (!condition) { \n throw message || \"Assertion failed\"; \n } \n }\n",
-        REPL: JSREPL
+        REPL: JSREPL,
+        sep: ";\n",
     };
 });
+
 define('utils/execute',[
     "execute/javascript"
 ], function(javascript) {
@@ -21222,13 +21224,21 @@ define('utils/execute',[
         repl.loadLanguage(lang.id, eventHandler);
     };
 
-    var execute = function(lang, solution, validation, callback) {
+    var execute = function(lang, solution, validation, context, callback) {
+        // Language data
+        var langd =  LANGUAGES[lang];
+
         // Check language is supported
-        if (!LANGUAGES[lang]) return callback(new Error("Language '"+lang+"' not available for execution"));
+        if (!langd) return callback(new Error("Language '"+lang+"' not available for execution"));
 
         // Validate with validation code
-        var code = [solution, LANGUAGES[lang].assertCode, validation].join(";\n");
-        evalJS(LANGUAGES[lang], code, function(err, res) {
+        var code = [
+            context,
+            solution,
+            langd.assertCode,
+            validation,
+        ].join(langd.sep);
+        evalJS(langd, code, function(err, res) {
             if(err) return callback(err);
 
             if (res.type == "error") callback(new Error(res.value));
@@ -21238,6 +21248,7 @@ define('utils/execute',[
 
     return execute;
 });
+
 define('core/exercise',[
     "jQuery",
     "utils/execute",
@@ -21248,6 +21259,7 @@ define('core/exercise',[
     var prepareExercise = function($exercise) {
         var codeSolution = $exercise.find(".code-solution").text();
         var codeValidation = $exercise.find(".code-validation").text();
+        var codeContext = $exercise.find(".code-context").text();
 
         var editor = ace.edit($exercise.find(".editor").get(0));
         editor.setTheme("ace/theme/tomorrow");
@@ -21260,7 +21272,7 @@ define('core/exercise',[
 
             analytic.track("exercise.submit");
 
-            execute("javascript", editor.getValue(), codeValidation, function(err, result) {
+            execute("javascript", editor.getValue(), codeValidation, codeContext, function(err, result) {
                 $exercise.toggleClass("return-error", err != null);
                 $exercise.toggleClass("return-success", err == null);
                 if (err) $exercise.find(".alert-danger").text(err.message || err);
