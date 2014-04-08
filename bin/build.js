@@ -25,18 +25,17 @@ var buildFunc = function(dir, options) {
     })
     .then(function(repoID) {
         var title = options.title;
+        var githubID = options.github || repoID;
 
-        if (!title) {
-            var githubID = options.github || repoID;
-
-            if(!githubID) {
-                throw new Error('Needs a githubID (username/repo). Either set repo origin to a github repo or use the -g flag');
-            }
-
+        if (!title && !githubID) {
+            throw new Error('Needs either a title or a githubID (username/repo).\n'+
+                            '  If using github, either set repo origin to a github repo or use the -g flag.\n'+
+                            '  For title, use the -t flag.');
+        } else if (!title) {
             var parts = githubID.split('/', 2);
             var user = parts[0], repo = parts[1];
 
-            title = options.title || utils.titleCase(repo);
+            title = utils.titleCase(repo);
         }
 
         return generate.folder(
