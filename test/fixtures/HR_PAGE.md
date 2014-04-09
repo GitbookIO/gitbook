@@ -4,7 +4,7 @@ Some nice content here
 
 ---
 
-A beautiful separator, but non an exercise !
+A beautiful separator, but non an exercise or a quiz !
 
 ---
 
