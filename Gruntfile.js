@@ -28,7 +28,7 @@ module.exports = function (grunt) {
                     baseUrl: "theme/javascript/",
                     out: "theme/assets/app.js",
                     preserveLicenseComments: false,
-                    optimize: "none", //"uglify",
+                    optimize: "uglify", //"uglify",
                     include: ["requireLib"],
                     paths: {
                         "jQuery": 'vendors/jquery',
