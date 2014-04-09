@@ -16,6 +16,9 @@
 
 <pre class="hidden code-solution">{{ section.code.solution }}</pre>
 <pre class="hidden code-validation">{{ section.code.validation }}</pre>
+{% if section.code.context %}
+<pre class="hidden code-context">{{ section.code.context }}</pre>
+{% endif %}
 
 <div class="btn-group btn-group-justified">
     <a href="#" class="btn btn-default action-submit">Submit</a>

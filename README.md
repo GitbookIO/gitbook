@@ -89,7 +89,7 @@ An exercise is defined by 4 simple parts:
 * **Solution** code, being a correct solution to the exercise
 * **Validation** code that tests the correctness of the user's input
 
-Exercises need to start and finish with a separation bar (```---``` or ```***```). It should contain 3 code elements (**base**, **solution** and **validation**).
+Exercises need to start and finish with a separation bar (```---``` or ```***```). It should contain 3 code elements (**base**, **solution** and **validation**). It can contain a 4th element that provides **context** code (functions, imports of libraries etc ... that shouldn't be displayed to the user).
 
     ---
 
@@ -105,6 +105,14 @@ Exercises need to start and finish with a separation bar (```---``` or ```***```
 
     ```js
     assert(x == 10);
+    ```
+
+    ```js
+    // This is context code available everywhere
+    // The user will be able to call magicFunc in his code
+    function magicFunc() {
+        return 3;
+    }
     ```
 
     ---

@@ -71,13 +71,21 @@ define([
         repl.loadLanguage(lang.id, eventHandler);
     };
 
-    var execute = function(lang, solution, validation, callback) {
+    var execute = function(lang, solution, validation, context, callback) {
+        // Language data
+        var langd =  LANGUAGES[lang];
+
         // Check language is supported
-        if (!LANGUAGES[lang]) return callback(new Error("Language '"+lang+"' not available for execution"));
+        if (!langd) return callback(new Error("Language '"+lang+"' not available for execution"));
 
         // Validate with validation code
-        var code = [solution, LANGUAGES[lang].assertCode, validation].join(";\n");
-        evalJS(LANGUAGES[lang], code, function(err, res) {
+        var code = [
+            context,
+            solution,
+            langd.assertCode,
+            validation,
+        ].join(langd.sep);
+        evalJS(langd, code, function(err, res) {
             if(err) return callback(err);
 
             if (res.type == "error") callback(new Error(res.value));
