@@ -31,6 +31,9 @@ Some more nice content ....
 
 [Link to another Markdown file](./xyz/file.md)
 
+And look at this pretty picture:
+![Pretty](../assets/my-pretty-picture.png "Pretty")
+
 Lets go for another exercise but this time with some context :
 
 ---
