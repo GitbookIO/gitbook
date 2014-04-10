@@ -6,9 +6,8 @@ define([
 ], function($, execute, analytic, state){
     // Bind an exercise
     var prepareExercise = function($exercise) {
-        var $answers = $exercise.find(".quiz-answers").find("input[type=radio], input[type=checkbox]");
 
-        $answers.click(function(e) {
+        $exercise.find(".quiz-answers input").click(function(e) {
             e.preventDefault();
         });
 
@@ -16,19 +15,22 @@ define([
         $exercise.find(".action-submit").click(function(e) {
             e.preventDefault();
             analytic.track("exercise.submit");
-            $exercise.find("tr.alert-danger").removeClass("alert-danger");
+            $exercise.find("tr.alert-danger,li.alert-danger").removeClass("alert-danger");
             $exercise.find(".alert-success,.alert-danger").addClass("hidden");
 
-            var result = true;
-            $exercise.find(".quiz input[type=radio],.quiz input[type=checkbox]").each(function(i) {
-                var correct = $(this).is(":checked") === $answers.slice(i).first().is(":checked");
-                result = result && correct;
-                if (!correct) {
-                    $(this).closest("tr").addClass("alert-danger");
-                }
+            $exercise.find(".quiz").each(function(q) {
+                var result = true;
+                var $answers = $exercise.find(".quiz-answers").slice(q).find("input[type=radio], input[type=checkbox]");
+                $(this).find("input[type=radio],input[type=checkbox]").each(function(i) {
+                    var correct = $(this).is(":checked") === $answers.slice(i).first().is(":checked");
+                    result = result && correct;
+                    if (!correct) {
+                        $(this).closest("tr, li").addClass("alert-danger");
+                    }
+                });
+                $(this).find(result ? "div.alert-success" : "div.alert-danger").toggleClass("hidden");
             });
 
-            $exercise.find(result ? "div.alert-success" : "div.alert-danger").toggleClass("hidden");
         });
 
         $exercise.find(".action-solution").click(function(e) {

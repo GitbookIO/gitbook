@@ -67,9 +67,12 @@ describe('Page parsing', function() {
     it('should render a quiz', function() {
         assert(QUIZ_LEXED[1].content);
         assert(QUIZ_LEXED[1].quiz);
-        assert(QUIZ_LEXED[1].quiz.base);
-        assert(QUIZ_LEXED[1].quiz.solution);
-        assert(QUIZ_LEXED[1].quiz.feedback);
+        assert(QUIZ_LEXED[1].quiz[0].base);
+        assert(QUIZ_LEXED[1].quiz[0].solution);
+        assert(QUIZ_LEXED[1].quiz[0].feedback);
+        assert(QUIZ_LEXED[1].quiz[1].base);
+        assert(QUIZ_LEXED[1].quiz[1].solution);
+        assert(QUIZ_LEXED[1].quiz[1].feedback);
     });
 });
 
