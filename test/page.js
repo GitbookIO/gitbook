@@ -6,7 +6,10 @@ var page = require('../').parse.page;
 
 
 var CONTENT = fs.readFileSync(path.join(__dirname, './fixtures/PAGE.md'), 'utf8');
-var LEXED = page(CONTENT);
+var LEXED = page(CONTENT, {
+    dir: 'course',
+    outdir: '_book'
+});
 
 var HR_CONTENT = fs.readFileSync(path.join(__dirname, './fixtures/HR_PAGE.md'), 'utf8');
 var HR_LEXED = page(HR_CONTENT);
@@ -29,6 +32,10 @@ describe('Page parsing', function() {
         assert(LEXED[0].content);
         assert(LEXED[2].content);
     });
+
+    it('should make image URLs relative', function() {
+        assert(LEXED[2].content.indexOf('_book/assets/my-pretty-picture.png') !== -1);
+    })
 
     it('should gen code and content for exercise sections', function() {
         assert(LEXED[1].content);
@@ -67,7 +74,7 @@ describe('Relative links', function() {
             repo: 'GitBookIO/javascript',
 
             // Imaginary folder of markdown file
-            dir: 'course',
+            dir: 'course'
         });
 
         assert(LEXED[0].content.indexOf('https://github.com/GitBookIO/javascript/blob/src/something.cpp') !== -1);
