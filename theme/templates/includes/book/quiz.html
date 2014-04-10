@@ -6,8 +6,9 @@
     {% autoescape false %}{{ section.content }}{% endautoescape %}
 </div>
 
+{% for quiz in section.quiz %}
 <div class="quiz">
-    {% autoescape false %}{{ section.quiz.base }}{% endautoescape %}
+    {% autoescape false %}{{ quiz.base }}{% endautoescape %}
 
     <div class="alert alert-success hidden">
         <b>Correct!</b>
@@ -15,13 +16,14 @@
 
     <div class="alert alert-danger error-message hidden">
         <p><b>Not quite!</b></p>
-        {% autoescape false %}{{ section.quiz.feedback }}{% endautoescape %}
+        {% autoescape false %}{{ quiz.feedback }}{% endautoescape %}
     </div>
 </div>
 
 <div class="hidden quiz-answers">
-    {% autoescape false %}{{ section.quiz.solution }}{% endautoescape %}
+    {% autoescape false %}{{ quiz.solution }}{% endautoescape %}
 </div>
+{% endfor %}
 
 <div class="btn-group btn-group-justified">
     <a href="#" class="btn btn-default action-submit">Submit</a>
