@@ -15,25 +15,26 @@
                 {% include "includes/book/progress.html" %}
 
                 <div class="page-inner">
-                {% for section in content %}
+                    {% for section in content %}
                     <section class="{{ section.type }}" id="section-{{ section.id }}">
-                    {% if section.type == "normal" %}
+                        {% if section.type == "normal" %}
                         {% autoescape false %}{{ section.content }}{% endautoescape %}
-                    {% elif section.type == "exercise" %}
+                        {% elif section.type == "exercise" %}
                         {% include "./includes/book/exercise.html" with {section: section} %}
-                    {% endif %}
+                        {% endif %}
                     </section>
-                {% endfor %}
+                    {% endfor %}
+
+                    {% if progress.current.prev and progress.current.prev.path %}
+                    <a href="{{ basePath }}/{{ progress.current.prev.path|mdLink }}" class="navigation navigation-prev"><i class="fa fa-angle-left"></i></a>
+                    {% endif %}
+                    {% if progress.current.next and progress.current.next.path %}
+                    <a href="{{ basePath }}/{{ progress.current.next.path|mdLink }}" class="navigation navigation-next"><i class="fa fa-angle-right"></i></a>
+                    {% endif %}
                 </div>
             </div>
         </div>
 
-        {% if progress.current.prev and progress.current.prev.path %}
-        <a href="{{ basePath }}/{{ progress.current.prev.path|mdLink }}" class="navigation navigation-prev"><i class="fa fa-angle-left"></i></a>
-        {% endif %}
-        {% if progress.current.next and progress.current.next.path %}
-        <a href="{{ basePath }}/{{ progress.current.next.path|mdLink }}" class="navigation navigation-next"><i class="fa fa-angle-right"></i></a>
-        {% endif %}
     </div>
 </div>
 {% endblock %}
