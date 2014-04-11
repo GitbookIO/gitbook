@@ -32,15 +32,18 @@ function gitURL(path) {
 // Poorman's parsing
 // Parse a git URL to a github ID : username/reponame
 function githubID(_url) {
+    // Remove .git if it's in _url
+    var sliceEnd = _url.slice(-4) === '.git' ? -4 : _url.length;
+
     // Detect HTTPS repos
     var parsed = url.parse(_url);
     if(parsed.protocol === 'https:' && parsed.host === 'github.com') {
-        return parsed.path.slice(1, -4);
+        return parsed.path.slice(1, sliceEnd);
     }
 
     // Detect SSH repos
     if(_url.indexOf('git@') === 0) {
-        return _url.split(':', 2)[1].slice(0, -4);
+        return _url.split(':', 2)[1].slice(0, sliceEnd);
     }
 
     // None found
