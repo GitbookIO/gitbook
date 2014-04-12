@@ -7,6 +7,7 @@ var prog = require('commander');
 
 var pkg = require('../package.json');
 var generators = require("../lib/generate").generators;
+var initDir = require("../lib/generate/init");
 var fs = require('../lib/generate/fs');
 
 var utils = require('./utils');
@@ -80,6 +81,14 @@ buildCommand(prog)
             cover: options.cover
         }
     });
+});
+
+prog
+.command('init [source_dir]')
+.description('Create files and folders based on contents of SUMMARY.md')
+.action(function(dir) {
+    dir = dir || process.cwd();
+    return initDir(dir);
 });
 
 // Parse and fallback to help if no args
