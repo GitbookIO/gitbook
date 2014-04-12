@@ -21,6 +21,8 @@
                         {% autoescape false %}{{ section.content }}{% endautoescape %}
                     {% elif section.type == "exercise" %}
                         {% include "./includes/book/exercise.html" with {section: section} %}
+                    {% elif section.type == "quiz" %}
+                        {% include "./includes/book/quiz.html" with {section: section} %}
                     {% endif %}
                     </section>
                 {% endfor %}

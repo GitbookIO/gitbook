@@ -7,10 +7,11 @@ require([
     "core/state",
     "core/keyboard",
     "core/exercise",
+    "core/quiz",
     "core/progress",
     "core/sidebar",
     "core/search"
-], function($, storage, analytic, sharing, state, keyboard, exercise, progress, sidebar, search){
+], function($, storage, analytic, sharing, state, keyboard, exercise, quiz, progress, sidebar, search){
     $(document).ready(function() {
         var $book = state.$book;
 
@@ -35,8 +36,9 @@ require([
             });
         }
 
-        // Bind exercise
+        // Bind exercises
         exercise.init();
+        quiz.init();
 
         // Bind sharing button
         sharing.init();

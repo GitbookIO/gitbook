@@ -1,0 +1,34 @@
+<div class="header">
+    <h2>Quiz</h2>
+</div>
+
+<div class="message">
+    {% autoescape false %}{{ section.content }}{% endautoescape %}
+</div>
+
+{% for quiz in section.quiz %}
+<div class="quiz">
+    {% autoescape false %}{{ quiz.base }}{% endautoescape %}
+
+    <div class="alert alert-success hidden">
+        <b>Correct!</b>
+    </div>
+
+    <div class="alert alert-danger error-message hidden">
+        <p><b>Not quite!</b></p>
+        {% autoescape false %}{{ quiz.feedback }}{% endautoescape %}
+    </div>
+</div>
+
+<div class="hidden quiz-answers">
+    {% autoescape false %}{{ quiz.solution }}{% endautoescape %}
+</div>
+{% endfor %}
+
+<div class="btn-group btn-group-justified">
+    <a href="#" class="btn btn-default action-submit">Submit</a>
+    <a href="#" class="btn btn-default action-solution">Solution</a>
+    {% if githubId %}
+    <a href="{{ githubHost }}{{ githubId }}/issues/new" target="_blank" class="btn btn-default">Have a Question?</a>
+    {% endif %}
+</div>
