@@ -9,7 +9,10 @@ function loadPage (name, options) {
     return page(CONTENT, options);
 }
 
-var LEXED = loadPage('PAGE');
+var LEXED = loadPage('PAGE', {
+    dir: 'course',
+    outdir: '_book'
+});
 var QUIZ_LEXED = loadPage('QUIZ_PAGE');
 var HR_LEXED = loadPage('HR_PAGE');
 
@@ -34,7 +37,7 @@ describe('Page parsing', function() {
 
     it('should make image URLs relative', function() {
         assert(LEXED[2].content.indexOf('_book/assets/my-pretty-picture.png') !== -1);
-    })
+    });
 
     it('should gen code and content for exercise sections', function() {
         assert(LEXED[1].content);
