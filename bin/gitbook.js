@@ -16,7 +16,7 @@ var build = require('./build');
 prog
 .version(pkg.version);
 
-var buildCommand = function(command, action) {
+var buildCommand = function(command) {
     return command
     .option('-o, --output <directory>', 'Path to output directory, defaults to ./_book')
     .option('-f, --format <name>', 'Change generation format, defaults to site, availables are: '+_.keys(generators).join(", "))
@@ -24,19 +24,19 @@ var buildCommand = function(command, action) {
     .option('-i, --intro <intro>', 'Description of the book to generate')
     .option('-g, --github <repo_path>', 'ID of github repo like : username/repo')
     .option('--githubHost <url>', 'The url of the github host (defaults to https://github.com/')
-    .option('--theme <path>', 'Path to theme directory')
-    .action(action);
-}
+    .option('--theme <path>', 'Path to theme directory');
+};
 
-buildCommand(prog
+buildCommand(prog)
 .command('build [source_dir]')
-.description('Build a gitbook from a directory'), build.folder);
+.description('Build a gitbook from a directory')
+.action(build.folder);
 
-buildCommand(prog
+buildCommand(prog)
 .command('serve [source_dir]')
 .description('Build then serve a gitbook from a directory')
-.option('-p, --port <port>', 'Port for server to listen on', 4000),
-function(dir, options) {
+.option('-p, --port <port>', 'Port for server to listen on', 4000)
+.action(function(dir, options) {
     build.folder(dir, options)
     .then(function(_options) {
         console.log();
@@ -51,11 +51,11 @@ function(dir, options) {
     });
 });
 
-buildCommand(prog
+buildCommand(prog)
 .command('pdf [source_dir] [output_file]')
 .description('Build a gitbook as a PDF')
-.option('-pf, --paperformat <format>', 'PDF paper format (default is A4): "5in*7.5in", "10cm*20cm", "A4", "Letter"'),
-function(dir, output, options) {
+.option('-pf, --paperformat <format>', 'PDF paper format (default is A4): "5in*7.5in", "10cm*20cm", "A4", "Letter"')
+.action(function(dir, output, options) {
     build.files(dir, output, options, {
         extension: "pdf",
         format: "pdf",
@@ -65,13 +65,13 @@ function(dir, output, options) {
     });
 });
 
-buildCommand(prog
+buildCommand(prog)
 .command('ebook [source_dir] [output_file]')
 .description('Build a gitbook as a eBook')
-.option('-c, --cover <path>', 'Cover image, default is cover.png if exists'),
-function(dir, output, options) {
+.option('-c, --cover <path>', 'Cover image, default is cover.png if exists')
+.action(function(dir, output, options) {
     var ext = output ? path.extname(output) : "epub";
-    
+
     build.files(dir, output, options, {
         extension: ext,
         format: "ebook",
