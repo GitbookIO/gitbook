@@ -28,17 +28,15 @@ var buildCommand = function(command) {
     .option('--theme <path>', 'Path to theme directory');
 };
 
-buildCommand(prog)
-.command('build [source_dir]')
+buildCommand(prog.command('build [source_dir]'))
 .description('Build a gitbook from a directory')
 .action(build.folder);
 
-buildCommand(prog)
-.command('serve [source_dir]')
+buildCommand(prog.command('serve [source_dir]'))
 .description('Build then serve a gitbook from a directory')
 .option('-p, --port <port>', 'Port for server to listen on', 4000)
 .action(function(dir, options) {
-    build.folder(dir, options)
+    build.folder(dir, options || {})
     .then(function(_options) {
         console.log();
         console.log('Starting server ...');
@@ -52,35 +50,26 @@ buildCommand(prog)
     });
 });
 
-buildCommand(prog)
-.command('pdf [source_dir] [output_file]')
+buildCommand(prog.command('pdf [source_dir]'))
 .description('Build a gitbook as a PDF')
 .option('-pf, --paperformat <format>', 'PDF paper format (default is A4): "5in*7.5in", "10cm*20cm", "A4", "Letter"')
-.action(function(dir, output, options) {
-    build.files(dir, output, options, {
+.action(function(dir, options) {
+    build.file(dir, _.extend(options, {
         extension: "pdf",
-        format: "pdf",
-        options: {
-            paperformat: options.paperformat
-        }
-    });
+        format: "pdf"
+    }));
 });
 
-buildCommand(prog)
-.command('ebook [source_dir] [output_file]')
+buildCommand(prog.command('ebook [source_dir]'))
 .description('Build a gitbook as a eBook')
 .option('-c, --cover <path>', 'Cover image, default is cover.png if exists')
-.action(function(dir, output, options) {
-    var ext = output ? path.extname(output) : "epub";
+.action(function(dir, options) {
+    var ext = options.output ? path.extname(options.output) : "epub";
 
-    build.files(dir, output, options, {
+    build.file(dir, _.extend(options, {
         extension: ext,
-        format: "ebook",
-        options: {
-            extension: ext,
-            cover: options.cover
-        }
-    });
+        format: "ebook"
+    }));
 });
 
 prog
