@@ -19,7 +19,6 @@
             padding: @sidebar-search-padding;
 
             background: @sidebar-search-background;
-            border-bottom: 1px solid @sidebar-search-border-color;
 
             position: absolute;
             top: -@header-height;
@@ -30,7 +29,7 @@
 
             input, input:focus {
                 width: 100%;
-                border: none;
+                border: 1px solid @sidebar-search-input-border-color;
                 .box-shadow(none);
             }
         }
