@@ -1,74 +1,74 @@
 .book {
-   .book-body {
-        position: fixed;
-        top: 40px;
-        right: 0px;
-        left: 0px;
-        bottom: 0px;
+  .book-body {
+    position: fixed;
+    top: @header-height;
+    right: 0px;
+    left: 0px;
+    bottom: 0px;
 
-        .body-inner {
-            position: absolute;
-            top: 0px;
-            right: 0px;
-            left: 0px;
-            bottom: 0px;
-            overflow-y: auto;
-        }
+    background: @body-background;
+    .transition(left 0.5s ease);
 
-        .transition(left 0.5s ease);
-
-        background: #edece4;
-
-        .page-wrapper {
-            position: relative;
-            min-height: 100%;
-
-            .page-inner {
-                max-width: 800px;
-                margin: 0px auto;
-            
-                section {
-                    margin: 0px 0px;
-                    padding: 5px 15px;
-                    background: #fff;
-                    border-radius: 2px;
-                    font-size: 15px;
-                    line-height: 1.7;
-                }
-
-                .btn-group {
-
-                    .btn {
-                        border-radius: 0px;
-                        background: #eee;
-                        border: 0px;
-                    }
-                }
-            }
-        }
-
-        @media (max-width: @mobileMaxWidth) {
-            overflow-y: auto;
-
-            .body-inner {
-                position: static;
-                padding-bottom: 20px;
-                min-height: calc(~"100% - 57px")
-            }
-        }
+    .body-inner {
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      left: 0px;
+      bottom: 0px;
+      overflow-y: auto;
     }
 
-    &.with-summary {
-        @media (min-width: 800px) {
-            .book-body {
-                left: 250px;
-            }
+    .page-wrapper {
+      position: relative;
+
+      .page-inner {
+        font-family: @font-family-serif;
+        max-width: 800px;
+        margin: 0px auto;
+
+        section {
+          margin: 0px 0px;
+          padding: 5px 15px;
+
+          background: @page-background;
+          border-radius: 2px;
+
+          font-size: 16px;
+          line-height: 1.5em;
         }
+
+        .btn-group {
+          .btn {
+            border-radius: 0px;
+            background: #eee;
+            border: 0px;
+          }
+        }
+      }
     }
 
-    &.without-animation {
-        .book-body {
-            .transition(none) !important;
-        }
+    @media (max-width: @mobileMaxWidth) {
+      overflow-y: auto;
+
+      .body-inner {
+        position: static;
+        padding-bottom: 20px;
+        min-height: calc(~"100% - 57px")
+      }
     }
+  }
+
+  &.with-summary {
+    @media (min-width: 800px) {
+      .book-body {
+        left: 250px;
+      }
+    }
+  }
+
+  &.without-animation {
+    .book-body {
+      .transition(none) !important;
+    }
+  }
 }

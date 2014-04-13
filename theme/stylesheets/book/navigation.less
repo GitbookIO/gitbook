@@ -1,45 +1,45 @@
 .book .book-body  {
+  .navigation {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    margin: 0;
+    max-width: 150px;
+    min-width: 90px;
+
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+
+    font-size: 40px;
+    color: rgba(0,0,0,0.5);
+
+    text-align: center;
+
+    .transition(all 350ms ease);
+
+    &:hover {
+      background-color: @body-pagination-background;
+      text-decoration: none;
+    }
+
+    &.navigation-next {
+      right: 0px;
+    }
+    &.navigation-prev {
+      left: 0px;
+    }
+  }
+
+  @media (max-width: @mobileMaxWidth) {
     .navigation {
-        position: absolute;
-        top: 0px;
-        bottom: 0px;
-        margin: 0;
-        max-width: 150px;
-        min-width: 90px;
-
-        display: flex;
-        justify-content:center;
-        align-content:center;
-        flex-direction:column;
-
-        font-size: 40px;
-        color: rgba(0,0,0, 0.5);
-
-        text-align: center;
-
-        .transition(all 350ms ease);
-
-        &:hover {
-            background-color: rgba(0,0,0, 0.06);
-            text-decoration: none;
-        } 
-
-        &.navigation-next {
-            right: 0px;
-        }
-        &.navigation-prev {
-            left: 0px;
-        }
+      position: static;
+      top: auto;
+      max-width: 50%;
+      width: 50%;
+      display: inline-block;
+      float: left;
     }
-
-    @media (max-width: @mobileMaxWidth) {
-        .navigation {
-            position: static;
-            top: auto;
-            max-width: 50%;
-            width: 50%;
-            display: inline-block;
-            float: left;
-        } 
-    }
+  }
 }

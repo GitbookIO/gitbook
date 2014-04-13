@@ -1,33 +1,83 @@
-/* Base static */
 @staticPath: "./";
 
 // Sizes
-@mobileMaxWidth: 1240px;
+@mobileMaxWidth:                      1240px;
 
+// Header
+@header-height:                       50px;
+@header-color:                        hsl(194, 5%, 52%);
+@header-background:                   white;
+@header-button-color:                 hsl(194, 5%, 52%);
+@header-button-hover-color:           #151515;
+@header-button-hover-background:      hsl(207, 15%, 95%);
+
+// Body
+@body-background:                     white;
+@body-pagination-background:          hsl(207, 15%, 95%);
+
+// Sidebar
+@sidebar-width:                       250px;
+@sidebar-color:                       hsl(207, 15%, 80%);
+@sidebar-background:                  hsl(207, 15%, 95%);
+
+@sidebar-nested-padding:              10px;
+
+@sidebar-search-padding:              6px;
+@sidebar-search-background:           hsl(207, 15%, 80%);
+@sidebar-search-border-color:         hsl(207, 15%, 80%);
+
+@sidebar-divider-color:               hsl(207, 15%, 85%);
+
+@sidebar-link-color:                  hsl(207, 15%, 50%);
+@sidebar-link-background:             transparent;
+@sidebar-link-hover-color:            hsl(207, 100%, 50%);
+@sidebar-link-hover-background:       transparent;
+
+@sidebar-icon-color:                  @bar-progress-background;
+@sidebar-link-completed:              hsl(207, 15%, 25%);
+@sidebar-link-completed-weight:       normal;
+
+// Page
+@page-background:                     white;
+
+// Progress Bar
+@chapter-display:                     none;
+@chapter-size:                        16px;
+
+@progress-height:                     0px;
+
+@bar-height:                          2px;
+@bar-left:                            @sidebar-width;
+@bar-right:                           0;
+@bar-top:                             50px;
+@bar-position:                        fixed;
+@bar-background:                      white;
+@bar-progress-background:             hsl(120, 60%, 50%);
 
 // Basics of a navbar
-@navbar-height:                    50px;
-@navbar-margin-bottom:             @line-height-computed;
-@navbar-default-border:            #d5d5d5;
-@navbar-border-radius:             0px;
-@navbar-padding-horizontal:        floor(@grid-gutter-width / 2);
-@navbar-padding-vertical:          ((@navbar-height - @line-height-computed) / 2);
+@navbar-height:                       50px;
+@navbar-margin-bottom:                @line-height-computed;
+@navbar-default-border:               #d5d5d5;
+@navbar-border-radius:                0px;
+@navbar-padding-horizontal:           floor(@grid-gutter-width / 2);
+@navbar-padding-vertical:             ((@navbar-height - @line-height-computed) / 2);
 
 // Navbar brand label
-@navbar-default-color: #333;
-@navbar-default-link-color: #333;
-@navbar-default-brand-color:               @navbar-default-link-color;
-@navbar-default-brand-hover-color:         @navbar-default-link-color;
-@navbar-default-brand-hover-bg:            transparent;
+@navbar-default-color:                #333;
+@navbar-default-link-color:           #333;
+@navbar-default-brand-color:          @navbar-default-link-color;
+@navbar-default-brand-hover-color:    @navbar-default-link-color;
+@navbar-default-brand-hover-bg:       transparent;
 
-@border-radius-base:  1px;
-@border-radius-large: 3px;
-@border-radius-small: 1px;
+// Border Radius
+@border-radius-base:                  1px;
+@border-radius-large:                 3px;
+@border-radius-small:                 1px;
 
-/* Fonts */
-@font-family-base: 'appNormal';
+// Fonts
+@font-family-serif:                   Merriweather, "EB Garamond", Georgia, serif;
+@font-family-sans:                    "Open Sans", "Clear Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+@font-family-base:                    @font-family-serif;
 
-
-/* Fonts */
-@FontPath: '@{staticPath}/fonts';
-@fa-font-path: "@{FontPath}/fontawesome";
+@FontPath:                            '@{staticPath}/gitbook/fonts';
+@fa-font-path:                        "@{FontPath}/fontawesome";

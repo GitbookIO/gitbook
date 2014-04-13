@@ -1,89 +1,84 @@
 /* Chrome, Safari, Opera */
-@-webkit-keyframes animate-loading
-{
-    from {width: 0%;}
-    to {}
+@-webkit-keyframes animate-loading {
+  from {width: 0%;}
+  to {}
 }
 
 /* Standard syntax */
-@keyframes animate-loading
-{
-    from {width: 0%;}
-    to {}
+@keyframes animate-loading {
+  from {width: 0%;}
+  to {}
 }
 
 .book .book-body {
-    @chapter-size: 16px;
+  .book-progress {
+    height: @progress-height;
+    width: 100%;
+    position: relative;
+    background: #fff;
+    margin-bottom: 20px;
+    z-index: 10;
 
-    @bar-background: #eee;
+    .bar {
+      height: @bar-height;
+      position: @bar-position;
+      right: @bar-right;
+      left: @bar-left;
+      top: @bar-top;
 
-    .book-progress {
-        height: 30px;
-        width: 100%;
-        position: relative;
-        background: #fff;
-        margin-bottom: 20px;
-        z-index: 10;
+      background: @bar-background;
+      border-radius: 5px;
+      overflow: hidden;
 
-        .bar {
-            height: 8px;
-            position: absolute;
-            right: 20px;
-            left: 20px;
-            top: 11px;
+      .inner {
+        height: 100%;
+        width: 0%;
 
-            background: @bar-background;
-            border-radius: 5px;
-            overflow: hidden;
+        background: @bar-progress-background;
+        -webkit-animation: animate-loading 1s; /* Chrome, Safari, Opera */
+        animation: animate-loading 1s;
 
-            .inner {
-                height: 100%;
-                width: 0%;
-
-                background: @brand-success;
-                -webkit-animation: animate-loading 1s; /* Chrome, Safari, Opera */
-                animation: animate-loading 1s;
-
-                .in-inner {
-                    height: 100%;
-                    width: 50%;
-                    
-                }
-            }
+        .in-inner {
+          height: 100%;
+          width: 50%;
         }
-
-        .chapters {
-            position: absolute;
-            right: 20px + @chapter-size;
-            left: 20px;
-            top: 7px;
-
-            .chapter {
-                position: absolute;
-                width: @chapter-size;
-                height: @chapter-size;
-                border-radius: @chapter-size;
-
-                background: @bar-background;
-                box-shadow: 0px 0px 1px #bbb;
-
-                &.new-chapter {
-
-                }
-
-                &.done {
-                    background: @brand-success;
-                    box-shadow: none;
-                }
-
-                @media (max-width: 800px) {
-                    display: none;
-
-                    &.new-chapter {
-                        display: block;
-                    }
-                }
-            }
-        }
+      }
     }
+
+    .chapters {
+      display: @chapter-display;
+
+      position: absolute;
+      right: 20px + @chapter-size;
+      left: 20px;
+      top: 7px;
+
+      .chapter {
+        position: absolute;
+        width: @chapter-size;
+        height: @chapter-size;
+        border-radius: @chapter-size;
+
+        background: @bar-background;
+        box-shadow: 0px 0px 1px #bbb;
+
+        &.new-chapter {
+
+        }
+
+        &.done {
+          background: @bar-progress-background;
+          box-shadow: none;
+        }
+
+        @media (max-width: 800px) {
+          display: none;
+
+          &.new-chapter {
+            display: block;
+          }
+        }
+      }
+    }
+  }
 }

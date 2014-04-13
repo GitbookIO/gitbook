@@ -15,7 +15,6 @@
 @import "book/markdown.less";
 @import "book/progress.less";
 @import "book/navigation.less";
-@import "book/quiz.less";
 
 * {
     -webkit-overflow-scrolling: touch;
@@ -34,7 +33,7 @@ html, body {
 }
 
 body {
-
+    text-rendering: optimizeLegibility;
 	font-smoothing: antialiased;
-	font-family: 'appNormal';
+	font-family: @font-family-base;
 }

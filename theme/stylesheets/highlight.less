@@ -1,9 +1,8 @@
 /* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
 
 /* Tomorrow Comment */
-.hljs-comment,
-.hljs-title {
-  color: #8e908c;
+.hljs-comment {
+  color: hsl(207, 35%, 35%);
 }
 
 /* Tomorrow Red */
@@ -28,9 +27,9 @@
 .hljs-pragma,
 .hljs-built_in,
 .hljs-literal,
-.hljs-params,
-.hljs-constant {
-  color: #f5871f;
+.hljs-constant,
+.hljs-function .hljs-title {
+  color: hsl(50, 100%, 60%);
 }
 
 /* Tomorrow Yellow */
@@ -46,7 +45,7 @@
 .hljs-header,
 .ruby .hljs-symbol,
 .xml .hljs-cdata {
-  color: #718c00;
+  color: hsl(0, 100%, 70%);
 }
 
 /* Tomorrow Aqua */
@@ -55,7 +54,7 @@
 }
 
 /* Tomorrow Blue */
-.hljs-function,
+.hljs-function .keyword,
 .python .hljs-decorator,
 .python .hljs-title,
 .ruby .hljs-function .hljs-title,
@@ -63,13 +62,13 @@
 .perl .hljs-sub,
 .javascript .hljs-title,
 .coffeescript .hljs-title {
-  color: #4271ae;
+  color: hsl(207, 70%, 60%);
 }
 
 /* Tomorrow Purple */
 .hljs-keyword,
 .javascript .hljs-function {
-  color: #8959a8;
+  color: hsl(207, 95%, 70%);
 }
 
 .hljs {
@@ -77,6 +76,7 @@
   background: white;
   color: #4d4d4c;
   padding: 0.5em;
+  font-family: "Anonymous Pro", "Inconsolata", "Monaco", monospace;
 }
 
 .coffeescript .javascript,

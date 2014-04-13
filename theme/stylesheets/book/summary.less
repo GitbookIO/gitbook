@@ -1,143 +1,144 @@
 .book {
-    @searchHeight: 41px;
+  .book-summary {
+    font-family: @font-family-sans;
 
+    position: fixed;
+    top: @header-height;
+    left: -@sidebar-width;
+    bottom: 0px;
+    z-index: 1;
+
+    width: @sidebar-width;
+    color: @sidebar-color;
+    background: @sidebar-background;
+    box-shadow: inset -1px 0 5px hsla(0, 0%, 0%, 0.1);
+
+    .transition(all 0.5s ease);
+
+    .book-search {
+      padding: @sidebar-search-padding;
+
+      background: @sidebar-search-background;
+      border-bottom: 1px solid @sidebar-search-border-color;
+
+      position: absolute;
+      top: -@header-height;
+      left: 0px;
+      right: 0px;
+
+      .transition(top 0.5s ease);
+
+      input, input:focus {
+        width: 100%;
+        border: none;
+        .box-shadow(none);
+      }
+    }
+
+    ul.summary {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      right: 0px;
+      bottom: 0px;
+
+      overflow-y: auto;
+
+      list-style: none;
+      margin: 0px;
+      padding: 0px;
+
+      .transition(top 0.5s ease);
+
+      li {
+        list-style: none;
+
+        &.divider {
+          height: 1px;
+          margin: 7px 0;
+          overflow: hidden;
+          background: @sidebar-divider-color;
+          box-shadow: 0 1px rgba(255,255,255,0.7);
+        }
+
+        i.fa-check {
+          display: none;
+          position: absolute;
+          right: 9px;
+          top: 16px;
+          font-size: 9px;
+          color: @sidebar-icon-color;
+        }
+
+        &.done {
+          > a {
+            color: @sidebar-link-completed;
+            font-weight: @sidebar-link-completed-weight;
+
+            i {
+              display: inline;
+            }
+          }
+        }
+
+        a, span {
+          display: block;
+          padding: 10px 15px;
+          border-bottom: none;
+          color: @sidebar-link-color;
+          background: @sidebar-link-background;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+          position: relative;
+          padding-left: 25px;
+        }
+
+        span {
+          cursor: not-allowed;
+          .opacity(0.3);
+        }
+
+        &.active > a, a:hover {
+          color: @sidebar-link-hover-color;
+          background: @sidebar-link-hover-background;
+          text-decoration: none;
+        }
+
+        ul {
+          padding-left: @sidebar-nested-padding;
+        }
+      }
+    }
+
+    @media (max-width: 600px) {
+      width: 100%;
+      bottom: 0px;
+      left: -100%;
+    }
+  }
+
+  &.with-summary {
     .book-summary {
-        @width: 250px;
-
-        position: fixed;
-        top: 40px;
-        left: -@width;
-        bottom: 0px;
-        z-index: 1;
-
-        width: @width;
-        background: #2e3133;
-        color: #e2edf2;
-
-        .transition(all 0.5s ease);
-
-        .book-search {
-            padding: 6px;
-            padding-top: 0px;
-
-            background: #242628;
-            border-bottom: 1px solid #333;
-
-            position: absolute;
-            top: -@searchHeight;
-            left: 0px;
-            right: 0px;
-
-            .transition(top 0.5s ease);
-
-
-            input, input:focus {
-                width: 100%;
-                border: none;
-                .box-shadow(none);
-            }
-        }
-
-        ul.summary {
-            position: absolute;
-            top: 0px;
-            left: 0px;
-            right: 0px;
-            bottom: 0px;
-
-            overflow-y: auto;
-
-            list-style: none;
-            margin: 0px;
-            padding: 0px;
-
-            .transition(top 0.5s ease);
-
-            li {
-                list-style: none;
-                
-                &.divider {
-                    height: 1px;
-                    margin: 7px 0;
-                    overflow: hidden;
-                    background: #35393b;
-                }
-
-                i.fa-check {
-                    display: none;
-                    position: absolute;
-                    left: 7px;
-                    top: 14px;
-                }
-
-                &.done {
-                    > a {
-                        color: @brand-success;
-
-                        i {
-                            display: inline;
-                        }
-                    }
-                }
-                
-                a, span {
-                    display: block;
-                    height: 40px;
-                    padding: 11px 15px;
-                    border-bottom: none;
-                    text-transform: uppercase;
-                    color: #e2edf2;
-                    text-overflow: ellipsis;
-                    overflow: hidden;
-                    white-space: nowrap;
-                    position: relative;
-                    padding-left: 26px;
-                }
-
-                span {
-                    cursor: not-allowed;
-                    .opacity(0.3);
-                }
-
-                &.active > a, a:hover {
-                    background: #242628;
-                    text-decoration: none;
-                }
-
-                ul {
-                    padding-left: 35px;
-                }
-            }
-        }
-
-        @media (max-width: 600px) {
-            width: 100%;
-            bottom: 0px;
-            left: -100%;
-        }
+      left: 0px;
     }
+  }
 
-    &.with-summary {
-        .book-summary {
-            left: 0px;
-        }        
+  &.without-animation {
+    .book-summary {
+      .transition(none) !important;
     }
+  }
 
-    &.without-animation {
-        .book-summary {
-            .transition(none) !important;
-        }
+  &.with-search {
+    .book-summary {
+      .book-search {
+        top: 0px;
+      }
+
+      ul.summary {
+        top: @header-height;
+      }
     }
-
-    &.with-search {
-        .book-summary {
-            .book-search {
-                top: 0px;
-            }
-
-            ul.summary {
-                top: @searchHeight;
-            }
-        }
-    }
+  }
 }

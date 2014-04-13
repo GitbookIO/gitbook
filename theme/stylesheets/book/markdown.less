@@ -2,13 +2,13 @@
     padding: 25px;
     padding-top: 15px;
     background-color: white;
-    
+
 
     & > *:first-child {
         margin-top: 0 !important; }
     & > *:last-child {
         margin-bottom: 0 !important; }
-     
+
     a {
         color: #4183C4; }
     a.absent {
@@ -22,7 +22,7 @@
         top: 0;
         left: 0;
         bottom: 0; }
-     
+
     h1, h2, h3, h4, h5, h6 {
         line-height: 1.7;
         margin: 20px 0 10px;
@@ -31,54 +31,54 @@
         -webkit-font-smoothing: antialiased;
         cursor: text;
         position: relative; }
-     
+
     h1 tt, h1 code {
         font-size: inherit; }
-     
+
     h2 tt, h2 code {
         font-size: inherit; }
-     
+
     h3 tt, h3 code {
         font-size: inherit; }
-     
+
     h4 tt, h4 code {
         font-size: inherit; }
-     
+
     h5 tt, h5 code {
         font-size: inherit; }
-     
+
     h6 tt, h6 code {
         font-size: inherit; }
-     
+
     h1 {
         font-size: 28px;
         color: black; }
-     
+
     h2 {
         font-size: 24px;
         border-bottom: 1px solid #eee;
         color: black; }
-     
+
     h3 {
         font-size: 18px; }
-     
+
     h4 {
         font-size: 16px; }
-     
+
     h5 {
         font-size: 14px; }
-     
+
     h6 {
         color: #777777;
         font-size: 14px; }
-     
+
     p, blockquote, ul, ol, dl, table, pre {
         margin: 15px 0; }
-     
+
     hr {
-        
+
     }
-     
+
     body > h2:first-child {
         margin-top: 0;
         padding-top: 0; }
@@ -91,23 +91,23 @@
     body > h3:first-child, body > h4:first-child, body > h5:first-child, body > h6:first-child {
         margin-top: 0;
         padding-top: 0; }
-     
+
     a:first-child h1, a:first-child h2, a:first-child h3, a:first-child h4, a:first-child h5, a:first-child h6 {
         margin-top: 0;
         padding-top: 0; }
-     
+
     h1 p, h2 p, h3 p, h4 p, h5 p, h6 p {
         margin-top: 0; }
-     
+
     li p.first {
         display: inline-block; }
-     
+
     ul, ol {
         padding-left: 30px; }
-     
+
     ul :first-child, ol :first-child {
         margin-top: 0; }
-     
+
     ul :last-child, ol :last-child {
         margin-bottom: 0; }
 
@@ -117,7 +117,7 @@
     ul ul {
         margin: 0px;
     }
-     
+
     dl {
         padding: 0; }
         dl dt {
@@ -139,7 +139,7 @@
                 margin-top: 0; }
             dl dd > :last-child {
                 margin-bottom: 0; }
-     
+
     blockquote {
         border-left: 4px solid #dddddd;
         padding: 0 15px;
@@ -154,12 +154,12 @@
         }
         blockquote > :last-child {
             margin-bottom: 0; }
-     
+
     table {
         width: 100%;
         padding: 0;
     }
-    
+
         table tr {
             border-top: 1px solid #cccccc;
             background-color: white;
@@ -182,13 +182,13 @@
                 margin-top: 0; }
             table tr th :last-child, table tr td :last-child {
                 margin-bottom: 0; }
-     
+
     img {
         max-width: 100%;
         display: block;
         margin: 0px auto;
     }
-     
+
     span.frame {
         display: block;
         overflow: hidden; }
@@ -256,7 +256,7 @@
             text-align: right;
         }
     }
-     
+
     code, tt {
         margin: 0 2px;
         padding: 0 5px;
@@ -265,7 +265,7 @@
         background-color: #f8f8f8;
         border-radius: 3px;
     }
-     
+
     pre code {
         margin: 0;
         padding: 0;
@@ -273,27 +273,33 @@
         border: none;
         background: transparent;
     }
-     
+
     .highlight pre {
-        background-color: #f8f8f8;
-        border: 1px solid #cccccc;
-        font-size: 13px;
-        line-height: 19px;
+        color: hsl(204, 40%, 80%);
+        background-color: hsl(204, 30%, 10%);
+        border: 1px solid hsl(204, 30%, 10%);
+        font-size: 16px;
+        line-height: 1.5em;
         overflow: auto;
-        padding: 6px 10px;
+        padding: 20px;
+        margin: 0 -20px;
         border-radius: 3px;
     }
-     
+
     pre {
-        background-color: #f8f8f8;
-        border: 1px solid #cccccc;
-        font-size: 13px;
-        line-height: 19px;
+        color: hsl(204, 40%, 80%);
+        background-color: hsl(204, 30%, 10%);
+        border: 1px solid hsl(204, 30%, 10%);
+        font-size: 16px;
+        line-height: 1.5em;
         overflow: auto;
-        padding: 6px 10px;
-        border-radius: 3px; }
-        pre code, pre tt {
-            background-color: transparent;
-            border: none;
+        padding: 20px;
+        margin: 0 -20px;
+        border-radius: 3px;
+    }
+
+    pre code, pre tt {
+        background-color: transparent;
+        border: none;
     }
 }
