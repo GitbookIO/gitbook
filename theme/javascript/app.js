@@ -12,8 +12,17 @@ require([
     "core/sidebar",
     "core/search"
 ], function($, storage, analytic, sharing, state, keyboard, exercise, quiz, progress, sidebar, search){
+    function changeNavigationPosition()
+    {
+        var bodyInnerWidth, pageWrapperWidth;
+        bodyInnerWidth = parseInt($('.body-inner').css('width'), 10);
+        pageWrapperWidth = parseInt($('.page-wrapper').css('width'), 10);
+        $('.navigation-next').css('margin-right', (bodyInnerWidth - pageWrapperWidth) + 'px');
+    }
+    $(window).on('resize', changeNavigationPosition);
     $(document).ready(function() {
-        var $book = state.$book;
+        var $book;
+        $book = state.$book;
 
         // Init sidebar
         sidebar.init();
@@ -48,5 +57,8 @@ require([
 
         // Focus on content
         $(".book-body").focus();
+
+        // Move, if needed, right navigation control to allow scrolling.
+        changeNavigationPosition();
     });
 });
