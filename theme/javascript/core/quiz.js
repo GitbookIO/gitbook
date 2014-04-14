@@ -14,13 +14,13 @@ define([
         // Submit: test code
         $quiz.find(".action-submit").click(function(e) {
             e.preventDefault();
-            analytic.track("exercise.submit");
+            analytic.track("exercise.submit", {type: "quiz"});
             $quiz.find("tr.alert-danger,li.alert-danger").removeClass("alert-danger");
             $quiz.find(".alert-success,.alert-danger").addClass("hidden");
 
-            $quiz.find(".quiz").each(function(q) {
+            $quiz.find(".question").each(function(q) {
                 var result = true;
-                var $answers = $quiz.find(".quiz-answers").slice(q).find("input[type=radio], input[type=checkbox]");
+                var $answers = $quiz.find(".question-answers").slice(q).find("input[type=radio], input[type=checkbox]");
                 $(this).find("input[type=radio],input[type=checkbox]").each(function(i) {
                     var correct = $(this).is(":checked") === $answers.slice(i).first().is(":checked");
                     result = result && correct;
@@ -34,7 +34,8 @@ define([
         });
 
         $quiz.find(".action-solution").click(function(e) {
-            $quiz.find(".quiz, .quiz-answers").toggleClass("hidden");
+            e.preventDefault();
+            $quiz.find(".question-content, .question-answers").toggleClass("hidden");
         });
     };
 
