@@ -17,15 +17,19 @@ define([
             return
         }
 
-        console.log("load url", url);
         return $.get(url)
-        .done(function (data) {
-            var $newPage = $(data);
-            var title = data.match("<title>(.*?)</title>")[1];
-            
-            $('title').text(title);
-            $('.book-body').html($newPage.find('.book-body').html());
-            $('.book-summary').html($newPage.find('.book-summary').html());
+        .done(function (html) {
+            html = html.replace( /<(\/?)(html|head|body)([^>]*)>/ig, function(a,b,c,d){
+                return '<' + b + 'div' + ( b ? '' : ' data-element="' + c + '"' ) + d + '>';
+            });
+
+            var $page = $(html);
+            var $pageHead = $page.find("[data-element=head]");
+
+            $("head").html($pageHead.html());
+            $('.book-header').html($page.find('.book-header').html());
+            $('.book-body').html($page.find('.book-body').html());
+            $('.book-summary').html($page.find('.book-summary').html());
 
             if (push) updateHistory(url, null);
             preparePage();
