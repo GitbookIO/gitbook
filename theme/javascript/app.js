@@ -6,11 +6,11 @@ require([
 
     "core/state",
     "core/keyboard",
-    "core/exercise",
+    "core/navigation",
     "core/progress",
     "core/sidebar",
     "core/search"
-], function($, storage, analytic, sharing, state, keyboard, exercise, progress, sidebar, search){
+], function($, storage, analytic, sharing, state, keyboard, navigation, progress, sidebar, search){
     $(document).ready(function() {
         var $book = state.$book;
 
@@ -35,14 +35,11 @@ require([
         // Init keyboard
         keyboard.init();
 
-        // Bind exercise
-        exercise.init();
-
         // Bind sharing button
         sharing.init();
 
-        // Show progress
-        progress.show();
+        // Init navigation
+        navigation.init();
 
         // Focus on content
         $(".book-body").focus();
