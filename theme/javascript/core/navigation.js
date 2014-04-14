@@ -42,6 +42,12 @@ define([
 
         // Show progress
         progress.show();
+
+        // Reset scroll
+        $(".book-body").scrollTop(0);
+
+        // Focus on content
+        $(".book-body").focus();
     };
 
     var handlePagination = function (e) {

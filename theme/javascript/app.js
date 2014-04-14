@@ -40,8 +40,5 @@ require([
 
         // Init navigation
         navigation.init();
-
-        // Focus on content
-        $(".book-body").focus();
     });
 });
