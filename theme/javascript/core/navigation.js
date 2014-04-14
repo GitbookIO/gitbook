@@ -1,11 +1,12 @@
 define([
     "jQuery",
+    "utils/analytic",
     "core/state",
     "core/search",
     "core/progress",
     "core/exercise",
     "core/quiz"
-], function($, state, search, progress, exercises, quiz) {
+], function($, analytic, state, search, progress, exercises, quiz) {
     var prev, next;
     var githubCountStars, githubCountWatch;
 
@@ -98,6 +99,9 @@ define([
                 });
             }
         }
+
+        // Send to mixpanel
+        analytic.track("page.view");
     };
 
     var handlePagination = function (e) {

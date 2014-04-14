@@ -4,7 +4,7 @@ define([
 ], function(_, mixpanel) {
     mixpanel.init("01eb2b950ae09a5fdb15a98dcc5ff20e", {
         loaded: function() {
-            track("View");
+            track("page.start");
         }
     });
 
