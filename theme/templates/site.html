@@ -5,9 +5,9 @@
     <div class="book" {% if githubId %}data-github="{{ githubId }}"{% endif %} data-level="{{ progress.current.level }}" data-basepath="{{ basePath }}" data-revision="{{ revision }}">
     {% include "includes/book/header.html" %}
     {% include "includes/book/summary.html" %}
-    <div class="book-body" tabindex="-1">
+    <div class="book-body">
         <div class="body-inner">
-            <div class="page-wrapper">
+            <div class="page-wrapper" tabindex="-1">
                 {% include "includes/book/progress.html" %}
 
                 <div class="page-inner">

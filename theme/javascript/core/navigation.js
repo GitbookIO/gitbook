@@ -63,6 +63,8 @@ define([
     };
 
     var preparePage = function() {
+        var $pageWrapper = $(".book-body .page-wrapper");
+        
         // Bind exercises/quiz
         exercises.init();
         quiz.init();
@@ -74,10 +76,10 @@ define([
         updateNavigationPosition();
 
         // Reset scroll
-        $(".book-body").scrollTop(0);
+        $pageWrapper.scrollTop(0);
 
         // Focus on content
-        $(".book-body").focus();
+        $pageWrapper.focus();
 
         // Update GitHub count
         if (state.githubId) {
