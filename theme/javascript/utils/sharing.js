@@ -19,7 +19,7 @@ define([
 
     // Bind all sharing button
     var init = function() {
-        $("a[data-sharing]").click(function(e) {
+        $(document).on("click", "a[data-sharing]", function(e) {
             if (e) e.preventDefault();
             var type = $(this).data("sharing");
 

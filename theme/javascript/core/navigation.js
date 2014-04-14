@@ -1,10 +1,12 @@
 define([
     "jQuery",
+    "core/state",
     "core/progress",
     "core/exercise",
     "core/quiz"
-], function($, progress, exercises, quiz) {
+], function($, state, progress, exercises, quiz) {
     var prev, next;
+    var githubCountStars, githubCountWatch;
 
     var updateHistory = function(url, title) {
         history.pushState({ path: url }, title, url);
@@ -39,6 +41,11 @@ define([
         });
     };
 
+    var updateGitHubCounts = function() {
+        $(".book-header .count-star span").text(githubCountStars);
+        $(".book-header .count-watch span").text(githubCountWatch);
+    }
+
     var preparePage = function() {
         // Bind exercises/quiz
         exercises.init();
@@ -52,6 +59,20 @@ define([
 
         // Focus on content
         $(".book-body").focus();
+
+        // Update GitHub count
+        if (state.githubId) {
+            if (githubCountStars) {
+                updateGitHubCounts();
+            } else {
+                $.getJSON("https://api.github.com/repos/"+state.githubId)
+                .done(function(repo) {
+                    githubCountStars = repo.stargazers_count;
+                    githubCountWatch = repo.subscribers_count;
+                    updateGitHubCounts();
+                });
+            }
+        }
     };
 
     var handlePagination = function (e) {
