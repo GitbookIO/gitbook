@@ -28,16 +28,24 @@ define([
 
     function handleNavigation (url, push) {
         if (typeof history.pushState === "undefined") {
-          // Refresh the page to the new URL if pushState not supported
-          location.href = url;
+            // Refresh the page to the new URL if pushState not supported
+            location.href = url;
+            return
         }
 
-        return $.get(url).done(function (data) {
-            $('.book-body').html($(data).find('.book-body').html());
-            $('.book-summary').html($(data).find('.book-summary').html());
+        return $.get(url)
+        .done(function (data) {
+            var $newPage = $(data);
+            var title = data.match("<title>(.*?)</title>")[1];
+            
+            $('title').text(title);
+            $('.book-body').html($newPage.find('.book-body').html());
+            $('.book-summary').html($newPage.find('.book-summary').html());
+
             if (push) updateHistory(url, null);
             progress.show();
-        }).fail(function () {
+        })
+        .fail(function () {
             location.href = url;
         });
     }
