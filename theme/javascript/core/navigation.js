@@ -28,7 +28,15 @@ define([
             var $page = $(html);
             var $pageHead = $page.find("[data-element=head]");
 
-            $("head").html($pageHead.html());
+            // Merge heads
+            var headContent = $pageHead.html()
+
+            $("head style").each(function() {
+                headContent = headContent + this.outerHTML
+            });
+            $("head").html(headContent);
+
+            // Update header, body and summary
             $('.book-header').html($page.find('.book-header').html());
             $('.book-body').html($page.find('.book-body').html());
             $('.book-summary').html($page.find('.book-summary').html());
