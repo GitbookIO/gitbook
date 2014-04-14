@@ -12,7 +12,8 @@ require([
     "core/search"
 ], function($, storage, analytic, sharing, state, keyboard, navigation, progress, sidebar, search){
     $(document).ready(function() {
-        var $book = state.$book;
+        var $book;
+        $book = state.$book;
 
         if (state.githubId) {
             // Initialize storage
@@ -30,7 +31,7 @@ require([
 
         // Bind sharing button
         sharing.init();
-
+        
         // Init navigation
         navigation.init();
     });

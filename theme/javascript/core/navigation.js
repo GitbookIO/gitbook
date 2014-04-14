@@ -52,7 +52,15 @@ define([
     var updateGitHubCounts = function() {
         $(".book-header .count-star span").text(githubCountStars);
         $(".book-header .count-watch span").text(githubCountWatch);
-    }
+    };
+
+    var updateNavigationPosition = function() {
+        var bodyInnerWidth, pageWrapperWidth;
+
+        bodyInnerWidth = parseInt($('.body-inner').css('width'), 10);
+        pageWrapperWidth = parseInt($('.page-wrapper').css('width'), 10);
+        $('.navigation-next').css('margin-right', (bodyInnerWidth - pageWrapperWidth) + 'px');
+    };
 
     var preparePage = function() {
         // Bind exercises/quiz
@@ -61,6 +69,9 @@ define([
 
         // Show progress
         progress.show();
+
+        // Update navigation position
+        updateNavigationPosition();
 
         // Reset scroll
         $(".book-body").scrollTop(0);
@@ -125,6 +136,8 @@ define([
         $(document).on('click', ".navigation-prev", handlePagination);
         $(document).on('click', ".navigation-next", handlePagination);
         $(document).on('click', ".summary [data-path] a", handlePagination);
+        
+        $(window).resize(updateNavigationPosition);
 
         // Prepare current page
         preparePage();
