@@ -56,7 +56,7 @@ buildCommand(prog.command('pdf [source_dir]'))
 .action(function(dir, options) {
     build.file(dir, _.extend(options, {
         extension: "pdf",
-        format: "pdf"
+        generator: "pdf"
     }));
 });
 
@@ -68,7 +68,7 @@ buildCommand(prog.command('ebook [source_dir]'))
 
     build.file(dir, _.extend(options, {
         extension: ext,
-        format: "ebook"
+        generator: "ebook"
     }));
 });
 
