@@ -7,8 +7,6 @@ define([
     "core/sidebar"
 ], function($, _, lunr, storage, state, sidebar) {
     var index = null;
-    var $searchBar = state.$book.find(".book-search");
-    var $searchInput = $searchBar.find("input");
 
     // Use a specific idnex
     var useIndex = function(data) {
@@ -41,6 +39,7 @@ define([
     var toggleSearch = function(_state) {
         if (state != null && isSearchOpen() == _state) return;
 
+        var $searchInput = $(".book-search input");
         state.$book.toggleClass("with-search", _state);
 
         // If search bar is open: focus input
@@ -68,6 +67,10 @@ define([
             e.preventDefault();
             toggleSearch();
         });
+    };
+
+    var prepare = function() {
+        var $searchInput = $(".book-search input");
 
         $searchInput.keyup(function(e) {
             var key = (e.keyCode ? e.keyCode : e.which);
@@ -87,11 +90,12 @@ define([
                 );
             }
         });
-    };
+    }
 
     return {
         init: init,
         search: search,
-        toggle: toggleSearch
+        toggle: toggleSearch,
+        prepare: prepare
     };
 });

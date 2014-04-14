@@ -1,10 +1,11 @@
 define([
     "jQuery",
     "core/state",
+    "core/search",
     "core/progress",
     "core/exercise",
     "core/quiz"
-], function($, state, progress, exercises, quiz) {
+], function($, state, search, progress, exercises, quiz) {
     var prev, next;
     var githubCountStars, githubCountWatch;
 
@@ -64,7 +65,7 @@ define([
 
     var preparePage = function() {
         var $pageWrapper = $(".book-body .page-wrapper");
-        
+
         // Bind exercises/quiz
         exercises.init();
         quiz.init();
@@ -80,6 +81,9 @@ define([
 
         // Focus on content
         $pageWrapper.focus();
+
+        // Prepare search bar
+        search.prepare();
 
         // Update GitHub count
         if (state.githubId) {
