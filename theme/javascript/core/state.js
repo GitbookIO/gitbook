@@ -1,14 +1,19 @@
 define([
     "jQuery"
 ], function() {
-    var $book = $(".book");
+    var state = {};
 
-    return {
-      '$book': $book,
+    state.update = function(dom) {
+        var $book = $(dom.find(".book"));
 
-      'githubId': $book.data("github"),
-      'level': $book.data("level"),
-      'basePath': $book.data("basepath"),
-      'revision': $book.data("revision")
+        state.$book = $book;
+        state.githubId = $book.data("github");
+        state.level = $book.data("level");
+        state.basePath = $book.data("basepath");
+        state.revision = $book.data("revision");
     };
+
+    state.update($);
+
+    return state;
 });

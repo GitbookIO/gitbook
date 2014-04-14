@@ -43,6 +43,9 @@ define([
             $('.book-body').html($page.find('.book-body').html());
             $('.book-summary').html($page.find('.book-summary').html());
 
+            // Update state
+            state.update($page);
+
             if (push) updateHistory(url, null);
             preparePage();
         })
