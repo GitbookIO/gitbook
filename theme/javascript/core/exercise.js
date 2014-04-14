@@ -19,7 +19,7 @@ define([
         $exercise.find(".action-submit").click(function(e) {
             e.preventDefault();
 
-            analytic.track("exercise.submit");
+            analytic.track("exercise.submit", {type: "code"});
 
             execute("javascript", editor.getValue(), codeValidation, codeContext, function(err, result) {
                 $exercise.toggleClass("return-error", err != null);

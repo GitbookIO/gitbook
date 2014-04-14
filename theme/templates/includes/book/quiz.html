@@ -6,22 +6,31 @@
     {% autoescape false %}{{ section.content }}{% endautoescape %}
 </div>
 
+
 {% for quiz in section.quiz %}
-<div class="quiz">
-    {% autoescape false %}{{ quiz.base }}{% endautoescape %}
+<div class="question">
+    <div class="question-header">Question {{ loop.index }} of {{ section.quiz.length }}</div>
 
-    <div class="alert alert-success hidden">
-        <b>Correct!</b>
+    <div class="question-content">
+        <div class="alert alert-success hidden">
+            <b>Correct!</b>
+        </div>
+
+        <div class="alert alert-danger error-message hidden">
+            <p><b>Not quite!</b></p>
+            {% autoescape false %}{{ quiz.feedback }}{% endautoescape %}
+        </div>
+
+        <div class="question-inner">
+        {% autoescape false %}{{ quiz.base }}{% endautoescape %}
+        </div>
     </div>
 
-    <div class="alert alert-danger error-message hidden">
-        <p><b>Not quite!</b></p>
-        {% autoescape false %}{{ quiz.feedback }}{% endautoescape %}
+    <div class="hidden question-answers">
+        <div class="question-inner">
+        {% autoescape false %}{{ quiz.solution }}{% endautoescape %}
+        </div>
     </div>
-</div>
-
-<div class="hidden quiz-answers">
-    {% autoescape false %}{{ quiz.solution }}{% endautoescape %}
 </div>
 {% endfor %}
 

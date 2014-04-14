@@ -1,39 +1,35 @@
 .book {
-    @searchHeight: 41px;
-
     .book-summary {
-        @width: 250px;
+        font-family: @font-family-sans;
 
         position: fixed;
-        top: 40px;
-        left: -@width;
+        top: @header-height;
+        left: -@sidebar-width;
         bottom: 0px;
         z-index: 1;
 
-        width: @width;
-        background: #2e3133;
-        color: #e2edf2;
+        width: @sidebar-width;
+        color: @sidebar-color;
+        background: @sidebar-background;
+        box-shadow: inset -1px 0 5px hsla(0, 0%, 0%, 0.1);
 
         .transition(all 0.5s ease);
 
         .book-search {
-            padding: 6px;
-            padding-top: 0px;
+            padding: @sidebar-search-padding;
 
-            background: #242628;
-            border-bottom: 1px solid #333;
+            background: @sidebar-search-background;
 
             position: absolute;
-            top: -@searchHeight;
+            top: -@header-height;
             left: 0px;
             right: 0px;
 
             .transition(top 0.5s ease);
 
-
             input, input:focus {
                 width: 100%;
-                border: none;
+                border: 1px solid @sidebar-search-input-border-color;
                 .box-shadow(none);
             }
         }
@@ -55,43 +51,46 @@
 
             li {
                 list-style: none;
-                
+
                 &.divider {
                     height: 1px;
                     margin: 7px 0;
                     overflow: hidden;
-                    background: #35393b;
+                    background: @sidebar-divider-color;
+                    box-shadow: 0 1px rgba(255,255,255,0.7);
                 }
 
                 i.fa-check {
                     display: none;
                     position: absolute;
-                    left: 7px;
-                    top: 14px;
+                    right: 9px;
+                    top: 16px;
+                    font-size: 9px;
+                    color: @sidebar-icon-color;
                 }
 
                 &.done {
                     > a {
-                        color: @brand-success;
+                        color: @sidebar-link-completed;
+                        font-weight: @sidebar-link-completed-weight;
 
                         i {
                             display: inline;
                         }
                     }
                 }
-                
+
                 a, span {
                     display: block;
-                    height: 40px;
-                    padding: 11px 15px;
+                    padding: 10px 15px;
                     border-bottom: none;
-                    text-transform: uppercase;
-                    color: #e2edf2;
+                    color: @sidebar-link-color;
+                    background: @sidebar-link-background;
                     text-overflow: ellipsis;
                     overflow: hidden;
                     white-space: nowrap;
                     position: relative;
-                    padding-left: 26px;
+                    padding-left: 25px;
                 }
 
                 span {
@@ -100,12 +99,13 @@
                 }
 
                 &.active > a, a:hover {
-                    background: #242628;
+                    color: @sidebar-link-hover-color;
+                    background: @sidebar-link-hover-background;
                     text-decoration: none;
                 }
 
                 ul {
-                    padding-left: 35px;
+                    padding-left: @sidebar-nested-padding;
                 }
             }
         }
@@ -120,7 +120,7 @@
     &.with-summary {
         .book-summary {
             left: 0px;
-        }        
+        }
     }
 
     &.without-animation {
@@ -136,7 +136,7 @@
             }
 
             ul.summary {
-                top: @searchHeight;
+                top: @header-height;
             }
         }
     }

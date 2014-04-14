@@ -22,10 +22,10 @@
             <li {% if item._path == _input %}class="active"{% endif %} data-level="{{ item.level }}" {% if item.path %}data-path="{{ item.path|mdLink }}"{% endif %}>
                 {% if item.path %}
                 <a href="{{ basePath }}/{{ item.path|mdLink }}">
-                    <i class="fa fa-check"></i> <b>{{ item.level }})</b> {{ item.title }}
+                    <i class="fa fa-check"></i> <b>{{ item.level }}.</b> {{ item.title }}
                 </a>
                 {% else %}
-                <span><b>{{ item.level }})</b> {{ item.title }}</span>
+                <span><b>{{ item.level }}.</b> {{ item.title }}</span>
                 {% endif %}
                 {% if item.articles.length > 0 %}
                 <ul class="articles">
@@ -33,10 +33,10 @@
                         <li {% if article._path == _input %}class="active"{% endif %} data-level="{{ article.level }}" {% if article.path %}data-path="{{ article.path|mdLink }}"{% endif %}>
                             {% if article.path %}
                             <a href="{{ basePath }}/{{ article.path|mdLink }}">
-                                <i class="fa fa-check"></i> <b>{{ article.level }})</b> {{ article.title }}
+                                <i class="fa fa-check"></i> <b>{{ article.level }}.</b> {{ article.title }}
                             </a>
                             {% else %}
-                            <span><b>{{ article.level }})</b> {{ article.title }}</span>
+                            <span><b>{{ article.level }}.</b> {{ article.title }}</span>
                             {% endif %}
                         </li>
                     {% endfor %}

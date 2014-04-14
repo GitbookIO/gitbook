@@ -8,21 +8,21 @@
         min-width: 90px;
 
         display: flex;
-        justify-content:center;
-        align-content:center;
-        flex-direction:column;
+        justify-content: center;
+        align-content: center;
+        flex-direction: column;
 
         font-size: 40px;
-        color: rgba(0,0,0, 0.5);
+        color: rgba(0,0,0,0.5);
 
         text-align: center;
 
         .transition(all 350ms ease);
 
         &:hover {
-            background-color: rgba(0,0,0, 0.06);
+            background-color: @body-pagination-background;
             text-decoration: none;
-        } 
+        }
 
         &.navigation-next {
             right: 0px;
@@ -40,6 +40,6 @@
             width: 50%;
             display: inline-block;
             float: left;
-        } 
+        }
     }
 }

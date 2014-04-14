@@ -64,7 +64,7 @@ define([
         loadIndex();
 
         // Toggle search
-        state.$book.find(".book-header .toggle-search").click(function(e) {
+        $(document).on("click", ".book-header .toggle-search", function(e) {
             e.preventDefault();
             toggleSearch();
         });

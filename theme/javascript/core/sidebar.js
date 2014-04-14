@@ -25,7 +25,7 @@ define([
     // Prepare sidebar: state and toggle button
     var init = function() {
         // Toggle summary
-        state.$book.find(".book-header .toggle-summary").click(function(e) {
+        $(document).on("click", ".book-header .toggle-summary", function(e) {
             e.preventDefault();
             toggleSidebar();
         });

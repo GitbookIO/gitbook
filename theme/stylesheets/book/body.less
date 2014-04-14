@@ -1,10 +1,13 @@
 .book {
-   .book-body {
+    .book-body {
         position: fixed;
-        top: 40px;
+        top: @header-height;
         right: 0px;
         left: 0px;
         bottom: 0px;
+
+        background: @body-background;
+        .transition(left 0.5s ease);
 
         .body-inner {
             position: absolute;
@@ -15,29 +18,26 @@
             overflow-y: auto;
         }
 
-        .transition(left 0.5s ease);
-
-        background: #edece4;
-
         .page-wrapper {
             position: relative;
-            min-height: 100%;
 
             .page-inner {
+                font-family: @font-family-serif;
                 max-width: 800px;
                 margin: 0px auto;
-            
+
                 section {
                     margin: 0px 0px;
                     padding: 5px 15px;
-                    background: #fff;
+
+                    background: @page-background;
                     border-radius: 2px;
-                    font-size: 15px;
-                    line-height: 1.7;
+
+                    font-size: 16px;
+                    line-height: 1.5em;
                 }
 
                 .btn-group {
-
                     .btn {
                         border-radius: 0px;
                         background: #eee;

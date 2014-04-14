@@ -1,34 +1,34 @@
 .book {
     .book-header {
+        font-family: @font-family-sans;
+
         position: fixed;
+        overflow: hidden;
         top: 0px;
         right: 0px;
         left: 0px;
+        height: @header-height;
         z-index: 2;
 
-        height: 40px;
-
         font-size: 0.85em;
-
-        background: #242628;
-        color: #e2edf2;
-        overflow: hidden;
+        color: @header-color;
+        background: @header-background;
+        box-shadow: 0 1px 2px hsla(200,10%,80%,0.6);
 
         .btn {
             display: block;
-            height: 40px;
+            height: @header-height;
             padding: 0px 15px;
             border-bottom: none;
-            color: #7d878a;
+            color: @header-button-color;
             text-transform: uppercase;
-            line-height: 40px;
+            line-height: @header-height;
 
             &:hover {
-                color: #e2edf2;
-                text-decoration: none;
                 position: relative;
-                background: #303436;
-                box-shadow: 0 -2px 2px rgba(0,0,0,0.2) inset;
+                text-decoration: none;
+                color: @header-button-hover-color;
+                background: @header-button-hover-background;
             }
         }
 
@@ -36,7 +36,7 @@
             margin: 0px;
             font-size: 20px;
             text-align: center;
-            line-height: 40px;
+            line-height: @header-height;
 
             padding-left: 200px;
             padding-right: 200px;
