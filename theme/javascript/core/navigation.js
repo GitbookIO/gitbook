@@ -38,10 +38,14 @@ define([
             });
             $("head").html(headContent);
 
-            // Update header, body and summary
+            // Update header, body
             $('.book-header').html($page.find('.book-header').html());
             $('.book-body').html($page.find('.book-body').html());
+
+            // Update summary
+            var scrollPosition = $('.book-summary .summary').scrollTop();
             $('.book-summary').html($page.find('.book-summary').html());
+            $('.book-summary .summary').scrollTop(scrollPosition);
 
             // Update state
             state.update($page);
