@@ -28,6 +28,7 @@ describe('Page parsing', function() {
         assert.equal(QUIZ_LEXED[0].type, 'normal');
         assert.equal(QUIZ_LEXED[1].type, 'quiz');
         assert.equal(QUIZ_LEXED[2].type, 'normal');
+        assert.equal(QUIZ_LEXED[3].type, 'quiz');
     });
 
     it('should gen content for normal sections', function() {
