@@ -35,7 +35,6 @@ Options for commands `build` and `serve` are:
 -g, --github <repo_path> ID of github repo like : username/repo
 -o, --output <directory>  Path to output directory, defaults to ./_book
 -f, --format <name>       Change generation format, defaults to site, availables are: site, page, pdf, json
--i, --intro <intro>       Description of the book to generate
 --githubHost <url>   The url of the github host (defaults to https://github.com/)
 --theme <path>            Path to theme directory
 ```
