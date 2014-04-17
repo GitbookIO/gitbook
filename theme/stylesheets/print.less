@@ -1,3 +1,31 @@
+@import "vendors/bootstrap/bootstrap.less";
+@import "vendors/fontawesome/font-awesome.less";
+
+@import "mixins.less";
+@import "variables.less";
+@import "fonts.less";
+
+@import "page/highlight.less";
+
+* {
+    -webkit-overflow-scrolling: touch;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: none;
+    -webkit-touch-callout: none;
+    -webkit-font-smoothing: antialiased;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    text-rendering: optimizeLegibility;
+    font-smoothing: antialiased;
+    font-family: @font-family-base;
+}
+
+
 h1, h2 {
     page-break-after: avoid;
     page-break-before: auto;
@@ -56,8 +84,6 @@ section {
             font-size: 0.6cm;
             text-align: center;
             padding: 3cm 0cm;
-
-            border-top: 1px solid #ccc;
 
             @media print {
                 border: none;
