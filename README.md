@@ -39,6 +39,8 @@ Options for commands `build` and `serve` are:
 --theme <path>            Path to theme directory
 ```
 
+You can publish your books to our index by visiting [GitBook.io](http://www.gitbook.io)
+
 ## Output Formats
 
 GitBook can generate your book in the following formats:
