@@ -41,27 +41,28 @@
 
     {# Summary #}
     <section id="summary">
-        <h1>Summary</h1>
-
-        <ul class="summary">
+        <h1>Table of Contents</h1>
+        <ol>
             <li>
-                <a href="#README.md">Introduction</a>
+                <a href="#README.md">
+                    <h2>Introduction</h2>
+                </a>
             </li>
             {% for item in summary.chapters %}
                 <li>
-                    <a href="#{{ item.path }}">{{ item.level }}) {{ item.title }}</a>
+                    <h2><span>{{ item.level }}.</span> <a href="#{{ item.path }}">{{ item.title }}</a></h2>
                     {% if item.articles.length > 0 %}
-                    <ul>
+                    <ol>
                         {% for article in item.articles %}
                             <li>
-                                <a href="#{{ article.path }}">{{ article.level }}) {{ article.title }}</a>
+                                <span>{{ article.level }}</span> <a href="#{{ article.path }}">{{ article.title }}</a>
                             </li>
                         {% endfor %}
-                    </ul>
+                    </ol>
                     {% endif %}
                 </li>
             {% endfor %}
-        </ul>
+        </ol>
     </section>
 
     {# Pages content #}

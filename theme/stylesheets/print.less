@@ -7,6 +7,10 @@
 
 @import "page/highlight.less";
 
+
+@font-size-base:          13px;
+
+
 * {
     -webkit-overflow-scrolling: touch;
     -webkit-tap-highlight-color: transparent;
@@ -26,10 +30,17 @@ body {
 }
 
 
-h1, h2 {
+h1, h2, h3 {
     page-break-after: avoid;
     page-break-before: auto;
 }
+
+h1 { font-size: floor(@font-size-base * 2.15); }
+h2 { font-size: floor(@font-size-base * 1.70); }
+h3 { font-size: ceil(@font-size-base * 1.25); }
+h4 { font-size: ceil(@font-size-base * 1); }
+h5 { font-size:  ceil(@font-size-base * 0.85); }
+h6 { font-size: ceil(@font-size-base * 0.65); }
 
 pre, blockquote {
     border: 1px solid #999;
@@ -54,39 +65,36 @@ section {
     }
 
     &#summary {
-        text-align: center;
+        margin: 1.5cm;
 
-        ul {
-            font-size: 0.5cm;
-            line-height: 1.8em;
-            padding: 0px;
-            margin: 0px;
-            list-style: none;
+        h1 {
+            text-align: center;
         }
 
-        > ul {
-            > li {
-                margin-bottom: 1cm;
+        ol {
+            list-style: none;
+            padding: 0px;
+            margin: 0px;
+            margin-left: 1cm;
+        }
 
-                > a {
-                    font-size: 0.6cm;
-                }
+        > ol {
+            > li {
             }
         }
     }
 
     article {
-        margin: 1.5cm;
-
-        /* Big centered title */
+        margin-bottom: 1.5cm;
+        
         &.new-chapter {
             page-break-after: always;
             font-size: 0.6cm;
             text-align: center;
             padding: 3cm 0cm;
 
-            @media print {
-                border: none;
+            h1 {
+                font-size: floor(@font-size-base * 2.7);
             }
         }
 
