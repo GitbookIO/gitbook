@@ -48,7 +48,7 @@ define([
             $('.book-summary .summary').scrollTop(scrollPosition);
 
             // Update state
-            state.update($page);
+            state.update($("html"));
 
             if (push) updateHistory(url, null);
             preparePage();
