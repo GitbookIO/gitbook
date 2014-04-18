@@ -36,10 +36,6 @@ describe('Page parsing', function() {
         assert(LEXED[2].content);
     });
 
-    it('should make image URLs relative', function() {
-        assert(LEXED[2].content.indexOf('_book/assets/my-pretty-picture.png') !== -1);
-    });
-
     it('should gen code and content for exercise sections', function() {
         assert(LEXED[1].content);
         assert(LEXED[1].code);
@@ -92,5 +88,35 @@ describe('Relative links', function() {
         });
 
         assert(LEXED[0].content.indexOf('https://github.com/GitBookIO/javascript/blob/src/something.cpp') !== -1);
+    });
+});
+
+describe('Relative images', function() {
+    it('should keep image relative with considering output directory in site format', function() {
+        var LEXED = loadPage('IMAGES', {
+            // GitHub repo ID
+            repo: 'GitBookIO/javascript',
+
+            // Imaginary folder of markdown file
+            dir: 'syntax',
+            outdir: 'syntax'
+        });
+
+        assert(LEXED[0].content.indexOf('"preview.png"') !== -1);
+        assert(LEXED[0].content.indexOf('"../preview2.png"') !== -1);
+    });
+
+    it('should keep image relative with considering output directory in page format', function() {
+        var LEXED = loadPage('IMAGES', {
+            // GitHub repo ID
+            repo: 'GitBookIO/javascript',
+
+            // Imaginary folder of markdown file
+            dir: 'syntax',
+            outdir: './'
+        });
+
+        assert(LEXED[0].content.indexOf('"syntax/preview.png"') !== -1);
+        assert(LEXED[0].content.indexOf('"preview2.png"') !== -1);
     });
 });
