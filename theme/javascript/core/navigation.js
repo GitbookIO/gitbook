@@ -10,12 +10,14 @@ define([
     var prev, next;
     var githubCountStars, githubCountWatch;
 
+    var usePushState = !navigator.userAgent.match('CriOS') && (typeof history.pushState !== "undefined");
+
     var updateHistory = function(url, title) {
         history.pushState({ path: url }, title, url);
     };
 
     var handleNavigation = function(url, push) {
-        if (typeof history.pushState === "undefined") {
+        if (!usePushState) {
             // Refresh the page to the new URL if pushState not supported
             location.href = url;
             return
