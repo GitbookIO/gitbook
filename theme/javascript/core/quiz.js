@@ -20,8 +20,11 @@ define([
 
             $quiz.find(".question").each(function(q) {
                 var result = true;
-                var $answers = $quiz.find(".question-answers").slice(q).find("input[type=radio], input[type=checkbox]");
-                $(this).find("input[type=radio],input[type=checkbox]").each(function(i) {
+
+                var $questions = $(this).find(".question-content").find("input[type=radio], input[type=checkbox]");
+                var $answers = $(this).find(".question-answers").find("input[type=radio], input[type=checkbox]");
+
+                $questions.each(function(i) {
                     var correct = $(this).is(":checked") === $answers.slice(i).first().is(":checked");
                     result = result && correct;
                     if (!correct) {
