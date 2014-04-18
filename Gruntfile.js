@@ -35,7 +35,6 @@ module.exports = function (grunt) {
                         "lodash": 'vendors/lodash',
                         "requireLib": 'vendors/require',
                         "Mousetrap": 'vendors/mousetrap',
-                        "mixpanel": 'vendors/mixpanel',
                         "lunr": path.join(__dirname, "node_modules/lunr/lunr")
                     },
                     shim: {
@@ -47,9 +46,6 @@ module.exports = function (grunt) {
                         },
                         'Mousetrap': {
                             exports: 'Mousetrap'
-                        },
-                        'mixpanel': {
-                            exports: 'mixpanel'
                         },
                         'lunr': {
                             exports: 'lunr'
