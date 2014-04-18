@@ -35,10 +35,10 @@
         {% endblock %}
     </head>
     <body>
-        {% block content %}{% endblock %}
         {% block style %}
         <link rel="stylesheet" href="{{ staticBase }}/style.css">
         {% endblock %}
+        {% block content %}{% endblock %}
         {% block javascript %}
         <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.1.3/ace.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.1.3/mode-javascript.js"></script>
