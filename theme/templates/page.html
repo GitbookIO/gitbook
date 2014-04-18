@@ -77,9 +77,11 @@
                 <h1>{{ item.title }}</h1>
             </article>
 
+            {% if pages[item.path] %}
             <article>
             {{ articleContent(pages[item.path].content) }}
             </article>
+            {% endif %}
 
             {% if item.articles.length > 0 %}
                 {% for article in item.articles %}
