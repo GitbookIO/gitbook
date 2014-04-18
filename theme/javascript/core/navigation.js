@@ -25,6 +25,8 @@ define([
 
         return $.get(url)
         .done(function (html) {
+            if (push) updateHistory(url, null);
+            
             html = html.replace( /<(\/?)(html|head|body)([^>]*)>/ig, function(a,b,c,d){
                 return '<' + b + 'div' + ( b ? '' : ' data-element="' + c + '"' ) + d + '>';
             });
@@ -51,8 +53,6 @@ define([
 
             // Update state
             state.update($("html"));
-
-            if (push) updateHistory(url, null);
             preparePage();
         })
         .fail(function () {
