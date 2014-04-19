@@ -33,7 +33,7 @@ var makeBuildFunc = function(converter) {
                     github: options.github || repoID,
                     githubHost: options.githubHost,
                     generator: options.format,
-                    theme: options.theme
+                    plugins: options.plugins
                 })
             );
         })

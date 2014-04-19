@@ -25,7 +25,7 @@ var buildCommand = function(command) {
     .option('-i, --intro <intro>', 'Description of the book to generate, default is extracted from readme')
     .option('-g, --github <repo_path>', 'ID of github repo like : username/repo')
     .option('--githubHost <url>', 'The url of the github host (defaults to https://github.com/')
-    .option('--theme <path>', 'Path to theme directory');
+    .option('--plugins <plugins>', 'List of plugins to use separated by ":"');
 };
 
 buildCommand(prog.command('build [source_dir]'))
