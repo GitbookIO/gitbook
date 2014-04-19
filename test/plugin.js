@@ -21,7 +21,6 @@ describe('Plugin list of names', function () {
     });
 
     it('should contains default plugins', function() {
-        console.log(firstDefault, Plugin.normalizeNames([]));
         assert(_.contains(Plugin.normalizeNames([]), firstDefault));
     });
 
