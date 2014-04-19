@@ -35,6 +35,8 @@ require([
         // Init navigation
         navigation.init();
 
+        $(document).trigger("bookReady");
+
         global.trigger("init");
     });
 });
