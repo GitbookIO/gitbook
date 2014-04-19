@@ -1,4 +1,4 @@
-var fs = require('fs');
+var _ = require('lodash');
 var path = require('path');
 var assert = require('assert');
 
@@ -9,6 +9,24 @@ describe('Plugin validation', function () {
 
     it('should be valid', function() {
         assert(plugin.isValid());
+    });
+});
+
+describe('Plugin list of names', function () {
+    var firstDefault = _.first(Plugin.defaults);
+
+    it('should convert string to array', function() {
+        var _name = "test";
+        assert(_.contains(Plugin.normalizeNames(_name), _name));
+    });
+
+    it('should contains default plugins', function() {
+        console.log(firstDefault, Plugin.normalizeNames([]));
+        assert(_.contains(Plugin.normalizeNames([]), firstDefault));
+    });
+
+    it('should remove name starting with -', function() {
+        assert(!_.contains(Plugin.normalizeNames(["-"+firstDefault]), firstDefault));
     });
 });
 
