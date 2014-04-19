@@ -9,8 +9,9 @@ require([
     "core/navigation",
     "core/progress",
     "core/sidebar",
-    "core/search"
-], function($, storage, analytic, sharing, state, keyboard, navigation, progress, sidebar, search){
+    "core/search",
+    "core/font-settings"
+], function($, storage, analytic, sharing, state, keyboard, navigation, progress, sidebar, search, fontSettings){
     $(document).ready(function() {
         var $book;
         $book = state.$book;
@@ -34,5 +35,8 @@ require([
         
         // Init navigation
         navigation.init();
+
+        //Init font settings 
+        fontSettings.init();
     });
 });

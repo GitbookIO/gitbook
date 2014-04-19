@@ -3,7 +3,7 @@
         font-family: @font-family-sans;
 
         position: fixed;
-        overflow: hidden;
+        overflow: visible;
         top: 0px;
         right: 0px;
         left: 0px;
@@ -24,6 +24,7 @@
             text-transform: uppercase;
             line-height: @header-height;
             .box-shadow(none) !important;
+            position:relative;
 
             &:hover {
                 position: relative;
@@ -62,6 +63,32 @@
     &.without-animation {
         .book-header h1 {
             .transition(none) !important;
+        }
+    }
+    &.color-theme-1{
+        .book-header{
+            color: @header-color-1;
+            background: @header-background-1;
+            .btn {
+                color: @header-button-color-1;
+                &:hover {
+                    color: @header-button-hover-color-1;
+                    background: @header-button-hover-background-1;
+                }
+            }
+        }
+    }
+    &.color-theme-2{
+        .book-header{
+            color: @header-color-2;
+            background: @header-background-2;
+            .btn {
+                color: @header-button-color-2;
+                &:hover {
+                    color: @header-button-hover-color-2;
+                    background: @header-button-hover-background-2;
+                }
+            }
         }
     }
 }

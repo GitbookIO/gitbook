@@ -1,8 +1,13 @@
+.book.color-theme-1 .book-body .page-wrapper .page-inner section.normal {
+    color:@page-color-1;
+}
+.book.color-theme-2 .book-body .page-wrapper .page-inner section.normal {
+    color:@page-color-2;
+}
 .book .book-body .page-wrapper .page-inner section.normal {
     padding: 25px;
     padding-top: 15px;
-    background-color: white;
-
+    color:@page-color;
 
     & > *:first-child {
         margin-top: 0 !important; }
@@ -52,12 +57,12 @@
 
     h1 {
         font-size: 28px;
-        color: black; }
+    }
 
     h2 {
         font-size: 24px;
         border-bottom: 1px solid #eee;
-        color: black; }
+    }
 
     h3 {
         font-size: 18px; }
@@ -69,7 +74,6 @@
         font-size: 14px; }
 
     h6 {
-        color: #777777;
         font-size: 14px; }
 
     p, blockquote, ul, ol, dl, table, pre {
