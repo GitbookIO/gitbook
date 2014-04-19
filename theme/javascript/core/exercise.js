@@ -1,9 +1,9 @@
 define([
     "jQuery",
     "utils/execute",
-    "utils/analytic",
+    "core/global",
     "core/state"
-], function($, execute, analytic, state){
+], function($, execute, global, state){
     // Bind an exercise
     var prepareExercise = function($exercise) {
         var codeSolution = $exercise.find(".code-solution").text();
@@ -19,7 +19,7 @@ define([
         $exercise.find(".action-submit").click(function(e) {
             e.preventDefault();
 
-            analytic.track("exercise.submit", {type: "code"});
+            global.trigger("exercise.submit", {type: "code"});
 
             execute("javascript", editor.getValue(), codeValidation, codeContext, function(err, result) {
                 $exercise.toggleClass("return-error", err != null);

@@ -1,9 +1,9 @@
 define([
     "jQuery",
     "utils/execute",
-    "utils/analytic",
+    "core/global",
     "core/state"
-], function($, execute, analytic, state){
+], function($, execute, global, state){
     // Bind an exercise
     var prepareQuiz = function($quiz) {
 
@@ -14,7 +14,7 @@ define([
         // Submit: test code
         $quiz.find(".action-submit").click(function(e) {
             e.preventDefault();
-            analytic.track("exercise.submit", {type: "quiz"});
+            global.trigger("exercise.submit", {type: "quiz"});
             $quiz.find("tr.alert-danger,li.alert-danger").removeClass("alert-danger");
             $quiz.find(".alert-success,.alert-danger").addClass("hidden");
 
