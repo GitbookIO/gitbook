@@ -35,3 +35,17 @@
     </div>
 </div>
 {% endblock %}
+
+{% block javascript %}
+{% parent %}
+{% for resource in plugins.resources.js %}
+<script src="{{ staticBase }}/plugins/{{ resource.id }}.js"></script>
+{% endfor %}
+{% endblock %}
+
+{% block style %}
+{% parent %}
+{% for resource in plugins.resources.css %}
+<link rel="stylesheet" href="{{ staticBase }}/plugins/{{ resource.id }}.css">
+{% endfor %}
+{% endblock %}
