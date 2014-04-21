@@ -1,18 +1,37 @@
 var path = require('path');
 var Q = require('q');
 var _ = require('lodash');
+var fs = require('fs');
 
 var utils = require('./utils');
-
 var generate = require("../lib/generate");
 var parse = require("../lib/parse");
-var fs = require('../lib/generate/fs');
 var generators = require("../lib/generate").generators;
+
+var buildCommand = function(command) {
+    return command
+    .option('-o, --output <directory>', 'Path to output directory, defaults to ./_book')
+    .option('-f, --format <name>', 'Change generation format, defaults to site, availables are: '+_.keys(generators).join(", "))
+    .option('-t, --title <name>', 'Name of the book to generate, default is extracted from readme')
+    .option('-i, --intro <intro>', 'Description of the book to generate, default is extracted from readme')
+    .option('--plugins <plugins>', 'List of plugins to use separated by ","')
+    .option('--pluginsConfig <json file>', 'JSON File containing plugins configuration')
+    .option('-g, --github <repo_path>', 'ID of github repo like : username/repo')
+    .option('--githubHost <url>', 'The url of the github host (defaults to https://github.com/');
+};
+
 
 var makeBuildFunc = function(converter) {
     return  function(dir, options) {
         dir = dir || process.cwd();
-        outputDir = options.output
+        outputDir = options.output;
+
+        // Read plugins config
+        var pluginsConfig = {};
+        if (options.pluginsConfig) {
+            pluginsConfig = JSON.parse(fs.readFileSync(options.pluginsConfig))
+        }
+
 
         console.log('Starting build ...');
         // Get repo's URL
@@ -33,7 +52,8 @@ var makeBuildFunc = function(converter) {
                     github: options.github || repoID,
                     githubHost: options.githubHost,
                     generator: options.format,
-                    theme: options.theme
+                    plugins: options.plugins,
+                    pluginsConfig: pluginsConfig
                 })
             );
         })
@@ -42,9 +62,10 @@ var makeBuildFunc = function(converter) {
             return output;
         }, utils.logError);
     };   
-}
+};
 
 module.exports = {
     folder: makeBuildFunc(generate.folder),
-    file: makeBuildFunc(generate.file)
+    file: makeBuildFunc(generate.file),
+    command: buildCommand
 };

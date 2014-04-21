@@ -1,17 +1,17 @@
-require([
+define([
     "jQuery",
     "utils/storage",
-    "utils/analytic",
     "utils/sharing",
 
+    "core/events",
     "core/state",
     "core/keyboard",
     "core/navigation",
     "core/progress",
     "core/sidebar",
     "core/search"
-], function($, storage, analytic, sharing, state, keyboard, navigation, progress, sidebar, search){
-    $(document).ready(function() {
+], function($, storage, sharing, events, state, keyboard, navigation, progress, sidebar, search){
+    var start = function(config) {
         var $book;
         $book = state.$book;
 
@@ -34,5 +34,14 @@ require([
         
         // Init navigation
         navigation.init();
-    });
+
+        $(document).trigger("bookReady");
+
+        events.trigger("start", config);
+    }
+
+    return {
+        start: start,
+        events: events
+    };
 });
