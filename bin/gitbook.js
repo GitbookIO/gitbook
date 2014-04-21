@@ -17,22 +17,11 @@ var build = require('./build');
 prog
 .version(pkg.version);
 
-var buildCommand = function(command) {
-    return command
-    .option('-o, --output <directory>', 'Path to output directory, defaults to ./_book')
-    .option('-f, --format <name>', 'Change generation format, defaults to site, availables are: '+_.keys(generators).join(", "))
-    .option('-t, --title <name>', 'Name of the book to generate, default is extracted from readme')
-    .option('-i, --intro <intro>', 'Description of the book to generate, default is extracted from readme')
-    .option('-g, --github <repo_path>', 'ID of github repo like : username/repo')
-    .option('--githubHost <url>', 'The url of the github host (defaults to https://github.com/')
-    .option('--plugins <plugins>', 'List of plugins to use separated by ":"');
-};
-
-buildCommand(prog.command('build [source_dir]'))
+build.command(prog.command('build [source_dir]'))
 .description('Build a gitbook from a directory')
 .action(build.folder);
 
-buildCommand(prog.command('serve [source_dir]'))
+build.command(prog.command('serve [source_dir]'))
 .description('Build then serve a gitbook from a directory')
 .option('-p, --port <port>', 'Port for server to listen on', 4000)
 .action(function(dir, options) {
@@ -50,7 +39,7 @@ buildCommand(prog.command('serve [source_dir]'))
     });
 });
 
-buildCommand(prog.command('pdf [source_dir]'))
+build.command(prog.command('pdf [source_dir]'))
 .description('Build a gitbook as a PDF')
 .option('-pf, --paperformat <format>', 'PDF paper format (default is A4): "5in*7.5in", "10cm*20cm", "A4", "Letter"')
 .action(function(dir, options) {
@@ -60,7 +49,7 @@ buildCommand(prog.command('pdf [source_dir]'))
     }));
 });
 
-buildCommand(prog.command('ebook [source_dir]'))
+build.command(prog.command('ebook [source_dir]'))
 .description('Build a gitbook as a eBook')
 .option('-c, --cover <path>', 'Cover image, default is cover.png if exists')
 .action(function(dir, options) {
