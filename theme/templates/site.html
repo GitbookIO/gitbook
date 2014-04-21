@@ -45,6 +45,12 @@
     <script src="{{ staticBase }}/plugins/{{ resource.path }}"></script>
     {% endif %}
 {% endfor %}
+<script>
+require(["gitbook"], function(gitbook) {
+    var config = {% autoescape false %}{{ pluginsConfig }}{% endautoescape %};
+    gitbook.start(config);
+});
+</script>
 {% endblock %}
 
 {% block style %}

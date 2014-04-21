@@ -24,7 +24,7 @@ module.exports = function (grunt) {
         requirejs: {
             compile: {
                 options: {
-                    name: "app",
+                    name: "gitbook",
                     baseUrl: "theme/javascript/",
                     out: "theme/assets/app.js",
                     preserveLicenseComments: false,
