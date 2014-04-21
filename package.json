@@ -19,9 +19,9 @@
         "tmp": "0.0.23",
         "semver": "2.2.1",
 
-        "gitbook-plugin": "0.0.1",
-        "gitbook-plugin-mixpanel": "0.0.1",
-        "gitbook-plugin-mathjax": "0.0.2"
+        "gitbook-plugin": "0.0.2",
+        "gitbook-plugin-mixpanel": "0.0.2",
+        "gitbook-plugin-mathjax": "0.0.3"
     },
     "devDependencies": {
         "mocha": "1.18.2",
