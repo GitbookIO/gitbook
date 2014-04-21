@@ -36,7 +36,7 @@ Options for commands `build` and `serve` are:
 -o, --output <directory>  Path to output directory, defaults to ./_book
 -f, --format <name>       Change generation format, defaults to site, availables are: site, page, pdf, json
 --githubHost <url>   The url of the github host (defaults to https://github.com/)
---plugins <plugins>  List of plugins to use separated by ":"
+--plugins <plugins>  List of plugins to use separated by ","
 --pluginsConfig <json file> JSON File containing plugins configuration
 ```
 

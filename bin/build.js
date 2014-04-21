@@ -14,7 +14,7 @@ var buildCommand = function(command) {
     .option('-f, --format <name>', 'Change generation format, defaults to site, availables are: '+_.keys(generators).join(", "))
     .option('-t, --title <name>', 'Name of the book to generate, default is extracted from readme')
     .option('-i, --intro <intro>', 'Description of the book to generate, default is extracted from readme')
-    .option('--plugins <plugins>', 'List of plugins to use separated by ":"')
+    .option('--plugins <plugins>', 'List of plugins to use separated by ","')
     .option('--pluginsConfig <json file>', 'JSON File containing plugins configuration')
     .option('-g, --github <repo_path>', 'ID of github repo like : username/repo')
     .option('--githubHost <url>', 'The url of the github host (defaults to https://github.com/');
