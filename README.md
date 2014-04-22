@@ -134,3 +134,16 @@ You can see a complete example with the [Learn Git](https://github.com/GitbookIO
 #### Ignoring files & folders
 
 GitBook will read the `.gitignore`, `.bookignore` and `.ignore` files to get a list of files and folders to skip. (The format inside those files, follows the same convention as `.gitignore`)
+
+#### Plugins
+
+PLugins can used to extend your book functionnalities. Read [GitbookIO/plugin](https://github.com/GitbookIO/plugin) for more informations about how to build a plugin for gitbook.
+
+##### Default plugins:
+
+* [mathjax](https://github.com/GitbookIO/plugin-mathjax): displays mathematical notation in the book.
+* [mixpanel](https://github.com/GitbookIO/plugin-mixpanel): Mixpanel tracking for your book
+
+##### Other plugins:
+
+* [Google Analytics](https://github.com/GitbookIO/plugin-ga): Google Analytics tracking for your book
