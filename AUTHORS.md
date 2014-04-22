@@ -15,3 +15,4 @@ Contributors
 ------------
 
 - Nijiko Yonskai
+- Herman Starikov
