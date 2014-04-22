@@ -17,7 +17,6 @@
         position: relative;
         background: #fff;
         margin-bottom: 20px;
-        z-index: 10;
 
         .bar {
             height: @bar-height;
@@ -79,6 +78,38 @@
                     }
                 }
             }
+        }
+    }
+}
+.book.color-theme-1 .book-body {
+    .book-progress {
+        .bar {
+            background: @bar-background-1;
+            .inner {
+                background: @bar-progress-background-1;
+            }
+        }
+    }
+    .chapters .chapter{
+        background: @bar-background-1;
+        &.done{
+            background: @bar-progress-background-1;
+        }
+    }
+}
+.book.color-theme-2 .book-body {
+    .book-progress {
+        .bar {
+            background: @bar-background-2;
+            .inner {
+                background: @bar-progress-background-2;
+            }
+        }
+    }
+    .chapters .chapter{
+        background: @bar-background-2;
+        &.done{
+            background: @bar-progress-background-2;
         }
     }
 }

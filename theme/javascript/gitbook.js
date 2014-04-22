@@ -4,13 +4,14 @@ define([
     "utils/sharing",
 
     "core/events",
+    "core/font-settings",
     "core/state",
     "core/keyboard",
     "core/navigation",
     "core/progress",
     "core/sidebar",
     "core/search"
-], function($, storage, sharing, events, state, keyboard, navigation, progress, sidebar, search){
+], function($, storage, sharing, events, fontSettings, state, keyboard, navigation, progress, sidebar, search){
     var start = function(config) {
         var $book;
         $book = state.$book;
@@ -35,7 +36,8 @@ define([
         // Init navigation
         navigation.init();
 
-        $(document).trigger("bookReady");
+        //Init font settings 
+        fontSettings.init();
 
         events.trigger("start", config);
     }
