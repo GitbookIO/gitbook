@@ -4,6 +4,8 @@
 			.dropdown-menu{
 				background-color:@header-background;
 				border-color:@sidebar-divider-color;
+				padding: 0px;
+
 				.dropdown-caret{
 					position: absolute;
 					top: 14px;
@@ -56,28 +58,17 @@
 					.btn{
 						width: 33.7%;
 						padding: initial;
-						&#color-theme-preview-0{
-							color:@header-button-color;
-							background-color:@header-background;
-						}
-						&#color-theme-preview-1{
-							color:@page-color-1;
-							background-color:@page-background-1;
-						}
-						&#color-theme-preview-2{
-							color:@header-button-color-2;
-							background-color:@sidebar-background-2;
-						}
-
 					}
 				}
 				.list-group{
-					margin: 5px 0;
+					margin: 0px 0;
+
 					.list-group-item{
 						cursor:pointer;
 						background-color:transparent;
-						border-color:@sidebar-divider-color;
+						border-color: @sidebar-divider-color;
 						border-width: 1px 0 !important;
+
 						&:hover{
 							color:@header-button-hover-color;
 							background-color:@header-button-hover-background !important;
