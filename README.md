@@ -137,7 +137,7 @@ GitBook will read the `.gitignore`, `.bookignore` and `.ignore` files to get a l
 
 #### Plugins
 
-PLugins can used to extend your book functionnalities. Read [GitbookIO/plugin](https://github.com/GitbookIO/plugin) for more informations about how to build a plugin for gitbook.
+Plugins can used to extend your book functionnalities. Read [GitbookIO/plugin](https://github.com/GitbookIO/plugin) for more informations about how to build a plugin for gitbook.
 
 ##### Default plugins:
 
