@@ -5,7 +5,7 @@ var assert = require('assert');
 var Plugin = require('../').generate.Plugin;
 
 describe('Plugin validation', function () {
-    var plugin = new Plugin("gitbook-plugin");
+    var plugin = new Plugin("plugin");
 
     it('should be valid', function() {
         assert(plugin.isValid());
@@ -41,7 +41,7 @@ describe('Plugin defaults loading', function () {
         })
         .fin(done);
     });
-    
+
 
     it('should load defaults addons', function() {
         assert(ret != null);
