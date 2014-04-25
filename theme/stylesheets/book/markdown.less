@@ -1,8 +1,24 @@
 .book.color-theme-1 .book-body .page-wrapper .page-inner section.normal {
     color:@page-color-1;
+
+    pre {
+        background: #fdf6e3;
+        color: #657b83;
+        border-color: darken(#fdf6e3, 15%);
+
+        @import "./highlight/sepia.less";
+    }
 }
 .book.color-theme-2 .book-body .page-wrapper .page-inner section.normal {
     color:@page-color-2;
+
+    pre {
+        background: black;
+        color: #eaeaea;
+        border-color: #000;
+
+        @import "./highlight/night.less";
+    }
 }
 .book .book-body .page-wrapper .page-inner section.normal {
     padding: 25px 0px;
@@ -276,6 +292,8 @@
         white-space: pre;
         border: none;
         background: transparent;
+
+        @import "./highlight/white.less";
     }
 
     pre {
