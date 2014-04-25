@@ -12,6 +12,7 @@ var fs = require('../lib/generate/fs');
 
 var utils = require('./utils');
 var build = require('./build');
+var Server = require('./server');
 
 // General options
 prog
@@ -24,19 +25,39 @@ build.command(prog.command('build [source_dir]'))
 build.command(prog.command('serve [source_dir]'))
 .description('Build then serve a gitbook from a directory')
 .option('-p, --port <port>', 'Port for server to listen on', 4000)
+.option('--no-watch', 'Disable restart with file watching')
 .action(function(dir, options) {
-    build.folder(dir, options || {})
-    .then(function(_options) {
-        console.log();
-        console.log('Starting server ...');
-        return utils.serveDir(_options.output, options.port)
+    var server = new Server();
+
+    var generate = function() {
+        if (server.isRunning()) console.log("Stopping server");
+
+        server.stop()
+        .then(function() {
+            return build.folder(dir, options);
+        })
+        .then(function(_options) {
+            console.log();
+            console.log('Starting server ...');
+            return server.start(_options.output, options.port)
+            .then(function() {
+                console.log('Serving book on http://localhost:'+options.port);
+
+                if (!options.watch) return;
+                return utils.watch(_options.input)
+                .then(function(filepath) {
+                    console.log("Restart after change in "+path.relative(dir, filepath));
+                    console.log('');
+                    return generate();
+                })
+            })
+        })
         .fail(utils.logError);
-    })
-    .then(function() {
-        console.log('Serving book on http://localhost:'+options.port);
-        console.log();
-        console.log('Press CTRL+C to quit ...');
-    });
+    };
+
+    console.log('Press CTRL+C to quit ...');
+    console.log('')
+    generate();
 });
 
 build.command(prog.command('pdf [source_dir]'))

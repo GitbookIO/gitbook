@@ -4,8 +4,11 @@ var _ = require('lodash');
 var http = require('http');
 var send = require('send');
 
-var url = require('url');
 var cp = require('child_process');
+var path = require('path');
+var url = require('url');
+
+var Gaze = require('gaze').Gaze;
 
 
 // Get the remote of a given repo
@@ -55,32 +58,24 @@ function titleCase(str)
     return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 }
 
-function serveDir(dir, port) {
+function watch(dir) {
     var d = Q.defer();
+    dir = path.resolve(dir);
 
-    var server = http.createServer(function(req, res){
-        // Render error
-        function error(err) {
-            res.statusCode = err.status || 500;
-            res.end(err.message);
-        }
+    var gaze = new Gaze("**/*.md", {
+        cwd: dir
+    });
 
-        // Redirect to directory's index.html
-        function redirect() {
-            res.statusCode = 301;
-            res.setHeader('Location', req.url + '/');
-            res.end('Redirecting to ' + req.url + '/');
-        }
+    gaze.once("all", function(e, filepath) {
+        gaze.close();
 
-        // Send file
-        send(req, url.parse(req.url).pathname)
-        .root(dir)
-        .on('error', error)
-        .on('directory', redirect)
-        .pipe(res);
-    }).listen(port);
+        d.resolve(filepath);
+    });
+    gaze.once("error", function(err) {
+        gaze.close();
 
-    d.resolve(server);
+        d.reject(err);
+    });
 
     return d.promise;
 }
@@ -96,6 +91,6 @@ module.exports = {
     gitURL: gitURL,
     githubID: githubID,
     titleCase: titleCase,
-    serveDir: serveDir,
+    watch: watch,
     logError: logError
 };

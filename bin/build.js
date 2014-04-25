@@ -44,7 +44,7 @@ var makeBuildFunc = function(converter) {
         })
         .then(function(repoID) {
             return converter(
-                _.extend(options || {}, {
+                _.extend({}, options || {}, {
                     input: dir,
                     output: outputDir,
                     title: options.title,

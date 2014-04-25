@@ -18,6 +18,7 @@
         "highlight.js": "8.0.0",
         "tmp": "0.0.23",
         "semver": "2.2.1",
+        "gaze": "0.6.4",
 
         "gitbook-plugin": "0.0.2",
         "gitbook-plugin-mixpanel": "0.0.2",
