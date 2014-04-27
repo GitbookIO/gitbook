@@ -52,9 +52,23 @@
             @media (max-width: 800px) {
                 display: none;
             }
+
+            i {
+                display: none;
+            }
         }
     }
 
+    &.is-loading {
+        .book-header h1 {
+            i {
+                display: inline-block;
+            }
+            a {
+                display: none;
+            }
+        }
+    }
     &.with-summary {
         .book-header h1 {
             margin-left: 250px;

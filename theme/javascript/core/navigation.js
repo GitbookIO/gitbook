@@ -6,8 +6,9 @@ define([
     "core/search",
     "core/progress",
     "core/exercise",
-    "core/quiz"
-], function($, path, events, state, search, progress, exercises, quiz) {
+    "core/quiz",
+    "core/loading"
+], function($, path, events, state, search, progress, exercises, quiz, loading) {
     var prev, next;
     var githubCountStars, githubCountWatch;
 
@@ -23,7 +24,7 @@ define([
             return
         }
 
-        return $.get(url)
+        return loading.show($.get(url)
         .done(function (html) {
             // Push url to history
             if (push) history.pushState({ path: url }, null, url);
@@ -59,7 +60,7 @@ define([
         })
         .fail(function (e) {
             location.href = relativeUrl;
-        });
+        }));
     };
 
     var updateGitHubCounts = function() {
