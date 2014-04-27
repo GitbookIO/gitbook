@@ -19,6 +19,7 @@
         "tmp": "0.0.23",
         "semver": "2.2.1",
         "gaze": "0.6.4",
+        "resolve": "0.6.3",
 
         "gitbook-plugin": "0.0.2",
         "gitbook-plugin-mixpanel": "0.0.2",
