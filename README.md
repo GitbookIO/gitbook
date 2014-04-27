@@ -147,3 +147,4 @@ Plugins can used to extend your book functionnalities. Read [GitbookIO/plugin](h
 ##### Other plugins:
 
 * [Google Analytics](https://github.com/GitbookIO/plugin-ga): Google Analytics tracking for your book
+* [Disqus](https://github.com/GitbookIO/plugin-disqus): Disqus comments integration in your book
