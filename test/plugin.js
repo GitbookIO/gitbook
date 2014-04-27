@@ -5,7 +5,7 @@ var assert = require('assert');
 var Plugin = require('../').generate.Plugin;
 
 describe('Plugin validation', function () {
-    var plugin = new Plugin("plugin");
+    var plugin = new Plugin("plugin", __dirname);
 
     it('should be valid', function() {
         assert(plugin.isValid());
@@ -33,7 +33,7 @@ describe('Plugin defaults loading', function () {
     var ret = true;
 
     beforeEach(function(done){
-        Plugin.fromList(Plugin.defaults)
+        Plugin.fromList(Plugin.defaults, __dirname)
         .then(function(_r) {
             ret = _r;
         }, function(err) {
