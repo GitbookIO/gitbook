@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% block htmlTag %}manifest="{{ baseBase }}/manifest.appcache"{% endblock %}
+{% block htmlTag %}manifest="{{ basePath }}/manifest.appcache"{% endblock %}
 {% block title %}{{ progress.current.title }}{% parent %}{% endblock %}
 {% block content %}
     <div class="book" {% if githubId %}data-github="{{ githubId }}"{% endif %} data-level="{{ progress.current.level }}" data-basepath="{{ basePath }}" data-revision="{{ revision }}">
