@@ -148,3 +148,5 @@ Plugins can used to extend your book functionnalities. Read [GitbookIO/plugin](h
 
 * [Google Analytics](https://github.com/GitbookIO/plugin-ga): Google Analytics tracking for your book
 * [Disqus](https://github.com/GitbookIO/plugin-disqus): Disqus comments integration in your book
+* [Transform comments to notes](https://github.com/erixtekila/gitbook-plugin-comments): Allow markdown comments to be inserted in HTML output
+* [Send code to console](https://github.com/erixtekila/gitbook-plugin-toconsole): Evaluate javascript blockin the browser inspector's console
