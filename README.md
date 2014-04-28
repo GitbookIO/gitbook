@@ -30,14 +30,37 @@ $ gitbook build ./repository --output=./outputFolder
 Options for commands `build` and `serve` are:
 
 ```
--t, --title <name> Name of the book to generate, defaults to repo name
--i, --intro <intro> Description of the book to generate
--g, --github <repo_path> ID of github repo like : username/repo
 -o, --output <directory>  Path to output directory, defaults to ./_book
 -f, --format <name>       Change generation format, defaults to site, availables are: site, page, pdf, json
---githubHost <url>   The url of the github host (defaults to https://github.com/)
---plugins <plugins>  List of plugins to use separated by ","
---pluginsConfig <json file> JSON File containing plugins configuration
+--config <config file>    Configuration file to use, defualt to book.json
+```
+
+GitBook load the default configuration from a `book.json` file in the repository if it exists.
+
+Here are the options that can be stored in this file:
+
+```
+{
+    // Folders to use for output (caution: it override the value from the command line)
+    output: null,
+
+    // Generator to use for building (caution: it override the value from the command line)
+    generator: "site",
+
+    // Book title and description (defaults are extracted from the README)
+    title: null,
+    description: null,
+
+    // GitHub informations (defaults are extracted using git)
+    github: null,
+    githubHost: 'https://github.com/',
+
+    // Plugins list, can contain "-name" for removing default plugins
+    plugins: [],
+
+    // Global configuration for plugins
+    pluginsConfig: {}
+}
 ```
 
 You can publish your books to our index by visiting [GitBook.io](http://www.gitbook.io)
