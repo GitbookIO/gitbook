@@ -34,29 +34,19 @@ var makeBuildFunc = function(converter) {
 
 
         console.log('Starting build ...');
-        // Get repo's URL
-        return utils.gitURL(dir)
-        .then(function(url) {
-            // Get ID of repo
-            return utils.githubID(url);
-        }, function(err) {
-            return null;
-        })
-        .then(function(repoID) {
-            return converter(
-                _.extend({}, options || {}, {
-                    input: dir,
-                    output: outputDir,
-                    title: options.title,
-                    description: options.intro,
-                    github: options.github || repoID,
-                    githubHost: options.githubHost,
-                    generator: options.format,
-                    plugins: options.plugins,
-                    pluginsConfig: pluginsConfig
-                })
-            );
-        })
+        return converter(
+            _.extend({}, options || {}, {
+                input: dir,
+                output: outputDir,
+                title: options.title,
+                description: options.intro,
+                github: options.github,
+                githubHost: options.githubHost,
+                generator: options.format,
+                plugins: options.plugins,
+                pluginsConfig: pluginsConfig
+            })
+        )
         .then(function(output) {
             console.log("Successfuly built !");
             return output;
