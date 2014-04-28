@@ -15,7 +15,7 @@ var buildCommand = function(command) {
     .option('-t, --title <name>', 'Name of the book to generate, default is extracted from readme')
     .option('-i, --intro <intro>', 'Description of the book to generate, default is extracted from readme')
     .option('--plugins <plugins>', 'List of plugins to use separated by ","')
-    .option('--pluginsConfig <json file>', 'JSON File containing plugins configuration')
+    .option('--config <config file>', 'Configuration file to use, defualt to book.json')
     .option('-g, --github <repo_path>', 'ID of github repo like : username/repo')
     .option('--githubHost <url>', 'The url of the github host (defaults to https://github.com/');
 };
@@ -25,13 +25,6 @@ var makeBuildFunc = function(converter) {
     return  function(dir, options) {
         dir = dir || process.cwd();
         outputDir = options.output;
-
-        // Read plugins config
-        var pluginsConfig = {};
-        if (options.pluginsConfig) {
-            pluginsConfig = JSON.parse(fs.readFileSync(options.pluginsConfig))
-        }
-
 
         console.log('Starting build ...');
         return converter(
@@ -44,7 +37,7 @@ var makeBuildFunc = function(converter) {
                 githubHost: options.githubHost,
                 generator: options.format,
                 plugins: options.plugins,
-                pluginsConfig: pluginsConfig
+                configFile: options.config
             })
         )
         .then(function(output) {
