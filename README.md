@@ -32,7 +32,7 @@ Options for commands `build` and `serve` are:
 ```
 -o, --output <directory>  Path to output directory, defaults to ./_book
 -f, --format <name>       Change generation format, defaults to site, availables are: site, page, pdf, json
---config <config file>    Configuration file to use, defualt to book.json
+--config <config file>    Configuration file to use, defaults to book.json
 ```
 
 GitBook load the default configuration from a `book.json` file in the repository if it exists.
@@ -160,7 +160,7 @@ GitBook will read the `.gitignore`, `.bookignore` and `.ignore` files to get a l
 
 #### Plugins
 
-Plugins can used to extend your book functionnalities. Read [GitbookIO/plugin](https://github.com/GitbookIO/plugin) for more informations about how to build a plugin for gitbook.
+Plugins can used to extend your book's functionality. Read [GitbookIO/plugin](https://github.com/GitbookIO/plugin) for more information about how to build a plugin for gitbook.
 
 ##### Default plugins:
 
