@@ -42,24 +42,24 @@ Here are the options that can be stored in this file:
 ```
 {
     // Folders to use for output (caution: it override the value from the command line)
-    output: null,
+    "output": null,
 
     // Generator to use for building (caution: it override the value from the command line)
-    generator: "site",
+    "generator": "site",
 
     // Book title and description (defaults are extracted from the README)
-    title: null,
-    description: null,
+    "title": null,
+    "description": null,
 
     // GitHub informations (defaults are extracted using git)
-    github: null,
-    githubHost: 'https://github.com/',
+    "github": null,
+    "githubHost": "https://github.com/",
 
     // Plugins list, can contain "-name" for removing default plugins
-    plugins: [],
+    "plugins": [],
 
     // Global configuration for plugins
-    pluginsConfig: {}
+    "pluginsConfig": {}
 }
 ```
 
