@@ -59,7 +59,14 @@ Here are the options that can be stored in this file:
     "plugins": [],
 
     // Global configuration for plugins
-    "pluginsConfig": {}
+    "pluginsConfig": {},
+
+    // Links in template (null: default, false: remove, string: new value)
+    "links": {
+        "about": null,
+        "issues": null,
+        "edit": null
+    }
 }
 ```
 

@@ -3,18 +3,28 @@
         <input type="text" placeholder="Search" class="form-control" />
     </div>
     <ul class="summary">
-        {% if githubId %}
+        {% if options.links.about !== false && (options.links.about != null || githubId) %}
         <li>
-            <a href="{{ githubHost }}{{ githubAuthor }}" target="blank">About the author</a>
+            <a href="{{ options.links.about|default(githubHost+githubAuthor) }}" target="blank">About the author</a>
         </li>
+        {% endif %}
+
+        {% if options.links.issues !== false && (options.links.issues != null || githubId) %}
         <li>
-            <a href="{{ githubHost }}{{ githubId }}/issues" target="blank">Questions and Issues</a>
+            <a href="{{ options.links.issues|default(githubHost+githubId+"/issues") }}" target="blank">Questions and Issues</a>
         </li>
+        {% endif %}
+
+        {% if options.links.contribute !== false && (options.links.contribute != null || githubId) %}
         <li>
-            <a href="{{ githubHost }}{{ githubId }}/edit/master/{{ _input }}" target="blank">Edit and Contribute</a>
+            <a href="{{ options.links.contribute|default(githubHost+githubId+"/edit/master/"+_input) }}" target="blank">Edit and Contribute</a>
         </li>
+        {% endif %}
+
+        {% if options.links.contribute || options.links.issues || options.links.about || githubId %}
         <li class="divider"></li>
         {% endif %}
+
         <li data-level="0" data-path="index.html">
             <a href="{{ basePath }}/"><i class="fa fa-check"></i> Introduction</a>
         </li>
@@ -44,5 +54,12 @@
                 {% endif %}
             </li>
         {% endfor %}
+
+        {% if options.links.gitbook !== false %}
+        <li class="divider"></li>
+        <li>
+            <a href="http://www.gitbook.io/" target="blank">Generated using GitBook</a>
+        </li>
+        {% endif %}
     </ul>
 </div>
