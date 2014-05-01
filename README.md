@@ -65,7 +65,12 @@ Here are the options that can be stored in this file:
     "links": {
         "about": null,
         "issues": null,
-        "edit": null
+        "edit": null,
+        "sharing": {
+            "google": null,
+            "facebook": null,
+            "twitter": null
+        }
     }
 }
 ```

@@ -12,9 +12,15 @@
     </span>
 
     <!-- Actions Right -->
+    {% if options.links.sharing.google !== false %}
     <a href="#" target="_blank" class="btn pull-right" data-sharing="google-plus"><i class="fa fa-google-plus"></i></a>
+    {% endif %}
+    {% if options.links.sharing.facebook !== false %}
     <a href="#" target="_blank" class="btn pull-right" data-sharing="facebook"><i class="fa fa-facebook"></i></a>
+    {% endif %}
+    {% if options.links.sharing.twitter !== false %}
     <a href="#" target="_blank" class="btn pull-right" data-sharing="twitter"><i class="fa fa-twitter"></i></a>
+    {% endif %}
 
     {% if githubId %}
     <a href="{{ githubHost }}{{ githubId }}/stargazers" target="_blank" class="btn pull-right count-star hidden-xs"><i class="fa fa-star-o"></i> Star (<span>-</span>)</a>
