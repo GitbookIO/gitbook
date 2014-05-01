@@ -28,7 +28,7 @@ define([
         .done(function (html) {
             // Push url to history
             if (push) history.pushState({ path: url }, null, url);
-            
+
             // Replace html content
             html = html.replace( /<(\/?)(html|head|body)([^>]*)>/ig, function(a,b,c,d){
                 return '<' + b + 'div' + ( b ? '' : ' data-element="' + c + '"' ) + d + '>';
@@ -36,6 +36,7 @@ define([
 
             var $page = $(html);
             var $pageHead = $page.find("[data-element=head]");
+            var $pageBody = $page.find('.book');
 
             // Merge heads
             var headContent = $pageHead.html()
@@ -45,13 +46,11 @@ define([
             });
             $("head").html(headContent);
 
-            // Update header, body
-            $('.book-header').html($page.find('.book-header').html());
-            $('.book-body').html($page.find('.book-body').html());
-
-            // Update summary
+            // Merge body
             var scrollPosition = $('.book-summary .summary').scrollTop();
-            $('.book-summary').html($page.find('.book-summary').html());
+            $pageBody.toggleClass("with-summary", $(".book").hasClass("with-summary"))
+
+            $(".book").replaceWith($pageBody);
             $('.book-summary .summary').scrollTop(scrollPosition);
 
             // Update state
@@ -134,7 +133,7 @@ define([
         if (url) handleNavigation(url, true);
     };
 
-    
+
 
     var init = function() {
         // Prevent cache so that using the back button works
@@ -157,7 +156,7 @@ define([
         $(document).on('click', ".navigation-prev", handlePagination);
         $(document).on('click', ".navigation-next", handlePagination);
         $(document).on('click', ".summary [data-path] a", handlePagination);
-        
+
         $(window).resize(updateNavigationPosition);
 
         // Prepare current page
