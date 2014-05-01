@@ -46,7 +46,7 @@ build.command(prog.command('serve [source_dir]'))
                 if (!options.watch) return;
                 return utils.watch(_options.input)
                 .then(function(filepath) {
-                    console.log("Restart after change in "+path.relative(dir, filepath));
+                    console.log("Restart after change in files");
                     console.log('');
                     return generate();
                 })
