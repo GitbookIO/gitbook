@@ -63,9 +63,15 @@ Here are the options that can be stored in this file:
 
     // Links in template (null: default, false: remove, string: new value)
     "links": {
+        // Link to home in the top-left corner
+        "home": null,
+
+        // Links in top of sidebar
         "about": null,
         "issues": null,
         "edit": null,
+
+        // Sharing links
         "sharing": {
             "google": null,
             "facebook": null,

@@ -1,7 +1,7 @@
 <div class="book-header">
     <!-- Actions Left -->
-    {% if githubId %}
-    <a href="{{ githubHost }}{{ githubId }}" target="_blank" class="btn pull-left"><i class="fa fa-github-alt"></i></a>
+    {% if options.links.home !== false and (options.links.home != null or githubId) %}
+    <a href="{{ options.links.home|default(githubHost+githubId) }}" target="_blank" class="btn pull-left"><i class="fa fa-bookmark-o"></i></a>
     {% endif %}
     <a href="#" class="btn pull-left toggle-summary"><i class="fa fa-align-justify"></i></a>
     <a href="#" class="btn pull-left toggle-search"><i class="fa fa-search"></i></a>
