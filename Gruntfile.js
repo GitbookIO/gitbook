@@ -39,11 +39,12 @@ module.exports = function (grunt) {
                     optimize: "uglify", //"uglify",
                     include: ["requireLib"],
                     paths: {
-                        "jQuery": 'vendors/jquery',
-                        "lodash": 'vendors/lodash',
-                        "requireLib": 'vendors/require',
-                        "Mousetrap": 'vendors/mousetrap',
-                        "lunr": path.join(__dirname, "node_modules/lunr/lunr")
+                        "jQuery": 'vendors/jquery/dist/jquery',
+                        "lodash": 'vendors/lodash/dist/lodash',
+                        "requireLib": 'vendors/requirejs/require',
+                        "Mousetrap": 'vendors/mousetrap/mousetrap',
+                        "lunr": 'vendors/lunr.js/lunr',
+                        "URI": 'vendors/URIjs/src/URI'
                     },
                     shim: {
                         'jQuery': {
@@ -68,6 +69,7 @@ module.exports = function (grunt) {
 
     // Build
     grunt.registerTask('build', [
+        'bower-install',
         'less',
         'requirejs'
     ]);

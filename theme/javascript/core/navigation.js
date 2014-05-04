@@ -1,6 +1,6 @@
 define([
     "jQuery",
-    "utils/path",
+    "utils/url",
     "core/events",
     "core/state",
     "core/search",
@@ -8,15 +8,15 @@ define([
     "core/exercise",
     "core/quiz",
     "core/loading"
-], function($, path, events, state, search, progress, exercises, quiz, loading) {
+], function($, URL, events, state, search, progress, exercises, quiz, loading) {
     var prev, next;
     var githubCountStars, githubCountWatch;
 
     var usePushState = (typeof history.pushState !== "undefined");
 
     var handleNavigation = function(relativeUrl, push) {
-        var url = path.isAbsolute(relativeUrl) ? relativeUrl : path.join(path.dirname(window.location.pathname), relativeUrl);
-        console.log("navigate to ", url, "baseurl="+relativeUrl);
+        var url = URL.join(window.location.pathname, relativeUrl);
+        console.log("navigate to ", url, "baseurl="+relativeUrl, "current="+window.location.pathname);
 
         if (!usePushState) {
             // Refresh the page to the new URL if pushState not supported
