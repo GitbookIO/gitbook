@@ -69,7 +69,7 @@ Here are the options that can be stored in this file:
         // Links in top of sidebar
         "about": null,
         "issues": null,
-        "edit": null,
+        "contribute": null,
 
         // Sharing links
         "sharing": {
