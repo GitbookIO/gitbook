@@ -61,6 +61,11 @@ Here are the options that can be stored in this file:
     // Global configuration for plugins
     "pluginsConfig": {},
 
+    // set another theme with your own layout
+    // it's recommended to use plugins or add more options for default theme, though
+    // see https://github.com/GitbookIO/gitbook/issues/209
+    // "theme": "./localtheme",
+
     // Links in template (null: default, false: remove, string: new value)
     "links": {
         // Link to home in the top-left corner
