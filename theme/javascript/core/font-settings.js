@@ -4,6 +4,17 @@ define([
 ], function($, storage) {
     var fontState;
 
+    var THEMES = {
+        "white": 0,
+        "sepia": 1,
+        "night": 2
+    };
+
+    var FAMILY = {
+        "serif": 0,
+        "sans": 1
+    };
+
     var togglePopover = function(e) {
         var $dropdown = $("#font-settings-wrapper .dropdown-menu");
 
@@ -11,7 +22,7 @@ define([
         e.stopPropagation();
         e.preventDefault();
     };
-    
+
     var closePopover = function(e) {
         var $dropdown = $("#font-settings-wrapper .dropdown-menu");
 
@@ -29,7 +40,7 @@ define([
             fontState.save();
         }
     };
-    
+
     var reduceFontSize = function(e){
         var $bookBody = $(".book-body");
 
@@ -70,7 +81,7 @@ define([
         fontState.save();
     };
 
-    var init = function() {
+    var init = function(config) {
         var $toggle, $bookBody, $dropdown, $book;
 
         //Find DOM elements.
@@ -79,11 +90,11 @@ define([
         $dropdown = $("#font-settings-wrapper .dropdown-menu");
         $bookBody = $(".book-body");
 
-        //Instantiate font state object 
+        // Instantiate font state object
         fontState = storage.get("fontState", {
-            size:1,
-            family:0,
-            theme:0
+            size: config.size || 1,
+            family: FAMILY[config.family || "serif"],
+            theme: THEMES[config.theme || "white"]
         });
         fontState.save = function(){
             storage.set("fontState",fontState);
@@ -100,15 +111,15 @@ define([
         //Add event listeners
         $(document).on('click', "#enlarge-font-size", enlargeFontSize);
         $(document).on('click', "#reduce-font-size", reduceFontSize);
-        
+
         $(document).on('click', "#font-settings-wrapper .font-family-list li", changeFontFamily);
         $(document).on('click', "#font-settings-wrapper .color-theme-list button", changeColorTheme);
 
-        $(document).on('click', ".book-header .toggle-font-settings", togglePopover);   
+        $(document).on('click', ".book-header .toggle-font-settings", togglePopover);
         $(document).on('click', "#font-settings-wrapper .dropdown-menu", function(e){ e.stopPropagation(); });
         $(document).on("click", closePopover);
     };
-    
+
     return {
         init: init
     }

@@ -59,12 +59,18 @@ Here are the options that can be stored in this file:
     "plugins": [],
 
     // Global configuration for plugins
-    "pluginsConfig": {},
+    "pluginsConfig": {
+        "fontSettings": {
+            "theme": "sepia", "night" or "white",
+            "family": "serif" or "sans",
+            "size": 1 to 4
+        }
+    },
 
     // set another theme with your own layout
     // it's recommended to use plugins or add more options for default theme, though
     // see https://github.com/GitbookIO/gitbook/issues/209
-    // "theme": "./localtheme",
+    "theme": "./localtheme",
 
     // Links in template (null: default, false: remove, string: new value)
     "links": {

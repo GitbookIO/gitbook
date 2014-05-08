@@ -36,12 +36,12 @@ define([
 
         // Bind sharing button
         sharing.init();
-        
+
         // Init navigation
         navigation.init();
 
-        //Init font settings 
-        fontSettings.init();
+        //Init font settings
+        fontSettings.init(config.fontSettings || {});
 
         events.trigger("start", config);
     }
