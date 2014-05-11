@@ -187,6 +187,11 @@ You can see a complete example with the [Learn Git](https://github.com/GitbookIO
 
 GitBook will read the `.gitignore`, `.bookignore` and `.ignore` files to get a list of files and folders to skip. (The format inside those files, follows the same convention as `.gitignore`)
 
+#### Cover
+
+A cover image can be set by creating a file: **/cover.jpg** or **cover.png**.
+The best resolution is **1600x2400**. The generation of the cover can be done automatically using the plugin [autocover](https://github.com/GitbookIO/plugin-autocover).
+
 #### Plugins
 
 Plugins can used to extend your book's functionality. Read [GitbookIO/plugin](https://github.com/GitbookIO/plugin) for more information about how to build a plugin for gitbook.
@@ -200,6 +205,7 @@ Plugins can used to extend your book's functionality. Read [GitbookIO/plugin](ht
 
 * [Google Analytics](https://github.com/GitbookIO/plugin-ga): Google Analytics tracking for your book
 * [Disqus](https://github.com/GitbookIO/plugin-disqus): Disqus comments integration in your book
+* [Autocover](https://github.com/GitbookIO/plugin-autocover): Generate a cover for yoru book
 * [Transform annoted quotes to notes](https://github.com/erixtekila/gitbook-plugin-richquotes): Allow extra markdown markup to render blockquotes as nice notes
 * [Send code to console](https://github.com/erixtekila/gitbook-plugin-toconsole): Evaluate javascript blockin the browser inspector's console
 * [Revealable sections](https://github.com/mrpotes/gitbook-plugin-reveal): Reveal sections of the page using buttons made from the first title in each section
