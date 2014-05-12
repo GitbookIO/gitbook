@@ -205,7 +205,7 @@ Plugins can used to extend your book's functionality. Read [GitbookIO/plugin](ht
 
 * [Google Analytics](https://github.com/GitbookIO/plugin-ga): Google Analytics tracking for your book
 * [Disqus](https://github.com/GitbookIO/plugin-disqus): Disqus comments integration in your book
-* [Autocover](https://github.com/GitbookIO/plugin-autocover): Generate a cover for yoru book
+* [Autocover](https://github.com/GitbookIO/plugin-autocover): Generate a cover for your book
 * [Transform annoted quotes to notes](https://github.com/erixtekila/gitbook-plugin-richquotes): Allow extra markdown markup to render blockquotes as nice notes
 * [Send code to console](https://github.com/erixtekila/gitbook-plugin-toconsole): Evaluate javascript blockin the browser inspector's console
 * [Revealable sections](https://github.com/mrpotes/gitbook-plugin-reveal): Reveal sections of the page using buttons made from the first title in each section
