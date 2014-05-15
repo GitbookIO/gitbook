@@ -4,6 +4,7 @@ var Q = require('q');
 var _ = require('lodash');
 var path = require('path');
 var prog = require('commander');
+var tinylr = require('tiny-lr-fork');
 
 var pkg = require('../package.json');
 var generators = require("../lib/generate").generators;
@@ -30,6 +31,15 @@ build.command(prog.command('serve [source_dir]'))
 .action(function(dir, options) {
     var server = new Server();
 
+    // init livereload server
+    var lrOptions = {port: 35729};
+    var lrServer = tinylr(lrOptions);
+    var lrPath = undefined;
+    lrServer.listen(lrOptions.port, function(err) {
+      if (err) { return console.log(err); }
+      console.log('Live reload server started on port: ' + lrOptions.port);
+    });
+
     var generate = function() {
         if (server.isRunning()) console.log("Stopping server");
 
@@ -44,9 +54,16 @@ build.command(prog.command('serve [source_dir]'))
             .then(function() {
                 console.log('Serving book on http://localhost:'+options.port);
 
+                if (lrPath) {
+                  // trigger livereload
+                  lrServer.changed({body:{files:[lrPath]}})
+                }
+
                 if (!options.watch) return;
                 return utils.watch(_options.input)
                 .then(function(filepath) {
+                    // set livereload path
+                    lrPath = filepath;
                     console.log("Restart after change in files");
                     console.log('');
                     return generate();

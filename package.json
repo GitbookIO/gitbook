@@ -20,7 +20,7 @@
         "semver": "2.2.1",
         "gaze": "~0.5.1",
         "resolve": "0.6.3",
-
+        "tiny-lr-fork": "0.0.5",
         "gitbook-plugin": "0.0.2",
         "gitbook-plugin-mixpanel": "0.0.2",
         "gitbook-plugin-mathjax": "0.0.3"
