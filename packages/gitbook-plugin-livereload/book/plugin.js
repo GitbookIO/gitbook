@@ -4,7 +4,7 @@
 
   if (firstScriptTag) {
     newEl.async = 1;
-    newEl.src = '//' + window.location.host + ':35729/livereload.js';
+    newEl.src = '//' + window.location.hostname + ':35729/livereload.js';
   }
 
   firstScriptTag.parentNode.insertBefore(newEl, firstScriptTag);
