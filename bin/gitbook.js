@@ -26,6 +26,7 @@ build.command(prog.command('serve [source_dir]'))
 .description('Build then serve a gitbook from a directory')
 .option('-p, --port <port>', 'Port for server to listen on', 4000)
 .option('--no-watch', 'Disable restart with file watching')
+.option('--no-cache', 'Disable cache manifest generation')
 .action(function(dir, options) {
     var server = new Server();
 
