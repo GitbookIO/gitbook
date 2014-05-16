@@ -87,6 +87,12 @@ Here are the options that can be stored in this file:
             "google": null,
             "facebook": null,
             "twitter": null
+        },
+
+        // Contribute links
+        "contribute": {
+            "watch" : null,
+            "star": null
         }
     }
 }
