@@ -22,9 +22,11 @@
     <a href="#" target="_blank" class="btn pull-right twitter-sharing-link sharing-link" data-sharing="twitter" aria-label="Share on Twitter"><i class="fa fa-twitter"></i></a>
     {% endif %}
 
-    {% if githubId %}
-    <a href="{{ githubHost }}{{ githubId }}/stargazers" target="_blank" class="btn pull-right count-star hidden-xs"><i class="fa fa-star-o"></i> Star (<span>-</span>)</a>
-    <a href="{{ githubHost }}{{ githubId }}/watchers" target="_blank" class="btn pull-right count-watch hidden-xs"><i class="fa fa-eye"></i> Watch (<span>-</span>)</a>
+    {% if options.links.contribute.star !== false and (options.links.contribute.star != null or githubId) %}
+    <a href="{{ options.links.contribute.star|default(githubHost+githubId+"/stargazers") }}" target="_blank" class="btn pull-right count-star hidden-xs"><i class="fa fa-star-o"></i> Star (<span>-</span>)</a>
+    {% endif %}
+    {% if options.links.contribute.watch !== false and (options.links.contribute.watch != null or githubId) %}
+    <a href="{{ options.links.contribute.watch|default(githubHost+githubId+"/watchers") }}" target="_blank" class="btn pull-right count-watch hidden-xs"><i class="fa fa-eye"></i> Watch (<span>-</span>)</a>
     {% endif %}
 
     <!-- Title -->
