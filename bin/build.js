@@ -33,8 +33,11 @@ var makeBuildFunc = function(converter) {
         .then(function(output) {
             console.log("Successfuly built !");
             return output;
-        }, utils.logError);
-    };   
+        }, utils.logError)
+        .fail(function() {
+            process.exit(-1);
+        });
+    };
 };
 
 module.exports = {
