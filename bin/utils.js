@@ -30,7 +30,9 @@ function watch(dir) {
 }
 
 function logError(err) {
-    console.log(err.stack || err.message || err);
+    var message = err.message || err;
+    if (process.env.DEBUG != null) message = err.stack || message;
+    console.log(message);
     return Q.reject(err);
 };
 
