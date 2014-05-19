@@ -189,8 +189,10 @@ GitBook will read the `.gitignore`, `.bookignore` and `.ignore` files to get a l
 
 #### Cover
 
-A cover image can be set by creating a file: **/cover.jpg** or **cover.png**.
+A cover image can be set by creating a file: **/cover.jpg**.
 The best resolution is **1800x2360**. The generation of the cover can be done automatically using the plugin [autocover](https://github.com/GitbookIO/plugin-autocover).
+
+A small version of the cover can also be set by creating a file: **/cover_small.jpg**.
 
 #### Plugins
 
