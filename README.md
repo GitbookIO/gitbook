@@ -3,7 +3,7 @@ GitBook
 
 [![Build Status](https://travis-ci.org/GitbookIO/gitbook.png?branch=master)](https://travis-ci.org/GitbookIO/gitbook)
 
-GitBook is a command line tool (and Node.js library) for building beautiful programming books and exercises using GitHub/Git and Markdown. You can see an example: [Learn Javascript](http://gitbookio.github.io/javascript/). An [editor](https://github.com/GitbookIO/editor) is available for Windows, Mac and Linux. You can follow [@GitBookIO](https://twitter.com/GitBookIO) on Twitter.
+GitBook is a command line tool (and Node.js library) for building beautiful books and exercises using GitHub/Git and Markdown. You can see an example: [Learn Javascript](https://www.gitbook.io/book/GitBookIO/javascript). An [editor](https://github.com/GitbookIO/editor) is available for Windows, Mac and Linux. You can follow [@GitBookIO](https://twitter.com/GitBookIO) on Twitter.
 
 ![Image](https://raw.github.com/GitbookIO/gitbook/master/preview.png)
 
@@ -106,7 +106,7 @@ GitBook can generate your book in the following formats:
 
 ## Book Format
 
-A book is a GitHub repository containing at least 2 files: `README.md` and `SUMMARY.md`.
+A book is a Git repository containing at least 2 files: `README.md` and `SUMMARY.md`.
 
 #### README.md
 
@@ -193,6 +193,10 @@ A cover image can be set by creating a file: **/cover.jpg**.
 The best resolution is **1800x2360**. The generation of the cover can be done automatically using the plugin [autocover](https://github.com/GitbookIO/plugin-autocover).
 
 A small version of the cover can also be set by creating a file: **/cover_small.jpg**.
+
+#### Publish your book
+
+The platform [GitBook.io](https://www.gitbook.io/) is like an "Heroku for books", you can create a book on it (public, paid, or private) and update it using **git push**.
 
 #### Plugins
 
