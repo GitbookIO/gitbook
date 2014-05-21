@@ -3,7 +3,7 @@ GitBook
 
 [![Build Status](https://travis-ci.org/GitbookIO/gitbook.png?branch=master)](https://travis-ci.org/GitbookIO/gitbook)
 
-GitBook is a command line tool (and Node.js library) for building beautiful books and exercises using GitHub/Git and Markdown. You can see an example: [Learn Javascript](https://www.gitbook.io/book/GitBookIO/javascript). An [editor](https://github.com/GitbookIO/editor) is available for Windows, Mac and Linux. You can follow [@GitBookIO](https://twitter.com/GitBookIO) on Twitter.
+GitBook is a command line tool (and Node.js library) for building beautiful books and exercises using GitHub/Git and Markdown. You can see an example: [Learn Javascript](https://www.gitbook.io/book/GitBookIO/javascript). An [editor](https://github.com/GitbookIO/editor) is available for Windows, Mac and Linux. You can follow [@GitBookIO](https://twitter.com/GitBookIO) on Twitter. A complete documentation is available at [help.gitbook.io](http://help.gitbook.io/).
 
 ![Image](https://raw.github.com/GitbookIO/gitbook/master/preview.png)
 
