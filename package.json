@@ -24,7 +24,7 @@
         "gitbook-plugin": "0.0.2",
         "gitbook-plugin-mixpanel": "0.0.2",
         "gitbook-plugin-mathjax": "0.0.3",
-        "gitbook-plugin-livereload": "git://github.com/davidagraf/gitbookio-plugin-livereload.git"
+        "gitbook-plugin-livereload": "0.0.1"
     },
     "devDependencies": {
         "mocha": "1.18.2",
