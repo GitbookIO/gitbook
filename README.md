@@ -110,7 +110,7 @@ A book is a Git repository containing at least 2 files: `README.md` and `SUMMARY
 
 #### README.md
 
-As usual, it should contains an introduction for your book. It will be automatically added to the final summary.
+Typically, this should be the introduction for your book. It will be automatically added to the final summary.
 
 #### SUMMARY.md
 
@@ -130,7 +130,7 @@ This is the summary of my book.
     * [example 1](section2/example1.md)
 ```
 
-Files that are not included in the `SUMMARY.md` will not be processed by `gitbook`.
+Files that are not included in `SUMMARY.md` will not be processed by `gitbook`.
 
 #### Exercises
 
