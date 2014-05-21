@@ -3,7 +3,7 @@ GitBook
 
 [![Build Status](https://travis-ci.org/GitbookIO/gitbook.png?branch=master)](https://travis-ci.org/GitbookIO/gitbook)
 
-GitBook is a command line tool (and Node.js library) for building beautiful programming books and exercises using GitHub/Git and Markdown. You can see an example: [Learn Javascript](http://gitbookio.github.io/javascript/). An [editor](https://github.com/GitbookIO/editor) is available for Windows, Mac and Linux. You can follow [@GitBookIO](https://twitter.com/GitBookIO) on Twitter.
+GitBook is a command line tool (and Node.js library) for building beautiful books and exercises using GitHub/Git and Markdown. You can see an example: [Learn Javascript](https://www.gitbook.io/book/GitBookIO/javascript). An [editor](https://github.com/GitbookIO/editor) is available for Windows, Mac and Linux. You can follow [@GitBookIO](https://twitter.com/GitBookIO) on Twitter.
 
 ![Image](https://raw.github.com/GitbookIO/gitbook/master/preview.png)
 
@@ -106,11 +106,11 @@ GitBook can generate your book in the following formats:
 
 ## Book Format
 
-A book is a GitHub repository containing at least 2 files: `README.md` and `SUMMARY.md`.
+A book is a Git repository containing at least 2 files: `README.md` and `SUMMARY.md`.
 
 #### README.md
 
-As usual, it should contains an introduction for your book. It will be automatically added to the final summary.
+Typically, this should be the introduction for your book. It will be automatically added to the final summary.
 
 #### SUMMARY.md
 
@@ -130,7 +130,7 @@ This is the summary of my book.
     * [example 1](section2/example1.md)
 ```
 
-Files that are not included in the `SUMMARY.md` will not be processed by `gitbook`.
+Files that are not included in `SUMMARY.md` will not be processed by `gitbook`.
 
 #### Exercises
 
@@ -189,8 +189,14 @@ GitBook will read the `.gitignore`, `.bookignore` and `.ignore` files to get a l
 
 #### Cover
 
-A cover image can be set by creating a file: **/cover.jpg** or **cover.png**.
-The best resolution is **1600x2400**. The generation of the cover can be done automatically using the plugin [autocover](https://github.com/GitbookIO/plugin-autocover).
+A cover image can be set by creating a file: **/cover.jpg**.
+The best resolution is **1800x2360**. The generation of the cover can be done automatically using the plugin [autocover](https://github.com/GitbookIO/plugin-autocover).
+
+A small version of the cover can also be set by creating a file: **/cover_small.jpg**.
+
+#### Publish your book
+
+The platform [GitBook.io](https://www.gitbook.io/) is like an "Heroku for books", you can create a book on it (public, paid, or private) and update it using **git push**.
 
 #### Plugins
 
@@ -207,7 +213,7 @@ Plugins can used to extend your book's functionality. Read [GitbookIO/plugin](ht
 * [Disqus](https://github.com/GitbookIO/plugin-disqus): Disqus comments integration in your book
 * [Autocover](https://github.com/GitbookIO/plugin-autocover): Generate a cover for your book
 * [Transform annoted quotes to notes](https://github.com/erixtekila/gitbook-plugin-richquotes): Allow extra markdown markup to render blockquotes as nice notes
-* [Send code to console](https://github.com/erixtekila/gitbook-plugin-toconsole): Evaluate javascript blockin the browser inspector's console
+* [Send code to console](https://github.com/erixtekila/gitbook-plugin-toconsole): Evaluate javascript block in the browser inspector's console
 * [Revealable sections](https://github.com/mrpotes/gitbook-plugin-reveal): Reveal sections of the page using buttons made from the first title in each section
 * [Markdown within HTML](https://github.com/mrpotes/gitbook-plugin-nestedmd): Process markdown within HTML blocks - allows custom layout options for individual pages
 * [Bootstrap JavaScript plugins](https://github.com/mrpotes/gitbook-plugin-bootstrapjs): Use the [Bootstrap JavaScript plugins](http://getbootstrap.com/javascript) in your online GitBook

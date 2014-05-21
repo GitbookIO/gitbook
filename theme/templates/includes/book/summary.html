@@ -3,19 +3,19 @@
         <input type="text" placeholder="Search" class="form-control" />
     </div>
     <ul class="summary">
-        {% if options.links.about !== false && (options.links.about != null || githubId) %}
+        {% if options.links.about !== false && (options.links.about || githubId) %}
         <li>
             <a href="{{ options.links.about|default(githubHost+githubAuthor) }}" target="blank" class="author-link">About the author</a>
         </li>
         {% endif %}
 
-        {% if options.links.issues !== false && (options.links.issues != null || githubId) %}
+        {% if options.links.issues !== false && (options.links.issues || githubId) %}
         <li>
             <a href="{{ options.links.issues|default(githubHost+githubId+"/issues") }}" target="blank"class="issues-link">Questions and Issues</a>
         </li>
         {% endif %}
 
-        {% if options.links.contribute !== false && (options.links.contribute != null || githubId) %}
+        {% if options.links.contribute !== false && (options.links.contribute || githubId) %}
         <li>
             <a href="{{ options.links.contribute|default(githubHost+githubId+"/edit/master/"+_input) }}" target="blank" class="contribute-link">Edit and Contribute</a>
         </li>
