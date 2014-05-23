@@ -67,12 +67,10 @@ define([
             e.preventDefault();
             toggleSearch();
         });
-    };
 
-    var prepare = function() {
-        var $searchInput = $(".book-search input");
 
-        $searchInput.keyup(function(e) {
+        // Type in search bar
+        $(document).on("keyup", ".book-search input", function(e) {
             var key = (e.keyCode ? e.keyCode : e.which);
             var q = $(this).val();
 
@@ -89,13 +87,12 @@ define([
                     _.pluck(results, "path")
                 );
             }
-        });
-    }
+        })
+    };
 
     return {
         init: init,
         search: search,
-        toggle: toggleSearch,
-        prepare: prepare
+        toggle: toggleSearch
     };
 });

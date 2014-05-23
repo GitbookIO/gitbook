@@ -1,11 +1,10 @@
 define([
+    "jQuery",
     "lodash",
     "utils/storage",
     "utils/platform",
     "core/state"
-], function(_, storage, platform, state) {
-    var $summary = state.$book.find(".book-summary");
-
+], function($, _, storage, platform, state) {
     // Toggle sidebar with or withour animation
     var toggleSidebar = function(_state, animation) {
         if (state != null && isOpen() == _state) return;
@@ -38,6 +37,8 @@ define([
 
     // Filter summary with a list of path
     var filterSummary = function(paths) {
+        var $summary = $(".book-summary");
+
         $summary.find("li").each(function() {
             var path = $(this).data("path");
             var st = paths == null || _.contains(paths, path);
@@ -48,7 +49,6 @@ define([
     };
 
     return {
-        $el: $summary,
         init: init,
         toggle: toggleSidebar,
         filter: filterSummary

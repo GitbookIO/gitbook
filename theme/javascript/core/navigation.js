@@ -3,12 +3,11 @@ define([
     "utils/url",
     "core/events",
     "core/state",
-    "core/search",
     "core/progress",
     "core/exercise",
     "core/quiz",
     "core/loading"
-], function($, URL, events, state, search, progress, exercises, quiz, loading) {
+], function($, URL, events, state, progress, exercises, quiz, loading) {
     var prev, next;
     var githubCountStars, githubCountWatch;
 
@@ -95,9 +94,6 @@ define([
 
         // Focus on content
         $pageWrapper.focus();
-
-        // Prepare search bar
-        search.prepare();
 
         // Update GitHub count
         if (state.githubId) {
