@@ -1,6 +1,8 @@
 <!DOCTYPE HTML>
 <html lang="en-US" {% block htmlTag %}{% endblock %}>
+    {{ htmlSnippet("html:start")|default("") }}
     <head prefix="og: http://ogp.me/ns# book: http://ogp.me/ns/book#">
+        {{ htmlSnippet("head:start")|default("") }}
         {% block head %}
         <meta charset="UTF-8">
         <title>{% block title %} | {{ title }}{% endblock %}</title>
@@ -33,8 +35,10 @@
 
         <link rel="shortcut icon" href="{{ staticBase }}/images/favicon.ico" type="image/x-icon">
         {% endblock %}
+        {{ htmlSnippet("head:end")|default("") }}
     </head>
     <body>
+        {{ htmlSnippet("body:start")|default("") }}
         {% block style %}
         <link rel="stylesheet" href="{{ staticBase }}/style.css">
         {% endblock %}
@@ -45,5 +49,7 @@
         <script src="{{ staticBase }}/jsrepl/jsrepl.js" id="jsrepl-script"></script>
         <script src="{{ staticBase }}/app.js"></script>
         {% endblock %}
+        {{ htmlSnippet("body:end")|default("") }}
     </body>
+    {{ htmlSnippet("html:end")|default("") }}
 </html>
