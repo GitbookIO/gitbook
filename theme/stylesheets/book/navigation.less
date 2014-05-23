@@ -13,15 +13,15 @@
         flex-direction: column;
 
         font-size: 40px;
-        color: rgba(0,0,0,0.5);
+        color: rgba(0,0,0,0.4);
 
         text-align: center;
 
         .transition(all 350ms ease);
 
         &:hover {
-            background-color: @body-pagination-background;
             text-decoration: none;
+            color: rgba(0,0,0,0.6);
         }
 
         &.navigation-next {
@@ -50,11 +50,9 @@
 }
 .book.color-theme-1 .book-body  {
     .navigation:hover{
-        background-color: @body-pagination-background-1;
     }
 }
 .book.color-theme-2 .book-body  {
     .navigation:hover{
-        background-color: @body-pagination-background-2;
     }
 }
