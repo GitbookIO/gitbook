@@ -30,40 +30,23 @@ define([
     };
 
     var enlargeFontSize = function(e){
-        var $bookBody = $(".book-body");
-
         if (fontState.size < 4){
-            $bookBody.toggleClass("font-size-"+fontState.size, false);
             fontState.size++;
-
-            $bookBody.toggleClass("font-size-"+fontState.size, true);
             fontState.save();
         }
     };
 
     var reduceFontSize = function(e){
-        var $bookBody = $(".book-body");
-
         if (fontState.size > 0){
-            $bookBody.toggleClass("font-size-"+fontState.size);
             fontState.size--;
-
-            $bookBody.toggleClass("font-size-"+fontState.size);
             fontState.save();
         }
     };
 
     var changeFontFamily = function(){
-        var $bookBody = $(".book-body");
         var index = $(this).data("font");
 
-        $bookBody.toggleClass("font-family-"+fontState.family);
-        $(".font-settings .font-family-list li:nth-child("+(fontState.family+1)+")")
-            .removeClass("active");
-
         fontState.family = index;
-        $bookBody.toggleClass("font-family-"+fontState.family);
-        $(this).addClass("active");
         fontState.save();
     };
 
@@ -79,6 +62,22 @@ define([
             $book.addClass("color-theme-"+fontState.theme);
 
         fontState.save();
+    };
+
+    var update = function() {
+        var $book = $(".book");
+
+        $(".font-settings .font-family-list li").removeClass("active");
+        $(".font-settings .font-family-list li:nth-child("+(fontState.family+1)+")").addClass("active");
+
+        $book[0].className = $book[0].className.replace(/\bfont-\S+/g, '');
+        $book.addClass("font-size-"+fontState.size);
+        $book.addClass("font-family-"+fontState.family);
+
+        if(fontState.theme !== 0) {
+            $book[0].className = $book[0].className.replace(/\bcolor-theme-\S+/g, '');
+            $book.addClass("color-theme-"+fontState.theme);
+        }
     };
 
     var init = function(config) {
@@ -98,15 +97,10 @@ define([
         });
         fontState.save = function(){
             storage.set("fontState",fontState);
+            update();
         };
 
-        $bookBody.addClass("font-size-"+fontState.size);
-        $bookBody.addClass("font-family-"+fontState.family);
-
-        $(".font-settings .font-family-list li:nth-child("+(fontState.family+1)+")").addClass("active");
-
-        if(fontState.theme !== 0)
-            $book.addClass("color-theme-"+fontState.theme);
+        update();
 
         //Add event listeners
         $(document).on('click', "#enlarge-font-size", enlargeFontSize);
@@ -121,6 +115,7 @@ define([
     };
 
     return {
-        init: init
+        init: init,
+        update: update
     }
 });

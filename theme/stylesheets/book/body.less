@@ -59,28 +59,6 @@
                 min-height: calc(~"100% - 57px")
             }
         }
-        &.font-size-0{
-            font-size:@s-font-size;
-        }
-        &.font-size-1{
-            font-size:@m-font-size;
-        }
-        &.font-size-2{
-            font-size:@l-font-size;
-        }
-        &.font-size-3{
-            font-size:@xl-font-size;
-        }
-        &.font-size-4{
-            font-size:@xxl-font-size;
-        }
-
-        &.font-family-0{
-            font-family: @font-family-serif;
-        }
-        &.font-family-1{
-            font-family: @font-family-sans;
-        }
     }
 
     &.with-summary {
@@ -121,5 +99,38 @@
                 }
             }
         }
+    }
+
+    &.font-size-0 {
+        .book-body {
+            font-size:@s-font-size;
+        }
+    }
+    &.font-size-1 {
+        .book-body {
+            font-size:@m-font-size;
+        }
+    }
+    &.font-size-2 {
+        .book-body {
+            font-size:@l-font-size;
+        }
+    }
+    &.font-size-3 {
+        .book-body {
+            font-size:@xl-font-size;
+        }
+    }
+    &.font-size-4 {
+        .book-body {
+            font-size:@xxl-font-size;
+        }
+    }
+
+    &.font-family-0{
+        font-family: @font-family-serif;
+    }
+    &.font-family-1{
+        font-family: @font-family-sans;
     }
 }

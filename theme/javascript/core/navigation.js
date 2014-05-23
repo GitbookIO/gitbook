@@ -47,10 +47,12 @@ define([
             $("head").html(headContent);
 
             // Merge body
+            var bodyClass = $(".book").attr("class");
             var scrollPosition = $('.book-summary .summary').scrollTop();
             $pageBody.toggleClass("with-summary", $(".book").hasClass("with-summary"))
 
             $(".book").replaceWith($pageBody);
+            $(".book").attr("class", bodyClass);
             $('.book-summary .summary').scrollTop(scrollPosition);
 
             // Update state
