@@ -92,7 +92,7 @@ build.command(prog.command('pdf [source_dir]'))
 
 build.command(prog.command('ebook [source_dir]'))
 .description('Build a gitbook as a eBook')
-.option('-c, --cover <path>', 'Cover image, default is cover.png if exists')
+.option('-c, --cover <path>', 'Cover image, default is cover.jpg if exists')
 .action(function(dir, options) {
     var ext = options.output ? path.extname(options.output) : "epub";
 
