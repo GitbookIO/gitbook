@@ -3,7 +3,7 @@ GitBook
 
 [![Build Status](https://travis-ci.org/GitbookIO/gitbook.png?branch=master)](https://travis-ci.org/GitbookIO/gitbook)
 
-GitBook is a command line tool (and Node.js library) for building beautiful books and exercises using GitHub/Git and Markdown. You can see an example: [Learn Javascript](https://www.gitbook.io/book/GitBookIO/javascript). An [editor](https://github.com/GitbookIO/editor) is available for Windows, Mac and Linux. You can follow [@GitBookIO](https://twitter.com/GitBookIO) on Twitter. A complete documentation is available at [help.gitbook.io](http://help.gitbook.io/).
+GitBook is a command line tool (and Node.js library) for building beautiful books and exercises using GitHub/Git and Markdown. You can see an example: [Learn Javascript](https://www.gitbook.io/book/GitBookIO/javascript). An [editor](https://github.com/GitbookIO/editor) is available for Windows, Mac and Linux. You can follow [@GitBookIO](https://twitter.com/GitBookIO) on Twitter. Complete documentation is available at [help.gitbook.io](http://help.gitbook.io/).
 
 ![Image](https://raw.github.com/GitbookIO/gitbook/master/preview.png)
 
@@ -35,23 +35,23 @@ Options for commands `build` and `serve` are:
 --config <config file>    Configuration file to use, defaults to book.json
 ```
 
-GitBook load the default configuration from a `book.json` file in the repository if it exists.
+GitBook loads the default configuration from a `book.json` file in the repository if it exists.
 
 Here are the options that can be stored in this file:
 
 ```
 {
-    // Folders to use for output (caution: it override the value from the command line)
+    // Folders to use for output (caution: it overrides the value from the command line)
     "output": null,
 
-    // Generator to use for building (caution: it override the value from the command line)
+    // Generator to use for building (caution: it overrides the value from the command line)
     "generator": "site",
 
     // Book title and description (defaults are extracted from the README)
     "title": null,
     "description": null,
 
-    // GitHub informations (defaults are extracted using git)
+    // GitHub information (defaults are extracted using git)
     "github": null,
     "githubHost": "https://github.com/",
 
@@ -67,9 +67,9 @@ Here are the options that can be stored in this file:
         }
     },
 
-    // set another theme with your own layout
-    // it's recommended to use plugins or add more options for default theme, though
-    // see https://github.com/GitbookIO/gitbook/issues/209
+    // Set another theme with your own layout
+    // It's recommended to use plugins or add more options for default theme, though
+    // See https://github.com/GitbookIO/gitbook/issues/209
     "theme": "./localtheme",
 
     // Links in template (null: default, false: remove, string: new value)
@@ -98,11 +98,11 @@ You can publish your books to our index by visiting [GitBook.io](http://www.gitb
 
 GitBook can generate your book in the following formats:
 
-* **Static Website**: This is the default format, it generates a complete interactive static website that can be for example hosted on GitHub Pages.
-* **PDF**: A complete PDF book with exercise solutions at the end of the book. Generate to this format using: ```gitbook pdf ./myrepo```, you need to have [gitbook-pdf](https://github.com/GitbookIO/gitbook-pdf) installed.
-* **eBook**: A complete eBook with exercise solutions at the end of the book. Generate to this format using: ```gitbook ebook ./myrepo```, you need to have [ebook-convert](http://manual.calibre-ebook.com/cli/ebook-convert.html) installed.
-* **Single Page**: The book will be stored in a single printable HTML page, this format is used for conversion to PDF or eBook. Generate to this format using: ```gitbook build ./myrepo -f page```.
-* **JSON**: This format is used for debugging or extracting metadata from a book. Generate to this format using: ```gitbook build ./myrepo -f json```.
+* **Static Website**: This is the default format. It generates a complete interactive static website that can be, for example, hosted on GitHub Pages.
+* **PDF**: A complete PDF book with exercise solutions at the end of the book. Generate this format using: ```gitbook pdf ./myrepo```. You need to have [gitbook-pdf](https://github.com/GitbookIO/gitbook-pdf) installed.
+* **eBook**: A complete eBook with exercise solutions at the end of the book. Generate this format using: ```gitbook ebook ./myrepo```. You need to have [ebook-convert](http://manual.calibre-ebook.com/cli/ebook-convert.html) installed.
+* **Single Page**: The book will be stored in a single printable HTML page. This format is used for conversion to PDF or eBook. Generate this format using: ```gitbook build ./myrepo -f page```.
+* **JSON**: This format is used for debugging or extracting metadata from a book. Generate this format using: ```gitbook build ./myrepo -f json```.
 
 ## Book Format
 
@@ -134,7 +134,7 @@ Files that are not included in `SUMMARY.md` will not be processed by `gitbook`.
 
 #### Exercises
 
-A book can contain interactive exercises (currently only in Javascript but Python and Ruby are coming soon ;) ). An exercise is a code challenge provided to the reader, which is given a code editor to write a solution which is checked against the book author's validation code.
+A book can contain interactive exercises (currently only in Javascript but Python and Ruby are coming soon ;) ). An exercise is a code challenge provided to the reader, who is given a code editor to write a solution which is checked against the book author's validation code.
 
 An exercise is defined by 4 simple parts:
 
@@ -143,7 +143,7 @@ An exercise is defined by 4 simple parts:
 * **Solution** code, being a correct solution to the exercise
 * **Validation** code that tests the correctness of the user's input
 
-Exercises need to start and finish with a separation bar (```---``` or ```***```). It should contain 3 code elements (**base**, **solution** and **validation**). It can contain a 4th element that provides **context** code (functions, imports of libraries etc ... that shouldn't be displayed to the user).
+Exercises need to start and finish with a separation bar (```---``` or ```***```). It should contain 3 code elements (**base**, **solution** and **validation**). It can contain a 4th element that provides **context** code (functions, imports of libraries, etc which shouldn't be displayed to the user).
 
     ---
 
@@ -185,7 +185,7 @@ You can see a complete example with the [Learn Git](https://github.com/GitbookIO
 
 #### Ignoring files & folders
 
-GitBook will read the `.gitignore`, `.bookignore` and `.ignore` files to get a list of files and folders to skip. (The format inside those files, follows the same convention as `.gitignore`)
+GitBook will read the `.gitignore`, `.bookignore` and `.ignore` files to get a list of files and folders to skip. (The format inside those files follows the same convention as `.gitignore`)
 
 #### Cover
 
@@ -196,11 +196,11 @@ A small version of the cover can also be set by creating a file: **/cover_small.
 
 #### Publish your book
 
-The platform [GitBook.io](https://www.gitbook.io/) is like an "Heroku for books", you can create a book on it (public, paid, or private) and update it using **git push**.
+The platform [GitBook.io](https://www.gitbook.io/) is like an "Heroku for books": you can create a book on it (public, paid, or private) and update it using **git push**.
 
 #### Plugins
 
-Plugins can used to extend your book's functionality. Read [GitbookIO/plugin](https://github.com/GitbookIO/plugin) for more information about how to build a plugin for gitbook.
+Plugins can used to extend your book's functionality. Read [GitbookIO/plugin](https://github.com/GitbookIO/plugin) for more information about how to build a plugin for GitBook.
 
 ##### Default plugins:
 
