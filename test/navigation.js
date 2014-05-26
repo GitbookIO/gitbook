@@ -18,6 +18,8 @@ describe('Summary navigation', function() {
             'chapter-1/ARTICLE1.md',
             'chapter-1/ARTICLE2.md',
             'chapter-2/README.md',
+            'chapter-1/ARTICLE-1-2-1.md',
+            'chapter-1/ARTICLE-1-2-2.md'
         ]);
 
         // Make sure it found the files we gave it
@@ -26,6 +28,8 @@ describe('Summary navigation', function() {
         assert(nav['chapter-1/ARTICLE1.md']);
         assert(nav['chapter-1/ARTICLE2.md']);
         assert(nav['chapter-2/README.md']);
+        assert(nav['chapter-1/ARTICLE-1-2-1.md']);
+        assert(nav['chapter-1/ARTICLE-1-2-2.md']);
 
 
         assert.equal(nav['README.md'].prev, null);
@@ -38,9 +42,15 @@ describe('Summary navigation', function() {
         assert.equal(nav['chapter-1/ARTICLE1.md'].next.path, 'chapter-1/ARTICLE2.md');
 
         assert.equal(nav['chapter-1/ARTICLE2.md'].prev.path, 'chapter-1/ARTICLE1.md');
-        assert.equal(nav['chapter-1/ARTICLE2.md'].next.path, 'chapter-2/README.md');
+        assert.equal(nav['chapter-1/ARTICLE2.md'].next.path, 'chapter-1/ARTICLE-1-2-1.md');
 
-        assert.equal(nav['chapter-2/README.md'].prev.path, 'chapter-1/ARTICLE2.md');
+        assert.equal(nav['chapter-1/ARTICLE-1-2-1.md'].prev.path, 'chapter-1/ARTICLE2.md');
+        assert.equal(nav['chapter-1/ARTICLE-1-2-1.md'].next.path, 'chapter-1/ARTICLE-1-2-2.md');
+
+        assert.equal(nav['chapter-1/ARTICLE-1-2-2.md'].prev.path, 'chapter-1/ARTICLE-1-2-1.md');
+        assert.equal(nav['chapter-1/ARTICLE-1-2-2.md'].next.path, 'chapter-2/README.md');
+
+        assert.equal(nav['chapter-2/README.md'].prev.path, 'chapter-1/ARTICLE-1-2-2.md');
         assert.equal(nav['chapter-2/README.md'].next.path, 'chapter-3/README.md');
     });
 
