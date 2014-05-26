@@ -50,5 +50,6 @@ describe('Summary parsing', function () {
 
         assert.equal(c[0].articles[0].level, '1.1');
         assert.equal(c[0].articles[1].level, '1.2');
+        assert.equal(c[0].articles[1].articles[0].level, '1.2.1');
     });
 });
