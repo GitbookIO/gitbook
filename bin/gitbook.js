@@ -80,24 +80,40 @@ build.command(prog.command('serve [source_dir]'))
     generate();
 });
 
-build.command(prog.command('pdf [source_dir]'))
-.description('Build a gitbook as a PDF')
-.option('-pf, --paperformat <format>', 'PDF paper format (default is A4): "5in*7.5in", "10cm*20cm", "A4", "Letter"')
-.action(function(dir, options) {
-    build.file(dir, _.extend(options, {
-        extension: "pdf",
-        format: "pdf"
-    }));
-});
-
-build.command(prog.command('ebook [source_dir]'))
-.description('Build a gitbook as a eBook')
-.option('-c, --cover <path>', 'Cover image, default is cover.jpg if exists')
+build.commandEbook(prog.command('ebook [source_dir]'))
+.description('Build a gitbook as a eBook (format detected according to the extension)')
 .action(function(dir, options) {
     var ext = options.output ? path.extname(options.output) : "epub";
 
     build.file(dir, _.extend(options, {
         extension: ext,
+        format: "ebook"
+    }));
+});
+
+build.commandEbook(prog.command('pdf [source_dir]'))
+.description('Build a gitbook as a PDF')
+.action(function(dir, options) {
+    build.file(dir, _.extend(options, {
+        extension: "pdf",
+        format: "ebook"
+    }));
+});
+
+build.commandEbook(prog.command('epub [source_dir]'))
+.description('Build a gitbook as a ePub book')
+.action(function(dir, options) {
+    build.file(dir, _.extend(options, {
+        extension: "epub",
+        format: "ebook"
+    }));
+});
+
+build.commandEbook(prog.command('mobi [source_dir]'))
+.description('Build a gitbook as a Mobi book')
+.action(function(dir, options) {
+    build.file(dir, _.extend(options, {
+        extension: "mobi",
         format: "ebook"
     }));
 });

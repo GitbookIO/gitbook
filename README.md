@@ -31,7 +31,7 @@ Options for commands `build` and `serve` are:
 
 ```
 -o, --output <directory>  Path to output directory, defaults to ./_book
--f, --format <name>       Change generation format, defaults to site, availables are: site, page, pdf, json
+-f, --format <name>       Change generation format, defaults to site, availables are: site, page, pdf, json, mobi, epub
 --config <config file>    Configuration file to use, defaults to book.json
 ```
 
@@ -99,8 +99,7 @@ You can publish your books to our index by visiting [GitBook.io](http://www.gitb
 GitBook can generate your book in the following formats:
 
 * **Static Website**: This is the default format. It generates a complete interactive static website that can be, for example, hosted on GitHub Pages.
-* **PDF**: A complete PDF book with exercise solutions at the end of the book. Generate this format using: ```gitbook pdf ./myrepo```. You need to have [gitbook-pdf](https://github.com/GitbookIO/gitbook-pdf) installed.
-* **eBook**: A complete eBook with exercise solutions at the end of the book. Generate this format using: ```gitbook ebook ./myrepo```. You need to have [ebook-convert](http://manual.calibre-ebook.com/cli/ebook-convert.html) installed.
+* **eBook**: A complete eBook with exercise solutions at the end of the book. Generate this format using: ```gitbook ebook ./myrepo```. You need to have [ebook-convert](http://manual.calibre-ebook.com/cli/ebook-convert.html) installed. The output format could be **PDF**, **ePub** or **MOBI**.
 * **Single Page**: The book will be stored in a single printable HTML page. This format is used for conversion to PDF or eBook. Generate this format using: ```gitbook build ./myrepo -f page```.
 * **JSON**: This format is used for debugging or extracting metadata from a book. Generate this format using: ```gitbook build ./myrepo -f json```.
 

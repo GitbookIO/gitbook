@@ -16,6 +16,11 @@ var buildCommand = function(command) {
 };
 
 
+var buildEbookCommand = function(command) {
+    return buildCommand(command)
+    .option('-c, --cover <path>', 'Cover image, default is cover.jpg if exists');
+};
+
 var makeBuildFunc = function(converter) {
     return  function(dir, options) {
         dir = dir || process.cwd();
@@ -43,5 +48,6 @@ var makeBuildFunc = function(converter) {
 module.exports = {
     folder: makeBuildFunc(generate.folder),
     file: makeBuildFunc(generate.file),
-    command: buildCommand
+    command: buildCommand,
+    commandEbook: buildEbookCommand
 };
