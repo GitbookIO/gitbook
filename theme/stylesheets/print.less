@@ -1,38 +1,19 @@
 @import "vendors/bootstrap/bootstrap.less";
-@import "vendors/fontawesome/font-awesome.less";
 
 @import "mixins.less";
-@import "variables.less";
-@import "fonts.less";
+/*@import "variables.less";*/
 
 @import "page/highlight.less";
 
 
 @font-size-base:          13px;
 
-
-* {
-    -webkit-overflow-scrolling: touch;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-text-size-adjust: none;
-    -webkit-touch-callout: none;
-    -webkit-font-smoothing: antialiased;
+.book-chapter {
+    display: none;
 }
 
-html, body {
-    height: 100%;
-}
-
-body {
-    text-rendering: optimizeLegibility;
-    font-smoothing: antialiased;
-    font-family: @font-family-base;
-}
-
-
-h1, h2, h3 {
-    page-break-after: avoid;
-    page-break-before: auto;
+article {
+    page-break-after: always;
 }
 
 h1 { font-size: floor(@font-size-base * 2.15); }
@@ -52,64 +33,16 @@ img {
     page-break-inside: avoid;
 }
 
-section {
-    page-break-after: always;
+.exercise {
+    margin: 1cm 0cm;
+    padding: 0.4cm;
+    page-break-inside: avoid;
 
-    &#cover {
-        padding: 3cm 0cm;
-        text-align: center;
+    border: 3px solid #ddd;
 
-        h1 {
-            font-size: 1.5cm;
-        }
-    }
-
-    &#summary {
-        margin: 1.5cm;
-
-        h1 {
-            text-align: center;
-        }
-
-        ol {
-            list-style: none;
-            padding: 0px;
-            margin: 0px;
-            margin-left: 1cm;
-        }
-
-        > ol {
-            > li {
-            }
-        }
-    }
-
-    article {
-        margin-bottom: 1.5cm;
-        
-        &.new-chapter {
-            page-break-after: always;
-            font-size: 0.6cm;
-            text-align: center;
-            padding: 3cm 0cm;
-
-            h1 {
-                font-size: floor(@font-size-base * 2.7);
-            }
-        }
-
-        .exercise {
-            margin: 1cm 0cm;
-            padding: 0.4cm;
-            page-break-inside: avoid;
-
-            border: 3px solid #ddd;
-
-            .exercise-header {
-                margin-bottom: 0.4cm;
-                padding-bottom: 0.2cm;
-                border-bottom: 1px solid #ddd;
-            }
-        }
+    .exercise-header {
+        margin-bottom: 0.4cm;
+        padding-bottom: 0.2cm;
+        border-bottom: 1px solid #ddd;
     }
 }

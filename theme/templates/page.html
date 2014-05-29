@@ -20,10 +20,10 @@
             </div>
         {% elif section.type == "quiz" %}
         <div class="quiz">
-          <div class="exercise-header">Exercise #{{ exercise }}</div>
-          {% autoescape false %}{{ section.content }}{% endautoescape %}
-          {% autoescape false %}{{ section.quiz.base }}{% endautoescape %}
-          {% set exercise = exercise + 1 %}
+            <div class="exercise-header">Exercise #{{ exercise }}</div>
+            {% autoescape false %}{{ section.content }}{% endautoescape %}
+            {% autoescape false %}{{ section.quiz.base }}{% endautoescape %}
+            {% set exercise = exercise + 1 %}
         </div>
         {% endif %}
     {% endfor %}
@@ -31,78 +31,45 @@
 
 {% set exercise = 1 %}
 {% block content %}
-    {# Cover #}
-    <section id="cover">
-        <h1>{{ title }}</h1>
-        {% if githubId %}
-        <h2>By <a href="{{ githubHost }}{{ githubAuthor }}">@{{ githubAuthor }}</a></h2>
-        {% endif %}
-    </section>
-
     {# Pages content #}
-    <section>
-        <article id="README.md">
-        {{ articleContent(pages["README.md"].content) }}
-        </article>
-    </section>
-    {% for item in summary.chapters %}
-        <section>
-            <article id="{{ item.path }}" class="new-chapter">
-                <h1 class="book-chapter">{{ item.title }}</h1>
-            </article>
-
-            {% if pages[item.path] %}
-            <article>
-            {{ articleContent(pages[item.path].content) }}
-            </article>
-            {% endif %}
-
-            {% if item.articles.length > 0 %}
-                {% for article in item.articles %}
-                    {% if pages[article.path] %}
-                        <article id="{{ article.path }}">
-                            {{ articleContent(pages[article.path].content) }}
-                        </article>
-                    {% endif %}
-                {% endfor %}
-            {% endif %}
-        </section>
+    {% for item in progress.chapters %}
+    <article id="{{ article.path }}">
+        <h1 class="book-chapter book-chapter-{{ item.level|lvl }}">{{ item.title }}</h1>
+        {% if pages[item.path] %}
+        {{ articleContent(pages[item.path].content) }}
+        {% endif %}
+    </article>
     {% endfor %}
 
 
     {# Exercise solutions #}
     {% if exercise > 1 %}
         {% set exercise = 1 %}
-        <section>
-            <article class="new-chapter">
-                <h1  class="book-chapter">Exercise Solutions</h1>
-            </article>
-            <article>
-            {% for item in summary.chapters %}
-                {% for article in item.articles %}
-                    {% if pages[article.path] %}
-                        {% for section in pages[article.path].content %}
-                            {% if section.type == "exercise" %}
-                                <div class="exercise">
-                                    <div class="exercise-header">Exercise #{{ exercise }}</div>
-                                    {% autoescape false %}{{ section.content }}{% endautoescape %}
-                                    <pre><code>{% autoescape false %}{{ section.code.solution|code }}{% endautoescape %}</code></pre>
-                                    {% set exercise = exercise + 1 %}
-                                </div>
-                            {% elif section.type == "quiz" %}
-                                <div class="quiz">
-                                    <div class="exercise-header">Exercise #{{ exercise }}</div>
-                                    {% autoescape false %}{{ section.content }}{% endautoescape %}
-                                    {% autoescape false %}{{ section.quiz.solution }}{% endautoescape %}
-                                    {% set exercise = exercise + 1 %}
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    {% endif %}
-                {% endfor %}
+        <article>
+            <h1 class="book-chapter book-chapter-1">Exercise Solutions</h1>
+
+            {% for item in progress.chapters %}
+                {% if pages[item.path] %}
+                    {% for section in pages[item.path].content %}
+                        {% if section.type == "exercise" %}
+                            <div class="exercise">
+                                <div class="exercise-header">Exercise #{{ exercise }}</div>
+                                {% autoescape false %}{{ section.content }}{% endautoescape %}
+                                <pre><code>{% autoescape false %}{{ section.code.solution|code }}{% endautoescape %}</code></pre>
+                                {% set exercise = exercise + 1 %}
+                            </div>
+                        {% elif section.type == "quiz" %}
+                            <div class="quiz">
+                                <div class="exercise-header">Exercise #{{ exercise }}</div>
+                                {% autoescape false %}{{ section.content }}{% endautoescape %}
+                                {% autoescape false %}{{ section.quiz.solution }}{% endautoescape %}
+                                {% set exercise = exercise + 1 %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
             {% endfor %}
-            </article>
-        </section>
+        </article>
     {% endif %}
 {% endblock %}
 
