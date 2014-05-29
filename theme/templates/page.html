@@ -39,32 +39,6 @@
         {% endif %}
     </section>
 
-    {# Summary #}
-    <section id="summary">
-        <h1>Table of Contents</h1>
-        <ol>
-            <li>
-                <a href="#README.md">
-                    <h2>Introduction</h2>
-                </a>
-            </li>
-            {% for item in summary.chapters %}
-                <li>
-                    <h2><span>{{ item.level }}.</span> <a href="#{{ item.path }}">{{ item.title }}</a></h2>
-                    {% if item.articles.length > 0 %}
-                    <ol>
-                        {% for article in item.articles %}
-                            <li>
-                                <span>{{ article.level }}</span> <a href="#{{ article.path }}">{{ article.title }}</a>
-                            </li>
-                        {% endfor %}
-                    </ol>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ol>
-    </section>
-
     {# Pages content #}
     <section>
         <article id="README.md">
@@ -74,7 +48,7 @@
     {% for item in summary.chapters %}
         <section>
             <article id="{{ item.path }}" class="new-chapter">
-                <h1>{{ item.title }}</h1>
+                <h1 class="book-chapter">{{ item.title }}</h1>
             </article>
 
             {% if pages[item.path] %}
@@ -101,7 +75,7 @@
         {% set exercise = 1 %}
         <section>
             <article class="new-chapter">
-                <h1>Exercise Solutions</h1>
+                <h1  class="book-chapter">Exercise Solutions</h1>
             </article>
             <article>
             {% for item in summary.chapters %}
