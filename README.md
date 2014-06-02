@@ -98,6 +98,29 @@ Here are the options that can be stored in this file:
             "facebook": null,
             "twitter": null
         }
+    },
+
+
+    // Options for PDF generation
+    "pdf": {
+        // Add toc at the end of the file
+        "toc": true,
+
+        // Font size for the fiel content
+        "fontSize": 12,
+
+        // Paper size for the pdf
+        // Choices are [u’a0’, u’a1’, u’a2’, u’a3’, u’a4’, u’a5’, u’a6’, u’b0’, u’b1’, u’b2’, u’b3’, u’b4’, u’b5’, u’b6’, u’legal’, u’letter’]
+        "paperSize": "a4",
+
+        // Margin (in pts)
+        // Note: 72 pts equals 1 inch
+        "margin": {
+            "right": 62,
+            "left": 62,
+            "top": 36,
+            "bottom": 36
+        }
     }
 }
 ```
