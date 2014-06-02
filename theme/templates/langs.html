@@ -10,7 +10,7 @@
         <ul class="languages">
         {%  for lang in langs %}
             <li>
-                <a href="{{ basePath}}/{{ lang.path }}">{{ lang.title }}</a>
+                <a href="{{ basePath}}/{{ lang.path|pathJoin("/index.html") }}">{{ lang.title }}</a>
             </li>
         {% endfor %}
         </ul>
