@@ -39,17 +39,27 @@ GitBook loads the default configuration from a `book.json` file in the repositor
 
 Here are the options that can be stored in this file:
 
-```
+```js
 {
-    // Folders to use for output (caution: it overrides the value from the command line)
+    // Folders to use for output
+    // Caution: it overrides the value from the command line
+    // It's not advised this option in the book.json
     "output": null,
 
-    // Generator to use for building (caution: it overrides the value from the command line)
+    // Generator to use for building
+    // Caution: it overrides the value from the command line
+    // It's not advised this option in the book.json
     "generator": "site",
 
     // Book title and description (defaults are extracted from the README)
     "title": null,
     "description": null,
+
+    // For ebook format, the extension to use for generation (default is detected from output extension)
+    // "epub", "pdf", "mobi"
+    // Caution: it overrides the value from the command line
+    // It's not advised this option in the book.json
+    "extension": null,
 
     // GitHub information (defaults are extracted using git)
     "github": null,
