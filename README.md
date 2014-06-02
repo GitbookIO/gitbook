@@ -98,6 +98,16 @@ Here are the options that can be stored in this file:
             "facebook": null,
             "twitter": null
         }
+    },
+
+
+    // Options for PDF generation
+    "pdf": {
+        // Add toc at the end of the file
+        "toc": true,
+
+        // Font size for the fiel content
+        "fontSize": 12
     }
 }
 ```
