@@ -24,8 +24,8 @@ module.exports = function (grunt) {
                     optimization: 2
                 },
                 files: {
-                    "theme/assets/style.css": "theme/stylesheets/main.less",
-                    "theme/assets/print.css": "theme/stylesheets/print.less"
+                    "theme/assets/style.css": "theme/stylesheets/website.less",
+                    "theme/assets/print.css": "theme/stylesheets/ebook.less"
                 }
             }
         },
