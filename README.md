@@ -106,6 +106,9 @@ Here are the options that can be stored in this file:
         // Add toc at the end of the file
         "toc": true,
 
+        // Add page numbers to the bottom of every page
+        "pageNumbers": false,
+
         // Font size for the fiel content
         "fontSize": 12,
 
