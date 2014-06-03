@@ -36,7 +36,7 @@ var makeBuildFunc = function(converter) {
             })
         )
         .then(function(output) {
-            console.log("Successfuly built !");
+            console.log("Successfully built!");
             return output;
         }, utils.logError)
         .fail(function() {
