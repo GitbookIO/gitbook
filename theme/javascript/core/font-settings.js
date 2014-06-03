@@ -92,7 +92,7 @@ define([
         // Instantiate font state object
         fontState = storage.get("fontState", {
             size: config.size || 1,
-            family: FAMILY[config.family || "serif"],
+            family: FAMILY[config.family || "sans"],
             theme: THEMES[config.theme || "white"]
         });
         fontState.save = function(){
