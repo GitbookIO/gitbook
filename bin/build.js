@@ -12,7 +12,7 @@ var buildCommand = function(command) {
     return command
     .option('-o, --output <directory>', 'Path to output directory, defaults to ./_book')
     .option('-f, --format <name>', 'Change generation format, defaults to site, availables are: '+_.keys(generators).join(", "))
-    .option('--config <config file>', 'Configuration file to use, defualt to book.json')
+    .option('--config <config file>', 'Configuration file to use, defaults to book.js or book.json')
 };
 
 

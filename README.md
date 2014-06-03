@@ -32,7 +32,7 @@ Options for commands `build` and `serve` are:
 ```
 -o, --output <directory>  Path to output directory, defaults to ./_book
 -f, --format <name>       Change generation format, defaults to site, availables are: site, page, ebook, json
---config <config file>    Configuration file to use, defaults to book.json
+--config <config file>    Configuration file to use, defaults to book.js or book.json
 ```
 
 GitBook loads the default configuration from a `book.json` file in the repository if it exists.
