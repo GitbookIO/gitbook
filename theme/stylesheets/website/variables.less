@@ -7,6 +7,7 @@
 @header-height:                       50px;
 @header-color:                        hsl(194, 5%, 52%);
 @header-background:                   white;
+@header-border:                       rgba(0, 0, 0, 0.07);
 @header-button-color:                 hsl(194, 5%, 52%);
 @header-button-hover-color:           #151515;
 @header-button-hover-background:      hsl(207, 15%, 95%);
@@ -18,28 +19,29 @@
 @sidebar-width:                       250px;
 @sidebar-breakpoint:                  600px;
 @sidebar-color:                       hsl(207, 15%, 80%);
-@sidebar-background:                  hsl(207, 15%, 95%);
+@sidebar-background:                  @body-background;
+@sidebar-border:                      @header-border;
 
 @sidebar-nested-padding:              20px;
 
 @sidebar-search-padding:              6px;
 @sidebar-search-background:           transparent;
-@sidebar-search-input-border-color:   hsl(207, 15%, 80%);
+@sidebar-search-input-border-color:   @sidebar-border;
 
-@sidebar-divider-color:               hsl(207, 15%, 85%);
+@sidebar-divider-color:               @sidebar-border;
 
-@sidebar-link-color:                  hsl(207, 15%, 50%);
+@sidebar-link-color:                  hsl(207, 15%, 25%);
 @sidebar-link-background:             transparent;
 @sidebar-link-hover-color:            hsl(207, 100%, 50%);
 @sidebar-link-hover-background:       transparent;
 
 @sidebar-icon-color:                  @bar-progress-background;
-@sidebar-link-completed:              hsl(207, 15%, 25%);
+@sidebar-link-completed:              @sidebar-link-color;
 @sidebar-link-completed-weight:       normal;
 
 // Page
-@page-color:                                black;
-@page-background:                     white;
+@page-color:                          black;
+@page-background:                     @body-background;
 
 // Progress Bar
 @chapter-display:                     none;
@@ -116,15 +118,15 @@
 // Sidebar
 @sidebar-color-1:                       #AFA790;
 @sidebar-color-2:                       hsl(207, 15%, 80%);
-@sidebar-background-1:                  #F3EACB;
-@sidebar-background-2:                  #111111;
+@sidebar-background-1:                  @body-background-1;
+@sidebar-background-2:                  @body-background-2;
 
 @sidebar-search-background-1:           transparent;
 @sidebar-search-background-2:           transparent;
 @sidebar-search-input-border-color-1:   #D6CFBA;
-@sidebar-search-input-border-color-2:   #c4cdd4;
+@sidebar-search-input-border-color-2:   #000;
 
-@sidebar-divider-color-1:               hsl(207, 15%, 85%);
+@sidebar-divider-color-1:               @sidebar-divider-color;
 @sidebar-divider-color-2:               #1d1f21;
 
 @sidebar-link-color-1:                  #877F6A;
@@ -138,8 +140,8 @@
 
 @sidebar-icon-color-1:                  @bar-progress-background;
 @sidebar-icon-color-2:                  @bar-progress-background;
-@sidebar-link-completed-1:              hsl(207, 15%, 25%);
-@sidebar-link-completed-2:              hsl(207, 15%, 25%);
+@sidebar-link-completed-1:              @sidebar-link-color-1;
+@sidebar-link-completed-2:              @sidebar-link-color-2;
 @sidebar-link-completed-weight-1:       normal;
 @sidebar-link-completed-weight-2:       normal;
 
