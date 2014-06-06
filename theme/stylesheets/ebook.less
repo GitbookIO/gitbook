@@ -1,4 +1,3 @@
-@import "vendors/bootstrap/bootstrap.less";
 @import "mixins.less";
 
 @import "ebook/variables.less";
@@ -12,16 +11,11 @@ article {
     page-break-after: always;
 }
 
-h1 { font-size: floor(@font-size-base * 2.15); }
-h2 { font-size: floor(@font-size-base * 1.70); }
-h3 { font-size: ceil(@font-size-base * 1.25); }
-h4 { font-size: ceil(@font-size-base * 1); }
-h5 { font-size:  ceil(@font-size-base * 0.85); }
-h6 { font-size: ceil(@font-size-base * 0.65); }
-
 pre, blockquote {
     border: 1px solid #999;
     page-break-inside: avoid;
+    background: #f1f1f1;
+    padding: 8px;
 }
 
 img {
