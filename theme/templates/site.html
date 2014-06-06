@@ -1,7 +1,23 @@
 {% extends "layout.html" %}
 
 {% block htmlTag %}{% if options.cache !== false %}manifest="{{ basePath }}/manifest.appcache"{% endif %}{% endblock %}
-{% block title %}{{ progress.current.title }}{% parent %}{% endblock %}
+
+{% block title %}{{ progress.current.title }} | {{ title }}{% endblock %}
+{% block description %}{% if progress.current.level == "0" %}{{ description }}{% endif %}{% endblock %}
+
+{% block head %}
+    {% parent %}
+    {% if githubAuthor %}
+    <meta name="author" content="{{ githubAuthor }}">
+    {% endif %}
+    {% if progress.current.next and progress.current.next.path %}
+    <link rel="next" href="{{ basePath }}/{{ progress.current.next.path|mdLink }}" />
+    {% endif %}
+    {% if progress.current.prev and progress.current.prev.path %}
+    <link rel="prev" href="{{ basePath }}/{{ progress.current.prev.path|mdLink }}" />
+    {% endif %}
+{% endblock %}
+
 {% block content %}
     <div class="book" {% if githubId %}data-github="{{ githubId }}"{% endif %} data-level="{{ progress.current.level }}" data-basepath="{{ basePath }}" data-revision="{{ revision }}">
     {% include "includes/book/header.html" %}
