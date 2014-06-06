@@ -20,9 +20,14 @@
             </div>
         {% elif section.type == "quiz" %}
         <div class="quiz">
-            <div class="exercise-header">Exercise #{{ exercise }}</div>
+            <div class="exercise-header">Quiz #{{ exercise }}</div>
             {% autoescape false %}{{ section.content }}{% endautoescape %}
-            {% autoescape false %}{{ section.quiz.base }}{% endautoescape %}
+            {% for quiz in section.quiz %}
+                <div class="question">
+                    <div class="question-header">Question {{ loop.index }} of {{ section.quiz.length }}</div>
+                    {% autoescape false %}{{ quiz.base }}{% endautoescape %}
+                </div>
+            {% endfor %}
             {% set exercise = exercise + 1 %}
         </div>
         {% endif %}
@@ -60,9 +65,14 @@
                             </div>
                         {% elif section.type == "quiz" %}
                             <div class="quiz">
-                                <div class="exercise-header">Exercise #{{ exercise }}</div>
+                                <div class="exercise-header">Quiz #{{ exercise }}</div>
                                 {% autoescape false %}{{ section.content }}{% endautoescape %}
-                                {% autoescape false %}{{ section.quiz.solution }}{% endautoescape %}
+                                {% for quiz in section.quiz %}
+                                    <div class="question">
+                                        <div class="question-header">Question {{ loop.index }} of {{ section.quiz.length }}</div>
+                                        {% autoescape false %}{{ quiz.solution }}{% endautoescape %}
+                                    </div>
+                                {% endfor %}
                                 {% set exercise = exercise + 1 %}
                             </div>
                         {% endif %}
