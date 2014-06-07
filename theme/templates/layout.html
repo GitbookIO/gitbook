@@ -19,16 +19,9 @@
     </head>
     <body>
         {{ htmlSnippet("body:start")|default("") }}
-        {% block style %}
-        <link rel="stylesheet" href="{{ staticBase }}/style.css">
-        {% endblock %}
+        {% block style %}{% endblock %}
         {% block content %}{% endblock %}
-        {% block javascript %}
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.1.3/ace.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.1.3/mode-javascript.js"></script>
-        <script src="{{ staticBase }}/jsrepl/jsrepl.js" id="jsrepl-script"></script>
-        <script src="{{ staticBase }}/app.js"></script>
-        {% endblock %}
+        {% block javascript %}{% endblock %}
         {{ htmlSnippet("body:end")|default("") }}
     </body>
     {{ htmlSnippet("html:end")|default("") }}

@@ -1,9 +1,13 @@
 define([
     "jQuery",
+    "ace/ace",
+    "ace/theme-tomorrow",
+    "ace/mode-javascript",
     "utils/execute",
     "core/events",
     "core/state"
-], function($, execute, events, state){
+], function($, _ace, _aceTheme, _aceMode, execute, events, state){
+
     // Bind an exercise
     var prepareExercise = function($exercise) {
         var codeSolution = $exercise.find(".code-solution").text();

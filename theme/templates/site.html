@@ -54,7 +54,8 @@
 {% endblock %}
 
 {% block javascript %}
-{% parent %}
+<script src="{{ staticBase }}/jsrepl/jsrepl.js" id="jsrepl-script"></script>
+<script src="{{ staticBase }}/app.js"></script>
 {% for resource in plugins.resources.js %}
     {% if resource.url %}
     <script src="{{ resource.url }}"></script>
@@ -71,7 +72,7 @@ require(["gitbook"], function(gitbook) {
 {% endblock %}
 
 {% block style %}
-{% parent %}
+<link rel="stylesheet" href="{{ staticBase }}/style.css">
 {% for resource in plugins.resources.css %}
     {% if resource.url %}
     <link rel="stylesheet" href="{{ resource.url }}">

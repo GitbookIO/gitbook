@@ -44,7 +44,8 @@ module.exports = function (grunt) {
                         "requireLib": 'vendors/requirejs/require',
                         "Mousetrap": 'vendors/mousetrap/mousetrap',
                         "lunr": 'vendors/lunr.js/lunr',
-                        "URI": 'vendors/URIjs/src/URI'
+                        "URI": 'vendors/URIjs/src/URI',
+                        "ace": 'vendors/ace-builds/src-noconflict/'
                     },
                     shim: {
                         'jQuery': {
