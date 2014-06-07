@@ -3,7 +3,6 @@
     {{ htmlSnippet("html:start")|default("") }}
     <head>
         {{ htmlSnippet("head:start")|default("") }}
-        {% block head %}
         <meta charset="UTF-8">
         <title>{% block title %}{% endblock %}</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
@@ -14,7 +13,7 @@
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black">
         <link rel="shortcut icon" href="{{ staticBase }}/images/favicon.ico" type="image/x-icon">
-        {% endblock %}
+        {% block head %}{% endblock %}
         {{ htmlSnippet("head:end")|default("") }}
     </head>
     <body>

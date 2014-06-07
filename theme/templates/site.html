@@ -2,9 +2,6 @@
 
 {% block htmlTag %}{% if options.cache !== false %}manifest="{{ basePath }}/manifest.appcache"{% endif %}{% endblock %}
 
-{% block title %}{{ progress.current.title }} | {{ title }}{% endblock %}
-{% block description %}{% if progress.current.level == "0" %}{{ description }}{% endif %}{% endblock %}
-
 {% block head %}
     {% parent %}
     {% if githubAuthor %}
@@ -17,6 +14,9 @@
     <link rel="prev" href="{{ basePath }}/{{ progress.current.prev.path|mdLink }}" />
     {% endif %}
 {% endblock %}
+
+{% block title %}{{ progress.current.title }} | {{ title }}{% endblock %}
+{% block description %}{% if progress.current.level == "0" %}{{ description }}{% endif %}{% endblock %}
 
 {% block content %}
     <div class="book" {% if githubId %}data-github="{{ githubId }}"{% endif %} data-level="{{ progress.current.level }}" data-basepath="{{ basePath }}" data-revision="{{ revision }}">
