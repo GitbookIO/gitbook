@@ -1,10 +1,17 @@
 {% macro articles(_articles) %}
     {% for item in _articles %}
-        <li class="chapter {% if item._path == _input %}active{% endif %}" data-level="{{ item.level }}" {% if item.path %}data-path="{{ item.path|mdLink }}"{% endif %}>
+        {% set externalLink = item.path|isExternalLink %}
+        <li class="chapter {% if item._path == _input %}active{% endif %}" data-level="{{ item.level }}" {% if item.path && !externalLink %}data-path="{{ item.path|mdLink }}"{% endif %}>
             {% if item.path %}
-            <a href="{{ basePath }}/{{ item.path|mdLink }}">
-                <i class="fa fa-check"></i> <b>{{ item.level }}.</b> {{ item.title }}
-            </a>
+                {% if !externalLink %}
+                    <a href="{{ basePath }}/{{ item.path|mdLink }}">
+                        <i class="fa fa-check"></i> <b>{{ item.level }}.</b> {{ item.title }}
+                    </a>
+                {% else %}
+                    <a target="_blank" href="{{ item.path }}">
+                        <i class="fa fa-check"></i> <b>{{ item.level }}.</b> {{ item.title }}
+                    </a>
+                {% endif %}
             {% else %}
             <span><b>{{ item.level }}.</b> {{ item.title }}</span>
             {% endif %}
