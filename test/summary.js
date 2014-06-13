@@ -148,30 +148,30 @@ describe('Summary with parts', function () {
     });
 
     it('should detect levels correctly', function() {
-        assert.equal(LEXED.parts[0].level, "");
-        assert.equal(LEXED.parts[1].level, "");
-        assert.equal(LEXED.parts[2].level, "");
+        assert.equal(LEXED.parts[0].level, "1");
+        assert.equal(LEXED.parts[1].level, "2");
+        assert.equal(LEXED.parts[2].level, "3");
 
-        assert.equal(LEXED.parts[0].chapters[0].level, '1');
-        assert.equal(LEXED.parts[0].chapters[1].level, '2');
-        assert.equal(LEXED.parts[0].chapters[2].level, '3');
+        assert.equal(LEXED.parts[0].chapters[0].level, '1.1');
+        assert.equal(LEXED.parts[0].chapters[1].level, '1.2');
+        assert.equal(LEXED.parts[0].chapters[2].level, '1.3');
 
-        assert.equal(LEXED.parts[1].chapters[0].level, '1');
-        assert.equal(LEXED.parts[1].chapters[1].level, '2');
-        assert.equal(LEXED.parts[1].chapters[2].level, '3');
+        assert.equal(LEXED.parts[1].chapters[0].level, '2.1');
+        assert.equal(LEXED.parts[1].chapters[1].level, '2.2');
+        assert.equal(LEXED.parts[1].chapters[2].level, '2.3');
 
-        assert.equal(LEXED.parts[2].chapters[0].level, '1');
-        assert.equal(LEXED.parts[2].chapters[1].level, '2');
-        assert.equal(LEXED.parts[2].chapters[2].level, '3');
+        assert.equal(LEXED.parts[2].chapters[0].level, '3.1');
+        assert.equal(LEXED.parts[2].chapters[1].level, '3.2');
+        assert.equal(LEXED.parts[2].chapters[2].level, '3.3');
 
-        assert.equal(LEXED.parts[0].chapters[0].articles[0].level, '1.1');
-        assert.equal(LEXED.parts[0].chapters[0].articles[1].level, '1.2');
-        assert.equal(LEXED.parts[0].chapters[0].articles[1].articles[0].level, '1.2.1');
-        assert.equal(LEXED.parts[0].chapters[0].articles[1].articles[1].level, '1.2.2');
+        assert.equal(LEXED.parts[0].chapters[0].articles[0].level, '1.1.1');
+        assert.equal(LEXED.parts[0].chapters[0].articles[1].level, '1.1.2');
+        assert.equal(LEXED.parts[0].chapters[0].articles[1].articles[0].level, '1.1.2.1');
+        assert.equal(LEXED.parts[0].chapters[0].articles[1].articles[1].level, '1.1.2.2');
 
-        assert.equal(LEXED.parts[1].chapters[0].articles[0].level, '1.1');
-        assert.equal(LEXED.parts[1].chapters[0].articles[1].level, '1.2');
-        assert.equal(LEXED.parts[1].chapters[0].articles[1].articles[0].level, '1.2.1');
-        assert.equal(LEXED.parts[1].chapters[0].articles[1].articles[1].level, '1.2.2');
+        assert.equal(LEXED.parts[1].chapters[0].articles[0].level, '2.1.1');
+        assert.equal(LEXED.parts[1].chapters[0].articles[1].level, '2.1.2');
+        assert.equal(LEXED.parts[1].chapters[0].articles[1].articles[0].level, '2.1.2.1');
+        assert.equal(LEXED.parts[1].chapters[0].articles[1].articles[1].level, '2.1.2.2');
     });
 });
