@@ -83,8 +83,8 @@
         <li class="divider"></li>
         {% endif %}
 
-        <li data-level="0" data-path="index.html">
-            <a href="{{ basePath }}/"><i class="fa fa-check"></i> Introduction</a>
+        <li class="{% if 'README.md' == _input %}active{% endif %}" data-level="0" data-path="index.html">
+            <a href="{{ basePath }}/index.html"><i class="fa fa-check"></i> Introduction</a>
         </li>
 
         {{ parts(summary.parts) }}
