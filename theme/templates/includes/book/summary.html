@@ -1,3 +1,31 @@
+{% macro parts(_parts) %}
+    {% for part in _parts %}
+        <li>
+            <ul class="part">
+                {% set externalLink = part.path|isExternalLink %}
+                {% if part.title %}
+                    <li class="part-header" {% if part.path && !externalLink %}data-path="{{ part.path|mdLink }}"{% endif %}>
+                        {% if part.path %}
+                            {% if !externalLink %}
+                                <a href="{{ basePath }}/{{ part.path|mdLink }}">
+                                    <i class="fa fa-check"></i> {{ part.title }}
+                                </a>
+                            {% else %}
+                                <a target="_blank" href="{{ part.path }}">
+                                    <i class="fa fa-check"></i> {{ part.title }}
+                                </a>
+                            {% endif %}
+                        {% else %}
+                            <span>{{ part.title }}</span>
+                        {% endif %}
+                    </li>
+                {% endif %}
+                {{ articles(part.chapters) }}
+            </ul>
+        </li>
+    {% endfor %}
+{% endmacro %}
+
 {% macro articles(_articles) %}
     {% for item in _articles %}
         {% set externalLink = item.path|isExternalLink %}
@@ -58,7 +86,8 @@
         <li data-level="0" data-path="index.html">
             <a href="{{ basePath }}/"><i class="fa fa-check"></i> Introduction</a>
         </li>
-        {{ articles(summary.chapters) }}
+
+        {{ parts(summary.parts) }}
 
         {% if options.links.gitbook !== false %}
         <li class="divider"></li>
