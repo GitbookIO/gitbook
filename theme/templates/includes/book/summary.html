@@ -5,11 +5,19 @@
             {% if item.path %}
                 {% if !externalLink %}
                     <a href="{{ basePath }}/{{ item.path|mdLink }}">
-                        <i class="fa fa-check"></i> <b>{{ item.level }}.</b> {{ item.title }}
+                        <i class="fa fa-check"></i>
+                        {% if item.level !== "0" %}
+                            <b>{{ item.level }}.</b>
+                        {% endif %}
+                         {{ item.title }}
                     </a>
                 {% else %}
                     <a target="_blank" href="{{ item.path }}">
-                        <i class="fa fa-check"></i> <b>{{ item.level }}.</b> {{ item.title }}
+                        <i class="fa fa-check"></i>
+                        {% if item.level !== "0" %}
+                            <b>{{ item.level }}.</b>
+                        {% endif %}
+                         {{ item.title }}
                     </a>
                 {% endif %}
             {% else %}
@@ -55,9 +63,6 @@
         <li class="divider"></li>
         {% endif %}
 
-        <li data-level="0" data-path="index.html">
-            <a href="{{ basePath }}/"><i class="fa fa-check"></i> Introduction</a>
-        </li>
         {{ articles(summary.chapters) }}
 
         {% if options.links.gitbook !== false %}
