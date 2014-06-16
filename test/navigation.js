@@ -7,7 +7,9 @@ var navigation = require('../').parse.navigation;
 
 
 var CONTENT = fs.readFileSync(path.join(__dirname, './fixtures/SUMMARY.md'), 'utf8');
+var ALT_CONTENT = fs.readFileSync(path.join(__dirname, './fixtures/SUMMARY.md'), 'utf8');
 var LEXED = summary(CONTENT);
+var ALT_LEXED = summary(ALT_CONTENT);
 
 
 describe('Summary navigation', function() {
@@ -74,6 +76,20 @@ describe('Summary navigation', function() {
         assert.equal(nav['chapter-1/ARTICLE2.md'].level, '1.2');
         assert.equal(nav['chapter-2/README.md'].level, '2');
         assert.equal(nav['chapter-3/README.md'].level, '3');
+    });
+
+    it('should have a default README node', function() {
+        var nav = navigation(LEXED);
+
+        assert.equal(nav['README.md'].level, '0');
+        assert.equal(nav['README.md'].title, 'Introduction');
+    });
+
+    it('Should allow README node to be customized', function() {
+        var nav = navigation(ALT_LEXED);
+
+        assert(nav['README.md']);
+        assert.notEqual(nav['README.md'].title, 'Introduction');
     });
 
     it('should not accept null paths', function() {
