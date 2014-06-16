@@ -7,7 +7,7 @@ var navigation = require('../').parse.navigation;
 
 
 var CONTENT = fs.readFileSync(path.join(__dirname, './fixtures/SUMMARY.md'), 'utf8');
-var ALT_CONTENT = fs.readFileSync(path.join(__dirname, './fixtures/SUMMARY.md'), 'utf8');
+var ALT_CONTENT = fs.readFileSync(path.join(__dirname, './fixtures/ALTERNATIVE_SUMMARY.md'), 'utf8');
 var LEXED = summary(CONTENT);
 var ALT_LEXED = summary(ALT_CONTENT);
 
