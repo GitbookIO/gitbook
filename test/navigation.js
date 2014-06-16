@@ -89,6 +89,7 @@ describe('Summary navigation', function() {
         var nav = navigation(ALT_LEXED);
 
         assert(nav['README.md']);
+        assert.equal(nav['README.md'].level, '0');
         assert.notEqual(nav['README.md'].title, 'Introduction');
     });
 
