@@ -253,3 +253,12 @@ Plugins can used to extend your book's functionality. Read [GitbookIO/plugin](ht
 * [Markdown within HTML](https://github.com/mrpotes/gitbook-plugin-nestedmd): Process markdown within HTML blocks - allows custom layout options for individual pages
 * [Bootstrap JavaScript plugins](https://github.com/mrpotes/gitbook-plugin-bootstrapjs): Use the [Bootstrap JavaScript plugins](http://getbootstrap.com/javascript) in your online GitBook
 * [Piwik Open Analytics](https://github.com/emmanuel-keller/gitbook-plugin-piwik): Piwik Open Analytics tracking for your book
+
+#### Debugging
+
+You can use the environment variable `DEBUG=true` to get better error messages (with stack trace). For example:
+
+```
+$ export DEBUG=true
+$ gitbook build ./
+```
