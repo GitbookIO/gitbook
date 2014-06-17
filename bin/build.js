@@ -10,9 +10,10 @@ var generators = require("../lib/generate").generators;
 
 var buildCommand = function(command) {
     return command
+    .option('-v, --verbose', 'Activate verbose mode, useful for debugging errors')
     .option('-o, --output <directory>', 'Path to output directory, defaults to ./_book')
     .option('-f, --format <name>', 'Change generation format, defaults to site, availables are: '+_.keys(generators).join(", "))
-    .option('--config <config file>', 'Configuration file to use, defaults to book.js or book.json')
+    .option('--config <config file>', 'Configuration file to use, defaults to book.js or book.json');
 };
 
 
@@ -26,6 +27,11 @@ var makeBuildFunc = function(converter) {
         dir = dir || process.cwd();
         outputDir = options.output;
 
+        // Set debugging
+        if(options.verbose) {
+            process.env.DEBUG = "true";
+        }
+
         console.log('Starting build ...');
         return converter(
             _.extend({}, options || {}, {
@@ -38,8 +44,12 @@ var makeBuildFunc = function(converter) {
         .then(function(output) {
             console.log("Successfully built!");
             return output;
-        }, utils.logError)
-        .fail(function() {
+        })
+        .fail(function(err) {
+            // Log error
+            utils.logError(err);
+
+            // Exit process with failure code
             process.exit(-1);
         });
     };
