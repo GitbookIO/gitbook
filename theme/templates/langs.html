@@ -2,6 +2,10 @@
 
 {% block title %}{{ title }}{% endblock %}
 
+{% block style %}
+<link rel="stylesheet" href="{{ staticBase }}/style.css">
+{% endblock %}
+
 {% block content %}
 <div class="book-langs-index">
     <div class="inner">
@@ -10,7 +14,7 @@
         <ul class="languages">
         {%  for lang in langs %}
             <li>
-                <a href="{{ basePath}}/{{ lang.path }}">{{ lang.title }}</a>
+                <a href="{{ basePath}}/{{ lang.path|pathJoin("/index.html") }}">{{ lang.title }}</a>
             </li>
         {% endfor %}
         </ul>

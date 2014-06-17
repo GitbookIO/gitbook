@@ -24,8 +24,8 @@ module.exports = function (grunt) {
                     optimization: 2
                 },
                 files: {
-                    "theme/assets/style.css": "theme/stylesheets/main.less",
-                    "theme/assets/print.css": "theme/stylesheets/print.less"
+                    "theme/assets/style.css": "theme/stylesheets/website.less",
+                    "theme/assets/print.css": "theme/stylesheets/ebook.less"
                 }
             }
         },
@@ -44,7 +44,8 @@ module.exports = function (grunt) {
                         "requireLib": 'vendors/requirejs/require',
                         "Mousetrap": 'vendors/mousetrap/mousetrap',
                         "lunr": 'vendors/lunr.js/lunr',
-                        "URI": 'vendors/URIjs/src/URI'
+                        "URI": 'vendors/URIjs/src/URI',
+                        "ace": 'vendors/ace-builds/src-noconflict/'
                     },
                     shim: {
                         'jQuery': {

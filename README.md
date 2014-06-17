@@ -3,7 +3,7 @@ GitBook
 
 [![Build Status](https://travis-ci.org/GitbookIO/gitbook.png?branch=master)](https://travis-ci.org/GitbookIO/gitbook)
 
-GitBook is a command line tool (and Node.js library) for building beautiful books and exercises using GitHub/Git and Markdown. You can see an example: [Learn Javascript](https://www.gitbook.io/book/GitBookIO/javascript). An [editor](https://github.com/GitbookIO/editor) is available for Windows, Mac and Linux. You can follow [@GitBookIO](https://twitter.com/GitBookIO) on Twitter. Complete documentation is available at [help.gitbook.io](http://help.gitbook.io/).
+GitBook is a command line tool (and Node.js library) for building beautiful books and exercises using GitHub/Git and Markdown. Here is an example: [Learn Javascript](https://www.gitbook.io/book/GitBookIO/javascript). You can publish book easily online using [gitbook.io](https://www.gitbook.io) and an [editor](https://github.com/GitbookIO/editor) is available for Windows, Mac and Linux. You can follow [@GitBookIO](https://twitter.com/GitBookIO) on Twitter. Complete documentation is available at [help.gitbook.io](http://help.gitbook.io/).
 
 ![Image](https://raw.github.com/GitbookIO/gitbook/master/preview.png)
 
@@ -31,25 +31,35 @@ Options for commands `build` and `serve` are:
 
 ```
 -o, --output <directory>  Path to output directory, defaults to ./_book
--f, --format <name>       Change generation format, defaults to site, availables are: site, page, pdf, json
---config <config file>    Configuration file to use, defaults to book.json
+-f, --format <name>       Change generation format, defaults to site, availables are: site, page, ebook, json
+--config <config file>    Configuration file to use, defaults to book.js or book.json
 ```
 
 GitBook loads the default configuration from a `book.json` file in the repository if it exists.
 
 Here are the options that can be stored in this file:
 
-```
+```js
 {
-    // Folders to use for output (caution: it overrides the value from the command line)
+    // Folders to use for output
+    // Caution: it overrides the value from the command line
+    // It's not advised this option in the book.json
     "output": null,
 
-    // Generator to use for building (caution: it overrides the value from the command line)
+    // Generator to use for building
+    // Caution: it overrides the value from the command line
+    // It's not advised this option in the book.json
     "generator": "site",
 
     // Book title and description (defaults are extracted from the README)
     "title": null,
     "description": null,
+
+    // For ebook format, the extension to use for generation (default is detected from output extension)
+    // "epub", "pdf", "mobi"
+    // Caution: it overrides the value from the command line
+    // It's not advised this option in the book.json
+    "extension": null,
 
     // GitHub information (defaults are extracted using git)
     "github": null,
@@ -88,6 +98,32 @@ Here are the options that can be stored in this file:
             "facebook": null,
             "twitter": null
         }
+    },
+
+
+    // Options for PDF generation
+    "pdf": {
+        // Add toc at the end of the file
+        "toc": true,
+
+        // Add page numbers to the bottom of every page
+        "pageNumbers": false,
+
+        // Font size for the fiel content
+        "fontSize": 12,
+
+        // Paper size for the pdf
+        // Choices are [u’a0’, u’a1’, u’a2’, u’a3’, u’a4’, u’a5’, u’a6’, u’b0’, u’b1’, u’b2’, u’b3’, u’b4’, u’b5’, u’b6’, u’legal’, u’letter’]
+        "paperSize": "a4",
+
+        // Margin (in pts)
+        // Note: 72 pts equals 1 inch
+        "margin": {
+            "right": 62,
+            "left": 62,
+            "top": 36,
+            "bottom": 36
+        }
     }
 }
 ```
@@ -99,8 +135,7 @@ You can publish your books to our index by visiting [GitBook.io](http://www.gitb
 GitBook can generate your book in the following formats:
 
 * **Static Website**: This is the default format. It generates a complete interactive static website that can be, for example, hosted on GitHub Pages.
-* **PDF**: A complete PDF book with exercise solutions at the end of the book. Generate this format using: ```gitbook pdf ./myrepo```. You need to have [gitbook-pdf](https://github.com/GitbookIO/gitbook-pdf) installed.
-* **eBook**: A complete eBook with exercise solutions at the end of the book. Generate this format using: ```gitbook ebook ./myrepo```. You need to have [ebook-convert](http://manual.calibre-ebook.com/cli/ebook-convert.html) installed.
+* **eBook**: A complete eBook with exercise solutions at the end of the book. Generate this format using: ```gitbook ebook ./myrepo```. You need to have [ebook-convert](http://manual.calibre-ebook.com/cli/ebook-convert.html) installed. The output format could be **PDF**, **ePub** or **MOBI**.
 * **Single Page**: The book will be stored in a single printable HTML page. This format is used for conversion to PDF or eBook. Generate this format using: ```gitbook build ./myrepo -f page```.
 * **JSON**: This format is used for debugging or extracting metadata from a book. Generate this format using: ```gitbook build ./myrepo -f json```.
 
@@ -217,3 +252,4 @@ Plugins can used to extend your book's functionality. Read [GitbookIO/plugin](ht
 * [Revealable sections](https://github.com/mrpotes/gitbook-plugin-reveal): Reveal sections of the page using buttons made from the first title in each section
 * [Markdown within HTML](https://github.com/mrpotes/gitbook-plugin-nestedmd): Process markdown within HTML blocks - allows custom layout options for individual pages
 * [Bootstrap JavaScript plugins](https://github.com/mrpotes/gitbook-plugin-bootstrapjs): Use the [Bootstrap JavaScript plugins](http://getbootstrap.com/javascript) in your online GitBook
+* [Piwik Open Analytics](https://github.com/emmanuel-keller/gitbook-plugin-piwik): Piwik Open Analytics tracking for your book

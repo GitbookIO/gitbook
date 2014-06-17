@@ -1,10 +1,25 @@
 {% macro articles(_articles) %}
     {% for item in _articles %}
-        <li class="chapter {% if item._path == _input %}active{% endif %}" data-level="{{ item.level }}" {% if item.path %}data-path="{{ item.path|mdLink }}"{% endif %}>
+        {% set externalLink = item.path|isExternalLink %}
+        <li class="chapter {% if item._path == _input %}active{% endif %}" data-level="{{ item.level }}" {% if item.path && !externalLink %}data-path="{{ item.path|mdLink }}"{% endif %}>
             {% if item.path %}
-            <a href="{{ basePath }}/{{ item.path|mdLink }}">
-                <i class="fa fa-check"></i> <b>{{ item.level }}.</b> {{ item.title }}
-            </a>
+                {% if !externalLink %}
+                    <a href="{{ basePath }}/{{ item.path|mdLink }}">
+                        <i class="fa fa-check"></i>
+                        {% if item.level !== "0" %}
+                            <b>{{ item.level }}.</b>
+                        {% endif %}
+                         {{ item.title }}
+                    </a>
+                {% else %}
+                    <a target="_blank" href="{{ item.path }}">
+                        <i class="fa fa-check"></i>
+                        {% if item.level !== "0" %}
+                            <b>{{ item.level }}.</b>
+                        {% endif %}
+                         {{ item.title }}
+                    </a>
+                {% endif %}
             {% else %}
             <span><b>{{ item.level }}.</b> {{ item.title }}</span>
             {% endif %}
@@ -48,9 +63,6 @@
         <li class="divider"></li>
         {% endif %}
 
-        <li data-level="0" data-path="index.html">
-            <a href="{{ basePath }}/"><i class="fa fa-check"></i> Introduction</a>
-        </li>
         {{ articles(summary.chapters) }}
 
         {% if options.links.gitbook !== false %}

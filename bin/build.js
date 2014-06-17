@@ -12,9 +12,14 @@ var buildCommand = function(command) {
     return command
     .option('-o, --output <directory>', 'Path to output directory, defaults to ./_book')
     .option('-f, --format <name>', 'Change generation format, defaults to site, availables are: '+_.keys(generators).join(", "))
-    .option('--config <config file>', 'Configuration file to use, defualt to book.json')
+    .option('--config <config file>', 'Configuration file to use, defaults to book.js or book.json')
 };
 
+
+var buildEbookCommand = function(command) {
+    return buildCommand(command)
+    .option('-c, --cover <path>', 'Cover image, default is cover.jpg if exists');
+};
 
 var makeBuildFunc = function(converter) {
     return  function(dir, options) {
@@ -31,7 +36,7 @@ var makeBuildFunc = function(converter) {
             })
         )
         .then(function(output) {
-            console.log("Successfuly built !");
+            console.log("Successfully built!");
             return output;
         }, utils.logError)
         .fail(function() {
@@ -43,5 +48,6 @@ var makeBuildFunc = function(converter) {
 module.exports = {
     folder: makeBuildFunc(generate.folder),
     file: makeBuildFunc(generate.file),
-    command: buildCommand
+    command: buildCommand,
+    commandEbook: buildEbookCommand
 };

@@ -1,0 +1,40 @@
+@import "mixins.less";
+
+@import "ebook/variables.less";
+@import "ebook/highlight.less";
+
+.book-chapter {
+    display: none;
+}
+
+
+pre, blockquote {
+    border: 1px solid #999;
+    page-break-inside: avoid;
+    background: #f1f1f1;
+    padding: 8px;
+}
+
+img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+    margin: 0px auto;
+}
+
+.exercise, .quiz {
+    margin: 1cm 0cm;
+    padding: 0.4cm;
+    page-break-inside: avoid;
+
+    border: 3px solid #ddd;
+
+    .exercise-header {
+        margin-bottom: 0.4cm;
+        padding-bottom: 0.2cm;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .question {
+        margin-top: 0.4cm;
+    }
+}
