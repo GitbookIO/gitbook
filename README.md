@@ -253,6 +253,7 @@ Plugins can used to extend your book's functionality. Read [GitbookIO/plugin](ht
 * [Markdown within HTML](https://github.com/mrpotes/gitbook-plugin-nestedmd): Process markdown within HTML blocks - allows custom layout options for individual pages
 * [Bootstrap JavaScript plugins](https://github.com/mrpotes/gitbook-plugin-bootstrapjs): Use the [Bootstrap JavaScript plugins](http://getbootstrap.com/javascript) in your online GitBook
 * [Piwik Open Analytics](https://github.com/emmanuel-keller/gitbook-plugin-piwik): Piwik Open Analytics tracking for your book
+* [Heading Anchors](https://github.com/rlmv/gitbook-plugin-anchors): Add linkable Github-style anchors to headings
 
 #### Debugging
 
