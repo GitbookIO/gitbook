@@ -59,6 +59,15 @@
         </li>
         {% endif %}
 
+	{% if options.links.custom %}
+	{% for link in options.links.custom %}
+	    {% set _divider = true %}
+	     <li> 
+	         <a href="{{ options.links.custom[loop.key] }}" target="blank" class="custom-link">{{ loop.key }}</a>
+             </li>
+	{% endfor %}
+	{% endif %}
+
         {% if _divider %}
         <li class="divider"></li>
         {% endif %}
