@@ -1,7 +1,7 @@
 {% macro articles(_articles) %}
     {% for item in _articles %}
         {% set externalLink = item.path|isExternalLink %}
-        <li class="chapter {% if item._path == _input %}active{% endif %}" data-level="{{ item.level }}" {% if item.path && !externalLink %}data-path="{{ item.path|mdLink }}"{% endif %}>
+        <li class="chapter {% if item.path == _input %}active{% endif %}" data-level="{{ item.level }}" {% if item.path && !externalLink %}data-path="{{ item.path|mdLink }}"{% endif %}>
             {% if item.path %}
                 {% if !externalLink %}
                     <a href="{{ basePath }}/{{ item.path|mdLink }}">
