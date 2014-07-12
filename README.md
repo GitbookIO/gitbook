@@ -259,6 +259,7 @@ Plugins can used to extend your book's functionality. Read [GitbookIO/plugin](ht
 * [Bootstrap JavaScript plugins](https://github.com/mrpotes/gitbook-plugin-bootstrapjs): Use the [Bootstrap JavaScript plugins](http://getbootstrap.com/javascript) in your online GitBook
 * [Piwik Open Analytics](https://github.com/emmanuel-keller/gitbook-plugin-piwik): Piwik Open Analytics tracking for your book
 * [Heading Anchors](https://github.com/rlmv/gitbook-plugin-anchors): Add linkable Github-style anchors to headings
+* [JSBin](https://github.com/jcouyang/gitbook-plugin-jsbin): Ebedded jsbin frame into your book
 
 #### Debugging
 
