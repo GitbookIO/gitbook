@@ -1,6 +1,7 @@
 var Q = require('q');
 var _ = require('lodash');
 
+var exec = require('child_process').exec;
 var http = require('http');
 var send = require('send');
 
@@ -36,9 +37,30 @@ function logError(err) {
     return Q.reject(err);
 };
 
+function runGitCommand(command, args) {
+    var d = Q.defer(), child;
+    args = ["git", command].concat(args).join(" ");
+
+    child = exec(args, function (error, stdout, stderr) {
+        if (error !== null) {
+            error.stdout = stdout;
+            error.stderr = stderr;
+            d.reject(error);
+        } else {
+            d.resolve({
+                stdout: stdout,
+                stderr: stderr
+            })
+        }
+    });
+
+    return d.promise;
+};
+
 
 // Exports
 module.exports = {
     watch: watch,
-    logError: logError
+    logError: logError,
+    gitCmd: runGitCommand
 };

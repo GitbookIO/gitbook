@@ -14,6 +14,7 @@ var fs = require('../lib/generate/fs');
 var utils = require('./utils');
 var build = require('./build');
 var Server = require('./server');
+var platform = require("./platform");
 
 // General options
 prog
@@ -113,6 +114,22 @@ prog
 .action(function(dir) {
     dir = dir || process.cwd();
     return initDir(dir);
+});
+
+prog
+.command('git:push [source_dir]')
+.description('Publish content to the associated gitbook.io book')
+.action(function(dir) {
+    dir = dir || process.cwd();
+    return platform.publish(dir);
+});
+
+prog
+.command('git:remote [source_dir] [book_id]')
+.description('Adds a git remote to a book repository')
+.action(function(dir, bookId) {
+    dir = dir || process.cwd();
+    return platform.remote(dir, bookId);
 });
 
 // Parse and fallback to help if no args
