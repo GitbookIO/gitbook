@@ -117,7 +117,7 @@ prog
 });
 
 prog
-.command('git:push [source_dir]')
+.command('publish [source_dir]')
 .description('Publish content to the associated gitbook.io book')
 .action(function(dir) {
     dir = dir || process.cwd();
