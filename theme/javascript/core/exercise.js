@@ -18,6 +18,14 @@ define([
         editor.setTheme("ace/theme/tomorrow");
         editor.getSession().setUseWorker(false);
         editor.getSession().setMode("ace/mode/javascript");
+        
+        editor.commands.addCommand({
+            name: "submit",
+            bindKey: "Ctrl-Return|Cmd-Return",
+            exec: function() {
+                $exercise.find(".action-submit").click();
+            }
+        });
 
         // Submit: test code
         $exercise.find(".action-submit").click(function(e) {
