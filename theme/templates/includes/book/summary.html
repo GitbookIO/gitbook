@@ -48,7 +48,7 @@
         {% if options.links.issues !== false && (options.links.issues || githubId) %}
         {% set _divider = true %}
         <li>
-            <a href="{{ options.links.issues|default(githubHost+githubId+"/issues") }}" target="blank"class="issues-link">Questions and Issues</a>
+            <a href="{{ options.links.issues|default(githubHost+githubId+"/issues") }}" target="blank" class="issues-link">Questions and Issues</a>
         </li>
         {% endif %}
 
