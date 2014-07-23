@@ -22,7 +22,7 @@
         "resolve": "0.6.3",
         "tiny-lr-fork": "0.0.5",
         "gitbook-plugin": "0.0.2",
-        "gitbook-plugin-mathjax": "0.0.3",
+        "gitbook-plugin-mathjax": "0.0.4",
         "gitbook-plugin-livereload": "0.0.1"
     },
     "devDependencies": {
