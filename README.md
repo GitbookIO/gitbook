@@ -92,10 +92,10 @@ Here are the options that can be stored in this file:
         "issues": null,
         "contribute": null,
 
-	// Custom links at top of sidebar
-	"custom": {
-	    "Custom link name": "https://customlink.com"
-	},	    	
+    	// Custom links at top of sidebar
+    	"custom": {
+    	    "Custom link name": "https://customlink.com"
+    	},
 
         // Sharing links
         "sharing": {
