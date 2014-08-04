@@ -81,18 +81,34 @@ define([
             }
             if (q.length == 0) {
                 sidebar.filter(null);
+                storage.remove("keyword");
             } else {
                 var results = search(q);
                 sidebar.filter(
                     _.pluck(results, "path")
                 );
+                storage.set("keyword", q);
             }
         })
+
+    };
+
+    // filter sidebar menu with current search keyword
+    var recoverSearch = function() {
+        var keyword = storage.get("keyword", "");
+        if(keyword.length > 0) {
+            if(!isSearchOpen()){
+                toggleSearch();
+            }
+            sidebar.filter(_.pluck(search(keyword), "path"));
+        }
+        $(".book-search input").val(keyword);
     };
 
     return {
         init: init,
         search: search,
-        toggle: toggleSearch
+        toggle: toggleSearch,
+        recover:recoverSearch
     };
 });
