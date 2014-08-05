@@ -6,8 +6,9 @@ define([
     "core/progress",
     "core/exercise",
     "core/quiz",
-    "core/loading"
-], function($, URL, events, state, progress, exercises, quiz, loading) {
+    "core/loading",
+    "core/search"
+], function($, URL, events, state, progress, exercises, quiz, loading, search) {
     var prev, next;
 
     var usePushState = (typeof history.pushState !== "undefined");
@@ -55,6 +56,8 @@ define([
 
             // Update state
             state.update($("html"));
+            // recover search keyword
+            search.recover();
             preparePage();
         })
         .fail(function (e) {
@@ -147,3 +150,4 @@ define([
         goPrev: goPrev
     };
 });
+
