@@ -1,5 +1,8 @@
 # Release notes
 
+## 0.7.1
+- Update `fs-extra` to `0.10.0` (fixes potential race conditions)
+
 ## 0.7.0
 - Add page break in ebook (pdf, epub, mobi) between chapters/articles
 - Start using kramed instead of marked
