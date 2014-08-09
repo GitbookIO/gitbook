@@ -1,7 +1,5 @@
 {% extends "layout.html" %}
 
-{% block htmlTag %}{% if options.cache !== false %}manifest="{{ basePath }}/manifest.appcache"{% endif %}{% endblock %}
-
 {% block head %}
     {% parent %}
     {% if githubAuthor %}

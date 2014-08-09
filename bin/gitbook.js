@@ -46,7 +46,6 @@ build.command(prog.command('serve [source_dir]'))
         server.stop()
         .then(function() {
             return build.folder(dir, _.extend(options || {}, {
-                cache: false,
                 defaultsPlugins: ["livereload"]
             }));
         })
