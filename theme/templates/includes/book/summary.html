@@ -38,35 +38,35 @@
     </div>
     <ul class="summary">
         {% set _divider = false %}
-        {% if options.links.about !== false && (options.links.about || githubId) %}
+        {% if options.links.about %}
         {% set _divider = true %}
         <li>
-            <a href="{{ options.links.about|default(githubHost+githubAuthor) }}" target="blank" class="author-link">About the author</a>
+            <a href="{{ options.links.about }}" target="blank" class="author-link">About the author</a>
         </li>
         {% endif %}
 
-        {% if options.links.issues !== false && (options.links.issues || githubId) %}
+        {% if options.links.issues %}
         {% set _divider = true %}
         <li>
-            <a href="{{ options.links.issues|default(githubHost+githubId+"/issues") }}" target="blank" class="issues-link">Questions and Issues</a>
+            <a href="{{ options.links.issues }}" target="blank" class="issues-link">Questions and Issues</a>
         </li>
         {% endif %}
 
-        {% if options.links.contribute !== false && (options.links.contribute || githubId) %}
+        {% if options.links.contribute %}
         {% set _divider = true %}
         <li>
-            <a href="{{ options.links.contribute|default(githubHost+githubId+"/edit/master/"+_input) }}" target="blank" class="contribute-link">Edit and Contribute</a>
+            <a href="{{ options.links.contribute }}" target="blank" class="contribute-link">Contribute to this book</a>
         </li>
         {% endif %}
 
-	{% if options.links.custom %}
-	{% for link in options.links.custom %}
-	    {% set _divider = true %}
-	     <li> 
-	         <a href="{{ options.links.custom[loop.key] }}" target="blank" class="custom-link">{{ loop.key }}</a>
-             </li>
-	{% endfor %}
-	{% endif %}
+    	{% if options.links.custom %}
+    	{% for link in options.links.custom %}
+    	    {% set _divider = true %}
+            <li>
+                <a href="{{ options.links.custom[loop.key] }}" target="blank" class="custom-link">{{ loop.key }}</a>
+            </li>
+    	{% endfor %}
+    	{% endif %}
 
         {% if _divider %}
         <li class="divider"></li>

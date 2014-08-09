@@ -37,7 +37,7 @@
 <div class="btn-group btn-group-justified">
     <a href="#" class="btn btn-default action-submit">Submit</a>
     <a href="#" class="btn btn-default action-solution">Solution</a>
-    {% if githubId %}
-    <a href="{{ githubHost }}{{ githubId }}/issues/new" target="_blank" class="btn btn-default">Have a Question?</a>
+    {% if options.links.issues %}
+    <a href="{{ options.links.issues }}" target="_blank" class="btn btn-default">Have a Question?</a>
     {% endif %}
 </div>
