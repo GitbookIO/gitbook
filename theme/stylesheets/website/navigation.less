@@ -49,14 +49,20 @@
     }
 }
 .book.color-theme-1 .book-body  {
+    .navigation {
+        color: @navigation-color-1;
 
+        &:hover {
+            color: @navigation-hover-color-1;
+        }
+    }
 }
 .book.color-theme-2 .book-body  {
     .navigation {
-        color: rgba(255, 255, 255, 0.4);
+        color: @navigation-color-2;
 
         &:hover {
-            color: rgba(255, 255, 255, 0.9);
+            color: @navigation-hover-color-2;
         }
     }
 }
