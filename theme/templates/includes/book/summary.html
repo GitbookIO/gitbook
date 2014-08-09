@@ -38,32 +38,11 @@
     </div>
     <ul class="summary">
         {% set _divider = false %}
-        {% if options.links.about %}
-        {% set _divider = true %}
-        <li>
-            <a href="{{ options.links.about }}" target="blank" class="author-link">About the author</a>
-        </li>
-        {% endif %}
-
-        {% if options.links.issues %}
-        {% set _divider = true %}
-        <li>
-            <a href="{{ options.links.issues }}" target="blank" class="issues-link">Questions and Issues</a>
-        </li>
-        {% endif %}
-
-        {% if options.links.contribute %}
-        {% set _divider = true %}
-        <li>
-            <a href="{{ options.links.contribute }}" target="blank" class="contribute-link">Contribute to this book</a>
-        </li>
-        {% endif %}
-
-    	{% if options.links.custom %}
-    	{% for link in options.links.custom %}
+    	{% if options.links.sidebar %}
+    	{% for link in options.links.sidebar %}
     	    {% set _divider = true %}
             <li>
-                <a href="{{ options.links.custom[loop.key] }}" target="blank" class="custom-link">{{ loop.key }}</a>
+                <a href="{{ options.links.sidebar[loop.key] }}" target="blank" class="custom-link">{{ loop.key }}</a>
             </li>
     	{% endfor %}
     	{% endif %}
