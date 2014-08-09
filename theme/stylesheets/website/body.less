@@ -53,13 +53,7 @@
         }
 
         @media (max-width: @mobileMaxWidth) {
-            overflow-y: auto;
-
-            .body-inner {
-                position: static;
-                padding-bottom: 20px;
-                min-height: calc(~"100% - 57px")
-            }
+            .transition-transform(0.5s ease);
         }
     }
 
@@ -67,6 +61,13 @@
         @media (min-width: @sidebar-breakpoint) {
             .book-body {
                 left: @sidebar-width;
+            }
+        }
+        @media (max-width: @sidebar-breakpoint) {
+            overflow: hidden;
+
+            .book-body {
+                .translate(~"calc(100% - 60px)", 0px);
             }
         }
     }
