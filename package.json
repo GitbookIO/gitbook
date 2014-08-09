@@ -16,7 +16,7 @@
         "commander": "2.2.0",
         "graceful-fs": "3.0.2",
         "fs-extra": "0.10.0",
-        "highlight.js": "8.0.0",
+        "highlight.js": "8.1.0",
         "tmp": "0.0.23",
         "semver": "2.2.1",
         "gaze": "~0.5.1",
