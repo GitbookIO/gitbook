@@ -66,8 +66,8 @@
 					.list-group-item{
 						cursor:pointer;
 						background-color:transparent;
-						border-color: @sidebar-divider-color;
-						border-width: 1px 0 !important;
+						border: none;
+						border-top: 1px solid @sidebar-divider-color;
 
 						&:hover{
 							color:@header-button-hover-color;
@@ -76,6 +76,10 @@
 						&.active{
 							color:@header-button-hover-color;
 							background-color:@header-button-hover-background !important;
+						}
+
+						&:last-child {
+							border-bottom: 1px solid @sidebar-divider-color;
 						}
 					}
 				}
@@ -107,7 +111,7 @@
 				}
 				.list-group{
 					.list-group-item{
-						border-color:@sidebar-divider-color-1;
+						border-color:@sidebar-divider-color-1 !important;
 						&:hover{
 							color:@header-button-hover-color-1;
 							background-color:@header-button-hover-background-1 !important;
@@ -143,7 +147,7 @@
 				}
 				.list-group{
 					.list-group-item{
-						border-color:@sidebar-divider-color-2;
+						border-color:@sidebar-divider-color-2 !important;
 						&:hover{
 							color:@header-button-hover-color-2;
 							background-color:@header-button-hover-background-2 !important;
