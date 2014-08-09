@@ -5,22 +5,23 @@
 
     .book-body {
         position: absolute;
-        top: @header-height;
+        top: 0px;
         right: 0px;
         left: 0px;
         bottom: 0px;
+        overflow-y: auto;
 
         color: @page-color;
         background: @body-background;
         .transition(left 0.5s ease);
 
         .body-inner {
-            position: absolute;
+            /*position: absolute;
             top: 0px;
             right: 0px;
             left: 0px;
             bottom: 0px;
-            overflow-y: auto;
+            overflow-y: auto;*/
         }
 
         .page-wrapper {
@@ -65,7 +66,7 @@
     &.with-summary {
         @media (min-width: @sidebar-breakpoint) {
             .book-body {
-                left: 250px;
+                left: @sidebar-width;
             }
         }
     }

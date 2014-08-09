@@ -6,20 +6,21 @@
 // Header
 @header-height:                       50px;
 @header-color:                        hsl(194, 5%, 52%);
-@header-background:                   white;
+@header-background:                   transparent;
 @header-border:                       rgba(0, 0, 0, 0.07);
 @header-button-color:                 hsl(194, 5%, 52%);
 @header-button-hover-color:           #151515;
-@header-button-hover-background:      hsl(207, 15%, 95%);
+@header-button-hover-background:      none;
+@header-dropdown-background:          @sidebar-background;
 
 // Body
 @body-background:                     white;
 
 // Sidebar
-@sidebar-width:                       250px;
+@sidebar-width:                       300px;
 @sidebar-breakpoint:                  600px;
 @sidebar-color:                       hsl(207, 15%, 80%);
-@sidebar-background:                  @body-background;
+@sidebar-background:                  #fafafa;
 @sidebar-border:                      @header-border;
 
 @sidebar-nested-padding:              20px;
@@ -106,14 +107,16 @@
 // Header
 @header-color-1:                        #AFA790;
 @header-color-2:                        #7e888b;
-@header-background-1:                   #ECE3C4;
-@header-background-2:                   #1d1f21;
+@header-background-1:                   transparent;
+@header-background-2:                   transparent;
 @header-button-color-1:                 #AFA790;
 @header-button-color-2:                 #7e888b;
 @header-button-hover-color-1:           #73553C;
 @header-button-hover-color-2:           #C9C9C9;
-@header-button-hover-background-1:      #E2DABE;
-@header-button-hover-background-2:      #0B0D0E;
+@header-button-hover-background-1:      none;
+@header-button-hover-background-2:      none;
+@header-dropdown-background-1:          @sidebar-background-1;
+@header-dropdown-background-2:          @sidebar-background-2;
 
 // Body
 @body-background-1:                     #F3EACB;
@@ -122,8 +125,8 @@
 // Sidebar
 @sidebar-color-1:                       #AFA790;
 @sidebar-color-2:                       hsl(207, 15%, 80%);
-@sidebar-background-1:                  @body-background-1;
-@sidebar-background-2:                  @body-background-2;
+@sidebar-background-1:                  #111;
+@sidebar-background-2:                  #111;
 
 @sidebar-search-background-1:           transparent;
 @sidebar-search-background-2:           transparent;

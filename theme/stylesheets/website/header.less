@@ -2,18 +2,13 @@
     .book-header {
         font-family: @font-family-sans;
 
-        position: absolute;
         overflow: visible;
-        top: 0px;
-        right: 0px;
-        left: 0px;
         height: @header-height;
         z-index: 2;
 
         font-size: 0.85em;
         color: @header-color;
         background: @header-background;
-        border-bottom: 1px solid @header-border;
 
         .btn {
             display: block;
@@ -39,6 +34,7 @@
             font-size: 20px;
             text-align: center;
             line-height: @header-height;
+            display: none;
 
             padding-left: 200px;
             padding-right: 200px;
@@ -73,16 +69,7 @@
             }
         }
     }
-    &.with-summary {
-        .book-header h1 {
-            margin-left: 250px;
-        }
-    }
-    &.without-animation {
-        .book-header h1 {
-            .transition(none) !important;
-        }
-    }
+
     &.color-theme-1{
         .book-header{
             color: @header-color-1;
@@ -96,6 +83,7 @@
             }
         }
     }
+
     &.color-theme-2{
         .book-header{
             color: @header-color-2;
