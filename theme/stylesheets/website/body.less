@@ -55,6 +55,12 @@
 
         @media (max-width: @mobileMaxWidth) {
             .transition-transform(@sidebar-transition-duration ease);
+            padding-bottom: 20px;
+
+            .body-inner {
+                position: static;
+                min-height: calc(~"100% - 50px")
+            }
         }
     }
 
