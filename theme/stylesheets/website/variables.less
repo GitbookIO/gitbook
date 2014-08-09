@@ -31,7 +31,8 @@
 
 @sidebar-search-padding:              6px;
 @sidebar-search-background:           transparent;
-@sidebar-search-input-border-color:   @sidebar-border;
+@sidebar-search-input-background:     transparent;
+@sidebar-search-input-border-color:   transparent;
 
 @sidebar-divider-color:               @sidebar-border;
 
@@ -40,7 +41,7 @@
 @sidebar-link-hover-color:            hsl(207, 100%, 50%);
 @sidebar-link-hover-background:       transparent;
 
-@sidebar-icon-color:                  @bar-progress-background;
+@sidebar-icon-color:                  hsl(120, 60%, 50%);
 @sidebar-link-completed:              @sidebar-link-color;
 @sidebar-link-completed-weight:       normal;
 
@@ -50,20 +51,6 @@
 
 // Content
 @content-line-height:                 1.6em;
-
-// Progress Bar
-@chapter-display:                     none;
-@chapter-size:                        16px;
-
-@progress-height:                     0px;
-
-@bar-height:                          2px;
-@bar-left:                            @sidebar-width;
-@bar-right:                           0;
-@bar-top:                             50px;
-@bar-position:                        static;
-@bar-background:                      white;
-@bar-progress-background:             hsl(120, 60%, 50%);
 
 // Basics of a navbar
 @navbar-height:                       50px;
@@ -149,8 +136,8 @@
 @sidebar-link-hover-background-1:       transparent;
 @sidebar-link-hover-background-2:       transparent;
 
-@sidebar-icon-color-1:                  @bar-progress-background;
-@sidebar-icon-color-2:                  @bar-progress-background;
+@sidebar-icon-color-1:                  hsl(120, 60%, 50%);
+@sidebar-icon-color-2:                  @sidebar-icon-color-1;
 @sidebar-link-completed-1:              @sidebar-link-color-1;
 @sidebar-link-completed-2:              @sidebar-link-color-2;
 @sidebar-link-completed-weight-1:       normal;
@@ -164,8 +151,8 @@
 
 @bar-background-1:                      #F3EACB;
 @bar-background-2:                      #1d1f21;
-@bar-progress-background-1:             #704214;
-@bar-progress-background-2:             hsl(120, 60%, 50%);
+/*@bar-progress-background-1:             #704214;
+@bar-progress-background-2:             hsl(120, 60%, 50%);*/
 
 // Basics of a navbar
 @navbar-default-border-1:               #d5d5d5;

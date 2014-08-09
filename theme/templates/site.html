@@ -23,8 +23,6 @@
         {% include "includes/book/header.html" %}
         <div class="body-inner">
             <div class="page-wrapper" tabindex="-1">
-                {% include "includes/book/progress.html" %}
-
                 <div class="page-inner">
                 {% for section in content %}
                     <section class="{{ section.type }}" id="section-{{ section.id }}">
