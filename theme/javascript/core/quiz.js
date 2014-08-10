@@ -1,9 +1,8 @@
 define([
     "jQuery",
-    "utils/execute",
     "core/events",
     "core/state"
-], function($, execute, events, state){
+], function($, events, state){
     // Bind an exercise
     var prepareQuiz = function($quiz) {
 

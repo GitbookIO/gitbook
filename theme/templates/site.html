@@ -50,7 +50,6 @@
 {% endblock %}
 
 {% block javascript %}
-<script src="{{ staticBase }}/jsrepl/jsrepl.js" id="jsrepl-script"></script>
 <script src="{{ staticBase }}/app.js"></script>
 {% for resource in plugins.resources.js %}
     {% if resource.url %}

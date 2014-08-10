@@ -48,6 +48,7 @@ define([
 
     return {
         start: start,
-        events: events
+        events: events,
+        state: state
     };
 });
