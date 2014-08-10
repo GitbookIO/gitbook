@@ -6,7 +6,7 @@
     position: absolute;
     top: 100%;
     left: 0;
-    z-index: @zindex-dropdown;
+    z-index: @dropdown-zindex;
     display: none; // none by default, but block on "open" of the menu
     float: left;
     min-width: 160px;
@@ -14,8 +14,8 @@
     margin: 2px 0 0; // override default ul
     list-style: none;
     font-size: @font-size-base;
-    background-color: @header-dropdown-background;
-    border: 1px solid @sidebar-divider-color;
+    background-color: @dropdown-background;
+    border: 1px solid @dropdown-border-color;
     border-radius: @border-radius-base;
     .box-shadow(0 6px 12px rgba(0,0,0,.175));
     background-clip: padding-box;
@@ -63,7 +63,7 @@
             top: 1px;
             border-left: 9px solid transparent;
             border-right: 9px solid transparent;
-            border-bottom: 9px solid @header-dropdown-background;
+            border-bottom: 9px solid @dropdown-background;
         }
     }
 
@@ -78,7 +78,7 @@
         .button {
             border: 0;
             background-color: transparent;
-            color: @header-button-color;
+            color: @dropdown-button-color;
             width: 100%;
             text-align: center;
             float: left;
@@ -86,8 +86,7 @@
             padding: 8px 4px;
 
             &:hover {
-                color: @header-button-hover-color;
-                background-color: @header-button-hover-background;
+                color: @dropdown-button-hover-color;
             }
 
             &:focus, &:hover {
@@ -109,25 +108,24 @@
  * Theme 1
  */
 
-.color-theme-1{
+.color-theme-1 {
     .dropdown-menu{
-        background-color: @header-dropdown-background-1;
-        border-color: @sidebar-divider-color-1;
+        background-color: @dropdown-background-1;
+        border-color: @dropdown-border-color-1;
 
         .dropdown-caret .caret-inner{
-            border-bottom: 9px solid @header-dropdown-background-1;
+            border-bottom: 9px solid @dropdown-background-1;
         }
 
         .buttons {
-            border-color: @sidebar-divider-color-1;
+            border-color: @dropdown-divider-color-1;
         }
 
         .button {
-            color:@header-button-color-1;
+            color: @dropdown-button-color-1;
 
             &:hover{
-                color:@header-button-hover-color-1;
-                background-color:@header-button-hover-background-1;
+                color: @dropdown-button-hover-color-1;
             }
         }
     }
@@ -137,24 +135,24 @@
  * Theme 2
  */
 
-.color-theme-2{
+.color-theme-2 {
     .dropdown-menu{
-        background-color: @header-dropdown-background-2;
-        border-color: @sidebar-divider-color-2;
+        background-color: @dropdown-background-2;
+        border-color: @dropdown-border-color-2;
 
         .dropdown-caret .caret-inner{
-            border-bottom: 9px solid @header-dropdown-background-2;
+            border-bottom: 9px solid @dropdown-background-2;
         }
 
         .buttons {
-            border-color: @sidebar-divider-color-2;
+            border-color: @dropdown-divider-color-2;
         }
 
         .button {
-            color:@header-button-color-2;
+            color: @dropdown-button-color-2;
+
             &:hover{
-                color:@header-button-hover-color-2;
-                background-color:@header-button-hover-background-2;
+                color: @dropdown-button-hover-color-2;
             }
         }
     }

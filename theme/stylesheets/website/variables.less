@@ -18,7 +18,6 @@
 @header-button-color:                 #ccc;
 @header-button-hover-color:           #444;
 @header-button-hover-background:      none;
-@header-dropdown-background:          @sidebar-background;
 
 // Navigation
 @navigation-color:                    @header-button-color;
@@ -61,7 +60,12 @@
 @content-color:                       #333333;
 
 // Dropdown
-@zindex-dropdown:                     100;
+@dropdown-zindex:                     100;
+@dropdown-divider-color:              @sidebar-divider-color;
+@dropdown-background:                 @sidebar-background;
+@dropdown-button-color:               darken(@header-button-color, 15%);
+@dropdown-border-color:               @sidebar-divider-color;
+@dropdown-button-hover-color:         @header-button-hover-color;
 
 // Border Radius
 @border-radius-base:                  1px;
@@ -139,6 +143,19 @@
 @sidebar-link-completed-2:              @sidebar-link-color-2;
 @sidebar-link-completed-weight-1:       normal;
 @sidebar-link-completed-weight-2:       normal;
+
+// Dropdown
+@dropdown-divider-color-1:              @sidebar-divider-color-1;
+@dropdown-background-1:                 @sidebar-background-1;
+@dropdown-button-color-1:               @header-button-color-1;
+@dropdown-border-color-1:               @sidebar-divider-color-1;
+@dropdown-button-hover-color-1:         @header-button-hover-color-1;
+
+@dropdown-divider-color-2:              @sidebar-divider-color-2;
+@dropdown-background-2:                 @sidebar-background-2;
+@dropdown-button-color-2:               @header-button-color-2;
+@dropdown-border-color-2:               @sidebar-divider-color-2;
+@dropdown-button-hover-color-2:         @header-button-hover-color-2;
 
 // Page
 @page-color-1:                              #704214;
