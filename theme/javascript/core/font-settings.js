@@ -106,8 +106,8 @@ define([
         $(document).on('click', "#enlarge-font-size", enlargeFontSize);
         $(document).on('click', "#reduce-font-size", reduceFontSize);
 
-        $(document).on('click', "#font-settings-wrapper .font-family-list li", changeFontFamily);
-        $(document).on('click', "#font-settings-wrapper .color-theme-list button", changeColorTheme);
+        $(document).on('click', "#font-settings-wrapper .font-family-list .button", changeFontFamily);
+        $(document).on('click', "#font-settings-wrapper .color-theme-list .button", changeColorTheme);
 
         $(document).on('click', ".book-header .toggle-font-settings", togglePopover);
         $(document).on('click', "#font-settings-wrapper .dropdown-menu", function(e){ e.stopPropagation(); });

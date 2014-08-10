@@ -27,11 +27,14 @@
 
             .transition(top 0.5s ease);
 
-            input, input:focus {
+            input, input:focus, input:hover {
                 width: 100%;
                 background: @sidebar-search-input-background;
                 border: 1px solid @sidebar-search-input-border-color;
                 .box-shadow(none);
+                outline: none;
+                line-height: 22px;
+                padding: 7px 4px;
             }
         }
 

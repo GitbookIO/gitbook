@@ -1,0 +1,150 @@
+.dropdown {
+    position: relative;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: @zindex-dropdown;
+    display: none; // none by default, but block on "open" of the menu
+    float: left;
+    min-width: 160px;
+    padding: 0;
+    margin: 2px 0 0; // override default ul
+    list-style: none;
+    font-size: @font-size-base;
+    background-color: @header-dropdown-background;
+    border: 1px solid @sidebar-divider-color;
+    border-radius: @border-radius-base;
+    .box-shadow(0 6px 12px rgba(0,0,0,.175));
+    background-clip: padding-box;
+
+    &.open{
+        display:block;
+    }
+
+    .dropdown-caret{
+        position: absolute;
+        top: 14px;
+        left: -8px;
+        width: 10px;
+        height: 18px;
+        float: left;
+        overflow: hidden;
+        .caret-outer{
+            position: absolute;
+            border-bottom: 9px solid transparent;
+            border-top: 9px solid transparent;
+            border-right: 9px solid rgba(0,0,0,0.1);
+            height: auto;
+            left: 0;
+            top: 0;
+            width: auto;
+            display: inline-block;
+            margin-left: -1px;
+        }
+        .caret-inner{
+            position: absolute;
+            display: inline-block;
+            margin-left: -1px;
+            top: 0;
+            left: 1px;
+            border-bottom: 9px solid transparent;
+            border-top: 9px solid transparent;
+            border-right: 9px solid @header-dropdown-background;
+        }
+    }
+
+    .buttons {
+        .clearfix();
+        border-bottom: 1px solid @sidebar-divider-color;
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        .button {
+            border: 0;
+            background-color: transparent;
+            color: @header-button-color;
+            width: 100%;
+            text-align: center;
+            float: left;
+            line-height: @line-height-base;
+            padding: 8px 4px;
+
+            &:hover {
+                color: @header-button-hover-color;
+                background-color: @header-button-hover-background;
+            }
+
+            &:focus, &:hover {
+                outline: none;
+            }
+
+            &.size-2 {
+                width: 50%;
+            }
+
+            &.size-3 {
+                width: 33%;
+            }
+        }
+    }
+}
+
+/*
+ * Theme 1
+ */
+
+.color-theme-1{
+    .dropdown-menu{
+        background-color: @header-dropdown-background-1;
+        border-color: @sidebar-divider-color-1;
+
+        .dropdown-caret .caret-inner{
+            border-right: 9px solid @header-dropdown-background-1;
+        }
+
+        .buttons {
+            border-color: @sidebar-divider-color-1;
+        }
+
+        .button {
+            color:@header-button-color-1;
+
+            &:hover{
+                color:@header-button-hover-color-1;
+                background-color:@header-button-hover-background-1;
+            }
+        }
+    }
+}
+
+/*
+ * Theme 2
+ */
+
+.color-theme-2{
+    .dropdown-menu{
+        background-color: @header-dropdown-background-2;
+        border-color: @sidebar-divider-color-2;
+
+        .dropdown-caret .caret-inner{
+            border-right: 9px solid @header-dropdown-background-2;
+        }
+
+        .buttons {
+            border-color: @sidebar-divider-color-2;
+        }
+
+        .button {
+            color:@header-button-color-2;
+            &:hover{
+                color:@header-button-hover-color-2;
+                background-color:@header-button-hover-background-2;
+            }
+        }
+    }
+}
