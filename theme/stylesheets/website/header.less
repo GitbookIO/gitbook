@@ -33,13 +33,15 @@
         h1 {
             margin: 0px;
             font-size: 20px;
+            font-weight: 200;
             text-align: center;
             line-height: @header-height;
-            display: none;
+            opacity: 0;
+            .transition(opacity ease 0.4s);
 
             padding-left: 200px;
             padding-right: 200px;
-            .transition(margin-left 0.5s ease);
+            .transition(opacity 0.2s ease);
 
             overflow: hidden;
             text-overflow: ellipsis;
@@ -56,6 +58,12 @@
 
             i {
                 display: none;
+            }
+        }
+
+        &:hover {
+            h1 {
+                opacity: 1;
             }
         }
     }
