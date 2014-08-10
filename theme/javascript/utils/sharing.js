@@ -18,7 +18,7 @@ define([
             window.open("http://service.weibo.com/share/share.php?content=utf-8&url="+encodeURIComponent(url)+"&title="+encodeURIComponent(title))
         },
         "instapaper": function($el) {
-            window.open("http://www.instapaper.com/text?u="+encodeURIComponent(url))
+            window.open("http://www.instapaper.com/text?u="+encodeURIComponent(url));
         }
     };
 
