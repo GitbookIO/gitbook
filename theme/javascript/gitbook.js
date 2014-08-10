@@ -2,7 +2,6 @@ define([
     "jQuery",
     "utils/storage",
     "utils/sharing",
-    "utils/appcache",
 
     "core/events",
     "core/font-settings",
@@ -12,7 +11,7 @@ define([
     "core/progress",
     "core/sidebar",
     "core/search"
-], function($, storage, appCache, sharing, events, fontSettings, state, keyboard, navigation, progress, sidebar, search){
+], function($, storage, sharing, events, fontSettings, state, keyboard, navigation, progress, sidebar, search){
     var start = function(config) {
         var $book;
         $book = state.$book;
@@ -30,9 +29,6 @@ define([
 
         // Init keyboard
         keyboard.init();
-
-        // Init appcache
-        appCache.init();
 
         // Bind sharing button
         sharing.init();
