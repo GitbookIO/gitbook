@@ -2,6 +2,7 @@ define([
     "jQuery",
     "utils/storage",
     "utils/sharing",
+    "utils/dropdown",
 
     "core/events",
     "core/font-settings",
@@ -11,7 +12,7 @@ define([
     "core/progress",
     "core/sidebar",
     "core/search"
-], function($, storage, sharing, events, fontSettings, state, keyboard, navigation, progress, sidebar, search){
+], function($, storage, sharing, dropdown, events, fontSettings, state, keyboard, navigation, progress, sidebar, search){
     var start = function(config) {
         var $book;
         $book = state.$book;
@@ -32,6 +33,9 @@ define([
 
         // Bind sharing button
         sharing.init();
+
+        // Bind dropdown
+        dropdown.init();
 
         // Init navigation
         navigation.init();

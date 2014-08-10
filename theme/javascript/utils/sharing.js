@@ -22,7 +22,7 @@ define([
 
     // Bind all sharing button
     var init = function() {
-        $(document).on("click", "a[data-sharing]", function(e) {
+        $(document).on("click", "a[data-sharing],button[data-sharing]", function(e) {
             if (e) e.preventDefault();
             var type = $(this).data("sharing");
 

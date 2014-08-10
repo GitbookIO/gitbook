@@ -24,19 +24,30 @@
         display:block;
     }
 
+    &.dropdown-left {
+        left: auto;
+        right: 4%;
+
+        .dropdown-caret {
+            right: 14px;
+            left: auto;
+        }
+    }
+
     .dropdown-caret{
         position: absolute;
-        top: 14px;
-        left: -8px;
-        width: 10px;
-        height: 18px;
+        top: -8px;
+        left: 14px;
+        width: 18px;
+        height: 10px;
         float: left;
         overflow: hidden;
+
         .caret-outer{
             position: absolute;
-            border-bottom: 9px solid transparent;
-            border-top: 9px solid transparent;
-            border-right: 9px solid rgba(0,0,0,0.1);
+            border-left: 9px solid transparent;
+            border-right: 9px solid transparent;
+            border-bottom: 9px solid rgba(0,0,0,0.1);
             height: auto;
             left: 0;
             top: 0;
@@ -47,12 +58,12 @@
         .caret-inner{
             position: absolute;
             display: inline-block;
-            margin-left: -1px;
+            margin-top: -1px;
             top: 0;
-            left: 1px;
-            border-bottom: 9px solid transparent;
-            border-top: 9px solid transparent;
-            border-right: 9px solid @header-dropdown-background;
+            top: 1px;
+            border-left: 9px solid transparent;
+            border-right: 9px solid transparent;
+            border-bottom: 9px solid @header-dropdown-background;
         }
     }
 
@@ -104,7 +115,7 @@
         border-color: @sidebar-divider-color-1;
 
         .dropdown-caret .caret-inner{
-            border-right: 9px solid @header-dropdown-background-1;
+            border-bottom: 9px solid @header-dropdown-background-1;
         }
 
         .buttons {
@@ -132,7 +143,7 @@
         border-color: @sidebar-divider-color-2;
 
         .dropdown-caret .caret-inner{
-            border-right: 9px solid @header-dropdown-background-2;
+            border-bottom: 9px solid @header-dropdown-background-2;
         }
 
         .buttons {
