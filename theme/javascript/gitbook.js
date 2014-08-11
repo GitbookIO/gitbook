@@ -2,7 +2,7 @@ define([
     "jQuery",
     "utils/storage",
     "utils/sharing",
-    "utils/appcache",
+    "utils/dropdown",
 
     "core/events",
     "core/font-settings",
@@ -12,7 +12,7 @@ define([
     "core/progress",
     "core/sidebar",
     "core/search"
-], function($, storage, appCache, sharing, events, fontSettings, state, keyboard, navigation, progress, sidebar, search){
+], function($, storage, sharing, dropdown, events, fontSettings, state, keyboard, navigation, progress, sidebar, search){
     var start = function(config) {
         var $book;
         $book = state.$book;
@@ -31,11 +31,11 @@ define([
         // Init keyboard
         keyboard.init();
 
-        // Init appcache
-        appCache.init();
-
         // Bind sharing button
         sharing.init();
+
+        // Bind dropdown
+        dropdown.init();
 
         // Init navigation
         navigation.init();
@@ -48,6 +48,7 @@ define([
 
     return {
         start: start,
-        events: events
+        events: events,
+        state: state
     };
 });

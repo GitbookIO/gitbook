@@ -1,41 +1,53 @@
 @staticPath: "./";
 
+// Font sizes
+@font-size-base:          14px;
+@font-size-large:         ceil(@font-size-base * 1.25); // ~18px
+@font-size-small:         ceil(@font-size-base * 0.85); // ~12px
+@line-height-base:        1.428571429; // 20/14
+@line-height-computed:    floor(@font-size-base * @line-height-base);
+
 // Sizes
 @mobileMaxWidth:                      1240px;
 
 // Header
 @header-height:                       50px;
 @header-color:                        hsl(194, 5%, 52%);
-@header-background:                   white;
+@header-background:                   transparent;
 @header-border:                       rgba(0, 0, 0, 0.07);
-@header-button-color:                 hsl(194, 5%, 52%);
-@header-button-hover-color:           #151515;
-@header-button-hover-background:      hsl(207, 15%, 95%);
+@header-button-color:                 #ccc;
+@header-button-hover-color:           #444;
+@header-button-hover-background:      none;
+
+// Navigation
+@navigation-color:                    @header-button-color;
+@navigation-hover-color:              @header-button-hover-color;
 
 // Body
 @body-background:                     white;
 
 // Sidebar
-@sidebar-width:                       250px;
+@sidebar-width:                       300px;
 @sidebar-breakpoint:                  600px;
-@sidebar-color:                       hsl(207, 15%, 80%);
-@sidebar-background:                  @body-background;
+@sidebar-color:                       hsl(207, 15%, 25%);
+@sidebar-background:                  #fafafa;
 @sidebar-border:                      @header-border;
 
 @sidebar-nested-padding:              20px;
 
 @sidebar-search-padding:              6px;
 @sidebar-search-background:           transparent;
-@sidebar-search-input-border-color:   @sidebar-border;
+@sidebar-search-input-background:     transparent;
+@sidebar-search-input-border-color:   transparent;
 
 @sidebar-divider-color:               @sidebar-border;
 
-@sidebar-link-color:                  hsl(207, 15%, 25%);
+@sidebar-link-color:                  @sidebar-color;
 @sidebar-link-background:             transparent;
 @sidebar-link-hover-color:            hsl(207, 100%, 50%);
 @sidebar-link-hover-background:       transparent;
 
-@sidebar-icon-color:                  @bar-progress-background;
+@sidebar-icon-color:                  hsl(120, 60%, 50%);
 @sidebar-link-completed:              @sidebar-link-color;
 @sidebar-link-completed-weight:       normal;
 
@@ -44,36 +56,38 @@
 @page-background:                     @body-background;
 
 // Content
-@content-line-height:                 1.6em;
+@content-line-height:                 1.6;
+@content-color:                       #333333;
 
-// Progress Bar
-@chapter-display:                     none;
-@chapter-size:                        16px;
+// Dropdown
+@dropdown-zindex:                     100;
+@dropdown-divider-color:              @sidebar-divider-color;
+@dropdown-background:                 @sidebar-background;
+@dropdown-button-color:               darken(@header-button-color, 15%);
+@dropdown-border-color:               @sidebar-divider-color;
+@dropdown-button-hover-color:         @header-button-hover-color;
 
-@progress-height:                     0px;
+// Buttons
+@button-background:                   #eee;
+@button-color:                        #666;
+@button-hover-color:                  #444;
 
-@bar-height:                          2px;
-@bar-left:                            @sidebar-width;
-@bar-right:                           0;
-@bar-top:                             50px;
-@bar-position:                        static;
-@bar-background:                      white;
-@bar-progress-background:             hsl(120, 60%, 50%);
+// States and alerts
+@state-success-text:                  #3c763d;
+@state-success-bg:                    #dff0d8;
+@state-success-border:                darken(spin(@state-success-bg, -10), 5%);
 
-// Basics of a navbar
-@navbar-height:                       50px;
-@navbar-margin-bottom:                @line-height-computed;
-@navbar-default-border:               #d5d5d5;
-@navbar-border-radius:                0px;
-@navbar-padding-horizontal:           floor(@grid-gutter-width / 2);
-@navbar-padding-vertical:             ((@navbar-height - @line-height-computed) / 2);
+@state-info-text:                     #31708f;
+@state-info-bg:                       #d9edf7;
+@state-info-border:                   darken(spin(@state-info-bg, -10), 7%);
 
-// Navbar brand label
-@navbar-default-color:                #333;
-@navbar-default-link-color:           #333;
-@navbar-default-brand-color:          @navbar-default-link-color;
-@navbar-default-brand-hover-color:    @navbar-default-link-color;
-@navbar-default-brand-hover-bg:       transparent;
+@state-warning-text:                  #8a6d3b;
+@state-warning-bg:                    #fcf8e3;
+@state-warning-border:                darken(spin(@state-warning-bg, -10), 5%);
+
+@state-danger-text:                   #a94442;
+@state-danger-bg:                     #f2dede;
+@state-danger-border:                 darken(spin(@state-danger-bg, -10), 5%);
 
 // Border Radius
 @border-radius-base:                  1px;
@@ -106,29 +120,32 @@
 // Header
 @header-color-1:                        #AFA790;
 @header-color-2:                        #7e888b;
-@header-background-1:                   #ECE3C4;
-@header-background-2:                   #1d1f21;
+@header-background-1:                   transparent;
+@header-background-2:                   transparent;
 @header-button-color-1:                 #AFA790;
 @header-button-color-2:                 #7e888b;
 @header-button-hover-color-1:           #73553C;
 @header-button-hover-color-2:           #C9C9C9;
-@header-button-hover-background-1:      #E2DABE;
-@header-button-hover-background-2:      #0B0D0E;
+@header-button-hover-background-1:      none;
+@header-button-hover-background-2:      none;
+@header-dropdown-background-1:          @sidebar-background-1;
+@header-dropdown-background-2:          @sidebar-background-2;
 
 // Body
 @body-background-1:                     #F3EACB;
 @body-background-2:                     #1d1f21;
 
 // Sidebar
+@sidebar-transition-duration:           250ms;
 @sidebar-color-1:                       #AFA790;
 @sidebar-color-2:                       hsl(207, 15%, 80%);
-@sidebar-background-1:                  @body-background-1;
-@sidebar-background-2:                  @body-background-2;
+@sidebar-background-1:                  #111;
+@sidebar-background-2:                  #111;
 
 @sidebar-search-background-1:           transparent;
 @sidebar-search-background-2:           transparent;
-@sidebar-search-input-border-color-1:   #D6CFBA;
-@sidebar-search-input-border-color-2:   #000;
+@sidebar-search-input-border-color-1:   transparent;
+@sidebar-search-input-border-color-2:   transparent;
 
 @sidebar-divider-color-1:               @sidebar-divider-color;
 @sidebar-divider-color-2:               #1d1f21;
@@ -142,12 +159,25 @@
 @sidebar-link-hover-background-1:       transparent;
 @sidebar-link-hover-background-2:       transparent;
 
-@sidebar-icon-color-1:                  @bar-progress-background;
-@sidebar-icon-color-2:                  @bar-progress-background;
+@sidebar-icon-color-1:                  hsl(120, 60%, 50%);
+@sidebar-icon-color-2:                  @sidebar-icon-color-1;
 @sidebar-link-completed-1:              @sidebar-link-color-1;
 @sidebar-link-completed-2:              @sidebar-link-color-2;
 @sidebar-link-completed-weight-1:       normal;
 @sidebar-link-completed-weight-2:       normal;
+
+// Dropdown
+@dropdown-divider-color-1:              @sidebar-divider-color-1;
+@dropdown-background-1:                 @sidebar-background-1;
+@dropdown-button-color-1:               @header-button-color-1;
+@dropdown-border-color-1:               @sidebar-divider-color-1;
+@dropdown-button-hover-color-1:         @header-button-hover-color-1;
+
+@dropdown-divider-color-2:              @sidebar-divider-color-2;
+@dropdown-background-2:                 @sidebar-background-2;
+@dropdown-button-color-2:               @header-button-color-2;
+@dropdown-border-color-2:               @sidebar-divider-color-2;
+@dropdown-button-hover-color-2:         @header-button-hover-color-2;
 
 // Page
 @page-color-1:                              #704214;
@@ -157,21 +187,13 @@
 
 @bar-background-1:                      #F3EACB;
 @bar-background-2:                      #1d1f21;
-@bar-progress-background-1:             #704214;
-@bar-progress-background-2:             hsl(120, 60%, 50%);
+
+// Navigation
+@navigation-color-1:                    @header-button-color-1;
+@navigation-color-2:                    @header-button-color-2;
+@navigation-hover-color-1:              @header-button-hover-color-1;
+@navigation-hover-color-2:              @header-button-hover-color-2;
 
 // Basics of a navbar
 @navbar-default-border-1:               #d5d5d5;
 @navbar-default-border-2:               #d5d5d5;
-
-// Navbar brand label
-@navbar-default-color-1:                #333;
-@navbar-default-color-2:                #333;
-@navbar-default-link-color-1:           #333;
-@navbar-default-link-color-2:           #333;
-@navbar-default-brand-color-1:          @navbar-default-link-color;
-@navbar-default-brand-color-2:          @navbar-default-link-color;
-@navbar-default-brand-hover-color-1:    @navbar-default-link-color;
-@navbar-default-brand-hover-color-2:    @navbar-default-link-color;
-@navbar-default-brand-hover-bg-1:       transparent;
-@navbar-default-brand-hover-bg-2:       transparent;

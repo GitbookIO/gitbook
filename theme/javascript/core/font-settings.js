@@ -15,20 +15,6 @@ define([
         "sans": 1
     };
 
-    var togglePopover = function(e) {
-        var $dropdown = $("#font-settings-wrapper .dropdown-menu");
-
-        $dropdown.toggleClass("open");
-        e.stopPropagation();
-        e.preventDefault();
-    };
-
-    var closePopover = function(e) {
-        var $dropdown = $("#font-settings-wrapper .dropdown-menu");
-
-        $dropdown.removeClass("open");
-    };
-
     var enlargeFontSize = function(e){
         if (fontState.size < 4){
             fontState.size++;
@@ -106,12 +92,8 @@ define([
         $(document).on('click', "#enlarge-font-size", enlargeFontSize);
         $(document).on('click', "#reduce-font-size", reduceFontSize);
 
-        $(document).on('click', "#font-settings-wrapper .font-family-list li", changeFontFamily);
-        $(document).on('click', "#font-settings-wrapper .color-theme-list button", changeColorTheme);
-
-        $(document).on('click', ".book-header .toggle-font-settings", togglePopover);
-        $(document).on('click', "#font-settings-wrapper .dropdown-menu", function(e){ e.stopPropagation(); });
-        $(document).on("click", closePopover);
+        $(document).on('click', "#font-settings-wrapper .font-family-list .button", changeFontFamily);
+        $(document).on('click', "#font-settings-wrapper .color-theme-list .button", changeColorTheme);
     };
 
     return {

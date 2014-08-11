@@ -2,18 +2,14 @@
     .book-header {
         font-family: @font-family-sans;
 
-        position: absolute;
         overflow: visible;
-        top: 0px;
-        right: 0px;
-        left: 0px;
         height: @header-height;
+        padding: 0px 8px;
         z-index: 2;
 
         font-size: 0.85em;
         color: @header-color;
         background: @header-background;
-        border-bottom: 1px solid @header-border;
 
         .btn {
             display: block;
@@ -25,6 +21,7 @@
             line-height: @header-height;
             .box-shadow(none) !important;
             position:relative;
+            font-size: @font-size-base;
 
             &:hover {
                 position: relative;
@@ -37,12 +34,15 @@
         h1 {
             margin: 0px;
             font-size: 20px;
+            font-weight: 200;
             text-align: center;
             line-height: @header-height;
+            opacity: 0;
+            .transition(opacity ease 0.4s);
 
             padding-left: 200px;
             padding-right: 200px;
-            .transition(margin-left 0.5s ease);
+            .transition(opacity 0.2s ease);
 
             overflow: hidden;
             text-overflow: ellipsis;
@@ -61,6 +61,12 @@
                 display: none;
             }
         }
+
+        &:hover {
+            h1 {
+                opacity: 1;
+            }
+        }
     }
 
     &.is-loading {
@@ -73,20 +79,12 @@
             }
         }
     }
-    &.with-summary {
-        .book-header h1 {
-            margin-left: 250px;
-        }
-    }
-    &.without-animation {
-        .book-header h1 {
-            .transition(none) !important;
-        }
-    }
+
     &.color-theme-1{
         .book-header{
             color: @header-color-1;
             background: @header-background-1;
+
             .btn {
                 color: @header-button-color-1;
                 &:hover {
@@ -94,18 +92,28 @@
                     background: @header-button-hover-background-1;
                 }
             }
+
+            h1 {
+                color: @page-color-1;
+            }
         }
     }
+
     &.color-theme-2{
         .book-header{
             color: @header-color-2;
             background: @header-background-2;
+
             .btn {
                 color: @header-button-color-2;
                 &:hover {
                     color: @header-button-hover-color-2;
                     background: @header-button-hover-background-2;
                 }
+            }
+
+            h1 {
+                color: @page-color-2;
             }
         }
     }

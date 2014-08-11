@@ -1,5 +1,5 @@
 define([
-    "vendors/URIjs/src/URI"
+    "URIjs/URI"
 ], function(URI) {
     // Joins path segments.  Preserves initial "/" and resolves ".." and "."
     // Does not support using ".." to go above/outside the root.

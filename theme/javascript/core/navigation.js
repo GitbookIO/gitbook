@@ -4,11 +4,9 @@ define([
     "core/events",
     "core/state",
     "core/progress",
-    "core/exercise",
-    "core/quiz",
     "core/loading",
     "core/search"
-], function($, URL, events, state, progress, exercises, quiz, loading, search) {
+], function($, URL, events, state, progress, loading, search) {
     var prev, next;
 
     var usePushState = (typeof history.pushState !== "undefined");
@@ -75,10 +73,6 @@ define([
 
     var preparePage = function() {
         var $pageWrapper = $(".book-body .page-wrapper");
-
-        // Bind exercises/quiz
-        exercises.init();
-        quiz.init();
 
         // Show progress
         progress.show();

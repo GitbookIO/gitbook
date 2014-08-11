@@ -25,6 +25,7 @@ build/Release
 node_modules
 
 theme/javascript/vendors
+theme/vendors
 
 # vim swapfile
 *.swp

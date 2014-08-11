@@ -1,17 +1,34 @@
 <div class="book-header">
     <!-- Actions Left -->
     <a href="#" class="btn pull-left toggle-summary" aria-label="Toggle summary"><i class="fa fa-align-justify"></i></a>
-    {% if options.links.home !== false and (options.links.home != null or githubId) %}
-    <a href="{{ options.links.home|default(githubHost+githubId) }}" target="_blank" class="btn pull-left home-bookmark" aria-label="GitHub home"><i class="fa fa-bookmark-o"></i></a>
-    {% endif %}
     <a href="#" class="btn pull-left toggle-search" aria-label="Toggle search"><i class="fa fa-search"></i></a>
-    <span id="font-settings-wrapper">
-        <a href="#" class="btn pull-left toggle-font-settings" aria-label="Toggle font settings"><i class="fa fa-font"></i>
+    <div id="font-settings-wrapper" class="dropdown pull-left">
+        <a href="#" class="btn toggle-dropdown" aria-label="Toggle font settings"><i class="fa fa-font"></i>
         </a>
         {% include "./font-settings.html" %}
-    </span>
+    </div>
 
     <!-- Actions Right -->
+    {% if options.links.sharing.all !== false %}
+    <div class="dropdown pull-right">
+        <a href="#" class="btn toggle-dropdown" aria-label="Toggle share dropdown"><i class="fa fa-share-alt"></i>
+        </a>
+        <div class="dropdown-menu font-settings dropdown-left">
+            <div class="dropdown-caret">
+                <span class="caret-outer"></span>
+                <span class="caret-inner"></span>
+            </div>
+            <div class="buttons">
+                <button type="button" data-sharing="twitter" class="button">Twitter</button>
+                <button type="button" data-sharing="google-plus" class="button">Google</button>
+                <button type="button" data-sharing="facebook" class="button">Facebook</button>
+                <button type="button" data-sharing="weibo" class="button">Weibo</button>
+                <button type="button" data-sharing="instapaper" class="button">Instapaper</button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     {% if options.links.sharing.google !== false %}
     <a href="#" target="_blank" class="btn pull-right google-plus-sharing-link sharing-link" data-sharing="google-plus" aria-label="Share on Google Plus"><i class="fa fa-google-plus"></i></a>
     {% endif %}
@@ -27,7 +44,7 @@
 
     <!-- Title -->
     <h1>
-        <i class="fa fa-spinner fa-spin"></i>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
         <a href="{{ basePath }}/" >{{ title }}</a>
     </h1>
 </div>

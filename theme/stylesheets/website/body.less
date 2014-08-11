@@ -5,14 +5,15 @@
 
     .book-body {
         position: absolute;
-        top: @header-height;
+        top: 0px;
         right: 0px;
         left: 0px;
         bottom: 0px;
+        overflow-y: auto;
 
         color: @page-color;
         background: @body-background;
-        .transition(left 0.5s ease);
+        .transition(left @sidebar-transition-duration ease);
 
         .body-inner {
             position: absolute;
@@ -30,6 +31,7 @@
             .page-inner {
                 max-width: 800px;
                 margin: 0px auto;
+                padding: 20px 0px 40px 0px;
 
                 section {
                     margin: 0px 0px;
@@ -52,12 +54,12 @@
         }
 
         @media (max-width: @mobileMaxWidth) {
-            overflow-y: auto;
+            .transition-transform(@sidebar-transition-duration ease);
+            padding-bottom: 20px;
 
             .body-inner {
                 position: static;
-                padding-bottom: 20px;
-                min-height: calc(~"100% - 57px")
+                min-height: calc(~"100% - 50px")
             }
         }
     }
@@ -65,7 +67,14 @@
     &.with-summary {
         @media (min-width: @sidebar-breakpoint) {
             .book-body {
-                left: 250px;
+                left: @sidebar-width;
+            }
+        }
+        @media (max-width: @sidebar-breakpoint) {
+            overflow: hidden;
+
+            .book-body {
+                .translate(~"calc(100% - 60px)", 0px);
             }
         }
     }

@@ -3,7 +3,7 @@
         font-family: @font-family-sans;
 
         position: absolute;
-        top: @header-height;
+        top: 0px;
         left: -@sidebar-width;
         bottom: 0px;
         z-index: 1;
@@ -13,7 +13,7 @@
         background: @sidebar-background;
         border-right: 1px solid @sidebar-border;
 
-        .transition(all 0.5s ease);
+        .transition(left @sidebar-transition-duration ease);
 
         .book-search {
             padding: @sidebar-search-padding;
@@ -27,10 +27,15 @@
 
             .transition(top 0.5s ease);
 
-            input, input:focus {
+            input, input:focus, input:hover {
                 width: 100%;
+                background: @sidebar-search-input-background;
                 border: 1px solid @sidebar-search-input-border-color;
                 .box-shadow(none);
+                outline: none;
+                line-height: 22px;
+                padding: 7px 4px;
+                color: inherit;
             }
         }
 
@@ -109,7 +114,7 @@
         }
 
         @media (max-width: @sidebar-breakpoint) {
-            width: 100%;
+            width: calc(~"100% - 60px");
             bottom: 0px;
             left: -100%;
         }

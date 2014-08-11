@@ -34,39 +34,18 @@
 
 <div class="book-summary">
     <div class="book-search">
-        <input type="text" placeholder="Search" class="form-control" />
+        <input type="text" placeholder="Type to search" class="form-control" />
     </div>
     <ul class="summary">
         {% set _divider = false %}
-        {% if options.links.about !== false && (options.links.about || githubId) %}
-        {% set _divider = true %}
-        <li>
-            <a href="{{ options.links.about|default(githubHost+githubAuthor) }}" target="blank" class="author-link">About the author</a>
-        </li>
-        {% endif %}
-
-        {% if options.links.issues !== false && (options.links.issues || githubId) %}
-        {% set _divider = true %}
-        <li>
-            <a href="{{ options.links.issues|default(githubHost+githubId+"/issues") }}" target="blank" class="issues-link">Questions and Issues</a>
-        </li>
-        {% endif %}
-
-        {% if options.links.contribute !== false && (options.links.contribute || githubId) %}
-        {% set _divider = true %}
-        <li>
-            <a href="{{ options.links.contribute|default(githubHost+githubId+"/edit/master/"+_input) }}" target="blank" class="contribute-link">Edit and Contribute</a>
-        </li>
-        {% endif %}
-
-	{% if options.links.custom %}
-	{% for link in options.links.custom %}
-	    {% set _divider = true %}
-	     <li> 
-	         <a href="{{ options.links.custom[loop.key] }}" target="blank" class="custom-link">{{ loop.key }}</a>
-             </li>
-	{% endfor %}
-	{% endif %}
+    	{% if options.links.sidebar %}
+    	{% for link in options.links.sidebar %}
+    	    {% set _divider = true %}
+            <li>
+                <a href="{{ options.links.sidebar[loop.key] }}" target="blank" class="custom-link">{{ loop.key }}</a>
+            </li>
+    	{% endfor %}
+    	{% endif %}
 
         {% if _divider %}
         <li class="divider"></li>
@@ -77,7 +56,7 @@
         {% if options.links.gitbook !== false %}
         <li class="divider"></li>
         <li>
-            <a href="http://www.gitbook.io/" target="blank" class="gitbook-link">Generated using GitBook</a>
+            <a href="http://www.gitbook.io/" target="blank" class="gitbook-link">Published using GitBook</a>
         </li>
         {% endif %}
     </ul>

@@ -2,6 +2,7 @@ module.exports = function (grunt) {
     var path = require("path");
 
     // Load NPM tasks
+    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks("grunt-bower-install-simple");
@@ -13,7 +14,7 @@ module.exports = function (grunt) {
             options: {
                 color:       true,
                 production:  false,
-                directory:   "theme/javascript/vendors"
+                directory:   "theme/vendors"
             }
         },
         less: {
@@ -36,16 +37,16 @@ module.exports = function (grunt) {
                     baseUrl: "theme/javascript/",
                     out: "theme/assets/app.js",
                     preserveLicenseComments: false,
-                    optimize: "uglify", //"uglify",
+                    optimize: "uglify",
                     include: ["requireLib"],
                     paths: {
-                        "jQuery": 'vendors/jquery/dist/jquery',
-                        "lodash": 'vendors/lodash/dist/lodash',
-                        "requireLib": 'vendors/requirejs/require',
-                        "Mousetrap": 'vendors/mousetrap/mousetrap',
-                        "lunr": 'vendors/lunr.js/lunr',
-                        "URI": 'vendors/URIjs/src/URI',
-                        "ace": 'vendors/ace-builds/src-noconflict/'
+                        "jQuery": '../vendors/jquery/dist/jquery',
+                        "lodash": '../vendors/lodash/dist/lodash',
+                        "requireLib": '../vendors/requirejs/require',
+                        "Mousetrap": '../vendors/mousetrap/mousetrap',
+                        "lunr": '../vendors/lunr.js/lunr',
+                        "URIjs": '../vendors/URIjs/src/',
+                        "ace": '../vendors/ace-builds/src-noconflict/'
                     },
                     shim: {
                         'jQuery': {
@@ -63,6 +64,19 @@ module.exports = function (grunt) {
                     }
                 }
             }
+        },
+        copy: {
+            vendors: {
+                files: [
+                    {
+                        expand: true,
+                        cwd: 'theme/vendors/fontawesome/fonts/',
+                        src: ['**'],
+                        dest: 'theme/assets/fonts/fontawesome/',
+                        filter: 'isFile'
+                    }
+                ]
+            }
         }
     });
 
@@ -72,7 +86,8 @@ module.exports = function (grunt) {
     grunt.registerTask('build', [
         'bower-install',
         'less',
-        'requirejs'
+        'requirejs',
+        'copy:vendors'
     ]);
 
     grunt.registerTask('default', [
