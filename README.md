@@ -2,6 +2,7 @@ GitBook
 =======
 
 [![Build Status](https://travis-ci.org/GitbookIO/gitbook.png?branch=master)](https://travis-ci.org/GitbookIO/gitbook)
+[![NPM version](https://badge.fury.io/js/gitbook.svg)](http://badge.fury.io/js/gitbook)
 
 GitBook is a command line tool (and Node.js library) for building beautiful books using GitHub/Git and Markdown. Here is an example: [Learn Javascript](https://www.gitbook.io/book/GitBookIO/javascript). You can publish book easily online using [gitbook.io](https://www.gitbook.io) and an [editor](https://github.com/GitbookIO/editor) is available for Windows, Mac and Linux. You can follow [@GitBookIO](https://twitter.com/GitBookIO) on Twitter. Complete documentation is available at [help.gitbook.io](http://help.gitbook.io/).
 
@@ -194,24 +195,28 @@ Plugins can used to extend your book's functionality. Read [GitbookIO/plugin](ht
 
 ##### Official plugins:
 
-* [exercises](https://github.com/GitbookIO/plugin-exercises): add interactive exercises to your book.
-* [quizzes](https://github.com/GitbookIO/plugin-quizzes): add interactive quizzes to your book.
-* [mathjax](https://github.com/GitbookIO/plugin-mathjax): displays mathematical notation in the book.
-* [mixpanel](https://github.com/GitbookIO/plugin-mixpanel): Mixpanel tracking for your book
+| Name | Description |
+| ----- | ---- |
+| [exercises](https://github.com/GitbookIO/plugin-exercises) | Add interactive exercises to your book. |
+| [quizzes](https://github.com/GitbookIO/plugin-quizzes) | Add interactive quizzes to your book. |
+| [mathjax](https://github.com/GitbookIO/plugin-mathjax) | Displays mathematical notation in the book. |
+| [mixpanel](https://github.com/GitbookIO/plugin-mixpanel) | Mixpanel tracking for your book |
 
 ##### Other plugins:
 
-* [Google Analytics](https://github.com/GitbookIO/plugin-ga): Google Analytics tracking for your book
-* [Disqus](https://github.com/GitbookIO/plugin-disqus): Disqus comments integration in your book
-* [Autocover](https://github.com/GitbookIO/plugin-autocover): Generate a cover for your book
-* [Transform annoted quotes to notes](https://github.com/erixtekila/gitbook-plugin-richquotes): Allow extra markdown markup to render blockquotes as nice notes
-* [Send code to console](https://github.com/erixtekila/gitbook-plugin-toconsole): Evaluate javascript block in the browser inspector's console
-* [Revealable sections](https://github.com/mrpotes/gitbook-plugin-reveal): Reveal sections of the page using buttons made from the first title in each section
-* [Markdown within HTML](https://github.com/mrpotes/gitbook-plugin-nestedmd): Process markdown within HTML blocks - allows custom layout options for individual pages
-* [Bootstrap JavaScript plugins](https://github.com/mrpotes/gitbook-plugin-bootstrapjs): Use the [Bootstrap JavaScript plugins](http://getbootstrap.com/javascript) in your online GitBook
-* [Piwik Open Analytics](https://github.com/emmanuel-keller/gitbook-plugin-piwik): Piwik Open Analytics tracking for your book
-* [Heading Anchors](https://github.com/rlmv/gitbook-plugin-anchors): Add linkable Github-style anchors to headings
-* [JSBin](https://github.com/jcouyang/gitbook-plugin-jsbin): Ebedded jsbin frame into your book
+| Name | Description |
+| ----- | ---- |
+| [Google Analytics](https://github.com/GitbookIO/plugin-ga) | Google Analytics tracking for your book |
+| [Disqus](https://github.com/GitbookIO/plugin-disqus) | Disqus comments integration in your book |
+| [Autocover](https://github.com/GitbookIO/plugin-autocover) | Generate a cover for your book |
+| [Transform annoted quotes to notes](https://github.com/erixtekila/gitbook-plugin-richquotes) | Allow extra markdown markup to render blockquotes as nice notes |
+| [Send code to console](https://github.com/erixtekila/gitbook-plugin-toconsole) | Evaluate javascript block in the browser inspector's console |
+| [Revealable sections](https://github.com/mrpotes/gitbook-plugin-reveal) | Reveal sections of the page using buttons made from the first title in each section |
+| [Markdown within HTML](https://github.com/mrpotes/gitbook-plugin-nestedmd) | Process markdown within HTML blocks - allows custom layout options for individual pages |
+| [Bootstrap JavaScript plugins](https://github.com/mrpotes/gitbook-plugin-bootstrapjs) | Use the [Bootstrap JavaScript plugins](http://getbootstrap.com/javascript) in your online GitBook |
+| [Piwik Open Analytics](https://github.com/emmanuel-keller/gitbook-plugin-piwik) | Piwik Open Analytics tracking for your book |
+| [Heading Anchors](https://github.com/rlmv/gitbook-plugin-anchors) | Add linkable Github-style anchors to headings |
+| [JSBin](https://github.com/jcouyang/gitbook-plugin-jsbin) | Embedded jsbin frame into your book |
 
 #### Debugging
 
