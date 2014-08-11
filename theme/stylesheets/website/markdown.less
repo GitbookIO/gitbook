@@ -1,0 +1,63 @@
+.book .book-body .page-wrapper .page-inner section {
+    display: none;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal {
+    .markdown-content(@content-color, @content-line-height);
+}
+
+.book.color-theme-1 .book-body .page-wrapper .page-inner section.normal {
+    color:@page-color-1;
+
+    pre, code {
+        background: #fdf6e3;
+        color: #657b83;
+        border-color: darken(#fdf6e3, 15%);
+
+        @import "./highlight/sepia.less";
+    }
+
+    table {
+        th, td {
+            border-color: darken(#fdf6e3, 25%);
+        }
+
+        tr {
+            background: #fdf6e3;
+            color: inherit;
+            border-color: #444;
+        }
+
+        tr:nth-child(2n) {
+            background-color: darken(#fdf6e3, 5%);
+        }
+    }
+}
+
+.book.color-theme-2 .book-body .page-wrapper .page-inner section.normal {
+    color:@page-color-2;
+
+    pre, code {
+        background: black;
+        color: #eaeaea;
+        border-color: #000;
+
+        @import "./highlight/night.less";
+    }
+
+    table {
+        th, td {
+            border-color: #444;
+        }
+
+        tr {
+            background-color: black;
+            color: #eaeaea;
+            border-color: #444;
+        }
+
+        tr:nth-child(2n) {
+            background-color: #222;
+        }
+    }
+}
