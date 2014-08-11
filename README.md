@@ -3,7 +3,7 @@ GitBook
 
 [![Build Status](https://travis-ci.org/GitbookIO/gitbook.png?branch=master)](https://travis-ci.org/GitbookIO/gitbook)
 
-GitBook is a command line tool (and Node.js library) for building beautiful books and exercises using GitHub/Git and Markdown. Here is an example: [Learn Javascript](https://www.gitbook.io/book/GitBookIO/javascript). You can publish book easily online using [gitbook.io](https://www.gitbook.io) and an [editor](https://github.com/GitbookIO/editor) is available for Windows, Mac and Linux. You can follow [@GitBookIO](https://twitter.com/GitBookIO) on Twitter. Complete documentation is available at [help.gitbook.io](http://help.gitbook.io/).
+GitBook is a command line tool (and Node.js library) for building beautiful books using GitHub/Git and Markdown. Here is an example: [Learn Javascript](https://www.gitbook.io/book/GitBookIO/javascript). You can publish book easily online using [gitbook.io](https://www.gitbook.io) and an [editor](https://github.com/GitbookIO/editor) is available for Windows, Mac and Linux. You can follow [@GitBookIO](https://twitter.com/GitBookIO) on Twitter. Complete documentation is available at [help.gitbook.io](http://help.gitbook.io/).
 
 ![Image](https://raw.github.com/GitbookIO/gitbook/master/preview.png)
 
@@ -77,23 +77,10 @@ Here are the options that can be stored in this file:
         }
     },
 
-    // Set another theme with your own layout
-    // It's recommended to use plugins or add more options for default theme, though
-    // See https://github.com/GitbookIO/gitbook/issues/209
-    "theme": "./localtheme",
-
     // Links in template (null: default, false: remove, string: new value)
     "links": {
-        // Link to home in the top-left corner
-        "home": null,
-
-        // Links in top of sidebar
-        "about": null,
-        "issues": null,
-        "contribute": null,
-
     	// Custom links at top of sidebar
-    	"custom": {
+    	"sidebar": {
     	    "Custom link name": "https://customlink.com"
     	},
 
@@ -101,7 +88,9 @@ Here are the options that can be stored in this file:
         "sharing": {
             "google": null,
             "facebook": null,
-            "twitter": null
+            "twitter": null,
+            "weibo": null,
+            "all": null
         }
     },
 
@@ -203,8 +192,10 @@ The platform [GitBook.io](https://www.gitbook.io/) is like an "Heroku for books"
 
 Plugins can used to extend your book's functionality. Read [GitbookIO/plugin](https://github.com/GitbookIO/plugin) for more information about how to build a plugin for GitBook.
 
-##### Default plugins:
+##### Official plugins:
 
+* [exercises](https://github.com/GitbookIO/plugin-exercises): add interactive exercises to your book.
+* [quizzes](https://github.com/GitbookIO/plugin-quizzes): add interactive quizzes to your book.
 * [mathjax](https://github.com/GitbookIO/plugin-mathjax): displays mathematical notation in the book.
 * [mixpanel](https://github.com/GitbookIO/plugin-mixpanel): Mixpanel tracking for your book
 
