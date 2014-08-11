@@ -4,6 +4,10 @@
 
 .book .book-body .page-wrapper .page-inner section.normal {
     .markdown-content(@content-color, @content-line-height);
+
+    pre, code {
+        @import "./highlight/white.less";
+    }
 }
 
 .book.color-theme-1 .book-body .page-wrapper .page-inner section.normal {
