@@ -3,9 +3,10 @@ define([
     "lodash",
     "lunr",
     "utils/storage",
+    "utils/highlight",
     "core/state",
     "core/sidebar"
-], function($, _, lunr, storage, state, sidebar) {
+], function($, _, lunr, storage, highlight, state, sidebar) {
     var index = null;
 
     // Use a specific idnex
@@ -50,6 +51,7 @@ define([
             $searchInput.blur();
             $searchInput.val("");
             sidebar.filter(null);
+            highlight.clearHighlight();
         }
     };
 
@@ -88,6 +90,7 @@ define([
                     _.pluck(results, "path")
                 );
                 storage.set("keyword", q);
+                highlight.highlight($('div.book-body')[0], q);
             }
         })
 
@@ -97,12 +100,13 @@ define([
     var recoverSearch = function() {
         var keyword = storage.get("keyword", "");
         if(keyword.length > 0) {
-            if(!isSearchOpen()){
+            if(!isSearchOpen()) {
                 toggleSearch();
             }
             sidebar.filter(_.pluck(search(keyword), "path"));
         }
         $(".book-search input").val(keyword);
+        highlight.highlight($('div.book-body')[0], keyword);
     };
 
     return {
