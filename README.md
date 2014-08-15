@@ -176,7 +176,9 @@ You can see a complete example with the [Learn Git](https://github.com/GitbookIO
 
 #### Ignoring files & folders
 
-GitBook will read the `.gitignore`, `.bookignore` and `.ignore` files to get a list of files and folders to skip. (The format inside those files follows the same convention as `.gitignore`)
+GitBook will read the `.gitignore`, `.bookignore` and `.ignore` files to get a list of files and folders to skip. (The format inside those files follows the same convention as `.gitignore`).
+
+Best practices for the `.gitignore` is to ignore build files from [**node.js**](https://github.com/github/gitignore/blob/master/Node.gitignore) (`node_modules`, ...) and build files from GitBook: `_book`, `*.epub`, `*.mobi` and `*.pdf`.
 
 #### Cover
 
