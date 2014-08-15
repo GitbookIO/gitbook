@@ -90,6 +90,7 @@ define([
                     _.pluck(results, "path")
                 );
                 storage.set("keyword", q);
+                highlight.highlight($('div.book-body')[0], q);
             }
         })
 
