@@ -7,7 +7,7 @@
         "requirejs": "2.1.11",
         "URIjs": "1.13.1",
         "mousetrap": "1.4.6",
-        "lunr.js": "0.5.2",
+        "lunr.js": "codepiano/lunr.js",
         "fontawesome": "4.1.0"
     }
 }
