@@ -3,5 +3,10 @@
 {% block title %}Glossary | {{ title }}{% endblock %}
 
 {% block page_inner %}
-
+{% for item in glossary %}
+<section class="normal glossary" id="{{ item.name }}">
+    <h2>{{ item.name }}</h2>
+    <p>{{ item.description }}</p>
+</section>
+{% endfor %}
 {% endblock %}
