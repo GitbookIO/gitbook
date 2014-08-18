@@ -7,7 +7,7 @@
     "dependencies": {
         "q": "1.0.1",
         "lodash": "2.4.1",
-        "kramed": "0.4.0",
+        "kramed": "0.4.1",
         "kramed-text-renderer": "0.2.1",
         "lunr": "0.5.2",
         "swig": "1.3.2",
