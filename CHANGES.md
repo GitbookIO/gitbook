@@ -1,5 +1,11 @@
 # Release notes
 
+## 1.0.0
+- New design
+- Support for glossary
+- Support for sharing to instapaper
+- Support for footnotes
+
 ## 0.7.1
 - Update `fs-extra` to `0.10.0` (fixes potential race conditions)
 
