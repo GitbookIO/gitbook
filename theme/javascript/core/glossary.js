@@ -31,6 +31,22 @@ define([
         return d.promise();
     }
 
+    var pregQuote = function( str ) {
+        // http://kevin.vanzonneveld.net
+        // +   original by: booeyOH
+        // +   improved by: Ates Goral (http://magnetiq.com)
+        // +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+        // +   bugfixed by: Onno Marsman
+        // *     example 1: preg_quote("$40");
+        // *     returns 1: '\$40'
+        // *     example 2: preg_quote("*RRRING* Hello?");
+        // *     returns 2: '\*RRRING\* Hello\?'
+        // *     example 3: preg_quote("\\.+*?[^]$(){}=!<>|:");
+        // *     returns 3: '\\\.\+\*\?\[\^\]\$\(\)\{\}\=\!\<\>\|\:'
+
+        return (str+'').replace(/([\\\.\+\*\?\[\^\]\$\(\)\{\}\=\!\<\>\|\:])/g, "\\$1");
+    };
+
     var init = function() {
         // Bind click on glossary item
         $(document).on("click", ".book-body .page-wrapper .page-inner .glossary-term", function(e) {
@@ -41,11 +57,13 @@ define([
     };
 
     var replaceTerm = function($el, term) {
+        var r =  new RegExp( "(" + pregQuote(term.name.toLowerCase()) + ")" , 'gi' );
+
         $el.find("p:contains('"+term.name+"')").each( function( i, element ) {
             element = $(element);
-
             var content = $(element).html();
-            content = content.replace(term.name, '<span class="glossary-term" data-glossary-term="' + term.id + '" title="' + term.description + '">' + term.name + '</span>');
+
+            content = content.replace(r, '<span class="glossary-term" data-glossary-term="' + term.id + '" title="' + term.description + '">$1</span>');
             element.html(content);
         });
     };
