@@ -33,7 +33,6 @@ define([
     };
 
     return {
-        init: init,
-        search: search
+        init: init
     };
 });
