@@ -174,7 +174,7 @@ GitBook supports building books written in multiple languages. Each language sho
 
 You can see a complete example with the [Learn Git](https://github.com/GitbookIO/git) book.
 
-#### GLOSSARY.md
+#### Glossary
 
 Allows you to specify terms and their respective definitions to be displayed in the glossary. Based on those terms, `gitbook` will automatically build an index and highlight those terms in pages.
 
