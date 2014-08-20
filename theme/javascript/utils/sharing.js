@@ -51,13 +51,14 @@ define([
         if (qrcodeDropdown.hasClass("open")) {
             qrcodeDropdown.removeClass("open");
         } else {
+            var current_url = location.href;
             var lastUrl = $("#last_url");
-            if (lastUrl[0] && lastUrl.val() !== url) {
-                qrcodeInfo.text = url;
+            if (lastUrl[0] && lastUrl.val() !== current_url) {
+                qrcodeInfo.text = current_url;
                 new qrcode.qrcode($("#qrcode")[0], qrcodeInfo);
             }
             qrcodeDropdown.addClass("open");
-            lastUrl.val(url);
+            lastUrl.val(current_url);
         }
     }
 
