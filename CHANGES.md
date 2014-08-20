@@ -1,5 +1,10 @@
 # Release notes
 
+## 1.0.1
+- New inline math convention (kramdown's), using `$$` rather than `$` as delimiters
+- Fix instapaper sharing
+- The `exercises` & `quizzes` plugins are now by default
+
 ## 1.0.0
 - New design
 - Support for glossary
