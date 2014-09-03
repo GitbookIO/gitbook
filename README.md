@@ -204,7 +204,7 @@ A small version of the cover can also be set by creating a file: **/cover_small.
 
 #### Publish your book
 
-The platform [GitBook.io](https://www.gitbook.io/) is like an "Heroku for books": you can create a book on it (public, paid, or private) and update it using **git push**.
+The platform [GitBook.io](https://www.gitbook.io/) is like a "Heroku for books": you can create a book on it (public, paid, or private) and update it using **git push**.
 
 #### Plugins
 
