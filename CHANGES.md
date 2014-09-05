@@ -1,5 +1,9 @@
 # Release notes
 
+## 1.0.3
+- Update `mathjax` plugin and MathJAx to version 2.4
+- Update `highlight.js` to 8.2.0
+
 ## 1.0.2
 - Update `mathjax` plugin, fixes issues with inline math rendering (no longer wanted)
 
