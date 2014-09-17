@@ -4,6 +4,13 @@
 
 {% block style %}
 <link rel="stylesheet" href="{{ staticBase }}/print.css">
+{% for resource in plugins.resources.css %}
+    {% if resource.url %}
+    <link rel="stylesheet" href="{{ resource.url }}">
+    {% else %}
+    <link rel="stylesheet" href="{{ staticBase }}/plugins/{{ resource.path }}">
+    {% endif %}
+{% endfor %}
 {% endblock %}
 
 
@@ -41,7 +48,7 @@
     <article id="{{ article.path }}">
         <h1 class="book-chapter book-chapter-{{ item.level|lvl }}">{{ item.title }}</h1>
         {% if pages[item.path] %}
-        {{ articleContent(pages[item.path].content) }}
+        {{ articleContent(pages[item.path].sections) }}
         {% endif %}
     </article>
     {% endfor %}
@@ -56,7 +63,7 @@
 
             {% for item in progress.chapters %}
                 {% if pages[item.path] %}
-                    {% for section in pages[item.path].content %}
+                    {% for section in pages[item.path].sections %}
                         {% if section.type == "exercise" %}
                             <div class="exercise">
                                 <div class="exercise-header">Exercise #{{ exercise }}</div>
