@@ -18,11 +18,6 @@ define([
         var $book;
         $book = state.$book;
 
-        if (state.githubId) {
-            // Initialize storage
-            storage.setBaseKey(state.githubId);
-        }
-
         // Init sidebar
         sidebar.init();
 
