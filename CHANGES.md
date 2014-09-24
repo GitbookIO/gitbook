@@ -1,5 +1,9 @@
 # Release notes
 
+## 1.1.0
+- Plugins can now extend the ebook generation (pdf, epub, mobi)
+- Update `kramed` to version 0.4.3
+
 ## 1.0.3
 - Update `mathjax` plugin and MathJAx to version 2.4
 - Update `highlight.js` to 8.2.0
