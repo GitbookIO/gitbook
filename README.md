@@ -119,7 +119,12 @@ Here are the options that can be stored in this file:
             "top": 36,
             "bottom": 36
         }
-    }
+    },
+    
+    //Option for all ebook types
+    "ebook": {
+        "justification": "justify" //must be one of 'original', 'left' or 'justify'
+     }
 }
 ```
 
