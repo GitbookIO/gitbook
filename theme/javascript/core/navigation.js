@@ -5,8 +5,9 @@ define([
     "core/state",
     "core/progress",
     "core/loading",
-    "core/search"
-], function($, URL, events, state, progress, loading, search) {
+    "core/search",
+    "core/glossary"
+], function($, URL, events, state, progress, loading, search, glossary) {
     var prev, next;
 
     var usePushState = (typeof history.pushState !== "undefined");
@@ -80,13 +81,16 @@ define([
         // Update navigation position
         updateNavigationPosition();
 
+        // Set glossary items
+        glossary.prepare();
+
         // Reset scroll
         $pageWrapper.scrollTop(0);
 
         // Focus on content
         $pageWrapper.focus();
 
-        // Send to mixpanel
+        // Notify
         events.trigger("page.change");
     };
 

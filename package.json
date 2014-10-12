@@ -1,14 +1,14 @@
 {
     "name": "gitbook",
-    "version": "0.7.1",
+    "version": "1.1.0",
     "homepage": "http://www.gitbook.io/",
     "description": "Library and cmd utility to generate GitBooks",
     "main": "lib/index.js",
     "dependencies": {
         "q": "1.0.1",
         "lodash": "2.4.1",
-        "kramed": "0.4.0",
-        "marked-text-renderer": "0.1.0",
+        "kramed": "0.4.3",
+        "kramed-text-renderer": "0.2.1",
         "lunr": "0.5.2",
         "swig": "1.3.2",
         "send": "0.2.0",
@@ -16,15 +16,17 @@
         "commander": "2.2.0",
         "graceful-fs": "3.0.2",
         "fs-extra": "0.10.0",
-        "highlight.js": "8.1.0",
+        "highlight.js": "8.2.0",
         "tmp": "0.0.23",
         "semver": "2.2.1",
         "gaze": "~0.5.1",
         "resolve": "0.6.3",
         "tiny-lr-fork": "0.0.5",
         "gitbook-plugin": "0.0.2",
-        "gitbook-plugin-mathjax": "0.0.4",
-        "gitbook-plugin-livereload": "0.0.1"
+        "gitbook-plugin-mathjax": "0.0.6",
+        "gitbook-plugin-livereload": "0.0.1",
+        "gitbook-plugin-exercises": "1.0.0",
+        "gitbook-plugin-quizzes": "1.0.0"
     },
     "devDependencies": {
         "mocha": "1.18.2",

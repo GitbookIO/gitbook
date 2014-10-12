@@ -11,22 +11,21 @@ define([
     "core/navigation",
     "core/progress",
     "core/sidebar",
-    "core/search"
-], function($, storage, sharing, dropdown, events, fontSettings, state, keyboard, navigation, progress, sidebar, search){
+    "core/search",
+    "core/glossary"
+], function($, storage, sharing, dropdown, events, fontSettings, state, keyboard, navigation, progress, sidebar, search, glossary){
     var start = function(config) {
         var $book;
         $book = state.$book;
-
-        if (state.githubId) {
-            // Initialize storage
-            storage.setBaseKey(state.githubId);
-        }
 
         // Init sidebar
         sidebar.init();
 
         // Load search
         search.init();
+
+        // Load glossary
+        glossary.init();
 
         // Init keyboard
         keyboard.init();

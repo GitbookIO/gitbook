@@ -17,13 +17,14 @@
 {% block description %}{% if progress.current.level == "0" %}{{ description }}{% endif %}{% endblock %}
 
 {% block content %}
-    <div class="book" {% if githubId %}data-github="{{ githubId }}"{% endif %} data-level="{{ progress.current.level }}" data-basepath="{{ basePath }}" data-revision="{{ revision }}">
+    <div class="book" data-level="{{ progress.current.level }}" data-basepath="{{ basePath }}" data-revision="{{ revision }}">
     {% include "includes/book/summary.html" %}
     <div class="book-body">
         <div class="body-inner">
             {% include "includes/book/header.html" %}
             <div class="page-wrapper" tabindex="-1">
                 <div class="page-inner">
+                {% block page_inner %}
                 {% for section in content %}
                     <section class="{{ section.type }}" id="section-{{ section.id }}">
                     {% if section.type == "normal" %}
@@ -35,6 +36,7 @@
                     {% endif %}
                     </section>
                 {% endfor %}
+                {% endblock %}
                 </div>
             </div>
         </div>
