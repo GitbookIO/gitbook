@@ -1,6 +1,11 @@
 <div class="exercise-header">Exercise</div>
-{% autoescape false %}{{ section.content }}{% endautoescape %}
-<pre><code>{% autoescape false %}{{ section.code.base|code }}{% endautoescape %}</code></pre>
+<div class="exercise-inner">
+    {% autoescape false %}{{ section.content }}{% endautoescape %}
+</div>
+<div class="exercise-inner">
+    <pre><code>{% autoescape false %}{{ section.code.base|code }}{% endautoescape %}</code></pre>
+</div>
 <hr>
-<p>Solution:</p>
-<pre><code>{% autoescape false %}{{ section.code.solution|code }}{% endautoescape %}</code></pre>
+<div class="exercise-inner">
+    <pre><code>{% autoescape false %}{{ section.code.solution|code }}{% endautoescape %}</code></pre>
+</div>
