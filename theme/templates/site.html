@@ -2,9 +2,6 @@
 
 {% block head %}
     {% parent %}
-    {% if githubAuthor %}
-    <meta name="author" content="{{ githubAuthor }}">
-    {% endif %}
     {% if progress.current.next and progress.current.next.path %}
     <link rel="next" href="{{ basePath }}/{{ progress.current.next.path|mdLink }}" />
     {% endif %}
