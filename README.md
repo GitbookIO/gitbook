@@ -62,10 +62,6 @@ Here are the options that can be stored in this file:
     // It's not advised this option in the book.json
     "extension": null,
 
-    // GitHub information (defaults are extracted using git)
-    "github": null,
-    "githubHost": "https://github.com/",
-
     // Plugins list, can contain "-name" for removing default plugins
     "plugins": [],
 
@@ -119,10 +115,10 @@ Here are the options that can be stored in this file:
             "top": 36,
             "bottom": 36
         },
-        
+
         //Header HTML template. Available variables: _PAGENUM_, _TITLE_, _AUTHOR_ and _SECTION_.
         "headerTemplate": null,
-        
+
         //Footer HTML template. Available variables: _PAGENUM_, _TITLE_, _AUTHOR_ and _SECTION_.
         "footerTemplate": null
     }
