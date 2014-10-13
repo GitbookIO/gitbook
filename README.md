@@ -118,7 +118,13 @@ Here are the options that can be stored in this file:
             "left": 62,
             "top": 36,
             "bottom": 36
-        }
+        },
+        
+        //Header HTML template. Available variables: _PAGENUM_, _TITLE_, _AUTHOR_ and _SECTION_.
+        "headerTemplate": null,
+        
+        //Footer HTML template. Available variables: _PAGENUM_, _TITLE_, _AUTHOR_ and _SECTION_.
+        "footerTemplate": null
     }
 }
 ```
