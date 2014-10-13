@@ -31,6 +31,8 @@ define([
         return d.promise();
     }
 
+
+
     var pregQuote = function( str ) {
         // http://kevin.vanzonneveld.net
         // +   original by: booeyOH
@@ -56,15 +58,47 @@ define([
         });
     };
 
+    var matchText = function(node, regex, callback, excludeElements) {
+        excludeElements || (excludeElements = ['script', 'style', 'iframe', 'canvas']);
+        var child = node.firstChild;
+
+        if (!child) return;
+
+        do {
+            switch (child.nodeType) {
+            case 1:
+                if (excludeElements.indexOf(child.tagName.toLowerCase()) > -1) {
+                    continue;
+                }
+                matchText(child, regex, callback, excludeElements);
+                break;
+            case 3:
+               child.data.replace(regex, function(all) {
+                    var args = [].slice.call(arguments),
+                        offset = args[args.length - 2],
+                        newTextNode = child.splitText(offset);
+
+                    newTextNode.data = newTextNode.data.substr(all.length);
+                    callback.apply(window, [child].concat(args));
+                    child = newTextNode;
+                });
+                break;
+            }
+        } while (child = child.nextSibling);
+
+        return node;
+    };
+
     var replaceTerm = function($el, term) {
         var r =  new RegExp( "\\b(" + pregQuote(term.name.toLowerCase()) + ")\\b" , 'gi' );
 
-        $el.find("p:contains('"+term.name+"')").each( function( i, element ) {
-            element = $(element);
-            var content = $(element).html();
-
-            content = content.replace(r, '<span class="glossary-term" data-glossary-term="' + term.id + '" title="' + term.description + '">$1</span>');
-            element.html(content);
+        matchText($el.get(0), r, function(node, match, offset) {
+            var span = document.createElement("span");
+            span.className = "glossary-term";
+            span.textContent = match;
+            span.setAttribute("data-glossary-term", term.id);
+            span.setAttribute("title", term.description);
+            node.parentNode.insertBefore(span, node.nextSibling);
         });
     };
 
