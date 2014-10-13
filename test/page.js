@@ -122,3 +122,11 @@ describe('Relative images', function() {
         assert(LEXED[0].content.indexOf('"preview2.png"') !== -1);
     });
 });
+
+describe('Section parsing', function() {
+    it('should not have false positive quiz parsing', function() {
+        var LEXED = loadPage('FALSE_QUIZ');
+
+        assert.equal(LEXED[0].type, 'normal');
+    });
+});
