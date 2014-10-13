@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}{{ progress.current.title }} | {{ title }}{% endblock %}
 
 {% block style %}
 <link rel="stylesheet" href="{{ staticBase }}/print.css">
@@ -13,82 +13,24 @@
 {% endfor %}
 {% endblock %}
 
-
-{% macro articleContent(content) %}
+{% block content %}
+<div class="page">
+    <h1 class="book-chapter book-chapter-{{ progress.current.level|lvl }}">{{ progress.current.title }}</h1>
     {% for section in content %}
+        <section class="{{ section.type }}" id="section-{{ section.id }}">
         {% if section.type == "normal" %}
             {% autoescape false %}{{ section.content }}{% endautoescape %}
         {% elif section.type == "exercise" %}
-            <div class="exercise">
-                <div class="exercise-header">Exercise #{{ exercise }}</div>
-                {% autoescape false %}{{ section.content }}{% endautoescape %}
-                <pre><code>{% autoescape false %}{{ section.code.base|code }}{% endautoescape %}</code></pre>
-                {% set exercise = exercise + 1 %}
-            </div>
+            {% include "./includes/page/exercise.html" with {section: section} %}
         {% elif section.type == "quiz" %}
-        <div class="quiz">
-            <div class="exercise-header">Quiz #{{ exercise }}</div>
-            {% autoescape false %}{{ section.content }}{% endautoescape %}
-            {% for quiz in section.quiz %}
-                <div class="question">
-                    <div class="question-header">Question {{ loop.index }} of {{ section.quiz.length }}</div>
-                    {% autoescape false %}{{ quiz.base }}{% endautoescape %}
-                </div>
-            {% endfor %}
-            {% set exercise = exercise + 1 %}
-        </div>
+            {% include "./includes/page/quiz.html" with {section: section} %}
         {% endif %}
-    {% endfor %}
-{% endmacro %}
-
-{% set exercise = 1 %}
-{% block content %}
-    {# Pages content #}
-    {% for item in progress.chapters %}
-    <article id="{{ article.path }}">
-        <h1 class="book-chapter book-chapter-{{ item.level|lvl }}">{{ item.title }}</h1>
-        {% if pages[item.path] %}
-        {{ articleContent(pages[item.path].sections) }}
-        {% endif %}
-    </article>
+        </section>
     {% endfor %}
 
-
-    {# Exercise solutions #}
-    {% if exercise > 1 %}
-        {% set exercise = 1 %}
-        <article>
-            <h1 class="book-chapter book-chapter-1">Exercise Solutions</h1>
-            <h1>Exercise Solutions</h1>
-
-            {% for item in progress.chapters %}
-                {% if pages[item.path] %}
-                    {% for section in pages[item.path].sections %}
-                        {% if section.type == "exercise" %}
-                            <div class="exercise">
-                                <div class="exercise-header">Exercise #{{ exercise }}</div>
-                                {% autoescape false %}{{ section.content }}{% endautoescape %}
-                                <pre><code>{% autoescape false %}{{ section.code.solution|code }}{% endautoescape %}</code></pre>
-                                {% set exercise = exercise + 1 %}
-                            </div>
-                        {% elif section.type == "quiz" %}
-                            <div class="quiz">
-                                <div class="exercise-header">Quiz #{{ exercise }}</div>
-                                {% autoescape false %}{{ section.content }}{% endautoescape %}
-                                {% for quiz in section.quiz %}
-                                    <div class="question">
-                                        <div class="question-header">Question {{ loop.index }} of {{ section.quiz.length }}</div>
-                                        {% autoescape false %}{{ quiz.solution }}{% endautoescape %}
-                                    </div>
-                                {% endfor %}
-                                {% set exercise = exercise + 1 %}
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                {% endif %}
-            {% endfor %}
-        </article>
+    {% if progress.current.next and progress.current.next.path %}
+    <a href="{{ basePath }}/{{ progress.current.next.path|mdLink }}" />
     {% endif %}
+</div>
 {% endblock %}
 
-{% block javascript %}{% endblock %}

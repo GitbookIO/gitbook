@@ -62,10 +62,6 @@ Here are the options that can be stored in this file:
     // It's not advised this option in the book.json
     "extension": null,
 
-    // GitHub information (defaults are extracted using git)
-    "github": null,
-    "githubHost": "https://github.com/",
-
     // Plugins list, can contain "-name" for removing default plugins
     "plugins": [],
 
@@ -118,7 +114,13 @@ Here are the options that can be stored in this file:
             "left": 62,
             "top": 36,
             "bottom": 36
-        }
+        },
+
+        //Header HTML template. Available variables: _PAGENUM_, _TITLE_, _AUTHOR_ and _SECTION_.
+        "headerTemplate": null,
+
+        //Footer HTML template. Available variables: _PAGENUM_, _TITLE_, _AUTHOR_ and _SECTION_.
+        "footerTemplate": null
     }
 }
 ```
@@ -131,7 +133,6 @@ GitBook can generate your book in the following formats:
 
 * **Static Website**: This is the default format. It generates a complete interactive static website that can be, for example, hosted on GitHub Pages.
 * **eBook**: A complete eBook with exercise solutions at the end of the book. Generate this format using: ```gitbook ebook ./myrepo```. You need to have [ebook-convert](http://manual.calibre-ebook.com/cli/ebook-convert.html) installed. The output format could be **PDF**, **ePub** or **MOBI**.
-* **Single Page**: The book will be stored in a single printable HTML page. This format is used for conversion to PDF or eBook. Generate this format using: ```gitbook build ./myrepo -f page```.
 * **JSON**: This format is used for debugging or extracting metadata from a book. Generate this format using: ```gitbook build ./myrepo -f json```.
 
 ## Book Format
@@ -193,7 +194,7 @@ With it's definition, this can contain bold text and all other kinds of inline m
 
 GitBook will read the `.gitignore`, `.bookignore` and `.ignore` files to get a list of files and folders to skip. (The format inside those files follows the same convention as `.gitignore`).
 
-Best practices for the `.gitignore` is to ignore build files from [**node.js**](https://github.com/github/gitignore/blob/master/Node.gitignore) (`node_modules`, ...) and build files from GitBook: `_book`, `*.epub`, `*.mobi` and `*.pdf`.
+Best practices for the `.gitignore` is to ignore build files from **node.js** (`node_modules`, ...) and build files from GitBook: `_book`, `*.epub`, `*.mobi` and `*.pdf` ([Download GitBook.gitignore](https://github.com/github/gitignore/blob/master/GitBook.gitignore)).
 
 #### Cover
 
