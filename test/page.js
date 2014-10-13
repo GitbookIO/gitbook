@@ -127,6 +127,6 @@ describe('Section parsing', function() {
     it('should not have false positive quiz parsing', function() {
         var LEXED = loadPage('FALSE_QUIZ');
 
-        assert.not.equal(LEXED[0].type, 'quiz');
+        assert.equal(LEXED[0].type, 'normal');
     });
 });
