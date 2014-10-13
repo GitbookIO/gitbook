@@ -194,7 +194,7 @@ With it's definition, this can contain bold text and all other kinds of inline m
 
 GitBook will read the `.gitignore`, `.bookignore` and `.ignore` files to get a list of files and folders to skip. (The format inside those files follows the same convention as `.gitignore`).
 
-Best practices for the `.gitignore` is to ignore build files from [**node.js**](https://github.com/github/gitignore/blob/master/Node.gitignore) (`node_modules`, ...) and build files from GitBook: `_book`, `*.epub`, `*.mobi` and `*.pdf`.
+Best practices for the `.gitignore` is to ignore build files from **node.js** (`node_modules`, ...) and build files from GitBook: `_book`, `*.epub`, `*.mobi` and `*.pdf` ([Download GitBook.gitignore](https://github.com/github/gitignore/blob/master/GitBook.gitignore)).
 
 #### Cover
 
