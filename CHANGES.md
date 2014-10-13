@@ -1,5 +1,12 @@
 # Release notes
 
+## 1.1.1
+- Rewrite quiz logic to be more robust
+- Improve integration of glossary
+- Improve generation of ebook by using a multiple HTML pages input source
+- Fix incorrect page breaks after h1 and h2 divs
+- New options to set header and footer in PDF generation
+
 ## 1.1.0
 - Plugins can now extend the ebook generation (pdf, epub, mobi)
 - Update `kramed` to version 0.4.3
