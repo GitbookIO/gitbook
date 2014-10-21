@@ -209,7 +209,7 @@ The platform [GitBook.io](https://www.gitbook.io/) is like an "Heroku for books"
 
 #### Plugins
 
-Plugins can used to extend your book's functionality. Read [GitbookIO/plugin](https://github.com/GitbookIO/plugin) for more information about how to build a plugin for GitBook.
+Plugins can be used to extend your book's functionality. Read [GitbookIO/plugin](https://github.com/GitbookIO/plugin) for more information about how to build a plugin for GitBook.
 
 ##### Official plugins:
 
