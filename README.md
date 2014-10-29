@@ -74,6 +74,9 @@ Here are the options that can be stored in this file:
         }
     },
 
+    // Variables for templating
+    "variables": {},
+
     // Links in template (null: default, false: remove, string: new value)
     "links": {
     	// Custom links at top of sidebar
