@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "../layout.html" %}
 
 {% block title %}{{ progress.current.title }} | {{ title }}{% endblock %}
 
@@ -27,10 +27,6 @@
         {% endif %}
         </section>
     {% endfor %}
-
-    {% if progress.current.next and progress.current.next.path %}
-    <a href="{{ basePath }}/{{ progress.current.next.path|mdLink }}" />
-    {% endif %}
 </div>
 {% endblock %}
 
