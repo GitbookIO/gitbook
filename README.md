@@ -97,9 +97,6 @@ Here are the options that can be stored in this file:
 
     // Options for PDF generation
     "pdf": {
-        // Add toc at the end of the file
-        "toc": true,
-
         // Add page numbers to the bottom of every page
         "pageNumbers": false,
 
