@@ -222,6 +222,7 @@ Plugins can be used to extend your book's functionality. Read [GitbookIO/plugin]
 | [quizzes](https://github.com/GitbookIO/plugin-quizzes) | Add interactive quizzes to your book. |
 | [mathjax](https://github.com/GitbookIO/plugin-mathjax) | Displays mathematical notation in the book. |
 | [mixpanel](https://github.com/GitbookIO/plugin-mixpanel) | Mixpanel tracking for your book |
+| [infinitescroll](https://github.com/GitbookIO/gitbook-plugin-infinitescroll) | Infinite Scrolling |
 
 ##### Other plugins:
 
