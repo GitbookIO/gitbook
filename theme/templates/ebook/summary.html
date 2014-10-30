@@ -13,14 +13,34 @@
 {% endfor %}
 {% endblock %}
 
-{% block content %}
-<div class="page">
-    <h1>Table of Contents</h1>
-    <p>
-    {% for chapter in toc %}
-        <a href="{{ basePath }}/{{ chapter.path|mdLink }}">{{ chapter.title }}</a><br/>
+{% macro articles(_articles) %}
+    {% for item in _articles %}
+        {% set externalLink = item.path|isExternalLink %}
+        <li>
+            {% if item.path %}
+                {% if !externalLink %}
+                    <a href="{{ basePath }}/{{ item.path|mdLink }}">{{ item.title }}</a>
+                {% else %}
+                    <a target="_blank" href="{{ item.path }}">{{ item.title }}</a>
+                {% endif %}
+            {% else %}
+            {{ item.title }}
+            {% endif %}
+            {% if item.articles.length > 0 %}
+            <ol>
+                {{ articles(item.articles) }}
+            </ol>
+            {% endif %}
+        </li>
     {% endfor %}
-    </p>
+{% endmacro %}
+
+{% block content %}
+<div class="page page-toc">
+    <h1>Table of Contents</h1>
+    <ol>
+    {{ articles(summary.chapters) }}
+    </ol>
 </div>
 {% endblock %}
 
