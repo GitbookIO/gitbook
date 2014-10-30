@@ -1,5 +1,12 @@
 # Release notes
 
+## 1.2.0
+- Improvements on ebook generation
+- Fix incorrect follow of links in ebook generation
+- Move Table of Contents at the beginning of the ebook
+- Update to last highlight.js (includes Swift)
+- Includes of templates and variables (from book.json)
+
 ## 1.1.1
 - Rewrite quiz logic to be more robust
 - Improve integration of glossary
