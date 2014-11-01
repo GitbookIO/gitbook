@@ -3,6 +3,7 @@ var path = require('path');
 var assert = require('assert');
 
 var page = require('../').parse.page;
+var includer = require('../').parse.includer;
 
 var FIXTURES_DIR = path.join(__dirname, './fixtures/');
 
@@ -16,6 +17,9 @@ describe('Code includes', function() {
 
     var LEXED = loadPage('INCLUDES', {
         'dir': FIXTURES_DIR,
+        'includer': includer({}, [
+            FIXTURES_DIR
+        ], path.join, fs.readFileSync)
     });
 
     var INCLUDED_C = fs.readFileSync(path.join(FIXTURES_DIR, 'included.c'), 'utf8');

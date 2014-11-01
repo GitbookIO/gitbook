@@ -6,6 +6,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks("grunt-bower-install-simple");
+    grunt.loadNpmTasks('grunt-browserify');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
 
     // Init GRUNT configuraton
     grunt.initConfig({
@@ -77,6 +79,30 @@ module.exports = function (grunt) {
                     }
                 ]
             }
+        },
+        browserify: {
+            dist: {
+                files: {
+                    'gitbook.js': [
+                        './lib/parse/index.js'
+                    ],
+                },
+                options: {
+                    postBundleCB: function (err, src, next) {
+                        return next(null, '(function () { var define = undefined; '+src+'; })();')
+                    },
+                    browserifyOptions: {
+                        'standalone': "gitbook"
+                    }
+                }
+            }
+        },
+        uglify: {
+            dist: {
+                files: {
+                    'gitbook.min.js': ['gitbook.js']
+                }
+            }
         }
     });
 
@@ -90,7 +116,14 @@ module.exports = function (grunt) {
         'copy:vendors'
     ]);
 
+    // Bundle the library
+    grunt.registerTask('bundle', [
+        'bower-install',
+        'uglify'
+    ]);
+
     grunt.registerTask('default', [
-        'build'
+        'build',
+        'bundle'
     ]);
 };
