@@ -1,5 +1,8 @@
 # Release notes
 
+## 1.3.1
+- Fix error with links in markdown
+
 ## 1.3.0
 - Bundle gitbook parsing library as a client side library in `gitbook.js` and `gitbook.min.js`
 
