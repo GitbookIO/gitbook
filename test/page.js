@@ -80,9 +80,6 @@ describe('Page parsing', function() {
 describe('Relative links', function() {
     it('should replace link to .md by link to .html', function() {
         var LEXED = loadPage('MARKDOWN_LINKS', {
-            // GitHub repo ID
-            repo: 'GitBookIO/javascript',
-
             // Imaginary folder of markdown file
             dir: 'course',
             outdir: 'course'
@@ -96,9 +93,6 @@ describe('Relative links', function() {
 describe('Relative images', function() {
     it('should keep image relative with considering output directory in site format', function() {
         var LEXED = loadPage('IMAGES', {
-            // GitHub repo ID
-            repo: 'GitBookIO/javascript',
-
             // Imaginary folder of markdown file
             dir: 'syntax',
             outdir: 'syntax'
@@ -110,9 +104,6 @@ describe('Relative images', function() {
 
     it('should keep image relative with considering output directory in page format', function() {
         var LEXED = loadPage('IMAGES', {
-            // GitHub repo ID
-            repo: 'GitBookIO/javascript',
-
             // Imaginary folder of markdown file
             dir: 'syntax',
             outdir: './'
