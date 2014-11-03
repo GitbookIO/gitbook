@@ -9,7 +9,7 @@ var FIXTURES_DIR = path.join(__dirname, './fixtures/');
 
 function loadPage (name, options) {
     var CONTENT = fs.readFileSync(FIXTURES_DIR + name + '.md', 'utf8');
-    return page(CONTENT, options);
+    return page(CONTENT, options).sections;
 }
 
 

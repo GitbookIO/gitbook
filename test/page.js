@@ -6,7 +6,7 @@ var page = require('../').parse.page;
 
 function loadPage (name, options) {
     var CONTENT = fs.readFileSync(path.join(__dirname, './fixtures/' + name + '.md'), 'utf8');
-    return page(CONTENT, options);
+    return page(CONTENT, options).sections;
 }
 
 var LEXED = loadPage('PAGE', {
