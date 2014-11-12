@@ -31,21 +31,57 @@ define([
         return d.promise();
     }
 
+    $.fn.replaceText = function( search, replace, text_only ) {
+        return this.each(function(){
+            var node = this.firstChild,
+                val,
+                new_val,
 
+                // Elements to be removed at the end.
+                remove = [];
+
+            // Only continue if firstChild exists.
+            if ( node ) {
+
+                // Loop over all childNodes.
+                do {
+
+                    // Only process text nodes.
+                    if ( node.nodeType === 3 ) {
+
+                        // The original node value.
+                        val = node.nodeValue;
+
+                        // The new value.
+                        new_val = val.replace( search, replace );
+
+                        // Only replace text if the new value is actually different!
+                        if ( new_val !== val ) {
+
+                            if ( !text_only && /</.test( new_val ) ) {
+                                // The new value contains HTML, set it in a slower but far more
+                                // robust way.
+                                $(node).before( new_val );
+
+                                // Don't remove the node yet, or the loop will lose its place.
+                                remove.push( node );
+                            } else {
+                                // The new value contains no HTML, so it can be set in this
+                                // very fast, simple way.
+                                node.nodeValue = new_val;
+                            }
+                        }
+                    }
+
+                } while ( node = node.nextSibling );
+            }
+
+            // Time to remove those elements!
+            remove.length && $(remove).remove();
+        });
+    };
 
     var pregQuote = function( str ) {
-        // http://kevin.vanzonneveld.net
-        // +   original by: booeyOH
-        // +   improved by: Ates Goral (http://magnetiq.com)
-        // +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-        // +   bugfixed by: Onno Marsman
-        // *     example 1: preg_quote("$40");
-        // *     returns 1: '\$40'
-        // *     example 2: preg_quote("*RRRING* Hello?");
-        // *     returns 2: '\*RRRING\* Hello\?'
-        // *     example 3: preg_quote("\\.+*?[^]$(){}=!<>|:");
-        // *     returns 3: '\\\.\+\*\?\[\^\]\$\(\)\{\}\=\!\<\>\|\:'
-
         return (str+'').replace(/([\\\.\+\*\?\[\^\]\$\(\)\{\}\=\!\<\>\|\:])/g, "\\$1");
     };
 
@@ -58,48 +94,13 @@ define([
         });
     };
 
-    var matchText = function(node, regex, callback, excludeElements) {
-        excludeElements || (excludeElements = ['script', 'style', 'iframe', 'canvas']);
-        var child = node.firstChild;
-
-        if (!child) return;
-
-        do {
-            switch (child.nodeType) {
-            case 1:
-                if (excludeElements.indexOf(child.tagName.toLowerCase()) > -1) {
-                    continue;
-                }
-                matchText(child, regex, callback, excludeElements);
-                break;
-            case 3:
-               child.data.replace(regex, function(all) {
-                    var args = [].slice.call(arguments),
-                        offset = args[args.length - 2],
-                        newTextNode = child.splitText(offset);
-
-                    newTextNode.data = newTextNode.data.substr(all.length);
-                    callback.apply(window, [child].concat(args));
-                    child = newTextNode;
-                });
-                break;
-            }
-        } while (child = child.nextSibling);
-
-        return node;
-    };
-
     var replaceTerm = function($el, term) {
         var r =  new RegExp( "\\b(" + pregQuote(term.name.toLowerCase()) + ")\\b" , 'gi' );
 
-        matchText($el.get(0), r, function(node, match, offset) {
-            var span = document.createElement("span");
-            span.className = "glossary-term";
-            span.textContent = match;
-            span.setAttribute("data-glossary-term", term.id);
-            span.setAttribute("title", term.description);
-            node.parentNode.insertBefore(span, node.nextSibling);
+        $el.find("*").replaceText(r, function(match) {
+            return "<span class='glossary-term' data-glossary-term='"+term.id+"' title='"+term.description+"'>"+match+"</span>";
         });
+
     };
 
     var prepare = function() {
