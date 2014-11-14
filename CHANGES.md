@@ -1,5 +1,11 @@
 # Release notes
 
+## 1.3.2
+- ePub files are now passing validation from epubcheck
+- Fix replacement of multiple glossary terms in a single sentence
+- Fix on windows deep relative links
+- Fix search indexer
+
 ## 1.3.1
 - Fix error with links in markdown
 
