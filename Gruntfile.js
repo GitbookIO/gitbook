@@ -118,7 +118,7 @@ module.exports = function (grunt) {
 
     // Bundle the library
     grunt.registerTask('bundle', [
-        'bower-install',
+        'browserify',
         'uglify'
     ]);
 
