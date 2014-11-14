@@ -427,8 +427,10 @@ function parsePage(src, options) {
     options = options || {};
 
     // Lex if not already lexed
-    return (_.isArray(src) ? src : lex(include(src, options.includer || function() { return undefined; })))
-    .map(function(section) {
+    var parsed = {
+        lexed: (_.isArray(src) ? page.content : lex(include(src, options.includer || function() { return undefined; })))
+    };
+    parsed.sections = parsed.lexed.map(function(section) {
         // Transform given type
         if(section.type === 'exercise') {
             var nonCodeNodes = _.reject(section, {
@@ -526,6 +528,8 @@ function parsePage(src, options) {
             content: render(section, options)
         };
     });
+
+    return parsed;
 }
 
 // Exports
@@ -628,6 +632,7 @@ module.exports = parseReadme;
 
 },{"kramed":134,"kramed-text-renderer":133,"lodash":135}],13:[function(require,module,exports){
 var url = require('url');
+var _ = require('lodash');
 var inherits = require('util').inherits;
 var links = require('../utils').links;
 var kramed = require('kramed');
@@ -677,7 +682,7 @@ GitBookRenderer.prototype.link = function(href, title, text) {
     // Parsed version of the url
     var parsed = url.parse(href);
     var o = this._extra_options;
-    var extname = _.last(parsed.path.split("."));
+    var extname = parsed.path? _.last(parsed.path.split(".")) : "";
 
     // Relative link, rewrite it to point to github repo
     if(links.isRelative(_href) && extname == "md") {
@@ -768,7 +773,7 @@ GitBookRenderer.prototype.heading = function(text, level, raw) {
 // Exports
 module.exports = GitBookRenderer;
 
-},{"../utils":15,"kramed":134,"url":25,"util":27}],14:[function(require,module,exports){
+},{"../utils":15,"kramed":134,"lodash":135,"url":25,"util":27}],14:[function(require,module,exports){
 var _ = require('lodash');
 var kramed = require('kramed');
 
