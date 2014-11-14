@@ -428,7 +428,7 @@ function parsePage(src, options) {
 
     // Lex if not already lexed
     var parsed = {
-        lexed: (_.isArray(src) ? page.content : lex(include(src, options.includer || function() { return undefined; })))
+        lexed: (_.isArray(src) ? src : lex(include(src, options.includer || function() { return undefined; })))
     };
     parsed.sections = parsed.lexed.map(function(section) {
         // Transform given type
