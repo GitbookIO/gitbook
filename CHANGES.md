@@ -1,5 +1,8 @@
 # Release notes
 
+## 1.3.3
+- Fix parsing of lexed content using the client library
+
 ## 1.3.2
 - ePub files are now passing validation from epubcheck
 - Fix replacement of multiple glossary terms in a single sentence
