@@ -132,7 +132,10 @@ You can publish your books to our index by visiting [GitBook.io](http://www.gitb
 GitBook can generate your book in the following formats:
 
 * **Static Website**: This is the default format. It generates a complete interactive static website that can be, for example, hosted on GitHub Pages.
-* **eBook**: A complete eBook with exercise solutions at the end of the book. Generate this format using: ```gitbook ebook ./myrepo```. You need to have [ebook-convert](http://manual.calibre-ebook.com/cli/ebook-convert.html) installed. The output format could be **PDF**, **ePub** or **MOBI**.
+* **eBook**: A complete eBook with exercise solutions at the end of the book.  You need to have [ebook-convert](http://manual.calibre-ebook.com/cli/ebook-convert.html) installed.  You can specify the eBook filename with the `-o` option, otherwise `book` will be used.
+  * Generate a **PDF** using:  `gitbook pdf ./myrepo`
+  * Generate a **ePub** using: `gitbook epub ./myrepo`
+  * Generate a **MOBI** using: `gitbook mobi ./myrepo`
 * **JSON**: This format is used for debugging or extracting metadata from a book. Generate this format using: ```gitbook build ./myrepo -f json```.
 
 ## Book Format
