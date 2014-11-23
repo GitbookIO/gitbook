@@ -31,7 +31,7 @@
 @sidebar-breakpoint:                  600px;
 @sidebar-color:                       hsl(207, 15%, 25%);
 @sidebar-background:                  #fafafa;
-@sidebar-border:                      @header-border;
+@sidebar-border-right:                1px solid @header-border;
 
 @sidebar-nested-padding:              20px;
 
@@ -40,7 +40,7 @@
 @sidebar-search-input-background:     transparent;
 @sidebar-search-input-border-color:   transparent;
 
-@sidebar-divider-color:               @sidebar-border;
+@sidebar-divider-color:               @header-border;
 
 @sidebar-link-color:                  @sidebar-color;
 @sidebar-link-background:             transparent;
@@ -103,12 +103,12 @@
 @FontPath:                            '@{staticPath}/fonts';
 @fa-font-path:                        "@{FontPath}/fontawesome";
 
-@s-font-size:                                               1.2rem;
-@m-font-size:                                               1.4rem;
-@l-font-size:                                               1.6rem;
-@xl-font-size:                                              2.2rem;
-@xxl-font-size:                                             4.0rem;
-@default-font-size:                                         @l-font-size;
+@s-font-size:                         1.2rem;
+@m-font-size:                         1.4rem;
+@l-font-size:                         1.6rem;
+@xl-font-size:                        2.2rem;
+@xxl-font-size:                       4.0rem;
+@default-font-size:                   @l-font-size;
 
 /*
 ,--------.,--.
@@ -123,9 +123,9 @@
 @header-background-1:                   transparent;
 @header-background-2:                   transparent;
 @header-button-color-1:                 #AFA790;
-@header-button-color-2:                 #7e888b;
+@header-button-color-2:                 hsl(230, 17%, 28%);
 @header-button-hover-color-1:           #73553C;
-@header-button-hover-color-2:           #C9C9C9;
+@header-button-hover-color-2:           hsl(60, 100%, 98%);
 @header-button-hover-background-1:      none;
 @header-button-hover-background-2:      none;
 @header-dropdown-background-1:          @sidebar-background-1;
@@ -133,14 +133,16 @@
 
 // Body
 @body-background-1:                     #F3EACB;
-@body-background-2:                     #1d1f21;
+@body-background-2:                     hsl(228, 21%, 14%);
 
 // Sidebar
 @sidebar-transition-duration:           250ms;
 @sidebar-color-1:                       #AFA790;
-@sidebar-color-2:                       hsl(207, 15%, 80%);
+@sidebar-color-2:                       hsl(226, 20%, 78%);
 @sidebar-background-1:                  #111;
-@sidebar-background-2:                  #111;
+@sidebar-background-2:                  hsl(229, 20%, 22%);
+@sidebar-border-right-1:                @sidebar-border-right;
+@sidebar-border-right-2:                none;
 
 @sidebar-search-background-1:           transparent;
 @sidebar-search-background-2:           transparent;
@@ -148,51 +150,92 @@
 @sidebar-search-input-border-color-2:   transparent;
 
 @sidebar-divider-color-1:               @sidebar-divider-color;
-@sidebar-divider-color-2:               #1d1f21;
+@sidebar-divider-color-2:               hsl(230, 19%, 19%);
 
 @sidebar-link-color-1:                  #877F6A;
-@sidebar-link-color-2:                  hsl(207, 15%, 50%);
+@sidebar-link-color-2:                  hsl(226, 22%, 80%);
 @sidebar-link-background-1:             transparent;
 @sidebar-link-background-2:             transparent;
+@sidebar-link-weight-1:                 normal;
+@sidebar-link-weight-2:                 600;
 @sidebar-link-hover-color-1:            #704214;
-@sidebar-link-hover-color-2:            hsl(207, 100%, 50%);
+@sidebar-link-hover-color-2:            hsl(240, 5%, 96%);
 @sidebar-link-hover-background-1:       transparent;
-@sidebar-link-hover-background-2:       transparent;
+@sidebar-link-hover-background-2:       hsl(233, 19%, 18%);
+@sidebar-link-hover-weight-1:           normal;
+@sidebar-link-hover-weight-2:           600;
 
 @sidebar-icon-color-1:                  hsl(120, 60%, 50%);
 @sidebar-icon-color-2:                  @sidebar-icon-color-1;
 @sidebar-link-completed-1:              @sidebar-link-color-1;
-@sidebar-link-completed-2:              @sidebar-link-color-2;
+@sidebar-link-completed-2:              hsl(227, 13%, 44%);
 @sidebar-link-completed-weight-1:       normal;
-@sidebar-link-completed-weight-2:       normal;
+@sidebar-link-completed-weight-2:       600;
 
 // Dropdown
 @dropdown-divider-color-1:              @sidebar-divider-color-1;
-@dropdown-background-1:                 @sidebar-background-1;
-@dropdown-button-color-1:               @header-button-color-1;
-@dropdown-border-color-1:               @sidebar-divider-color-1;
-@dropdown-button-hover-color-1:         @header-button-hover-color-1;
-
 @dropdown-divider-color-2:              @sidebar-divider-color-2;
-@dropdown-background-2:                 @sidebar-background-2;
-@dropdown-button-color-2:               @header-button-color-2;
+@dropdown-border-color-1:               @sidebar-divider-color-1;
 @dropdown-border-color-2:               @sidebar-divider-color-2;
-@dropdown-button-hover-color-2:         @header-button-hover-color-2;
+@dropdown-background-1:                 @sidebar-background-1;
+@dropdown-background-2:                 @sidebar-background-2;
+
+@dropdown-button-color-1:               @header-button-color-1;
+@dropdown-button-color-2:               hsl(228, 13%, 44%);
+@dropdown-button-hover-color-1:         @header-button-hover-color-1;
+@dropdown-button-hover-color-2:         hsl(240, 5%, 96%);
 
 // Page
-@page-color-1:                              #704214;
-@page-color-2:                              #a4b1b1;
-@page-background-1:                     #F3EACB;
-@page-background-2:                     #1d1f21;
+@page-color-1:                          #704214;
+@page-color-2:                          hsl(214, 29%, 80%);
+@page-background-1:                     @body-background-1;
+@page-background-2:                     @body-background-2;
 
-@bar-background-1:                      #F3EACB;
-@bar-background-2:                      #1d1f21;
+@page-link-color-1:                     inherit;
+@page-link-color-2:                     hsl(193, 61%, 53%);
+
+@page-heading-color-1:                  inherit;
+@page-heading-color-2:                  hsl(60, 100%, 99%);
+@page-heading-border-color-1:           inherit;
+@page-heading-border-color-2:           hsl(230, 17%, 26%);
+@page-h6-color-1:                       inherit;
+@page-h6-color-2:                       hsl(230, 17%, 26%);
+
+@page-hr-color-1:                       inherit;
+@page-hr-color-2:                       hsl(230, 17%, 26%);
+
+@page-blockquote-border-color-1:        inherit;
+@page-blockquote-border-color-2:        hsl(230, 17%, 26%);
+
+@page-pre-color-1:                      #657b83;
+@page-pre-color-2:                      hsl(206, 43%, 73%);
+@page-pre-background-1:                 #fdf6e3;
+@page-pre-background-2:                 hsl(229, 20%, 22%);
+@page-pre-border-color-1:               darken(#fdf6e3, 15%);
+@page-pre-border-color-2:               hsl(229, 20%, 22%);
+@page-highlight-background-1:           inherit;
+@page-highlight-background-2:           hsl(233, 18%, 19%);
+
+@page-table-header-border-color-1:      darken(#fdf6e3, 25%);
+@page-table-header-border-color-2:      hsl(230, 17%, 28%);
+@page-table-row-border-color-1:         #444;
+@page-table-row-border-color-2:         hsl(230, 17%, 28%);
+@page-table-row-color-1:                inherit;
+@page-table-row-color-2:                hsl(216, 24%, 77%);
+@page-table-row-background-1:           #fdf6e3;
+@page-table-row-background-2:           hsl(229, 19%, 22%);
+@page-table-row-odd-background-1:       darken(#fdf6e3, 5%);
+@page-table-row-odd-background-2:       hsl(229, 17%, 25%);
+
+// Page Bar
+@bar-background-1:                      @page-background-1;
+@bar-background-2:                      @page-background-2;
 
 // Navigation
 @navigation-color-1:                    @header-button-color-1;
-@navigation-color-2:                    @header-button-color-2;
+@navigation-color-2:                    hsl(224, 19%, 27%);
 @navigation-hover-color-1:              @header-button-hover-color-1;
-@navigation-hover-color-2:              @header-button-hover-color-2;
+@navigation-hover-color-2:              hsl(60, 100%, 98%);
 
 // Basics of a navbar
 @navbar-default-border-1:               #d5d5d5;

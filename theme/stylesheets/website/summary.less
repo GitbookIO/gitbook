@@ -11,7 +11,7 @@
         width: @sidebar-width;
         color: @sidebar-color;
         background: @sidebar-background;
-        border-right: 1px solid @sidebar-border;
+        border-right: @sidebar-border-right;
 
         .transition(left @sidebar-transition-duration ease);
 
@@ -152,6 +152,7 @@
     .book-summary {
         color: @sidebar-color-1;
         background: @sidebar-background-1;
+        border-right: @sidebar-border-right-1;
 
         .book-search {
             background: @sidebar-search-background-1;
@@ -179,11 +180,13 @@
                 a, span {
                     color: @sidebar-link-color-1;
                     background: @sidebar-link-background-1;
+                    font-weight: @sidebar-link-weight-1;
                 }
 
                 &.active > a, a:hover {
                     color: @sidebar-link-hover-color-1;
                     background: @sidebar-link-hover-background-1;
+                    font-weight: @sidebar-link-hover-weight-1;
                 }
             }
         }
@@ -197,6 +200,7 @@
     .book-summary {
         color: @sidebar-color-2;
         background: @sidebar-background-2;
+        border-right: @sidebar-border-right-2;
 
         .book-search {
             background: @sidebar-search-background-2;
@@ -224,11 +228,13 @@
                 a, span {
                     color: @sidebar-link-color-2;
                     background: @sidebar-link-background-2;
+                    font-weight: @sidebar-link-weight-2;
                 }
 
                 &.active > a, a:hover {
                     color: @sidebar-link-hover-color-2;
                     background: @sidebar-link-hover-background-2;
+                    font-weight: @sidebar-link-hover-weight-2;
                 }
             }
         }
