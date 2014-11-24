@@ -40,6 +40,10 @@
     <h1>Table of Contents</h1>
     <ol>
     {{ articles(summary.chapters) }}
+
+    {% if glossary.length > 0 %}
+    <li><a href="{{ basePath }}/GLOSSARY.html">Glossary</a></li>
+    {% endif %}
     </ol>
 </div>
 {% endblock %}
