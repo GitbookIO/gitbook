@@ -1,5 +1,10 @@
 # Release notes
 
+## 1.3.4
+- Add glossary to ebooks
+- Fix autocover with new hook "finish:before"
+- Add X-UA-Compatible meta tag for IE
+
 ## 1.3.3
 - Fix parsing of lexed content using the client library
 
