@@ -83,6 +83,8 @@ build.command(prog.command('serve [source_dir]'))
 build.commandEbook(prog.command('install [source_dir]'))
 .description('Install plugins for a book')
 .action(function(dir, options) {
+    dir = dir || process.cwd();
+    
     console.log("Install plugins in", dir);
     genbook.config.read({
         input: dir
