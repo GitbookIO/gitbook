@@ -12,7 +12,7 @@ describe('Plugin validation', function () {
     });
 });
 
-describe('Plugin list of names', function () {
+describe('Plugins list', function () {
     var firstDefault = _.first(Plugin.defaults);
 
     it('should convert string to array', function() {
@@ -26,6 +26,15 @@ describe('Plugin list of names', function () {
 
     it('should remove name starting with -', function() {
         assert(!_.contains(Plugin.normalizeNames(["-"+firstDefault]), firstDefault));
+    });
+
+    it('should accept version', function() {
+        var _name = "test@0.3.0,exercises@1.2.0,test2";
+        var plugins = Plugin.normalizeList(_name);
+
+        assert(_.find(plugins, {'name': "test"}).version = "0.3.0");
+        assert(_.find(plugins, {'name': "exercises"}).version = "1.2.0");
+        assert(!_.find(plugins, {'name': "test2"}).version);
     });
 });
 
