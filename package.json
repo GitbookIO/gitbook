@@ -19,6 +19,7 @@
         "highlight.js": "8.3.0",
         "tmp": "0.0.23",
         "semver": "2.2.1",
+        "npmi": "0.1.1",
         "gaze": "~0.5.1",
         "resolve": "0.6.3",
         "tiny-lr-fork": "0.0.5",

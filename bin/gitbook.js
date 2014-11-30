@@ -7,7 +7,7 @@ var prog = require('commander');
 var tinylr = require('tiny-lr-fork');
 
 var pkg = require('../package.json');
-var generators = require("../lib/generate").generators;
+var genbook = require("../lib/generate");
 var initDir = require("../lib/generate/init");
 var fs = require('../lib/generate/fs');
 
@@ -78,6 +78,28 @@ build.command(prog.command('serve [source_dir]'))
     console.log('Press CTRL+C to quit ...');
     console.log('')
     generate();
+});
+
+build.commandEbook(prog.command('install [source_dir]'))
+.description('Install plugins for a book')
+.action(function(dir, options) {
+    console.log("Install plugins in", dir);
+    genbook.config.read({
+        input: dir
+    })
+    .then(function(options) {
+        return genbook.Plugin.install(options);
+    })
+    .then(function() {
+        console.log("Successfully installed plugins!");
+    })
+    .fail(function(err) {
+        // Log error
+        utils.logError(err);
+
+        // Exit process with failure code
+        process.exit(-1);
+    });
 });
 
 build.commandEbook(prog.command('pdf [source_dir]'))
