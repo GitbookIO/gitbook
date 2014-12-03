@@ -52,9 +52,10 @@ Here are the options that can be stored in this file:
     // It's not advised this option in the book.json
     "generator": "site",
 
-    // Book title and description (defaults are extracted from the README)
+    // Book metadats (somes are extracted from the README by default)
     "title": null,
     "description": null,
+    "isbn": null,
 
     // For ebook format, the extension to use for generation (default is detected from output extension)
     // "epub", "pdf", "mobi"

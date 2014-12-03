@@ -15,6 +15,9 @@
         <meta name="apple-mobile-web-app-status-bar-style" content="black">
         <link rel="apple-touch-icon-precomposed" sizes="152x152" href="{{ staticBase }}/images/apple-touch-icon-precomposed-152.png">
         <link rel="shortcut icon" href="{{ staticBase }}/images/favicon.ico" type="image/x-icon">
+        {% if options.isbn %}
+        <meta name="identifier" content="{{ options.isbn }}" scheme="ISBN">
+        {% endif %}
         {% block head %}{% endblock %}
         {{ htmlSnippet("head:end")|default("") }}
     </head>
