@@ -51,6 +51,11 @@ var makeBuildFunc = function(converter) {
 
             // Exit process with failure code
             process.exit(-1);
+        })
+        .then(function() {
+            // Prevent badly behaving plugins
+            // from making the process hang
+            process.exit(0);
         });
     };
 };
