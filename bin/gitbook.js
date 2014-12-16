@@ -12,6 +12,7 @@ var initDir = require("../lib/generate/init");
 var fs = require('../lib/generate/fs');
 
 var utils = require('./utils');
+var action = utils.action;
 var build = require('./build');
 var Server = require('./server');
 var platform = require("./platform");
@@ -22,13 +23,13 @@ prog
 
 build.command(prog.command('build [source_dir]'))
 .description('Build a gitbook from a directory')
-.action(build.folder);
+.action(action(build.folder));
 
 build.command(prog.command('serve [source_dir]'))
 .description('Build then serve a gitbook from a directory')
 .option('-p, --port <port>', 'Port for server to listen on', 4000)
 .option('--no-watch', 'Disable restart with file watching')
-.action(function(dir, options) {
+.action(action(function(dir, options) {
     var server = new Server();
 
     // init livereload server
@@ -41,9 +42,11 @@ build.command(prog.command('serve [source_dir]'))
     });
 
     var generate = function() {
-        if (server.isRunning()) console.log("Stopping server");
+        if (server.isRunning()) {
+            console.log("Stopping server");
+        }
 
-        server.stop()
+        return server.stop()
         .then(function() {
             return build.folder(dir, _.extend(options || {}, {
                 defaultsPlugins: ["livereload"]
@@ -77,16 +80,18 @@ build.command(prog.command('serve [source_dir]'))
 
     console.log('Press CTRL+C to quit ...');
     console.log('')
-    generate();
-});
+
+    return generate();
+}));
 
 build.commandEbook(prog.command('install [source_dir]'))
 .description('Install plugins for a book')
-.action(function(dir, options) {
+.action(action(function(dir, options) {
     dir = dir || process.cwd();
-    
+
     console.log("Install plugins in", dir);
-    genbook.config.read({
+
+    return genbook.config.read({
         input: dir
     })
     .then(function(options) {
@@ -94,66 +99,59 @@ build.commandEbook(prog.command('install [source_dir]'))
     })
     .then(function() {
         console.log("Successfully installed plugins!");
-    })
-    .fail(function(err) {
-        // Log error
-        utils.logError(err);
-
-        // Exit process with failure code
-        process.exit(-1);
     });
-});
+}));
 
 build.commandEbook(prog.command('pdf [source_dir]'))
 .description('Build a gitbook as a PDF')
-.action(function(dir, options) {
-    build.file(dir, _.extend(options, {
+.action(action(function(dir, options) {
+    return build.file(dir, _.extend(options, {
         extension: "pdf",
         format: "ebook"
     }));
-});
+}));
 
 build.commandEbook(prog.command('epub [source_dir]'))
 .description('Build a gitbook as a ePub book')
-.action(function(dir, options) {
-    build.file(dir, _.extend(options, {
+.action(action(function(dir, options) {
+    return build.file(dir, _.extend(options, {
         extension: "epub",
         format: "ebook"
     }));
-});
+}));
 
 build.commandEbook(prog.command('mobi [source_dir]'))
 .description('Build a gitbook as a Mobi book')
-.action(function(dir, options) {
-    build.file(dir, _.extend(options, {
+.action(action(function(dir, options) {
+    return build.file(dir, _.extend(options, {
         extension: "mobi",
         format: "ebook"
     }));
-});
+}));
 
 prog
 .command('init [source_dir]')
 .description('Create files and folders based on contents of SUMMARY.md')
-.action(function(dir) {
+.action(action(function(dir) {
     dir = dir || process.cwd();
     return initDir(dir);
-});
+}));
 
 prog
 .command('publish [source_dir]')
 .description('Publish content to the associated gitbook.io book')
-.action(function(dir) {
+.action(action(function(dir) {
     dir = dir || process.cwd();
     return platform.publish(dir);
-});
+}));
 
 prog
 .command('git:remote [source_dir] [book_id]')
 .description('Adds a git remote to a book repository')
-.action(function(dir, bookId) {
+.action(action(function(dir, bookId) {
     dir = dir || process.cwd();
     return platform.remote(dir, bookId);
-});
+}));
 
 // Parse and fallback to help if no args
 if(_.isEmpty(prog.parse(process.argv).args) && process.argv.length === 2) {
