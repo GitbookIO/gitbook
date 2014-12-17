@@ -1,5 +1,9 @@
 # Release notes
 
+## 1.5.0
+- Fix `serve` command, broken by `1.4.2`
+- Add nicer `dark` theme :)
+
 ## 1.4.2
 - Force `process.exit` after builds, to prevent (possibly) lingering plugins
 
