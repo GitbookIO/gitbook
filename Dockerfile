@@ -10,7 +10,7 @@ RUN apt-get install -y calibre
 VOLUME /repository
 WORKDIR /repository
 
-EXPOSE 4000
+EXPOSE 4000 35729
 
 ENTRYPOINT ["gitbook"]
 CMD ["--version"]
