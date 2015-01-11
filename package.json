@@ -1,7 +1,7 @@
 {
     "name": "gitbook",
     "version": "1.5.0",
-    "homepage": "http://www.gitbook.io/",
+    "homepage": "https://www.gitbook.com",
     "description": "Library and cmd utility to generate GitBooks",
     "main": "lib/index.js",
     "dependencies": {
@@ -55,7 +55,7 @@
         "book",
         "gitbook"
     ],
-    "author": "FriendCode <contact@friendco.de>",
+    "author": "FriendCode Inc. <contact@gitbook.com>",
     "license": "Apache 2",
     "bugs": {
         "url": "https://github.com/GitbookIO/gitbook/issues"
@@ -63,11 +63,11 @@
     "contributors": [
         {
             "name": "Aaron O'Mullan",
-            "email": "aaron.omullan@gmail.com"
+            "email": "aaron@gitbook.com"
         },
         {
             "name": "Samy Pessé",
-            "email": "samypesse@gmail.com"
+            "email": "samy@gitbook.com"
         }
     ]
 }
