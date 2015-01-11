@@ -249,6 +249,7 @@ Plugins needed to build a book can be installed using: `gitbook install ./`.
 | [JSBin](https://github.com/jcouyang/gitbook-plugin-jsbin) | Embedded jsbin frame into your book |
 | [gitbook-grvis](https://github.com/romanlytkin/gitbook-grvis) | Gitbook GrViz plugin is used to select from markdown dot and converting it into a picture format svg |
 | [gitbook-plantuml](https://github.com/romanlytkin/gitbook-plantuml) | Gitbook PlantUml plugin is used to select from markdown uml and converting it into a picture format svg |
+| [gitbook-mermaid](https://github.com/JozoVilcek/gitbook-mermaid-plugin) | Adds diagrams and flowcharts rendered by [mermaid](https://github.com/knsv/mermaid) |
 
 #### Debugging
 
