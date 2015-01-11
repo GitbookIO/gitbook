@@ -28,7 +28,7 @@ What does Gitbook support?
 
 Some more nice content ....
 
-[Cool stuff](http://gitbook.io)
+[Cool stuff](http://gitbook.com)
 
 [Link to another Markdown file](./xyz/file.md)
 

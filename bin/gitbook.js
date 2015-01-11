@@ -139,7 +139,7 @@ prog
 
 prog
 .command('publish [source_dir]')
-.description('Publish content to the associated gitbook.io book')
+.description('Publish content to the associated gitbook.com book')
 .action(action(function(dir) {
     dir = dir || process.cwd();
     return platform.publish(dir);

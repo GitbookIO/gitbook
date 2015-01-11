@@ -12,7 +12,7 @@ var publish = function(folder) {
         console.log(out.stdout);
     }, function(err) {
         if (err.code == 128) {
-            console.log("No book on gitbook.io is configured with this git repository.");
+            console.log("No book on gitbook.com is configured with this git repository.");
             console.log("Run 'gitbook git:remote username/book' to intialize this repository.");
         } else {
             console.log(err.message);
@@ -27,7 +27,7 @@ var remote = function(folder, bookId) {
         return process.exit(-1);
     }
 
-    var url = "https://push.gitbook.io/"+bookId+".git";
+    var url = "https://git.gitbook.com/"+bookId+".git";
     var addRemote = function() {
         return utils.gitCmd("remote", ["add", "gitbook", url]);
     }

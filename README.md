@@ -4,7 +4,7 @@ GitBook
 [![Build Status](https://travis-ci.org/GitbookIO/gitbook.png?branch=master)](https://travis-ci.org/GitbookIO/gitbook)
 [![NPM version](https://badge.fury.io/js/gitbook.svg)](http://badge.fury.io/js/gitbook)
 
-GitBook is a command line tool (and Node.js library) for building beautiful books using GitHub/Git and Markdown. Here is an example: [Learn Javascript](https://www.gitbook.io/book/GitBookIO/javascript). You can publish book easily online using [gitbook.io](https://www.gitbook.io) and an [editor](https://github.com/GitbookIO/editor) is available for Windows, Mac and Linux. You can follow [@GitBookIO](https://twitter.com/GitBookIO) on Twitter. Complete documentation is available at [help.gitbook.io](http://help.gitbook.io/).
+GitBook is a command line tool (and Node.js library) for building beautiful books using GitHub/Git and Markdown. Here is an example: [Learn Javascript](https://www.gitbook.com/book/GitBookIO/javascript). You can publish book easily online using [gitbook.com](https://www.gitbook.com) and an [editor](https://github.com/GitbookIO/editor) is available for Windows, Mac and Linux. You can follow [@GitBookIO](https://twitter.com/GitBookIO) on Twitter. Complete documentation is available at [help.gitbook.io](http://help.gitbook.io/).
 
 ![Image](https://raw.github.com/GitbookIO/gitbook/master/preview.png)
 
@@ -16,7 +16,7 @@ GitBook can be installed from **NPM** using:
 $ npm install gitbook -g
 ```
 
-Create the directories and files for a book from its [SUMMARY.md](https://github.com/GitbookIO/gitbook#book-format) file using 
+Create the directories and files for a book from its [SUMMARY.md](https://github.com/GitbookIO/gitbook#book-format) file using
 ```
 $ gitbook init
 ```
@@ -131,7 +131,7 @@ Here are the options that can be stored in this file:
 }
 ```
 
-You can publish your books to our index by visiting [GitBook.io](http://www.gitbook.io)
+You can publish your books to our index by visiting [GitBook.com](http://www.gitbook.com)
 
 ## Output Formats
 
