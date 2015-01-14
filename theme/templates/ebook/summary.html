@@ -1,17 +1,6 @@
-{% extends "./layout.html" %}
+{% extends "./page.html" %}
 
 {% block title %}Table of Contents | {{ title }}{% endblock %}
-
-{% block style %}
-<link rel="stylesheet" href="{{ staticBase }}/print.css">
-{% for resource in plugins.resources.css %}
-    {% if resource.url %}
-    <link rel="stylesheet" href="{{ resource.url }}">
-    {% else %}
-    <link rel="stylesheet" href="{{ staticBase }}/plugins/{{ resource.path }}">
-    {% endif %}
-{% endfor %}
-{% endblock %}
 
 {% macro articles(_articles) %}
     {% for item in _articles %}
