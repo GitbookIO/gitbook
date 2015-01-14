@@ -4,10 +4,16 @@ var assert = require('assert');
 
 var summary = require('../').parse.summary;
 
+function lex(fixtureFile) {
+    return summary(
+        fs.readFileSync(
+            path.join(__dirname, 'fixtures', fixtureFile),
+            'utf8'
+        )
+    );
+}
 
-var CONTENT = fs.readFileSync(path.join(__dirname, './fixtures/SUMMARY.md'), 'utf8');
-var LEXED = summary(CONTENT);
-
+var LEXED = lex('SUMMARY.md');
 
 describe('Summary parsing', function () {
 
@@ -55,5 +61,11 @@ describe('Summary parsing', function () {
         assert.equal(c[1].articles[0].level, '1.1');
         assert.equal(c[1].articles[1].level, '1.2');
         assert.equal(c[1].articles[1].articles[0].level, '1.2.1');
+    });
+
+    it('should allow lists separated by whitespace', function() {
+        var l = lex('SUMMARY_WHITESPACE.md');
+
+        assert.equal(l.chapters.length, 6);
     });
 });
