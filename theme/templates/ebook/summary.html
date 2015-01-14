@@ -1,6 +1,6 @@
 {% extends "./page.html" %}
 
-{% block title %}Table of Contents | {{ title }}{% endblock %}
+{% block title %}{% i18n TABLE_OF_CONTENTS %}Table of Contents{% endi18n %} | {{ title }}{% endblock %}
 
 {% macro articles(_articles) %}
     {% for item in _articles %}
@@ -26,12 +26,12 @@
 
 {% block content %}
 <div class="page page-toc">
-    <h1>Table of Contents</h1>
+    <h1>{% i18n TABLE_OF_CONTENTS %}Table of Contents{% endi18n %}</h1>
     <ol>
     {{ articles(summary.chapters) }}
 
     {% if glossary.length > 0 %}
-    <li><a href="{{ basePath }}/GLOSSARY.html">Glossary</a></li>
+    <li><a href="{{ basePath }}/GLOSSARY.html">{% i18n GLOSSARY %}Glossary{% endi18n %}</a></li>
     {% endif %}
     </ol>
 </div>

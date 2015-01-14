@@ -1,5 +1,5 @@
 <div class="header">
-    <h2>Quiz</h2>
+    <h2>{% i18n QUIZ %}Quiz{% endi18n %}</h2>
 </div>
 
 <div class="message">
@@ -9,15 +9,15 @@
 
 {% for quiz in section.quiz %}
 <div class="question">
-    <div class="question-header">Question {{ loop.index }} of {{ section.quiz.length }}</div>
+    <div class="question-header">{% i18n QUESTION_HEADER __index__:loop.index, __count__:section.quiz.length }}%}Question __index__ of __count__{% endi18n %}</div>
 
     <div class="question-content">
         <div class="alert alert-success hidden">
-            <b>Correct!</b>
+            <b>{% i18n CORRECT_ANSWER %}Correct!{% endi18n %}</b>
         </div>
 
         <div class="alert alert-danger error-message hidden">
-            <p><b>Not quite!</b></p>
+            <p><b>{% i18n INCORRECT_ANSWER %}Not quite!{% endi18n %}</b></p>
             {% autoescape false %}{{ quiz.feedback }}{% endautoescape %}
         </div>
 
@@ -35,6 +35,6 @@
 {% endfor %}
 
 <div class="buttons">
-    <a href="#" class="button size-2 action-submit">Submit</a>
-    <a href="#" class="button size-2 action-solution">Solution</a>
+    <a href="#" class="button size-2 action-submit">{% i18n SUBMIT_SOLUTION %}Submit{% endi18n %}</a>
+    <a href="#" class="button size-2 action-solution">{% i18n SHOW_SOLUTION %}Solution{% endi18n %}</a>
 </div>

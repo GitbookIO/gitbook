@@ -1,12 +1,12 @@
 <div class="header">
-    <h2>Exercise</h2>
+    <h2>{% i18n EXERCISE %}Exercise{% endi18n %}</h2>
 </div>
 <div class="alert alert-success">
-    <b>Correct!</b>
+    <b>{% i18n CORRECT_ANSWER %}Correct!{% endi18n %}</b>
 </div>
 
 <div class="alert alert-danger error-message">
-    <b>False!</b>
+    <b>{% i18n WRONG_ANSWER %}False!{% endi18n %}</b>
 </div>
 
 <div class="message">
@@ -21,6 +21,6 @@
 {% endif %}
 
 <div class="buttons">
-    <a href="#" class="button size-2 action-submit">Submit</a>
-    <a href="#" class="button size-2 action-solution">Solution</a>
+    <a href="#" class="button size-2 action-submit">{% i18n SUBMIT_SOLUTION %}Submit{% endi18n %}</a>
+    <a href="#" class="button size-2 action-solution">{% i18n SHOW_SOLUTION %}Solution{% endi18n %}</a>
 </div>
