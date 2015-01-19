@@ -15,6 +15,7 @@
         "nunjucks": "git+https://github.com/SamyPesse/nunjucks.git#4019d1b7379372336b86ce1b0bf84352a2029747",
         "semver": "2.2.1",
         "npmi": "0.1.1",
+        "cheerio": "0.18.0",
         "gitbook-plugin-mathjax": "0.0.6",
         "gitbook-plugin-livereload": "0.0.1"
     },

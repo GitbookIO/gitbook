@@ -24,7 +24,11 @@ describe('Book generation', function () {
     it('should correctly generate a book to json', function(done) {
     	testGeneration(book1, "json", function(output) {
             assert(!fs.existsSync(path.join(output, "README.json")));
-            assert(fs.existsSync(path.join(output, "intro.json")))
+            assert(fs.existsSync(path.join(output, "intro.json")));
+            assert(fs.existsSync(path.join(output, "sub/test1.json")));
+
+            var test1 = JSON.parse(fs.readFileSync(path.join(output, "sub/test1.json")));
+            assert(test1.sections[0].content.indexOf("intro.html") > 0);
         }, done);
     });
 

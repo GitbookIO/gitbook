@@ -31,8 +31,7 @@ describe('Book parsing', function () {
     it('should correctly parse list of files', function() {
         var FILES = book1.files;
 
-        assert.equal(FILES.length, 2);
-        assert.equal(_.difference(FILES, [ 'intro.md', 'README.md' ]).length, 0);
+        assert.deepEqual(FILES, [ 'README.md', 'intro.md', 'sub/', 'sub/test1.md' ]);
     });
 
     it('should correctly parse the languages', function() {
@@ -49,7 +48,7 @@ describe('Book parsing', function () {
     it('should correctly parse the navigation', function() {
         var NAVIGATION = book1.navigation;
 
-        assert.equal(_.size(NAVIGATION), 1);
+        assert.equal(_.size(NAVIGATION), 2);
         assert(NAVIGATION["intro.md"])
         assert.equal(NAVIGATION["intro.md"].title, "Introduction");
         assert.equal(NAVIGATION["intro.md"].prev, null);
