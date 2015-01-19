@@ -2,8 +2,6 @@ var path = require('path');
 var _ = require('lodash');
 var assert = require('assert');
 
-var Book = require('../').Book;
-
 describe('Book parsing', function () {
     it('should correctly parse the readme', function() {
         assert.equal(book1.options.title, 'My Book');
