@@ -6,7 +6,10 @@
     "main": "lib/index.js",
     "dependencies": {
         "q": "1.0.1",
-        "lodash": "2.4.1"
+        "lodash": "2.4.1",
+        "graceful-fs": "3.0.5",
+        "fs-extra": "0.14.0",
+        "fstream-ignore": "1.0.2"
     },
     "devDependencies": {
         "mocha": "1.18.2"
