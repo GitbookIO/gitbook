@@ -17,9 +17,9 @@ before(function(done) {
     global.book2 = new Book(path.join(__dirname, './fixtures/test2'));
 
     qdone(
-	    global.book1.init()
+	    global.book1.parse()
 	    .then(function() {
-	    	return global.book2.init();
+	    	return global.book2.parse();
 	    }),
 	    done
 	);

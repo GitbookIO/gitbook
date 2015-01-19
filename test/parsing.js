@@ -31,6 +31,7 @@ describe('Book parsing', function () {
 
     it('should correctly parse the languages', function() {
         assert.equal(book2.books.length, 2);
+        assert(book2.isMultilingual());
 
         assert.equal(book2.books[0].options.lang, "en");
         assert.equal(book2.books[0].options.title, "English Book");
