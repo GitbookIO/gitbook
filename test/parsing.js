@@ -16,4 +16,16 @@ describe('Book parsing', function () {
     	assert.equal(LEXED.chapters[1].path, 'test.md');
         assert.equal(LEXED.chapters[2].path, 'test2.md');
     });
+
+    it('should correctly parse the glossary', function() {
+        var LEXED = book1.glossary;
+
+        assert.equal(LEXED[0].id, "test");
+        assert.equal(LEXED[0].name, "Test");
+        assert.equal(LEXED[0].description, "a test text");
+
+        assert.equal(LEXED[1].id, "test 2");
+        assert.equal(LEXED[1].name, "Test 2");
+        assert.equal(LEXED[1].description, "a second test");
+    });
 });
