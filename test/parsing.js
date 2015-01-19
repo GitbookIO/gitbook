@@ -1,4 +1,5 @@
 var path = require('path');
+var _ = require('lodash');
 var assert = require('assert');
 
 var Book = require('../').Book;
@@ -27,6 +28,13 @@ describe('Book parsing', function () {
         assert.equal(LEXED[1].id, "test 2");
         assert.equal(LEXED[1].name, "Test 2");
         assert.equal(LEXED[1].description, "a second test");
+    });
+
+    it('should correctly parse files', function() {
+        var FILES = book1.files;
+
+        assert.equal(FILES.length, 4);
+        assert.equal(_.difference(FILES, [ 'GLOSSARY.md', 'README.md', 'SUMMARY.md', 'intro.md' ]).length, 0);
     });
 
     it('should correctly parse the languages', function() {
