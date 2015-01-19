@@ -31,8 +31,8 @@ describe('Book parsing', function () {
     it('should correctly parse files', function() {
         var FILES = book1.files;
 
-        assert.equal(FILES.length, 4);
-        assert.equal(_.difference(FILES, [ 'GLOSSARY.md', 'README.md', 'SUMMARY.md', 'intro.md' ]).length, 0);
+        assert.equal(FILES.length, 2);
+        assert.equal(_.difference(FILES, [ 'intro.md', 'README.md' ]).length, 0);
     });
 
     it('should correctly parse the languages', function() {
