@@ -34,7 +34,9 @@ describe('Book generation', function () {
 
     it('should correctly generate a multilingual book to json', function(done) {
     	testGeneration(book2, "json", function(output) {
-
+            assert(fs.existsSync(path.join(output, "README.json")));
+            assert(fs.existsSync(path.join(output, "en/README.json")));
+            assert(fs.existsSync(path.join(output, "fr/README.json")));
         }, done);
     });
 });
