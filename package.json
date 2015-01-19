@@ -9,7 +9,8 @@
         "lodash": "2.4.1",
         "graceful-fs": "3.0.5",
         "fs-extra": "0.14.0",
-        "fstream-ignore": "1.0.2"
+        "fstream-ignore": "1.0.2",
+        "gitbook-markdown": "1.0.0"
     },
     "devDependencies": {
         "mocha": "1.18.2"
