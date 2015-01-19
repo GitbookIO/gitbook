@@ -31,5 +31,11 @@ describe('Book parsing', function () {
 
     it('should correctly parse the languages', function() {
         assert.equal(book2.books.length, 2);
+
+        assert.equal(book2.books[0].options.lang, "en");
+        assert.equal(book2.books[0].options.title, "English Book");
+
+        assert.equal(book2.books[1].options.lang, "fr");
+        assert.equal(book2.books[1].options.title, "French Book");
     });
 });
