@@ -28,4 +28,8 @@ describe('Book parsing', function () {
         assert.equal(LEXED[1].name, "Test 2");
         assert.equal(LEXED[1].description, "a second test");
     });
+
+    it('should correctly parse the languages', function() {
+        assert.equal(book2.books.length, 2);
+    });
 });

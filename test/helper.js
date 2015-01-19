@@ -14,6 +14,13 @@ global.qdone = function qdone(promise, done) {
 // Init before doing tests
 before(function(done) {
     global.book1 = new Book(path.join(__dirname, './fixtures/test1'));
+    global.book2 = new Book(path.join(__dirname, './fixtures/test2'));
 
-    qdone(global.book1.init(), done);
+    qdone(
+	    global.book1.init()
+	    .then(function() {
+	    	return global.book2.init();
+	    }),
+	    done
+	);
 });
