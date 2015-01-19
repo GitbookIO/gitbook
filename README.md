@@ -212,10 +212,6 @@ The best resolution is **1800x2360**. The generation of the cover can be done au
 
 A small version of the cover can also be set by creating a file: **/cover_small.jpg**.
 
-#### Custom Styles
-
-You can use your own custom stylesheet to change the style of the website or ebooks (pdf, epub, mobi). Create a `styles/website.css` (only for website output), `styles/ebook.css` (for all ebook outputs), `styles/pdf.css` (only for pdf output), `styles/epub.css` (for epub output) or `styles/mobi.css` (for mobi output). These paths can be changed in the `book.json`.
-
 #### Publish your book
 
 The platform [GitBook.com](https://www.gitbook.com/) is like an "Heroku for books": you can create a book on it (public, paid, or private) and update it using **git push**.
