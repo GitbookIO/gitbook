@@ -28,7 +28,7 @@ describe('Book parsing', function () {
         assert.equal(LEXED[1].description, "a second test");
     });
 
-    it('should correctly parse files', function() {
+    it('should correctly parse list of files', function() {
         var FILES = book1.files;
 
         assert.equal(FILES.length, 2);
@@ -44,5 +44,15 @@ describe('Book parsing', function () {
 
         assert.equal(book2.books[1].options.lang, "fr");
         assert.equal(book2.books[1].options.title, "French Book");
+    });
+
+    it('should correctly parse the navigation', function() {
+        var NAVIGATION = book1.navigation;
+
+        assert.equal(_.size(NAVIGATION), 1);
+        assert(NAVIGATION["intro.md"])
+        assert.equal(NAVIGATION["intro.md"].title, "Introduction");
+        assert.equal(NAVIGATION["intro.md"].prev, null);
+        assert.equal(NAVIGATION["intro.md"].next.title, "Chapter 1");
     });
 });
