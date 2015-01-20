@@ -1,0 +1,20 @@
+{
+    "CHOOSE_LANGUAGE": "Choose a language",
+    "CORRECT_ANSWER": "Correct!",
+    "EXERCISE": "Exercise",
+    "GITBOOK_LINK": "Published using GitBook",
+    "GLOSSARY": "Glossary",
+    "INCORRECT_ANSWER": "Not quite!",
+    "INDEX": "Index",
+    "QUESTION_HEADER": "Question __index__ of __count__",
+    "QUIZ": "Quiz",
+    "SEARCH_PLACEHOLDER": "Type to search",
+    "SHARE_ON": "Share on __platform__",
+    "SHOW_SOLUTION": "Solution",
+    "SUBMIT_SOLUTION": "Submit",
+    "TABLE_OF_CONTENTS": "Table of Contents",
+    "THEME_NIGHT": "Night",
+    "THEME_SEPIA": "Sepia",
+    "THEME_WHITE": "White",
+    "WRONG_ANSWER": "False!"
+}
