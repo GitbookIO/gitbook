@@ -1,0 +1,15 @@
+{% extends "./layout.html" %}
+
+{% block title %}Glossary | {{ title }}{% endblock %}
+
+{% block content %}
+<div class="page page-toc">
+    <h1>Glossary</h1>
+	{% for item in glossaryIndex %}
+	<section class="normal glossary" id="{{ item.id }}">
+	    <h2><a href="#{{ item.id }}">{{ item.name }}</a></h2>
+	    <p>{{ item.description }}</p>
+	</section>
+	{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "./layout.html" %}
+
+{% block title %}Table of Contents | {{ title }}{% endblock %}
+
+{% block style %}
+<link rel="stylesheet" href="{{ staticBase }}/print.css">
+{% for resource in plugins.resources.css %}
+    {% if resource.url %}
+    <link rel="stylesheet" href="{{ resource.url }}">
+    {% else %}
+    <link rel="stylesheet" href="{{ staticBase }}/plugins/{{ resource.path }}">
+    {% endif %}
+{% endfor %}
+{% endblock %}
+
+{% macro articles(_articles) %}
+    {% for item in _articles %}
+        {% set externalLink = item.path|isExternalLink %}
+        <li>
+            {% if item.path %}
+                {% if !externalLink %}
+                    <a href="{{ basePath }}/{{ item.path|mdLink }}">{{ item.title }}</a>
+                {% else %}
+                    <a target="_blank" href="{{ item.path }}">{{ item.title }}</a>
+                {% endif %}
+            {% else %}
+            {{ item.title }}
+            {% endif %}
+            {% if item.articles.length > 0 %}
+            <ol>
+                {{ articles(item.articles) }}
+            </ol>
+            {% endif %}
+        </li>
+    {% endfor %}
+{% endmacro %}
+
+{% block content %}
+<div class="page page-toc">
+    <h1>Table of Contents</h1>
+    <ol>
+    {{ articles(summary.chapters) }}
+
+    {% if glossary.length > 0 %}
+    <li><a href="{{ basePath }}/GLOSSARY.html">Glossary</a></li>
+    {% endif %}
+    </ol>
+</div>
+{% endblock %}
+

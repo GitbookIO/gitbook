@@ -1,0 +1,26 @@
+<div class="header">
+    <h2>Exercise</h2>
+</div>
+<div class="alert alert-success">
+    <b>Correct!</b>
+</div>
+
+<div class="alert alert-danger error-message">
+    <b>False!</b>
+</div>
+
+<div class="message">
+    {% autoescape false %}{{ section.content }}{% endautoescape %}
+</div>
+<div class="editor" style="height: {{ section.code.solution|lines*20 }}px">{{ section.code.base }}</div>
+
+<pre class="hidden code-solution">{{ section.code.solution }}</pre>
+<pre class="hidden code-validation">{{ section.code.validation }}</pre>
+{% if section.code.context %}
+<pre class="hidden code-context">{{ section.code.context }}</pre>
+{% endif %}
+
+<div class="buttons">
+    <a href="#" class="button size-2 action-submit">Submit</a>
+    <a href="#" class="button size-2 action-solution">Solution</a>
+</div>

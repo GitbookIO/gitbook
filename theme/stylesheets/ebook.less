@@ -1,0 +1,63 @@
+@import "mixins.less";
+
+@import "ebook/variables.less";
+@import "ebook/highlight.less";
+
+.page {
+    &.page-toc {
+        ol {
+            margin: 0px;
+        }
+    }
+
+    .book-chapter {
+        display: none;
+    }
+
+    .exercise, .quiz {
+        margin: 1cm 0cm;
+        border: 2px solid #ddd;
+
+        .exercise-header {
+            padding: 0.1cm 0.3cm;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+            font-weight: bold;
+            page-break-inside: avoid;
+        }
+
+        .exercise-inner {
+            padding: 0.15cm 0.3cm;
+
+            p:last-child {
+                margin: 0px;
+            }
+        }
+
+        hr {
+            height: 2px;
+        }
+
+        .question {
+            margin-top: 0.1cm;
+            border-top: 1px solid #ddd;
+
+            .question-base {
+
+            }
+
+            .question-solution {
+
+            }
+        }
+    }
+}
+
+
+
+body {
+    .page {
+        font-family: sans-serif;
+        .markdown-content(#333, 1.6);
+    }
+}

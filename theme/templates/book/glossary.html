@@ -1,0 +1,18 @@
+{% extends "page.html" %}
+
+{% block title %}Glossary | {{ title }}{% endblock %}
+
+{% block page_inner %}
+{% for item in glossaryIndex %}
+<section class="normal glossary" id="{{ item.id }}">
+    <h2><a href="#{{ item.id }}">{{ item.name }}</a></h2>
+    <p>{{ item.description }}</p>
+    <h4>Index</h4>
+    <ul class="glossary-index">
+    {% for file in item.files %}
+        <li><a href="{{ basePath }}/{{ file.path|mdLink }}"><span class="level">{{ file.level }}.</span> {{ file.title }}</a></li>
+    {% endfor %}
+    </ul>
+</section>
+{% endfor %}
+{% endblock %}
