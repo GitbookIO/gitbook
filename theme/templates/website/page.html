@@ -1,4 +1,4 @@
-{% extends "../layout.html" %}
+{% extends "./layout.html" %}
 
 {% block head %}
     {% parent %}
@@ -66,12 +66,15 @@ require(["gitbook"], function(gitbook) {
 {% endblock %}
 
 {% block style %}
-<link rel="stylesheet" href="{{ staticBase }}/style.css">
-{% for resource in plugins.resources.css %}
-    {% if resource.url %}
-    <link rel="stylesheet" href="{{ resource.url }}">
-    {% else %}
-    <link rel="stylesheet" href="{{ staticBase }}/plugins/{{ resource.path }}">
-    {% endif %}
-{% endfor %}
+    <link rel="stylesheet" href="{{ staticBase }}/style.css">
+    {% for resource in plugins.resources.css %}
+        {% if resource.url %}
+        <link rel="stylesheet" href="{{ resource.url }}">
+        {% else %}
+        <link rel="stylesheet" href="{{ staticBase }}/plugins/{{ resource.path }}">
+        {% endif %}
+    {% endfor %}
+    {% for style in styles %}
+        <link rel="stylesheet" href="{{ basePath }}/{{ style }}">
+    {% endfor %}
 {% endblock %}
