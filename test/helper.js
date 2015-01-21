@@ -15,12 +15,16 @@ global.qdone = function qdone(promise, done) {
 before(function(done) {
     global.book1 = new Book(path.join(__dirname, './fixtures/test1'));
     global.book2 = new Book(path.join(__dirname, './fixtures/test2'));
+    global.book3 = new Book(path.join(__dirname, './fixtures/test3'));
 
     qdone(
 	    global.book1.parse()
 	    .then(function() {
 	    	return global.book2.parse();
-	    }),
+	    })
+        .then(function() {
+            return global.book3.parse();
+        }),
 	    done
 	);
 });

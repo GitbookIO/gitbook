@@ -8,6 +8,11 @@ describe('Book parsing', function () {
     	assert.equal(book1.options.description, 'Test description');
     });
 
+    it('should correctly parse the readme with asciidoc', function() {
+        assert.equal(book3.options.title, 'My Book');
+        assert.equal(book3.options.description, 'Test description');
+    });
+
     it('should correctly parse the summary', function() {
         var LEXED = book1.summary;
 
