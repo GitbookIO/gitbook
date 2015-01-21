@@ -54,4 +54,13 @@ describe('Book generation', function () {
             assert(fs.existsSync(path.join(output, "index.html")));
         }, done);
     });
+
+    it('should correctly include styles in website', function(done) {
+        testGeneration(books[0], "site", function(output) {
+            assert(fs.existsSync(path.join(output, "styles/website.css")));
+
+            var INDEX = fs.readFileSync(path.join(output, "index.html")).toString();
+            assert(INDEX.indexOf("styles/website.css") > 0);
+        }, done);
+    });
 });
