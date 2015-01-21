@@ -49,9 +49,9 @@ describe('Book generation', function () {
         }, done);
     });
 
-    /*it('should correctly generate a book to website', function(done) {
+    it('should correctly generate a book to website', function(done) {
         testGeneration(book1, "site", function(output) {
             assert(fs.existsSync(path.join(output, "index.html")));
         }, done);
-    });*/
+    });
 });
