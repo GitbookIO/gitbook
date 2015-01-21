@@ -1,9 +1,8 @@
 {% macro articles(_articles) %}
     {% for item in _articles %}
-        {% set externalLink = item.path|isExternalLink %}
-        <li class="chapter {% if item.path == _input %}active{% endif %}" data-level="{{ item.level }}" {% if item.path and not externalLink %}data-path="{{ item.path|contentLink }}"{% endif %}>
+        <li class="chapter {% if item.path == _input %}active{% endif %}" data-level="{{ item.level }}" {% if item.path and not item.external %}data-path="{{ item.path|contentLink }}"{% endif %}>
             {% if item.path %}
-                {% if not externalLink %}
+                {% if not item.external %}
                     <a href="{{ basePath }}/{{ item.path|contentLink }}">
                         <i class="fa fa-check"></i>
                         {% if item.level != "0" %}

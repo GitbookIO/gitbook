@@ -4,10 +4,9 @@
 
 {% macro articles(_articles) %}
     {% for item in _articles %}
-        {% set externalLink = item.path|isExternalLink %}
         <li>
             {% if item.path %}
-                {% if !externalLink %}
+                {% if item.external %}
                     <a href="{{ basePath }}/{{ item.path|contentLink }}">{{ item.title }}</a>
                 {% else %}
                     <a target="_blank" href="{{ item.path }}">{{ item.title }}</a>
