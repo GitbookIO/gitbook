@@ -22,7 +22,7 @@ var testGeneration = function(book, type, func, done) {
 
 describe('Book generation', function () {
     it('should correctly generate a book to json', function(done) {
-    	testGeneration(book1, "json", function(output) {
+    	testGeneration(books[1], "json", function(output) {
             assert(!fs.existsSync(path.join(output, "README.json")));
             assert(fs.existsSync(path.join(output, "intro.json")));
             assert(fs.existsSync(path.join(output, "sub/test1.json")));
@@ -32,8 +32,16 @@ describe('Book generation', function () {
         }, done);
     });
 
+    it('should correctly generate a multilingual book to json', function(done) {
+    	testGeneration(books[2], "json", function(output) {
+            assert(fs.existsSync(path.join(output, "README.json")));
+            assert(fs.existsSync(path.join(output, "en/README.json")));
+            assert(fs.existsSync(path.join(output, "fr/README.json")));
+        }, done);
+    });
+
     it('should correctly generate an asciidoc book to json', function(done) {
-        testGeneration(book3, "json", function(output) {
+        testGeneration(books[3], "json", function(output) {
             assert(fs.existsSync(path.join(output, "README.json")));
             assert(fs.existsSync(path.join(output, "test.json")));
             assert(fs.existsSync(path.join(output, "test1.json")));
@@ -41,16 +49,8 @@ describe('Book generation', function () {
         }, done);
     });
 
-    it('should correctly generate a multilingual book to json', function(done) {
-    	testGeneration(book2, "json", function(output) {
-            assert(fs.existsSync(path.join(output, "README.json")));
-            assert(fs.existsSync(path.join(output, "en/README.json")));
-            assert(fs.existsSync(path.join(output, "fr/README.json")));
-        }, done);
-    });
-
     it('should correctly generate a book to website', function(done) {
-        testGeneration(book1, "site", function(output) {
+        testGeneration(books[1], "site", function(output) {
             assert(fs.existsSync(path.join(output, "index.html")));
         }, done);
     });

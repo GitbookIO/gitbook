@@ -1,5 +1,8 @@
 var path = require('path');
 var Q = require('q');
+var fs = require('fs');
+var _ = require('lodash');
+
 var Book = require('../').Book;
 
 // Nicety for mocha / Q
@@ -11,20 +14,28 @@ global.qdone = function qdone(promise, done) {
     }).done();
 };
 
+// Books for testings
+global.books = [];
+
 // Init before doing tests
 before(function(done) {
-    global.book1 = new Book(path.join(__dirname, './fixtures/test1'));
-    global.book2 = new Book(path.join(__dirname, './fixtures/test2'));
-    global.book3 = new Book(path.join(__dirname, './fixtures/test3'));
+    var books = fs.readdirSync(path.join(__dirname, './fixtures/'));
+
+    global.books = _.chain(books)
+        .sortBy()
+        .map(function(book) {
+            if (book.indexOf("test") !== 0) return null;
+            return new Book(path.join(__dirname, './fixtures/', book));;
+        })
+        .compact()
+        .value();
 
     qdone(
-	    global.book1.parse()
-	    .then(function() {
-	    	return global.book2.parse();
-	    })
-        .then(function() {
-            return global.book3.parse();
-        }),
+	    _.reduce(global.books, function(prev, book) {
+            return prev.then(function() {
+                return book.parse();
+            });
+        }, Q()),
 	    done
 	);
 });
