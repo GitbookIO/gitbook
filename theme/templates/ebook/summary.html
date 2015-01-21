@@ -8,7 +8,7 @@
         <li>
             {% if item.path %}
                 {% if !externalLink %}
-                    <a href="{{ basePath }}/{{ item.path|mdLink }}">{{ item.title }}</a>
+                    <a href="{{ basePath }}/{{ item.path|contentLink }}">{{ item.title }}</a>
                 {% else %}
                     <a target="_blank" href="{{ item.path }}">{{ item.title }}</a>
                 {% endif %}
@@ -17,7 +17,7 @@
             {% endif %}
             {% if item.articles.length > 0 %}
             <ol>
-                {{ articles(item.articles) }}
+                {{ articles(item.articles) }}
             </ol>
             {% endif %}
         </li>

@@ -51,6 +51,7 @@ describe('Book generation', function () {
 
     it('should correctly generate a book to website', function(done) {
         testGeneration(book1, "site", function(output) {
+            console.log(fs.readdirSync(output));
             assert(fs.existsSync(path.join(output, "index.html")));
         }, done);
     });

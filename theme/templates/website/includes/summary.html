@@ -1,12 +1,12 @@
 {% macro articles(_articles) %}
     {% for item in _articles %}
         {% set externalLink = item.path|isExternalLink %}
-        <li class="chapter {% if item.path == _input %}active{% endif %}" data-level="{{ item.level }}" {% if item.path && !externalLink %}data-path="{{ item.path|mdLink }}"{% endif %}>
+        <li class="chapter {% if item.path == _input %}active{% endif %}" data-level="{{ item.level }}" {% if item.path and not externalLink %}data-path="{{ item.path|contentLink }}"{% endif %}>
             {% if item.path %}
-                {% if !externalLink %}
-                    <a href="{{ basePath }}/{{ item.path|mdLink }}">
+                {% if not externalLink %}
+                    <a href="{{ basePath }}/{{ item.path|contentLink }}">
                         <i class="fa fa-check"></i>
-                        {% if item.level !== "0" %}
+                        {% if item.level != "0" %}
                             <b>{{ item.level }}.</b>
                         {% endif %}
                          {{ item.title }}
@@ -14,7 +14,7 @@
                 {% else %}
                     <a target="_blank" href="{{ item.path }}">
                         <i class="fa fa-check"></i>
-                        {% if item.level !== "0" %}
+                        {% if item.level != "0" %}
                             <b>{{ item.level }}.</b>
                         {% endif %}
                          {{ item.title }}
@@ -25,7 +25,7 @@
             {% endif %}
             {% if item.articles.length > 0 %}
             <ul class="articles">
-                {{ articles(item.articles) }}
+                {{ articles(item.articles) }}
             </ul>
             {% endif %}
         </li>
@@ -53,7 +53,7 @@
 
         {{ articles(summary.chapters) }}
 
-        {% if options.links.gitbook !== false %}
+        {% if options.links.gitbook != false %}
         <li class="divider"></li>
         <li>
             <a href="https://www.gitbook.com" target="blank" class="gitbook-link">Published using GitBook</a>

@@ -10,7 +10,7 @@
     <h4>Index</h4>
     <ul class="glossary-index">
     {% for file in item.files %}
-        <li><a href="{{ basePath }}/{{ file.path|mdLink }}"><span class="level">{{ file.level }}.</span> {{ file.title }}</a></li>
+        <li><a href="{{ basePath }}/{{ file.path|contentLink }}"><span class="level">{{ file.level }}.</span> {{ file.title }}</a></li>
     {% endfor %}
     </ul>
 </section>
