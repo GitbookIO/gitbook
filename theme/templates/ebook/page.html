@@ -23,10 +23,6 @@
         <div class="{{ section.type }}" id="section-{{ section.id }}">
         {% if section.type == "normal" %}
             {% autoescape false %}{{ section.content }}{% endautoescape %}
-        {% elif section.type == "exercise" %}
-            {% include "./includes/exercise.html" with {section: section} %}
-        {% elif section.type == "quiz" %}
-            {% include "./includes/quiz.html" with {section: section} %}
         {% endif %}
         </div>
     {% endfor %}
