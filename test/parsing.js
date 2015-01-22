@@ -28,7 +28,7 @@ describe('Book parsing', function () {
         assert.equal(LEXED[0].name, "Test");
         assert.equal(LEXED[0].description, "a test text");
 
-        assert.equal(LEXED[1].id, "test 2");
+        assert.equal(LEXED[1].id, "test_2");
         assert.equal(LEXED[1].name, "Test 2");
         assert.equal(LEXED[1].description, "a second test");
     });

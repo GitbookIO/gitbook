@@ -25,6 +25,7 @@ describe('Website Generator', function () {
     it('should correctly generate a multilingual book to website', function(done) {
         testGeneration(books[2], "site", function(output) {
             assert(fs.existsSync(path.join(output, "index.html")));
+            assert(fs.existsSync(path.join(output, "gitbook")));
             assert(fs.existsSync(path.join(output, "fr/index.html")));
             assert(fs.existsSync(path.join(output, "en/index.html")));
         }, done);
