@@ -3,7 +3,6 @@ var _ = require('lodash');
 var assert = require('assert');
 
 var fs = require("fs");
-var fsUtil = require("../lib/utils/fs");
 
 describe('JSON generator', function () {
     it('should correctly generate a book to json', function(done) {

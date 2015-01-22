@@ -3,6 +3,7 @@ var Q = require('q');
 var fs = require('fs');
 var _ = require('lodash');
 
+var fsUtil = require("../lib/utils/fs");
 var Book = require('../').Book;
 
 // Nicety for mocha / Q
@@ -48,6 +49,9 @@ before(function(done) {
     qdone(
 	    _.reduce(global.books, function(prev, book) {
             return prev.then(function() {
+                return fsUtil.remove(path.join(book.root, "_book"));
+            })
+            .then(function() {
                 return book.parse();
             });
         }, Q()),
