@@ -5,7 +5,16 @@ var assert = require('assert');
 var fs = require("fs");
 
 describe('JSON generator', function () {
-    it('should correctly generate a book to json', function(done) {
+    it('should correctly generate a book to json with glossary', function(done) {
+        testGeneration(books[0], "json", function(output) {
+            assert(fs.existsSync(path.join(output, "README.json")));
+
+            var readme = JSON.parse(fs.readFileSync(path.join(output, "README.json")));
+            assert(readme.sections[0].content.indexOf('class="glossary-term"') > 0);
+        }, done);
+    });
+
+    it('should correctly generate a book to json with sub folders', function(done) {
     	testGeneration(books[1], "json", function(output) {
             assert(!fs.existsSync(path.join(output, "README.json")));
             assert(fs.existsSync(path.join(output, "intro.json")));
