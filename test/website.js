@@ -10,6 +10,7 @@ describe('Website Generator', function () {
     it('should correctly generate a book to website', function(done) {
         testGeneration(books[1], "site", function(output) {
             assert(fs.existsSync(path.join(output, "index.html")));
+            assert(fs.existsSync(path.join(output, "search_index.json")));
         }, done);
     });
 
