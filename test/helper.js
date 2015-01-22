@@ -14,6 +14,21 @@ global.qdone = function qdone(promise, done) {
     }).done();
 };
 
+// Test generation of a book
+global.testGeneration = function(book, type, func, done) {
+    var OUTPUT_PATH = book.options.output;
+
+    qdone(
+        book.generate(type)
+            .then(function() {
+                func(OUTPUT_PATH);
+            })
+            .fin(function() {
+                return fsUtil.remove(OUTPUT_PATH);
+            }),
+        done);
+};
+
 // Books for testings
 global.books = [];
 
