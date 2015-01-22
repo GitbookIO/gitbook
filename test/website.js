@@ -22,6 +22,12 @@ describe('Website Generator', function () {
         }, done);
     });
 
+    it('should correctly include glossary in website', function(done) {
+        testGeneration(books[0], "site", function(output) {
+            assert(fs.existsSync(path.join(output, "GLOSSARY.html")));
+        }, done);
+    });
+
     it('should correctly generate a multilingual book to website', function(done) {
         testGeneration(books[2], "site", function(output) {
             assert(fs.existsSync(path.join(output, "index.html")));
