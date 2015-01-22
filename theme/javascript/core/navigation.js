@@ -5,9 +5,8 @@ define([
     "core/state",
     "core/progress",
     "core/loading",
-    "core/search",
-    "core/glossary"
-], function($, URL, events, state, progress, loading, search, glossary) {
+    "core/search"
+], function($, URL, events, state, progress, loading, search) {
     var prev, next;
 
     var usePushState = (typeof history.pushState !== "undefined");
@@ -80,9 +79,6 @@ define([
 
         // Update navigation position
         updateNavigationPosition();
-
-        // Set glossary items
-        glossary.prepare();
 
         // Reset scroll
         $pageWrapper.scrollTop(0);
