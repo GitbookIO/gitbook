@@ -43,10 +43,10 @@ describe('Book parsing', function () {
         assert.equal(books[2].books.length, 2);
         assert(books[2].isMultilingual());
 
-        assert.equal(books[2].books[0].options.lang, "en");
+        assert.equal(books[2].books[0].options.language, "en");
         assert.equal(books[2].books[0].options.title, "English Book");
 
-        assert.equal(books[2].books[1].options.lang, "fr");
+        assert.equal(books[2].books[1].options.language, "fr");
         assert.equal(books[2].books[1].options.title, "French Book");
     });
 
