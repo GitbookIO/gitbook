@@ -1,12 +1,12 @@
 <div class="book-header">
     <!-- Actions Left -->
-    <a href="#" class="btn pull-left toggle-summary" aria-label="Toggle summary"><i class="fa fa-align-justify"></i></a>
-    <a href="#" class="btn pull-left toggle-search" aria-label="Toggle search"><i class="fa fa-search"></i></a>
+    <a href="#" class="btn pull-left toggle-summary" aria-label="{% i18n "SUMMARY_TOGGLE" %}Table of Contents{% endi18n %}"><i class="fa fa-align-justify"></i></a>
+    <a href="#" class="btn pull-left toggle-search" aria-label="{% i18n "SEARCH_TOGGLE" %}Search{% endi18n %}"><i class="fa fa-search"></i></a>
     {% if glossary.length > 0 %}
-    <a href="{{ basePath }}/GLOSSARY.html" class="btn pull-left" aria-label="Open Glossary"><i class="fa fa-sort-alpha-asc"></i></a>
+    <a href="{{ basePath }}/GLOSSARY.html" class="btn pull-left" aria-label="{% i18n "GLOSSARY_OPEN" %}Glossary{% endi18n %}"><i class="fa fa-sort-alpha-asc"></i></a>
     {% endif %}
     <div id="font-settings-wrapper" class="dropdown pull-left">
-        <a href="#" class="btn toggle-dropdown" aria-label="Toggle font settings"><i class="fa fa-font"></i>
+        <a href="#" class="btn toggle-dropdown" aria-label="{% i18n "FONTSETTINGS_TOGGLE" %}Font Settings{% endi18n %}"><i class="fa fa-font"></i>
         </a>
         {% include "./font-settings.html" %}
     </div>
@@ -14,7 +14,7 @@
     <!-- Actions Right -->
     {% if options.links.sharing.all != false %}
     <div class="dropdown pull-right">
-        <a href="#" class="btn toggle-dropdown" aria-label="Toggle share dropdown"><i class="fa fa-share-alt"></i>
+        <a href="#" class="btn toggle-dropdown" aria-label="{% i18n "SHARE_TOGGLE" %}Share{% endi18n %}"><i class="fa fa-share-alt"></i>
         </a>
         <div class="dropdown-menu font-settings dropdown-left">
             <div class="dropdown-caret">
@@ -22,27 +22,27 @@
                 <span class="caret-inner"></span>
             </div>
             <div class="buttons">
-                <button type="button" data-sharing="twitter" class="button">Twitter</button>
-                <button type="button" data-sharing="google-plus" class="button">Google</button>
-                <button type="button" data-sharing="facebook" class="button">Facebook</button>
-                <button type="button" data-sharing="weibo" class="button">Weibo</button>
-                <button type="button" data-sharing="instapaper" class="button">Instapaper</button>
+                <button type="button" data-sharing="twitter" class="button">{% i18n "SHARE_TWITTER" %}Twitter{% endi18n %}</button>
+                <button type="button" data-sharing="google-plus" class="button">{% i18n "SHARE_GOOGLE" %}Google{% endi18n %}</button>
+                <button type="button" data-sharing="facebook" class="button">{% i18n "SHARE_FACEBOOK" %}Facebook{% endi18n %}</button>
+                <button type="button" data-sharing="weibo" class="button">{% i18n "SHARE_WEIBO" %}Weibo{% endi18n %}</button>
+                <button type="button" data-sharing="instapaper" class="button">{% i18n "SHARE_INSTAPAPER" %}Instapaper{% endi18n %}</button>
             </div>
         </div>
     </div>
     {% endif %}
 
     {% if options.links.sharing.google != false %}
-    <a href="#" target="_blank" class="btn pull-right google-plus-sharing-link sharing-link" data-sharing="google-plus" aria-label="Share on Google Plus"><i class="fa fa-google-plus"></i></a>
+    <a href="#" target="_blank" class="btn pull-right google-plus-sharing-link sharing-link" data-sharing="google-plus" aria-label="{% i18n "SHARE_GOOGLE" %}Google{% endi18n %}"><i class="fa fa-google-plus"></i></a>
     {% endif %}
     {% if options.links.sharing.facebook != false %}
-    <a href="#" target="_blank" class="btn pull-right facebook-sharing-link sharing-link" data-sharing="facebook" aria-label="Share on Facebook"><i class="fa fa-facebook"></i></a>
+    <a href="#" target="_blank" class="btn pull-right facebook-sharing-link sharing-link" data-sharing="facebook" aria-label="{% i18n "SHARE_FACEBOOK" %}Facebook{% endi18n %}"><i class="fa fa-facebook"></i></a>
     {% endif %}
     {% if options.links.sharing.twitter != false %}
-    <a href="#" target="_blank" class="btn pull-right twitter-sharing-link sharing-link" data-sharing="twitter" aria-label="Share on Twitter"><i class="fa fa-twitter"></i></a>
+    <a href="#" target="_blank" class="btn pull-right twitter-sharing-link sharing-link" data-sharing="twitter" aria-label="{% i18n "SHARE_TWITTER" %}Twitter{% endi18n %}"><i class="fa fa-twitter"></i></a>
     {% endif %}
     {% if options.links.sharing.weibo == true %}
-    <a href="#" target="_blank" class="btn pull-right weibo-sharing-link sharing-link" data-sharing="weibo" aria-label="Share on Weibo"><i class="fa fa-weibo"></i></a>
+    <a href="#" target="_blank" class="btn pull-right weibo-sharing-link sharing-link" data-sharing="weibo" aria-label="{% i18n "SHARE_WEIBO" %}Weibo{% endi18n %}"><i class="fa fa-weibo"></i></a>
     {% endif %}
 
     <!-- Title -->

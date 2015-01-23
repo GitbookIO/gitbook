@@ -33,7 +33,7 @@
 
 <div class="book-summary">
     <div class="book-search">
-        <input type="text" placeholder="Type to search" class="form-control" />
+        <input type="text" placeholder="{% i18n "SEARCH_PLACEHOLDER" %}Type to search{% endi18n %}" class="form-control" />
     </div>
     <ul class="summary">
         {% set _divider = false %}
@@ -55,7 +55,7 @@
         {% if options.links.gitbook != false %}
         <li class="divider"></li>
         <li>
-            <a href="https://www.gitbook.com" target="blank" class="gitbook-link">Published using GitBook</a>
+            <a href="https://www.gitbook.com" target="blank" class="gitbook-link">{% i18n "GITBOOK_LINK" %}Published using GitBook{% endi18n %}</a>
         </li>
         {% endif %}
     </ul>
