@@ -22,27 +22,27 @@
                 <span class="caret-inner"></span>
             </div>
             <div class="buttons">
-                <button type="button" data-sharing="twitter" class="button">{% i18n "SHARE_TWITTER" %}Twitter{% endi18n %}</button>
-                <button type="button" data-sharing="google-plus" class="button">{% i18n "SHARE_GOOGLE" %}Google{% endi18n %}</button>
-                <button type="button" data-sharing="facebook" class="button">{% i18n "SHARE_FACEBOOK" %}Facebook{% endi18n %}</button>
-                <button type="button" data-sharing="weibo" class="button">{% i18n "SHARE_WEIBO" %}Weibo{% endi18n %}</button>
-                <button type="button" data-sharing="instapaper" class="button">{% i18n "SHARE_INSTAPAPER" %}Instapaper{% endi18n %}</button>
+                <button type="button" data-sharing="twitter" class="button">{% i18n "SHARE_ON", __platform__="Twitter" %}Share on __platform__{% endi18n %}</button>
+                <button type="button" data-sharing="google-plus" class="button">{% i18n "SHARE_ON", __platform__="Google" %}Share on __platform__{% endi18n %}</button>
+                <button type="button" data-sharing="facebook" class="button">{% i18n "SHARE_ON", __platform__="Facebook" %}Share on __platform__{% endi18n %}</button>
+                <button type="button" data-sharing="weibo" class="button">{% i18n "SHARE_ON", __platform__="Weibo" %}Share on __platform__{% endi18n %}</button>
+                <button type="button" data-sharing="instapaper" class="button">{% i18n "SHARE_ON", __platform__="Instapaper" %}Share on __platform__{% endi18n %}</button>
             </div>
         </div>
     </div>
     {% endif %}
 
     {% if options.links.sharing.google != false %}
-    <a href="#" target="_blank" class="btn pull-right google-plus-sharing-link sharing-link" data-sharing="google-plus" aria-label="{% i18n "SHARE_GOOGLE" %}Google{% endi18n %}"><i class="fa fa-google-plus"></i></a>
+    <a href="#" target="_blank" class="btn pull-right google-plus-sharing-link sharing-link" data-sharing="google-plus" aria-label="Google"><i class="fa fa-google-plus"></i></a>
     {% endif %}
     {% if options.links.sharing.facebook != false %}
-    <a href="#" target="_blank" class="btn pull-right facebook-sharing-link sharing-link" data-sharing="facebook" aria-label="{% i18n "SHARE_FACEBOOK" %}Facebook{% endi18n %}"><i class="fa fa-facebook"></i></a>
+    <a href="#" target="_blank" class="btn pull-right facebook-sharing-link sharing-link" data-sharing="facebook" aria-label="Facebook"><i class="fa fa-facebook"></i></a>
     {% endif %}
     {% if options.links.sharing.twitter != false %}
-    <a href="#" target="_blank" class="btn pull-right twitter-sharing-link sharing-link" data-sharing="twitter" aria-label="{% i18n "SHARE_TWITTER" %}Twitter{% endi18n %}"><i class="fa fa-twitter"></i></a>
+    <a href="#" target="_blank" class="btn pull-right twitter-sharing-link sharing-link" data-sharing="twitter" aria-label="Twitter"><i class="fa fa-twitter"></i></a>
     {% endif %}
     {% if options.links.sharing.weibo == true %}
-    <a href="#" target="_blank" class="btn pull-right weibo-sharing-link sharing-link" data-sharing="weibo" aria-label="{% i18n "SHARE_WEIBO" %}Weibo{% endi18n %}"><i class="fa fa-weibo"></i></a>
+    <a href="#" target="_blank" class="btn pull-right weibo-sharing-link sharing-link" data-sharing="weibo" aria-label="Weibo"><i class="fa fa-weibo"></i></a>
     {% endif %}
 
     <!-- Title -->
