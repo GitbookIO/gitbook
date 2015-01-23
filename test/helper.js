@@ -41,7 +41,9 @@ before(function(done) {
         .sortBy()
         .map(function(book) {
             if (book.indexOf("test") !== 0) return null;
-            return new Book(path.join(__dirname, './fixtures/', book));;
+            return new Book(path.join(__dirname, './fixtures/', book), {
+                logLevel: Book.LOG_LEVELS.DISABLED
+            });
         })
         .compact()
         .value();
