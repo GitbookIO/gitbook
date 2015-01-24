@@ -5,9 +5,9 @@
 {% macro articles(_articles) %}
     {% for item in _articles %}
         <li>
-            {% if item.path %}
-                {% if item.external %}
-                    <a href="{{ basePath }}/{{ item.path|contentLink }}">{{ item.title }}</a>
+            {% if item.path and item.exists %}
+                {% if not item.external %}
+                    <a href="{{ basePath }}/{{ item.path|contentLink }}">{% if item.introduction %}{% i18n "SUMMARY_INTRODUCTION" %}Introduction{% endi18n %}{% else %}{{ item.title }}{% endif %}</a>
                 {% else %}
                     <a target="_blank" href="{{ item.path }}">{{ item.title }}</a>
                 {% endif %}

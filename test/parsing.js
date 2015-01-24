@@ -18,18 +18,22 @@ describe('Book parsing', function () {
 
         assert.equal(LEXED.chapters[0].path, 'intro.md');
         assert.equal(LEXED.chapters[0].exists, true);
+        assert.equal(LEXED.chapters[0].introduction, true);
         assert.equal(LEXED.chapters[0].external, false);
 
     	assert.equal(LEXED.chapters[1].path, 'test.md');
         assert.equal(LEXED.chapters[1].exists, false);
+        assert.equal(LEXED.chapters[1].introduction, false);
         assert.equal(LEXED.chapters[1].external, false);
 
         assert.equal(LEXED.chapters[2].path, 'test2.md');
         assert.equal(LEXED.chapters[2].exists, false);
+        assert.equal(LEXED.chapters[2].introduction, false);
         assert.equal(LEXED.chapters[2].external, false);
 
         assert.equal(LEXED.chapters[3].path, 'https://www.google.com');
         assert.equal(LEXED.chapters[3].exists, true);
+        assert.equal(LEXED.chapters[3].introduction, false);
         assert.equal(LEXED.chapters[3].external, true);
     });
 
@@ -69,6 +73,10 @@ describe('Book parsing', function () {
         assert(NAVIGATION["intro.md"])
         assert.equal(NAVIGATION["intro.md"].title, "Introduction");
         assert.equal(NAVIGATION["intro.md"].prev, null);
-        assert.equal(NAVIGATION["intro.md"].next.title, "Chapter 1");
+        assert.equal(NAVIGATION["intro.md"].next.title, "Article 1");
+
+        assert.equal(NAVIGATION["sub/test1.md"].title, "Article 1");
+        assert.equal(NAVIGATION["sub/test1.md"].prev.title, "Introduction");
+        assert.equal(NAVIGATION["sub/test1.md"].next, null);
     });
 });

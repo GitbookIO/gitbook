@@ -1,14 +1,14 @@
 {% macro articles(_articles) %}
     {% for item in _articles %}
         <li class="chapter {% if item.path == _input %}active{% endif %}" data-level="{{ item.level }}" {% if item.path and not item.external %}data-path="{{ item.path|contentLink }}"{% endif %}>
-            {% if item.path %}
+            {% if item.path and item.exists %}
                 {% if not item.external %}
                     <a href="{{ basePath }}/{{ item.path|contentLink }}">
                         <i class="fa fa-check"></i>
                         {% if item.level != "0" %}
                             <b>{{ item.level }}.</b>
                         {% endif %}
-                         {{ item.title }}
+                        {% if item.introduction %}{% i18n "SUMMARY_INTRODUCTION" %}Introduction{% endi18n %}{% else %}{{ item.title }}{% endif %}
                     </a>
                 {% else %}
                     <a target="_blank" href="{{ item.path }}">
@@ -16,7 +16,7 @@
                         {% if item.level != "0" %}
                             <b>{{ item.level }}.</b>
                         {% endif %}
-                         {{ item.title }}
+                        {{ item.title }}
                     </a>
                 {% endif %}
             {% else %}
