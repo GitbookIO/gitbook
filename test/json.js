@@ -41,4 +41,13 @@ describe('JSON generator', function () {
             assert(fs.existsSync(path.join(output, "test2.json")));
         }, done);
     });
+
+    it('should correctly generate a book with inclusion', function(done) {
+        testGeneration(books[5], "json", function(output) {
+            assert(fs.existsSync(path.join(output, "README.json")));
+
+            var readme = JSON.parse(fs.readFileSync(path.join(output, "README.json")));
+            assert(readme.sections[0].content.indexOf('Hello World') > 0);
+        }, done);
+    });
 });
