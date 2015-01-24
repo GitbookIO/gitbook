@@ -22,7 +22,7 @@
         "cheerio": "0.18.0",
         "gitbook-plugin-mathjax": "0.0.6",
         "gitbook-plugin-livereload": "0.0.1",
-        "gaze": "0.6.4",
+        "gaze": "~0.5.1",
         "send": "0.2.0",
         "tiny-lr-fork": "0.0.5"
     },
