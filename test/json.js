@@ -42,12 +42,18 @@ describe('JSON generator', function () {
         }, done);
     });
 
-    it('should correctly generate a book with inclusion', function(done) {
+    it('should correctly generate a book with local inclusion', function(done) {
         testGeneration(books[5], "json", function(output) {
-            assert(fs.existsSync(path.join(output, "README.json")));
-
             var readme = JSON.parse(fs.readFileSync(path.join(output, "README.json")));
             assert(readme.sections[0].content.indexOf('Hello World') > 0);
+        }, done);
+    });
+
+    it('should correctly generate a book with external inclusion', function(done) {
+        testGeneration(books[5], "json", function(output) {
+            var readme = JSON.parse(fs.readFileSync(path.join(output, "README.json")));
+            assert(readme.sections[0].content.indexOf('Git1:Hello from git') > 0);
+            assert(readme.sections[0].content.indexOf('Git2:First Hello. Hello from git') > 0);
         }, done);
     });
 });
