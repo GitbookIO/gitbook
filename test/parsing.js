@@ -17,8 +17,20 @@ describe('Book parsing', function () {
         var LEXED = books[1].summary;
 
         assert.equal(LEXED.chapters[0].path, 'intro.md');
+        assert.equal(LEXED.chapters[0].exists, true);
+        assert.equal(LEXED.chapters[0].external, false);
+
     	assert.equal(LEXED.chapters[1].path, 'test.md');
+        assert.equal(LEXED.chapters[1].exists, false);
+        assert.equal(LEXED.chapters[1].external, false);
+
         assert.equal(LEXED.chapters[2].path, 'test2.md');
+        assert.equal(LEXED.chapters[2].exists, false);
+        assert.equal(LEXED.chapters[2].external, false);
+
+        assert.equal(LEXED.chapters[3].path, 'https://www.google.com');
+        assert.equal(LEXED.chapters[3].exists, true);
+        assert.equal(LEXED.chapters[3].external, true);
     });
 
     it('should correctly parse the glossary', function() {
