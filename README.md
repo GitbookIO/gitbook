@@ -37,8 +37,11 @@ $ gitbook build ./repository ./outputFolder
 
 ## Features
 
+* [Output as a website or ebook (pdf, epub, mobi)](#outputformats)
+* [Multi-Languages](#multilanguages)
 * [Glossary](#glossary)
-* [Glossary](#glossary)
+* [Cover](#cover)
+* [AsciiDoc Support](#asciidoc)
 
 ## Output Formats
 
@@ -118,11 +121,15 @@ The best resolution is **1800x2360**. The generation of the cover can be done au
 
 A small version of the cover can also be set by creating a file: **/cover_small.jpg**.
 
-#### Publish your book
+#### AsciiDoc
+
+Since version 2.0.0, AsciiDoc can be used instead of Markdown, simply replace the `.md` by the `.adoc` extension. Chapters in the summary are detected from an ordered list in the `SUMMARY.adoc`.
+
+## Publish your book
 
 The platform [GitBook.com](https://www.gitbook.com/) is like an "Heroku for books": you can create a book on it (public, paid, or private) and update it using **git push**.
 
-#### Plugins
+## Plugins
 
 Plugins can be used to extend your book's functionality. Read [GitbookIO/plugin](https://github.com/GitbookIO/plugin) for more information about how to build a plugin for GitBook.
 
@@ -157,7 +164,7 @@ Plugins needed to build a book can be installed using: `gitbook install ./`.
 | [PlantUml](https://github.com/romanlytkin/gitbook-plantuml) | Gitbook PlantUml plugin is used to select from markdown uml and converting it into a picture format svg |
 | [Mermaid](https://github.com/JozoVilcek/gitbook-plugin-mermaid) | Adds diagrams and flowcharts rendered by [mermaid](https://github.com/knsv/mermaid) |
 
-#### Debugging
+## Debugging
 
 You can use the options `--log=debug` and `--debug` to get better error messages (with stack trace). For example:
 
