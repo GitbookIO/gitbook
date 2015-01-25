@@ -37,11 +37,12 @@ $ gitbook build ./repository ./outputFolder
 
 ## Features
 
-* [Output as a website or ebook (pdf, epub, mobi)](#outputformats)
-* [Multi-Languages](#multilanguages)
+* [Output as a website or ebook (pdf, epub, mobi)](#output-formats)
+* [Multi-Languages](#multi-languages)
 * [Glossary](#glossary)
 * [Cover](#cover)
 * [AsciiDoc Support](#asciidoc)
+* [Plugins](#plugins)
 
 ## Output Formats
 
