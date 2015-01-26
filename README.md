@@ -113,6 +113,40 @@ With it's definition, this can contain bold text and all other kinds of inline m
 
 #### Variables and Templating
 
+A set of variables can be defined in the `book.json`:
+
+```js
+{
+    "variables": {
+        "host": "mybook.com"
+    }
+}
+```
+
+These variables can be used in the markdown files:
+
+```
+The host is {{ book.host }}
+```
+
+You can also use condition with these variables:
+
+```
+{% if book.host == "mybook.com" %}
+
+{% else %}
+
+{% endif %}
+```
+
+Variables of `book.json` are available in the `book` namespace. You can also access informations about the `file` itself and the `gitbook` version:
+
+```
+My file is {{ file.path }}
+Modified at {{ file.mtime }}
+Book built with GitBook {{ gitbook.version }}
+```
+
 #### Content References
 
 You can use "content references," or conrefs, when writing books or documentation using GitBook.
