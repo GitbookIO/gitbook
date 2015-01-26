@@ -35,4 +35,19 @@ describe('Plugins', function () {
                 done);
         });
     });
+
+    describe('filters', function() {
+        var plugin = new Plugin(books[0], "filters");
+        plugin.load("./filters", PLUGINS_ROOT);
+
+        it('should valid a plugin', function() {
+            assert(plugin.isValid());
+        });
+
+        it('should return a map of filters', function() {
+            var filters = plugin.getFilters();
+            assert.equal(_.size(filters), 1);
+            assert(filters["hello"]);
+        });
+    });
 });
