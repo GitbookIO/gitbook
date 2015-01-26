@@ -45,6 +45,10 @@ $ gitbook build ./repository ./outputFolder
 * [Variables and Templating](#variables-and-templating)
 * [Content References](#content-references)
 * [Plugins](#plugins)
+* Interractive reader website:
+    * Search
+    * Font Settings (Serif, Sans Serif)
+    * Themes: white, sepia, night
 
 ## Output Formats
 
