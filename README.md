@@ -42,6 +42,8 @@ $ gitbook build ./repository ./outputFolder
 * [Glossary](#glossary)
 * [Cover](#cover)
 * [AsciiDoc Support](#asciidoc)
+* [Variables and Templating](#variables-and-templating)
+* [Content References](#content-references)
 * [Plugins](#plugins)
 
 ## Output Formats
@@ -107,6 +109,30 @@ Definition for this term
 
 # Another term
 With it's definition, this can contain bold text and all other kinds of inline markup ...
+```
+
+#### Variables and Templating
+
+#### Content References
+
+You can use "content references," or conrefs, when writing books or documentation using GitBook.
+
+Include a file from the same book:
+
+```
+{% include "./test.md" %}
+```
+
+or from a git repository (with a specific revision):
+
+```
+{% include "git+https://github.com/GitbookIO/documentation.git/README.md#1.0.1" %}
+```
+
+Includes can be used with variables (see [Variables and Templating](#variables-and-templating)):
+
+```
+{% include book.ref_doc_readme %}
 ```
 
 #### Ignoring files & folders
