@@ -28,7 +28,7 @@
         "tmp": "0.0.24",
         "crc": "3.2.1",
         "bash-color": "0.0.3",
-        "normalize-git-url": "1.0.0"
+        "URIjs": "1.14.1"
     },
     "devDependencies": {
         "mocha": "1.18.2",

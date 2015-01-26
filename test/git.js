@@ -25,7 +25,7 @@ describe('GIT parser and getter', function () {
     it('should correctly parse an ssh url', function() {
         var parts = git.parseUrl("git+git@github.com:GitbookIO/gitbook.git/directory/README.md#e1594cde2c32e4ff48f6c4eff3d3d461743d74e1");
         assert(parts);
-        assert.equal(parts.host, "ssh://git@github.com/GitbookIO/gitbook.git");
+        assert.equal(parts.host, "git@github.com:GitbookIO/gitbook.git");
         assert.equal(parts.ref, "e1594cde2c32e4ff48f6c4eff3d3d461743d74e1");
         assert.equal(parts.filepath, "directory/README.md");
     });
