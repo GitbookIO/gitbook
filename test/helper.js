@@ -31,22 +31,21 @@ global.testGeneration = function(book, type, func, done) {
 };
 
 // Books for testings
-global.books = [];
+var books = fs.readdirSync(path.join(__dirname, './fixtures/'));
+
+global.books = _.chain(books)
+    .sortBy()
+    .map(function(book) {
+        if (book.indexOf("test") !== 0) return null;
+        return new Book(path.join(__dirname, './fixtures/', book), {
+            logLevel: Book.LOG_LEVELS.DISABLED
+        });
+    })
+    .compact()
+    .value();
 
 // Init before doing tests
 before(function(done) {
-    var books = fs.readdirSync(path.join(__dirname, './fixtures/'));
-
-    global.books = _.chain(books)
-        .sortBy()
-        .map(function(book) {
-            if (book.indexOf("test") !== 0) return null;
-            return new Book(path.join(__dirname, './fixtures/', book), {
-                logLevel: Book.LOG_LEVELS.DISABLED
-            });
-        })
-        .compact()
-        .value();
 
     qdone(
 	    _.reduce(global.books, function(prev, book) {
