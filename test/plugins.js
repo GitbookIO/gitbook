@@ -40,14 +40,39 @@ describe('Plugins', function () {
         var plugin = new Plugin(books[0], "filters");
         plugin.load("./filters", PLUGINS_ROOT);
 
+        before(function(done) {
+            qdone(books[0].plugins.load(plugin), done);
+        });
+
         it('should valid a plugin', function() {
             assert(plugin.isValid());
         });
 
         it('should return a map of filters', function() {
             var filters = plugin.getFilters();
-            assert.equal(_.size(filters), 1);
+            assert.equal(_.size(filters), 2);
             assert(filters["hello"]);
+            assert(filters["helloCtx"]);
+        });
+
+        it('should correctly extend template filters', function(done) {
+            qdone(
+                books[0].template.renderString('{{ "World"|hello }}')
+                .then(function(content) {
+                    assert.equal(content, "Hello World");
+                }),
+                done
+            );
+        });
+
+        it('should correctly set book as context', function(done) {
+            qdone(
+                books[0].template.renderString('{{ "root"|helloCtx }}')
+                .then(function(content) {
+                    assert.equal(content, "root:"+books[0].root);
+                }),
+                done
+            );
         });
     });
 });
