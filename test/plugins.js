@@ -97,5 +97,15 @@ describe('Plugins', function () {
                 done
             );
         });
+
+        it('should correctly extend template blocks with defined end', function(done) {
+            qdone(
+                books[0].template.renderString('{% test2 %}hello{% endtest2end %}')
+                .then(function(content) {
+                    assert.equal(content, "test2hellotest2");
+                }),
+                done
+            );
+        });
     });
 });
