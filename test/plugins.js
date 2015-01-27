@@ -110,9 +110,9 @@ describe('Plugins', function () {
 
         it('should correctly extend template blocks with sub-blocks', function(done) {
             qdone(
-                books[0].template.renderString('{% test3join %}hello{% also %}the{% also %}world{% endtest3join %}')
+                books[0].template.renderString('{% test3join separator=";" %}hello{% also %}world{% endtest3join %}')
                 .then(function(content) {
-                    assert.equal(content, "hello the world");
+                    assert.equal(content, "hello;world");
                 }),
                 done
             );
