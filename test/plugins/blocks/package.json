@@ -1,0 +1,9 @@
+{
+    "name": "gitbook-plugin-blocks",
+    "description": "Test blocks",
+    "main": "index.js",
+    "version": "0.0.1",
+    "engines": {
+        "gitbook": "*"
+    }
+}

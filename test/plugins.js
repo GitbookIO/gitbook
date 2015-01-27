@@ -75,4 +75,27 @@ describe('Plugins', function () {
             );
         });
     });
+
+    describe('blocks', function() {
+        var plugin = new Plugin(books[0], "blocks");
+        plugin.load("./blocks", PLUGINS_ROOT);
+
+        before(function(done) {
+            qdone(books[0].plugins.load(plugin), done);
+        });
+
+        it('should valid a plugin', function() {
+            assert(plugin.isValid());
+        });
+
+        it('should correctly extend template blocks', function(done) {
+            qdone(
+                books[0].template.renderString('{% test %}hello{% endtest %}')
+                .then(function(content) {
+                    assert.equal(content, "testhellotest");
+                }),
+                done
+            );
+        });
+    });
 });
