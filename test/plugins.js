@@ -117,5 +117,15 @@ describe('Plugins', function () {
                 done
             );
         });
+
+        it('should correctly extend template blocks with different sub-blocks', function(done) {
+            qdone(
+                books[0].template.renderString('{% test4join separator=";" %}hello{% also %}the{% finally %}world{% endtest4join %}')
+                .then(function(content) {
+                    assert.equal(content, "hello;the;world");
+                }),
+                done
+            );
+        });
     });
 });
