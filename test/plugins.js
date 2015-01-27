@@ -100,7 +100,9 @@ describe('Plugins', function () {
 
         it('should correctly accept shortcuts', function(done) {
             qdone(
-                books[0].template.renderString('$$hello$$')
+                books[0].template.renderString('$$hello$$', {}, {
+                    type: "markdown"
+                })
                 .then(function(content) {
                     assert.equal(content, "testhellotest");
                 }),
