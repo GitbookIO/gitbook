@@ -3,6 +3,11 @@ var assert = require("assert");
 module.exports = {
     blocks: {
     	"test": {
+            shortcuts: {
+                parsers:  ["markdown"],
+                start: "$$",
+                end: "$$"
+            },
     		process: function(blk) {
     			return "test"+blk.body+"test";
     		}

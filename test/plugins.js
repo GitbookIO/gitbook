@@ -98,6 +98,16 @@ describe('Plugins', function () {
             );
         });
 
+        it('should correctly accept shortcuts', function(done) {
+            qdone(
+                books[0].template.renderString('$$hello$$')
+                .then(function(content) {
+                    assert.equal(content, "testhellotest");
+                }),
+                done
+            );
+        });
+
         it('should correctly extend template blocks with defined end', function(done) {
             qdone(
                 books[0].template.renderString('{% test2 %}hello{% endtest2end %}')
