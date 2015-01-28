@@ -28,7 +28,6 @@
         "crc": "3.2.1",
         "bash-color": "0.0.3",
         "URIjs": "1.14.1",
-        "gm": "1.17.0",
         "request": "2.51.0"
     },
     "devDependencies": {
