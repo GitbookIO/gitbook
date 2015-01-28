@@ -12,4 +12,10 @@ describe('eBook Generator', function () {
             assert(fs.existsSync(path.join(output, "SUMMARY.html")));
         }, done);
     });
+
+    it('should correctly convert svg images to png', function(done) {
+        testGeneration(books[4], "ebook", function(output) {
+            assert(fs.existsSync(path.join(output, "test.png")));
+        }, done);
+    });
 });
