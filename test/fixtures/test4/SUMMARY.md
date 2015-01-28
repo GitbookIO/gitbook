@@ -1,3 +1,3 @@
 # Summary
 
-* [Page](PAGE.md)
+* [Page](sub/PAGE.md)

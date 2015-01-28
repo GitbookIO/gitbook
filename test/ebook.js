@@ -15,9 +15,17 @@ describe('eBook Generator', function () {
 
     it('should correctly convert svg images to png', function(done) {
         testGeneration(books[4], "ebook", function(output) {
+            var pageContent = fs.readFileSync(path.join(output, "sub/PAGE.html"), {encoding: "utf8"});
+
             assert(fs.existsSync(path.join(output, "test.png")));
-            assert(!fs.existsSync(path.join(output, "test_0.png")));
             assert(fs.existsSync(path.join(output, "NewTux.png")));
+
+            assert(!fs.existsSync(path.join(output, "test_0.png")));
+            assert(!fs.existsSync(path.join(output, "sub/test.png")));
+            assert(!fs.existsSync(path.join(output, "sub/NewTux.png")));
+
+            assert(pageContent.indexOf('src="../test.png"') >= 0);
+            assert(pageContent.indexOf('src="../NewTux.png"') >= 0);
         }, done);
     });
 });
