@@ -36,6 +36,33 @@ describe('Plugins', function () {
         });
     });
 
+    describe('resources plugin', function() {
+        var plugin = new Plugin(books[0], "resources");
+        plugin.load("./resources", PLUGINS_ROOT);
+
+        before(function(done) {
+            qdone(books[0].plugins.load(plugin), done);
+        });
+
+        it('should valid a plugin', function() {
+            assert(plugin.isValid());
+        });
+
+        it('should return a valid list of resources', function(done) {
+            qdone(
+                plugin.getResources()
+                .then(function(resources) {
+                    assert.equal(resources["js"].length, 1);
+                }),
+                done);
+        });
+
+        it('should extend books plugins', function() {
+            var resources = books[0].plugins.resources;
+            assert.equal(resources["js"].length, 1);
+        });
+    });
+
     describe('filters', function() {
         var plugin = new Plugin(books[0], "filters");
         plugin.load("./filters", PLUGINS_ROOT);

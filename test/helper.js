@@ -5,6 +5,7 @@ var _ = require('lodash');
 
 var fsUtil = require("../lib/utils/fs");
 var Book = require('../').Book;
+var LOG_LEVELS = require('../').LOG_LEVELS;
 
 // Nicety for mocha / Q
 global.qdone = function qdone(promise, done) {
@@ -38,7 +39,7 @@ global.books = _.chain(books)
     .map(function(book) {
         if (book.indexOf("test") !== 0) return null;
         return new Book(path.join(__dirname, './fixtures/', book), {
-            logLevel: Book.LOG_LEVELS.DISABLED
+            logLevel: LOG_LEVELS.DISABLED
         });
     })
     .compact()
