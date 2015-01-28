@@ -16,6 +16,7 @@ describe('eBook Generator', function () {
     it('should correctly convert svg images to png', function(done) {
         testGeneration(books[4], "ebook", function(output) {
             assert(fs.existsSync(path.join(output, "test.png")));
+            assert(fs.existsSync(path.join(output, "NewTux.png")));
         }, done);
     });
 });
