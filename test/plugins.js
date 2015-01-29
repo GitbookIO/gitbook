@@ -107,6 +107,11 @@ describe('Plugins', function () {
         var plugin = new Plugin(books[0], "blocks");
         plugin.load("./blocks", PLUGINS_ROOT);
 
+        var testTpl = function(str, args, options) {
+            return books[0].template.renderString(str, args, options)
+            .then(books[0].template.postProcess)
+        };
+
         before(function(done) {
             qdone(books[0].plugins.load(plugin), done);
         });
@@ -117,7 +122,7 @@ describe('Plugins', function () {
 
         it('should correctly extend template blocks', function(done) {
             qdone(
-                books[0].template.renderString('{% test %}hello{% endtest %}')
+                testTpl('{% test %}hello{% endtest %}')
                 .then(function(content) {
                     assert.equal(content, "testhellotest");
                 }),
@@ -127,7 +132,7 @@ describe('Plugins', function () {
 
         it('should correctly accept shortcuts', function(done) {
             qdone(
-                books[0].template.renderString('$$hello$$', {}, {
+                testTpl('$$hello$$', {}, {
                     type: "markdown"
                 })
                 .then(function(content) {
@@ -139,7 +144,7 @@ describe('Plugins', function () {
 
         it('should correctly extend template blocks with defined end', function(done) {
             qdone(
-                books[0].template.renderString('{% test2 %}hello{% endtest2end %}')
+                testTpl('{% test2 %}hello{% endtest2end %}')
                 .then(function(content) {
                     assert.equal(content, "test2hellotest2");
                 }),
@@ -149,7 +154,7 @@ describe('Plugins', function () {
 
         it('should correctly extend template blocks with sub-blocks', function(done) {
             qdone(
-                books[0].template.renderString('{% test3join separator=";" %}hello{% also %}world{% endtest3join %}')
+                testTpl('{% test3join separator=";" %}hello{% also %}world{% endtest3join %}')
                 .then(function(content) {
                     assert.equal(content, "hello;world");
                 }),
@@ -159,7 +164,7 @@ describe('Plugins', function () {
 
         it('should correctly extend template blocks with different sub-blocks', function(done) {
             qdone(
-                books[0].template.renderString('{% test4join separator=";" %}hello{% also %}the{% finally %}world{% endtest4join %}')
+                testTpl('{% test4join separator=";" %}hello{% also %}the{% finally %}world{% endtest4join %}')
                 .then(function(content) {
                     assert.equal(content, "hello;the;world");
                 }),
