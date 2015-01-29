@@ -836,6 +836,26 @@ function filterList(nodes) {
     .value().slice(1, -1);
 }
 
+function skipSpace(nodes) {
+    return _.filter(nodes, function(node) {
+        return node && node.type != 'space';
+    });
+}
+
+function correctLoose(nodes) {
+    return _.map(nodes, function(node) {
+        // Return normal nodes
+        if(!node || node.type != 'loose_item_start') {
+            return node
+        }
+
+        // Correct loose items
+        node.type = 'list_item_start';
+
+        return node;
+    })
+}
+
 // Parses an Article or Chapter title
 // supports extracting links
 function parseTitle(src, nums) {
@@ -899,18 +919,17 @@ function listGroups(src) {
 
     // Get out groups of lists
     return listSplit(
-        filterList(nodes),
+        filterList(correctLoose(skipSpace(nodes))),
         'list_item_start', 'list_item_end'
     );
 }
 
 function parseSummary(src) {
     // Split out chapter sections
-    var chapters = defaultChapterList(listGroups(src))
-    .map(parseChapter);
+    var chapters = defaultChapterList(listGroups(src));
 
     return {
-        chapters: chapters
+        chapters: chapters.map(parseChapter)
     };
 }
 
@@ -12986,7 +13005,7 @@ Lexer.prototype.token = function(src, top, bq) {
         type: 'table',
         header: cap[1].replace(/^ *| *\| *$/g, '').split(/ *\| */),
         align: cap[2].replace(/^ *|\| *$/g, '').split(/ *\| */),
-        cells: cap[3].replace(/(?: *\| *)?\n$/, '').split('\n')
+        cells: cap[3].replace(/(?: *\| *)?\n$/, '').split('\n').slice(0),
       };
 
       for (i = 0; i < item.align.length; i++) {
@@ -13413,13 +13432,24 @@ Renderer.prototype.html = function(html) {
   return html;
 };
 
+Renderer.prototype._createId = function(str) {
+  // replace " " and all punctuation characters to "-"
+  str = str.toLowerCase().replace(/[\s\]\[\!\"\#\$\%\&\'\(\)\*\+\,\.\/\:\;\<\=\>\?\@\\\^\_\`\{\|\}\~\-]+/g, '-');
+  try {
+    str = encodeURIComponent(str);
+  } catch (e) {
+    str = str.replace(/[^\w]+/g, '-');
+  }
+  return str.replace(/-$/, '');
+};
+
 Renderer.prototype.heading = function(text, level, raw) {
   var id = /({#)(.+)(})/g.exec(raw);
   return '<h'
     + level
     + ' id="'
     + this.options.headerPrefix
-    + (id ? id[2] : (raw.toLowerCase().replace(/[^\w]+/g, '-')).replace(/-$/, ''))
+    + (id ? id[2] : this._createId(raw))
     + '">'
     + text.replace(/{#.+}/g, '')
     + '</h'
