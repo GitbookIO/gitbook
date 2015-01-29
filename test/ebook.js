@@ -18,6 +18,10 @@ describe('eBook Generator', function () {
             var readmeContent = fs.readFileSync(path.join(output, "index.html"), {encoding: "utf8"});
             var pageContent = fs.readFileSync(path.join(output, "sub/PAGE.html"), {encoding: "utf8"});
 
+            // Remote image
+            assert(pageContent.indexOf('src="../Tux.png"') >= 0);
+            assert(fs.existsSync(path.join(output, "Tux.png")));
+
             assert(fs.existsSync(path.join(output, "test.png")));
             assert(fs.existsSync(path.join(output, "NewTux.png")));
 
