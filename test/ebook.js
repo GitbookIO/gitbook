@@ -27,6 +27,7 @@ describe('eBook Generator', function () {
 
             assert(pageContent.indexOf('src="../test.png"') >= 0);
             assert(pageContent.indexOf('src="../NewTux.png"') >= 0);
+            assert(pageContent.indexOf('<svg') < 0);
 
             assert(readmeContent.indexOf('src="test.png"') >= 0);
             assert(readmeContent.indexOf('src="NewTux.png"') >= 0);
