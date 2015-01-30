@@ -48,18 +48,32 @@ describe('Plugins', function () {
             assert(plugin.isValid());
         });
 
-        it('should return a valid list of resources', function(done) {
+        it('should return a valid list of resources (website)', function(done) {
             qdone(
-                plugin.getResources()
+                plugin.getResources("website")
                 .then(function(resources) {
                     assert.equal(resources["js"].length, 1);
                 }),
                 done);
         });
 
-        it('should extend books plugins', function() {
-            var resources = books[0].plugins.resources;
+        it('should return a valid list of resources (ebook)', function(done) {
+            qdone(
+                plugin.getResources("ebook")
+                .then(function(resources) {
+                    assert.equal(resources["css"].length, 1);
+                }),
+                done);
+        });
+
+        it('should extend books plugins (website)', function() {
+            var resources = books[0].plugins.resources("website");
             assert.equal(resources["js"].length, 1);
+        });
+
+        it('should extend books plugins (ebook)', function() {
+            var resources = books[0].plugins.resources("ebook");
+            assert.equal(resources["css"].length, 1);
         });
     });
 

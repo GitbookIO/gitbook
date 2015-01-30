@@ -1,8 +1,8 @@
 <!DOCTYPE HTML>
 <html lang="{{ language }}" {% block htmlTag %}{% endblock %}>
-    {{ htmlSnippet("html:start")|default("") }}
+    {{ htmlSnippet("html:start")|default("")|safe }}
     <head>
-        {{ htmlSnippet("head:start")|default("") }}
+        {{ htmlSnippet("head:start")|default("")|safe }}
         <meta charset="UTF-8">
         <title>{% block title %}{% endblock %}</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
@@ -12,11 +12,11 @@
         {{ htmlSnippet("head:end")|default("") }}
     </head>
     <body>
-        {{ htmlSnippet("body:start")|default("") }}
+        {{ htmlSnippet("body:start")|default("")|safe }}
         {% block style %}{% endblock %}
         {% block content %}{% endblock %}
         {% block javascript %}{% endblock %}
-        {{ htmlSnippet("body:end")|default("") }}
+        {{ htmlSnippet("body:end")|default("")|safe }}
     </body>
-    {{ htmlSnippet("html:end")|default("") }}
+    {{ htmlSnippet("html:end")|default("")|safe }}
 </html>

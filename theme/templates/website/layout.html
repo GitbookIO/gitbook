@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
 <html lang="{{ language }}">
-    {{ htmlSnippet("html:start")|default("") }}
+    {{ htmlSnippet("html:start")|default("")|safe }}
     <head>
         {{ htmlSnippet("head:start")|default("") }}
         <meta charset="UTF-8">
@@ -19,14 +19,14 @@
         <meta name="identifier" content="{{ options.isbn }}" scheme="ISBN">
         {% endif %}
         {% block head %}{% endblock %}
-        {{ htmlSnippet("head:end")|default("") }}
+        {{ htmlSnippet("head:end")|default("")|safe }}
     </head>
     <body>
-        {{ htmlSnippet("body:start")|default("") }}
+        {{ htmlSnippet("body:start")|default("")|safe }}
         {% block style %}{% endblock %}
         {% block content %}{% endblock %}
         {% block javascript %}{% endblock %}
-        {{ htmlSnippet("body:end")|default("") }}
+        {{ htmlSnippet("body:end")|default("")|safe }}
     </body>
-    {{ htmlSnippet("html:end")|default("") }}
+    {{ htmlSnippet("html:end")|default("")|safe }}
 </html>
