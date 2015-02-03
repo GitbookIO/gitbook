@@ -18,7 +18,8 @@ GitBook can be installed from **NPM** using:
 $ npm install gitbook-cli -g
 ```
 
-Create the directories and files for a book from its [SUMMARY.md](https://github.com/GitbookIO/gitbook#book-format) file using
+Create the directories and files for a book from its [SUMMARY.md](https://github.com/GitbookIO/gitbook#book-format) file (if existing) using
+
 ```
 $ gitbook init
 ```
