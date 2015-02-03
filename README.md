@@ -15,7 +15,7 @@ GitBook is a command line tool (and Node.js library) for building beautiful book
 GitBook can be installed from **NPM** using:
 
 ```
-$ npm install gitbook -g
+$ npm install gitbook-cli -g
 ```
 
 Create the directories and files for a book from its [SUMMARY.md](https://github.com/GitbookIO/gitbook#book-format) file using
