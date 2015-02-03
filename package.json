@@ -48,6 +48,9 @@
         "type": "git",
         "url": "https://github.com/GitbookIO/gitbook.git"
     },
+    "bin": {
+        "gitbook": "./bin/gitbook.js"
+    },
     "keywords": [
         "git",
         "book",
