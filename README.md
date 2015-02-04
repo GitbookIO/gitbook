@@ -250,6 +250,7 @@ Plugins needed to build a book can be installed using: `gitbook install ./`.
 | [GrVis](https://github.com/romanlytkin/gitbook-grvis) | Gitbook GrViz plugin is used to select from markdown dot and converting it into a picture format svg |
 | [PlantUml](https://github.com/romanlytkin/gitbook-plantuml) | Gitbook PlantUml plugin is used to select from markdown uml and converting it into a picture format svg |
 | [Mermaid](https://github.com/JozoVilcek/gitbook-plugin-mermaid) | Adds diagrams and flowcharts rendered by [mermaid](https://github.com/knsv/mermaid) |
+| [Baidu Analytics](https://github.com/poppinlp/gitbook-plugin-baidu) | Baidu Analytics tracking for your book |
 
 #### Debugging
 
