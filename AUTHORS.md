@@ -7,12 +7,26 @@ Names below are ordered by first contribution.
 Author
 ------
 
-- Samy Pessé <samypesse@gmail.com>
-- Aaron O'Mullan <aaron.omullan@gmail.com>
+- Samy Pessé <samypesse@gmail.com> (@SamyPesse)
+- Aaron O'Mullan <aaron.omullan@gmail.com> (@AaronO)
 
 
 Contributors
 ------------
 
-- Nijiko Yonskai
-- Herman Starikov
+- Nijiko Yonskai (@Nijikokun)
+- Herman Starikov (@Hermanya)
+
+Translators
+------------
+
+- German
+	- Winnie (@winniehell)
+- Italian
+	- Giulio Bonanome (@gbonanome)
+- Russian
+	- Andrey Akinshin (@AndreyAkinshin)
+- Norwegian
+	- Knut Melvær (@kmelve)
+- French
+	- Samy Pessé (@SamyPesse)
