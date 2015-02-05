@@ -30,7 +30,7 @@
         "URIjs": "1.14.1",
         "request": "2.51.0",
         "npm": "2.4.1",
-        "dom-serializer": "git+https://github.com/SamyPesse/dom-serializer.git#58d8ea24b9b7b4137ee5f30a41abce4d7c4a922a"
+        "dom-serializer": "git+https://github.com/SamyPesse/dom-serializer.git#57ed9a2c3dfa964022ce7d71859c558ba7721785"
     },
     "devDependencies": {
         "mocha": "1.18.2",
