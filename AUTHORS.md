@@ -30,5 +30,7 @@ Translators
 	- Knut Melvær (@kmelve)
 - Portuguese
 	- Ryan O'Mullan (@RyanOM)
+- Spanish
+	- Ryan O'Mullan (@RyanOM)
 - French
 	- Samy Pessé (@SamyPesse)
