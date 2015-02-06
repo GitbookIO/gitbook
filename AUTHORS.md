@@ -28,5 +28,7 @@ Translators
 	- Andrey Akinshin (@AndreyAkinshin)
 - Norwegian
 	- Knut Melvær (@kmelve)
+- Portuguese
+	- Ryan O'Mullan (@RyanOM)
 - French
 	- Samy Pessé (@SamyPesse)
