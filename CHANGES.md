@@ -1,5 +1,9 @@
 # Release notes
 
+## 2.0.0-alpha.6
+- Add es and pt translations
+- Fix replacement of glossary terms
+
 ## 2.0.0-alpha.5
 - Fix copy of files/covers
 - Add back `finish:before` hook
