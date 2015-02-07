@@ -19,4 +19,16 @@ describe('Glossary Generation', function () {
             assert($a.text() == "description");
         }, done);
     });
+
+    it('should correctly replace glossary terms in sub pages', function(done) {
+        testGeneration(books[1], "website", function(output) {
+            var content = fs.readFileSync(path.join(output, "sub/test1.html"), { encoding: "utf8" });
+            var $ = cheerio.load(content);
+
+            var $body = $(".page-inner");
+            var $a = $("a[href='../GLOSSARY.html#test']");
+            assert($a.length == 1);
+            assert($a.text() == "a test text");
+        }, done);
+    });
 });

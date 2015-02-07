@@ -4,3 +4,5 @@ This is a relative link [test](../intro.md).
 
 ![image](../image.png)
 
+This is a glossary link.
+
