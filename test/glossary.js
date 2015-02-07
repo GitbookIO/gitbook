@@ -28,7 +28,8 @@ describe('Glossary Generation', function () {
             var $body = $(".page-inner");
             var $a = $("a[href='../GLOSSARY.html#test']");
             assert($a.length == 1);
-            assert($a.text() == "a test text");
+            assert($a.text() == "test");
+            assert($a.attr("title") == "a test text");
         }, done);
     });
 });
