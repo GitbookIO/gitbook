@@ -32,5 +32,7 @@ Translators
 	- Ryan O'Mullan (@RyanOM)
 - Spanish
 	- Ryan O'Mullan (@RyanOM)
+- Simplifiled Chinese
+	- Hu Hao (@howiehu)
 - French
 	- Samy Pessé (@SamyPesse)
