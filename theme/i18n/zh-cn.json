@@ -15,6 +15,6 @@
     "FONTSETTINGS_WHITE": "白色",
     "FONTSETTINGS_SEPIA": "棕褐色",
     "FONTSETTINGS_NIGHT": "夜间",
-    "FONTSETTINGS_SANS": "Sans",
-    "FONTSETTINGS_SERIF": "Serif"
+    "FONTSETTINGS_SANS": "无衬线体",
+    "FONTSETTINGS_SERIF": "衬线体"
 }
