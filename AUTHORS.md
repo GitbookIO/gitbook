@@ -34,5 +34,7 @@ Translators
 	- Ryan O'Mullan (@RyanOM)
 - Simplifiled Chinese
 	- Hu Hao (@howiehu)
+- Traditional Chinese
+	- Hu Hao (@howiehu)
 - French
 	- Samy Pessé (@SamyPesse)
