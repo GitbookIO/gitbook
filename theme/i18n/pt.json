@@ -14,5 +14,7 @@
     "SHARE_ON": "Compartilhar no __platform__",
     "FONTSETTINGS_WHITE": "Claro",
     "FONTSETTINGS_SEPIA": "Sépia",
-    "FONTSETTINGS_NIGHT": "Noite"
+    "FONTSETTINGS_NIGHT": "Noite",
+    "FONTSETTINGS_SANS": "Sans",
+    "FONTSETTINGS_SERIF": "Serif"
 }

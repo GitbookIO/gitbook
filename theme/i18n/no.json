@@ -14,5 +14,7 @@
     "SHARE_ON": "Del på __platform__",
     "FONTSETTINGS_WHITE": "Lys",
     "FONTSETTINGS_SEPIA": "Sepia",
-    "FONTSETTINGS_NIGHT": "Mørk"
+    "FONTSETTINGS_NIGHT": "Mørk",
+    "FONTSETTINGS_SANS": "Sans",
+    "FONTSETTINGS_SERIF": "Serif"
 }

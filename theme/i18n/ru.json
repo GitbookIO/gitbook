@@ -14,5 +14,7 @@
 	"SHARE_ON": "Поделиться в __platform__",
 	"FONTSETTINGS_WHITE": "Светлый",
 	"FONTSETTINGS_SEPIA": "Сепия",
-	"FONTSETTINGS_NIGHT": "Тёмный"
+	"FONTSETTINGS_NIGHT": "Тёмный",
+	"FONTSETTINGS_SANS": "Sans",
+	"FONTSETTINGS_SERIF": "Serif"
 }
