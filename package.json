@@ -7,7 +7,7 @@
     "dependencies": {
         "q": "1.0.1",
         "lunr": "0.5.7",
-        "lodash": "2.4.1",
+        "lodash": "git+https://github.com/lodash/lodash.git#b0ff6f4c7b400da562b932f35de73209259585e1",
         "graceful-fs": "3.0.5",
         "resolve": "0.6.3",
         "fs-extra": "0.16.3",
