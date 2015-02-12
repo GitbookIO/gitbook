@@ -1,6 +1,7 @@
 var path = require('path');
 var _ = require('lodash');
 var assert = require('assert');
+var cheerio = require('cheerio');
 
 var fs = require("fs");
 var fsUtil = require("../lib/utils/fs");
@@ -15,26 +16,22 @@ describe('eBook Generator', function () {
 
     it('should correctly convert svg images to png', function(done) {
         testGeneration(books[4], "ebook", function(output) {
-            var readmeContent = fs.readFileSync(path.join(output, "index.html"), {encoding: "utf8"});
-            var pageContent = fs.readFileSync(path.join(output, "sub/PAGE.html"), {encoding: "utf8"});
+            // Check that all images exists
+            _.each([
+                "index.html",
+                "sub/PAGE.html"
+            ], function(pageName) {
+                var pageFile = path.join(output, pageName);
+                var pageFolder = path.dirname(pageFile);
+                var pageContent = fs.readFileSync(pageFile, {encoding: "utf8"});
+                var $ = cheerio.load(pageContent);
 
-            // Remote image
-            assert(pageContent.indexOf('src="../Tux.png"') >= 0);
-            assert(fs.existsSync(path.join(output, "Tux.png")));
-
-            assert(fs.existsSync(path.join(output, "test.png")));
-            assert(fs.existsSync(path.join(output, "NewTux.png")));
-
-            assert(!fs.existsSync(path.join(output, "test_0.png")));
-            assert(!fs.existsSync(path.join(output, "sub/test.png")));
-            assert(!fs.existsSync(path.join(output, "sub/NewTux.png")));
-
-            assert(pageContent.indexOf('src="../test.png"') >= 0);
-            assert(pageContent.indexOf('src="../NewTux.png"') >= 0);
-            assert(pageContent.indexOf('<svg') < 0);
-
-            assert(readmeContent.indexOf('src="test.png"') >= 0);
-            assert(readmeContent.indexOf('src="NewTux.png"') >= 0);
+                $("img").each(function() {
+                    var src = $(this).attr("src");
+                    console.log(path.resolve(pageFolder, src));
+                    assert(fs.existsSync(path.resolve(pageFolder, src)), src+" not found for page "+pageName);
+                })
+            });
         }, done);
     });
 });
