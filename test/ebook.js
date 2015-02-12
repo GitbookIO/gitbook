@@ -28,7 +28,6 @@ describe('eBook Generator', function () {
 
                 $("img").each(function() {
                     var src = $(this).attr("src");
-                    console.log(path.resolve(pageFolder, src));
                     assert(fs.existsSync(path.resolve(pageFolder, src)), src+" not found for page "+pageName);
                 })
             });
