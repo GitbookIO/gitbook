@@ -1,5 +1,11 @@
 # Release notes
 
+## 2.0.0-alpha.7
+- Fix display of glossary in ebook formats
+- Add default footer and header to pdf
+- Fix generation of json format compatible with 1.x.x
+- Add Simplifiled Chinese and Traditional Chinese translations
+
 ## 2.0.0-alpha.6
 - Add es and pt translations
 - Fix replacement of glossary terms
