@@ -256,6 +256,5 @@ Plugins needed to build a book can be installed using: `gitbook install ./`.
 You can use the environment variable `DEBUG=true` to get better error messages (with stack trace). For example:
 
 ```
-$ export DEBUG=true
-$ gitbook build ./
+$ DEBUG=true gitbook build ./
 ```
