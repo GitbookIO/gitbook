@@ -14,7 +14,7 @@
         "fstream-ignore": "1.0.2",
         "gitbook-parsers": "0.4.1",
         "nunjucks": "git+https://github.com/SamyPesse/nunjucks.git#4019d1b7379372336b86ce1b0bf84352a2029747",
-        "nunjucks-autoescape": "0.1.0",
+        "nunjucks-autoescape": "0.1.1",
         "nunjucks-filter": "0.1.0",
         "nunjucks-i18n": "1.0.0",
         "semver": "2.2.1",
