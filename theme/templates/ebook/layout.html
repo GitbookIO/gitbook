@@ -9,7 +9,7 @@
         <meta name="description" content="{% block description %}{% endblock %}">
         <meta name="generator" content="GitBook {{ gitbook.version }}">
         {% block head %}{% endblock %}
-        {{ htmlSnippet("head:end")|default("") }}
+        {{ htmlSnippet("head:end")|default("")|safe }}
     </head>
     <body>
         {{ htmlSnippet("body:start")|default("")|safe }}
