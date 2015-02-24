@@ -38,10 +38,10 @@
     <ul class="summary">
         {% set _divider = false %}
     	{% if options.links.sidebar %}
-    	{% for link in options.links.sidebar %}
+    	{% for linkTitle, link in options.links.sidebar %}
     	    {% set _divider = true %}
             <li>
-                <a href="{{ options.links.sidebar[loop.key] }}" target="blank" class="custom-link">{{ loop.key }}</a>
+                <a href="{{ link }}" target="blank" class="custom-link">{{ linkTitle }}</a>
             </li>
     	{% endfor %}
     	{% endif %}
