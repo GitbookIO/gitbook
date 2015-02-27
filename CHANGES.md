@@ -1,4 +1,18 @@
 # Release notes
+All notable changes to this project will be documented in this file.
+This project adheres to [Semantic Versioning](http://semver.org/).
+
+## 2.0.0-alpha.9
+- Fix links in sidebar
+- Fix normalization of html link (README to index)
+- Fix html snippets escaping
+
+## 2.0.0-alpha.8
+- Improve locale detection for i18n
+- Fix chapter name for Glossary in pdf
+- Don't escape html in glossary items
+- Fix generation of multilingual book as ebook
+- Add "post" block attribute to post-process
 
 ## 2.0.0-alpha.7
 - Fix display of glossary in ebook formats
