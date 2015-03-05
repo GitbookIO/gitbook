@@ -30,7 +30,8 @@
         "URIjs": "1.14.1",
         "request": "2.51.0",
         "npm": "2.4.1",
-        "dom-serializer": "0.1.0"
+        "dom-serializer": "0.1.0",
+        "shell-escape": "0.2.0"
     },
     "devDependencies": {
         "mocha": "1.18.2",
