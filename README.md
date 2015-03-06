@@ -209,3 +209,16 @@ You can use the options `--log=debug` and `--debug` to get better error messages
 ```
 $ gitbook build ./ -- log=debug --debug
 ```
+
+## How to use the latest commit from GitBook in gitbook-cli
+
+To use the latest commit from `GitBook/gitbook` with `gitbook-cli`:
+
+```
+$ git clone https://github.com/GitbookIO/gitbook.git ./gitbook
+$ gitbook versions:link 2.0.0 ./gitbook
+```
+
+Now the version tag `2.0.0` wil be associated with the `./gitbook` folder.
+
+You can uninstall it using: `gitbook versions:uninstall 2.0.0`.
