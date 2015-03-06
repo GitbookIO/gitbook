@@ -13,6 +13,13 @@ describe('Links', function () {
         assert(!links.isExternal("/folder/test.md"));
     });
 
+    it('should correctly test anchor links', function() {
+        assert(links.isAnchor("#test"));
+        assert(links.isAnchor(" #test"));
+        assert(!links.isAnchor("https://google.fr#test"));
+        assert(!links.isAnchor("test.md#test"));
+    });
+
     describe('toAbsolute', function() {
         it('should correctly transform as absolute', function() {
             assert.equal(links.toAbsolute("http://google.fr"), "http://google.fr");
