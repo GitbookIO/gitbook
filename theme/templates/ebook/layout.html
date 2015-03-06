@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html lang="{{ language }}" {% block htmlTag %}{% endblock %}>
+<html lang="{{ language }}" {% block htmlTag %}{% endblock %} {% if options.direction == "rtl" %}dir="rtl"{% endif %}>
     {{ htmlSnippet("html:start")|default("")|safe }}
     <head>
         {{ htmlSnippet("head:start")|default("")|safe }}
