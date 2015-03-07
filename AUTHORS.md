@@ -28,6 +28,8 @@ Translators
 	- Andrey Akinshin (@AndreyAkinshin)
 - Norwegian
 	- Knut Melvær (@kmelve)
+- Persian (Farsi)
+	- Mohammad Hossein Mojtahedi (@mhm5000)
 - Portuguese
 	- Ryan O'Mullan (@RyanOM)
 - Spanish
