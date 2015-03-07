@@ -1,0 +1,21 @@
+{
+	"direction": "rtl",
+	"LANGS_CHOOSE": "انتخاب زبان",
+	"GLOSSARY": "واژه‌نامه",
+	"GLOSSARY_INDEX": "فهرست واژه‌ها",
+	"GLOSSARY_OPEN": "واژه‌نامه",
+	"GITBOOK_LINK": "انتشار یافته توسط GitBook",
+	"SUMMARY": "فهرست مطالب",
+	"SUMMARY_INTRODUCTION": "مقدمه",
+	"SUMMARY_TOGGLE": "فهرست مطالب",
+	"SEARCH_TOGGLE": "جستجو",
+	"SEARCH_PLACEHOLDER": "چیزی برای جستجو بنویسید",
+	"FONTSETTINGS_TOGGLE": "تنظیمات فونت",
+	"SHARE_TOGGLE": "اشتراک",
+	"SHARE_ON": "در __platform__ به اشتراک بگذارید",
+	"FONTSETTINGS_WHITE": "سفید",
+	"FONTSETTINGS_SEPIA": "سپیا",
+	"FONTSETTINGS_NIGHT": "شب",
+	"FONTSETTINGS_SANS": "سنس",
+	"FONTSETTINGS_SERIF": "سریف"
+}
