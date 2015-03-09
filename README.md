@@ -48,7 +48,7 @@ $ gitbook build ./repository ./outputFolder
 * [Cover](http://help.gitbook.com/format/cover.html)
 * [AsciiDoc Support](http://help.gitbook.com/format/asciidoc.html)
 * [Variables and Templating](http://help.gitbook.com/format/templating.html)
-* [Content References]http://help.gitbook.com/format/conrefs.html)
+* [Content References](http://help.gitbook.com/format/conrefs.html)
 * [Plugins](http://help.gitbook.com/plugins/index.html)
 * Interractive reader website:
     * Search
@@ -214,7 +214,7 @@ You can use the options `--log=debug` and `--debug` to get better error messages
 $ gitbook build ./ -- log=debug --debug
 ```
 
-## How to use the latest commit from GitBook in gitbook-cli
+#### How to use the latest commit from GitBook in gitbook-cli
 
 To use the latest commit from `GitBook/gitbook` with `gitbook-cli`:
 
