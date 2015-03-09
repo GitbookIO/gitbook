@@ -1,12 +1,16 @@
 GitBook
 =======
 
-:warning: This branch contains the version 2.0.
-
 [![Build Status](https://travis-ci.org/GitbookIO/gitbook.png?branch=master)](https://travis-ci.org/GitbookIO/gitbook)
 [![NPM version](https://badge.fury.io/js/gitbook.svg)](http://badge.fury.io/js/gitbook)
 
-GitBook is a command line tool (and Node.js library) for building beautiful books using GitHub/Git and Markdown (or AsciiDoc). Here is an example: [Learn Javascript](https://www.gitbook.com/book/GitBookIO/javascript). You can publish and host book easily online using [gitbook.com](https://www.gitbook.com), a web-editor is [also available](https://www.gitbook.com/editor). You can follow [@GitBookIO](https://twitter.com/GitBookIO) on Twitter. Complete documentation is available at [help.gitbook.io](http://help.gitbook.io/).
+GitBook is a command line tool (and Node.js library) for building beautiful books using GitHub/Git and Markdown (or AsciiDoc). Here is an example: [Learn Javascript](https://www.gitbook.com/book/GitBookIO/javascript).
+
+You can publish and host book easily online using [gitbook.com](https://www.gitbook.com), a web-editor is [also available](https://www.gitbook.com/editor).
+
+Stay updated by following [@GitBookIO](https://twitter.com/GitBookIO) on Twitter or [GitBook](https://www.facebook.com/gitbookcom) on Facebook.
+
+Complete documentation is available at [help.gitbook.com](http://help.gitbook.com/).
 
 ![Image](https://raw.github.com/GitbookIO/gitbook/master/preview.png)
 
@@ -38,14 +42,14 @@ $ gitbook build ./repository ./outputFolder
 
 ## Features
 
-* [Output as a website or ebook (pdf, epub, mobi)](#output-formats)
-* [Multi-Languages](#multi-languages)
-* [Glossary](#glossary)
-* [Cover](#cover)
-* [AsciiDoc Support](#asciidoc)
-* [Variables and Templating](#variables-and-templating)
-* [Content References](#content-references)
-* [Plugins](#plugins)
+* [Output as a website or ebook (pdf, epub, mobi)](http://help.gitbook.com/format/output.html)
+* [Multi-Languages](http://help.gitbook.com/format/languages.html)
+* [Glossary](http://help.gitbook.com/format/glossary.html)
+* [Cover](http://help.gitbook.com/format/cover.html)
+* [AsciiDoc Support](http://help.gitbook.com/format/asciidoc.html)
+* [Variables and Templating](http://help.gitbook.com/format/templating.html)
+* [Content References]http://help.gitbook.com/format/conrefs.html)
+* [Plugins](http://help.gitbook.com/plugins/index.html)
 * Interractive reader website:
     * Search
     * Font Settings (Serif, Sans Serif)
