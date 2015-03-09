@@ -1,23 +1,22 @@
 {% macro articles(_articles) %}
     {% for item in _articles %}
-        {% set externalLink = item.path|isExternalLink %}
-        <li class="chapter {% if item.path == _input %}active{% endif %}" data-level="{{ item.level }}" {% if item.path && !externalLink %}data-path="{{ item.path|mdLink }}"{% endif %}>
-            {% if item.path %}
-                {% if !externalLink %}
-                    <a href="{{ basePath }}/{{ item.path|mdLink }}">
+        <li class="chapter {% if item.path == _input %}active{% endif %}" data-level="{{ item.level }}" {% if item.path and not item.external %}data-path="{{ item.path|contentLink }}"{% endif %}>
+            {% if item.path and item.exists %}
+                {% if not item.external %}
+                    <a href="{{ basePath }}/{{ item.path|contentLink }}">
                         <i class="fa fa-check"></i>
-                        {% if item.level !== "0" %}
+                        {% if item.level != "0" %}
                             <b>{{ item.level }}.</b>
                         {% endif %}
-                         {{ item.title }}
+                        {% if item.introduction %}{% i18n "SUMMARY_INTRODUCTION" %}Introduction{% endi18n %}{% else %}{{ item.title }}{% endif %}
                     </a>
                 {% else %}
                     <a target="_blank" href="{{ item.path }}">
                         <i class="fa fa-check"></i>
-                        {% if item.level !== "0" %}
+                        {% if item.level != "0" %}
                             <b>{{ item.level }}.</b>
                         {% endif %}
-                         {{ item.title }}
+                        {{ item.title }}
                     </a>
                 {% endif %}
             {% else %}
@@ -25,7 +24,7 @@
             {% endif %}
             {% if item.articles.length > 0 %}
             <ul class="articles">
-                {{ articles(item.articles) }}
+                {{ articles(item.articles) }}
             </ul>
             {% endif %}
         </li>
@@ -34,15 +33,15 @@
 
 <div class="book-summary">
     <div class="book-search">
-        <input type="text" placeholder="Type to search" class="form-control" />
+        <input type="text" placeholder="{% i18n "SEARCH_PLACEHOLDER" %}Type to search{% endi18n %}" class="form-control" />
     </div>
     <ul class="summary">
         {% set _divider = false %}
     	{% if options.links.sidebar %}
-    	{% for link in options.links.sidebar %}
+    	{% for linkTitle, link in options.links.sidebar %}
     	    {% set _divider = true %}
             <li>
-                <a href="{{ options.links.sidebar[loop.key] }}" target="blank" class="custom-link">{{ loop.key }}</a>
+                <a href="{{ link }}" target="blank" class="custom-link">{{ linkTitle }}</a>
             </li>
     	{% endfor %}
     	{% endif %}
@@ -53,10 +52,10 @@
 
         {{ articles(summary.chapters) }}
 
-        {% if options.links.gitbook !== false %}
+        {% if options.links.gitbook != false %}
         <li class="divider"></li>
         <li>
-            <a href="https://www.gitbook.com" target="blank" class="gitbook-link">Published using GitBook</a>
+            <a href="https://www.gitbook.com" target="blank" class="gitbook-link">{% i18n "GITBOOK_LINK" %}Published using GitBook{% endi18n %}</a>
         </li>
         {% endif %}
     </ul>

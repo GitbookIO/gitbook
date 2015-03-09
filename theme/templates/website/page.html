@@ -1,20 +1,20 @@
 {% extends "./layout.html" %}
 
 {% block head %}
-    {% parent %}
+    {{ super() }}
     {% if progress.current.next and progress.current.next.path %}
-    <link rel="next" href="{{ basePath }}/{{ progress.current.next.path|mdLink }}" />
+    <link rel="next" href="{{ basePath }}/{{ progress.current.next.path|contentLink }}" />
     {% endif %}
     {% if progress.current.prev and progress.current.prev.path %}
-    <link rel="prev" href="{{ basePath }}/{{ progress.current.prev.path|mdLink }}" />
+    <link rel="prev" href="{{ basePath }}/{{ progress.current.prev.path|contentLink }}" />
     {% endif %}
 {% endblock %}
 
 {% block title %}{{ progress.current.title }} | {{ title }}{% endblock %}
-{% block description %}{% if progress.current.level == "0" %}{{ description }}{% endif %}{% endblock %}
+{% block description %}{% if progress.current.level == "0" %}{{ description }}{% endif %}{% endblock %}
 
 {% block content %}
-    <div class="book" data-level="{{ progress.current.level }}" data-basepath="{{ basePath }}" data-revision="{{ revision }}">
+    <div class="book" data-level="{{ progress.current.level }}" data-basepath="{{ basePath }}" data-revision="{{ revision }}">
     {% include "includes/summary.html" %}
     <div class="book-body">
         <div class="body-inner">
@@ -23,13 +23,9 @@
                 <div class="page-inner">
                 {% block page_inner %}
                 {% for section in content %}
-                    <section class="{{ section.type }}" id="section-{{ section.id }}">
+                    <section class="{{ section.type }}" id="section-{{ section.id }}">
                     {% if section.type == "normal" %}
                         {% autoescape false %}{{ section.content }}{% endautoescape %}
-                    {% elif section.type == "exercise" %}
-                        {% include "./includes/exercise.html" with {section: section} %}
-                    {% elif section.type == "quiz" %}
-                        {% include "./includes/quiz.html" with {section: section} %}
                     {% endif %}
                     </section>
                 {% endfor %}
@@ -39,10 +35,10 @@
         </div>
 
         {% if progress.current.prev and progress.current.prev.path %}
-        <a href="{{ basePath }}/{{ progress.current.prev.path|mdLink }}" class="navigation navigation-prev {% if !progress.current.next or !progress.current.next.path %}navigation-unique{% endif %}" aria-label="Previous page: {{ progress.current.prev.title }}"><i class="fa fa-angle-left"></i></a>
+        <a href="{{ basePath }}/{{ progress.current.prev.path|contentLink }}" class="navigation navigation-prev {% if not (progress.current.next and progress.current.next.path) %}navigation-unique{% endif %}" aria-label="Previous page: {{ progress.current.prev.title }}"><i class="fa fa-angle-left"></i></a>
         {% endif %}
         {% if progress.current.next and progress.current.next.path %}
-        <a href="{{ basePath }}/{{ progress.current.next.path|mdLink }}" class="navigation navigation-next {% if !progress.current.prev or !progress.current.prev.path %}navigation-unique{% endif %}" aria-label="Next page: {{ progress.current.next.title }}"><i class="fa fa-angle-right"></i></a>
+        <a href="{{ basePath }}/{{ progress.current.next.path|contentLink }}" class="navigation navigation-next {% if not (progress.current.prev or progress.current.prev.path) %}navigation-unique{% endif %}" aria-label="Next page: {{ progress.current.next.title }}"><i class="fa fa-angle-right"></i></a>
         {% endif %}
     </div>
 </div>

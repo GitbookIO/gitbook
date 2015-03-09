@@ -1,0 +1,20 @@
+{
+	"LANGS_CHOOSE": "Выберите язык",
+	"GLOSSARY": "Алфавитный указатель",
+	"GLOSSARY_INDEX": "Алфавитный указатель",
+	"GLOSSARY_OPEN": "Алфавитный указатель",
+	"GITBOOK_LINK": "Опубликовано с помощью GitBook",
+	"SUMMARY": "Содержание",
+	"SUMMARY_INTRODUCTION": "Введение",
+	"SUMMARY_TOGGLE": "Содержание",
+	"SEARCH_TOGGLE": "Поиск",
+	"SEARCH_PLACEHOLDER": "Введите условия поиска",
+	"FONTSETTINGS_TOGGLE": "Шрифт",
+	"SHARE_TOGGLE": "Поделиться",
+	"SHARE_ON": "Поделиться в __platform__",
+	"FONTSETTINGS_WHITE": "Светлый",
+	"FONTSETTINGS_SEPIA": "Сепия",
+	"FONTSETTINGS_NIGHT": "Тёмный",
+	"FONTSETTINGS_SANS": "Sans",
+	"FONTSETTINGS_SERIF": "Serif"
+}

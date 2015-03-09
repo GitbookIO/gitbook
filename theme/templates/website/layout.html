@@ -1,8 +1,8 @@
 <!DOCTYPE HTML>
-<html lang="en-US" {% block htmlTag %}{% endblock %}>
-    {{ htmlSnippet("html:start")|default("") }}
+<html lang="{{ language }}" {% if options.direction == "rtl" %}dir="rtl"{% endif %}>
+    {{ htmlSnippet("html:start")|default("")|safe }}
     <head>
-        {{ htmlSnippet("head:start")|default("") }}
+        {{ htmlSnippet("head:start")|default("")|safe }}
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=11; IE=10; IE=9; IE=8; IE=7; IE=EDGE" />
         <title>{% block title %}{% endblock %}</title>
@@ -19,14 +19,14 @@
         <meta name="identifier" content="{{ options.isbn }}" scheme="ISBN">
         {% endif %}
         {% block head %}{% endblock %}
-        {{ htmlSnippet("head:end")|default("") }}
+        {{ htmlSnippet("head:end")|default("")|safe }}
     </head>
     <body>
-        {{ htmlSnippet("body:start")|default("") }}
+        {{ htmlSnippet("body:start")|default("")|safe }}
         {% block style %}{% endblock %}
         {% block content %}{% endblock %}
         {% block javascript %}{% endblock %}
-        {{ htmlSnippet("body:end")|default("") }}
+        {{ htmlSnippet("body:end")|default("")|safe }}
     </body>
-    {{ htmlSnippet("html:end")|default("") }}
+    {{ htmlSnippet("html:end")|default("")|safe }}
 </html>

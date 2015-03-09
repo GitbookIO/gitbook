@@ -11,9 +11,8 @@ define([
     "core/navigation",
     "core/progress",
     "core/sidebar",
-    "core/search",
-    "core/glossary"
-], function($, storage, sharing, dropdown, events, fontSettings, state, keyboard, navigation, progress, sidebar, search, glossary){
+    "core/search"
+], function($, storage, sharing, dropdown, events, fontSettings, state, keyboard, navigation, progress, sidebar, search){
     var start = function(config) {
         var $book;
         $book = state.$book;
@@ -23,9 +22,6 @@ define([
 
         // Load search
         search.init();
-
-        // Load glossary
-        glossary.init();
 
         // Init keyboard
         keyboard.init();

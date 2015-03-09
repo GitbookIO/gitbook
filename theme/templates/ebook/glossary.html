@@ -1,15 +1,21 @@
 {% extends "./page.html" %}
 
-{% block title %}Glossary | {{ title }}{% endblock %}
+{% block title %}{% i18n "GLOSSARY" %}Glossary{% endi18n %} | {{ title }}{% endblock %}
 
 {% block content %}
 <div class="page page-toc">
-    <h1>Glossary</h1>
-	{% for item in glossaryIndex %}
-	<section class="normal glossary" id="{{ item.id }}">
-	    <h2><a href="#{{ item.id }}">{{ item.name }}</a></h2>
-	    <p>{{ item.description }}</p>
-	</section>
-	{% endfor %}
+    <h1 class="book-chapter book-chapter-1">{% i18n "GLOSSARY" %}Glossary{% endi18n %}</h1>
+    <h1>{% i18n "GLOSSARY" %}Glossary{% endi18n %}</h1>
+    {% for item in glossary %}
+    <section class="normal glossary" id="{{ item.id }}">
+        <h2><a href="#{{ item.id }}">{{ item.name }}</a></h2>
+        <p>{{ item.description|safe }}</p>
+        <ul class="glossary-index">
+        {% for file in item.files %}
+            <li><a href="{{ basePath }}/{{ file.path|contentLink }}"><span class="level">{{ file.level }}.</span> {{ file.title }}</a></li>
+        {% endfor %}
+        </ul>
+    </section>
+    {% endfor %}
 </div>
 {% endblock %}

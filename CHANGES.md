@@ -1,4 +1,59 @@
 # Release notes
+All notable changes to this project will be documented in this file.
+This project adheres to [Semantic Versioning](http://semver.org/).
+
+## 2.0.0-alpha.9
+- Fix links in sidebar
+- Fix normalization of html link (README to index)
+- Fix html snippets escaping
+
+## 2.0.0-alpha.8
+- Improve locale detection for i18n
+- Fix chapter name for Glossary in pdf
+- Don't escape html in glossary items
+- Fix generation of multilingual book as ebook
+- Add "post" block attribute to post-process
+
+## 2.0.0-alpha.7
+- Fix display of glossary in ebook formats
+- Add default footer and header to pdf
+- Fix generation of json format compatible with 1.x.x
+- Add Simplifiled Chinese and Traditional Chinese translations
+
+## 2.0.0-alpha.6
+- Add es and pt translations
+- Fix replacement of glossary terms
+
+## 2.0.0-alpha.5
+- Fix copy of files/covers
+- Add back `finish:before` hook
+
+## 2.0.0-alpha.4
+- Fix copy of cover for multilingal books
+
+## 2.0.0-alpha.3
+- Norwegian translation
+- Load plugins from book in priority
+
+## 2.0.0-alpha.3
+- Fix init command
+- Update parsers to fix spaces in summary (`gitbook-parsers@0.3.1`)
+
+## 2.0.0-alpha.1
+- Externalize parsing into `gitbook-parsers` module
+- Supports AsciiDoc and reStructuredText
+- Hooks for page (`page:*`) are now deprecated, plugins should extend filters and blocks instead
+- Hooks `summary` and `glossary` (after and before) have been removed
+- Exercises and Quizzes are no longer parsed in the markdown parser
+- Support for more markdown extensions: `.markdown`, `.mdown`
+- Templates are rendered with nunjucks instead of swig, syntax is almost compatible, there is some changes with contexts and filters. `{{ super() }}` should be use instead of `{% parent %}`
+- Clean output folder on build without removing `.git` and `.svn`
+- MathJAX is no longer a default plugin
+- SVG images are converted to PNG during generation of ebooks
+- i18n in website and ebook (ru, it, de, fr)
+- New templating syntax
+- Content references (both internal and external)
+- Glossary terms are handled during generation (also in ebook format)
 
 ## 1.5.0
 - Fix `serve` command, broken by `1.4.2`

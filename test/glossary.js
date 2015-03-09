@@ -1,20 +1,35 @@
-var fs = require('fs');
 var path = require('path');
+var _ = require('lodash');
 var assert = require('assert');
+var cheerio = require('cheerio');
 
-var glossary = require('../').parse.glossary;
+var fs = require("fs");
+var fsUtil = require("../lib/utils/fs");
 
-var CONTENT = fs.readFileSync(path.join(__dirname, './fixtures/GLOSSARY.md'), 'utf8');
-var LEXED = glossary(CONTENT);
 
-describe('Glossary parsing', function () {
-    it('should only get heading + paragraph pairs', function() {
-        assert.equal(LEXED.length, 5);
+describe('Glossary Generation', function () {
+    it('should correctly replace glossary terms', function(done) {
+        testGeneration(books[0], "website", function(output) {
+            var content = fs.readFileSync(path.join(output, "index.html"), { encoding: "utf8" });
+            var $ = cheerio.load(content);
+
+            var $body = $(".page-inner");
+            var $a = $("a[href='GLOSSARY.html#description']");
+            assert($a.length == 1);
+            assert($a.text() == "description");
+        }, done);
     });
 
-    it('should output simple name/description objects', function() {
-        assert.equal(true, !(LEXED.some(function(e) {
-            return !Boolean(e.name && e.description);
-        })));
+    it('should correctly replace glossary terms in sub pages', function(done) {
+        testGeneration(books[1], "website", function(output) {
+            var content = fs.readFileSync(path.join(output, "sub/test1.html"), { encoding: "utf8" });
+            var $ = cheerio.load(content);
+
+            var $body = $(".page-inner");
+            var $a = $("a[href='../GLOSSARY.html#test']");
+            assert($a.length == 1);
+            assert($a.text() == "test");
+            assert($a.attr("title") == "a test text");
+        }, done);
     });
 });

@@ -1,0 +1,20 @@
+{
+	"LANGS_CHOOSE": "Choisissez une langue",
+	"GLOSSARY": "Glossaire",
+	"GLOSSARY_INDEX": "Index",
+	"GLOSSARY_OPEN": "Glossaire",
+	"GITBOOK_LINK": "Publié avec GitBook",
+	"SUMMARY": "Table des matières",
+	"SUMMARY_INTRODUCTION": "Introduction",
+	"SUMMARY_TOGGLE": "Table des matières",
+	"SEARCH_TOGGLE": "Recherche",
+	"SEARCH_PLACEHOLDER": "Tapez pour rechercher",
+	"FONTSETTINGS_TOGGLE": "Paramètres de Police",
+	"SHARE_TOGGLE": "Partage",
+	"SHARE_ON": "Partager sur __platform__",
+	"FONTSETTINGS_WHITE": "Clair",
+	"FONTSETTINGS_SEPIA": "Sépia",
+	"FONTSETTINGS_NIGHT": "Nuit",
+	"FONTSETTINGS_SANS": "Sans",
+	"FONTSETTINGS_SERIF": "Serif"
+}

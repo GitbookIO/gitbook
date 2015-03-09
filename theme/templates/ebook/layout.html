@@ -1,22 +1,22 @@
 <!DOCTYPE HTML>
-<html lang="en-US" {% block htmlTag %}{% endblock %}>
-    {{ htmlSnippet("html:start")|default("") }}
+<html lang="{{ language }}" {% block htmlTag %}{% endblock %} {% if options.direction == "rtl" %}dir="rtl"{% endif %}>
+    {{ htmlSnippet("html:start")|default("")|safe }}
     <head>
-        {{ htmlSnippet("head:start")|default("") }}
+        {{ htmlSnippet("head:start")|default("")|safe }}
         <meta charset="UTF-8">
         <title>{% block title %}{% endblock %}</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="{% block description %}{% endblock %}">
         <meta name="generator" content="GitBook {{ gitbook.version }}">
         {% block head %}{% endblock %}
-        {{ htmlSnippet("head:end")|default("") }}
+        {{ htmlSnippet("head:end")|default("")|safe }}
     </head>
     <body>
-        {{ htmlSnippet("body:start")|default("") }}
+        {{ htmlSnippet("body:start")|default("")|safe }}
         {% block style %}{% endblock %}
         {% block content %}{% endblock %}
         {% block javascript %}{% endblock %}
-        {{ htmlSnippet("body:end")|default("") }}
+        {{ htmlSnippet("body:end")|default("")|safe }}
     </body>
-    {{ htmlSnippet("html:end")|default("") }}
+    {{ htmlSnippet("html:end")|default("")|safe }}
 </html>

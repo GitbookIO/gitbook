@@ -1,0 +1,9 @@
+{
+    "name": "gitbook-plugin-empty",
+    "description": "Test empty plugin",
+    "main": "index.js",
+    "version": "0.0.1",
+    "engines": {
+        "gitbook": "*"
+    }
+}

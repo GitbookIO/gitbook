@@ -5,51 +5,32 @@
 
 .page {
     &.page-toc {
-        ol {
-            margin: 0px;
+        .glossary {
+            margin-bottom: 40px;
+
+            h2 {
+                a, a:hover {
+                    color: inherit;
+                    text-decoration: none;
+                }
+            }
+
+            .glossary-index {
+                list-style: none;
+                margin: 0px;
+                padding: 0px;
+
+                li {
+                    display: inline;
+                    margin: 0px 8px;
+                    white-space: nowrap;
+                }
+            }
         }
     }
 
     .book-chapter {
         display: none;
-    }
-
-    .exercise, .quiz {
-        margin: 1cm 0cm;
-        border: 2px solid #ddd;
-
-        .exercise-header {
-            padding: 0.1cm 0.3cm;
-            background: #f5f5f5;
-            border-bottom: 1px solid #ddd;
-            font-weight: bold;
-            page-break-inside: avoid;
-        }
-
-        .exercise-inner {
-            padding: 0.15cm 0.3cm;
-
-            p:last-child {
-                margin: 0px;
-            }
-        }
-
-        hr {
-            height: 2px;
-        }
-
-        .question {
-            margin-top: 0.1cm;
-            border-top: 1px solid #ddd;
-
-            .question-base {
-
-            }
-
-            .question-solution {
-
-            }
-        }
     }
 }
 

@@ -1,0 +1,21 @@
+{
+    "direction": "rtl",
+    "LANGS_CHOOSE": "اختيار اللغة",
+    "GLOSSARY": "قاموس مصطلحات",
+    "GLOSSARY_INDEX": "مؤشر المصطلحات",
+    "GLOSSARY_OPEN": "قاموس مصطلحات",
+    "GITBOOK_LINK": "نشرت مع GitBook",
+    "SUMMARY": "جدول المحتويات",
+    "SUMMARY_INTRODUCTION": "مقدمة",
+    "SUMMARY_TOGGLE": "جدول المحتويات",
+    "SEARCH_TOGGLE": "بحث",
+    "SEARCH_PLACEHOLDER": "اكتب للبحث",
+    "FONTSETTINGS_TOGGLE": "إعدادات الخط",
+    "SHARE_TOGGLE": "حصة",
+    "SHARE_ON": "على __platform__ حصة",
+    "FONTSETTINGS_WHITE": "أبيض",
+    "FONTSETTINGS_SEPIA": "بني داكن",
+    "FONTSETTINGS_NIGHT": "ليل",
+    "FONTSETTINGS_SANS": "بلا",
+    "FONTSETTINGS_SERIF": "الرقيق"
+}

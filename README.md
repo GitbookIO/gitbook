@@ -1,10 +1,12 @@
 GitBook
 =======
 
+:warning: This branch contains the version 2.0.
+
 [![Build Status](https://travis-ci.org/GitbookIO/gitbook.png?branch=master)](https://travis-ci.org/GitbookIO/gitbook)
 [![NPM version](https://badge.fury.io/js/gitbook.svg)](http://badge.fury.io/js/gitbook)
 
-GitBook is a command line tool (and Node.js library) for building beautiful books using GitHub/Git and Markdown. Here is an example: [Learn Javascript](https://www.gitbook.com/book/GitBookIO/javascript). You can publish book easily online using [gitbook.com](https://www.gitbook.com) and an [editor](https://github.com/GitbookIO/editor) is available for Windows, Mac and Linux. You can follow [@GitBookIO](https://twitter.com/GitBookIO) on Twitter. Complete documentation is available at [help.gitbook.io](http://help.gitbook.io/).
+GitBook is a command line tool (and Node.js library) for building beautiful books using GitHub/Git and Markdown (or AsciiDoc). Here is an example: [Learn Javascript](https://www.gitbook.com/book/GitBookIO/javascript). You can publish and host book easily online using [gitbook.com](https://www.gitbook.com), a web-editor is [also available](https://www.gitbook.com/editor). You can follow [@GitBookIO](https://twitter.com/GitBookIO) on Twitter. Complete documentation is available at [help.gitbook.io](http://help.gitbook.io/).
 
 ![Image](https://raw.github.com/GitbookIO/gitbook/master/preview.png)
 
@@ -13,10 +15,11 @@ GitBook is a command line tool (and Node.js library) for building beautiful book
 GitBook can be installed from **NPM** using:
 
 ```
-$ npm install gitbook -g
+$ npm install gitbook-cli -g
 ```
 
-Create the directories and files for a book from its [SUMMARY.md](https://github.com/GitbookIO/gitbook#book-format) file using
+Create the directories and files for a book from its [SUMMARY.md](https://github.com/GitbookIO/gitbook#book-format) file (if existing) using
+
 ```
 $ gitbook init
 ```
@@ -30,119 +33,34 @@ $ gitbook serve ./repository
 Or simply build the static website using:
 
 ```
-$ gitbook build ./repository --output=./outputFolder
+$ gitbook build ./repository ./outputFolder
 ```
 
-Options for commands `build` and `serve` are:
+## Features
 
-```
--o, --output <directory>  Path to output directory, defaults to ./_book
--f, --format <name>       Change generation format, defaults to site, availables are: site, page, ebook, json
---config <config file>    Configuration file to use, defaults to book.js or book.json
-```
-
-GitBook loads the default configuration from a `book.json` file in the repository if it exists.
-
-Here are the options that can be stored in this file:
-
-```js
-{
-    // Folders to use for output
-    // Caution: it overrides the value from the command line
-    // It's not advised this option in the book.json
-    "output": null,
-
-    // Generator to use for building
-    // Caution: it overrides the value from the command line
-    // It's not advised this option in the book.json
-    "generator": "site",
-
-    // Book metadats (somes are extracted from the README by default)
-    "title": null,
-    "description": null,
-    "isbn": null,
-
-    // For ebook format, the extension to use for generation (default is detected from output extension)
-    // "epub", "pdf", "mobi"
-    // Caution: it overrides the value from the command line
-    // It's not advised this option in the book.json
-    "extension": null,
-
-    // Plugins list, can contain "-name" for removing default plugins
-    "plugins": [],
-
-    // Global configuration for plugins
-    "pluginsConfig": {
-        "fontSettings": {
-            "theme": "sepia", "night" or "white",
-            "family": "serif" or "sans",
-            "size": 1 to 4
-        }
-    },
-
-    // Variables for templating
-    "variables": {},
-
-    // Links in template (null: default, false: remove, string: new value)
-    "links": {
-    	// Custom links at top of sidebar
-    	"sidebar": {
-    	    "Custom link name": "https://customlink.com"
-    	},
-
-        // Sharing links
-        "sharing": {
-            "google": null,
-            "facebook": null,
-            "twitter": null,
-            "weibo": null,
-            "all": null
-        }
-    },
-
-
-    // Options for PDF generation
-    "pdf": {
-        // Add page numbers to the bottom of every page
-        "pageNumbers": false,
-
-        // Font size for the fiel content
-        "fontSize": 12,
-
-        // Paper size for the pdf
-        // Choices are [u’a0’, u’a1’, u’a2’, u’a3’, u’a4’, u’a5’, u’a6’, u’b0’, u’b1’, u’b2’, u’b3’, u’b4’, u’b5’, u’b6’, u’legal’, u’letter’]
-        "paperSize": "a4",
-
-        // Margin (in pts)
-        // Note: 72 pts equals 1 inch
-        "margin": {
-            "right": 62,
-            "left": 62,
-            "top": 36,
-            "bottom": 36
-        },
-
-        //Header HTML template. Available variables: _PAGENUM_, _TITLE_, _AUTHOR_ and _SECTION_.
-        "headerTemplate": null,
-
-        //Footer HTML template. Available variables: _PAGENUM_, _TITLE_, _AUTHOR_ and _SECTION_.
-        "footerTemplate": null
-    }
-}
-```
-
-You can publish your books to our index by visiting [GitBook.com](http://www.gitbook.com)
+* [Output as a website or ebook (pdf, epub, mobi)](#output-formats)
+* [Multi-Languages](#multi-languages)
+* [Glossary](#glossary)
+* [Cover](#cover)
+* [AsciiDoc Support](#asciidoc)
+* [Variables and Templating](#variables-and-templating)
+* [Content References](#content-references)
+* [Plugins](#plugins)
+* Interractive reader website:
+    * Search
+    * Font Settings (Serif, Sans Serif)
+    * Themes: white, sepia, night
 
 ## Output Formats
 
 GitBook can generate your book in the following formats:
 
 * **Static Website**: This is the default format. It generates a complete interactive static website that can be, for example, hosted on GitHub Pages.
-* **eBook**: A complete eBook with exercise solutions at the end of the book.  You need to have [ebook-convert](http://manual.calibre-ebook.com/cli/ebook-convert.html) installed.  You can specify the eBook filename with the `-o` option, otherwise `book` will be used.
-  * Generate a **PDF** using:  `gitbook pdf ./myrepo`
-  * Generate a **ePub** using: `gitbook epub ./myrepo`
-  * Generate a **MOBI** using: `gitbook mobi ./myrepo`
-* **JSON**: This format is used for debugging or extracting metadata from a book. Generate this format using: ```gitbook build ./myrepo -f json```.
+* **eBook**: You need to have [ebook-convert](http://manual.calibre-ebook.com/cli/ebook-convert.html) installed.  You can specify the eBook filename as the second argument, otherwise `book` will be used.
+  * Generate a **PDF** using:  `gitbook pdf ./myrepo ./mybook.pdf`
+  * Generate a **ePub** using: `gitbook epub ./myrepo ./mybook.epub`
+  * Generate a **MOBI** using: `gitbook mobi ./myrepo ./mybook.mobi`
+* **JSON**: This format is used for debugging or extracting metadata from a book. Generate this format using: ```gitbook build ./myrepo --format=json```.
 
 ## Book Format
 
@@ -196,7 +114,64 @@ Definition for this term
 
 # Another term
 With it's definition, this can contain bold text and all other kinds of inline markup ...
+```
 
+#### Variables and Templating
+
+A set of variables can be defined in the `book.json`:
+
+```js
+{
+    "variables": {
+        "host": "mybook.com"
+    }
+}
+```
+
+These variables can be used in the markdown files:
+
+```
+The host is {{ book.host }}
+```
+
+You can also use condition with these variables:
+
+```
+{% if book.host == "mybook.com" %}
+
+{% else %}
+
+{% endif %}
+```
+
+Variables of `book.json` are available in the `book` namespace. You can also access informations about the `file` itself and the `gitbook` version:
+
+```
+My file is {{ file.path }}
+Modified at {{ file.mtime }}
+Book built with GitBook {{ gitbook.version }}
+```
+
+#### Content References
+
+You can use "content references," or conrefs, when writing books or documentation using GitBook.
+
+Include a file from the same book:
+
+```
+{% include "./test.md" %}
+```
+
+or from a git repository (with a specific revision):
+
+```
+{% include "git+https://github.com/GitbookIO/documentation.git/README.md#1.0.1" %}
+```
+
+Includes can be used with variables (see [Variables and Templating](#variables-and-templating)):
+
+```
+{% include book.ref_doc_readme %}
 ```
 
 #### Ignoring files & folders
@@ -212,50 +187,38 @@ The best resolution is **1800x2360**. The generation of the cover can be done au
 
 A small version of the cover can also be set by creating a file: **/cover_small.jpg**.
 
-#### Publish your book
+#### AsciiDoc
+
+Since version 2.0.0, AsciiDoc can be used instead of Markdown, simply replace the `.md` by the `.adoc` extension. Chapters in the summary are detected from an ordered list in the `SUMMARY.adoc`.
+
+## Publish your book
 
 The platform [GitBook.com](https://www.gitbook.com/) is like an "Heroku for books": you can create a book on it (public, paid, or private) and update it using **git push**.
 
-#### Plugins
+## Plugins
 
 Plugins can be used to extend your book's functionality. Read [GitbookIO/plugin](https://github.com/GitbookIO/plugin) for more information about how to build a plugin for GitBook.
 
-Plugins needed to build a book can be installed using: `gitbook install ./`.
+Plugins needed to build a book can be installed using: `gitbook install ./`. You can find plugins at [plugins.gitbook.com](plugins.gitbook.com).
 
-##### Official plugins:
 
-| Name | Description |
-| ----- | ---- |
-| [exercises](https://github.com/GitbookIO/plugin-exercises) | Add interactive exercises to your book. |
-| [quizzes](https://github.com/GitbookIO/plugin-quizzes) | Add interactive quizzes to your book. |
-| [mathjax](https://github.com/GitbookIO/plugin-mathjax) | Displays mathematical notation in the book. |
-| [mixpanel](https://github.com/GitbookIO/plugin-mixpanel) | Mixpanel tracking for your book |
-| [infinitescroll](https://github.com/GitbookIO/gitbook-plugin-infinitescroll) | Infinite Scrolling |
+## Debugging
 
-##### Other plugins:
-
-| Name | Description |
-| ----- | ---- |
-| [Google Analytics](https://github.com/GitbookIO/plugin-ga) | Google Analytics tracking for your book |
-| [Disqus](https://github.com/GitbookIO/plugin-disqus) | Disqus comments integration in your book |
-| [Autocover](https://github.com/GitbookIO/plugin-autocover) | Generate a cover for your book |
-| [Transform annoted quotes to notes](https://github.com/erixtekila/gitbook-plugin-richquotes) | Allow extra markdown markup to render blockquotes as nice notes |
-| [Send code to console](https://github.com/erixtekila/gitbook-plugin-toconsole) | Evaluate javascript block in the browser inspector's console |
-| [Revealable sections](https://github.com/mrpotes/gitbook-plugin-reveal) | Reveal sections of the page using buttons made from the first title in each section |
-| [Markdown within HTML](https://github.com/mrpotes/gitbook-plugin-nestedmd) | Process markdown within HTML blocks - allows custom layout options for individual pages |
-| [Bootstrap JavaScript plugins](https://github.com/mrpotes/gitbook-plugin-bootstrapjs) | Use the [Bootstrap JavaScript plugins](http://getbootstrap.com/javascript) in your online GitBook |
-| [Piwik Open Analytics](https://github.com/emmanuel-keller/gitbook-plugin-piwik) | Piwik Open Analytics tracking for your book |
-| [Heading Anchors](https://github.com/rlmv/gitbook-plugin-anchors) | Add linkable Github-style anchors to headings |
-| [JSBin](https://github.com/jcouyang/gitbook-plugin-jsbin) | Embedded jsbin frame into your book |
-| [GrVis](https://github.com/romanlytkin/gitbook-grvis) | Gitbook GrViz plugin is used to select from markdown dot and converting it into a picture format svg |
-| [PlantUml](https://github.com/romanlytkin/gitbook-plantuml) | Gitbook PlantUml plugin is used to select from markdown uml and converting it into a picture format svg |
-| [Mermaid](https://github.com/JozoVilcek/gitbook-plugin-mermaid) | Adds diagrams and flowcharts rendered by [mermaid](https://github.com/knsv/mermaid) |
-
-#### Debugging
-
-You can use the environment variable `DEBUG=true` to get better error messages (with stack trace). For example:
+You can use the options `--log=debug` and `--debug` to get better error messages (with stack trace). For example:
 
 ```
-$ export DEBUG=true
-$ gitbook build ./
+$ gitbook build ./ -- log=debug --debug
 ```
+
+## How to use the latest commit from GitBook in gitbook-cli
+
+To use the latest commit from `GitBook/gitbook` with `gitbook-cli`:
+
+```
+$ git clone https://github.com/GitbookIO/gitbook.git ./gitbook
+$ gitbook versions:link 2.0.0 ./gitbook
+```
+
+Now the version tag `2.0.0` wil be associated with the `./gitbook` folder.
+
+You can uninstall it using: `gitbook versions:uninstall 2.0.0`.
