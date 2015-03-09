@@ -203,7 +203,7 @@ The platform [GitBook.com](https://www.gitbook.com/) is like an "Heroku for book
 
 Plugins can be used to extend your book's functionality. Read [GitbookIO/plugin](https://github.com/GitbookIO/plugin) for more information about how to build a plugin for GitBook.
 
-Plugins needed to build a book can be installed using: `gitbook install ./`. You can find plugins at [plugins.gitbook.com](plugins.gitbook.com).
+Plugins needed to build a book can be installed using: `gitbook install ./`. You can find plugins at [plugins.gitbook.com](http://plugins.gitbook.com).
 
 
 ## Debugging
