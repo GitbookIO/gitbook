@@ -43,7 +43,7 @@
         "grunt-bower-install-simple": "0.9.2"
     },
     "scripts": {
-        "test": "node_modules/.bin/mocha --reporter list --timeout 15000 --bail --no-exit"
+        "test": "node_modules/.bin/mocha --reporter list --timeout 15000"
     },
     "repository": {
         "type": "git",
