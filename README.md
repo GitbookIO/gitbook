@@ -1,8 +1,9 @@
 GitBook
 =======
 
-[![Build Status](https://travis-ci.org/GitbookIO/gitbook.png?branch=master)](https://travis-ci.org/GitbookIO/gitbook)
 [![NPM version](https://badge.fury.io/js/gitbook.svg)](http://badge.fury.io/js/gitbook)
+[![Build Status](https://travis-ci.org/GitbookIO/gitbook.png?branch=master)](https://travis-ci.org/GitbookIO/gitbook)
+[![Windows Build Status](https://ci.appveyor.com/api/projects/status/github/GitbookIO/gitbook?branch=master&svg=true)](https://ci.appveyor.com/project/SamyPesse/gitbook)
 
 GitBook is a command line tool (and Node.js library) for building beautiful books using GitHub/Git and Markdown (or AsciiDoc). Here is an example: [Learn Javascript](https://www.gitbook.com/book/GitBookIO/javascript).
 
