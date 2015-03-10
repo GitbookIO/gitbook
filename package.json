@@ -31,7 +31,7 @@
         "request": "2.51.0",
         "npm": "2.4.1",
         "dom-serializer": "0.1.0",
-        "shell-escape": "0.2.0"
+        "spawn-cmd": "0.0.2"
     },
     "devDependencies": {
         "mocha": "2.2.1",
