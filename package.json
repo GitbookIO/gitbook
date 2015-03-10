@@ -13,7 +13,7 @@
         "fs-extra": "0.16.5",
         "fstream-ignore": "1.0.2",
         "gitbook-parsers": "0.5.2",
-        "nunjucks": "git+https://github.com/mozilla/nunjucks.git#42d2b9f5c0ad5db8ca3a1fdbba5bde9fc4cc2c45",
+        "nunjucks": "git+https://github.com/mozilla/nunjucks.git#41dd01cf61ae4aa09d96df55f2674fa6ddaa0f8a",
         "nunjucks-autoescape": "0.1.1",
         "nunjucks-filter": "0.1.0",
         "nunjucks-i18n": "1.0.0",
