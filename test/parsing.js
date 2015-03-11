@@ -71,12 +71,12 @@ describe('Book parsing', function () {
 
         assert.equal(_.size(NAVIGATION), 2);
         assert(NAVIGATION["intro.md"])
-        assert.equal(NAVIGATION["intro.md"].title, "Introduction");
+        assert.equal(NAVIGATION["intro.md"].title, "");
         assert.equal(NAVIGATION["intro.md"].prev, null);
         assert.equal(NAVIGATION["intro.md"].next.title, "Article 1");
 
         assert.equal(NAVIGATION["sub/test1.md"].title, "Article 1");
-        assert.equal(NAVIGATION["sub/test1.md"].prev.title, "Introduction");
+        assert.equal(NAVIGATION["sub/test1.md"].prev.title, "");
         assert.equal(NAVIGATION["sub/test1.md"].next, null);
     });
 });
