@@ -8,7 +8,7 @@
                         {% if item.level != "0" %}
                             <b>{{ item.level }}.</b>
                         {% endif %}
-                        {% if item.introduction %}{% i18n "SUMMARY_INTRODUCTION" %}Introduction{% endi18n %}{% else %}{{ item.title }}{% endif %}
+                        {% if item.introduction and not item.title %}{% i18n "SUMMARY_INTRODUCTION" %}Introduction{% endi18n %}{% else %}{{ item.title }}{% endif %}
                     </a>
                 {% else %}
                     <a target="_blank" href="{{ item.path }}">
