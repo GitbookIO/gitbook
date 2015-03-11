@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.0.0-beta.2
+- Fix definition of entry point title using SUMMARY.md
+
 ## 2.0.0-beta.1
 - Fix windows incompatibility
 - Add support for rtl (enabled by default for `ar` and `fa`)
