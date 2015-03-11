@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.0.0-beta.1
+- Fix windows incompatibility
+- Add support for rtl (enabled by default for `ar` and `fa`)
+- Escape code blocks in markdown parser
+- Add Persian/Farsi translation (`fa`)
+- Add Arabic translation (`ar`)
+- Add Bengali translation (`bn`)
+- Provide generator name in template context
+
 ## 2.0.0-alpha.9
 - Fix links in sidebar
 - Fix normalization of html link (README to index)
