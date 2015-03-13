@@ -21,7 +21,7 @@ describe('JSON generator', function () {
             assert(fs.existsSync(path.join(output, "sub/test1.json")));
 
             var test1 = JSON.parse(fs.readFileSync(path.join(output, "sub/test1.json")));
-            assert(test1.sections[0].content.indexOf("intro.html") > 0);
+            assert(test1.sections[0].content.indexOf("index.html") > 0);
         }, done);
     });
 
