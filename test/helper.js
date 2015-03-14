@@ -49,7 +49,7 @@ global.books = _.chain(books)
 before(function(done) {
 
     qdone(
-	    _.reduce(global.books, function(prev, book) {
+        _.reduce(global.books, function(prev, book) {
             return prev.then(function() {
                 return fsUtil.remove(path.join(book.root, "_book"));
             })
@@ -57,6 +57,6 @@ before(function(done) {
                 return book.parse();
             });
         }, Q()),
-	    done
-	);
+        done
+    );
 });

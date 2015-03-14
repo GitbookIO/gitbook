@@ -5,7 +5,7 @@ var assert = require('assert');
 describe('Book parsing', function () {
     it('should correctly parse the readme', function() {
         assert.equal(books[1].options.title, 'My Book');
-    	assert.equal(books[1].options.description, 'Test description');
+        assert.equal(books[1].options.description, 'Test description');
     });
 
     it('should correctly parse the readme with asciidoc', function() {
@@ -21,7 +21,7 @@ describe('Book parsing', function () {
         assert.equal(LEXED.chapters[0].introduction, true);
         assert.equal(LEXED.chapters[0].external, false);
 
-    	assert.equal(LEXED.chapters[1].path, 'test.md');
+        assert.equal(LEXED.chapters[1].path, 'test.md');
         assert.equal(LEXED.chapters[1].exists, false);
         assert.equal(LEXED.chapters[1].introduction, false);
         assert.equal(LEXED.chapters[1].external, false);

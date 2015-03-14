@@ -15,7 +15,7 @@ describe('JSON generator', function () {
     });
 
     it('should correctly generate a book to json with sub folders', function(done) {
-    	testGeneration(books[1], "json", function(output) {
+        testGeneration(books[1], "json", function(output) {
             assert(fs.existsSync(path.join(output, "README.json")));
             assert(fs.existsSync(path.join(output, "intro.json")));
             assert(fs.existsSync(path.join(output, "sub/test1.json")));
@@ -26,7 +26,7 @@ describe('JSON generator', function () {
     });
 
     it('should correctly generate a multilingual book to json', function(done) {
-    	testGeneration(books[2], "json", function(output) {
+        testGeneration(books[2], "json", function(output) {
             assert(fs.existsSync(path.join(output, "README.json")));
             assert(fs.existsSync(path.join(output, "en/README.json")));
             assert(fs.existsSync(path.join(output, "fr/README.json")));

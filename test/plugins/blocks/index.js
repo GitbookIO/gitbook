@@ -2,22 +2,22 @@ var assert = require("assert");
 
 module.exports = {
     blocks: {
-    	"test": {
+        "test": {
             shortcuts: {
                 parsers:  ["markdown"],
                 start: "$$",
                 end: "$$"
             },
-    		process: function(blk) {
-    			return "test"+blk.body+"test";
-    		}
-    	},
-    	"test2": {
-    		end: "endtest2end",
-    		process: function(blk) {
-    			return "test2"+blk.body+"test2";
-    		}
-    	},
+            process: function(blk) {
+                return "test"+blk.body+"test";
+            }
+        },
+        "test2": {
+            end: "endtest2end",
+            process: function(blk) {
+                return "test2"+blk.body+"test2";
+            }
+        },
         "test3join": {
             blocks: [
                 "also"

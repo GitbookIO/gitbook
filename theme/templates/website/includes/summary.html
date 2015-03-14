@@ -37,14 +37,14 @@
     </div>
     <ul class="summary">
         {% set _divider = false %}
-    	{% if options.links.sidebar %}
-    	{% for linkTitle, link in options.links.sidebar %}
-    	    {% set _divider = true %}
+        {% if options.links.sidebar %}
+        {% for linkTitle, link in options.links.sidebar %}
+            {% set _divider = true %}
             <li>
                 <a href="{{ link }}" target="blank" class="custom-link">{{ linkTitle }}</a>
             </li>
-    	{% endfor %}
-    	{% endif %}
+        {% endfor %}
+        {% endif %}
 
         {% if _divider %}
         <li class="divider"></li>
