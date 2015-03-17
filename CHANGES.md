@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.0.0-beta.4
+- Fix default generator for use programmatically
+- Add option "author" for html meta tags
+- Fix links normalization (content and hash)
+
 ## 2.0.0-beta.3
 - Fix odd cases with code blocks escaping
 
