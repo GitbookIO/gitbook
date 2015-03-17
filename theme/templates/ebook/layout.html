@@ -8,6 +8,8 @@
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="{% block description %}{% endblock %}">
         <meta name="generator" content="GitBook {{ gitbook.version }}">
+        {% if options.author %}<meta name="author" content="{{ options.author }}">{% endif %}
+        {% if options.isbn %}<meta name="identifier" content="{{ options.isbn }}" scheme="ISBN">{% endif %}
         {% block head %}{% endblock %}
         {{ htmlSnippet("head:end")|default("")|safe }}
     </head>
