@@ -12,7 +12,7 @@
         "resolve": "0.6.3",
         "fs-extra": "0.16.5",
         "fstream-ignore": "1.0.2",
-        "gitbook-parsers": "0.5.4",
+        "gitbook-parsers": "0.6.0",
         "nunjucks": "git+https://github.com/mozilla/nunjucks.git#0f8b21b8df7e8e852b2e1889388653b7075f0d09",
         "nunjucks-autoescape": "0.1.1",
         "nunjucks-filter": "0.1.0",
@@ -31,7 +31,8 @@
         "request": "2.51.0",
         "npm": "2.4.1",
         "dom-serializer": "0.1.0",
-        "spawn-cmd": "0.0.2"
+        "spawn-cmd": "0.0.2",
+        "highlight.js": "8.4.0"
     },
     "devDependencies": {
         "mocha": "2.2.1",
