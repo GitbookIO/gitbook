@@ -36,6 +36,7 @@
     },
     "devDependencies": {
         "mocha": "2.2.1",
+        "should": "5.2.0",
         "grunt": "~0.4.2",
         "grunt-cli": "0.1.11",
         "grunt-contrib-copy": "0.5.0",

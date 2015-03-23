@@ -1,0 +1,31 @@
+{
+    "progress": {
+        "prevPercent": 0,
+        "percent": 0,
+        "chapters": [
+            {
+                "index": 0,
+                "title": "",
+                "level": "0",
+                "path": "README.md",
+                "percent": 0,
+                "done": true
+            }
+        ],
+        "current": {
+            "index": 0,
+            "title": "",
+            "level": "0",
+            "path": "README.md",
+            "percent": 0,
+            "done": true
+        }
+    },
+    "sections": [
+        {
+            "type": "normal",
+            "content": "<h1 id=\"readme\">Readme</h1>\n"
+        }
+    ],
+    "langs": []
+}

@@ -1,62 +1,71 @@
+var os = require('os');
 var path = require('path');
 var Q = require('q');
 var fs = require('fs');
 var _ = require('lodash');
+var should = require('should');
 
-var fsUtil = require("../lib/utils/fs");
+var fsUtil = require('../lib/utils/fs');
 var Book = require('../').Book;
 var LOG_LEVELS = require('../').LOG_LEVELS;
 
-// Nicety for mocha / Q
-global.qdone = function qdone(promise, done) {
-    return promise.then(function() {
-        return done();
-    }, function(err) {
-        return done(err);
-    }).done();
-};
+var BOOKS = {};
+var TMPDIR = os.tmpdir();
 
-// Test generation of a book
-global.testGeneration = function(book, type, func, done) {
-    var OUTPUT_PATH = book.options.output;
 
-    qdone(
-        book.generate(type)
-            .then(function() {
-                func(OUTPUT_PATH);
-            })
-            .fin(function() {
-                return fsUtil.remove(OUTPUT_PATH);
-            }),
-        done);
-};
+// Generate and return a book
+function generateBook(bookId, test) {
+    BOOKS[bookId] = BOOKS[bookId] || {};
+    if (BOOKS[bookId][test]) return Q(BOOKS[bookId][test]);
 
-// Books for testings
-var books = fs.readdirSync(path.join(__dirname, './fixtures/'));
+    BOOKS[bookId][test] = new Book(path.resolve(__dirname, "books", bookId), {
+        logLevel: LOG_LEVELS.DISABLED,
+        output: path.resolve(TMPDIR, bookId+"-"+test)
+    });
 
-global.books = _.chain(books)
-    .sortBy()
-    .map(function(book) {
-        if (book.indexOf("test") !== 0) return null;
-        return new Book(path.join(__dirname, './fixtures/', book), {
-            logLevel: LOG_LEVELS.DISABLED
-        });
+    console.log("gen");
+    return BOOKS[bookId][test].parse()
+    .then(function() {
+        return BOOKS[bookId][test].generate(test);
     })
-    .compact()
-    .value();
+    .then(function() {
+        return BOOKS[bookId][test];
+    });
+}
 
-// Init before doing tests
-before(function(done) {
+// Generate and return a book
+function parseBook(bookId, test) {
+    BOOKS[bookId] = BOOKS[bookId] || {};
+    if (BOOKS[bookId][test]) return Q(BOOKS[book][test]);
 
-    qdone(
-        _.reduce(global.books, function(prev, book) {
+    BOOKS[bookId] = new Book(path.resolve(__dirname, "books", bookId), {
+        logLevel: LOG_LEVELS.DISABLED,
+        output: path.resolve(TMPDIR, bookId+"-"+test)
+    });
+
+    return BOOKS[bookId].parse();
+}
+
+
+global.books = {
+    parse: parseBook,
+    generate: generateBook
+};
+
+// Cleanup all tests
+after(function() {
+    console.log("cleanup!");
+    return _.chain(BOOKS)
+        .map(function(types, bookId) {
+            return _.values(types);
+        })
+        .reduce(function(prev, book) {
             return prev.then(function() {
-                return fsUtil.remove(path.join(book.root, "_book"));
+                console.log("cleanup", book.options.output);
+                return fsUtil.remove(book.options.output);
             })
-            .then(function() {
-                return book.parse();
-            });
-        }, Q()),
-        done
-    );
+        })
+        .value();
 });
+
+
