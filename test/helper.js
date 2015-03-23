@@ -15,15 +15,25 @@ var TMPDIR = os.tmpdir();
 
 // Generate and return a book
 function generateBook(bookId, test) {
+    return parseBook(bookId, test)
+    .then(function(book) {
+        return book.generate(test)
+        .thenResolve(book);
+    });
+}
+
+// Generate and return a book
+function parseBook(bookId, test) {
     BOOKS[bookId] = BOOKS[bookId] || {};
     if (BOOKS[bookId][test]) return Q(BOOKS[bookId][test]);
 
     BOOKS[bookId][test] = new Book(path.resolve(__dirname, "books", bookId), {
         logLevel: LOG_LEVELS.DISABLED,
-        output: path.resolve(TMPDIR, bookId+"-"+test)
+        config: {
+            output: path.resolve(TMPDIR, bookId+"-"+test)
+        }
     });
 
-    console.log("gen");
     return BOOKS[bookId][test].parse()
     .then(function() {
         return BOOKS[bookId][test].generate(test);
@@ -31,19 +41,6 @@ function generateBook(bookId, test) {
     .then(function() {
         return BOOKS[bookId][test];
     });
-}
-
-// Generate and return a book
-function parseBook(bookId, test) {
-    BOOKS[bookId] = BOOKS[bookId] || {};
-    if (BOOKS[bookId][test]) return Q(BOOKS[book][test]);
-
-    BOOKS[bookId] = new Book(path.resolve(__dirname, "books", bookId), {
-        logLevel: LOG_LEVELS.DISABLED,
-        output: path.resolve(TMPDIR, bookId+"-"+test)
-    });
-
-    return BOOKS[bookId].parse();
 }
 
 
@@ -54,17 +51,16 @@ global.books = {
 
 // Cleanup all tests
 after(function() {
-    console.log("cleanup!");
     return _.chain(BOOKS)
         .map(function(types, bookId) {
             return _.values(types);
         })
+        .flatten()
         .reduce(function(prev, book) {
             return prev.then(function() {
-                console.log("cleanup", book.options.output);
                 return fsUtil.remove(book.options.output);
             })
-        })
+        }, Q())
         .value();
 });
 
