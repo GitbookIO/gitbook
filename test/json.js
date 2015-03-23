@@ -1,9 +1,11 @@
 
 describe('JSON generator', function () {
-    it('should correctly generate a basic book to json', function() {
-        return books.generate("basic", "json")
-            .then(function(book) {
-
-            });
+    describe('Basic Book', function() {
+        it('should correctly output a README.json', function() {
+            return books.generate("basic", "json")
+                .then(function(book) {
+                    book.should.have.file("README.json");
+                });
+        });
     });
 });

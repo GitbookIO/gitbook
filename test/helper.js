@@ -9,6 +9,9 @@ var fsUtil = require('../lib/utils/fs');
 var Book = require('../').Book;
 var LOG_LEVELS = require('../').LOG_LEVELS;
 
+require("./assertions");
+
+
 var BOOKS = {};
 var TMPDIR = os.tmpdir();
 
