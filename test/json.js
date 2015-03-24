@@ -38,6 +38,12 @@ describe('JSON generator', function () {
                 page.sections[0].should.have.property("type").which.is.a.String.which.equal("normal");
             });
 
+            it('should contains valid progress', function() {
+                page.should.have.property("progress");
+                page.progress.should.have.property("chapters").with.lengthOf(1);
+                page.progress.should.have.property("current");
+            });
+
             it('should contains no languages', function() {
                 page.should.have.property("langs").with.lengthOf(0);
             });
