@@ -1,0 +1,9 @@
+{
+    "name": "gitbook-plugin-filters",
+    "description": "Test filters",
+    "main": "index.js",
+    "version": "0.0.1",
+    "engines": {
+        "gitbook": "*"
+    }
+}

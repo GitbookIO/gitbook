@@ -1,0 +1,9 @@
+{
+    "name": "gitbook-plugin-invalid",
+    "description": "Test invalid plugin",
+    "main": "index.js",
+    "version": "0.0.1",
+    "engines": {
+        "gitbook": "<2.0.0"
+    }
+}

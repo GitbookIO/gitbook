@@ -1,0 +1,9 @@
+{
+    "name": "gitbook-plugin-resources",
+    "description": "Test resources plugin",
+    "main": "index.js",
+    "version": "0.0.1",
+    "engines": {
+        "gitbook": "*"
+    }
+}
