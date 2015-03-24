@@ -60,12 +60,16 @@ describe('JSON generator', function () {
                 });
         });
 
-        it('should correctly output a README.json', function() {
+        it('should correctly output READMEs', function() {
             book.should.have.file("README.json");
+            book.should.have.file("en/README.json");
+            book.should.have.file("fr/README.json");
         });
 
-        it('should output a valid json', function() {
+        it('should output valid json', function() {
             book.should.have.jsonfile("README.json");
+            book.should.have.jsonfile("en/README.json");
+            book.should.have.jsonfile("fr/README.json");
         });
 
         describe('Page Format', function() {
