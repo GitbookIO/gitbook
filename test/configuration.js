@@ -9,6 +9,13 @@ describe('Configuration', function () {
             });
     });
 
+    it('should extract default description from README', function() {
+        return books.parse("basic")
+            .then(function(book) {
+                book.options.description.should.be.equal("Default description for the book.");
+            });
+    });
+
     it('should correctly load from json (book.json)', function() {
         return books.parse("config-json")
             .then(function(book) {
