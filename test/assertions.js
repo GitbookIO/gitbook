@@ -27,7 +27,9 @@ should.Assertion.add('html', function(rules, description) {
     _.each(rules, function(validations, query) {
         validations = _.defaults(validations || {}, {
             count: 1,
-            attributes: {}
+            attributes: {},
+            trim: false,
+            text: undefined
         });
 
         var $el = $(query);
@@ -36,7 +38,11 @@ should.Assertion.add('html', function(rules, description) {
         $el.should.have.lengthOf(validations.count);
 
         // Test text
-        if (validations.text !== undefined) $el.text().should.be.equal(validations.text);
+        if (validations.text !== undefined) {
+            var text = $el.text();
+            if (validations.trim) text = text.trim();
+            text.should.be.equal(validations.text);
+        }
 
         // Test attributes
         _.each(validations.attributes, function(value, name) {
