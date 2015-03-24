@@ -6,7 +6,7 @@ describe('Summary', function () {
         var book;
 
         before(function() {
-            return books.parse("summary", "website")
+            return books.parse("summary")
                 .then(function(_book) {
                     book = _book;
                 });
