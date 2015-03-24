@@ -27,6 +27,7 @@ function generateBook(bookId, test) {
 
 // Generate and return a book
 function parseBook(bookId, test) {
+    test = test || "website";
     BOOKS[bookId] = BOOKS[bookId] || {};
     if (BOOKS[bookId][test]) return Q(BOOKS[bookId][test]);
 
