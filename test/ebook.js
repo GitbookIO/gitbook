@@ -1,36 +1,24 @@
+var fs = require('fs');
 var path = require('path');
-var _ = require('lodash');
-var assert = require('assert');
-var cheerio = require('cheerio');
 
-var fs = require("fs");
-var fsUtil = require("../lib/utils/fs");
+describe('eBook generator', function () {
+    describe('Basic Book', function() {
+        var book;
 
+        before(function() {
+            return books.generate("basic", "ebook")
+                .then(function(_book) {
+                    book = _book;
+                });
+        });
 
-describe('eBook Generator', function () {
-    it('should correctly generate ebook pages', function(done) {
-        testGeneration(books[1], "ebook", function(output) {
-            assert(fs.existsSync(path.join(output, "SUMMARY.html")));
-        }, done);
-    });
+        it('should correctly output a SUMMARY.html', function() {
+            book.should.have.file("SUMMARY.html");
+        });
 
-    it('should correctly convert svg images to png', function(done) {
-        testGeneration(books[4], "ebook", function(output) {
-            // Check that all images exists
-            _.each([
-                "index.html",
-                "sub/PAGE.html"
-            ], function(pageName) {
-                var pageFile = path.join(output, pageName);
-                var pageFolder = path.dirname(pageFile);
-                var pageContent = fs.readFileSync(pageFile, {encoding: "utf8"});
-                var $ = cheerio.load(pageContent);
-
-                $("img").each(function() {
-                    var src = $(this).attr("src");
-                    assert(fs.existsSync(path.resolve(pageFolder, src)), src+" not found for page "+pageName);
-                })
-            });
-        }, done);
+        it('should correctly copy assets', function() {
+            book.should.have.file("gitbook");
+            book.should.have.file("gitbook/style.css");
+        });
     });
 });

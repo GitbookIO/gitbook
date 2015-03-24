@@ -1,59 +1,92 @@
+var fs = require('fs');
 var path = require('path');
-var _ = require('lodash');
-var assert = require('assert');
-
-var fs = require("fs");
 
 describe('JSON generator', function () {
-    it('should correctly generate a book to json with glossary', function(done) {
-        testGeneration(books[0], "json", function(output) {
-            assert(fs.existsSync(path.join(output, "README.json")));
+    describe('Basic Book', function() {
+        var book;
 
-            var readme = JSON.parse(fs.readFileSync(path.join(output, "README.json")));
-            assert(readme.sections[0].content.indexOf('class="glossary-term"') > 0);
-        }, done);
+        before(function() {
+            return books.generate("basic", "json")
+                .then(function(_book) {
+                    book = _book;
+                });
+        });
+
+        it('should correctly output a README.json', function() {
+            book.should.have.file("README.json");
+        });
+
+        it('should output a valid json', function() {
+            book.should.have.jsonfile("README.json");
+        });
+
+        describe('Page Format', function() {
+            var page;
+
+            before(function() {
+                page = JSON.parse(
+                    fs.readFileSync(
+                        path.join(book.options.output, "README.json"),
+                        { encoding: "utf-8" }
+                    )
+                );
+            });
+
+            it('should contains valid section', function() {
+                page.should.have.property("sections").with.lengthOf(1);
+                page.sections[0].should.have.property("content").which.is.a.String;
+                page.sections[0].should.have.property("type").which.is.a.String.which.equal("normal");
+            });
+
+            it('should contains valid progress', function() {
+                page.should.have.property("progress");
+                page.progress.should.have.property("chapters").with.lengthOf(1);
+                page.progress.should.have.property("current");
+            });
+
+            it('should contains no languages', function() {
+                page.should.have.property("langs").with.lengthOf(0);
+            });
+        });
     });
 
-    it('should correctly generate a book to json with sub folders', function(done) {
-        testGeneration(books[1], "json", function(output) {
-            assert(fs.existsSync(path.join(output, "README.json")));
-            assert(fs.existsSync(path.join(output, "intro.json")));
-            assert(fs.existsSync(path.join(output, "sub/test1.json")));
+    describe('Multilingual Book', function() {
+        var book;
 
-            var test1 = JSON.parse(fs.readFileSync(path.join(output, "sub/test1.json")));
-            assert(test1.sections[0].content.indexOf("index.html") > 0);
-        }, done);
-    });
+        before(function() {
+            return books.generate("languages", "json")
+                .then(function(_book) {
+                    book = _book;
+                });
+        });
 
-    it('should correctly generate a multilingual book to json', function(done) {
-        testGeneration(books[2], "json", function(output) {
-            assert(fs.existsSync(path.join(output, "README.json")));
-            assert(fs.existsSync(path.join(output, "en/README.json")));
-            assert(fs.existsSync(path.join(output, "fr/README.json")));
-        }, done);
-    });
+        it('should correctly output READMEs', function() {
+            book.should.have.file("README.json");
+            book.should.have.file("en/README.json");
+            book.should.have.file("fr/README.json");
+        });
 
-    it('should correctly generate an asciidoc book to json', function(done) {
-        testGeneration(books[3], "json", function(output) {
-            assert(fs.existsSync(path.join(output, "README.json")));
-            assert(fs.existsSync(path.join(output, "test.json")));
-            assert(fs.existsSync(path.join(output, "test1.json")));
-            assert(fs.existsSync(path.join(output, "test2.json")));
-        }, done);
-    });
+        it('should output valid json', function() {
+            book.should.have.jsonfile("README.json");
+            book.should.have.jsonfile("en/README.json");
+            book.should.have.jsonfile("fr/README.json");
+        });
 
-    it('should correctly generate a book with local inclusion', function(done) {
-        testGeneration(books[5], "json", function(output) {
-            var readme = JSON.parse(fs.readFileSync(path.join(output, "README.json")));
-            assert(readme.sections[0].content.indexOf('Hello World') > 0);
-        }, done);
-    });
+        describe('Page Format', function() {
+            var page;
 
-    it('should correctly generate a book with external inclusion', function(done) {
-        testGeneration(books[5], "json", function(output) {
-            var readme = JSON.parse(fs.readFileSync(path.join(output, "README.json")));
-            assert(readme.sections[0].content.indexOf('Git1:Hello from git') > 0);
-            assert(readme.sections[0].content.indexOf('Git2:First Hello. Hello from git') > 0);
-        }, done);
+            before(function() {
+                page = JSON.parse(
+                    fs.readFileSync(
+                        path.join(book.options.output, "README.json"),
+                        { encoding: "utf-8" }
+                    )
+                );
+            });
+
+            it('should contains no languages', function() {
+                page.should.have.property("langs").with.lengthOf(2);
+            });
+        });
     });
 });

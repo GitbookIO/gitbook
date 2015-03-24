@@ -1,62 +1,68 @@
+var os = require('os');
 var path = require('path');
 var Q = require('q');
 var fs = require('fs');
 var _ = require('lodash');
+var should = require('should');
 
-var fsUtil = require("../lib/utils/fs");
+var fsUtil = require('../lib/utils/fs');
 var Book = require('../').Book;
 var LOG_LEVELS = require('../').LOG_LEVELS;
 
-// Nicety for mocha / Q
-global.qdone = function qdone(promise, done) {
-    return promise.then(function() {
-        return done();
-    }, function(err) {
-        return done(err);
-    }).done();
+require("./assertions");
+
+
+var BOOKS = {};
+var TMPDIR = os.tmpdir();
+
+
+// Generate and return a book
+function generateBook(bookId, test) {
+    return parseBook(bookId, test)
+    .then(function(book) {
+        return book.generate(test)
+        .thenResolve(book);
+    });
+}
+
+// Generate and return a book
+function parseBook(bookId, test) {
+    test = test || "website";
+    BOOKS[bookId] = BOOKS[bookId] || {};
+    if (BOOKS[bookId][test]) return Q(BOOKS[bookId][test]);
+
+    BOOKS[bookId][test] = new Book(path.resolve(__dirname, "books", bookId), {
+        logLevel: LOG_LEVELS.DISABLED,
+        config: {
+            output: path.resolve(TMPDIR, bookId+"-"+test)
+        }
+    });
+
+    return BOOKS[bookId][test].parse()
+    .then(function() {
+        return BOOKS[bookId][test];
+    });
+}
+
+
+global.books = {
+    parse: parseBook,
+    generate: generateBook
 };
 
-// Test generation of a book
-global.testGeneration = function(book, type, func, done) {
-    var OUTPUT_PATH = book.options.output;
-
-    qdone(
-        book.generate(type)
-            .then(function() {
-                func(OUTPUT_PATH);
-            })
-            .fin(function() {
-                return fsUtil.remove(OUTPUT_PATH);
-            }),
-        done);
-};
-
-// Books for testings
-var books = fs.readdirSync(path.join(__dirname, './fixtures/'));
-
-global.books = _.chain(books)
-    .sortBy()
-    .map(function(book) {
-        if (book.indexOf("test") !== 0) return null;
-        return new Book(path.join(__dirname, './fixtures/', book), {
-            logLevel: LOG_LEVELS.DISABLED
-        });
-    })
-    .compact()
-    .value();
-
-// Init before doing tests
-before(function(done) {
-
-    qdone(
-        _.reduce(global.books, function(prev, book) {
+// Cleanup all tests
+after(function() {
+    return _.chain(BOOKS)
+        .map(function(types, bookId) {
+            return _.values(types);
+        })
+        .flatten()
+        .reduce(function(prev, book) {
             return prev.then(function() {
-                return fsUtil.remove(path.join(book.root, "_book"));
+                return fsUtil.remove(book.options.output);
             })
-            .then(function() {
-                return book.parse();
-            });
-        }, Q()),
-        done
-    );
+        }, Q())
+        .value();
 });
+
+
