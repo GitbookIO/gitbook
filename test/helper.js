@@ -39,9 +39,6 @@ function parseBook(bookId, test) {
 
     return BOOKS[bookId][test].parse()
     .then(function() {
-        return BOOKS[bookId][test].generate(test);
-    })
-    .then(function() {
         return BOOKS[bookId][test];
     });
 }
