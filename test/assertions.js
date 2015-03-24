@@ -5,7 +5,7 @@ var should = require('should');
 var cheerio = require('cheerio');
 
 should.Assertion.add('file', function(file, description) {
-    this.params = { operator: 'have file ' + file, message: description };
+    this.params = { actual: this.obj.toString(), operator: 'have file ' + file, message: description };
 
     this.obj.should.have.property('options').which.is.an.Object;
     this.obj.options.should.have.property('output').which.is.a.String;
@@ -13,7 +13,7 @@ should.Assertion.add('file', function(file, description) {
 });
 
 should.Assertion.add('jsonfile', function(file, description) {
-    this.params = { operator: 'have valid jsonfile ' + file, message: description };
+    this.params = { actual: this.obj.toString(), operator: 'have valid jsonfile ' + file, message: description };
 
     this.obj.should.have.property('options').which.is.an.Object;
     this.obj.options.should.have.property('output').which.is.a.String;
