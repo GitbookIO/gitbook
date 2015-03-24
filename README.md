@@ -32,13 +32,13 @@ $ gitbook init
 You can serve a repository as a book using:
 
 ```
-$ gitbook serve ./repository
+$ gitbook serve
 ```
 
 Or simply build the static website using:
 
 ```
-$ gitbook build ./repository ./outputFolder
+$ gitbook build
 ```
 
 ## Features
