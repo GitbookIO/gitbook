@@ -33,21 +33,43 @@ describe('Glossary', function () {
         });
 
         describe('Page Integration', function() {
-            var page;
+            var readme, page;
 
             before(function() {
-                page = fs.readFileSync(
+                readme = fs.readFileSync(
                     path.join(book.options.output, "index.html"),
+                    { encoding: "utf-8" }
+                );
+                page = fs.readFileSync(
+                    path.join(book.options.output, "folder/PAGE.html"),
                     { encoding: "utf-8" }
                 );
             });
 
             it('should correctly replaced terms by links', function() {
-                page.should.be.html(".page-inner a[href='GLOSSARY.html#test']", {
-                    count: 1,
-                    text: "test",
-                    attributes: {
-                        title: "Just a simple and easy to understand test."
+                readme.should.be.html({
+                    ".page-inner a[href='GLOSSARY.html#test']": {
+                        count: 1,
+                        text: "test",
+                        attributes: {
+                            title: "Just a simple and easy to understand test."
+                        }
+                    }
+                });
+            });
+
+            it('should correctly replaced terms by links (relative)', function() {
+                page.should.be.html({
+                    ".page-inner a[href='../GLOSSARY.html#test']": {
+                        count: 1
+                    }
+                });
+            });
+
+            it('should not replace terms in codeblocks', function() {
+                readme.should.be.html({
+                    ".page-inner code a": {
+                        count: 0
                     }
                 });
             });

@@ -20,26 +20,27 @@ should.Assertion.add('jsonfile', function(file, description) {
     this.assert(JSON.parse(fs.readFileSync(path.resolve(this.obj.options.output, file), { encoding: "utf-8" })));
 });
 
-should.Assertion.add('html', function(query, validations, description) {
-    validations = _.defaults(validations || {}, {
-        count: 1,
-        attributes: {}
-    });
-
-
+should.Assertion.add('html', function(rules, description) {
     this.params = { actual: "HTML string", operator: 'valid html', message: description };
-
     var $ = cheerio.load(this.obj);
-    var $el = $(query);
 
-    // Test number of elements
-    $el.should.have.lengthOf(validations.count);
+    _.each(rules, function(validations, query) {
+        validations = _.defaults(validations || {}, {
+            count: 1,
+            attributes: {}
+        });
 
-    // Test text
-    if (validations.text !== undefined) $el.text().should.be.equal(validations.text);
+        var $el = $(query);
 
-    // Test attributes
-    _.each(validations.attributes, function(value, name) {
-        $el.attr(name).should.be.equal(value);
+        // Test number of elements
+        $el.should.have.lengthOf(validations.count);
+
+        // Test text
+        if (validations.text !== undefined) $el.text().should.be.equal(validations.text);
+
+        // Test attributes
+        _.each(validations.attributes, function(value, name) {
+            $el.attr(name).should.be.equal(value);
+        });
     });
 });
