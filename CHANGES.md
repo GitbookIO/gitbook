@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.0.0
+- Fix page title of introduction
+- Ignore codeblocks when replacing glossary terms
+- Improve Unit Tests
+- Fix scrolling position in website when preparing page
+
 ## 2.0.0-beta.5
 - Fix progress order in json format
 
