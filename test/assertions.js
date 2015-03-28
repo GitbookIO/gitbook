@@ -46,7 +46,9 @@ should.Assertion.add('html', function(rules, description) {
 
         // Test attributes
         _.each(validations.attributes, function(value, name) {
-            $el.attr(name).should.be.equal(value);
+            var attr = $el.attr(name);
+            should(attr).be.ok;
+            attr.should.be.equal(value);
         });
     });
 });

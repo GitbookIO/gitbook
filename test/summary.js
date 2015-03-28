@@ -41,5 +41,30 @@ describe('Summary', function () {
             book.should.have.file("PAGE1.html");
             book.should.have.file("folder/PAGE2.html");
         });
+
+        it('should correctly output summary', function() {
+            var PAGE = fs.readFileSync(
+                path.join(book.options.output, "index.html"),
+                { encoding: "utf-8" }
+            );
+
+            PAGE.should.be.html({
+                ".book-summary .chapter[data-level='0'] a": {
+                    attributes: {
+                        href: "./index.html"
+                    }
+                },
+                ".book-summary .chapter[data-level='1'] a": {
+                    attributes: {
+                        href: "./PAGE1.html"
+                    }
+                },
+                ".book-summary .chapter[data-level='2'] a": {
+                    attributes: {
+                        href: "./folder/PAGE2.html"
+                    }
+                }
+            });
+        });
     });
 });
