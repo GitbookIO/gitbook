@@ -30,6 +30,8 @@ Translators
 	- Knut Melvær (@kmelve)
 - Persian (Farsi)
 	- Mohammad Hossein Mojtahedi (@mhm5000)
+- Polish
+	- Łukasz Szeremeta (@lszeremeta)
 - Portuguese
 	- Ryan O'Mullan (@RyanOM)
 - Spanish
