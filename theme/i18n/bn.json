@@ -11,7 +11,7 @@
     "SEARCH_PLACEHOLDER": "অনুসন্ধান",
     "FONTSETTINGS_TOGGLE": "ফন্ট সেটিংস",
     "SHARE_TOGGLE": "শেয়ার",
-    "SHARE_ON": "__platform__-এ শেয়ার",
+    "SHARE_ON": "{{platform}}-এ শেয়ার",
     "FONTSETTINGS_WHITE": "সাদা",
     "FONTSETTINGS_SEPIA": "সেপিয়া",
     "FONTSETTINGS_NIGHT": "রাত",

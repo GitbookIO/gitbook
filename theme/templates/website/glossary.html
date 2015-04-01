@@ -1,6 +1,6 @@
 {% extends "page.html" %}
 
-{% block title %}{% i18n "GLOSSARY" %}Glossary{% endi18n %} | {{ title }}{% endblock %}
+{% block title %}{{ __("GLOSSARY") }} | {{ title }}{% endblock %}
 
 {% block page_inner %}
     {% for item in glossary %}

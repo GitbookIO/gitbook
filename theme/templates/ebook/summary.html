@@ -1,13 +1,13 @@
 {% extends "./page.html" %}
 
-{% block title %}{% i18n "SUMMARY" %}Table of Contents{% endi18n %} | {{ title }}{% endblock %}
+{% block title %}{{ __("SUMMARY") }} | {{ title }}{% endblock %}
 
 {% macro articles(_articles) %}
     {% for item in _articles %}
         <li>
             {% if item.path and item.exists %}
                 {% if not item.external %}
-                    <a href="{{ basePath }}/{{ item.path|contentLink }}">{% if item.introduction %}{% i18n "SUMMARY_INTRODUCTION" %}Introduction{% endi18n %}{% else %}{{ item.title }}{% endif %}</a>
+                    <a href="{{ basePath }}/{{ item.path|contentLink }}">{{ item.title }}</a>
                 {% else %}
                     <a target="_blank" href="{{ item.path }}">{{ item.title }}</a>
                 {% endif %}
@@ -25,12 +25,12 @@
 
 {% block content %}
 <div class="page page-toc">
-    <h1>{% i18n "SUMMARY" %}Table of Contents{% endi18n %}</h1>
+    <h1>{{ __("SUMMARY") }}</h1>
     <ol>
     {{ articles(summary.chapters) }}
 
     {% if glossary.length > 0 %}
-    <li><a href="{{ basePath }}/GLOSSARY.html">{% i18n "GLOSSARY" %}Glossary{% endi18n %}</a></li>
+    <li><a href="{{ basePath }}/GLOSSARY.html">{{ __("GLOSSARY") }}</a></li>
     {% endif %}
     </ol>
 </div>

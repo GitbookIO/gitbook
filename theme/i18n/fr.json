@@ -11,7 +11,7 @@
     "SEARCH_PLACEHOLDER": "Tapez pour rechercher",
     "FONTSETTINGS_TOGGLE": "Paramètres de Police",
     "SHARE_TOGGLE": "Partage",
-    "SHARE_ON": "Partager sur __platform__",
+    "SHARE_ON": "Partager sur {{platform}}",
     "FONTSETTINGS_WHITE": "Clair",
     "FONTSETTINGS_SEPIA": "Sépia",
     "FONTSETTINGS_NIGHT": "Nuit",

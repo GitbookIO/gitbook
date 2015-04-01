@@ -11,7 +11,7 @@
     "SEARCH_PLACEHOLDER": "Suchbegriff eingeben",
     "FONTSETTINGS_TOGGLE": "Schrifteinstellungen",
     "SHARE_TOGGLE": "Teilen",
-    "SHARE_ON": "Auf __platform__ teilen",
+    "SHARE_ON": "Auf {{platform}} teilen",
     "FONTSETTINGS_WHITE": "Hell",
     "FONTSETTINGS_SEPIA": "Sepia",
     "FONTSETTINGS_NIGHT": "Nacht",

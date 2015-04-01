@@ -12,7 +12,7 @@
     "SEARCH_PLACEHOLDER": "چیزی برای جستجو بنویسید",
     "FONTSETTINGS_TOGGLE": "تنظیمات فونت",
     "SHARE_TOGGLE": "اشتراک",
-    "SHARE_ON": "در __platform__ به اشتراک بگذارید",
+    "SHARE_ON": "در {{platform}} به اشتراک بگذارید",
     "FONTSETTINGS_WHITE": "سفید",
     "FONTSETTINGS_SEPIA": "سپیا",
     "FONTSETTINGS_NIGHT": "شب",

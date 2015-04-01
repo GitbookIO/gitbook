@@ -1,11 +1,11 @@
 {% extends "./page.html" %}
 
-{% block title %}{% i18n "GLOSSARY" %}Glossary{% endi18n %} | {{ title }}{% endblock %}
+{% block title %}{{ __("GLOSSARY") }} | {{ title }}{% endblock %}
 
 {% block content %}
 <div class="page page-toc">
-    <h1 class="book-chapter book-chapter-1">{% i18n "GLOSSARY" %}Glossary{% endi18n %}</h1>
-    <h1>{% i18n "GLOSSARY" %}Glossary{% endi18n %}</h1>
+    <h1 class="book-chapter book-chapter-1">{{ __("GLOSSARY") }}</h1>
+    <h1>{{ __("GLOSSARY") }}</h1>
     {% for item in glossary %}
     <section class="normal glossary" id="{{ item.id }}">
         <h2><a href="#{{ item.id }}">{{ item.name }}</a></h2>

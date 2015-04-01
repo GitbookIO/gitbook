@@ -11,7 +11,7 @@
     "SEARCH_PLACEHOLDER": "输入并搜索",
     "FONTSETTINGS_TOGGLE": "字体设置",
     "SHARE_TOGGLE": "分享",
-    "SHARE_ON": "分享到 __platform__",
+    "SHARE_ON": "分享到 {{platform}}",
     "FONTSETTINGS_WHITE": "白色",
     "FONTSETTINGS_SEPIA": "棕褐色",
     "FONTSETTINGS_NIGHT": "夜间",
