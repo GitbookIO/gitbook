@@ -1,12 +1,12 @@
 <div class="book-header">
     <!-- Actions Left -->
-    <a href="#" class="btn pull-left toggle-summary" aria-label="{% i18n "SUMMARY_TOGGLE" %}Table of Contents{% endi18n %}"><i class="fa fa-align-justify"></i></a>
-    <a href="#" class="btn pull-left toggle-search" aria-label="{% i18n "SEARCH_TOGGLE" %}Search{% endi18n %}"><i class="fa fa-search"></i></a>
+    <a href="#" class="btn pull-left toggle-summary" aria-label="{{ __("SUMMARY_TOGGLE") }}"><i class="fa fa-align-justify"></i></a>
+    <a href="#" class="btn pull-left toggle-search" aria-label="{{ __("SEARCH_TOGGLE") }}"><i class="fa fa-search"></i></a>
     {% if glossary.length > 0 %}
-    <a href="{{ basePath }}/GLOSSARY.html" class="btn pull-left" aria-label="{% i18n "GLOSSARY_OPEN" %}Glossary{% endi18n %}"><i class="fa fa-sort-alpha-asc"></i></a>
+    <a href="{{ basePath }}/GLOSSARY.html" class="btn pull-left" aria-label="{{ __("GLOSSARY_OPEN") }}"><i class="fa fa-sort-alpha-asc"></i></a>
     {% endif %}
     <div id="font-settings-wrapper" class="dropdown pull-left">
-        <a href="#" class="btn toggle-dropdown" aria-label="{% i18n "FONTSETTINGS_TOGGLE" %}Font Settings{% endi18n %}"><i class="fa fa-font"></i>
+        <a href="#" class="btn toggle-dropdown" aria-label="{{ __("FONTSETTINGS_TOGGLE") }}"><i class="fa fa-font"></i>
         </a>
         {% include "./font-settings.html" %}
     </div>
@@ -14,7 +14,7 @@
     <!-- Actions Right -->
     {% if options.links.sharing.all != false %}
     <div class="dropdown pull-right">
-        <a href="#" class="btn toggle-dropdown" aria-label="{% i18n "SHARE_TOGGLE" %}Share{% endi18n %}"><i class="fa fa-share-alt"></i>
+        <a href="#" class="btn toggle-dropdown" aria-label="{{ __("SHARE_TOGGLE") }}"><i class="fa fa-share-alt"></i>
         </a>
         <div class="dropdown-menu font-settings dropdown-left">
             <div class="dropdown-caret">
@@ -22,11 +22,21 @@
                 <span class="caret-inner"></span>
             </div>
             <div class="buttons">
-                <button type="button" data-sharing="twitter" class="button">{% i18n "SHARE_ON", __platform__="Twitter" %}Share on __platform__{% endi18n %}</button>
-                <button type="button" data-sharing="google-plus" class="button">{% i18n "SHARE_ON", __platform__="Google" %}Share on __platform__{% endi18n %}</button>
-                <button type="button" data-sharing="facebook" class="button">{% i18n "SHARE_ON", __platform__="Facebook" %}Share on __platform__{% endi18n %}</button>
-                <button type="button" data-sharing="weibo" class="button">{% i18n "SHARE_ON", __platform__="Weibo" %}Share on __platform__{% endi18n %}</button>
-                <button type="button" data-sharing="instapaper" class="button">{% i18n "SHARE_ON", __platform__="Instapaper" %}Share on __platform__{% endi18n %}</button>
+                <button type="button" data-sharing="twitter" class="button">
+                    {{ __("SHARE_ON", platform="Twitter") }}
+                </button>
+                <button type="button" data-sharing="google-plus" class="button">
+                    {{ __("SHARE_ON", platform="Google") }}
+                </button>
+                <button type="button" data-sharing="facebook" class="button">
+                    {{ __("SHARE_ON", platform="Facebook") }}
+                </button>
+                <button type="button" data-sharing="weibo" class="button">
+                    {{ __("SHARE_ON", platform="Weibo") }}
+                </button>
+                <button type="button" data-sharing="instapaper" class="button">
+                    {{ __("SHARE_ON", platform="Instapaper") }}
+                </button>
             </div>
         </div>
     </div>

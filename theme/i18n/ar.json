@@ -12,7 +12,7 @@
     "SEARCH_PLACEHOLDER": "اكتب للبحث",
     "FONTSETTINGS_TOGGLE": "إعدادات الخط",
     "SHARE_TOGGLE": "حصة",
-    "SHARE_ON": "على __platform__ حصة",
+    "SHARE_ON": "على {{platform}} حصة",
     "FONTSETTINGS_WHITE": "أبيض",
     "FONTSETTINGS_SEPIA": "بني داكن",
     "FONTSETTINGS_NIGHT": "ليل",

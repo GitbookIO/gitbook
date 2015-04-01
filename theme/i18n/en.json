@@ -11,7 +11,7 @@
     "SEARCH_PLACEHOLDER": "Type to search",
     "FONTSETTINGS_TOGGLE": "Font Settings",
     "SHARE_TOGGLE": "Share",
-    "SHARE_ON": "Share on __platform__",
+    "SHARE_ON": "Share on {{platform}}",
     "FONTSETTINGS_WHITE": "White",
     "FONTSETTINGS_SEPIA": "Sepia",
     "FONTSETTINGS_NIGHT": "Night",

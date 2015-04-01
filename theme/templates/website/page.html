@@ -10,7 +10,7 @@
     {% endif %}
 {% endblock %}
 
-{% block title %}{% if progress.current.introduction and not progress.current.title %}{% i18n "SUMMARY_INTRODUCTION" %}Introduction{% endi18n %}{% else %}{{ progress.current.title }}{% endif %} | {{ title }}{% endblock %}
+{% block title %}{{ progress.current.title }} | {{ title }}{% endblock %}
 {% block description %}{% if progress.current.level == "0" %}{{ description }}{% endif %}{% endblock %}
 
 {% block content %}

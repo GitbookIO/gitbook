@@ -11,7 +11,7 @@
     "SEARCH_PLACEHOLDER": "Wpisz szukaną frazę",
     "FONTSETTINGS_TOGGLE": "Ustawienia czcionki",
     "SHARE_TOGGLE": "Udostępnij",
-    "SHARE_ON": "Udostępnij na __platform__",
+    "SHARE_ON": "Udostępnij na {{platform}}",
     "FONTSETTINGS_WHITE": "Jasny",
     "FONTSETTINGS_SEPIA": "Sepia",
     "FONTSETTINGS_NIGHT": "Noc",

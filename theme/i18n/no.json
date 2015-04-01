@@ -11,7 +11,7 @@
     "SEARCH_PLACEHOLDER": "Skriv inn søkeord",
     "FONTSETTINGS_TOGGLE": "Tekstinnstillinger",
     "SHARE_TOGGLE": "Del",
-    "SHARE_ON": "Del på __platform__",
+    "SHARE_ON": "Del på {{platform}}",
     "FONTSETTINGS_WHITE": "Lys",
     "FONTSETTINGS_SEPIA": "Sepia",
     "FONTSETTINGS_NIGHT": "Mørk",
