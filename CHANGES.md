@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.0.1
+- Improve error logging (display file, line and column)
+- Add back support for `options.originalInput`
+- Don't process math in markdown parser (delegated to `mathjax` plugin)
+- Fix some cases of code blocks escaping
+- Fix i18n for introduction title in json format
+- Fix reload when book configuration is updated
+- Fix backslashes in url when building on windows
+
 ## 2.0.0
 - Fix page title of introduction
 - Ignore codeblocks when replacing glossary terms
