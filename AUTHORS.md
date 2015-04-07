@@ -42,3 +42,7 @@ Translators
 	- Hu Hao (@howiehu)
 - French
 	- Samy Pessé (@SamyPesse)
+- Japanese 
+        - Iancu Aurel (@awrelll)
+- Korean
+        - Iancu Aurel (@awrelll)
