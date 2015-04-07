@@ -42,3 +42,6 @@ Translators
 	- Hu Hao (@howiehu)
 - French
 	- Samy Pessé (@SamyPesse)
+- Romanian
+        - Iancu Aurel (@awrelll)
+	
