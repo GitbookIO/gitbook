@@ -21,7 +21,7 @@
         "npmi": "0.1.1",
         "cheerio": "0.19.0",
         "gitbook-plugin-livereload": "0.0.1",
-        "gaze": "~0.5.1",
+        "chokidar": "~1.0.1",
         "send": "0.2.0",
         "tiny-lr": "0.1.5",
         "tmp": "0.0.24",
