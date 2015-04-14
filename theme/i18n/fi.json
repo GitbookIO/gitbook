@@ -1,0 +1,20 @@
+{
+    "LANGS_CHOOSE": "Valitse kieli",
+    "GLOSSARY": "Sanasto",
+    "GLOSSARY_INDEX": "Hakemisto",
+    "GLOSSARY_OPEN": "Sanasto",
+    "GITBOOK_LINK": "Julkaistu GitBookilla",
+    "SUMMARY": "Sisällysluettelo",
+    "SUMMARY_INTRODUCTION": "Johdanto",
+    "SUMMARY_TOGGLE": "Sisällysluettelu",
+    "SEARCH_TOGGLE": "Etsi",
+    "SEARCH_PLACEHOLDER": "Kirjoita hakusana",
+    "FONTSETTINGS_TOGGLE": "Fonttivalinnat",
+    "SHARE_TOGGLE": "Jaa",
+    "SHARE_ON": "Jaa {{platform}}ssa",
+    "FONTSETTINGS_WHITE": "Valkoinen",
+    "FONTSETTINGS_SEPIA": "Seepia",
+    "FONTSETTINGS_NIGHT": "Yö",
+    "FONTSETTINGS_SANS": "Sans",
+    "FONTSETTINGS_SERIF": "Serif"
+}
