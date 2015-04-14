@@ -44,4 +44,5 @@ Translators
 	- Samy Pessé (@SamyPesse)
 - Romanian
         - Iancu Aurel (@awrelll)
-	
+- Finnish
+	- Tommi Savikko (@savikko)
