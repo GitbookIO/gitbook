@@ -46,3 +46,7 @@ Translators
         - Iancu Aurel (@awrelll)
 - Finnish
 	- Tommi Savikko (@savikko)
+- Japanese
+	- Iancu Aurel (@awrelll)
+- Korean
+	- Iancu Aurel (@awrelll)
