@@ -1,4 +1,9 @@
 var should = require('should');
+var fs = require('fs');
+var _ = require('lodash');
+var path = require('path');
+var cheerio = require('cheerio');
+
 var links = require("../lib/utils/links");
 
 describe('Links', function () {
@@ -34,4 +39,27 @@ describe('Links', function () {
             links.toAbsolute("/sub/test.md", "test", "test").should.be.equal("../sub/test.md");
         });
     });
+
+    describe('page', function() {
+        var book;
+
+        before(function() {
+            return books.generate("links", "website")
+                .then(function(_book) {
+                    book = _book;
+                });
+        });
+
+        it('should correctly replace relative links', function() {
+            var readme = fs.readFileSync(
+                path.join(book.options.output, "folder1/index.html"),
+                { encoding: "utf-8" }
+            );
+            var $ = cheerio.load(readme);
+            var $a = $(".page-inner a");
+
+            $a.attr('href').should.be.exactly("../folder2/index.html");
+        })
+    });
+
 });
