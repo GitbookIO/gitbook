@@ -95,6 +95,21 @@ This is the summary of my book.
 
 Files that are not included in `SUMMARY.md` will not be processed by `gitbook`.
 
+#### Book Context
+
+If you prefer to use README.md for documenting the repository itself, or use different files to structure your book, you can override this behavior in the book context (`./book.json` by default):
+
+```json
+{
+    "structure": {
+        "readme": "INTRO.md",
+        "summary": "table_of_contents.md"
+    }
+}
+```
+
+See `lib/configuration.js` for more options.
+
 #### Multi-Languages
 
 GitBook supports building books written in multiple languages. Each language should be a sub-directory following the normal GitBook format, and a file named `LANGS.md` should be present at the root of the repository with the following format:
@@ -123,9 +138,9 @@ With it's definition, this can contain bold text and all other kinds of inline m
 
 #### Variables and Templating
 
-A set of variables can be defined in the `book.json`:
+A set of variables can be defined in the [book context](#book-context):
 
-```js
+```json
 {
     "variables": {
         "host": "mybook.com"
