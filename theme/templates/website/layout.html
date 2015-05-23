@@ -17,12 +17,12 @@
         <meta name="apple-mobile-web-app-status-bar-style" content="black">
         <link rel="apple-touch-icon-precomposed" sizes="152x152" href="{{ staticBase }}/images/apple-touch-icon-precomposed-152.png">
         <link rel="shortcut icon" href="{{ staticBase }}/images/favicon.ico" type="image/x-icon">
+        {% block style %}{% endblock %}
         {% block head %}{% endblock %}
         {{ htmlSnippet("head:end")|default("")|safe }}
     </head>
     <body>
         {{ htmlSnippet("body:start")|default("")|safe }}
-        {% block style %}{% endblock %}
         {% block content %}{% endblock %}
         {% block javascript %}{% endblock %}
         {{ htmlSnippet("body:end")|default("")|safe }}
