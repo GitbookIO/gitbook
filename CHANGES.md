@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.0.3
+- Fix `gitbook init` for SUMMARY with empty entries
+- Fix escaping of code blocks in markdown
+
 ## 2.0.2
 - Fix relative links in windows
 - Improve watcher in serve command (switch to chokidar)
