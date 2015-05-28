@@ -16,6 +16,9 @@ define([
         },
         "instapaper": function($el) {
             window.open("http://www.instapaper.com/text?u="+encodeURIComponent(location.href));
+        },
+        "vk": function($el) {
+            window.open("http://vkontakte.ru/share.php?url="+encodeURIComponent(location.href));
         }
     };
 
