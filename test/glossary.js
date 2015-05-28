@@ -14,7 +14,7 @@ describe('Glossary', function () {
 
         it('should correctly list items', function() {
             book.should.have.property("glossary");
-            book.glossary.should.have.lengthOf(2);
+            book.glossary.should.have.lengthOf(3);
         });
     });
 
@@ -70,6 +70,15 @@ describe('Glossary', function () {
                 readme.should.be.html({
                     ".page-inner code a": {
                         count: 0
+                    }
+                });
+            });
+
+            it('should correctly select the longest term', function() {
+                readme.should.be.html({
+                    ".page-inner a[href='GLOSSARY.html#test-long']": {
+                        count: 1,
+                        text: "test long"
                     }
                 });
             });
