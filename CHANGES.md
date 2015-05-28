@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.0.4
+- Fix `{% raw %}`, got confused with "fake" variable declarations
+- Fix title of language chooser
+- Fix the X-UA-Compatible meta tag
+- Move style sheets to the <head> section
+
 ## 2.0.3
 - Fix `gitbook init` for SUMMARY with empty entries
 - Fix escaping of code blocks in markdown
