@@ -1,8 +1,8 @@
 <!DOCTYPE HTML>
 <html lang="{{ language }}" {% if options.direction == "rtl" %}dir="rtl"{% endif %}>
-    {{ htmlSnippet("html:start")|default("")|safe }}
+    {{ htmlSnippet("html:start")|default("", true)|safe }}
     <head>
-        {{ htmlSnippet("head:start")|default("")|safe }}
+        {{ htmlSnippet("head:start")|default("", true)|safe }}
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <title>{% block title %}{% endblock %}</title>
@@ -19,13 +19,13 @@
         <link rel="shortcut icon" href="{{ staticBase }}/images/favicon.ico" type="image/x-icon">
         {% block style %}{% endblock %}
         {% block head %}{% endblock %}
-        {{ htmlSnippet("head:end")|default("")|safe }}
+        {{ htmlSnippet("head:end")|default("", true)|safe }}
     </head>
     <body>
-        {{ htmlSnippet("body:start")|default("")|safe }}
+        {{ htmlSnippet("body:start")|default("", true)|safe }}
         {% block content %}{% endblock %}
         {% block javascript %}{% endblock %}
-        {{ htmlSnippet("body:end")|default("")|safe }}
+        {{ htmlSnippet("body:end")|default("", true)|safe }}
     </body>
-    {{ htmlSnippet("html:end")|default("")|safe }}
+    {{ htmlSnippet("html:end")|default("", true)|safe }}
 </html>
