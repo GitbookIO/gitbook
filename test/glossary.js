@@ -76,7 +76,7 @@ describe('Glossary', function () {
 
             it('should correctly select the longest term', function() {
                 readme.should.be.html({
-                    ".page-inner a[href='GLOSSARY.html#test-long']": {
+                    ".page-inner a[href='GLOSSARY.html#test_long']": {
                         count: 1,
                         text: "test long"
                     }
