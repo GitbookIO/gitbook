@@ -70,7 +70,7 @@ require(["gitbook"], function(gitbook) {
         <link rel="stylesheet" href="{{ staticBase }}/plugins/{{ resource.path }}">
         {% endif %}
     {% endfor %}
-    {% for style in styles %}
+    {% for type, style in styles %}
         <link rel="stylesheet" href="{{ basePath }}/{{ style }}">
     {% endfor %}
 {% endblock %}

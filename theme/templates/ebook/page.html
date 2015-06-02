@@ -3,7 +3,9 @@
 {% block title %}{{ progress.current.title }} | {{ title }}{% endblock %}
 
 {% block style %}
+    {% if not styles.print %}
     <link rel="stylesheet" href="{{ staticBase }}/print.css">
+    {% endif %}
     {% for resource in plugins.resources.css %}
         {% if resource.url %}
         <link rel="stylesheet" href="{{ resource.url }}">
@@ -11,7 +13,7 @@
         <link rel="stylesheet" href="{{ staticBase }}/plugins/{{ resource.path }}">
         {% endif %}
     {% endfor %}
-    {% for style in styles %}
+    {% for type, style in styles %}
         <link rel="stylesheet" href="{{ basePath }}/{{ style }}">
     {% endfor %}
 {% endblock %}

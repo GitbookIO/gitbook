@@ -35,7 +35,7 @@ should.Assertion.add('html', function(rules, description) {
         var $el = $(query);
 
         // Test number of elements
-        $el.should.have.lengthOf(validations.count);
+        $el.length.should.be.equal(validations.count);
 
         // Test text
         if (validations.text !== undefined) {
