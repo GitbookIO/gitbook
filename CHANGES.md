@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.1.0
+- Fix error in calcul of `levels` in table of contents, error introduced a few versions ago
+- Add optional `styles/print.css` to replace `print.css` used in ebook
+
 ## 2.0.4
 - Fix `{% raw %}`, got confused with "fake" variable declarations
 - Fix title of language chooser
