@@ -50,3 +50,5 @@ Translators
 	- Iancu Aurel (@awrelll)
 - Korean
 	- Iancu Aurel (@awrelll)
+- Vietnamese
+    - Hong Nguyen (@nghong)
