@@ -42,5 +42,15 @@ module.exports = {
                 return "test5"+blk.args.join(',')+"test5";
             }
         },
+        "test5kwargs": {
+            process: function(blk) {
+                var s = blk.args.join(',');
+                for (var key in blk.kwargs) {
+                    s = s + ','+key+':'+blk.kwargs[key];
+                }
+
+                return "test5"+s+"test5";
+            }
+        },
     }
 };

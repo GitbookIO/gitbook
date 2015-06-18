@@ -192,6 +192,13 @@ describe('Plugins', function () {
                     content.should.equal("test5a,b,ctest5");
                 });
         });
+
+        it('should correctly extend template blocks with args and kwargs', function() {
+            return testTpl('{% test5kwargs "a", "b", "c", d="test", e="test2" %}{% endtest5kwargs %}')
+                .then(function(content) {
+                    content.should.equal("test5a,b,c,d:test,e:test2,__keywords:truetest5");
+                });
+        });
     });
 });
 
