@@ -36,6 +36,21 @@ module.exports = {
                 assert(blk.blocks[1].name, "finally");
                 return [blk.body, blk.blocks[0].body, blk.blocks[1].body].join(blk.kwargs.separator);
             }
-        }
+        },
+        "test5args": {
+            process: function(blk) {
+                return "test5"+blk.args.join(',')+"test5";
+            }
+        },
+        "test5kwargs": {
+            process: function(blk) {
+                var s = blk.args.join(',');
+                for (var key in blk.kwargs) {
+                    s = s + ','+key+':'+blk.kwargs[key];
+                }
+
+                return "test5"+s+"test5";
+            }
+        },
     }
 };
