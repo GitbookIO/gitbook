@@ -185,6 +185,13 @@ describe('Plugins', function () {
                     content.should.equal("hello;the;world");
                 });
         });
+
+        it('should correctly extend template blocks with arguments', function() {
+            return testTpl('{% test5args "a", "b", "c" %}{% endtest5args %}')
+                .then(function(content) {
+                    content.should.equal("test5a,b,ctest5");
+                });
+        });
     });
 });
 
