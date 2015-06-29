@@ -4,21 +4,15 @@
             {% if item.path and item.exists %}
                 {% if not item.external %}
                     <a href="{{ basePath }}/{{ item.path|contentLink }}">
-                        <i class="fa fa-check"></i>
-                        {% if item.level != "0" %}
-                            <b>{{ item.level }}.</b>
-                        {% endif %}
-                        {{ item.title }}
-                    </a>
                 {% else %}
                     <a target="_blank" href="{{ item.path }}">
+                {% endif %}
                         <i class="fa fa-check"></i>
                         {% if item.level != "0" %}
                             <b>{{ item.level }}.</b>
                         {% endif %}
                         {{ item.title }}
                     </a>
-                {% endif %}
             {% else %}
             <span><b>{{ item.level }}.</b> {{ item.title }}</span>
             {% endif %}
