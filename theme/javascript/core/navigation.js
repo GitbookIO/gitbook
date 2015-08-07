@@ -35,13 +35,25 @@ define([
             var $pageHead = $page.find("[data-element=head]");
             var $pageBody = $page.find('.book');
 
+            ////
             // Merge heads
-            var headContent = $pageHead.html()
+            // !! Warning !!: we only update necessary portions to avoid strange behavior (page flickering etc ...)
+            ////
 
-            $("head style").each(function() {
-                headContent = headContent + this.outerHTML
-            });
-            $("head").html(headContent);
+            // Update title
+            document.title = $pageHead.find("title").text();
+
+            // Reference to $("head");
+            var $head = $("head");
+
+            // Update next & prev <link> tags
+            // Remove old
+            $head.find("link[rel=prev]").remove();
+            $head.find("link[rel=next]").remove();
+
+            // Add new next * prev <link> tags
+            $head.append($pageHead.find("link[rel=prev]"));
+            $head.append($pageHead.find("link[rel=next]"));
 
             // Merge body
             var bodyClass = $(".book").attr("class");
