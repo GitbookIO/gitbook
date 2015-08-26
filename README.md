@@ -50,7 +50,7 @@ $ gitbook build
 * [AsciiDoc Support](http://help.gitbook.com/format/asciidoc.html)
 * [Variables and Templating](http://help.gitbook.com/format/templating.html)
 * [Content References](http://help.gitbook.com/format/conrefs.html)
-* [Plugins](http://help.gitbook.com/plugins/index.html)
+* [Plugins](http://help.gitbook.com/format/plugins.html)
 * Interractive reader website:
     * Search
     * Font Settings (Serif, Sans Serif)
