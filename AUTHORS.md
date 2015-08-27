@@ -21,34 +21,36 @@ Translators
 ------------
 
 - German
-	- Winnie (@winniehell)
+    - Winnie (@winniehell)
 - Italian
-	- Giulio Bonanome (@gbonanome)
+    - Giulio Bonanome (@gbonanome)
 - Russian
-	- Andrey Akinshin (@AndreyAkinshin)
+    - Andrey Akinshin (@AndreyAkinshin)
 - Norwegian
-	- Knut Melvær (@kmelve)
+    - Knut Melvær (@kmelve)
 - Persian (Farsi)
-	- Mohammad Hossein Mojtahedi (@mhm5000)
+    - Mohammad Hossein Mojtahedi (@mhm5000)
 - Polish
-	- Łukasz Szeremeta (@lszeremeta)
+    - Łukasz Szeremeta (@lszeremeta)
 - Portuguese
-	- Ryan O'Mullan (@RyanOM)
+    - Ryan O'Mullan (@RyanOM)
 - Spanish
-	- Ryan O'Mullan (@RyanOM)
+    - Ryan O'Mullan (@RyanOM)
 - Simplifiled Chinese
-	- Hu Hao (@howiehu)
+    - Hu Hao (@howiehu)
 - Traditional Chinese
-	- Hu Hao (@howiehu)
+    - Hu Hao (@howiehu)
 - French
-	- Samy Pessé (@SamyPesse)
+    - Samy Pessé (@SamyPesse)
 - Romanian
         - Iancu Aurel (@awrelll)
 - Finnish
-	- Tommi Savikko (@savikko)
+    - Tommi Savikko (@savikko)
 - Japanese
-	- Iancu Aurel (@awrelll)
+    - Iancu Aurel (@awrelll)
 - Korean
-	- Iancu Aurel (@awrelll)
+    - Iancu Aurel (@awrelll)
 - Vietnamese
     - Hong Nguyen (@nghong)
+- Hebrew
+    - @a-moses
