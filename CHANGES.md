@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.3.0
+- Fix nunjucks issue with multiple `{% raw %}` blocks
+- Fix crash when git conref failed
+- Fix crash when failed to download remote image (better error message)
+- Fix flicking effect when changing page (big UX improvement)
+- Add Hebrew translation (`he`)
+- Add utility method `book.config.get` for plugins
+- Hooks `page:before` and `page` are no longer deprecated
+- Remove webfonts to make website lighter
+- Make glossary's order case insensitive
+
 ## 2.2.0
 - Fix direction in code blocks (always LTR)
 - Add options `chapterMark` and `pageBreaksBefore` for PDF
