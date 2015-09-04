@@ -50,6 +50,7 @@ Translators
     - Iancu Aurel (@awrelll)
 - Korean
     - Iancu Aurel (@awrelll)
+    - SangYeob Yu (@deminoth)
 - Vietnamese
     - Hong Nguyen (@nghong)
 - Hebrew
