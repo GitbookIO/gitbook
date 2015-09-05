@@ -12,7 +12,7 @@
         "resolve": "0.6.3",
         "fs-extra": "0.16.5",
         "fstream-ignore": "1.0.2",
-        "gitbook-parsers": "0.8.0",
+        "gitbook-parsers": "0.8.1",
         "nunjucks": "mozilla/nunjucks#b4351ec0752b102ebd02c5e2cbc2898a6e0e4839",
         "nunjucks-autoescape": "1.0.0",
         "nunjucks-filter": "1.0.0",
