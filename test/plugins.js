@@ -3,6 +3,7 @@ var should = require('should');
 var path = require('path');
 
 var Plugin = require('../lib/plugin');
+var parsers = require("gitbook-parsers");
 var PLUGINS_ROOT = path.resolve(__dirname, 'plugins');
 
 describe('Plugins', function () {
@@ -197,6 +198,39 @@ describe('Plugins', function () {
             return testTpl('{% test5kwargs "a", "b", "c", d="test", e="test2" %}{% endtest5kwargs %}')
                 .then(function(content) {
                     content.should.equal("test5a,b,c,d:test,e:test2,__keywords:truetest5");
+                });
+        });
+    });
+
+    describe('Blocks without parsing', function() {
+        var plugin;
+
+        before(function() {
+            plugin = new Plugin(book, "blocks");
+            plugin.load("./blocks", PLUGINS_ROOT);
+
+            return book.plugins.load(plugin);
+        });
+
+        var testTpl = function(markup, str, args, options) {
+            var filetype = parsers.get(markup);
+
+            return book.template.renderString(str, args, options)
+            .then(filetype.page).get('sections').get(0).get('content')
+            .then(book.template.postProcess)
+        };
+
+        it('should correctly process unparsable for markdown', function() {
+            return testTpl('.md', '{% test %}**hello**{% endtest %}')
+                .then(function(content) {
+                    content.should.equal("<p>test**hello**test</p>\n");
+                });
+        });
+
+        it('should correctly process unparsable for asciidoc', function() {
+            return testTpl('.adoc', '{% test %}**hello**{% endtest %}')
+                .then(function(content) {
+                    content.should.equal('<div class="paragraph">\n<p>test**hello**test</p>\n</div>\n');
                 });
         });
     });
