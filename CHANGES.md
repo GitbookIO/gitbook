@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.3.1
+- Fix black font color for ebooks (mobi, pdf and epub)
+- Fix ISO code for korean language
+- Fix korean translation
+- Fix syntax highlighting for asciidoc
+- Fix inline html escaping in markdown
+- Add warning for file outside SUMMARY
+- Force SUMMARY entries to be unique by filename
+
 ## 2.3.0
 - Fix nunjucks issue with multiple `{% raw %}` blocks
 - Fix crash when git conref failed
