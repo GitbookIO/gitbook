@@ -230,7 +230,7 @@ describe('Plugins', function () {
         it('should correctly process unparsable for asciidoc', function() {
             return testTpl('.adoc', '{% test %}**hello**{% endtest %}')
                 .then(function(content) {
-                    content.should.equal('<div class="paragraph">\n<p>test**hello**test</p>\n</div>\n');
+                    content.should.equal('<div class="paragraph">\n<p>test**hello**test</p>\n</div>');
                 });
         });
     });
