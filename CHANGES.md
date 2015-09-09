@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.3.2
+- Fix blocks (like maths) in Asciidoc
+- Fix error when checking gitbook version
+
 ## 2.3.1
 - Fix black font color for ebooks (mobi, pdf and epub)
 - Fix ISO code for korean language
