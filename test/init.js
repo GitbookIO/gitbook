@@ -19,5 +19,6 @@ describe('Init Books', function () {
         should(fs.existsSync(path.resolve(initRoot, "hello.md"))).be.ok;
         should(fs.existsSync(path.resolve(initRoot, "hello2.md"))).be.ok;
         should(fs.existsSync(path.resolve(initRoot, "hello3/hello4.md"))).be.ok;
+        should(fs.existsSync(path.resolve(initRoot, "hello3/hello5/hello6.md"))).be.ok;
     });
 });
