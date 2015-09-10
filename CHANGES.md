@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.3.3
+- Fix bug in SUMMARY parsing preventing multiple entries without filenames
+
 ## 2.3.2
 - Fix blocks (like maths) in Asciidoc
 - Fix error when checking gitbook version
