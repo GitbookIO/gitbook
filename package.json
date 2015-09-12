@@ -32,7 +32,6 @@
         "npm": "2.4.1",
         "dom-serializer": "0.1.0",
         "spawn-cmd": "0.0.2",
-        "highlight.js": "8.8.0",
         "escape-string-regexp": "1.0.3"
     },
     "devDependencies": {
