@@ -105,7 +105,19 @@ define([
         events.trigger("page.change");
     };
 
+    var isLeftClickEvent = function (e) {
+        return e.button === 0;
+    };
+
+    var isModifiedEvent = function (e) {
+        return !!(e.metaKey || e.altKey || e.ctrlKey || e.shiftKey);
+    };
+
     var handlePagination = function (e) {
+        if (isModifiedEvent(e) || !isLeftClickEvent(e)) {
+          return;
+        }
+
         e.stopPropagation();
         e.preventDefault();
 
