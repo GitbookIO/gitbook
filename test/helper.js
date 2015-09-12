@@ -17,8 +17,16 @@ var TMPDIR = os.tmpdir();
 
 
 // Generate and return a book
-function generateBook(bookId, test) {
+function generateBook(bookId, test, options) {
+    options = _.defaults(options || {}, {
+        before: function() {}
+    });
+
     return parseBook(bookId, test)
+    .then(function(book) {
+        return Q(options.before(book))
+        .thenResolve(book);
+    })
     .then(function(book) {
         return book.generate(test)
         .thenResolve(book);
