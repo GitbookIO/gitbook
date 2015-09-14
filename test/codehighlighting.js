@@ -14,8 +14,8 @@ describe('Code Highlighting', function () {
             prepare: function(_book) {
                 book = _book;
 
-                var plugin = new Plugin(book, "highlight");
-                plugin.load("./highlight", PLUGINS_ROOT);
+                var plugin = new Plugin(book, "replace_highlight");
+                plugin.load("./replace_highlight", PLUGINS_ROOT);
 
                 book.plugins.load(plugin);
             }

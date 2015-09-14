@@ -1,9 +1,0 @@
-{
-    "name": "gitbook-plugin-highlight",
-    "description": "Highlight coe blocks",
-    "main": "index.js",
-    "version": "0.0.1",
-    "engines": {
-        "gitbook": "*"
-    }
-}
