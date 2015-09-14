@@ -1,7 +1,15 @@
 # Readme
 
-Default description for the book.
+Block without language
 
 ```
-test
+test 1
 ```
+
+Block with a language
+
+```lang
+test 2
+```
+
+Inline code: `test 3`

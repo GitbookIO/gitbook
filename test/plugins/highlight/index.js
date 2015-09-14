@@ -2,7 +2,9 @@ module.exports = {
     blocks: {
         "code": {
             process: function(blk) {
-                return "code_"+blk.body+"_code";
+                var lang = blk.kwargs.language || 'code';
+
+                return lang+"_"+blk.body+"_"+lang;
             }
         }
     }

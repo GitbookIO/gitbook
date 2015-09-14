@@ -26,13 +26,26 @@ should.Assertion.add('html', function(rules, description) {
 
     _.each(rules, function(validations, query) {
         validations = _.defaults(validations || {}, {
+            // Select a specific element in the list of matched elements
+            index: null,
+
+            // Check that there is the correct count of elements
             count: 1,
+
+            // Check attribute values
             attributes: {},
+
+            // Trim inner text
             trim: false,
+
+            // Check inner text
             text: undefined
         });
 
         var $el = $(query);
+
+        // Select correct element
+        if (_.isNumber(validations.index)) $el = $($el.get(validations.index));
 
         // Test number of elements
         $el.length.should.be.equal(validations.count);
