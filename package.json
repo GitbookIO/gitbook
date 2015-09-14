@@ -13,7 +13,8 @@
         "fs-extra": "0.16.5",
         "fstream-ignore": "1.0.2",
         "gitbook-parsers": "0.8.2",
-        "nunjucks": "mozilla/nunjucks#b4351ec0752b102ebd02c5e2cbc2898a6e0e4839",
+        "gitbook-plugin-highlight": "1.0.0",
+        "nunjucks": "mozilla/nunjucks#dc89bf91611a2101731c2c06afcf5c32160b4dc9",
         "nunjucks-autoescape": "1.0.0",
         "nunjucks-filter": "1.0.0",
         "i18n": "0.5.0",
@@ -32,7 +33,6 @@
         "npm": "2.4.1",
         "dom-serializer": "0.1.0",
         "spawn-cmd": "0.0.2",
-        "highlight.js": "8.8.0",
         "escape-string-regexp": "1.0.3"
     },
     "devDependencies": {

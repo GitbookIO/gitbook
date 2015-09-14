@@ -5,10 +5,6 @@
 .book .book-body .page-wrapper .page-inner section.normal {
     .markdown-content(@content-color, @content-line-height);
 
-    pre, code {
-        @import "./highlight/white.less";
-    }
-
     .glossary-term {
         cursor: help;
         text-decoration: underline;
@@ -51,8 +47,6 @@
         background: @page-pre-background-1;
         color: @page-pre-color-1;
         border-color: @page-pre-border-color-1;
-
-        @import "./highlight/sepia.less";
     }
 
     .highlight {
@@ -112,8 +106,6 @@
         color: @page-pre-color-2;
         background: @page-pre-background-2;
         border-color: @page-pre-border-color-2;
-
-        @import "./highlight/night.less";
     }
 
     .highlight {

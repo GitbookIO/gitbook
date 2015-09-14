@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var should = require('should');
 var path = require('path');
+var fs = require('fs');
 
 var Plugin = require('../lib/plugin');
 var parsers = require("gitbook-parsers");

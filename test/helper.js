@@ -17,10 +17,18 @@ var TMPDIR = os.tmpdir();
 
 
 // Generate and return a book
-function generateBook(bookId, test) {
+function generateBook(bookId, test, opts) {
+    opts = _.defaults(opts || {}, {
+        prepare: function() {}
+    });
+
     return parseBook(bookId, test)
     .then(function(book) {
-        return book.generate(test)
+
+        return Q(opts.prepare(book))
+        .then(function() {
+            return book.generate(test);
+        })
         .thenResolve(book);
     });
 }
