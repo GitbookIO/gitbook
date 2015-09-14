@@ -235,31 +235,5 @@ describe('Plugins', function () {
                 });
         });
     });
-
-    describe('Replace code highlighting', function() {
-        it('should correctly replace highlighting', function() {
-            return books.generate('basic', 'website', {
-                before: function(book) {
-                    var plugin = new Plugin(book, "blocks");
-                    plugin.load("./highlight", PLUGINS_ROOT);
-
-                    return book.plugins.load(plugin);
-                }
-            })
-            .then(function() {
-                var PAGE = fs.readFileSync(
-                    path.join(book.options.output, "index.html"),
-                    { encoding: "utf-8" }
-                );
-
-                PAGE.should.be.html({
-                    "code": {
-                        count: 1,
-                        text: 'code__test\n__code'
-                    }
-                });
-            });
-        })
-    });
 });
 
