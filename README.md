@@ -7,7 +7,7 @@ GitBook
 
 GitBook is a command line tool (and Node.js library) for building beautiful books using GitHub/Git and Markdown (or AsciiDoc). Here is an example: [Learn Javascript](https://www.gitbook.com/book/GitBookIO/javascript).
 
-You can publish and host book easily online using [gitbook.com](https://www.gitbook.com), a web-editor is [also available](https://www.gitbook.com/editor).
+You can publish and host book easily online using [gitbook.com](https://www.gitbook.com), a desktop editor is [also available](https://www.gitbook.com/editor).
 
 Stay updated by following [@GitBookIO](https://twitter.com/GitBookIO) on Twitter or [GitBook](https://www.facebook.com/gitbookcom) on Facebook.
 
