@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.4.0
+- Fix page being updated when user wants to open a link in a new tab
+- Plugins can now replaced default code highlighter
+- Add semantic information for screen readers (web version)
+- Content references accept absolute paths, resolved to book folder
+- Improve overall reliability
+
 ## 2.3.3
 - Fix bug in SUMMARY parsing preventing multiple entries without filenames
 
