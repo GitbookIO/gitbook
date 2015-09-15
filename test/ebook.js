@@ -37,12 +37,23 @@ describe('eBook generator', function () {
                 path.join(book.options.output, "index.html"),
                 { encoding: "utf-8" }
             );
+
+            // There are 2 styles (one from plugin-highlight and the new style)
             PAGE.should.be.html({
                 "link": {
-                    count: 1,
-                    attributes: {
-                        href: "./styles/print.css"
-                    }
+                    count: 2
+                }
+            });
+
+            PAGE.should.be.html({
+                "link[href='./styles/print.css']": {
+                    count: 1
+                }
+            });
+
+            PAGE.should.be.html({
+                "link[href='gitbook/plugins/gitbook-plugin-highlight/ebook.css']": {
+                    count: 1
                 }
             });
         });

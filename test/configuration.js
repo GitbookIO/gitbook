@@ -29,4 +29,12 @@ describe('Configuration', function () {
                 book.options.title.should.be.equal("js-config");
             });
     });
+
+    it('should provide configuration on book.config.get', function() {
+        return books.parse("basic")
+            .then(function(book) {
+                book.config.get('description').should.be.equal("Default description for the book.");
+                book.getConfig('description').should.be.equal("Default description for the book.");
+            });
+    });
 });
