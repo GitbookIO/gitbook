@@ -1,8 +1,8 @@
-var fs = require('fs');
-var path = require('path');
+var fs = require("fs");
+var path = require("path");
 
-describe('Glossary', function () {
-    describe('Parsing', function() {
+describe("Glossary", function () {
+    describe("Parsing", function() {
         var book;
 
         before(function() {
@@ -12,13 +12,13 @@ describe('Glossary', function () {
                 });
         });
 
-        it('should correctly list items', function() {
+        it("should correctly list items", function() {
             book.should.have.property("glossary");
             book.glossary.should.have.lengthOf(3);
         });
     });
 
-    describe('Generation', function() {
+    describe("Generation", function() {
         var book;
 
         before(function() {
@@ -28,11 +28,11 @@ describe('Glossary', function () {
                 });
         });
 
-        it('should correctly generate a GLOSSARY.html', function() {
+        it("should correctly generate a GLOSSARY.html", function() {
             book.should.have.file("GLOSSARY.html");
         });
 
-        describe('Page Integration', function() {
+        describe("Page Integration", function() {
             var readme, page;
 
             before(function() {
@@ -46,9 +46,9 @@ describe('Glossary', function () {
                 );
             });
 
-            it('should correctly replaced terms by links', function() {
+            it("should correctly replaced terms by links", function() {
                 readme.should.be.html({
-                    ".page-inner a[href='GLOSSARY.html#test']": {
+                    ".page-inner a[href=\"GLOSSARY.html#test\"]": {
                         count: 1,
                         text: "test",
                         attributes: {
@@ -58,15 +58,15 @@ describe('Glossary', function () {
                 });
             });
 
-            it('should correctly replaced terms by links (relative)', function() {
+            it("should correctly replaced terms by links (relative)", function() {
                 page.should.be.html({
-                    ".page-inner a[href='../GLOSSARY.html#test']": {
+                    ".page-inner a[href=\"../GLOSSARY.html#test\"]": {
                         count: 1
                     }
                 });
             });
 
-            it('should not replace terms in codeblocks', function() {
+            it("should not replace terms in codeblocks", function() {
                 readme.should.be.html({
                     ".page-inner code a": {
                         count: 0
@@ -74,9 +74,9 @@ describe('Glossary', function () {
                 });
             });
 
-            it('should correctly select the longest term', function() {
+            it("should correctly select the longest term", function() {
                 readme.should.be.html({
-                    ".page-inner a[href='GLOSSARY.html#test_long']": {
+                    ".page-inner a[href=\"GLOSSARY.html#test_long\"]": {
                         count: 1,
                         text: "test long"
                     }

@@ -1,13 +1,11 @@
-var os = require('os');
-var path = require('path');
-var Q = require('q');
-var fs = require('fs');
-var _ = require('lodash');
-var should = require('should');
+var os = require("os");
+var path = require("path");
+var Q = require("q");
+var _ = require("lodash");
 
-var fsUtil = require('../lib/utils/fs');
-var Book = require('../').Book;
-var LOG_LEVELS = require('../').LOG_LEVELS;
+var fsUtil = require("../lib/utils/fs");
+var Book = require("../").Book;
+var LOG_LEVELS = require("../").LOG_LEVELS;
 
 require("./assertions");
 
@@ -61,16 +59,14 @@ global.books = {
 // Cleanup all tests
 after(function() {
     return _.chain(BOOKS)
-        .map(function(types, bookId) {
+        .map(function(types) {
             return _.values(types);
         })
         .flatten()
         .reduce(function(prev, book) {
             return prev.then(function() {
                 return fsUtil.remove(book.options.output);
-            })
+            });
         }, Q())
         .value();
 });
-
-

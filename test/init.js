@@ -1,11 +1,11 @@
-var fs = require('fs');
-var path = require('path');
-var should = require('should');
+var fs = require("fs");
+var path = require("path");
+var should = require("should");
 
-var Book = require('../').Book;
-var LOG_LEVELS = require('../').LOG_LEVELS;
+var Book = require("../").Book;
+var LOG_LEVELS = require("../").LOG_LEVELS;
 
-describe('Init Books', function () {
+describe("Init Books", function () {
     var initRoot;
 
     before(function() {
@@ -15,10 +15,10 @@ describe('Init Books', function () {
         });
     });
 
-    it('should create all chapters', function() {
-        should(fs.existsSync(path.resolve(initRoot, "hello.md"))).be.ok;
-        should(fs.existsSync(path.resolve(initRoot, "hello2.md"))).be.ok;
-        should(fs.existsSync(path.resolve(initRoot, "hello3/hello4.md"))).be.ok;
-        should(fs.existsSync(path.resolve(initRoot, "hello3/hello5/hello6.md"))).be.ok;
+    it("should create all chapters", function() {
+        should(fs.existsSync(path.resolve(initRoot, "hello.md"))).be.ok();
+        should(fs.existsSync(path.resolve(initRoot, "hello2.md"))).be.ok();
+        should(fs.existsSync(path.resolve(initRoot, "hello3/hello4.md"))).be.ok();
+        should(fs.existsSync(path.resolve(initRoot, "hello3/hello5/hello6.md"))).be.ok();
     });
 });

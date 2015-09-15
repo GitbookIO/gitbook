@@ -1,8 +1,5 @@
-var fs = require('fs');
-var path = require('path');
-
-describe('Languages', function () {
-    describe('Parsing', function() {
+describe("Languages", function () {
+    describe("Parsing", function() {
         var book;
 
         before(function() {
@@ -12,7 +9,7 @@ describe('Languages', function () {
                 });
         });
 
-        it('should correctly list languages', function() {
+        it("should correctly list languages", function() {
             book.should.have.property("books");
             book.books.should.have.lengthOf(2);
 
@@ -21,7 +18,7 @@ describe('Languages', function () {
         });
     });
 
-    describe('Generation', function() {
+    describe("Generation", function() {
         var book;
 
         before(function() {
@@ -31,7 +28,7 @@ describe('Languages', function () {
                 });
         });
 
-        it('should correctly create books', function() {
+        it("should correctly create books", function() {
             book.should.have.file("index.html");
             book.should.have.file("en/index.html");
             book.should.have.file("fr/index.html");
