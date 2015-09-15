@@ -35,7 +35,7 @@ describe('JSON generator', function () {
             it('should contains valid section', function() {
                 page.should.have.property("sections").with.lengthOf(1);
                 page.sections[0].should.have.property("content").which.is.a.String;
-                page.sections[0].should.have.property("type").which.is.a.String.which.equal("normal");
+                page.sections[0].should.have.property("type", "normal");
             });
 
             it('should contains valid progress', function() {

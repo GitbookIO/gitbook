@@ -26,14 +26,39 @@ describe('ConRefs', function () {
         });
     });
 
-    it('should handle git references', function() {
+    it('should handle local references with absolute paths', function() {
         readme.should.be.html({
             ".page-inner p#t2": {
                 count: 1,
+                text: "Hello World",
+                trim: true
+            }
+        });
+    });
+
+    it('should correctly include file from git reference', function() {
+        readme.should.be.html({
+            ".page-inner p#t3": {
+                count: 1,
                 text: "Hello from git",
                 trim: true
-            },
-            ".page-inner p#t3": {
+            }
+        });
+    });
+
+    it('should correctly handle deep include in git reference', function() {
+        readme.should.be.html({
+            ".page-inner p#t4": {
+                count: 1,
+                text: "First Hello. Hello from git",
+                trim: true
+            }
+        });
+    });
+
+    it('should correctly handle absolute include in git reference', function() {
+        readme.should.be.html({
+            ".page-inner p#t5": {
                 count: 1,
                 text: "First Hello. Hello from git",
                 trim: true
