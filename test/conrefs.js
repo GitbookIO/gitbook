@@ -1,7 +1,7 @@
-var fs = require('fs');
-var path = require('path');
+var fs = require("fs");
+var path = require("path");
 
-describe('ConRefs', function () {
+describe("ConRefs", function () {
     var book, readme;
 
     before(function() {
@@ -16,7 +16,7 @@ describe('ConRefs', function () {
             });
     });
 
-    it('should handle local references', function() {
+    it("should handle local references", function() {
         readme.should.be.html({
             ".page-inner p#t1": {
                 count: 1,
@@ -26,7 +26,7 @@ describe('ConRefs', function () {
         });
     });
 
-    it('should handle local references with absolute paths', function() {
+    it("should handle local references with absolute paths", function() {
         readme.should.be.html({
             ".page-inner p#t2": {
                 count: 1,
@@ -36,7 +36,7 @@ describe('ConRefs', function () {
         });
     });
 
-    it('should correctly include file from git reference', function() {
+    it("should correctly include file from git reference", function() {
         readme.should.be.html({
             ".page-inner p#t3": {
                 count: 1,
@@ -46,7 +46,7 @@ describe('ConRefs', function () {
         });
     });
 
-    it('should correctly handle deep include in git reference', function() {
+    it("should correctly handle deep include in git reference", function() {
         readme.should.be.html({
             ".page-inner p#t4": {
                 count: 1,
@@ -56,7 +56,7 @@ describe('ConRefs', function () {
         });
     });
 
-    it('should correctly handle absolute include in git reference', function() {
+    it("should correctly handle absolute include in git reference", function() {
         readme.should.be.html({
             ".page-inner p#t5": {
                 count: 1,
