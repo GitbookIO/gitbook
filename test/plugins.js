@@ -192,7 +192,21 @@ describe("Plugins", function () {
                 });
         });
 
-        it("should correctly extend template blocks with arguments", function() {
+        it("should correctly extend template blocks with arguments (1)", function() {
+            return testTpl("{% test5args \"a\" %}{% endtest5args %}")
+                .then(function(content) {
+                    content.should.equal("test5atest5");
+                });
+        });
+
+        it("should correctly extend template blocks with arguments (2)", function() {
+            return testTpl("{% test5args 'a', 'b' %}{% endtest5args %}")
+                .then(function(content) {
+                    content.should.equal("test5a,btest5");
+                });
+        });
+
+        it("should correctly extend template blocks with arguments (3)", function() {
             return testTpl("{% test5args 'a', 'b', 'c' %}{% endtest5args %}")
                 .then(function(content) {
                     content.should.equal("test5a,b,ctest5");
