@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.4.1
+- Fix disabling of default plugins, ex: `-highlight`
+
 ## 2.4.0
 - Fix page being updated when user wants to open a link in a new tab
 - Plugins can now replaced default code highlighter
