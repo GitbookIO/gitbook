@@ -52,5 +52,14 @@ describe("Code Highlighting", function () {
             }
         });
     });
+
+    it("should correctly replace highlighting for inline code with html tags", function() {
+        PAGE.should.be.html({
+            "code": {
+                index: 3,
+                text: "code_<test>_code"
+            }
+        });
+    });
 });
 

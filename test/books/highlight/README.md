@@ -13,3 +13,4 @@ test 2
 ```
 
 Inline code: `test 3`
+Inline code with html: `<test>`

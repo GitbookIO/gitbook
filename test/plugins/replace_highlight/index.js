@@ -4,7 +4,10 @@ module.exports = {
             process: function(blk) {
                 var lang = blk.kwargs.language || "code";
 
-                return lang+"_"+blk.body+"_"+lang;
+                return {
+                    body: lang+"_"+blk.body+"_"+lang,
+                    html: false
+                };
             }
         }
     }

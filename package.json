@@ -13,7 +13,7 @@
         "fs-extra": "0.16.5",
         "fstream-ignore": "1.0.2",
         "gitbook-parsers": "0.8.2",
-        "gitbook-plugin-highlight": "1.0.2",
+        "gitbook-plugin-highlight": "1.0.3",
         "nunjucks": "mozilla/nunjucks#dc89bf91611a2101731c2c06afcf5c32160b4dc9",
         "nunjucks-autoescape": "1.0.0",
         "nunjucks-filter": "1.0.0",
