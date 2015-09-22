@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.4.2
+- Default plugins should not be installed by `gitbook install`
+- Limit search index size to avoid crash during generation
+- Fix code highlighting for html without language specified
+- Fix warning message for gitbook version when building a multilingual book
+
 ## 2.4.1
 - Fix disabling of default plugins, ex: `-highlight`
 
