@@ -39,17 +39,22 @@ module.exports = {
         },
         "test5args": {
             process: function(blk) {
-                return "test5"+blk.args.join(',')+"test5";
+                return "test5"+blk.args.join(",")+"test5";
             }
         },
         "test5kwargs": {
             process: function(blk) {
-                var s = blk.args.join(',');
+                var s = blk.args.join(",");
                 for (var key in blk.kwargs) {
-                    s = s + ','+key+':'+blk.kwargs[key];
+                    s = s + ","+key+":"+blk.kwargs[key];
                 }
 
                 return "test5"+s+"test5";
+            }
+        },
+        "test6context": {
+            process: function() {
+                return "test6"+(this.ctx.name)+"test6";
             }
         },
     }

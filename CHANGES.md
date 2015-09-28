@@ -2,6 +2,49 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.4.2
+- Default plugins should not be installed by `gitbook install`
+- Limit search index size to avoid crash during generation
+- Fix code highlighting for html without language specified
+- Fix warning message for gitbook version when building a multilingual book
+
+## 2.4.1
+- Fix disabling of default plugins, ex: `-highlight`
+
+## 2.4.0
+- Fix page being updated when user wants to open a link in a new tab
+- Plugins can now replaced default code highlighter
+- Add semantic information for screen readers (web version)
+- Content references accept absolute paths, resolved to book folder
+- Improve overall reliability
+
+## 2.3.3
+- Fix bug in SUMMARY parsing preventing multiple entries without filenames
+
+## 2.3.2
+- Fix blocks (like maths) in Asciidoc
+- Fix error when checking gitbook version
+
+## 2.3.1
+- Fix black font color for ebooks (mobi, pdf and epub)
+- Fix ISO code for korean language
+- Fix korean translation
+- Fix syntax highlighting for asciidoc
+- Fix inline html escaping in markdown
+- Add warning for file outside SUMMARY
+- Force SUMMARY entries to be unique by filename
+
+## 2.3.0
+- Fix nunjucks issue with multiple `{% raw %}` blocks
+- Fix crash when git conref failed
+- Fix crash when failed to download remote image (better error message)
+- Fix flicking effect when changing page (big UX improvement)
+- Add Hebrew translation (`he`)
+- Add utility method `book.config.get` for plugins
+- Hooks `page:before` and `page` are no longer deprecated
+- Remove webfonts to make website lighter
+- Make glossary's order case insensitive
+
 ## 2.2.0
 - Fix direction in code blocks (always LTR)
 - Add options `chapterMark` and `pageBreaksBefore` for PDF

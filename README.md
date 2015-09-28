@@ -2,14 +2,15 @@ GitBook
 =======
 
 [![NPM version](https://badge.fury.io/js/gitbook.svg)](http://badge.fury.io/js/gitbook)
-[![Build Status](https://travis-ci.org/GitbookIO/gitbook.png?branch=master)](https://travis-ci.org/GitbookIO/gitbook)
-[![Windows Build Status](https://ci.appveyor.com/api/projects/status/github/GitbookIO/gitbook?branch=master&svg=true)](https://ci.appveyor.com/project/SamyPesse/gitbook)
+[![Linux Build Status](https://travis-ci.org/GitbookIO/gitbook.png?branch=master)](https://travis-ci.org/GitbookIO/gitbook)
+[![Windows Build status](https://ci.appveyor.com/api/projects/status/63nlflxcwmb2pue6?svg=true)](https://ci.appveyor.com/project/GitBook/gitbook)
+[![Slack Status](https://slack.gitbook.com/badge.svg)](https://slack.gitbook.com)
 
 GitBook is a command line tool (and Node.js library) for building beautiful books using GitHub/Git and Markdown (or AsciiDoc). Here is an example: [Learn Javascript](https://www.gitbook.com/book/GitBookIO/javascript).
 
-You can publish and host book easily online using [gitbook.com](https://www.gitbook.com), a web-editor is [also available](https://www.gitbook.com/editor).
+You can publish and host book easily online using [gitbook.com](https://www.gitbook.com), a desktop editor is [also available](https://www.gitbook.com/editor).
 
-Stay updated by following [@GitBookIO](https://twitter.com/GitBookIO) on Twitter or [GitBook](https://www.facebook.com/gitbookcom) on Facebook.
+Check out the [GitBook Community Slack Channel](https://slack.gitbook.com), Stay updated by following [@GitBookIO](https://twitter.com/GitBookIO) on Twitter or [GitBook](https://www.facebook.com/gitbookcom) on Facebook.
 
 Complete documentation is available at [help.gitbook.com](http://help.gitbook.com/).
 
@@ -50,7 +51,7 @@ $ gitbook build
 * [AsciiDoc Support](http://help.gitbook.com/format/asciidoc.html)
 * [Variables and Templating](http://help.gitbook.com/format/templating.html)
 * [Content References](http://help.gitbook.com/format/conrefs.html)
-* [Plugins](http://help.gitbook.com/plugins/index.html)
+* [Plugins](http://help.gitbook.com/format/plugins.html)
 * Interractive reader website:
     * Search
     * Font Settings (Serif, Sans Serif)
