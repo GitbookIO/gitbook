@@ -55,3 +55,5 @@ Translators
     - Hong Nguyen (@nghong)
 - Hebrew
     - @a-moses
+- Ukrainian
+    - @Karnaukhov
