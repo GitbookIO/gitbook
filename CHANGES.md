@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.4.3
+- Add ukrainian translation (`uk`)
+- Add `book.json` configuration for maximum size of search index
+- Improve reliability of summary parser
+
 ## 2.4.2
 - Default plugins should not be installed by `gitbook install`
 - Limit search index size to avoid crash during generation
