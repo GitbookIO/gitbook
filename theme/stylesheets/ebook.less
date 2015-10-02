@@ -7,11 +7,7 @@ body {
         font-family: sans-serif;
         .markdown-content(#000, 1.6);
 
-        pre, code, blockquote {
-            page-break-inside: avoid;
-        }
-
-        tr, img {
+        pre, code, blockquote, tr, img {
             page-break-inside: avoid;
         }
 
@@ -26,7 +22,6 @@ body {
         h1,
         h2,
         h3 {
-            page-break-before: initial;
             page-break-after: avoid;
         }
 
@@ -44,6 +39,11 @@ body {
 
         // First page: table of contents
         &.page-toc {
+
+        }
+
+        // Glossary page
+        &.page-glossary {
             .glossary {
                 margin-bottom: 40px;
 
