@@ -7,6 +7,42 @@ body {
         font-family: sans-serif;
         .markdown-content(#000, 1.6);
 
+        pre, code, blockquote {
+            page-break-inside: avoid;
+        }
+
+        tr, img {
+            page-break-inside: avoid;
+        }
+
+        p,
+        h2,
+        h3 {
+            orphans: 3;
+            widows: 3;
+        }
+
+
+        h1,
+        h2,
+        h3 {
+            page-break-before: initial;
+            page-break-after: avoid;
+        }
+
+        // Section and first titles
+        .section {
+            > h1, > h2, > h3 {
+                margin-top: 0px;
+            }
+        }
+
+        // Hide the title (only used to build PDF table of content)
+        .book-chapter {
+            display: none;
+        }
+
+        // First page: table of contents
         &.page-toc {
             .glossary {
                 margin-bottom: 40px;
@@ -30,10 +66,6 @@ body {
                     }
                 }
             }
-        }
-
-        .book-chapter {
-            display: none;
         }
     }
 }
