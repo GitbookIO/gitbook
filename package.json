@@ -35,7 +35,8 @@
         "npm": "2.4.1",
         "dom-serializer": "0.1.0",
         "spawn-cmd": "0.0.2",
-        "escape-string-regexp": "1.0.3"
+        "escape-string-regexp": "1.0.3",
+        "juice": "1.5.0"
     },
     "devDependencies": {
         "eslint": "1.5.0",
