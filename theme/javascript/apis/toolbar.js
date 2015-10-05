@@ -1,9 +1,11 @@
 define([
     'jQuery',
-    'lodash'
-], function($, _) {
-    var $toolbar = $('.book-header');
-    var $title = $toolbar.find('h1');
+    'lodash',
+    'core/events'
+], function($, _, events) {
+    // List of created buttons
+    var buttons = [];
+
 
     // Default click handler
     function defaultOnClick(e) {
@@ -84,6 +86,15 @@ define([
             dropdown: null
         });
 
+        buttons.push(opts);
+        updateButton(opts);
+    }
+
+    // Update a button
+    function updateButton(opts) {
+        var $toolbar = $('.book-header');
+        var $title = $toolbar.find('h1');
+
         // Build class name
         var positionClass = 'pull-'+opts.position;
 
@@ -126,6 +137,16 @@ define([
             $btn.insertBefore($title);
         }
     }
+
+    // Update all buttons
+    function updateAllButtons() {
+        _.each(buttons, updateButton);
+    }
+
+    // When page changed, reset buttons
+    events.bind('page.change', function() {
+        updateAllButtons();
+    });
 
     return {
         createButton: createButton
