@@ -7,10 +7,17 @@ module.exports = {
     setBaseKey: function(key) {
         baseKey = key;
     },
+
+    // Write something in localstorage
     set: function(key, value) {
         key = baseKey+':'+key;
-        localStorage[key] = JSON.stringify(value);
+
+        try {
+            localStorage[key] = JSON.stringify(value);
+        } catch(e) {}
     },
+
+    // Read a value from localstorage
     get: function(key, def) {
         key = baseKey+':'+key;
         if (localStorage[key] === undefined) return def;
@@ -21,6 +28,8 @@ module.exports = {
             return localStorage[key] || def;
         }
     },
+
+    // Remove a key from localstorage
     remove: function(key) {
         key = baseKey+':'+key;
         localStorage.removeItem(key);
