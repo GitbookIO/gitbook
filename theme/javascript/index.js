@@ -62,6 +62,8 @@ var MODULES = {
     'lodash': _
 };
 
+window.gitbook = gitbook;
+window.$ = $;
 window.require = function(mods, fn) {
     mods = _.map(mods, function(mod) {
         if (!MODULES[mod]) {
