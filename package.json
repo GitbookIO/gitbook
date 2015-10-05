@@ -14,6 +14,7 @@
         "fstream-ignore": "1.0.2",
         "gitbook-parsers": "0.8.4",
         "gitbook-plugin-highlight": "1.0.3",
+        "gitbook-plugin-sharing": "1.0.0",
         "nunjucks": "2.1.0",
         "nunjucks-autoescape": "1.0.0",
         "nunjucks-filter": "1.0.0",
