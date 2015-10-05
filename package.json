@@ -36,6 +36,7 @@
         "escape-string-regexp": "1.0.3"
     },
     "devDependencies": {
+        "eslint": "1.5.0",
         "mocha": "2.3.2",
         "should": "7.1.0",
         "grunt": "~0.4.2",
