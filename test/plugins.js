@@ -75,7 +75,7 @@ describe('Plugins', function () {
 
             it('should extend books plugins', function() {
                 var resources = book.plugins.resources('website');
-                resources.js.should.have.lengthOf(3);
+                resources.js.should.have.lengthOf(5);
             });
         });
 
