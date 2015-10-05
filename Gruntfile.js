@@ -44,9 +44,7 @@ module.exports = function (grunt) {
                         'lodash': '../vendors/lodash/lodash',
                         'requireLib': '../vendors/requirejs/require',
                         'Mousetrap': '../vendors/mousetrap/mousetrap',
-                        'lunr': '../vendors/lunr.js/lunr',
-                        'URIjs': '../vendors/URIjs/src/',
-                        'ace': '../vendors/ace-builds/src-noconflict/'
+                        'URIjs': '../vendors/URIjs/src/'
                     },
                     shim: {
                         'jQuery': {
@@ -57,9 +55,6 @@ module.exports = function (grunt) {
                         },
                         'Mousetrap': {
                             exports: 'Mousetrap'
-                        },
-                        'lunr': {
-                            exports: 'lunr'
                         }
                     }
                 }

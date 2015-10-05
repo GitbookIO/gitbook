@@ -65,7 +65,6 @@ define([
 
             // Update state
             state.update($("html"));
-            // recover search keyword
             preparePage();
         })
         .fail(function (e) {

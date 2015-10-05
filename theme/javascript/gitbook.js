@@ -26,6 +26,16 @@ keyboard, navigation, progress, sidebar, toolbar){
         // Init navigation
         navigation.init();
 
+
+        // Add action to toggle sidebar
+        toolbar.createButton({
+            icon: 'fa fa-align-justify',
+            onClick: function(e) {
+                e.preventDefault();
+                sidebar.toggle();
+            }
+        });
+
         events.trigger('start', config);
     };
 
