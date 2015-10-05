@@ -1,22 +1,21 @@
 define([
-    "jQuery",
-    "utils/storage",
-    "utils/sharing",
-    "utils/dropdown",
+    'jQuery',
+    'utils/storage',
+    'utils/sharing',
+    'utils/dropdown',
 
-    "core/events",
-    "core/font-settings",
-    "core/state",
-    "core/keyboard",
-    "core/navigation",
-    "core/progress",
-    "core/sidebar",
-    "core/search"
-], function($, storage, sharing, dropdown, events, fontSettings, state, keyboard, navigation, progress, sidebar, search){
+    'core/events',
+    'core/state',
+    'core/keyboard',
+    'core/navigation',
+    'core/progress',
+    'core/sidebar',
+    'core/search',
+
+    'apis/toolbar'
+], function($, storage, sharing, dropdown, events, state,
+keyboard, navigation, progress, sidebar, search, toolbar){
     var start = function(config) {
-        var $book;
-        $book = state.$book;
-
         // Init sidebar
         sidebar.init();
 
@@ -35,15 +34,16 @@ define([
         // Init navigation
         navigation.init();
 
-        //Init font settings
-        fontSettings.init(config.fontSettings || {});
+        events.trigger('start', config);
+    };
 
-        events.trigger("start", config);
-    }
-
+    // Export APIs for plugins
     return {
         start: start,
         events: events,
-        state: state
+        state: state,
+
+        toolbar: toolbar,
+        storage: storage
     };
 });
