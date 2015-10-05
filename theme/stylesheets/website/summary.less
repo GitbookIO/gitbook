@@ -15,30 +15,6 @@
 
         .transition(left @sidebar-transition-duration ease);
 
-        .book-search {
-            padding: @sidebar-search-padding;
-
-            background: @sidebar-search-background;
-
-            position: absolute;
-            top: -@header-height;
-            left: 0px;
-            right: 0px;
-
-            .transition(top 0.5s ease);
-
-            input, input:focus, input:hover {
-                width: 100%;
-                background: @sidebar-search-input-background;
-                border: 1px solid @sidebar-search-input-border-color;
-                .box-shadow(none);
-                outline: none;
-                line-height: 22px;
-                padding: 7px 4px;
-                color: inherit;
-            }
-        }
-
         ul.summary {
             position: absolute;
             top: 0px;
@@ -129,18 +105,6 @@
     &.without-animation {
         .book-summary {
             .transition(none) !important;
-        }
-    }
-
-    &.with-search {
-        .book-summary {
-            .book-search {
-                top: 0px;
-            }
-
-            ul.summary {
-                top: @header-height;
-            }
         }
     }
 }
