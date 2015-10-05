@@ -1,7 +1,6 @@
 define([
     'jQuery',
     'utils/storage',
-    'utils/sharing',
     'utils/dropdown',
 
     'core/events',
@@ -13,7 +12,7 @@ define([
     'core/search',
 
     'apis/toolbar'
-], function($, storage, sharing, dropdown, events, state,
+], function($, storage, dropdown, events, state,
 keyboard, navigation, progress, sidebar, search, toolbar){
     var start = function(config) {
         // Init sidebar
@@ -24,9 +23,6 @@ keyboard, navigation, progress, sidebar, search, toolbar){
 
         // Init keyboard
         keyboard.init();
-
-        // Bind sharing button
-        sharing.init();
 
         // Bind dropdown
         dropdown.init();

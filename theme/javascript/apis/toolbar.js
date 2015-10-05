@@ -128,6 +128,10 @@ define([
 
             // Create inner menu
             var $menu = createDropdownMenu(opts.dropdown);
+
+            // Menu position
+            $menu.addClass('dropdown-'+(opts.position == 'right'? 'left' : 'right'));
+
             $container.append($menu);
 
             $container.insertBefore($title);
