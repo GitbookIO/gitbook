@@ -86,6 +86,12 @@ body {
                     padding-left: 5px;
                 }
             }
+
+            ol {
+                margin: 0px;
+                padding: 0px;
+                padding-left: 2em;
+            }
         }
     }
 
@@ -111,6 +117,25 @@ body {
                     margin: 0px 8px;
                     white-space: nowrap;
                 }
+            }
+        }
+    }
+}
+
+// For LTR, fix direction of table of content
+body.dir-rtl {
+    .page.page-toc {
+        li {
+            .inner {
+                .page {
+                    float: left;
+                }
+            }
+
+            ol {
+                margin: 0px;
+                padding: 0px;
+                padding-right: 2em;
             }
         }
     }

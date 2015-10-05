@@ -14,7 +14,7 @@
         {% block style %}{% endblock %}
         {{ htmlSnippet("head:end")|default("", true)|safe }}
     </head>
-    <body>
+    <body class="dir-{{ options.direction }}">
         {{ htmlSnippet("body:start")|default("", true)|safe }}
         {% block content %}{% endblock %}
         {% block javascript %}{% endblock %}
