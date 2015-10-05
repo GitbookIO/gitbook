@@ -40,12 +40,18 @@
         "eslint": "1.5.0",
         "mocha": "2.3.2",
         "should": "7.1.0",
-        "grunt": "~0.4.2",
-        "grunt-cli": "0.1.11",
-        "grunt-contrib-copy": "0.5.0",
-        "grunt-contrib-less": "~0.5.0",
-        "grunt-contrib-requirejs": "0.4.1",
-        "grunt-bower-install-simple": "0.9.2"
+        "gulp": "^3.8.11",
+        "gulp-rename": "^1.2.2",
+        "gulp-uglify": "1.1.0",
+        "gulp-less": "3.0.2",
+        "gulp-minify-css": "1.0.0",
+        "gulp-util": "3.0.6",
+        "browserify": "11.0.1",
+        "merge-stream": "0.1.7",
+        "vinyl-source-stream": "1.1.0",
+        "jquery": "2.1.4",
+        "mousetrap": "1.5.3",
+        "font-awesome": "4.1.0"
     },
     "scripts": {
         "test": "node_modules/.bin/mocha --reporter spec --timeout 15000"
