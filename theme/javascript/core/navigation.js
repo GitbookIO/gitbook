@@ -4,9 +4,8 @@ define([
     "core/events",
     "core/state",
     "core/progress",
-    "core/loading",
-    "core/search"
-], function($, URL, events, state, progress, loading, search) {
+    "core/loading"
+], function($, URL, events, state, progress, loading) {
     var prev, next;
 
     var usePushState = (typeof history.pushState !== "undefined");
@@ -67,7 +66,6 @@ define([
             // Update state
             state.update($("html"));
             // recover search keyword
-            search.recover();
             preparePage();
         })
         .fail(function (e) {

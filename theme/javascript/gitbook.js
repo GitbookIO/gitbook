@@ -9,17 +9,13 @@ define([
     'core/navigation',
     'core/progress',
     'core/sidebar',
-    'core/search',
 
     'apis/toolbar'
 ], function($, storage, dropdown, events, state,
-keyboard, navigation, progress, sidebar, search, toolbar){
+keyboard, navigation, progress, sidebar, toolbar){
     var start = function(config) {
         // Init sidebar
         sidebar.init();
-
-        // Load search
-        search.init();
 
         // Init keyboard
         keyboard.init();
@@ -39,7 +35,14 @@ keyboard, navigation, progress, sidebar, search, toolbar){
         events: events,
         state: state,
 
+        // UI sections
         toolbar: toolbar,
-        storage: storage
+        sidebar: sidebar,
+
+        // Read/Write the localstorage
+        storage: storage,
+
+        // Create keyboard shortcuts
+        keyboard: keyboard
     };
 });
