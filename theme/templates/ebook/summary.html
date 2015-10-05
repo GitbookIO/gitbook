@@ -5,15 +5,18 @@
 {% macro articles(_articles) %}
     {% for item in _articles %}
         <li>
-            {% if item.path and item.exists %}
-                {% if not item.external %}
-                    <a href="{{ basePath }}/{{ item.path|contentLink }}">{{ item.title }}</a>
+            <span class="inner">
+                <span class="page">{{ item.level }}</span>
+                {% if item.path and item.exists %}
+                    {% if not item.external %}
+                        <a href="{{ basePath }}/{{ item.path|contentLink }}">{{ item.title }}</a>
+                    {% else %}
+                        <a target="_blank" href="{{ item.path }}">{{ item.title }}</a>
+                    {% endif %}
                 {% else %}
-                    <a target="_blank" href="{{ item.path }}">{{ item.title }}</a>
+                    <span>{{ item.title }}</span>
                 {% endif %}
-            {% else %}
-            {{ item.title }}
-            {% endif %}
+            </span>
             {% if item.articles.length > 0 %}
             <ol>
                 {{ articles(item.articles) }}
