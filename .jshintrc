@@ -1,7 +1,0 @@
-{
-    "strict": false,
-    "browser": false,
-    "quotmark": true,
-    "node": true,
-    "mocha": true
-}
