@@ -6,31 +6,14 @@
 
 body {
     font-family: @font-family-base;
+    color: @text-color;
+    .text-adjust(100%);
 }
 
 .page {
-    .markdown-content(#000, 1.6, @md-link-color: @link-color);
-
-    pre, code, blockquote, tr, img, table, figure {
-        page-break-inside: avoid;
-    }
-
-    p,
-    h2,
-    h3 {
-        orphans: 3;
-        widows: 3;
-    }
-
-    h1, h2, h3, h4, h5 {
-        page-break-after: avoid;
-    }
-
     // Section and first titles
     .section {
-        > h1, > h2, > h3 {
-            margin-top: 0px;
-        }
+        .markdown-content(@text-color, 1.6, @md-link-color: @link-color);
     }
 
     // Hide the title (only used to build PDF table of content)

@@ -5,8 +5,7 @@
 {% block style %}
     {# Default styles if not disabled #}
     {% if not styles.print %}
-        <link rel="stylesheet" href="{{ staticBase }}/ebook.css">
-        {% if options.generator != "ebook" %}<link rel="stylesheet" href="{{ staticBase }}/{{ options.generator }}.css">{% endif %}
+        <link rel="stylesheet" href="{{ staticBase }}/{{ options.generator }}.css">
     {% endif %}
 
     {# Style from plugins  #}
