@@ -15,7 +15,9 @@
                 {% else %}
                     <span>{{ item.title }}</span>
                 {% endif %}
+                {% if options.generator != "mobi" %}
                 <span class="page">{{ item.level }}</span>
+                {% endif %}
             </span>
             {% if item.articles.length > 0 %}
             <ol>
