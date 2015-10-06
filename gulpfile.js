@@ -33,12 +33,12 @@ gulp.task('js', function() {
     return browserify('./theme/javascript/index.js')
         .bundle()
         .pipe(source('app.js'))
-        .pipe(gulp.dest('./theme/assets/'));
+        .pipe(gulp.dest('./theme/assets/website'));
 });
 
 gulp.task('assets', function() {
     return gulp.src('./node_modules/font-awesome/fonts/*')
-    .pipe(gulp.dest('theme/assets/fonts/fontawesome/'));
+    .pipe(gulp.dest('theme/assets/website/fonts/fontawesome/'));
 });
 
 gulp.task('default', ['css', 'js', 'assets'], function() {
