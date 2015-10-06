@@ -24110,6 +24110,7 @@ var MODULES = {
 
 window.gitbook = gitbook;
 window.$ = $;
+window.jQuery = $;
 window.require = function(mods, fn) {
     mods = _.map(mods, function(mod) {
         if (!MODULES[mod]) {
