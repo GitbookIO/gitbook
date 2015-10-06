@@ -6,7 +6,6 @@
     {% for item in _articles %}
         <li>
             <span class="inner">
-                <span class="page">{{ item.level }}</span>
                 {% if item.path and item.exists %}
                     {% if not item.external %}
                         <a href="{{ basePath }}/{{ item.path|contentLink }}">{{ item.title }}</a>
@@ -16,6 +15,7 @@
                 {% else %}
                     <span>{{ item.title }}</span>
                 {% endif %}
+                <span class="page">{{ item.level }}</span>
             </span>
             {% if item.articles.length > 0 %}
             <ol>
