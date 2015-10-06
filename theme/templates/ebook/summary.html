@@ -33,7 +33,11 @@
         {{ articles(summary.chapters) }}
 
         {% if glossary.length > 0 %}
-        <li><a href="{{ basePath }}/GLOSSARY.html">{{ __("GLOSSARY") }}</a></li>
+        <li>
+            <span class="inner">
+                <a href="{{ basePath }}/GLOSSARY.html">{{ __("GLOSSARY") }}</a>
+            </span>
+        </li>
         {% endif %}
     </ol>
 </div>
