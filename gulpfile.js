@@ -8,18 +8,10 @@ var source = require('vinyl-source-stream');
 
 gulp.task('css', function() {
     return mergeStream(
-        // Stylesheet for website
-        gulp.src('theme/stylesheets/website.less')
+        gulp.src('theme/stylesheets/*.less')
             .pipe(less())
             .pipe(minifyCSS())
-            .pipe(rename('style.css'))
-            .pipe(gulp.dest('theme/assets/')),
-
-        // Stylesheet for ebooks
-        gulp.src('theme/stylesheets/ebook.less')
-            .pipe(less())
-            .pipe(minifyCSS())
-            .pipe(rename('print.css'))
+            //.pipe(rename('style.css'))
             .pipe(gulp.dest('theme/assets/'))
     );
 });

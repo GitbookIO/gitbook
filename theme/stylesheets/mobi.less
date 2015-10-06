@@ -1,0 +1,23 @@
+@import "./ebook/base.less";
+
+@font-family-base: serif;
+@link-color: #000;
+
+a {
+    color: #000;
+    text-decoration: underline !important;
+}
+
+.page-toc {
+    li {
+        list-style-type: lower-alpha;
+
+        .inner {
+            border: none;
+
+            span.page {
+                display: none;
+            }
+        }
+    }
+}

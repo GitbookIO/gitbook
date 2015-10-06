@@ -1,4 +1,4 @@
-.markdown-content(@md-color, @md-line-height) {
+.markdown-content(@md-color: #000, @md-line-height: 1.6, @md-link-color: #4183c4) {
     -ms-text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
     line-height: 1.4;
@@ -70,7 +70,7 @@
     }
 
     a {
-        color: #4183c4;
+        color: @md-link-color;
         text-decoration: none;
     }
 

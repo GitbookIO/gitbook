@@ -3,9 +3,13 @@
 {% block title %}{{ progress.current.title }} | {{ title }}{% endblock %}
 
 {% block style %}
+    {# Default styles if not disabled #}
     {% if not styles.print %}
-    <link rel="stylesheet" href="{{ staticBase }}/print.css">
+        <link rel="stylesheet" href="{{ staticBase }}/ebook.css">
+        {% if options.generator != "ebook" %}<link rel="stylesheet" href="{{ staticBase }}/{{ options.generator }}.css">{% endif %}
     {% endif %}
+
+    {# Style from plugins  #}
     {% for resource in plugins.resources.css %}
         {% if resource.url %}
         <link rel="stylesheet" href="{{ resource.url }}">
@@ -13,6 +17,8 @@
         <link rel="stylesheet" href="{{ staticBase }}/plugins/{{ resource.path }}">
         {% endif %}
     {% endfor %}
+
+    {# Custom styles from the book #}
     {% for type, style in styles %}
         <link rel="stylesheet" href="{{ basePath }}/{{ style }}">
     {% endfor %}

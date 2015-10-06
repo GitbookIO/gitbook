@@ -1,0 +1,40 @@
+@import "../base/mixins.less";
+@import "./variables.less";
+
+@import "./summary.less";
+@import "./glossary.less";
+
+body {
+    font-family: @font-family-base;
+}
+
+.page {
+    .markdown-content(#000, 1.6, @md-link-color: @link-color);
+
+    pre, code, blockquote, tr, img, table, figure {
+        page-break-inside: avoid;
+    }
+
+    p,
+    h2,
+    h3 {
+        orphans: 3;
+        widows: 3;
+    }
+
+    h1, h2, h3, h4, h5 {
+        page-break-after: avoid;
+    }
+
+    // Section and first titles
+    .section {
+        > h1, > h2, > h3 {
+            margin-top: 0px;
+        }
+    }
+
+    // Hide the title (only used to build PDF table of content)
+    .book-chapter {
+        display: none;
+    }
+}
