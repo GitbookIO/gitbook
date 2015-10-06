@@ -29,3 +29,5 @@ theme/vendors
 
 # vim swapfile
 *.swp
+# jetbrains ide
+.idea
