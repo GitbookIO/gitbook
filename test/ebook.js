@@ -20,6 +20,10 @@ describe('eBook generator', function () {
             book.should.have.file('gitbook');
             book.should.have.file('gitbook/ebook.css');
         });
+
+        it('should not copy website assets', function() {
+            book.should.not.have.file('gitbook/style.css');
+        });
     });
 
     describe('Custom styles', function() {

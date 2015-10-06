@@ -16,7 +16,11 @@ describe('Website generator', function () {
         it('should correctly copy assets', function() {
             book.should.have.file('gitbook');
             book.should.have.file('gitbook/app.js');
-            book.should.have.file('gitbook/website.css');
+            book.should.have.file('gitbook/style.css');
+        });
+
+        it('should not copy ebook assets', function() {
+            book.should.not.have.file('gitbook/ebook.css');
         });
     });
 });

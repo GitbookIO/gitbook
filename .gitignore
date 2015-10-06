@@ -24,8 +24,5 @@ build/Release
 # see https://npmjs.org/doc/faq.html#Should-I-check-my-node_modules-folder-into-git
 node_modules
 
-theme/javascript/vendors
-theme/vendors
-
 # vim swapfile
 *.swp
