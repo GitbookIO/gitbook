@@ -25,14 +25,16 @@
 
 {% block content %}
 <div class="page">
-    <h1 class="book-chapter book-chapter-{{ progress.current.level|lvl }}">{{ progress.current.title }}</h1>
-    {% for section in content %}
-        <div class="section {{ section.type }}" id="section-{{ section.id }}">
-        {% if section.type == "normal" %}
-            {% autoescape false %}{{ section.content }}{% endautoescape %}
-        {% endif %}
-        </div>
-    {% endfor %}
+    {% block page %}
+        <h1 class="book-chapter book-chapter-{{ progress.current.level|lvl }}">{{ progress.current.title }}</h1>
+        {% for section in content %}
+            <div class="section {{ section.type }}" id="section-{{ section.id }}">
+            {% if section.type == "normal" %}
+                {% autoescape false %}{{ section.content }}{% endautoescape %}
+            {% endif %}
+            </div>
+        {% endfor %}
+    {% endblock %}
 </div>
 {% endblock %}
 

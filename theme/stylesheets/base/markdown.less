@@ -4,6 +4,7 @@
 
     // Spacing between blocks
     @spacing: @md-line-height * 2 * @scale * 1em;
+    @spacing-lg: @md-line-height * 3 * @scale * 1em;
 
 
     display: block;
@@ -94,7 +95,7 @@
 
     /* Headings */
     h1, h2, h3, h4, h5, h6 {
-        margin-top: 2 * @spacing;
+        margin-top: @spacing-lg;
         margin-bottom: @spacing;
         font-weight: bold;
     }
@@ -137,7 +138,7 @@
         word-wrap: normal;
         margin: 0px;
         padding: 0.85em 1em;
-        margin-bottom: 2 * @spacing;
+        margin-bottom: @spacing-lg;
         background: @md-code-background;
 
         > code {
