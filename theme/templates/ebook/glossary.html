@@ -2,20 +2,21 @@
 
 {% block title %}{{ __("GLOSSARY") }} | {{ title }}{% endblock %}
 
-{% block content %}
-<div class="page page-toc">
+{% block page %}
     <h1 class="book-chapter book-chapter-1">{{ __("GLOSSARY") }}</h1>
-    <h1>{{ __("GLOSSARY") }}</h1>
-    {% for item in glossary %}
-    <section class="normal glossary" id="{{ item.id }}">
-        <h2><a href="#{{ item.id }}">{{ item.name }}</a></h2>
-        <p>{{ item.description|safe }}</p>
-        <ul class="glossary-index">
-        {% for file in item.files %}
-            <li><a href="{{ basePath }}/{{ file.path|contentLink }}"><span class="level">{{ file.level }}.</span> {{ file.title }}</a></li>
+    <div class="section glossary">
+        <h1>{{ __("GLOSSARY") }}</h1>
+
+        {% for item in glossary %}
+        <div class="glossary-entry" id="{{ item.id }}">
+            <h2><a href="#{{ item.id }}">{{ item.name }}</a></h2>
+            <p>{{ item.description|safe }}</p>
+            <ul class="glossary-index">
+            {% for file in item.files %}
+                <li><a href="{{ basePath }}/{{ file.path|contentLink }}"><span class="level">{{ file.level }}.</span> {{ file.title }}</a></li>
+            {% endfor %}
+            </ul>
+        </div>
         {% endfor %}
-        </ul>
-    </section>
-    {% endfor %}
-</div>
+    </div>
 {% endblock %}

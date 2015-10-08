@@ -5,15 +5,20 @@
 {% macro articles(_articles) %}
     {% for item in _articles %}
         <li>
-            {% if item.path and item.exists %}
-                {% if not item.external %}
-                    <a href="{{ basePath }}/{{ item.path|contentLink }}">{{ item.title }}</a>
+            <span class="inner">
+                {% if item.path and item.exists %}
+                    {% if not item.external %}
+                        <a href="{{ basePath }}/{{ item.path|contentLink }}">{{ item.title }}</a>
+                    {% else %}
+                        <a target="_blank" href="{{ item.path }}">{{ item.title }}</a>
+                    {% endif %}
                 {% else %}
-                    <a target="_blank" href="{{ item.path }}">{{ item.title }}</a>
+                    <span>{{ item.title }}</span>
                 {% endif %}
-            {% else %}
-            {{ item.title }}
-            {% endif %}
+                {% if options.generator != "mobi" %}
+                <span class="page">{{ item.level }}</span>
+                {% endif %}
+            </span>
             {% if item.articles.length > 0 %}
             <ol>
                 {{ articles(item.articles) }}
@@ -23,15 +28,19 @@
     {% endfor %}
 {% endmacro %}
 
-{% block content %}
-<div class="page page-toc">
+{% block page %}
+<div class="section toc">
     <h1>{{ __("SUMMARY") }}</h1>
     <ol>
-    {{ articles(summary.chapters) }}
+        {{ articles(summary.chapters) }}
 
-    {% if glossary.length > 0 %}
-    <li><a href="{{ basePath }}/GLOSSARY.html">{{ __("GLOSSARY") }}</a></li>
-    {% endif %}
+        {% if glossary.length > 0 %}
+        <li>
+            <span class="inner">
+                <a href="{{ basePath }}/GLOSSARY.html">{{ __("GLOSSARY") }}</a>
+            </span>
+        </li>
+        {% endif %}
     </ol>
 </div>
 {% endblock %}

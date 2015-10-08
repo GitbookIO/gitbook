@@ -1,0 +1,56 @@
+.section.toc {
+    > h1 {
+        text-align: center;
+    }
+
+    > ol {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    li {
+        list-style: none;
+
+        .inner {
+            display: block;
+            border-bottom: 1px dotted #eee;
+            margin-bottom: 4px;
+
+            a, span {
+                padding-right: 5px;
+                border-bottom: 1px solid #fff;
+                margin-bottom: -1px;
+            }
+
+            .page {
+                float: right;
+                padding-left: 5px;
+            }
+        }
+
+        ol {
+            margin: 0px;
+            padding: 0px;
+            padding-left: 2em;
+        }
+    }
+}
+
+// For LTR, fix direction of table of content
+.dir-rtl {
+    .section.toc {
+        li {
+            .inner {
+                .page {
+                    float: left;
+                }
+            }
+
+            ol {
+                margin: 0px;
+                padding: 0px;
+                padding-right: 2em;
+            }
+        }
+    }
+}

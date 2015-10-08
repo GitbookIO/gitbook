@@ -1,0 +1,23 @@
+@import "../base/mixins.less";
+@import "./variables.less";
+
+@import "./summary.less";
+@import "./glossary.less";
+
+body {
+    font-family: @font-family-base;
+    color: @text-color;
+    .text-adjust(100%);
+}
+
+.page {
+    // Section and first titles
+    .section {
+        .markup-content(@text-color, 1.6, @md-link-color: @link-color);
+    }
+
+    // Hide the title (only used to build PDF table of content)
+    .book-chapter {
+        display: none;
+    }
+}
