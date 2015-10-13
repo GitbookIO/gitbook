@@ -14,7 +14,7 @@
         "gitbook-parsers": "0.8.4",
         "gitbook-plugin-highlight": "1.0.3",
         "gitbook-plugin-sharing": "1.0.0",
-        "gitbook-plugin-search": "1.0.0",
+        "gitbook-plugin-search": "1.0.1",
         "gitbook-plugin-fontsettings": "1.0.0",
         "nunjucks": "2.1.0",
         "nunjucks-autoescape": "1.0.0",
