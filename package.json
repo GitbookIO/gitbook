@@ -38,7 +38,8 @@
         "escape-string-regexp": "1.0.3",
         "juice": "1.5.0",
         "jsonschema": "1.0.2",
-        "json-schema-defaults": "0.1.1"
+        "json-schema-defaults": "0.1.1",
+        "merge-defaults": "0.2.1"
     },
     "devDependencies": {
         "eslint": "1.5.0",
