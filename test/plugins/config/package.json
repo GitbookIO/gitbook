@@ -1,0 +1,21 @@
+{
+    "name": "gitbook-plugin-testconfig",
+    "description": "Test plugin configuration",
+    "main": "index.js",
+    "version": "0.0.1",
+    "engines": {
+        "gitbook": "*"
+    },
+    "gitbook": {
+        "properties": {
+            "hello": {
+                "type": "string",
+                "default": "world"
+            },
+            "testRequired": {
+                "type": "number",
+                "required": true
+            }
+        }
+    }
+}

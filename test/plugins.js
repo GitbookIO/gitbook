@@ -51,6 +51,37 @@ describe('Plugins', function () {
         });
     });
 
+    describe('Configuration', function() {
+        var plugin;
+
+        before(function() {
+            plugin = new Plugin(book, 'testconfig');
+            plugin.load('./config', PLUGINS_ROOT);
+        });
+
+        it('should throw error for invalid configuration', function() {
+            return plugin.validateConfig({})
+            .should.be.rejectedWith('Configuration Error: pluginsConfig.testconfig.testRequired is required');
+        });
+
+        it('should throw error for invalid types', function() {
+            return plugin.validateConfig({
+                testRequired: 'hello'
+            })
+            .should.be.rejectedWith('Configuration Error: pluginsConfig.testconfig.testRequired is not of a type(s) number');
+        });
+
+        it('should extend with default values', function() {
+            return plugin.validateConfig({
+                testRequired: 12
+            })
+            .should.be.fulfilledWith({
+                hello: 'world',
+                testRequired: 12
+            });
+        });
+    });
+
     describe('Resources', function() {
         var plugin;
 
@@ -93,7 +124,7 @@ describe('Plugins', function () {
                 // There is resources from highlight plugin and this plugin
                 resources.css.should.have.lengthOf(2);
                 should.exist(_.find(resources.css, {
-                    path: './resources/test'
+                    path: 'gitbook-plugin-resources/test'
                 }));
             });
         });
