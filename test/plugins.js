@@ -93,7 +93,7 @@ describe('Plugins', function () {
                 // There is resources from highlight plugin and this plugin
                 resources.css.should.have.lengthOf(2);
                 should.exist(_.find(resources.css, {
-                    path: './resources/test'
+                    path: 'gitbook-plugin-resources/test'
                 }));
             });
         });
