@@ -1,27 +1,29 @@
-var _ = require("lodash");
-var fs = require("fs");
-var path = require("path");
-var should = require("should");
-var cheerio = require("cheerio");
+var _ = require('lodash');
+var fs = require('fs');
+var path = require('path');
+var should = require('should');
+var cheerio = require('cheerio');
 
-should.Assertion.add("file", function(file, description) {
-    this.params = { actual: this.obj.toString(), operator: "have file " + file, message: description };
+require('should-promised');
 
-    this.obj.should.have.property("options").which.is.an.Object();
-    this.obj.options.should.have.property("output").which.is.a.String();
+should.Assertion.add('file', function(file, description) {
+    this.params = { actual: this.obj.toString(), operator: 'have file ' + file, message: description };
+
+    this.obj.should.have.property('options').which.is.an.Object();
+    this.obj.options.should.have.property('output').which.is.a.String();
     this.assert(fs.existsSync(path.resolve(this.obj.options.output, file)));
 });
 
-should.Assertion.add("jsonfile", function(file, description) {
-    this.params = { actual: this.obj.toString(), operator: "have valid jsonfile " + file, message: description };
+should.Assertion.add('jsonfile', function(file, description) {
+    this.params = { actual: this.obj.toString(), operator: 'have valid jsonfile ' + file, message: description };
 
-    this.obj.should.have.property("options").which.is.an.Object();
-    this.obj.options.should.have.property("output").which.is.a.String();
-    this.assert(JSON.parse(fs.readFileSync(path.resolve(this.obj.options.output, file), { encoding: "utf-8" })));
+    this.obj.should.have.property('options').which.is.an.Object();
+    this.obj.options.should.have.property('output').which.is.a.String();
+    this.assert(JSON.parse(fs.readFileSync(path.resolve(this.obj.options.output, file), { encoding: 'utf-8' })));
 });
 
-should.Assertion.add("html", function(rules, description) {
-    this.params = { actual: "HTML string", operator: "valid html", message: description };
+should.Assertion.add('html', function(rules, description) {
+    this.params = { actual: 'HTML string', operator: 'valid html', message: description };
     var $ = cheerio.load(this.obj);
 
     _.each(rules, function(validations, query) {
