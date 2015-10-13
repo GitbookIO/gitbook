@@ -2,6 +2,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.5.0-beta.1
+- Font settings, sharing and search are externalized as default plugins
+- Plugins can define a configuration schema in the manifest, this schema will be used to validate configuration during build
+- New Node.js API for plugin: `book.formatString(type, content)`
+- New client side API for website plugins: `gitbook.toolbar.createButton(opts)`
+- Better header/footer for PDF, CSS wil be inlined to easily style the header/footer
+- Cleaner table of contents for ebooks
+- Support for RTL in ebook's table of contents
+- Better colors for mobi (links and code blocks)
+
 ## 2.4.3
 - Add ukrainian translation (`uk`)
 - Add `book.json` configuration for maximum size of search index
