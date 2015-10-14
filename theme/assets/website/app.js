@@ -24073,6 +24073,7 @@ function start(config) {
 
     // Add action to toggle sidebar
     toolbar.createButton({
+        index: 0,
         icon: 'fa fa-align-justify',
         onClick: function(e) {
             e.preventDefault();
@@ -24466,6 +24467,18 @@ var events = require('./events');
 // List of created buttons
 var buttons = [];
 
+// Insert a jquery element at a specific position
+function insertAt(parent, selector, index, element) {
+    var lastIndex = parent.children(selector).size();
+    if (index < 0) {
+        index = Math.max(0, lastIndex + 1 + index);
+    }
+    parent.append(element);
+
+    if (index < lastIndex) {
+        parent.children(selector).eq(index).before(parent.children(selector).last());
+    }
+}
 
 // Default click handler
 function defaultOnClick(e) {
@@ -24543,7 +24556,10 @@ function createButton(opts) {
         onClick: defaultOnClick,
 
         // Button is a dropdown
-        dropdown: null
+        dropdown: null,
+
+        // Position in the toolbar
+        index: null
     });
 
     buttons.push(opts);
@@ -24552,6 +24568,7 @@ function createButton(opts) {
 
 // Update a button
 function updateButton(opts) {
+    var $result;
     var $toolbar = $('.book-header');
     var $title = $toolbar.find('h1');
 
@@ -24593,12 +24610,17 @@ function updateButton(opts) {
         $menu.addClass('dropdown-'+(opts.position == 'right'? 'left' : 'right'));
 
         $container.append($menu);
-
-        $container.insertBefore($title);
+        $result = $container;
     } else {
         $btn.addClass(positionClass);
         $btn.addClass(opts.className);
-        $btn.insertBefore($title);
+        $result = $btn;
+    }
+
+    if (_.isNumber(opts.index) && opts.index >= 0) {
+        insertAt($toolbar, '.btn, .dropdown', opts.index, $result);
+    } else {
+        $result.insertBefore($title);
     }
 }
 

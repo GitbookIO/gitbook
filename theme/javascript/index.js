@@ -27,6 +27,7 @@ function start(config) {
 
     // Add action to toggle sidebar
     toolbar.createButton({
+        index: 0,
         icon: 'fa fa-align-justify',
         onClick: function(e) {
             e.preventDefault();
