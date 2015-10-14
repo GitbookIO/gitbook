@@ -24618,7 +24618,7 @@ function updateButton(opts) {
     }
 
     if (_.isNumber(opts.index) && opts.index >= 0) {
-        insertAt($toolbar, '.btn, .dropdown', opts.index, $result);
+        insertAt($toolbar, '.btn, .dropdown, h1', opts.index, $result);
     } else {
         $result.insertBefore($title);
     }
