@@ -222,9 +222,9 @@ To use the latest commit from `GitBook/gitbook` with `gitbook-cli`:
 
 ```
 $ git clone https://github.com/GitbookIO/gitbook.git ./gitbook
-$ gitbook versions:link 2.0.0 ./gitbook
+$ gitbook versions:link ./gitbook
 ```
 
-Now the version tag `2.0.0` wil be associated with the `./gitbook` folder.
+Now `gitbook-cli` will be using the `./gitbook` folder.
 
-You can uninstall it using: `gitbook versions:uninstall 2.0.0`.
+You can uninstall it using: `gitbook versions:uninstall latest`.
