@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.5.0-beta.2
+- Fix support for pre-releases
+
 ## 2.5.0-beta.1
 - Font settings, sharing and search are externalized as default plugins
 - Plugins can define a configuration schema in the manifest, this schema will be used to validate configuration during build
