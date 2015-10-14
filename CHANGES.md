@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.5.0-beta.3
+- Fix installation of plugins when using a pre-release
+
 ## 2.5.0-beta.2
 - Fix support for pre-releases
 
