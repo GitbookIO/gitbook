@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.5.0-beta.5
+- Fix position of sidebar toggle button
+- Update asciidoc parser to remove git dependency
+
 ## 2.5.0-beta.4
 - Fix compatibility for some plugins (like `autocover`)
 - Fix position of sidebar toggle button when glossary button is present
