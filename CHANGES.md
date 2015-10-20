@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.5.0-beta.6
+- Fix default style for pdf footer and header
+- Correctly handle query in image urls
+- Fix templating in imported content
+- Use helvetica as default font for PDFs
+
 ## 2.5.0-beta.5
 - Fix position of sidebar toggle button
 - Update asciidoc parser to remove git dependency
