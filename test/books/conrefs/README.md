@@ -1,5 +1,8 @@
 # Readme
 
+<p id="test-plugin-block-shortcuts-1">$$test_block1$$</p>
+<p id="test-plugin-block-shortcuts-2">{% include "./block.md" %}</p>
+
 ### Relative
 
 <p id="t1">{% include "./hello.md" %}</p>

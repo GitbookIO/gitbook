@@ -1,13 +1,13 @@
-var os = require("os");
-var path = require("path");
-var Q = require("q");
-var _ = require("lodash");
+var os = require('os');
+var path = require('path');
+var Q = require('q');
+var _ = require('lodash');
 
-var fsUtil = require("../lib/utils/fs");
-var Book = require("../").Book;
-var LOG_LEVELS = require("../").LOG_LEVELS;
+var fsUtil = require('../lib/utils/fs');
+var Book = require('../').Book;
+var LOG_LEVELS = require('../').LOG_LEVELS;
 
-require("./assertions");
+require('./assertions');
 
 
 var BOOKS = {};
@@ -20,7 +20,7 @@ function generateBook(bookId, test, opts) {
         prepare: function() {}
     });
 
-    return parseBook(bookId, test)
+    return parseBook(bookId, test, opts)
     .then(function(book) {
 
         return Q(opts.prepare(book))
@@ -32,21 +32,27 @@ function generateBook(bookId, test, opts) {
 }
 
 // Generate and return a book
-function parseBook(bookId, test) {
-    test = test || "website";
-    BOOKS[bookId] = BOOKS[bookId] || {};
-    if (BOOKS[bookId][test]) return Q(BOOKS[bookId][test]);
+function parseBook(bookId, test, opts) {
+    opts = _.defaults(opts || {}, {
+        testId: ''
+    });
 
-    BOOKS[bookId][test] = new Book(path.resolve(__dirname, "books", bookId), {
+    test = test || 'website';
+    var testId = [test, opts.testId].join('-');
+
+    BOOKS[bookId] = BOOKS[bookId] || {};
+    if (BOOKS[bookId][testId]) return Q(BOOKS[bookId][testId]);
+
+    BOOKS[bookId][testId] = new Book(path.resolve(__dirname, 'books', bookId), {
         logLevel: LOG_LEVELS.DISABLED,
         config: {
-            output: path.resolve(TMPDIR, bookId+"-"+test)
+            output: path.resolve(TMPDIR, bookId+'-'+testId)
         }
     });
 
-    return BOOKS[bookId][test].parse()
+    return BOOKS[bookId][testId].parse()
     .then(function() {
-        return BOOKS[bookId][test];
+        return BOOKS[bookId][testId];
     });
 }
 
