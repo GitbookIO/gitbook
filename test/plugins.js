@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var fs = require('fs');
 var should = require('should');
 var path = require('path');
 
@@ -193,14 +194,48 @@ describe('Plugins', function () {
                 });
         });
 
-        it('should correctly accept shortcuts', function() {
-            return testTpl('$$hello$$', {}, {
-                type: 'markdown'
-            })
-            .then(function(content) {
-                content.should.equal('testhellotest');
+        describe('Shortcuts', function() {
+            it('should correctly accept shortcuts', function() {
+                return testTpl('$$hello$$', {}, {
+                    type: 'markdown'
+                })
+                .then(function(content) {
+                    content.should.equal('testhellotest');
+                });
+            });
+
+            it('should correctly apply shortcuts to included file', function() {
+                return books.generate('conrefs', 'website', {
+                    testId: 'include-plugins',
+                    prepare: function(bookConref) {
+                        plugin = new Plugin(bookConref, 'blocks');
+                        plugin.load('./blocks', PLUGINS_ROOT);
+
+                        return bookConref.plugins.load(plugin);
+                    }
+                })
+                .then(function(bookConref) {
+                    var readme = fs.readFileSync(
+                        path.join(bookConref.options.output, 'index.html'),
+                        { encoding: 'utf-8' }
+                    );
+
+                    readme.should.be.html({
+                        '.page-inner p#test-plugin-block-shortcuts-1': {
+                            count: 1,
+                            text: 'testtest_block1test',
+                            trim: true
+                        },
+                        '.page-inner p#test-plugin-block-shortcuts-2': {
+                            count: 1,
+                            text: 'testtest_block2test',
+                            trim: true
+                        }
+                    });
+                });
             });
         });
+
 
         it('should correctly extend template blocks with defined end', function() {
             return testTpl('{% test2 %}hello{% endtest2end %}')
