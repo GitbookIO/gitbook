@@ -11,7 +11,7 @@
         "resolve": "0.6.3",
         "fs-extra": "0.16.5",
         "fstream-ignore": "1.0.2",
-        "gitbook-parsers": "0.8.6",
+        "gitbook-parsers": "0.8.7",
         "gitbook-plugin-highlight": "1.0.3",
         "gitbook-plugin-sharing": "1.0.1",
         "gitbook-plugin-search": "1.0.2",
