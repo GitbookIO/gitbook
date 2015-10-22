@@ -10,7 +10,11 @@ state.update = function(dom) {
     state.$book = $book;
     state.level = $book.data('level');
     state.basePath = $book.data('basepath');
+
+    // Date of build
     state.revision = $book.data('revision');
+
+    // Original path of the file
     state.filepath = $book.data('filepath');
 
     // Absolute url to the root of the book
