@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.5.0-beta.7
+- Use Arial as default font for PDFs
+- Client side API provides `gitbook.state.root`
+- Normalize heading IDs like GitHub
+
 ## 2.5.0-beta.6
 - Fix default style for pdf footer and header
 - Correctly handle query in image urls
