@@ -24426,7 +24426,7 @@ var gitbook = {
 // Modules mapping for plugins
 var MODULES = {
     'gitbook': gitbook,
-    'jQuery': $,
+    'jquery': $,
     'lodash': _
 };
 
@@ -24435,6 +24435,7 @@ window.$ = $;
 window.jQuery = $;
 window.require = function(mods, fn) {
     mods = _.map(mods, function(mod) {
+        mod = mod.toLowerCase();
         if (!MODULES[mod]) {
             throw new Error('GitBook module '+mod+' doesn\'t exist');
         }
@@ -24735,7 +24736,11 @@ state.update = function(dom) {
     state.$book = $book;
     state.level = $book.data('level');
     state.basePath = $book.data('basepath');
+
+    // Date of build
     state.revision = $book.data('revision');
+
+    // Original path of the file
     state.filepath = $book.data('filepath');
 
     // Absolute url to the root of the book
