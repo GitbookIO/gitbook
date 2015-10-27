@@ -2,36 +2,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+
 ## 2.5.0
-- Add `chapterTitle` and `filepath` to `gitbook.state` JS API
-- Fix compatibility with plugins `<2.5.0`
-
-## 2.5.0-beta.7
-- Use Arial as default font for PDFs
-- Client side API provides `gitbook.state.root`
-- Normalize heading IDs like GitHub
-
-## 2.5.0-beta.6
-- Fix default style for pdf footer and header
-- Correctly handle query in image urls
-- Fix templating in imported content
-- Use helvetica as default font for PDFs
-
-## 2.5.0-beta.5
-- Fix position of sidebar toggle button
-- Update asciidoc parser to remove git dependency
-
-## 2.5.0-beta.4
-- Fix compatibility for some plugins (like `autocover`)
-- Fix position of sidebar toggle button when glossary button is present
-
-## 2.5.0-beta.3
-- Fix installation of plugins when using a pre-release
-
-## 2.5.0-beta.2
-- Fix support for pre-releases
-
-## 2.5.0-beta.1
 - Font settings, sharing and search are externalized as default plugins
 - Plugins can define a configuration schema in the manifest, this schema will be used to validate configuration during build
 - New Node.js API for plugin: `book.formatString(type, content)`
@@ -40,6 +12,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Cleaner table of contents for ebooks
 - Support for RTL in ebook's table of contents
 - Better colors for mobi (links and code blocks)
+- Fix installation of plugins when using a pre-release
+- Fix support for pre-releases
+- Update asciidoc parser to remove git dependency
+- Fix templating in imported content
+- Fix querystring in image urls
+- Normalize heading IDs like GitHub
+- Use Arial as default font for PDFs
+- Add `root`, `chapterTitle` and `filepath` to `gitbook.state` JS API
 
 ## 2.4.3
 - Add ukrainian translation (`uk`)
