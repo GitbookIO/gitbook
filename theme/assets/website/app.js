@@ -24743,6 +24743,9 @@ state.update = function(dom) {
     // Original path of the file
     state.filepath = $book.data('filepath');
 
+    // Title of the chapter
+    state.chapterTitle = $book.data('chapter-title');
+
     // Absolute url to the root of the book
     state.root = url.resolve(
         location.protocol+'//'+location.host,
