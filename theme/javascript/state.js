@@ -23,7 +23,7 @@ state.update = function(dom) {
     // Absolute url to the root of the book
     state.root = url.resolve(
         location.protocol+'//'+location.host,
-        path.dirname(path.resolve(location.pathname, state.basePath))
+        path.dirname(path.resolve(location.pathname.replace(/\/$/, '/index.html'), state.basePath))
     );
 };
 
