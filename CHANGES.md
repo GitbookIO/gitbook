@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.5.0
+- Add `chapterTitle` and `filepath` to `gitbook.state` JS API
+- Fix compatibility with plugins `<2.5.0`
+
 ## 2.5.0-beta.7
 - Use Arial as default font for PDFs
 - Client side API provides `gitbook.state.root`
