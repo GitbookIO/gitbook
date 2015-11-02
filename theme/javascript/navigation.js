@@ -75,7 +75,11 @@ function updateNavigationPosition() {
     $('.navigation-next').css('margin-right', (bodyInnerWidth - pageWrapperWidth) + 'px');
 }
 
-function preparePage() {
+function notifyPageChange() {
+    events.trigger('page.change');
+}
+
+function preparePage(notify) {
     var $bookBody = $('.book-body');
     var $bookInner = $bookBody.find('.body-inner');
     var $pageWrapper = $bookInner.find('.page-wrapper');
@@ -91,7 +95,7 @@ function preparePage() {
     $bookBody.scrollTop(0);
 
     // Notify
-    events.trigger('page.change');
+    if (notify !== false) notifyPageChange();
 }
 
 function isLeftClickEvent(e) {
@@ -150,11 +154,12 @@ function init() {
     $(window).resize(updateNavigationPosition);
 
     // Prepare current page
-    preparePage();
+    preparePage(false);
 }
 
 module.exports = {
     init: init,
     goNext: goNext,
-    goPrev: goPrev
+    goPrev: goPrev,
+    notify: notifyPageChange
 };

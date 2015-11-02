@@ -36,6 +36,7 @@ function start(config) {
     });
 
     events.trigger('start', config);
+    navigation.notify();
 }
 
 // Export APIs for plugins

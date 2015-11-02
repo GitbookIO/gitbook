@@ -156,6 +156,8 @@ function updateButton(opts) {
         $result = $btn;
     }
 
+    $result.addClass('js-toolbar-action');
+
     if (_.isNumber(opts.index) && opts.index >= 0) {
         insertAt($toolbar, '.btn, .dropdown, h1', opts.index, $result);
     } else {
@@ -165,6 +167,7 @@ function updateButton(opts) {
 
 // Update all buttons
 function updateAllButtons() {
+    $('.js-toolbar-action').remove();
     _.each(buttons, updateButton);
 }
 
