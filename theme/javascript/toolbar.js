@@ -117,7 +117,7 @@ function updateButton(opts) {
     // Create button
     var $btn = $('<a>', {
         'class': 'btn',
-        'text': opts.text,
+        'text': opts.text? ' ' + opts.text : '',
         'aria-label': opts.label,
         'href': '#'
     });
