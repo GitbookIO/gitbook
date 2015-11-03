@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.5.2
+- Fix custom stylesheets for ebook generation
+- Trigger event `start` before `page.change`
+
 ## 2.5.1
 - Fix calcul of `gitbook.state.root` when serving HTML index as `/`
 
