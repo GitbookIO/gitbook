@@ -57,3 +57,5 @@ Translators
     - @a-moses
 - Ukrainian
     - @Karnaukhov
+- Czech
+    - @mjanda
