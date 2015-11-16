@@ -59,3 +59,5 @@ Translators
     - @Karnaukhov
 - Czech
     - @mjanda
+- Swedish
+    - Jacob Burenstam (@buren)
