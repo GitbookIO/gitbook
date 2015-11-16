@@ -213,7 +213,7 @@ Plugins needed to build a book can be installed using: `gitbook install ./`. You
 You can use the options `--log=debug` and `--debug` to get better error messages (with stack trace). For example:
 
 ```
-$ gitbook build ./ -- log=debug --debug
+$ gitbook build ./ --log=debug --debug
 ```
 
 #### How to use the latest commit from GitBook in gitbook-cli
