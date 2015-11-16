@@ -1,0 +1,20 @@
+{
+    "LANGS_CHOOSE": "Välj språk",
+    "GLOSSARY": "Gloslista",
+    "GLOSSARY_INDEX": "Index",
+    "GLOSSARY_OPEN": "Gloslista",
+    "GITBOOK_LINK": "Publicera med GitBook",
+    "SUMMARY": "Innehållsförteckning",
+    "SUMMARY_INTRODUCTION": "Inledning",
+    "SUMMARY_TOGGLE": "Innehållsförteckning",
+    "SEARCH_TOGGLE": "Sök",
+    "SEARCH_PLACEHOLDER": "Skriv sökord",
+    "FONTSETTINGS_TOGGLE": "Textinställningar",
+    "SHARE_TOGGLE": "Dela",
+    "SHARE_ON": "Dela på {{platform}}",
+    "FONTSETTINGS_WHITE": "Ljus",
+    "FONTSETTINGS_SEPIA": "Sepia",
+    "FONTSETTINGS_NIGHT": "Mörk",
+    "FONTSETTINGS_SANS": "Sans",
+    "FONTSETTINGS_SERIF": "Serif"
+}
