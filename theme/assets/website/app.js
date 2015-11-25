@@ -24766,7 +24766,7 @@ state.update = function(dom) {
     state.root = url.resolve(
         location.protocol+'//'+location.host,
         path.dirname(path.resolve(location.pathname.replace(/\/$/, '/index.html'), state.basePath))
-    );
+    ).replace(/\/?$/, '/');
 
     // Absolute root to the language (for multilingual book)
     state.bookRoot = state.innerLanguage? url.resolve(state.root, '..') : state.root;
