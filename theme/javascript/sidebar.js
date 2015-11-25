@@ -25,9 +25,14 @@ function isOpen() {
 // Prepare sidebar: state and toggle button
 function init() {
     // Init last state if not mobile
-    if (!platform.isMobile) {
+    if (!platform.isMobile()) {
         toggleSidebar(storage.get('sidebar', true), false);
     }
+
+    // Close sidebar after clicking a link on mobile
+    $(document).on('click', '.book-summary li.chapter a', function(e) {
+        if (platform.isMobile()) toggleSidebar(false, false);
+    });
 }
 
 // Filter summary with a list of path
