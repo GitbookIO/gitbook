@@ -24751,7 +24751,7 @@ state.update = function(dom) {
     state.basePath = $book.data('basepath');
 
     // If book is multilingual, language of this book
-    state.innerlanguage = $book.data('innerlanguage');
+    state.innerLanguage = $book.data('innerlanguage');
 
     // Date of build
     state.revision = $book.data('revision');
@@ -24769,7 +24769,7 @@ state.update = function(dom) {
     );
 
     // Absolute root to the language (for multilingual book)
-    state.bookRoot = state.innerlanguage? url.resolve(state.root, '..') : state.root;
+    state.bookRoot = state.innerLanguage? url.resolve(state.root, '..') : state.root;
 };
 
 state.update($);
