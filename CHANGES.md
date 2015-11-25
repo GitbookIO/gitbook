@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.6.0
+- Close sidebar after clicking a link on mobile
+- Add root for multilingual books: `gitbook.state.bookRoot`
+- Fix color of h6 headings
+- Fix bottom margin of lists and blockquotes
+- Add Swedish translation (`sv`)
+- Add Czech translation (`cs`)
+- Fix locale names for `zh-hans` and `jp`
+- Update plugin `search` to fix crashes
+- Aceept case-incensitive structure files (README, GLOSSARY, etc)
+
 ## 2.5.2
 - Fix custom stylesheets for ebook generation
 - Trigger event `start` before `page.change`
