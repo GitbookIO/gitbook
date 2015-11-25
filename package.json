@@ -16,7 +16,7 @@
         "gitbook-plugin-sharing": "1.0.1",
         "gitbook-plugin-search": "1.1.0",
         "gitbook-plugin-fontsettings": "1.0.2",
-        "nunjucks": "2.1.0",
+        "nunjucks": "2.2.0",
         "nunjucks-autoescape": "1.0.0",
         "nunjucks-filter": "1.0.0",
         "i18n": "0.5.0",
