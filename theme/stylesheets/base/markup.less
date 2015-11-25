@@ -1,4 +1,5 @@
-.markup-content(@md-color: #000, @md-line-height: 1.7, @md-link-color: #4183c4, @md-code-background: #f7f7f7, @md-code-fontsize: 0.85, @md-blockquote-color: #858585, @md-blockquote-border: #e5e5e5) {
+.markup-content(@md-color: #000, @md-line-height: 1.7, @md-link-color: #4183c4, @md-code-background: #f7f7f7,
+@md-code-fontsize: 0.85, @md-blockquote-color: #858585, @md-blockquote-border: #e5e5e5, @md-h6-color: #777) {
     // Rate of growth for headings
     @scale: 0.25;
 
@@ -122,6 +123,7 @@
 
     h6 {
         font-size: 1em;
+        color: @md-h6-color;
     }
 
     /* Code blocks */
