@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.6.4
+- Fix regression introduced by `2.6.3` of single HTML tags in markdown
+
 ## 2.6.3
 - Fix parsing bug with inline HTML in Markdown
 
