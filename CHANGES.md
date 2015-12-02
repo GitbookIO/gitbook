@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.6.3
+- Fix parsing bug with inline HTML in Markdown
+
 ## 2.6.2
 - Fix `gitbook.state.bookRoot`, `gitbook.state.root` now has a trailing slash
 - Update nunjucks to 2.2.0
