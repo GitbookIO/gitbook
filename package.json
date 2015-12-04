@@ -58,7 +58,8 @@
         "vinyl-source-stream": "1.1.0",
         "jquery": "2.1.4",
         "mousetrap": "1.5.3",
-        "font-awesome": "4.1.0"
+        "font-awesome": "4.1.0",
+        "gitbook-markdown-css": "1.0.1"
     },
     "scripts": {
         "test": "node_modules/.bin/mocha --reporter spec --timeout 15000"
