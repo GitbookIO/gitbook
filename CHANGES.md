@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.6.5
+- Fix support for plugins generating custom stylesheets (`styles-less` and `styles-sass`)
+- Fix glossary terms being replaced in script (ex: math)
+
 ## 2.6.4
 - Fix regression introduced by `2.6.3` of single HTML tags in markdown
 
