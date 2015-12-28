@@ -1,6 +1,6 @@
 {
     "name": "gitbook",
-    "version": "2.5.2",
+    "version": "2.6.6",
     "homepage": "https://www.gitbook.com",
     "description": "Library and cmd utility to generate GitBooks",
     "main": "lib/index.js",
@@ -11,12 +11,12 @@
         "resolve": "0.6.3",
         "fs-extra": "0.16.5",
         "fstream-ignore": "1.0.2",
-        "gitbook-parsers": "0.8.7",
+        "gitbook-parsers": "0.8.9",
         "gitbook-plugin-highlight": "1.0.3",
         "gitbook-plugin-sharing": "1.0.1",
         "gitbook-plugin-search": "1.1.0",
         "gitbook-plugin-fontsettings": "1.0.2",
-        "nunjucks": "2.1.0",
+        "nunjucks": "2.2.0",
         "nunjucks-autoescape": "1.0.0",
         "nunjucks-filter": "1.0.0",
         "i18n": "0.5.0",
@@ -58,7 +58,8 @@
         "vinyl-source-stream": "1.1.0",
         "jquery": "2.1.4",
         "mousetrap": "1.5.3",
-        "font-awesome": "4.1.0"
+        "font-awesome": "4.1.0",
+        "gitbook-markdown-css": "1.0.1"
     },
     "scripts": {
         "test": "node_modules/.bin/mocha --reporter spec --timeout 15000"

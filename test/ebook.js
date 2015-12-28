@@ -36,6 +36,11 @@ describe('eBook generator', function () {
                 });
         });
 
+        it('should correctly copy print.css', function() {
+            book.should.have.file('styles');
+            book.should.have.file('styles/print.css');
+        });
+
         it('should remove default print.css', function() {
             var PAGE = fs.readFileSync(
                 path.join(book.options.output, 'index.html'),
@@ -60,11 +65,6 @@ describe('eBook generator', function () {
                     count: 1
                 }
             });
-        });
-
-        it('should correctly copy print.css', function() {
-            book.should.have.file('styles');
-            book.should.have.file('styles/print.css');
         });
     });
 });
