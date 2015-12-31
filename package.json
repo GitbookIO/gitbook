@@ -1,8 +1,8 @@
 {
-    "name": "gitbook",
+    "name": "gitshu",
     "version": "2.6.6",
-    "homepage": "https://www.gitbook.com",
-    "description": "Library and cmd utility to generate GitBooks",
+    "homepage": "https://www.gitshu.com",
+    "description": "Fork GitBook",
     "main": "lib/index.js",
     "dependencies": {
         "q": "1.0.1",
@@ -66,20 +66,21 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/GitbookIO/gitbook.git"
+        "url": "https://github.com/GitShuCom/gitshu.git"
     },
     "bin": {
-        "gitbook": "./bin/gitbook.js"
+        "gitshu": "./bin/gitbook.js"
     },
     "keywords": [
         "git",
         "book",
-        "gitbook"
+        "gitbook",
+        "gitshu"
     ],
     "author": "FriendCode Inc. <contact@gitbook.com>",
     "license": "Apache-2.0",
     "bugs": {
-        "url": "https://github.com/GitbookIO/gitbook/issues"
+        "url": "https://github.com/GitShuCom/gitshu/issues"
     },
     "contributors": [
         {
@@ -89,6 +90,10 @@
         {
             "name": "Samy Pessé",
             "email": "samy@gitbook.com"
+        },
+        {
+            "name": "WangSai",
+            "email": "wangsai@bootcss.com"
         }
     ]
 }
