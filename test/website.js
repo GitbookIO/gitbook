@@ -23,4 +23,19 @@ describe('Website generator', function () {
             book.should.not.have.file('gitbook/ebook.css');
         });
     });
+
+    describe('Custom structure', function() {
+        var book;
+
+        before(function() {
+            return books.generate('custom-structure', 'website')
+              .then(function(_book) {
+                  book = _book;
+              });
+        });
+
+        it('should correctly output an index.html', function() {
+            book.should.have.file('index.html');
+        });
+    });
 });
