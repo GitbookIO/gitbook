@@ -61,3 +61,7 @@ Translators
     - @mjanda
 - Swedish
     - Jacob Burenstam (@buren)
+- Turkish
+    - Turan Konan (@turankonan)
+- Catalan
+    - Esaú García Sánchez-Torija (@egasato)
