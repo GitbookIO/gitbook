@@ -33,13 +33,19 @@ $ gitbook init
 You can serve a repository as a book using:
 
 ```
-$ gitbook serve
+$ gitbook serve [book] [--port 4000] [--lrport 35729] [--watch]
 ```
 
 Or simply build the static website using:
 
 ```
 $ gitbook build
+```
+
+For more information:
+
+```
+$ gitbook help
 ```
 
 ## Features
