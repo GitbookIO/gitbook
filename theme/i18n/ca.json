@@ -1,5 +1,5 @@
 {
-    "LANGS_CHOOSE": "Seleccioni un idioma",
+    "LANGS_CHOOSE": "Selecciona un idioma",
     "GLOSSARY": "Glossari",
     "GLOSSARY_INDEX": "Índex",
     "GLOSSARY_OPEN": "Glossari",
@@ -7,14 +7,14 @@
     "SUMMARY": "Taula de contingut",
     "SUMMARY_INTRODUCTION": "Introducció",
     "SUMMARY_TOGGLE": "Taula de contingut",
-    "SEARCH_TOGGLE": "Cerca",
+    "SEARCH_TOGGLE": "Cercar",
     "SEARCH_PLACEHOLDER": "Escriu per cercar",
     "FONTSETTINGS_TOGGLE": "Configuració de font",
-    "SHARE_TOGGLE": "Comparteix",
-    "SHARE_ON": "Comparteix en {{platform}}",
-    "FONTSETTINGS_WHITE": "Claro",
-    "FONTSETTINGS_SEPIA": "Sépia",
-    "FONTSETTINGS_NIGHT": "Noche",
+    "SHARE_TOGGLE": "Compartir",
+    "SHARE_ON": "Compartir en {{platform}}",
+    "FONTSETTINGS_WHITE": "Clar",
+    "FONTSETTINGS_SEPIA": "Sèpia",
+    "FONTSETTINGS_NIGHT": "Nit",
     "FONTSETTINGS_SANS": "Sans",
     "FONTSETTINGS_SERIF": "Serif"
 }
