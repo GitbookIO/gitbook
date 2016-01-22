@@ -26,3 +26,6 @@ node_modules
 
 # vim swapfile
 *.swp
+
+lib2
+test2

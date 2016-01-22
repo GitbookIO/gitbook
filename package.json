@@ -40,7 +40,9 @@
         "jsonschema": "1.0.2",
         "json-schema-defaults": "0.1.1",
         "merge-defaults": "0.2.1",
-        "github-slugid": "1.0.0"
+        "github-slugid": "1.0.0",
+        "destroy": "1.0.4",
+        "ignore": "2.2.19"
     },
     "devDependencies": {
         "eslint": "1.5.0",
