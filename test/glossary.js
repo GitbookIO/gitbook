@@ -55,22 +55,17 @@ describe('Glossary', function() {
                     should.not.exist(entry);
                 });
             });
-        });
 
-        it('should parse glossary entries', function() {
-            return mock.setupDefaultBook({
-                'GLOSSARY.md': '# Glossary\n\n### Hello World\n\nThis is an entry'
-            })
-            .then(function(book) {
-                return book.prepareConfig()
+            describe('glossary.find', function() {
+                it('should return an existing entry', function() {
+                    var entry = book.glossary.find('HeLLo World');
+                    should.exist(entry);
+                    entry.id.should.equal('hello_world');
+                });
 
-                .then(function() {
-                    return book.glossary.load();
-                })
-                .then(function() {
-
-
-
+                it('should undefined return non existing entry', function() {
+                    var entry = book.glossary.find('Hello');
+                    should.not.exist(entry);
                 });
             });
         });
