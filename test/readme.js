@@ -28,6 +28,19 @@ describe('Readme', function() {
                 });
             });
         });
+
+        it('should parse AsciiDoc readme', function() {
+            return mock.setupBook({
+                'README.adoc': '# Hello World\n\nThis is my book\n'
+            })
+            .then(function(book) {
+                return book.readme.load()
+                .then(function() {
+                    book.readme.title.should.equal('Hello World');
+                    book.readme.description.should.equal('This is my book');
+                });
+            });
+        });
     });
 
 });
