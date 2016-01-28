@@ -1,7 +1,6 @@
 var mock = require('./mock');
 
 describe('Parsing', function() {
-
     it('should fail without SUMMARY', function() {
         return mock.setupBook({
             'README.md': ''
@@ -19,6 +18,5 @@ describe('Parsing', function() {
             return book.parse().should.be.rejected;
         });
     });
-
 });
 
