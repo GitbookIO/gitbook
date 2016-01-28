@@ -35,11 +35,13 @@ function setupFS(fs, rootFolder, files) {
 // Setup a mock book for testing using a map of files
 function setupBook(files, opts) {
     opts = opts || {};
+    opts.log = function() { };
 
     return Q.nfcall(tmp.dir.bind(tmp)).get(0)
     .then(function(folder) {
         opts.fs = fs;
         opts.root = folder;
+
         return setupFS(fs, folder, files);
     })
     .then(function(fs) {

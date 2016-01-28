@@ -9,7 +9,7 @@
         "lodash": "3.10.1",
         "graceful-fs": "3.0.5",
         "resolve": "0.6.3",
-        "fs-extra": "0.16.5",
+        "mkdirp": "0.5.1",
         "fstream-ignore": "1.0.2",
         "gitbook-parsers": "0.8.9",
         "gitbook-plugin-highlight": "1.0.3",

@@ -18,5 +18,30 @@ describe('Parsing', function() {
             return book.parse().should.be.rejected;
         });
     });
+
+
+    describe('Multilingual book', function() {
+        var book;
+
+        before(function() {
+            return mock.setupBook({
+                'LANGS.md': '# Languages\n\n'
+                    + '* [English](./en)\n'
+                    + '* [French](./fr)\n\n',
+                'en/README.md': '# English',
+                'en/SUMMARY.md': '# Summary',
+                'fr/README.md': '# French',
+                'fr/SUMMARY.md': '# Summary'
+            })
+            .then(function(_book) {
+                book = _book;
+                return book.parse();
+            });
+        });
+
+        it('should list language books', function() {
+
+        });
+    });
 });
 
