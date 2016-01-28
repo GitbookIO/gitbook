@@ -61,7 +61,7 @@ describe('Glossary', function() {
                 entry.id.should.equal('hello_world');
             });
 
-            it('should undefined return non existing entry', function() {
+            it('should return undefined for non existing entry', function() {
                 var entry = book.glossary.find('Hello');
                 should.not.exist(entry);
             });

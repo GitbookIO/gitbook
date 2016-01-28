@@ -40,7 +40,8 @@ describe('Parsing', function() {
         });
 
         it('should list language books', function() {
-
+            book.isMultilingual().should.equal(true);
+            book.books.should.have.lengthOf(2);
         });
     });
 });
