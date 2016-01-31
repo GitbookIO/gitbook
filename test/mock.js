@@ -7,6 +7,7 @@ require('should');
 require('should-promised');
 
 var Book = require('../').Book;
+var Output = require('../lib/output');
 var NodeFS = require('../lib/fs/node');
 
 // Create filesystem instance for testing
@@ -57,7 +58,23 @@ function setupDefaultBook(files, opts) {
     }), opts);
 }
 
+// Output a book with a specific generator
+function outputDefaultBook(generator, files, opts) {
+    return setupDefaultBook(files, opts)
+    .then(function(book) {
+        // Parse the book
+        return book.parse()
+
+        // Start generation
+        .then(function() {
+            var output = new Output(book, generator);
+            return output.generate();
+        });
+    });
+}
+
 module.exports = {
     setupBook: setupBook,
-    setupDefaultBook: setupDefaultBook
+    setupDefaultBook: setupDefaultBook,
+    outputDefaultBook: outputDefaultBook
 };
