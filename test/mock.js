@@ -1,9 +1,10 @@
 var Q = require('q');
 var _ = require('lodash');
+var fs = require('fs');
 var tmp = require('tmp');
 var path = require('path');
 
-require('should');
+var should = require('should');
 require('should-promised');
 
 var Book = require('../').Book;
@@ -11,9 +12,9 @@ var Output = require('../lib/output');
 var NodeFS = require('../lib/fs/node');
 
 // Create filesystem instance for testing
-var fs = new NodeFS();
+var nodeFS = new NodeFS();
 
-function setupFS(fs, rootFolder, files) {
+function setupFS(_fs, rootFolder, files) {
     return _.chain(_.pairs(files))
         .sortBy(0)
         .reduce(function(prev, pair) {
@@ -24,12 +25,12 @@ function setupFS(fs, rootFolder, files) {
                 if (_.isObject(buf)) buf = JSON.stringify(buf);
                 if (_.isString(buf)) buf = new Buffer(buf, 'utf-8');
 
-                return fs.write(filename, buf);
+                return _fs.write(filename, buf);
             });
         }, Q())
         .value()
         .then(function() {
-            return fs;
+            return _fs;
         });
 }
 
@@ -40,12 +41,12 @@ function setupBook(files, opts) {
 
     return Q.nfcall(tmp.dir.bind(tmp)).get(0)
     .then(function(folder) {
-        opts.fs = fs;
+        opts.fs = nodeFS;
         opts.root = folder;
 
-        return setupFS(fs, folder, files);
+        return setupFS(nodeFS, folder, files);
     })
-    .then(function(fs) {
+    .then(function() {
         return new Book(opts);
     });
 }
@@ -68,10 +69,24 @@ function outputDefaultBook(generator, files, opts) {
         // Start generation
         .then(function() {
             var output = new Output(book, generator);
-            return output.generate();
+            return output.generate()
+                .thenResolve(output);
         });
     });
 }
+
+// Assertions to test if an Output has generated a file
+should.Assertion.add('file', function(file, description) {
+    this.params = {
+        actual: this.obj.toString(),
+        operator: 'have file ' + file,
+        message: description
+    };
+
+    this.obj.should.have.property('resolve').which.is.a.Function;
+    this.assert(fs.existsSync(this.obj.resolve(file)));
+});
+
 
 module.exports = {
     setupBook: setupBook,
