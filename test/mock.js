@@ -5,7 +5,6 @@ var tmp = require('tmp');
 var path = require('path');
 
 var should = require('should');
-require('should-promised');
 
 var Book = require('../').Book;
 var Output = require('../lib/output');
