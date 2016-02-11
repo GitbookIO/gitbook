@@ -7,8 +7,8 @@ require('./glossary');
 require('./langs');
 require('./parse');
 
-require('./template');
 require('./git');
+require('./template');
 
 // Output
 require('./output-json');
