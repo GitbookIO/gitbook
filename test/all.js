@@ -5,6 +5,7 @@ require('./readme');
 require('./summary');
 require('./glossary');
 require('./langs');
+require('./page');
 require('./parse');
 
 require('./git');

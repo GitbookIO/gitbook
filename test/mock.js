@@ -1,14 +1,13 @@
 var Q = require('q');
 var _ = require('lodash');
-var fs = require('fs');
 var tmp = require('tmp');
 var path = require('path');
-
-var should = require('should');
 
 var Book = require('../').Book;
 var Output = require('../lib/output');
 var NodeFS = require('../lib/fs/node');
+
+require('./assertions');
 
 // Create filesystem instance for testing
 var nodeFS = new NodeFS();
@@ -73,19 +72,6 @@ function outputDefaultBook(generator, files, opts) {
         });
     });
 }
-
-// Assertions to test if an Output has generated a file
-should.Assertion.add('file', function(file, description) {
-    this.params = {
-        actual: this.obj.toString(),
-        operator: 'have file ' + file,
-        message: description
-    };
-
-    this.obj.should.have.property('resolve').which.is.a.Function;
-    this.assert(fs.existsSync(this.obj.resolve(file)));
-});
-
 
 module.exports = {
     setupBook: setupBook,
