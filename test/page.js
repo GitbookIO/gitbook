@@ -13,12 +13,19 @@ describe('Page', function() {
         });
     });
 
-    it.only('should add a default ID to headings', function() {
+    it('should add a default ID to headings', function() {
         var page = book.addPage('heading.md');
 
         return page.parse()
         .then(function() {
-            console.log(page.content);
+            page.content.should.be.html({
+                'h1#hello': {
+                    count: 1
+                },
+                'h2#world': {
+                    count: 1
+                }
+            });
         });
 
     });
