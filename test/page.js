@@ -7,13 +7,34 @@ describe('Page', function() {
     before(function() {
         return mock.setupDefaultBook({
             'heading.md': '# Hello\n\n## World',
-            'links.md': '[link](hello.md) [readme](README.md)'
+            'links.md': '[link](hello.md) [readme](README.md)',
+            'folder/paths.md': ''
         })
         .then(function(_book) {
             book = _book;
             output = new Output(book);
 
             return book.parse();
+        });
+    });
+
+    describe('.resolveLocal', function() {
+        it('should correctly resolve path to file', function() {
+            var page = book.addPage('heading.md');
+
+            page.resolveLocal('test.png').should.equal('test.png');
+            page.resolveLocal('/test.png').should.equal('test.png');
+            page.resolveLocal('test/hello.png').should.equal('test/hello.png');
+            page.resolveLocal('/test/hello.png').should.equal('test/hello.png');
+        });
+
+        it('should correctly resolve path to file (2)', function() {
+            var page = book.addPage('folder/paths.md');
+
+            page.resolveLocal('test.png').should.equal('folder/test.png');
+            page.resolveLocal('/test.png').should.equal('test.png');
+            page.resolveLocal('test/hello.png').should.equal('folder/test/hello.png');
+            page.resolveLocal('/test/hello.png').should.equal('test/hello.png');
         });
     });
 
