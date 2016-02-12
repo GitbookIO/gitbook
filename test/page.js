@@ -1,7 +1,8 @@
 var mock = require('./mock');
+var Output = require('../lib/output/base');
 
 describe('Page', function() {
-    var book;
+    var book, output;
 
     before(function() {
         return mock.setupDefaultBook({
@@ -10,6 +11,8 @@ describe('Page', function() {
         })
         .then(function(_book) {
             book = _book;
+            output = new Output(book);
+
             return book.parse();
         });
     });
@@ -18,7 +21,7 @@ describe('Page', function() {
         it('should add a default ID to headings', function() {
             var page = book.addPage('heading.md');
 
-            return page.parse()
+            return page.parse(output)
             .then(function() {
                 page.content.should.be.html({
                     'h1#hello': {
@@ -37,7 +40,7 @@ describe('Page', function() {
 
         before(function() {
             page = book.addPage('links.md');
-            return page.parse();
+            return page.parse(output);
         });
 
         it('should replace links to page to .html', function() {
