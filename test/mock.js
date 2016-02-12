@@ -4,7 +4,6 @@ var tmp = require('tmp');
 var path = require('path');
 
 var Book = require('../').Book;
-var Output = require('../lib/output');
 var NodeFS = require('../lib/fs/node');
 
 require('./assertions');
@@ -58,7 +57,7 @@ function setupDefaultBook(files, opts) {
 }
 
 // Output a book with a specific generator
-function outputDefaultBook(generator, files, opts) {
+function outputDefaultBook(Output, files, opts) {
     return setupDefaultBook(files, opts)
     .then(function(book) {
         // Parse the book
@@ -66,7 +65,7 @@ function outputDefaultBook(generator, files, opts) {
 
         // Start generation
         .then(function() {
-            var output = new Output(book, generator);
+            var output = new Output(book);
             return output.generate()
                 .thenResolve(output);
         });

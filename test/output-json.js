@@ -1,4 +1,5 @@
 var mock = require('./mock');
+var JSONOutput = require('../lib/output/json');
 
 describe('JSON Output', function() {
 
@@ -6,7 +7,7 @@ describe('JSON Output', function() {
         var output;
 
         before(function() {
-            return mock.outputDefaultBook('json')
+            return mock.outputDefaultBook(JSONOutput)
             .then(function(_output) {
                 output = _output;
             });
