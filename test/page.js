@@ -38,6 +38,18 @@ describe('Page', function() {
         });
     });
 
+    describe('.relative', function() {
+        it('should correctly resolve absolute path in the book', function() {
+            var page = book.addPage('heading.md');
+            var page2 = book.addPage('folder/paths.md');
+
+            page.relative('/test.png').should.equal('test.png');
+            page.relative('test.png').should.equal('test.png');
+            page2.relative('/test.png').should.equal('../test.png');
+            page2.relative('test.png').should.equal('test.png');
+        });
+    });
+
     describe('Headings', function() {
         it('should add a default ID to headings', function() {
             var page = book.addPage('heading.md');
