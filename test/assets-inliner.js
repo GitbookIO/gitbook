@@ -14,7 +14,8 @@ describe('Assets Inliner Output', function() {
             return mock.outputDefaultBook(AssetsInliner, {
                 'README.md': '![image](test.svg)',
                 'inline.md': 'This is a svg: '+SVG,
-                'test.svg': '<?xml version="1.0" encoding="UTF-8"?>' + SVG
+                'test.svg': '<?xml version="1.0" encoding="UTF-8"?>' + SVG,
+                'SUMMARY.md': '* [inline](inline.md)\n\n'
             })
             .then(function(_output) {
                 output = _output;
@@ -35,7 +36,7 @@ describe('Assets Inliner Output', function() {
         });
 
         it('should correctly inline SVG convert to PNG', function() {
-            var page = output.book.addPage('README.md');
+            var page = output.book.getPage('inline.md');
             var $ = cheerio.load(page.content);
 
             // Is there an image?
