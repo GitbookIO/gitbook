@@ -32,7 +32,7 @@
         "crc": "3.2.1",
         "bash-color": "0.0.3",
         "urijs": "1.17.0",
-        "request": "2.51.0",
+        "request": "2.69.0",
         "npm": "2.4.1",
         "dom-serializer": "0.1.0",
         "spawn-cmd": "0.0.2",

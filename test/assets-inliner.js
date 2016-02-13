@@ -47,5 +47,9 @@ describe('Assets Inliner Output', function() {
             output.should.have.file(src);
         });
     });
+
+    describe('Remote Assets', function() {
+
+    });
 });
 
