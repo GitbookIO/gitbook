@@ -8,7 +8,9 @@ describe('Page', function() {
         return mock.setupDefaultBook({
             'heading.md': '# Hello\n\n## World',
             'links.md': '[link](hello.md) [readme](README.md)',
-            'folder/paths.md': ''
+            'folder/paths.md': '',
+            'variables/file/mtime.md': '{{ file.mtime }}',
+            'variables/file/path.md': '{{ file.path }}'
         })
         .then(function(_book) {
             book = _book;
@@ -93,4 +95,20 @@ describe('Page', function() {
         });
     });
 
+
+    describe('Templating Context', function() {
+        it('should set file.mtime', function() {
+            var page = book.addPage('variables/file/mtime.md');
+            return page.toHTML(output)
+            .then(function(content) {
+                content.should.endWith('(CET)</p>\n');
+            });
+        });
+
+        it('should set file.[path]', function() {
+            var page = book.addPage('variables/file/path.md');
+            return page.toHTML(output)
+            .should.be.fulfilledWith('<p>variables/file/path.md</p>\n');
+        });
+    });
 });
