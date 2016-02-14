@@ -54,7 +54,7 @@ describe('Page', function() {
         it('should add a default ID to headings', function() {
             var page = book.addPage('heading.md');
 
-            return page.parse(output)
+            return page.toHTML(output)
             .then(function() {
                 page.content.should.be.html({
                     'h1#hello': {
@@ -73,7 +73,7 @@ describe('Page', function() {
 
         before(function() {
             page = book.addPage('links.md');
-            return page.parse(output);
+            return page.toHTML(output);
         });
 
         it('should replace links to page to .html', function() {

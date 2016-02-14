@@ -10,6 +10,7 @@ require('./parse');
 
 require('./git');
 require('./template');
+require('./conrefs');
 
 // Output
 require('./output-json');
