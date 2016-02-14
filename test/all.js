@@ -14,3 +14,4 @@ require('./template');
 // Output
 require('./output-json');
 require('./assets-inliner');
+require('./website-theme');
