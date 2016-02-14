@@ -1,3 +1,3 @@
-# GitBook v{{ book.version }}: Technical documentation
+# GitBook v{{ book.version }}: Documentation
 
 
