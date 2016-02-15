@@ -17,7 +17,7 @@
         "gitbook-plugin-sharing": "1.0.1",
         "gitbook-plugin-search": "1.1.0",
         "gitbook-plugin-fontsettings": "1.0.2",
-        "nunjucks": "2.2.0",
+        "nunjucks": "2.3.0",
         "nunjucks-autoescape": "1.0.0",
         "nunjucks-filter": "1.0.0",
         "i18n": "0.5.0",
@@ -43,7 +43,8 @@
         "merge-defaults": "0.2.1",
         "github-slugid": "1.0.0",
         "destroy": "1.0.4",
-        "ignore": "2.2.19"
+        "ignore": "2.2.19",
+        "deprecated": "0.0.1"
     },
     "devDependencies": {
         "eslint": "1.5.0",

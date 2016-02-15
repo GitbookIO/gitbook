@@ -8,7 +8,13 @@ describe('Page', function() {
         return mock.setupDefaultBook({
             'heading.md': '# Hello\n\n## World',
             'links.md': '[link](hello.md) [readme](README.md)',
+
+            'codes/simple.md': '```hello world```',
+            'codes/lang.md': '```js\nhello world\n```',
+            'codes/lang.adoc': '```js\nhello world\n```',
+
             'folder/paths.md': '',
+
             'variables/file/mtime.md': '{{ file.mtime }}',
             'variables/file/path.md': '{{ file.path }}',
             'variables/page/title.md': '{{ page.title }}',
@@ -83,6 +89,34 @@ describe('Page', function() {
                     }
                 });
             });
+        });
+    });
+
+    describe('Code Blocks', function() {
+        var page;
+
+        before(function() {
+            output.template.addBlock('code', function(blk) {
+                return (blk.kwargs.language || '') + blk.body + 'test';
+            });
+        });
+
+        it('should apply "code" block', function() {
+            page = book.addPage('codes/simple.md');
+            return page.toHTML(output)
+                .should.be.fulfilledWith('<p><code>hello worldtest</code></p>\n');
+        });
+
+        it('should add language as kwargs', function() {
+            page = book.addPage('codes/lang.md');
+            return page.toHTML(output)
+                .should.be.fulfilledWith('<pre><code class="lang-js">jshello world\ntest</code></pre>\n');
+        });
+
+        it('should add language as kwargs (asciidoc)', function() {
+            page = book.addPage('codes/lang.adoc');
+            return page.toHTML(output)
+                .should.be.fulfilledWith('<div class="listingblock">\n<div class="content">\n<pre class="highlight"><code class="language-js" data-lang="js">jshello worldtest</code></pre>\n</div>\n</div>');
         });
     });
 
