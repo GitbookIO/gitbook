@@ -10,8 +10,14 @@ describe('Page', function() {
             'links.md': '[link](hello.md) [readme](README.md)',
             'folder/paths.md': '',
             'variables/file/mtime.md': '{{ file.mtime }}',
-            'variables/file/path.md': '{{ file.path }}'
-        })
+            'variables/file/path.md': '{{ file.path }}',
+            'variables/page/title.md': '{{ page.title }}'
+        }, [
+            {
+                title: 'Test Variables',
+                path: 'variables/page/title.md'
+            }
+        ])
         .then(function(_book) {
             book = _book;
             output = new Output(book);
@@ -95,7 +101,6 @@ describe('Page', function() {
         });
     });
 
-
     describe('Templating Context', function() {
         it('should set file.mtime', function() {
             var page = book.addPage('variables/file/mtime.md');
@@ -105,10 +110,16 @@ describe('Page', function() {
             });
         });
 
-        it('should set file.[path]', function() {
+        it('should set file.path', function() {
             var page = book.addPage('variables/file/path.md');
             return page.toHTML(output)
             .should.be.fulfilledWith('<p>variables/file/path.md</p>\n');
+        });
+
+        it('should set page.title when page is in summary', function() {
+            var page = book.getPage('variables/page/title.md');
+            return page.toHTML(output)
+            .should.be.fulfilledWith('<p>Test Variables</p>\n');
         });
     });
 });

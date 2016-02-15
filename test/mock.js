@@ -49,15 +49,21 @@ function setupBook(files, opts) {
 }
 
 // Setup a book with default README/SUMMARY
-function setupDefaultBook(files, opts) {
+function setupDefaultBook(files, summary, opts) {
+    var summaryContent = '# Summary \n\n' +
+        _.map(summary, function(article) {
+            return '* [' + article.title +'](' + article.path + ')';
+        })
+        .join('\n');
+
     return setupBook(_.defaults(files || {}, {
         'README.md': 'Hello',
-        'SUMMARY.md': '# Summary'
+        'SUMMARY.md': summaryContent
     }), opts);
 }
 
 // Output a book with a specific generator
-function outputDefaultBook(Output, files, opts) {
+function outputDefaultBook(Output, files, summary, opts) {
     return setupDefaultBook(files, opts)
     .then(function(book) {
         // Parse the book
