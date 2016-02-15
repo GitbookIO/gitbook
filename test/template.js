@@ -34,6 +34,15 @@ describe('Template', function() {
                 .should.be.fulfilledWith('Hello World!');
         });
 
+        it('should correctly add a block with args', function() {
+            output.template.addBlock('sayhello_args', function(blk) {
+                return 'Hello ' + blk.args[0] + '!';
+            });
+
+            return output.template.renderString('{% sayhello_args "World" %}{% endsayhello_args %}')
+                .should.be.fulfilledWith('Hello World!');
+        });
+
         it('should correctly add a block with kwargs', function() {
             output.template.addBlock('sayhello_kwargs', function(blk) {
                 return 'Hello ' + blk.kwargs.name + '!';
