@@ -11,11 +11,21 @@ describe('Page', function() {
             'folder/paths.md': '',
             'variables/file/mtime.md': '{{ file.mtime }}',
             'variables/file/path.md': '{{ file.path }}',
-            'variables/page/title.md': '{{ page.title }}'
+            'variables/page/title.md': '{{ page.title }}',
+            'variables/page/previous.md': '{{ page.previous.title }} {{ page.previous.path }}',
+            'variables/page/next.md': '{{ page.next.title }} {{ page.next.path }}'
         }, [
+            {
+                title: 'Test page.next',
+                path: 'variables/page/next.md'
+            },
             {
                 title: 'Test Variables',
                 path: 'variables/page/title.md'
+            },
+            {
+                title: 'Test page.previous',
+                path: 'variables/page/previous.md'
             }
         ])
         .then(function(_book) {
@@ -120,6 +130,18 @@ describe('Page', function() {
             var page = book.getPage('variables/page/title.md');
             return page.toHTML(output)
             .should.be.fulfilledWith('<p>Test Variables</p>\n');
+        });
+
+        it('should set page.previous when possible', function() {
+            var page = book.getPage('variables/page/previous.md');
+            return page.toHTML(output)
+            .should.be.fulfilledWith('<p>Test Variables variables/page/title.md</p>\n');
+        });
+
+        it('should set page.next when possible', function() {
+            var page = book.getPage('variables/page/next.md');
+            return page.toHTML(output)
+            .should.be.fulfilledWith('<p>Test Variables variables/page/title.md</p>\n');
         });
     });
 });
