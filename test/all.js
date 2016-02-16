@@ -10,6 +10,7 @@ require('./parse');
 require('./git');
 require('./template');
 require('./conrefs');
+require('./plugins');
 
 // Page and HTML generation
 require('./page');
