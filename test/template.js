@@ -1,5 +1,4 @@
 var mock = require('./mock');
-var pkg = require('../package.json');
 var Output = require('../lib/output/base');
 
 describe('Template', function() {
@@ -19,8 +18,8 @@ describe('Template', function() {
         });
 
         it('should render with variable', function() {
-            return output.template.renderString('Version is {{ gitbook.version }}')
-                .should.be.fulfilledWith('Version is '+pkg.version);
+            return output.template.renderString('Hello {{ world }}', { world: 'World'})
+                .should.be.fulfilledWith('Hello World');
         });
     });
 
