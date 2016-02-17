@@ -10,6 +10,7 @@ The following is a reference of the available data during book's parsing and the
 | `gitbook` | GitBook specific information |
 | `page` | Current page specific information |
 | `file` | File associated with the current page specific information |
+| `summary` | Information about the table of contents |
 
 ### Book Variables
 
@@ -41,6 +42,13 @@ The following is a reference of the available data during book's parsing and the
 | `page.previous` | Previous page in the Table of Contents (can be `null`) |
 | `page.next` | Next page in the Table of Contents (can be `null`) |
 
+#### Table of Contents Variables
 
+| Variable | Description |
+| -------- | ----------- |
+| `summary.parts` | List of sections in the Table of Contents |
 
+Thw whole table of contents (`SUMMARY.md`) can be accessed:
+
+`summary.parts[0].articles[0].title` will return the title of the first article.
 
