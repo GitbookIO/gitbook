@@ -1,4 +1,7 @@
 
+// Utilities
+require('./location');
+
 // Parsing
 require('./config');
 require('./readme');
