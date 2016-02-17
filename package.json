@@ -44,7 +44,8 @@
         "github-slugid": "1.0.0",
         "destroy": "1.0.4",
         "ignore": "2.2.19",
-        "deprecated": "0.0.1"
+        "deprecated": "0.0.1",
+        "rmdir": "1.2.0"
     },
     "devDependencies": {
         "eslint": "1.5.0",
