@@ -11,13 +11,12 @@ The following is a reference of the available data during book's parsing and the
 | `page` | Current page specific information |
 | `file` | File associated with the current page specific information |
 | `summary` | Information about the table of contents |
+| `config` | Dump of the `book.json` |
 
 ### Book Variables
 
 | Variable | Description |
 | -------- | ----------- |
-| `book.title` | Title specified in the `book.json` (or detected from the README) |
-| `book.description` | Description specified in the `book.json` (or detected from the README) |
 | `book.[CONFIGURATION_DATA]` | All the `variables` set via the `book.json` are available through the book variable. |
 
 ### GitBook Variables
@@ -33,6 +32,7 @@ The following is a reference of the available data during book's parsing and the
 | -------- | ----------- |
 | `file.path` | The path to the raw page |
 | `file.mtime` | Modified Time, Time when file data last modified |
+| `file.type` | The name of the parser used to compile this file (ex: `markdown`, `asciidoc`, etc) |
 
 #### Page Variables
 
