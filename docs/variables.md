@@ -15,12 +15,15 @@ The following is a reference of the available data during book's parsing and the
 
 | Variable | Description |
 | -------- | ----------- |
+| `book.title` | Title specified in the `book.json` (or detected from the README) |
+| `book.description` | Description specified in the `book.json` (or detected from the README) |
 | `book.[CONFIGURATION_DATA]` | All the `variables` set via the `book.json` are available through the book variable. |
 
 ### GitBook Variables
 
 | Variable | Description |
 | -------- | ----------- |
+| `gitbook.time` | The current time (when you run the `gitbook` command). |
 | `gitbook.version` | Version of GitBook used to generate the book |
 
 ### File Variables
