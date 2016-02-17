@@ -19,6 +19,17 @@ describe('Parsing', function() {
         });
     });
 
+    it('should add GLOSSARY as a page', function() {
+        return mock.setupDefaultBook({
+            'GLOSSARY.md': ''
+        })
+        .then(function(book) {
+            return book.parse()
+            .then(function() {
+                book.hasPage('GLOSSARY.md').should.equal(true);
+            });
+        });
+    });
 
     describe('Multilingual book', function() {
         var book;
