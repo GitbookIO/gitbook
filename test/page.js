@@ -7,7 +7,7 @@ describe('Page', function() {
     before(function() {
         return mock.setupDefaultBook({
             'heading.md': '# Hello\n\n## World',
-            'links.md': '[link](hello.md) [readme](README.md)',
+            'links.md': '[link](hello.md) [link 2](variables/page/next.md) [readme](README.md)',
 
             'codes/simple.md': '```hello world```',
             'codes/lang.md': '```js\nhello world\n```',
@@ -130,7 +130,15 @@ describe('Page', function() {
 
         it('should replace links to page to .html', function() {
             page.content.should.be.html({
-                'a[href="index.html"]': {
+                'a[href="./"]': {
+                    count: 1
+                }
+            });
+        });
+
+        it('should use directory urls when file is a README', function() {
+            page.content.should.be.html({
+                'a[href="./"]': {
                     count: 1
                 }
             });
