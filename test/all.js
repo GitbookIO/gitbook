@@ -16,6 +16,6 @@ require('./conrefs');
 require('./page');
 
 // Output
-require('./output-json');
 require('./assets-inliner');
-require('./website-theme');
+require('./output-json');
+require('./output-website');
