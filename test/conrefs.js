@@ -1,5 +1,5 @@
 var mock = require('./mock');
-var ConrefsLoader = require('../lib/output/conrefs');
+var ConrefsLoader = require('../lib/output/conrefs')();
 
 
 describe('Conrefs Loader', function() {

@@ -2,7 +2,7 @@ var cheerio = require('cheerio');
 var path = require('path');
 
 var mock = require('./mock');
-var AssetsInliner = require('../lib/output/assets-inliner');
+var AssetsInliner = require('../lib/output/assets-inliner')();
 
 describe('Assets Inliner Output', function() {
     var output;
