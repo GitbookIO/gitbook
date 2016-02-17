@@ -9,6 +9,10 @@ describe('Page', function() {
             'heading.md': '# Hello\n\n## World',
             'links.md': '[link](hello.md) [link 2](variables/page/next.md) [readme](README.md)',
 
+            'annotations/simple.md': 'A magicien say abracadabra!',
+            'annotations/code.md': 'A magicien say `abracadabra`!',
+            'annotations/class.md': 'A magicien say <div class="no-glossary"><b>abracadabra</b>, right?</div>!',
+
             'codes/simple.md': '```hello world```',
             'codes/lang.md': '```js\nhello world\n```',
             'codes/lang.adoc': '```js\nhello world\n```',
@@ -19,7 +23,9 @@ describe('Page', function() {
             'variables/file/path.md': '{{ file.path }}',
             'variables/page/title.md': '{{ page.title }}',
             'variables/page/previous.md': '{{ page.previous.title }} {{ page.previous.path }}',
-            'variables/page/next.md': '{{ page.next.title }} {{ page.next.path }}'
+            'variables/page/next.md': '{{ page.next.title }} {{ page.next.path }}',
+
+            'GLOSSARY.md': '# Glossary\n\n\n## abracadabra\n\nthis is the description'
         }, [
             {
                 title: 'Test page.next',
@@ -184,6 +190,40 @@ describe('Page', function() {
             var page = book.getPage('variables/page/next.md');
             return page.toHTML(output)
             .should.be.fulfilledWith('<p>Test Variables variables/page/title.md</p>\n');
+        });
+    });
+
+    describe('Annotations / Glossary', function() {
+        it('should replace glossary terms', function() {
+            return book.addPage('annotations/simple.md').toHTML(output)
+            .should.finally.be.html({
+                '.glossary-term': {
+                    count: 1,
+                    text: 'abracadabra',
+                    attributes: {
+                        title: 'this is the description',
+                        href: '../GLOSSARY.html#abracadabra'
+                    }
+                }
+            });
+        });
+
+        it('should not replace terms in code blocks', function() {
+            return book.addPage('annotations/code.md').toHTML(output)
+            .should.finally.be.html({
+                '.glossary-term': {
+                    count: 0
+                }
+            });
+        });
+
+        it('should not replace terms in ".no-glossary"', function() {
+            return book.addPage('annotations/class.md').toHTML(output)
+            .should.finally.be.html({
+                '.glossary-term': {
+                    count: 0
+                }
+            });
         });
     });
 });
