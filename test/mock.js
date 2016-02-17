@@ -78,8 +78,14 @@ function outputDefaultBook(Output, files, summary, opts) {
     });
 }
 
+// Log an error
+function logError(err) {
+    console.log(err.stack || err);
+}
+
 module.exports = {
     setupBook: setupBook,
     setupDefaultBook: setupDefaultBook,
-    outputDefaultBook: outputDefaultBook
+    outputDefaultBook: outputDefaultBook,
+    logError: logError
 };
