@@ -5,6 +5,7 @@ var path = require('path');
 
 var Book = require('../').Book;
 var NodeFS = require('../lib/fs/node');
+var fs = require('../lib/utils/fs');
 
 require('./assertions');
 
@@ -22,7 +23,10 @@ function setupFS(_fs, rootFolder, files) {
                 if (_.isObject(buf)) buf = JSON.stringify(buf);
                 if (_.isString(buf)) buf = new Buffer(buf, 'utf-8');
 
-                return _fs.write(filename, buf);
+                return fs.mkdirp(path.dirname(filename))
+                .then(function() {
+                    return fs.writeFile(filename, buf);
+                });
             });
         }, Q())
         .value()
