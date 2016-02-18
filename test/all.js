@@ -1,6 +1,7 @@
 
 // Utilities
 require('./location');
+require('./paths');
 
 // Parsing
 require('./config');
