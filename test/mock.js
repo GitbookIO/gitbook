@@ -68,7 +68,7 @@ function setupDefaultBook(files, summary, opts) {
 
 // Output a book with a specific generator
 function outputDefaultBook(Output, files, summary, opts) {
-    return setupDefaultBook(files, opts)
+    return setupDefaultBook(files, summary, opts)
     .then(function(book) {
         // Parse the book
         return book.parse()

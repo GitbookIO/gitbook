@@ -6,7 +6,7 @@ var should = require('should');
 // Assertions to test if an Output has generated a file
 should.Assertion.add('file', function(file, description) {
     this.params = {
-        actual: this.obj.toString(),
+        actual: this.obj.root(),
         operator: 'have file ' + file,
         message: description
     };
