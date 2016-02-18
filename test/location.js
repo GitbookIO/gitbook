@@ -16,7 +16,21 @@ describe('Location', function() {
         location.isAnchor('test.md#test').should.be.exactly(false);
     });
 
-    describe('toAbsolute', function() {
+    describe('.relative', function() {
+        it('should resolve to a relative path (same folder)', function() {
+            location.relative('links/', 'links/test.md').should.equal('test.md');
+        });
+
+        it('should resolve to a relative path (parent folder)', function() {
+            location.relative('links/', 'test.md').should.equal('../test.md');
+        });
+
+        it('should resolve to a relative path (child folder)', function() {
+            location.relative('links/', 'links/hello/test.md').should.equal('hello/test.md');
+        });
+    });
+
+    describe('.toAbsolute', function() {
         it('should correctly transform as absolute', function() {
             location.toAbsolute('http://google.fr').should.be.equal('http://google.fr');
             location.toAbsolute('test.md', './', './').should.be.equal('test.md');

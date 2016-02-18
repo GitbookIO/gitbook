@@ -7,7 +7,9 @@ describe('Page', function() {
     before(function() {
         return mock.setupDefaultBook({
             'heading.md': '# Hello\n\n## World',
+
             'links.md': '[link](hello.md) [link 2](variables/page/next.md) [readme](README.md)',
+            'links/relative.md': '[link](../hello.md) [link 2](/variables/page/next.md) [readme](../README.md)',
 
             'annotations/simple.md': 'A magicien say abracadabra!',
             'annotations/code.md': 'A magicien say `abracadabra`!',
@@ -71,12 +73,12 @@ describe('Page', function() {
     describe('.relative', function() {
         it('should correctly resolve absolute path in the book', function() {
             var page = book.addPage('heading.md');
-            var page2 = book.addPage('folder/paths.md');
-
             page.relative('/test.png').should.equal('test.png');
             page.relative('test.png').should.equal('test.png');
+
+            var page2 = book.addPage('folder/paths.md');
             page2.relative('/test.png').should.equal('../test.png');
-            page2.relative('test.png').should.equal('test.png');
+            page2.relative('test.png').should.equal('../test.png');
         });
     });
 
@@ -126,35 +128,91 @@ describe('Page', function() {
         });
     });
 
-    describe('Links', function() {
+    describe('.resolve', function() {
         var page;
 
         before(function() {
-            page = book.addPage('links.md');
-            return page.toHTML(output);
+            page = book.addPage('links/relative.md');
         });
 
-        it('should replace links to page to .html', function() {
-            page.content.should.be.html({
-                'a[href="./"]': {
-                    count: 1
-                }
+        it('should resolve to a relative path (same folder)', function() {
+            page.relative('links/test.md').should.equal('test.md');
+        });
+
+        it('should resolve to a relative path (parent folder)', function() {
+            page.relative('test.md').should.equal('../test.md');
+            page.relative('hello/test.md').should.equal('../hello/test.md');
+        });
+
+        it('should resolve to a relative path (child folder)', function() {
+            page.relative('links/hello/test.md').should.equal('hello/test.md');
+        });
+    });
+
+    describe('Links', function() {
+        describe('From base directory', function() {
+            var page;
+
+            before(function() {
+                page = book.addPage('links.md');
+                return page.toHTML(output);
+            });
+
+            it('should replace links to page to .html', function() {
+                page.content.should.be.html({
+                    'a[href="variables/page/next.html"]': {
+                        count: 1
+                    }
+                });
+            });
+
+            it('should use directory urls when file is a README', function() {
+                page.content.should.be.html({
+                    'a[href="./"]': {
+                        count: 1
+                    }
+                });
+            });
+
+            it('should not replace links to file not in SUMMARY', function() {
+                page.content.should.be.html({
+                    'a[href="hello.md"]': {
+                        count: 1
+                    }
+                });
             });
         });
 
-        it('should use directory urls when file is a README', function() {
-            page.content.should.be.html({
-                'a[href="./"]': {
-                    count: 1
-                }
-            });
-        });
+        describe('From sub-directory', function() {
+            var page;
 
-        it('should not replace links to file not in SUMMARY', function() {
-            page.content.should.be.html({
-                'a[href="hello.md"]': {
-                    count: 1
-                }
+            before(function() {
+                page = book.addPage('links/relative.md');
+                return page.toHTML(output);
+            });
+
+            it('should replace links to page to .html', function() {
+                page.content.should.be.html({
+                    'a[href="../variables/page/next.html"]': {
+                        count: 1
+                    }
+                });
+            });
+
+            it('should use directory urls when file is a README', function() {
+                page.content.should.be.html({
+                    'a[href="../"]': {
+                        count: 1
+                    }
+                });
+            });
+
+            it('should not replace links to file not in SUMMARY', function() {
+                page.content.should.be.html({
+                    'a[href="../hello.md"]': {
+                        count: 1
+                    }
+                });
             });
         });
     });
