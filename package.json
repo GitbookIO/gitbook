@@ -11,7 +11,6 @@
         "resolve": "0.6.3",
         "mkdirp": "0.5.1",
         "error": "7.0.2",
-        "fstream-ignore": "1.0.2",
         "gitbook-parsers": "0.8.9",
         "gitbook-plugin-highlight": "1.0.3",
         "gitbook-plugin-sharing": "1.0.1",
@@ -45,7 +44,9 @@
         "destroy": "1.0.4",
         "ignore": "2.2.19",
         "deprecated": "0.0.1",
-        "rmdir": "1.2.0"
+        "rmdir": "1.2.0",
+        "cp": "0.2.0",
+        "cpr": "1.0.0"
     },
     "devDependencies": {
         "eslint": "1.5.0",
