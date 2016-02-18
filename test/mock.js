@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 var Q = require('q');
 var _ = require('lodash');
 var tmp = require('tmp');

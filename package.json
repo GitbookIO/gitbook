@@ -52,19 +52,11 @@
     "devDependencies": {
         "eslint": "1.5.0",
         "mocha": "2.4.5",
-        "should": "8.2.2",
-        "gulp": "^3.8.11",
-        "gulp-rename": "^1.2.2",
-        "gulp-uglify": "1.1.0",
-        "gulp-less": "3.0.2",
-        "gulp-minify-css": "1.0.0",
-        "gulp-util": "3.0.6",
-        "browserify": "11.0.1",
-        "merge-stream": "0.1.7",
-        "vinyl-source-stream": "1.1.0"
+        "should": "8.2.2"
     },
     "scripts": {
-        "test": "node_modules/.bin/mocha --reporter spec --bail --timeout 15000 ./test/all.js"
+        "test": "node_modules/.bin/mocha --reporter spec --bail --timeout 15000 ./test/all.js",
+        "lint": "eslint ."
     },
     "repository": {
         "type": "git",
