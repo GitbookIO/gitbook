@@ -20,7 +20,6 @@
         "nunjucks": "2.3.0",
         "nunjucks-autoescape": "1.0.0",
         "nunjucks-filter": "1.0.0",
-        "i18n": "0.5.0",
         "semver": "5.0.1",
         "npmi": "0.1.1",
         "cheerio": "0.19.0",
@@ -47,7 +46,8 @@
         "deprecated": "0.0.1",
         "rmdir": "1.2.0",
         "cp": "0.2.0",
-        "cpr": "1.0.0"
+        "cpr": "1.0.0",
+        "direction": "0.1.5"
     },
     "devDependencies": {
         "eslint": "1.5.0",

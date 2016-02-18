@@ -29,6 +29,8 @@ describe('Page', function() {
             'variables/page/title.md': '{{ page.title }}',
             'variables/page/previous.md': '{{ page.previous.title }} {{ page.previous.path }}',
             'variables/page/next.md': '{{ page.next.title }} {{ page.next.path }}',
+            'variables/page/dir/ltr.md': 'This is english: {{ page.dir }}',
+            'variables/page/dir/rtl.md': 'بسيطة {{ page.dir }}',
 
             'GLOSSARY.md': '# Glossary\n\n\n## abracadabra\n\nthis is the description'
         }, [
@@ -311,6 +313,20 @@ describe('Page', function() {
             var page = book.getPage('variables/page/next.md');
             return page.toHTML(output)
             .should.be.fulfilledWith('<p>Test Variables variables/page/title.md</p>\n');
+        });
+
+        describe('page.dir', function() {
+            it('should detect ltr', function() {
+                var page = book.addPage('variables/page/dir/ltr.md');
+                return page.toHTML(output)
+                .should.be.fulfilledWith('<p>This is english: ltr</p>\n');
+            });
+
+            it('should detect rtl', function() {
+                var page = book.addPage('variables/page/dir/rtl.md');
+                return page.toHTML(output)
+                .should.be.fulfilledWith('<p>&#x628;&#x633;&#x64A;&#x637;&#x629; rtl</p>\n');
+            });
         });
     });
 

@@ -41,6 +41,7 @@ The following is a reference of the available data during book's parsing and the
 | `page.title` | Title of the page |
 | `page.previous` | Previous page in the Table of Contents (can be `null`) |
 | `page.next` | Next page in the Table of Contents (can be `null`) |
+| `page.dir` | Text direction, based on configuration or detected from content (`rtl` or `ltr`) |
 
 #### Table of Contents Variables
 
