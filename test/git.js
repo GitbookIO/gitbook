@@ -10,14 +10,14 @@ describe('Git', function() {
 
         it('should correctly validate git urls', function() {
             // HTTPS
-            Git.isUrl('git+https://github.com/Hello/world.git').should.be.ok;
+            Git.isUrl('git+https://github.com/Hello/world.git').should.be.ok();
 
             // SSH
             Git.isUrl('git+git@github.com:GitbookIO/gitbook.git/directory/README.md#e1594cde2c32e4ff48f6c4eff3d3d461743d74e1').should.be.ok;
 
             // Non valid
-            Git.isUrl('https://github.com/Hello/world.git').should.not.be.ok;
-            Git.isUrl('README.md').should.not.be.ok;
+            Git.isUrl('https://github.com/Hello/world.git').should.not.be.ok();
+            Git.isUrl('README.md').should.not.be.ok();
         });
 
         it('should parse HTTPS urls', function() {
