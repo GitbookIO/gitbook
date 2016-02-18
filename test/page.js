@@ -11,6 +11,9 @@ describe('Page', function() {
             'links.md': '[link](hello.md) [link 2](variables/page/next.md) [readme](README.md)',
             'links/relative.md': '[link](../hello.md) [link 2](/variables/page/next.md) [readme](../README.md)',
 
+            'images.md': '![this is an image](test.png) ![this is an absolute image](/test2.png) ![this is a remote image](https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png)',
+            'images/relative.md': '![this is an image](test.png) ![this is an absolute image](/test2.png)',
+
             'annotations/simple.md': 'A magicien say abracadabra!',
             'annotations/code.md': 'A magicien say `abracadabra`!',
             'annotations/class.md': 'A magicien say <div class="no-glossary"><b>abracadabra</b>, right?</div>!',
@@ -82,6 +85,27 @@ describe('Page', function() {
         });
     });
 
+    describe('.resolve', function() {
+        var page;
+
+        before(function() {
+            page = book.addPage('links/relative.md');
+        });
+
+        it('should resolve to a relative path (same folder)', function() {
+            page.relative('links/test.md').should.equal('test.md');
+        });
+
+        it('should resolve to a relative path (parent folder)', function() {
+            page.relative('test.md').should.equal('../test.md');
+            page.relative('hello/test.md').should.equal('../hello/test.md');
+        });
+
+        it('should resolve to a relative path (child folder)', function() {
+            page.relative('links/hello/test.md').should.equal('hello/test.md');
+        });
+    });
+
     describe('Headings', function() {
         it('should add a default ID to headings', function() {
             var page = book.addPage('heading.md');
@@ -125,27 +149,6 @@ describe('Page', function() {
             page = book.addPage('codes/lang.adoc');
             return page.toHTML(output)
                 .should.be.fulfilledWith('<div class="listingblock">\n<div class="content">\n<pre class="highlight"><code class="language-js" data-lang="js">jshello worldtest</code></pre>\n</div>\n</div>');
-        });
-    });
-
-    describe('.resolve', function() {
-        var page;
-
-        before(function() {
-            page = book.addPage('links/relative.md');
-        });
-
-        it('should resolve to a relative path (same folder)', function() {
-            page.relative('links/test.md').should.equal('test.md');
-        });
-
-        it('should resolve to a relative path (parent folder)', function() {
-            page.relative('test.md').should.equal('../test.md');
-            page.relative('hello/test.md').should.equal('../hello/test.md');
-        });
-
-        it('should resolve to a relative path (child folder)', function() {
-            page.relative('links/hello/test.md').should.equal('hello/test.md');
         });
     });
 
@@ -210,6 +213,66 @@ describe('Page', function() {
             it('should not replace links to file not in SUMMARY', function() {
                 page.content.should.be.html({
                     'a[href="../hello.md"]': {
+                        count: 1
+                    }
+                });
+            });
+        });
+    });
+
+    describe('Images', function() {
+        describe('From base directory', function() {
+            var page;
+
+            before(function() {
+                page = book.addPage('images.md');
+                return page.toHTML(output);
+            });
+
+            it('should resolve relative images', function() {
+                page.content.should.be.html({
+                    'img[src="test.png"]': {
+                        count: 1
+                    }
+                });
+            });
+
+            it('should resolve absolute images', function() {
+                page.content.should.be.html({
+                    'img[src="test2.png"]': {
+                        count: 1
+                    }
+                });
+            });
+
+            it('should keep external images path', function() {
+                page.content.should.be.html({
+                    'img[src="https:/upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png"]': {
+                        count: 1
+                    }
+                });
+            });
+        });
+
+        describe('From sub-directory', function() {
+            var page;
+
+            before(function() {
+                page = book.addPage('images/relative.md');
+                return page.toHTML(output);
+            });
+
+            it('should resolve relative images', function() {
+                page.content.should.be.html({
+                    'img[src="test.png"]': {
+                        count: 1
+                    }
+                });
+            });
+
+            it('should resolve absolute images', function() {
+                page.content.should.be.html({
+                    'img[src="../test2.png"]': {
                         count: 1
                     }
                 });
