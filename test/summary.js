@@ -2,16 +2,30 @@ var should = require('should');
 
 var mock = require('./mock');
 
+function mockSummary(files, summary) {
+    return mock.setupDefaultBook(files, summary)
+    .then(function(book) {
+        return book.readme.load()
+        .then(function() {
+            return book.summary.load();
+        })
+        .thenResolve(book);
+    });
+}
+
 describe('Summary / Table of contents', function() {
     describe('Empty summary list', function() {
         var book;
 
         before(function() {
-            return mock.setupDefaultBook({})
+            return mockSummary({})
             .then(function(_book) {
                 book = _book;
-                return book.summary.load();
             });
+        });
+
+        it('should add README as first entry', function() {
+            should(book.summary.getArticle('README.md')).be.ok();
         });
 
         it('should correctly count articles', function() {
@@ -23,14 +37,13 @@ describe('Summary / Table of contents', function() {
         var book;
 
         before(function() {
-            return mock.setupDefaultBook({
+            return mockSummary({
                 'SUMMARY.md': '# Summary\n\n'
                     + '* [Hello](./hello.md)\n'
                     + '* [World](./world.md)\n\n'
             })
             .then(function(_book) {
                 book = _book;
-                return book.summary.load();
             });
         });
 
@@ -39,11 +52,40 @@ describe('Summary / Table of contents', function() {
         });
     });
 
+    describe('Levels', function() {
+        var book;
+
+        before(function() {
+            return mockSummary({
+                'SUMMARY.md': '# Summary\n\n'
+                    + '* [Hello](./hello.md)\n'
+                    + '    * [Hello 2](./hello2.md)\n'
+                    + '* [World](./world.md)\n\n'
+                    + '## Part 2\n\n'
+                    + '* [Hello 3](./hello.md)\n'
+                    + '    * [Hello 4](./hello2.md)\n'
+            })
+            .then(function(_book) {
+                book = _book;
+            });
+        });
+
+        it('should correctly index levels', function() {
+            book.summary.getArticleByLevel('0').title.should.equal('Introduction');
+            book.summary.getArticleByLevel('1.1').title.should.equal('Hello');
+            book.summary.getArticleByLevel('1.1.1').title.should.equal('Hello 2');
+            book.summary.getArticleByLevel('1.2').title.should.equal('World');
+
+            book.summary.getArticleByLevel('2.1').title.should.equal('Hello 3');
+            book.summary.getArticleByLevel('2.1.1').title.should.equal('Hello 4');
+        });
+    });
+
     describe('External', function() {
         var book;
 
         before(function() {
-            return mock.setupDefaultBook({}, [
+            return mockSummary({}, [
                 {
                     title: 'Google',
                     path: 'https://www.google.fr'
@@ -51,7 +93,6 @@ describe('Summary / Table of contents', function() {
             ])
             .then(function(_book) {
                 book = _book;
-                return book.summary.load();
             });
         });
 
@@ -66,7 +107,7 @@ describe('Summary / Table of contents', function() {
             should(article.path).not.be.ok();
 
             article.title.should.equal('Google');
-            article.ref.should.equal('https:/www.google.fr');
+            article.ref.should.equal('https://www.google.fr');
             article.isExternal().should.be.ok;
         });
     });
@@ -75,7 +116,7 @@ describe('Summary / Table of contents', function() {
         var book;
 
         before(function() {
-            return mock.setupDefaultBook({
+            return mockSummary({
                 'SUMMARY.md': '# Summary\n\n' +
                     '* [Hello](hello.md)\n' +
                     '* [Hello 2](hello2.md)\n' +
@@ -86,7 +127,6 @@ describe('Summary / Table of contents', function() {
             })
             .then(function(_book) {
                 book = _book;
-                return book.summary.load();
             });
         });
 
