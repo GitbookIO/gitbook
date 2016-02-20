@@ -48,7 +48,8 @@
         "rmdir": "1.2.0",
         "cp": "0.2.0",
         "cpr": "1.0.0",
-        "direction": "0.1.5"
+        "direction": "0.1.5",
+        "moment": "2.11.2"
     },
     "devDependencies": {
         "eslint": "1.5.0",
