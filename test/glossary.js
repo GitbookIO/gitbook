@@ -23,7 +23,7 @@ describe('Glossary', function() {
 
         before(function() {
             return mock.setupDefaultBook({
-                'GLOSSARY.md': '# Glossary\n\n### Hello World\n\nThis is an entry'
+                'GLOSSARY.md': '# Glossary\n\n## Hello World\n\nThis is an entry'
             })
             .then(function(_book) {
                 book = _book;
