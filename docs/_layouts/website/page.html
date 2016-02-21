@@ -1,0 +1,14 @@
+{% extends template.theme %}
+
+{% block page %}
+{{ super() }}
+<hr>
+<div class="btn-group btn-group-justified">
+    {% if page.previous and page.previous.path %}
+    <a class="btn" href="{{ page.previous.path|resolveFile }}"><b>Previous:</b> {{ page.previous.title }}</a>
+    {% endif %}
+    {% if page.next and page.next.path %}
+    <a class="btn" href="{{ page.next.path|resolveFile }}"><b>Next:</b> {{ page.next.title }}</a>
+    {% endif %}
+</div>
+{% endblock %}
