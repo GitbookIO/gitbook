@@ -1,4 +1,4 @@
-# GitBook v{{ book.version }}: Documentation
+# GitBook Documentation: v{{ book.version }}
 
 ### FAQ
 

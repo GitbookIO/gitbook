@@ -27,6 +27,9 @@ node_modules
 # vim swapfile
 *.swp
 
+# Output of documentation
+docs/_book
+
 lib2
 test2
 theme2
