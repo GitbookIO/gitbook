@@ -6,6 +6,7 @@ describe('Page', function() {
 
     before(function() {
         return mock.setupDefaultBook({
+            'README.md': ' # Hello World\n\nThis is a description',
             'heading.md': '# Hello\n\n## World',
 
             'links.md': '[link](hello.md) [link 2](variables/page/next.md) [readme](README.md)',
@@ -31,6 +32,7 @@ describe('Page', function() {
             'variables/page/next.md': '{{ page.next.title }} {{ page.next.path }}',
             'variables/page/dir/ltr.md': 'This is english: {{ page.dir }}',
             'variables/page/dir/rtl.md': 'بسيطة {{ page.dir }}',
+            'variables/book/title.md': '{{ book.title}}',
 
             'GLOSSARY.md': '# Glossary\n\n\n## abracadabra\n\nthis is the description'
         }, [
@@ -313,6 +315,12 @@ describe('Page', function() {
             var page = book.getPage('variables/page/next.md');
             return page.toHTML(output)
             .should.be.fulfilledWith('<p>Test Variables variables/page/title.md</p>\n');
+        });
+
+        it('should set book.title', function() {
+            var page = book.addPage('variables/book/title.md');
+            return page.toHTML(output)
+            .should.be.fulfilledWith('<p>Hello World</p>\n');
         });
 
         describe('page.dir', function() {
