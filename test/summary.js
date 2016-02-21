@@ -123,7 +123,10 @@ describe('Summary / Table of contents', function() {
                     '    * [Hello 3](hello3.md)\n' +
                     '    * [Hello 4](hello4.md)\n' +
                     '    * [Hello 5](hello5.md)\n' +
-                    '* [Hello 6](hello6.md)\n'
+                    '* [Hello 6](hello6.md)\n\n\n' +
+                    '### Part 2\n\n' +
+                    '* [Hello 7](hello7.md)\n' +
+                    '* [Hello 8](hello8.md)\n\n'
             })
             .then(function(_book) {
                 book = _book;
@@ -136,7 +139,7 @@ describe('Summary / Table of contents', function() {
             var prev = article.prev();
             var next = article.next();
 
-            should(prev).equal(null);
+            should(prev).not.be.ok();
             should(next).be.ok();
 
             next.path.should.equal('hello.md');
@@ -207,8 +210,34 @@ describe('Summary / Table of contents', function() {
             next.path.should.equal('hello6.md');
         });
 
-        it('should return prev for last', function() {
+        it('should return next/prev for a joint <- parts', function() {
+            var article = book.summary.getArticle('hello7.md');
+
+            var prev = article.prev();
+            var next = article.next();
+
+            should(prev).be.ok();
+            should(next).be.ok();
+
+            prev.path.should.equal('hello6.md');
+            next.path.should.equal('hello8.md');
+        });
+
+        it('should return next/prev for a joint -> parts', function() {
             var article = book.summary.getArticle('hello6.md');
+
+            var prev = article.prev();
+            var next = article.next();
+
+            should(prev).be.ok();
+            should(next).be.ok();
+
+            prev.path.should.equal('hello5.md');
+            next.path.should.equal('hello7.md');
+        });
+
+        it('should return only prev for last', function() {
+            var article = book.summary.getArticle('hello8.md');
 
             var prev = article.prev();
             var next = article.next();
@@ -216,7 +245,7 @@ describe('Summary / Table of contents', function() {
             should(prev).be.ok();
             should(next).be.not.ok();
 
-            prev.path.should.equal('hello5.md');
+            prev.path.should.equal('hello7.md');
         });
     });
 });
