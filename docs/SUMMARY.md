@@ -29,3 +29,4 @@
 --
 
 * [FAQ](faq.md)
+* [Release notes](https://github.com/GitbookIO/gitbook/blob/master/CHANGES.md)
