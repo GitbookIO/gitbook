@@ -49,7 +49,8 @@
         "cp": "0.2.0",
         "cpr": "1.0.0",
         "direction": "0.1.5",
-        "moment": "2.11.2"
+        "moment": "2.11.2",
+        "i18n-t": "1.0.0"
     },
     "devDependencies": {
         "eslint": "1.5.0",
