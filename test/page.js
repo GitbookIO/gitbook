@@ -289,7 +289,8 @@ describe('Page', function() {
             var page = book.addPage('variables/file/mtime.md');
             return page.toHTML(output)
             .then(function(content) {
-                content.should.endWith('(CET)</p>\n');
+                // A date ends with "(CET)" or "(UTC)""
+                content.should.endWith(')</p>\n');
             });
         });
 
