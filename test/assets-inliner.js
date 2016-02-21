@@ -13,12 +13,15 @@ describe('Assets Inliner Output', function() {
         return mock.outputDefaultBook(AssetsInliner, {
             'README.md': '',
 
-            // test for SVGS
+            // SVGs
             'svg_file.md': '![image](test.svg)',
             'svg_inline.md': 'This is a svg: '+SVG,
             'test.svg': '<?xml version="1.0" encoding="UTF-8"?>' + SVG,
 
-            // test for remote files
+            // Relative
+            'folder/test.md': '![image](../test.svg)',
+
+            // Remote images
             'remote_png.md': '![image](https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png)',
             'remote_svg.md': '![image](https://upload.wikimedia.org/wikipedia/commons/0/02/SVG_logo.svg)',
 
@@ -26,6 +29,7 @@ describe('Assets Inliner Output', function() {
                 '* [svg file](svg_file.md)\n' +
                 '* [remote png file](remote_png.md)\n' +
                 '* [remote svg file](remote_svg.md)\n' +
+                '* [relative image](folder/test.md)\n' +
                 '\n\n'
         })
         .then(function(_output) {
@@ -43,8 +47,14 @@ describe('Assets Inliner Output', function() {
 
         // Does the file exists
         var src = $img.attr('src');
+
+        // Resolve the filename
+        src = page.resolveLocal(src);
+
         output.should.have.file(src);
         path.extname(src).should.equal('.png');
+
+        return src;
     }
 
     describe('SVG', function() {
@@ -64,6 +74,12 @@ describe('Assets Inliner Output', function() {
 
         it('should correctly download then convert a remote SVG to PNG', function() {
             testImageInPage('remote_svg.md');
+        });
+    });
+
+    describe('Relative Images', function() {
+        it('should correctly resolve image', function() {
+            testImageInPage('folder/test.md');
         });
     });
 });
