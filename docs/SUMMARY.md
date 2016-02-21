@@ -4,14 +4,15 @@
 
 * [About this document](README.md)
 * [Installation and Setup](setup.md)
-* [Directory structure](structure.md)
 
 ### Your Content
 
-* [Configuration](config.md)
+* [Directory structure](structure.md)
 * [Pages and Summary](pages.md)
-* [Assets](assets.md)
+* [Assets and Images](assets.md)
 * [Glossary](glossary.md)
+* [Multi-Lingual](langs.md)
+* [Configuration](config.md)
 
 ### Miscellaneous
 
