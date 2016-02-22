@@ -100,5 +100,29 @@ describe('Plugins', function() {
             });
         });
     });
+
+    describe('Resources', function() {
+        var plugin;
+
+        before(function() {
+            plugin = new BookPlugin(book, 'test-resources');
+            return plugin.load(PLUGINS_ROOT);
+        });
+
+
+        it('should list all resources for website', function() {
+            return plugin.getResources('website')
+            .then(function(resources) {
+                resources.assets.should.equal('./assets');
+
+                resources.js.should.have.lengthOf(2);
+                resources.js[0].path.should.equal('gitbook-plugin-test-resources/myfile.js');
+                resources.js[1].url.should.equal('https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js');
+
+                resources.css.should.have.lengthOf(1);
+                resources.css[0].path.should.equal('gitbook-plugin-test-resources/myfile.css');
+            });
+        });
+    });
 });
 
