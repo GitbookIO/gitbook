@@ -138,8 +138,7 @@ describe('Plugins', function() {
             });
         });
 
-
-        it('should list all resources for website', function() {
+        it('should list all filters', function() {
             _.size(filters).should.equal(2);
         });
 
@@ -149,6 +148,31 @@ describe('Plugins', function() {
 
         it('should correctly set contexts for filter', function() {
             filters.testContext('Hello');
+        });
+    });
+
+    describe('Blocks', function() {
+        var plugin, blocks;
+
+        before(function() {
+            plugin = new BookPlugin(book, 'test-blocks');
+            return plugin.load(PLUGINS_ROOT)
+
+            .then(function() {
+                blocks = plugin.getBlocks();
+            });
+        });
+
+        it('should list all blocks', function() {
+            _.size(blocks).should.equal(2);
+        });
+
+        it('should correctly normalize block', function() {
+            blocks.hello.exec({ body: 'World' }).should.equal('Hello World!');
+        });
+
+        it('should correctly set contexts for filter', function() {
+            blocks.testContext.exec({ body: 'Hello' });
         });
     });
 });
