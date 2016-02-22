@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var path = require('path');
 
 var mock = require('./mock');
@@ -122,6 +123,32 @@ describe('Plugins', function() {
                 resources.css.should.have.lengthOf(1);
                 resources.css[0].path.should.equal('gitbook-plugin-test-resources/myfile.css');
             });
+        });
+    });
+
+    describe('Filters', function() {
+        var plugin, filters;
+
+        before(function() {
+            plugin = new BookPlugin(book, 'test-filters');
+            return plugin.load(PLUGINS_ROOT)
+
+            .then(function() {
+                filters = plugin.getFilters();
+            });
+        });
+
+
+        it('should list all resources for website', function() {
+            _.size(filters).should.equal(2);
+        });
+
+        it('should correctly execute a filter', function() {
+            filters.hello('World').should.equal('Hello World!');
+        });
+
+        it('should correctly set contexts for filter', function() {
+            filters.testContext('Hello');
         });
     });
 });
