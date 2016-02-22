@@ -1,7 +1,13 @@
+var path = require('path');
+
 var mock = require('./mock');
 var registry = require('../lib/plugins/registry');
 var Output = require('../lib/output/base');
+var error = require('../lib/utils/error');
 var PluginsManager = require('../lib/plugins');
+var BookPlugin = require('../lib/plugins/plugin');
+
+var PLUGINS_ROOT = path.resolve(__dirname, 'node_modules');
 
 describe('Plugins', function() {
     var book;
@@ -17,15 +23,6 @@ describe('Plugins', function() {
         it('should resolve a plugin version', function() {
             return registry.resolve('ga')
             .should.be.fulfilled();
-        });
-    });
-
-    describe('Loading', function() {
-        it('should load default plugins', function() {
-            return mock.outputDefaultBook(Output)
-            .then(function(output) {
-                output.plugins.count().should.be.greaterThan(0);
-            });
         });
     });
 
@@ -63,6 +60,23 @@ describe('Plugins', function() {
                 });
             })
             .should.be.fulfilledWith(1);
+        });
+    });
+
+    describe('Loading', function() {
+        it('should load default plugins', function() {
+            return mock.outputDefaultBook(Output)
+            .then(function(output) {
+                output.plugins.count().should.be.greaterThan(0);
+            });
+        });
+    });
+
+    describe('Configuration', function() {
+        it('should fail loading a plugin with an invalid configuration', function() {
+            var plugin = new BookPlugin(book, 'test-config');
+            return plugin.load(PLUGINS_ROOT)
+                .should.be.rejectedWith('Error with book\'s configuration: pluginsConfig.test-config.myProperty is required');
         });
     });
 });
