@@ -22,6 +22,10 @@ describe('Website Output', function() {
             output.should.have.file('gitbook/images/favicon.ico');
         });
 
+        it('should correctly copy plugins', function() {
+            output.should.have.file('gitbook/gitbook-plugin-highlight/website.css');
+        });
+
     });
 
     describe('Book with chapters', function() {
