@@ -1,3 +1,4 @@
+var path = require('path');
 var pathUtils = require('../lib/utils/path');
 
 describe('Paths', function() {
@@ -9,8 +10,8 @@ describe('Paths', function() {
         });
 
         it('should correctly change extension of path', function() {
-            pathUtils.setExtension('hello/test.md', '.html').should.be.equal('hello/test.html');
-            pathUtils.setExtension('hello/test.md', '.json').should.be.equal('hello/test.json');
+            pathUtils.setExtension('hello/test.md', '.html').should.be.equal(path.normalize('hello/test.html'));
+            pathUtils.setExtension('hello/test.md', '.json').should.be.equal(path.normalize('hello/test.json'));
         });
     });
 });
