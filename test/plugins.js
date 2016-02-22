@@ -3,7 +3,6 @@ var path = require('path');
 var mock = require('./mock');
 var registry = require('../lib/plugins/registry');
 var Output = require('../lib/output/base');
-var error = require('../lib/utils/error');
 var PluginsManager = require('../lib/plugins');
 var BookPlugin = require('../lib/plugins/plugin');
 
@@ -77,6 +76,28 @@ describe('Plugins', function() {
             var plugin = new BookPlugin(book, 'test-config');
             return plugin.load(PLUGINS_ROOT)
                 .should.be.rejectedWith('Error with book\'s configuration: pluginsConfig.test-config.myProperty is required');
+        });
+
+        it('should extend configuration with default properties', function() {
+            return mock.setupBook({
+                'book.json': {
+                    pluginsConfig: {
+                        'test-config': {
+                            'myProperty': 'world'
+                        }
+                    }
+                }
+            })
+            .then(function(book2) {
+                return book2.config.load()
+                .then(function() {
+                    var plugin = new BookPlugin(book2, 'test-config');
+                    return plugin.load(PLUGINS_ROOT);
+                })
+                .then(function() {
+                    book2.config.get('pluginsConfig.test-config.myDefaultProperty', '').should.equal('hello');
+                });
+            });
         });
     });
 });
