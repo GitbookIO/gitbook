@@ -14,27 +14,30 @@ require('./assertions');
 // Create filesystem instance for testing
 var nodeFS = new NodeFS();
 
-function setupFS(_fs, rootFolder, files) {
-    return _.chain(_.pairs(files))
-        .sortBy(0)
-        .reduce(function(prev, pair) {
-            return prev.then(function() {
-                var filename = path.resolve(rootFolder, pair[0]);
-                var buf = pair[1];
+function setupFS(files) {
+    return Q.nfcall(tmp.dir.bind(tmp)).get(0)
+    .then(function(rootFolder) {
+        return _.chain(_.pairs(files))
+            .sortBy(0)
+            .reduce(function(prev, pair) {
+                return prev.then(function() {
+                    var filename = path.resolve(rootFolder, pair[0]);
+                    var buf = pair[1];
 
-                if (_.isObject(buf)) buf = JSON.stringify(buf);
-                if (_.isString(buf)) buf = new Buffer(buf, 'utf-8');
+                    if (_.isObject(buf)) buf = JSON.stringify(buf);
+                    if (_.isString(buf)) buf = new Buffer(buf, 'utf-8');
 
-                return fs.mkdirp(path.dirname(filename))
-                .then(function() {
-                    return fs.writeFile(filename, buf);
+                    return fs.mkdirp(path.dirname(filename))
+                    .then(function() {
+                        return fs.writeFile(filename, buf);
+                    });
                 });
+            }, Q())
+            .value()
+            .then(function() {
+                return rootFolder;
             });
-        }, Q())
-        .value()
-        .then(function() {
-            return _fs;
-        });
+    });
 }
 
 // Setup a mock book for testing using a map of files
@@ -42,14 +45,11 @@ function setupBook(files, opts) {
     opts = opts || {};
     opts.log = function() { };
 
-    return Q.nfcall(tmp.dir.bind(tmp)).get(0)
+    return setupFS(files)
     .then(function(folder) {
         opts.fs = nodeFS;
         opts.root = folder;
 
-        return setupFS(nodeFS, folder, files);
-    })
-    .then(function() {
         return new Book(opts);
     });
 }
@@ -90,6 +90,8 @@ function logError(err) {
 }
 
 module.exports = {
+    fs: nodeFS,
+    setupFS: setupFS,
     setupBook: setupBook,
     setupDefaultBook: setupDefaultBook,
     outputDefaultBook: outputDefaultBook,

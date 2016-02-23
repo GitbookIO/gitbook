@@ -4,6 +4,7 @@ require('./location');
 require('./paths');
 
 // Parsing
+require('./locate');
 require('./config');
 require('./readme');
 require('./summary');
