@@ -1,1 +1,2 @@
-theme/**/*
+docs/**/*
+test/node_modules/**/*
