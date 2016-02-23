@@ -1,5 +1,6 @@
 # Directory structure
 
+GitBook uses a very simple and obvious directory sttructure:
 
 ```
 .
@@ -24,3 +25,19 @@ An overview of what each of these does:
 
 
 ### Sub-directory
+
+For project documentaiton, it sometimes better to use a diretcory (like `docs/`) to store the prject's documentation. You can use a `.gitbook` file to indicate to GitBook in which folder the book is stored:
+
+```
+.
+├── .gitbook
+└── docs/
+    ├── README.md
+    └── SUMMARY.md
+```
+
+With `.gitbook` containing:
+
+```
+./docs/
+```
