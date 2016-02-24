@@ -105,6 +105,12 @@ describe('Summary / Table of contents', function() {
             book.summary.getArticleByLevel('2.1').title.should.equal('Hello 3');
             book.summary.getArticleByLevel('2.1.1').title.should.equal('Hello 4');
         });
+
+        it('should correctly calcul depth', function() {
+            book.summary.getArticleByLevel('0').depth().should.equal(1);
+            book.summary.getArticleByLevel('1.1').depth().should.equal(2);
+            book.summary.getArticleByLevel('1.1.1').depth().should.equal(3);
+        });
     });
 
     describe('External', function() {
