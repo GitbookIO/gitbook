@@ -24,7 +24,26 @@ An overview of what each of these does:
 | `SUMMARY.md` | Table of Contents |
 
 
-### Sub-directory
+### Static files and Images
+
+A static file is a file that is not listed in the `SUMMARY.md`. All static files, not [ignored](#ignore), are copied to the output.
+
+### Ignoring files & folders {#ignore}
+
+GitBook will read the `.gitignore`, `.bookignore` and `.ignore` files to get a list of files and folders to skip.
+The format inside those files, follows the same convention as `.gitignore`:
+
+```
+# This is a comment
+
+# Ignore the file test.md
+test.md
+
+# Ignore everything in the directory "bin"
+bin/*
+```
+
+### Project documentation / Sub-directory
 
 For project documentaiton, it sometimes better to use a diretcory (like `docs/`) to store the prject's documentation. You can use a `.gitbook` file to indicate to GitBook in which folder the book is stored:
 

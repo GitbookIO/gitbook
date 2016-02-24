@@ -9,7 +9,6 @@
 
 * [Directory structure](structure.md)
 * [Pages and Summary](pages.md)
-* [Assets and Images](assets.md)
 * [Glossary](glossary.md)
 * [Multi-Lingual](langs.md)
 * [Configuration](config.md)
