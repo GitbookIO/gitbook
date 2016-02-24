@@ -2,14 +2,14 @@
 
 ### Getting Started
 
-* [About this document](README.md)
+* [About this documentation](README.md)
 * [Installation and Setup](setup.md)
 
 ### Your Content
 
 * [Directory structure](structure.md)
 * [Pages and Summary](pages.md)
-* [Glossary](glossary.md)
+* [Glossary](lexicon.md)
 * [Multi-Lingual](langs.md)
 * [Configuration](config.md)
 

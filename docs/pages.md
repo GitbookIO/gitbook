@@ -8,7 +8,7 @@ Subchapters are defined simply by adding a nested list to a parent chapter.
 
 ### Simple example
 
-```
+```markdown
 # Summary
 
 * [Part I](part1/README.md)
@@ -21,7 +21,7 @@ Subchapters are defined simply by adding a nested list to a parent chapter.
 
 ### Example with subchapters split into parts
 
-```
+```markdown
 # Summary
 
 ### Part 1
