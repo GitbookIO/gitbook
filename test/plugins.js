@@ -168,11 +168,11 @@ describe('Plugins', function() {
         });
 
         it('should correctly normalize block', function() {
-            blocks.hello.exec({ body: 'World' }).should.equal('Hello World!');
+            blocks.hello.process({ body: 'World' }).should.equal('Hello World!');
         });
 
         it('should correctly set contexts for filter', function() {
-            blocks.testContext.exec({ body: 'Hello' });
+            blocks.testContext.process({ body: 'Hello' });
         });
     });
 });
