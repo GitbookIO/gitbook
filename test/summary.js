@@ -33,6 +33,32 @@ describe('Summary / Table of contents', function() {
         });
     });
 
+    describe('Non-existant summary', function() {
+        var book;
+
+        before(function() {
+            return mock.setupBook({
+                'README.md': 'Hello'
+            })
+            .then(function(_book) {
+                book = _book;
+
+                return book.readme.load()
+                .then(function() {
+                    return book.summary.load();
+                });
+            });
+        });
+
+        it('should add README as first entry', function() {
+            should(book.summary.getArticle('README.md')).be.ok();
+        });
+
+        it('should correctly count articles', function() {
+            book.summary.count().should.equal(1);
+        });
+    });
+
     describe('Non-empty summary list', function() {
         var book;
 
