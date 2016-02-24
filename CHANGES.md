@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Themes are now published as a plugin, with ability to extend it from the book source
 - `links.sidebar` configuration is no longer supported, use summary sections instead
 - `pdf.headerTemplate` and `pdf.footerTemplate` have been replaced by a template in theme/book: `_layout/ebook/pdf_header.html` and `_layout/ebook/pdf_footer.html`
+- Markdown parser is now using CommonMark
+- Root folder for the book can be specified in a `.gitbook` file
 
 ## 2.6.7
 - Fix bug with filenames including spaces
