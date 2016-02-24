@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - `pdf.headerTemplate` and `pdf.footerTemplate` have been replaced by a template in theme/book: `_layout/ebook/pdf_header.html` and `_layout/ebook/pdf_footer.html`
 - Markdown parser is now using CommonMark
 - Root folder for the book can be specified in a `.gitbook` file
+- Multi-lingual books share assets folder
 
 ## 2.6.7
 - Fix bug with filenames including spaces

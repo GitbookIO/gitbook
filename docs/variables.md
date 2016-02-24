@@ -11,6 +11,7 @@ The following is a reference of the available data during book's parsing and the
 | `page` | Current page specific information |
 | `file` | File associated with the current page specific information |
 | `summary` | Information about the table of contents |
+| `languages` | List of languages for multi-lingual books |
 | `config` | Dump of the `book.json` |
 
 ### Book Variables
@@ -53,3 +54,10 @@ Thw whole table of contents (`SUMMARY.md`) can be accessed:
 
 `summary.parts[0].articles[0].title` will return the title of the first article.
 
+#### Multi-lingual book Variable
+
+| Variable | Description |
+| -------- | ----------- |
+| `languages.list` | List of languages for this book |
+
+Languages are defined by `{ id: 'en', title: 'English' }`.
