@@ -10,7 +10,7 @@
 * [Directory structure](structure.md)
 * [Pages and Summary](pages.md)
 * [Glossary](lexicon.md)
-* [Multi-Lingual](langs.md)
+* [Multi-Lingual](languages.md)
 * [Configuration](config.md)
 
 ### Miscellaneous
