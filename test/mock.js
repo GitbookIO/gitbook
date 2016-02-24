@@ -84,6 +84,22 @@ function outputDefaultBook(Output, files, summary, opts) {
     });
 }
 
+// Output a book with a specific generator
+function outputBook(Output, files, opts) {
+    return setupBook(files, opts)
+    .then(function(book) {
+        // Parse the book
+        return book.parse()
+
+        // Start generation
+        .then(function() {
+            var output = new Output(book);
+            return output.generate()
+                .thenResolve(output);
+        });
+    });
+}
+
 // Log an error
 function logError(err) {
     console.log(err.stack || err);
@@ -93,6 +109,7 @@ module.exports = {
     fs: nodeFS,
     setupFS: setupFS,
     setupBook: setupBook,
+    outputBook: outputBook,
     setupDefaultBook: setupDefaultBook,
     outputDefaultBook: outputDefaultBook,
     logError: logError

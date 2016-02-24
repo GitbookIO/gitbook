@@ -25,7 +25,6 @@ describe('Website Output', function() {
         it('should correctly copy plugins', function() {
             output.should.have.file('gitbook/gitbook-plugin-highlight/website.css');
         });
-
     });
 
     describe('Book with chapters', function() {
@@ -58,7 +57,42 @@ describe('Website Output', function() {
             output.should.have.file('hello/index.html');
             output.should.have.file('hello/test.html');
         });
+    });
 
+    describe('Multilingual Book', function() {
+        var output;
+
+        before(function() {
+            return mock.outputBook(WebsiteOutput, {
+                'LANGS.md': '# Languages\n\n'
+                    + '* [en](./en)\n'
+                    + '* [fr](./fr)\n\n',
+                'en/README.md': '# Hello',
+                'fr/README.md': '# Bonjour'
+
+            })
+            .then(function(_output) {
+                output = _output;
+            });
+        });
+
+        it('should correctly generate an index.html for each language', function() {
+            output.should.have.file('en/index.html');
+            output.should.have.file('fr/index.html');
+        });
+
+        it('should correctly copy assets', function() {
+            output.should.have.file('gitbook/app.js');
+        });
+
+        it('should not copy assets for each language', function() {
+            output.should.have.not.file('en/gitbook/app.js');
+            output.should.have.not.file('fr/gitbook/app.js');
+        });
+
+        it('should correctly generate an index.html', function() {
+            output.should.have.file('index.html');
+        });
     });
 
 });
