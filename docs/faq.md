@@ -7,3 +7,7 @@ You should always use `.md` extensions for your relative links, GitBook will aut
 #### Can I create a GitBook in a sub-directory of my repository?
 
 Yes, GitBooks can be created in sub-directories. GitBook.com and the CLI also looks by default in a series of [folders](structure.md).
+
+#### Does GitBook support Math equations?
+
+GitBook supports math equations and TeX thanks to plugins. There are currently 2 official plugins to display math: [mathjax](https://plugins.gitbook.com/plugin/mathjax) and [katex](https://plugins.gitbook.com/plugin/katex).
