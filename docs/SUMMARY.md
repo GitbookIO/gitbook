@@ -12,6 +12,7 @@
 * [Glossary](lexicon.md)
 * [Multi-Lingual](languages.md)
 * [Configuration](config.md)
+* [AsciiDoc](asciidoc.md)
 
 ### Miscellaneous
 
@@ -28,3 +29,5 @@
 
 * [FAQ](faq.md)
 * [Release notes](https://github.com/GitbookIO/gitbook/blob/master/CHANGES.md)
+
+

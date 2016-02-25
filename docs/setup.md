@@ -35,3 +35,11 @@ $ npm install gitbook-cli -g
 $ gitbook install beta
 ```
 
+##### Debugging
+
+You can use the options `--log=debug` and `--debug` to get better error messages (with stack trace). For example:
+
+```
+$ gitbook build ./ --log=debug --debug
+```
+
