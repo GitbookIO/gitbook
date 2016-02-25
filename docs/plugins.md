@@ -9,7 +9,7 @@ Plugins can be easily searched on [plugins.gitbook.com](https://plugins.gitbook.
 
 ### How to install a plugin?
 
-Once you find a plugin that you want to install, you need to add it to your book.json:
+Once you find a plugin that you want to install, you need to add it to your `book.json`:
 
 ```
 {
@@ -17,6 +17,10 @@ Once you find a plugin that you want to install, you need to add it to your book
 }
 ```
 
-You can also specify a specific version using: "myPlugin@0.3.1". By default GitBook will resolve the latest version of the plugin compatbile with the current GitBook version.
+You can also specify a specific version using: `"myPlugin@0.3.1"`. By default GitBook will resolve the latest version of the plugin compatbile with the current GitBook version.
 
 Plugins are automatically installed on [GitBook.com](https://www.gitbook.com). Locally, run `gitbook install` to install and prepare all plugins for your books.
+
+### Configuring plugins
+
+PLugins specific configurations are stored in `pluginsConfig`. You have to refer to the documentation of the plugin itself for details about the available options.

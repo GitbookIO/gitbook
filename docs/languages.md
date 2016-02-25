@@ -7,3 +7,9 @@ GitBook supports building books written in multiple languages. Each language sho
 * [French](fr/)
 * [Español](es/)
 ```
+
+### Configuration for each language
+
+When a language book (ex: `en`) has a `book.json`, its configuration will extend the main configuration.
+
+The only exception is plugins, plugins are specify globally relative to the book, and language specific plugins can not be specified.
