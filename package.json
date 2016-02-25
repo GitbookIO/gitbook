@@ -51,7 +51,8 @@
         "direction": "0.1.5",
         "moment": "2.11.2",
         "i18n-t": "1.0.0",
-        "front-matter": "2.0.6"
+        "front-matter": "2.0.6",
+        "spawn-cmd": "0.0.2"
     },
     "devDependencies": {
         "eslint": "1.5.0",
