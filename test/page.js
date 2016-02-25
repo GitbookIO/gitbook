@@ -32,7 +32,7 @@ describe('Page', function() {
             'variables/page/next.md': '{{ page.next.title }} {{ page.next.path }}',
             'variables/page/dir/ltr.md': 'This is english: {{ page.dir }}',
             'variables/page/dir/rtl.md': 'بسيطة {{ page.dir }}',
-            'variables/book/title.md': '{{ book.title}}',
+            'variables/config/title.md': '{{ config.title}}',
 
             'GLOSSARY.md': '# Glossary\n\n\n## abracadabra\n\nthis is the description'
         }, [
@@ -318,8 +318,8 @@ describe('Page', function() {
             .should.be.fulfilledWith('<p>Test Variables variables/page/title.md</p>\n');
         });
 
-        it('should set book.title', function() {
-            var page = book.addPage('variables/book/title.md');
+        it('should set config.title', function() {
+            var page = book.addPage('variables/config/title.md');
             return page.toHTML(output)
             .should.be.fulfilledWith('<p>Hello World</p>\n');
         });

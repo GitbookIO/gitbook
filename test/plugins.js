@@ -175,5 +175,21 @@ describe('Plugins', function() {
             blocks.testContext.process({ body: 'Hello' });
         });
     });
+
+    describe('Hooks', function() {
+        var plugin;
+
+        before(function() {
+            plugin = new BookPlugin(book, 'test-hooks');
+            return plugin.load(PLUGINS_ROOT);
+        });
+
+        it('can call a hook', function() {
+            return plugin.hook('init')
+            .then(function() {
+                global._hooks.should.deepEqual(['init']);
+            });
+        });
+    });
 });
 

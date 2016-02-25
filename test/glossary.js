@@ -7,7 +7,7 @@ describe('Glossary', function() {
             'GLOSSARY.md': ''
         })
         .then(function(book) {
-            return book.prepareConfig()
+            return book.config.load()
 
             .then(function() {
                 return book.glossary.load();
@@ -27,7 +27,7 @@ describe('Glossary', function() {
             })
             .then(function(_book) {
                 book = _book;
-                return book.prepareConfig();
+                return book.config.load();
             })
             .then(function() {
                 return book.glossary.load();
