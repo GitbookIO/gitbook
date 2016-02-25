@@ -30,6 +30,6 @@ build/Release
 # Output of documentation
 docs/_book
 
-lib2
-test2
-theme2
+book.pdf
+book.epub
+book.mobi
