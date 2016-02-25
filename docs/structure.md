@@ -43,7 +43,7 @@ test.md
 bin/*
 ```
 
-### Project documentation / Sub-directory
+### Project documentation / Sub-directory {#subdirectory}
 
 For project documentaiton, it sometimes better to use a diretcory (like `docs/`) to store the prject's documentation. You can use a `.gitbook` file to indicate to GitBook in which folder the book is stored:
 
