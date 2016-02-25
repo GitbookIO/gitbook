@@ -38,7 +38,7 @@
         "spawn-cmd": "0.0.2",
         "escape-string-regexp": "1.0.3",
         "juice": "1.9.0",
-        "jsonschema": "1.0.2",
+        "jsonschema": "1.1.0",
         "json-schema-defaults": "0.1.1",
         "merge-defaults": "0.2.1",
         "github-slugid": "1.0.0",

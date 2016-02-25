@@ -1,6 +1,43 @@
+var should = require('should');
 var mock = require('./mock');
+var validator = require('../lib/config/validator');
 
-describe('Config', function() {
+describe('Configuration', function() {
+
+    describe('Validation', function() {
+        it('should merge default', function() {
+            validator.validate({}).should.have.property('gitbook').which.equal('*');
+        });
+
+        it('should throw error for invalid configuration', function() {
+            should.throws(function() {
+                validator.validate({
+                    direction: 'invalid'
+                });
+            });
+        });
+
+        it('should not throw error for non existing configuration', function() {
+            validator.validate({
+                style: {
+                    'pdf': 'test.css'
+                }
+            });
+        });
+
+        it('should validate plugins as an array', function() {
+            validator.validate({
+                plugins: ['hello']
+            });
+        });
+
+        it('should validate plugins as a string', function() {
+            validator.validate({
+                plugins: 'hello,world'
+            });
+        });
+
+    });
 
     describe('No configuration', function() {
         var book;
