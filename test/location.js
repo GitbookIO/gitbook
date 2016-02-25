@@ -45,6 +45,11 @@ describe('Location', function() {
             location.toAbsolute('/test.md', './', './').should.be.equal('test.md');
             location.toAbsolute('/test.md', 'test', 'test').should.be.equal('../test.md');
             location.toAbsolute('/sub/test.md', 'test', 'test').should.be.equal('../sub/test.md');
+            location.toAbsolute('/test.png', 'folder', '').should.be.equal('test.png');
+        });
+
+        it('should correctly handle absolute path (windows)', function() {
+            location.toAbsolute('\\test.png', 'folder', '').should.be.equal('test.png');
         });
     });
 });
