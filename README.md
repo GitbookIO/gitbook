@@ -16,31 +16,19 @@ Complete documentation is available at [help.gitbook.com](http://help.gitbook.co
 
 ![Image](https://raw.github.com/GitbookIO/gitbook/master/preview.png)
 
-## How to use it:
+## Getting started
 
-GitBook can be installed from **NPM** using:
+GitBook can be used either on your computer for building local books or on GitBook.com for hosting them. To get started, check out [the installation instructions in the documentation](docs/setup.md).
 
-```
-$ npm install gitbook-cli -g
-```
+## Usage examples
 
-Create the directories and files for a book from its [SUMMARY.md](https://github.com/GitbookIO/gitbook#book-format) file (if existing) using
+GitBook can be used to create book, public documentation, enterprise manual, thesis, research papers, etc.
 
-```
-$ gitbook init
-```
+You can find a [list of real-world examples](docs/examples.md) in the documentation.
 
-You can serve a repository as a book using:
+## Help and Support
 
-```
-$ gitbook serve
-```
-
-Or simply build the static website using:
-
-```
-$ gitbook build
-```
+We're always happy to help out with your books or any other questions you might have. You can ask a question on the following contact form at [gitbook.com/contact](https://www.gitbook.com/contact) or signal an issue on [GitHub](https://github.com/GitbookIO/gitbook).
 
 ## Features
 
@@ -52,179 +40,12 @@ $ gitbook build
 * [Variables and Templating](http://help.gitbook.com/format/templating.html)
 * [Content References](http://help.gitbook.com/format/conrefs.html)
 * [Plugins](http://help.gitbook.com/format/plugins.html)
-* Interractive reader website:
-    * Search
-    * Font Settings (Serif, Sans Serif)
-    * Themes: white, sepia, night
-
-## Output Formats
-
-GitBook can generate your book in the following formats:
-
-* **Static Website**: This is the default format. It generates a complete interactive static website that can be, for example, hosted on GitHub Pages.
-* **eBook**: You need to have [ebook-convert](http://manual.calibre-ebook.com/cli/ebook-convert.html) installed.  You can specify the eBook filename as the second argument, otherwise `book` will be used.
-  * Generate a **PDF** using:  `gitbook pdf ./myrepo ./mybook.pdf`
-  * Generate a **ePub** using: `gitbook epub ./myrepo ./mybook.epub`
-  * Generate a **MOBI** using: `gitbook mobi ./myrepo ./mybook.mobi`
-* **JSON**: This format is used for debugging or extracting metadata from a book. Generate this format using: ```gitbook build ./myrepo --format=json```.
-
-## Book Format
-
-A book is a Git repository containing at least 2 files: `README.md` and `SUMMARY.md`.
-
-#### README.md
-
-Typically, this should be the introduction for your book. It will be automatically added to the final summary.
-
-#### SUMMARY.md
-
-The `SUMMARY.md` defines your book's structure. It should contain a list of chapters, linking to their respective pages.
-
-Example:
-
-```markdown
-# Summary
-
-This is the summary of my book.
-
-* [section 1](section1/README.md)
-    * [example 1](section1/example1.md)
-    * [example 2](section1/example2.md)
-* [section 2](section2/README.md)
-    * [example 1](section2/example1.md)
-```
-
-Files that are not included in `SUMMARY.md` will not be processed by `gitbook`.
-
-#### Multi-Languages
-
-GitBook supports building books written in multiple languages. Each language should be a sub-directory following the normal GitBook format, and a file named `LANGS.md` should be present at the root of the repository with the following format:
-
-```markdown
-* [English](en/)
-* [French](fr/)
-* [Español](es/)
-```
-
-You can see a complete example with the [Learn Git](https://github.com/GitbookIO/git) book.
-
-#### Glossary
-
-Allows you to specify terms and their respective definitions to be displayed in the glossary. Based on those terms, `gitbook` will automatically build an index and highlight those terms in pages.
-
-The `GLOSSARY.md` format is very simple :
-
-```markdown
-# term
-Definition for this term
-
-# Another term
-With it's definition, this can contain bold text and all other kinds of inline markup ...
-```
-
-#### Variables and Templating
-
-A set of variables can be defined in the `book.json`:
-
-```js
-{
-    "variables": {
-        "host": "mybook.com"
-    }
-}
-```
-
-These variables can be used in the markdown files:
-
-```
-The host is {{ book.host }}
-```
-
-You can also use condition with these variables:
-
-```
-{% if book.host == "mybook.com" %}
-
-{% else %}
-
-{% endif %}
-```
-
-Variables of `book.json` are available in the `book` namespace. You can also access informations about the `file` itself and the `gitbook` version:
-
-```
-My file is {{ file.path }}
-Modified at {{ file.mtime }}
-Book built with GitBook {{ gitbook.version }}
-```
-
-#### Content References
-
-You can use "content references," or conrefs, when writing books or documentation using GitBook.
-
-Include a file from the same book:
-
-```
-{% include "./test.md" %}
-```
-
-or from a git repository (with a specific revision):
-
-```
-{% include "git+https://github.com/GitbookIO/documentation.git/README.md#1.0.1" %}
-```
-
-Includes can be used with variables (see [Variables and Templating](#variables-and-templating)):
-
-```
-{% include book.ref_doc_readme %}
-```
-
-#### Ignoring files & folders
-
-GitBook will read the `.gitignore`, `.bookignore` and `.ignore` files to get a list of files and folders to skip. (The format inside those files follows the same convention as `.gitignore`).
-
-Best practices for the `.gitignore` is to ignore build files from **node.js** (`node_modules`, ...) and build files from GitBook: `_book`, `*.epub`, `*.mobi` and `*.pdf` ([Download GitBook.gitignore](https://github.com/github/gitignore/blob/master/GitBook.gitignore)).
-
-#### Cover
-
-A cover image can be set by creating a file: **/cover.jpg**.
-The best resolution is **1800x2360**. The generation of the cover can be done automatically using the plugin [autocover](https://github.com/GitbookIO/plugin-autocover).
-
-A small version of the cover can also be set by creating a file: **/cover_small.jpg**.
-
-#### AsciiDoc
-
-Since version 2.0.0, AsciiDoc can be used instead of Markdown, simply replace the `.md` by the `.adoc` extension. Chapters in the summary are detected from an ordered list in the `SUMMARY.adoc`.
+* [Beautiful default theme](https://github.com/GitbookIO/theme-default)
 
 ## Publish your book
 
-The platform [GitBook.com](https://www.gitbook.com/) is like an "Heroku for books": you can create a book on it (public, paid, or private) and update it using **git push**.
+The platform [GitBook.com](https://www.gitbook.com/) is like an "Heroku for books": you can create a book on it (public, or private) and update it using **git push**.
 
-## Plugins
+## Licensing
 
-Plugins can be used to extend your book's functionality. Read [GitbookIO/plugin](https://github.com/GitbookIO/plugin) for more information about how to build a plugin for GitBook.
-
-Plugins needed to build a book can be installed using: `gitbook install ./`. You can find plugins at [plugins.gitbook.com](http://plugins.gitbook.com).
-
-
-## Debugging
-
-You can use the options `--log=debug` and `--debug` to get better error messages (with stack trace). For example:
-
-```
-$ gitbook build ./ --log=debug --debug
-```
-
-#### How to use the latest commit from GitBook in gitbook-cli
-
-To use the latest commit from `GitBook/gitbook` with `gitbook-cli`:
-
-```
-$ git clone https://github.com/GitbookIO/gitbook.git ./gitbook
-$ gitbook versions:link ./gitbook
-```
-
-Now `gitbook-cli` will be using the `./gitbook` folder.
-
-You can uninstall it using: `gitbook versions:uninstall latest`.
+GitBook is licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for the full license text.
