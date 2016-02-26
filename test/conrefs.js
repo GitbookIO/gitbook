@@ -1,68 +1,49 @@
-var fs = require('fs');
-var path = require('path');
+var mock = require('./mock');
+var ConrefsLoader = require('../lib/output/conrefs')();
 
-describe('ConRefs', function () {
-    var book, readme;
+
+describe('Conrefs Loader', function() {
+    var output;
 
     before(function() {
-        return books.generate('conrefs', 'website')
-            .then(function(_book) {
-                book = _book;
-
-                readme = fs.readFileSync(
-                    path.join(book.options.output, 'index.html'),
-                    { encoding: 'utf-8' }
-                );
-            });
-    });
-
-    it('should handle local references', function() {
-        readme.should.be.html({
-            '.page-inner p#t1': {
-                count: 1,
-                text: 'Hello World',
-                trim: true
-            }
+        return mock.outputDefaultBook(ConrefsLoader, {
+            'test.md': 'World'
+        })
+        .then(function(_output) {
+            output = _output;
         });
     });
 
-    it('should handle local references with absolute paths', function() {
-        readme.should.be.html({
-            '.page-inner p#t2': {
-                count: 1,
-                text: 'Hello World',
-                trim: true
-            }
-        });
+
+    it('should include a local file', function() {
+        return output.template.renderString('Hello {% include "./test.md" %}')
+            .should.be.fulfilledWith('Hello World');
     });
 
-    it('should correctly include file from git reference', function() {
-        readme.should.be.html({
-            '.page-inner p#t3': {
-                count: 1,
-                text: 'Hello from git',
-                trim: true
-            }
-        });
+    it('should include a git url', function() {
+        return output.template.renderString('Hello {% include "./test.md" %}')
+            .should.be.fulfilledWith('Hello World');
     });
 
-    it('should correctly handle deep include in git reference', function() {
-        readme.should.be.html({
-            '.page-inner p#t4': {
-                count: 1,
-                text: 'First Hello. Hello from git',
-                trim: true
-            }
-        });
+    it('should reject file out of scope', function() {
+        return output.template.renderString('Hello {% include "../test.md" %}')
+            .should.be.rejected();
     });
 
-    it('should correctly handle absolute include in git reference', function() {
-        readme.should.be.html({
-            '.page-inner p#t5': {
-                count: 1,
-                text: 'First Hello. Hello from git',
-                trim: true
-            }
+    describe('Git Urls', function() {
+        it('should include a file from a git repo', function() {
+            return output.template.renderString('{% include "git+https://gist.github.com/69ea4542e4c8967d2fa7.git/test.md" %}')
+                .should.be.fulfilledWith('Hello from git');
+        });
+
+        it('should handle deep inclusion (1)', function() {
+            return output.template.renderString('{% include "git+https://gist.github.com/69ea4542e4c8967d2fa7.git/test2.md" %}')
+                .should.be.fulfilledWith('First Hello. Hello from git');
+        });
+
+        it('should handle deep inclusion (2)', function() {
+            return output.template.renderString('{% include "git+https://gist.github.com/69ea4542e4c8967d2fa7.git/test3.md" %}')
+                .should.be.fulfilledWith('First Hello. Hello from git');
         });
     });
 });

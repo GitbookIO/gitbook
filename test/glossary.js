@@ -1,87 +1,71 @@
-var fs = require("fs");
-var path = require("path");
+var should = require('should');
+var mock = require('./mock');
 
-describe("Glossary", function () {
-    describe("Parsing", function() {
-        var book;
+describe('Glossary', function() {
+    it('should parse empty glossary', function() {
+        return mock.setupDefaultBook({
+            'GLOSSARY.md': ''
+        })
+        .then(function(book) {
+            return book.config.load()
 
-        before(function() {
-            return books.parse("glossary")
-                .then(function(_book) {
-                    book = _book;
-                });
-        });
-
-        it("should correctly list items", function() {
-            book.should.have.property("glossary");
-            book.glossary.should.have.lengthOf(3);
+            .then(function() {
+                return book.glossary.load();
+            })
+            .then(function() {
+                book.glossary.isEmpty().should.be.true();
+            });
         });
     });
 
-    describe("Generation", function() {
+    describe('Non-empty glossary', function() {
         var book;
 
         before(function() {
-            return books.generate("glossary", "website")
-                .then(function(_book) {
-                    book = _book;
-                });
+            return mock.setupDefaultBook({
+                'GLOSSARY.md': '# Glossary\n\n## Hello World\n\nThis is an entry'
+            })
+            .then(function(_book) {
+                book = _book;
+                return book.config.load();
+            })
+            .then(function() {
+                return book.glossary.load();
+            });
         });
 
-        it("should correctly generate a GLOSSARY.html", function() {
-            book.should.have.file("GLOSSARY.html");
+        it('should not be empty', function() {
+            book.glossary.isEmpty().should.be.false();
         });
 
-        describe("Page Integration", function() {
-            var readme, page;
+        describe('glossary.get', function() {
+            it('should return an existing entry', function() {
+                var entry = book.glossary.get('hello_world');
+                should.exist(entry);
 
-            before(function() {
-                readme = fs.readFileSync(
-                    path.join(book.options.output, "index.html"),
-                    { encoding: "utf-8" }
-                );
-                page = fs.readFileSync(
-                    path.join(book.options.output, "folder/PAGE.html"),
-                    { encoding: "utf-8" }
-                );
+                entry.name.should.equal('Hello World');
+                entry.description.should.equal('This is an entry');
+                entry.id.should.equal('hello_world');
             });
 
-            it("should correctly replaced terms by links", function() {
-                readme.should.be.html({
-                    ".page-inner a[href=\"GLOSSARY.html#test\"]": {
-                        count: 1,
-                        text: "test",
-                        attributes: {
-                            title: "Just a simple and easy to understand test."
-                        }
-                    }
-                });
+            it('should undefined return non existing entry', function() {
+                var entry = book.glossary.get('cool');
+                should.not.exist(entry);
+            });
+        });
+
+        describe('glossary.find', function() {
+            it('should return an existing entry', function() {
+                var entry = book.glossary.find('HeLLo World');
+                should.exist(entry);
+                entry.id.should.equal('hello_world');
             });
 
-            it("should correctly replaced terms by links (relative)", function() {
-                page.should.be.html({
-                    ".page-inner a[href=\"../GLOSSARY.html#test\"]": {
-                        count: 1
-                    }
-                });
-            });
-
-            it("should not replace terms in codeblocks", function() {
-                readme.should.be.html({
-                    ".page-inner code a": {
-                        count: 0
-                    }
-                });
-            });
-
-            it("should correctly select the longest term", function() {
-                readme.should.be.html({
-                    ".page-inner a[href=\"GLOSSARY.html#test_long\"]": {
-                        count: 1,
-                        text: "test long"
-                    }
-                });
+            it('should return undefined for non existing entry', function() {
+                var entry = book.glossary.find('Hello');
+                should.not.exist(entry);
             });
         });
     });
 });
+

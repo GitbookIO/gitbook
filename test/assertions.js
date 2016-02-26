@@ -1,25 +1,18 @@
-var _ = require('lodash');
 var fs = require('fs');
-var path = require('path');
-var should = require('should');
+var _ = require('lodash');
 var cheerio = require('cheerio');
+var should = require('should');
 
-require('should-promised');
-
+// Assertions to test if an Output has generated a file
 should.Assertion.add('file', function(file, description) {
-    this.params = { actual: this.obj.toString(), operator: 'have file ' + file, message: description };
+    this.params = {
+        actual: this.obj.root(),
+        operator: 'have file ' + file,
+        message: description
+    };
 
-    this.obj.should.have.property('options').which.is.an.Object();
-    this.obj.options.should.have.property('output').which.is.a.String();
-    this.assert(fs.existsSync(path.resolve(this.obj.options.output, file)));
-});
-
-should.Assertion.add('jsonfile', function(file, description) {
-    this.params = { actual: this.obj.toString(), operator: 'have valid jsonfile ' + file, message: description };
-
-    this.obj.should.have.property('options').which.is.an.Object();
-    this.obj.options.should.have.property('output').which.is.a.String();
-    this.assert(JSON.parse(fs.readFileSync(path.resolve(this.obj.options.output, file), { encoding: 'utf-8' })));
+    this.obj.should.have.property('resolve').which.is.a.Function;
+    this.assert(fs.existsSync(this.obj.resolve(file)));
 });
 
 should.Assertion.add('html', function(rules, description) {
