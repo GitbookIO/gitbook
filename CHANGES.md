@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## 3.x.x (unreleased)
+## 3.0.0 (pre)
 - Summary can contain external links and anchors (Fix [#776](https://github.com/GitbookIO/gitbook/issues/776))
 - Summary can contain differents entitled sections
 - Glossary is generated as a normal page
