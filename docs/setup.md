@@ -57,6 +57,8 @@ $ gitbook build
 $ gitbook fetch beta
 ```
 
+Use `gitbook ls-remote` to list remote versions available for install.
+
 ##### Debugging
 
 You can use the options `--log=debug` and `--debug` to get better error messages (with stack trace). For example:
