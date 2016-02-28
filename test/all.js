@@ -25,3 +25,6 @@ require('./assets-inliner');
 require('./output-json');
 require('./output-website');
 require('./output-ebook');
+
+// Misc
+require('./init');
