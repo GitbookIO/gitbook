@@ -1,4 +1,7 @@
 
+// Module API
+require('./exports');
+
 // Utilities
 require('./location');
 require('./paths');
