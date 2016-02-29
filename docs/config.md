@@ -6,6 +6,7 @@ GitBook allows you to customize your book using a flexible configuration. These 
 
 | Variable | Description |
 | -------- | ----------- |
+| `root` | Path to the root folder containing the content |
 | `title` | Title of your book, default value is extracted from the README. On GitBook.com this field is pre-filled. |
 | `description` | Description of your book, default value is extracted from the README. On GitBook.com this field is pre-filled. |
 | `author` | Name of the author. On GitBook.com this field is pre-filled. |

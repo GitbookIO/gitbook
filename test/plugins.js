@@ -53,7 +53,7 @@ describe('Plugins', function() {
                 }
             })
             .then(function(book) {
-                return book.config.load()
+                return book.prepareConfig()
                 .then(function() {
                     var plugins = new PluginsManager(book);
                     return plugins.install();
@@ -90,7 +90,7 @@ describe('Plugins', function() {
                 }
             })
             .then(function(book2) {
-                return book2.config.load()
+                return book2.prepareConfig()
                 .then(function() {
                     var plugin = new BookPlugin(book2, 'test-config');
                     return plugin.load(PLUGINS_ROOT);

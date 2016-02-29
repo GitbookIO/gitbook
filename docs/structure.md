@@ -45,18 +45,20 @@ bin/*
 
 ### Project documentation / Sub-directory {#subdirectory}
 
-For project documentaiton, it sometimes better to use a diretcory (like `docs/`) to store the prject's documentation. You can use a `.gitbook` file to indicate to GitBook in which folder the book is stored:
+For software project, it sometimes better to use a diretcory (like `docs/`) to store the project's documentation. You can use the [`root` option](config.md) to indicate to GitBook in which folder the book is stored:
 
 ```
 .
-├── .gitbook
+├── book.json
 └── docs/
     ├── README.md
     └── SUMMARY.md
 ```
 
-With `.gitbook` containing:
+With `book.json` containing:
 
 ```
-./docs/
+{
+    "root": "./docs"
+}
 ```
