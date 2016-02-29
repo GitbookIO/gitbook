@@ -14,8 +14,8 @@ GitBook allows you to customize your book using a flexible configuration. These 
 | `language` | ISO code of the book's language, default value is `en` |
 | `direction` | `rtl` or `ltr`, default value depends on the value of `language` |
 | `gitbook` | [SemVer](http://semver.org) condition to validate which GitBook version should be used |
-| `plugins` | List of plugins to load, See [the plugins section](plugins.md) for more details |
-| `pluginsConfig` |Configuration for plugins, See [the plugins section](plugins.md) for more details |
+| `plugins` | List of plugins to load, See [the plugins section](plugins/README.md) for more details |
+| `pluginsConfig` |Configuration for plugins, See [the plugins section](plugins/README.md) for more details |
 
 ### PDF Options
 
@@ -34,5 +34,5 @@ PDF Output can be customized using a set of options in the `book.json`:
 
 ### Plugins
 
-Plugins and their configurations are specified in the `book.json`. See [the plugins section](plugins.md) for more details.
+Plugins and their configurations are specified in the `book.json`. See [the plugins section](plugins/README.md) for more details.
 
