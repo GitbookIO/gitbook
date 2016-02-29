@@ -19,6 +19,8 @@ Once you find a plugin that you want to install, you need to add it to your `boo
 
 You can also specify a specific version using: `"myPlugin@0.3.1"`. By default GitBook will resolve the latest version of the plugin compatbile with the current GitBook version.
 
+### GitBook.com
+
 Plugins are automatically installed on [GitBook.com](https://www.gitbook.com). Locally, run `gitbook install` to install and prepare all plugins for your books.
 
 ### Configuring plugins

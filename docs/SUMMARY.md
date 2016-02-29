@@ -9,9 +9,9 @@
 
 * [Directory structure](structure.md)
 * [Pages and Summary](pages.md)
+* [Configuration](config.md)
 * [Glossary](lexicon.md)
 * [Multi-Lingual](languages.md)
-* [Configuration](config.md)
 * [AsciiDoc](asciidoc.md)
 
 ### Customization

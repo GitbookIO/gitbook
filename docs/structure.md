@@ -1,6 +1,6 @@
 # Directory structure
 
-GitBook uses a very simple and obvious directory sttructure:
+GitBook uses a very simple and obvious directory structure:
 
 ```
 .
