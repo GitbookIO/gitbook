@@ -14,16 +14,15 @@
 * [Configuration](config.md)
 * [AsciiDoc](asciidoc.md)
 
-### Miscellaneous
-
-* [Templating](templating.md)
-* [Content References](conrefs.md)
-* [Variables](variables.md)
-
 ### Customization
 
-* [Plugins](plugins.md)
-* [Theming](themes.md)
+* [Templating](templating/README.md)
+    * [Content References](templating/conrefs.md)
+    * [Variables](templating/variables.md)
+* [Plugins](plugins/README.md)
+    * [Create a plugin](plugins/create.md)
+    * [Test your plugin](plugins/testing.md)
+* [Theming](themes/README.md)
 
 --
 

@@ -28,7 +28,7 @@ build/Release
 *.swp
 
 # Output of documentation
-docs/_book
+_book
 
 book.pdf
 book.epub
