@@ -57,7 +57,7 @@ Private plugins can be hosted on GitHub and included using `git` urls:
 ```
 {
     "plugins": [
-        "git+https://github.com/MyCompany/mygitbookplugin.git#1.0.0"
+        "myplugin@git+https://github.com/MyCompany/mygitbookplugin.git#1.0.0"
     ]
 }
 ```
