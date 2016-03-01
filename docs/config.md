@@ -1,6 +1,6 @@
 # Configuration
 
-GitBook allows you to customize your book using a flexible configuration. These options are specified in a `book.json` file.
+GitBook allows you to customize your book using a flexible configuration. These options are specified in a `book.json` file. For authors, not used to write JSON, you can validate the syntax using [jsonlint](http://jsonlint.com).
 
 ### Configuration Settings
 
