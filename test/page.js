@@ -132,12 +132,12 @@ describe('Page', function() {
     });
 
     describe('Description', function() {
-        it('should extratc page description from content', function() {
+        it('should extract page description from content', function() {
             var page = book.addPage('description.md');
 
             return page.toHTML(output)
             .then(function() {
-                page.description.should.equal('This is the short description.');
+                page.attributes.description.should.equal('This is the short description.');
             });
         });
     });
@@ -148,7 +148,7 @@ describe('Page', function() {
 
             return page.toHTML(output)
             .then(function() {
-                page.description.should.equal('Hello World');
+                page.attributes.description.should.equal('Hello World');
             });
         });
 
