@@ -51,10 +51,15 @@ This file is used to define terms. [See the glossary section](./lexicon.md).
 = Glossary
 
 == Magic
-Sufficiently advanced technology, beyond the understanding of the observer producing a sense of wonder.
+
+Sufficiently advanced technology, beyond the understanding of the
+observer producing a sense of wonder.
 
 == PHP
-A popular web programming language, used by many large websites such as Facebook. Rasmus Lerdorf originally created PHP in 1994 to power his personal homepage (PHP originally stood for "Personal Home Page" but now stands for "PHP: Hypertext Preprocessor").
-```
+
+A popular web programming language, used by many large websites such
+as Facebook. Rasmus Lerdorf originally created PHP in 1994 to power
+his personal homepage (PHP originally stood for "Personal Home Page"
+but now stands for "PHP: Hypertext Preprocessor"). ```
 
 

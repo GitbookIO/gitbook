@@ -6,7 +6,7 @@ The following is a reference of the available data during book's parsing and the
 
 | Variable | Description |
 | -------- | ----------- |
-| `book` | Bookwide information + configuration settings from `book.json`. See below for details. |
+| `book` | Book-wide information + configuration settings from `book.json`. See below for details. |
 | `gitbook` | GitBook specific information |
 | `page` | Current page specific information |
 | `file` | File associated with the current page specific information |
@@ -25,7 +25,7 @@ The following is a reference of the available data during book's parsing and the
 
 | Variable | Description |
 | -------- | ----------- |
-| `gitbook.time` | The current time (when you run the `gitbook` command). |
+| `gitbook.time` | The current time (when you run the `gitbook` command) . |
 | `gitbook.version` | Version of GitBook used to generate the book |
 
 ### File Variables
@@ -33,7 +33,7 @@ The following is a reference of the available data during book's parsing and the
 | Variable | Description |
 | -------- | ----------- |
 | `file.path` | The path to the raw page |
-| `file.mtime` | Modified Time, Time when file data last modified |
+| `file.mtime` | Modified Time. Last time the file was modified |
 | `file.type` | The name of the parser used to compile this file (ex: `markdown`, `asciidoc`, etc) |
 
 #### Page Variables
@@ -51,7 +51,7 @@ The following is a reference of the available data during book's parsing and the
 | -------- | ----------- |
 | `summary.parts` | List of sections in the Table of Contents |
 
-Thw whole table of contents (`SUMMARY.md`) can be accessed:
+The whole table of contents (`SUMMARY.md`) can be accessed:
 
 `summary.parts[0].articles[0].title` will return the title of the first article.
 

@@ -26,8 +26,8 @@ GitBook supports math equations and TeX thanks to plugins. There are currently 2
 
 #### Can I customize/theme the output?
 
-Yes, both the website and ebook outputs can be customized using [themes](themes/README.md).
+Yes, both the website and ebook outputs can be customized using [themes](/themes/).
 
 #### Can I add interactive content (videos, etc)?
 
-GitBook is very [extensible](plugins.md). You can use [existing plugins](https://plugins.gitbook.com) or create your own!
+GitBook is very [extensible](/plugins/). You can use [existing plugins](https://plugins.gitbook.com) or create your own!
