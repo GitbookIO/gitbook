@@ -21,7 +21,7 @@ GitBook can also resolve the include path by using git:
 The format of git url is:
 
 ```
-git+https://user@hostname/project/blah.git/file#commit-ish
+git+https://user@hostname/owner/project.git/file#commit-ish
 ```
 
 The real git url part should finish with `.git`, the filename to import is extracted after the `.git` till the fragment of the url.
