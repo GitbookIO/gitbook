@@ -8,11 +8,11 @@ Just like for markdown, GitBook is using some special files to extract structure
 
 ### README.adoc
 
-This is the main entry of your book: the introduction. This file is **non optional**.
+This is the main entry of your book: the introduction. This file is **required**.
 
 ### SUMMARY.adoc
 
-This file defines the list of chapters and subchapters. Just like [for markdown](./pages.md), the `SUMMARY.adoc`'s format is simply a list of links, the name of the link is used as the chapter's name, and the target is a path to that chapter's file.
+This file defines the list of chapters and subchapters. Just like  in Markdown, the `SUMMARY.adoc`'s format is simply a list of links, the name of the link is used as the chapter's name, and the target is a path to that chapter's file.
 
 Subchapters are defined simply by adding a nested list to a parent chapter.
 
