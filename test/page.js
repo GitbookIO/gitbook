@@ -9,7 +9,8 @@ describe('Page', function() {
             'README.md': ' # Hello World\n\nThis is a description',
             'heading.md': '# Hello\n\n## World',
             'description.md': '# This is a title\n\nThis is the short description.\n\nNot this one.',
-            'frontmatter.md': '---\ndescription: Hello World\n---\n\n# This is a title\n\nThis is not the description',
+            'frontmatter/description.md': '---\ndescription: Hello World\n---\n\n# This is a title\n\nThis is not the description',
+            'frontmatter/var.md': '---\ntest: Hello World\n---\n\n{{ page.test }}',
 
             'links.md': '[link](hello.md) [link 2](variables/page/next.md) [readme](README.md)',
             'links/relative.md': '[link](../hello.md) [link 2](/variables/page/next.md) [readme](../README.md)',
@@ -142,12 +143,21 @@ describe('Page', function() {
     });
 
     describe('Font-Matter', function() {
-        it('should extratc page description from front matter', function() {
-            var page = book.addPage('frontmatter.md');
+        it('should extract page description from front matter', function() {
+            var page = book.addPage('frontmatter/description.md');
 
             return page.toHTML(output)
             .then(function() {
                 page.description.should.equal('Hello World');
+            });
+        });
+
+        it('should extend page attributes with custom properties', function() {
+            var page = book.addPage('frontmatter/var.md');
+
+            return page.toHTML(output)
+            .then(function() {
+                page.content.should.equal('<p>Hello World</p>\n');
             });
         });
     });
