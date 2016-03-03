@@ -22,7 +22,7 @@
     "gitbook-asciidoc": "1.0.2",
     "gitbook-markdown": "1.0.3",
     "gitbook-plugin-fontsettings": "1.0.2",
-    "gitbook-plugin-highlight": "1.0.3",
+    "gitbook-plugin-highlight": "2.0.0",
     "gitbook-plugin-livereload": "0.0.1",
     "gitbook-plugin-search": "1.1.0",
     "gitbook-plugin-sharing": "1.0.1",
