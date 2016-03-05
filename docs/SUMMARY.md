@@ -16,6 +16,7 @@
 
 ### Customization
 
+* [Cover](cover.md)
 * [Templating](templating/README.md)
     * [Content References](templating/conrefs.md)
     * [Variables](templating/variables.md)

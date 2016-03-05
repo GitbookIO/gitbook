@@ -4,7 +4,7 @@ description: Real world examples of content published using GitBook.
 
 # Examples
 
-More than 50,000 books have benn published on [GitBook.com](https://www.gitbook.com/explore).
+More than 50,000 books have been published on [GitBook.com](https://www.gitbook.com/explore).
 
 ### Books
 
