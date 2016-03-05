@@ -25,4 +25,4 @@ Plugins are automatically installed on [GitBook.com](https://www.gitbook.com). L
 
 ### Configuring plugins
 
-PLugins specific configurations are stored in `pluginsConfig`. You have to refer to the documentation of the plugin itself for details about the available options.
+Plugins specific configurations are stored in `pluginsConfig`. You have to refer to the documentation of the plugin itself for details about the available options.

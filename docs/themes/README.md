@@ -23,4 +23,4 @@ Authors can extend the templates of a theme directly from the book source (witho
 
 ### Publish a theme
 
-Themes are published as plugins ([see related docs](plugins.md)) with a `theme-` prefix. For example the theme `awesome` will be loaded from `theme-awesome` plugin, and then from `gitbook-plugin-theme-awesome` NPM package.
+Themes are published as plugins ([see related docs](../plugins/README.md)) with a `theme-` prefix. For example the theme `awesome` will be loaded from the `theme-awesome` plugin, and then from the `gitbook-plugin-theme-awesome` NPM package.

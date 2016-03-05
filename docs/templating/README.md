@@ -1,18 +1,18 @@
 # Templating
 
-GitBook uses the Nunjucks templating language to process pages and theme's templates.
+GitBook uses the [Nunjucks templating language](https://mozilla.github.io/nunjucks/) to process pages and theme's templates.
 
-The Nunjucks syntax is very similar to **Jinja2** or **Liquid**.
+The Nunjucks syntax is very similar to **Jinja2** or **Liquid**. Its syntax uses surrounding braces `{ }` to mark content that needs to be processed.
 
 ### Variables
 
-A variable looks up a value from the template context. If you wanted to simply display a variable, you would do:
+A variable looks up a value from the template context. If you wanted to simply display a variable, you would use the `{{ variable }}` syntax. For example :
 
 ```twig
-{{ username }}
+My name is {{ name }}, nice to meet you
 ```
 
-This looks up username from the context and displays it. Variable names can have dots in them which lookup properties, just like javascript. You can also use the square bracket syntax.
+This looks up username from the context and displays it. Variable names can have dots in them which lookup properties, just like JavaScript. You can also use the square bracket syntax.
 
 ```twig
 {{ foo.bar }}
@@ -21,7 +21,7 @@ This looks up username from the context and displays it. Variable names can have
 
 If a value is undefined, nothing is displayed. The following all output nothing if foo is undefined: `{{ foo }}`, `{{ foo.bar }}`, `{{ foo.bar.baz }}`.
 
-GitBook provides a set of [context variables](variables.md).
+GitBook provides a set of [predefined  variables](variables.md) from the context.
 
 ### Filters
 
@@ -39,7 +39,7 @@ The third example shows how you can chain filters. It would display "Bar", by fi
 
 ##### if
 
-`if` tests a condition and lets you selectively display content. It behaves exactly as javascript's if behaves.
+`if` tests a condition and lets you selectively display content. It behaves exactly as JavaScript's `if` behaves.
 
 ```twig
 {% if variable %}
@@ -49,7 +49,7 @@ The third example shows how you can chain filters. It would display "Bar", by fi
 
 If variable is defined and evaluates to true, "It is true" will be displayed. Otherwise, nothing will be.
 
-You can specify alternate conditions with elif and else:
+You can specify alternate conditions with `elif` and `else`:
 
 ```twig
 {% if hungry %}
@@ -86,5 +86,4 @@ Current version is {{ softwareVersion }}.
 
 ##### include and block
 
-Inclusion and inheritance is detailled in the [ConRefs](conrefs.md) section.
-
+Inclusion and inheritance is detailled in the [Content References](conrefs.md) section.

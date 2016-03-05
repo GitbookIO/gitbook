@@ -1,10 +1,10 @@
 # Content References
 
-Content referencing (conref) is a convenient mechanism for reuse of content from other files or books.
+Content referencing (conref) is a convenient mechanism to reuse content from other files or books.
 
 ### Importing local files
 
-Importing an other file's content is really easy using the `include` tag:
+Importing an other file's content is easy using the `include` tag:
 
 ```
 {% include "./test.md" %}
@@ -21,7 +21,7 @@ GitBook can also resolve the include path by using git:
 The format of git url is:
 
 ```
-git+https://user@hostname/project/blah.git/file#commit-ish
+git+https://user@hostname/owner/project.git/file#commit-ish
 ```
 
 The real git url part should finish with `.git`, the filename to import is extracted after the `.git` till the fragment of the url.
@@ -42,7 +42,7 @@ Template inheritance is a way to make it easy to reuse templates. When writing a
 {% endblock %}
 ```
 
-In the file `mypage.md`, you should specify the blocks that can be extent:
+In the file `mypage.md`, you should specify the blocks that can be extended:
 
 ```
 {% block pageContent %}

@@ -1,6 +1,6 @@
 # Directory structure
 
-GitBook uses a very simple and obvious directory structure:
+GitBook uses a simple directory structure:
 
 ```
 .
@@ -26,7 +26,7 @@ An overview of what each of these does:
 
 ### Static files and Images
 
-A static file is a file that is not listed in the `SUMMARY.md`. All static files, not [ignored](#ignore), are copied to the output.
+A static file is a file that is not listed in the `SUMMARY.md`. All static files, unless [ignored](#ignore), are copied to the output.
 
 ### Ignoring files & folders {#ignore}
 
@@ -43,9 +43,9 @@ test.md
 bin/*
 ```
 
-### Project documentation / Sub-directory {#subdirectory}
+### Project integration with subdirectory {#subdirectory}
 
-For software project, it sometimes better to use a diretcory (like `docs/`) to store the project's documentation. You can use the [`root` option](config.md) to indicate to GitBook in which folder the book is stored:
+For software projects, you can use a subdirectory (like `docs/`) to store the book for the project's documentation. You can configure the [`root` option](config.md) to indicate the folder where GitBook can find the book's files:
 
 ```
 .
