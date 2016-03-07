@@ -19,7 +19,7 @@ describe('Init', function() {
                 rootFolder.should.have.file('hello.md');
                 rootFolder.should.have.file('hello 2.md');
             });
-        })
+        });
     });
 
     it('should create file subfolder', function() {
@@ -38,7 +38,7 @@ describe('Init', function() {
                 rootFolder.should.have.file('test/hello.md');
                 rootFolder.should.have.file('test/test2/world.md');
             });
-        })
+        });
     });
 
     it('should create SUMMARY if non-existant', function() {
@@ -51,7 +51,7 @@ describe('Init', function() {
                 rootFolder.should.have.file('SUMMARY.md');
                 rootFolder.should.have.file('README.md');
             });
-        })
+        });
     });
 
 });

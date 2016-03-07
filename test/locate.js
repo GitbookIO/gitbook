@@ -1,7 +1,6 @@
 var path = require('path');
 var should = require('should');
 
-var Book = require('../').Book;
 var mock = require('./mock');
 
 describe('Locate', function() {
