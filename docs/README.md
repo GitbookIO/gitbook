@@ -14,6 +14,8 @@ GitBook can output your content as a website ([customizable](themes/README.md) a
 
 We're always happy to help out with your books or any other questions you might have. You can ask a question on the following contact form at [gitbook.com/contact](https://www.gitbook.com/contact) or signal an issue on [GitHub](https://github.com/GitbookIO/gitbook).
 
+Check out the [GitBook Community Slack Channel](https://slack.gitbook.com), Stay updated by following [@GitBookIO](https://twitter.com/GitBookIO) on Twitter or [GitBook](https://www.facebook.com/gitbookcom) on Facebook.
+
 ### FAQ
 
 Some questions are frequently asked. If you have a problem you should  [check this out](faq.md) first.
