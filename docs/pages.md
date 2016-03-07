@@ -77,4 +77,4 @@ description: This is a short description of my page
 ...
 ```
 
-The front matter can define variables of your own, they will be added to the [book variable](templating/variables.md) so you can use them in your templating.
+The front matter can define variables of your own, they will be added to the [page variable](templating/variables.md) so you can use them in your templating.

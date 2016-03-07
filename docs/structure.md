@@ -1,6 +1,8 @@
-# Directory structure
+# Directory Structure
 
-GitBook uses a simple directory structure:
+GitBook uses a simple directory structure. All Markdown/Asciidoc files listed in the [SUMMARY](pages.md) will be transformed as HTML. Multi-Lingual books have a slightly [different structure](languages.md).
+
+A basic GitBook usually looks something like this:
 
 ```
 .
@@ -21,8 +23,8 @@ An overview of what each of these does:
 | -------- | ----------- |
 | `book.json` | Stores [configuration](config.md) data (__optional__) |
 | `README.md` | Preface / Introduction for your book (**required**) |
-| `SUMMARY.md` | Table of Contents |
-
+| `SUMMARY.md` | Table of Contents (See [Pages](pages.md)) (__optional__) |
+| `GLOSSARY.md` | Lexicon / List of terms to annotate (See [Glossary](lexicon.md)) (__optional__) |
 
 ### Static files and Images
 
@@ -33,7 +35,7 @@ A static file is a file that is not listed in the `SUMMARY.md`. All static files
 GitBook will read the `.gitignore`, `.bookignore` and `.ignore` files to get a list of files and folders to skip.
 The format inside those files, follows the same convention as `.gitignore`:
 
-```markdown
+```
 # This is a comment
 
 # Ignore the file test.md
