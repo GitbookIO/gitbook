@@ -19,8 +19,3 @@ A good cover respects the following guidelines:
 * Clearly visible book title
 * Any important text should be visible in the small version
 
-### Autocover
-
-A GitBook plugin (`autocover`) can also be used to automatically generate a cover file, or just create a `cover_small.jpg` from a `cover.jpg`. This plugin is added by default on hosted books.
-
-[Read more about autocover](https://github.com/GitbookIO/plugin-autocover).
