@@ -2,10 +2,6 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## 3.x.x (unreleased)
-- Fix filename argument for ebook commands
-- YAML frontmatter can extend page's properties
-
 ## 3.0.0 (pre)
 - Summary can contain external links and anchors (Fix [#776](https://github.com/GitbookIO/gitbook/issues/776))
 - Summary can contain differents entitled sections
@@ -17,7 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Markdown parser is now using CommonMark
 - Root folder for the book can be specified in a `.gitbook` file
 - Multi-lingual books share assets folder
-- YAML front matter is parsed and page's description can be specified in it
+- YAML front matter is parsed and can extend page's properties
 - Fix `uk` translation
 
 ## 2.6.7
