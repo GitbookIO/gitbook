@@ -9,10 +9,16 @@ module.exports = {
     gitbook: pkg.version,
 
     // Use the "official" theme
-    plugins: ['theme-official'],
+    plugins: ['theme-official', 'sitemap'],
     theme: 'official',
 
     variables: {
         version: pkg.version
+    },
+
+    pluginsConfig: {
+        sitemap: {
+            hostname: 'https://docs.gitbook.com'
+        }
     }
 };
