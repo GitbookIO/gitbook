@@ -24,10 +24,10 @@
     * [HTML](syntax/markdown.md#html)
     * [Footnotes](syntax/markdown.md#footnotes)
 * [AsciiDoc](syntax/asciidoc.md)
+* [eBook and PDF](ebook.md)
 
 ### Customization
 
-* [Cover](cover.md)
 * [Templating](templating/README.md)
     * [Content References](templating/conrefs.md)
     * [Variables](templating/variables.md)
