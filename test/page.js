@@ -36,6 +36,7 @@ describe('Page', function() {
             'variables/page/dir/ltr.md': 'This is english: {{ page.dir }}',
             'variables/page/dir/rtl.md': 'بسيطة {{ page.dir }}',
             'variables/config/title.md': '{{ config.title}}',
+            'variables/gitbook/generator.md': '{{ gitbook.generator }}',
 
             'GLOSSARY.md': '# Glossary\n\n\n## abracadabra\n\nthis is the description'
         }, [
@@ -356,6 +357,12 @@ describe('Page', function() {
             var page = book.addPage('variables/config/title.md');
             return page.toHTML(output)
             .should.be.fulfilledWith('<p>Hello World</p>\n');
+        });
+
+        it('should set gitbook.generator', function() {
+            var page = book.addPage('variables/gitbook/generator.md');
+            return page.toHTML(output)
+            .should.be.fulfilledWith('<p>base</p>\n');
         });
 
         describe('page.dir', function() {
