@@ -31,6 +31,7 @@
 * [Templating](templating/README.md)
     * [Content References](templating/conrefs.md)
     * [Variables](templating/variables.md)
+    * [Builtin](templating/builtin.md)
 * [Plugins](plugins/README.md)
     * [Create a plugin](plugins/create.md)
     * [Hooks](plugins/hooks.md)
