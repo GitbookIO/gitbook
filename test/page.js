@@ -38,7 +38,10 @@ describe('Page', function() {
             'variables/config/title.md': '{{ config.title}}',
             'variables/gitbook/generator.md': '{{ gitbook.generator }}',
 
-            'GLOSSARY.md': '# Glossary\n\n\n## abracadabra\n\nthis is the description'
+            'GLOSSARY.md': '# Glossary\n\n\n## abracadabra\n\nthis is the description',
+
+            'blocks/markdown.md': 'Hello <span>{% markdown %}**World**{% endmarkdown %}</span>',
+            'blocks/asciidoc.md': 'Hello <span>{% asciidoc %}^super^script phrase{% endasciidoc %}</span>'
         }, [
             {
                 title: 'Test page.next',
@@ -411,6 +414,18 @@ describe('Page', function() {
                     count: 0
                 }
             });
+        });
+    });
+
+    describe('Default Blocks', function() {
+        it('should render block "markdown"', function() {
+            return book.addPage('blocks/markdown.md').toHTML(output)
+            .should.finally.equal('<p>Hello <span><strong>World</strong></span></p>\n');
+        });
+
+        it('should render block "asciidoc"', function() {
+            return book.addPage('blocks/asciidoc.md').toHTML(output)
+            .should.finally.equal('<p>Hello <span><sup>super</sup>script phrase</span></p>\n');
         });
     });
 });
