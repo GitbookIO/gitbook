@@ -1,12 +1,12 @@
 # Theming
 
-Since version 3.0.0, GitBook can be easily themed. Books are using by default the [theme-default](https://github.com/GitbookIO/theme-default).
+Since version 3.0.0, GitBook can be easily themed. Books use the [theme-default](https://github.com/GitbookIO/theme-default) theme by default.
 
 > **Caution**: Custom theming can block some plugins from working correctly.
 
 ### Structure of a theme
 
-A theme is a plugin containing templates and assets. All the templates are optionnal, since theme are always extending the default theme.
+A theme is a plugin containing templates and assets. Overriding any individual template is optional, since themes always extend the default theme.
 
 | Folder | Description |
 | -------- | ----------- |
@@ -17,7 +17,7 @@ A theme is a plugin containing templates and assets. All the templates are optio
 
 ### Extend/Customize theme in a book
 
-Authors can extend the templates of a theme directly from the book source (without creating an external theme). Templates will be resolved in the `_layouts` folder of the book first, then in
+Authors can extend the templates of a theme directly from their book's source (without creating an external theme). Templates will be resolved in the `_layouts` folder of the book first, then in
 
 ### Publish a theme
 
