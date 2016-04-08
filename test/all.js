@@ -19,6 +19,7 @@ require('./git');
 require('./plugins');
 require('./template');
 require('./conrefs');
+require('./ignore');
 
 // Page and HTML generation
 require('./page');
