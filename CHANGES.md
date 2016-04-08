@@ -15,6 +15,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Multi-lingual books share assets folder
 - YAML front matter is parsed and can extend page's properties
 - Fix `uk` translation
+- Fix heading ID including dashes
+- Fix error in code highlighting for unknown languages
+- Accept SSH url as plugin version
+- Add templating blocks `markdown`, `asciidoc` and `markup`
 
 ## 2.6.7
 - Fix bug with filenames including spaces
