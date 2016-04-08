@@ -81,21 +81,25 @@ describe('Plugins', function() {
             })
             .should.be.fulfilledWith(1);
         });
-        it('should correctly install dependencies from GitHub via ssh', function() {
-            return mock.setupBook({
-                'book.json': {
-                    plugins: ['ga@git@github.com:GitbookIO/plugin-ga.git#master']
-                }
-            })
-            .then(function(book) {
-                return book.prepareConfig()
-                .then(function() {
-                    var plugins = new PluginsManager(book);
-                    return plugins.install();
-                });
-            })
-            .should.be.fulfilledWith(1);
-        });
+
+        // This test requires a SSH key, we only run it locally
+        if (!process.env.CI) {
+            it('should correctly install dependencies from GitHub via ssh', function() {
+                return mock.setupBook({
+                    'book.json': {
+                        plugins: ['ga@git@github.com:GitbookIO/plugin-ga.git#master']
+                    }
+                })
+                .then(function(book) {
+                    return book.prepareConfig()
+                    .then(function() {
+                        var plugins = new PluginsManager(book);
+                        return plugins.install();
+                    });
+                })
+                .should.be.fulfilledWith(1);
+            });
+        }
     });
 
     describe('Loading', function() {
