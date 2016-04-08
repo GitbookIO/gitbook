@@ -53,8 +53,9 @@ describe('JSON Output', function() {
 
         it('should correctly generate a README.json for the whole book', function() {
             output.should.have.file('README.json');
-
             var json = require(output.resolve('README.json'));
+
+            json.book.language.should.equal('en');
 
             json.should.have.property('languages')
                 .with.property('list').with.lengthOf(2);
