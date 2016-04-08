@@ -41,8 +41,23 @@ describe('JSON Output', function() {
             output.should.have.file('fr/README.json');
         });
 
+        it('should correctly add languages list to all json', function() {
+            var jsonFR = require(output.resolve('fr/README.json'));
+            var jsonEN = require(output.resolve('en/README.json'));
+
+            jsonFR.should.have.property('languages')
+                .with.property('list').with.lengthOf(2);
+            jsonEN.should.have.property('languages')
+                .with.property('list').with.lengthOf(2);
+        });
+
         it('should correctly generate a README.json for the whole book', function() {
             output.should.have.file('README.json');
+
+            var json = require(output.resolve('README.json'));
+
+            json.should.have.property('languages')
+                .with.property('list').with.lengthOf(2);
         });
     });
 });
