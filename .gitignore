@@ -26,3 +26,12 @@ node_modules
 
 # vim swapfile
 *.swp
+
+# Output of documentation
+_book
+
+book.pdf
+book.epub
+book.mobi
+
+.idea
