@@ -25,7 +25,7 @@ Each chapter has a dedicated page (`part#/README.md`) and is split into subchapt
 
 ##### Anchors
 
-Chaptersi n the Table of Contents can be pointing to specific part of a file using anchor.
+Chapters in the Table of Contents can be pointing to specific part of a file using anchor.
 
 ```markdown
 # Summary
