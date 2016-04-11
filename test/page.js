@@ -289,7 +289,7 @@ describe('Page', function() {
 
             it('should keep external images path', function() {
                 page.content.should.be.html({
-                    'img[src="https:/upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png"]': {
+                    'img[src="https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png"]': {
                         count: 1
                     }
                 });
