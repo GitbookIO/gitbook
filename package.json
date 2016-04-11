@@ -1,6 +1,6 @@
 {
   "name": "gitbook",
-  "version": "3.0.0-pre.6",
+  "version": "3.0.0-pre.7",
   "homepage": "https://www.gitbook.com",
   "description": "Library and cmd utility to generate GitBooks",
   "main": "lib/index.js",
