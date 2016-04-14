@@ -25,6 +25,7 @@
     "gitbook-plugin-highlight": "2.0.2",
     "gitbook-plugin-livereload": "0.0.1",
     "gitbook-plugin-search": "1.2.0",
+    "gitbook-plugin-lunr": "1.0.0",
     "gitbook-plugin-theme-default": "1.0.0-pre.6",
     "gitbook-plugin-sharing": "1.0.2",
     "github-slugid": "1.0.1",
