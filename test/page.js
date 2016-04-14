@@ -8,7 +8,7 @@ describe('Page', function() {
         return mock.setupDefaultBook({
             'README.md': ' # Hello World\n\nThis is a description',
             'heading.md': '# Hello\n\n## World',
-            'description.md': '# This is a title\n\nThis is the short description.\n\nNot this one.',
+            'description.md': '# This is a title\n\nThis is the short description.\n\nAnd the rest of the description.\n\n# Heading\n\nThis is not in the description',
             'frontmatter/description.md': '---\ndescription: Hello World\n---\n\n# This is a title\n\nThis is not the description',
             'frontmatter/var.md': '---\ntest: Hello World\n---\n\n{{ page.test }}',
 
@@ -141,7 +141,7 @@ describe('Page', function() {
 
             return page.toHTML(output)
             .then(function() {
-                page.attributes.description.should.equal('This is the short description.');
+                page.attributes.description.should.equal('This is the short description. And the rest of the description.');
             });
         });
     });
