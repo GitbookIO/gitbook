@@ -20,7 +20,8 @@ describe('Website Output', function() {
         });
 
         it('should correctly copy assets', function() {
-            output.should.have.file('gitbook/app.js');
+            output.should.have.file('gitbook/gitbook.js');
+            output.should.have.file('gitbook/theme.js');
             output.should.have.file('gitbook/images/favicon.ico');
         });
 
@@ -84,12 +85,16 @@ describe('Website Output', function() {
         });
 
         it('should correctly copy assets', function() {
-            output.should.have.file('gitbook/app.js');
+            output.should.have.file('gitbook/gitbook.js');
+            output.should.have.file('gitbook/theme.js');
         });
 
         it('should not copy assets for each language', function() {
-            output.should.have.not.file('en/gitbook/app.js');
-            output.should.have.not.file('fr/gitbook/app.js');
+            output.should.have.not.file('en/gitbook/gitbook.js');
+            output.should.have.not.file('fr/gitbook/gitbook.js');
+
+            output.should.have.not.file('en/gitbook/theme.js');
+            output.should.have.not.file('fr/gitbook/theme.js');
         });
 
         it('should correctly generate an index.html', function() {
