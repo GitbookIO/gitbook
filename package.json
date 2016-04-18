@@ -42,7 +42,7 @@
     "npm": "3.8.6",
     "npmi": "1.0.1",
     "nunjucks": "2.4.1",
-    "nunjucks-autoescape": "1.0.1",
+    "nunjucks-do": "1.0.0",
     "q": "1.4.1",
     "read-installed": "^4.0.3",
     "request": "2.70.0",
