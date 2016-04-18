@@ -6,6 +6,7 @@ var registry = require('../lib/plugins/registry');
 var Output = require('../lib/output/base');
 var PluginsManager = require('../lib/plugins');
 var BookPlugin = require('../lib/plugins/plugin');
+var JSONOutput = require('../lib/output/json');
 
 var PLUGINS_ROOT = path.resolve(__dirname, 'node_modules');
 
@@ -227,6 +228,42 @@ describe('Plugins', function() {
             return plugin.hook('init')
             .then(function() {
                 global._hooks.should.deepEqual(['init']);
+            });
+        });
+
+
+        describe('Hook "page"', function() {
+            var pluginDeprecated;
+
+            before(function() {
+                pluginDeprecated = TestPlugin(book, 'test-deprecated');
+                return pluginDeprecated.load(PLUGINS_ROOT);
+            });
+
+            it('should update content using "content" property', function() {
+                return mock.setupDefaultOutput(JSONOutput)
+                .then(function(output) {
+                    output.plugins.load(plugin);
+
+                    return output.generate()
+                    .then(function() {
+                        var json = require(output.resolve('README.json'));
+                        json.page.content.should.equal('Hello <p>Hello</p>\n');
+                    });
+                });
+            });
+
+            it('should update content using deprecated "sections" property', function() {
+                return mock.setupDefaultOutput(JSONOutput)
+                .then(function(output) {
+                    output.plugins.load(pluginDeprecated);
+
+                    return output.generate()
+                    .then(function() {
+                        var json = require(output.resolve('README.json'));
+                        json.page.content.should.equal('Hello (sections) <p>Hello</p>\n');
+                    });
+                });
             });
         });
     });

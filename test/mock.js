@@ -68,24 +68,8 @@ function setupDefaultBook(files, summary, opts) {
     }), opts);
 }
 
-// Output a book with a specific generator
-function outputDefaultBook(Output, files, summary, opts) {
-    return setupDefaultBook(files, summary, opts)
-    .then(function(book) {
-        // Parse the book
-        return book.parse()
-
-        // Start generation
-        .then(function() {
-            var output = new Output(book);
-            return output.generate()
-                .thenResolve(output);
-        });
-    });
-}
-
-// Output a book with a specific generator
-function outputBook(Output, files, opts) {
+// Prepare output for a book
+function setupOutput(Output, files, opts) {
     return setupBook(files, opts)
     .then(function(book) {
         // Parse the book
@@ -93,10 +77,40 @@ function outputBook(Output, files, opts) {
 
         // Start generation
         .then(function() {
-            var output = new Output(book);
-            return output.generate()
-                .thenResolve(output);
+            return new Output(book);
         });
+    });
+}
+
+// Prepare output for a book
+function setupDefaultOutput(Output, files, summary, opts) {
+    return setupDefaultBook(files, summary, opts)
+    .then(function(book) {
+        // Parse the book
+        return book.parse()
+
+        // Start generation
+        .then(function() {
+            return new Output(book);
+        });
+    });
+}
+
+// Output a book with a specific generator
+function outputDefaultBook(Output, files, summary, opts) {
+    return setupDefaultOutput(Output, files, summary, opts)
+    .then(function(output) {
+        return output.generate()
+            .thenResolve(output);
+    });
+}
+
+// Output a book with a specific generator
+function outputBook(Output, files, opts) {
+    return setupOutput(Output, files, opts)
+    .then(function(output) {
+        return output.generate()
+            .thenResolve(output);
     });
 }
 
@@ -107,10 +121,17 @@ function logError(err) {
 
 module.exports = {
     fs: nodeFS,
+
     setupFS: setupFS,
+
     setupBook: setupBook,
-    outputBook: outputBook,
     setupDefaultBook: setupDefaultBook,
+
+    setupOutput: setupOutput,
+    setupDefaultOutput: setupDefaultOutput,
+
+    outputBook: outputBook,
     outputDefaultBook: outputDefaultBook,
+
     logError: logError
 };
