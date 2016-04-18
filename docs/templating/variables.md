@@ -10,6 +10,8 @@ The following is a reference of the available data during book's parsing and the
 | `gitbook` | GitBook specific information |
 | `page` | Current page specific information |
 | `file` | File associated with the current page specific information |
+| `readme` | Information about the Readme |
+| `glossary` | Information about the Glossary |
 | `summary` | Information about the table of contents |
 | `languages` | List of languages for multi-lingual books |
 | `output` | Information about the output generator |
@@ -71,3 +73,14 @@ Languages are defined by `{ id: 'en', title: 'English' }`.
 | `output.name` | Name of the output generator, possible values are `website`, `json`, `ebook` |
 | `output.format` | When `output.name == "ebook"`, `format` defines the ebook format that will be generated, possible values are `pdf`, `epub` or `mobi` |
 
+### Readme Variables
+
+| Variable | Description |
+| -------- | ----------- |
+| `readme.path` | Path to the Readme in the book |
+
+### Glossary Variables
+
+| Variable | Description |
+| -------- | ----------- |
+| `glossary.path` | Path to the Glossary in the book |
