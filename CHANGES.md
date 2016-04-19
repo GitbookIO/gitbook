@@ -19,6 +19,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Fix error in code highlighting for unknown languages
 - Accept SSH url as plugin version
 - Add templating blocks `markdown`, `asciidoc` and `markup`
+- Better search experience
+- Better default theme, more responsive and cleaner
 
 ## 2.6.7
 - Fix bug with filenames including spaces
