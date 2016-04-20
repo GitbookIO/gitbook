@@ -19,7 +19,6 @@ require('./git');
 require('./plugins');
 require('./template');
 require('./conrefs');
-require('./ignore');
 
 // Page and HTML generation
 require('./page');
@@ -29,6 +28,9 @@ require('./assets-inliner');
 require('./output-json');
 require('./output-website');
 require('./output-ebook');
+
+require('./structure');
+require('./ignore');
 
 // Misc
 require('./init');
