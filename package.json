@@ -64,7 +64,7 @@
     "should": "8.3.0"
   },
   "scripts": {
-    "test": "node_modules/.bin/mocha --reporter spec --bail --timeout 15000 ./test/all.js",
+    "test": "node_modules/.bin/jest --bail",
     "lint": "eslint ."
   },
   "repository": {
