@@ -13,7 +13,8 @@
     "env": {
         "node": true,
         "mocha": true,
-        "browser": true
+        "browser": true,
+        "jest": true
     },
     "extends": "eslint:recommended"
 }
