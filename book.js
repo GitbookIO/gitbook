@@ -9,7 +9,7 @@ module.exports = {
     gitbook: '>=3.0.0-pre.0',
 
     // Use the "official" theme
-    plugins: ['theme-official', 'sitemap'],
+    //plugins: ['theme-official', 'sitemap'],
 
     variables: {
         version: pkg.version

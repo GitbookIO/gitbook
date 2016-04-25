@@ -1,6 +1,7 @@
 var path = require('path');
 
 var gitbook = require('./lib');
+var Output = require('./lib/output');
 var NodeFS = require('./lib/fs/node');
 
 
@@ -15,7 +16,9 @@ var book = gitbook.Book.createForFS(fs);
 // Parse the book
 gitbook.Parse.parseBook(book)
 .then(function(_book) {
-    return gitbook.Parse.parsePagesList(_book);
+    return Output.generate(Output.JSONGenerator, _book, {
+        root: path.join(__dirname, '_book')
+    });
 })
 .then(function(pages) {
     //console.log('parsed', pages);
