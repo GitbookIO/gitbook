@@ -16,7 +16,7 @@ var book = gitbook.Book.createForFS(fs);
 // Parse the book
 gitbook.Parse.parseBook(book)
 .then(function(_book) {
-    return Output.generate(Output.JSONGenerator, _book, {
+    return Output.generate(Output.WebsiteGenerator, _book, {
         root: path.join(__dirname, '_book')
     });
 })
