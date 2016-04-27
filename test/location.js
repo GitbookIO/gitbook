@@ -1,4 +1,5 @@
 var location = require('../lib/utils/location');
+var dataURI = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==';
 
 describe('Location', function() {
     it('should correctly test external location', function() {
@@ -7,6 +8,16 @@ describe('Location', function() {
         location.isExternal('test.md').should.be.exactly(false);
         location.isExternal('folder/test.md').should.be.exactly(false);
         location.isExternal('/folder/test.md').should.be.exactly(false);
+        location.isExternal(dataURI).should.be.exactly(false);
+    });
+
+    it('should correctly test a data-uri location', function() {
+        location.isDataURI('http://google.fr').should.be.exactly(false);
+        location.isDataURI('https://google.fr').should.be.exactly(false);
+        location.isDataURI('test.md').should.be.exactly(false);
+        location.isDataURI('folder/test.md').should.be.exactly(false);
+        location.isDataURI('/folder/test.md').should.be.exactly(false);
+        location.isDataURI(dataURI).should.be.exactly(true);
     });
 
     it('should correctly detect anchor location', function() {
@@ -51,5 +62,9 @@ describe('Location', function() {
         it('should correctly handle absolute path (windows)', function() {
             location.toAbsolute('\\test.png', 'folder', '').should.be.equal('test.png');
         });
+
+        it('should correctly handle data-uri paths',function() {
+            location.toAbsolute(dataURI).should.be.equal(dataURI);
+        })
     });
 });
