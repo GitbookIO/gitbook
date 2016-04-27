@@ -4,6 +4,7 @@
   "homepage": "https://www.gitbook.com",
   "description": "Library and cmd utility to generate GitBooks",
   "main": "lib/index.js",
+  "browser": "./lib/browser.js",
   "dependencies": {
     "bash-color": "0.0.3",
     "cheerio": "0.20.0",
