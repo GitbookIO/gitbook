@@ -19,6 +19,7 @@
     "escape-html": "^1.0.3",
     "escape-string-regexp": "1.0.5",
     "eslint": "^2.2.0",
+    "extend": "^3.0.0",
     "front-matter": "2.0.7",
     "gitbook-asciidoc": "1.1.0",
     "gitbook-markdown": "1.2.0",
