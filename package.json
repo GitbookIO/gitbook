@@ -63,9 +63,7 @@
   },
   "devDependencies": {
     "eslint": "2.7.0",
-    "jest-cli": "^11.0.2",
-    "mocha": "2.4.5",
-    "should": "8.3.0"
+    "jest-cli": "^11.0.2"
   },
   "scripts": {
     "test": "node_modules/.bin/jest --bail",
@@ -97,5 +95,9 @@
       "name": "Samy Pessé",
       "email": "samy@gitbook.com"
     }
-  ]
+  ],
+  "jest": {
+    "automock": false,
+    "setupTestFrameworkScriptFile": "<rootDir>/jest/customMatchers.js"
+  }
 }

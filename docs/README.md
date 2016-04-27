@@ -1,5 +1,7 @@
 # GitBook Toolchain Documentation
 
+![image](https://upload.wikimedia.org/wikipedia/commons/0/02/SVG_logo.svg)
+
 This document aims to be a comprehensive guide to GitBook. It contains the full documentation for version **{{ book.version }}**. Help for GitBook.com specific questions can be found at [help.gitbook.com](https://help.gitbook.com).
 
 ### What is GitBook?
