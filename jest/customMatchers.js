@@ -20,5 +20,6 @@ var matchers = {
 };
 
 jasmine.getEnv().beforeEach(function () {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
     jasmine.addMatchers(matchers);
 });
