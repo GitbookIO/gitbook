@@ -12,7 +12,6 @@
     },
     "env": {
         "node": true,
-        "mocha": true,
         "browser": true,
         "jest": true,
         "jasmine": true

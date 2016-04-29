@@ -1,2 +1,4 @@
 docs/**/*
-test/node_modules/**/*
+_book/**/*
+node_modules/**/*
+test/**/*
