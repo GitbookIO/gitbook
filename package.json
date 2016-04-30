@@ -39,7 +39,6 @@
     "json-schema-defaults": "0.1.1",
     "jsonschema": "1.1.0",
     "juice": "1.10.0",
-    "lodash": "3.10.1",
     "merge-defaults": "0.2.1",
     "mkdirp": "0.5.1",
     "moment": "2.12.0",
