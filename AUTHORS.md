@@ -7,9 +7,10 @@ Names below are ordered by first contribution.
 Author
 ------
 
-- Samy Pessé <samypesse@gmail.com> (@SamyPesse)
-- Aaron O'Mullan <aaron.omullan@gmail.com> (@AaronO)
-
+- Samy Pessé <samy@gitbook.com> (@SamyPesse)
+- Aaron O'Mullan <aaron@gitbook.com> (@AaronO)
+- Johan Preynat <johan@gitbook.com> (@jpreynat)
+- Nicolas Gaborit <nicolas@gitbook.com> (@soreine)
 
 Contributors
 ------------
