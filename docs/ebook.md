@@ -2,6 +2,17 @@
 
 GitBook can generates a website, but can also output content as ebook (ePub, Mobi, PDF).
 
+```
+# Generate a PDF file
+$ gitbook pdf ./ ./mybook.pdf
+
+# Generate an ePub file
+$ gitbook epub ./ ./mybook.epub
+
+# Generate a Mobi file
+$ gitbook mobi ./ ./mybook.mobi
+```
+
 ### Installing ebook-convert
 
 `ebook-convert` is required to generate ebooks (epub, mobi, pdf).
