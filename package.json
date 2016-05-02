@@ -63,7 +63,7 @@
   },
   "devDependencies": {
     "eslint": "2.7.0",
-    "jest-cli": "^11.0.2"
+    "jest-cli": "12.0.2"
   },
   "scripts": {
     "test": "node_modules/.bin/jest --bail",
