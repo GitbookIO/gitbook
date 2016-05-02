@@ -98,6 +98,9 @@
   ],
   "jest": {
     "automock": false,
-    "setupTestFrameworkScriptFile": "<rootDir>/jest/customMatchers.js"
+    "setupTestFrameworkScriptFile": "<rootDir>/jest/customMatchers.js",
+    "globals": {
+      "__DEV__": true
+    }
   }
 }
