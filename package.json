@@ -22,7 +22,7 @@
     "extend": "^3.0.0",
     "fresh-require": "1.0.3",
     "front-matter": "2.0.7",
-    "gitbook-asciidoc": "1.1.3",
+    "gitbook-asciidoc": "1.1.4",
     "gitbook-markdown": "1.2.3",
     "gitbook-plugin-fontsettings": "1.0.3",
     "gitbook-plugin-highlight": "2.0.2",
