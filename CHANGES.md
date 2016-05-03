@@ -17,6 +17,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Fix `uk` translation
 - Fix heading ID including dashes
 - Fix error in code highlighting for unknown languages
+- Fix data-uri images being handled as external images
 - Accept SSH url as plugin version
 - Add templating blocks `markdown`, `asciidoc` and `markup`
 - Better search experience
