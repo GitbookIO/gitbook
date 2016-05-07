@@ -46,3 +46,33 @@ PDF Output can be customized using a set of options in the `book.json`:
 | `pdf.margin.bottom` | Bottom margin (default is `56`) |
 | `pdf.margin.right` | Right margin (default is `62`) |
 | `pdf.margin.left` | Left margin (default is `62`) |
+| `pdf.ebookConvertOptions` | Pass additional commands to the `ebook-convert` tool |
+
+Margin values are specified in points. Descriptions for the available options can be found in the [`ebook-convert` documentation][ebook-docs].
+
+Example configuration:
+```json
+...
+
+"pdf": {
+  "toc": true,
+  "fontFamily": "Helvetica",
+  "paperSize": "letter",
+  "chapterMark" : "pagebreak",
+  "pageBreaksBefore": "/",
+  "margin": {
+      "right": 90,
+      "left": 90,
+      "top": 90,
+      "bottom": 90
+  },
+  "headerTemplate": "",
+  "footerTemplate": "_PAGENUM_",
+  "ebookConvertOptions": {
+    "--pdf-add-toc": true,
+    "--embed-all-fonts": true
+  }
+}
+```
+
+[ebook-docs]: https://manual.calibre-ebook.com/generated/en/ebook-convert.html#pdf-input-options
