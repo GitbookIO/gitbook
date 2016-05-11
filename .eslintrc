@@ -13,8 +13,10 @@
     "env": {
         "node": true,
         "browser": true,
-        "jest": true,
-        "jasmine": true
+        "mocha": true
+    },
+    "globals": {
+        "expect": true
     },
     "extends": "eslint:recommended"
 }
