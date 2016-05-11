@@ -62,11 +62,12 @@
   },
   "devDependencies": {
     "eslint": "2.9.0",
-    "jest-cli": "12.0.2"
+    "expect": "^1.20.1",
+    "mocha": "^2.4.5"
   },
   "scripts": {
-    "test": "node_modules/.bin/jest --bail",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "./node_modules/.bin/mocha ./testing/setup.js './lib/**/*/__tests__/*.js' --bail --reporter=list --timeout=5000"
   },
   "repository": {
     "type": "git",
@@ -94,12 +95,5 @@
       "name": "Samy Pessé",
       "email": "samy@gitbook.com"
     }
-  ],
-  "jest": {
-    "automock": false,
-    "setupTestFrameworkScriptFile": "<rootDir>/jest/customMatchers.js",
-    "globals": {
-      "__DEV__": true
-    }
-  }
+  ]
 }
