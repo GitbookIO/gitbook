@@ -37,7 +37,7 @@ var filepath = output.resolve('myimage.png');
 var fileurl = output.toURL('mychapter/README.md');
 
 // Write a file in the output folder
-output.write('hello.txt', 'Hello World')
+output.writeFile('hello.txt', 'Hello World')
     .then(function() { ... });
 
 // Copy a file to the output folder
