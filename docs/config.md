@@ -7,6 +7,7 @@ GitBook allows you to customize your book using a flexible configuration. These 
 | Variable | Description |
 | -------- | ----------- |
 | `root` | Path to the root folder containing all the book's files, except `book.json`|
+| `structure` | To specify paths for Readme, Summary, Glossary etc. See [Structure paragraph](#structure). |
 | `title` | Title of your book, default value is extracted from the README. On GitBook.com this field is pre-filled. |
 | `description` | Description of your book, default value is extracted from the README. On GitBook.com this field is pre-filled. |
 | `author` | Name of the author. On GitBook.com this field is pre-filled. |
@@ -31,6 +32,18 @@ Since version 3.0.0, GitBook can use themes. See [the theming section](themes/RE
 | Variable | Description |
 | -------- | ----------- |
 | `theme` | The theme to use for the book |
+
+### Structure
+
+In addition to the `root` variable, you can tell Gitbook where to find files for Readme, Summary, Glossary, Languages (instead of using the default paths such as `README.md`).
+These paths are relative to `root` of each book, and can be extended in every language's `book.json`.
+
+| Variable | Description |
+| -------- | ----------- |
+| `structure.readme` | Path to the Readme file (defaults to `README.md`) |
+| `structure.summary` | Path to the Summary file (defaults to `SUMMARY.md`) |
+| `structure.glossary` | Path to the Glossary file (defaults to `GLOSSARY.md`) |
+| `structure.languages` | Path to the Languages file (defaults to `LANGS.md`) |
 
 ### PDF Options
 
