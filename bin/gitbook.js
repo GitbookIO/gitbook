@@ -1,4 +1,5 @@
 #! /usr/bin/env node
+/* eslint-disable no-console */
 
 var color = require('bash-color');
 
