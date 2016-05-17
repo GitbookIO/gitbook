@@ -35,15 +35,15 @@ Since version 3.0.0, GitBook can use themes. See [the theming section](themes/RE
 
 ### Structure
 
-In addition to the `root` variable, you can tell Gitbook where to find files for Readme, Summary, Glossary, Languages (instead of using the default paths such as `README.md`).
-These paths are relative to `root` of each book, and can be extended in every language's `book.json`.
+In addition to the `root` variable, you can tell Gitbook the name of the files for Readme, Summary, Glossary, Languages (instead of using the default names such as `README.md`).
+These files must be at the root of your book (or the root of every language book). Paths such as `dir/MY_README.md` are not accepted.
 
 | Variable | Description |
 | -------- | ----------- |
-| `structure.readme` | Path to the Readme file (defaults to `README.md`) |
-| `structure.summary` | Path to the Summary file (defaults to `SUMMARY.md`) |
-| `structure.glossary` | Path to the Glossary file (defaults to `GLOSSARY.md`) |
-| `structure.languages` | Path to the Languages file (defaults to `LANGS.md`) |
+| `structure.readme` | Readme file name (defaults to `README.md`) |
+| `structure.summary` | Summary file name (defaults to `SUMMARY.md`) |
+| `structure.glossary` | Glossary file name (defaults to `GLOSSARY.md`) |
+| `structure.languages` | Languages file name (defaults to `LANGS.md`) |
 
 ### PDF Options
 
