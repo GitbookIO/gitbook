@@ -9,10 +9,14 @@ environment:
     - nodejs_version: "5"
     - nodejs_version: "4"
 
+matrix:
+  fast_finish: true
+
 # Install scripts. (runs after repo cloning)
 install:
   # Get the latest stable version of Node.js or io.js
   - ps: Install-Product node $env:nodejs_version
+  - set CI=true
   # install svgexport
   - npm install svgexport -g
   # install modules
@@ -28,3 +32,7 @@ test_script:
 
 # Don't actually build.
 build: off
+
+# Clone only last commit
+shallow_clone: true
+clone_depth: 1
