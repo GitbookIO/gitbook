@@ -51,5 +51,5 @@ This is the default content
 
 # License
 
-{% import "./LICENSE" %}
+{% include "./LICENSE" %}
 ```
