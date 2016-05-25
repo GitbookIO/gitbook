@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## 3.0.1 (unreleased)
+## 3.0.1
 - Fix regression in link resolution when contain anchor
 - Fix `structure.<name>` configuration not supporting filenames with dots
 
