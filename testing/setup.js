@@ -2,6 +2,7 @@ var is = require('is');
 var path = require('path');
 var fs = require('fs');
 var expect = require('expect');
+var cheerio = require('cheerio');
 
 expect.extend({
     /**
@@ -43,6 +44,18 @@ expect.extend({
             'expected to be defined'
         );
         return this;
+    },
+
+    /**
+        Check that a dom element exists in HTML
+
+        @param {String} selector
+    */
+    toHaveDOMElement: function(selector) {
+        var $ = cheerio.load(this.actual);
+        var $el = $(selector);
+
+        expect.assert($el.length > 0, 'expected HTML to contains %s', selector);
     }
 });
 
