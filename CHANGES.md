@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.0.3
+- Fix redirection in `gitbook serve` when accessing a folder without trailing slash
+- Fix links/annotations for glossary not being correctly resolved
+- Fix regression for supporting uppercase filenames in structure files
+- Fix `gitbook install` when using Git URLs for plugins
+
 ## 3.0.2
 - Fix crash for anchor links
 
