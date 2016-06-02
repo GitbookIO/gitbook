@@ -23,7 +23,7 @@
     "front-matter": "2.0.8",
     "gitbook-asciidoc": "1.1.4",
     "gitbook-markdown": "1.2.3",
-    "gitbook-plugin-fontsettings": "1.0.3",
+    "gitbook-plugin-fontsettings": "2.0.0",
     "gitbook-plugin-highlight": "2.0.2",
     "gitbook-plugin-livereload": "0.0.1",
     "gitbook-plugin-lunr": "1.1.0",
