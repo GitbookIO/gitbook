@@ -10,7 +10,7 @@ In the plugin's folder, run:
 $ npm link
 ```
 
-Then npn your book's folder:
+Then npm your book's folder:
 
 ```
 $ npm link gitbook-plugin-<plugin's name>
