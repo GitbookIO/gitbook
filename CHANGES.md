@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.1.0
+- Always load themes after plugins
+- README/Introduction doesn't require to be the first entry in the summary
+- Highlight active entry in summary when scrolling a page with anchors
+- Support empty parts in summary
+
 ## 3.0.3
 - Fix redirection in `gitbook serve` when accessing a folder without trailing slash
 - Fix links/annotations for glossary not being correctly resolved
