@@ -6,10 +6,9 @@ var cheerio = require('cheerio');
 
 expect.extend({
     /**
-        Check that a file is created in a directory:
-
-        expect('myFolder').toHaveFile('hello.md');
-    */
+     * Check that a file is created in a directory:
+     * expect('myFolder').toHaveFile('hello.md');
+     */
     toHaveFile: function(fileName) {
         var filePath = path.join(this.actual, fileName);
         var exists = fs.existsSync(filePath);
@@ -36,8 +35,8 @@ expect.extend({
     },
 
     /**
-        Check that a value is defined (not null nor undefined)
-    */
+     * Check that a value is defined (not null nor undefined)
+     */
     toBeDefined: function() {
         expect.assert(
             !(is.undefined(this.actual) || is.null(this.actual)),
@@ -47,10 +46,21 @@ expect.extend({
     },
 
     /**
-        Check that a dom element exists in HTML
+     * Check that a value is defined (not null nor undefined)
+     */
+    toNotBeDefined: function() {
+        expect.assert(
+            (is.undefined(this.actual) || is.null(this.actual)),
+            'expected %s to be not defined',
+            this.actual
+        );
+        return this;
+    },
 
-        @param {String} selector
-    */
+    /**
+     * Check that a dom element exists in HTML
+     * @param {String} selector
+     */
     toHaveDOMElement: function(selector) {
         var $ = cheerio.load(this.actual);
         var $el = $(selector);
