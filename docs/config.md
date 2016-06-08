@@ -20,18 +20,12 @@ GitBook allows you to customize your book using a flexible configuration. These 
 
 Plugins and their configurations are specified in the `book.json`. See [the plugins section](plugins/README.md) for more details.
 
-| Variable | Description |
-| -------- | ----------- |
-| `plugins` | List of plugins to load |
-| `pluginsConfig` |Configuration for plugins |
-
-### Theme
-
 Since version 3.0.0, GitBook can use themes. See [the theming section](themes/README.md) for more details.
 
 | Variable | Description |
 | -------- | ----------- |
-| `theme` | The theme to use for the book |
+| `plugins` | List of plugins to load |
+| `pluginsConfig` |Configuration for plugins |
 
 ### Structure
 
