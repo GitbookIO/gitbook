@@ -35,7 +35,7 @@ To provide a cover, place a **`cover.jpg`** file at the root directory of your b
 
 A good cover should respect the following guidelines:
 
-* Size of `1800x2360` pixels for `cover.jpg`, 200x262 for `cover_small.jpg`
+* Size of 1800x2360 pixels for `cover.jpg`, 200x262 for `cover_small.jpg`
 * No border
 * Clearly visible book title
 * Any important text should be visible in the small version
