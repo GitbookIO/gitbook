@@ -39,6 +39,3 @@ A good cover should respect the following guidelines:
 * No border
 * Clearly visible book title
 * Any important text should be visible in the small version
-
-
-Covers are used for all the ebook formats, and to make books more elegant on GitBook.com.
