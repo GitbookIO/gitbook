@@ -29,7 +29,7 @@ You can replace `/usr/bin` with any directory that is in your $PATH.
 
 ### Cover
 
-Covers are used for all the ebook formats. It's an important part of an ebook brandline.
+Covers are used for all the ebook formats. You can either provide one yourself, or generate one using the [autocover plugin](https://plugins.gitbook.com/plugin/autocover).
 
 To provide a cover, place a **`cover.jpg`** file at the root directory of your book. Adding a **`cover_small.jpg`** will specify a smaller version of the cover. The cover should be a **JPEG** file.
 
