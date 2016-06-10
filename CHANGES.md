@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.1.1
+- Fix order of plugins during loading
+- Fix error when using math and conrefs
+- Fix target attribute for external links
+- Fix serve command
+
 ## 3.1.0
 - Always load themes after plugins
 - README/Introduction doesn't require to be the first entry in the summary
