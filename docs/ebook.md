@@ -15,11 +15,13 @@ $ gitbook mobi ./ ./mybook.mobi
 
 ### Installing ebook-convert
 
-`ebook-convert` is required to generate ebooks (epub, mobi, pdf).
+The cli tools `ebook-convert` is required to generate ebooks (epub, mobi, pdf).
+
+Download the [Calibre application](https://calibre-ebook.com/download). Then verify that the `ebook-convert` are accessible via your path.
 
 ##### OS X
 
-Download the [Calibre application](https://calibre-ebook.com/download). After moving the `calibre.app` to your Applications folder create a symbolic link to the ebook-convert tool:
+After moving the `calibre.app` to your Applications folder create a symbolic link to the ebook-convert tool:
 
 ```
 $ sudo ln -s ~/Applications/calibre.app/Contents/MacOS/ebook-convert /usr/bin
