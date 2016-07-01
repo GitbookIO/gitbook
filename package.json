@@ -26,7 +26,7 @@
     "gitbook-plugin-fontsettings": "2.0.0",
     "gitbook-plugin-highlight": "2.0.2",
     "gitbook-plugin-livereload": "0.0.1",
-    "gitbook-plugin-lunr": "1.1.0",
+    "gitbook-plugin-lunr": "1.2.0",
     "gitbook-plugin-search": "2.2.1",
     "gitbook-plugin-sharing": "1.0.2",
     "gitbook-plugin-theme-default": "1.0.4",
