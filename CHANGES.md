@@ -5,6 +5,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## 3.2.0 (pre)
 - Switch markdown parser from `kramed` to `markup-it`
 - Fix support of `|` in tables
+- Fix access to `output.name` in templating
+- Improve options of default search indexer (keywords, disabling per pages)
+- Improve pertinence of search results
 
 ## 3.1.1
 - Fix order of plugins during loading
