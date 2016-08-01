@@ -4,7 +4,7 @@ If possible, open separate issues for each bug report. Avoid grouping bugs that 
 
 ### What is the current behavior?
 
-If the current behavior is a bug, please provide the steps to reproduce. if possible, provide the GitBook version being used (`gitbook -v`) and the system infromations (OS and version).
+If the current behavior is a bug, please provide the steps to reproduce. if possible, provide the GitBook version being used (`gitbook -V`) and the system infromations (OS and version).
 
 ### What is the expected behavior?
 
