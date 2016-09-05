@@ -155,7 +155,7 @@ TemplateBlock.prototype.toNunjucksExt = function(mainContext, blocksOutput) {
                 const blockKwargs = extractKwargs(blockArgs);
 
                 blocks.push({
-                    blkName,
+                    name: blkName,
                     body: blockBody(),
                     args: blockArgs,
                     kwargs: blockKwargs
