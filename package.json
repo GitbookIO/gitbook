@@ -1,7 +1,7 @@
 {
   "private": true,
   "devDependencies": {
-    "eslint": "2.10.2",
+    "eslint": "3.4.0",
     "eslint-config-gitbook": "^1.2.0",
     "expect": "^1.20.1",
     "lerna": "2.0.0-beta.26",
