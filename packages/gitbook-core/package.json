@@ -23,7 +23,7 @@
   },
   "scripts": {
     "dist-lib": "rm -rf lib/ && babel -d lib/ src/",
-    "dist-standalone": "browserify -r react -r react-dom -r ./lib/index.js:gitbook-core | uglifyjs -c > gitbook.core.js.min",
+    "dist-standalone": "browserify -r ./lib/index.js:gitbook-core -r react -r react-dom ./lib/index.js | uglifyjs -c > gitbook.core.min.js",
     "prepublish": "npm run dist-lib && npm run dist-standalone"
   },
   "repository": {

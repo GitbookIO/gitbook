@@ -5,6 +5,11 @@ const ThemeBody = React.createClass({
     render() {
         return (
             <div>
+                <GitBook.Head
+                    title={'Homepage'}
+                    titleTemplate="%s - GitBook"
+                />
+
                 My Base theme for gitbook
             </div>
         );

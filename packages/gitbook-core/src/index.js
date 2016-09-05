@@ -1,3 +1,4 @@
+const Head = require('react-helmet');
 const { InjectedComponent, InjectedComponentSet } = require('./components/InjectedComponent');
 const { registerComponent } = require('./actions/components');
 const ACTIONS = require('./actions/TYPES');
@@ -16,5 +17,6 @@ module.exports = {
     renderComponent,
     registerComponent,
     InjectedComponent,
-    InjectedComponentSet
+    InjectedComponentSet,
+    Head
 };

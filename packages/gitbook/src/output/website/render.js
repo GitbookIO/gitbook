@@ -14,7 +14,7 @@ function HTML({head, innerHTML, props}) {
                 {head.link.toComponent()}
             </head>
             <body>
-                <div id="content" dangerouslySetInnerHTML={{__html: innerHTML}} />    
+                <div id="content" dangerouslySetInnerHTML={{__html: innerHTML}} />
                 {head.link.toComponent()}
                 <script
                     type="application/payload+json"
@@ -25,6 +25,7 @@ function HTML({head, innerHTML, props}) {
 }
 HTML.propTypes = {
     head:      React.PropTypes.object,
+    props:     React.PropTypes.object,
     innerHTML: React.PropTypes.string
 };
 
