@@ -67,7 +67,9 @@
     "urijs": "1.18.0"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha ./testing/setup.js \"./lib/**/*/__tests__/*.js\" --bail --reporter=list --timeout=10000"
+    "test": "./node_modules/.bin/mocha ./testing/setup.js \"./lib/**/*/__tests__/*.js\" --bail --reporter=list --timeout=10000",
+    "dist": "rm -rf lib/ && babel --presets es2015 -d lib/ src/",
+    "prepublish": "npm run dist"
   },
   "repository": {
     "type": "git",
@@ -95,5 +97,10 @@
       "name": "Samy Pessé",
       "email": "samy@gitbook.com"
     }
-  ]
+  ],
+  "devDependencies": {
+    "babel-cli": "^6.14.0",
+    "babel-preset-es2015": "^6.14.0",
+    "babel-preset-react": "^6.11.1"
+  }
 }

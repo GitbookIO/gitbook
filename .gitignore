@@ -27,9 +27,11 @@ node_modules
 # vim swapfile
 *.swp
 
+# GitBook with babel
+/packages/gitbook/lib
+
 # Output of documentation
 _book
-
 book.pdf
 book.epub
 book.mobi
