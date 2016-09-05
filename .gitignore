@@ -29,6 +29,7 @@ node_modules
 
 # GitBook with babel
 /packages/gitbook/lib
+/packages/gitbook-core/lib
 
 # Output of documentation
 _book

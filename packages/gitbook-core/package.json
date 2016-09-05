@@ -2,7 +2,7 @@
   "name": "gitbook-core",
   "version": "0.0.0",
   "description": "Core for GitBook plugins API",
-  "main": "./src/index.js",
+  "main": "./lib/index.js",
   "dependencies": {
     "immutable": "^3.8.1",
     "react": "^15.3.1",
@@ -13,9 +13,14 @@
     "redux-thunk": "^2.1.0"
   },
   "devDependencies": {
+    "babel-cli": "^6.14.0",
     "babel-preset-es2015": "^6.14.0",
     "babel-preset-react": "^6.11.1",
     "babel-preset-stage-2": "^6.13.0"
+  },
+  "scripts": {
+    "dist": "rm -rf lib/ && babel -d lib/ src/",
+    "prepublish": "npm run dist"
   },
   "repository": {
     "type": "git",

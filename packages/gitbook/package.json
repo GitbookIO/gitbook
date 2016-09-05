@@ -68,7 +68,7 @@
   },
   "scripts": {
     "test": "./node_modules/.bin/mocha ./testing/setup.js \"./src/**/*/__tests__/*.js\" --bail --reporter=list --timeout=10000 --compilers js:babel-register",
-    "dist": "rm -rf lib/ && babel --presets es2015 -d lib/ src/",
+    "dist": "rm -rf lib/ && babel -d lib/ src/",
     "prepublish": "npm run dist"
   },
   "repository": {
