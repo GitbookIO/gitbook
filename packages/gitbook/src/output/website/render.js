@@ -2,8 +2,9 @@ const React = require('react');
 const ReactDOMServer = require('react-dom/server');
 const GitBook = require('gitbook-core');
 
-function HTML({head, innerHTML}) {
+function HTML({head, innerHTML, props}) {
     const attrs = head.htmlAttributes.toComponent();
+    const propsJSON = JSON.stringify(props);
 
     return (
         <html {...attrs}>
@@ -13,7 +14,11 @@ function HTML({head, innerHTML}) {
                 {head.link.toComponent()}
             </head>
             <body>
-                <div id="content" dangerouslySetInnerHTML={{__html: innerHTML}} />
+                <div id="content" dangerouslySetInnerHTML={{__html: innerHTML}} />    
+                {head.link.toComponent()}
+                <script
+                    type="application/payload+json"
+                    dangerouslySetInnerHTML={{__html: propsJSON}} />
             </body>
         </html>
     );
@@ -31,12 +36,17 @@ HTML.propTypes = {
 function render(initialState) {
     const plugins = [];
     const store = GitBook.createStore(plugins, initialState);
-    const { el, head } = GitBook.renderComponent(store, {
-        role: 'Body'
-    });
+    const { el, head } = GitBook.renderComponent(store, { role: 'Body' });
 
+    // Render inner body
     const innerHTML = ReactDOMServer.renderToString(el);
-    const htmlEl = <HTML head={head} innerHTML={innerHTML} />;
+
+    // Render whole HTML page
+    const htmlEl = <HTML
+        head={head}
+        innerHTML={innerHTML}
+        props={initialState}
+    />;
 
     const html = ReactDOMServer.renderToStaticMarkup(htmlEl);
     return html;

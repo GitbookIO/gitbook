@@ -16,11 +16,15 @@
     "babel-cli": "^6.14.0",
     "babel-preset-es2015": "^6.14.0",
     "babel-preset-react": "^6.11.1",
-    "babel-preset-stage-2": "^6.13.0"
+    "babel-preset-stage-2": "^6.13.0",
+    "browserify": "^13.1.0",
+    "envify": "^3.4.1",
+    "uglify-js": "^2.7.3"
   },
   "scripts": {
-    "dist": "rm -rf lib/ && babel -d lib/ src/",
-    "prepublish": "npm run dist"
+    "dist-lib": "rm -rf lib/ && babel -d lib/ src/",
+    "dist-standalone": "browserify -r react -r react-dom -r ./lib/index.js:gitbook-core | uglifyjs -c > gitbook.core.js.min",
+    "prepublish": "npm run dist-lib && npm run dist-standalone"
   },
   "repository": {
     "type": "git",
