@@ -2,6 +2,7 @@ const React = require('react');
 const connect = require('./connect');
 
 const UnsafeComponent = require('./UnsafeComponent');
+const { findMatchingComponents } = require('../actions/components');
 
 /*
     Public: InjectedComponent makes it easy to include a set of dynamically registered
@@ -50,23 +51,6 @@ const InjectedComponentSet = React.createClass({
         );
     }
 });
-
-/**
- * Find all components matching a descriptor
- * @param {List<ComponentDescriptor>} components
- * @param {String} matching.role
- */
-function findMatchingComponents(components, matching) {
-    return components
-    .filter(({descriptor}) => {
-        if (matching.role && matching.role === descriptor.role) {
-            return false;
-        }
-
-        return true;
-    })
-    .map(component => component.Component);
-}
 
 /**
  * Map Redux state to InjectedComponentSet's props
