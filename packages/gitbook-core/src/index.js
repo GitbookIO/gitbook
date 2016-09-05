@@ -5,6 +5,7 @@ const connect = require('./connect');
 const createPlugin = require('./createPlugin');
 const createReducer = require('./createReducer');
 const createStore = require('./createStore');
+const renderComponent = require('./renderComponent');
 
 module.exports = {
     ACTIONS,
@@ -12,6 +13,7 @@ module.exports = {
     createPlugin,
     createReducer,
     createStore,
+    renderComponent,
     registerComponent,
     InjectedComponent,
     InjectedComponentSet

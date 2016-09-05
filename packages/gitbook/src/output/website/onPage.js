@@ -7,9 +7,10 @@ const JSONUtils = require('../../json');
 const LocationUtils = require('../../utils/location');
 const Modifiers = require('../modifiers');
 const writeFile = require('../helper/writeFile');
+const fileToOutput = require('../helper/fileToOutput');
 const getModifiers = require('../getModifiers');
 const createTemplateEngine = require('./createTemplateEngine');
-const fileToOutput = require('../helper/fileToOutput');
+const render = require('./render');
 
 /**
  * Write a page as a json file
@@ -40,12 +41,12 @@ function onPage(output, page) {
     return Modifiers.modifyHTML(page, getModifiers(output, page))
     .then(function(resultPage) {
         // Generate the context
-        const context = JSONUtils.encodeOutputWithPage(output, resultPage);
-        context.plugins = {
+        const initialState = JSONUtils.encodeOutputWithPage(output, resultPage);
+        initialState.plugins = {
             resources: Plugins.listResources(plugins, resources).toJS()
         };
 
-        context.template = {
+        /*context.template = {
             getJSContext() {
                 return {
                     page: omit(context.page, 'content'),
@@ -58,18 +59,16 @@ function onPage(output, page) {
                     }
                 };
             }
-        };
+        };*/
 
         // We should probabbly move it to "template" or a "site" namespace
-        context.basePath = basePath;
+        // context.basePath = basePath;
 
         // Render the theme
-        return Templating.renderFile(engine, prefix + '/page.html', context)
+        const html = render(initialState);
 
         // Write it to the disk
-        .then(function(tplOut) {
-            return writeFile(output, filePath, tplOut.getContent());
-        });
+        return writeFile(output, filePath, html);
     });
 }
 

@@ -1,5 +1,5 @@
 const React = require('react');
-const connect = require('./connect');
+const ReactRedux = require('react-redux');
 
 const UnsafeComponent = require('./UnsafeComponent');
 const { findMatchingComponents } = require('../actions/components');
@@ -65,11 +65,11 @@ function mapStateToProps(state, props) {
 }
 
 module.exports = {
-    InjectedComponent: connect(InjectedComponentSet, (state, props) => {
+    InjectedComponent: ReactRedux.connect(InjectedComponentSet, (state, props) => {
         const result = mapStateToProps(state, props);
         result.components = result.components.slice(0, 1);
         result.withContainer = false;
         return result;
     }),
-    InjectedComponentSet: connect(InjectedComponentSet, mapStateToProps)
+    InjectedComponentSet: ReactRedux.connect(InjectedComponentSet, mapStateToProps)
 };

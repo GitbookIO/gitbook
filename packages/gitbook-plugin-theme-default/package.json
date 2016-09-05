@@ -2,6 +2,7 @@
   "name": "gitbook-plugin-theme-default",
   "description": "Default theme for GitBook",
   "main": "./index.js",
+  "browser": "./src/index.js",
   "version": "1.0.5",
   "engines": {
     "gitbook": ">=3.0.0"
