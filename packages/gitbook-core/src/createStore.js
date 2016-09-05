@@ -13,7 +13,7 @@ const reducers = require('./reducers');
  */
 function createStore(plugins, initialState) {
     const pluginReducers = plugins.map(plugin => plugin.onReduceState);
-    const reducer = Redux.combine(reducers, ...pluginReducers);
+    const reducer = Redux.compose(reducers, ...pluginReducers);
 
     const store = Redux.createStore(
         reducer,

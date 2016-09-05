@@ -7,7 +7,7 @@ const ReactRedux = require('react-redux');
  * @return {ReactComponent}
  */
 function connect(Component, mapStateToProps) {
-    return ReactRedux.connect(Component, mapStateToProps);
+    return ReactRedux.connect(mapStateToProps)(Component);
 }
 
 module.exports = connect;

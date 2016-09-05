@@ -38,7 +38,8 @@ function render(initialState) {
     const innerHTML = ReactDOMServer.renderToString(el);
     const htmlEl = <HTML head={head} innerHTML={innerHTML} />;
 
-    return ReactDOMServer.renderToStaticMarkup(htmlEl);
+    const html = ReactDOMServer.renderToStaticMarkup(htmlEl);
+    return html;
 }
 
 module.exports = render;

@@ -65,11 +65,11 @@ function mapStateToProps(state, props) {
 }
 
 module.exports = {
-    InjectedComponent: ReactRedux.connect(InjectedComponentSet, (state, props) => {
+    InjectedComponent: ReactRedux.connect((state, props) => {
         const result = mapStateToProps(state, props);
         result.components = result.components.slice(0, 1);
         result.withContainer = false;
         return result;
-    }),
-    InjectedComponentSet: ReactRedux.connect(InjectedComponentSet, mapStateToProps)
+    })(InjectedComponentSet),
+    InjectedComponentSet: ReactRedux.connect(mapStateToProps)(InjectedComponentSet)
 };
