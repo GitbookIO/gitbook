@@ -1,0 +1,22 @@
+{
+  "name": "gitbook-core",
+  "version": "0.0.0",
+  "description": "Core for GitBook plugins API",
+  "main": "./src/index.js",
+  "dependencies": {
+    "immutable": "^3.8.1",
+    "react": "^15.3.1",
+    "react-dom": "^15.3.1",
+    "react-redux": "^4.4.5",
+    "redux": "^3.5.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GitbookIO/gitbook.git"
+  },
+  "author": "GitBook Inc. <contact@gitbook.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/GitbookIO/gitbook/issues"
+  }
+}
