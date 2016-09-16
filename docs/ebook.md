@@ -17,6 +17,20 @@ $ gitbook mobi ./ ./mybook.mobi
 
 `ebook-convert` is required to generate ebooks (epub, mobi, pdf).
 
+##### GNU/Linux
+
+Install the [Calibre application](https://calibre-ebook.com/download).
+
+```
+$ sudo aptitude install calibre
+```
+
+In some GNU/Linux distributions node is installed as nodejs, you need to manually create a symlink:
+
+```
+$sudo ln -s /usr/bin/nodejs /usr/bin/node
+```
+
 ##### OS X
 
 Download the [Calibre application](https://calibre-ebook.com/download). After moving the `calibre.app` to your Applications folder create a symbolic link to the ebook-convert tool:
