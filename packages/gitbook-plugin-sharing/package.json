@@ -1,0 +1,72 @@
+{
+  "name": "gitbook-plugin-sharing",
+  "description": "Sharing buttons in GitBooks website",
+  "main": "index.js",
+  "version": "1.0.2",
+  "dependencies": {
+
+  },
+  "engines": {
+    "gitbook": ">=3.0.0"
+  },
+  "homepage": "https://github.com/GitbookIO/plugin-sharing",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GitbookIO/plugin-sharing.git"
+  },
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/GitbookIO/plugin-sharing/issues"
+  },
+  "gitbook": {
+    "properties": {
+      "facebook": {
+        "type": "boolean",
+        "default": true,
+        "title": "Facebook"
+      },
+      "twitter": {
+        "type": "boolean",
+        "default": true,
+        "title": "Twitter"
+      },
+      "google": {
+        "type": "boolean",
+        "default": false,
+        "title": "Google"
+      },
+      "weibo": {
+        "type": "boolean",
+        "default": false,
+        "description": "Weibo"
+      },
+      "instapaper": {
+        "type": "boolean",
+        "default": false,
+        "description": "Instapaper"
+      },
+      "vk": {
+        "type": "boolean",
+        "default": false,
+        "description": "VK"
+      },
+      "all": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "default": [
+          "facebook",
+          "google",
+          "twitter",
+          "weibo",
+          "instapaper"
+        ],
+        "uniqueItems": true
+      }
+    }
+  },
+  "devDependencies": {
+    "eslint": "^2.7.0"
+  }
+}

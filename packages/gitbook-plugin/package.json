@@ -1,0 +1,33 @@
+{
+  "name": "gitbook-plugin",
+  "version": "0.0.0",
+  "description": "CLI for compiling and testing plugins",
+  "main": "./lib/index.js",
+  "dependencies": {
+    "babelify": "^7.3.0",
+    "browserify": "^13.1.0",
+    "commander": "^2.9.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.14.0",
+    "babel-preset-es2015": "^6.14.0",
+    "babel-preset-react": "^6.11.1",
+    "babel-preset-stage-2": "^6.13.0"
+  },
+  "bin": {
+    "gitbook-plugin": "./lib/cli.js"
+  },
+  "scripts": {
+    "dist": "rm -rf lib/ && babel -d lib/ src/",
+    "prepublish": "npm run dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GitbookIO/gitbook.git"
+  },
+  "author": "GitBook Inc. <contact@gitbook.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/GitbookIO/gitbook/issues"
+  }
+}
