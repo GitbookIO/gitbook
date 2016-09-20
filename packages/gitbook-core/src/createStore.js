@@ -1,7 +1,7 @@
 const Redux = require('redux');
 const ReduxThunk = require('redux-thunk').default;
 
-const reducers = require('./reducers');
+const coreReducers = require('./reducers');
 
 /**
  * Create a new redux store from an initial state and a list of plugins.
@@ -13,10 +13,13 @@ const reducers = require('./reducers');
  */
 function createStore(plugins, initialState) {
     const pluginReducers = plugins.map(plugin => plugin.onReduceState);
-    console.log(pluginReducers);
-    const reducer = Redux.compose(reducers, ...pluginReducers);
     const store = Redux.createStore(
-        reducers,
+        (state, action) => {
+            return pluginReducers.reduce(
+                (newState, reducer) => reducer(newState, action),
+                coreReducers(state, action)
+            );
+        },
         initialState,
         Redux.compose(Redux.applyMiddleware(ReduxThunk))
     );

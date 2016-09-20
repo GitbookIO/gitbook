@@ -3,7 +3,6 @@ const ACTION_TYPES = require('../actions/TYPES');
 
 function reduceComponents(state, action) {
     state = state || List();
-
     switch (action.type) {
 
     case ACTION_TYPES.REGISTER_COMPONENT:
