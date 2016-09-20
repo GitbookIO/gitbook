@@ -7,6 +7,8 @@
  * @return {Plugin}
  */
 function createPlugin(onInitialState, onReduceState) {
+    onReduceState = onReduceState || ((state, action) => state);
+
     const plugin = {
         onInitialState,
         onReduceState

@@ -24,7 +24,8 @@
   "scripts": {
     "dist-lib": "rm -rf lib/ && babel -d lib/ src/",
     "dist-standalone": "browserify -r ./lib/index.js:gitbook-core -r react -r react-dom ./lib/index.js | uglifyjs -c > gitbook.core.min.js",
-    "prepublish": "npm run dist-lib && npm run dist-standalone"
+    "dist": "npm run dist-lib && npm run dist-standalone",
+    "prepublish": "npm run dist"
   },
   "repository": {
     "type": "git",

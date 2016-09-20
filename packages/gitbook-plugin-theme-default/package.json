@@ -2,12 +2,21 @@
   "name": "gitbook-plugin-theme-default",
   "description": "Default theme for GitBook",
   "main": "./index.js",
-  "browser": "./src/index.js",
+  "browser": "./assets/theme.js",
   "version": "1.0.5",
   "engines": {
     "gitbook": ">=3.0.0"
   },
-  "dependencies": {},
+  "dependencies": {
+      "gitbook-core": "^0.0.0",
+      "react": "^15.3.1"
+  },
+  "devDependencies": {
+    "gitbook-plugin": "*"
+  },
+  "scripts": {
+    "prepublish": "gitbook-plugin build ./src/index.js ./assets/theme.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/GitbookIO/gitbook.git"

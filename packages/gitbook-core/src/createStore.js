@@ -13,12 +13,12 @@ const reducers = require('./reducers');
  */
 function createStore(plugins, initialState) {
     const pluginReducers = plugins.map(plugin => plugin.onReduceState);
+    console.log(pluginReducers);
     const reducer = Redux.compose(reducers, ...pluginReducers);
-
     const store = Redux.createStore(
-        reducer,
+        reducers,
         initialState,
-        Redux.applyMiddleware(ReduxThunk)
+        Redux.compose(Redux.applyMiddleware(ReduxThunk))
     );
 
     // Initialize the plugins

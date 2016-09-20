@@ -37,10 +37,8 @@ function onPage(output, page) {
         // We should probabbly move it to "template" or a "site" namespace
         // context.basePath = basePath;
 
-        console.log('render page');
-
         // Load the plugins
-        const browserPlugins = []; //loadBrowserPlugins(plugins);
+        const browserPlugins = loadBrowserPlugins(plugins);
 
         // Render the theme
         const html = render(browserPlugins, initialState);

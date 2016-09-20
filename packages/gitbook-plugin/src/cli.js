@@ -1,13 +1,26 @@
-const program = require('commander');
-const pkg = require('../package.json');
+#! /usr/bin/env node
 
-program.version(pkg.version)
+const program = require('commander');
+const path = require('path');
+const winston = require('winston');
+
+const pkg = require('../package.json');
+const compile = require('./compile');
+
+const resolve = (input => path.resolve(process.cwd(), input));
+
+program.version(pkg.version);
+winston.cli();
 
 program
-    .command('build [plugin]')
-    .description('build a plugin')
-    .action(function(plugin, options) {
-
+    .command('build [input] [output]')
+    .description('build a browser plugin')
+    .action(function(input, output, options) {
+        compile(resolve(input), resolve(output))
+        .then(
+            () => winston.info('Plugin compiled successfully'),
+            (err) => winston.error('Error: ', err)
+        );
     });
 
 
