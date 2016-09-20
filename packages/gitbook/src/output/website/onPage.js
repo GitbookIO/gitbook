@@ -8,7 +8,8 @@ const writeFile = require('../helper/writeFile');
 const fileToOutput = require('../helper/fileToOutput');
 const getModifiers = require('../getModifiers');
 const createTemplateEngine = require('./createTemplateEngine');
-const render = require('./render');
+const render = require('../../browser/render');
+const loadBrowserPlugins = require('../../browser/loadPlugins');
 
 /**
  * Write a page as a json file
@@ -36,8 +37,13 @@ function onPage(output, page) {
         // We should probabbly move it to "template" or a "site" namespace
         // context.basePath = basePath;
 
+        console.log('render page');
+
+        // Load the plugins
+        const browserPlugins = []; //loadBrowserPlugins(plugins);
+
         // Render the theme
-        const html = render(initialState);
+        const html = render(browserPlugins, initialState);
 
         // Write it to the disk
         return writeFile(output, filePath, html);

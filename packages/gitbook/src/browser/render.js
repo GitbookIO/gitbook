@@ -31,11 +31,11 @@ HTML.propTypes = {
 
 /**
  * Render a page
+ * @param  {List<Plugin>} plugin
  * @param  {Object} initialState
  * @return {String} html
  */
-function render(initialState) {
-    const plugins = [];
+function render(plugins, initialState) {
     const store = GitBook.createStore(plugins, initialState);
     const { el, head } = GitBook.renderComponent(store, { role: 'Body' });
 

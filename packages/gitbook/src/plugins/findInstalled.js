@@ -45,7 +45,7 @@ function findInstalled(folder) {
         if (!validateId(name)) {
             if (parent) return;
         } else {
-            results = results.set(pluginName, Plugin({
+            results = results.set(pluginName, new Plugin({
                 name: pluginName,
                 version,
                 path: pkgPath,

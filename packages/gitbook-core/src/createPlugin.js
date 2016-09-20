@@ -7,10 +7,17 @@
  * @return {Plugin}
  */
 function createPlugin(onInitialState, onReduceState) {
-    return {
+    const plugin = {
         onInitialState,
         onReduceState
     };
+
+    if (typeof window !== 'undefined') {
+        window.gitbookPlugins = window.gitbookPlugins || [];
+        window.gitbookPlugins.push(plugin);
+    }
+
+    return plugin;
 }
 
 module.exports = createPlugin;
