@@ -1,5 +1,6 @@
 const React = require('react');
 const ReactRedux = require('react-redux');
+const { List } = require('immutable');
 
 const UnsafeComponent = require('./UnsafeComponent');
 const { findMatchingComponents } = require('../actions/components');
@@ -28,7 +29,10 @@ const { findMatchingComponents } = require('../actions/components');
 
 const InjectedComponentSet = React.createClass({
     propTypes: {
-        components:    React.PropTypes.arrayOf(React.PropTypes.func).isRequired,
+        components:    React.PropTypes.oneOfType([
+            React.PropTypes.arrayOf(React.PropTypes.func),
+            React.PropTypes.instanceOf(List)
+        ]).isRequired,
         props:         React.PropTypes.object,
         withContainer: React.PropTypes.bool
     },
@@ -36,11 +40,12 @@ const InjectedComponentSet = React.createClass({
     render() {
         const { components, props, ...divProps } = this.props;
 
-        const inner = components.map(Component => {
-            if (Component.sandbox === false) {
-                return <Component key={Component.displayName} {...props} />;
+        const inner = components.map(Comp => {
+            // TODO fix sandboxing
+            if (Comp.sandbox === false || 1) {
+                return <Comp key={Comp.displayName} {...props} />;
             } else {
-                return <UnsafeComponent key={Component.displayName} Component={Component} props={props} />;
+                return <UnsafeComponent key={Comp.displayName} Component={Comp} props={props} />;
             }
         });
 

@@ -8,7 +8,7 @@ const ACTION_TYPES = require('./TYPES');
 function findMatchingComponents(state, matching) {
     return state
     .filter(({descriptor}) => {
-        if (matching.role && matching.role === descriptor.role) {
+        if (matching.role && matching.role !== descriptor.role) {
             return false;
         }
 
