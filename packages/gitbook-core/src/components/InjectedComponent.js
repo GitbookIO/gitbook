@@ -41,8 +41,7 @@ const InjectedComponentSet = React.createClass({
         const { components, props, ...divProps } = this.props;
 
         const inner = components.map(Comp => {
-            // TODO fix sandboxing
-            if (Comp.sandbox === false || 1) {
+            if (Comp.sandbox === false) {
                 return <Comp key={Comp.displayName} {...props} />;
             } else {
                 return <UnsafeComponent key={Comp.displayName} Component={Comp} props={props} />;

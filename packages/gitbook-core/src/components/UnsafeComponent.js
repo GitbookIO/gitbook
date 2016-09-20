@@ -80,4 +80,4 @@ const UnsafeComponent = React.createClass({
     }
 });
 
-module.exports = ReactRedux.connect(UnsafeComponent);
+module.exports = ReactRedux.connect()(UnsafeComponent);
