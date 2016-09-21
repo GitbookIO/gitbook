@@ -12,7 +12,6 @@ let ThemeBody = React.createClass({
     render() {
         const { page } = this.props;
 
-        console.log('render theme', page);
         return (
             <div className="GitBook book">
                 <GitBook.Head

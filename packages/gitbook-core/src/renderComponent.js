@@ -17,9 +17,9 @@ function renderComponent(store, matching) {
             <InjectedComponent matching={matching} />
         </ReactRedux.Provider>
     );
-    const head = Helmet.rewind();
+    const getHead = Helmet.rewind;
 
-    return { el, head };
+    return { el, getHead };
 }
 
 module.exports = renderComponent;

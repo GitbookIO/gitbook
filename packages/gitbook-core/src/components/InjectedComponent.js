@@ -26,6 +26,23 @@ const { findMatchingComponents } = require('../actions/components');
     If no matching components is found, the InjectedComponent renders an empty span.
  */
 
+const Injection = React.createClass({
+    propTypes: {
+        component: React.PropTypes.func,
+        props:     React.PropTypes.object
+    },
+
+    render() {
+        const Comp = this.props.component;
+        const { props } = this.props;
+
+        if (Comp.sandbox === false) {
+            return <Comp {...props} />;
+        } else {
+            return <UnsafeComponent Component={Comp} props={props} />;
+        }
+    }
+});
 
 const InjectedComponentSet = React.createClass({
     propTypes: {
@@ -40,13 +57,7 @@ const InjectedComponentSet = React.createClass({
     render() {
         const { components, props, ...divProps } = this.props;
 
-        const inner = components.map(Comp => {
-            if (Comp.sandbox === false) {
-                return <Comp key={Comp.displayName} {...props} />;
-            } else {
-                return <UnsafeComponent key={Comp.displayName} Component={Comp} props={props} />;
-            }
-        });
+        const inner = components.map(Comp => <Injection key={Comp.displayName} component={Comp} props={props} />);
 
         return (
             <div {...divProps}>
@@ -57,26 +68,47 @@ const InjectedComponentSet = React.createClass({
 });
 
 /**
+ * Render only the first component matching
+ */
+const InjectedComponent = React.createClass({
+    propTypes: {
+        components:    React.PropTypes.oneOfType([
+            React.PropTypes.arrayOf(React.PropTypes.func),
+            React.PropTypes.instanceOf(List)
+        ]).isRequired,
+        props:    React.PropTypes.object,
+        children: React.PropTypes.node
+    },
+
+    render() {
+        const { components, props, children } = this.props;
+        const base = children ? React.Children.only(children) : undefined;
+
+        return components.reduce((inner, Comp) => {
+            return (
+                <Injection component={Comp} props={props}>
+                    {inner}
+                </Injection>
+            );
+        }, base);
+    }
+});
+
+/**
  * Map Redux state to InjectedComponentSet's props
  */
 function mapStateToProps(state, props) {
     const { components } = state;
     const { matching } = props;
 
-    console.log('get components matching', matching);
     return {
         components: findMatchingComponents(components, matching)
     };
 }
 
-const InjectedComponent = ReactRedux.connect((state, props) => {
-    const result = mapStateToProps(state, props);
-    result.components = result.components.slice(0, 1);
-    result.withContainer = false;
-    return result;
-})(InjectedComponentSet);
+const connect = ReactRedux.connect(mapStateToProps);
 
 module.exports = {
-    InjectedComponent,
-    InjectedComponentSet: ReactRedux.connect(mapStateToProps)(InjectedComponentSet)
+    InjectedComponent:    connect(InjectedComponent),
+    InjectedComponentSet: connect(InjectedComponentSet)
 };

@@ -12,6 +12,7 @@ function HTML({head, innerHTML, props}) {
                 {head.title.toComponent()}
                 {head.meta.toComponent()}
                 {head.link.toComponent()}
+                {head.style.toComponent()}
             </head>
             <body>
                 <div id="content" dangerouslySetInnerHTML={{__html: innerHTML}} />
@@ -37,10 +38,13 @@ HTML.propTypes = {
  */
 function render(plugins, initialState) {
     const store = GitBook.createStore(plugins, initialState);
-    const { el, head } = GitBook.renderComponent(store, { role: 'Body' });
+    const { el, getHead } = GitBook.renderComponent(store, { role: 'Body' });
 
     // Render inner body
     const innerHTML = ReactDOMServer.renderToString(el);
+
+    // Get headers
+    const head = getHead();
 
     // Render whole HTML page
     const htmlEl = <HTML
