@@ -15,7 +15,7 @@ function HTML({head, innerHTML, props}) {
             </head>
             <body>
                 <div id="content" dangerouslySetInnerHTML={{__html: innerHTML}} />
-                {head.link.toComponent()}
+                {head.script.toComponent()}
                 <script
                     type="application/payload+json"
                     dangerouslySetInnerHTML={{__html: propsJSON}} />

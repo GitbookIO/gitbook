@@ -1,7 +1,12 @@
 const Head = require('react-helmet');
+
 const { InjectedComponent, InjectedComponentSet } = require('./components/InjectedComponent');
+const HTMLContent = require('./components/HTMLContent');
+
 const { registerComponent } = require('./actions/components');
 const ACTIONS = require('./actions/TYPES');
+
+const Shapes = require('./shapes');
 const connect = require('./connect');
 const createPlugin = require('./createPlugin');
 const createReducer = require('./createReducer');
@@ -16,7 +21,11 @@ module.exports = {
     createStore,
     renderComponent,
     registerComponent,
+    // React Components
     InjectedComponent,
     InjectedComponentSet,
-    Head
+    HTMLContent,
+    Head,
+    // Utilities
+    Shapes
 };

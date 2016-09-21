@@ -3,6 +3,8 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 const ReactRedux = require('react-redux');
 
+const isServerSide = typeof window === 'undefined';
+
 /*
  Public: Renders a component provided via the `component` prop, and ensures that
  failures in the component's code do not cause state inconsistencies elsewhere in
@@ -22,6 +24,9 @@ const UnsafeComponent = React.createClass({
         Component: React.PropTypes.func.isRequired,
         props:     React.PropTypes.object
     },
+    contextTypes: {
+        store: React.PropTypes.object
+    },
 
     componentDidMount() {
         return this.renderInjected();
@@ -35,18 +40,22 @@ const UnsafeComponent = React.createClass({
         return this.unmountInjected();
     },
 
-    renderInjected() {
+    getInjected() {
         const { Component, props } = this.props;
         const { store } = this.context;
 
+        return (
+            <ReactRedux.Provider store={store}>
+                <Component {...props}/>
+            </ReactRedux.Provider>
+        );
+    },
+
+    renderInjected() {
         const node = ReactDOM.findDOMNode(this);
 
         try {
-            this.injected = (
-                <ReactRedux.Provider store={store}>
-                    <Component {...props}/>
-                </ReactRedux.Provider>
-            );
+            this.injected = this.getInjected();
 
             ReactDOM.render(this.injected, node);
         } catch (err) {
@@ -76,7 +85,13 @@ const UnsafeComponent = React.createClass({
     },
 
     render() {
-        return <div name="unsafe-component-wrapper" />;
+        let inner;
+
+        if (isServerSide) {
+            inner = this.getInjected();
+        }
+
+        return <div name="unsafe-component-wrapper">{inner}</div>;
     }
 });
 

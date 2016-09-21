@@ -5,13 +5,13 @@ const Promise = require('../../utils/promise');
 const fs = require('../../utils/fs');
 
 /**
-    Copy all assets from plugins.
-    Assets are files stored in "_assets"
-    nd resources declared in the plugin itself.
-
-    @param {Output}
-    @return {Promise}
-*/
+ * Copy all assets from plugins.
+ * Assets are files stored in "_assets"
+ * and resources declared in the plugin itself.
+ *
+ * @param {Output}
+ * @return {Promise}
+ */
 function copyPluginAssets(output) {
     const book = output.getBook();
 
@@ -37,11 +37,11 @@ function copyPluginAssets(output) {
 }
 
 /**
-    Copy assets from a plugin
-
-    @param {Plugin}
-    @return {Promise}
-*/
+ * Copy assets from a plugin
+ *
+ * @param {Plugin}
+ * @return {Promise}
+ */
 function copyAssets(output, plugin) {
     const logger = output.getLogger();
     const pluginRoot = plugin.getPath();
@@ -70,11 +70,11 @@ function copyAssets(output, plugin) {
 }
 
 /**
-    Copy resources from a plugin
-
-    @param {Plugin}
-    @return {Promise}
-*/
+ * Copy resources from a plugin
+ *
+ * @param {Plugin}
+ * @return {Promise}
+ */
 function copyResources(output, plugin) {
     const logger = output.getLogger();
 

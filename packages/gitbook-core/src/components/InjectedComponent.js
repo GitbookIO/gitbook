@@ -63,17 +63,20 @@ function mapStateToProps(state, props) {
     const { components } = state;
     const { matching } = props;
 
+    console.log('get components matching', matching);
     return {
         components: findMatchingComponents(components, matching)
     };
 }
 
+const InjectedComponent = ReactRedux.connect((state, props) => {
+    const result = mapStateToProps(state, props);
+    result.components = result.components.slice(0, 1);
+    result.withContainer = false;
+    return result;
+})(InjectedComponentSet);
+
 module.exports = {
-    InjectedComponent: ReactRedux.connect((state, props) => {
-        const result = mapStateToProps(state, props);
-        result.components = result.components.slice(0, 1);
-        result.withContainer = false;
-        return result;
-    })(InjectedComponentSet),
+    InjectedComponent,
     InjectedComponentSet: ReactRedux.connect(mapStateToProps)(InjectedComponentSet)
 };

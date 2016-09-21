@@ -4,11 +4,13 @@
   "description": "Core for GitBook plugins API",
   "main": "./lib/index.js",
   "dependencies": {
+    "html-tags": "^1.1.1",
     "immutable": "^3.8.1",
     "react": "^15.3.1",
     "react-dom": "^15.3.1",
     "react-helmet": "^3.1.0",
     "react-redux": "^4.4.5",
+    "react-safe-html": "^0.3.0",
     "redux": "^3.5.2",
     "redux-thunk": "^2.1.0"
   },
