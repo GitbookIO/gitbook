@@ -29,17 +29,18 @@ const { findMatchingComponents } = require('../actions/components');
 const Injection = React.createClass({
     propTypes: {
         component: React.PropTypes.func,
-        props:     React.PropTypes.object
+        props:     React.PropTypes.object,
+        children:  React.PropTypes.node
     },
 
     render() {
         const Comp = this.props.component;
-        const { props } = this.props;
+        const { props, children } = this.props;
 
         if (Comp.sandbox === false) {
-            return <Comp {...props} />;
+            return <Comp {...props}>{children}</Comp>;
         } else {
-            return <UnsafeComponent Component={Comp} props={props} />;
+            return <UnsafeComponent Component={Comp} props={props}>{children}</UnsafeComponent>;
         }
     }
 });
@@ -82,7 +83,6 @@ const InjectedComponent = React.createClass({
 
     render() {
         const { components, props, children } = this.props;
-        const base = children ? React.Children.only(children) : undefined;
 
         return components.reduce((inner, Comp) => {
             return (
@@ -90,7 +90,7 @@ const InjectedComponent = React.createClass({
                     {inner}
                 </Injection>
             );
-        }, base);
+        }, children);
     }
 });
 

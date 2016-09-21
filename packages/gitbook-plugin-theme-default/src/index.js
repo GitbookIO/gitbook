@@ -6,11 +6,12 @@ const Page = require('./Page');
 
 let ThemeBody = React.createClass({
     propTypes: {
-        page: GitBook.Shapes.Page
+        page:     GitBook.Shapes.Page,
+        children: React.PropTypes.node
     },
 
     render() {
-        const { page } = this.props;
+        const { page, children } = this.props;
 
         return (
             <div className="GitBook book">
@@ -21,6 +22,7 @@ let ThemeBody = React.createClass({
 
                 <Sidebar />
                 <Page page={page} />
+                {children}
             </div>
         );
     }

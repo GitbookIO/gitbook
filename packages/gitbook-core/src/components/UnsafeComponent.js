@@ -22,7 +22,8 @@ const isServerSide = typeof window === 'undefined';
 const UnsafeComponent = React.createClass({
     propTypes: {
         Component: React.PropTypes.func.isRequired,
-        props:     React.PropTypes.object
+        props:     React.PropTypes.object,
+        children:  React.PropTypes.node
     },
     contextTypes: {
         store: React.PropTypes.object
@@ -41,12 +42,12 @@ const UnsafeComponent = React.createClass({
     },
 
     getInjected() {
-        const { Component, props } = this.props;
+        const { Component, props, children } = this.props;
         const { store } = this.context;
 
         return (
             <ReactRedux.Provider store={store}>
-                <Component {...props}/>
+                <Component {...props}>{children}</Component>
             </ReactRedux.Provider>
         );
     },
