@@ -11,6 +11,8 @@ function bootstrap() {
     const initialState = getPayload(window.document);
     const plugins = window.gitbookPlugins;
 
+    console.log(initialState);
+
     const mountNode = document.getElementById('content');
 
     // Create the redux store
