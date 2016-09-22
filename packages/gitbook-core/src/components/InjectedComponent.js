@@ -2,7 +2,6 @@ const React = require('react');
 const ReactRedux = require('react-redux');
 const { List } = require('immutable');
 
-const UnsafeComponent = require('./UnsafeComponent');
 const { findMatchingComponents } = require('../actions/components');
 
 /*
@@ -37,11 +36,8 @@ const Injection = React.createClass({
         const Comp = this.props.component;
         const { props, children } = this.props;
 
-        if (Comp.sandbox === false) {
-            return <Comp {...props}>{children}</Comp>;
-        } else {
-            return <UnsafeComponent Component={Comp} props={props}>{children}</UnsafeComponent>;
-        }
+        // TODO: try to render with an error handling for unsafe component
+        return <Comp {...props}>{children}</Comp>;
     }
 });
 

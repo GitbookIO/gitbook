@@ -3,6 +3,7 @@ const GitBook = require('gitbook-core');
 
 const Sidebar = require('./Sidebar');
 const Page = require('./Page');
+const Toolbar = require('./Toolbar');
 
 let ThemeBody = React.createClass({
     propTypes: {
@@ -17,9 +18,10 @@ let ThemeBody = React.createClass({
             <div className="GitBook book">
                 <GitBook.Head
                     title={page.title}
-                    titleTemplate="%s - GitBook"
-                />
+                    titleTemplate="%s - GitBook" />
+                <GitBook.ImportCSS href="gitbook/gitbook-plugin-theme-default/theme.css" />
 
+                <Toolbar />
                 <Sidebar />
                 <Page page={page} />
                 {children}

@@ -4,7 +4,9 @@ const GitBook = require('gitbook-core');
 
 const loadPlugins = require('./loadPlugins');
 
-function HTML({head, innerHTML}) {
+const BOOTSTRAP_CODE = '(function() { require("gitbook-core").bootstrap() })()';
+
+function HTML({head, innerHTML, payload, scripts}) {
     const attrs = head.htmlAttributes.toComponent();
 
     return (
@@ -17,6 +19,11 @@ function HTML({head, innerHTML}) {
             </head>
             <body>
                 <div id="content" dangerouslySetInnerHTML={{__html: innerHTML}} />
+                {scripts.map(script => {
+                    return <script key={script} src={script} />;
+                })}
+                <script type="application/payload+json" dangerouslySetInnerHTML={{__html: JSON.stringify(payload)}} />
+                <script type="application/javascript" dangerouslySetInnerHTML={{__html: BOOTSTRAP_CODE}} />
                 {head.script.toComponent()}
             </body>
         </html>
@@ -24,7 +31,9 @@ function HTML({head, innerHTML}) {
 }
 HTML.propTypes = {
     head:      React.PropTypes.object,
-    innerHTML: React.PropTypes.string
+    innerHTML: React.PropTypes.string,
+    payload:   React.PropTypes.object,
+    scripts:   React.PropTypes.arrayOf(React.PropTypes.string)
 };
 
 /**
@@ -40,25 +49,10 @@ function render(plugins, initialState) {
 
     const scripts = plugins.toList()
         .filter(plugin => plugin.getPackage().has('browser'))
-        .map(plugin => {
-            return { src: '/gitbook/plugins/' + plugin.getName() + '.js' };
-        })
+        .map(plugin => 'gitbook/plugins/' + plugin.getName() + '.js')
         .toArray();
 
-    scripts.push({
-        type: 'application/payload+json',
-        innerHTML: JSON.stringify(initialState)
-    });
-
-    const el = (
-        <GitBook.Provider store={store}>
-            <GitBook.InjectedComponent matching={{ role: 'Body' }}>
-                <GitBook.Head
-                    script={scripts}
-                />
-            </GitBook.InjectedComponent>
-        </GitBook.Provider>
-    );
+    const el = GitBook.renderWithStore(store);
 
     // Render inner body
     const innerHTML = ReactDOMServer.renderToString(el);
@@ -70,6 +64,8 @@ function render(plugins, initialState) {
     const htmlEl = <HTML
         head={head}
         innerHTML={innerHTML}
+        payload={initialState}
+        scripts={['gitbook/core.js'].concat(scripts)}
     />;
 
     const html = ReactDOMServer.renderToStaticMarkup(htmlEl);
