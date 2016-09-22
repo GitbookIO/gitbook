@@ -8,11 +8,12 @@ const Toolbar = require('./Toolbar');
 let ThemeBody = React.createClass({
     propTypes: {
         page:     GitBook.Shapes.Page,
+        summary:  GitBook.Shapes.Summary,
         children: React.PropTypes.node
     },
 
     render() {
-        const { page, children } = this.props;
+        const { page, summary, children } = this.props;
 
         return (
             <div className="GitBook book">
@@ -22,7 +23,7 @@ let ThemeBody = React.createClass({
                 <GitBook.ImportCSS href="gitbook/gitbook-plugin-theme-default/theme.css" />
 
                 <Toolbar />
-                <Sidebar />
+                <Sidebar summary={summary} />
                 <Page page={page} />
                 {children}
             </div>
@@ -30,8 +31,8 @@ let ThemeBody = React.createClass({
     }
 });
 
-ThemeBody = GitBook.connect(ThemeBody, ({page}) => {
-    return { page };
+ThemeBody = GitBook.connect(ThemeBody, ({page, summary}) => {
+    return { page, summary };
 });
 
 module.exports = GitBook.createPlugin((dispatch, state) => {
