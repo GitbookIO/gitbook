@@ -21,7 +21,7 @@ const SummaryArticle = React.createClass({
 
 const SummaryArticles = React.createClass({
     propTypes: {
-        articles: React.PropTypes.arrayOf(GitBook.Shapes.SummaryArticle)
+        articles: GitBook.Shapes.listOf(GitBook.Shapes.SummaryArticle)
     },
 
     render() {
@@ -59,7 +59,7 @@ const SummaryPart = React.createClass({
 
 const SummaryParts = React.createClass({
     propTypes: {
-        parts: React.PropTypes.arrayOf(GitBook.Shapes.SummaryPart)
+        parts: GitBook.Shapes.listOf(GitBook.Shapes.SummaryPart)
     },
 
     render() {
