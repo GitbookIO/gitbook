@@ -72,3 +72,14 @@ Same API as `InjectedComponentSet` but render the matching components in chain i
 ```
 
 **Warning:** Children are discarded.
+
+#### `GitBook.FlexLayout` and `GitBook.FlexBox`
+
+A simple wrapper that provides a Flexbox layout with the given direction and style. Any additional props you set on the Flexbox are rendered.
+
+```js
+<GitBook.FlexLayout column>
+    <GitBook.FlexBox>First column</GitBook.FlexBox>
+    <GitBook.FlexBox>Second column</GitBook.FlexBox>
+</GitBook.FlexLayout>
+```

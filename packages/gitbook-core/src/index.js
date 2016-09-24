@@ -1,5 +1,6 @@
 const Head = require('react-helmet');
 const { Provider } = require('react-redux');
+const { Flex, Box } = require('reflexbox');
 
 const { InjectedComponent, InjectedComponentSet } = require('./components/InjectedComponent');
 const { ImportLink, ImportScript, ImportCSS } = require('./components/Import');
@@ -13,6 +14,7 @@ const connect = require('./connect');
 const createPlugin = require('./createPlugin');
 const createReducer = require('./createReducer');
 const createStore = require('./createStore');
+const composeReducer = require('./composeReducer');
 const bootstrap = require('./bootstrap');
 const renderWithStore = require('./renderWithStore');
 
@@ -24,6 +26,7 @@ module.exports = {
     createPlugin,
     createReducer,
     createStore,
+    composeReducer,
     registerComponent,
     // React Components
     InjectedComponent,
@@ -34,6 +37,8 @@ module.exports = {
     ImportLink,
     ImportScript,
     ImportCSS,
+    FlexLayout: Flex,
+    FlexBox: Box,
     // Utilities
     Shapes
 };

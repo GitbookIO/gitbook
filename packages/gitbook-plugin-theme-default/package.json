@@ -8,14 +8,20 @@
     "gitbook": ">=3.0.0"
   },
   "dependencies": {
-      "gitbook-core": "^0.0.0",
-      "react": "^15.3.1"
+    "gitbook-core": "^0.0.0",
+    "react": "^15.3.1"
   },
   "devDependencies": {
-    "gitbook-plugin": "*"
+    "font-awesome": "^4.6.3",
+    "gitbook-markdown-css": "^1.0.1",
+    "gitbook-plugin": "*",
+    "less": "^2.7.1",
+    "preboot": "git+https://github.com/mdo/preboot.git#4aab4edd85f076d50609cbe28e4fe66cc0771701"
   },
   "scripts": {
-    "prepublish": "gitbook-plugin build ./src/index.js ./assets/theme.js"
+    "build-css": "lessc -clean-css ./less/main.less ./_assets/website/theme.css",
+    "build-js": "gitbook-plugin build ./src/index.js ./assets/theme.js",
+    "prepublish": "npm run build-css && npm run build-js"
   },
   "repository": {
     "type": "git",

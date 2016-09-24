@@ -7,7 +7,7 @@
  * @return {Function(state, action): state}
  */
 function createReducer(name, reduce) {
-    return function(state, action) {
+    return (state, action) => {
         const value = state[name];
         state[name] = reduce(value, action);
         return state;
