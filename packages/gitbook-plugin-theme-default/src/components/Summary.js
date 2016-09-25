@@ -46,10 +46,12 @@ const SummaryPart = React.createClass({
         const { part } = this.props;
         const { title, articles } = part;
 
+        const titleEL = title ? <h2>{title}</h2> : null;
+
         return (
             <GitBook.InjectedComponent matching={{ role: 'summary:part' }} props={this.props}>
                 <div className="SummaryPart">
-                    {title}
+                    {titleEL}
                     <SummaryArticles articles={articles} />
                 </div>
             </GitBook.InjectedComponent>

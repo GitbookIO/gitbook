@@ -1,10 +1,11 @@
-const Redux = require('redux');
+const composeReducer = require('../composeReducer');
+const createReducer = require('../createReducer');
 
-module.exports = Redux.combineReducers({
-    components: require('./components'),
-    navigation: require('./navigation'),
+module.exports = composeReducer(
+    createReducer('components', require('./components')),
+    createReducer('navigation', require('./navigation')),
     // GitBook JSON
-    page:       require('./page'),
-    summary:    require('./summary'),
-    readme:    require('./readme')
-});
+    createReducer('page', require('./page')),
+    createReducer('summary', require('./summary')),
+    createReducer('readme', require('./readme'))
+);

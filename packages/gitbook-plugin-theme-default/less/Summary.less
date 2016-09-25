@@ -1,0 +1,37 @@
+.Summary {
+
+}
+
+.SummaryPart {
+    > h1 {
+        padding: @summary-article-padding-v @summary-article-padding-h;
+        padding-top: 20px;
+        text-transform: uppercase;
+        color: @summary-header-color;
+    }
+}
+
+.SummaryArticles {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+.SummaryArticle {
+    list-style: none;
+
+    a, span {
+        display: block;
+        padding: @summary-article-padding-v @summary-article-padding-h;
+        border-bottom: none;
+        color: @summary-article-color;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        position: relative;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+}

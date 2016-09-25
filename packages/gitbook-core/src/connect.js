@@ -6,8 +6,8 @@ const ReactRedux = require('react-redux');
  * @param {Function} mapStateToProps
  * @return {ReactComponent}
  */
-function connect(Component, mapStateToProps) {
-    return ReactRedux.connect(mapStateToProps)(Component);
+function connect(Component, mapStateToProps, mapDispatchToProps) {
+    return ReactRedux.connect(mapStateToProps, mapDispatchToProps)(Component);
 }
 
 module.exports = connect;

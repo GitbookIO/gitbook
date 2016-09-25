@@ -24,7 +24,7 @@ let ThemeBody = React.createClass({
                 <GitBook.Head
                     title={page.title}
                     titleTemplate="%s - GitBook" />
-                <GitBook.ImportCSS href="gitbook/gitbook-plugin-theme-default/theme.css" />
+                <GitBook.ImportCSS href="gitbook/theme.css" />
 
                 <GitBook.FlexBox>
                     <GitBook.FlexLayout>
@@ -45,7 +45,7 @@ let ThemeBody = React.createClass({
 });
 
 ThemeBody = GitBook.connect(ThemeBody, ({page, summary, sidebar}) => {
-    console.log('connect', sidebar.toJS())
+    console.log('connect!');
     return { page, summary, sidebar };
 });
 

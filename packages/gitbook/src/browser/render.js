@@ -22,7 +22,7 @@ function HTML({head, innerHTML, payload, scripts}) {
                 {scripts.map(script => {
                     return <script key={script} src={script} />;
                 })}
-                <script type="application/payload+json" dangerouslySetInnerHTML={{__html: JSON.stringify(payload)}} />
+                <script type="application/payload+json" dangerouslySetInnerHTML={{__html: payload}} />
                 <script type="application/javascript" dangerouslySetInnerHTML={{__html: BOOTSTRAP_CODE}} />
                 {head.script.toComponent()}
             </body>
@@ -45,6 +45,7 @@ HTML.propTypes = {
 function render(plugins, initialState) {
     // Load the plugins
     const browserPlugins = loadPlugins(plugins);
+    const payload = JSON.stringify(initialState);
     const store = GitBook.createStore(browserPlugins, initialState);
 
     const scripts = plugins.toList()
@@ -64,7 +65,7 @@ function render(plugins, initialState) {
     const htmlEl = <HTML
         head={head}
         innerHTML={innerHTML}
-        payload={initialState}
+        payload={payload}
         scripts={['gitbook/core.js'].concat(scripts)}
     />;
 
