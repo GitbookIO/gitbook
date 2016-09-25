@@ -5,6 +5,7 @@ const { Flex, Box } = require('reflexbox');
 const { InjectedComponent, InjectedComponentSet } = require('./components/InjectedComponent');
 const { ImportLink, ImportScript, ImportCSS } = require('./components/Import');
 const HTMLContent = require('./components/HTMLContent');
+const Link = require('./components/Link');
 
 const { registerComponent } = require('./actions/components');
 const ACTIONS = require('./actions/TYPES');
@@ -39,6 +40,7 @@ module.exports = {
     ImportCSS,
     FlexLayout: Flex,
     FlexBox: Box,
+    Link,
     // Utilities
     Shapes
 };

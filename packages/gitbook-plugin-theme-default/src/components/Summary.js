@@ -1,22 +1,34 @@
 const React = require('react');
+const classNames = require('classnames');
 const GitBook = require('gitbook-core');
 
-const SummaryArticle = React.createClass({
+let SummaryArticle = React.createClass({
     propTypes: {
+        active: React.PropTypes.bool,
         article: GitBook.Shapes.SummaryArticle
     },
 
     render() {
-        const { article } = this.props;
+        const { article, active } = this.props;
+        const className = classNames('SummaryArticle', {
+            active
+        });
 
         return (
             <GitBook.InjectedComponent matching={{ role: 'summary:article' }} props={this.props}>
-                <li className="SummaryArticle">
-                    <span>{article.title}</span>
+                <li className={className}>
+                    {article.ref ?
+                        <GitBook.Link to={article}>{article.title}</GitBook.Link>
+                        : <span>{article.title}</span>}
                 </li>
             </GitBook.InjectedComponent>
         );
     }
+});
+SummaryArticle = GitBook.connect(SummaryArticle, ({page}, {article}) => {
+    return {
+        active: page.level === article.level
+    };
 });
 
 const SummaryArticles = React.createClass({

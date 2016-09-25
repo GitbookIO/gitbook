@@ -12,6 +12,7 @@
     "react": "^15.3.1"
   },
   "devDependencies": {
+    "classnames": "^2.2.5",
     "font-awesome": "^4.6.3",
     "gitbook-markdown-css": "^1.0.1",
     "gitbook-plugin": "*",
