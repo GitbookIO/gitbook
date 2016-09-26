@@ -22,7 +22,7 @@
     "gitbook-plugin": "./lib/cli.js"
   },
   "scripts": {
-    "dist": "rm -rf lib/ && babel -d lib/ src/",
+    "dist": "rm -rf lib/ && babel -d lib/ src/ && chmod +x ./lib/cli.js",
     "prepublish": "npm run dist"
   },
   "repository": {
