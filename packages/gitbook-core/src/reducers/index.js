@@ -1,3 +1,5 @@
+const ACTION_TYPES = require('../actions/TYPES');
+
 const composeReducer = require('../composeReducer');
 const createReducer = require('../createReducer');
 

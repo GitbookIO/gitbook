@@ -1,4 +1,5 @@
 const React = require('react');
+const ReactRedux = require('react-redux');
 const SummaryArticleShape = require('../shapes/SummaryArticle');
 
 const Link = React.createClass({
@@ -35,4 +36,4 @@ const Link = React.createClass({
     }
 });
 
-module.exports = Link;
+module.exports = ReactRedux.connect()(Link);

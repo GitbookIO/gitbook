@@ -1,6 +1,7 @@
 const React = require('react');
 const { Provider } = require('react-redux');
 const { InjectedComponent } = require('./components/InjectedComponent');
+const PJAXWrapper = require('./components/PJAXWrapper');
 
 /**
  * Render the application for a store
@@ -10,7 +11,9 @@ const { InjectedComponent } = require('./components/InjectedComponent');
 function renderWithStore(store) {
     return (
         <Provider store={store}>
-            <InjectedComponent matching={{ role: 'Body' }} />
+            <PJAXWrapper>
+                <InjectedComponent matching={{ role: 'Body' }} />
+            </PJAXWrapper>
         </Provider>
     );
 }
