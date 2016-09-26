@@ -32,7 +32,7 @@ function HTML({head, innerHTML, payload, scripts}) {
 HTML.propTypes = {
     head:      React.PropTypes.object,
     innerHTML: React.PropTypes.string,
-    payload:   React.PropTypes.object,
+    payload:   React.PropTypes.string,
     scripts:   React.PropTypes.arrayOf(React.PropTypes.string)
 };
 

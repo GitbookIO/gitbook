@@ -2,17 +2,20 @@ const { Record } = require('immutable');
 const ACTION_TYPES = require('../actions/TYPES');
 
 const DEFAULTS = {
-    title:   '',
-    content: '',
-    dir:     'ltr',
-    depth:   1,
-    level:   ''
+    title:    '',
+    content:  '',
+    dir:      'ltr',
+    depth:    1,
+    level:    '',
+    previous: null
 };
 
 class PageState extends Record(DEFAULTS) {
     static create(state) {
         return state instanceof PageState ?
-            state : new PageState(state);
+            state : new PageState({
+                ...state
+            });
     }
 }
 

@@ -71,7 +71,7 @@ function redirect(uri) {
  * @param {Boolean} options.replace
  * @return {Action} action
  */
-function fetchPage(uri, options) {
+function fetchPage(uri, options = {}) {
     const { replace } = options;
 
     return (dispatch, getState) => {

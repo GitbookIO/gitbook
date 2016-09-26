@@ -1,5 +1,7 @@
 const React = require('react');
 const ReactRedux = require('react-redux');
+const path = require('path');
+const url = require('url');
 const SummaryArticleShape = require('../shapes/SummaryArticle');
 
 const Link = React.createClass({
@@ -23,9 +25,13 @@ const Link = React.createClass({
             return to;
         }
 
+        // Article
         if (typeof to.ref === 'string') {
-            // TODO: normalize url
-            return to.ref;
+            const parts = url.parse(to.ref);
+            const ext = path.extname(parts.pathname);
+            const pathname = path.basename(parts.pathname, ext) + '.html';
+
+            return pathname + (parts.hash || '');
         }
     },
 
