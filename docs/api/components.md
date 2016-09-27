@@ -19,6 +19,7 @@ Custom roles can be use for interopability with other plugins, but GitBook and t
 
 | Role | Description | Props |
 | ---- | ----------- | ----- |
+| `page:container` | DIV container for the page's content | `{ page: Page }` |
 | `summary:container` | DIV container for the whole summary | `{ summary: Summary }` |
 | `summary:parts` | DIV container for summary's parts | `{ parts: List<SummaryPart> }` |
 | `summary:part` | DIV for a specific part | `{ part: SummaryPart }` |

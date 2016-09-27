@@ -16,7 +16,9 @@ const Toolbar = React.createClass({
     render() {
         return (
             <div className="Toolbar book-toolbar">
-                <button onClick={this.onToggle}>Toggle</button>
+                <GitBook.Button onClick={this.onToggle}>
+                    <GitBook.Icon id="align-justify" />
+                </GitBook.Button>
                 <GitBook.InjectedComponentSet matching={{ role: 'toolbar:buttons:left' }} />
                 <GitBook.InjectedComponentSet matching={{ role: 'toolbar:buttons:right' }} />
             </div>

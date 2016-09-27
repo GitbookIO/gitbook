@@ -1,0 +1,15 @@
+.Page {
+    position: relative;
+    outline: none;
+    width: 100%;
+    max-width: @page-width;
+    margin: 0px auto;
+    padding: 20px 15px 40px 15px;
+
+    .gitbook-markdown(@md-color: @page-color, @md-line-height: @page-line-height);
+
+    .glossary-term {
+        cursor: help;
+        text-decoration: underline;
+    }
+}
