@@ -1,3 +1,9 @@
+// Font sizes
+@font-size-base:              14px;
+@font-size-large:             ceil(@font-size-base * 1.25); // ~18px
+@font-size-small:             ceil(@font-size-base * 0.85); // ~12px
+@line-height-base:            1.428571429; // 20/14
+@line-height-computed:        floor(@font-size-base * @line-height-base);
 // Sidebar
 @sidebar-background:          rgb(250, 250, 250);
 @sidebar-border-color:        rgba(0, 0, 0, 0.0666667);
@@ -11,3 +17,7 @@
 @page-width:                  800px;
 @page-color:                  #333333;
 @page-line-height:            1.7;
+// Button
+@button-background:           transparent;
+@button-color:                #ddd;
+@button-hover-color:          #ccc;

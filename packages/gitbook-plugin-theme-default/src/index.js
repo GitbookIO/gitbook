@@ -33,7 +33,7 @@ let ThemeBody = React.createClass({
                                 <Sidebar summary={summary} />
                             </GitBook.FlexBox>
                         ) : null}
-                        <GitBook.FlexBox col={9}>
+                        <GitBook.FlexBox col={sidebar.open ? 9 : 12}>
                             <Body page={page} />
                         </GitBook.FlexBox>
                     </GitBook.FlexLayout>

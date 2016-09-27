@@ -1,5 +1,5 @@
 const React = require('react');
-//const classNames = require('classnames');
+const classNames = require('classnames');
 
 const Button = React.createClass({
     propTypes: {
@@ -11,10 +11,10 @@ const Button = React.createClass({
     },
 
     render() {
-        const { children, active, onClick, className } = this.props;
-        /*const className = classNames('GitBook//Button', this.props.className, {
+        const { children, active, onClick } = this.props;
+        const className = classNames('GitBook/Button', this.props.className, {
             active
-        });*/
+        });
 
         return <button className={className} onClick={onClick}>{children}</button>;
     }
