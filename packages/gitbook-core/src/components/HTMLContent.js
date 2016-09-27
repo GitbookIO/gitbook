@@ -12,9 +12,15 @@ const { InjectedComponent } = require('./InjectedComponent');
 
 function inject(injectedProps, Component) {
     return (props) => {
+        const cleanProps = {
+            ...props,
+            className: props.className
+        };
+        delete cleanProps['class'];
+
         return (
-            <InjectedComponent {...injectedProps(props)}>
-                <Component {...props} />
+            <InjectedComponent {...injectedProps(cleanProps)}>
+                <Component {...cleanProps} />
             </InjectedComponent>
         );
     };

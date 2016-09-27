@@ -45,7 +45,6 @@ let ThemeBody = React.createClass({
 });
 
 ThemeBody = GitBook.connect(ThemeBody, ({page, summary, sidebar}) => {
-    console.log('connect!');
     return { page, summary, sidebar };
 });
 

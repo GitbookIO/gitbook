@@ -9,8 +9,18 @@
 function createReducer(name, reduce) {
     return (state, action) => {
         const value = state[name];
-        state[name] = reduce(value, action);
-        return state;
+        const newValue = reduce(value, action);
+
+        if (newValue === value) {
+            return state;
+        }
+
+        const newState = {
+            ...state,
+            [name]: newValue
+        };
+
+        return newState;
     };
 }
 
