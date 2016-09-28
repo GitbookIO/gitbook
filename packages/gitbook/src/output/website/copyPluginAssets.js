@@ -105,7 +105,7 @@ function copyCoreJS(output) {
     const options    = output.getOptions();
     const outputRoot = options.get('root');
 
-    const inputFile = require.resolve('gitbook-core/gitbook.core.min.js');
+    const inputFile = require.resolve('gitbook-core/dist/gitbook.core.min.js');
     const outputFile = path.join(outputRoot, 'gitbook/core.js');
 
     logger.debug.ln('copy JS for gitbook-core');
