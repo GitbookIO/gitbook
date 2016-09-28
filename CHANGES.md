@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.2.1
+- Fix bug on Firefox when navigating to an url containing an hash
+- Update nunjucks to fix JS error when page contains a lot of templating blocks
+
 ## 3.2.0
 - Switch markdown parser from `kramed` to `markup-it`
 - Fix support of `|` in tables
