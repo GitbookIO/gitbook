@@ -4,11 +4,14 @@
     "eslint": "3.4.0",
     "eslint-config-gitbook": "^1.2.0",
     "expect": "^1.20.1",
-    "lerna": "2.0.0-beta.26",
+    "lerna": "2.0.0-beta.29",
     "mocha": "^2.4.5"
   },
   "scripts": {
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "",
+    "bootstrap": "lerna bootstrap",
+    "dist": "lerna run dist"
   },
   "repository": {
     "type": "git",

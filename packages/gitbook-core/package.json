@@ -4,6 +4,7 @@
   "description": "Core for GitBook plugins API",
   "main": "./lib/index.js",
   "dependencies": {
+    "classnames": "^2.2.5",
     "html-tags": "^1.1.1",
     "immutable": "^3.8.1",
     "react": "^15.3.1",
@@ -27,7 +28,7 @@
   },
   "scripts": {
     "dist-lib": "rm -rf lib/ && babel -d lib/ src/",
-    "dist-standalone": "browserify -r ./lib/index.js:gitbook-core -r react -r react-dom ./lib/index.js | uglifyjs -c > ./dist/gitbook.core.min.js",
+    "dist-standalone": "mkdir -p dist && browserify -r ./lib/index.js:gitbook-core -r react -r react-dom ./lib/index.js | uglifyjs -c > ./dist/gitbook.core.min.js",
     "dist": "npm run dist-lib && npm run dist-standalone",
     "prepublish": "npm run dist"
   },

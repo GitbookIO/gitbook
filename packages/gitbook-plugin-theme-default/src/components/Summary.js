@@ -1,6 +1,6 @@
-const React = require('react');
 const classNames = require('classnames');
 const GitBook = require('gitbook-core');
+const { React } = GitBook;
 
 let SummaryArticle = React.createClass({
     propTypes: {

@@ -1,5 +1,5 @@
-const React = require('react');
 const GitBook = require('gitbook-core');
+const { React } = GitBook;
 
 const sidebar = require('../actions/sidebar');
 

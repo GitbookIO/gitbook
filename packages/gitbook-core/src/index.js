@@ -1,3 +1,4 @@
+const React = require('react');
 const Head = require('react-helmet');
 const { Provider } = require('react-redux');
 const { Flex, Box } = require('reflexbox');
@@ -45,6 +46,7 @@ module.exports = {
     Link,
     Icon,
     Button,
+    React,
     // Utilities
     Shapes
 };
