@@ -1,5 +1,7 @@
 const React = require('react');
+const Immutable = require('immutable');
 const Head = require('react-helmet');
+const Promise = require('bluebird');
 const { Provider } = require('react-redux');
 const { Flex, Box } = require('reflexbox');
 
@@ -9,6 +11,7 @@ const HTMLContent = require('./components/HTMLContent');
 const Link = require('./components/Link');
 const Icon = require('./components/Icon');
 const Button = require('./components/Button');
+const IntlProvider = require('./components/IntlProvider');
 
 const { registerComponent } = require('./actions/components');
 const ACTIONS = require('./actions/TYPES');
@@ -46,7 +49,10 @@ module.exports = {
     Link,
     Icon,
     Button,
-    React,
     // Utilities
-    Shapes
+    Shapes,
+    // Librairies
+    React,
+    Immutable,
+    Promise
 };
