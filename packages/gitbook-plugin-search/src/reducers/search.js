@@ -3,12 +3,6 @@ const { Record, List, OrderedMap } = GitBook.Immutable;
 
 const TYPES = require('../actions/types');
 
-const Result = Record({
-    url:   String(''),
-    title: String(''),
-    body:  String('')
-});
-
 const SearchState = Record({
     // Current query
     query:    String(''),
@@ -20,6 +14,14 @@ const SearchState = Record({
 
 module.exports = (state = SearchState(), action) => {
     switch (action.type) {
+
+    case TYPES.CLEAR:
+        return SearchState();
+
+    case TYPES.UPDATE_QUERY:
+        return state.merge({
+            query: action.query
+        });
 
     case TYPES.REGISTER_HANDLER:
         return state.merge({

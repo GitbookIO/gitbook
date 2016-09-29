@@ -26,8 +26,8 @@ function createContext(plugins, initialState) {
 
     // Get actions from all plugins
     const actions = plugins.reduce((accu, plugin) => {
-        return { ...accu, ...plugin.actions };
-    });
+        return Object.assign(accu, plugin.actions);
+    }, {});
 
     const store = Redux.createStore(
         (state, action) => {

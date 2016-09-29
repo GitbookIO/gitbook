@@ -8,8 +8,12 @@ const TYPES = require('./types');
  * @return {Action}
  */
 function query(q) {
+    if (!q) {
+        return clear();
+    }
+
     return (dispatch, getState) => {
-        const handlers = getState().search;
+        const { handlers } = getState().search;
 
         dispatch({ type: TYPES.UPDATE_QUERY, query: q });
 
@@ -21,6 +25,14 @@ function query(q) {
             dispatch({ type: TYPES.UPDATE_RESULTS, query: q });
         });
     };
+}
+
+/**
+ * Clear the whole search
+ * @return {Action}
+ */
+function clear() {
+    return { type: TYPES.CLEAR };
 }
 
 /**
@@ -43,6 +55,7 @@ function unregisterHandler(name) {
 }
 
 module.exports = {
+    clear,
     query,
     registerHandler,
     unregisterHandler

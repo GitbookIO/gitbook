@@ -3,45 +3,33 @@ const { React } = GitBook;
 
 const search = require('../actions/search');
 
-const DEBOUNCE_MS = 600;
-
 const SearchInput = React.createClass({
     propTypes: {
+        query:    React.PropTypes.string,
         dispatch: React.PropTypes.func
     },
 
-    onUpdateQuery(q) {
+    onChange(event) {
         const { dispatch } = this.props;
-
-        dispatch(search.query(q));
-    },
-
-    onKeyDown(event) {
         const { value } = event.currentTarget;
 
-        if (this.debouncedSearch) {
-            clearTimeout(this.debouncedSearch);
-        }
-
-        this.debouncedSearch = setTimeout(() => {
-            this.debouncedSearch = null;
-            this.onUpdateQuery(value);
-        }, DEBOUNCE_MS);
-    },
-
-    componentWillUnmount() {
-        if (this.debouncedSearch) {
-            clearTimeout(this.debouncedSearch);
-        }
+        dispatch(search.query(value));
     },
 
     render() {
+        const { query } = this.props;
+
         return (
             <div className="Search/Input">
-                <input type="text" placeholder="" onKeyDown={this.onKeyDown} />
+                <input type="text" value={query} onChange={this.onChange} />
             </div>
         );
     }
 });
 
-module.exports = GitBook.connect(SearchInput);
+const mapStateToProps = state => {
+    const { query } = state.search;
+    return { query };
+};
+
+module.exports = GitBook.connect(SearchInput, mapStateToProps);
