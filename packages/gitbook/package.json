@@ -1,6 +1,6 @@
 {
   "name": "gitbook",
-  "version": "3.2.0",
+  "version": "4.0.0",
   "homepage": "https://www.gitbook.com",
   "description": "Library and cmd utility to generate GitBooks",
   "main": "lib/index.js",
@@ -31,6 +31,7 @@
     "gitbook-plugin-search": "2.2.1",
     "gitbook-plugin-sharing": "1.0.2",
     "gitbook-plugin-theme-default": "1.0.5",
+    "gitbook-plugin-hints": "2.0.0",
     "github-slugid": "1.0.1",
     "graceful-fs": "4.1.4",
     "i18n-t": "1.0.1",
