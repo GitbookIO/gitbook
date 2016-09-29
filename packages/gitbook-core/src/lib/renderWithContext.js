@@ -1,9 +1,9 @@
 const React = require('react');
-const { Provider } = require('react-redux');
 
 const { InjectedComponent } = require('../components/InjectedComponent');
 const PJAXWrapper = require('../components/PJAXWrapper');
 const IntlProvider = require('../components/IntlProvider');
+const ContextProvider = require('../components/IntlProvider');
 
 /**
  * Render the application for a store
@@ -12,13 +12,13 @@ const IntlProvider = require('../components/IntlProvider');
  */
 function renderWithContext(context) {
     return (
-        <Provider store={context.store}>
+        <ContextProvider context={context}>
             <PJAXWrapper>
                 <IntlProvider>
                     <InjectedComponent matching={{ role: 'Body' }} />
                 </IntlProvider>
             </PJAXWrapper>
-        </Provider>
+        </ContextProvider>
     );
 }
 
