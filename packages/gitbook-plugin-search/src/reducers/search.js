@@ -23,6 +23,11 @@ module.exports = (state = SearchState(), action) => {
             query: action.query
         });
 
+    case TYPES.UPDATE_RESULTS:
+        return state.merge({
+            results: action.results
+        });
+
     case TYPES.REGISTER_HANDLER:
         return state.merge({
             handlers: state.handlers.set(action.name, action.handler)

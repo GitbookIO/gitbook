@@ -1,3 +1,5 @@
+require('whatwg-fetch');
+
 const React = require('react');
 const Immutable = require('immutable');
 const Head = require('react-helmet');

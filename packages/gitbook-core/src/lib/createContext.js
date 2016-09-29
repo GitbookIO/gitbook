@@ -40,7 +40,7 @@ function createContext(plugins, initialState) {
 
     // Initialize the plugins
     plugins.forEach(plugin => {
-        plugin.init(store.dispatch, store.getState);
+        plugin.init(store.dispatch, store.getState, actions);
     });
 
     return GitBookContext({

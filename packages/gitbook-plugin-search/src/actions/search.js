@@ -17,13 +17,19 @@ function query(q) {
 
         dispatch({ type: TYPES.UPDATE_QUERY, query: q });
 
-        return Promise.reduce(handlers, (results, handler) => {
-            return Promise(handler(q))
-            .then(handlerResults => results.concat(handlerResults));
-        }, List())
-        .then(results => {
-            dispatch({ type: TYPES.UPDATE_RESULTS, query: q });
-        });
+        return Promise.reduce(
+            handlers.toArray(),
+            (results, handler) => {
+                return Promise.resolve(handler(q))
+                .then(handlerResults => results.concat(handlerResults));
+            },
+            List()
+        )
+        .then(
+            results => {
+                dispatch({ type: TYPES.UPDATE_RESULTS, query: q, results });
+            }
+        );
     };
 }
 
