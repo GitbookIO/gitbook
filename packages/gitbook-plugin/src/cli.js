@@ -3,9 +3,11 @@
 const program = require('commander');
 const path = require('path');
 const winston = require('winston');
+const inquirer = require('inquirer');
 
 const pkg = require('../package.json');
 const compile = require('./compile');
+const create = require('./create');
 
 const resolve = (input => path.resolve(process.cwd(), input));
 
@@ -23,6 +25,33 @@ program
         );
     });
 
+program
+    .command('create [output]')
+    .description('create a new plugin')
+    .action(function(output, options) {
+        inquirer.prompt([
+            {
+                name: 'name',
+                message: 'name:'
+            },
+            {
+                name: 'desc',
+                message: 'description:'
+            },
+            {
+                name: 'github',
+                message: 'github url:'
+            }
+        ])
+        .then(answers => {
+            output = resolve(output || answers.name);
+            return create(output, answers);
+        })
+        .then(
+            () => winston.info(`Plugin created successfully in "${output}"`),
+            (err) => winston.error('Error: ', err)
+        );
+    });
 
 program
     .command('test [plugin]')
