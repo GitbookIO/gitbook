@@ -1,11 +1,11 @@
 {
-  "name": "gitbook-plugin-search",
-  "description": "Search integration in GitBook",
+  "name": "gitbook-plugin-sharing",
+  "description": "Sharing button in the toolbar",
   "main": "index.js",
   "browser": "./_assets/theme.js",
-  "version": "2.2.1",
+  "version": "0.0.0",
   "dependencies": {
-      "gitbook-core": "^0.0.0"
+    "gitbook-core": "^0.0.0"
   },
   "devDependencies": {
     "gitbook-plugin": "*"
@@ -22,7 +22,6 @@
     "type": "git",
     "url": "https://github.com/GitbookIO/gitbook.git"
   },
-  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/GitbookIO/gitbook/issues"
   }

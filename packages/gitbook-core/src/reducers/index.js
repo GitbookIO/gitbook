@@ -1,11 +1,10 @@
-const ACTION_TYPES = require('../actions/TYPES');
-
-const composeReducer = require('../composeReducer');
-const createReducer = require('../createReducer');
+const composeReducer = require('../lib/composeReducer');
+const createReducer = require('../lib/createReducer');
 
 module.exports = composeReducer(
     createReducer('components', require('./components')),
     createReducer('navigation', require('./navigation')),
+    createReducer('i18n', require('./i18n')),
     // GitBook JSON
     createReducer('page', require('./page')),
     createReducer('summary', require('./summary')),

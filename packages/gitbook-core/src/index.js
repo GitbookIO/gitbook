@@ -17,25 +17,26 @@ const { registerComponent } = require('./actions/components');
 const ACTIONS = require('./actions/TYPES');
 
 const Shapes = require('./shapes');
-const connect = require('./connect');
-const createPlugin = require('./createPlugin');
-const createReducer = require('./createReducer');
-const createStore = require('./createStore');
-const composeReducer = require('./composeReducer');
-const bootstrap = require('./bootstrap');
-const renderWithStore = require('./renderWithStore');
+const connect = require('./lib/connect');
+const createPlugin = require('./lib/createPlugin');
+const createReducer = require('./lib/createReducer');
+const createContext = require('./lib/createContext');
+const composeReducer = require('./lib/composeReducer');
+const bootstrap = require('./lib/bootstrap');
+const renderWithContext = require('./lib/renderWithContext');
 
 module.exports = {
     ACTIONS,
     bootstrap,
-    renderWithStore,
+    renderWithContext,
     connect,
     createPlugin,
     createReducer,
-    createStore,
+    createContext,
     composeReducer,
     registerComponent,
     // React Components
+    IntlProvider,
     InjectedComponent,
     InjectedComponentSet,
     HTMLContent,

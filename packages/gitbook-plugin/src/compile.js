@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require('fs-extra');
 const Promise = require('q');
 const browserify = require('browserify');
 const babelify = require('babelify');
@@ -25,6 +25,8 @@ function compilePlugin(inputFile, outputFile) {
             require('babel-preset-react')
         ]
     });
+
+    fs.ensureFileSync(outputFile);
 
     const output = fs.createWriteStream(outputFile);
 

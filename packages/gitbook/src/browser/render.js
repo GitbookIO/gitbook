@@ -46,14 +46,14 @@ function render(plugins, initialState) {
     // Load the plugins
     const browserPlugins = loadPlugins(plugins);
     const payload = JSON.stringify(initialState);
-    const store = GitBook.createStore(browserPlugins, initialState);
+    const context = GitBook.createContext(browserPlugins, initialState);
 
     const scripts = plugins.toList()
         .filter(plugin => plugin.getPackage().has('browser'))
         .map(plugin => 'gitbook/plugins/' + plugin.getName() + '.js')
         .toArray();
 
-    const el = GitBook.renderWithStore(store);
+    const el = GitBook.renderWithContext(context);
 
     // Render inner body
     const innerHTML = ReactDOMServer.renderToString(el);

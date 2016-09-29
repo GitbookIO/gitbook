@@ -1,8 +1,8 @@
 const ReactDOM = require('react-dom');
 
-const getPayload = require('./lib/getPayload');
-const createStore = require('./createStore');
-const renderWithStore = require('./renderWithStore');
+const getPayload = require('./getPayload');
+const createContext = require('./createContext');
+const renderWithContext = require('./renderWithContext');
 
 /**
  * Bootstrap GitBook on the browser (this function should not be called on the server side)
@@ -11,17 +11,15 @@ function bootstrap() {
     const initialState = getPayload(window.document);
     const plugins = window.gitbookPlugins;
 
-    console.log(initialState);
-
     const mountNode = document.getElementById('content');
 
     // Create the redux store
-    const store = createStore(plugins, initialState);
+    const context = createContext(plugins, initialState);
 
-    window.appStore = store;
+    window.gitbookContext = context;
 
     // Render with the store
-    const el = renderWithStore(store);
+    const el = renderWithContext(context);
 
     ReactDOM.render(el, mountNode);
 }

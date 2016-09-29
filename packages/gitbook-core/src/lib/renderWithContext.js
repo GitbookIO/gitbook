@@ -1,18 +1,18 @@
 const React = require('react');
 const { Provider } = require('react-redux');
 
-const { InjectedComponent } = require('./components/InjectedComponent');
-const PJAXWrapper = require('./components/PJAXWrapper');
-const IntlProvider = require('./components/IntlProvider');
+const { InjectedComponent } = require('../components/InjectedComponent');
+const PJAXWrapper = require('../components/PJAXWrapper');
+const IntlProvider = require('../components/IntlProvider');
 
 /**
  * Render the application for a store
- * @param  {ReduxStore} store
+ * @param  {GitBookContext} context
  * @return {React.Element} element
  */
-function renderWithStore(store) {
+function renderWithContext(context) {
     return (
-        <Provider store={store}>
+        <Provider store={context.store}>
             <PJAXWrapper>
                 <IntlProvider>
                     <InjectedComponent matching={{ role: 'Body' }} />
@@ -22,4 +22,4 @@ function renderWithStore(store) {
     );
 }
 
-module.exports = renderWithStore;
+module.exports = renderWithContext;

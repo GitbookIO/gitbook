@@ -1,4 +1,7 @@
 
+const defaultInit = ((dispatch, getState) => {});
+const defaultReduce = ((state, action) => state);
+
 /**
  * Create a plugin to extend the state and the views.
  *
@@ -6,12 +9,15 @@
  * @param  {Funciton(state, action)} onReduceState
  * @return {Plugin}
  */
-function createPlugin(onInitialState, onReduceState) {
-    onReduceState = onReduceState || ((state, action) => state);
+function createPlugin({ init, reduce, actions }) {
+    init = init || defaultInit;
+    reduce = reduce || defaultReduce;
+    actions = actions || {};
 
     const plugin = {
-        onInitialState,
-        onReduceState
+        init,
+        reduce,
+        actions
     };
 
     if (typeof window !== 'undefined') {

@@ -14,6 +14,7 @@ function create(outputDir, spec) {
         'name': `gitbook-plugin-${spec.name}`,
         'description': `${spec.desc}`,
         'main': 'index.js',
+        'browser': './_assets/theme.js',
         'version': '0.0.0',
         'dependencies': {
             'gitbook-core': '^0.0.0'
