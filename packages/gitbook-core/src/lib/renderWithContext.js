@@ -2,11 +2,12 @@ const React = require('react');
 
 const { InjectedComponent } = require('../components/InjectedComponent');
 const PJAXWrapper = require('../components/PJAXWrapper');
-const IntlProvider = require('../components/IntlProvider');
-const ContextProvider = require('../components/IntlProvider');
+const I18nProvider = require('../components/I18nProvider');
+const ContextProvider = require('../components/ContextProvider');
 
 /**
- * Render the application for a store
+ * Render the application for a GitBook context.
+ *
  * @param  {GitBookContext} context
  * @return {React.Element} element
  */
@@ -14,9 +15,9 @@ function renderWithContext(context) {
     return (
         <ContextProvider context={context}>
             <PJAXWrapper>
-                <IntlProvider>
+                <I18nProvider>
                     <InjectedComponent matching={{ role: 'Body' }} />
-                </IntlProvider>
+                </I18nProvider>
             </PJAXWrapper>
         </ContextProvider>
     );

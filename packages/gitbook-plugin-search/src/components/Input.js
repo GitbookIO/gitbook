@@ -6,7 +6,8 @@ const search = require('../actions/search');
 const SearchInput = React.createClass({
     propTypes: {
         query:    React.PropTypes.string,
-        dispatch: React.PropTypes.func
+        i18n:     GitBook.Shapes.i18n,
+        dispatch: GitBook.Shapes.dispatch
     },
 
     onChange(event) {
@@ -17,11 +18,16 @@ const SearchInput = React.createClass({
     },
 
     render() {
-        const { query } = this.props;
+        const { i18n, query } = this.props;
 
         return (
             <div className="Search/Input">
-                <input type="text" value={query} onChange={this.onChange} />
+                <input
+                    type="text"
+                    value={query}
+                    placeholder={i18n.t('SEARCH_PLACEHOLDER')}
+                    onChange={this.onChange}
+                />
             </div>
         );
     }

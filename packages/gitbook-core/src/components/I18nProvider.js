@@ -2,7 +2,7 @@ const React = require('react');
 const intl = require('react-intl');
 const ReactRedux = require('react-redux');
 
-const IntlProvider = React.createClass({
+const I18nProvider = React.createClass({
     propTypes: {
         children: React.PropTypes.node
     },
@@ -19,4 +19,4 @@ const IntlProvider = React.createClass({
     }
 });
 
-module.exports = ReactRedux.connect()(IntlProvider);
+module.exports = ReactRedux.connect()(I18nProvider);

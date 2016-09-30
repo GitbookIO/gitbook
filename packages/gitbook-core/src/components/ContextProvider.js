@@ -25,7 +25,7 @@ const ContextProvider = React.createClass({
 
     render() {
         const { context, children } = this.props;
-        return <Provider store={context}>{children}</Provider>;
+        return <Provider store={context.store}>{children}</Provider>;
     }
 });
 

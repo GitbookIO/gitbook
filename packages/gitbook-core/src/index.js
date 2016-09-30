@@ -13,7 +13,7 @@ const HTMLContent = require('./components/HTMLContent');
 const Link = require('./components/Link');
 const Icon = require('./components/Icon');
 const Button = require('./components/Button');
-const IntlProvider = require('./components/IntlProvider');
+const I18nProvider = require('./components/I18nProvider');
 
 const { registerComponent } = require('./actions/components');
 const ACTIONS = require('./actions/TYPES');
@@ -38,7 +38,7 @@ module.exports = {
     composeReducer,
     registerComponent,
     // React Components
-    IntlProvider,
+    I18nProvider,
     InjectedComponent,
     InjectedComponentSet,
     HTMLContent,
