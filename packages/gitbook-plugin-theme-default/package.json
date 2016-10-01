@@ -20,9 +20,7 @@
     "preboot": "git+https://github.com/mdo/preboot.git#4aab4edd85f076d50609cbe28e4fe66cc0771701"
   },
   "scripts": {
-    "build-css": "lessc -clean-css ./less/main.less ./_assets/website/theme.css",
-    "build-js": "gitbook-plugin build ./src/index.js ./_assets/theme.js",
-    "prepublish": "npm run build-css && npm run build-js"
+    "prepublish": "./prepublish.sh"
   },
   "repository": {
     "type": "git",
