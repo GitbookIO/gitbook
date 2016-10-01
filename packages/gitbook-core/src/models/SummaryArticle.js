@@ -52,6 +52,15 @@ class SummaryArticle extends Record(DEFAULTS) {
 
         return filePath + (parts.hash || '');
     }
+
+    /**
+     * Return true if article is an instance of SummaryArticle
+     * @param {Mixed} article
+     * @return {Boolean}
+     */
+    static is(article) {
+        return (article instanceof SummaryArticle);
+    }
 }
 
 module.exports = SummaryArticle;

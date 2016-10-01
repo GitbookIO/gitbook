@@ -7,7 +7,13 @@ const DEFAULTS = {
 };
 
 class Plugin extends Record(DEFAULTS) {
-
+    constructor(plugin) {
+        super({
+            init: plugin.init || DEFAULTS.init,
+            reduce: plugin.reduce || DEFAULTS.reduce,
+            actions: plugin.actions || DEFAULTS.actions
+        });
+    }
 }
 
 module.exports = Plugin;

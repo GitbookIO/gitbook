@@ -9,7 +9,7 @@ const Plugin = require('../models/Plugin');
  * @return {Plugin}
  */
 function createPlugin({ init, reduce, actions }) {
-    const plugin = Plugin({
+    const plugin = new Plugin({
         init,
         reduce,
         actions
