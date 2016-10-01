@@ -2,6 +2,8 @@ const React = require('react');
 const ReactRedux = require('react-redux');
 const { injectIntl } = require('react-intl');
 
+const ContextShape = require('../shapes/Context');
+
 /**
  * Use the GitBook context provided by ContextProvider to map actions to props
  * @param  {ReactComponent} Component
@@ -20,13 +22,13 @@ function connectToActions(Component, mapActionsToProps) {
         },
 
         contextTypes: {
-            gitbookContext: React.PropTypes.object.isRequired
+            gitbook: ContextShape.isRequired
         },
 
         render() {
-            const { gitbookContext } = this.context;
+            const { gitbook } = this.context;
             const { children, ...props } = this.props;
-            const { actions, store } = gitbookContext;
+            const { actions, store } = gitbook;
 
             const actionsProps = mapActionsToProps(actions, store.dispatch);
 

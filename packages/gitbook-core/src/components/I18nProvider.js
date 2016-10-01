@@ -19,4 +19,8 @@ const I18nProvider = React.createClass({
     }
 });
 
-module.exports = ReactRedux.connect()(I18nProvider);
+const mapStateToProps = state => {
+    return { messages: state.i18n.messages };
+};
+
+module.exports = ReactRedux.connect(mapStateToProps)(I18nProvider);

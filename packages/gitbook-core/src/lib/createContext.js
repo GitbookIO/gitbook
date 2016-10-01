@@ -1,15 +1,22 @@
 /* eslint-disable no-console */
-const { Record } = require('immutable');
 const Redux = require('redux');
 const ReduxThunk = require('redux-thunk').default;
 
+const Plugin = require('./models/Plugin');
+const Context = require('./models/Context');
 const coreReducers = require('../reducers');
 const composeReducer = require('./composeReducer');
 
-const GitBookContext = Record({
-    store: null,
-    actions: {}
-}, 'GitBookContext');
+const Components = require('./actions/components');
+const I18n = require('./actions/i18n');
+const Navigation = require('./actions/navigation');
+
+const corePlugin = Plugin({
+    reduce: coreReducers,
+    actions: {
+        Components, I18n, Navigation
+    }
+});
 
 /**
  * Create a new context containing redux store from an initial state and a list of plugins.
@@ -17,12 +24,14 @@ const GitBookContext = Record({
  *
  * @param  {Array<Plugin>} plugins
  * @param  {Object} initialState
- * @return {GitBookContext} context
+ * @return {Context} context
  */
 function createContext(plugins, initialState) {
+    plugins = [corePlugin].concat(plugins);
+
     // Compose the reducer from core with plugins
     const pluginReducers = plugins.map(plugin => plugin.reduce);
-    const reducer = composeReducer(...[coreReducers].concat(pluginReducers));
+    const reducer = composeReducer(pluginReducers);
 
     // Get actions from all plugins
     const actions = plugins.reduce((accu, plugin) => {
@@ -43,7 +52,7 @@ function createContext(plugins, initialState) {
         plugin.init(store.dispatch, store.getState, actions);
     });
 
-    return GitBookContext({
+    return Context({
         store,
         actions
     });

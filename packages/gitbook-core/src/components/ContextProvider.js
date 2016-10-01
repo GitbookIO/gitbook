@@ -1,25 +1,27 @@
 const React = require('react');
 const { Provider } = require('react-redux');
 
+const ContextShape = require('../shapes/Context');
+
 /**
  * React component to provide a GitBook context to children components.
  */
 
 const ContextProvider = React.createClass({
     propTypes: {
-        context: React.PropTypes.object.isRequired,
+        context: ContextShape.isRequired,
         children: React.PropTypes.node
     },
 
     childContextTypes: {
-        gitbookContext: React.PropTypes.object.isRequired
+        gitbook: ContextShape
     },
 
     getChildContext() {
         const { context } = this.props;
 
         return {
-            gitbookContext: context
+            gitbook: context
         };
     },
 

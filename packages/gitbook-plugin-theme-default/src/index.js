@@ -49,8 +49,8 @@ ThemeBody = GitBook.connect(ThemeBody, ({page, summary, sidebar}) => {
 });
 
 module.exports = GitBook.createPlugin({
-    init: (dispatch, state) => {
-        dispatch(GitBook.registerComponent(ThemeBody, { role: 'Body' }));
+    init: (dispatch, state, { Components }) => {
+        dispatch(Components.registerComponent(ThemeBody, { role: 'Body' }));
     },
     reduce: reduceState
 });

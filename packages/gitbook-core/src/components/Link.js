@@ -1,8 +1,10 @@
 const React = require('react');
 const ReactRedux = require('react-redux');
-const path = require('path');
-const url = require('url');
+
+const File = require('../models/File');
+const SummaryArticle = require('../models/SummaryArticle');
 const SummaryArticleShape = require('../shapes/SummaryArticle');
+const ContextShape = require('../shapes/Context');
 
 const Link = React.createClass({
     propTypes: {
@@ -14,25 +16,31 @@ const Link = React.createClass({
         ])
     },
 
+    contextTypes: {
+        gitbook: ContextShape.isRequired
+    },
+
     getHref() {
-        const { to, href } = this.props;
+        const { gitbook } = this.context;
+        let { to, href } = this.props;
 
         if (href) {
             return href;
         }
 
+        if (SummaryArticle.is(to)) {
+            return to.toURL(gitbook);
+        }
+
         if (typeof to === 'string') {
-            return to;
+            to = new File(to);
         }
 
-        // Article
-        if (typeof to.ref === 'string') {
-            const parts = url.parse(to.ref);
-            const ext = path.extname(parts.pathname);
-            const pathname = path.basename(parts.pathname, ext) + '.html';
-
-            return pathname + (parts.hash || '');
+        if (File.is(to)) {
+            return to.toURL(gitbook);
         }
+
+        throw new Error('Invalid format for prop "to"');
     },
 
     render() {

@@ -1,45 +1,17 @@
 const { Record, List } = require('immutable');
-const FileState = require('./file');
 
-class SummaryArticle extends Record({
-    title:    '',
-    depth:    0,
-    path:     '',
-    ref:      '',
-    level:    '',
-    articles: List()
-}) {
-    constructor(state) {
-        super({
-            ...state,
-            articles: (new List(state.articles))
-                .map(article => new SummaryArticle(article))
-        });
-    }
-}
-
-class SummaryPart extends Record({
-    title:    '',
-    articles: List()
-}) {
-    constructor(state) {
-        super({
-            ...state,
-            articles: (new List(state.articles))
-                .map(article => new SummaryArticle(article))
-        });
-    }
-}
+const File = require('../models/File');
+const SummaryPart = require('../models/SummaryPart');
 
 
 class SummaryState extends Record({
-    file: new FileState(),
+    file: new File(),
     parts: List()
 }) {
     constructor(state = {}) {
         super({
             ...state,
-            file:  new FileState(state.file),
+            file:  new File(state.file),
             parts: (new List(state.parts))
                 .map(article => new SummaryPart(article))
         });

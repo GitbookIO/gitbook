@@ -15,7 +15,6 @@ const Icon = require('./components/Icon');
 const Button = require('./components/Button');
 const I18nProvider = require('./components/I18nProvider');
 
-const { registerComponent } = require('./actions/components');
 const ACTIONS = require('./actions/TYPES');
 
 const Shapes = require('./shapes');
@@ -36,7 +35,6 @@ module.exports = {
     createReducer,
     createContext,
     composeReducer,
-    registerComponent,
     // React Components
     I18nProvider,
     InjectedComponent,

@@ -1,24 +1,19 @@
-
-const defaultInit = ((dispatch, getState) => {});
-const defaultReduce = ((state, action) => state);
+const Plugin = require('../models/Plugin');
 
 /**
  * Create a plugin to extend the state and the views.
  *
- * @param  {Function(dispatch, state)} onInitialState
- * @param  {Funciton(state, action)} onReduceState
+ * @param  {Function(dispatch, state)} plugin.init
+ * @param  {Function(state, action)} plugin.reduce
+ * @param  {Object} plugin.actions
  * @return {Plugin}
  */
 function createPlugin({ init, reduce, actions }) {
-    init = init || defaultInit;
-    reduce = reduce || defaultReduce;
-    actions = actions || {};
-
-    const plugin = {
+    const plugin = Plugin({
         init,
         reduce,
         actions
-    };
+    });
 
     if (typeof window !== 'undefined') {
         window.gitbookPlugins = window.gitbookPlugins || [];

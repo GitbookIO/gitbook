@@ -13,9 +13,8 @@ function searchHandler(query) {
 }
 
 module.exports = GitBook.createPlugin({
-    init: (dispatch, getState, actions) => {
-        const { search } = actions;
-        dispatch(search.registerHandler('lunr', searchHandler));
+    init: (dispatch, getState, { Search }) => {
+        dispatch(Search.registerHandler('lunr', searchHandler));
     },
     reduce: (state, action) => state
 });

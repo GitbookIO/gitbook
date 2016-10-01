@@ -5,6 +5,7 @@ module.exports = {
     ...ImmutablePropTypes,
     dispatch:       React.PropTypes.func,
     i18n:           require('./i18n'),
+    Context:        require('./Context'),
     Page:           require('./Page'),
     File:           require('./File'),
     Summary:        require('./Summary'),

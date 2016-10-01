@@ -34,7 +34,7 @@ const HintAlert = React.createClass({
 });
 
 module.exports = GitBook.createPlugin({
-    init: (dispatch, getState) => {
-        dispatch(GitBook.registerComponent(HintAlert, { role: 'block:hint' }));
+    init: (dispatch, getState, { Components }) => {
+        dispatch(Components.registerComponent(HintAlert, { role: 'block:hint' }));
     }
 });

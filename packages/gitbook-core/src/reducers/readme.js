@@ -1,12 +1,12 @@
 const { Record } = require('immutable');
-const FileState = require('./file');
+const File = require('../models/file');
 
 class ReadmeState extends Record({
-    file: new FileState()
+    file: new File()
 }) {
     constructor(state = {}) {
         super({
-            file: new FileState(state.file)
+            file: new File(state.file)
         });
     }
 

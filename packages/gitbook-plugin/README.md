@@ -1,3 +1,1 @@
-# `gitbook-plugin`
-
-CLI utility to build and test plugins.
+See [GitBook: Create a plugin](toolchain.gitbook.com/api/).
