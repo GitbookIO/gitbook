@@ -13,7 +13,9 @@ function reduceI18n(state, action) {
 
     case ACTION_TYPES.I18N_REGISTER_LOCALE:
         return state.merge({
-            messages: state.messages.set(action.locale, Map(action.messages))
+            messages: state.messages.set(action.locale,
+                state.messages.get(action.locale, Map()).merge(action.messages)
+            )
         });
 
     default:

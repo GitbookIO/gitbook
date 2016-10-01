@@ -4,12 +4,13 @@ const ReactRedux = require('react-redux');
 
 const I18nProvider = React.createClass({
     propTypes: {
-        children: React.PropTypes.node
+        children: React.PropTypes.node,
+        messages: React.PropTypes.object
     },
 
     render() {
-        // TODO
-        const messages = {};
+        let { messages } = this.props;
+        messages = messages.get('en').toJS();
 
         return (
             <intl.IntlProvider locale={'en'} messages={messages}>
