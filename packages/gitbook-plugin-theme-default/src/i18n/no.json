@@ -1,0 +1,20 @@
+{
+    "LANGS_CHOOSE": "Velg språk",
+    "GLOSSARY": "Register",
+    "GLOSSARY_INDEX": "Indeks",
+    "GLOSSARY_OPEN": "Register",
+    "GITBOOK_LINK": "Publisert med GitBook",
+    "SUMMARY": "Innholdsfortegnelse",
+    "SUMMARY_INTRODUCTION": "Innledning",
+    "SUMMARY_TOGGLE": "Innholdsfortegnelse",
+    "SEARCH_TOGGLE": "Søk",
+    "SEARCH_PLACEHOLDER": "Skriv inn søkeord",
+    "FONTSETTINGS_TOGGLE": "Tekstinnstillinger",
+    "SHARE_TOGGLE": "Del",
+    "SHARE_ON": "Del på {{platform}}",
+    "FONTSETTINGS_WHITE": "Lys",
+    "FONTSETTINGS_SEPIA": "Sepia",
+    "FONTSETTINGS_NIGHT": "Mørk",
+    "FONTSETTINGS_SANS": "Sans",
+    "FONTSETTINGS_SERIF": "Serif"
+}

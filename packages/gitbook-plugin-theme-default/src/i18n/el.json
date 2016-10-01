@@ -1,0 +1,20 @@
+{
+    "LANGS_CHOOSE": "Επιλογή γλώσσας",
+    "GLOSSARY": "Γλωσσάρι",
+    "GLOSSARY_INDEX": "Ευρετήριο",
+    "GLOSSARY_OPEN": "Γλωσσάρι",
+    "GITBOOK_LINK": "Δημοσιεύτηκε με το GitBook",
+    "SUMMARY": "Πίνακας Περιεχομένων",
+    "SUMMARY_INTRODUCTION": "Εισαγωγή",
+    "SUMMARY_TOGGLE": "Πίνακας Περιεχομένων",
+    "SEARCH_TOGGLE": "Αναζήτηση",
+    "SEARCH_PLACEHOLDER": "Αναζήτηση για ...",
+    "FONTSETTINGS_TOGGLE": "Επιλογές γραμματοσειράς",
+    "SHARE_TOGGLE": "Κοινοποίηση",
+    "SHARE_ON": "Κοινοποίηση σε {{platform}}",
+    "FONTSETTINGS_WHITE": "Λευκό",
+    "FONTSETTINGS_SEPIA": "Καστανόχρους",
+    "FONTSETTINGS_NIGHT": "Βραδινό",
+    "FONTSETTINGS_SANS": "Χωρίς πατούρες",
+    "FONTSETTINGS_SERIF": "Με πατούρες"
+}

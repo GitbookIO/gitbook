@@ -1,0 +1,20 @@
+{
+    "LANGS_CHOOSE": "Zvolte jazyk",
+    "GLOSSARY": "Slovníček",
+    "GLOSSARY_INDEX": "Rejstřík",
+    "GLOSSARY_OPEN": "Slovníček",
+    "GITBOOK_LINK": "Publikováno pomocí GitBook",
+    "SUMMARY": "Obsah",
+    "SUMMARY_INTRODUCTION": "Úvod",
+    "SUMMARY_TOGGLE": "Obsah",
+    "SEARCH_TOGGLE": "Hledání",
+    "SEARCH_PLACEHOLDER": "Vyhledat",
+    "FONTSETTINGS_TOGGLE": "Nastavení písma",
+    "SHARE_TOGGLE": "Sdílet",
+    "SHARE_ON": "Sdílet na {{platform}}",
+    "FONTSETTINGS_WHITE": "Bílá",
+    "FONTSETTINGS_SEPIA": "Sépie",
+    "FONTSETTINGS_NIGHT": "Noc",
+    "FONTSETTINGS_SANS": "Bezpatkové",
+    "FONTSETTINGS_SERIF": "Patkové"
+}

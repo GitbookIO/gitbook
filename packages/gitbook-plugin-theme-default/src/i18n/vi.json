@@ -1,0 +1,20 @@
+{
+    "LANGS_CHOOSE": "Lựa chọn ngôn ngữ",
+    "GLOSSARY": "Chú giải",
+    "GLOSSARY_INDEX": "Chỉ mục",
+    "GLOSSARY_OPEN": "Chú giải",
+    "GITBOOK_LINK": "Xuất bản với GitBook",
+    "SUMMARY": "Mục Lục",
+    "SUMMARY_INTRODUCTION": "Giới thiệu",
+    "SUMMARY_TOGGLE": "Mục Lục",
+    "SEARCH_TOGGLE": "Tìm kiếm",
+    "SEARCH_PLACEHOLDER": "Nhập thông tin cần tìm",
+    "FONTSETTINGS_TOGGLE": "Tùy chỉnh phông chữ",
+    "SHARE_TOGGLE": "Chia sẻ",
+    "SHARE_ON": "Chia sẻ trên {{platform}}",
+    "FONTSETTINGS_WHITE": "Sáng",
+    "FONTSETTINGS_SEPIA": "Vàng nâu",
+    "FONTSETTINGS_NIGHT": "Tối",
+    "FONTSETTINGS_SANS": "Sans",
+    "FONTSETTINGS_SERIF": "Serif"
+}

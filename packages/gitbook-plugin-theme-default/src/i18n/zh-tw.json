@@ -1,0 +1,20 @@
+{
+    "LANGS_CHOOSE": "選擇一種語言",
+    "GLOSSARY": "術語表",
+    "GLOSSARY_INDEX": "索引",
+    "GLOSSARY_OPEN": "術語表",
+    "GITBOOK_LINK": "本書使用 GitBook 釋出",
+    "SUMMARY": "目錄",
+    "SUMMARY_INTRODUCTION": "介紹",
+    "SUMMARY_TOGGLE": "目錄",
+    "SEARCH_TOGGLE": "搜尋",
+    "SEARCH_PLACEHOLDER": "輸入並搜尋",
+    "FONTSETTINGS_TOGGLE": "字型設定",
+    "SHARE_TOGGLE": "分享",
+    "SHARE_ON": "分享到 {{platform}}",
+    "FONTSETTINGS_WHITE": "白色",
+    "FONTSETTINGS_SEPIA": "棕褐色",
+    "FONTSETTINGS_NIGHT": "夜間",
+    "FONTSETTINGS_SANS": "無襯線體",
+    "FONTSETTINGS_SERIF": "襯線體"
+}

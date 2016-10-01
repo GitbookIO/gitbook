@@ -1,0 +1,22 @@
+{
+    "LANGS_CHOOSE": "Choose a language",
+    "GLOSSARY": "Glossary",
+    "GLOSSARY_INDEX": "Index",
+    "GLOSSARY_OPEN": "Glossary",
+    "GITBOOK_LINK": "Published with GitBook",
+    "SUMMARY": "Table of Contents",
+    "SUMMARY_INTRODUCTION": "Introduction",
+    "SUMMARY_TOGGLE": "Table of Contents",
+    "SEARCH_TOGGLE": "Search",
+    "SEARCH_PLACEHOLDER": "Type to search",
+    "SEARCH_RESULTS_TITLE": "<span class='search-results-count'></span> results matching \"<span class='search-query'></span>\"",
+    "SEARCH_NO_RESULTS_TITLE": "No results matching \"<span class='search-query'></span>\"",
+    "FONTSETTINGS_TOGGLE": "Font Settings",
+    "SHARE_TOGGLE": "Share",
+    "SHARE_ON": "Share on {{platform}}",
+    "FONTSETTINGS_WHITE": "White",
+    "FONTSETTINGS_SEPIA": "Sepia",
+    "FONTSETTINGS_NIGHT": "Night",
+    "FONTSETTINGS_SANS": "Sans",
+    "FONTSETTINGS_SERIF": "Serif"
+}

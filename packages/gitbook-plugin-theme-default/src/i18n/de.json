@@ -1,0 +1,20 @@
+{
+    "LANGS_CHOOSE": "Sprache auswählen",
+    "GLOSSARY": "Glossar",
+    "GLOSSARY_INDEX": "Index",
+    "GLOSSARY_OPEN": "Glossar",
+    "GITBOOK_LINK": "Veröffentlicht mit GitBook",
+    "SUMMARY": "Inhaltsverzeichnis",
+    "SUMMARY_INTRODUCTION": "Einleitung",
+    "SUMMARY_TOGGLE": "Inhaltsverzeichnis",
+    "SEARCH_TOGGLE": "Suche",
+    "SEARCH_PLACEHOLDER": "Suchbegriff eingeben",
+    "FONTSETTINGS_TOGGLE": "Schrifteinstellungen",
+    "SHARE_TOGGLE": "Teilen",
+    "SHARE_ON": "Auf {{platform}} teilen",
+    "FONTSETTINGS_WHITE": "Hell",
+    "FONTSETTINGS_SEPIA": "Sepia",
+    "FONTSETTINGS_NIGHT": "Nacht",
+    "FONTSETTINGS_SANS": "Sans",
+    "FONTSETTINGS_SERIF": "Serif"
+}

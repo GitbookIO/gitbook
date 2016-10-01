@@ -10,6 +10,24 @@ function registerLocale(locale, messages) {
     return { type: ACTION_TYPES.I18N_REGISTER_LOCALE, locale, messages };
 }
 
+/**
+ * Register multiple locales
+ * @param {Map<String:Object>} locales
+ * @return {Action}
+ */
+function registerLocales(locales) {
+    return (dispatch) => {
+        for (const locale in locales) {
+            if (!locales.hasOwnProperty(locale)) {
+                continue;
+            }
+
+            dispatch(registerLocale(locale, locales[locale]));
+        }
+    };
+}
+
 module.exports = {
-    registerLocale
+    registerLocale,
+    registerLocales
 };
