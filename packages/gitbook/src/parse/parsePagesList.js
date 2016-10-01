@@ -11,15 +11,26 @@ const parsePage = require('./parsePage');
 
     @param {Book} book
     @param {String} filePath
-    @return {Page}
+    @return {Page?}
 */
 function parseFilePage(book, filePath) {
     const fs = book.getContentFS();
 
     return fs.statFile(filePath)
-    .then(function(file) {
-        const page = Page.createForFile(file);
-        return parsePage(book, page);
+    .then(
+        function(file) {
+            const page = Page.createForFile(file);
+            return parsePage(book, page);
+        },
+        function(err) {
+            // file doesn't exist
+            return null;
+        }
+    )
+    .fail(function(err) {
+        const logger = book.getLogger();
+        logger.error.ln('error while parsing page "' + filePath + '":');
+        throw err;
     });
 }
 
@@ -48,9 +59,12 @@ function parsePagesList(book) {
 
             return parseFilePage(book, filepath)
             .then(function(page) {
-                map = map.set(filepath, page);
-            }, function() {
                 // file doesn't exist
+                if (!page) {
+                    return;
+                }
+
+                map = map.set(filepath, page);
             });
         })
     )
@@ -65,6 +79,11 @@ function parsePagesList(book) {
 
         return parseFilePage(book, file.getPath())
         .then(function(page) {
+            // file doesn't exist
+            if (!page) {
+                return;
+            }
+
             map = map.set(file.getPath(), page);
         });
     })

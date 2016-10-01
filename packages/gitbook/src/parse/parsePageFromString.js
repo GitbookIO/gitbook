@@ -9,6 +9,7 @@ const direction = require('direction');
  * @return {Page}
  */
 function parsePageFromString(page, content) {
+    // Parse page YAML
     const parsed = fm(content);
 
     return page.merge({
