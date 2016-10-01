@@ -3,17 +3,20 @@ const { Record } = require('immutable');
 
 const DEFAULTS = {
     type:  '',
-    mtime: '',
+    mtime: new Date(),
     path:  ''
 };
 
 class File extends Record(DEFAULTS) {
-    constructor(file) {
+    constructor(file = {}) {
         if (typeof file === 'string') {
             file = { path: file };
         }
 
-        super(file);
+        super({
+            ...file,
+            mtime: new Date(file.mtime)
+        });
     }
 
     /**

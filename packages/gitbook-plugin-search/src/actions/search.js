@@ -15,7 +15,7 @@ function query(q) {
     return (dispatch, getState) => {
         const { handlers } = getState().search;
 
-        dispatch({ type: TYPES.UPDATE_QUERY, query: q });
+        dispatch({ type: TYPES.START, query: q });
 
         return Promise.reduce(
             handlers.toArray(),
@@ -27,7 +27,7 @@ function query(q) {
         )
         .then(
             results => {
-                dispatch({ type: TYPES.UPDATE_RESULTS, query: q, results });
+                dispatch({ type: TYPES.END, query: q, results });
             }
         );
     };

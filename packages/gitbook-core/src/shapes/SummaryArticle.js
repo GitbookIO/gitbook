@@ -1,8 +1,9 @@
 /* eslint-disable no-use-before-define */
 
-const React  = require('react');
+const React = require('react');
+const { list } = require('react-immutable-proptypes');
+
 const {
-    arrayOf,
     string,
     number,
     shape
@@ -14,7 +15,7 @@ const Article = shape({
     path:     string,
     ref:      string,
     level:    string,
-    articles: arrayOf(Article)
+    articles: list
 });
 
 module.exports = Article;

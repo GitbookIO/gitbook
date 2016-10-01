@@ -1,6 +1,7 @@
 const React  = require('react');
+const { listOf } = require('react-immutable-proptypes');
+
 const {
-    arrayOf,
     shape
 } = React.PropTypes;
 
@@ -9,5 +10,5 @@ const Part = require('./SummaryPart');
 
 module.exports = shape({
     file:  File.isRequired,
-    parts: arrayOf(Part).isRequired
+    parts: listOf(Part).isRequired
 });
