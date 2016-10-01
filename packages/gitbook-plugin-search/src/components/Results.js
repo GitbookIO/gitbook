@@ -10,7 +10,7 @@ const Result = React.createClass({
         const { result } = this.props;
 
         return (
-            <div className="Search/Result">
+            <div className="Search-Result">
                 <h3>{result.title}</h3>
                 <p>{result.body}</p>
             </div>
@@ -34,7 +34,7 @@ const SearchResults = React.createClass({
         }
 
         return (
-            <div className="Search/ResultsContainer">
+            <div className="Search-ResultsContainer">
                 <h1>{i18n.t('SEARCH_RESULTS_TITLE', { query, count: results.size })}</h1>
                 <div className="Search/Results">
                     {results.map((result, i) => {

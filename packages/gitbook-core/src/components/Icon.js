@@ -18,7 +18,7 @@ const Icon = React.createClass({
         let { className } = this.props;
 
         if (id) {
-            className = type + ' ' + type + '-' + id;
+            className = 'GitBook-Icon ' + type + ' ' + type + '-' + id;
         }
 
         return <i className={className}/>;

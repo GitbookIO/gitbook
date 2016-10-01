@@ -12,7 +12,7 @@ const Button = React.createClass({
 
     render() {
         const { children, active, onClick } = this.props;
-        const className = classNames('GitBook/Button', this.props.className, {
+        const className = classNames('GitBook-Button', this.props.className, {
             active
         });
 

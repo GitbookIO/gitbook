@@ -21,7 +21,7 @@ const SearchInput = React.createClass({
         const { i18n, query } = this.props;
 
         return (
-            <div className="Search/Input">
+            <div className="Search-Input">
                 <input
                     type="text"
                     value={query}
