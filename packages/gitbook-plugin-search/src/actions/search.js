@@ -8,14 +8,24 @@ const TYPES = require('./types');
  * @return {Action}
  */
 function query(q) {
+    return (dispatch, getState, { Navigation }) => {
+        dispatch(Navigation.updateQuery({ q }));
+    };
+}
+
+
+/**
+ * Update results for a query
+ * @param {String} q
+ * @return {Action}
+ */
+function handleQuery(q) {
     if (!q) {
         return clear();
     }
 
     return (dispatch, getState, { Navigation }) => {
         const { handlers } = getState().search;
-
-        dispatch(Navigation.updateQuery({ q }));
         dispatch({ type: TYPES.START, query: q });
 
         return Promise.reduce(
@@ -64,6 +74,7 @@ function unregisterHandler(name) {
 module.exports = {
     clear,
     query,
+    handleQuery,
     registerHandler,
     unregisterHandler
 };

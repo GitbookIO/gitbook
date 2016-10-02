@@ -1,5 +1,10 @@
+const { createBrowserHistory, createMemoryHistory } = require('history');
+
 const ACTION_TYPES = require('./TYPES');
 const getPayload = require('../lib/getPayload');
+const Location = require('../models/Location');
+
+const isServerSide = (typeof window === 'undefined');
 
 const SUPPORTED = (
     typeof window !== 'undefined' &&
@@ -8,48 +13,39 @@ const SUPPORTED = (
     !navigator.userAgent.match(/((iPod|iPhone|iPad).+\bOS\s+[1-4]\D|WebApps\/.+CFNetwork)/)
 );
 
-let PUSH_ID = 0;
-
-/**
- * Generate a new state to be pushed or replaced
- * @param {Object}
- */
-function genState() {
-    return {
-        id: (PUSH_ID++)
-    };
-}
+// Create tge history instance
+const history = isServerSide ? createMemoryHistory() : createBrowserHistory();
 
 /**
  * Push a new url into the navigation
- * @param {String} uri
+ * @param {String|Location} location
  * @return {Action} action
  */
-function pushURI(uri) {
+function pushURI(location) {
     return () => {
-        const state = genState();
+        location = Location.fromNative(location);
 
         if (SUPPORTED) {
-            window.history.pushState(state, '', uri);
+            history.push(location.toNative());
         } else {
-            redirect(uri);
+            redirect(location.toString());
         }
     };
 }
 
 /**
  * Replace current state in navigation
- * @param {String} uri
+ * @param {String|Location} location
  * @return {Action} action
  */
-function replaceURI(uri) {
+function replaceURI(location) {
     return () => {
-        const state = genState();
+        location = Location.fromNative(location);
 
         if (SUPPORTED) {
-            window.history.replaceState(state, '', uri);
+            history.replace(location.toNative());
         } else {
-            redirect(uri);
+            redirect(location.toString());
         }
     };
 }
@@ -62,6 +58,20 @@ function replaceURI(uri) {
 function redirect(uri) {
     return () => {
         window.location.href = uri;
+    };
+}
+
+/**
+ * Listen to url change
+ * @param {Function} fn
+ * @return {Action} action
+ */
+function listen(fn) {
+    return (dispatch, getState) => {
+        history.listen(location => {
+            location = Location.fromNative(location);
+            fn(location, dispatch, getState);
+        });
     };
 }
 
@@ -125,11 +135,11 @@ function fetchArticle(article) {
 
 /**
  * Update anchor for current page
- * @param {String} anchor
+ * @param {String} hash
  * @return {Action} action
  */
-function updateAnchor(anchor) {
-    return { type: ACTION_TYPES.PAGE_UPDATE_ANCHOR, anchor };
+function updateAnchor(hash) {
+    return pushURI({ hash });
 }
 
 /**
@@ -138,10 +148,11 @@ function updateAnchor(anchor) {
  * @return {Action} action
  */
 function updateQuery(query) {
-    return { type: ACTION_TYPES.PAGE_UPDATE_QUERY, query };
+    return pushURI({ query });
 }
 
 module.exports = {
+    listen,
     pushURI,
     fetchPage,
     fetchArticle,
