@@ -12,9 +12,10 @@ function query(q) {
         return clear();
     }
 
-    return (dispatch, getState) => {
+    return (dispatch, getState, { Navigation }) => {
         const { handlers } = getState().search;
 
+        dispatch(Navigation.updateQuery({ q }));
         dispatch({ type: TYPES.START, query: q });
 
         return Promise.reduce(

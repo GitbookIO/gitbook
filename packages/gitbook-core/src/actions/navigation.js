@@ -123,8 +123,28 @@ function fetchArticle(article) {
     return fetchPage(article.path);
 }
 
+/**
+ * Update anchor for current page
+ * @param {String} anchor
+ * @return {Action} action
+ */
+function updateAnchor(anchor) {
+    return { type: ACTION_TYPES.PAGE_UPDATE_ANCHOR, anchor };
+}
+
+/**
+ * Update query for current page
+ * @param {Object|Map} query
+ * @return {Action} action
+ */
+function updateQuery(query) {
+    return { type: ACTION_TYPES.PAGE_UPDATE_QUERY, query };
+}
+
 module.exports = {
     pushURI,
     fetchPage,
-    fetchArticle
+    fetchArticle,
+    updateAnchor,
+    updateQuery
 };

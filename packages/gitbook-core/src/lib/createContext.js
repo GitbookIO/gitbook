@@ -11,6 +11,8 @@ const Components = require('../actions/components');
 const I18n = require('../actions/i18n');
 const Navigation = require('../actions/navigation');
 
+const isBrowser = (typeof window !== 'undefined');
+
 const corePlugin = new Plugin({
     reduce: coreReducers,
     actions: {
@@ -38,13 +40,19 @@ function createContext(plugins, initialState) {
         return Object.assign(accu, plugin.actions);
     }, {});
 
+    // Create thunk middleware which include actions
+    const thunk = ReduxThunk.withExtraArgument(actions);
+
+    // Create the redux store
     const store = Redux.createStore(
         (state, action) => {
-            console.log('[store]', action.type);
+            if (isBrowser) {
+                console.log('[store]', action.type);
+            }
             return reducer(state, action);
         },
         initialState,
-        Redux.compose(Redux.applyMiddleware(ReduxThunk))
+        Redux.compose(Redux.applyMiddleware(thunk))
     );
 
     // Initialize the plugins
