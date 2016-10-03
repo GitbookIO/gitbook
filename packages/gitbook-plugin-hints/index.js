@@ -1,8 +1,9 @@
 
 module.exports = {
     blocks: {
-        hint: ({ kwargs }) => {
+        hint: ({ kwargs, children }) => {
             return {
+                children,
                 style: kwargs.style || 'info',
                 icon:  kwargs.icon
             };

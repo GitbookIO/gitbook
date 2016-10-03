@@ -1,6 +1,7 @@
 const React = require('react');
 const ReactSafeHtml = require('react-safe-html');
 const htmlTags = require('html-tags');
+const entities = require('entities');
 
 const { InjectedComponent } = require('./InjectedComponent');
 
@@ -27,11 +28,12 @@ function inject(injectedProps, Component) {
 }
 
 const COMPONENTS = {
-    // Templating blocks are exported as <template-block block="youtube" props="{}" />
-    'template-block': inject(
-        ({block, props}) => {
+    // Templating blocks are exported as <xblock name="youtube" props="{}" />
+    'xblock': inject(
+        ({name, props}) => {
+            props = entities.decodeHTML(props);
             return {
-                matching: { role: `block:${block}` },
+                matching: { role: `block:${name}` },
                 props: JSON.parse(props)
             };
         },

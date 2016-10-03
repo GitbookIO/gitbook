@@ -1,12 +1,13 @@
 const is = require('is');
 const extend = require('extend');
 const Immutable = require('immutable');
+const escape = require('escape-html');
 
 const Promise = require('../utils/promise');
-const genKey = require('../utils/genKey');
 const TemplateShortcut = require('./templateShortcut');
 
 const NODE_ENDARGS = '%%endargs%%';
+const HTML_TAGNAME = 'xblock';
 
 const TemplateBlock = Immutable.Record({
     // Name of block, also the start tag
@@ -156,7 +157,7 @@ TemplateBlock.prototype.toNunjucksExt = function(mainContext, blocksOutput) {
 
                 blocks.push({
                     name: blkName,
-                    body: blockBody(),
+                    children: blockBody(),
                     args: blockArgs,
                     kwargs: blockKwargs
                 });
@@ -173,8 +174,8 @@ TemplateBlock.prototype.toNunjucksExt = function(mainContext, blocksOutput) {
 
                 return that.applyBlock(mainBlock, ctx);
             })
-            .then(function(result) {
-                return that.blockResultToHtml(result, blocksOutput);
+            .then(function(props) {
+                return that.blockResultToHtml(props);
             })
             .nodeify(callback);
         };
@@ -184,10 +185,11 @@ TemplateBlock.prototype.toNunjucksExt = function(mainContext, blocksOutput) {
 };
 
 /**
- * Apply a block to a content
+ * Apply a block to a content.
+ *
  * @param {Object} inner
  * @param {Object} context
- * @return {Promise<String>|String}
+ * @return {Promise<Props>|Props}
  */
 TemplateBlock.prototype.applyBlock = function(inner, context) {
     const processFn = this.getProcess();
@@ -197,52 +199,23 @@ TemplateBlock.prototype.applyBlock = function(inner, context) {
     inner.kwargs = inner.kwargs || {};
     inner.blocks = inner.blocks || [];
 
-    const r = processFn.call(context, inner);
-
-    if (Promise.isPromiseAlike(r)) {
-        return r.then(this.normalizeBlockResult.bind(this));
-    } else {
-        return this.normalizeBlockResult(r);
-    }
+    return processFn.call(context, inner);
 };
 
 /**
- * Normalize result from a block process function
- * @param {Object|String} result
- * @return {Object}
- */
-TemplateBlock.prototype.normalizeBlockResult = function(result) {
-    if (is.string(result)) {
-        result = { body: result };
-    }
-    result.name = this.getName();
-
-    return result;
-};
-
-/**
- * Convert a block result to HTML
- * @param {Object} result
- * @param {Object} blocksOutput: stored post processing blocks in this object
+ * Convert a block props to HTML. This HTML is then being
+ * parsed by gitbook-core during rendering, and binded to the right react components.
+ *
+ * @param {Object} props
  * @return {String}
  */
-TemplateBlock.prototype.blockResultToHtml = function(result, blocksOutput) {
-    let indexedKey;
-    const toIndex = (!result.parse) || (result.post !== undefined);
+TemplateBlock.prototype.blockResultToHtml = function(props) {
+    const { children, ...innerProps } = props;
+    const payload = escape(JSON.stringify(innerProps));
 
-    if (toIndex) {
-        indexedKey = genKey();
-        blocksOutput[indexedKey] = result;
-    }
-
-    // Parsable block, just return it
-    if (result.parse) {
-        return result.body;
-    }
-
-    // Return it as a position marker
-    return '{{-%' + indexedKey + '%-}}';
-
+    return (
+        `<${HTML_TAGNAME} name="${this.name}" props="${payload}">${children}</${HTML_TAGNAME}>`
+    );
 };
 
 /**
