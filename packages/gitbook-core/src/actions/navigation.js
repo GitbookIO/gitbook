@@ -14,16 +14,35 @@ const SUPPORTED = (
  */
 function activate() {
     return (dispatch, getState) => {
-        const listener = (location) => {
-            const { listeners } = getState().navigation;
-            location = Location.fromNative(location);
+        dispatch({
+            type: ACTION_TYPES.NAVIGATION_ACTIVATE,
+            listener: () => dispatch(emit())
+        });
 
-            listeners.forEach(handler => {
-                handler(location, dispatch, getState);
-            });
-        };
+        // Trigger for existing listeners
+        dispatch(emit());
+    };
+}
 
-        dispatch({ type: ACTION_TYPES.NAVIGATION_ACTIVATE, listener });
+/**
+ * Emit current location
+ * @param {List|Array<Function>} to?
+ */
+function emit(to) {
+    return (dispatch, getState) => {
+        const { listeners, history } = getState().navigation;
+
+        if (!history) {
+            return;
+        }
+
+        const location = Location.fromNative(history.location);
+
+        to = to || listeners;
+
+        to.forEach(handler => {
+            handler(location, dispatch, getState);
+        });
     };
 }
 
@@ -87,7 +106,12 @@ function redirect(uri) {
  * @return {Action} action
  */
 function listen(listener) {
-    return { type: ACTION_TYPES.NAVIGATION_LISTEN, listener };
+    return (dispatch, getState) => {
+        dispatch({ type: ACTION_TYPES.NAVIGATION_LISTEN, listener });
+
+        // Trigger for existing listeners
+        dispatch(emit([ listener ]));
+    };
 }
 
 /**
