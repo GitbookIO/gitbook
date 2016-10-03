@@ -55,6 +55,9 @@ function render(plugins, initialState) {
 
     const el = GitBook.renderWithContext(context);
 
+    // We're done with the context
+    context.deactivate();
+
     // Render inner body
     const innerHTML = ReactDOMServer.renderToString(el);
 

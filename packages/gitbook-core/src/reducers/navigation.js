@@ -1,5 +1,8 @@
 const { Record, List } = require('immutable');
+const { createBrowserHistory, createMemoryHistory } = require('history');
 const ACTION_TYPES = require('../actions/TYPES');
+
+const isServerSide = (typeof window === 'undefined');
 
 const NavigationState = Record({
     // Are we loading a new page
@@ -7,7 +10,11 @@ const NavigationState = Record({
     // Did we fail loading a page?
     error:   null,
     // Listener for history changes
-    listeners: List()
+    listeners: List(),
+    // Function to call to stop listening
+    unlisten: null,
+    // History instance
+    history: null
 });
 
 function reduceNavigation(state, action) {
@@ -28,6 +35,27 @@ function reduceNavigation(state, action) {
         return state.merge({
             loading: false,
             error:   action.error
+        });
+
+    case ACTION_TYPES.NAVIGATION_ACTIVATE:
+        const history = isServerSide ? createMemoryHistory() : createBrowserHistory();
+        const unlisten = history.listen(action.listener);
+
+        // We can't use .merge since it convert history to an immutable
+        const newState = state
+            .set('history', history)
+            .set('unlisten', unlisten);
+
+        return newState;
+
+    case ACTION_TYPES.NAVIGATION_DEACTIVATE:
+        if (state.unlisten) {
+            state.unlisten();
+        }
+
+        return state.merge({
+            history:  null,
+            unlisten: null
         });
 
     case ACTION_TYPES.NAVIGATION_LISTEN:

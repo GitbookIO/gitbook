@@ -8,9 +8,10 @@ const Plugin = require('../models/Plugin');
  * @param  {Object} plugin.actions
  * @return {Plugin}
  */
-function createPlugin({ init, reduce, actions }) {
+function createPlugin({ activate, deactivate, reduce, actions }) {
     const plugin = new Plugin({
-        init,
+        activate,
+        deactivate,
         reduce,
         actions
     });

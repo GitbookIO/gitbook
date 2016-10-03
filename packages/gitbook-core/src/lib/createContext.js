@@ -66,15 +66,17 @@ function createContext(plugins, initialState) {
         Redux.compose(Redux.applyMiddleware(thunk))
     );
 
-    // Initialize the plugins
-    plugins.forEach(plugin => {
-        plugin.init(store.dispatch, store.getState, actions);
-    });
-
-    return new Context({
+    // Create the context
+    const context = new Context({
         store,
+        plugins,
         actions
     });
+
+    // Initialize the plugins
+    context.activate();
+
+    return context;
 }
 
 module.exports = createContext;

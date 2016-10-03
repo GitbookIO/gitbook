@@ -1,10 +1,6 @@
-const { createBrowserHistory, createMemoryHistory } = require('history');
-
 const ACTION_TYPES = require('./TYPES');
 const getPayload = require('../lib/getPayload');
 const Location = require('../models/Location');
-
-const isServerSide = (typeof window === 'undefined');
 
 const SUPPORTED = (
     typeof window !== 'undefined' &&
@@ -13,23 +9,21 @@ const SUPPORTED = (
     !navigator.userAgent.match(/((iPod|iPhone|iPad).+\bOS\s+[1-4]\D|WebApps\/.+CFNetwork)/)
 );
 
-// Create tge history instance
-const history = isServerSide ? createMemoryHistory() : createBrowserHistory();
-
 /**
  * Initialize the navigation
  */
 function activate() {
     return (dispatch, getState) => {
-        const { listeners } = getState().navigation;
-
-        history.listen(location => {
+        const listener = (location) => {
+            const { listeners } = getState().navigation;
             location = Location.fromNative(location);
 
-            listeners.forEach(listener => {
-                listener(location, dispatch, getState);
+            listeners.forEach(handler => {
+                handler(location, dispatch, getState);
             });
-        });
+        };
+
+        dispatch({ type: ACTION_TYPES.NAVIGATION_ACTIVATE, listener });
     };
 }
 
@@ -37,9 +31,7 @@ function activate() {
  * Cleanup the navigation
  */
 function deactivate() {
-    return (dispatch, getState) => {
-
-    };
+    return { type: ACTION_TYPES.NAVIGATION_DEACTIVATE };
 }
 
 /**
@@ -48,7 +40,8 @@ function deactivate() {
  * @return {Action} action
  */
 function pushURI(location) {
-    return () => {
+    return (dispatch, getState) => {
+        const { history } = getState().navigation;
         location = Location.fromNative(location);
 
         if (SUPPORTED) {
@@ -65,7 +58,8 @@ function pushURI(location) {
  * @return {Action} action
  */
 function replaceURI(location) {
-    return () => {
+    return (dispatch, getState) => {
+        const { history } = getState().navigation;
         location = Location.fromNative(location);
 
         if (SUPPORTED) {

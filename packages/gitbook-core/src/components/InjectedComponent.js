@@ -78,7 +78,11 @@ const InjectedComponent = React.createClass({
     },
 
     render() {
-        const { components, props, children } = this.props;
+        let { components, props, children } = this.props;
+
+        if (!children) {
+            children = null;
+        }
 
         return components.reduce((inner, Comp) => {
             return (

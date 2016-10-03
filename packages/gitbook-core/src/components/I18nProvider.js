@@ -1,3 +1,4 @@
+const { Map } = require('immutable');
 const React = require('react');
 const intl = require('react-intl');
 const ReactRedux = require('react-redux');
@@ -10,7 +11,7 @@ const I18nProvider = React.createClass({
 
     render() {
         let { messages } = this.props;
-        messages = messages.get('en').toJS();
+        messages = messages.get('en', Map()).toJS();
 
         return (
             <intl.IntlProvider locale={'en'} messages={messages}>
