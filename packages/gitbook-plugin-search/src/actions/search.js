@@ -20,10 +20,12 @@ function query(q) {
         const searchState = getState().search;
         const currentQuery = searchState.query;
 
+        const queryString = q ? { q } : {};
+
         if (currentQuery && q) {
-            dispatch(Navigation.replace({ query: { q } }));
+            dispatch(Navigation.replace({ query: queryString }));
         } else {
-            dispatch(Navigation.push({ query: { q } }));
+            dispatch(Navigation.push({ query: queryString }));
         }
     };
 }
