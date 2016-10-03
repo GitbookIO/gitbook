@@ -1,11 +1,13 @@
-const { Record } = require('immutable');
+const { Record, List } = require('immutable');
 const ACTION_TYPES = require('../actions/TYPES');
 
 const NavigationState = Record({
     // Are we loading a new page
     loading: Boolean(false),
     // Did we fail loading a page?
-    error:   null
+    error:   null,
+    // Listener for history changes
+    listeners: List()
 });
 
 function reduceNavigation(state, action) {
@@ -26,6 +28,11 @@ function reduceNavigation(state, action) {
         return state.merge({
             loading: false,
             error:   action.error
+        });
+
+    case ACTION_TYPES.NAVIGATION_LISTEN:
+        return state.merge({
+            listeners: state.listeners.push(action.listener)
         });
 
     default:

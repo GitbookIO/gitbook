@@ -17,6 +17,32 @@ const SUPPORTED = (
 const history = isServerSide ? createMemoryHistory() : createBrowserHistory();
 
 /**
+ * Initialize the navigation
+ */
+function activate() {
+    return (dispatch, getState) => {
+        const { listeners } = getState().navigation;
+
+        history.listen(location => {
+            location = Location.fromNative(location);
+
+            listeners.forEach(listener => {
+                listener(location, dispatch, getState);
+            });
+        });
+    };
+}
+
+/**
+ * Cleanup the navigation
+ */
+function deactivate() {
+    return (dispatch, getState) => {
+
+    };
+}
+
+/**
  * Push a new url into the navigation
  * @param {String|Location} location
  * @return {Action} action
@@ -63,16 +89,11 @@ function redirect(uri) {
 
 /**
  * Listen to url change
- * @param {Function} fn
+ * @param {Function} listener
  * @return {Action} action
  */
-function listen(fn) {
-    return (dispatch, getState) => {
-        history.listen(location => {
-            location = Location.fromNative(location);
-            fn(location, dispatch, getState);
-        });
-    };
+function listen(listener) {
+    return { type: ACTION_TYPES.NAVIGATION_LISTEN, listener };
 }
 
 /**
@@ -152,6 +173,8 @@ function updateQuery(query) {
 }
 
 module.exports = {
+    activate,
+    deactivate,
     listen,
     pushURI,
     fetchPage,

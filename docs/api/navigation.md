@@ -19,3 +19,5 @@ module.exports = GitBook.createPlugin({
 ```
 
 The `onLocationChanged` will be triggered for initial state.
+
+### Changing the url

@@ -2,6 +2,14 @@ const { Promise, Immutable } = require('gitbook-core');
 const { List } = Immutable;
 const TYPES = require('./types');
 
+/*
+    Search workflow:
+
+    1. Typing in the search input
+    2. Trigger an update of the url
+    3. An update of the url, trigger an update of search results
+ */
+
 /**
  * Start a search query
  * @param {String} q
@@ -12,7 +20,6 @@ function query(q) {
         dispatch(Navigation.updateQuery({ q }));
     };
 }
-
 
 /**
  * Update results for a query

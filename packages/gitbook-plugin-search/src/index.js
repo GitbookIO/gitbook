@@ -5,6 +5,11 @@ const SearchResults = require('./components/Results');
 const reducers = require('./reducers');
 const Search = require('./actions/search');
 
+/**
+ * Url of the page changed, we update the search according to this.
+ * @param  {GitBook.Location} location
+ * @param  {Function} dispatch
+ */
 const onLocationChange = (location, dispatch) => {
     const { query } = location;
     const q = query.get('q');
@@ -13,7 +18,7 @@ const onLocationChange = (location, dispatch) => {
 };
 
 module.exports = GitBook.createPlugin({
-    init: (dispatch, getState, { Navigation, Components }) => {
+    activate: (dispatch, getState, { Navigation, Components }) => {
         // Register the navigation handler
         dispatch(Navigation.listen(onLocationChange));
 

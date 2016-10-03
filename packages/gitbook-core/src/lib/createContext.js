@@ -13,7 +13,18 @@ const Navigation = require('../actions/navigation');
 
 const isBrowser = (typeof window !== 'undefined');
 
+/**
+ * The core plugin defines the defualt behaviour of GitBook and provides
+ * actions to other plugins.
+ * @type {Plugin}
+ */
 const corePlugin = new Plugin({
+    activate: (dispatch) => {
+        dispatch(Navigation.activate());
+    },
+    deactivate: (dispatch) => {
+        dispatch(Navigation.deactivate());
+    },
     reduce: coreReducers,
     actions: {
         Components, I18n, Navigation
