@@ -39,7 +39,7 @@ function deactivate() {
  * @param {String|Location} location
  * @return {Action} action
  */
-function pushURI(location) {
+function push(location) {
     return (dispatch, getState) => {
         const { history } = getState().navigation;
         location = Location.fromNative(location);
@@ -57,7 +57,7 @@ function pushURI(location) {
  * @param {String|Location} location
  * @return {Action} action
  */
-function replaceURI(location) {
+function replace(location) {
     return (dispatch, getState) => {
         const { history } = getState().navigation;
         location = Location.fromNative(location);
@@ -97,16 +97,16 @@ function listen(listener) {
  * @return {Action} action
  */
 function fetchPage(uri, options = {}) {
-    const { replace } = options;
+    const shouldReplace = options.replace;
 
     return (dispatch, getState) => {
         const prevURI = location.href;
         dispatch({ type: ACTION_TYPES.PAGE_FETCH_START });
 
-        if (replace) {
-            dispatch(replaceURI(uri));
+        if (shouldReplace) {
+            dispatch(replace(uri));
         } else {
-            dispatch(pushURI(uri));
+            dispatch(push(uri));
         }
 
         window.fetch(uri, {
@@ -130,7 +130,7 @@ function fetchPage(uri, options = {}) {
         )
         .catch(
             error => {
-                dispatch(replaceURI(prevURI));
+                dispatch(replace(prevURI));
                 dispatch(redirect(uri));
 
                 dispatch({ type: ACTION_TYPES.PAGE_FETCH_ERROR, error });
@@ -148,31 +148,12 @@ function fetchArticle(article) {
     return fetchPage(article.path);
 }
 
-/**
- * Update anchor for current page
- * @param {String} hash
- * @return {Action} action
- */
-function updateAnchor(hash) {
-    return pushURI({ hash });
-}
-
-/**
- * Update query for current page
- * @param {Object|Map} query
- * @return {Action} action
- */
-function updateQuery(query) {
-    return pushURI({ query });
-}
-
 module.exports = {
     activate,
     deactivate,
     listen,
-    pushURI,
+    push,
+    replace,
     fetchPage,
-    fetchArticle,
-    updateAnchor,
-    updateQuery
+    fetchArticle
 };

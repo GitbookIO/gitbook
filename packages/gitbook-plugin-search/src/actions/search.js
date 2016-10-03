@@ -17,7 +17,14 @@ const TYPES = require('./types');
  */
 function query(q) {
     return (dispatch, getState, { Navigation }) => {
-        dispatch(Navigation.updateQuery({ q }));
+        const searchState = getState().search;
+        const currentQuery = searchState.query;
+
+        if (currentQuery && q) {
+            dispatch(Navigation.replace({ query: { q } }));
+        } else {
+            dispatch(Navigation.push({ query: { q } }));
+        }
     };
 }
 
@@ -33,6 +40,7 @@ function handleQuery(q) {
 
     return (dispatch, getState, { Navigation }) => {
         const { handlers } = getState().search;
+
         dispatch({ type: TYPES.START, query: q });
 
         return Promise.reduce(
