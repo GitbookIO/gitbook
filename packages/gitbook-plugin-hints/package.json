@@ -2,7 +2,7 @@
   "name": "gitbook-plugin-hints",
   "description": "Defines four types of styled hint blocks: info, danger, tip, working.",
   "main": "index.js",
-  "browser": "./_assets/theme.js",
+  "browser": "./_assets/plugin.js",
   "version": "2.0.0",
   "dependencies": {
     "classnames": "^2.2.5",
@@ -15,7 +15,7 @@
     "gitbook": ">=4.0.0"
   },
   "scripts": {
-    "build-js": "gitbook-plugin build ./src/index.js ./_assets/theme.js",
+    "build-js": "gitbook-plugin build ./src/index.js ./_assets/plugin.js",
     "prepublish": "npm run build-js"
   },
   "homepage": "https://github.com/GitBookIO/gitbook",

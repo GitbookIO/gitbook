@@ -3,8 +3,9 @@ const GitBook = require('gitbook-core');
 const { React } = GitBook;
 
 const STYLE_TO_ICON = {
-    info:    'info',
+    info:    'info-circle',
     tip:     'question',
+    success: 'check-circle',
     danger:  'exclamation-circle',
     warning: 'exclamation-triangle'
 };
@@ -18,14 +19,18 @@ const HintAlert = React.createClass({
 
     render() {
         const { children, style, icon } = this.props;
-        const className = classNames('HintAlert', 'alert', `alert-${style}`);
+        const className = classNames(
+            'HintAlert', `HintAlert-Style-${style}`,
+            'alert', `alert-${style}`
+        );
 
         return (
             <div className={className}>
-                <div className="HintAlert/Icon">
+                <GitBook.ImportCSS href="gitbook/hints/plugin.css" />
+                <div className="HintAlert-Icon">
                     <GitBook.Icon id={icon || STYLE_TO_ICON[style]} />
                 </div>
-                <div className="HintAlert/Content">
+                <div className="HintAlert-Content">
                     {children}
                 </div>
             </div>

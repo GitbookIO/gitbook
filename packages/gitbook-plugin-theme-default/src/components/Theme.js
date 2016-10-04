@@ -22,7 +22,7 @@ const Theme = React.createClass({
                 <GitBook.Head
                     title={page.title}
                     titleTemplate="%s - GitBook" />
-                <GitBook.ImportCSS href="gitbook/theme.css" />
+                <GitBook.ImportCSS href="gitbook/theme-default/theme.css" />
 
                 <GitBook.FlexBox>
                     <GitBook.FlexLayout>

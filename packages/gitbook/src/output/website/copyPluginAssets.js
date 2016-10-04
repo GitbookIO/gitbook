@@ -28,7 +28,6 @@ function copyPluginAssets(output) {
 
     return Promise.forEach(plugins, function(plugin) {
         return copyAssets(output, plugin)
-        .then(() => copyResources(output, plugin))
         .then(() => copyBrowserJS(output, plugin));
     })
     .then(() => copyCoreJS(output))
@@ -47,10 +46,10 @@ function copyAssets(output, plugin) {
     const options = output.getOptions();
 
     const outputRoot = options.get('root');
-    const assetOutputFolder = path.join(outputRoot, 'gitbook');
     const prefix = options.get('prefix');
 
     const assetFolder = path.join(pluginRoot, ASSET_FOLDER, prefix);
+    const assetOutputFolder = path.join(outputRoot, 'gitbook', plugin.getName());
 
     if (!fs.existsSync(assetFolder)) {
         return Promise();
@@ -111,51 +110,6 @@ function copyCoreJS(output) {
     logger.debug.ln('copy JS for gitbook-core');
     return fs.ensureFile(outputFile)
     .then(() => fs.copy(inputFile, outputFile));
-}
-
-/**
- * Copy resources from a plugin
- *
- * @param {Plugin}
- * @return {Promise}
- */
-function copyResources(output, plugin) {
-    const logger = output.getLogger();
-
-    const options    = output.getOptions();
-    const outputRoot = options.get('root');
-
-    const state = output.getState();
-    const resources = state.getResources();
-
-    const pluginRoot      = plugin.getPath();
-    const pluginResources = resources.get(plugin.getName());
-
-    let assetsFolder = pluginResources.get('assets');
-    const assetOutputFolder = path.join(outputRoot, 'gitbook', plugin.getNpmID());
-
-    if (!assetsFolder) {
-        return Promise();
-    }
-
-    // Resolve assets folder
-    assetsFolder = path.resolve(pluginRoot, assetsFolder);
-    if (!fs.existsSync(assetsFolder)) {
-        logger.warn.ln('assets folder for plugin "' + plugin.getName() + '" doesn\'t exist');
-        return Promise();
-    }
-
-    logger.debug.ln('copy resources from plugin', assetsFolder);
-
-    return fs.copyDir(
-        assetsFolder,
-        assetOutputFolder,
-        {
-            deleteFirst: false,
-            overwrite: true,
-            confirm: true
-        }
-    );
 }
 
 module.exports = copyPluginAssets;
