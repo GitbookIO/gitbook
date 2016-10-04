@@ -5,7 +5,8 @@
   "browser": "./_assets/plugin.js",
   "version": "2.0.2",
   "dependencies": {
-    "gitbook-core": "^0.0.0"
+    "gitbook-core": "^0.0.0",
+    "highlight.js": "9.7.0"
   },
   "devDependencies": {
     "gitbook-plugin": "*"

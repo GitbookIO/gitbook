@@ -15,7 +15,7 @@ function inject(injectedProps, Component) {
     return (props) => {
         const cleanProps = {
             ...props,
-            className: props.className
+            className: props['class']
         };
         delete cleanProps['class'];
 

@@ -1,14 +1,16 @@
 const GitBook = require('gitbook-core');
 const { List } = GitBook.Immutable;
 
+const ALIASES = require('./ALIASES');
+
 /**
  * Return language for a code blocks from a list of class names
  *
- * @param {Array<String>}
+ * @param {String} className
  * @return {String}
  */
-function getLanguage(classNames) {
-    return List(classNames)
+function getLanguage(className) {
+    const lang = List(className.split(' '))
         .map(function(cl) {
             // Markdown
             if (cl.search('lang-') === 0) {
@@ -25,6 +27,8 @@ function getLanguage(classNames) {
         .find(function(cl) {
             return Boolean(cl);
         });
+
+    return ALIASES[lang] || lang;
 }
 
 module.exports = getLanguage;
