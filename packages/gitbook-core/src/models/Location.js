@@ -10,6 +10,11 @@ const DEFAULTS = {
 };
 
 class Location extends Record(DEFAULTS) {
+
+    /**
+     * Return search query as a string
+     * @return {String}
+     */
     get search() {
         const { query } = this;
         return query.size === 0 ?

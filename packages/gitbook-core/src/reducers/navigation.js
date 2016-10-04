@@ -5,16 +5,18 @@ const ACTION_TYPES = require('../actions/TYPES');
 const isServerSide = (typeof window === 'undefined');
 
 const NavigationState = Record({
+    // Current location
+    location:  null,
     // Are we loading a new page
-    loading: Boolean(false),
+    loading:   Boolean(false),
     // Did we fail loading a page?
-    error:   null,
+    error:     null,
     // Listener for history changes
     listeners: List(),
     // Function to call to stop listening
-    unlisten: null,
+    unlisten:  null,
     // History instance
-    history: null
+    history:   null
 });
 
 function reduceNavigation(state, action) {
@@ -56,6 +58,11 @@ function reduceNavigation(state, action) {
         return state.merge({
             history:  null,
             unlisten: null
+        });
+
+    case ACTION_TYPES.NAVIGATION_UPDATE:
+        return state.merge({
+            location: action.location
         });
 
     case ACTION_TYPES.NAVIGATION_LISTEN:

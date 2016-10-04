@@ -14,9 +14,27 @@ const SUPPORTED = (
  */
 function activate() {
     return (dispatch, getState) => {
+
         dispatch({
             type: ACTION_TYPES.NAVIGATION_ACTIVATE,
-            listener: () => dispatch(emit())
+            listener: (location) => {
+                location = Location.fromNative(location);
+                const prevLocation = getState().navigation.location;
+
+                // Fetch page if required
+                if (!prevLocation || location.pathname !== prevLocation.pathname) {
+                    dispatch(fetchPage(location.pathname));
+                }
+
+                // Signal location to listener
+                dispatch(emit());
+
+                // Update the location
+                dispatch({
+                    type: ACTION_TYPES.NAVIGATION_UPDATE,
+                    location
+                });
+            }
         });
 
         // Trigger for existing listeners
@@ -116,24 +134,14 @@ function listen(listener) {
 
 /**
  * Fetch a new page and update the store accordingly
- * @param {String} uri
- * @param {Boolean} options.replace
+ * @param {String} pathname
  * @return {Action} action
  */
-function fetchPage(uri, options = {}) {
-    const shouldReplace = options.replace;
-
+function fetchPage(pathname) {
     return (dispatch, getState) => {
-        const prevURI = location.href;
         dispatch({ type: ACTION_TYPES.PAGE_FETCH_START });
 
-        if (shouldReplace) {
-            dispatch(replace(uri));
-        } else {
-            dispatch(push(uri));
-        }
-
-        window.fetch(uri, {
+        window.fetch(pathname, {
             credentials: 'include'
         })
         .then(
@@ -154,9 +162,8 @@ function fetchPage(uri, options = {}) {
         )
         .catch(
             error => {
-                dispatch(replace(prevURI));
-                dispatch(redirect(uri));
-
+                // dispatch(redirect(pathname));
+                console.error(error);
                 dispatch({ type: ACTION_TYPES.PAGE_FETCH_ERROR, error });
             }
         );

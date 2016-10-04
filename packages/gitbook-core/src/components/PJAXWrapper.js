@@ -1,6 +1,6 @@
 const React = require('react');
 const ReactRedux = require('react-redux');
-const navigation = require('../actions/navigation');
+const Navigation = require('../actions/navigation');
 
 /**
  * Check if an element is inside a link
@@ -61,7 +61,7 @@ function getHrefForEvent(event) {
     if (link.getAttribute('data-nopjax'))
         return;
 
-    return link.href;
+    return link.pathname;
 }
 
 /*
@@ -83,25 +83,15 @@ const PJAXWrapper = React.createClass({
         }
 
         event.preventDefault();
-        dispatch(navigation.fetchPage(href));
-
-    },
-
-    onPopState(event) {
-        const { dispatch } = this.props;
-        event.preventDefault();
-
-        dispatch(navigation.fetchPage(location.href, { replace: true }));
+        dispatch(Navigation.push(href));
     },
 
     componentDidMount() {
         document.addEventListener('click', this.onClick, false);
-        window.addEventListener('popstate', this.onPopState, false);
     },
 
     componentWillUnmount() {
         document.removeEventListener('click', this.onClick, false);
-        window.removeEventListener('popstate', this.onPopState, false);
     },
 
     render() {
