@@ -10,6 +10,5 @@ module.exports = {
     svgToPng:           require('./svgToPng'),
     resolveLinks:       require('./resolveLinks'),
     resolveImages:      require('./resolveImages'),
-    annotateText:       require('./annotateText'),
-    highlightCode:      require('./highlightCode')
+    annotateText:       require('./annotateText')
 };
