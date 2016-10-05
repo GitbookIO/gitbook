@@ -40,7 +40,7 @@ function handleQuery(q) {
         return clear();
     }
 
-    return (dispatch, getState, { Navigation }) => {
+    return (dispatch, getState, actions) => {
         const { handlers } = getState().search;
 
         dispatch({ type: TYPES.START, query: q });
@@ -48,7 +48,7 @@ function handleQuery(q) {
         return Promise.reduce(
             handlers.toArray(),
             (results, handler) => {
-                return Promise.resolve(handler(q))
+                return Promise.resolve(handler(q, dispatch, getState, actions))
                 .then(handlerResults => results.concat(handlerResults));
             },
             List()
@@ -56,6 +56,9 @@ function handleQuery(q) {
         .then(
             results => {
                 dispatch({ type: TYPES.END, query: q, results });
+            },
+            error => {
+                console.error(error);
             }
         );
     };
