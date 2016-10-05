@@ -67,6 +67,20 @@ function handleQuery(q) {
 }
 
 /**
+ * Refresh current search (when handlers have changed)
+ * @return {Action}
+ */
+function refresh() {
+    return (dispatch, getState) => {
+        const q = getState().search.query;
+        console.log('refresh search with', q);
+        if (q) {
+            dispatch(handleQuery(q));
+        }
+    };
+}
+
+/**
  * Clear the whole search
  * @return {Action}
  */
@@ -81,7 +95,10 @@ function clear() {
  * @return {Action}
  */
 function registerHandler(name, handler) {
-    return { type: TYPES.REGISTER_HANDLER, name, handler };
+    return (dispatch) => {
+        dispatch({ type: TYPES.REGISTER_HANDLER, name, handler });
+        dispatch(refresh());
+    };
 }
 
 /**
@@ -90,7 +107,10 @@ function registerHandler(name, handler) {
  * @return {Action}
  */
 function unregisterHandler(name) {
-    return { type: TYPES.UNREGISTER_HANDLER, name };
+    return (dispatch) => {
+        dispatch({ type: TYPES.UNREGISTER_HANDLER, name });
+        dispatch(refresh());
+    };
 }
 
 module.exports = {

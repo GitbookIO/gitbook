@@ -11,7 +11,9 @@ const Result = React.createClass({
 
         return (
             <div className="Search-Result">
-                <h3>{result.title}</h3>
+                <h3>
+                    <GitBook.Link to={result.url}>{result.title}</GitBook.Link>
+                </h3>
                 <p>{result.body}</p>
             </div>
         );
@@ -36,7 +38,7 @@ const SearchResults = React.createClass({
         return (
             <div className="Search-ResultsContainer">
                 <h1>{i18n.t('SEARCH_RESULTS_TITLE', { query, count: results.size })}</h1>
-                <div className="Search/Results">
+                <div className="Search-Results">
                     {results.map((result, i) => {
                         return <Result key={i} result={result} />;
                     })}
