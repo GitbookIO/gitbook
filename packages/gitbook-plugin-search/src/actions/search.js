@@ -1,6 +1,8 @@
 const { Promise, Immutable } = require('gitbook-core');
 const { List } = Immutable;
+
 const TYPES = require('./types');
+const Result = require('../models/Result');
 
 /*
     Search workflow:
@@ -49,6 +51,9 @@ function handleQuery(q) {
             handlers.toArray(),
             (results, handler) => {
                 return Promise.resolve(handler(q, dispatch, getState, actions))
+                .then(handlerResults => {
+                    return handlerResults.map(result => new Result(result));
+                })
                 .then(handlerResults => results.concat(handlerResults));
             },
             List()
@@ -56,9 +61,6 @@ function handleQuery(q) {
         .then(
             results => {
                 dispatch({ type: TYPES.END, query: q, results });
-            },
-            error => {
-                console.error(error);
             }
         );
     };

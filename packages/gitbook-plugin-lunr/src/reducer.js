@@ -4,6 +4,10 @@ const { Record } = GitBook.Immutable;
 
 const { TYPES } = require('./actions');
 
+/*
+    We store the lunr index an the document index in the store.
+ */
+
 const LunrState = Record({
     idx: null,
     store: {}

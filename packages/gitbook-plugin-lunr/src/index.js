@@ -7,10 +7,16 @@ const actions = require('./actions');
  * @param  {String} query
  * @return {Promise<List>}
  */
-function searchHandler(query, dispatch) {
+function searchHandler(query, dispatch, getState) {
+    // Fetch the index if non loaded
     return dispatch(actions.fetch())
+
+    // Execute the search
     .then(() => {
-        return [];
+        const { idx, store } = getState().lunr;
+        const results = idx.search(query);
+
+        return results.map(({ref}) => store.get(ref).toJS());
     });
 }
 

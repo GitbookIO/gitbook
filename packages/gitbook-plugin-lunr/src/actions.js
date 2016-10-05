@@ -19,6 +19,12 @@ function load(json) {
  */
 function fetch() {
     return (dispatch, getState) => {
+        const { idx } = getState().lunr;
+
+        if (idx) {
+            return GitBook.Promise.resolve();
+        }
+
         return GitBook.Promise.resolve()
         .then(() => {
             // TODO: resolve the file correctly
