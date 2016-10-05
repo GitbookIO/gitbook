@@ -25,6 +25,6 @@ module.exports = Immutable.List([
     'lunr',
     'sharing',
     'hints',
-    'fontsettings',
+    'headings',
     'theme-default'
 ]).map(createFromDependency);
