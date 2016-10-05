@@ -1,4 +1,5 @@
-const { Record } = require('immutable');
+const GitBook = require('gitbook-core');
+const { Record } = GitBook.Immutable;
 const ActionTypes = require('../actions/types');
 
 const SidebarState = Record({
