@@ -19,12 +19,6 @@ const isBrowser = (typeof window !== 'undefined');
  * @type {Plugin}
  */
 const corePlugin = new Plugin({
-    activate: (dispatch) => {
-        dispatch(Navigation.activate());
-    },
-    deactivate: (dispatch) => {
-        dispatch(Navigation.deactivate());
-    },
     reduce: coreReducers,
     actions: {
         Components, I18n, Navigation
