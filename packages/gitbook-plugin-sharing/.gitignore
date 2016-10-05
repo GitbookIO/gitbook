@@ -28,4 +28,4 @@ node_modules
 *.swp
 
 # Plugin assets
-_assets
+_assets/plugin.js

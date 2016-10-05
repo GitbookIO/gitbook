@@ -1,9 +1,9 @@
 {
   "name": "gitbook-plugin-sharing",
-  "description": "Sharing button in the toolbar",
+  "description": "Sharing buttons in the toolbar",
   "main": "index.js",
-  "browser": "./_assets/theme.js",
-  "version": "0.0.0",
+  "browser": "./_assets/plugin.js",
+  "version": "4.0.0",
   "dependencies": {
     "gitbook-core": "^0.0.0"
   },
@@ -14,7 +14,7 @@
     "gitbook": ">=3.0.0"
   },
   "scripts": {
-    "build-js": "gitbook-plugin build ./src/index.js ./_assets/theme.js",
+    "build-js": "gitbook-plugin build ./src/index.js ./_assets/plugin.js",
     "prepublish": "npm run build-js"
   },
   "homepage": "https://github.com/GitbookIO/gitbook",
