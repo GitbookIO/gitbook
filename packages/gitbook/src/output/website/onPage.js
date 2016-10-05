@@ -1,4 +1,3 @@
-const Plugins = require('../../plugins');
 const JSONUtils = require('../../json');
 const Modifiers = require('../modifiers');
 const writeFile = require('../helper/writeFile');
@@ -7,7 +6,7 @@ const getModifiers = require('../getModifiers');
 const render = require('../../browser/render');
 
 /**
- * Write a page as a json file
+ * Generate a page using react and the plugins.
  *
  * @param {Output} output
  * @param {Page} page
@@ -15,8 +14,6 @@ const render = require('../../browser/render');
 function onPage(output, page) {
     const file      = page.getFile();
     const plugins   = output.getPlugins();
-    const state     = output.getState();
-    const resources = state.getResources();
 
     // Output file path
     const filePath = fileToOutput(output, file.getPath());
@@ -25,9 +22,6 @@ function onPage(output, page) {
     .then(function(resultPage) {
         // Generate the context
         const initialState = JSONUtils.encodeOutputWithPage(output, resultPage);
-        initialState.plugins = {
-            resources: Plugins.listResources(plugins, resources).toJS()
-        };
 
         // Render the theme
         const html = render(plugins, initialState);

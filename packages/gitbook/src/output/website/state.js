@@ -2,10 +2,9 @@ const I18n = require('i18n-t');
 const Immutable = require('immutable');
 
 const GeneratorState = Immutable.Record({
-    i18n:       I18n(),
-
+    i18n:      I18n(),
     // List of plugins' resources
-    resources:  Immutable.Map()
+    resources: Immutable.Map()
 });
 
 GeneratorState.prototype.getI18n = function() {

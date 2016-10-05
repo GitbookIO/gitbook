@@ -1,3 +1,5 @@
+const resolveFileToURL = require('../output/helper/resolveFileToURL');
+
 const encodeOutput = require('./encodeOutput');
 const encodePage = require('./encodePage');
 const encodeFile = require('./encodeFile');
@@ -15,7 +17,7 @@ function encodeOutputWithPage(output, page) {
 
     const result = encodeOutput(output);
     result.page = encodePage(page, book.getSummary());
-    result.file = encodeFile(file);
+    result.file = encodeFile(file, resolveFileToURL(output, file.getPath()));
 
     return result;
 }

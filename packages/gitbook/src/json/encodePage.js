@@ -1,12 +1,12 @@
 const encodeSummaryArticle = require('./encodeSummaryArticle');
 
 /**
-    Return a JSON representation of a page
-
-    @param {Page} page
-    @param {Summary} summary
-    @return {Object}
-*/
+ * Return a JSON representation of a page
+ *
+ * @param {Page} page
+ * @param {Summary} summary
+ * @return {Object} json
+ */
 function encodePage(page, summary) {
     const file = page.getFile();
     const attributes = page.getAttributes();
