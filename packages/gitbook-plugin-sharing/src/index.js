@@ -1,10 +1,19 @@
 const GitBook = require('gitbook-core');
 const { React } = GitBook;
+const { string, arrayOf, shape, func } = React.PropTypes;
+
+const SITES = require('./SITES');
+const optionsShape = require('./optionsShape');
+const siteShape = shape({
+    label: string.isRequired,
+    icon: string.isRequired,
+    onShare: func.isRequired
+});
 
 module.exports = GitBook.createPlugin({
     activate: (dispatch, getState, { Components }) => {
         // Dispatch initialization actions
-        dispatch(Components.registerComponent(SharingButton, { role: 'toolbar:buttons:right' }))
+        dispatch(Components.registerComponent(Sharing, { role: 'toolbar:buttons:right' }));
     },
     deactivate: (dispatch, getState) => {
         // Dispatch cleanup actions
@@ -12,23 +21,89 @@ module.exports = GitBook.createPlugin({
     reduce: (state, action) => state
 });
 
-let SharingButton = React.createClass({
+/**
+ * Displays the group of sharing buttons
+ */
+let Sharing = React.createClass({
     propTypes: {
-        page: GitBook.Shapes.Page
+        options: optionsShape.isRequired,
+        page: GitBook.Shapes.Page.isRequired
     },
 
-    onClick() {
-        alert(this.props.page.title)
+    onShare(site) {
+        site.onShare(location.href, this.props.page.title);
     },
 
     render() {
+        const { options } = this.props;
+
+        // Highlighted sites
+        const mainButtons = SITES
+            .ALL
+            .filter(id => options[id])
+            .map(id => <SiteButton key={id} onShare={this.onShare} site={SITES[id]} />);
+
+        // Other sites
+        let shareButton = undefined;
+        if (options.all.length > 0) {
+            shareButton = (
+                <ShareButton sites={options.all.map(id => SITES[id])}
+                onShare={this.onShare} />
+            );
+        }
+
+        return (
+            <GitBook.ButtonGroup>
+                { mainButtons }
+                { shareButton }
+            </GitBook.ButtonGroup>
+        );
+    }
+});
+
+function mapStateToProps(state) {
+    return {
+        page: state.page,
+        options: state.config.pluginsConfig.sharing || { all: [] }
+    };
+}
+
+Sharing = GitBook.connect(Sharing, mapStateToProps);
+
+// An individual site sharing button
+const SiteButton = React.createClass({
+    propTypes: {
+        site: siteShape.isRequired,
+        onShare: func.isRequired
+    },
+
+    onClick(e) {
+        e.preventDefault();
+        this.props.onShare(this.props.site);
+    },
+
+    render() {
+        const { site } = this.props;
+
         return (
             <GitBook.Button onClick={this.onClick}>
-                <GitBook.Icon id="facebook"/>
+                <GitBook.Icon id={site.icon}/>
             </GitBook.Button>
-        )
+        );
     }
-})
-SharingButton = GitBook.connect(SharingButton, function mapStateToProps(state) {
-    return { page: state.page }
-})
+});
+
+// Share button with dropdown list of sites
+const ShareButton = React.createClass({
+    propTypes: {
+        sites: arrayOf(siteShape).isRequired,
+        onShare: func.isRequired
+    },
+
+    render() {
+        const { sites } = this.props;
+        return (
+            <span>{sites.map(site => site.label).join(' ')}</span>
+        );
+    }
+});
