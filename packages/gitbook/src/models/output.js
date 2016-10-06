@@ -4,7 +4,7 @@ const Book = require('./book');
 const LocationUtils = require('../utils/location');
 
 const Output = Immutable.Record({
-    book:       Book(),
+    book:       new Book(),
 
     // Name of the generator being used
     generator:  String(),
