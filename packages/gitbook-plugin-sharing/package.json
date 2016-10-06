@@ -4,6 +4,54 @@
   "main": "index.js",
   "browser": "./_assets/plugin.js",
   "version": "4.0.0",
+  "gitbook": {
+    "properties": {
+      "facebook": {
+        "type": "boolean",
+        "default": true,
+        "title": "Facebook"
+      },
+      "twitter": {
+        "type": "boolean",
+        "default": true,
+        "title": "Twitter"
+      },
+      "google": {
+        "type": "boolean",
+        "default": false,
+        "title": "Google"
+      },
+      "weibo": {
+        "type": "boolean",
+        "default": false,
+        "description": "Weibo"
+      },
+      "instapaper": {
+        "type": "boolean",
+        "default": false,
+        "description": "Instapaper"
+      },
+      "vk": {
+        "type": "boolean",
+        "default": false,
+        "description": "VK"
+      },
+      "all": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "default": [
+          "facebook",
+          "google",
+          "twitter",
+          "weibo",
+          "instapaper"
+        ],
+        "uniqueItems": true
+      }
+    }
+  },
   "dependencies": {
     "gitbook-core": "^0.0.0"
   },
@@ -24,5 +72,6 @@
   },
   "bugs": {
     "url": "https://github.com/GitbookIO/gitbook/issues"
-  }
+  },
+  "license": "Apache-2.0"
 }
