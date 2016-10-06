@@ -7,12 +7,12 @@ const parsePage = require('./parsePage');
 
 
 /**
-    Parse a page from a path
-
-    @param {Book} book
-    @param {String} filePath
-    @return {Page?}
-*/
+ * Parse a page from a path
+ *
+ * @param {Book} book
+ * @param {String} filePath
+ * @return {Page?}
+ */
 function parseFilePage(book, filePath) {
     const fs = book.getContentFS();
 
@@ -36,11 +36,11 @@ function parseFilePage(book, filePath) {
 
 
 /**
-    Parse all pages from a book as an OrderedMap
-
-    @param {Book} book
-    @return {Promise<OrderedMap<Page>>}
-*/
+ * Parse all pages from a book as an OrderedMap
+ *
+ * @param {Book} book
+ * @return {Promise<OrderedMap<Page>>}
+ */
 function parsePagesList(book) {
     const summary = book.getSummary();
     const glossary = book.getGlossary();

@@ -10,7 +10,6 @@ const Summary = require('./summary');
 const Glossary = require('./glossary');
 const Languages = require('./languages');
 const Ignore = require('./ignore');
-const URIIndex = require('./uriIndex');
 
 const DEFAULTS = {
     // Logger for output message
@@ -25,8 +24,6 @@ const DEFAULTS = {
     summary:        new Summary(),
     glossary:       new Glossary(),
     languages:      new Languages(),
-    // Index of urls
-    urls:           new URIIndex(),
     // ID of the language for language books
     language:       String(),
     // List of children, if multilingual (String -> Book)

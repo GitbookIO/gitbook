@@ -21,16 +21,14 @@ class File extends Record(DEFAULTS) {
     }
 
     /**
-     * Return url for a file in a GitBook context.
-     * @param {Context} context
-     * @return {String} url
+     * Returns the relative path from this file to "to"
+     * @param {String} to
+     * @return {String}
      */
-    toURL(context) {
-        const { file } = context.getState();
-
+    relative(to) {
         return path.relative(
-            path.dirname(file.path),
-            this.path
+            path.dirname(this.path),
+            to
         );
     }
 

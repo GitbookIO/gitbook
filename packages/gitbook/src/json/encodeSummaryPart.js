@@ -1,11 +1,11 @@
 const encodeSummaryArticle = require('./encodeSummaryArticle');
 
 /**
-    Encode a SummaryPart to JSON
-
-    @param {SummaryPart}
-    @return {Object}
-*/
+ * Encode a SummaryPart to JSON
+ *
+ * @param {SummaryPart}
+ * @return {Object}
+ */
 function encodeSummaryPart(part) {
     return {
         title: part.getTitle(),

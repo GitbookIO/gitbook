@@ -8,12 +8,12 @@ const defaultBlocks = require('../constants/defaultBlocks');
 const defaultFilters = require('../constants/defaultFilters');
 
 /**
-    Create template engine for an output.
-    It adds default filters/blocks, then add the ones from plugins
-
-    @param {Output} output
-    @return {TemplateEngine}
-*/
+ * Create template engine for an output.
+ * It adds default filters/blocks, then add the ones from plugins
+ *
+ * @param {Output} output
+ * @return {TemplateEngine}
+ */
 function createTemplateEngine(output) {
     const plugins = output.getPlugins();
     const book = output.getBook();

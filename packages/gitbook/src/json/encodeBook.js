@@ -7,11 +7,11 @@ const encodeReadme = require('./encodeReadme');
 const encodeLanguages = require('./encodeLanguages');
 
 /**
-    Encode a book to JSON
-
-    @param {Book}
-    @return {Object}
-*/
+ * Encode a book to JSON
+ *
+ * @param {Book}
+ * @return {Object}
+ */
 function encodeBookToJson(book) {
     const config = book.getConfig();
     const language = book.getLanguage();

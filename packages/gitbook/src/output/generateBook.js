@@ -167,7 +167,7 @@ function generateBook(generator, book, options) {
     )
 
     // Cleanup output folder
-    .then(function(output) {
+    .then((output) => {
         const logger = output.getLogger();
         const rootFolder = output.getRoot();
 
@@ -176,10 +176,10 @@ function generateBook(generator, book, options) {
             .thenResolve(output);
     })
 
-    .then(processOutput.bind(null, generator))
+    .then(output => processOutput(generator, output))
 
     // Log duration and end message
-    .then(function(output) {
+    .then((output) => {
         const logger = output.getLogger();
         const end = Date.now();
         const duration = (end - start) / 1000;

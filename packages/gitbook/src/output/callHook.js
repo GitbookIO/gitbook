@@ -11,14 +11,14 @@ function defaultHandleResult(output, result) {
 }
 
 /**
-    Call a "global" hook for an output
-
-    @param {String} name
-    @param {Function(Output) -> Mixed} getArgument
-    @param {Function(Output, result) -> Output} handleResult
-    @param {Output} output
-    @return {Promise<Output>}
-*/
+ * Call a "global" hook for an output. Hooks are functions exported by plugins.
+ *
+ * @param {String} name
+ * @param {Function(Output) -> Mixed} getArgument
+ * @param {Function(Output, result) -> Output} handleResult
+ * @param {Output} output
+ * @return {Promise<Output>}
+ */
 function callHook(name, getArgument, handleResult, output) {
     getArgument = getArgument || defaultGetArgument;
     handleResult = handleResult || defaultHandleResult;

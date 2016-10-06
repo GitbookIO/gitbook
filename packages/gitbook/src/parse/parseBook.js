@@ -10,11 +10,11 @@ const parseReadme = require('./parseReadme');
 const parseLanguages = require('./parseLanguages');
 
 /**
-    Parse content of a book
-
-    @param {Book} book
-    @return {Promise<Book>}
-*/
+ * Parse content of a book
+ *
+ * @param {Book} book
+ * @return {Promise<Book>}
+ */
 function parseBookContent(book) {
     return Promise(book)
         .then(parseReadme)
@@ -23,11 +23,11 @@ function parseBookContent(book) {
 }
 
 /**
-    Parse a multilingual book
-
-    @param {Book} book
-    @return {Promise<Book>}
-*/
+ * Parse a multilingual book
+ *
+ * @param {Book} book
+ * @return {Promise<Book>}
+ */
 function parseMultilingualBook(book) {
     const languages = book.getLanguages();
     const langList = languages.getList();
@@ -52,11 +52,11 @@ function parseMultilingualBook(book) {
 
 
 /**
-    Parse a whole book from a filesystem
-
-    @param {Book} book
-    @return {Promise<Book>}
-*/
+ * Parse a whole book from a filesystem
+ *
+ * @param {Book} book
+ * @return {Promise<Book>}
+ */
 function parseBook(book) {
     return timing.measure(
         'parse.book',

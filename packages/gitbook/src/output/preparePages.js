@@ -1,12 +1,13 @@
 const Parse = require('../parse');
 const Promise = require('../utils/promise');
+const parseURIIndexFromPages = require('../parse/parseURIIndexFromPages');
 
 /**
-    List and prepare all pages
-
-    @param {Output}
-    @return {Promise<Output>}
-*/
+ * List and parse all pages, then create the urls mapping.
+ *
+ * @param {Output}
+ * @return {Promise<Output>}
+ */
 function preparePages(output) {
     const book = output.getBook();
     const logger = book.getLogger();
@@ -16,10 +17,14 @@ function preparePages(output) {
     }
 
     return Parse.parsePagesList(book)
-    .then(function(pages) {
+    .then((pages) => {
         logger.info.ln('found', pages.size, 'pages');
+        const urls = parseURIIndexFromPages(pages);
 
-        return output.set('pages', pages);
+        return output.merge({
+            pages,
+            urls
+        });
     });
 }
 
