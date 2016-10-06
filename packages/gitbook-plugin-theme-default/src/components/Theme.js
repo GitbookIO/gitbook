@@ -9,13 +9,14 @@ const Theme = React.createClass({
         // State
         page:     GitBook.Shapes.Page,
         summary:  GitBook.Shapes.Summary,
+        readme:   GitBook.Shapes.Readme,
         sidebar:  React.PropTypes.object,
         // Other props
         children: React.PropTypes.node
     },
 
     render() {
-        const { page, summary, children, sidebar } = this.props;
+        const { page, summary, children, sidebar, readme } = this.props;
 
         return (
             <GitBook.FlexLayout column className="GitBook book">
@@ -32,7 +33,7 @@ const Theme = React.createClass({
                             </GitBook.FlexBox>
                         ) : null}
                         <GitBook.FlexBox col={sidebar.open ? 9 : 12}>
-                            <Body page={page} />
+                            <Body page={page} readme={readme} />
                         </GitBook.FlexBox>
                     </GitBook.FlexLayout>
                 </GitBook.FlexBox>
@@ -42,6 +43,6 @@ const Theme = React.createClass({
     }
 });
 
-module.exports = GitBook.connect(Theme, ({page, summary, sidebar}) => {
-    return { page, summary, sidebar };
+module.exports = GitBook.connect(Theme, ({page, summary, sidebar, readme}) => {
+    return { page, summary, sidebar, readme };
 });

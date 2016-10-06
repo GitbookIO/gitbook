@@ -32,12 +32,22 @@ class File extends Record(DEFAULTS) {
         );
     }
 
+    /**
+     * Return true if file is an instance of File
+     * @param {Mixed} file
+     * @return {Boolean}
+     */
     static is(file) {
         return (file instanceof File);
     }
 
+    /**
+     * Create a file instance
+     * @param {Mixed|File} file
+     * @return {File}
+     */
     static create(file) {
-        return file instanceof File ?
+        return File.is(file) ?
             file : new File(file);
     }
 }

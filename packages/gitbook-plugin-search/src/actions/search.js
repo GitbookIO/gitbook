@@ -73,7 +73,6 @@ function handleQuery(q) {
 function refresh() {
     return (dispatch, getState) => {
         const q = getState().search.query;
-        console.log('refresh search with', q);
         if (q) {
             dispatch(handleQuery(q));
         }

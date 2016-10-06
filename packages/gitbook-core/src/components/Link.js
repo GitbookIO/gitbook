@@ -28,7 +28,6 @@ const Link = React.createClass({
         }
 
         href = currentFile.relative(href);
-
         return <a href={href} {...props}>{children}</a>;
     }
 });
