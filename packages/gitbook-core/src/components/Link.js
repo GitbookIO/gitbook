@@ -19,19 +19,16 @@ const Link = React.createClass({
         ])
     },
 
-    getHref() {
-        let { currentFile, to } = this.props;
+    render() {
+        const { currentFile, to, children, ...props } = this.props;
+        let href = to;
 
         if (SummaryArticle.is(to) || File.is(to)) {
-            to = to.url;
+            href = to.url;
         }
 
-        return currentFile.relative(to);
-    },
+        href = currentFile.relative(href);
 
-    render() {
-        const { children, ...props } = this.props;
-        const href = this.getHref();
         return <a href={href} {...props}>{children}</a>;
     }
 });

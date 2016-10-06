@@ -2,11 +2,11 @@
 /**
  * Return a JSON representation of a file
  *
- * @param {File} file
- * @param {String} url?
- * @return {Object} json
+ * @param  {File} file
+ * @param  {URIIndex} urls
+ * @return {JSON} json
  */
-function encodeFileToJson(file, url) {
+function encodeFileToJson(file, urls) {
     const filePath = file.getPath();
     if (!filePath) {
         return undefined;
@@ -16,7 +16,7 @@ function encodeFileToJson(file, url) {
         path:  filePath,
         mtime: file.getMTime(),
         type:  file.getType(),
-        url
+        url:   urls.resolveToURL(filePath)
     };
 }
 

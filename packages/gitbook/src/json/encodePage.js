@@ -1,13 +1,14 @@
 const encodeSummaryArticle = require('./encodeSummaryArticle');
 
 /**
- * Return a JSON representation of a page
+ * Return a JSON representation of a page.
  *
- * @param {Page} page
- * @param {Summary} summary
- * @return {Object} json
+ * @param  {Page} page
+ * @param  {Summary} summary
+ * @param  {URIIndex} urls
+ * @return {JSON} json
  */
-function encodePage(page, summary) {
+function encodePage(page, summary, urls) {
     const file = page.getFile();
     const attributes = page.getAttributes();
     const article = summary.getByPath(file.getPath());
@@ -21,12 +22,12 @@ function encodePage(page, summary) {
 
         const nextArticle = summary.getNextArticle(article);
         if (nextArticle) {
-            result.next = encodeSummaryArticle(nextArticle);
+            result.next = encodeSummaryArticle(nextArticle, urls, false);
         }
 
         const prevArticle = summary.getPrevArticle(article);
         if (prevArticle) {
-            result.previous = encodeSummaryArticle(prevArticle);
+            result.previous = encodeSummaryArticle(prevArticle, urls, false);
         }
     }
 

@@ -4,6 +4,7 @@ const DEFAULTS = {
     title:    '',
     depth:    0,
     path:     '',
+    url:      '',
     ref:      '',
     level:    '',
     articles: List()

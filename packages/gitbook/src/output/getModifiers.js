@@ -1,7 +1,4 @@
 const Modifiers = require('./modifiers');
-const resolveFileToURL = require('./helper/resolveFileToURL');
-const fileToOutput = require('./helper/fileToOutput');
-
 
 /**
  * Return default modifier to prepare a page for
@@ -14,10 +11,13 @@ function getModifiers(output, page) {
     const glossary = book.getGlossary();
     const file = page.getFile();
 
+    // Map of urls
+    const urls = output.getURLIndex();
+
     // Glossary entries
     const entries = glossary.getEntries();
     const glossaryFile = glossary.getFile();
-    const glossaryFilename = fileToOutput(output, glossaryFile.getPath());
+    const glossaryFilename = urls.resolveToURL(glossaryFile.getPath());
 
     // Current file path
     const currentFilePath = file.getPath();
@@ -35,7 +35,7 @@ function getModifiers(output, page) {
         // Resolve links (.md -> .html)
         Modifiers.resolveLinks.bind(null,
             currentFilePath,
-            resolveFileToURL.bind(null, output)
+            (filePath => urls.resolveToURL(filePath))
         )
     ];
 }

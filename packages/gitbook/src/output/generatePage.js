@@ -27,7 +27,7 @@ function generatePage(output, page) {
             const file = resultPage.getFile();
             const filePath = file.getPath();
             const parser = file.getParser();
-            const context = JSONUtils.encodeOutputWithPage(output, resultPage);
+            const context = JSONUtils.encodeState(output, resultPage);
 
             if (!parser) {
                 return Promise.reject(error.FileNotParsableError({

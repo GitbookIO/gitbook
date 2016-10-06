@@ -1,16 +1,17 @@
 const encodeFile = require('./encodeFile');
 
 /**
- * Encode a readme to JSON
+ * Encode a readme to JSON.
  *
- * @param {Readme}
- * @return {Object}
+ * @param  {Readme} readme
+ * @param  {URIIndex} urls
+ * @return {JSON} json
  */
-function encodeReadme(readme) {
+function encodeReadme(readme, urls) {
     const file = readme.getFile();
 
     return {
-        file: encodeFile(file)
+        file: encodeFile(file, urls)
     };
 }
 

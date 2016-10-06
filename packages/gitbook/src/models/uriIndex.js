@@ -9,7 +9,8 @@ const LocationUtils = require('../utils/location');
  */
 
 const DEFAULTS = {
-    uris: Map()
+    uris:           Map(),
+    directoryIndex: Boolean(true)
 };
 
 /**
@@ -70,6 +71,28 @@ class URIIndex extends Record(DEFAULTS) {
             href = LocationUtils.normalize(href);
 
             return uris.get(href, href);
+        });
+    }
+
+    /**
+     * Resolve an entry to an url
+     * @param {String} filePath
+     * @return {String}
+     */
+    resolveToURL(filePath) {
+        const { directoryIndex } = this;
+        const uri = this.resolve(filePath);
+
+        if (!directoryIndex || LocationUtils.isExternal(uri)) {
+            return uri;
+        }
+
+        return transformURLPath(uri, (pathname) => {
+            if (path.basename(pathname) == 'index.html') {
+                pathname = path.dirname(pathname) + '/';
+            }
+
+            return pathname;
         });
     }
 

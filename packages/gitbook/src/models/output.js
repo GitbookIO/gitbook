@@ -51,6 +51,10 @@ class Output extends Record(DEFAULTS) {
         return this.get('state');
     }
 
+    getURLIndex() {
+        return this.get('urls');
+    }
+
     /**
      * Return a page byt its file path
      *

@@ -19,7 +19,7 @@ function onPage(output, page) {
     return Modifiers.modifyHTML(page, getModifiers(output, page))
     .then(function(resultPage) {
         // Generate the JSON
-        const json = JSONUtils.encodeBookWithPage(output.getBook(), resultPage);
+        const json = JSONUtils.encodeState(output, resultPage);
 
         // Delete some private properties
         delete json.config;

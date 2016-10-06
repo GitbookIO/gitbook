@@ -5,14 +5,15 @@ const fs = require('../../utils/fs');
 const JSONUtils = require('../../json');
 
 /**
-    Finish the generation
-
-    @param {Output}
-    @return {Output}
-*/
+ * Finish the generation
+ *
+ * @param {Output}
+ * @return {Output}
+ */
 function onFinish(output) {
     const book = output.getBook();
     const outputRoot = output.getRoot();
+    const urls = output.getURLIndex();
 
     if (!book.isMultilingual()) {
         return Promise(output);
@@ -29,7 +30,7 @@ function onFinish(output) {
     .then(function(content) {
         const json = JSON.parse(content);
 
-        json.languages = JSONUtils.encodeLanguages(languages);
+        json.languages = JSONUtils.encodeLanguages(languages, urls);
 
         return json;
     })

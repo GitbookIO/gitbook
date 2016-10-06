@@ -1,12 +1,12 @@
 const Immutable = require('immutable');
 
 /**
-    Encode an article for next/prev
-
-    @param {Map<String:Page>}
-    @param {Article}
-    @return {Object}
-*/
+ * Encode an article for next/prev
+ *
+ * @param {Map<String:Page>}
+ * @param {Article}
+ * @return {Object}
+ */
 function encodeArticle(pages, article) {
     const articlePath = article.getPath();
 
@@ -20,11 +20,11 @@ function encodeArticle(pages, article) {
 }
 
 /**
-    this.navigation is a deprecated property from GitBook v2
-
-    @param {Output}
-    @return {Object}
-*/
+ * this.navigation is a deprecated property from GitBook v2
+ *
+ * @param {Output}
+ * @return {Object}
+ */
 function encodeNavigation(output) {
     const book = output.getBook();
     const pages = output.getPages();

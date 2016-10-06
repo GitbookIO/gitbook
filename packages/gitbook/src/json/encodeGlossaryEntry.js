@@ -1,10 +1,10 @@
 
 /**
-    Encode a SummaryArticle to JSON
-
-    @param {GlossaryEntry}
-    @return {Object}
-*/
+ * Encode a SummaryArticle to JSON
+ *
+ * @param {GlossaryEntry} entry
+ * @return {JSON} json
+ */
 function encodeGlossaryEntry(entry) {
     return {
         id: entry.getID(),
