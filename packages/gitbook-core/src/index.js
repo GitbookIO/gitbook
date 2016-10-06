@@ -13,6 +13,7 @@ const HTMLContent = require('./components/HTMLContent');
 const Link = require('./components/Link');
 const Icon = require('./components/Icon');
 const Button = require('./components/Button');
+const ButtonGroup = require('./components/ButtonGroup');
 const I18nProvider = require('./components/I18nProvider');
 
 const ACTIONS = require('./actions/TYPES');
@@ -50,6 +51,7 @@ module.exports = {
     Link,
     Icon,
     Button,
+    ButtonGroup,
     // Utilities
     Shapes,
     // Librairies
