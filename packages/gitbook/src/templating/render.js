@@ -1,6 +1,5 @@
 const Promise = require('../utils/promise');
 const timing = require('../utils/timing');
-const TemplateOutput = require('../models/templateOutput');
 const replaceShortcuts = require('./replaceShortcuts');
 
 /**
@@ -10,7 +9,7 @@ const replaceShortcuts = require('./replaceShortcuts');
  * @param {String} filePath: absolute path for the loader
  * @param {String} content
  * @param {Object} context (optional)
- * @return {Promise<TemplateOutput>}
+ * @return {Promise<String>}
  */
 function renderTemplate(engine, filePath, content, context) {
     context = context || {};
@@ -35,9 +34,6 @@ function renderTemplate(engine, filePath, content, context) {
                 path: filePath
             }
         )
-        .then(function(content) {
-            return TemplateOutput.create(content, blocks);
-        })
     );
 }
 
