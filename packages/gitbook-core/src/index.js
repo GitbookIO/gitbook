@@ -14,6 +14,7 @@ const Link = require('./components/Link');
 const Icon = require('./components/Icon');
 const Button = require('./components/Button');
 const ButtonGroup = require('./components/ButtonGroup');
+const Dropdown = require('./components/Dropdown');
 const I18nProvider = require('./components/I18nProvider');
 
 const ACTIONS = require('./actions/TYPES');
@@ -52,6 +53,7 @@ module.exports = {
     Icon,
     Button,
     ButtonGroup,
+    Dropdown,
     // Utilities
     Shapes,
     // Librairies
