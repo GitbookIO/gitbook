@@ -1,139 +1,133 @@
 const nunjucks = require('nunjucks');
-const Immutable = require('immutable');
+const { Record, Map, List } = require('immutable');
 
-const TemplateEngine = Immutable.Record({
-    // Map of {TemplateBlock}
-    blocks:     Immutable.Map(),
-
+const DEFAULTS = {
+    // List of {TemplateBlock}
+    blocks:     List(),
     // Map of Extension
-    extensions: Immutable.Map(),
-
+    extensions: Map(),
     // Map of filters: {String} name -> {Function} fn
-    filters:    Immutable.Map(),
-
+    filters:    Map(),
     // Map of globals: {String} name -> {Mixed}
-    globals:    Immutable.Map(),
-
+    globals:    Map(),
     // Context for filters / blocks
     context:    Object(),
-
     // Nunjucks loader
     loader:     nunjucks.FileSystemLoader('views')
-}, 'TemplateEngine');
-
-TemplateEngine.prototype.getBlocks = function() {
-    return this.get('blocks');
 };
 
-TemplateEngine.prototype.getGlobals = function() {
-    return this.get('globals');
-};
+class TemplateEngine extends Record(DEFAULTS) {
+    getBlocks() {
+        return this.get('blocks');
+    }
 
-TemplateEngine.prototype.getFilters = function() {
-    return this.get('filters');
-};
+    getGlobals() {
+        return this.get('globals');
+    }
 
-TemplateEngine.prototype.getShortcuts = function() {
-    return this.get('shortcuts');
-};
+    getFilters() {
+        return this.get('filters');
+    }
 
-TemplateEngine.prototype.getLoader = function() {
-    return this.get('loader');
-};
+    getShortcuts() {
+        return this.get('shortcuts');
+    }
 
-TemplateEngine.prototype.getContext = function() {
-    return this.get('context');
-};
+    getLoader() {
+        return this.get('loader');
+    }
 
-TemplateEngine.prototype.getExtensions = function() {
-    return this.get('extensions');
-};
+    getContext() {
+        return this.get('context');
+    }
 
-/**
-    Return a block by its name (or undefined)
+    getExtensions() {
+        return this.get('extensions');
+    }
 
-    @param {String} name
-    @return {TemplateBlock}
-*/
-TemplateEngine.prototype.getBlock = function(name) {
-    const blocks = this.getBlocks();
-    return blocks.find(function(block) {
-        return block.getName() === name;
-    });
-};
+    /**
+     * Return a block by its name (or undefined).
+     * @param {String} name
+     * @return {TemplateBlock} block?
+     */
+    getBlock(name) {
+        const blocks = this.getBlocks();
+        return blocks.find(function(block) {
+            return block.getName() === name;
+        });
+    }
 
-/**
-    Return a nunjucks environment from this configuration
+    /**
+     * Return a nunjucks environment from this configuration
+     * @return {Nunjucks.Environment} env
+     */
+    toNunjucks() {
+        const loader = this.getLoader();
+        const blocks = this.getBlocks();
+        const filters = this.getFilters();
+        const globals = this.getGlobals();
+        const extensions = this.getExtensions();
+        const context = this.getContext();
 
-    @return {Nunjucks.Environment}
-*/
-TemplateEngine.prototype.toNunjucks = function(blocksOutput) {
-    const loader = this.getLoader();
-    const blocks = this.getBlocks();
-    const filters = this.getFilters();
-    const globals = this.getGlobals();
-    const extensions = this.getExtensions();
-    const context = this.getContext();
+        const env = new nunjucks.Environment(
+            loader,
+            {
+                // Escaping is done after by the asciidoc/markdown parser
+                autoescape: false,
 
-    const env = new nunjucks.Environment(
-        loader,
-        {
-            // Escaping is done after by the asciidoc/markdown parser
-            autoescape: false,
-
-            // Syntax
-            tags: {
-                blockStart: '{%',
-                blockEnd: '%}',
-                variableStart: '{{',
-                variableEnd: '}}',
-                commentStart: '{###',
-                commentEnd: '###}'
+                // Syntax
+                tags: {
+                    blockStart:    '{%',
+                    blockEnd:      '%}',
+                    variableStart: '{{',
+                    variableEnd:   '}}',
+                    commentStart:  '{###',
+                    commentEnd:    '###}'
+                }
             }
-        }
-    );
+        );
 
-    // Add filters
-    filters.forEach(function(filterFn, filterName) {
-        env.addFilter(filterName, filterFn.bind(context));
-    });
+        // Add filters
+        filters.forEach(function(filterFn, filterName) {
+            env.addFilter(filterName, filterFn.bind(context));
+        });
 
-    // Add blocks
-    blocks.forEach(function(block) {
-        const extName = block.getExtensionName();
-        const Ext = block.toNunjucksExt(context, blocksOutput);
+        // Add blocks
+        blocks.forEach(function(block) {
+            const extName = block.getExtensionName();
+            const Ext = block.toNunjucksExt(context);
 
-        env.addExtension(extName, new Ext());
-    });
+            env.addExtension(extName, new Ext());
+        });
 
-    // Add globals
-    globals.forEach(function(globalValue, globalName) {
-        env.addGlobal(globalName, globalValue);
-    });
+        // Add globals
+        globals.forEach(function(globalValue, globalName) {
+            env.addGlobal(globalName, globalValue);
+        });
 
-    // Add other extensions
-    extensions.forEach(function(ext, extName) {
-        env.addExtension(extName, ext);
-    });
+        // Add other extensions
+        extensions.forEach(function(ext, extName) {
+            env.addExtension(extName, ext);
+        });
 
-    return env;
-};
+        return env;
+    }
 
-/**
-    Create a template engine
-
-    @param {Object} def
-    @return {TemplateEngine}
-*/
-TemplateEngine.create = function(def) {
-    return new TemplateEngine({
-        blocks:     Immutable.List(def.blocks || []),
-        extensions: Immutable.Map(def.extensions || {}),
-        filters:    Immutable.Map(def.filters || {}),
-        globals:    Immutable.Map(def.globals || {}),
-        context:    def.context,
-        loader:     def.loader
-    });
-};
+    /**
+     * Create a template engine.
+     * @param {Object} def
+     * @return {TemplateEngine} engine
+     */
+    static create(def) {
+        return new TemplateEngine({
+            blocks:     List(def.blocks || []),
+            extensions: Map(def.extensions || {}),
+            filters:    Map(def.filters || {}),
+            globals:    Map(def.globals || {}),
+            context:    def.context,
+            loader:     def.loader
+        });
+    }
+}
 
 module.exports = TemplateEngine;
