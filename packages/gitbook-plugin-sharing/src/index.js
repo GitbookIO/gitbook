@@ -100,10 +100,33 @@ const ShareButton = React.createClass({
         onShare: func.isRequired
     },
 
-    render() {
-        const { sites } = this.props;
+    renderButton({ onToggle }) {
         return (
-            <span>{sites.map(site => site.label).join(' ')}</span>
+            <GitBook.Button onClick={onToggle}>
+                <GitBook.Icon id="share-alt" />
+            </GitBook.Button>
+        );
+    },
+
+    renderMenu({ onToggle }) {
+        const { sites } = this.props;
+        const items = sites.map((site) => (
+            <GitBook.Dropdown.Item onClick={site.onShare}>
+                {site.label}
+            </GitBook.Dropdown.Item>
+        ));
+
+        return (
+            <GitBook.Dropdown.Menu>
+                {items}
+            </GitBook.Dropdown.Menu>
+        );
+    },
+
+    render() {
+        return (
+            <GitBook.Dropdown renderChildren={this.renderButton}
+                              renderMenu={this.renderMenu} />
         );
     }
 });
