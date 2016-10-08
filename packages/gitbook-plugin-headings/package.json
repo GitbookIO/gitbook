@@ -5,6 +5,7 @@
   "browser": "./_assets/plugin.js",
   "version": "1.0.0",
   "dependencies": {
+      "classnames": "^2.2.5",
     "gitbook-core": "^0.0.0"
   },
   "devDependencies": {
