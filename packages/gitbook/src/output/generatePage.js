@@ -49,15 +49,11 @@ function generatePage(output, page) {
                 return Templating.render(engine, absoluteFilePath, content, context);
             })
 
-            .then((content) => {
-                return parser.parsePage(content)
-                .then(function(result) {
-                    return output.setContent(result.content);
-                });
-            })
+            // Parse with markdown/asciidoc parser
+            .then((content) => parser.parsePage(content))
 
             // Return new page
-            .then((content) => {
+            .then(({content}) => {
                 return resultPage.set('content', content);
             })
 

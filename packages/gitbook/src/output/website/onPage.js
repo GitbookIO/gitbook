@@ -24,7 +24,7 @@ function onPage(output, page) {
         const initialState = JSONUtils.encodeState(output, resultPage);
 
         // Render the theme
-        const html = render(plugins, initialState);
+        const html = render(plugins, initialState, 'browser', 'website:body');
 
         // Write it to the disk
         return writeFile(output, filePath, html);

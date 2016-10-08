@@ -11,8 +11,9 @@
     "lint": "eslint .",
     "test": "",
     "bootstrap": "lerna bootstrap",
-    "dist": "lerna run --concurrency 1 prepublish",
-    "clean": "lerna clean"
+    "bump": "./scripts/bump.js",
+    "clean": "lerna clean",
+    "dist": "lerna run --concurrency 1 prepublish"
   },
   "repository": {
     "type": "git",

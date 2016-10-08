@@ -58,7 +58,7 @@ function processOutput(generator, startOutput) {
         )
     )
 
-    .then(function(output) {
+    .then((output) => {
         if (!generator.onInit) {
             return output;
         }
@@ -69,7 +69,7 @@ function processOutput(generator, startOutput) {
     .then(generateAssets.bind(null, generator))
     .then(generatePages.bind(null, generator))
 
-    .tap(function(output) {
+    .tap((output) => {
         const book = output.getBook();
 
         if (!book.isMultilingual()) {
@@ -111,7 +111,7 @@ function processOutput(generator, startOutput) {
         )
     )
 
-    .then(function(output) {
+    .then((output) => {
         if (!generator.onFinish) {
             return output;
         }

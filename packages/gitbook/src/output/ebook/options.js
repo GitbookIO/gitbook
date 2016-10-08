@@ -2,16 +2,13 @@ const Immutable = require('immutable');
 
 const Options = Immutable.Record({
     // Root folder for the output
-    root:               String(),
-
+    root:           String(),
     // Prefix for generation
-    prefix:             String('ebook'),
-
+    prefix:         String('ebook'),
     // Format to generate using ebook-convert
-    format:             String(),
-
+    format:         String(),
     // Force use of absolute urls ("index.html" instead of "/")
-    directoryIndex:     Boolean(false)
+    directoryIndex: Boolean(false)
 });
 
 module.exports = Options;

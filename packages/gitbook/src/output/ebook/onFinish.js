@@ -1,45 +1,39 @@
 const path = require('path');
 
-const WebsiteGenerator = require('../website');
 const JSONUtils = require('../../json');
-const Templating = require('../../templating');
 const Promise = require('../../utils/promise');
 const error = require('../../utils/error');
 const command = require('../../utils/command');
 const writeFile = require('../helper/writeFile');
+const render = require('../../browser/render');
 
 const getConvertOptions = require('./getConvertOptions');
 const SUMMARY_FILE = 'SUMMARY.html';
 
 /**
-    Write the SUMMARY.html
-
-    @param {Output}
-    @return {Output}
-*/
+ * Write the SUMMARY.html
+ *
+ * @param {Output} output
+ * @return {Output} output
+ */
 function writeSummary(output) {
-    const options = output.getOptions();
-    const prefix = options.get('prefix');
+    const plugins = output.getPlugins();
 
-    const filePath = SUMMARY_FILE;
-    const engine = WebsiteGenerator.createTemplateEngine(output, filePath);
-    const context = JSONUtils.encodeOutput(output);
+    // Generate initial state
+    const initialState = JSONUtils.encodeState(output);
 
-    // Render the theme
-    return Templating.renderFile(engine, prefix + '/summary.html', context)
+    // Render using React
+    const html = render(plugins, initialState, 'ebook', 'ebook:summary');
 
-    // Write it to the disk
-    .then(function(tplOut) {
-        return writeFile(output, filePath, tplOut.getContent());
-    });
+    return writeFile(output, SUMMARY_FILE, html);
 }
 
 /**
-    Generate the ebook file as "index.pdf"
-
-    @param {Output}
-    @return {Output}
-*/
+ * Generate the ebook file as "index.pdf"
+ *
+ * @param {Output} output
+ * @return {Output} output
+ */
 function runEbookConvert(output) {
     const logger = output.getLogger();
     const options = output.getOptions();
@@ -78,11 +72,11 @@ function runEbookConvert(output) {
 }
 
 /**
-    Finish the generation, generates the SUMMARY.html
-
-    @param {Output}
-    @return {Output}
-*/
+ * Finish the generation, generates the SUMMARY.html
+ *
+ * @param {Output} output
+ * @return {Output} output
+ */
 function onFinish(output) {
     return writeSummary(output)
     .then(runEbookConvert);
