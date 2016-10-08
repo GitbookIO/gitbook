@@ -25,5 +25,14 @@
   },
   "bugs": {
     "url": "https://github.com/GitbookIO/gitbook/issues"
+  },
+  "gitbook": {
+    "properties": {
+      "position": {
+        "type": "string",
+        "title": "Position of anchors",
+        "default": "left"
+      }
+    }
   }
 }
