@@ -5,7 +5,7 @@ describe('Page', function() {
 
     describe('toText', function() {
         it('must not prepend frontmatter if no attributes', function() {
-            const page = Page().merge({
+            const page = (new Page()).merge({
                 content: 'Hello World'
             });
 
@@ -13,7 +13,7 @@ describe('Page', function() {
         });
 
         it('must prepend frontmatter if attributes', function() {
-            const page = Page().merge({
+            const page = (new Page()).merge({
                 content: 'Hello World',
                 attributes: Immutable.fromJS({
                     hello: 'world'
@@ -24,4 +24,3 @@ describe('Page', function() {
         });
     });
 });
-

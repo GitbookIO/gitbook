@@ -3,13 +3,13 @@
   "description": "Automatically add anchors to headings",
   "main": "index.js",
   "browser": "./_assets/plugin.js",
-  "version": "1.0.0",
+  "version": "4.0.0",
   "dependencies": {
       "classnames": "^2.2.5",
-    "gitbook-core": "^0.0.0"
+    "gitbook-core": "^4.0.0"
   },
   "devDependencies": {
-    "gitbook-plugin": "*"
+    "gitbook-plugin": "4.0.0"
   },
   "engines": {
     "gitbook": ">=3.0.0"

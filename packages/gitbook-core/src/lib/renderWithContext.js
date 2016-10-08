@@ -9,7 +9,8 @@ const contextShape = require('../shapes/context');
 
 const GitBookApplication = React.createClass({
     propTypes: {
-        context: contextShape
+        context:  contextShape,
+        matching: React.PropTypes.object
     },
 
     componentDidMount() {
@@ -23,13 +24,13 @@ const GitBookApplication = React.createClass({
     },
 
     render() {
-        const { context } = this.props;
+        const { context, matching } = this.props;
 
         return (
             <ContextProvider context={context}>
                 <PJAXWrapper>
                     <I18nProvider>
-                        <InjectedComponent matching={{ role: 'Body' }} />
+                        <InjectedComponent matching={matching} />
                     </I18nProvider>
                 </PJAXWrapper>
             </ContextProvider>
@@ -42,11 +43,12 @@ const GitBookApplication = React.createClass({
  * Render the application for a GitBook context.
  *
  * @param  {GitBookContext} context
+ * @param  {Object} matching
  * @return {React.Element} element
  */
-function renderWithContext(context) {
+function renderWithContext(context, matching) {
     return (
-        <GitBookApplication context={context} />
+        <GitBookApplication context={context} matching={matching} />
     );
 }
 

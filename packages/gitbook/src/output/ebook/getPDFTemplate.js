@@ -1,40 +1,35 @@
 const juice = require('juice');
 
-const WebsiteGenerator = require('../website');
 const JSONUtils = require('../../json');
-const Templating = require('../../templating');
+const render = require('../../browser/render');
 const Promise = require('../../utils/promise');
 
-
 /**
-    Generate PDF header/footer templates
-
-    @param {Output} output
-    @param {String} type
-    @return {String}
-*/
+ * Generate PDF header/footer templates
+ *
+ * @param {Output} output
+ * @param {String} type ("footer" or "header")
+ * @return {String} html
+ */
 function getPDFTemplate(output, type) {
-    const filePath = 'pdf_' + type + '.html';
     const outputRoot = output.getRoot();
-    const engine = WebsiteGenerator.createTemplateEngine(output, filePath);
+    const plugins = output.getPlugins();
 
-    // Generate context
-    const context = JSONUtils.encodeOutput(output);
-    context.page = {
+    // Generate initial state
+    const initialState = JSONUtils.encodeState(output);
+    initialState.page = {
         num: '_PAGENUM_',
         title: '_SECTION_'
     };
 
     // Render the theme
-    return Templating.renderFile(engine, 'ebook/' + filePath, context)
+    const html = render(plugins, initialState, 'ebook', `pdf:${type}`);
 
-    // Inline css and assets
-    .then(function(tplOut) {
-        return Promise.nfcall(juice.juiceResources, tplOut.getContent(), {
-            webResources: {
-                relativeTo: outputRoot
-            }
-        });
+    // Inline CSS
+    return Promise.nfcall(juice.juiceResources, html, {
+        webResources: {
+            relativeTo: outputRoot
+        }
     });
 }
 

@@ -1,79 +1,79 @@
 {
-  "name": "gitbook-plugin-theme-default",
-  "description": "Default theme for GitBook",
-  "main": "./index.js",
-  "browser": "./_assets/theme.js",
-  "version": "1.0.5",
-  "engines": {
-    "gitbook": ">=3.0.0"
-  },
-  "dependencies": {
-    "gitbook-core": "^0.0.0"
-  },
-  "devDependencies": {
-    "classnames": "^2.2.5",
-    "font-awesome": "^4.6.3",
-    "gitbook-markdown-css": "^1.0.1",
-    "gitbook-plugin": "*",
-    "less": "^2.7.1",
-    "less-plugin-clean-css": "^1.5.1",
-    "preboot": "git+https://github.com/mdo/preboot.git#4aab4edd85f076d50609cbe28e4fe66cc0771701"
-  },
-  "scripts": {
-    "prepublish": "./prepublish.sh"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/GitbookIO/gitbook.git"
-  },
-  "author": "GitBook Inc. <contact@gitbook.com>",
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/GitbookIO/gitbook/issues"
-  },
-  "contributors": [
-    {
-      "name": "Samy Pessé",
-      "email": "samy@gitbook.com"
-    }
-  ],
-  "gitbook": {
-    "properties": {
-      "styles": {
-        "type": "object",
-        "title": "Custom Stylesheets",
-        "properties": {
-          "website": {
-            "title": "Stylesheet for website output",
-            "default": "styles/website.css"
-          },
-          "pdf": {
-            "title": "Stylesheet for PDF output",
-            "default": "styles/pdf.css"
-          },
-          "epub": {
-            "title": "Stylesheet for ePub output",
-            "default": "styles/epub.css"
-          },
-          "mobi": {
-            "title": "Stylesheet for Mobi output",
-            "default": "styles/mobi.css"
-          },
-          "ebook": {
-            "title": "Stylesheet for ebook outputs (PDF, ePub, Mobi)",
-            "default": "styles/ebook.css"
-          },
-          "print": {
-            "title": "Stylesheet to replace default ebook css",
-            "default": "styles/print.css"
-          }
-        }
-      },
-      "showLevel": {
-        "type": "boolean",
-        "title": "Show level indicator in TOC",
-        "default": false
+   "name": "gitbook-plugin-theme-default",
+   "description": "Default theme for GitBook",
+   "main": "./index.js",
+   "browser": "./_assets/theme.js",
+   "version": "4.0.0",
+   "engines": {
+      "gitbook": ">=3.0.0"
+   },
+   "dependencies": {
+      "gitbook-core": "4.0.0"
+   },
+   "devDependencies": {
+      "classnames": "^2.2.5",
+      "font-awesome": "^4.6.3",
+      "gitbook-markdown-css": "^1.0.1",
+      "gitbook-plugin": "4.0.0",
+      "less": "^2.7.1",
+      "less-plugin-clean-css": "^1.5.1",
+      "preboot": "git+https://github.com/mdo/preboot.git#4aab4edd85f076d50609cbe28e4fe66cc0771701"
+   },
+   "scripts": {
+      "prepublish": "./prepublish.sh"
+   },
+   "repository": {
+      "type": "git",
+      "url": "https://github.com/GitbookIO/gitbook.git"
+   },
+   "author": "GitBook Inc. <contact@gitbook.com>",
+   "license": "Apache-2.0",
+   "bugs": {
+      "url": "https://github.com/GitbookIO/gitbook/issues"
+   },
+   "contributors": [
+      {
+         "name": "Samy Pessé",
+         "email": "samy@gitbook.com"
       }
-    }
-  }
+   ],
+   "gitbook": {
+      "properties": {
+         "styles": {
+            "type": "object",
+            "title": "Custom Stylesheets",
+            "properties": {
+               "website": {
+                  "title": "Stylesheet for website output",
+                  "default": "styles/website.css"
+               },
+               "pdf": {
+                  "title": "Stylesheet for PDF output",
+                  "default": "styles/pdf.css"
+               },
+               "epub": {
+                  "title": "Stylesheet for ePub output",
+                  "default": "styles/epub.css"
+               },
+               "mobi": {
+                  "title": "Stylesheet for Mobi output",
+                  "default": "styles/mobi.css"
+               },
+               "ebook": {
+                  "title": "Stylesheet for ebook outputs (PDF, ePub, Mobi)",
+                  "default": "styles/ebook.css"
+               },
+               "print": {
+                  "title": "Stylesheet to replace default ebook css",
+                  "default": "styles/print.css"
+               }
+            }
+         },
+         "showLevel": {
+            "type": "boolean",
+            "title": "Show level indicator in TOC",
+            "default": false
+         }
+      }
+   }
 }

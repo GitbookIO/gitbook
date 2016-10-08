@@ -11,13 +11,12 @@ const encodeFile = require('./encodeFile');
  * This JSON representation is used as initial state for the redux store.
  *
  * @param  {Output} output
- * @param  {Page} page
+ * @param  {Page} page?
  * @return {JSON}
  */
 function encodeStateToJSON(output, page) {
     const book = output.getBook();
     const urls = output.getURLIndex();
-    const file = page.getFile();
 
     return {
         output: {
@@ -34,8 +33,8 @@ function encodeStateToJSON(output, page) {
         config: book.getConfig().getValues().toJS(),
         languages: book.isMultilingual() ? encodeLanguages(book.getLanguages()) : undefined,
 
-        page: encodePage(page, book.getSummary(), urls),
-        file: encodeFile(file, urls)
+        page: page ? encodePage(page, book.getSummary(), urls) : undefined,
+        file: page ? encodeFile(page.getFile(), urls) : undefined
     };
 }
 

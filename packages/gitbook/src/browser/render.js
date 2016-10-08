@@ -4,9 +4,7 @@ const GitBook = require('gitbook-core');
 
 const loadPlugins = require('./loadPlugins');
 
-const BOOTSTRAP_CODE = '(function() { require("gitbook-core").bootstrap() })()';
-
-function HTML({head, innerHTML, payload, scripts}) {
+function HTML({head, innerHTML, payload, scripts, bootstrap}) {
     const attrs = head.htmlAttributes.toComponent();
 
     return (
@@ -23,7 +21,7 @@ function HTML({head, innerHTML, payload, scripts}) {
                     return <script key={script} src={script} />;
                 })}
                 <script type="application/payload+json" dangerouslySetInnerHTML={{__html: payload}} />
-                <script type="application/javascript" dangerouslySetInnerHTML={{__html: BOOTSTRAP_CODE}} />
+                <script type="application/javascript" dangerouslySetInnerHTML={{__html: bootstrap}} />
                 {head.script.toComponent()}
             </body>
         </html>
@@ -33,27 +31,40 @@ HTML.propTypes = {
     head:      React.PropTypes.object,
     innerHTML: React.PropTypes.string,
     payload:   React.PropTypes.string,
+    bootstrap: React.PropTypes.string,
     scripts:   React.PropTypes.arrayOf(React.PropTypes.string)
 };
 
 /**
- * Render a page
+ * Get bootstrap code for a role
+ * @param  {String} role
+ * @return {String}
+ */
+function getBootstrapCode(role) {
+    return `(function() { require("gitbook-core").bootstrap({ role: "${role}" }) })()`;
+}
+
+/**
+ * Render a view using plugins.
+ *
  * @param  {OrderedMap<String:Plugin>} plugin
  * @param  {Object} initialState
+ * @param  {String} type ("ebook" or "browser")
+ * @param  {String} role
  * @return {String} html
  */
-function render(plugins, initialState) {
+function render(plugins, initialState, type, role) {
     // Load the plugins
-    const browserPlugins = loadPlugins(plugins);
+    const browserPlugins = loadPlugins(plugins, type);
     const payload = JSON.stringify(initialState);
     const context = GitBook.createContext(browserPlugins, initialState);
 
     const scripts = plugins.toList()
-        .filter(plugin => plugin.getPackage().has('browser'))
+        .filter(plugin => plugin.getPackage().has(type))
         .map(plugin => 'gitbook/plugins/' + plugin.getName() + '.js')
         .toArray();
 
-    const el = GitBook.renderWithContext(context);
+    const el = GitBook.renderWithContext(context, { role });
 
     // We're done with the context
     context.deactivate();
@@ -69,6 +80,7 @@ function render(plugins, initialState) {
         head={head}
         innerHTML={innerHTML}
         payload={payload}
+        bootstrap={getBootstrapCode(role)}
         scripts={['gitbook/core.js'].concat(scripts)}
     />;
 

@@ -1,6 +1,6 @@
 const URIIndex = require('../uriIndex');
 
-describe.only('URIIndex', () => {
+describe('URIIndex', () => {
     let index;
 
     before(() => {
@@ -36,6 +36,18 @@ describe.only('URIIndex', () => {
 
         it('should preserve hash', () => {
             expect(index.resolve('hello/test.md#myhash')).toBe('hello/test.html#myhash');
+        });
+
+    });
+
+    describe('.resolveToURL', () => {
+
+        it('should resolve a basic file path with directory index', () => {
+            expect(index.resolveToURL('README.md')).toBe('./');
+        });
+
+        it('should resolve a basic file path with directory index', () => {
+            expect(index.resolveToURL('hello/README.md')).toBe('hello/');
         });
 
     });
