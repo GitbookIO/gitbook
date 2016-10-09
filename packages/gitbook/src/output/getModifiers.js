@@ -34,8 +34,7 @@ function getModifiers(output, page) {
 
         // Resolve links (.md -> .html)
         Modifiers.resolveLinks.bind(null,
-            currentFilePath,
-            (filePath => urls.resolveToURL(filePath))
+            (filePath => urls.resolveToURLFrom(currentFilePath, filePath))
         )
     ];
 }

@@ -1,20 +1,14 @@
-const path = require('path');
-const url = require('url');
-
 const LocationUtils = require('../../utils/location');
 const editHTMLElement = require('./editHTMLElement');
 
 /**
-    Resolve all HTML links:
-        - /test.md in hello -> ../test.html
-
-    @param {String} currentFile
-    @param {Function(String) -> String} resolveFile
-    @param {HTMLDom} $
-*/
-function resolveLinks(currentFile, resolveFile, $) {
-    const currentDirectory = path.dirname(currentFile);
-
+ * Resolve all HTML links:
+ * - /test.md in hello -> ../test.html
+ *
+ * @param {Function(String) -> String} resolveURL
+ * @param {HTMLDom} $
+ */
+function resolveLinks(resolveURL, $) {
     return editHTMLElement($, 'a', function($a) {
         let href = $a.attr('href');
 
@@ -28,24 +22,7 @@ function resolveLinks(currentFile, resolveFile, $) {
             return;
         }
 
-        // Split anchor
-        const parsed = url.parse(href);
-        href = parsed.pathname || '';
-
-        if (href) {
-            // Calcul absolute path for this
-            href = LocationUtils.toAbsolute(href, currentDirectory, '.');
-
-            // Resolve file
-            href = resolveFile(href);
-
-            // Convert back to relative
-            href = LocationUtils.relative(currentDirectory, href);
-        }
-
-        // Add back anchor
-        href = href + (parsed.hash || '');
-
+        href = resolveURL(href);
         $a.attr('href', href);
     });
 }

@@ -75,35 +75,14 @@ class URIIndex extends Record(DEFAULTS) {
     }
 
     /**
-     * Resolve an entry to an url
-     * @param {String} filePath
-     * @return {String}
-     */
-    resolveToURL(filePath) {
-        const { directoryIndex } = this;
-        const uri = this.resolve(filePath);
-
-        if (!directoryIndex || LocationUtils.isExternal(uri)) {
-            return uri;
-        }
-
-        return transformURLPath(uri, (pathname) => {
-            if (path.basename(pathname) == 'index.html') {
-                pathname = path.dirname(pathname) + '/';
-            }
-
-            return pathname;
-        });
-    }
-
-    /**
      * Resolve a filename to an url, considering that the link to "filePath"
      * in the file "originPath".
      *
      * For example if we are generating doc/README.md and we have a link "/READNE.md":
      * index.resolveFrom('doc/README.md', '/README.md') === '../index.html'
      *
-     * @param {String} filePath
+     * @param  {String} originPath
+     * @param  {String} filePath
      * @return {String} url
      */
     resolveFrom(originPath, filePath) {
@@ -130,6 +109,49 @@ class URIIndex extends Record(DEFAULTS) {
 
             return href;
         });
+    }
+
+    /**
+     * Normalize an url
+     * @param  {String} uri
+     * @return {String} uri
+     */
+    normalizeURL(uri) {
+        const { directoryIndex } = this;
+
+        if (!directoryIndex || LocationUtils.isExternal(uri)) {
+            return uri;
+        }
+
+        return transformURLPath(uri, (pathname) => {
+            if (path.basename(pathname) == 'index.html') {
+                pathname = path.dirname(pathname) + '/';
+            }
+
+            return pathname;
+        });
+    }
+
+    /**
+     * Resolve an entry to an url
+     * @param {String} filePath
+     * @return {String}
+     */
+    resolveToURL(filePath) {
+        const uri = this.resolve(filePath);
+        return this.normalizeURL(uri);
+    }
+
+    /**
+     * Resolve an entry to an url
+     *
+     * @param  {String} originPath
+     * @param  {String} filePath
+     * @return {String} url
+     */
+    resolveToURLFrom(originPath, filePath) {
+        const uri = this.resolveFrom(originPath, filePath);
+        return this.normalizeURL(uri);
     }
 
 }

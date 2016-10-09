@@ -4,12 +4,12 @@ const LocationUtils = require('../../utils/location');
 const editHTMLElement = require('./editHTMLElement');
 
 /**
-    Resolve all HTML images:
-        - /test.png in hello -> ../test.html
-
-    @param {String} currentFile
-    @param {HTMLDom} $
-*/
+ * Resolve all HTML images:
+ * - /test.png in hello -> ../test.html
+ *
+ * @param {String} currentFile
+ * @param {HTMLDom} $
+ */
 function resolveImages(currentFile, $) {
     const currentDirectory = path.dirname(currentFile);
 

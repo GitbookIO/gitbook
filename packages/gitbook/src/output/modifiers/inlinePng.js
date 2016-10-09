@@ -8,12 +8,12 @@ const LocationUtils = require('../../utils/location');
 const editHTMLElement = require('./editHTMLElement');
 
 /**
-    Convert all inline PNG images to PNG file
-
-    @param {String} rootFolder
-    @param {HTMLDom} $
-    @return {Promise}
-*/
+ * Convert all inline PNG images to PNG file
+ *
+ * @param {String} rootFolder
+ * @param {HTMLDom} $
+ * @return {Promise}
+ */
 function inlinePng(rootFolder, currentFile, $) {
     const currentDirectory = path.dirname(currentFile);
 
@@ -42,6 +42,5 @@ function inlinePng(rootFolder, currentFile, $) {
         });
     });
 }
-
 
 module.exports = inlinePng;

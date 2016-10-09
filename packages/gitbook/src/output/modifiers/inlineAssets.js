@@ -7,10 +7,10 @@ const fetchRemoteImages = require('./fetchRemoteImages');
 const Promise = require('../../utils/promise');
 
 /**
-    Inline all assets in a page
-
-    @param {String} rootFolder
-*/
+ * Inline all assets in a page
+ *
+ * @param {String} rootFolder
+ */
 function inlineAssets(rootFolder, currentFile) {
     return function($) {
         return Promise()

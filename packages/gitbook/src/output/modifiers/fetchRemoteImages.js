@@ -6,13 +6,13 @@ const fs = require('../../utils/fs');
 const LocationUtils = require('../../utils/location');
 
 /**
-    Fetch all remote images
-
-    @param {String} rootFolder
-    @param {String} currentFile
-    @param {HTMLDom} $
-    @return {Promise}
-*/
+ * Fetch all remote images
+ *
+ * @param {String} rootFolder
+ * @param {String} currentFile
+ * @param {HTMLDom} $
+ * @return {Promise}
+ */
 function fetchRemoteImages(rootFolder, currentFile, $) {
     const currentDirectory = path.dirname(currentFile);
 
