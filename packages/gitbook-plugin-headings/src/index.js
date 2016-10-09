@@ -4,7 +4,7 @@ const classNames = require('classnames');
 
 function mapStateToProps({ config }) {
     return {
-        position: config.get('pluginsConfig').get('headings').get('position') || 'left'
+        position: config.getIn(['pluginsConfig', 'headings', 'position'], 'left')
     };
 }
 
