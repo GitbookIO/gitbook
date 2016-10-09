@@ -59,9 +59,13 @@ function render(plugins, initialState, type, role) {
     const payload = JSON.stringify(initialState);
     const context = GitBook.createContext(browserPlugins, initialState);
 
+    const currentFile = context.getState().file;
+
     const scripts = plugins.toList()
         .filter(plugin => plugin.getPackage().has(type))
-        .map(plugin => 'gitbook/plugins/' + plugin.getName() + '.js')
+        .map(plugin => {
+            return currentFile.relative('gitbook/plugins/' + plugin.getName() + '.js');
+        })
         .toArray();
 
     const el = GitBook.renderWithContext(context, { role });
@@ -81,7 +85,9 @@ function render(plugins, initialState, type, role) {
         innerHTML={innerHTML}
         payload={payload}
         bootstrap={getBootstrapCode(role)}
-        scripts={['gitbook/core.js'].concat(scripts)}
+        scripts={[
+            currentFile.relative('gitbook/core.js')
+        ].concat(scripts)}
     />;
 
     const html = ReactDOMServer.renderToStaticMarkup(htmlEl);

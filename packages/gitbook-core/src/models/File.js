@@ -29,7 +29,7 @@ class File extends Record(DEFAULTS) {
         return path.relative(
             path.dirname(this.path),
             to
-        );
+        ) || './';
     }
 
     /**
