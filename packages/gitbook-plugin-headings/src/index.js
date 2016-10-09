@@ -16,7 +16,7 @@ let Heading = React.createClass({
     },
 
     render() {
-        const { position, id } = this.props;
+        const { position, children, id } = this.props;
         const className = classNames('Headings-Container', {
             'Headings-Right': (position !== 'left')
         });
@@ -26,17 +26,17 @@ let Heading = React.createClass({
                 <GitBook.ImportCSS href="gitbook/headings/headings.css" />
 
                 {position == 'left' ?
-                <GitBook.Link className="Headings-Anchor-Left" href={`#${id}`}>
+                <a className="Headings-Anchor-Left" href={`#${id}`}>
                     <i className="fa fa-link" />
-                </GitBook.Link>
+                </a>
                 : null}
 
-                {this.props.children}
+                {children}
 
                 {position != 'left' ?
-                <GitBook.Link className="Headings-Anchor-Right" href={`#${id}`}>
+                <a className="Headings-Anchor-Right" href={`#${id}`}>
                     <i className="fa fa-link" />
-                </GitBook.Link>
+                </a>
                 : null}
             </div>
         );
