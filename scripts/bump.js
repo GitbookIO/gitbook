@@ -10,6 +10,10 @@ const PACKAGES_DIR = path.resolve(__dirname, '../packages');
 const packages = fs.readdirSync(PACKAGES_DIR);
 
 function updateDependencies(dependencies) {
+    if (!dependencies) {
+        return;
+    }
+
     Object.keys(dependencies).map((key) => {
         if (!packages.includes(key)) {
             return;
