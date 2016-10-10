@@ -5,12 +5,12 @@ const logged = {};
 const disabled = {};
 
 /**
-    Log a deprecated notice
-
-    @param {Book|Output} book
-    @param {String} key
-    @param {String} message
-*/
+ * Log a deprecated notice
+ *
+ * @param {Book|Output} book
+ * @param {String} key
+ * @param {String} message
+ */
 function logNotice(book, key, message) {
     if (logged[key] || disabled[key]) return;
 
@@ -21,49 +21,49 @@ function logNotice(book, key, message) {
 }
 
 /**
-    Deprecate a function
-
-    @param {Book|Output} book
-    @param {String} key: unique identitifer for the deprecated
-    @param {Function} fn
-    @param {String} msg: message to print when called
-    @return {Function}
-*/
+ * Deprecate a function
+ *
+ * @param {Book|Output} book
+ * @param {String} key: unique identitifer for the deprecated
+ * @param {Function} fn
+ * @param {String} msg: message to print when called
+ * @return {Function}
+ */
 function deprecateMethod(book, key, fn, msg) {
-    return function() {
+    return function(...args) {
         logNotice(book, key, msg);
-
-        return fn.apply(this, arguments);
+        return fn.apply(this, args);
     };
 }
 
 /**
-    Deprecate a property of an object
-
-    @param {Book|Output} book
-    @param {String} key: unique identitifer for the deprecated
-    @param {Object} instance
-    @param {String|Function} property
-    @param {String} msg: message to print when called
-    @return {Function}
-*/
+ * Deprecate a property of an object
+ *
+ * @param {Book|Output} book
+ * @param {String} key: unique identitifer for the deprecated
+ * @param {Object} instance
+ * @param {String|Function} property
+ * @param {String} msg: message to print when called
+ * @return {Function}
+ */
 function deprecateField(book, key, instance, property, value, msg) {
     let store = undefined;
 
-    const prepare = function() {
+    const prepare = () => {
         if (!is.undefined(store)) return;
 
         if (is.fn(value)) store = value();
         else store = value;
     };
 
-    const getter = function() {
+    const getter = () => {
         prepare();
 
         logNotice(book, key, msg);
         return store;
     };
-    const setter = function(v) {
+
+    const setter = (v) => {
         prepare();
 
         logNotice(book, key, msg);
@@ -74,38 +74,36 @@ function deprecateField(book, key, instance, property, value, msg) {
     Object.defineProperty(instance, property, {
         get: getter,
         set: setter,
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
 }
 
 /**
-    Enable a deprecation
-
-    @param {String} key: unique identitifer
-*/
+ * Enable a deprecation
+ * @param {String} key: unique identitifer
+ */
 function enableDeprecation(key) {
     disabled[key] = false;
 }
 
 /**
-    Disable a deprecation
-
-    @param {String} key: unique identitifer
-*/
+ * Disable a deprecation
+ * @param {String} key: unique identitifer
+ */
 function disableDeprecation(key) {
     disabled[key] = true;
 }
 
 /**
-    Deprecate a method in favor of another one
-
-    @param {Book} book
-    @param {String} key
-    @param {Object} instance
-    @param {String} oldName
-    @param {String} newName
-*/
+ * Deprecate a method in favor of another one.
+ *
+ * @param {Book} book
+ * @param {String} key
+ * @param {Object} instance
+ * @param {String} oldName
+ * @param {String} newName
+ */
 function deprecateRenamedMethod(book, key, instance, oldName, newName, msg) {
     msg = msg || ('"' + oldName + '" is deprecated, use "' + newName + '()" instead');
     const fn = objectPath.get(instance, newName);
