@@ -10,7 +10,7 @@
   "scripts": {
     "lint": "eslint .",
     "test": "",
-    "bootstrap": "lerna bootstrap",
+    "bootstrap": "npm run bump && lerna bootstrap",
     "bump": "./scripts/bump.js",
     "clean": "lerna clean",
     "dist": "lerna run --concurrency 1 prepublish"

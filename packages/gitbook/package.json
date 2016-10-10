@@ -24,6 +24,7 @@
       "gitbook-asciidoc": "1.2.2",
       "gitbook-core": "4.0.0",
       "gitbook-markdown": "1.3.2",
+      "gitbook-plugin-copy-code": "4.0.0",
       "gitbook-plugin-headings": "4.0.0",
       "gitbook-plugin-highlight": "4.0.0",
       "gitbook-plugin-livereload": "0.0.1",
