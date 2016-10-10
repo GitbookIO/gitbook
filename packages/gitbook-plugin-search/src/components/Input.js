@@ -6,7 +6,7 @@ const search = require('../actions/search');
 const SearchInput = React.createClass({
     propTypes: {
         query:    React.PropTypes.string,
-        i18n:     GitBook.Shapes.i18n,
+        i18n:     GitBook.Shapes.I18n,
         dispatch: GitBook.Shapes.dispatch
     },
 

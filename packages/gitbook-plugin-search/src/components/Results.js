@@ -22,7 +22,7 @@ const Result = React.createClass({
 
 const SearchResults = React.createClass({
     propTypes: {
-        i18n:     GitBook.Shapes.i18n,
+        i18n:     GitBook.Shapes.I18n,
         results:  GitBook.Shapes.list,
         query:    React.PropTypes.string,
         children: React.PropTypes.node
