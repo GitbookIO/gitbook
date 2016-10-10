@@ -24,5 +24,8 @@ build/Release
 # see https://npmjs.org/doc/faq.html#Should-I-check-my-node_modules-folder-into-git
 node_modules
 
-# vim swap file
+# vim swapfile
 *.swp
+
+# Plugin assets
+_assets/plugin.js
