@@ -1,5 +1,6 @@
 const fs = require('fs-extra');
 const path = require('path');
+const GITBOOK_VERSION = require('../package.json').version;
 
 const TEMPLATE_DIR = path.resolve(__dirname, '../template');
 
@@ -17,13 +18,14 @@ function create(outputDir, spec) {
         'browser': './_assets/plugin.js',
         'version': '0.0.0',
         'dependencies': {
-            'gitbook-core': '^0.0.0'
+            'gitbook-core': '^' + GITBOOK_VERSION
         },
         'devDependencies': {
-            'gitbook-plugin': '*'
+            'gitbook-plugin': '^' + GITBOOK_VERSION,
+            'eslint-config-gitbook': '1.4.0'
         },
         'engines': {
-            'gitbook': '>=3.0.0'
+            'gitbook': '>=4.0.0-alpha.0'
         },
         'scripts': {
             'build-js': 'gitbook-plugin build ./src/index.js ./_assets/plugin.js',
