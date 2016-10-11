@@ -16,7 +16,7 @@
       "react-immutable-proptypes": "^2.1.0",
       "react-intl": "^2.1.5",
       "react-redux": "^4.4.5",
-      "react-safe-html": "^0.3.0",
+      "react-safe-html": "0.4.0",
       "redux": "^3.5.2",
       "redux-thunk": "^2.1.0",
       "reflexbox": "^2.2.2",
