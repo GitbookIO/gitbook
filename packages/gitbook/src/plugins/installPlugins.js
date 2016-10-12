@@ -1,5 +1,3 @@
-const npmi = require('npmi');
-
 const DEFAULT_PLUGINS = require('../constants/defaultPlugins');
 const Promise = require('../utils/promise');
 const installPlugin = require('./installPlugin');
@@ -34,10 +32,10 @@ function installPlugins(book) {
 
     if (plugins.size == 0) {
         logger.info.ln('nothing to install!');
-        return Promise();
+        return Promise(0);
     }
 
-    logger.info.ln('installing', plugins.size, 'plugins using npm@' + npmi.NPM_VERSION);
+    logger.info.ln('installing', plugins.size, 'plugins from registry');
 
     return Promise.forEach(plugins, function(plugin) {
         return installPlugin(book, plugin);

@@ -7,11 +7,11 @@ const FS = require('../models/fs');
 const error = require('../utils/error');
 
 /**
-    Create a fake filesystem for unit testing GitBook.
-
-    @param {Map<String:String|Map>}
-*/
-function createMockFS(files) {
+ * Create a fake filesystem for unit testing GitBook.
+ * @param {Map<String:String|Map>}
+ * @return {FS}
+ */
+function createMockFS(files, root = '') {
     files = Immutable.fromJS(files);
     const mtime = new Date();
 

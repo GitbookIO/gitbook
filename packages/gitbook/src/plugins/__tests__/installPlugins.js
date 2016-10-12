@@ -1,27 +1,34 @@
-const path = require('path');
+const tmp = require('tmp');
 
 const Book = require('../../models/book');
-const NodeFS = require('../../fs/node');
+const MockFS = require('../../fs/mock');
 const installPlugins = require('../installPlugins');
 
 const Parse = require('../../parse');
 
-describe('installPlugins', function() {
-    let book;
+describe('installPlugins', () => {
+    let book, dir;
 
-    this.timeout(30000);
+    before(() => {
+        dir = tmp.dirSync({ unsafeCleanup: true });
 
-    before(function() {
-        const fs = NodeFS(path.resolve(__dirname, '../../../'));
-        const baseBook = Book.createForFS(fs);
+        const fs = MockFS({
+            'book.json': JSON.stringify({ plugins: ['ga', 'sitemap' ]})
+        }, dir.name);
+        const baseBook = Book.createForFS(fs)
+            .setLogLevel('disabled');
 
         return Parse.parseConfig(baseBook)
-        .then(function(_book) {
+        .then((_book) => {
             book = _book;
         });
     });
 
-    it('must install all plugins from NPM', function() {
+    after(() => {
+        dir.removeCallback();
+    });
+
+    it('must install all plugins from NPM', () => {
         return installPlugins(book)
         .then(function(n) {
             expect(n).toBe(2);

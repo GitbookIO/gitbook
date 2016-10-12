@@ -4,12 +4,12 @@ const spawn = require('spawn-cmd').spawn;
 const Promise = require('./promise');
 
 /**
-    Execute a command
-
-    @param {String} command
-    @param {Object} options
-    @return {Promise}
-*/
+ * Execute a command
+ *
+ * @param {String} command
+ * @param {Object} options
+ * @return {Promise}
+ */
 function exec(command, options) {
     const d = Promise.defer();
 
@@ -34,13 +34,13 @@ function exec(command, options) {
 }
 
 /**
-    Spawn an executable
-
-    @param {String} command
-    @param {Array} args
-    @param {Object} options
-    @return {Promise}
-*/
+ * Spawn an executable
+ *
+ * @param {String} command
+ * @param {Array} args
+ * @param {Object} options
+ * @return {Promise}
+ */
 function spawnCmd(command, args, options) {
     const d = Promise.defer();
     const child = spawn(command, args, options);
@@ -69,11 +69,11 @@ function spawnCmd(command, args, options) {
 }
 
 /**
-    Transform an option object to a command line string
-
-    @param {String|number} value
-    @param {String}
-*/
+ * Transform an option object to a command line string
+ *
+ * @param {String|number} value
+ * @param {String}
+ */
 function escapeShellArg(value) {
     if (is.number(value)) {
         return value;
@@ -86,11 +86,11 @@ function escapeShellArg(value) {
 }
 
 /**
-    Transform a map of options into a command line arguments string
-
-    @param {Object} options
-    @return {String}
-*/
+ * Transform a map of options into a command line arguments string
+ *
+ * @param {Object} options
+ * @return {String}
+ */
 function optionsToShellArgs(options) {
     const result = [];
 
