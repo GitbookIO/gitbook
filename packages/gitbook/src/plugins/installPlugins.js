@@ -5,11 +5,11 @@ const Promise = require('../utils/promise');
 const installPlugin = require('./installPlugin');
 
 /**
-    Install plugin requirements for a book
-
-    @param {Book}
-    @return {Promise<Number>}
-*/
+ * Install plugin requirements for a book
+ *
+ * @param {Book} book
+ * @return {Promise<Number>} count
+ */
 function installPlugins(book) {
     const logger = book.getLogger();
     const config = book.getConfig();

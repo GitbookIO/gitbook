@@ -1,13 +1,13 @@
 const timing = require('../utils/timing');
 
 /**
-    List all assets in a book
-    Assets are file not ignored and not a page
-
-    @param {Book} book
-    @param {List<String>} pages
-    @param
-*/
+ * List all assets in a book
+ * Assets are file not ignored and not a page
+ *
+ * @param {Book} book
+ * @param {List<String>} pages
+ * @return {Promise<List<String>>} assets
+ */
 function listAssets(book, pages) {
     const fs = book.getContentFS();
 

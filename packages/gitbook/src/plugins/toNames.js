@@ -1,6 +1,6 @@
 
 /**
- * Return list of plugin names. This method is nly used in unit tests.
+ * Return list of plugin names. This method is only used in unit tests.
  *
  * @param {OrderedMap<String:Plugin} plugins
  * @return {Array<String>}

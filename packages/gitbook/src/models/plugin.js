@@ -7,25 +7,19 @@ const THEME_PREFIX = require('../constants/themePrefix');
 const DEFAULT_VERSION = '*';
 
 const DEFAULTS = {
-    name:       String(),
-
+    name:    String(),
     // Requirement version (ex: ">1.0.0")
-    version:    String(DEFAULT_VERSION),
-
+    version: String(DEFAULT_VERSION),
     // Path to load this plugin
-    path:       String(),
-
+    path:    String(),
     // Depth of this plugin in the dependency tree
-    depth:      Number(0),
-
+    depth:   Number(0),
     // Parent depending on this plugin
-    parent:     String(),
-
+    parent:  String(),
     // Content of the "package.json"
-    package:    Map(),
-
+    package: Map(),
     // Content of the package itself
-    content:    Map()
+    content: Map()
 };
 
 class Plugin extends Record(DEFAULTS) {
@@ -88,22 +82,6 @@ class Plugin extends Record(DEFAULTS) {
      */
     getHooks() {
         return this.getContent().get('hooks') || Map();
-    }
-
-    /**
-     * Return infos about resources for a specific type
-     * @param {String} type
-     * @return {Map<String:Mixed>}
-     */
-    getResources(type) {
-        if (type != 'website' && type != 'ebook') {
-            throw new Error('Invalid assets type ' + type);
-        }
-
-        const content = this.getContent();
-        return (content.get(type)
-            || (type == 'website' ? content.get('book') : null)
-            || Map());
     }
 
     /**

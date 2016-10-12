@@ -1,7 +1,7 @@
 const Promise = require('../../utils/promise');
 
 /**
- * Finish the generation, write the languages index
+ * Finish the generation, write the languages index.
  *
  * @param {Output}
  * @return {Output}

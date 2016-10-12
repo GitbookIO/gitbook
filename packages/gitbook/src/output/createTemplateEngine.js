@@ -9,7 +9,9 @@ const defaultFilters = require('../constants/defaultFilters');
 
 /**
  * Create template engine for an output.
- * It adds default filters/blocks, then add the ones from plugins
+ * It adds default filters/blocks, then add the ones from plugins.
+ *
+ * This template engine is used to compile pages.
  *
  * @param {Output} output
  * @return {TemplateEngine}

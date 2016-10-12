@@ -4,12 +4,12 @@ const Promise = require('../utils/promise');
 const resolveVersion = require('./resolveVersion');
 
 /**
-    Install a plugin for a book
-
-    @param {Book}
-    @param {PluginDependency}
-    @return {Promise}
-*/
+ * Install a plugin for a book
+ *
+ * @param {Book} book
+ * @param {PluginDependency} plugin
+ * @return {Promise}
+ */
 function installPlugin(book, plugin) {
     const logger = book.getLogger();
 

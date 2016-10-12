@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('../../utils/fs');
 
 /**
- * Copy an asset to the output folder
+ * Copy an asset from the book to the output folder.
  *
  * @param {Output} output
  * @param {Page} page

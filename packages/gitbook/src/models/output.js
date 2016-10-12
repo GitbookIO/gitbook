@@ -13,7 +13,7 @@ const DEFAULTS = {
     plugins:   OrderedMap(),
     // Map pages to generation (String -> Page)
     pages:     OrderedMap(),
-    // List assets (String)
+    // List of file that are not pages in the book (String)
     assets:    List(),
     // Option for the generation
     options:   Map(),

@@ -1,18 +1,21 @@
-const Immutable = require('immutable');
+const { Map } = require('immutable');
 
 /**
-    List blocks from a list of plugins
-
-    @param {OrderedMap<String:Plugin>}
-    @return {Map<String:TemplateBlock>}
-*/
+ * List blocks from a list of plugins
+ *
+ * @param {OrderedMap<String:Plugin>}
+ * @return {Map<String:TemplateBlock>}
+ */
 function listBlocks(plugins) {
     return plugins
         .reverse()
-        .reduce(function(result, plugin) {
-            const blocks = plugin.getBlocks();
-            return result.merge(blocks);
-        }, Immutable.Map());
+        .reduce(
+            (result, plugin) => {
+                const blocks = plugin.getBlocks();
+                return result.merge(blocks);
+            },
+            Map()
+        );
 }
 
 module.exports = listBlocks;

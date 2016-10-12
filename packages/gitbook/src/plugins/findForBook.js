@@ -30,5 +30,4 @@ function findForBook(book) {
     );
 }
 
-
 module.exports = findForBook;

@@ -20,13 +20,9 @@ function copyPluginAssets(output) {
         return Promise(output);
     }
 
-    const plugins = output.getPlugins()
+    const plugins = output.getPlugins();
 
-    // We reverse the order of plugins to copy
-    // so that first plugins can replace assets from other plugins.
-    .reverse();
-
-    return Promise.forEach(plugins, function(plugin) {
+    return Promise.forEach(plugins, (plugin) => {
         return copyAssets(output, plugin)
         .then(() => copyBrowserJS(output, plugin));
     })
@@ -55,7 +51,7 @@ function copyAssets(output, plugin) {
         return Promise();
     }
 
-    logger.debug.ln('copy assets from theme', assetFolder);
+    logger.debug.ln('copy assets from plugin', assetFolder);
     return fs.copyDir(
         assetFolder,
         assetOutputFolder,

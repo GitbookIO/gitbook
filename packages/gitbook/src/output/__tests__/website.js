@@ -134,11 +134,10 @@ describe('WebsiteGenerator', function() {
             expect(folder).toNotHaveFile('fr/README.md');
 
             // Should copy assets only once
-            expect(folder).toHaveFile('gitbook/style.css');
-            expect(folder).toNotHaveFile('en/gitbook/style.css');
+            expect(folder).toHaveFile('gitbook/core.js');
+            expect(folder).toNotHaveFile('en/gitbook/core.js');
 
             expect(folder).toHaveFile('index.html');
         });
     });
 });
-

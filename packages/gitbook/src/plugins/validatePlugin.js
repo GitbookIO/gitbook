@@ -3,11 +3,11 @@ const gitbook = require('../gitbook');
 const Promise = require('../utils/promise');
 
 /**
-    Validate a plugin
-
-    @param {Plugin}
-    @return {Promise<Plugin>}
-*/
+ * Validate a plugin
+ *
+ * @param {Plugin}
+ * @return {Promise<Plugin>}
+ */
 function validatePlugin(plugin) {
     const packageInfos = plugin.getPackage();
 
