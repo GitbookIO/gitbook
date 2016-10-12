@@ -9,7 +9,7 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "test": "",
+    "test": "lerna run --concurrency 1 test",
     "bootstrap": "npm run bump && lerna bootstrap",
     "bump": "./scripts/bump.js",
     "clean": "lerna clean",

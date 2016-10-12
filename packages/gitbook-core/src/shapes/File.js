@@ -6,9 +6,8 @@ const {
     shape
 } = React.PropTypes;
 
-
 module.exports = shape({
     mtime: instanceOf(Date).isRequired,
     path:  string.isRequired,
-    type:  oneOf(['markdown', 'asciidoc']).isRequired
+    type:  oneOf(['', 'markdown', 'asciidoc']).isRequired
 });

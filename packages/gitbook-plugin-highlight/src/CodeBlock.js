@@ -29,7 +29,7 @@ const CodeBlock = React.createClass({
     render() {
         const { children, className } = this.props;
         const content = getChildrenToText(children);
-        const lang = getLanguage(className);
+        const lang = getLanguage(className || '');
 
         const includeCSS = <GitBook.ImportCSS href="gitbook/highlight/white.css" />;
 
