@@ -27,5 +27,6 @@ module.exports = Immutable.List([
     'hints',
     'headings',
     'copy-code',
-    'theme-default'
+    'theme-default',
+    'fontsettings'
 ]).map(createFromDependency);

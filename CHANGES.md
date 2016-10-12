@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - *Performances*: Git conrefs are faster over large books
 - *Website Feature:* new default plugin `copy-code` to copy code blocks content in one click
 - *Website Feature:* new default plugin `heading-anchors` to have clickable headings
+- *Website Feature:* `fontsettings` is now only controlling the font size, and can work on multiple themes
 
 ## 3.2.0
 - Switch markdown parser from `kramed` to `markup-it`

@@ -1,49 +1,49 @@
 {
-   "name": "gitbook-core",
-   "version": "4.0.0",
-   "description": "Core for GitBook plugins API",
-   "main": "./lib/index.js",
-   "dependencies": {
-      "bluebird": "^3.4.6",
-      "classnames": "^2.2.5",
-      "entities": "^1.1.1",
-      "history": "^4.3.0",
-      "html-tags": "^1.1.1",
-      "immutable": "^3.8.1",
-      "react": "^15.3.1",
-      "react-dom": "^15.3.1",
-      "react-helmet": "^3.1.0",
-      "react-immutable-proptypes": "^2.1.0",
-      "react-intl": "^2.1.5",
-      "react-redux": "^4.4.5",
-      "react-safe-html": "0.4.0",
-      "redux": "^3.5.2",
-      "redux-thunk": "^2.1.0",
-      "reflexbox": "^2.2.2",
-      "whatwg-fetch": "^1.0.0"
-   },
-   "devDependencies": {
-      "babel-cli": "^6.14.0",
-      "babel-preset-es2015": "^6.14.0",
-      "babel-preset-react": "^6.11.1",
-      "babel-preset-stage-2": "^6.13.0",
-      "browserify": "^13.1.0",
-      "envify": "^3.4.1",
-      "uglify-js": "^2.7.3"
-   },
-   "scripts": {
-      "dist-lib": "rm -rf lib/ && babel -d lib/ src/",
-      "dist-standalone": "mkdir -p dist && browserify -r ./lib/index.js:gitbook-core -r react -r react-dom ./lib/index.js | uglifyjs -c > ./dist/gitbook.core.min.js",
-      "dist": "npm run dist-lib && npm run dist-standalone",
-      "prepublish": "npm run dist"
-   },
-   "repository": {
-      "type": "git",
-      "url": "https://github.com/GitbookIO/gitbook.git"
-   },
-   "author": "GitBook Inc. <contact@gitbook.com>",
-   "license": "Apache-2.0",
-   "bugs": {
-      "url": "https://github.com/GitbookIO/gitbook/issues"
-   }
+  "name": "gitbook-core",
+  "version": "4.0.0",
+  "description": "Core for GitBook plugins API",
+  "main": "./lib/index.js",
+  "dependencies": {
+    "bluebird": "^3.4.6",
+    "classnames": "^2.2.5",
+    "entities": "^1.1.1",
+    "history": "^4.3.0",
+    "html-tags": "^1.1.1",
+    "immutable": "^3.8.1",
+    "react": "^15.3.1",
+    "react-dom": "^15.3.1",
+    "react-helmet": "^3.1.0",
+    "react-immutable-proptypes": "^2.1.0",
+    "react-intl": "^2.1.5",
+    "react-redux": "^4.4.5",
+    "react-safe-html": "0.4.0",
+    "redux": "^3.5.2",
+    "redux-thunk": "^2.1.0",
+    "reflexbox": "^2.2.2",
+    "whatwg-fetch": "^1.0.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.14.0",
+    "babel-preset-es2015": "^6.14.0",
+    "babel-preset-react": "^6.11.1",
+    "babel-preset-stage-2": "^6.13.0",
+    "browserify": "^13.1.0",
+    "envify": "^3.4.1",
+    "uglify-js": "^2.7.3"
+  },
+  "scripts": {
+    "dist-lib": "rm -rf lib/ && babel -d lib/ src/",
+    "dist-standalone": "mkdir -p dist && browserify -r ./lib/index.js:gitbook-core -r react -r react-dom ./lib/index.js | uglifyjs -c > ./dist/gitbook.core.min.js",
+    "dist": "npm run dist-lib && npm run dist-standalone",
+    "prepublish": "npm run dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GitbookIO/gitbook.git"
+  },
+  "author": "GitBook Inc. <contact@gitbook.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/GitbookIO/gitbook/issues"
+  }
 }
