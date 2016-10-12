@@ -41,9 +41,14 @@ function readModule(modulePath, depth, parent) {
  * @param {String} folder
  * @param {Number} depth
  * @param {String} parent
- * @return {OrderedMap<String:Plugin>}
+ * @return {Promise<OrderedMap<String:Plugin>>} plugins
  */
 function findInstalled(folder, depth = 0, parent = null) {
+    // When tetsing with mock-fs
+    if (!folder) {
+        return Promise(OrderedMap());
+    }
+
     // Search for gitbook-plugins in node_modules folder
     const node_modules = path.join(folder, 'node_modules');
 
