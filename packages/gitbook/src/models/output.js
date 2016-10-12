@@ -1,5 +1,6 @@
 const { Record, OrderedMap, Map, List } = require('immutable');
 
+const Git = require('../utils/git');
 const LocationUtils = require('../utils/location');
 const Book = require('./book');
 const URIIndex = require('./uriIndex');
@@ -19,7 +20,9 @@ const DEFAULTS = {
     // Internal state for the generation
     state:     Map(),
     // Index of urls
-    urls:      new URIIndex()
+    urls:      new URIIndex(),
+    // Git repositories manager
+    git:       new Git()
 };
 
 class Output extends Record(DEFAULTS) {

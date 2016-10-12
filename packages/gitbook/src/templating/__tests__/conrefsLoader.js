@@ -19,22 +19,22 @@ describe('ConrefsLoader', () => {
 
         it('should include content from git', () => {
             return renderTemplate(engine, fileName, '{% include "git+https://gist.github.com/69ea4542e4c8967d2fa7.git/test.md" %}')
-            .then(function(out) {
-                expect(out.getContent()).toBe('Hello from git');
+            .then((out) => {
+                expect(out).toBe('Hello from git');
             });
         });
 
         it('should handle deep inclusion (1)', () => {
             return renderTemplate(engine, fileName, '{% include "git+https://gist.github.com/69ea4542e4c8967d2fa7.git/test2.md" %}')
-            .then(function(out) {
-                expect(out.getContent()).toBe('First Hello. Hello from git');
+            .then((out) => {
+                expect(out).toBe('First Hello. Hello from git');
             });
         });
 
         it('should handle deep inclusion (2)', () => {
             return renderTemplate(engine, fileName, '{% include "git+https://gist.github.com/69ea4542e4c8967d2fa7.git/test3.md" %}')
-            .then(function(out) {
-                expect(out.getContent()).toBe('First Hello. Hello from git');
+            .then((out) => {
+                expect(out).toBe('First Hello. Hello from git');
             });
         });
     });
@@ -51,15 +51,15 @@ describe('ConrefsLoader', () => {
         describe('Relative', () => {
             it('should resolve basic relative filepath', () => {
                 return renderTemplate(engine, fileName, '{% include "include.md" %}')
-                .then(function(out) {
-                    expect(out.getContent()).toBe('Hello World');
+                .then((out) => {
+                    expect(out).toBe('Hello World');
                 });
             });
 
             it('should resolve basic parent filepath', () => {
                 return renderTemplate(engine, path.join(dirName, 'hello/test.md'), '{% include "../include.md" %}')
-                .then(function(out) {
-                    expect(out.getContent()).toBe('Hello World');
+                .then((out) => {
+                    expect(out).toBe('Hello World');
                 });
             });
         });
@@ -67,15 +67,15 @@ describe('ConrefsLoader', () => {
         describe('Absolute', function() {
             it('should resolve absolute filepath', () => {
                 return renderTemplate(engine, fileName, '{% include "/include.md" %}')
-                .then(function(out) {
-                    expect(out.getContent()).toBe('Hello World');
+                .then((out) => {
+                    expect(out).toBe('Hello World');
                 });
             });
 
             it('should resolve absolute filepath when in a directory', () => {
                 return renderTemplate(engine, path.join(dirName, 'hello/test.md'), '{% include "/include.md" %}')
-                .then(function(out) {
-                    expect(out.getContent()).toBe('Hello World');
+                .then((out) => {
+                    expect(out).toBe('Hello World');
                 });
             });
         });
@@ -103,8 +103,8 @@ describe('ConrefsLoader', () => {
 
         it('should transform included content', () => {
             return renderTemplate(engine, fileName, '{% include "include.md" %}')
-            .then(function(out) {
-                expect(out.getContent()).toBe('test-Hello World-endtest');
+            .then((out) => {
+                expect(out).toBe('test-Hello World-endtest');
             });
         });
     });

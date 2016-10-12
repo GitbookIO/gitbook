@@ -2,9 +2,9 @@ const path = require('path');
 const nunjucks = require('nunjucks');
 
 const fs = require('../utils/fs');
-const Git = require('../utils/git');
 const LocationUtils = require('../utils/location');
 const PathUtils = require('../utils/path');
+const Git = require('../utils/git');
 
 
 /**
@@ -20,11 +20,11 @@ const PathUtils = require('../utils/path');
 const ConrefsLoader = nunjucks.Loader.extend({
     async: true,
 
-    init(rootFolder, transformFn, logger) {
+    init(rootFolder, transformFn, logger, git = new Git()) {
         this.rootFolder = rootFolder;
         this.transformFn = transformFn;
         this.logger = logger;
-        this.git = new Git();
+        this.git = git;
     },
 
     getSource(sourceURL, callback) {

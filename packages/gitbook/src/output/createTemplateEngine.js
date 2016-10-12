@@ -15,6 +15,7 @@ const defaultFilters = require('../constants/defaultFilters');
  * @return {TemplateEngine}
  */
 function createTemplateEngine(output) {
+    const { git } = output;
     const plugins = output.getPlugins();
     const book = output.getBook();
     const rootFolder = book.getContentRoot();
@@ -29,7 +30,7 @@ function createTemplateEngine(output) {
 
     // Create loader
     const transformFn = Templating.replaceShortcuts.bind(null, blocks);
-    const loader = new Templating.ConrefsLoader(rootFolder, transformFn, logger);
+    const loader = new Templating.ConrefsLoader(rootFolder, transformFn, logger, git);
 
     // Create API context
     const context = Api.encodeGlobal(output);

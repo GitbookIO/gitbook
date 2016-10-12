@@ -13,4 +13,3 @@ describe('EbookGenerator', function() {
         });
     });
 });
-

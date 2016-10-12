@@ -25,7 +25,9 @@ class Git {
     allocateDir() {
         const that = this;
 
-        if (this.tmpDir) return Promise();
+        if (this.tmpDir) {
+            return Promise();
+        }
 
         return fs.tmpDir()
         .then(function(dir) {
@@ -33,7 +35,12 @@ class Git {
         });
     }
 
-    // Clone a git repository if non existant
+    /**
+     * Clone a git repository if non existant
+     * @param {String} host: url of the git repository
+     * @param {String} ref: branch/commit/tag to checkout
+     * @return {Promise<String>} repoPath
+     */
     clone(host, ref) {
         const that = this;
 
@@ -63,7 +70,11 @@ class Git {
         });
     }
 
-    // Get file from a git repo
+    /**
+     * Resole a git url, clone the repo and return the path to the right file.
+     * @param {String} giturl
+     * @return {Promise<String>} filePath
+     */
     resolve(giturl) {
         // Path to a file in a git repo?
         if (!Git.isUrl(giturl)) {
@@ -80,7 +91,11 @@ class Git {
         });
     }
 
-    // Return root of git repo from a filepath
+    /**
+     * Return root of git repo from a filepath
+     * @param  {String} filePath
+     * @return {String} repoPath
+     */
     resolveRoot(filepath) {
         // No git repo cloned, or file is not in a git repository
         if (!this.tmpDir || !pathUtil.isInRoot(this.tmpDir, filepath)) return null;
@@ -97,12 +112,20 @@ class Git {
         return path.resolve(this.tmpDir, repoId);
     }
 
-    // Check if an url is a git dependency url
+    /**
+     * Check if an url is a git dependency url
+     * @param  {String} giturl
+     * @return {Boolean} isUrl
+     */
     static isUrl(giturl) {
         return (giturl.indexOf(GIT_PREFIX) === 0);
     }
 
-    // Parse and extract infos
+    /**
+     * Parse and extract infos
+     * @param  {String} giturl
+     * @return {Object} { host, ref, filepath }
+     */
     static parseUrl(giturl) {
         if (!Git.isUrl(giturl)) {
             return null;
