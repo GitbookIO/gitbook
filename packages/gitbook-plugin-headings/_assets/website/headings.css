@@ -9,7 +9,8 @@
 .Headings-Container > .Headings-Anchor-Left {
     position: absolute;
     left: 5px;
-    bottom: 15px;
+    top: 50%;
+    transform: translateY(-50%);
     opacity: 0;
     color: inherit;
 }
