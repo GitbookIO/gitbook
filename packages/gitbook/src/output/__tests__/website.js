@@ -1,22 +1,21 @@
-const fs = require('fs');
 const generateMock = require('./generateMock');
 const WebsiteGenerator = require('../website');
 
-describe('WebsiteGenerator', function() {
+describe('WebsiteGenerator', () => {
 
-    it('should generate an index.html', function() {
+    it('should generate an index.html', () => {
         return generateMock(WebsiteGenerator, {
             'README.md': 'Hello World'
         })
-        .then(function(folder) {
+        .then((folder) => {
             expect(folder).toHaveFile('index.html');
         });
     });
 
-    describe('Glossary', function() {
+    describe('Glossary', () => {
         let folder;
 
-        before(function() {
+        before(() => {
             return generateMock(WebsiteGenerator, {
                 'README.md': 'Hello World',
                 'SUMMARY.md': '* [Deep](folder/page.md)',
@@ -25,43 +24,30 @@ describe('WebsiteGenerator', function() {
                 },
                 'GLOSSARY.md': '# Glossary\n\n## Hello\n\nHello World'
             })
-            .then(function(_folder) {
+            .then((_folder) => {
                 folder = _folder;
             });
         });
 
-        it('should generate a GLOSSARY.html', function() {
+        it('should generate a GLOSSARY.html', () => {
             expect(folder).toHaveFile('GLOSSARY.html');
         });
 
-        it('should correctly resolve glossary links in README', function() {
-            const html = fs.readFileSync(folder + '/index.html', 'utf8');
-            expect(html).toHaveDOMElement('.page-inner a[href="GLOSSARY.html#hello"]');
-        });
-
-        it('should correctly resolve glossary links in directory', function() {
-            const html = fs.readFileSync(folder + '/folder/page.html', 'utf8');
-            expect(html).toHaveDOMElement('.page-inner a[href="../GLOSSARY.html#hello"]');
-        });
-
-        it('should accept a custom glossary file', function() {
+        it('should accept a custom glossary file', () => {
             return generateMock(WebsiteGenerator, {
                 'README.md': 'Hello World',
                 'book.json': '{ "structure": { "glossary": "custom.md" } }',
                 'custom.md': '# Glossary\n\n## Hello\n\nHello World'
             })
-            .then(function(folder) {
-                expect(folder).toHaveFile('custom.html');
-                expect(folder).toNotHaveFile('GLOSSARY.html');
-
-                const html = fs.readFileSync(folder + '/index.html', 'utf8');
-                expect(html).toHaveDOMElement('.page-inner a[href="custom.html#hello"]');
+            .then((result) => {
+                expect(result).toHaveFile('custom.html');
+                expect(result).toNotHaveFile('GLOSSARY.html');
             });
         });
     });
 
 
-    it('should copy asset files', function() {
+    it('should copy asset files', () => {
         return generateMock(WebsiteGenerator, {
             'README.md': 'Hello World',
             'myJsFile.js': 'var a = "test";',
@@ -69,14 +55,14 @@ describe('WebsiteGenerator', function() {
                 'AnotherAssetFile.md': '# Even md'
             }
         })
-        .then(function(folder) {
+        .then((folder) => {
             expect(folder).toHaveFile('index.html');
             expect(folder).toHaveFile('myJsFile.js');
             expect(folder).toHaveFile('folder/AnotherAssetFile.md');
         });
     });
 
-    it('should generate an index.html for AsciiDoc', function() {
+    it('should generate an index.html for AsciiDoc', () => {
         return generateMock(WebsiteGenerator, {
             'README.adoc': 'Hello World'
         })
@@ -85,7 +71,7 @@ describe('WebsiteGenerator', function() {
         });
     });
 
-    it('should generate an HTML file for each articles', function() {
+    it('should generate an HTML file for each articles', () => {
         return generateMock(WebsiteGenerator, {
             'README.md': 'Hello World',
             'SUMMARY.md': '# Summary\n\n* [Page](test/page.md)',
@@ -99,7 +85,7 @@ describe('WebsiteGenerator', function() {
         });
     });
 
-    it('should not generate file if entry file doesn\'t exist', function() {
+    it('should not generate file if entry file doesn\'t exist', () => {
         return generateMock(WebsiteGenerator, {
             'README.md': 'Hello World',
             'SUMMARY.md': '# Summary\n\n* [Page 1](page.md)\n* [Page 2](test/page.md)',
@@ -107,14 +93,14 @@ describe('WebsiteGenerator', function() {
                 'page.md': 'Hello 2'
             }
         })
-        .then(function(folder) {
+        .then((folder) => {
             expect(folder).toHaveFile('index.html');
             expect(folder).toNotHaveFile('page.html');
             expect(folder).toHaveFile('test/page.html');
         });
     });
 
-    it('should generate a multilingual book', function() {
+    it('should generate a multilingual book', () => {
         return generateMock(WebsiteGenerator, {
             'LANGS.md': '# Languages\n\n* [en](en)\n* [fr](fr)',
             'en': {
@@ -124,7 +110,7 @@ describe('WebsiteGenerator', function() {
                 'README.md': 'Bonjour'
             }
         })
-        .then(function(folder) {
+        .then((folder) => {
             // It should generate languages
             expect(folder).toHaveFile('en/index.html');
             expect(folder).toHaveFile('fr/index.html');
