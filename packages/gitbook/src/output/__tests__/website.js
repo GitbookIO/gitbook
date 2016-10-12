@@ -12,6 +12,17 @@ describe('WebsiteGenerator', () => {
         });
     });
 
+    it('should generate an index.html for custom README', () => {
+        return generateMock(WebsiteGenerator, {
+            'CustomReadme.md': 'Hello World',
+            'book.json': '{ "structure": { "readme": "CustomReadme.md" } }'
+        })
+        .then((folder) => {
+            expect(folder).toHaveFile('index.html');
+            expect(folder).toNotHaveFile('CustomReadme.html');
+        });
+    });
+
     describe('Glossary', () => {
         let folder;
 

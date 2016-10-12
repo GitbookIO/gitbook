@@ -13,7 +13,6 @@ describe('URIIndex', () => {
     });
 
     describe('.resolve', () => {
-
         it('should resolve a basic file path', () => {
             expect(index.resolve('README.md')).toBe('index.html');
         });
@@ -37,11 +36,9 @@ describe('URIIndex', () => {
         it('should preserve hash', () => {
             expect(index.resolve('hello/test.md#myhash')).toBe('hello/test.html#myhash');
         });
-
     });
 
     describe('.resolveToURL', () => {
-
         it('should resolve a basic file path with directory index', () => {
             expect(index.resolveToURL('README.md')).toBe('./');
         });
@@ -49,11 +46,9 @@ describe('URIIndex', () => {
         it('should resolve a basic file path with directory index', () => {
             expect(index.resolveToURL('hello/README.md')).toBe('hello/');
         });
-
     });
 
     describe('.resolveFrom', () => {
-
         it('should resolve correctly in same directory', () => {
             expect(index.resolveFrom('README.md', 'world.md')).toBe('world.html');
         });
@@ -77,7 +72,13 @@ describe('URIIndex', () => {
         it('should not fail for absolute url', () => {
             expect(index.resolveFrom('README.md', 'http://google.fr')).toBe('http://google.fr');
         });
+    });
 
+    describe('.append', () => {
+        it('should normalize the filename', () => {
+            const newIndex = index.append('append//sometest.md', 'append/sometest.html');
+            expect(newIndex.resolve('append/sometest.md')).toBe('append/sometest.html');
+        });
     });
 
 });
