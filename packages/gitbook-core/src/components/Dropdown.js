@@ -11,13 +11,6 @@ const classNames = require('classnames');
  *     <Dropdown.Menu>
  *         <Dropdown.Item href={...}> ... </Dropdown.Item>
  *         <Dropdown.Item onClick={...}> ... </Dropdown.Item>
- *
- *         <Dropdown.Item> A submenu
- *              <Dropdown.Menu>
- *                  <Dropdown.Item href={...}> Subitem </Dropdown.Item>
- *              </Dropdown.Menu>
- *         </Dropdown.Item>
- *
  *     </Dropdown.Menu>
  * </Dropdown.Container>
  */
@@ -71,37 +64,25 @@ const DropdownItem = React.createClass({
     },
 
     render() {
-        const {
-            children, href,
-            ...otherProps
-        } = this.props;
-        delete otherProps.onCLick;
+        const { children, href, onClick, ...otherProps } = this.props;
 
-        const submenu = filterChildren(children, isDropdownMenu);
-        const inner = filterChildren(children, (child) => !isDropdownMenu(child));
+        let inner = children;
 
-        return (
-            <li className="GitBook-DropdownItem">
-                <a href={href || '#'} onClick={this.onClick} {...otherProps} >
+        if (href || onClick) {
+            inner = (
+                <a className="GitBook-DropdownItemLink" href={href || '#'} onClick={this.onClick} {...otherProps} >
                     {inner}
                 </a>
-                {submenu}
-            </li>
+            );
+        }
+
+        return (
+            <div className="GitBook-DropdownItem">
+                {inner}
+            </div>
         );
     }
 });
-
-/**
- * @param {Node} children
- * @param {Function} predicate
- * @return {Node} children that pass the predicate
- */
-function filterChildren(children, predicate) {
-    return React.Children.map(
-        children,
-        (child) => predicate(child) ? child : null
-    );
-}
 
 /**
  * A DropdownMenu to display DropdownItems. Must be inside a
@@ -118,16 +99,12 @@ const DropdownMenu = React.createClass({
         className = classNames('GitBook-DropdownMenu', className);
 
         return (
-            <ul className={className}>
+            <div className={className}>
                 {children}
-            </ul>
+            </div>
         );
     }
 });
-
-function isDropdownMenu(child) {
-    return (child && child.type && child.type.displayName === 'DropdownMenu');
-}
 
 const Dropdown = {
     Item: DropdownItem,

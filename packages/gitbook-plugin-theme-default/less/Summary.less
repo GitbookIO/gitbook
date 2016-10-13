@@ -7,8 +7,8 @@
 }
 
 .SummaryPart-Title {
-    padding: @summary-article-padding-v @summary-article-padding-h;
-    padding-top: 20px;
+    margin: 0px;
+    padding: 2*@summary-article-padding-v @summary-article-padding-h;
     text-transform: uppercase;
     color: @summary-header-color;
     font-size: inherit;
@@ -42,9 +42,10 @@
         color: @summary-article-hover-color;
     }
 
-    &.active, {
+    &.active, &.active:hover {
         a {
-            color: @summary-article-hover-color;
+            color: @summary-article-active-color;
+            background: @summary-article-active-background;
         }
     }
 }

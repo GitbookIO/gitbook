@@ -1,0 +1,51 @@
+.GitBook-Dropdown {
+    display: inline-block;
+    position: relative;
+}
+
+.GitBook-DropdownMenu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 300;
+    border: 1px solid @dropdown-border-color;
+    margin: 5px;
+    margin-top: 0px;
+    border-radius: 3px;
+
+    &:before {
+        content: " ";
+        width: 0;
+        height: 0;
+        border-left: @dropdown-arrow-width solid transparent;
+        border-right: @dropdown-arrow-width solid transparent;
+        border-bottom: @dropdown-arrow-width solid @dropdown-border-color;
+        position: absolute;
+        top: -@dropdown-arrow-width;
+        right: 10px;
+    }
+
+    &:after {
+        content: " ";
+        width: 0;
+        height: 0;
+        border-left: (@dropdown-arrow-width - 1) solid transparent;
+        border-right: (@dropdown-arrow-width - 1) solid transparent;
+        border-bottom: (@dropdown-arrow-width - 1) solid #fff;
+        position: absolute;
+        top: -(@dropdown-arrow-width - 1);
+        right: 11px;
+    }
+}
+
+.GitBook-DropdownItem {
+    padding: @dropdown-padding-v @dropdown-padding-h;
+}
+
+.GitBook-DropdownItemLink {
+    width: 100%;
+    display: inline-block;
+    padding: 6px 20px;
+    text-align: center;
+    color: #aaa;
+}

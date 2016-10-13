@@ -25,20 +25,20 @@ const ShareButton = React.createClass({
 
         return (
             <Dropdown.Container>
+                {open ? <Backdrop onClose={this.onToggle} /> : null}
+
                 <GitBook.Button onClick={this.onToggle}>
                     <GitBook.Icon id="share-alt" />
                 </GitBook.Button>
 
                 {open ? (
-                    <Backdrop onClose={this.onToggle}>
-                        <Dropdown.Menu>
-                            {siteIds.map((id) => (
-                                <Dropdown.Item onClick={() => onShare(SITES[id])} key={id}>
-                                    {SITES[id].label}
-                                </Dropdown.Item>
-                            ))}
-                        </Dropdown.Menu>
-                    </Backdrop>) : null}
+                    <Dropdown.Menu>
+                        {siteIds.map((id) => (
+                            <Dropdown.Item onClick={() => onShare(SITES[id])} key={id}>
+                                {SITES[id].label}
+                            </Dropdown.Item>
+                        ))}
+                    </Dropdown.Menu>) : null}
             </Dropdown.Container>
         );
     }

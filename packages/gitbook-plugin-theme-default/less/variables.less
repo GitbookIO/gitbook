@@ -1,32 +1,39 @@
 // Fonts
-@font-family-serif:           Georgia, serif;
-@font-family-sans:            "Helvetica Neue", Helvetica, Arial, sans-serif;
-@font-family-base:            @font-family-sans;
+@font-family-serif:                 Georgia, serif;
+@font-family-sans:                  "Helvetica Neue", Helvetica, Arial, sans-serif;
+@font-family-base:                  @font-family-sans;
 // Font sizes
-@font-size-base:              14px;
-@font-size-large:             ceil(@font-size-base * 1.25); // ~18px
-@font-size-small:             ceil(@font-size-base * 0.85); // ~12px
-@line-height-base:            1.428571429; // 20/14
-@line-height-computed:        floor(@font-size-base * @line-height-base);
+@font-size-base:                    14px;
+@font-size-large:                   ceil(@font-size-base * 1.25); // ~18px
+@font-size-small:                   ceil(@font-size-base * 0.85); // ~12px
+@line-height-base:                  1.428571429; // 20/14
+@line-height-computed:              floor(@font-size-base * @line-height-base);
 // Sidebar
-@sidebar-background:          rgb(250, 250, 250);
-@sidebar-border-color:        rgba(0, 0, 0, 0.0666667);
+@sidebar-background:                rgb(250, 250, 250);
+@sidebar-border-color:              rgba(0, 0, 0, 0.0666667);
 // Summary
-@summary-header-color:        #939da3;
-@summary-article-padding-v:   10px;
-@summary-article-padding-h:   15px;
-@summary-article-color:       hsl(207, 15%, 25%);
-@summary-article-hover-color: hsl(207, 100%, 50%);
+@summary-header-color:              #939da3;
+@summary-article-padding-v:         10px;
+@summary-article-padding-h:         15px;
+@summary-article-color:             hsl(207, 15%, 25%);
+@summary-article-hover-color:       hsl(207, 100%, 50%);
+@summary-article-active-color:      @summary-article-color;
+@summary-article-active-background: #f5f5f5;
 // Page
-@page-width:                  800px;
-@page-color:                  #333333;
-@page-line-height:            1.7;
+@page-width:                        800px;
+@page-color:                        #333333;
+@page-line-height:                  1.7;
 // Button
-@button-padding:              19px;
-@button-background:           transparent;
-@button-color:                #ddd;
-@button-hover-color:          #bbb;
+@button-padding:                    19px;
+@button-background:                 transparent;
+@button-color:                      #ddd;
+@button-hover-color:                #bbb;
+// Dropdown
+@dropdown-padding-v:                6px;
+@dropdown-padding-h:                10px;
+@dropdown-arrow-width:              8px;
+@dropdown-border-color:             #e5e5e5;
 // Font awesome
-@path-assets:                 '.';
-@path-fonts:                  '@{path-assets}/fonts';
-@fa-font-path:                '@{path-fonts}/fontawesome';
+@path-assets:                       '.';
+@path-fonts:                        '@{path-assets}/fonts';
+@fa-font-path:                      '@{path-fonts}/fontawesome';
