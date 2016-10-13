@@ -12,7 +12,10 @@ const { ImportLink, ImportScript, ImportCSS } = require('./components/Import');
 const HTMLContent = require('./components/HTMLContent');
 const Link = require('./components/Link');
 const Icon = require('./components/Icon');
+const HotKeys = require('./components/HotKeys');
 const Button = require('./components/Button');
+const ButtonGroup = require('./components/ButtonGroup');
+const Dropdown = require('./components/Dropdown');
 const I18nProvider = require('./components/I18nProvider');
 
 const ACTIONS = require('./actions/TYPES');
@@ -49,7 +52,10 @@ module.exports = {
     FlexBox: Box,
     Link,
     Icon,
+    HotKeys,
     Button,
+    ButtonGroup,
+    Dropdown,
     // Utilities
     Shapes,
     // Librairies

@@ -1,10 +1,22 @@
 const GitBook = require('gitbook-core');
-const { React } = GitBook;
+const {
+    React,
+    Dropdown
+} = GitBook;
+const { string, arrayOf, shape, func } = React.PropTypes;
+
+const SITES = require('./SITES');
+const optionsShape = require('./optionsShape');
+const siteShape = shape({
+    label: string.isRequired,
+    icon: string.isRequired,
+    onShare: func.isRequired
+});
 
 module.exports = GitBook.createPlugin({
     activate: (dispatch, getState, { Components }) => {
         // Dispatch initialization actions
-        dispatch(Components.registerComponent(SharingButton, { role: 'toolbar:buttons:right' }))
+        dispatch(Components.registerComponent(Sharing, { role: 'toolbar:buttons:right' }));
     },
     deactivate: (dispatch, getState) => {
         // Dispatch cleanup actions
@@ -12,23 +24,119 @@ module.exports = GitBook.createPlugin({
     reduce: (state, action) => state
 });
 
-let SharingButton = React.createClass({
+/**
+ * Displays the group of sharing buttons
+ */
+let Sharing = React.createClass({
     propTypes: {
-        page: GitBook.Shapes.Page
+        options: optionsShape.isRequired,
+        page: GitBook.Shapes.Page.isRequired
     },
 
-    onClick() {
-        alert(this.props.page.title)
+    onShare(site) {
+        site.onShare(location.href, this.props.page.title);
     },
 
     render() {
+        const { options } = this.props;
+
+        // Highlighted sites
+        const mainButtons = SITES
+            .ALL
+            .filter(id => options[id])
+            .map(id => <SiteButton key={id} onShare={this.onShare} site={SITES[id]} />);
+
+        // Other sites
+        let shareButton = undefined;
+        if (options.all.length > 0) {
+            shareButton = (
+                <ShareButton siteIds={options.all}
+                             onShare={this.onShare} />
+            );
+        }
+
+        return (
+            <GitBook.ButtonGroup>
+                { mainButtons }
+                { shareButton }
+            </GitBook.ButtonGroup>
+        );
+    }
+});
+
+function mapStateToProps(state) {
+    let options = state.config.getIn(['pluginsConfig', 'sharing']);
+    if (options) {
+        options = options.toJS();
+    } else {
+        options = { all: [] };
+    }
+
+    return {
+        page: state.page,
+        options
+    };
+}
+
+Sharing = GitBook.connect(Sharing, mapStateToProps);
+
+// An individual site sharing button
+const SiteButton = React.createClass({
+    propTypes: {
+        site: siteShape.isRequired,
+        onShare: func.isRequired
+    },
+
+    onClick(e) {
+        e.preventDefault();
+        this.props.onShare(this.props.site);
+    },
+
+    render() {
+        const { site } = this.props;
+
         return (
             <GitBook.Button onClick={this.onClick}>
-                <GitBook.Icon id="facebook"/>
+                <GitBook.Icon id={site.icon}/>
             </GitBook.Button>
-        )
+        );
     }
-})
-SharingButton = GitBook.connect(SharingButton, function mapStateToProps(state) {
-    return { page: state.page }
-})
+});
+
+// Share button with dropdown list of sites
+const ShareButton = React.createClass({
+    propTypes: {
+        siteIds: arrayOf(string).isRequired,
+        onShare: func.isRequired
+    },
+
+    getInitialState() {
+        return { open: false };
+    },
+
+    onToggle() {
+        this.setState({ open: !this.state.open });
+    },
+
+    render() {
+        const { siteIds, onShare } = this.props;
+
+        const items = siteIds.map((id) => (
+            <Dropdown.Item onClick={() => onShare(SITES[id])} key={id}>
+                {SITES[id].label}
+            </Dropdown.Item>
+        ));
+
+        return (
+            <Dropdown.Container>
+                <GitBook.Button onClick={this.onToggle}>
+                    <GitBook.Icon id="share-alt" />
+                </GitBook.Button>
+
+                <Dropdown.Menu open={this.state.open}>
+                    {items}
+                </Dropdown.Menu>
+            </Dropdown.Container>
+        );
+    }
+});

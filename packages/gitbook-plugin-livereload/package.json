@@ -10,6 +10,9 @@
   "dependencies": {
     "gitbook-core": "4.0.0"
   },
+  "devDependencies": {
+    "gitbook-plugin": "4.0.0"
+  },
   "scripts": {
     "build-js": "gitbook-plugin build ./src/index.js ./_assets/plugin.js",
     "prepublish": "npm run build-js"
