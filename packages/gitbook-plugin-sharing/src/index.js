@@ -62,9 +62,16 @@ let Sharing = React.createClass({
 });
 
 function mapStateToProps(state) {
+    let options = state.config.getIn(['pluginsConfig', 'sharing']);
+    if (options) {
+        options = options.toJS();
+    } else {
+        options = { all: [] };
+    }
+
     return {
         page: state.page,
-        options: state.config.pluginsConfig.sharing || { all: [] }
+        options
     };
 }
 
