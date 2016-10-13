@@ -18,16 +18,16 @@ const Result = require('../models/Result');
  * @return {Action}
  */
 function query(q) {
-    return (dispatch, getState, { Navigation }) => {
+    return (dispatch, getState, { History }) => {
         const searchState = getState().search;
         const currentQuery = searchState.query;
 
         const queryString = q ? { q } : {};
 
         if (currentQuery && q) {
-            dispatch(Navigation.replace({ query: queryString }));
+            dispatch(History.replace({ query: queryString }));
         } else {
-            dispatch(Navigation.push({ query: queryString }));
+            dispatch(History.push({ query: queryString }));
         }
     };
 }
