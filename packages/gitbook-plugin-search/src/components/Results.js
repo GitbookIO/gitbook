@@ -2,6 +2,8 @@ const GitBook = require('gitbook-core');
 const { React } = GitBook;
 const Highlight = require('react-highlighter');
 
+const MAX_DESCRIPTION_SIZE = 500;
+
 const Result = React.createClass({
     propTypes: {
         result: React.PropTypes.object,
@@ -10,6 +12,11 @@ const Result = React.createClass({
 
     render() {
         const { result, query } = this.props;
+
+        let summary = result.body.trim();
+        if (summary.length > MAX_DESCRIPTION_SIZE) {
+            summary = summary.slice(0, MAX_DESCRIPTION_SIZE).trim() + '...';
+        }
 
         return (
             <div className="Search-ResultContainer">
@@ -23,7 +30,7 @@ const Result = React.createClass({
                             matchElement="span"
                             matchClass="Search-MatchSpan"
                             search={query}>
-                                {result.body}
+                                {summary}
                             </Highlight>
                         </p>
                     </div>
