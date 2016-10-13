@@ -19,11 +19,11 @@ const DEFAULT_IGNORES = [
 ];
 
 /**
-    Parse ignore files
-
-    @param {Book}
-    @return {Book}
-*/
+ * Parse ignore files
+ *
+ * @param {Book} book
+ * @return {Book} book
+ */
 function parseIgnore(book) {
     if (book.isLanguageBook()) {
         return Promise.reject(new Error('Ignore files could be parsed for language books'));
@@ -34,16 +34,19 @@ function parseIgnore(book) {
 
     ignore = ignore.add(DEFAULT_IGNORES);
 
-    return Promise.serie(IGNORE_FILES, function(filename) {
+    return Promise.serie(IGNORE_FILES, (filename) => {
         return fs.readAsString(filename)
-        .then(function(content) {
-            ignore = ignore.add(content.toString().split(/\r?\n/));
-        }, function(err) {
-            return Promise();
-        });
+        .then(
+            (content) => {
+                ignore = ignore.add(content.toString().split(/\r?\n/));
+            },
+            (err) => {
+                return Promise();
+            }
+        );
     })
 
-    .then(function() {
+    .then(() => {
         return book.setIgnore(ignore);
     });
 }

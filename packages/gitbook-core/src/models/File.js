@@ -4,13 +4,14 @@ const { Record } = require('immutable');
 const DEFAULTS = {
     type:  '',
     mtime: new Date(),
-    path:  ''
+    path:  '',
+    url:   ''
 };
 
 class File extends Record(DEFAULTS) {
     constructor(file = {}) {
         if (typeof file === 'string') {
-            file = { path: file };
+            file = { path: file, url: file };
         }
 
         super({
@@ -20,25 +21,33 @@ class File extends Record(DEFAULTS) {
     }
 
     /**
-     * Return url for a file in a GitBook context.
-     * @param {Context} context
-     * @return {String} url
+     * Returns the relative path from this file to "to"
+     * @param {String} to
+     * @return {String}
      */
-    toURL(context) {
-        const { file } = context.getState();
-
+    relative(to) {
         return path.relative(
-            path.dirname(file.path),
-            this.path
-        );
+            path.dirname(this.path),
+            to
+        ) || './';
     }
 
+    /**
+     * Return true if file is an instance of File
+     * @param {Mixed} file
+     * @return {Boolean}
+     */
     static is(file) {
         return (file instanceof File);
     }
 
+    /**
+     * Create a file instance
+     * @param {Mixed|File} file
+     * @return {File}
+     */
     static create(file) {
-        return file instanceof File ?
+        return File.is(file) ?
             file : new File(file);
     }
 }

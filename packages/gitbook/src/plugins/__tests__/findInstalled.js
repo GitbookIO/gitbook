@@ -17,7 +17,7 @@ describe('findInstalled', function() {
         .then(function(plugins) {
             expect(plugins.size >= gitbookPlugins.size).toBeTruthy();
 
-            expect(plugins.has('fontsettings')).toBe(true);
+            expect(plugins.has('highlight')).toBe(true);
             expect(plugins.has('search')).toBe(true);
         });
     });

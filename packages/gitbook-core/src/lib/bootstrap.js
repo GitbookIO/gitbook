@@ -5,9 +5,10 @@ const createContext = require('./createContext');
 const renderWithContext = require('./renderWithContext');
 
 /**
- * Bootstrap GitBook on the browser (this function should not be called on the server side)
+ * Bootstrap GitBook on the browser (this function should not be called on the server side).
+ * @param {Object} matching
  */
-function bootstrap() {
+function bootstrap(matching) {
     const initialState = getPayload(window.document);
     const plugins = window.gitbookPlugins;
 
@@ -19,7 +20,7 @@ function bootstrap() {
     window.gitbookContext = context;
 
     // Render with the store
-    const el = renderWithContext(context);
+    const el = renderWithContext(context, matching);
 
     ReactDOM.render(el, mountNode);
 }

@@ -2,13 +2,13 @@ const Api = require('../api');
 const callHook = require('./callHook');
 
 /**
-    Call a hook for a specific page
-
-    @param {String} name
-    @param {Output} output
-    @param {Page} page
-    @return {Promise<Page>}
-*/
+ * Call a hook for a specific page.
+ *
+ * @param {String} name
+ * @param {Output} output
+ * @param {Page} page
+ * @return {Promise<Page>}
+ */
 function callPageHook(name, output, page) {
     return callHook(
         name,

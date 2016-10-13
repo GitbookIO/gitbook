@@ -9,10 +9,11 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "test": "",
-    "bootstrap": "lerna bootstrap",
-    "dist": "lerna run --concurrency 1 prepublish",
-    "clean": "lerna clean"
+    "test": "lerna run --concurrency 1 test",
+    "bootstrap": "npm run bump && lerna bootstrap",
+    "bump": "./scripts/bump.js",
+    "clean": "lerna clean",
+    "dist": "lerna run --concurrency 1 prepublish"
   },
   "repository": {
     "type": "git",

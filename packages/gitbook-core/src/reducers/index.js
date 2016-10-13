@@ -6,6 +6,8 @@ module.exports = composeReducer(
     createReducer('navigation', require('./navigation')),
     createReducer('i18n', require('./i18n')),
     // GitBook JSON
+    createReducer('config', require('./config')),
+    createReducer('file', require('./file')),
     createReducer('page', require('./page')),
     createReducer('summary', require('./summary')),
     createReducer('readme', require('./readme'))

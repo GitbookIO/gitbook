@@ -2,11 +2,12 @@ const WebsiteGenerator = require('../website');
 const Modifiers = require('../modifiers');
 
 /**
-    Write a page for ebook output
-
-    @param {Output} output
-    @param {Output}
-*/
+ * Write a page for ebook output. It renders it just as the website generator
+ * except that it inline assets.
+ *
+ * @param {Output} output
+ * @param {Output} output
+ */
 function onPage(output, page) {
     const options = output.getOptions();
 

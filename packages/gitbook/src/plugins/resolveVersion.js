@@ -1,6 +1,6 @@
 const npm = require('npm');
 const semver = require('semver');
-const Immutable = require('immutable');
+const { Map } = require('immutable');
 
 const Promise = require('../utils/promise');
 const Plugin = require('../models/plugin');
@@ -9,10 +9,9 @@ const gitbook = require('../gitbook');
 let npmIsReady;
 
 /**
-    Initialize and prepare NPM
-
-    @return {Promise}
-*/
+ * Initialize and prepare NPM
+ * @return {Promise}
+ */
 function initNPM() {
     if (npmIsReady) return npmIsReady;
 
@@ -25,11 +24,11 @@ function initNPM() {
 }
 
 /**
-    Resolve a plugin dependency to a version
-
-    @param {PluginDependency} plugin
-    @return {Promise<String>}
-*/
+ * Resolve a plugin dependency to a version
+ *
+ * @param {PluginDependency} plugin
+ * @return {Promise<String>}
+ */
 function resolveVersion(plugin) {
     const npmId = Plugin.nameToNpmID(plugin.getName());
     const requiredVersion = plugin.getVersion();
@@ -43,7 +42,7 @@ function resolveVersion(plugin) {
         return Promise.nfcall(npm.commands.view, [npmId + '@' + requiredVersion, 'engines'], true);
     })
     .then(function(versions) {
-        versions = Immutable.Map(versions).entrySeq();
+        versions = Map(versions).entrySeq();
 
         const result = versions
             .map(function(entry) {

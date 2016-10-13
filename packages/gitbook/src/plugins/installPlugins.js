@@ -1,15 +1,13 @@
-const npmi = require('npmi');
-
 const DEFAULT_PLUGINS = require('../constants/defaultPlugins');
 const Promise = require('../utils/promise');
 const installPlugin = require('./installPlugin');
 
 /**
-    Install plugin requirements for a book
-
-    @param {Book}
-    @return {Promise<Number>}
-*/
+ * Install plugin requirements for a book
+ *
+ * @param {Book} book
+ * @return {Promise<Number>} count
+ */
 function installPlugins(book) {
     const logger = book.getLogger();
     const config = book.getConfig();
@@ -34,10 +32,10 @@ function installPlugins(book) {
 
     if (plugins.size == 0) {
         logger.info.ln('nothing to install!');
-        return Promise();
+        return Promise(0);
     }
 
-    logger.info.ln('installing', plugins.size, 'plugins using npm@' + npmi.NPM_VERSION);
+    logger.info.ln('installing', plugins.size, 'plugins from registry');
 
     return Promise.forEach(plugins, function(plugin) {
         return installPlugin(book, plugin);

@@ -1,107 +1,112 @@
-const Immutable = require('immutable');
+const { Record, OrderedMap, Map, List } = require('immutable');
 
-const Book = require('./book');
+const Git = require('../utils/git');
 const LocationUtils = require('../utils/location');
+const Book = require('./book');
+const URIIndex = require('./uriIndex');
 
-const Output = Immutable.Record({
-    book:       Book(),
-
+const DEFAULTS = {
+    book:      new Book(),
     // Name of the generator being used
-    generator:  String(),
-
+    generator: String(),
     // Map of plugins to use (String -> Plugin)
-    plugins:    Immutable.OrderedMap(),
-
+    plugins:   OrderedMap(),
     // Map pages to generation (String -> Page)
-    pages:      Immutable.OrderedMap(),
-
-    // List assets (String)
-    assets:     Immutable.List(),
-
+    pages:     OrderedMap(),
+    // List of file that are not pages in the book (String)
+    assets:    List(),
     // Option for the generation
-    options:    Immutable.Map(),
-
+    options:   Map(),
     // Internal state for the generation
-    state:      Immutable.Map()
-});
-
-Output.prototype.getBook = function() {
-    return this.get('book');
+    state:     Map(),
+    // Index of urls
+    urls:      new URIIndex(),
+    // Git repositories manager
+    git:       new Git()
 };
 
-Output.prototype.getGenerator = function() {
-    return this.get('generator');
-};
+class Output extends Record(DEFAULTS) {
+    getBook() {
+        return this.get('book');
+    }
 
-Output.prototype.getPlugins = function() {
-    return this.get('plugins');
-};
+    getGenerator() {
+        return this.get('generator');
+    }
 
-Output.prototype.getPages = function() {
-    return this.get('pages');
-};
+    getPlugins() {
+        return this.get('plugins');
+    }
 
-Output.prototype.getOptions = function() {
-    return this.get('options');
-};
+    getPages() {
+        return this.get('pages');
+    }
 
-Output.prototype.getAssets = function() {
-    return this.get('assets');
-};
+    getOptions() {
+        return this.get('options');
+    }
 
-Output.prototype.getState = function() {
-    return this.get('state');
-};
+    getAssets() {
+        return this.get('assets');
+    }
 
-/**
-    Return a page byt its file path
+    getState() {
+        return this.get('state');
+    }
 
-    @param {String} filePath
-    @return {Page|undefined}
-*/
-Output.prototype.getPage = function(filePath) {
-    filePath = LocationUtils.normalize(filePath);
+    getURLIndex() {
+        return this.get('urls');
+    }
 
-    const pages = this.getPages();
-    return pages.get(filePath);
-};
+    /**
+     * Return a page byt its file path
+     *
+     * @param {String} filePath
+     * @return {Page|undefined}
+     */
+    getPage(filePath) {
+        filePath = LocationUtils.normalize(filePath);
 
-/**
-    Get root folder for output
+        const pages = this.getPages();
+        return pages.get(filePath);
+    }
 
-    @return {String}
-*/
-Output.prototype.getRoot = function() {
-    return this.getOptions().get('root');
-};
+    /**
+     * Get root folder for output.
+     * @return {String}
+     */
+    getRoot() {
+        return this.getOptions().get('root');
+    }
 
-/**
-    Update state of output
+    /**
+     * Update state of output
+     *
+     * @param {Map} newState
+     * @return {Output}
+     */
+    setState(newState) {
+        return this.set('state', newState);
+    }
 
-    @param {Map} newState
-    @return {Output}
-*/
-Output.prototype.setState = function(newState) {
-    return this.set('state', newState);
-};
+    /**
+     * Update options
+     *
+     * @param {Map} newOptions
+     * @return {Output}
+     */
+    setOptions(newOptions) {
+        return this.set('options', newOptions);
+    }
 
-/**
-    Update options
-
-    @param {Map} newOptions
-    @return {Output}
-*/
-Output.prototype.setOptions = function(newOptions) {
-    return this.set('options', newOptions);
-};
-
-/**
-    Return logegr for this output (same as book)
-
-    @return {Logger}
-*/
-Output.prototype.getLogger = function() {
-    return this.getBook().getLogger();
-};
+    /**
+     * Return logegr for this output (same as book)
+     *
+     * @return {Logger}
+     */
+    getLogger() {
+        return this.getBook().getLogger();
+    }
+}
 
 module.exports = Output;

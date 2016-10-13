@@ -5,7 +5,6 @@ const fs = require('../utils/fs');
 
 const Plugins = require('../plugins');
 const deprecate = require('./deprecate');
-const fileToURL = require('../output/helper/fileToURL');
 const defaultBlocks = require('../constants/defaultBlocks');
 const gitbook = require('../gitbook');
 const parsers = require('../parsers');
@@ -16,12 +15,12 @@ const encodeNavigation = require('./encodeNavigation');
 const encodePage = require('./encodePage');
 
 /**
-    Encode a global context into a JS object
-    It's the context for page's hook, etc
-
-    @param {Output} output
-    @return {Object}
-*/
+ * Encode a global context into a JS object
+ * It's the context for page's hook, etc
+ *
+ * @param {Output} output
+ * @return {Object}
+ */
 function encodeGlobal(output) {
     const book = output.getBook();
     const bookFS = book.getContentFS();
@@ -29,6 +28,7 @@ function encodeGlobal(output) {
     const outputFolder = output.getRoot();
     const plugins = output.getPlugins();
     const blocks = Plugins.listBlocks(plugins);
+    const urls = output.getURLIndex();
 
     const result = {
         log: logger,
@@ -36,59 +36,53 @@ function encodeGlobal(output) {
         summary: encodeSummary(output, book.getSummary()),
 
         /**
-            Check if the book is a multilingual book
-
-            @return {Boolean}
-        */
+         * Check if the book is a multilingual book.
+         * @return {Boolean}
+         */
         isMultilingual() {
             return book.isMultilingual();
         },
 
         /**
-            Check if the book is a language book for a multilingual book
-
-            @return {Boolean}
-        */
+         * Check if the book is a language book for a multilingual book.
+         * @return {Boolean}
+         */
         isLanguageBook() {
             return book.isLanguageBook();
         },
 
         /**
-            Read a file from the book
-
-            @param {String} fileName
-            @return {Promise<Buffer>}
-        */
+         * Read a file from the book.
+         * @param {String} fileName
+         * @return {Promise<Buffer>}
+         */
         readFile(fileName) {
             return bookFS.read(fileName);
         },
 
         /**
-            Read a file from the book as a string
-
-            @param {String} fileName
-            @return {Promise<String>}
-        */
+         * Read a file from the book as a string.
+         * @param {String} fileName
+         * @return {Promise<String>}
+         */
         readFileAsString(fileName) {
             return bookFS.readAsString(fileName);
         },
 
         /**
-            Resolve a file from the book root
-
-            @param {String} fileName
-            @return {String}
+         * Resolve a file from the book root.
+         * @param {String} fileName
+         * @return {String}
         */
         resolve(fileName) {
             return path.resolve(book.getContentRoot(), fileName);
         },
 
         /**
-            Resolve a page by it path
-
-            @param {String} filePath
-            @return {String}
-        */
+         * Resolve a page by it path.
+         * @param {String} filePath
+         * @return {String}
+         */
         getPageByPath(filePath) {
             const page = output.getPage(filePath);
             if (!page) return undefined;
@@ -97,12 +91,11 @@ function encodeGlobal(output) {
         },
 
         /**
-            Render a block of text (markdown/asciidoc)
-
-            @param {String} type
-            @param {String} text
-            @return {Promise<String>}
-        */
+         * Render a block of text (markdown/asciidoc).
+         * @param {String} type
+         * @param {String} text
+         * @return {Promise<String>}
+         */
         renderBlock(type, text) {
             const parser = parsers.get(type);
 
@@ -111,12 +104,11 @@ function encodeGlobal(output) {
         },
 
         /**
-            Render an inline text (markdown/asciidoc)
-
-            @param {String} type
-            @param {String} text
-            @return {Promise<String>}
-        */
+         * Render an inline text (markdown/asciidoc).
+         * @param {String} type
+         * @param {String} text
+         * @return {Promise<String>}
+         */
         renderInline(type, text) {
             const parser = parsers.get(type);
 
@@ -127,12 +119,11 @@ function encodeGlobal(output) {
         template: {
 
             /**
-                Apply a templating block and returns its result
-
-                @param {String} name
-                @param {Object} blockData
-                @return {Promise|Object}
-            */
+             * Apply a templating block and returns its result.
+             * @param {String} name
+             * @param {Object} blockData
+             * @return {Promise|Object}
+             */
             applyBlock(name, blockData) {
                 const block = blocks.get(name) || defaultBlocks.get(name);
                 return Promise(block.applyBlock(blockData, result));
@@ -142,43 +133,41 @@ function encodeGlobal(output) {
         output: {
 
             /**
-                Name of the generator being used
-                {String}
-            */
+             * Name of the generator being used
+             * {String}
+             */
             name: output.getGenerator(),
 
             /**
-                Return absolute path to the root folder of output
-                @return {String}
-            */
+             * Return absolute path to the root folder of output
+             * @return {String}
+             */
             root() {
                 return outputFolder;
             },
 
             /**
-                Resolve a file from the output root
-
-                @param {String} fileName
-                @return {String}
-            */
+             * Resolve a file from the output root.
+             * @param {String} fileName
+             * @return {String}
+             */
             resolve(fileName) {
                 return path.resolve(outputFolder, fileName);
             },
 
             /**
-                Convert a filepath into an url
-                @return {String}
-            */
+             * Convert a filepath into an url
+             * @return {String}
+             */
             toURL(filePath) {
-                return fileToURL(output, filePath);
+                return urls.resolveToURL(filePath);
             },
 
             /**
-                Check that a file exists.
-
-                @param {String} fileName
-                @return {Promise}
-            */
+             * Check that a file exists.
+             * @param {String} fileName
+             * @return {Promise}
+             */
             hasFile(fileName, content) {
                 return Promise()
                 .then(function() {
@@ -189,13 +178,13 @@ function encodeGlobal(output) {
             },
 
             /**
-                Write a file to the output folder,
-                It creates the required folder
-
-                @param {String} fileName
-                @param {Buffer} content
-                @return {Promise}
-            */
+             * Write a file to the output folder,
+             * It creates the required folder
+             *
+             * @param {String} fileName
+             * @param {Buffer} content
+             * @return {Promise}
+             */
             writeFile(fileName, content) {
                 return Promise()
                 .then(function() {
@@ -209,14 +198,14 @@ function encodeGlobal(output) {
             },
 
             /**
-                Copy a file to the output folder
-                It creates the required folder.
-
-                @param {String} inputFile
-                @param {String} outputFile
-                @param {Buffer} content
-                @return {Promise}
-            */
+             * Copy a file to the output folder
+             * It creates the required folder.
+             *
+             * @param {String} inputFile
+             * @param {String} outputFile
+             * @param {Buffer} content
+             * @return {Promise}
+             */
             copyFile(inputFile, outputFile, content) {
                 return Promise()
                 .then(function() {

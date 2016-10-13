@@ -26,5 +26,6 @@ module.exports = Immutable.List([
     'sharing',
     'hints',
     'headings',
+    'copy-code',
     'theme-default'
 ]).map(createFromDependency);

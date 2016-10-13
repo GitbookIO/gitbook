@@ -1,17 +1,18 @@
 const encodeFile = require('./encodeFile');
 
 /**
-    Encode a languages listing to JSON
-
-    @param {Languages}
-    @return {Object}
+ * Encode a languages listing to JSON
+ *
+ * @param  {Languages} languages
+ * @param  {URIIndex} urls
+ * @return {JSON} json
 */
-function encodeLanguages(languages) {
+function encodeLanguages(languages, urls) {
     const file = languages.getFile();
     const list = languages.getList();
 
     return {
-        file: encodeFile(file),
+        file: encodeFile(file, urls),
         list: list
             .valueSeq()
             .map(function(lang) {

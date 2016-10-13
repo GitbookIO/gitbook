@@ -1,3 +1,27 @@
 .Toolbar {
+    .Toolbar-Title {
+        padding: 0px 20px;
+        margin: 0;
+        font-size: 20px;
+        font-weight: 200;
+        text-align: center;
+        line-height: 50px;
+        opacity: 0;
+        .transition(~"opacity ease .2s");
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: @button-hover-color;
 
+        a, a:hover {
+            text-decoration: none;
+            color: inherit;
+        }
+    }
+
+    &:hover {
+        .Toolbar-Title {
+            opacity: 1;
+        }
+    }
 }

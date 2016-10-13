@@ -7,12 +7,12 @@ const error = require('../utils/error');
 const mergeDefaults = require('../utils/mergeDefaults');
 
 /**
-    Validate one plugin for a book and update book's confiration
-
-    @param {Book}
-    @param {Plugin}
-    @return {Book}
-*/
+ * Validate one plugin for a book and update book's confiration
+ *
+ * @param {Book}
+ * @param {Plugin}
+ * @return {Book}
+ */
 function validatePluginConfig(book, plugin) {
     let config = book.getConfig();
     const packageInfos = plugin.getPackage();
@@ -55,13 +55,13 @@ function validatePluginConfig(book, plugin) {
 }
 
 /**
-    Validate a book configuration for plugins and
-    returns an update configuration with default values.
-
-    @param {Book}
-    @param {OrderedMap<String:Plugin>}
-    @return {Promise<Book>}
-*/
+ * Validate a book configuration for plugins and
+ * returns an update configuration with default values.
+ *
+ * @param {Book}
+ * @param {OrderedMap<String:Plugin>}
+ * @return {Promise<Book>}
+ */
 function validateConfig(book, plugins) {
     return Promise.reduce(plugins, function(newBook, plugin) {
         return validatePluginConfig(newBook, plugin);

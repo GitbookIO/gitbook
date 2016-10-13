@@ -1,4 +1,4 @@
-const Immutable = require('immutable');
+const { List, OrderedMap } = require('immutable');
 
 const Promise = require('../utils/promise');
 const timing = require('../utils/timing');
@@ -22,13 +22,12 @@ function findForBook(book) {
 
         // Merge all plugins
         .then(function(results) {
-            return Immutable.List(results)
+            return List(results)
                 .reduce(function(out, result) {
                     return out.merge(result);
-                }, Immutable.OrderedMap());
+                }, OrderedMap());
         })
     );
 }
-
 
 module.exports = findForBook;

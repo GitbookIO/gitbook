@@ -1,11 +1,11 @@
 const Parse = require('../parse');
 
 /**
-    List all assets in the book
-
-    @param {Output}
-    @return {Promise<Output>}
-*/
+ * List all assets in the book.
+ *
+ * @param {Output} output
+ * @return {Promise<Output>} output
+ */
 function prepareAssets(output) {
     const book = output.getBook();
     const pages = output.getPages();

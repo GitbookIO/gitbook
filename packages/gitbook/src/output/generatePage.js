@@ -27,7 +27,7 @@ function generatePage(output, page) {
             const file = resultPage.getFile();
             const filePath = file.getPath();
             const parser = file.getParser();
-            const context = JSONUtils.encodeOutputWithPage(output, resultPage);
+            const context = JSONUtils.encodeState(output, resultPage);
 
             if (!parser) {
                 return Promise.reject(error.FileNotParsableError({
@@ -39,37 +39,26 @@ function generatePage(output, page) {
             return callPageHook('page:before', output, resultPage)
 
             // Escape code blocks with raw tags
-            .then(function(currentPage) {
+            .then((currentPage) => {
                 return parser.preparePage(currentPage.getContent());
             })
 
             // Render templating syntax
-            .then(function(content) {
+            .then((content) => {
                 const absoluteFilePath = path.join(book.getContentRoot(), filePath);
                 return Templating.render(engine, absoluteFilePath, content, context);
             })
 
-            .then(function(output) {
-                const content = output.getContent();
-
-                return parser.parsePage(content)
-                .then(function(result) {
-                    return output.setContent(result.content);
-                });
-            })
-
-            // Post processing for templating syntax
-            .then(function(output) {
-                return Templating.postRender(engine, output);
-            })
+            // Parse with markdown/asciidoc parser
+            .then((content) => parser.parsePage(content))
 
             // Return new page
-            .then(function(content) {
+            .then(({content}) => {
                 return resultPage.set('content', content);
             })
 
             // Call final hook
-            .then(function(currentPage) {
+            .then((currentPage) => {
                 return callPageHook('page', output, currentPage);
             });
         })

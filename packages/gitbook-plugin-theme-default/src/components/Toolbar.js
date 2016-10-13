@@ -5,7 +5,9 @@ const sidebar = require('../actions/sidebar');
 
 const Toolbar = React.createClass({
     propTypes: {
-        dispatch: React.PropTypes.func
+        title:    React.PropTypes.string.isRequired,
+        dispatch: React.PropTypes.func,
+        readme:   GitBook.Shapes.Readme
     },
 
     onToggle() {
@@ -14,18 +16,25 @@ const Toolbar = React.createClass({
     },
 
     render() {
+        const { title, readme } = this.props;
+
         return (
-            <div className="Toolbar book-toolbar">
-                <GitBook.Button onClick={this.onToggle}>
-                    <GitBook.Icon id="align-justify" />
-                </GitBook.Button>
-                <div className="Toolbar-left">
-                    <GitBook.InjectedComponentSet matching={{ role: 'toolbar:buttons:left' }} />
-                </div>
-                <div className="Toolbar-right">
-                    <GitBook.InjectedComponentSet matching={{ role: 'toolbar:buttons:right' }} />
-                </div>
-            </div>
+            <GitBook.FlexLayout className="Toolbar">
+                <GitBook.FlexBox className="Toolbar-left">
+                    <GitBook.Button onClick={this.onToggle}>
+                        <GitBook.Icon id="align-justify" />
+                    </GitBook.Button>
+                    <GitBook.InjectedComponentSet align="flex-start" matching={{ role: 'toolbar:buttons:left' }} />
+                </GitBook.FlexBox>
+                <GitBook.FlexBox auto>
+                    <h1 className="Toolbar-Title">
+                        <GitBook.Link to={readme.file}>{title}</GitBook.Link>
+                    </h1>
+                </GitBook.FlexBox>
+                <GitBook.FlexBox className="Toolbar-right">
+                    <GitBook.InjectedComponentSet align="flex-end" matching={{ role: 'toolbar:buttons:right' }} />
+                </GitBook.FlexBox>
+            </GitBook.FlexLayout>
         );
     }
 });

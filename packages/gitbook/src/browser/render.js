@@ -2,11 +2,10 @@ const React = require('react');
 const ReactDOMServer = require('react-dom/server');
 const GitBook = require('gitbook-core');
 
+const timing = require('../utils/timing');
 const loadPlugins = require('./loadPlugins');
 
-const BOOTSTRAP_CODE = '(function() { require("gitbook-core").bootstrap() })()';
-
-function HTML({head, innerHTML, payload, scripts}) {
+function HTML({head, innerHTML, payload, scripts, bootstrap}) {
     const attrs = head.htmlAttributes.toComponent();
 
     return (
@@ -23,7 +22,7 @@ function HTML({head, innerHTML, payload, scripts}) {
                     return <script key={script} src={script} />;
                 })}
                 <script type="application/payload+json" dangerouslySetInnerHTML={{__html: payload}} />
-                <script type="application/javascript" dangerouslySetInnerHTML={{__html: BOOTSTRAP_CODE}} />
+                <script type="application/javascript" dangerouslySetInnerHTML={{__html: bootstrap}} />
                 {head.script.toComponent()}
             </body>
         </html>
@@ -33,47 +32,72 @@ HTML.propTypes = {
     head:      React.PropTypes.object,
     innerHTML: React.PropTypes.string,
     payload:   React.PropTypes.string,
+    bootstrap: React.PropTypes.string,
     scripts:   React.PropTypes.arrayOf(React.PropTypes.string)
 };
 
 /**
- * Render a page
+ * Get bootstrap code for a role
+ * @param  {String} role
+ * @return {String}
+ */
+function getBootstrapCode(role) {
+    return `(function() { require("gitbook-core").bootstrap({ role: "${role}" }) })()`;
+}
+
+/**
+ * Render a view using plugins.
+ *
  * @param  {OrderedMap<String:Plugin>} plugin
  * @param  {Object} initialState
+ * @param  {String} type ("ebook" or "browser")
+ * @param  {String} role
  * @return {String} html
  */
-function render(plugins, initialState) {
-    // Load the plugins
-    const browserPlugins = loadPlugins(plugins);
-    const payload = JSON.stringify(initialState);
-    const context = GitBook.createContext(browserPlugins, initialState);
+function render(plugins, initialState, type, role) {
+    return timing.measure(
+        'browser.render',
+        () => {
+            // Load the plugins
+            const browserPlugins = loadPlugins(plugins, type);
+            const payload = JSON.stringify(initialState);
+            const context = GitBook.createContext(browserPlugins, initialState);
 
-    const scripts = plugins.toList()
-        .filter(plugin => plugin.getPackage().has('browser'))
-        .map(plugin => 'gitbook/plugins/' + plugin.getName() + '.js')
-        .toArray();
+            const currentFile = context.getState().file;
 
-    const el = GitBook.renderWithContext(context);
+            const scripts = plugins.toList()
+                .filter(plugin => plugin.getPackage().has(type))
+                .map(plugin => {
+                    return currentFile.relative('gitbook/plugins/' + plugin.getName() + '.js');
+                })
+                .toArray();
 
-    // We're done with the context
-    context.deactivate();
+            const el = GitBook.renderWithContext(context, { role });
 
-    // Render inner body
-    const innerHTML = ReactDOMServer.renderToString(el);
+            // We're done with the context
+            context.deactivate();
 
-    // Get headers
-    const head = GitBook.Head.rewind();
+            // Render inner body
+            const innerHTML = ReactDOMServer.renderToString(el);
 
-    // Render whole HTML page
-    const htmlEl = <HTML
-        head={head}
-        innerHTML={innerHTML}
-        payload={payload}
-        scripts={['gitbook/core.js'].concat(scripts)}
-    />;
+            // Get headers
+            const head = GitBook.Head.rewind();
 
-    const html = ReactDOMServer.renderToStaticMarkup(htmlEl);
-    return html;
+            // Render whole HTML page
+            const htmlEl = <HTML
+                head={head}
+                innerHTML={innerHTML}
+                payload={payload}
+                bootstrap={getBootstrapCode(role)}
+                scripts={[
+                    currentFile.relative('gitbook/core.js')
+                ].concat(scripts)}
+            />;
+
+            const html = ReactDOMServer.renderToStaticMarkup(htmlEl);
+            return html;
+        }
+    );
 }
 
 module.exports = render;

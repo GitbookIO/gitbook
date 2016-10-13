@@ -5,8 +5,8 @@ const listDependencies = require('./listDependencies');
  * It can be different from the final list of plugins,
  * since plugins can have their own dependencies
  *
- * @param {Book}
- * @return {List<PluginDependency>}
+ * @param {Book} book
+ * @return {List<PluginDependency>} dependencies
  */
 function listDepsForBook(book) {
     const config = book.getConfig();

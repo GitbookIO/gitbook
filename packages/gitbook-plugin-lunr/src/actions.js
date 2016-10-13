@@ -3,6 +3,7 @@ const GitBook = require('gitbook-core');
 const TYPES = {
     LOAD: 'lunr/load'
 };
+const INDEX_FILENAME = 'search_index.json';
 
 /**
  * Load an index set
@@ -19,7 +20,9 @@ function load(json) {
  */
 function fetch() {
     return (dispatch, getState) => {
-        const { idx } = getState().lunr;
+        const { lunr, file } = getState();
+        const { idx } = lunr;
+        const filePath = file.relative(INDEX_FILENAME);
 
         if (idx) {
             return GitBook.Promise.resolve();
@@ -27,8 +30,7 @@ function fetch() {
 
         return GitBook.Promise.resolve()
         .then(() => {
-            // TODO: resolve the file correctly
-            return window.fetch('search_index.json');
+            return window.fetch(filePath);
         })
         .then(response => response.json())
         .then(json => dispatch(load(json)));

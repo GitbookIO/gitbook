@@ -1,15 +1,15 @@
-const npmi = require('npmi');
+const resolve = require('resolve');
 
-const Promise = require('../utils/promise');
+const { exec } = require('../utils/command');
 const resolveVersion = require('./resolveVersion');
 
 /**
-    Install a plugin for a book
-
-    @param {Book}
-    @param {PluginDependency}
-    @return {Promise}
-*/
+ * Install a plugin for a book
+ *
+ * @param {Book} book
+ * @param {PluginDependency} plugin
+ * @return {Promise}
+ */
 function installPlugin(book, plugin) {
     const logger = book.getLogger();
 
@@ -20,6 +20,8 @@ function installPlugin(book, plugin) {
     logger.info.ln('');
     logger.info.ln('installing plugin "' + name + '"');
 
+    const installerBin = resolve.sync('ied/lib/cmd.js');
+
     // Find a version to install
     return resolveVersion(plugin)
     .then(function(version) {
@@ -27,17 +29,12 @@ function installPlugin(book, plugin) {
             throw new Error('Found no satisfactory version for plugin "' + name + '" with requirement "' + requirement + '"');
         }
 
-        logger.info.ln('install plugin "' + name + '" (' + requirement + ') from NPM with version', version);
-        return Promise.nfcall(npmi, {
-            'name': plugin.getNpmID(),
-            version,
-            'path': installFolder,
-            'npmLoad': {
-                'loglevel': 'silent',
-                'loaded': true,
-                'prefix': installFolder
-            }
-        });
+        logger.info.ln('install plugin "' + name + '" (' + requirement + ') with version', version);
+
+        const npmID = plugin.getNpmID();
+        const command = `${installerBin} install ${npmID}@${version}`;
+
+        return exec(command, { cwd: installFolder });
     })
     .then(function() {
         logger.info.ok('plugin "' + name + '" installed with success');

@@ -1,4 +1,4 @@
-const Immutable = require('immutable');
+const { List } = require('immutable');
 const parsers = require('../parsers');
 
 /**
@@ -7,13 +7,13 @@ const parsers = require('../parsers');
  *
  * @param {List<TemplateBlock>} engine
  * @param {String} filePath
- * @return {List<TemplateShortcut>}
+ * @return {List<TemplateShortcut>} shortcuts
  */
 function listShortcuts(blocks, filePath) {
     const parser = parsers.getForFile(filePath);
 
     if (!parser) {
-        return Immutable.List();
+        return List();
     }
 
     return blocks

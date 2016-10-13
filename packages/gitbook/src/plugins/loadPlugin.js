@@ -15,13 +15,13 @@ function isModuleNotFound(err) {
 }
 
 /**
-    Load a plugin in a book
-
-    @param {Book} book
-    @param {Plugin} plugin
-    @param {String} pkgPath (optional)
-    @return {Promise<Plugin>}
-*/
+ * Load a plugin in a book
+ *
+ * @param {Book} book
+ * @param {Plugin} plugin
+ * @param {String} pkgPath (optional)
+ * @return {Promise<Plugin>}
+ */
 function loadPlugin(book, plugin) {
     const logger = book.getLogger();
 
