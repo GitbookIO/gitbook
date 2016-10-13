@@ -82,6 +82,8 @@ const InjectedComponent = React.createClass({
 
         if (!children) {
             children = null;
+        } else {
+            children = React.Children.only(children);
         }
 
         return components.reduce((inner, Comp) => {

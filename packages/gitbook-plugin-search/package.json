@@ -8,7 +8,8 @@
     "gitbook-core": "4.0.0"
   },
   "devDependencies": {
-    "gitbook-plugin": "4.0.0"
+    "gitbook-plugin": "4.0.0",
+    "react-highlighter": "^0.3.3"
   },
   "engines": {
     "gitbook": ">=3.0.0"
