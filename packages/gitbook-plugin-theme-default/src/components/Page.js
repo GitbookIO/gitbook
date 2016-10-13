@@ -10,11 +10,17 @@ const Page = React.createClass({
         const { page } = this.props;
 
         return (
-            <div className="Page page-wrapper">
+            <div className="PageContainer">
                 <GitBook.InjectedComponent matching={{ role: 'search:container:results' }} props={this.props}>
-                    <GitBook.InjectedComponent matching={{ role: 'page:container' }} props={this.props}>
-                        <GitBook.HTMLContent html={page.content} />
-                    </GitBook.InjectedComponent>
+                    <div className="Page">
+                        <GitBook.InjectedComponentSet matching={{ role: 'page:header' }} props={this.props} />
+
+                        <GitBook.InjectedComponent matching={{ role: 'page:container' }} props={this.props}>
+                            <GitBook.HTMLContent html={page.content} />
+                        </GitBook.InjectedComponent>
+
+                        <GitBook.InjectedComponentSet matching={{ role: 'page:footer' }} props={this.props} />
+                    </div>
                 </GitBook.InjectedComponent>
             </div>
         );
