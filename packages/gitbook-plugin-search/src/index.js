@@ -23,8 +23,8 @@ module.exports = GitBook.createPlugin({
         dispatch(History.listen(onLocationChange));
 
         // Register components
-        dispatch(Components.registerComponent(SearchInput, { role: 'search:input' }));
-        dispatch(Components.registerComponent(SearchResults, { role: 'search:results' }));
+        dispatch(Components.registerComponent(SearchInput, { role: 'search:container:input' }));
+        dispatch(Components.registerComponent(SearchResults, { role: 'search:container:results' }));
     },
     reduce: reducers,
     actions: {

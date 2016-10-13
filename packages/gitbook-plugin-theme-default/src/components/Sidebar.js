@@ -13,7 +13,7 @@ const Sidebar = React.createClass({
 
         return (
             <div className="Sidebar book-summary">
-                <GitBook.InjectedComponent matching={{ role: 'search:input' }} />
+                <GitBook.InjectedComponent matching={{ role: 'search:container:input' }} />
                 <Summary summary={summary} />
             </div>
         );
