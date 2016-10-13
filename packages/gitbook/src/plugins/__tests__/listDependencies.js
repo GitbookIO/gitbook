@@ -10,7 +10,7 @@ describe('listDependencies', () => {
 
         expect(names).toEqual([
             'ga', 'great', 'highlight', 'search', 'lunr',
-            'sharing', 'hints', 'headings', 'copy-code', 'fontsettings', 'theme-default'
+            'sharing', 'hints', 'headings', 'copy-code', 'theme-default'
         ]);
     });
 
@@ -22,7 +22,7 @@ describe('listDependencies', () => {
         expect(names).toEqual([
             'ga', 'highlight', 'search', 'lunr',
             'sharing', 'hints', 'headings',
-            'copy-code', 'fontsettings', 'theme-default'
+            'copy-code', 'theme-default'
         ]);
     });
 
@@ -33,7 +33,7 @@ describe('listDependencies', () => {
 
         expect(names).toEqual([
             'ga', 'highlight', 'lunr', 'sharing',
-            'hints', 'headings', 'copy-code', 'fontsettings', 'theme-default'
+            'hints', 'headings', 'copy-code', 'theme-default'
         ]);
     });
 });
