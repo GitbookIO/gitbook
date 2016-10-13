@@ -3,7 +3,7 @@
 
 ## Injection
 
-Plugins can inject components by registering react components to some roles.
+Plugins can inject components by registering React components to some roles.
 
 #### Register a components
 

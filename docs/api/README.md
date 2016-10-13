@@ -1,6 +1,6 @@
 # Plugin Architecture
 
-A GitBook plugin is a NPM package that follow a defined convention.
+A GitBook plugin is a NPM package that follows a defined convention.
 
 `gitbook-plugin` is a command line utility to help you create, test and release plugins.
 
@@ -12,13 +12,13 @@ Install `gitbook-plugin` from NPM:
 $ npm install gitbook-plugin -g
 ```
 
-Then create your plugin using:
+Then create your plugin:
 
 ```
 $ gitbook-plugin create
 ```
 
-It will prompt you to enter a name and a description.
+You will be asked for a plugin name, and a few other things to complete the creation process.
 
 
-### Publish your plugin 
+### Publish your plugin
