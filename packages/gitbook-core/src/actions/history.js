@@ -10,16 +10,16 @@ const SUPPORTED = (
 );
 
 /**
- * Initialize the navigation
+ * Initialize the history
  */
 function activate() {
     return (dispatch, getState) => {
 
         dispatch({
-            type: ACTION_TYPES.NAVIGATION_ACTIVATE,
+            type: ACTION_TYPES.HISTORY_ACTIVATE,
             listener: (location) => {
                 location = Location.fromNative(location);
-                const prevLocation = getState().navigation.location;
+                const prevLocation = getState().history.location;
 
                 // Fetch page if required
                 if (!prevLocation || location.pathname !== prevLocation.pathname) {
@@ -31,7 +31,7 @@ function activate() {
 
                 // Update the location
                 dispatch({
-                    type: ACTION_TYPES.NAVIGATION_UPDATE,
+                    type: ACTION_TYPES.HISTORY_UPDATE,
                     location
                 });
             }
@@ -48,13 +48,13 @@ function activate() {
  */
 function emit(to) {
     return (dispatch, getState) => {
-        const { listeners, history } = getState().navigation;
+        const { listeners, client } = getState().history;
 
-        if (!history) {
+        if (!client) {
             return;
         }
 
-        const location = Location.fromNative(history.location);
+        const location = Location.fromNative(client.location);
 
         to = to || listeners;
 
@@ -65,24 +65,24 @@ function emit(to) {
 }
 
 /**
- * Cleanup the navigation
+ * Cleanup the history
  */
 function deactivate() {
-    return { type: ACTION_TYPES.NAVIGATION_DEACTIVATE };
+    return { type: ACTION_TYPES.HISTORY_DEACTIVATE };
 }
 
 /**
- * Push a new url into the navigation
+ * Push a new url into the history
  * @param {String|Location} location
  * @return {Action} action
  */
 function push(location) {
     return (dispatch, getState) => {
-        const { history } = getState().navigation;
+        const { client } = getState().history;
         location = Location.fromNative(location);
 
         if (SUPPORTED) {
-            history.push(location.toNative());
+            client.push(location.toNative());
         } else {
             redirect(location.toString());
         }
@@ -90,17 +90,17 @@ function push(location) {
 }
 
 /**
- * Replace current state in navigation
+ * Replace current state in history
  * @param {String|Location} location
  * @return {Action} action
  */
 function replace(location) {
     return (dispatch, getState) => {
-        const { history } = getState().navigation;
+        const { client } = getState().history;
         location = Location.fromNative(location);
 
         if (SUPPORTED) {
-            history.replace(location.toNative());
+            client.replace(location.toNative());
         } else {
             redirect(location.toString());
         }
@@ -125,7 +125,7 @@ function redirect(uri) {
  */
 function listen(listener) {
     return (dispatch, getState) => {
-        dispatch({ type: ACTION_TYPES.NAVIGATION_LISTEN, listener });
+        dispatch({ type: ACTION_TYPES.HISTORY_LISTEN, listener });
 
         // Trigger for existing listeners
         dispatch(emit([ listener ]));
@@ -163,7 +163,6 @@ function fetchPage(pathname) {
         .catch(
             error => {
                 // dispatch(redirect(pathname));
-                console.error(error);
                 dispatch({ type: ACTION_TYPES.PAGE_FETCH_ERROR, error });
             }
         );

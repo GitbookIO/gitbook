@@ -3,7 +3,7 @@ const createReducer = require('../lib/createReducer');
 
 module.exports = composeReducer(
     createReducer('components', require('./components')),
-    createReducer('navigation', require('./navigation')),
+    createReducer('history', require('./history')),
     createReducer('i18n', require('./i18n')),
     // GitBook JSON
     createReducer('config', require('./config')),

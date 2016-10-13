@@ -18,9 +18,9 @@ const onLocationChange = (location, dispatch) => {
 };
 
 module.exports = GitBook.createPlugin({
-    activate: (dispatch, getState, { Navigation, Components }) => {
+    activate: (dispatch, getState, { History, Components }) => {
         // Register the navigation handler
-        dispatch(Navigation.listen(onLocationChange));
+        dispatch(History.listen(onLocationChange));
 
         // Register components
         dispatch(Components.registerComponent(SearchInput, { role: 'search:input' }));

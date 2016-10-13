@@ -9,7 +9,7 @@ const composeReducer = require('./composeReducer');
 
 const Components = require('../actions/components');
 const I18n = require('../actions/i18n');
-const Navigation = require('../actions/navigation');
+const History = require('../actions/history');
 
 const isBrowser = (typeof window !== 'undefined');
 
@@ -21,7 +21,7 @@ const isBrowser = (typeof window !== 'undefined');
 const corePlugin = new Plugin({
     reduce: coreReducers,
     actions: {
-        Components, I18n, Navigation
+        Components, I18n, History
     }
 });
 

@@ -4,7 +4,7 @@ const { InjectedComponent } = require('../components/InjectedComponent');
 const PJAXWrapper = require('../components/PJAXWrapper');
 const I18nProvider = require('../components/I18nProvider');
 const ContextProvider = require('../components/ContextProvider');
-const Navigation = require('../actions/navigation');
+const History = require('../actions/history');
 const contextShape = require('../shapes/context');
 
 const GitBookApplication = React.createClass({
@@ -15,12 +15,12 @@ const GitBookApplication = React.createClass({
 
     componentDidMount() {
         const { context } = this.props;
-        context.dispatch(Navigation.activate());
+        context.dispatch(History.activate());
     },
 
     componentWillUnmount() {
         const { context } = this.props;
-        context.dispatch(Navigation.deactivate());
+        context.dispatch(History.deactivate());
     },
 
     render() {

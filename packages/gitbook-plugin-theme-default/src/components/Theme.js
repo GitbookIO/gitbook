@@ -3,6 +3,7 @@ const { React } = GitBook;
 
 const Sidebar = require('./Sidebar');
 const Body = require('./Body');
+const LoadingBar = require('./LoadingBar');
 
 const Theme = React.createClass({
     propTypes: {
@@ -10,16 +11,18 @@ const Theme = React.createClass({
         page:     GitBook.Shapes.Page,
         summary:  GitBook.Shapes.Summary,
         readme:   GitBook.Shapes.Readme,
+        history:  GitBook.Shapes.History,
         sidebar:  React.PropTypes.object,
         // Other props
         children: React.PropTypes.node
     },
 
     render() {
-        const { page, summary, children, sidebar, readme } = this.props;
+        const { page, summary, children, sidebar, readme, history } = this.props;
 
         return (
             <GitBook.FlexLayout column className="GitBook book">
+                <LoadingBar show={history.loading} />
                 <GitBook.Head
                     title={page.title}
                     titleTemplate="%s - GitBook" />
@@ -43,6 +46,6 @@ const Theme = React.createClass({
     }
 });
 
-module.exports = GitBook.connect(Theme, ({page, summary, sidebar, readme}) => {
-    return { page, summary, sidebar, readme };
+module.exports = GitBook.connect(Theme, ({page, summary, sidebar, readme, history}) => {
+    return { page, summary, sidebar, readme, history };
 });

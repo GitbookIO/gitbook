@@ -8,6 +8,8 @@ module.exports = {
     Context:        require('./Context'),
     Page:           require('./Page'),
     File:           require('./File'),
+    History:        require('./History'),
+    Location:       require('./Location'),
     Readme:         require('./Readme'),
     Summary:        require('./Summary'),
     SummaryPart:    require('./SummaryPart'),

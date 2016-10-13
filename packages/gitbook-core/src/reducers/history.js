@@ -4,7 +4,7 @@ const ACTION_TYPES = require('../actions/TYPES');
 
 const isServerSide = (typeof window === 'undefined');
 
-const NavigationState = Record({
+const HistoryState = Record({
     // Current location
     location:  null,
     // Are we loading a new page
@@ -15,12 +15,12 @@ const NavigationState = Record({
     listeners: List(),
     // Function to call to stop listening
     unlisten:  null,
-    // History instance
-    history:   null
+    // HistoryJS instance
+    client:    null
 });
 
-function reduceNavigation(state, action) {
-    state = state || NavigationState();
+function reduceHistory(state, action) {
+    state = state || HistoryState();
     switch (action.type) {
 
     case ACTION_TYPES.PAGE_FETCH_START:
@@ -39,33 +39,33 @@ function reduceNavigation(state, action) {
             error:   action.error
         });
 
-    case ACTION_TYPES.NAVIGATION_ACTIVATE:
-        const history = isServerSide ? createMemoryHistory() : createBrowserHistory();
-        const unlisten = history.listen(action.listener);
+    case ACTION_TYPES.HISTORY_ACTIVATE:
+        const client = isServerSide ? createMemoryHistory() : createBrowserHistory();
+        const unlisten = client.listen(action.listener);
 
         // We can't use .merge since it convert history to an immutable
         const newState = state
-            .set('history', history)
+            .set('client', client)
             .set('unlisten', unlisten);
 
         return newState;
 
-    case ACTION_TYPES.NAVIGATION_DEACTIVATE:
+    case ACTION_TYPES.HISTORY_DEACTIVATE:
         if (state.unlisten) {
             state.unlisten();
         }
 
         return state.merge({
-            history:  null,
+            client:   null,
             unlisten: null
         });
 
-    case ACTION_TYPES.NAVIGATION_UPDATE:
+    case ACTION_TYPES.HISTORY_UPDATE:
         return state.merge({
             location: action.location
         });
 
-    case ACTION_TYPES.NAVIGATION_LISTEN:
+    case ACTION_TYPES.HISTORY_LISTEN:
         return state.merge({
             listeners: state.listeners.push(action.listener)
         });
@@ -76,4 +76,4 @@ function reduceNavigation(state, action) {
     }
 }
 
-module.exports = reduceNavigation;
+module.exports = reduceHistory;

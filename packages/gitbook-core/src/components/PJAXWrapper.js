@@ -1,6 +1,6 @@
 const React = require('react');
 const ReactRedux = require('react-redux');
-const Navigation = require('../actions/navigation');
+const History = require('../actions/history');
 
 /**
  * Check if an element is inside a link
@@ -83,7 +83,7 @@ const PJAXWrapper = React.createClass({
         }
 
         event.preventDefault();
-        dispatch(Navigation.push(href));
+        dispatch(History.push(href));
     },
 
     componentDidMount() {
