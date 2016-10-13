@@ -1,5 +1,8 @@
 const GitBook = require('gitbook-core');
-const { React } = GitBook;
+const {
+    React,
+    Dropdown
+} = GitBook;
 const { string, arrayOf, shape, func } = React.PropTypes;
 
 const SITES = require('./SITES');
@@ -107,33 +110,33 @@ const ShareButton = React.createClass({
         onShare: func.isRequired
     },
 
-    renderButton({ onToggle }) {
-        return (
-            <GitBook.Button onClick={onToggle}>
-                <GitBook.Icon id="share-alt" />
-            </GitBook.Button>
-        );
+    getInitialState() {
+        return { open: false };
     },
 
-    renderMenu({ onToggle }) {
-        const { sites } = this.props;
-        const items = sites.map((site) => (
-            <GitBook.Dropdown.Item onClick={site.onShare}>
-                {site.label}
-            </GitBook.Dropdown.Item>
-        ));
-
-        return (
-            <GitBook.Dropdown.Menu>
-                {items}
-            </GitBook.Dropdown.Menu>
-        );
+    onToggle() {
+        this.setState({ open: !this.state.open });
     },
 
     render() {
+        const { sites } = this.props;
+
+        const items = sites.map((site) => (
+            <Dropdown.Item onClick={site.onShare} key={site.label}>
+                {site.label}
+            </Dropdown.Item>
+        ));
+
         return (
-            <GitBook.Dropdown renderChildren={this.renderButton}
-                              renderMenu={this.renderMenu} />
+            <Dropdown.Container>
+                <GitBook.Button onClick={this.onToggle}>
+                    <GitBook.Icon id="share-alt" />
+                </GitBook.Button>
+
+                <Dropdown.Menu open={this.state.open}>
+                    {items}
+                </Dropdown.Menu>
+            </Dropdown.Container>
         );
     }
 });
