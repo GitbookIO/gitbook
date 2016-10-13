@@ -1,22 +1,31 @@
 const GitBook = require('gitbook-core');
 const { React } = GitBook;
+const Highlight = require('react-highlighter');
 
 const Result = React.createClass({
     propTypes: {
-        result: React.PropTypes.object
+        result: React.PropTypes.object,
+        query:  React.PropTypes.string
     },
 
     render() {
-        const { result } = this.props;
+        const { result, query } = this.props;
 
         return (
             <div className="Search-ResultContainer">
-                <GitBook.InjectedComponent matching={{ role: 'search:result' }} props={{ result }}>
+                <GitBook.InjectedComponent matching={{ role: 'search:result' }} props={{ result, query }}>
                     <div className="Search-Result">
                         <h3>
                             <GitBook.Link to={result.url}>{result.title}</GitBook.Link>
                         </h3>
-                        <p>{result.body}</p>
+                        <p>
+                            <Highlight
+                            matchElement="span"
+                            matchClass="Search-MatchSpan"
+                            search={query}>
+                                {result.body}
+                            </Highlight>
+                        </p>
                     </div>
                 </GitBook.InjectedComponent>
             </div>
@@ -46,7 +55,7 @@ const SearchResults = React.createClass({
                         <h1>{i18n.t('SEARCH_RESULTS_TITLE', { query, count: results.size })}</h1>
                         <div className="Search-Results">
                             {results.map((result, i) => {
-                                return <Result key={i} result={result} />;
+                                return <Result key={i} result={result} query={query} />;
                             })}
                         </div>
                     </div>
