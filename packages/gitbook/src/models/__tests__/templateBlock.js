@@ -30,7 +30,7 @@ describe('TemplateBlock', function() {
             });
         });
 
-        it('must not fsil if return a string', function() {
+        it('must not fail if return a string', function() {
             const templateBlock = TemplateBlock.create('sayhello', function(block) {
                 return 'Hello World';
             });
@@ -189,6 +189,29 @@ describe('TemplateBlock', function() {
             return Promise.nfcall(env.renderString.bind(env), src)
             .then(function(res) {
                 expect(res).toBe('<xblock name="yoda" props="{}"><p class="yoda">inverted this sentence should be</p></xblock>');
+            });
+        });
+
+        it('must handle multiple inline blocks', function() {
+            const templateBlock = new TemplateBlock({
+                name: 'math',
+                process(block) {
+                    return '<math>' + block.children + '</math>';
+                }
+            });
+
+            // Create a fresh Nunjucks environment
+            const env = new nunjucks.Environment(null, { autoescape: false });
+
+            // Add template block to environement
+            const Ext = templateBlock.toNunjucksExt();
+            env.addExtension(templateBlock.getExtensionName(), new Ext());
+
+            // Render a template using the block after replacing shortcuts
+            const src = 'There should be two inline blocks as a result: {% math %}a = b{% endmath %} and {% math %}c = d{% endmath %}';
+            return Promise.nfcall(env.renderString.bind(env), src)
+            .then(function(res) {
+                expect(res).toBe('There should be two inline blocks as a result: <xblock name="math" props="{}"><math>a = b</math></xblock> and <xblock name="math" props="{}"><math>c = d</math></xblock>');
             });
         });
     });
