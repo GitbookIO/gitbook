@@ -1,50 +1,53 @@
 const React = require('react');
 const Mousetrap = require('mousetrap');
-const { string, node, func, shape, arrayOf } = React.PropTypes;
-
-const bindingShape = shape({
-    // A key "escape", a combination of key "mod+s", or a key sequence "ctrl+x ctrl+s"
-    key: string.isRequired,
-    // function (event) {}
-    handler: func.isRequired
-});
+const { Map } = require('immutable');
 
 /**
  * Defines hotkeys globally when this component is mounted.
  *
- * keymap = [{
- *   key: 'escape',
- *   handler: (e) => quit()
- * }, {
- *   key: 'mod+s',
- *   handler: (e) => save()
- * }]
+ * keyMap = {
+ *   'escape': (e) => quit()
+ *   'mod+s': (e) => save()
+ * }
  *
- * <HotKeys keymap={keymap}>
+ * <HotKeys keyMap={keyMap}>
  *   < ... />
  * </HotKeys>
  */
 
 const HotKeys = React.createClass({
     propTypes: {
-        children: node.isRequired,
-        keymap: arrayOf(bindingShape)
+        children: React.PropTypes.node.isRequired,
+        keyMap: React.PropTypes.objectOf(React.PropTypes.func)
     },
 
     getDefaultProps() {
-        return { keymap: [] };
+        return { keyMap: [] };
+    },
+
+    updateBindings(keyMap) {
+        Map(keyMap).forEach((handler, key) => {
+            Mousetrap.bind(key, handler);
+        });
+    },
+
+    clearBindings(keyMap) {
+        Map(keyMap).forEach((handler, key) => {
+            Mousetrap.unbind(key, handler);
+        });
     },
 
     componentDidMount() {
-        this.props.keymap.forEach((binding) => {
-            Mousetrap.bind(binding.key, binding.handler);
-        });
+        this.updateBindings(this.props.keyMap);
+    },
+
+    componentDidUpdate(prevProps) {
+        this.clearBindings(prevProps.keyMap);
+        this.updateBindings(this.props.keyMap);
     },
 
     componentWillUnmount() {
-        this.props.keymap.forEach((binding) => {
-            Mousetrap.unbind(binding.key, binding.handler);
-        });
+        this.clearBindings(this.props.keyMap);
     },
 
     render() {

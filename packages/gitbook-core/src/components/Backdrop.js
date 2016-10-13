@@ -1,17 +1,19 @@
-const React      = require('react');
+const React = require('react');
+const HotKeys = require('./HotKeys');
 
 /**
  * Backdrop for modals, dropdown, etc. that covers the whole screen
- * and handles click.
+ * and handles click and pressing escape.
  *
- * <Backdrop onClick={onCloseModal} />
+ * <Backdrop onClose={onCloseModal} />
  */
 const Backdrop = React.createClass({
     propTypes: {
-        // Callback when backdrop is clicked
-        onClick:  React.PropTypes.func.isRequired,
+        // Callback when backdrop is closed
+        onClose:  React.PropTypes.func.isRequired,
         // Z-index for the backdrop
-        zIndex:   React.PropTypes.number
+        zIndex:   React.PropTypes.number,
+        children: React.PropTypes.node
     },
 
     getDefaultProps() {
@@ -20,8 +22,17 @@ const Backdrop = React.createClass({
         };
     },
 
+    onClick(event) {
+        const { onClose } = this.props;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        onClose();
+    },
+
     render() {
-        const { zIndex, onClick } = this.props;
+        const { zIndex, children, onClose } = this.props;
         const style = {
             zIndex,
             position: 'fixed',
@@ -30,8 +41,15 @@ const Backdrop = React.createClass({
             width: '100%',
             height: '100%'
         };
+        const keyMap = {
+            'escape': onClose
+        };
 
-        return <div style={style} onClick={onClick}></div>;
+        return (
+            <HotKeys keyMap={keyMap}>
+                <div style={style} onClick={this.onClick}>{children}</div>
+            </HotKeys>
+        );
     }
 });
 

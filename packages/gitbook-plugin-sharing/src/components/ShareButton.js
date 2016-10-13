@@ -1,5 +1,5 @@
 const GitBook = require('gitbook-core');
-const { React, Dropdown } = GitBook;
+const { React, Dropdown, Backdrop } = GitBook;
 
 const SITES = require('../SITES');
 
@@ -15,17 +15,13 @@ const ShareButton = React.createClass({
     },
 
     onToggle() {
-        this.setState({ open: !this.state.open });
+        const { open } = this.state;
+        this.setState({ open: !open });
     },
 
     render() {
         const { siteIds, onShare } = this.props;
-
-        const items = siteIds.map((id) => (
-            <Dropdown.Item onClick={() => onShare(SITES[id])} key={id}>
-                {SITES[id].label}
-            </Dropdown.Item>
-        ));
+        const { open } = this.state;
 
         return (
             <Dropdown.Container>
@@ -33,9 +29,16 @@ const ShareButton = React.createClass({
                     <GitBook.Icon id="share-alt" />
                 </GitBook.Button>
 
-                <Dropdown.Menu open={this.state.open}>
-                    {items}
-                </Dropdown.Menu>
+                {open ? (
+                    <Backdrop onClose={this.onToggle}>
+                        <Dropdown.Menu>
+                            {siteIds.map((id) => (
+                                <Dropdown.Item onClick={() => onShare(SITES[id])} key={id}>
+                                    {SITES[id].label}
+                                </Dropdown.Item>
+                            ))}
+                        </Dropdown.Menu>
+                    </Backdrop>) : null}
             </Dropdown.Container>
         );
     }

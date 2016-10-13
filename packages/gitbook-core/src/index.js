@@ -16,6 +16,7 @@ const HotKeys = require('./components/HotKeys');
 const Button = require('./components/Button');
 const ButtonGroup = require('./components/ButtonGroup');
 const Dropdown = require('./components/Dropdown');
+const Backdrop = require('./components/Backdrop');
 const I18nProvider = require('./components/I18nProvider');
 
 const ACTIONS = require('./actions/TYPES');
@@ -56,6 +57,7 @@ module.exports = {
     Button,
     ButtonGroup,
     Dropdown,
+    Backdrop,
     // Utilities
     Shapes,
     // Librairies

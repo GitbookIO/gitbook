@@ -1,8 +1,6 @@
 const React      = require('react');
 const classNames = require('classnames');
 
-const Backdrop = require('./Backdrop');
-
 /**
  * Dropdown to display a menu
  *
@@ -10,7 +8,7 @@ const Backdrop = require('./Backdrop');
  *
  *     <Button />
  *
- *     <Dropdown.Menu open={this.state.open}>
+ *     <Dropdown.Menu>
  *         <Dropdown.Item href={...}> ... </Dropdown.Item>
  *         <Dropdown.Item onClick={...}> ... </Dropdown.Item>
  *
@@ -27,21 +25,22 @@ const Backdrop = require('./Backdrop');
 const DropdownContainer = React.createClass({
     propTypes: {
         className:  React.PropTypes.string,
-        span: React.PropTypes.bool,
         children: React.PropTypes.node
     },
 
     render() {
-        let { className, span, children } = this.props;
+        let { className, children } = this.props;
 
         className = classNames(
             'GitBook-Dropdown',
             className
         );
 
-        return span ?
-               <span className={className}>{children}</span>
-             : <div className={className}>{children}</div>;
+        return (
+            <div className={className}>
+                {children}
+            </div>
+        );
     }
 });
 
@@ -56,31 +55,34 @@ const DropdownItem = React.createClass({
         href:      React.PropTypes.string
     },
 
-    onClick(e) {
-        if (!this.props.href) {
-            e.preventDefault();
-            e.stopPropagation();
+    onClick(event) {
+        const { onClick, href } = this.props;
 
-            if (this.props.onClick) this.props.onClick();
+        if (href) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (onClick) {
+            onClick();
         }
     },
 
     render() {
         const {
             children, href,
-            onClick, // eslint-disable-line no-unused-vars
             ...otherProps
         } = this.props;
+        delete otherProps.onCLick;
 
-        let inner = [], submenu = [];
-        submenu = filterChildren(children, isDropdownMenu);
-        inner = filterChildren(children, (child) => !isDropdownMenu(child));
+        const submenu = filterChildren(children, isDropdownMenu);
+        const inner = filterChildren(children, (child) => !isDropdownMenu(child));
 
         return (
             <li className="GitBook-DropdownItem">
-                <a href={href || '#'}
-                   onClick={this.onClick}
-                   {...otherProps} >
+                <a href={href || '#'} onClick={this.onClick} {...otherProps} >
                     {inner}
                 </a>
                 {submenu}
@@ -108,20 +110,16 @@ function filterChildren(children, predicate) {
 const DropdownMenu = React.createClass({
     propTypes: {
         className: React.PropTypes.string,
-        children:  React.PropTypes.node,
-        open:      React.PropTypes.bool
+        children:  React.PropTypes.node
     },
 
     render() {
-        const { open } = this.props;
-        const className = classNames(
-            'GitBook-DropdownMenu',
-            { 'GitBook-DropdownMenu-open': open }
-        );
+        let { className, children } = this.props;
+        className = classNames('GitBook-DropdownMenu', className);
 
         return (
             <ul className={className}>
-                {this.props.children}
+                {children}
             </ul>
         );
     }
@@ -134,8 +132,7 @@ function isDropdownMenu(child) {
 const Dropdown = {
     Item: DropdownItem,
     Menu: DropdownMenu,
-    Container: DropdownContainer,
-    Backdrop
+    Container: DropdownContainer
 };
 
 module.exports = Dropdown;
