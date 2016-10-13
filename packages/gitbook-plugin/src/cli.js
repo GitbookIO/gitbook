@@ -31,6 +31,10 @@ program
     .action(function(output, options) {
         inquirer.prompt([
             {
+                name: 'title',
+                message: 'title:'
+            },
+            {
                 name: 'name',
                 message: 'name:'
             },
@@ -41,6 +45,16 @@ program
             {
                 name: 'github',
                 message: 'github url:'
+            },
+            {
+                name: 'categories',
+                message: 'categories:',
+                type: 'checkbox',
+                choices: [
+                    'analytics',
+                    'search',
+                    'content'
+                ]
             }
         ])
         .then(answers => {
