@@ -5,6 +5,16 @@ const entities = require('entities');
 
 const { InjectedComponent } = require('./InjectedComponent');
 
+const DOMProperty = require('react/lib/ReactInjection').DOMProperty;
+DOMProperty.injectDOMPropertyConfig({
+    Properties: {
+        align: DOMProperty.MUST_USE_ATTRIBUTE
+    },
+    isCustomAttribute: (attributeName) => {
+        return attributeName === 'align';
+    }
+});
+
 /*
     HTMLContent is a container for the page HTML that parse the content and
     render the right block.
