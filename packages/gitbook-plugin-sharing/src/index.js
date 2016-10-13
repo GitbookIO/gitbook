@@ -50,8 +50,8 @@ let Sharing = React.createClass({
         let shareButton = undefined;
         if (options.all.length > 0) {
             shareButton = (
-                <ShareButton sites={options.all.map(id => SITES[id])}
-                onShare={this.onShare} />
+                <ShareButton siteIds={options.all}
+                             onShare={this.onShare} />
             );
         }
 
@@ -106,7 +106,7 @@ const SiteButton = React.createClass({
 // Share button with dropdown list of sites
 const ShareButton = React.createClass({
     propTypes: {
-        sites: arrayOf(siteShape).isRequired,
+        siteIds: arrayOf(string).isRequired,
         onShare: func.isRequired
     },
 
@@ -119,11 +119,11 @@ const ShareButton = React.createClass({
     },
 
     render() {
-        const { sites } = this.props;
+        const { siteIds, onShare } = this.props;
 
-        const items = sites.map((site) => (
-            <Dropdown.Item onClick={site.onShare} key={site.label}>
-                {site.label}
+        const items = siteIds.map((id) => (
+            <Dropdown.Item onClick={() => onShare(SITES[id])} key={id}>
+                {SITES[id].label}
             </Dropdown.Item>
         ));
 
