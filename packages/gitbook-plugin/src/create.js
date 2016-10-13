@@ -22,6 +22,7 @@ function create(outputDir, spec) {
         },
         'devDependencies': {
             'gitbook-plugin': '^' + GITBOOK_VERSION,
+            'eslint': '3.7.1',
             'eslint-config-gitbook': '1.4.0'
         },
         'engines': {
