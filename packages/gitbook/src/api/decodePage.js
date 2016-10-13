@@ -19,7 +19,7 @@ function decodePage(output, page, result) {
     }
 
     // Update page attributes
-    const newAttributes = Immutable.fromJS(page.attributes);
+    const newAttributes = Immutable.fromJS(result.attributes);
     page = page.set('attributes', newAttributes);
 
     // GitBook 3

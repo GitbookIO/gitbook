@@ -23,6 +23,11 @@ function encodePage(output, page) {
     result.path = file.getPath();
     result.rawPath = fs.resolve(result.path);
 
+    result.setAttribute = (key, value) => {
+        result.attributes[key] = value;
+        return result;
+    };
+
     deprecate.field(output, 'page.progress', result, 'progress', function() {
         return encodeProgress(output, page);
     }, '"page.progress" property is deprecated');
