@@ -45,7 +45,11 @@
 .GitBook-DropdownItemLink {
     width: 100%;
     display: inline-block;
-    padding: 6px 20px;
+    padding: @dropdown-padding-v @dropdown-padding-h;
     text-align: center;
-    color: #aaa;
+    color: @dropdown-color;
+
+    &:hover {
+        color: @dropdown-hover-color;
+    }
 }

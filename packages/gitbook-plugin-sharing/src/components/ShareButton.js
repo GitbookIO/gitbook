@@ -34,9 +34,9 @@ const ShareButton = React.createClass({
                 {open ? (
                     <Dropdown.Menu>
                         {siteIds.map((id) => (
-                            <Dropdown.Item onClick={() => onShare(SITES[id])} key={id}>
+                            <Dropdown.ItemLink onClick={() => onShare(SITES[id])} key={id}>
                                 {SITES[id].label}
-                            </Dropdown.Item>
+                            </Dropdown.ItemLink>
                         ))}
                     </Dropdown.Menu>) : null}
             </Dropdown.Container>

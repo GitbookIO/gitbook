@@ -38,10 +38,29 @@ const DropdownContainer = React.createClass({
 });
 
 /**
- * A dropdown item, which is always a link, and can contain a nested
- * DropdownMenu.
+ * A dropdown item which can contains informations.
  */
 const DropdownItem = React.createClass({
+    propTypes: {
+        children:  React.PropTypes.node
+    },
+
+    render() {
+        const { children } = this.props;
+
+        return (
+            <div className="GitBook-DropdownItem">
+                {children}
+            </div>
+        );
+    }
+});
+
+
+/**
+ * A dropdown item, which is always a link.
+ */
+const DropdownItemLink = React.createClass({
     propTypes: {
         children:  React.PropTypes.node,
         onClick:   React.PropTypes.func,
@@ -64,25 +83,16 @@ const DropdownItem = React.createClass({
     },
 
     render() {
-        const { children, href, onClick, ...otherProps } = this.props;
-
-        let inner = children;
-
-        if (href || onClick) {
-            inner = (
-                <a className="GitBook-DropdownItemLink" href={href || '#'} onClick={this.onClick} {...otherProps} >
-                    {inner}
-                </a>
-            );
-        }
+        const { children, href, ...otherProps } = this.props;
 
         return (
-            <div className="GitBook-DropdownItem">
-                {inner}
-            </div>
+            <a {...otherProps} className="GitBook-DropdownItemLink" href={href || '#'} onClick={this.onClick} >
+                {children}
+            </a>
         );
     }
 });
+
 
 /**
  * A DropdownMenu to display DropdownItems. Must be inside a
@@ -108,6 +118,7 @@ const DropdownMenu = React.createClass({
 
 const Dropdown = {
     Item: DropdownItem,
+    ItemLink: DropdownItemLink,
     Menu: DropdownMenu,
     Container: DropdownContainer
 };
