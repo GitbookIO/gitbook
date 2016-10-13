@@ -13,7 +13,11 @@ function encodePage(page, summary, urls) {
     const attributes = page.getAttributes();
     const article = summary.getByPath(file.getPath());
 
-    const result = attributes.toJS();
+    const result = {
+        content:    page.getContent(),
+        dir:        page.getDir(),
+        attributes: attributes.toJS()
+    };
 
     if (article) {
         result.title = article.getTitle();
@@ -30,9 +34,6 @@ function encodePage(page, summary, urls) {
             result.previous = encodeSummaryArticle(prevArticle, urls, false);
         }
     }
-
-    result.content = page.getContent();
-    result.dir = page.getDir();
 
     return result;
 }

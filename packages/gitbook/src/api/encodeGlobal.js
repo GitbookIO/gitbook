@@ -36,6 +36,22 @@ function encodeGlobal(output) {
         summary: encodeSummary(output, book.getSummary()),
 
         /**
+         * Return absolute path to the root folder of the book
+         * @return {String}
+         */
+        root() {
+            return book.getRoot();
+        },
+
+        /**
+         * Return absolute path to the root folder of the book (for content)
+         * @return {String}
+         */
+        contentRoot() {
+            return book.getContentRoot();
+        },
+
+        /**
          * Check if the book is a multilingual book.
          * @return {Boolean}
          */

@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - *Website Feature:* new default plugin `copy-code` to copy code blocks content in one click
 - *Website Feature:* new default plugin `heading-anchors` to have clickable headings
 - *Website Feature:* `fontsettings` is now only controlling the font size, and can work on multiple themes
+- *Plugin API*: hook `page` can no longer modify the content, only the page's attributes
+- *Plugin API*: plugins can no longer export resources, instead use the `_assets` folder
 
 ## 3.2.0
 - Switch markdown parser from `kramed` to `markup-it`
