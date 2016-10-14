@@ -10,5 +10,6 @@ module.exports = composeReducer(
     createReducer('file', require('./file')),
     createReducer('page', require('./page')),
     createReducer('summary', require('./summary')),
-    createReducer('readme', require('./readme'))
+    createReducer('readme', require('./readme')),
+    createReducer('languages', require('./languages'))
 );

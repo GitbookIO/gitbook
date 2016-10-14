@@ -31,7 +31,8 @@ function encodeStateToJSON(output, page) {
         glossary: encodeGlossary(book.getGlossary(), urls),
         readme: encodeReadme(book.getReadme(), urls),
         config: book.getConfig().getValues().toJS(),
-        languages: book.isMultilingual() ? encodeLanguages(book.getLanguages(), urls) : undefined,
+        languages: book.isMultilingual() ?
+            encodeLanguages(book.getLanguages(), book.getLanguage(), urls) : undefined,
 
         page: page ? encodePage(page, book.getSummary(), urls) : undefined,
         file: page ? encodeFile(page.getFile(), urls) : undefined

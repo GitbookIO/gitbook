@@ -35,7 +35,7 @@ class File extends Record(DEFAULTS) {
     /**
      * Return true if file is an instance of File
      * @param {Mixed} file
-     * @return {Boolean}
+     * @return {Boolean} isFile
      */
     static is(file) {
         return (file instanceof File);
@@ -44,7 +44,7 @@ class File extends Record(DEFAULTS) {
     /**
      * Create a file instance
      * @param {Mixed|File} file
-     * @return {File}
+     * @return {File} file
      */
     static create(file) {
         return File.is(file) ?

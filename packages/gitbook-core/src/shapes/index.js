@@ -9,6 +9,8 @@ module.exports = {
     Page:           require('./Page'),
     File:           require('./File'),
     History:        require('./History'),
+    Language:       require('./Language'),
+    Languages:      require('./Languages'),
     Location:       require('./Location'),
     Readme:         require('./Readme'),
     Summary:        require('./Summary'),
