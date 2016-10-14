@@ -16,6 +16,7 @@ const HotKeys = require('./components/HotKeys');
 const Button = require('./components/Button');
 const ButtonGroup = require('./components/ButtonGroup');
 const Dropdown = require('./components/Dropdown');
+const Panel = require('./components/Panel');
 const Backdrop = require('./components/Backdrop');
 const Tooltipped = require('./components/Tooltipped');
 const I18nProvider = require('./components/I18nProvider');
@@ -46,6 +47,7 @@ module.exports = {
     InjectedComponentSet,
     HTMLContent,
     Head,
+    Panel,
     Provider,
     ImportLink,
     ImportScript,
