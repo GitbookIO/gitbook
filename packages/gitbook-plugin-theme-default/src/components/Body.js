@@ -14,10 +14,16 @@ const Body = React.createClass({
         const { page, readme } = this.props;
 
         return (
-            <div className="Body page-wrapper">
-                <Toolbar title={page.title} readme={readme} />
-                <Page page={page} />
-            </div>
+            <GitBook.InjectedComponent matching={{ role: 'body:wrapper' }}>
+                <div className="Body page-wrapper">
+                    <GitBook.InjectedComponent matching={{ role: 'toolbar:wrapper' }}>
+                        <Toolbar title={page.title} readme={readme} />
+                    </GitBook.InjectedComponent>
+                    <GitBook.InjectedComponent matching={{ role: 'page:wrapper' }}>
+                        <Page page={page} />
+                    </GitBook.InjectedComponent>
+                </div>
+            </GitBook.InjectedComponent>
         );
     }
 });
