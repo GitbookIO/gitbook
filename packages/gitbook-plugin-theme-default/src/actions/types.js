@@ -1,4 +1,4 @@
 
 module.exports = {
-    TOGGLE_SIDEBAR: 'sidebar:toggle'
+    TOGGLE_SIDEBAR: 'theme-default/sidebar/toggle'
 };
