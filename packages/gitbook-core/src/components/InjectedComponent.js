@@ -43,21 +43,22 @@ const Injection = React.createClass({
 
 const InjectedComponentSet = React.createClass({
     propTypes: {
-        components:    React.PropTypes.oneOfType([
+        components: React.PropTypes.oneOfType([
             React.PropTypes.arrayOf(React.PropTypes.func),
             React.PropTypes.instanceOf(List)
         ]).isRequired,
-        props:         React.PropTypes.object,
-        withContainer: React.PropTypes.bool
+        props:    React.PropTypes.object,
+        children: React.PropTypes.node
     },
 
     render() {
-        const { components, props, ...divProps } = this.props;
+        const { components, props, children, ...divProps } = this.props;
 
         const inner = components.map((Comp, i) => <Injection key={i} component={Comp} props={props} />);
 
         return (
             <div {...divProps}>
+                {children}
                 {inner}
             </div>
         );

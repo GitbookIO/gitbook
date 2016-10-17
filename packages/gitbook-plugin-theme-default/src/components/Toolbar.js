@@ -21,10 +21,11 @@ const Toolbar = React.createClass({
         return (
             <GitBook.FlexLayout className="Toolbar">
                 <GitBook.FlexBox className="Toolbar-left">
-                    <GitBook.Button onClick={this.onToggle}>
-                        <GitBook.Icon id="align-justify" />
-                    </GitBook.Button>
-                    <GitBook.InjectedComponentSet align="flex-start" matching={{ role: 'toolbar:buttons:left' }} />
+                    <GitBook.InjectedComponentSet align="flex-end" matching={{ role: 'toolbar:buttons:left' }}>
+                        <GitBook.Button onClick={this.onToggle}>
+                            <GitBook.Icon id="align-justify" />
+                        </GitBook.Button>
+                    </GitBook.InjectedComponentSet>
                 </GitBook.FlexBox>
                 <GitBook.FlexBox auto>
                     <h1 className="Toolbar-Title">
