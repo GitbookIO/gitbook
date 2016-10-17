@@ -1,6 +1,6 @@
-const React = require('react');
-const ReactDOMServer = require('react-dom/server');
+const ReactDOMServer = require('gitbook-core/lib/server');
 const GitBook = require('gitbook-core');
+const { React } = GitBook;
 
 const timing = require('../utils/timing');
 const loadPlugins = require('./loadPlugins');
