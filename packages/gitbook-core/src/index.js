@@ -23,7 +23,7 @@ const I18nProvider = require('./components/I18nProvider');
 
 const ACTIONS = require('./actions/TYPES');
 
-const Shapes = require('./shapes');
+const PropTypes = require('./propTypes');
 const connect = require('./lib/connect');
 const createPlugin = require('./lib/createPlugin');
 const createReducer = require('./lib/createReducer');
@@ -63,7 +63,7 @@ module.exports = {
     Backdrop,
     Tooltipped,
     // Utilities
-    Shapes,
+    PropTypes,
     // Librairies
     React,
     Immutable,

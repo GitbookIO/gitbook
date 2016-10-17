@@ -23,7 +23,7 @@ function getChildrenToText(children) {
 let CodeBlockWithCopy = React.createClass({
     propTypes: {
         children: React.PropTypes.node,
-        i18n: GitBook.Shapes.I18n
+        i18n: GitBook.PropTypes.I18n
     },
 
     getInitialState() {

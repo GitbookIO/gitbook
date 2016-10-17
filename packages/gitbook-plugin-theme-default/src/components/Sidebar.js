@@ -5,7 +5,7 @@ const Summary = require('./Summary');
 
 const Sidebar = React.createClass({
     propTypes: {
-        summary: GitBook.Shapes.Summary
+        summary: GitBook.PropTypes.Summary
     },
 
     render() {

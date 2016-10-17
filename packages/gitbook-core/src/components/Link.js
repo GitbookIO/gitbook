@@ -3,8 +3,8 @@ const ReactRedux = require('react-redux');
 
 const File = require('../models/File');
 const SummaryArticle = require('../models/SummaryArticle');
-const SummaryArticleShape = require('../shapes/SummaryArticle');
-const FileShape = require('../shapes/File');
+const SummaryArticleShape = require('../propTypes/SummaryArticle');
+const FileShape = require('../propTypes/File');
 
 const Link = React.createClass({
     propTypes: {

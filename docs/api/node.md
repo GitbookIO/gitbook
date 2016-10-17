@@ -1,4 +1,4 @@
-# Context and APIs
+# Node APIs
 
 GitBooks provides different Node APIs and contexts to plugins. These APIs can vary according to the GitBook version being used, your plugin should specify the `engines.gitbook` field in `package.json` accordingly.
 

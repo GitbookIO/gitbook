@@ -3,7 +3,7 @@ const { React } = GitBook;
 
 const Page = React.createClass({
     propTypes: {
-        page: GitBook.Shapes.Page
+        page: GitBook.PropTypes.Page
     },
 
     render() {

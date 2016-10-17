@@ -12,7 +12,7 @@ const ShareButton = require('./ShareButton');
 const SharingButtons = React.createClass({
     propTypes: {
         options: optionsShape.isRequired,
-        page: GitBook.Shapes.Page.isRequired
+        page: GitBook.PropTypes.Page.isRequired
     },
 
     onShare(site) {

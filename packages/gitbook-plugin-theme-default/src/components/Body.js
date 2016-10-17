@@ -6,8 +6,8 @@ const Toolbar = require('./Toolbar');
 
 const Body = React.createClass({
     propTypes: {
-        page:   GitBook.Shapes.Page,
-        readme: GitBook.Shapes.Readme
+        page:   GitBook.PropTypes.Page,
+        readme: GitBook.PropTypes.Readme
     },
 
     render() {

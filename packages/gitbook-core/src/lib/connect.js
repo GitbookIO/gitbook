@@ -2,7 +2,7 @@ const React = require('react');
 const ReactRedux = require('react-redux');
 const { injectIntl } = require('react-intl');
 
-const ContextShape = require('../shapes/Context');
+const ContextShape = require('../propTypes/Context');
 
 /**
  * Use the GitBook context provided by ContextProvider to map actions to props

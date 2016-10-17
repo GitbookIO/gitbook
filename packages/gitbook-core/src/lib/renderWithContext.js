@@ -5,7 +5,7 @@ const PJAXWrapper = require('../components/PJAXWrapper');
 const I18nProvider = require('../components/I18nProvider');
 const ContextProvider = require('../components/ContextProvider');
 const History = require('../actions/history');
-const contextShape = require('../shapes/context');
+const contextShape = require('../propTypes/context');
 
 const GitBookApplication = React.createClass({
     propTypes: {

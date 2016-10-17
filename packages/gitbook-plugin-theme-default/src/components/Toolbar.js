@@ -7,7 +7,7 @@ const Toolbar = React.createClass({
     propTypes: {
         title:    React.PropTypes.string.isRequired,
         dispatch: React.PropTypes.func,
-        readme:   GitBook.Shapes.Readme
+        readme:   GitBook.PropTypes.Readme
     },
 
     onToggle() {

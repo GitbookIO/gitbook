@@ -8,10 +8,10 @@ const LoadingBar = require('./LoadingBar');
 const Theme = React.createClass({
     propTypes: {
         // State
-        page:     GitBook.Shapes.Page,
-        summary:  GitBook.Shapes.Summary,
-        readme:   GitBook.Shapes.Readme,
-        history:  GitBook.Shapes.History,
+        page:     GitBook.PropTypes.Page,
+        summary:  GitBook.PropTypes.Summary,
+        readme:   GitBook.PropTypes.Readme,
+        history:  GitBook.PropTypes.History,
         sidebar:  React.PropTypes.object,
         // Other props
         children: React.PropTypes.node

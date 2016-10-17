@@ -5,7 +5,7 @@ const { React } = GitBook;
 let SummaryArticle = React.createClass({
     propTypes: {
         active: React.PropTypes.bool,
-        article: GitBook.Shapes.SummaryArticle
+        article: GitBook.PropTypes.SummaryArticle
     },
 
     render() {
@@ -33,7 +33,7 @@ SummaryArticle = GitBook.connect(SummaryArticle, ({page}, {article}) => {
 
 const SummaryArticles = React.createClass({
     propTypes: {
-        articles: GitBook.Shapes.listOf(GitBook.Shapes.SummaryArticle)
+        articles: GitBook.PropTypes.listOf(GitBook.PropTypes.SummaryArticle)
     },
 
     render() {
@@ -51,7 +51,7 @@ const SummaryArticles = React.createClass({
 
 const SummaryPart = React.createClass({
     propTypes: {
-        part: GitBook.Shapes.SummaryPart
+        part: GitBook.PropTypes.SummaryPart
     },
 
     render() {
@@ -73,7 +73,7 @@ const SummaryPart = React.createClass({
 
 const SummaryParts = React.createClass({
     propTypes: {
-        parts: GitBook.Shapes.listOf(GitBook.Shapes.SummaryPart)
+        parts: GitBook.PropTypes.listOf(GitBook.PropTypes.SummaryPart)
     },
 
     render() {
@@ -91,7 +91,7 @@ const SummaryParts = React.createClass({
 
 const Summary = React.createClass({
     propTypes: {
-        summary: GitBook.Shapes.Summary
+        summary: GitBook.PropTypes.Summary
     },
 
     render() {
