@@ -12,6 +12,7 @@
     margin: 5px;
     margin-top: 0px;
     border-radius: 3px;
+    background: @dropdown-background;
 
     &:before {
         content: " ";
@@ -31,7 +32,7 @@
         height: 0;
         border-left: (@dropdown-arrow-width - 1) solid transparent;
         border-right: (@dropdown-arrow-width - 1) solid transparent;
-        border-bottom: (@dropdown-arrow-width - 1) solid #fff;
+        border-bottom: (@dropdown-arrow-width - 1) solid @dropdown-background;
         position: absolute;
         top: -(@dropdown-arrow-width - 1);
         right: 11px;
