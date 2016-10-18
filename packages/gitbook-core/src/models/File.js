@@ -21,9 +21,8 @@ class File extends Record(DEFAULTS) {
     }
 
     /**
-     * Returns the relative path from this file to "to"
-     * @param {String} to
-     * @return {String}
+     * @param {String} to Absolute path
+     * @return {String} The same path, but relative to this file
      */
     relative(to) {
         return path.relative(
