@@ -41,7 +41,9 @@ module.exports = {
     hooks: {
         // Index each page
         'page': function(page) {
-            if (this.output.name != 'website' || !searchIndexEnabled || page.search === false) {
+            const search = page.attributes.search;
+
+            if (this.output.name != 'website' || !searchIndexEnabled || search === false) {
                 return page;
             }
 
@@ -64,8 +66,8 @@ module.exports = {
             }
 
             var keywords = [];
-            if (page.search) {
-                keywords = page.search.keywords || [];
+            if (search) {
+                keywords = search.keywords || [];
             }
 
             // Add to index
