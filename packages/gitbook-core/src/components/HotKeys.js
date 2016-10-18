@@ -22,7 +22,7 @@ const HotKeys = React.createClass({
     },
 
     getDefaultProps() {
-        return { keyMap: [] };
+        return { keyMap: {} };
     },
 
     updateBindings(keyMap) {
