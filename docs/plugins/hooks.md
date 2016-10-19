@@ -71,7 +71,6 @@ In the `page` hook, `page.content` is the HTML generated from the markdown/ascii
 }
 ```
 
-
 ### Asynchronous Operations
 
 Hooks callbacks can be asynchronous and return promises.

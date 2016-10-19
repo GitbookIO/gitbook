@@ -66,4 +66,3 @@ You can use the options `--log=debug` and `--debug` to get better error messages
 ```
 $ gitbook build ./ --log=debug --debug
 ```
-
