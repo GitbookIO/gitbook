@@ -12,6 +12,7 @@
     "immutable": "^3.8.1",
     "mousetrap": "1.6.0",
     "react": "^15.3.1",
+    "react-addons-css-transition-group": "^15.3.1",
     "react-dom": "^15.3.1",
     "react-helmet": "^3.1.0",
     "react-immutable-proptypes": "^2.1.0",

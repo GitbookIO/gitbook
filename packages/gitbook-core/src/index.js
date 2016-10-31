@@ -1,6 +1,7 @@
 require('whatwg-fetch');
 
 const React = require('react');
+const ReactCSSTransitionGroup = require('react-addons-css-transition-group');
 const Immutable = require('immutable');
 const Head = require('react-helmet');
 const Promise = require('bluebird');
@@ -66,6 +67,7 @@ module.exports = {
     PropTypes,
     // Librairies
     React,
+    ReactCSSTransitionGroup,
     Immutable,
     Promise
 };
