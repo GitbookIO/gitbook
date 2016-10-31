@@ -4,7 +4,7 @@ GitBooks provides different APIs and contexts to plugins. These APIs can vary ac
 
 #### Book instance
 
-The `Book` class is the central point of GitBook, it centralize all access read methods. This class is defined in [book.js](https://github.com/GitbookIO/gitbook/blob/master/lib/book.js).
+The `Book` class is the central point of GitBook, it centralize all access read methods. This class is defined in [book.js](https://github.com/GitbookIO/gitbook/blob/master/lib/models/book.js).
 
 ```js
 // Read configuration from book.json
