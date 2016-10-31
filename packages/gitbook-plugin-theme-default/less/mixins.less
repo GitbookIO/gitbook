@@ -1,6 +1,15 @@
-
 .text-adjust(@value) {
     text-size-adjust: @value;
     -ms-text-size-adjust: @value;
     -webkit-text-size-adjust: @value;
+}
+
+// The 'flex' shorthand
+// - applies to: flex items
+// <positive-number>, initial, auto, or none
+.flex(@columns: initial) {
+  -webkit-flex: @columns;
+     -moz-flex: @columns;
+      -ms-flex: @columns;
+          flex: @columns;
 }

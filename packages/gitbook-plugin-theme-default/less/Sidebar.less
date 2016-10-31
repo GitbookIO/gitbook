@@ -1,3 +1,25 @@
+.Sidebar-Flex {
+    .flex(0 0 @sidebar-width);
+
+    &.Layout-enter {
+        margin-left: -@sidebar-width;
+
+        &.Layout-enter-active {
+            margin-left: 0;
+            transition: margin-left 250ms ease-in-out;
+        }
+    }
+
+    &.Layout-leave {
+        margin-left: 0;
+
+        &.Layout-leave-active {
+            margin-left: -@sidebar-width;
+            transition: margin-left 250ms ease-in-out;
+        }
+    }
+}
+
 .Sidebar {
     height: 100%;
     background: @sidebar-background;

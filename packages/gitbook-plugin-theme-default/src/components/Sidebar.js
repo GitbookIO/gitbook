@@ -12,9 +12,11 @@ const Sidebar = React.createClass({
         const { summary } = this.props;
 
         return (
-            <div className="Sidebar book-summary">
-                <GitBook.InjectedComponent matching={{ role: 'search:container:input' }} />
-                <Summary summary={summary} />
+            <div className="Sidebar-Flex">
+                <div className="Sidebar book-summary">
+                    <GitBook.InjectedComponent matching={{ role: 'search:container:input' }} />
+                    <Summary summary={summary} />
+                </div>
             </div>
         );
     }

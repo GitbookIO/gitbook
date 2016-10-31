@@ -1,5 +1,5 @@
 const GitBook = require('gitbook-core');
-const { React } = GitBook;
+const { React, ReactCSSTransitionGroup } = GitBook;
 
 const Sidebar = require('./Sidebar');
 const Body = require('./Body');
@@ -29,16 +29,18 @@ const Theme = React.createClass({
                 <GitBook.ImportCSS href="gitbook/theme-default/theme.css" />
 
                 <GitBook.FlexBox>
-                    <GitBook.FlexLayout>
-                        {sidebar.open ? (
-                            <GitBook.FlexBox col={3}>
-                                <Sidebar summary={summary} />
-                            </GitBook.FlexBox>
-                        ) : null}
-                        <GitBook.FlexBox col={sidebar.open ? 9 : 12}>
+                    <ReactCSSTransitionGroup
+                        component={GitBook.FlexLayout}
+                        transitionName="Layout"
+                        transitionEnterTimeout={300}
+                        transitionLeaveTimeout={300}>
+                    {sidebar.open ? (
+                        <Sidebar key={0} summary={summary} />
+                    ) : null}
+                        <div key={1} className="Body-Flex">
                             <Body page={page} readme={readme} />
-                        </GitBook.FlexBox>
-                    </GitBook.FlexLayout>
+                        </div>
+                    </ReactCSSTransitionGroup>
                 </GitBook.FlexBox>
                 {children}
             </GitBook.FlexLayout>
