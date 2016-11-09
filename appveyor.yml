@@ -5,6 +5,7 @@ init:
 # Test against these versions of Node.js.
 environment:
   matrix:
+    - nodejs_version: "7"
     - nodejs_version: "6"
     - nodejs_version: "5"
     - nodejs_version: "4"
@@ -17,8 +18,6 @@ install:
   # Get the latest stable version of Node.js or io.js
   - ps: Install-Product node $env:nodejs_version
   - set CI=true
-  # install svgexport
-  - npm install svgexport -g
   # install modules
   - npm install
 
