@@ -6,7 +6,5 @@ os:
 node_js:
   - "stable"
   - "4.1"
-before_install:
-  - npm install svgexport -g
 after_success:
   - npm run lint

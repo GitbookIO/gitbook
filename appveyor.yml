@@ -17,8 +17,6 @@ install:
   # Get the latest stable version of Node.js or io.js
   - ps: Install-Product node $env:nodejs_version
   - set CI=true
-  # install svgexport
-  - npm install svgexport -g
   # install modules
   - npm install
 
