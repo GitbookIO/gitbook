@@ -53,7 +53,10 @@ program
                 choices: [
                     'analytics',
                     'search',
-                    'content'
+                    'content',
+                    'structure',
+                    'social',
+                    'visual'
                 ]
             }
         ])
