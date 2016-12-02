@@ -4,7 +4,6 @@ const classNames = require('classnames');
 const Button = React.createClass({
     propTypes: {
         active:    React.PropTypes.bool,
-        href:      React.PropTypes.string,
         className: React.PropTypes.string,
         children:  React.PropTypes.node,
         onClick:   React.PropTypes.func
