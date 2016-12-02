@@ -1,11 +1,11 @@
 const React = require('react');
 const ReactSafeHtml = require('react-safe-html');
+const { DOMProperty } = require('react-dom/lib/ReactInjection');
 const htmlTags = require('html-tags');
 const entities = require('entities');
 
 const { InjectedComponent } = require('./InjectedComponent');
 
-const DOMProperty = require('react/lib/ReactInjection').DOMProperty;
 DOMProperty.injectDOMPropertyConfig({
     Properties: {
         align: DOMProperty.MUST_USE_ATTRIBUTE
