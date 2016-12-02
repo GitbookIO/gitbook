@@ -32,23 +32,23 @@ program
         inquirer.prompt([
             {
                 name: 'title',
-                message: 'title:'
+                message: 'Title (as displayed on GitBook.com):'
             },
             {
                 name: 'name',
-                message: 'name:'
+                message: 'Name (unique identifier for the plugin):'
             },
             {
                 name: 'desc',
-                message: 'description:'
+                message: 'Description:'
             },
             {
                 name: 'github',
-                message: 'github url:'
+                message: 'GitHub repository URL:'
             },
             {
                 name: 'categories',
-                message: 'categories:',
+                message: 'Categories (as displayed on GitBook.com):',
                 type: 'checkbox',
                 choices: [
                     'analytics',
