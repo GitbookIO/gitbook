@@ -76,3 +76,6 @@ program
 
 
 program.parse(process.argv);
+
+// Display help if no arguments
+if (!program.args.length) program.help();
