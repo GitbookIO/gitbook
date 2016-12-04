@@ -1,3 +1,4 @@
+const debounce = require('debounce');
 const GitBook = require('gitbook-core');
 const { React } = GitBook;
 
@@ -56,16 +57,21 @@ const Body = React.createClass({
         updateURI: React.PropTypes.func
     },
 
+    getInitialState() {
+        this.debouncedOnScroll = debounce(this.onScroll, 300);
+        return {};
+    },
+
     /**
      * User is scrolling the page, update the location with current section's ID.
      */
-    onScroll(event) {
+    onScroll() {
+        const { scrollContainer } = this;
         const { history, updateURI } = this.props;
         const { location } = history;
-        const container = event.target;
 
         // Find the id matching the current scroll position
-        const hash = getHeadingID(container, container.scrollTop);
+        const hash = getHeadingID(scrollContainer, scrollContainer.scrollTop);
 
         // Update url if changed
         if (hash !== location.hash) {
@@ -88,7 +94,8 @@ const Body = React.createClass({
             <GitBook.InjectedComponent matching={{ role: 'body:wrapper' }}>
                 <div
                     className="Body page-wrapper"
-                    onScroll={this.onScroll}
+                    onScroll={this.debouncedOnScroll}
+                    ref={div => this.scrollContainer = div}
                 >
                     <GitBook.InjectedComponent matching={{ role: 'toolbar:wrapper' }}>
                         <Toolbar title={page.title} readme={readme} />
