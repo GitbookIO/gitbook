@@ -7,7 +7,7 @@ const isServerSide = (typeof window === 'undefined');
 
 const HistoryState = Record({
     // Current location
-    location:  null,
+    location:  new Location(),
     // Are we loading a new page
     loading:   Boolean(false),
     // Did we fail loading a page?
