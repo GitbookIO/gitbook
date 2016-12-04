@@ -14,7 +14,6 @@ const SUPPORTED = (
  */
 function activate() {
     return (dispatch, getState) => {
-
         dispatch({
             type: ACTION_TYPES.HISTORY_ACTIVATE,
             listener: (location) => {

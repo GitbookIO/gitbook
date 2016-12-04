@@ -1,6 +1,7 @@
 const { Record, List } = require('immutable');
 const { createBrowserHistory, createMemoryHistory } = require('history');
 const ACTION_TYPES = require('../actions/TYPES');
+const Location = require('../models/Location');
 
 const isServerSide = (typeof window === 'undefined');
 
@@ -45,6 +46,8 @@ function reduceHistory(state, action) {
 
         // We can't use .merge since it convert history to an immutable
         const newState = state
+            // TODO: we should find a way to have the correct location on server side
+            .set('location', isServerSide ? new Location() : Location.fromNative(window.location))
             .set('client', client)
             .set('unlisten', unlisten);
 
