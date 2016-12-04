@@ -36,5 +36,7 @@ packages.forEach((name) => {
     updateDependencies(pkg.dependencies);
     updateDependencies(pkg.devDependencies);
 
-    fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2), 'utf-8');
+    const json = JSON.stringify(pkg, null, 2);
+
+    fs.writeFileSync(pkgPath, `${json}\n`, 'utf-8');
 });
