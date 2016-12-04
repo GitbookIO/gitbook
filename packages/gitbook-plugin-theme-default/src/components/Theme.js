@@ -38,7 +38,11 @@ const Theme = React.createClass({
                         <Sidebar key={0} summary={summary} />
                     ) : null}
                         <div key={1} className="Body-Flex">
-                            <Body page={page} readme={readme} />
+                            <Body
+                                page={page}
+                                readme={readme}
+                                history={history}
+                            />
                         </div>
                     </ReactCSSTransitionGroup>
                 </GitBook.FlexBox>
