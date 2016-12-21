@@ -1,19 +1,25 @@
-Thank you for giving us your feedback! We listed some guidelines to help you:
+<!--               IMPORTANT NOTICE                   -->
+<!-- Only post things related to the gitbook CLI.     -->
+<!-- For GitBook.com, the Editor, or anything else,   -->
+<!-- please go to:                                    -->
+<!-- https://github.com/GitbookIO/feedback/issues     -->
 
-If possible, open separate issues for each bug report. Avoid grouping bugs that are unrelated.
+<!-- Please open separate issues for each bug report. -->
 
 ### What is the current behavior?
 
-If the current behavior is a bug, please provide the steps to reproduce. if possible, provide the GitBook version being used (`gitbook -V`) and the system infromations (OS and version).
+<!-- For bugs, provide the steps to reproduce.             -->
+<!-- Provide the GitBook version being used (`gitbook -V`) -->
+<!-- Provide system informations (OS and version).         -->
+<!-- Provide your username and the URL of the book.        -->
+
+
+
 
 ### What is the expected behavior?
 
-How do you think, or how would you like it should behave.
 
-#### For GitBook.com
 
-Provide, if possible, your username and the URL of the concerned book.
 
-----
-
-The GitBook Team
+<!-- Thank you for giving us your feedback! -->
+<!--           The GitBook Team             -->
