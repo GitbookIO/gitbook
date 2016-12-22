@@ -32,20 +32,20 @@ Please include tests and docs with every pull request!
 
 ## Running Tests
 
-To run the examples, you need to have the GitBook repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies from `npm`.
+To run the examples, you need to have the GitBook repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies from `npm` using `yarn`.
 
 ```
-npm install
+$ yarn install
 ```
 
 Then you'll need to bootstrap it:
 
 ```
-npm run bootstrap
+$ npm run bootstrap
 ```
 
 Which will also compile the source files. Then run the tests with:
 
 ```
-npm test
+$ npm test
 ```
