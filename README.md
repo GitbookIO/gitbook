@@ -1,21 +1,28 @@
 [![GitBook](https://raw.github.com/GitbookIO/gitbook/master/docs/images/banner.png)](https://www.gitbook.com)
 
+<p align="center">A <em>modern</em> customizable documentation format and toolchain</p>
+
+
+<p align="center"><a href="#features"><strong>Features</strong></a> · <a href="https://www.gitbook.com"><strong>Hosting</strong></a> · <a href="http://redux.js.org/"><strong>Example</strong></a> · <a href="https://www.gitbook.com/editor"><strong>Editor</strong></a> · <a href="https://toolchain.gitbook.com/"><strong>Documentation</strong></a> · <a href="./CONTRIBUTING.md"><strong>Contributing!</strong></a> · <a href="https://twitter.com/GitBookIO"><strong>Twitter</strong></a></p>
+<br/>
+
+![Preview](https://raw.github.com/GitbookIO/gitbook/master/docs/images/preview.png)
+
+
 <p align="center">
-[![NPM version](https://badge.fury.io/js/gitbook.svg)](http://badge.fury.io/js/gitbook)
-[![Linux Build Status](https://travis-ci.org/GitbookIO/gitbook.png?branch=master)](https://travis-ci.org/GitbookIO/gitbook)
-[![Windows Build status](https://ci.appveyor.com/api/projects/status/63nlflxcwmb2pue6?svg=true)](https://ci.appveyor.com/project/GitBook/gitbook)
-[![Slack Status](https://slack.gitbook.com/badge.svg)](https://slack.gitbook.com)
+<img src="https://badge.fury.io/js/gitbook.svg" />
+<a href="https://travis-ci.org/GitbookIO/gitbook"><img src="https://travis-ci.org/GitbookIO/gitbook.png?branch=master" /></a>
+<a href="https://ci.appveyor.com/project/GitBook/gitbook"><img src="https://ci.appveyor.com/api/projects/status/63nlflxcwmb2pue6?svg=true" /></a>
+<a href="https://ci.appveyor.com/project/GitBook/gitbook"><img src="https://slack.gitbook.com/badge.svg" /></a>
 </p>
 
-GitBook is a command line tool (and Node.js library) for building beautiful books using GitHub/Git and Markdown (or AsciiDoc). Here is an example: [Learn Javascript](https://www.gitbook.com/book/GitBookIO/javascript).
+GitBook is a command line tool (and Node.js library) for building beautiful books using GitHub/Git and Markdown (or AsciiDoc). Here is an example: [ReduxJS documentation](http://redux.js.org/).
 
 You can publish and host books easily online using [gitbook.com](https://www.gitbook.com). A desktop editor is [also available](https://www.gitbook.com/editor).
 
 Check out the [GitBook Community Slack Channel](https://slack.gitbook.com), Stay updated by following [@GitBookIO](https://twitter.com/GitBookIO) on Twitter or [GitBook](https://www.facebook.com/gitbookcom) on Facebook.
 
 Complete documentation is available at [toolchain.gitbook.com](http://toolchain.gitbook.com/).
-
-![Preview](https://raw.github.com/GitbookIO/gitbook/master/docs/images/preview.png)
 
 ## Getting started
 
