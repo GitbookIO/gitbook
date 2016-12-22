@@ -1,5 +1,4 @@
-GitBook
-=======
+![GitBook](https://raw.github.com/GitbookIO/gitbook/master/docs/images/banner.png)
 
 [![NPM version](https://badge.fury.io/js/gitbook.svg)](http://badge.fury.io/js/gitbook)
 [![Linux Build Status](https://travis-ci.org/GitbookIO/gitbook.png?branch=master)](https://travis-ci.org/GitbookIO/gitbook)
@@ -14,7 +13,7 @@ Check out the [GitBook Community Slack Channel](https://slack.gitbook.com), Stay
 
 Complete documentation is available at [toolchain.gitbook.com](http://toolchain.gitbook.com/).
 
-![Image](https://raw.github.com/GitbookIO/gitbook/master/preview.png)
+![Preview](https://raw.github.com/GitbookIO/gitbook/master/docs/images/preview.png)
 
 ## Getting started
 
