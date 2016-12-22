@@ -12,7 +12,7 @@ A theme is a plugin containing templates and assets. Overriding any individual t
 | -------- | ----------- |
 | `_layouts` | Main folder containing all the templates |
 | `_layouts/website/page.html` | Template for a normal page |
-| `_layouts/ebook/page.html` | Template for a normal page during ebook generation (PDF< ePub, Mobi) |
+| `_layouts/ebook/page.html` | Template for a normal page during ebook generation (PDF, ePub, Mobi) |
 
 
 ### Extend/Customize theme in a book

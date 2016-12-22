@@ -21,7 +21,7 @@ This looks up username from the context and displays it. Variable names can have
 
 If a value is undefined, nothing is displayed. The following all output nothing if foo is undefined: `{{ foo }}`, `{{ foo.bar }}`, `{{ foo.bar.baz }}`.
 
-GitBook provides a set of [predefined  variables](variables.md) from the context.
+GitBook provides a set of [predefined variables](variables.md) from the context.
 
 ### Filters
 
@@ -92,7 +92,7 @@ Inclusion and inheritance is detailled in the [Content References](conrefs.md) s
 
 If you want GitBook to ignore any of the special templating tags, you can use raw and anything inside of it will be output as plain text.
 
-``` twig
+```twig
 {% raw %}
   this will {{ not be processed }}
 {% endraw %}

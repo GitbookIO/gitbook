@@ -18,7 +18,7 @@ Any text editor should work! But we advise using the [GitBook Editor](https://ww
 
 The GitBook format supports right to left, and bi-directional writing. To enable it, you either need to specify a language (ex: `ar`), or force GitBook to use RTL in your `book.json`:
 
-``` json
+```json
 {
     "language": "ar",
     "direction": "rtl"
@@ -34,7 +34,7 @@ You should always use paths and the `.md` extensions when linking to your files,
 
 #### Can I create a GitBook in a sub-directory of my repository?
 
-Yes, GitBooks can be created in [sub-directories](structure.md#subdirectory). GitBook.com and the CLI also looks by default in a serie of [folders](structure.md).
+Yes, GitBooks can be created in [sub-directories](structure.md#subdirectory). GitBook.com and the CLI also looks by default in a series of [folders](structure.md).
 
 #### Does GitBook supports RTL languages?
 

@@ -40,7 +40,6 @@ Chapters in the Table of Contents can be pointing to specific part of a file usi
     * [Better tools for authors](part2/README.md#tools)
 ```
 
-
 ##### Parts
 
 The Table of Contents can be divided into parts separated by headings or horizontal lines:
@@ -73,7 +72,7 @@ Most of the files for GitBook use the Markdown syntax by default. GitBook infers
 
 ##### Example of a chapter file
 
-``` markdown
+```markdown
 # Title of the chapter
 
 This is a great introduction.

@@ -28,7 +28,7 @@ The following is a reference of the available data during book's parsing and the
 
 | Variable | Description |
 | -------- | ----------- |
-| `gitbook.time` | The current time (when you run the `gitbook` command) . |
+| `gitbook.time` | The current time (when you run the `gitbook` command). |
 | `gitbook.version` | Version of GitBook used to generate the book |
 
 ### File Variables

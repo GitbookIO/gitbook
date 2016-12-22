@@ -13,6 +13,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - *Plugin API*: hook `page` can no longer modify the content, only the page's attributes
 - *Plugin API*: plugins can no longer export resources, instead use the `_assets` folder
 
+## 3.2.2
+- Fix catching parsing errors leading to possible missing pages in generated book
+- Rollback markdown parser to `kramed` until `markup-it` is stable enough
+
+## 3.2.1
+- Fix bug on Firefox when navigating to an url containing an hash
+- Update nunjucks to fix JS error when page contains a lot of templating blocks
+
 ## 3.2.0
 - Switch markdown parser from `kramed` to `markup-it`
 - Fix support of `|` in tables
