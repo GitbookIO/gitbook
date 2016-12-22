@@ -1,0 +1,51 @@
+.Summary {
+
+}
+
+.SummaryPart {
+
+}
+
+.SummaryPart-Title {
+    margin: 0px;
+    padding: 2*@summary-article-padding-v @summary-article-padding-h;
+    text-transform: uppercase;
+    color: @summary-header-color;
+    font-size: inherit;
+    font-weight: inherit;
+}
+
+.SummaryArticles {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+.SummaryArticle {
+    list-style: none;
+
+    a, span {
+        display: block;
+        padding: @summary-article-padding-v @summary-article-padding-h;
+        border-bottom: none;
+        color: @summary-article-color;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        position: relative;
+        text-decoration: none;
+        outline: none;
+    }
+
+    a:hover {
+        text-decoration: none;
+        color: @summary-article-hover-color;
+    }
+
+    &.active, &.active:hover {
+        a {
+            color: @summary-article-active-color;
+            background: @summary-article-active-background;
+        }
+    }
+}

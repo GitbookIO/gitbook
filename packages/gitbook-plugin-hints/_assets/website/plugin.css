@@ -1,0 +1,43 @@
+.HintAlert {
+    padding: 10px;
+    border-radius: 3px;
+    display: flex;
+    margin-bottom: 1.275em;
+}
+
+.HintAlert-Icon {
+    flex: 0;
+    padding: 10px 20px;
+    font-size: 24px;
+}
+
+.HintAlert-Content {
+    flex: auto;
+    padding: 10px;
+    padding-left: 0px;
+}
+
+/* Styles */
+.HintAlert-Style-info, .HintAlert-Style-tip {
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+}
+
+.HintAlert-Style-success {
+    color: #3c763d;
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+}
+
+.HintAlert-Style-danger {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+}
+
+.HintAlert-Style-warning {
+    color: #8a6d3b;
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+}

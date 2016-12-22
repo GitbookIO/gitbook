@@ -1,0 +1,20 @@
+{
+    "LANGS_CHOOSE": "ভাষা নির্বাচন করুন",
+    "GLOSSARY": "গ্লোসারি",
+    "GLOSSARY_INDEX": "ইন্ডেক্স",
+    "GLOSSARY_OPEN": "গ্লোসারি",
+    "GITBOOK_LINK": "গিটবুকের মাধ্যমে প্রকাশিত",
+    "SUMMARY": "সূচিপত্র",
+    "SUMMARY_INTRODUCTION": "সূচনা",
+    "SUMMARY_TOGGLE": "সূচিপত্র",
+    "SEARCH_TOGGLE": "অনুসন্ধান",
+    "SEARCH_PLACEHOLDER": "অনুসন্ধান",
+    "FONTSETTINGS_TOGGLE": "ফন্ট সেটিংস",
+    "SHARE_TOGGLE": "শেয়ার",
+    "SHARE_ON": "{{platform}}-এ শেয়ার",
+    "FONTSETTINGS_WHITE": "সাদা",
+    "FONTSETTINGS_SEPIA": "সেপিয়া",
+    "FONTSETTINGS_NIGHT": "রাত",
+    "FONTSETTINGS_SANS": "স্যান্স",
+    "FONTSETTINGS_SERIF": "শেরিফ"
+}

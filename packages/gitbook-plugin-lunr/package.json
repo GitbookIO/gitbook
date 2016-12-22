@@ -1,0 +1,44 @@
+{
+  "name": "gitbook-plugin-lunr",
+  "description": "Static and local index for search in GitBook",
+  "main": "index.js",
+  "browser": "./_assets/theme.js",
+  "version": "4.0.0",
+  "dependencies": {
+    "gitbook-core": "4.0.0",
+    "html-entities": "1.2.0",
+    "lunr": "0.5.12"
+  },
+  "devDependencies": {
+    "gitbook-plugin": "4.0.0"
+  },
+  "engines": {
+    "gitbook": ">=3.0.0"
+  },
+  "gitbook": {
+    "properties": {
+      "maxIndexSize": {
+        "type": "number",
+        "title": "Limit size for the index",
+        "default": 1000000
+      },
+      "ignoreSpecialCharacters": {
+        "type": "boolean",
+        "title": "Ignore special characters in words",
+        "default": false
+      }
+    }
+  },
+  "scripts": {
+    "build-js": "gitbook-plugin build ./src/index.js ./_assets/theme.js",
+    "prepublish": "npm run build-js"
+  },
+  "homepage": "https://github.com/GitBookIO/gitbook",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GitBookIO/gitbook.git"
+  },
+  "bugs": {
+    "url": "https://github.com/GitBookIO/gitbook/issues"
+  }
+}

@@ -1,0 +1,20 @@
+{
+    "LANGS_CHOOSE": "Виберіть мову",
+    "GLOSSARY": "Алфавітний покажчик",
+    "GLOSSARY_INDEX": "Алфавітний покажчик",
+    "GLOSSARY_OPEN": "Алфавітний покажчик",
+    "GITBOOK_LINK": "Опубліковано за допомогою GitBook",
+    "SUMMARY": "Зміст",
+    "SUMMARY_INTRODUCTION": "Вступ",
+    "SUMMARY_TOGGLE": "Зміст",
+    "SEARCH_TOGGLE": "Пошук",
+    "SEARCH_PLACEHOLDER": "Введіть для пошуку",
+    "FONTSETTINGS_TOGGLE": "Шрифт",
+    "SHARE_TOGGLE": "Поділитися",
+    "SHARE_ON": "Поділитися в {{platform}}",
+    "FONTSETTINGS_WHITE": "Світлий",
+    "FONTSETTINGS_SEPIA": "Сепія",
+    "FONTSETTINGS_NIGHT": "Темний",
+    "FONTSETTINGS_SANS": "Sans",
+    "FONTSETTINGS_SERIF": "Serif"
+}

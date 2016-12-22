@@ -1,0 +1,29 @@
+{
+  "name": "gitbook-plugin-livereload",
+  "description": "Live reloading for your gitbook",
+  "main": "index.js",
+  "browser": "./_assets/plugin.js",
+  "version": "4.0.0",
+  "engines": {
+    "gitbook": "*"
+  },
+  "dependencies": {
+    "gitbook-core": "4.0.0"
+  },
+  "devDependencies": {
+    "gitbook-plugin": "4.0.0"
+  },
+  "scripts": {
+    "build-js": "gitbook-plugin build ./src/index.js ./_assets/plugin.js",
+    "prepublish": "npm run build-js"
+  },
+  "homepage": "https://github.com/GitbookIO/gitbook",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GitbookIO/gitbook.git"
+  },
+  "license": "Apache 2",
+  "bugs": {
+    "url": "https://github.com/GitbookIO/gitbook/issues"
+  }
+}

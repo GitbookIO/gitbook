@@ -1,0 +1,20 @@
+{
+    "LANGS_CHOOSE": "בחר שפה",
+    "GLOSSARY": "מונחים",
+    "GLOSSARY_INDEX": "מפתח",
+    "GLOSSARY_OPEN": "מונחים",
+    "GITBOOK_LINK": "הוצאה לאור באמצעות גיט-בוק GITBOOK",
+    "SUMMARY": "תוכן העניינים",
+    "SUMMARY_INTRODUCTION": "הוראות",
+    "SUMMARY_TOGGLE": "תקציר",
+    "SEARCH_TOGGLE": "חיפוש",
+    "SEARCH_PLACEHOLDER": "סוג החיפוש",
+    "FONTSETTINGS_TOGGLE": "הגדרת אותיות",
+    "SHARE_TOGGLE": "שתף",
+    "SHARE_ON": "{{platform}} שתף ב",
+    "FONTSETTINGS_WHITE": "בהיר",
+    "FONTSETTINGS_SEPIA": "חום כהה",
+    "FONTSETTINGS_NIGHT": "מצב לילה",
+    "FONTSETTINGS_SANS": "Sans",
+    "FONTSETTINGS_SERIF": "Serif"
+}

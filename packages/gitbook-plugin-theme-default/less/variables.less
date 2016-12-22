@@ -1,0 +1,55 @@
+// Colors
+@color-primary:                     hsl(207, 100%, 50%); // rgb(44, 106, 254);
+// Fonts
+@font-family-serif:                 Georgia, serif;
+@font-family-sans:                  "Helvetica Neue", Helvetica, Arial, sans-serif;
+@font-family-base:                  @font-family-sans;
+// Font sizes
+@font-size-base:                    14px;
+@font-size-large:                   ceil(@font-size-base * 1.25); // ~18px
+@font-size-small:                   ceil(@font-size-base * 0.85); // ~12px
+@line-height-base:                  1.428571429; // 20/14
+@line-height-computed:              floor(@font-size-base * @line-height-base);
+// Sidebar
+@sidebar-background:                rgb(250, 250, 250);
+@sidebar-border-color:              rgba(0, 0, 0, 0.0666667);
+@sidebar-width:                     300px;
+// Summary
+@summary-header-color:              #939da3;
+@summary-article-padding-v:         10px;
+@summary-article-padding-h:         15px;
+@summary-article-color:             hsl(207, 15%, 25%);
+@summary-article-hover-color:       @color-primary;
+@summary-article-active-color:      @summary-article-color;
+@summary-article-active-background: #f5f5f5;
+// Page
+@page-width:                        800px;
+@page-color:                        #333333;
+@page-line-height:                  1.7;
+@page-font-size:                    16px;
+// Button
+@button-padding:                    19px;
+@button-background:                 transparent;
+@button-color:                      #bbb;
+@button-hover-color:                #a1a1a1;
+// Dropdown
+@dropdown-padding-v:                10px;
+@dropdown-padding-h:                15px;
+@dropdown-arrow-width:              8px;
+@dropdown-border-color:             #e5e5e5;
+@dropdown-color:                    @button-color;
+@dropdown-hover-color:              @button-hover-color;
+@dropdown-background:               #fff;
+// Tooltip
+@tooltip-background:                rgba(0,0,0,.8);
+@tooltip-radius:                    3px;
+@tooltip-color:                     #fff;
+// Search
+@search-highlight-color:            rgba(255, 220, 0, 0.4);
+@search-clear-color:                @button-color;
+// Font awesome
+@path-assets:                       '.';
+@path-fonts:                        '@{path-assets}/fonts';
+@fa-font-path:                      '@{path-fonts}/fontawesome';
+// Z-indexes
+@zindex-tooltip:                    300;

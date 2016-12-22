@@ -22,14 +22,20 @@ build/Release
 # Dependency directory
 # Deployed apps should consider commenting this line out:
 # see https://npmjs.org/doc/faq.html#Should-I-check-my-node_modules-folder-into-git
-/node_modules
+node_modules
+
+# yarn
+yarn.lock
 
 # vim swapfile
 *.swp
 
+# GitBook with babel
+/packages/gitbook-core/lib
+/packages/gitbook-plugin/lib
+
 # Output of documentation
 _book
-
 book.pdf
 book.epub
 book.mobi

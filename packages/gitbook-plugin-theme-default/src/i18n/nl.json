@@ -1,0 +1,20 @@
+{
+    "LANGS_CHOOSE": "Kies een taal",
+    "GLOSSARY": "Begrippenlijst",
+    "GLOSSARY_INDEX": "Index",
+    "GLOSSARY_OPEN": "Begrippenlijst",
+    "GITBOOK_LINK": "Gepubliceerd met GitBook",
+    "SUMMARY": "Inhoudsopgave",
+    "SUMMARY_INTRODUCTION": "Inleiding",
+    "SUMMARY_TOGGLE": "Inhoudsopgave",
+    "SEARCH_TOGGLE": "Zoeken",
+    "SEARCH_PLACEHOLDER": "Zoeken",
+    "FONTSETTINGS_TOGGLE": "Lettertype instellingen",
+    "SHARE_TOGGLE": "Delen",
+    "SHARE_ON": "Delen op {{platform}}",
+    "FONTSETTINGS_WHITE": "Wit",
+    "FONTSETTINGS_SEPIA": "Sepia",
+    "FONTSETTINGS_NIGHT": "Zwart",
+    "FONTSETTINGS_SANS": "Schreefloos",
+    "FONTSETTINGS_SERIF": "Schreef"
+}

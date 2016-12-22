@@ -42,6 +42,13 @@
     * [Test your plugin](plugins/testing.md)
 * [Theming](themes/README.md)
 
+### Plugin Development
+
+* [Introduction](./api/README.md)
+* [Node](./api/node.md)
+* [Connect to the context](./api/connect.md)
+* [Components](./api/components.md)
+
 --
 
 * [FAQ](faq.md)

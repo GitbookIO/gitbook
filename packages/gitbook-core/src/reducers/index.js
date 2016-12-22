@@ -1,0 +1,15 @@
+const composeReducer = require('../lib/composeReducer');
+const createReducer = require('../lib/createReducer');
+
+module.exports = composeReducer(
+    createReducer('components', require('./components')),
+    createReducer('history', require('./history')),
+    createReducer('i18n', require('./i18n')),
+    // GitBook JSON
+    createReducer('config', require('./config')),
+    createReducer('file', require('./file')),
+    createReducer('page', require('./page')),
+    createReducer('summary', require('./summary')),
+    createReducer('readme', require('./readme')),
+    createReducer('languages', require('./languages'))
+);

@@ -1,0 +1,27 @@
+.CodeBlockWithCopy-Container {
+    position: relative;
+}
+
+.CodeBlockWithCopy-Button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    padding: 3px 6px;
+    margin: 0px;
+    text-transform: uppercase;
+    border-radius: 3px;
+    line-height: 1em;
+    font-size: 12px;
+    border: 1px solid rgba(0,0,0, 0.1);
+    color: rgba(0,0,0, 0.4);
+    cursor: pointer;
+    display: none;
+}
+
+.CodeBlockWithCopy-Container:hover .CodeBlockWithCopy-Button {
+    display: block;
+}
+
+.CodeBlockWithCopy-Button:hover {
+    border-color: rgba(0,0,0, 0.2);
+}

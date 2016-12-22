@@ -1,0 +1,41 @@
+
+.Headings-Container {
+    position: relative;
+    margin-left: -30px;
+    padding-left: 30px;
+}
+
+/* Left anchors rules */
+.Headings-Container > .Headings-Anchor-Left {
+    position: absolute;
+    left: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0;
+    color: inherit;
+}
+
+/* Right anchors rules */
+.Headings-Container > .Headings-Anchor-Right {
+    padding-left: 5px;
+    opacity: 0;
+    color: inherit;
+}
+
+.Headings-Container.Headings-Right > h1,
+.Headings-Container.Headings-Right > h2,
+.Headings-Container.Headings-Right > h3,
+.Headings-Container.Headings-Right > h4,
+.Headings-Container.Headings-Right > h5,
+.Headings-Container.Headings-Right > h6 {
+    display: inline-block;
+    margin-right: 5px;
+}
+
+/* Display on hover */
+.Headings-Container:hover > .Headings-Anchor-Left,
+.Headings-Container > .Headings-Anchor-Left:focus,
+.Headings-Container:hover > .Headings-Anchor-Right,
+.Headings-Container > .Headings-Anchor-Right:focus {
+    opacity: 1;
+}

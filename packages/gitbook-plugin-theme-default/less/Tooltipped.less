@@ -1,0 +1,100 @@
+.GitBook-Tooltipped {
+    display: inline-block;
+    position: relative;
+
+    &:hover, &.Tooltipped-o {
+        &:after {
+            line-height: 1em;
+            background: @tooltip-background;
+            border-radius: @tooltip-radius;
+            bottom: auto;
+            top: ~"calc(100% + 10px)";
+            color: @tooltip-color;
+            content: attr(aria-label);
+            display: block;
+            left: 50%;
+            padding: 5px 5px;
+            position: absolute;
+            white-space: nowrap;
+            z-index: @zindex-tooltip;
+            font-size: 13px;
+            text-transform: none;
+            font-weight: @font-size-base;
+            pointer-events: none;
+            transform: translateX(-50%);
+        }
+
+        &:before {
+            border: solid;
+            border-color: @tooltip-background transparent;
+            bottom:auto;
+            top: ~"calc(100% + 5px)";
+            border-width: 0px 5px 5px 5px;
+            content: "";
+            display: block;
+            left: 50%;
+            position: absolute;
+            z-index: @zindex-tooltip+1;
+            transform: translateX(-50%);
+        }
+    }
+
+    .north() {
+        &:after {
+            top: auto;
+            bottom: ~"calc(100% + 10px)";
+            transform: translateX(0%);
+        }
+        &:before {
+            top: auto;
+            border-width: 5px 5px 0px 5px;
+            bottom: ~"calc(100% + 5px)";
+            transform: translateX(0%);
+        }
+    }
+    .west() {
+        &:after {
+            left: auto;
+            right: 5px;
+            transform: translateX(0%);
+        }
+        &:before {
+            left: auto;
+            right: 10px;
+            transform: translateX(0%);
+        }
+    }
+    .east() {
+        &:after {
+            right: auto;
+            left: 5px;
+            transform: translateX(0%);
+        }
+        &:before {
+            right: auto;
+            left: 10px;
+            transform: translateX(0%);
+        }
+    }
+
+    &.Tooltipped-e {
+        .east()
+    }
+
+    &.Tooltipped-n {
+        .north();
+    }
+
+    &.Tooltipped-ne {
+        .north();
+        .east();
+    }
+
+    &.Tooltipped-nw {
+        .north();
+        .west();
+    }
+    &.Tooltipped-sw, &.Tooltipped-w {
+        .west();
+    }
+}
