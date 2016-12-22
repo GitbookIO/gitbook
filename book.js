@@ -6,7 +6,7 @@ module.exports = {
     title: 'GitBook Toolchain Documentation',
 
     // Enforce use of GitBook v3
-    gitbook: '3.1.1',
+    gitbook: '3.3.0',
 
     // Use the "official" theme
     plugins: ['theme-official@2.1.1', '-sharing', '-fontsettings', 'sitemap'],
