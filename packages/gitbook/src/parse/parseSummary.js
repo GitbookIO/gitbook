@@ -1,21 +1,40 @@
+const { BLOCKS } = require('markup-it');
+
 const parseStructureFile = require('./parseStructureFile');
 const Summary = require('../models/summary');
+const SummaryPart = require('../models/summaryPart');
 const SummaryModifier = require('../modifiers').Summary;
 
 /**
-    Parse summary in a book, the summary can only be parsed
-    if the readme as be detected before.
+ * Extract parts from a Slate document.
+ * @param  {Slate.Document} document
+ * @return {Array<Part>} parts
+ */
+function listPartsFromDocuments(document) {
+    const { nodes } = document;
+    const parts = [];
 
-    @param {Book} book
-    @return {Promise<Book>}
-*/
+    nodes.forEach((node) => {
+        if (node.type == )
+    });
+
+    return parts;
+}
+
+/**
+ * Parse summary in a book, the summary can only be parsed
+ * if the readme as be detected before.
+ *
+ * @param {Book} book
+ * @return {Promise<Book>}
+ */
 function parseSummary(book) {
     const readme = book.getReadme();
     const logger = book.getLogger();
     const readmeFile = readme.getFile();
 
     return parseStructureFile(book, 'summary')
-    .spread(function(file, result) {
+    .spread((file, result) => {
         let summary;
 
         if (!file) {
