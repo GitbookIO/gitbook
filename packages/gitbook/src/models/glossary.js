@@ -6,7 +6,7 @@ const GlossaryEntry = require('./glossaryEntry');
 const parsers = require('../parsers');
 
 const Glossary = Immutable.Record({
-    file:       File(),
+    file:       new File(),
     entries:    Immutable.OrderedMap()
 });
 

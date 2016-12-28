@@ -6,6 +6,8 @@ const PARSERS = new Map({
     asciidoc: require('./asciidoc')
 });
 
+const FILE_EXTENSIONS = PARSERS.reduce((result, parser) => result.concat(parser.FILE_EXTENSIONS), []);
+
 /**
  * Return a specific parser by its name
  *
@@ -37,6 +39,7 @@ function getForFile(filename) {
 }
 
 module.exports = {
+    FILE_EXTENSIONS,
     get: getParser,
     getByExt,
     getForFile

@@ -3,7 +3,7 @@ const File = require('../../../models/file');
 
 describe('editPartTitle', () => {
     const editPartTitle = require('../editPartTitle');
-    const summary = Summary.createFromParts(File(), [
+    const summary = Summary.createFromParts(new File(), [
         {
             articles: [
                 {
@@ -40,4 +40,3 @@ describe('editPartTitle', () => {
         expect(newSummary.getParts().size).toBe(2);
     });
 });
-

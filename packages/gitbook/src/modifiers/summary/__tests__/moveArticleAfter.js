@@ -4,7 +4,7 @@ const File = require('../../../models/file');
 
 describe('moveArticleAfter', () => {
     const moveArticleAfter = require('../moveArticleAfter');
-    const summary = Summary.createFromParts(File(), [
+    const summary = Summary.createFromParts(new File(), [
         {
             articles: [
                 {

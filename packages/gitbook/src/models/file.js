@@ -1,6 +1,7 @@
 const path = require('path');
 const { Record } = require('immutable');
 
+const error = require('../utils/error');
 const parsers = require('../parsers');
 
 const DEFAULTS = {
@@ -20,6 +21,31 @@ class File extends Record(DEFAULTS) {
     }
 
     /**
+     * Return the file extension.
+     * @return {String}
+     */
+    get extension() {
+        return path.extname(this.getPath()).toLowerCase();
+    }
+
+    /**
+     * Return the parser for this file..
+     * @return {Parser}
+     */
+    get parser() {
+        return parsers.getByExt(this.extension);
+    }
+
+    /**
+     * Return type of file ('markdown' or 'asciidoc').
+     * @return {String}
+     */
+    get type() {
+        const { parser } = this;
+        return parser ? parser.name : undefined;
+    }
+
+    /**
      * Does the file exists / is set.
      * @return {Boolean}
      */
@@ -28,32 +54,38 @@ class File extends Record(DEFAULTS) {
     }
 
     /**
-     * Return type of file ('markdown' or 'asciidoc').
-     * @return {String}
+     * Read and parse the file.
+     * @param  {FS} fs
+     * @return {Promise<Document>} document
      */
-    getType() {
-        const parser = this.getParser();
-        if (parser) {
-            return parser.name;
-        } else {
-            return undefined;
+    parse(fs) {
+        const { parser } = this;
+
+        if (!parser) {
+            return Promise.reject(
+                error.FileNotParsableError({
+                    filename: this.path
+                })
+            );
         }
+
+        return fs.readAsString(this.path)
+        .then((content) => {
+            const document = parser.toDocument(content);
+            return document;
+        });
     }
 
-    /**
-     * Return extension of this file (lowercased).
-     * @return {String}
-     */
+    getType() {
+        return this.type;
+    }
+
     getExtension() {
-        return path.extname(this.getPath()).toLowerCase();
+        return this.extension;
     }
 
-    /**
-     * Return parser for this file.
-     * @return {Parser}
-     */
     getParser() {
-        return parsers.getByExt(this.getExtension());
+        return this.parser;
     }
 
     /**

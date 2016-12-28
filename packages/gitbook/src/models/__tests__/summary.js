@@ -3,7 +3,7 @@ describe('Summary', () => {
     const File = require('../file');
     const Summary = require('../summary');
 
-    const summary = Summary.createFromParts(File(), [
+    const summary = Summary.createFromParts(new File(), [
         {
             articles: [
                 {
@@ -90,4 +90,3 @@ describe('Summary', () => {
         });
     });
 });
-

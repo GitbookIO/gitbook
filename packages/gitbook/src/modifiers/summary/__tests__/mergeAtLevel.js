@@ -4,7 +4,7 @@ const File = require('../../../models/file');
 
 describe('mergeAtLevel', () => {
     const mergeAtLevel = require('../mergeAtLevel');
-    const summary = Summary.createFromParts(File(), [
+    const summary = Summary.createFromParts(new File(), [
         {
             articles: [
                 {

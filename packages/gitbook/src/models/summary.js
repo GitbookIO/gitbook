@@ -6,7 +6,7 @@ const LocationUtils = require('../utils/location');
 const File = require('./file');
 const SummaryPart = require('./summaryPart');
 const SummaryArticle = require('./summaryArticle');
-const parsers = require('../parse/parsers');
+const parsers = require('../parsers');
 const summaryToDocument = require('../parse/summary/toDocument');
 
 const DEFAULTS = {

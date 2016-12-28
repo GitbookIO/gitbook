@@ -5,7 +5,7 @@ const File = require('../../../models/file');
 
 describe('insertPart', () => {
     const insertPart = require('../insertPart');
-    const summary = Summary.createFromParts(File(), [
+    const summary = Summary.createFromParts(new File(), [
         {
             articles: [
                 {

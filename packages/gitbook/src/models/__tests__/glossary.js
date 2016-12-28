@@ -3,7 +3,7 @@ const Glossary = require('../glossary');
 const GlossaryEntry = require('../glossaryEntry');
 
 describe('Glossary', () => {
-    const glossary = Glossary.createFromEntries(File(), [
+    const glossary = Glossary.createFromEntries(new File(), [
         {
             name: 'Hello World',
             description: 'Awesome!'
@@ -36,4 +36,3 @@ describe('Glossary', () => {
         });
     });
 });
-

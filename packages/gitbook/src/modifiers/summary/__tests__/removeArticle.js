@@ -3,7 +3,7 @@ const File = require('../../../models/file');
 
 describe('removeArticle', () => {
     const removeArticle = require('../removeArticle');
-    const summary = Summary.createFromParts(File(), [
+    const summary = Summary.createFromParts(new File(), [
         {
             articles: [
                 {

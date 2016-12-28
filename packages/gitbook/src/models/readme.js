@@ -3,7 +3,7 @@ const Immutable = require('immutable');
 const File = require('./file');
 
 const Readme = Immutable.Record({
-    file:           File(),
+    file:           new File(),
     title:          String(),
     description:    String()
 });
