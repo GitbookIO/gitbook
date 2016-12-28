@@ -1124,13 +1124,9 @@ es6-weak-map@^2.0.1:
     es6-iterator "2"
     es6-symbol "3"
 
-escape-string-regexp@1.0.5, escape-string-regexp@^1.0.5:
+escape-string-regexp@1.0.5, escape-string-regexp@^1.0.2, escape-string-regexp@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz#1b61c0562190a8dff6ae3bb2cf0200ca130b86d4"
-
-escape-string-regexp@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-1.0.2.tgz#4dbc2fe674e71949caf3fb2695ce7f2dc1d9a8d1"
 
 escope@^3.6.0:
   version "3.6.0"
@@ -1141,9 +1137,9 @@ escope@^3.6.0:
     esrecurse "^4.1.0"
     estraverse "^4.1.1"
 
-eslint-config-gitbook@1.3.1:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/eslint-config-gitbook/-/eslint-config-gitbook-1.3.1.tgz#660d981188d4976e3640ccea0c26a65c1f341664"
+eslint-config-gitbook@1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/eslint-config-gitbook/-/eslint-config-gitbook-1.5.0.tgz#1875bafd9e89c11af87e6fa624efb67b380d738a"
   dependencies:
     eslint-plugin-react "^6.3.0"
 

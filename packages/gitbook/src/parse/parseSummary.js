@@ -1,25 +1,7 @@
-const { BLOCKS } = require('markup-it');
-
 const parseStructureFile = require('./parseStructureFile');
 const Summary = require('../models/summary');
 const SummaryPart = require('../models/summaryPart');
 const SummaryModifier = require('../modifiers').Summary;
-
-/**
- * Extract parts from a Slate document.
- * @param  {Slate.Document} document
- * @return {Array<Part>} parts
- */
-function listPartsFromDocuments(document) {
-    const { nodes } = document;
-    const parts = [];
-
-    nodes.forEach((node) => {
-        if (node.type == )
-    });
-
-    return parts;
-}
 
 /**
  * Parse summary in a book, the summary can only be parsed

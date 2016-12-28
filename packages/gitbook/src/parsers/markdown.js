@@ -9,6 +9,16 @@ const FILE_EXTENSIONS = [
 ];
 
 /**
+ * Render a document as markdown.
+ * @param  {Document} document
+ * @return {String} text
+ */
+function toText(document) {
+    const state = State.create(markdown);
+    return state.serializeDocument(document);
+}
+
+/**
  * Parse markdown into a document.
  * @param  {String} text
  * @return {Document} document
@@ -43,7 +53,9 @@ function toInlineHTML(text) {
 }
 
 module.exports = {
+    name: 'markdown',
     FILE_EXTENSIONS,
+    toText,
     toDocument,
     toHTML,
     toInlineHTML

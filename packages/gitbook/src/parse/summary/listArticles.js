@@ -1,7 +1,8 @@
-const { BLOCKS } = require('markup-it');
+const { BLOCKS, INLINES } = require('markup-it');
 const SummaryArticle = require('../../models/summaryArticle');
 
 const isList = node => node.type === BLOCKS.OL_LIST || node.type === BLOCKS.UL_LIST;
+const isLink = node => node.type === INLINES.LINK;
 
 /**
  * Create a summary article from a list item.
@@ -10,12 +11,17 @@ const isList = node => node.type === BLOCKS.OL_LIST || node.type === BLOCKS.UL_L
  */
 function createArticleFromItem(item) {
     const { nodes } = item;
-    const title = nodes.first().text;
-    const list = nodes.skip(1).find(node => isList(node));
+
+    const titleParent = nodes.first();
+    const list = nodes.skip(1).find(isList);
     const articles = list ? listArticles(list) : [];
+    const title = titleParent.text;
+    const link = titleParent.findDescendant(isLink);
+    const href = link ? link.data.get('href') : null;
 
     return SummaryArticle.create({
         title,
+        href,
         articles
     });
 }

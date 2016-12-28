@@ -196,7 +196,7 @@ class TemplateBlock extends Record(DEFAULTS) {
 
         return Promise()
         .then(() => processFn.call(context, inner))
-        .then(props => {
+        .then((props) => {
             if (is.string(props)) {
                 return { children: props };
             }

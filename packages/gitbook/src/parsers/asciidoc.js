@@ -10,6 +10,16 @@ const FILE_EXTENSIONS = [
 ];
 
 /**
+ * Render a document as text.
+ * @param  {Document} document
+ * @return {String} text
+ */
+function toText(document) {
+    const state = State.create(asciidoc);
+    return state.serializeDocument(document);
+}
+
+/**
  * Parse asciidoc into a document.
  * @param  {String} text
  * @return {Document} document
@@ -43,8 +53,10 @@ function toInlineHTML(text) {
 }
 
 module.exports = {
+    name: 'asciidoc',
     FILE_EXTENSIONS,
     toDocument,
+    toText,
     toHTML,
     toInlineHTML
 };

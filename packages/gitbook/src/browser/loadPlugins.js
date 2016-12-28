@@ -15,7 +15,7 @@ function loadPlugins(plugins, type) {
             return plugins
                 .valueSeq()
                 .filter(plugin => plugin.getPackage().has(type))
-                .map(plugin => {
+                .map((plugin) => {
                     const browserFile = path.resolve(
                         plugin.getPath(),
                         plugin.getPackage().get(type)

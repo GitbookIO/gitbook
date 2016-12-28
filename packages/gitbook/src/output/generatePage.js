@@ -50,7 +50,7 @@ function generatePage(output, page) {
             })
 
             // Parse with markdown/asciidoc parser
-            .then((content) => parser.parsePage(content))
+            .then(content => parser.parsePage(content))
 
             // Return new page
             .then(({content}) => {

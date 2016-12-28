@@ -66,7 +66,7 @@ function summaryToDocument(summary) {
         })
     ];
 
-    parts.forEach(part => {
+    parts.forEach((part) => {
         const { title, articles } = part;
 
         if (title) {
