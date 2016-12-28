@@ -22,12 +22,12 @@ module.exports = {
         const Generator = Output.getGenerator(kwargs.format);
 
         return Parse.parseBook(book)
-        .then(function(resultBook) {
+        .then((resultBook) => {
             return Output.generate(Generator, resultBook, {
                 root: outputFolder
             });
         })
-        .fin(function() {
+        .fin(() => {
             if (kwargs.timing) timing.dump(book.getLogger());
         });
     }

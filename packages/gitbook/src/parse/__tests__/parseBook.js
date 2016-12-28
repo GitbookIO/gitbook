@@ -1,10 +1,10 @@
 const Book = require('../../models/book');
 const createMockFS = require('../../fs/mock');
 
-describe('parseBook', function() {
+describe('parseBook', () => {
     const parseBook = require('../parseBook');
 
-    it('should parse multilingual book', function() {
+    it('should parse multilingual book', () => {
         const fs = createMockFS({
             'LANGS.md': '# Languages\n\n* [en](en)\n* [fr](fr)',
             'en': {
@@ -17,7 +17,7 @@ describe('parseBook', function() {
         const book = Book.createForFS(fs);
 
         return parseBook(book)
-        .then(function(resultBook) {
+        .then((resultBook) => {
             const languages = resultBook.getLanguages();
             const books = resultBook.getBooks();
 
@@ -27,7 +27,7 @@ describe('parseBook', function() {
         });
     });
 
-    it('should extend configuration for multilingual book', function() {
+    it('should extend configuration for multilingual book', () => {
         const fs = createMockFS({
             'LANGS.md': '# Languages\n\n* [en](en)\n* [fr](fr)',
             'book.json': '{ "title": "Test", "author": "GitBook" }',
@@ -42,7 +42,7 @@ describe('parseBook', function() {
         const book = Book.createForFS(fs);
 
         return parseBook(book)
-        .then(function(resultBook) {
+        .then((resultBook) => {
             const books = resultBook.getBooks();
 
             expect(resultBook.isMultilingual()).toBe(true);
@@ -62,7 +62,7 @@ describe('parseBook', function() {
         });
     });
 
-    it('should parse book in a directory', function() {
+    it('should parse book in a directory', () => {
         const fs = createMockFS({
             'book.json': JSON.stringify({
                 root: './test'
@@ -76,7 +76,7 @@ describe('parseBook', function() {
         const book = Book.createForFS(fs);
 
         return parseBook(book)
-        .then(function(resultBook) {
+        .then((resultBook) => {
             const readme = resultBook.getReadme();
             const summary = resultBook.getSummary();
             const articles = summary.getArticlesAsList();

@@ -11,7 +11,7 @@ function reducedObject(defaultVersion, currentVersion) {
         return currentVersion;
     }
 
-    return currentVersion.reduce(function(result, value, key) {
+    return currentVersion.reduce((result, value, key) => {
         const defaultValue = defaultVersion.get(key);
 
         if (Immutable.Map.isMap(value)) {

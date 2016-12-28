@@ -256,7 +256,7 @@ class Book extends Record(DEFAULTS) {
         ];
 
         // List their extensions
-        const exts = clues.map(function(clue) {
+        const exts = clues.map((clue) => {
             const file = clue.getFile();
             if (file.exists()) {
                 return file.getParser().getExtensions().first();
@@ -268,7 +268,7 @@ class Book extends Record(DEFAULTS) {
         exts.push('.md');
 
         // Choose the first non null
-        return exts.find(function(e) { return e !== null; });
+        return exts.find((e) => { return e !== null; });
     }
 
     /**

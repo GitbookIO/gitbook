@@ -100,7 +100,7 @@ class TemplateBlock extends Record(DEFAULTS) {
                     bodies.push(currentBody);
 
                     // Append arguments of this block as arguments of the run function
-                    lastBlockArgs.children.forEach(function(child) {
+                    lastBlockArgs.children.forEach((child) => {
                         args.addChild(child);
                     });
 
@@ -162,14 +162,14 @@ class TemplateBlock extends Record(DEFAULTS) {
                 mainBlock.blocks = blocks;
 
                 Promise()
-                .then(function() {
+                .then(() => {
                     const ctx = extend({
                         ctx: context
                     }, mainContext);
 
                     return that.toProps(mainBlock, ctx);
                 })
-                .then(function(props) {
+                .then((props) => {
                     return that.toHTML(props);
                 })
                 .nodeify(callback);

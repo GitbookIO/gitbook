@@ -52,7 +52,7 @@ class TemplateEngine extends Record(DEFAULTS) {
      */
     getBlock(name) {
         const blocks = this.getBlocks();
-        return blocks.find(function(block) {
+        return blocks.find((block) => {
             return block.getName() === name;
         });
     }
@@ -88,12 +88,12 @@ class TemplateEngine extends Record(DEFAULTS) {
         );
 
         // Add filters
-        filters.forEach(function(filterFn, filterName) {
+        filters.forEach((filterFn, filterName) => {
             env.addFilter(filterName, filterFn.bind(context));
         });
 
         // Add blocks
-        blocks.forEach(function(block) {
+        blocks.forEach((block) => {
             const extName = block.getExtensionName();
             const Ext = block.toNunjucksExt(context);
 
@@ -101,12 +101,12 @@ class TemplateEngine extends Record(DEFAULTS) {
         });
 
         // Add globals
-        globals.forEach(function(globalValue, globalName) {
+        globals.forEach((globalValue, globalName) => {
             env.addGlobal(globalName, globalValue);
         });
 
         // Add other extensions
-        extensions.forEach(function(ext, extName) {
+        extensions.forEach((ext, extName) => {
             env.addExtension(extName, ext);
         });
 

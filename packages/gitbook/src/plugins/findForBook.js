@@ -21,9 +21,9 @@ function findForBook(book) {
         ])
 
         // Merge all plugins
-        .then(function(results) {
+        .then((results) => {
             return List(results)
-                .reduce(function(out, result) {
+                .reduce((out, result) => {
                     return out.merge(result);
                 }, OrderedMap());
         })

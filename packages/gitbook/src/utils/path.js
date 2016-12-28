@@ -25,7 +25,7 @@ function isInRoot(root, filename) {
 // Throw error if file is outside this folder
 function resolveInRoot(root, ...args) {
     const input = args
-        .reduce(function(current, p) {
+        .reduce((current, p) => {
             // Handle path relative to book root ("/README.md")
             if (p[0] == '/' || p[0] == '\\') return p.slice(1);
 

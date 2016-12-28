@@ -22,14 +22,14 @@ function initBook(rootFolder) {
     return fs.mkdirp(rootFolder)
 
     // Parse the summary and readme
-    .then(function() {
+    .then(() => {
         const bookFS = createNodeFS(rootFolder);
         const book = Book.createForFS(bookFS);
 
         return Parse.parseReadme(book)
 
         // Setup default readme if doesn't found one
-        .fail(function() {
+        .fail(() => {
             const readmeFile = File.createWithFilepath('README' + extension);
             const readme = Readme.create(readmeFile);
             return book.setReadme(readme);
@@ -37,7 +37,7 @@ function initBook(rootFolder) {
     })
     .then(Parse.parseSummary)
 
-    .then(function(book) {
+    .then((book) => {
         const logger = book.getLogger();
         const summary = book.getSummary();
         const summaryFile = summary.getFile();
@@ -46,16 +46,16 @@ function initBook(rootFolder) {
         const articles = summary.getArticlesAsList();
 
         // Write pages
-        return Promise.forEach(articles, function(article) {
+        return Promise.forEach(articles, (article) => {
             const articlePath = article.getPath();
             const filePath = articlePath ? path.join(rootFolder, articlePath) : null;
             if (!filePath) {
                 return;
             }
 
-            return fs.assertFile(filePath, function() {
+            return fs.assertFile(filePath, () => {
                 return fs.ensureFile(filePath)
-                .then(function() {
+                .then(() => {
                     logger.info.ln('create', article.getPath());
                     return fs.writeFile(filePath, '# ' + article.getTitle() + '\n\n');
                 });
@@ -63,18 +63,18 @@ function initBook(rootFolder) {
         })
 
         // Write summary
-        .then(function() {
+        .then(() => {
             const filePath = path.join(rootFolder, summaryFilename);
 
             return fs.ensureFile(filePath)
-            .then(function() {
+            .then(() => {
                 logger.info.ln('create ' + path.basename(filePath));
                 return fs.writeFile(filePath, summary.toText(extension));
             });
         })
 
         // Log end
-        .then(function() {
+        .then(() => {
             logger.info.ln('initialization is finished');
         });
     });

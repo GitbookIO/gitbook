@@ -24,7 +24,7 @@ function createMockOutput(generator, files, options) {
     options = generator.Options(options);
 
     return parseBook(book)
-    .then(function(resultBook) {
+    .then((resultBook) => {
         return new Output({
             book:      resultBook,
             options,

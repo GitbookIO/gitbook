@@ -8,7 +8,7 @@ function convertSVGToPNG(source, dest, options) {
     if (!fs.existsSync(source)) return Promise.reject(new error.FileNotFoundError({ filename: source }));
 
     return command.spawn('svgexport', [source, dest])
-    .fail(function(err) {
+    .fail((err) => {
         if (err.code == 'ENOENT') {
             err = error.RequireInstallError({
                 cmd: 'svgexport',
@@ -17,7 +17,7 @@ function convertSVGToPNG(source, dest, options) {
         }
         throw err;
     })
-    .then(function() {
+    .then(() => {
         if (fs.existsSync(dest)) return;
 
         throw new Error('Error converting ' + source + ' into ' + dest);
@@ -30,9 +30,9 @@ function convertSVGBufferToPNG(buf, dest) {
     return fs.tmpFile({
         postfix: '.svg'
     })
-    .then(function(tmpSvg) {
+    .then((tmpSvg) => {
         return fs.writeFile(tmpSvg, buf)
-        .then(function() {
+        .then(() => {
             return convertSVGToPNG(tmpSvg, dest);
         });
     });
@@ -46,7 +46,7 @@ function convertInlinePNG(source, dest) {
     const buf = new Buffer(base64data, 'base64');
 
     return fs.writeFile(dest, buf)
-    .then(function() {
+    .then(() => {
         if (fs.existsSync(dest)) return;
 
         throw new Error('Error converting ' + source + ' into ' + dest);

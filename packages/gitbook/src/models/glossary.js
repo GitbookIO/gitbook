@@ -91,7 +91,7 @@ Glossary.addEntryByName = function addEntryByName(glossary, name, description) {
     @return {Glossary}
 */
 Glossary.createFromEntries = function createFromEntries(file, entries) {
-    entries = entries.map(function(entry) {
+    entries = entries.map((entry) => {
         if (!(entry instanceof GlossaryEntry)) {
             entry = new GlossaryEntry(entry);
         }

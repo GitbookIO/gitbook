@@ -9,7 +9,7 @@ const editHTMLElement = require('./editHTMLElement');
  * @param {HTMLDom} $
  */
 function resolveLinks(resolveURL, $) {
-    return editHTMLElement($, 'a', function($a) {
+    return editHTMLElement($, 'a', ($a) => {
         let href = $a.attr('href');
 
         // Don't change a tag without href

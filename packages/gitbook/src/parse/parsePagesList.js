@@ -18,16 +18,16 @@ function parseFilePage(book, filePath) {
 
     return fs.statFile(filePath)
     .then(
-        function(file) {
+        (file) => {
             const page = Page.createForFile(file);
             return parsePage(book, page);
         },
-        function(err) {
+        (err) => {
             // file doesn't exist
             return null;
         }
     )
-    .fail(function(err) {
+    .fail((err) => {
         const logger = book.getLogger();
         logger.error.ln('error while parsing page "' + filePath + '":');
         throw err;
@@ -49,7 +49,7 @@ function parsePagesList(book) {
     // Parse pages from summary
     return timing.measure(
         'parse.listPages',
-        walkSummary(summary, function(article) {
+        walkSummary(summary, (article) => {
             if (!article.isPage()) return;
 
             const filepath = article.getPath();
@@ -58,7 +58,7 @@ function parsePagesList(book) {
             if (book.isContentFileIgnored(filepath)) return;
 
             return parseFilePage(book, filepath)
-            .then(function(page) {
+            .then((page) => {
                 // file doesn't exist
                 if (!page) {
                     return;
@@ -70,7 +70,7 @@ function parsePagesList(book) {
     )
 
     // Parse glossary
-    .then(function() {
+    .then(() => {
         const file = glossary.getFile();
 
         if (!file.exists()) {
@@ -78,7 +78,7 @@ function parsePagesList(book) {
         }
 
         return parseFilePage(book, file.getPath())
-        .then(function(page) {
+        .then((page) => {
             // file doesn't exist
             if (!page) {
                 return;
@@ -88,7 +88,7 @@ function parsePagesList(book) {
         });
     })
 
-    .then(function() {
+    .then(() => {
         return map;
     });
 }

@@ -2,7 +2,7 @@ const File = require('../file');
 const Glossary = require('../glossary');
 const GlossaryEntry = require('../glossaryEntry');
 
-describe('Glossary', function() {
+describe('Glossary', () => {
     const glossary = Glossary.createFromEntries(File(), [
         {
             name: 'Hello World',
@@ -14,23 +14,23 @@ describe('Glossary', function() {
         }
     ]);
 
-    describe('createFromEntries', function() {
-        it('must add all entries', function() {
+    describe('createFromEntries', () => {
+        it('must add all entries', () => {
             const entries = glossary.getEntries();
             expect(entries.size).toBe(2);
         });
 
-        it('must add entries as GlossaryEntries', function() {
+        it('must add entries as GlossaryEntries', () => {
             const entries = glossary.getEntries();
             const entry = entries.get('hello-world');
             expect(entry instanceof GlossaryEntry).toBeTruthy();
         });
     });
 
-    describe('toText', function() {
-        it('return as markdown', function() {
+    describe('toText', () => {
+        it('return as markdown', () => {
             return glossary.toText('.md')
-            .then(function(text) {
+            .then((text) => {
                 expect(text).toContain('# Glossary');
             });
         });

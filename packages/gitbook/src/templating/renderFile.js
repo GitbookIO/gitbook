@@ -17,7 +17,7 @@ function renderTemplateFile(engine, filePath, context) {
     const resolvedFilePath = loader.resolve(null, filePath);
 
     return Promise()
-    .then(function() {
+    .then(() => {
         if (!loader.async) {
             return loader.getSource(resolvedFilePath);
         }
@@ -26,7 +26,7 @@ function renderTemplateFile(engine, filePath, context) {
         loader.getSource(resolvedFilePath, deferred.makeNodeResolver());
         return deferred.promise;
     })
-    .then(function(result) {
+    .then((result) => {
         if (!result) {
             throw error.TemplateError(new Error('Not found'), {
                 filename: filePath

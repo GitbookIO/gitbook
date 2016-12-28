@@ -186,7 +186,7 @@ function encodeGlobal(output) {
              */
             hasFile(fileName, content) {
                 return Promise()
-                .then(function() {
+                .then(() => {
                     const filePath = PathUtils.resolveInRoot(outputFolder, fileName);
 
                     return fs.exists(filePath);
@@ -203,11 +203,11 @@ function encodeGlobal(output) {
              */
             writeFile(fileName, content) {
                 return Promise()
-                .then(function() {
+                .then(() => {
                     const filePath = PathUtils.resolveInRoot(outputFolder, fileName);
 
                     return fs.ensureFile(filePath)
-                    .then(function() {
+                    .then(() => {
                         return fs.writeFile(filePath, content);
                     });
                 });
@@ -224,11 +224,11 @@ function encodeGlobal(output) {
              */
             copyFile(inputFile, outputFile, content) {
                 return Promise()
-                .then(function() {
+                .then(() => {
                     const outputFilePath = PathUtils.resolveInRoot(outputFolder, outputFile);
 
                     return fs.ensureFile(outputFilePath)
-                    .then(function() {
+                    .then(() => {
                         return fs.copy(inputFile, outputFilePath);
                     });
                 });
@@ -248,7 +248,7 @@ function encodeGlobal(output) {
     deprecate.field(output, 'this.generator', result, 'generator',
         output.getGenerator(), '"this.generator" property is deprecated, use "this.output.name" instead');
 
-    deprecate.field(output, 'this.navigation', result, 'navigation', function() {
+    deprecate.field(output, 'this.navigation', result, 'navigation', () => {
         return encodeNavigation(output);
     }, '"navigation" property is deprecated');
 

@@ -19,7 +19,7 @@ function onPage(output, page) {
     const filePath = urls.resolve(file.getPath());
 
     return Modifiers.modifyHTML(page, getModifiers(output, page))
-    .then(function(resultPage) {
+    .then((resultPage) => {
         // Generate the context
         const initialState = JSONUtils.encodeState(output, resultPage);
 

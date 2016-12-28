@@ -17,9 +17,9 @@ function onAsset(output, asset) {
     const outputPath   = path.resolve(outputFolder, asset);
 
     return fs.ensureFile(outputPath)
-    .then(function() {
+    .then(() => {
         return bookFS.readAsStream(asset)
-        .then(function(stream) {
+        .then((stream) => {
             return fs.writeStream(outputPath, stream);
         });
     })

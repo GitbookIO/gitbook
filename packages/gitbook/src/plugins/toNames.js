@@ -7,7 +7,7 @@
  */
 function toNames(plugins) {
     return plugins
-        .map(function(plugin) {
+        .map((plugin) => {
             return plugin.getName();
         })
         .toArray();

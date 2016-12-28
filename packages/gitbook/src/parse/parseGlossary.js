@@ -11,7 +11,7 @@ function parseGlossary(book) {
     const logger = book.getLogger();
 
     return parseStructureFile(book, 'glossary')
-    .spread(function(file, entries) {
+    .spread((file, entries) => {
         if (!file) {
             return book;
         }

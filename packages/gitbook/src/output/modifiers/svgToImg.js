@@ -31,7 +31,7 @@ function renderDOM($, dom, options) {
 function svgToImg(baseFolder, currentFile, $) {
     const currentDirectory = path.dirname(currentFile);
 
-    return editHTMLElement($, 'svg', function($svg) {
+    return editHTMLElement($, 'svg', ($svg) => {
         const content = '<?xml version="1.0" encoding="UTF-8"?>' +
             renderDOM($, $svg);
 
@@ -41,12 +41,12 @@ function svgToImg(baseFolder, currentFile, $) {
         const filePath = path.join(baseFolder, fileName);
 
         // Write the svg to the file
-        return fs.assertFile(filePath, function() {
+        return fs.assertFile(filePath, () => {
             return fs.writeFile(filePath, content, 'utf8');
         })
 
         // Return as image
-        .then(function() {
+        .then(() => {
             const src = LocationUtils.relative(currentDirectory, fileName);
             $svg.replaceWith('<img src="' + src + '" />');
         });

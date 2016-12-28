@@ -117,7 +117,7 @@ PluginDependency.listFromString = function(s) {
  */
 PluginDependency.listFromArray = function(arr) {
     return Immutable.List(arr)
-        .map(function(entry) {
+        .map((entry) => {
             if (is.string(entry)) {
                 return PluginDependency.createFromString(entry);
             } else {
@@ -127,7 +127,7 @@ PluginDependency.listFromArray = function(arr) {
                 });
             }
         })
-        .filter(function(dep) {
+        .filter((dep) => {
             return Boolean(dep.getName());
         });
 };
@@ -139,7 +139,7 @@ PluginDependency.listFromArray = function(arr) {
  */
 PluginDependency.listToArray = function(list) {
     return list
-        .map(function(dep) {
+        .map((dep) => {
             let result = '';
 
             if (!dep.isEnabled()) {

@@ -30,7 +30,7 @@ function loadPlugin(book, plugin) {
 
     // Try loading plugins from different location
     let p = Promise()
-    .then(function() {
+    .then(() => {
         let packageContent;
         let packageMain;
         let content;

@@ -5,7 +5,7 @@ const logOptions = {
     description: 'Minimum log level to display',
     values: Logger.LEVELS
         .keySeq()
-        .map(function(s) {
+        .map((s) => {
             return s.toLowerCase();
         }).toJS(),
     defaults: 'info'

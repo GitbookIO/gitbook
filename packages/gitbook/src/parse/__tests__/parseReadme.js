@@ -2,17 +2,17 @@ const Promise = require('../../utils/promise');
 const Book = require('../../models/book');
 const createMockFS = require('../../fs/mock');
 
-describe('parseReadme', function() {
+describe('parseReadme', () => {
     const parseReadme = require('../parseReadme');
 
-    it('should parse summary if exists', function() {
+    it('should parse summary if exists', () => {
         const fs = createMockFS({
             'README.md': '# Hello\n\nAnd here is the description.'
         });
         const book = Book.createForFS(fs);
 
         return parseReadme(book)
-        .then(function(resultBook) {
+        .then((resultBook) => {
             const readme = resultBook.getReadme();
             const file = readme.getFile();
 
@@ -22,14 +22,14 @@ describe('parseReadme', function() {
         });
     });
 
-    it('should fail if doesn\'t exist', function() {
+    it('should fail if doesn\'t exist', () => {
         const fs = createMockFS({});
         const book = Book.createForFS(fs);
 
         return parseReadme(book)
-        .then(function(resultBook) {
+        .then((resultBook) => {
             throw new Error('It should have fail');
-        }, function() {
+        }, () => {
             return Promise();
         });
     });

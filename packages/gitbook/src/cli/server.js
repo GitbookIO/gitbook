@@ -31,7 +31,7 @@ class Server extends events.EventEmitter {
         if (!this.isRunning()) return Promise();
 
         const d = Promise.defer();
-        this.running.close(function(err) {
+        this.running.close((err) => {
             that.running = null;
             that.emit('state', false);
 
@@ -57,10 +57,10 @@ class Server extends events.EventEmitter {
 
         if (that.isRunning()) pre = this.stop();
         return pre
-        .then(function() {
+        .then(() => {
             const d = Promise.defer();
 
-            that.running = http.createServer(function(req, res) {
+            that.running = http.createServer((req, res) => {
                 // Render error
                 function error(err) {
                     res.statusCode = err.status || 500;
@@ -69,7 +69,7 @@ class Server extends events.EventEmitter {
 
                 // Redirect to directory's index.html
                 function redirect() {
-                    const resultURL = urlTransform(req.url, function(parsed) {
+                    const resultURL = urlTransform(req.url, (parsed) => {
                         parsed.pathname += '/';
                         return parsed;
                     });
@@ -90,15 +90,15 @@ class Server extends events.EventEmitter {
                 .pipe(res);
             });
 
-            that.running.on('connection', function(socket) {
+            that.running.on('connection', (socket) => {
                 that.sockets.push(socket);
                 socket.setTimeout(4000);
-                socket.on('close', function() {
+                socket.on('close', () => {
                     that.sockets.splice(that.sockets.indexOf(socket), 1);
                 });
             });
 
-            that.running.listen(port, function(err) {
+            that.running.listen(port, (err) => {
                 if (err) return d.reject(err);
 
                 that.port = port;

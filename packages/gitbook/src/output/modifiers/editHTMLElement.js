@@ -6,7 +6,7 @@ const Promise = require('../../utils/promise');
 function editHTMLElement($, selector, fn) {
     const $elements = $(selector);
 
-    return Promise.forEach($elements, function(el) {
+    return Promise.forEach($elements, (el) => {
         const $el = $(el);
         return fn($el);
     });

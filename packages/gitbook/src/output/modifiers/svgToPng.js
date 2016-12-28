@@ -17,7 +17,7 @@ const editHTMLElement = require('./editHTMLElement');
 function svgToPng(rootFolder, currentFile, $) {
     const currentDirectory = path.dirname(currentFile);
 
-    return editHTMLElement($, 'img', function($img) {
+    return editHTMLElement($, 'img', ($img) => {
         let src = $img.attr('src');
         if (path.extname(src) !== '.svg') {
             return;
@@ -36,10 +36,10 @@ function svgToPng(rootFolder, currentFile, $) {
         // Result file path
         const filePath = path.join(rootFolder, fileName);
 
-        return fs.assertFile(filePath, function() {
+        return fs.assertFile(filePath, () => {
             return imagesUtil.convertSVGToPNG(inputPath, filePath);
         })
-        .then(function() {
+        .then(() => {
             // Convert filename to a relative filename
             fileName = LocationUtils.relative(currentDirectory, fileName);
 

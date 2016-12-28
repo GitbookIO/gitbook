@@ -64,7 +64,7 @@ describe('ConrefsLoader', () => {
             });
         });
 
-        describe('Absolute', function() {
+        describe('Absolute', () => {
             it('should resolve absolute filepath', () => {
                 return renderTemplate(engine, fileName, '{% include "/include.md" %}')
                 .then((out) => {

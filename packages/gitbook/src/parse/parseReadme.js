@@ -13,7 +13,7 @@ function parseReadme(book) {
     const logger = book.getLogger();
 
     return parseStructureFile(book, 'readme')
-    .spread(function(file, result) {
+    .spread((file, result) => {
         if (!file) {
             throw new error.FileNotFoundError({ filename: 'README' });
         }

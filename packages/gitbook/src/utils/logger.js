@@ -103,7 +103,7 @@ Logger.prototype.writeLn = function(msg) {
 Logger.prototype.log = function(level, ...args) {
     if (level < this.logLevel) return;
 
-    const levelKey = LEVELS.findKey(function(v) {
+    const levelKey = LEVELS.findKey((v) => {
         return v === level;
     });
     let msg = this.format(...args);
@@ -156,10 +156,10 @@ Logger.prototype.promise = function(level, p) {
     const that = this;
 
     return p
-    .then(function(st) {
+    .then((st) => {
         that.ok(level);
         return st;
-    }, function(err) {
+    }, (err) => {
         that.fail(level);
         throw err;
     });

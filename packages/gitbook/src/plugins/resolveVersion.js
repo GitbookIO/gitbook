@@ -38,23 +38,23 @@ function resolveVersion(plugin) {
     }
 
     return initNPM()
-    .then(function() {
+    .then(() => {
         return Promise.nfcall(npm.commands.view, [npmId + '@' + requiredVersion, 'engines'], true);
     })
-    .then(function(versions) {
+    .then((versions) => {
         versions = Map(versions).entrySeq();
 
         const result = versions
-            .map(function(entry) {
+            .map((entry) => {
                 return {
                     version: entry[0],
                     gitbook: (entry[1].engines || {}).gitbook
                 };
             })
-            .filter(function(v) {
+            .filter((v) => {
                 return v.gitbook && gitbook.satisfies(v.gitbook);
             })
-            .sort(function(v1, v2) {
+            .sort((v1, v2) => {
                 return semver.lt(v1.version, v2.version) ? 1 : -1;
             })
             .get(0);

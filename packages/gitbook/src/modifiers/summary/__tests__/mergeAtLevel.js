@@ -2,7 +2,7 @@ const Immutable = require('immutable');
 const Summary = require('../../../models/summary');
 const File = require('../../../models/file');
 
-describe('mergeAtLevel', function() {
+describe('mergeAtLevel', () => {
     const mergeAtLevel = require('../mergeAtLevel');
     const summary = Summary.createFromParts(File(), [
         {
@@ -23,7 +23,7 @@ describe('mergeAtLevel', function() {
         }
     ]);
 
-    it('should edit a part', function() {
+    it('should edit a part', () => {
         const beforeChildren = summary.getByLevel('1').getArticles();
         const newSummary = mergeAtLevel(summary, '1', {title: 'Part O'});
         const edited = newSummary.getByLevel('1');
@@ -33,7 +33,7 @@ describe('mergeAtLevel', function() {
         expect(Immutable.is(beforeChildren, edited.getArticles())).toBe(true);
     });
 
-    it('should edit a part', function() {
+    it('should edit a part', () => {
         const beforePath = summary.getByLevel('1.2').getPath();
         const newSummary = mergeAtLevel(summary, '1.2', {title: 'Renamed article'});
         const edited = newSummary.getByLevel('1.2');

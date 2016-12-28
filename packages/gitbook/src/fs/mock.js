@@ -17,7 +17,7 @@ function createMockFS(files, root = '') {
 
     function getFile(filePath) {
         const parts = path.normalize(filePath).split(path.sep);
-        return parts.reduce(function(list, part, i) {
+        return parts.reduce((list, part, i) => {
             if (!list) return null;
 
             let file;
@@ -73,7 +73,7 @@ function createMockFS(files, root = '') {
         }
 
         return dir
-            .map(function(content, name) {
+            .map((content, name) => {
                 if (!is.string(content)) {
                     name = name + '/';
                 }

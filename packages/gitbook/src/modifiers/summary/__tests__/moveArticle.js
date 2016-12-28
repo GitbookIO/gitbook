@@ -2,7 +2,7 @@ const Immutable = require('immutable');
 const Summary = require('../../../models/summary');
 const File = require('../../../models/file');
 
-describe('moveArticle', function() {
+describe('moveArticle', () => {
     const moveArticle = require('../moveArticle');
     const summary = Summary.createFromParts(File(), [
         {
@@ -42,13 +42,13 @@ describe('moveArticle', function() {
         }
     ]);
 
-    it('should move an article to the same place', function() {
+    it('should move an article to the same place', () => {
         const newSummary = moveArticle(summary, '2.1', '2.1');
 
         expect(Immutable.is(summary, newSummary)).toBe(true);
     });
 
-    it('should move an article to an previous level', function() {
+    it('should move an article to an previous level', () => {
         const newSummary = moveArticle(summary, '2.2', '2.1');
         const moved = newSummary.getByLevel('2.1');
         const other = newSummary.getByLevel('2.2');
@@ -57,7 +57,7 @@ describe('moveArticle', function() {
         expect(other.getTitle()).toBe('2.1');
     });
 
-    it('should move an article to a next level', function() {
+    it('should move an article to a next level', () => {
         const newSummary = moveArticle(summary, '2.1', '2.2');
         const moved = newSummary.getByLevel('2.1');
         const other = newSummary.getByLevel('2.2');

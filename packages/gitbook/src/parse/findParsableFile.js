@@ -19,11 +19,11 @@ function findParsableFile(book, filename) {
     // Ordered list of extensions to test
     const exts = parsers.extensions;
 
-    return Promise.some(exts, function(ext) {
+    return Promise.some(exts, (ext) => {
         const filepath = basename + ext;
 
         return fs.findFile(basedir, filepath)
-        .then(function(found) {
+        .then((found) => {
             if (!found || book.isContentFileIgnored(found)) {
                 return undefined;
             }

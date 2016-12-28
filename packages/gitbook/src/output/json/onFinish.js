@@ -27,7 +27,7 @@ function onFinish(output) {
     return fs.readFile(path.resolve(outputRoot, mainLanguage.getID(), 'README.json'), 'utf8')
 
     // Extend the JSON
-    .then(function(content) {
+    .then((content) => {
         const json = JSON.parse(content);
 
         json.languages = JSONUtils.encodeLanguages(languages, urls);
@@ -35,7 +35,7 @@ function onFinish(output) {
         return json;
     })
 
-    .then(function(json) {
+    .then((json) => {
         return fs.writeFile(
             path.resolve(outputRoot, 'README.json'),
             JSON.stringify(json, null, 4)

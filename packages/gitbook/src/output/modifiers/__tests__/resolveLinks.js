@@ -11,7 +11,7 @@ describe('resolveLinks', () => {
         const $ = cheerio.load(TEST);
 
         return resolveLinks(resolveFileBasic, $)
-        .then(function() {
+        .then(() => {
             const link = $('a');
             expect(link.attr('href')).toBe('fakeDir/test/cool.md');
         });
@@ -24,7 +24,7 @@ describe('resolveLinks', () => {
             const $ = cheerio.load(TEST);
 
             return resolveLinks(resolveFileBasic, $)
-            .then(function() {
+            .then(() => {
                 const link = $('a');
                 expect(link.attr('target')).toBe('_blank');
             });

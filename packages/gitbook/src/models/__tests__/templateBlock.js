@@ -2,12 +2,12 @@ const nunjucks = require('nunjucks');
 const Immutable = require('immutable');
 const Promise = require('../../utils/promise');
 
-describe('TemplateBlock', function() {
+describe('TemplateBlock', () => {
     const TemplateBlock = require('../templateBlock');
 
-    describe('.create', function() {
-        it('must initialize a simple TemplateBlock from a function', function() {
-            const templateBlock = TemplateBlock.create('sayhello', function(block) {
+    describe('.create', () => {
+        it('must initialize a simple TemplateBlock from a function', () => {
+            const templateBlock = TemplateBlock.create('sayhello', (block) => {
                 return { message: 'Hello World' };
             });
 
@@ -18,40 +18,40 @@ describe('TemplateBlock', function() {
         });
     });
 
-    describe('.toProps', function() {
-        it('must handle sync method', function() {
-            const templateBlock = TemplateBlock.create('sayhello', function(block) {
+    describe('.toProps', () => {
+        it('must handle sync method', () => {
+            const templateBlock = TemplateBlock.create('sayhello', (block) => {
                 return { message: 'Hello World' };
             });
 
             return templateBlock.toProps()
-            .then(function(props) {
+            .then((props) => {
                 expect(props).toEqual({ message: 'Hello World' });
             });
         });
 
-        it('must not fail if return a string', function() {
-            const templateBlock = TemplateBlock.create('sayhello', function(block) {
+        it('must not fail if return a string', () => {
+            const templateBlock = TemplateBlock.create('sayhello', (block) => {
                 return 'Hello World';
             });
 
             return templateBlock.toProps()
-            .then(function(props) {
+            .then((props) => {
                 expect(props).toEqual({ children: 'Hello World' });
             });
         });
     });
 
-    describe('.getShortcuts', function() {
-        it('must return undefined if no shortcuts', function() {
-            const templateBlock = TemplateBlock.create('sayhello', function(block) {
+    describe('.getShortcuts', () => {
+        it('must return undefined if no shortcuts', () => {
+            const templateBlock = TemplateBlock.create('sayhello', (block) => {
                 return { message: 'Hello World' };
             });
 
             expect(templateBlock.getShortcuts()).toNotExist();
         });
 
-        it('.must return complete shortcut', function() {
+        it('.must return complete shortcut', () => {
             const templateBlock = TemplateBlock.create('sayhello', {
                 process(block) {
                     return { message: 'Hello World' };
@@ -73,9 +73,9 @@ describe('TemplateBlock', function() {
         });
     });
 
-    describe('.toNunjucksExt()', function() {
-        it('should render children correctly', function() {
-            const templateBlock = TemplateBlock.create('sayhello', function(block) {
+    describe('.toNunjucksExt()', () => {
+        it('should render children correctly', () => {
+            const templateBlock = TemplateBlock.create('sayhello', (block) => {
                 return 'Hello';
             });
 
@@ -89,13 +89,13 @@ describe('TemplateBlock', function() {
             // Render a template using the block
             const src = '{% sayhello %}{% endsayhello %}';
             return Promise.nfcall(env.renderString.bind(env), src)
-            .then(function(res) {
+            .then((res) => {
                 expect(res).toBe('<xblock name="sayhello" props="{}">Hello</xblock>');
             });
         });
 
-        it('must handle HTML children', function() {
-            const templateBlock = TemplateBlock.create('sayhello', function(block) {
+        it('must handle HTML children', () => {
+            const templateBlock = TemplateBlock.create('sayhello', (block) => {
                 return '<p>Hello, World!</p>';
             });
 
@@ -109,13 +109,13 @@ describe('TemplateBlock', function() {
             // Render a template using the block
             const src = '{% sayhello %}{% endsayhello %}';
             return Promise.nfcall(env.renderString.bind(env), src)
-            .then(function(res) {
+            .then((res) => {
                 expect(res).toBe('<xblock name="sayhello" props="{}"><p>Hello, World!</p></xblock>');
             });
         });
 
-        it('must inline props without children', function() {
-            const templateBlock = TemplateBlock.create('sayhello', function(block) {
+        it('must inline props without children', () => {
+            const templateBlock = TemplateBlock.create('sayhello', (block) => {
                 return {
                     message: block.kwargs.tag + ' ' + block.kwargs.name
                 };
@@ -131,16 +131,16 @@ describe('TemplateBlock', function() {
             // Render a template using the block
             const src = '{% sayhello name="Samy", tag="p" %}{% endsayhello %}';
             return Promise.nfcall(env.renderString.bind(env), src)
-            .then(function(res) {
+            .then((res) => {
                 expect(res).toBe('<xblock name="sayhello" props="{&quot;message&quot;:&quot;p Samy&quot;}"></xblock>');
             });
         });
 
-        it('must accept an async function', function() {
-            const templateBlock = TemplateBlock.create('sayhello', function(block) {
+        it('must accept an async function', () => {
+            const templateBlock = TemplateBlock.create('sayhello', (block) => {
                 return Promise()
                 .delay(1)
-                .then(function() {
+                .then(() => {
                     return {
                         children: 'Hello ' + block.children
                     };
@@ -157,19 +157,19 @@ describe('TemplateBlock', function() {
             // Render a template using the block
             const src = '{% sayhello %}Samy{% endsayhello %}';
             return Promise.nfcall(env.renderString.bind(env), src)
-            .then(function(res) {
+            .then((res) => {
                 expect(res).toBe('<xblock name="sayhello" props="{}">Hello Samy</xblock>');
             });
         });
 
-        it('must handle nested blocks', function() {
+        it('must handle nested blocks', () => {
             const templateBlock = new TemplateBlock({
                 name: 'yoda',
                 blocks: Immutable.List(['start', 'end']),
                 process(block) {
                     const nested = {};
 
-                    block.blocks.forEach(function(blk) {
+                    block.blocks.forEach((blk) => {
                         nested[blk.name] = blk.children.trim();
                     });
 
@@ -187,12 +187,12 @@ describe('TemplateBlock', function() {
             // Render a template using the block
             const src = '{% yoda %}{% start %}this sentence should be{% end %}inverted{% endyoda %}';
             return Promise.nfcall(env.renderString.bind(env), src)
-            .then(function(res) {
+            .then((res) => {
                 expect(res).toBe('<xblock name="yoda" props="{}"><p class="yoda">inverted this sentence should be</p></xblock>');
             });
         });
 
-        it('must handle multiple inline blocks', function() {
+        it('must handle multiple inline blocks', () => {
             const templateBlock = new TemplateBlock({
                 name: 'math',
                 process(block) {
@@ -210,7 +210,7 @@ describe('TemplateBlock', function() {
             // Render a template using the block after replacing shortcuts
             const src = 'There should be two inline blocks as a result: {% math %}a = b{% endmath %} and {% math %}c = d{% endmath %}';
             return Promise.nfcall(env.renderString.bind(env), src)
-            .then(function(res) {
+            .then((res) => {
                 expect(res).toBe('There should be two inline blocks as a result: <xblock name="math" props="{}"><math>a = b</math></xblock> and <xblock name="math" props="{}"><math>c = d</math></xblock>');
             });
         });

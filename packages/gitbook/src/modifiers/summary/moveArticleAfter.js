@@ -38,7 +38,7 @@ function moveArticleAfter(summary, origin, afterTarget) {
     @return {Array<Number>}
  */
 function levelToArray(l) {
-    return l.split('.').map(function(char) {
+    return l.split('.').map((char) => {
         return parseInt(char, 10);
     });
 }

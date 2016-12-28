@@ -11,7 +11,7 @@ function parseLanguages(book) {
     const logger = book.getLogger();
 
     return parseStructureFile(book, 'langs')
-    .spread(function(file, result) {
+    .spread((file, result) => {
         if (!file) {
             return book;
         }

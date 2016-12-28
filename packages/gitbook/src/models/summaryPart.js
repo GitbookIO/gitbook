@@ -44,7 +44,7 @@ SummaryPart.prototype.createChildLevel = function() {
  * @return {SummaryPart}
  */
 SummaryPart.create = function(def, level) {
-    const articles = (def.articles || []).map(function(article, i) {
+    const articles = (def.articles || []).map((article, i) => {
         if (article instanceof SummaryArticle) {
             return article;
         }

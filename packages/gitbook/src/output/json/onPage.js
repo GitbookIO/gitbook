@@ -17,7 +17,7 @@ function onPage(output, page) {
     const readme = output.getBook().getReadme().getFile();
 
     return Modifiers.modifyHTML(page, getModifiers(output, page))
-    .then(function(resultPage) {
+    .then((resultPage) => {
         // Generate the JSON
         const json = JSONUtils.encodeState(output, resultPage);
 

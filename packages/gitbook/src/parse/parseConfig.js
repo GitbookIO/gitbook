@@ -13,7 +13,7 @@ function parseConfig(book) {
     const fs = book.getFS();
     let config = book.getConfig();
 
-    return Promise.some(CONFIG_FILES, function(filename) {
+    return Promise.some(CONFIG_FILES, (filename) => {
         // Is this file ignored?
         if (book.isFileIgnored(filename)) {
             return;
@@ -21,22 +21,22 @@ function parseConfig(book) {
 
         // Try loading it
         return fs.loadAsObject(filename)
-        .then(function(cfg) {
+        .then((cfg) => {
             return fs.statFile(filename)
-            .then(function(file) {
+            .then((file) => {
                 return {
                     file,
                     values: cfg
                 };
             });
         })
-        .fail(function(err) {
+        .fail((err) => {
             if (err.code != 'MODULE_NOT_FOUND') throw (err);
             else return Promise(false);
         });
     })
 
-    .then(function(result) {
+    .then((result) => {
         let values = result ? result.values : {};
         values = validateConfig(values);
 

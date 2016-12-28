@@ -4,19 +4,19 @@ const path = require('path');
 
 const URL = 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/280px-PNG_transparency_demonstration_1.png';
 
-describe('fetchRemoteImages', function() {
+describe('fetchRemoteImages', () => {
     let dir;
     const fetchRemoteImages = require('../fetchRemoteImages');
 
-    beforeEach(function() {
+    beforeEach(() => {
         dir = tmp.dirSync();
     });
 
-    it('should download image file', function() {
+    it('should download image file', () => {
         const $ = cheerio.load('<img src="' + URL + '" />');
 
         return fetchRemoteImages(dir.name, 'index.html', $)
-        .then(function() {
+        .then(() => {
             const $img = $('img');
             const src = $img.attr('src');
 
@@ -24,11 +24,11 @@ describe('fetchRemoteImages', function() {
         });
     });
 
-    it('should download image file and replace with relative path', function() {
+    it('should download image file and replace with relative path', () => {
         const $ = cheerio.load('<img src="' + URL + '" />');
 
         return fetchRemoteImages(dir.name, 'test/index.html', $)
-        .then(function() {
+        .then(() => {
             const $img = $('img');
             const src = $img.attr('src');
 

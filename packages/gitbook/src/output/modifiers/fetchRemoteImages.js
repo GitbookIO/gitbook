@@ -16,7 +16,7 @@ const LocationUtils = require('../../utils/location');
 function fetchRemoteImages(rootFolder, currentFile, $) {
     const currentDirectory = path.dirname(currentFile);
 
-    return editHTMLElement($, 'img', function($img) {
+    return editHTMLElement($, 'img', ($img) => {
         let src = $img.attr('src');
         const extension = path.extname(src);
 
@@ -29,10 +29,10 @@ function fetchRemoteImages(rootFolder, currentFile, $) {
         const fileName = hash + extension;
         const filePath = path.join(rootFolder, fileName);
 
-        return fs.assertFile(filePath, function() {
+        return fs.assertFile(filePath, () => {
             return fs.download(src, filePath);
         })
-        .then(function() {
+        .then(() => {
             // Convert to relative
             src = LocationUtils.relative(currentDirectory, fileName);
 

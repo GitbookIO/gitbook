@@ -23,7 +23,7 @@ function generatePage(output, page) {
     return timing.measure(
         'page.generate',
         Promise(page)
-        .then(function(resultPage) {
+        .then((resultPage) => {
             const file = resultPage.getFile();
             const filePath = file.getPath();
             const parser = file.getParser();

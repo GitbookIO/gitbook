@@ -13,7 +13,7 @@ const Promise = require('./promise');
 function exec(command, options) {
     const d = Promise.defer();
 
-    const child = childProcess.exec(command, options, function(err, stdout, stderr) {
+    const child = childProcess.exec(command, options, (err, stdout, stderr) => {
         if (!err) {
             return d.resolve();
         }
@@ -22,11 +22,11 @@ function exec(command, options) {
         d.reject(err);
     });
 
-    child.stdout.on('data', function(data) {
+    child.stdout.on('data', (data) => {
         d.notify(data);
     });
 
-    child.stderr.on('data', function(data) {
+    child.stderr.on('data', (data) => {
         d.notify(data);
     });
 
@@ -45,19 +45,19 @@ function spawnCmd(command, args, options) {
     const d = Promise.defer();
     const child = spawn(command, args, options);
 
-    child.on('error', function(error) {
+    child.on('error', (error) => {
         return d.reject(error);
     });
 
-    child.stdout.on('data', function(data) {
+    child.stdout.on('data', (data) => {
         d.notify(data);
     });
 
-    child.stderr.on('data', function(data) {
+    child.stderr.on('data', (data) => {
         d.notify(data);
     });
 
-    child.on('close', function(code) {
+    child.on('close', (code) => {
         if (code === 0) {
             d.resolve();
         } else {

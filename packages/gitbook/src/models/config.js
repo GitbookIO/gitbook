@@ -100,7 +100,7 @@ Config.prototype.getPluginDependencies = function() {
 Config.prototype.getPluginDependency = function(name) {
     const plugins = this.getPluginDependencies();
 
-    return plugins.find(function(dep) {
+    return plugins.find((dep) => {
         return dep.getName() === name;
     });
 };

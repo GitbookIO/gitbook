@@ -78,11 +78,11 @@ function dump(logger) {
 
     Immutable.Map(timers)
         .valueSeq()
-        .sortBy(function(timer) {
+        .sortBy((timer) => {
             measured += timer.total;
             return timer.total;
         })
-        .forEach(function(timer) {
+        .forEach((timer) => {
             const percent = (timer.total * 100) / totalDuration;
 
             logger.debug.ln((percent.toFixed(1)) + '% of time spent in "' + timer.type + '" (' + timer.count + ' times) :');

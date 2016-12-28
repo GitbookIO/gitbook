@@ -11,10 +11,10 @@ const sortDependencies = require('./sortDependencies');
 function listDependencies(deps) {
     // Extract list of plugins to disable (starting with -)
     const toRemove = deps
-        .filter(function(plugin) {
+        .filter((plugin) => {
             return !plugin.isEnabled();
         })
-        .map(function(plugin) {
+        .map((plugin) => {
             return plugin.getName();
         });
 
@@ -22,7 +22,7 @@ function listDependencies(deps) {
     deps = deps.concat(DEFAULT_PLUGINS);
 
     // Remove plugins
-    deps = deps.filterNot(function(plugin) {
+    deps = deps.filterNot((plugin) => {
         return toRemove.includes(plugin.getName());
     });
 

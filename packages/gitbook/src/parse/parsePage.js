@@ -12,7 +12,7 @@ function parsePage(book, page) {
     const file = page.getFile();
 
     return fs.readAsString(file.getPath())
-    .then(function(content) {
+    .then((content) => {
         return parsePageFromString(page, content);
     });
 }
