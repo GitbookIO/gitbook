@@ -1,7 +1,7 @@
 const Book = require('../../models/book');
 const createMockFS = require('../../fs/mock');
 
-describe.only('parseSummary', () => {
+describe('parseSummary', () => {
     const parseSummary = require('../parseSummary');
 
     it('should parse summary if exists', () => {

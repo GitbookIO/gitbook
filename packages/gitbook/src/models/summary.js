@@ -203,10 +203,10 @@ class Summary extends Record(DEFAULTS) {
     /**
      * Create a new summary for a list of parts.
      *
-     * @param {Lust|Array} parts
+     * @param {List|Array} parts
      * @return {Summary}
      */
-    static createFromParts(file, parts) {
+    static createFromParts(parts) {
         parts = parts.map((part, i) => {
             if (part instanceof SummaryPart) {
                 return part;
@@ -216,7 +216,6 @@ class Summary extends Record(DEFAULTS) {
         });
 
         return new Summary({
-            file,
             parts: new List(parts)
         });
     }
