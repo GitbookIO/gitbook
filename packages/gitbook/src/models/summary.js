@@ -6,8 +6,6 @@ const LocationUtils = require('../utils/location');
 const File = require('./file');
 const SummaryPart = require('./summaryPart');
 const SummaryArticle = require('./summaryArticle');
-const parsers = require('../parsers');
-const summaryToDocument = require('../parse/summary/toDocument');
 
 const DEFAULTS = {
     file:  new File(),
@@ -152,37 +150,6 @@ class Summary extends Record(DEFAULTS) {
         // Get parent of the position
         const parentArticle = this.getByLevel(parentLevel);
         return parentArticle || null;
-    }
-
-    /**
-     * Render a summary as a document.
-     * @return {Document} document
-     */
-    toDocument() {
-        return summaryToDocument(this);
-    }
-
-    /**
-     * Render summary as text.
-     *
-     * @param {String} ext Extension of the parser to use
-     * @return {String} text
-     */
-    toText(ext) {
-        const { file } = this;
-        const parser = ext ? parsers.getByExt(ext) : file.getParser();
-
-        if (!parser) {
-            throw error.FileNotParsableError({
-                filename: file.getPath()
-            });
-        }
-
-        // Create a document representing the summary
-        const document = this.toDocument();
-
-        // Render the document as text
-        return parser.toText(document);
     }
 
     /**

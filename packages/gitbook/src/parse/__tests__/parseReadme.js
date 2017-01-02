@@ -2,10 +2,10 @@ const Promise = require('../../utils/promise');
 const Book = require('../../models/book');
 const createMockFS = require('../../fs/mock');
 
-describe('parseReadme', () => {
+describe.only('parseReadme', () => {
     const parseReadme = require('../parseReadme');
 
-    it('should parse summary if exists', () => {
+    it('should parse readme if exists', () => {
         const fs = createMockFS({
             'README.md': '# Hello\n\nAnd here is the description.'
         });
@@ -17,8 +17,8 @@ describe('parseReadme', () => {
             const file = readme.getFile();
 
             expect(file.exists()).toBeTruthy();
-            expect(readme.getTitle()).toBe('Hello');
-            expect(readme.getDescription()).toBe('And here is the description.');
+            expect(readme.title).toBe('Hello');
+            expect(readme.description).toBe('And here is the description.');
         });
     });
 
