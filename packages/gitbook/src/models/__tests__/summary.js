@@ -1,9 +1,7 @@
+const Summary = require('../summary');
 
 describe('Summary', () => {
-    const File = require('../file');
-    const Summary = require('../summary');
-
-    const summary = Summary.createFromParts(new File(), [
+    const summary = Summary.createFromParts([
         {
             articles: [
                 {
@@ -78,15 +76,6 @@ describe('Summary', () => {
             const article = summary.getByPath('NOT_EXISTING.md');
 
             expect(article).toBeFalsy();
-        });
-    });
-
-    describe('toText', () => {
-        it('return as markdown', () => {
-            return summary.toText('.md')
-            .then((text) => {
-                expect(text).toContain('# Summary');
-            });
         });
     });
 });

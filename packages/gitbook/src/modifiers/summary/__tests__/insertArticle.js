@@ -1,10 +1,9 @@
 const Summary = require('../../../models/summary');
 const SummaryArticle = require('../../../models/summaryArticle');
-const File = require('../../../models/file');
 
 describe('insertArticle', () => {
     const insertArticle = require('../insertArticle');
-    const summary = Summary.createFromParts(new File(), [
+    const summary = Summary.createFromParts([
         {
             articles: [
                 {

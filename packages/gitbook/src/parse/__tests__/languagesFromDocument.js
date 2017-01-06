@@ -7,7 +7,7 @@ function readLanguages(filename) {
     return languagesFromDocument(document);
 }
 
-describe.only('languagesFromDocument', () => {
+describe('languagesFromDocument', () => {
 
     it('should parse empty', () => {
         const languages = readLanguages('languages/empty.yaml');

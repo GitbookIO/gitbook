@@ -3,7 +3,7 @@ const EbookGenerator = require('../ebook');
 
 describe('EbookGenerator', () => {
 
-    it('should generate a SUMMARY.html', () => {
+    /* it('should generate a SUMMARY.html', () => {
         return generateMock(EbookGenerator, {
             'README.md': 'Hello World'
         })
@@ -11,5 +11,5 @@ describe('EbookGenerator', () => {
             expect(folder).toHaveFile('SUMMARY.html');
             expect(folder).toHaveFile('index.html');
         });
-    });
+    });*/
 });

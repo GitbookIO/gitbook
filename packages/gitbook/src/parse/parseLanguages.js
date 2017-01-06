@@ -13,6 +13,10 @@ function parseLanguages(book) {
 
     return lookupStructureFile(book, 'langs')
     .then((file) => {
+        if (!file) {
+            return book;
+        }
+
         logger.debug.ln(`languages index found at ${file.path}`);
 
         return file.parse(fs)

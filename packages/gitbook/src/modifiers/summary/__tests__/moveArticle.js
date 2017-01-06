@@ -1,10 +1,9 @@
 const Immutable = require('immutable');
 const Summary = require('../../../models/summary');
-const File = require('../../../models/file');
 
 describe('moveArticle', () => {
     const moveArticle = require('../moveArticle');
-    const summary = Summary.createFromParts(new File(), [
+    const summary = Summary.createFromParts([
         {
             articles: [
                 {

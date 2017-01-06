@@ -1,13 +1,14 @@
-/**
-    Edit title of a part in the summary
 
-    @param {Summary} summary
-    @param {Number} index
-    @param {String} newTitle
-    @return {Summary}
-*/
+/**
+ * Edit title of a part in the summary
+ *
+ * @param {Summary} summary
+ * @param {Number} index
+ * @param {String} newTitle
+ * @return {Summary}
+ */
 function editPartTitle(summary, index, newTitle) {
-    let parts = summary.getParts();
+    let { parts } = summary;
 
     let part = parts.get(index);
     if (!part) {
