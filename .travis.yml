@@ -8,5 +8,7 @@ node_js:
   - "4.1"
 before_install:
   - npm install svgexport -g
+after_install:
+  - npm run bootstrap
 after_success:
   - npm run lint

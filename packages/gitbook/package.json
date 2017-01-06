@@ -76,7 +76,7 @@
     "read-metadata": "^1.0.0"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha ./testing/setup.js \"./src/**/*/__tests__/*.js\" --bail --reporter=list --timeout=100000 --compilers js:babel-register",
+    "test": "mocha ./testing/setup.js \"./src/**/*/__tests__/*.js\" --bail --reporter=list --timeout=100000 --compilers js:babel-register",
     "dist": "rm -rf lib/ && babel -d lib/ src/ --source-maps --ignore \"**/*/__tests__/*.js\"",
     "prepublish": "npm run dist"
   },
