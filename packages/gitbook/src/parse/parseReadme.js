@@ -1,5 +1,5 @@
 const lookupStructureFile = require('./lookupStructureFile');
-const readmeFromDocument = require('./readme/fromDocument');
+const readmeFromDocument = require('./readmeFromDocument');
 const error = require('../utils/error');
 
 /**
@@ -18,7 +18,7 @@ function parseReadme(book) {
             throw new error.FileNotFoundError({ filename: 'README' });
         }
 
-        logger.debug.ln('readme found at', file.path);
+        logger.debug.ln(`readme found at ${file.path}`);
         return file.parse(fs)
         .then((document) => {
             let readme = readmeFromDocument(document);

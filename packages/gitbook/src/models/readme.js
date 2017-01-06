@@ -27,11 +27,10 @@ class Readme extends Record(DEFAULTS) {
      * @param {Object} def
      * @return {Readme}
      */
-    static create(file, def) {
+    static create(def) {
         def = def || {};
 
         return new Readme({
-            file,
             title: def.title || '',
             description: def.description || ''
         });

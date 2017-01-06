@@ -1,43 +1,49 @@
-const Immutable = require('immutable');
+const { Record } = require('immutable');
 const slug = require('github-slugid');
 
-/*
-    A definition represents an entry in the glossary
-*/
-
-const GlossaryEntry = Immutable.Record({
-    name:               String(),
-    description:        String()
-});
-
-GlossaryEntry.prototype.getName = function() {
-    return this.get('name');
+const DEFAULTS = {
+    name:        String(),
+    description: String()
 };
-
-GlossaryEntry.prototype.getDescription = function() {
-    return this.get('description');
-};
-
 
 /**
-    Get identifier for this entry
+ * A definition represents an entry in the glossary.
+ * @param {Class}
+ */
 
-    @retrun {Boolean}
-*/
-GlossaryEntry.prototype.getID = function() {
-    return GlossaryEntry.nameToID(this.getName());
-};
+class GlossaryEntry extends Record(DEFAULTS) {
+
+    /**
+     * Get identifier for this entry
+     *
+     * @return {String}
+     */
+    get id() {
+        return GlossaryEntry.nameToID(this.name);
+    }
+
+    getName() {
+        return this.get('name');
+    }
+
+    getDescription() {
+        return this.get('description');
+    }
+
+    getID() {
+        return this.id;
+    }
 
 
-/**
-    Normalize a glossary entry name into a unique id
-
-    @param {String}
-    @return {String}
-*/
-GlossaryEntry.nameToID = function nameToID(name) {
-    return slug(name);
-};
-
+    /**
+     * Normalize a glossary entry name into a unique id
+     *
+     * @param {String}
+     * @return {String}
+     */
+    static nameToID(name) {
+        return slug(name);
+    }
+}
 
 module.exports = GlossaryEntry;

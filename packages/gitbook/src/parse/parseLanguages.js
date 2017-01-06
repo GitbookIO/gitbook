@@ -1,12 +1,11 @@
-const parseStructureFile = require('./parseStructureFile');
 const Languages = require('../models/languages');
 
 /**
-    Parse languages list from book
-
-    @param {Book} book
-    @return {Promise<Book>}
-*/
+ * Parse languages list from book
+ *
+ * @param {Book} book
+ * @return {Promise<Book>}
+ */
 function parseLanguages(book) {
     const logger = book.getLogger();
 

@@ -1,10 +1,9 @@
 const Promise = require('../../utils/promise');
 const Book = require('../../models/book');
 const createMockFS = require('../../fs/mock');
+const parseReadme = require('../parseReadme');
 
-describe.only('parseReadme', () => {
-    const parseReadme = require('../parseReadme');
-
+describe('parseReadme', () => {
     it('should parse readme if exists', () => {
         const fs = createMockFS({
             'README.md': '# Hello\n\nAnd here is the description.'

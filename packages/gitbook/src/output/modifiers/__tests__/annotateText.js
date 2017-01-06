@@ -5,8 +5,8 @@ const annotateText = require('../annotateText');
 
 describe('annotateText', () => {
     const entries = Immutable.List([
-        GlossaryEntry({ name: 'Word' }),
-        GlossaryEntry({ name: 'Multiple Words' })
+        new GlossaryEntry({ name: 'Word' }),
+        new GlossaryEntry({ name: 'Multiple Words' })
     ]);
 
     it('should annotate text', () => {
@@ -42,4 +42,3 @@ describe('annotateText', () => {
         expect($('a').length).toBe(0);
     });
 });
-

@@ -1,5 +1,5 @@
 const { BLOCKS } = require('markup-it');
-const Readme = require('../../models/readme');
+const Readme = require('../models/readme');
 
 /**
  * Parse a readme from a document.
@@ -12,7 +12,7 @@ function readmeFromDocument(document) {
     const first = nodes.first();
     const second = nodes.get(1);
 
-    return new Readme({
+    return Readme.create({
         title: first && first.type == BLOCKS.HEADING_1 ? first.text : '',
         description: second && second.type == BLOCKS.PARAGRAPH ? second.text : ''
     });

@@ -1,4 +1,4 @@
-const Summary = require('../../models/summary');
+const Summary = require('../models/summary');
 
 const { BLOCKS, INLINES } = require('markup-it');
 const { List } = require('immutable');

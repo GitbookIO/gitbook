@@ -1,6 +1,6 @@
 const Summary = require('../models/summary');
 const lookupStructureFile = require('./lookupStructureFile');
-const summaryFromDocument = require('./summary/fromDocument');
+const summaryFromDocument = require('./summaryFromDocument');
 const SummaryModifier = require('../modifiers').Summary;
 
 /**

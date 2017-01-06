@@ -7,8 +7,7 @@ describe('GlossaryEntry', () => {
                 name: 'Hello World'
             });
 
-            expect(entry.getID()).toBe('hello-world');
+            expect(entry.id).toBe('hello-world');
         });
     });
 });
-

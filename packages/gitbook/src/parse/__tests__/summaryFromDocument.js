@@ -1,19 +1,16 @@
 const expect = require('expect');
-const read = require('read-metadata');
-const { Raw } = require('slate');
-const summaryFromDocument = require('../fromDocument');
+const readDocument = require('./utils/readDocument');
+const summaryFromDocument = require('../summaryFromDocument');
 
 function readSummary(filename) {
-    const yaml = read.sync(filename);
-    const { document } = Raw.deserializeState(yaml, { terse: true });
-
+    const document = readDocument(filename);
     return summaryFromDocument(document);
 }
 
-describe('summaryFromDocument', () => {
+describe.only('summaryFromDocument', () => {
 
     it('should parse from a UL', () => {
-        const summary = readSummary(__dirname + '/fixtures/ul.yaml');
+        const summary = readSummary('summary/ul.yaml');
         expect(summary.parts.size).toBe(1);
 
         const first = summary.getByLevel('1.1');
@@ -26,7 +23,7 @@ describe('summaryFromDocument', () => {
     });
 
     it('should parse from a UL with links', () => {
-        const summary = readSummary(__dirname + '/fixtures/ul-with-link.yaml');
+        const summary = readSummary('summary/ul-with-link.yaml');
         const first = summary.getByLevel('1.1');
 
         expect(first).toExist();
@@ -35,7 +32,7 @@ describe('summaryFromDocument', () => {
     });
 
     it('should parse multiple parts', () => {
-        const summary = readSummary(__dirname + '/fixtures/parts-ul.yaml');
+        const summary = readSummary('summary/parts-ul.yaml');
         expect(summary.parts.size).toBe(2);
 
         const first = summary.getByLevel('1.1');

@@ -1,9 +1,8 @@
 const Book = require('../../models/book');
 const createMockFS = require('../../fs/mock');
+const parseSummary = require('../parseSummary');
 
 describe('parseSummary', () => {
-    const parseSummary = require('../parseSummary');
-
     it('should parse summary if exists', () => {
         const fs = createMockFS({
             'SUMMARY.md': '# Summary\n\n* [Hello](hello.md)'
