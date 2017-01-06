@@ -7,7 +7,7 @@ function readSummary(filename) {
     return summaryFromDocument(document);
 }
 
-describe.only('summaryFromDocument', () => {
+describe('summaryFromDocument', () => {
 
     it('should parse from a UL', () => {
         const summary = readSummary('summary/ul.yaml');

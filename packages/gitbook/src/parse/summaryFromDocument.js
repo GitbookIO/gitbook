@@ -9,7 +9,6 @@ const isLink = node => node.type === INLINES.LINK;
 /**
  * Create a summary article from a list item.
  * @param  {Block} item
- * @param  {String} level
  * @return {SummaryArticleLike} article
  */
 function createArticleFromItem(item) {
@@ -84,3 +83,5 @@ function summaryFromDocument(document) {
 }
 
 module.exports = summaryFromDocument;
+module.exports.listArticles = listArticles;
+module.exports.createArticleFromItem = createArticleFromItem;

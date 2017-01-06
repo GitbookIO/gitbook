@@ -1,21 +1,27 @@
 const path = require('path');
-const Immutable = require('immutable');
+const { Record } = require('immutable');
 
-const Language = Immutable.Record({
-    title:      String(),
-    path:       String()
-});
-
-Language.prototype.getTitle = function() {
-    return this.get('title');
+const DEFAULTS = {
+    title: String(),
+    path:  String()
 };
 
-Language.prototype.getPath = function() {
-    return this.get('path');
-};
+class Language extends Record(DEFAULTS) {
+    get id() {
+        return path.basename(this.path);
+    }
 
-Language.prototype.getID = function() {
-    return path.basename(this.getPath());
-};
+    getTitle() {
+        return this.get('title');
+    }
+
+    getPath() {
+        return this.get('path');
+    }
+
+    getID() {
+        return this.id;
+    }
+}
 
 module.exports = Language;

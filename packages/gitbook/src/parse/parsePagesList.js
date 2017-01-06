@@ -1,4 +1,4 @@
-const Immutable = require('immutable');
+const { OrderedMap } = require('immutable');
 
 const timing = require('../utils/timing');
 const Page = require('../models/page');
@@ -44,7 +44,7 @@ function parseFilePage(book, filePath) {
 function parsePagesList(book) {
     const summary = book.getSummary();
     const glossary = book.getGlossary();
-    let map = Immutable.OrderedMap();
+    let map = OrderedMap();
 
     // Parse pages from summary
     return timing.measure(

@@ -11,7 +11,7 @@ function parseGlossary(book) {
     const { logger } = book;
     const fs = book.getContentFS();
 
-    return lookupStructureFile(book, 'readme')
+    return lookupStructureFile(book, 'glossary')
     .then((file) => {
         if (!file) {
             logger.debug.ln('no glossary located');

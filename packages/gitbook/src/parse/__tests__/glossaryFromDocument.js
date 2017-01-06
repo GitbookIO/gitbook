@@ -7,7 +7,7 @@ function readGlossary(filename) {
     return glossaryFromDocument(document);
 }
 
-describe.only('glossaryFromDocument', () => {
+describe('glossaryFromDocument', () => {
 
     it('should parse empty', () => {
         const glossary = readGlossary('glossary/empty.yaml');

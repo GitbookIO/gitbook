@@ -7,7 +7,7 @@ function readReadme(filename) {
     return readmeFromDocument(document);
 }
 
-describe.only('readmeFromDocument', () => {
+describe('readmeFromDocument', () => {
 
     it('should parse only title', () => {
         const readme = readReadme('readme/only-title.yaml');

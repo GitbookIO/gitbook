@@ -1,71 +1,68 @@
-const Immutable = require('immutable');
+const { OrderedMap, Record } = require('immutable');
 
 const File = require('./file');
 const Language = require('./language');
 
-const Languages = Immutable.Record({
-    file:       new File(),
-    list:       Immutable.OrderedMap()
-});
-
-Languages.prototype.getFile = function() {
-    return this.get('file');
+const DEFAULTS = {
+    file: new File(),
+    list: OrderedMap()
 };
 
-Languages.prototype.getList = function() {
-    return this.get('list');
-};
+class Languages extends Record(DEFAULTS) {
+    getFile() {
+        return this.get('file');
+    }
 
-/**
-    Get default languages
+    getList() {
+        return this.get('list');
+    }
 
-    @return {Language}
-*/
-Languages.prototype.getDefaultLanguage = function() {
-    return this.getList().first();
-};
+    /**
+     * Get default languages
+     * @return {Language}
+     */
+    getDefaultLanguage() {
+        return this.list.first();
+    }
 
-/**
-    Get a language by its ID
+    /**
+     * Get a language by its ID.
+     * @param {String} lang
+     * @return {Language}
+     */
+    getLanguage(lang) {
+        return this.list.get(lang);
+    }
 
-    @param {String} lang
-    @return {Language}
-*/
-Languages.prototype.getLanguage = function(lang) {
-    return this.getList().get(lang);
-};
+    /**
+     * Return count of langs.
+     * @return {Number}
+     */
+    getCount() {
+        return this.list.size;
+    }
 
-/**
-    Return count of langs
+    /**
+     * Create a languages list from a JS object
+     *
+     * @param {Array}
+     * @return {Language}
+     */
+    static createFromList(langs) {
+        let list = OrderedMap();
 
-    @return {Number}
-*/
-Languages.prototype.getCount = function() {
-    return this.getList().size;
-};
-
-/**
-    Create a languages list from a JS object
-
-    @param {File}
-    @param {Array}
-    @return {Language}
-*/
-Languages.createFromList = function(file, langs) {
-    let list = Immutable.OrderedMap();
-
-    langs.forEach((lang) => {
-        lang = Language({
-            title: lang.title,
-            path: lang.ref
+        langs.forEach((lang) => {
+            lang = new Language({
+                title: lang.title,
+                path: lang.path || lang.ref
+            });
+            list = list.set(lang.getID(), lang);
         });
-        list = list.set(lang.getID(), lang);
-    });
 
-    return Languages({
-        file,
-        list
-    });
-};
+        return new Languages({
+            list
+        });
+    }
+}
 
 module.exports = Languages;
