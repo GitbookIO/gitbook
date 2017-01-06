@@ -21,6 +21,15 @@ class Readme extends Record(DEFAULTS) {
     }
 
     /**
+     * Set file linked to the readme.
+     * @param  {File} file
+     * @return {Readme}
+     */
+    setFile(file) {
+        return this.merge({ file });
+    }
+
+    /**
      * Create a new readme
      *
      * @param {File} file

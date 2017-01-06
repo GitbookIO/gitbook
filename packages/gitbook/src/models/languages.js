@@ -18,6 +18,15 @@ class Languages extends Record(DEFAULTS) {
     }
 
     /**
+     * Set file linked to the languages index.
+     * @param  {File} file
+     * @return {Languages}
+     */
+    setFile(file) {
+        return this.merge({ file });
+    }
+
+    /**
      * Get default languages
      * @return {Language}
      */

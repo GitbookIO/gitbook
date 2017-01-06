@@ -32,11 +32,11 @@ function initBook(rootFolder) {
         // Setup default readme if doesn't found one
         .fail(() => {
             const readmeFile = File.createWithFilepath('README' + extension);
-            const readme = Readme.create(readmeFile);
+            const readme = Readme.create().setFile(readmeFile);
             return book.setReadme(readme);
         });
     })
-    .then(Parse.parseSummary)
+    .then(book => Parse.parseSummary(book))
 
     .then((book) => {
         const logger = book.getLogger();

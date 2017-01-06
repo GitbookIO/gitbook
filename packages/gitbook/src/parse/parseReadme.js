@@ -22,7 +22,7 @@ function parseReadme(book) {
         return file.parse(fs)
         .then((document) => {
             let readme = readmeFromDocument(document);
-            readme = readme.merge({ file });
+            readme = readme.setFile(file);
             return book.set('readme', readme);
         });
     });

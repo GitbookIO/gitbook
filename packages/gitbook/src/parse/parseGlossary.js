@@ -22,7 +22,7 @@ function parseGlossary(book) {
         return file.parse(fs)
         .then((document) => {
             let glossary = glossaryFromDocument(document);
-            glossary = glossary.merge({ file });
+            glossary = glossary.setFile(file);
             return book.set('glossary', glossary);
         });
     });

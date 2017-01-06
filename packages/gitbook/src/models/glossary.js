@@ -18,6 +18,15 @@ class Glossary extends Record(DEFAULTS) {
     }
 
     /**
+     * Set file linked to the glossary.
+     * @param  {File} file
+     * @return {Readme}
+     */
+    setFile(file) {
+        return this.merge({ file });
+    }
+
+    /**
      * Return an entry by its name.
      * @param {String} name
      * @return {GlossaryEntry}

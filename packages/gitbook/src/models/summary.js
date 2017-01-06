@@ -22,6 +22,15 @@ class Summary extends Record(DEFAULTS) {
     }
 
     /**
+     * Set file linked to the summary.
+     * @param  {File} file
+     * @return {Summary}
+     */
+    setFile(file) {
+        return this.merge({ file });
+    }
+
+    /**
      * Return a part by its index.
      * @param {Number}
      * @return {Part}

@@ -15,7 +15,7 @@ function readSummary(book, file) {
     return file.parse(fs)
     .then((document) => {
         const summary = summaryFromDocument(document);
-        return summary.merge({ file });
+        return summary.setFile(file);
     });
 }
 
