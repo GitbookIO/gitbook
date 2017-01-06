@@ -7,15 +7,16 @@ const File = require('./models/file');
 const Readme = require('./models/readme');
 const Book = require('./models/book');
 const Parse = require('./parse');
+const SummaryModifier = require('./modifiers/summary');
 
 /**
-    Initialize folder structure for a book
-    Read SUMMARY to created the right chapter
-
-    @param {Book}
-    @param {String}
-    @return {Promise}
-*/
+ * Initialize folder structure for a book
+ * Read SUMMARY to created the right chapter
+ *
+ * @param {Book}
+ * @param {String}
+ * @return {Promise}
+ */
 function initBook(rootFolder) {
     const extension = '.md';
 
@@ -69,7 +70,8 @@ function initBook(rootFolder) {
             return fs.ensureFile(filePath)
             .then(() => {
                 logger.info.ln('create ' + path.basename(filePath));
-                return fs.writeFile(filePath, summary.toText(extension));
+                const text = SummaryModifier.toText(summary, extension);
+                return fs.writeFile(filePath, text);
             });
         })
 
