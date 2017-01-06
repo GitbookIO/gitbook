@@ -1,12 +1,12 @@
 const togglePlugin = require('../togglePlugin');
 const Config = require('../../../models/config');
 
-describe('togglePlugin', function() {
+describe('togglePlugin', () => {
     const config = Config.createWithValues({
         plugins: ['hello', 'world', '-disabled']
     });
 
-    it('should enable plugin', function() {
+    it('should enable plugin', () => {
         const newConfig = togglePlugin(config, 'disabled');
 
         const testDep = newConfig.getPluginDependency('disabled');
@@ -15,7 +15,7 @@ describe('togglePlugin', function() {
         expect(testDep.isEnabled()).toBeTruthy();
     });
 
-    it('should disable plugin', function() {
+    it('should disable plugin', () => {
         const newConfig = togglePlugin(config, 'world');
 
         const testDep = newConfig.getPluginDependency('world');

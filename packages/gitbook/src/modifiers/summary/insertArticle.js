@@ -4,16 +4,16 @@ const mergeAtLevel = require('./mergeAtLevel');
 const indexArticleLevels = require('./indexArticleLevels');
 
 /**
-    Returns a new Summary with the article at the given level, with
-    subsequent article shifted.
-
-    @param {Summary} summary
-    @param {Article} article
-    @param {String|Article} level: level to insert at
-    @return {Summary}
-*/
+ * Returns a new Summary with the article at the given level, with
+ * subsequent article shifted.
+ *
+ * @param {Summary} summary
+ * @param {Article} article
+ * @param {String|Article} level: level to insert at
+ * @return {Summary}
+ */
 function insertArticle(summary, article, level) {
-    article = SummaryArticle(article);
+    article = new SummaryArticle(article);
     level = is.string(level) ? level : level.getLevel();
 
     let parent = summary.getParent(level);
@@ -36,11 +36,11 @@ function insertArticle(summary, article, level) {
 }
 
 /**
-    @param {String}
-    @return {Number} The index of this level within its parent's children
+ * @param {String}
+ * @return {Number} The index of this level within its parent's children
  */
 function getLeafIndex(level) {
-    const arr = level.split('.').map(function(char) {
+    const arr = level.split('.').map((char) => {
         return parseInt(char, 10);
     });
     return arr[arr.length - 1] - 1;

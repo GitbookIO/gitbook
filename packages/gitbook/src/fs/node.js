@@ -7,18 +7,18 @@ const FS = require('../models/fs');
 
 function fsReadDir(folder) {
     return fs.readdir(folder)
-    .then(function(files) {
+    .then((files) => {
         files = Immutable.List(files);
 
         return files
-            .map(function(file) {
+            .map((file) => {
                 if (file == '.' || file == '..') return;
 
                 const stat = fs.statSync(path.join(folder, file));
                 if (stat.isDirectory()) file = file + path.sep;
                 return file;
             })
-            .filter(function(file) {
+            .filter((file) => {
                 return Boolean(file);
             });
     });

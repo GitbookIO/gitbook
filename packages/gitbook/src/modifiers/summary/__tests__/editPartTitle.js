@@ -1,9 +1,8 @@
 const Summary = require('../../../models/summary');
-const File = require('../../../models/file');
 
-describe('editPartTitle', function() {
+describe('editPartTitle', () => {
     const editPartTitle = require('../editPartTitle');
-    const summary = Summary.createFromParts(File(), [
+    const summary = Summary.createFromParts([
         {
             articles: [
                 {
@@ -21,23 +20,22 @@ describe('editPartTitle', function() {
         }
     ]);
 
-    it('should correctly set title of first part', function() {
+    it('should correctly set title of first part', () => {
         const newSummary = editPartTitle(summary, 0, 'Hello World');
         const part = newSummary.getPart(0);
 
         expect(part.getTitle()).toBe('Hello World');
     });
 
-    it('should correctly set title of second part', function() {
+    it('should correctly set title of second part', () => {
         const newSummary = editPartTitle(summary, 1, 'Hello');
         const part = newSummary.getPart(1);
 
         expect(part.getTitle()).toBe('Hello');
     });
 
-    it('should not fail if part doesn\'t exist', function() {
+    it('should not fail if part doesn\'t exist', () => {
         const newSummary = editPartTitle(summary, 3, 'Hello');
         expect(newSummary.getParts().size).toBe(2);
     });
 });
-

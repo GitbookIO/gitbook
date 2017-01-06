@@ -1,89 +1,116 @@
 const path = require('path');
-const Immutable = require('immutable');
+const { Record } = require('immutable');
 
+const error = require('../utils/error');
 const parsers = require('../parsers');
 
-const File = Immutable.Record({
+const DEFAULTS = {
     // Path of the file, relative to the FS
-    path:       String(),
-
+    path:  String(),
     // Time when file data last modified
-    mtime:      Date()
-});
-
-File.prototype.getPath = function() {
-    return this.get('path');
+    mtime: Date()
 };
 
-File.prototype.getMTime = function() {
-    return this.get('mtime');
-};
-
-/**
-    Does the file exists / is set
-
-    @return {Boolean}
-*/
-File.prototype.exists = function() {
-    return Boolean(this.getPath());
-};
-
-/**
-    Return type of file ('markdown' or 'asciidoc')
-
-    @return {String}
-*/
-File.prototype.getType = function() {
-    const parser = this.getParser();
-    if (parser) {
-        return parser.getName();
-    } else {
-        return undefined;
+class File extends Record(DEFAULTS) {
+    getPath() {
+        return this.get('path');
     }
-};
 
-/**
-    Return extension of this file (lowercased)
+    getMTime() {
+        return this.get('mtime');
+    }
 
-    @return {String}
-*/
-File.prototype.getExtension = function() {
-    return path.extname(this.getPath()).toLowerCase();
-};
+    /**
+     * Return the file extension.
+     * @return {String}
+     */
+    get extension() {
+        return path.extname(this.getPath()).toLowerCase();
+    }
 
-/**
-    Return parser for this file
+    /**
+     * Return the parser for this file..
+     * @return {Parser}
+     */
+    get parser() {
+        return parsers.getByExt(this.extension);
+    }
 
-    @return {Parser}
-*/
-File.prototype.getParser = function() {
-    return parsers.getByExt(this.getExtension());
-};
+    /**
+     * Return type of file ('markdown' or 'asciidoc').
+     * @return {String}
+     */
+    get type() {
+        const { parser } = this;
+        return parser ? parser.name : undefined;
+    }
 
-/**
-    Create a file from stats informations
+    /**
+     * Does the file exists / is set.
+     * @return {Boolean}
+     */
+    exists() {
+        return Boolean(this.getPath());
+    }
 
-    @param {String} filepath
-    @param {Object|fs.Stats} stat
-    @return {File}
-*/
-File.createFromStat = function createFromStat(filepath, stat) {
-    return new File({
-        path: filepath,
-        mtime: stat.mtime
-    });
-};
+    /**
+     * Read and parse the file.
+     * @param  {FS} fs
+     * @return {Promise<Document>} document
+     */
+    parse(fs) {
+        const { parser } = this;
 
-/**
-    Create a file with only a path
+        if (!parser) {
+            return Promise.reject(
+                error.FileNotParsableError({
+                    filename: this.path
+                })
+            );
+        }
 
-    @param {String} filepath
-    @return {File}
-*/
-File.createWithFilepath = function createWithFilepath(filepath) {
-    return new File({
-        path: filepath
-    });
-};
+        return fs.readAsString(this.path)
+        .then((content) => {
+            const document = parser.toDocument(content);
+            return document;
+        });
+    }
+
+    getType() {
+        return this.type;
+    }
+
+    getExtension() {
+        return this.extension;
+    }
+
+    getParser() {
+        return this.parser;
+    }
+
+    /**
+     * Create a file from stats informations.
+     * @param {String} filepath
+     * @param {Object|fs.Stats} stat
+     * @return {File}
+     */
+    static createFromStat(filepath, stat) {
+        return new File({
+            path: filepath,
+            mtime: stat.mtime
+        });
+    }
+
+    /**
+     * Create a file with only a path.
+     * @param {String} filepath
+     * @return {File}
+     */
+    static createWithFilepath(filepath) {
+        return new File({
+            path: filepath
+        });
+    }
+}
 
 module.exports = File;

@@ -1,9 +1,8 @@
 const Summary = require('../../../models/summary');
-const File = require('../../../models/file');
 
-describe('removeArticle', function() {
+describe('removeArticle', () => {
     const removeArticle = require('../removeArticle');
-    const summary = Summary.createFromParts(File(), [
+    const summary = Summary.createFromParts([
         {
             articles: [
                 {
@@ -41,7 +40,7 @@ describe('removeArticle', function() {
         }
     ]);
 
-    it('should remove an article at a given level', function() {
+    it('should remove an article at a given level', () => {
         const newSummary = removeArticle(summary, '2.1.1');
 
         const removed = newSummary.getByLevel('2.1.1');

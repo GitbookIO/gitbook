@@ -18,15 +18,15 @@ function encodeProgress(output, page) {
     let done = true;
 
     const chapters = navigation
-        .map(function(nav, chapterPath) {
+        .map((nav, chapterPath) => {
             nav.path = chapterPath;
             return nav;
         })
         .valueSeq()
-        .sortBy(function(nav) {
+        .sortBy((nav) => {
             return nav.index;
         })
-        .map(function(nav, i) {
+        .map((nav, i) => {
             // Calcul percent
             nav.percent = (i * 100) / Math.max((n - 1), 1);
 

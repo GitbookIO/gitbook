@@ -1,1 +1,2 @@
-_assets
+_assets/**/*
+!_assets/website/images

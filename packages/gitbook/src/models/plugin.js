@@ -101,7 +101,7 @@ class Plugin extends Record(DEFAULTS) {
         blocks = blocks || Map();
 
         return blocks
-            .map(function(block, blockName) {
+            .map((block, blockName) => {
                 return TemplateBlock.create(blockName, block);
             });
     }

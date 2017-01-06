@@ -63,7 +63,7 @@ function replaceText($, el, search, replace, text_only) {
  * @param {HTMLDom} $
  */
 function annotateText(entries, glossaryFilePath, $) {
-    entries.forEach(function(entry) {
+    entries.forEach((entry) => {
         const entryId     = entry.getID();
         const name        = entry.getName();
         const description = entry.getDescription();
@@ -77,7 +77,7 @@ function annotateText(entries, glossaryFilePath, $) {
                 $this.parents(ANNOTATION_IGNORE).length > 0
             ) return;
 
-            replaceText($, this, searchRegex, function(match) {
+            replaceText($, this, searchRegex, (match) => {
                 return '<a href="/' + glossaryFilePath + '#' + entryId + '" '
                     + 'class="glossary-term" title="' + escape(description) + '">'
                     + match

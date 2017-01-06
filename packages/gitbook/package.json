@@ -6,6 +6,7 @@
   "main": "lib/index.js",
   "browser": "./lib/browser.js",
   "dependencies": {
+    "asciidoctor.js": "^1.5.5-4",
     "bash-color": "0.0.4",
     "cheerio": "0.20.0",
     "chokidar": "1.5.0",
@@ -21,9 +22,7 @@
     "extend": "^3.0.0",
     "fresh-require": "1.0.3",
     "front-matter": "^2.1.0",
-    "gitbook-asciidoc": "1.2.2",
     "gitbook-core": "4.0.0",
-    "gitbook-markdown": "1.3.2",
     "gitbook-plugin-copy-code": "4.0.0",
     "gitbook-plugin-headings": "4.0.0",
     "gitbook-plugin-highlight": "4.0.0",
@@ -44,6 +43,7 @@
     "json-schema-defaults": "0.1.1",
     "jsonschema": "1.1.0",
     "juice": "2.0.0",
+    "markup-it": "3.3.0",
     "mkdirp": "0.5.1",
     "moment": "2.13.0",
     "npm": "3.10.9",
@@ -59,13 +59,24 @@
     "rmdir": "1.2.0",
     "semver": "5.1.0",
     "send": "0.13.2",
+    "slate": "^0.16.8",
     "spawn-cmd": "0.0.2",
     "tiny-lr": "0.2.1",
     "tmp": "0.0.28",
     "urijs": "1.18.0"
   },
+  "devDependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-react": "^6.16.0",
+    "babel-preset-stage-2": "^6.18.0",
+    "babel-register": "^6.18.0",
+    "expect": "^1.20.2",
+    "mocha": "^3.2.0",
+    "read-metadata": "^1.0.0"
+  },
   "scripts": {
-    "test": "./node_modules/.bin/mocha ./testing/setup.js \"./src/**/*/__tests__/*.js\" --bail --reporter=list --timeout=100000 --compilers js:babel-register",
+    "test": "mocha ./testing/setup.js \"./src/**/*/__tests__/*.js\" --bail --reporter=list --timeout=100000 --compilers js:babel-register",
     "dist": "rm -rf lib/ && babel -d lib/ src/ --source-maps --ignore \"**/*/__tests__/*.js\"",
     "prepublish": "npm run dist"
   },
@@ -95,13 +106,5 @@
       "name": "Samy Pessé",
       "email": "samy@gitbook.com"
     }
-  ],
-  "devDependencies": {
-    "babel-cli": "^6.14.0",
-    "babel-preset-es2015": "^6.14.0",
-    "babel-preset-react": "^6.11.1",
-    "babel-preset-stage-2": "^6.13.0",
-    "babel-register": "^6.14.0",
-    "mocha": "^3.0.2"
-  }
+  ]
 }

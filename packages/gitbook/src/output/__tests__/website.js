@@ -77,7 +77,7 @@ describe('WebsiteGenerator', () => {
         return generateMock(WebsiteGenerator, {
             'README.adoc': 'Hello World'
         })
-        .then(function(folder) {
+        .then((folder) => {
             expect(folder).toHaveFile('index.html');
         });
     });
@@ -90,7 +90,7 @@ describe('WebsiteGenerator', () => {
                 'page.md': 'Hello 2'
             }
         })
-        .then(function(folder) {
+        .then((folder) => {
             expect(folder).toHaveFile('index.html');
             expect(folder).toHaveFile('test/page.html');
         });

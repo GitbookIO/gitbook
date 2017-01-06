@@ -1,0 +1,25 @@
+nodes:
+  - kind: block
+    type: header_one
+    nodes:
+      - kind: text
+        text: Languages
+  - kind: block
+    type: unordered_list
+    nodes:
+      - kind: block
+        type: list_item
+        nodes:
+          - kind: block
+            type: unstyled
+            nodes:
+              - kind: text
+                text: English
+      - kind: block
+        type: list_item
+        nodes:
+          - kind: block
+            type: unstyled
+            nodes:
+              - kind: text
+                text: French

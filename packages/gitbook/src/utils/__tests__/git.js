@@ -46,7 +46,7 @@ describe('Git', () => {
         it('should clone an HTTPS url', () => {
             const git = new Git();
             return git.resolve('git+https://gist.github.com/69ea4542e4c8967d2fa7.git/test.md')
-            .then(function(filename) {
+            .then((filename) => {
                 expect(path.extname(filename)).toBe('.md');
             });
         });

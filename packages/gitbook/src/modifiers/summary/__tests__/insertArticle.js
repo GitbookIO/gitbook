@@ -1,10 +1,9 @@
 const Summary = require('../../../models/summary');
 const SummaryArticle = require('../../../models/summaryArticle');
-const File = require('../../../models/file');
 
-describe('insertArticle', function() {
+describe('insertArticle', () => {
     const insertArticle = require('../insertArticle');
-    const summary = Summary.createFromParts(File(), [
+    const summary = Summary.createFromParts([
         {
             articles: [
                 {
@@ -42,7 +41,7 @@ describe('insertArticle', function() {
         }
     ]);
 
-    it('should insert an article at a given level', function() {
+    it('should insert an article at a given level', () => {
         const article = SummaryArticle.create({
             title: 'Inserted'
         }, 'fake.level');
@@ -59,7 +58,7 @@ describe('insertArticle', function() {
         expect(nextOne.getLevel()).toBe('2.1.2');
     });
 
-    it('should insert an article in last position', function() {
+    it('should insert an article in last position', () => {
         const article = SummaryArticle.create({
             title: 'Inserted'
         }, 'fake.level');

@@ -13,7 +13,7 @@ const generators = Immutable.List([
     @return {Generator}
 */
 function getGenerator(name) {
-    return generators.find(function(generator) {
+    return generators.find((generator) => {
         return generator.name == name;
     });
 }

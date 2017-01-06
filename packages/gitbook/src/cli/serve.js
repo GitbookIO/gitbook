@@ -20,7 +20,7 @@ let server, lrServer, lrPath;
 function waitForCtrlC() {
     const d = Promise.defer();
 
-    process.on('SIGINT', function() {
+    process.on('SIGINT', () => {
         d.resolve();
     });
 
@@ -43,9 +43,9 @@ function generateBook(args, kwargs) {
     if (server.isRunning()) console.log('Stopping server');
 
     return server.stop()
-    .then(function() {
+    .then(() => {
         return Parse.parseBook(book)
-        .then(function(resultBook) {
+        .then((resultBook) => {
             if (hasLiveReloading) {
                 // Enable livereload plugin
                 let config = resultBook.getConfig();
@@ -58,12 +58,12 @@ function generateBook(args, kwargs) {
             });
         });
     })
-    .then(function() {
+    .then(() => {
         console.log();
         console.log('Starting server ...');
         return server.start(outputFolder, port);
     })
-    .then(function() {
+    .then(() => {
         console.log('Serving book on http://localhost:' + port);
 
         if (lrPath && hasLiveReloading) {
@@ -79,13 +79,13 @@ function generateBook(args, kwargs) {
             open('http://localhost:' + port, browser);
         }
     })
-    .then(function() {
+    .then(() => {
         if (!hasWatch) {
             return waitForCtrlC();
         }
 
         return watch(book.getRoot())
-        .then(function(filepath) {
+        .then((filepath) => {
             // set livereload path
             lrPath = filepath;
             console.log('Restart after change in file', filepath);
@@ -138,21 +138,21 @@ module.exports = {
         const hasLiveReloading = kwargs['live'];
 
         return Promise()
-        .then(function() {
+        .then(() => {
             if (!hasWatch || !hasLiveReloading) {
                 return;
             }
 
             lrServer = tinylr({});
             return Promise.nfcall(lrServer.listen.bind(lrServer), kwargs.lrport)
-            .then(function() {
+            .then(() => {
                 console.log('Live reload server started on port:', kwargs.lrport);
                 console.log('Press CTRL+C to quit ...');
                 console.log('');
 
             });
         })
-        .then(function() {
+        .then(() => {
             return generateBook(args, kwargs);
         });
     }

@@ -17,7 +17,7 @@ function encodeLanguages(languages, currentLanguage, urls) {
         current: currentLanguage,
         list: list
             .valueSeq()
-            .map(function(lang) {
+            .map((lang) => {
                 return {
                     id: lang.getID(),
                     title: lang.getTitle()

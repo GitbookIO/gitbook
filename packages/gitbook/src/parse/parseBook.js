@@ -32,7 +32,7 @@ function parseMultilingualBook(book) {
     const languages = book.getLanguages();
     const langList = languages.getList();
 
-    return Promise.reduce(langList, function(currentBook, lang) {
+    return Promise.reduce(langList, (currentBook, lang) => {
         const langID = lang.getID();
         const child = Book.createFromParent(currentBook, langID);
         let ignore = currentBook.getIgnore();
@@ -40,7 +40,7 @@ function parseMultilingualBook(book) {
         return Promise(child)
         .then(parseConfig)
         .then(parseBookContent)
-        .then(function(result) {
+        .then((result) => {
             // Ignore content of this book when generating parent book
             ignore = ignore.add(langID + '/**');
             currentBook = currentBook.set('ignore', ignore);
@@ -64,7 +64,7 @@ function parseBook(book) {
         .then(parseIgnore)
         .then(parseConfig)
         .then(parseLanguages)
-        .then(function(resultBook) {
+        .then((resultBook) => {
             if (resultBook.isMultilingual()) {
                 return parseMultilingualBook(resultBook);
             } else {

@@ -38,8 +38,8 @@ function callHook(name, getArgument, handleResult, output) {
         Promise(getArgument(output))
 
         // Call the hooks in serie
-        .then(function(arg) {
-            return Promise.reduce(plugins, function(prev, plugin) {
+        .then((arg) => {
+            return Promise.reduce(plugins, (prev, plugin) => {
                 const hook = plugin.getHook(name);
                 if (!hook) {
                     return prev;
@@ -50,7 +50,7 @@ function callHook(name, getArgument, handleResult, output) {
         })
 
         // Handle final result
-        .then(function(result) {
+        .then((result) => {
             output = Api.decodeGlobal(output, context);
             return handleResult(output, result);
         })

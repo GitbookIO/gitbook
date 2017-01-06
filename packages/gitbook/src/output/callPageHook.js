@@ -13,11 +13,11 @@ function callPageHook(name, output, page) {
     return callHook(
         name,
 
-        function(out) {
+        (out) => {
             return Api.encodePage(out, page);
         },
 
-        function(out, result) {
+        (out, result) => {
             return Api.decodePage(out, page, result);
         },
 

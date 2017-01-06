@@ -45,7 +45,7 @@ function runEbookConvert(output) {
     }
 
     return getConvertOptions(output)
-    .then(function(options) {
+    .then((options) => {
         const cmd = [
             'ebook-convert',
             path.resolve(outputFolder, SUMMARY_FILE),
@@ -54,10 +54,10 @@ function runEbookConvert(output) {
         ].join(' ');
 
         return command.exec(cmd)
-        .progress(function(data) {
+        .progress((data) => {
             logger.debug(data);
         })
-        .fail(function(err) {
+        .fail((err) => {
             if (err.code == 127) {
                 throw error.RequireInstallError({
                     cmd: 'ebook-convert',

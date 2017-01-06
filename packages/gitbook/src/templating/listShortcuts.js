@@ -17,13 +17,13 @@ function listShortcuts(blocks, filePath) {
     }
 
     return blocks
-        .map(function(block) {
+        .map((block) => {
             return block.getShortcuts();
         })
-        .filter(function(shortcuts) {
+        .filter((shortcuts) => {
             return (
                 shortcuts &&
-                shortcuts.acceptParser(parser.getName())
+                shortcuts.acceptParser(parser.name)
             );
         });
 }

@@ -1,109 +1,89 @@
-const Immutable = require('immutable');
+const { Record, OrderedMap } = require('immutable');
 
-const error = require('../utils/error');
 const File = require('./file');
 const GlossaryEntry = require('./glossaryEntry');
-const parsers = require('../parsers');
 
-const Glossary = Immutable.Record({
-    file:       File(),
-    entries:    Immutable.OrderedMap()
-});
-
-Glossary.prototype.getFile = function() {
-    return this.get('file');
+const DEFAULTS = {
+    file:    new File(),
+    entries: OrderedMap()
 };
 
-Glossary.prototype.getEntries = function() {
-    return this.get('entries');
-};
-
-/**
-    Return an entry by its name
-
-    @param {String} name
-    @return {GlossaryEntry}
-*/
-Glossary.prototype.getEntry = function(name) {
-    const entries = this.getEntries();
-    const id = GlossaryEntry.nameToID(name);
-
-    return entries.get(id);
-};
-
-/**
-    Render glossary as text
-
-    @return {Promise<String>}
-*/
-Glossary.prototype.toText = function(parser) {
-    const file = this.getFile();
-    const entries = this.getEntries();
-
-    parser = parser ? parsers.getByExt(parser) : file.getParser();
-
-    if (!parser) {
-        throw error.FileNotParsableError({
-            filename: file.getPath()
-        });
+class Glossary extends Record(DEFAULTS) {
+    getFile() {
+        return this.get('file');
     }
 
-    return parser.renderGlossary(entries.toJS());
-};
+    getEntries() {
+        return this.get('entries');
+    }
 
+    /**
+     * Set file linked to the glossary.
+     * @param  {File} file
+     * @return {Readme}
+     */
+    setFile(file) {
+        return this.merge({ file });
+    }
 
-/**
-    Add/Replace an entry to a glossary
+    /**
+     * Return an entry by its name.
+     * @param {String} name
+     * @return {GlossaryEntry}
+     */
+    getEntry(name) {
+        const { entries } = this;
+        const id = GlossaryEntry.nameToID(name);
 
-    @param {Glossary} glossary
-    @param {GlossaryEntry} entry
-    @return {Glossary}
-*/
-Glossary.addEntry = function addEntry(glossary, entry) {
-    const id = entry.getID();
-    let entries = glossary.getEntries();
+        return entries.get(id);
+    }
 
-    entries = entries.set(id, entry);
-    return glossary.set('entries', entries);
-};
+    /**
+     * Add/Replace an entry to a glossary.
+     * @param {GlossaryEntry} entry
+     * @return {Glossary}
+     */
+    addEntry(entry) {
+        const id = entry.getID();
+        let { entries } = this;
 
-/**
-    Add/Replace an entry to a glossary by name/description
+        entries = entries.set(id, entry);
+        return this.set('entries', entries);
+    }
 
-    @param {Glossary} glossary
-    @param {GlossaryEntry} entry
-    @return {Glossary}
-*/
-Glossary.addEntryByName = function addEntryByName(glossary, name, description) {
-    const entry = new GlossaryEntry({
-        name,
-        description
-    });
+    /**
+     * Add/Replace an entry to a glossary by name/description.
+     * @param {GlossaryEntry} entry
+     * @return {Glossary}
+     */
+    addEntryByName(name, description) {
+        const entry = new GlossaryEntry({
+            name,
+            description
+        });
 
-    return Glossary.addEntry(glossary, entry);
-};
+        return this.addEntry(entry);
+    }
 
-/**
-    Create a glossary from a list of entries
+    /**
+     * Create a glossary from a list of entries.
+     *
+     * @param {Array|List} entries
+     * @return {Glossary}
+     */
+    static createFromEntries(entries) {
+        entries = entries.map((entry) => {
+            if (!(entry instanceof GlossaryEntry)) {
+                entry = new GlossaryEntry(entry);
+            }
 
-    @param {String} filename
-    @param {Array|List} entries
-    @return {Glossary}
-*/
-Glossary.createFromEntries = function createFromEntries(file, entries) {
-    entries = entries.map(function(entry) {
-        if (!(entry instanceof GlossaryEntry)) {
-            entry = new GlossaryEntry(entry);
-        }
+            return [entry.id, entry];
+        });
 
-        return [entry.getID(), entry];
-    });
-
-    return new Glossary({
-        file,
-        entries: Immutable.OrderedMap(entries)
-    });
-};
-
+        return new Glossary({
+            entries: OrderedMap(entries)
+        });
+    }
+}
 
 module.exports = Glossary;

@@ -1,25 +1,30 @@
-const parseStructureFile = require('./parseStructureFile');
-const Glossary = require('../models/glossary');
+const lookupStructureFile = require('./lookupStructureFile');
+const glossaryFromDocument = require('./glossaryFromDocument');
 
 /**
-    Parse glossary
-
-    @param {Book} book
-    @return {Promise<Book>}
-*/
+ * Parse glossary.
+ *
+ * @param {Book} book
+ * @return {Promise<Book>}
+ */
 function parseGlossary(book) {
-    const logger = book.getLogger();
+    const { logger } = book;
+    const fs = book.getContentFS();
 
-    return parseStructureFile(book, 'glossary')
-    .spread(function(file, entries) {
+    return lookupStructureFile(book, 'glossary')
+    .then((file) => {
         if (!file) {
+            logger.debug.ln('no glossary located');
             return book;
         }
 
-        logger.debug.ln('glossary index file found at', file.getPath());
-
-        const glossary = Glossary.createFromEntries(file, entries);
-        return book.set('glossary', glossary);
+        logger.debug.ln(`glossary found at ${file.path}`);
+        return file.parse(fs)
+        .then((document) => {
+            let glossary = glossaryFromDocument(document);
+            glossary = glossary.setFile(file);
+            return book.set('glossary', glossary);
+        });
     });
 }
 

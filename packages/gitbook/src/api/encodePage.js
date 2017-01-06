@@ -28,7 +28,7 @@ function encodePage(output, page) {
         return result;
     };
 
-    deprecate.field(output, 'page.progress', result, 'progress', function() {
+    deprecate.field(output, 'page.progress', result, 'progress', () => {
         return encodeProgress(output, page);
     }, '"page.progress" property is deprecated');
 

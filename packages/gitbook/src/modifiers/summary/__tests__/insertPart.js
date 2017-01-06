@@ -1,11 +1,9 @@
 const Summary = require('../../../models/summary');
 const SummaryPart = require('../../../models/summaryPart');
 
-const File = require('../../../models/file');
-
-describe('insertPart', function() {
+describe('insertPart', () => {
     const insertPart = require('../insertPart');
-    const summary = Summary.createFromParts(File(), [
+    const summary = Summary.createFromParts([
         {
             articles: [
                 {
@@ -30,7 +28,7 @@ describe('insertPart', function() {
         }
     ]);
 
-    it('should insert an part at a given level', function() {
+    it('should insert an part at a given level', () => {
         const part = SummaryPart.create({
             title: 'Inserted'
         }, 'meaningless.level');
@@ -46,7 +44,7 @@ describe('insertPart', function() {
         expect(otherArticle.getLevel()).toBe('3.1');
     });
 
-    it('should insert an part in last position', function() {
+    it('should insert an part in last position', () => {
         const part = SummaryPart.create({
             title: 'Inserted'
         }, 'meaningless.level');

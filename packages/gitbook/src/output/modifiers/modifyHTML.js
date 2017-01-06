@@ -13,10 +13,10 @@ function modifyHTML(page, operations) {
     const html = page.getContent();
     const $ = cheerio.load(html);
 
-    return Promise.forEach(operations, function(op) {
+    return Promise.forEach(operations, (op) => {
         return op($);
     })
-    .then(function() {
+    .then(() => {
         const resultHTML = $.html();
         return page.set('content', resultHTML);
     });

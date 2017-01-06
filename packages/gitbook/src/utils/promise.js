@@ -16,9 +16,9 @@ if (process.env.DEBUG || process.env.CI) {
 function reduce(arr, iter, base) {
     arr = Immutable.Iterable.isIterable(arr) ? arr : Immutable.List(arr);
 
-    return arr.reduce(function(prev, elem, key) {
+    return arr.reduce((prev, elem, key) => {
         return prev
-        .then(function(val) {
+        .then((val) => {
             return iter(val, elem, key);
         });
     }, Q(base));
@@ -32,7 +32,7 @@ function reduce(arr, iter, base) {
  * @return {Promise}
  */
 function forEach(arr, iter) {
-    return reduce(arr, function(val, el, key) {
+    return reduce(arr, (val, el, key) => {
         return iter(el, key);
     });
 }
@@ -45,9 +45,9 @@ function forEach(arr, iter) {
  * @return {Promise}
  */
 function serie(arr, iter, base) {
-    return reduce(arr, function(before, item, key) {
+    return reduce(arr, (before, item, key) => {
         return Q(iter(item, key))
-        .then(function(r) {
+        .then((r) => {
             before.push(r);
             return before;
         });
@@ -64,8 +64,8 @@ function serie(arr, iter, base) {
 function some(arr, iter) {
     arr = Immutable.List(arr);
 
-    return arr.reduce(function(prev, elem, i) {
-        return prev.then(function(val) {
+    return arr.reduce((prev, elem, i) => {
+        return prev.then((val) => {
             if (val) return val;
 
             return iter(elem, i);
@@ -81,9 +81,9 @@ function some(arr, iter) {
  * @return {Promise<List>}
  */
 function mapAsList(arr, iter) {
-    return reduce(arr, function(prev, entry, i) {
+    return reduce(arr, (prev, entry, i) => {
         return Q(iter(entry, i))
-        .then(function(out) {
+        .then((out) => {
             prev.push(out);
             return prev;
         });
@@ -104,18 +104,18 @@ function map(arr, iter) {
             type = 'OrderedMap';
         }
 
-        return mapAsList(arr, function(value, key) {
+        return mapAsList(arr, (value, key) => {
             return Q(iter(value, key))
-            .then(function(result) {
+            .then((result) => {
                 return [key, result];
             });
         })
-        .then(function(result) {
+        .then((result) => {
             return Immutable[type](result);
         });
     } else {
         return mapAsList(arr, iter)
-        .then(function(result) {
+        .then((result) => {
             return Immutable.List(result);
         });
     }
@@ -131,7 +131,7 @@ function map(arr, iter) {
 function wrap(func) {
     return function(...args) {
         return Q()
-        .then(function() {
+        .then(() => {
             return func(...args);
         });
     };

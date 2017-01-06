@@ -63,7 +63,7 @@ function validatePluginConfig(book, plugin) {
  * @return {Promise<Book>}
  */
 function validateConfig(book, plugins) {
-    return Promise.reduce(plugins, function(newBook, plugin) {
+    return Promise.reduce(plugins, (newBook, plugin) => {
         return validatePluginConfig(newBook, plugin);
     }, book);
 }

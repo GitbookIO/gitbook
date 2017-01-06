@@ -17,7 +17,7 @@ const editHTMLElement = require('./editHTMLElement');
 function inlinePng(rootFolder, currentFile, $) {
     const currentDirectory = path.dirname(currentFile);
 
-    return editHTMLElement($, 'img', function($img) {
+    return editHTMLElement($, 'img', ($img) => {
         const src = $img.attr('src');
         if (!LocationUtils.isDataURI(src)) {
             return;
@@ -30,10 +30,10 @@ function inlinePng(rootFolder, currentFile, $) {
         // Result file path
         const filePath = path.join(rootFolder, fileName);
 
-        return fs.assertFile(filePath, function() {
+        return fs.assertFile(filePath, () => {
             return imagesUtil.convertInlinePNG(src, filePath);
         })
-        .then(function() {
+        .then(() => {
             // Convert filename to a relative filename
             fileName = LocationUtils.relative(currentDirectory, fileName);
 

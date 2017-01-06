@@ -17,7 +17,7 @@ function togglePlugin(config, pluginName, state) {
         deps = deps.push(PluginDependency.create(pluginName));
     }
 
-    deps = deps.map(function(dep) {
+    deps = deps.map((dep) => {
         if (dep.getName() === pluginName) {
             return dep.toggle(state);
         }

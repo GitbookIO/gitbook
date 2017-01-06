@@ -1,5 +1,5 @@
 
 module.exports = {
-    Summary:        require('./summary'),
-    Config:         require('./config')
+    Summary: require('./summary'),
+    Config:  require('./config')
 };

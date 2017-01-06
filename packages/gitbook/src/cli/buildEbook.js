@@ -31,7 +31,7 @@ module.exports = function(format) {
             const Generator = Output.getGenerator('ebook');
 
             return Parse.parseBook(book)
-            .then(function(resultBook) {
+            .then((resultBook) => {
                 return Output.generate(Generator, resultBook, {
                     root: outputFolder,
                     format
@@ -39,12 +39,12 @@ module.exports = function(format) {
             })
 
             // Extract ebook file
-            .then(function(output) {
+            .then((output) => {
                 const book = output.getBook();
                 const languages = book.getLanguages();
 
                 if (book.isMultilingual()) {
-                    return Promise.forEach(languages.getList(), function(lang) {
+                    return Promise.forEach(languages.getList(), (lang) => {
                         const langID = lang.getID();
 
                         const langOutputFile = path.join(
@@ -67,7 +67,7 @@ module.exports = function(format) {
             })
 
             // Log end
-            .then(function(count) {
+            .then((count) => {
                 logger.info.ok(count + ' file(s) generated');
 
                 logger.debug('cleaning up... ');

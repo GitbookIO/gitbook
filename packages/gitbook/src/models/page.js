@@ -4,7 +4,7 @@ const yaml = require('js-yaml');
 const File = require('./file');
 
 const DEFAULTS = {
-    file:       File(),
+    file:       new File(),
     // Attributes extracted from the YAML header
     attributes: Map(),
     // Content of the page

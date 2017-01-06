@@ -1,10 +1,9 @@
 const Immutable = require('immutable');
 const Summary = require('../../../models/summary');
-const File = require('../../../models/file');
 
-describe('moveArticleAfter', function() {
+describe('moveArticleAfter', () => {
     const moveArticleAfter = require('../moveArticleAfter');
-    const summary = Summary.createFromParts(File(), [
+    const summary = Summary.createFromParts([
         {
             articles: [
                 {
@@ -42,19 +41,19 @@ describe('moveArticleAfter', function() {
         }
     ]);
 
-    it('moving right after itself should be invariant', function() {
+    it('moving right after itself should be invariant', () => {
         const newSummary = moveArticleAfter(summary, '2.1', '2.1');
 
         expect(Immutable.is(summary, newSummary)).toBe(true);
     });
 
-    it('moving after previous one should be invariant too', function() {
+    it('moving after previous one should be invariant too', () => {
         const newSummary = moveArticleAfter(summary, '2.1', '2.0');
 
         expect(Immutable.is(summary, newSummary)).toBe(true);
     });
 
-    it('should move an article after a previous level', function() {
+    it('should move an article after a previous level', () => {
         const newSummary = moveArticleAfter(summary, '2.2', '2.0');
         const moved = newSummary.getByLevel('2.1');
 
@@ -62,7 +61,7 @@ describe('moveArticleAfter', function() {
         expect(newSummary.getByLevel('2.2').getTitle()).toBe('2.1');
     });
 
-    it('should move an article after a previous and less deep level', function() {
+    it('should move an article after a previous and less deep level', () => {
         const newSummary = moveArticleAfter(summary, '2.1.1', '2.0');
         const moved = newSummary.getByLevel('2.1');
 
@@ -71,7 +70,7 @@ describe('moveArticleAfter', function() {
         expect(newSummary.getByLevel('2.2').getTitle()).toBe('2.1');
     });
 
-    it('should move an article after a next level', function() {
+    it('should move an article after a next level', () => {
         const newSummary = moveArticleAfter(summary, '2.1', '2.2');
         const moved = newSummary.getByLevel('2.2');
 

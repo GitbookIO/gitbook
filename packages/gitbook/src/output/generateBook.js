@@ -28,14 +28,14 @@ function processOutput(generator, startOutput) {
     .then(
         callHook.bind(null,
             'config',
-            function(output) {
+            (output) => {
                 const book = output.getBook();
                 const config = book.getConfig();
                 const values = config.getValues();
 
                 return values.toJS();
             },
-            function(output, result) {
+            (output, result) => {
                 let book = output.getBook();
                 let config = book.getConfig();
 
@@ -49,10 +49,10 @@ function processOutput(generator, startOutput) {
     .then(
         callHook.bind(null,
             'init',
-            function(output) {
+            (output) => {
                 return {};
             },
-            function(output) {
+            (output) => {
                 return output;
             }
         )
@@ -83,7 +83,7 @@ function processOutput(generator, startOutput) {
         const state = output.getState();
         const options = output.getOptions();
 
-        return Promise.forEach(books, function(langBook) {
+        return Promise.forEach(books, (langBook) => {
             // Inherits plugins list, options and state
             const langOptions = options.set('root', path.join(outputRoot, langBook.getLanguage()));
             const langOutput = new Output({
@@ -102,10 +102,10 @@ function processOutput(generator, startOutput) {
 
     .then(callHook.bind(null,
         'finish:before',
-            function(output) {
+            (output) => {
                 return {};
             },
-            function(output) {
+            (output) => {
                 return output;
             }
         )
@@ -121,10 +121,10 @@ function processOutput(generator, startOutput) {
 
     .then(callHook.bind(null,
         'finish',
-            function(output) {
+            (output) => {
                 return {};
             },
-            function(output) {
+            (output) => {
                 return output;
             }
         )

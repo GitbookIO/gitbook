@@ -1,27 +1,33 @@
-const parseStructureFile = require('./parseStructureFile');
-const Languages = require('../models/languages');
+const lookupStructureFile = require('./lookupStructureFile');
+const languagesFromDocument = require('./languagesFromDocument');
 
 /**
-    Parse languages list from book
-
-    @param {Book} book
-    @return {Promise<Book>}
-*/
+ * Parse languages list from book
+ *
+ * @param {Book} book
+ * @return {Promise<Book>}
+ */
 function parseLanguages(book) {
-    const logger = book.getLogger();
+    const { logger } = book;
+    const fs = book.getContentFS();
 
-    return parseStructureFile(book, 'langs')
-    .spread(function(file, result) {
+    return lookupStructureFile(book, 'langs')
+    .then((file) => {
         if (!file) {
             return book;
         }
 
-        const languages = Languages.createFromList(file, result);
+        logger.debug.ln(`languages index found at ${file.path}`);
 
-        logger.debug.ln('languages index file found at', file.getPath());
-        logger.info.ln('parsing multilingual book, with', languages.getList().size, 'languages');
+        return file.parse(fs)
+        .then((document) => {
+            let languages = languagesFromDocument(document);
+            languages = languages.merge({ file });
 
-        return book.set('languages', languages);
+            logger.info.ln(`parsing multilingual book, with ${languages.list.size} languages`);
+
+            return book.set('languages', languages);
+        });
     });
 }
 

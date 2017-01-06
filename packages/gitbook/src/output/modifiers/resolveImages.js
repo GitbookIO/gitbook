@@ -13,7 +13,7 @@ const editHTMLElement = require('./editHTMLElement');
 function resolveImages(currentFile, $) {
     const currentDirectory = path.dirname(currentFile);
 
-    return editHTMLElement($, 'img', function($img) {
+    return editHTMLElement($, 'img', ($img) => {
         let src = $img.attr('src');
 
         if (LocationUtils.isExternal(src) || LocationUtils.isDataURI(src)) {

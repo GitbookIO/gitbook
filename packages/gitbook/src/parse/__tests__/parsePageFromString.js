@@ -1,10 +1,10 @@
 const parsePageFromString = require('../parsePageFromString');
 const Page = require('../../models/page');
 
-describe('parsePageFromString', function() {
+describe('parsePageFromString', () => {
     const page = new Page();
 
-    it('should parse YAML frontmatter', function() {
+    it('should parse YAML frontmatter', () => {
         const CONTENT = '---\nhello: true\nworld: "cool"\n---\n# Hello World\n';
         const newPage = parsePageFromString(page, CONTENT);
 
@@ -17,7 +17,7 @@ describe('parsePageFromString', function() {
         expect(attrs.get('world')).toBe('cool');
     });
 
-    it('should parse text direction (english)', function() {
+    it('should parse text direction (english)', () => {
         const CONTENT = 'Hello World';
         const newPage = parsePageFromString(page, CONTENT);
 
@@ -26,7 +26,7 @@ describe('parsePageFromString', function() {
         expect(newPage.getAttributes().size).toBe(0);
     });
 
-    it('should parse text direction (arab)', function() {
+    it('should parse text direction (arab)', () => {
         const CONTENT = 'مرحبا بالعالم';
         const newPage = parsePageFromString(page, CONTENT);
 

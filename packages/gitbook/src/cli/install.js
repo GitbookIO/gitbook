@@ -14,7 +14,7 @@ module.exports = {
         const book = getBook(args, kwargs);
 
         return Parse.parseConfig(book)
-        .then(function(resultBook) {
+        .then((resultBook) => {
             return Plugins.installPlugins(resultBook);
         });
     }

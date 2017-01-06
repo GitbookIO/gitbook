@@ -70,7 +70,7 @@ FS.prototype.exists = function(filename) {
     const that = this;
 
     return Promise()
-    .then(function() {
+    .then(() => {
         filename = that.resolve(filename);
         const exists = that.get('fsExists');
 
@@ -87,7 +87,7 @@ FS.prototype.read = function(filename) {
     const that = this;
 
     return Promise()
-    .then(function() {
+    .then(() => {
         filename = that.resolve(filename);
         const read = that.get('fsReadFile');
 
@@ -104,7 +104,7 @@ FS.prototype.readAsString = function(filename, encoding) {
     encoding = encoding || 'utf8';
 
     return this.read(filename)
-    .then(function(buf) {
+    .then((buf) => {
         return buf.toString(encoding);
     });
 };
@@ -124,7 +124,7 @@ FS.prototype.readAsStream = function(filename) {
     }
 
     return this.read(filename)
-    .then(function(buf) {
+    .then((buf) => {
         const bufferStream = new stream.PassThrough();
         bufferStream.end(buf);
 
@@ -141,13 +141,13 @@ FS.prototype.statFile = function(filename) {
     const that = this;
 
     return Promise()
-    .then(function() {
+    .then(() => {
         const filepath = that.resolve(filename);
         const stat = that.get('fsStatFile');
 
         return stat(filepath);
     })
-    .then(function(stat) {
+    .then((stat) => {
         return File.createFromStat(filename, stat);
     });
 };
@@ -163,13 +163,13 @@ FS.prototype.readDir = function(dirname) {
     const that = this;
 
     return Promise()
-    .then(function() {
+    .then(() => {
         const dirpath = that.resolve(dirname);
         const readDir = that.get('fsReadDir');
 
         return readDir(dirpath);
     })
-    .then(function(files) {
+    .then((files) => {
         return Immutable.List(files);
     });
 };
@@ -183,7 +183,7 @@ FS.prototype.readDir = function(dirname) {
  */
 FS.prototype.listFiles = function(dirname) {
     return this.readDir(dirname)
-    .then(function(files) {
+    .then((files) => {
         return files.filterNot(pathIsFolder);
     });
 };
@@ -200,8 +200,8 @@ FS.prototype.listAllFiles = function(dirName, filterFn) {
     dirName = dirName || '.';
 
     return this.readDir(dirName)
-    .then(function(files) {
-        return Promise.reduce(files, function(out, file) {
+    .then((files) => {
+        return Promise.reduce(files, (out, file) => {
             const isDirectory = pathIsFolder(file);
             const newDirName = path.join(dirName, file);
 
@@ -214,7 +214,7 @@ FS.prototype.listAllFiles = function(dirName, filterFn) {
             }
 
             return that.listAllFiles(newDirName, filterFn)
-            .then(function(inner) {
+            .then((inner) => {
                 return out.concat(inner);
             });
         }, Immutable.List());
@@ -231,8 +231,8 @@ FS.prototype.listAllFiles = function(dirName, filterFn) {
  */
 FS.prototype.findFile = function(dirname, filename) {
     return this.listFiles(dirname)
-    .then(function(files) {
-        return files.find(function(file) {
+    .then((files) => {
+        return files.find((file) => {
             return (file.toLowerCase() == filename.toLowerCase());
         });
     });
@@ -250,7 +250,7 @@ FS.prototype.loadAsObject = function(filename) {
     const fsLoadObject = this.get('fsLoadObject');
 
     return this.exists(filename)
-    .then(function(exists) {
+    .then((exists) => {
         if (!exists) {
             const err = new Error('Module doesn\'t exist');
             err.code = 'MODULE_NOT_FOUND';
@@ -262,7 +262,7 @@ FS.prototype.loadAsObject = function(filename) {
             return fsLoadObject(that.resolve(filename));
         } else {
             return that.readAsString(filename)
-            .then(function(str) {
+            .then((str) => {
                 return JSON.parse(str);
             });
         }

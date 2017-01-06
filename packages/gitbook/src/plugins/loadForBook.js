@@ -20,15 +20,15 @@ function loadForBook(book) {
 
     // List all plugins installed in the book
     return findForBook(book)
-    .then(function(installedMap) {
+    .then((installedMap) => {
         const missing = [];
-        let plugins = requirements.reduce(function(result, dep) {
+        let plugins = requirements.reduce((result, dep) => {
             const name = dep.getName();
             const installed = installedMap.get(name);
 
             if (installed) {
                 const deps = installedMap
-                    .filter(function(plugin) {
+                    .filter((plugin) => {
                         return plugin.getParent() === name;
                     })
                     .toArray();
@@ -44,7 +44,7 @@ function loadForBook(book) {
 
         // Convert plugins list to a map
         plugins = Immutable.List(plugins)
-            .map(function(plugin) {
+            .map((plugin) => {
                 return [
                     plugin.getName(),
                     plugin
@@ -63,7 +63,7 @@ function loadForBook(book) {
             throw new Error('Couldn\'t locate plugins "' + missing.join(', ') + '", Run \'gitbook install\' to install plugins from registry.');
         }
 
-        return Promise.map(plugins, function(plugin) {
+        return Promise.map(plugins, (plugin) => {
             return loadPlugin(book, plugin);
         });
     });

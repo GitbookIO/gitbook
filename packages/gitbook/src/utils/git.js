@@ -30,7 +30,7 @@ class Git {
         }
 
         return fs.tmpDir()
-        .then(function(dir) {
+        .then((dir) => {
             that.tmpDir = dir;
         });
     }
@@ -47,7 +47,7 @@ class Git {
         return this.allocateDir()
 
         // Return or clone the git repo
-        .then(function() {
+        .then(() => {
             // Unique ID for repo/ref combinaison
             const repoId = that.repoID(host, ref);
 
@@ -60,7 +60,7 @@ class Git {
             return command.exec('git clone ' + host + ' ' + repoPath)
 
             // Checkout reference if specified
-            .then(function() {
+            .then(() => {
                 that.cloned[repoId] = true;
 
                 if (!ref) return;
@@ -86,7 +86,7 @@ class Git {
 
         // Clone or get from cache
         return this.clone(giturl.host, giturl.ref)
-        .then(function(repo) {
+        .then((repo) => {
             return path.resolve(repo, giturl.filepath);
         });
     }

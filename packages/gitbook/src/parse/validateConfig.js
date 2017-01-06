@@ -6,12 +6,12 @@ const error = require('../utils/error');
 const mergeDefaults = require('../utils/mergeDefaults');
 
 /**
-    Validate a book.json content
-    And return a mix with the default value
-
-    @param {Object} bookJson
-    @return {Object}
-*/
+ * Validate a book.json content
+ * And return a mix with the default value
+ *
+ * @param {Object} bookJson
+ * @return {Object}
+ */
 function validateConfig(bookJson) {
     const v = new jsonschema.Validator();
     const result = v.validate(bookJson, schema, {

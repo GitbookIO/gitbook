@@ -17,16 +17,16 @@ function generatePages(generator, output) {
         return Promise(output);
     }
 
-    return Promise.reduce(pages, function(out, page) {
+    return Promise.reduce(pages, (out, page) => {
         const file = page.getFile();
 
         logger.debug.ln('generate page "' + file.getPath() + '"');
 
         return generatePage(out, page)
-        .then(function(resultPage) {
+        .then((resultPage) => {
             return generator.onPage(out, resultPage);
         })
-        .fail(function(err) {
+        .fail((err) => {
             logger.error.ln('error while generating page "' + file.getPath() + '":');
             throw err;
         });

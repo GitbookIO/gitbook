@@ -18,7 +18,7 @@ function HTML({head, innerHTML, payload, scripts, bootstrap}) {
             </head>
             <body>
                 <div id="content" dangerouslySetInnerHTML={{__html: innerHTML}} />
-                {scripts.map(script => {
+                {scripts.map((script) => {
                     return <script key={script} src={script} />;
                 })}
                 <script type="application/payload+json" dangerouslySetInnerHTML={{__html: payload}} />
@@ -67,7 +67,7 @@ function render(plugins, initialState, type, role) {
 
             const scripts = plugins.toList()
                 .filter(plugin => plugin.getPackage().has(type))
-                .map(plugin => {
+                .map((plugin) => {
                     return currentFile.relative('gitbook/plugins/' + plugin.getName() + '.js');
                 })
                 .toArray();

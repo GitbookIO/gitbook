@@ -16,7 +16,7 @@ function generateAssets(generator, output) {
         return Promise(output);
     }
 
-    return Promise.reduce(assets, function(out, assetFile) {
+    return Promise.reduce(assets, (out, assetFile) => {
         logger.debug.ln('copy asset "' + assetFile + '"');
 
         return generator.onAsset(out, assetFile);

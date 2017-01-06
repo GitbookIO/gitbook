@@ -8,6 +8,7 @@ const LoadingBar = require('./LoadingBar');
 const Theme = React.createClass({
     propTypes: {
         // State
+        file:     GitBook.PropTypes.File,
         page:     GitBook.PropTypes.Page,
         summary:  GitBook.PropTypes.Summary,
         readme:   GitBook.PropTypes.Readme,
@@ -18,14 +19,18 @@ const Theme = React.createClass({
     },
 
     render() {
-        const { page, summary, children, sidebar, readme, history } = this.props;
+        const { file, page, summary, children, sidebar, readme, history } = this.props;
 
         return (
             <GitBook.FlexLayout column className="GitBook book">
                 <LoadingBar show={history.loading} />
                 <GitBook.Head
                     title={page.title}
-                    titleTemplate="%s - GitBook" />
+                    titleTemplate="%s - GitBook"
+                    link={[
+                        {rel: 'shortcut icon', href: file.relative('gitbook/theme-default/images/favicon.ico')}
+                    ]}
+                />
                 <GitBook.ImportCSS href="gitbook/theme-default/theme.css" />
 
                 <GitBook.FlexBox>
@@ -52,6 +57,6 @@ const Theme = React.createClass({
     }
 });
 
-module.exports = GitBook.connect(Theme, ({page, summary, sidebar, readme, history}) => {
-    return { page, summary, sidebar, readme, history };
+module.exports = GitBook.connect(Theme, ({file, page, summary, sidebar, readme, history}) => {
+    return { file, page, summary, sidebar, readme, history };
 });

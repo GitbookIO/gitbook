@@ -44,7 +44,7 @@ TemplateShortcut.prototype.getParsers = function() {
 */
 TemplateShortcut.prototype.acceptParser = function(parser) {
     if (!is.string(parser)) {
-        parser = parser.getName();
+        parser = parser.name;
     }
 
     const parserNames = this.get('parsers');

@@ -30,7 +30,7 @@ describe('installPlugins', () => {
 
     it('must install all plugins from NPM', () => {
         return installPlugins(book)
-        .then(function(n) {
+        .then((n) => {
             expect(n).toBe(2);
         });
     });

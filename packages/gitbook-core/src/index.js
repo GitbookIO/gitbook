@@ -12,6 +12,7 @@ const { InjectedComponent, InjectedComponentSet } = require('./components/Inject
 const { ImportLink, ImportScript, ImportCSS } = require('./components/Import');
 const HTMLContent = require('./components/HTMLContent');
 const Link = require('./components/Link');
+const Image = require('./components/Image');
 const Icon = require('./components/Icon');
 const HotKeys = require('./components/HotKeys');
 const Button = require('./components/Button');
@@ -56,6 +57,7 @@ module.exports = {
     FlexLayout: Flex,
     FlexBox: Box,
     Link,
+    Image,
     Icon,
     HotKeys,
     Button,

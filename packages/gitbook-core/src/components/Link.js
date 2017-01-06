@@ -6,6 +6,12 @@ const SummaryArticle = require('../models/SummaryArticle');
 const SummaryArticleShape = require('../propTypes/SummaryArticle');
 const FileShape = require('../propTypes/File');
 
+/**
+ * Link to another page or file in the book. Using this component instead of <a>
+ * avoid broken links when location changes.
+ *
+ * @type {ReactClass}
+ */
 const Link = React.createClass({
     propTypes: {
         currentFile: FileShape,
@@ -22,6 +28,7 @@ const Link = React.createClass({
     render() {
         const { currentFile, to, children, ...props } = this.props;
         let href = to;
+        delete props.dispatch;
 
         if (SummaryArticle.is(to) || File.is(to)) {
             href = to.url;
@@ -32,6 +39,6 @@ const Link = React.createClass({
     }
 });
 
-module.exports = ReactRedux.connect(state => {
+module.exports = ReactRedux.connect((state) => {
     return { currentFile: state.file };
 })(Link);
