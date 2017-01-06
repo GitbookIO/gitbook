@@ -12,6 +12,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - *Website Feature:* `fontsettings` is now only controlling the font size, and can work on multiple themes
 - *Plugin API*: hook `page` can no longer modify the content, only the page's attributes
 - *Plugin API*: plugins can no longer export resources, instead use the `_assets` folder
+- [ ] *Plugin API*: testing framework
+- [ ] `gitbook init` creates `.gitignore` if not found
+- [ ] Ignore files are no longer copied to the output
 
 ## 3.2.2
 - Fix catching parsing errors leading to possible missing pages in generated book
