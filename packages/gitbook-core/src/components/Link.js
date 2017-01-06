@@ -6,6 +6,12 @@ const SummaryArticle = require('../models/SummaryArticle');
 const SummaryArticleShape = require('../propTypes/SummaryArticle');
 const FileShape = require('../propTypes/File');
 
+/**
+ * Link to another page or file in the book. Using this component instead of <a>
+ * avoid broken links when location changes.
+ *
+ * @type {ReactClass}
+ */
 const Link = React.createClass({
     propTypes: {
         currentFile: FileShape,
