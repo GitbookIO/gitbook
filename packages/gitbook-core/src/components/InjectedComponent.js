@@ -53,6 +53,8 @@ const InjectedComponentSet = React.createClass({
 
     render() {
         const { components, props, children, ...divProps } = this.props;
+        delete divProps.matching;
+        delete divProps.dispatch;
 
         const inner = components.map((Comp, i) => <Injection key={i} component={Comp} props={props} />);
 

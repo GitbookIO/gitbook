@@ -22,6 +22,7 @@ const Link = React.createClass({
     render() {
         const { currentFile, to, children, ...props } = this.props;
         let href = to;
+        delete props.dispatch;
 
         if (SummaryArticle.is(to) || File.is(to)) {
             href = to.url;
@@ -32,6 +33,6 @@ const Link = React.createClass({
     }
 });
 
-module.exports = ReactRedux.connect(state => {
+module.exports = ReactRedux.connect((state) => {
     return { currentFile: state.file };
 })(Link);

@@ -30,7 +30,7 @@ function onFinish(output) {
     .then((content) => {
         const json = JSON.parse(content);
 
-        json.languages = JSONUtils.encodeLanguages(languages, urls);
+        json.languages = JSONUtils.encodeLanguages(languages, null, urls);
 
         return json;
     })

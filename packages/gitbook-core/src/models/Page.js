@@ -12,7 +12,7 @@ const DEFAULTS = {
 };
 
 class Page extends Record(DEFAULTS) {
-    static create(state) {
+    static create(state = {}) {
         return state instanceof Page ?
             state : new Page({
                 ...state,

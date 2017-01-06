@@ -23,7 +23,7 @@ function listShortcuts(blocks, filePath) {
         .filter((shortcuts) => {
             return (
                 shortcuts &&
-                shortcuts.acceptParser(parser.getName())
+                shortcuts.acceptParser(parser.name)
             );
         });
 }

@@ -41,6 +41,15 @@ function toHTML(text) {
 }
 
 /**
+ * Prepare a document for parsing
+ * @param  {String} text
+ * @return {String} text
+ */
+function prepare(text) {
+    return text;
+}
+
+/**
  * Render asciidoc to inline HTML.
  * @param  {String} text
  * @return {String} html
@@ -55,6 +64,7 @@ function toInlineHTML(text) {
 module.exports = {
     name: 'asciidoc',
     FILE_EXTENSIONS,
+    prepare,
     toDocument,
     toText,
     toHTML,

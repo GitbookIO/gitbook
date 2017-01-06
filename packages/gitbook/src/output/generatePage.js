@@ -25,8 +25,7 @@ function generatePage(output, page) {
         Promise(page)
         .then((resultPage) => {
             const file = resultPage.getFile();
-            const filePath = file.getPath();
-            const parser = file.getParser();
+            const { path: filePath, parser } = file;
             const context = JSONUtils.encodeState(output, resultPage);
 
             if (!parser) {
@@ -39,8 +38,8 @@ function generatePage(output, page) {
             return callPageHook('page:before', output, resultPage)
 
             // Escape code blocks with raw tags
-            .then((currentPage) => {
-                return parser.preparePage(currentPage.getContent());
+            .then(({ content }) => {
+                return parser.prepare(content);
             })
 
             // Render templating syntax
@@ -49,11 +48,9 @@ function generatePage(output, page) {
                 return Templating.render(engine, absoluteFilePath, content, context);
             })
 
-            // Parse with markdown/asciidoc parser
-            .then(content => parser.parsePage(content))
-
-            // Return new page
-            .then(({content}) => {
+            // Render with markdown/asciidoc parser
+            .then((content) => {
+                content = parser.toHTML(content);
                 return resultPage.set('content', content);
             })
 

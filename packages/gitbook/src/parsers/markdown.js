@@ -1,6 +1,7 @@
 const { State } = require('markup-it');
 const markdown = require('markup-it/lib/markdown');
 const html = require('markup-it/lib/html');
+const annotateCodeBlocks = require('./annotateCodeBlocks');
 
 const FILE_EXTENSIONS = [
     '.md',
@@ -26,6 +27,17 @@ function toText(document) {
 function toDocument(text) {
     const state = State.create(markdown);
     return state.deserializeToDocument(text);
+}
+
+/**
+ * Prepare a document for parsing
+ * @param  {String} text
+ * @return {String} text
+ */
+function prepare(text) {
+    let doc = toDocument(text);
+    doc = annotateCodeBlocks(doc);
+    return toText(doc);
 }
 
 /**
@@ -55,6 +67,7 @@ function toInlineHTML(text) {
 module.exports = {
     name: 'markdown',
     FILE_EXTENSIONS,
+    prepare,
     toText,
     toDocument,
     toHTML,
