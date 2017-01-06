@@ -15,7 +15,10 @@ function articleToBlock(article) {
         type: INLINES.LINK,
         nodes: [
             text
-        ]
+        ],
+        data: {
+            href: ref
+        }
     }) : text;
 
     const nodes = [
@@ -66,7 +69,7 @@ function summaryToDocument(summary) {
         })
     ];
 
-    parts.forEach((part) => {
+    parts.forEach((part, i) => {
         const { title, articles } = part;
 
         if (title) {
@@ -76,7 +79,7 @@ function summaryToDocument(summary) {
                     Text.createFromString(title)
                 ]
             }));
-        } else {
+        } else if (i > 0) {
             nodes.push(Block.create({
                 type: BLOCKS.HR
             }));
