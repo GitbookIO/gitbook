@@ -10,7 +10,7 @@ const Summary = require('./Summary');
 const GitBookTrademark = React.createClass({
     render() {
         return (
-            <a className="GitBookTrademark" href="https://www.gitbook.com/?utm_source=gitbook&utm_medium=trademark">
+            <a className="GitBookTrademark" href="https://www.gitbook.com/?utm_source=gitbook&utm_medium=trademark" target="_blank">
                 <span>Published with <b>GitBook</b></span>
                 <GitBook.Image src="gitbook/theme-default/images/logo.svg" />
             </a>
