@@ -52,7 +52,7 @@ We're always happy to help out with your books or any other questions you might 
 
 ## Publish your book
 
-The platform [GitBook.com](https://www.gitbook.com/) is like an "Heroku for books": you can create a book on it (public, or private) and update it using **git push**.
+The platform [GitBook.com](https://www.gitbook.com/) is like a "Heroku for books": you can create a book on it (public, or private) and update it using **git push**.
 
 ## Licensing
 
