@@ -21,8 +21,20 @@ The following is a reference of the available data during book's parsing and the
 
 | Variable | Description |
 | -------- | ----------- |
-| `book.[CONFIGURATION_DATA]` | All the `variables` set via the `book.json` are available through the book variable. |
 | `book.language` | Current language for a multilingual book |
+| `book.[value]` | All other values under `variables` in the `book.json` are accessible here |
+
+For example, with this `book.json`:
+
+```json
+{
+  variables: {
+    hello: "everyone"
+  }
+}
+```
+
+... the following text `{{ book.hello }}` will expand to `everyone`.
 
 ### GitBook Variables
 
