@@ -45,6 +45,22 @@ test.md
 bin/*
 ```
 
+### Whitelisting files & folders 
+
+GitBook can also block all content by default, and only process specific "whitelisted" files and folders.
+
+Use the `*` operator first to block all content, then the `!` operator to create an exemption.
+
+```
+*
+!README.md
+!SUMMARY.md
+!book.json
+!allFilesInHere/
+```
+
+Remember to include `README.md` for your index, and `SUMMARY.md` and `book.json` for GitBook's internal use.
+
 ### Project integration with subdirectory {#subdirectory}
 
 For software projects, you can use a subdirectory (like `docs/`) to store the book for the project's documentation. You can configure the [`root` option](config.md) to indicate the folder where GitBook can find the book's files:
