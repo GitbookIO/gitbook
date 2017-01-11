@@ -1,7 +1,6 @@
 const is = require('is');
 const { List, Record } = require('immutable');
 
-const error = require('../utils/error');
 const LocationUtils = require('../utils/location');
 const File = require('./file');
 const SummaryPart = require('./summaryPart');
