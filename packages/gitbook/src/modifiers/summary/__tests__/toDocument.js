@@ -1,27 +1,27 @@
 const expect = require('expect');
-const readDocument = require('./utils/readDocument');
-const summaryFromDocument = require('../summaryFromDocument');
-const Summary = require('../../models/summary');
+const readDocument = require('./readDocument');
+const summaryToDocument = require('../toDocument');
+const Summary = require('../../../models/summary');
+const { Raw } = require('slate');
 
-function readSummary(filename) {
-    const document = readDocument(filename);
-    return summaryFromDocument(document);
-}
+/**
+ * Expect some parts to be converted to the given document
+ */
+function expectDocument(documentPath, parts) {
+    const summary = Summary.createFromParts(parts);
+    const document = summaryToDocument(summary);
+    const expectedDocument = readDocument(documentPath);
 
-function expectParts(summary, expectedParts) {
-    const expectedSummary = Summary.createFromParts(expectedParts);
     expect(
-        summary.toJS().parts
+        Raw.serializeDocument(document, { terse: true })
     ).toEqual(
-        expectedSummary.toJS().parts
+        Raw.serializeDocument(expectedDocument, { terse: true })
     );
 }
 
-describe('summaryFromDocument', () => {
-
-    it('should parse from a UL', () => {
-        const summary = readSummary('summary/ul.yaml');
-        expectParts(summary, [
+describe('summaryToDocument', () => {
+    it('should convert unlinked articles', () => {
+        expectDocument('ul.yaml', [
             {
                 title: '',
                 articles: [
@@ -38,10 +38,8 @@ describe('summaryFromDocument', () => {
         ]);
     });
 
-    it('should parse from a UL with links', () => {
-        const summary = readSummary('summary/ul-with-link.yaml');
-
-        expectParts(summary, [
+    it('should convert articles with links', () => {
+        expectDocument('ul-with-link.yaml', [
             {
                 title: '',
                 articles: [
@@ -58,10 +56,8 @@ describe('summaryFromDocument', () => {
         ]);
     });
 
-    it('should parse parts', () => {
-        const summary = readSummary('summary/parts-ul.yaml');
-
-        expectParts(summary, [
+    it('should convert parts', () => {
+        expectDocument('parts-ul.yaml', [
             {
                 title: '',
                 articles: [
@@ -92,10 +88,8 @@ describe('summaryFromDocument', () => {
         ]);
     });
 
-    it('should parse empty items', () => {
-        const summary = readSummary('summary/empty-items.yaml');
-
-        expectParts(summary, [
+    it('should convert empty articles', () => {
+        expectDocument('empty-items.yaml', [
             {
                 title: '',
                 articles: [
@@ -112,10 +106,8 @@ describe('summaryFromDocument', () => {
         ]);
     });
 
-    it('should parse an deep summary', () => {
-        const summary = readSummary('summary/deep.yaml');
-
-        expectParts(summary, [
+    it('should convert a deep summary', () => {
+        expectDocument('deep.yaml', [
             {
                 title: '1',
                 articles: [
@@ -169,10 +161,8 @@ describe('summaryFromDocument', () => {
         ]);
     });
 
-    it('should parse an empty summary', () => {
-        const summary = readSummary('summary/empty.yaml');
-
-        expectParts(summary, [
+    it('should convert an empty summary', () => {
+        expectDocument('empty.yaml', [
         ]);
     });
 });

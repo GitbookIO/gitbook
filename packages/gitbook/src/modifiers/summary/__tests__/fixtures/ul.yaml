@@ -15,15 +15,6 @@ nodes:
             nodes:
               - kind: text
                 text: Hello
-
-  - kind: block
-    type: header_two
-    nodes:
-      - kind: text
-        text: Some Part
-  - kind: block
-    type: unordered_list
-    nodes:
       - kind: block
         type: list_item
         nodes:
@@ -32,21 +23,3 @@ nodes:
             nodes:
               - kind: text
                 text: World
-
-  - kind: block
-    type: hr
-    nodes:
-      - kind: text
-        text: ''
-  - kind: block
-    type: unordered_list
-    nodes:
-      - kind: block
-        type: list_item
-        nodes:
-          - kind: block
-            type: unstyled
-            nodes:
-              - kind: text
-                text: Yeah
-

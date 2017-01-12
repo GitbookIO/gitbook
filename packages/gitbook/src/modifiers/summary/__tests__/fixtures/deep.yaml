@@ -1,0 +1,121 @@
+nodes:
+  - kind: block
+    type: header_one
+    nodes:
+      - kind: text
+        text: Summary
+
+  - kind: block
+    type: header_two
+    nodes:
+      - kind: text
+        text: '1'
+
+  - kind: block
+    type: unordered_list
+    nodes:
+      - kind: block
+        type: list_item
+        nodes:
+          - kind: block
+            type: unstyled
+            nodes:
+              - kind: text
+                text: '1.1'
+          - kind: block
+            type: unordered_list
+            nodes:
+              - kind: block
+                type: list_item
+                nodes:
+                  - kind: block
+                    type: unstyled
+                    nodes:
+                      - kind: text
+                        text: '1.1.1'
+              - kind: block
+                type: list_item
+                nodes:
+                  - kind: block
+                    type: unstyled
+                    nodes:
+                      - kind: text
+                        text: '1.1.2'
+      - kind: block
+        type: list_item
+        nodes:
+          - kind: block
+            type: unstyled
+            nodes:
+              - kind: text
+                text: '1.2'
+          - kind: block
+            type: unordered_list
+            nodes:
+              - kind: block
+                type: list_item
+                nodes:
+                  - kind: block
+                    type: unstyled
+                    nodes:
+                      - kind: text
+                        text: '1.2.1'
+              - kind: block
+                type: list_item
+                nodes:
+                  - kind: block
+                    type: unstyled
+                    nodes:
+                      - kind: text
+                        text: '1.2.2'
+
+  - kind: block
+    type: header_two
+    nodes:
+      - kind: text
+        text: '2'
+
+  - kind: block
+    type: unordered_list
+    nodes:
+      - kind: block
+        type: list_item
+        nodes:
+          - kind: block
+            type: unstyled
+            nodes:
+              - kind: text
+                text: '2.1'
+          - kind: block
+            type: unordered_list
+            nodes:
+              - kind: block
+                type: list_item
+                nodes:
+                  - kind: block
+                    type: unstyled
+                    nodes:
+                      - kind: text
+                        text: '2.1.1'
+                  - kind: block
+                    type: unordered_list
+                    nodes:
+                      - kind: block
+                        type: list_item
+                        nodes:
+                          - kind: block
+                            type: unstyled
+                            nodes:
+                              - kind: text
+                                text: '2.1.1.1'
+                          - kind: block
+                            type: unordered_list
+                            nodes:
+                              - kind: block
+                                type: list_item
+                                nodes:
+                                  - kind: block
+                                    type: unstyled
+                                    nodes:
+                                      - kind: text
+                                        text: '2.1.1.1.1'
