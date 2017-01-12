@@ -1,0 +1,159 @@
+const expect = require('expect');
+const readDocument = require('./readDocument');
+const summaryToDocument = require('../toDocument');
+const Summary = require('../../../models/summary');
+const { Raw } = require('slate');
+
+/**
+ * Expect some parts to be converted to the given document
+ */
+function expectDocument(documentPath, parts) {
+    const summary = Summary.createFromParts(parts);
+    const document = summaryToDocument(summary);
+    const expectedDocument = readDocument(documentPath);
+
+    expect(
+        Raw.serializeDocument(document, { terse: true })
+    ).toEqual(
+        Raw.serializeDocument(expectedDocument, { terse: true })
+    );
+}
+
+describe('summaryToDocument', () => {
+    it('should convert unlinked articles', () => {
+        expectDocument('ul.yaml', [
+            {
+                title: '',
+                articles: [
+                    {
+                        title: 'Hello',
+                        ref: ''
+                    },
+                    {
+                        title: 'World',
+                        ref: ''
+                    }
+                ]
+            }
+        ]);
+    });
+
+    it('should convert articles with links', () => {
+        expectDocument('ul-with-link.yaml', [
+            {
+                title: '',
+                articles: [
+                    {
+                        title: 'Hello',
+                        ref: 'hello.md'
+                    },
+                    {
+                        title: 'World',
+                        ref: ''
+                    }
+                ]
+            }
+        ]);
+    });
+
+    it('should convert multiple parts', () => {
+        expectDocument('parts-ul.yaml', [
+            {
+                title: '',
+                articles: [
+                    {
+                        title: 'Hello',
+                        ref: ''
+                    }
+                ]
+            },
+            {
+                title: 'Some Part',
+                articles: [
+                    {
+                        title: 'World',
+                        ref: ''
+                    }
+                ]
+            }
+        ]);
+    });
+
+    it('should convert empty articles', () => {
+        expectDocument('empty-items.yaml', [
+            {
+                title: '',
+                articles: [
+                    {
+                        title: '',
+                        ref: ''
+                    },
+                    {
+                        title: '',
+                        ref: ''
+                    }
+                ]
+            }
+        ]);
+    });
+
+    it('should convert a deep summary', () => {
+        expectDocument('deep.yaml', [
+            {
+                title: '1',
+                articles: [
+                    {
+                        title: '1.1',
+                        articles: [
+                            {
+                                title: '1.1.1'
+                            },
+                            {
+                                title: '1.1.2'
+                            }
+                        ]
+                    },
+                    {
+                        title: '1.2',
+                        articles: [
+                            {
+                                title: '1.2.1'
+                            },
+                            {
+                                title: '1.2.2'
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                title: '2',
+                articles: [
+                    {
+                        title: '2.1',
+                        articles: [
+                            {
+                                title: '2.1.1',
+                                articles: [
+                                    {
+                                        title: '2.1.1.1',
+                                        articles: [
+                                            {
+                                                title: '2.1.1.1.1'
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]);
+    });
+
+    it('should convert an empty summary', () => {
+        expectDocument('empty.yaml', [
+        ]);
+    });
+});
