@@ -56,7 +56,7 @@ describe('summaryToDocument', () => {
         ]);
     });
 
-    it('should convert multiple parts', () => {
+    it('should convert parts', () => {
         expectDocument('parts-ul.yaml', [
             {
                 title: '',
@@ -72,6 +72,15 @@ describe('summaryToDocument', () => {
                 articles: [
                     {
                         title: 'World',
+                        ref: ''
+                    }
+                ]
+            },
+            {
+                title: '', // untitled part
+                articles: [
+                    {
+                        title: 'Yeah',
                         ref: ''
                     }
                 ]

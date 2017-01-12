@@ -58,7 +58,7 @@ describe('summaryFromDocument', () => {
         ]);
     });
 
-    it('should parse multiple parts', () => {
+    it('should parse parts', () => {
         const summary = readSummary('summary/parts-ul.yaml');
 
         expectParts(summary, [
@@ -76,6 +76,15 @@ describe('summaryFromDocument', () => {
                 articles: [
                     {
                         title: 'World',
+                        ref: ''
+                    }
+                ]
+            },
+            {
+                title: '', // untitled part
+                articles: [
+                    {
+                        title: 'Yeah',
                         ref: ''
                     }
                 ]
