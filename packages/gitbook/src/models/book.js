@@ -259,7 +259,7 @@ class Book extends Record(DEFAULTS) {
         const exts = clues.map((clue) => {
             const file = clue.getFile();
             if (file.exists()) {
-                return file.getParser().getExtensions().first();
+                return file.getParser().FILE_EXTENSIONS[0];
             } else {
                 return null;
             }
