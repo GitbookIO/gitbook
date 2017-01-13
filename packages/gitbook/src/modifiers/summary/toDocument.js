@@ -85,7 +85,9 @@ function summaryToDocument(summary) {
             }));
         }
 
-        nodes.push(articlesToBlock(articles));
+        if (!articles.isEmpty()) {
+            nodes.push(articlesToBlock(articles));
+        }
     });
 
     return Document.create({ nodes });
