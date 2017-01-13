@@ -26,7 +26,13 @@ nodes:
     type: header_two
     nodes:
       - kind: text
-        text: 'Empty part'
+        text: 'Empty part 1'
+
+  - kind: block
+    type: header_two
+    nodes:
+      - kind: text
+        text: 'Empty part 2'
 
   - kind: block
     type: header_two
@@ -45,3 +51,8 @@ nodes:
               - kind: text
                 text: 'Article 2'
 
+  - kind: block
+    type: header_two
+    nodes:
+      - kind: text
+        text: 'Empty part 3'

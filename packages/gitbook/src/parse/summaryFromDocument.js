@@ -82,6 +82,11 @@ function listParts(document) {
         }
     });
 
+    if (pendingPart) {
+        // The last one was empty
+        parts.push(pendingPart);
+    }
+
     return List(parts);
 }
 

@@ -125,7 +125,11 @@ describe('summaryFromDocument', () => {
                 ]
             },
             {
-                title: 'Empty part',
+                title: 'Empty part 1',
+                articles: []
+            },
+            {
+                title: 'Empty part 2',
                 articles: []
             },
             {
@@ -135,6 +139,10 @@ describe('summaryFromDocument', () => {
                         title: 'Article 2'
                     }
                 ]
+            },
+            {
+                title: 'Empty part 3',
+                articles: []
             }
         ]);
     });
