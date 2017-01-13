@@ -15,7 +15,7 @@ echo " 5. Push"
 echo ""
 
 read -p "Version: " version
-read -p "NPM Tag [$defaultTag]:" tag
+read -p "NPM Tag (latest or pre) [$defaultTag]:" tag
 tag=${tag:-$defaultTag}
 echo ""
 
@@ -23,4 +23,4 @@ echo "You are going to publish version ${version} on NPM (tagged as ${tag})"
 echo "Press [ENTER] tp confirm"
 read
 
-lerna publish --skip-git --repo-version $[version] --npm-tag ${tag} --force-publish=*
+lerna publish --skip-git --repo-version ${version} --npm-tag ${tag} --force-publish=*
