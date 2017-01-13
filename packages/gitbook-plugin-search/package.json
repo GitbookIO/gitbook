@@ -3,13 +3,13 @@
   "description": "Search integration in GitBook",
   "main": "index.js",
   "browser": "./_assets/theme.js",
-  "version": "4.0.0-alpha.2",
+  "version": "4.0.0-alpha.3",
   "dependencies": {
-    "gitbook-core": "^4.0.0-alpha.2",
+    "gitbook-core": "^4.0.0-alpha.3",
     "react": "^15.4.1"
   },
   "devDependencies": {
-    "gitbook-plugin": "^4.0.0-alpha.2",
+    "gitbook-plugin": "^4.0.0-alpha.3",
     "react-highlighter": "^0.3.3"
   },
   "engines": {

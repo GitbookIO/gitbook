@@ -3,7 +3,7 @@
   "description": "Sharing buttons in the toolbar",
   "main": "index.js",
   "browser": "./_assets/plugin.js",
-  "version": "4.0.0-alpha.2",
+  "version": "4.0.0-alpha.3",
   "gitbook": {
     "properties": {
       "facebook": {
@@ -53,10 +53,10 @@
     }
   },
   "dependencies": {
-    "gitbook-core": "^4.0.0-alpha.2"
+    "gitbook-core": "^4.0.0-alpha.3"
   },
   "devDependencies": {
-    "gitbook-plugin": "^4.0.0-alpha.2"
+    "gitbook-plugin": "^4.0.0-alpha.3"
   },
   "engines": {
     "gitbook": ">=3.0.0"

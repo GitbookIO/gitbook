@@ -3,14 +3,14 @@
   "description": "Static and local index for search in GitBook",
   "main": "index.js",
   "browser": "./_assets/theme.js",
-  "version": "4.0.0-alpha.2",
+  "version": "4.0.0-alpha.3",
   "dependencies": {
-    "gitbook-core": "^4.0.0-alpha.2",
+    "gitbook-core": "^4.0.0-alpha.3",
     "html-entities": "1.2.0",
     "lunr": "0.5.12"
   },
   "devDependencies": {
-    "gitbook-plugin": "^4.0.0-alpha.2"
+    "gitbook-plugin": "^4.0.0-alpha.3"
   },
   "engines": {
     "gitbook": ">=3.0.0"
