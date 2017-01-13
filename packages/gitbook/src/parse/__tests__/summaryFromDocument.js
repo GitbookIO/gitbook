@@ -112,6 +112,41 @@ describe('summaryFromDocument', () => {
         ]);
     });
 
+    it('should parse empty parts', () => {
+        const summary = readSummary('summary/empty-part.yaml');
+
+        expectParts(summary, [
+            {
+                title: 'Part 1',
+                articles: [
+                    {
+                        title: 'Article 1'
+                    }
+                ]
+            },
+            {
+                title: 'Empty part 1',
+                articles: []
+            },
+            {
+                title: 'Empty part 2',
+                articles: []
+            },
+            {
+                title: 'Part 2',
+                articles: [
+                    {
+                        title: 'Article 2'
+                    }
+                ]
+            },
+            {
+                title: 'Empty part 3',
+                articles: []
+            }
+        ]);
+    });
+
     it('should parse an deep summary', () => {
         const summary = readSummary('summary/deep.yaml');
 

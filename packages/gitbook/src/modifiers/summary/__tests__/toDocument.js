@@ -106,6 +106,39 @@ describe('summaryToDocument', () => {
         ]);
     });
 
+    it('should convert empty parts', () => {
+        expectDocument('empty-part.yaml', [
+            {
+                title: 'Part 1',
+                articles: [
+                    {
+                        title: 'Article 1'
+                    }
+                ]
+            },
+            {
+                title: 'Empty part 1',
+                articles: []
+            },
+            {
+                title: 'Empty part 2',
+                articles: []
+            },
+            {
+                title: 'Part 2',
+                articles: [
+                    {
+                        title: 'Article 2'
+                    }
+                ]
+            },
+            {
+                title: 'Empty part 3',
+                articles: []
+            }
+        ]);
+    });
+
     it('should convert a deep summary', () => {
         expectDocument('deep.yaml', [
             {

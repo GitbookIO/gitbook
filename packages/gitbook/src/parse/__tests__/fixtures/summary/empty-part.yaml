@@ -1,0 +1,58 @@
+nodes:
+  - kind: block
+    type: header_one
+    nodes:
+      - kind: text
+        text: Summary
+
+  - kind: block
+    type: header_two
+    nodes:
+      - kind: text
+        text: 'Part 1'
+  - kind: block
+    type: unordered_list
+    nodes:
+      - kind: block
+        type: list_item
+        nodes:
+          - kind: block
+            type: unstyled
+            nodes:
+              - kind: text
+                text: 'Article 1'
+
+  - kind: block
+    type: header_two
+    nodes:
+      - kind: text
+        text: 'Empty part 1'
+
+  - kind: block
+    type: header_two
+    nodes:
+      - kind: text
+        text: 'Empty part 2'
+
+  - kind: block
+    type: header_two
+    nodes:
+      - kind: text
+        text: 'Part 2'
+  - kind: block
+    type: unordered_list
+    nodes:
+      - kind: block
+        type: list_item
+        nodes:
+          - kind: block
+            type: unstyled
+            nodes:
+              - kind: text
+                text: 'Article 2'
+
+  - kind: block
+    type: header_two
+    nodes:
+      - kind: text
+        text: 'Empty part 3'

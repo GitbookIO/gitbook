@@ -46,7 +46,9 @@ function listArticles(list) {
 function listParts(document) {
     const { nodes } = document;
     const parts = [];
-    let title = '';
+
+    // Keep a reference to a part, waiting for its articles
+    let pendingPart;
 
     nodes.forEach((node) => {
         const isHeading = (
@@ -55,19 +57,35 @@ function listParts(document) {
         );
 
         if (isHeading) {
-            title = node.text;
+            if (pendingPart) {
+                // The previous was empty
+                parts.push(pendingPart);
+            }
+            pendingPart = {
+                title: node.text
+            };
         }
 
         if (isList(node)) {
             const articles = listArticles(node);
-            parts.push({
-                title,
-                articles
-            });
 
-            title = '';
+            if (pendingPart) {
+                pendingPart.articles = articles;
+                parts.push(pendingPart);
+                pendingPart = undefined;
+            } else {
+                parts.push({
+                    title: '',
+                    articles
+                });
+            }
         }
     });
+
+    if (pendingPart) {
+        // The last one was empty
+        parts.push(pendingPart);
+    }
 
     return List(parts);
 }
