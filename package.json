@@ -8,8 +8,7 @@
   "scripts": {
     "lint": "eslint .",
     "test": "lerna run --concurrency 1 test",
-    "bootstrap": "npm run bump && lerna bootstrap",
-    "bump": "./scripts/bump.js",
+    "bootstrap": "lerna bootstrap",
     "clean": "lerna clean",
     "dist": "lerna run --concurrency 1 prepublish",
     "publish-version": "./scripts/publish.sh"
