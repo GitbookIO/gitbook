@@ -3,15 +3,15 @@
   "description": "Live reloading for your gitbook",
   "main": "index.js",
   "browser": "./_assets/plugin.js",
-  "version": "4.0.0",
+  "version": "4.0.0-alpha.2",
   "engines": {
     "gitbook": "*"
   },
   "dependencies": {
-    "gitbook-core": "4.0.0"
+    "gitbook-core": "^4.0.0-alpha.2"
   },
   "devDependencies": {
-    "gitbook-plugin": "4.0.0"
+    "gitbook-plugin": "^4.0.0-alpha.2"
   },
   "scripts": {
     "build-js": "gitbook-plugin build ./src/index.js ./_assets/plugin.js",

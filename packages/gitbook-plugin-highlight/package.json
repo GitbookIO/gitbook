@@ -3,13 +3,13 @@
   "description": "Syntax highlighter for Gitbook",
   "main": "index.js",
   "browser": "./_assets/plugin.js",
-  "version": "4.0.0",
+  "version": "4.0.0-alpha.2",
   "dependencies": {
-    "gitbook-core": "4.0.0",
+    "gitbook-core": "^4.0.0-alpha.2",
     "highlight.js": "9.7.0"
   },
   "devDependencies": {
-    "gitbook-plugin": "4.0.0"
+    "gitbook-plugin": "^4.0.0-alpha.2"
   },
   "engines": {
     "gitbook": ">=3.0.0"

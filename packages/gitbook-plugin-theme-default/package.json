@@ -3,19 +3,19 @@
   "description": "Default theme for GitBook",
   "main": "./index.js",
   "browser": "./_assets/theme.js",
-  "version": "4.0.0",
+  "version": "4.0.0-alpha.2",
   "engines": {
     "gitbook": ">=3.0.0"
   },
   "dependencies": {
     "debounce": "^1.0.0",
-    "gitbook-core": "4.0.0"
+    "gitbook-core": "^4.0.0-alpha.2"
   },
   "devDependencies": {
     "classnames": "^2.2.5",
     "font-awesome": "^4.6.3",
     "gitbook-markdown-css": "^1.0.1",
-    "gitbook-plugin": "4.0.0",
+    "gitbook-plugin": "^4.0.0-alpha.2",
     "less": "^2.7.1",
     "less-plugin-clean-css": "^1.5.1",
     "preboot": "git+https://github.com/mdo/preboot.git#4aab4edd85f076d50609cbe28e4fe66cc0771701"
