@@ -35,11 +35,19 @@ $sudo ln -s /usr/bin/nodejs /usr/bin/node
 
 Download the [Calibre application](https://calibre-ebook.com/download). After moving the `calibre.app` to your Applications folder create a symbolic link to the ebook-convert tool:
 
+###### Mac OS X 10.11+ (El Capitan)
+
 ```
-$ sudo ln -s ~/Applications/calibre.app/Contents/MacOS/ebook-convert /usr/bin
+$ sudo ln -s /Applications/calibre.app/Contents/MacOS/ebook-convert /usr/local/bin
 ```
 
-You can replace `/usr/bin` with any directory that is in your $PATH.
+###### Older Mac OS X versions
+
+```
+$ sudo ln -s /Applications/calibre.app/Contents/MacOS/ebook-convert /usr/bin
+```
+
+You can replace `/usr/bin` with any directory that is in your $PATH. Also verify the correct directory where the Calibre application was installed (for instance ~/Applications or /Applications).
 
 ### Cover
 
