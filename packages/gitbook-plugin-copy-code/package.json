@@ -3,13 +3,13 @@
   "description": "Button to copy code blocks",
   "main": "index.js",
   "browser": "./_assets/plugin.js",
-  "version": "4.0.0-alpha.3",
+  "version": "4.0.0-alpha.4",
   "dependencies": {
     "copy-to-clipboard": "^3.0.5",
-    "gitbook-core": "^4.0.0-alpha.3"
+    "gitbook-core": "^4.0.0-alpha.4"
   },
   "devDependencies": {
-    "gitbook-plugin": "^4.0.0-alpha.3"
+    "gitbook-plugin": "^4.0.0-alpha.4"
   },
   "engines": {
     "gitbook": ">=3.0.0"
