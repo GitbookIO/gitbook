@@ -49,6 +49,7 @@ PDF Output can be customized using a set of options in the `book.json`:
 | `pdf.fontSize` | Base font size (default is `12`) |
 | `pdf.fontFamily` | Base font family (default is `Arial`) |
 | `pdf.paperSize` | Paper size, options are `'a0', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'b0', 'b1', 'b2', 'b3', 'b4', 'b5', 'b6', 'legal', 'letter'` (default is `a4`) |
+| `pdf.customSize` | Custom size, overrides paperSize.  eg: `8.5x10.5` |
 | `pdf.margin.top` | Top margin (default is `56`) |
 | `pdf.margin.bottom` | Bottom margin (default is `56`) |
 | `pdf.margin.right` | Right margin (default is `62`) |
