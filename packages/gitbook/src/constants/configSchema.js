@@ -69,7 +69,6 @@ module.exports = {
                     'default': 'README.md',
                     'type': 'string',
                     'title': 'File to use as preface',
-                    'pattern': FILENAME_REGEX
                 },
                 'glossary': {
                     'default': 'GLOSSARY.md',
