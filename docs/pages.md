@@ -68,7 +68,7 @@ Parts are just groups of chapters and do not have dedicated pages, but according
 
 #### Markdown syntax
 
-Most of the files for GitBook use the Markdown syntax by default. GitBook infers your pages's structure from it. The syntax used is similar to the [GitHub Flavored Markdown syntax](https://guides.github.com/features/mastering-markdown/). One can also opt for the [AsciiDoc syntax](asciidoc.md).
+Most of the files for GitBook use the Markdown syntax by default. GitBook infers your pages's structure from it. The syntax used is similar to the [GitHub Flavored Markdown syntax](https://guides.github.com/features/mastering-markdown/). One can also opt for the [AsciiDoc syntax](syntax/asciidoc.md).
 
 ##### Example of a chapter file
 
