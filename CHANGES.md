@@ -65,7 +65,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Headings are no longer annotated with glossary terms
 - Themes are now published as a plugin, with ability to extend it from the book source
 - `links.sidebar` configuration is no longer supported, use summary sections instead
-- `pdf.headerTemplate` and `pdf.footerTemplate` have been replaced by a template in theme/book: `_layout/ebook/pdf_header.html` and `_layout/ebook/pdf_footer.html`
+- `pdf.headerTemplate` and `pdf.footerTemplate` have been replaced by a template in theme/book: `_layouts/ebook/pdf_header.html` and `_layouts/ebook/pdf_footer.html`
 - Markdown parser is now using CommonMark
 - Root folder for the book can be specified in the `"root"` property of the `book.json` file
 - Multi-lingual books share assets folder
