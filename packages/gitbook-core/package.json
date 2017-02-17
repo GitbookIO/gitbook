@@ -7,6 +7,7 @@
     "bluebird": "^3.4.6",
     "classnames": "^2.2.5",
     "entities": "^1.1.1",
+    "gitbook-api": "^3.0.2",
     "history": "^4.3.0",
     "html-tags": "^1.1.1",
     "immutable": "^3.8.1",

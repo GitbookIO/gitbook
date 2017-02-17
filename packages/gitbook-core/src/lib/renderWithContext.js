@@ -5,6 +5,7 @@ const PJAXWrapper = require('../components/PJAXWrapper');
 const I18nProvider = require('../components/I18nProvider');
 const ContextProvider = require('../components/ContextProvider');
 const History = require('../actions/history');
+const Api = require('../actions/api');
 const contextShape = require('../propTypes/Context');
 
 const GitBookApplication = React.createClass({
@@ -16,11 +17,13 @@ const GitBookApplication = React.createClass({
     componentDidMount() {
         const { context } = this.props;
         context.dispatch(History.activate());
+        context.dispatch(Api.activate());
     },
 
     componentWillUnmount() {
         const { context } = this.props;
         context.dispatch(History.deactivate());
+        context.dispatch(Api.deactivate());
     },
 
     render() {

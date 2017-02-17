@@ -8,6 +8,7 @@ const coreReducers = require('../reducers');
 const composeReducer = require('./composeReducer');
 
 const Components = require('../actions/components');
+const Api = require('../actions/api');
 const I18n = require('../actions/i18n');
 const History = require('../actions/history');
 
@@ -21,7 +22,7 @@ const isBrowser = (typeof window !== 'undefined');
 const corePlugin = new Plugin({
     reduce: coreReducers,
     actions: {
-        Components, I18n, History
+        Components, I18n, History, Api
     }
 });
 

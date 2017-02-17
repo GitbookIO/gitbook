@@ -11,6 +11,8 @@ module.exports = {
     PAGE_FETCH_START:     'history/fetch:start',
     PAGE_FETCH_END:       'history/fetch:end',
     PAGE_FETCH_ERROR:     'history/fetch:error',
-    // i18n
-    I18N_REGISTER_LOCALE: 'i18n/register:locale'
+    // I18n
+    I18N_REGISTER_LOCALE: 'i18n/register:locale',
+    // Api
+    API_USER_FETCHED:     'api/user_fetched'
 };
