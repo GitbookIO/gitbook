@@ -1,6 +1,9 @@
 const { Record } = require('immutable');
 
 const DEFAULTS = {
+    // Is the API accessible for this book ? (Is the book on GitBook.com)
+    isAvailable: false,
+    // Current gitbook.com ready the book
     currentUser: null
 };
 
