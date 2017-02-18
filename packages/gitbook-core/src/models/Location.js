@@ -27,7 +27,7 @@ class Location extends Record(DEFAULTS) {
      * @return {String}
      */
     toString() {
-
+        return `${this.pathname}${this.search}${this.hash ? '#' + this.hash : ''}`;
     }
 
     /**
