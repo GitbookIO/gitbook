@@ -1,10 +1,15 @@
-const { Map, fromJS } = require('immutable');
+const { Record, Map, fromJS } = require('immutable');
+
+const DEFAULTS = {
+    title:         String(),
+    pluginsConfig: Map()
+};
 
 /**
  * Configuration from the book.
  * @type {Class}
  */
-class Config extends Map {
+class Config extends Record(DEFAULTS) {
 
     /**
      * Create a config instance from values.
@@ -12,8 +17,9 @@ class Config extends Map {
      * @return {Config}
      */
     static create(values) {
-        return values instanceof Config ?
-            values : new Config(fromJS(values));
+        return (values instanceof Config) ?
+            values :
+            new Config(fromJS(values));
     }
 
     /**
