@@ -1,5 +1,6 @@
 const React  = require('react');
 const ImmutablePropTypes = require('react-immutable-proptypes');
+const Config = require('../models/Config');
 
 module.exports = {
     ...ImmutablePropTypes,
@@ -15,5 +16,6 @@ module.exports = {
     Readme:         require('./Readme'),
     Summary:        require('./Summary'),
     SummaryPart:    require('./SummaryPart'),
-    SummaryArticle: require('./SummaryArticle')
+    SummaryArticle: require('./SummaryArticle'),
+    Config:         React.PropTypes.instanceOf(Config)
 };
