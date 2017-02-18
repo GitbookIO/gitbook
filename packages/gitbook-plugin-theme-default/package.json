@@ -8,8 +8,7 @@
     "gitbook": ">=3.0.0"
   },
   "dependencies": {
-    "debounce": "^1.0.0",
-    "gitbook-core": "^4.0.0-alpha.4"
+    "debounce": "^1.0.0"
   },
   "devDependencies": {
     "classnames": "^2.2.5",

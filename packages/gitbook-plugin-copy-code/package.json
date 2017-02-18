@@ -5,8 +5,7 @@
   "browser": "./_assets/plugin.js",
   "version": "4.0.0-alpha.4",
   "dependencies": {
-    "copy-to-clipboard": "^3.0.5",
-    "gitbook-core": "^4.0.0-alpha.4"
+    "copy-to-clipboard": "^3.0.5"
   },
   "devDependencies": {
     "gitbook-plugin": "^4.0.0-alpha.4"

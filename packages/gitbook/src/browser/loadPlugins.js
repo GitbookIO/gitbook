@@ -1,5 +1,14 @@
 const path = require('path');
+const NativeModule = require('module');
 const timing = require('../utils/timing');
+
+// Still set NODE_PATH since tasks may need it.
+// This is an hack so that require('gitbook-core') may work in all plugins.
+// If it caused bugs, we can replaced by an installation (or live) operation to symlink "gitbook-core"
+// into plugin's node_modules.
+const globalPath = path.resolve(__dirname, 'exports');
+process.env.NODE_PATH = (process.env.NODE_PATH ? `${process.env.NODE_PATH}:` : '') + globalPath;
+NativeModule._initPaths();
 
 /**
  * Load all browser plugins.

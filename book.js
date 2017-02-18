@@ -1,4 +1,4 @@
-var pkg = require('./package.json');
+const pkg = require('./package.json');
 
 module.exports = {
     // Documentation for GitBook is stored under "docs"
@@ -6,7 +6,7 @@ module.exports = {
     title: 'GitBook Toolchain Documentation',
 
     // Use the "official" theme
-    plugins: ['sitemap'],
+    plugins: [],
 
     variables: {
         version: pkg.version

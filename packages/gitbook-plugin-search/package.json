@@ -5,7 +5,6 @@
   "browser": "./_assets/theme.js",
   "version": "4.0.0-alpha.4",
   "dependencies": {
-    "gitbook-core": "^4.0.0-alpha.4",
     "react": "^15.4.1"
   },
   "devDependencies": {

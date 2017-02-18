@@ -21,13 +21,13 @@ function create(outputDir, spec) {
         'main': 'index.js',
         'browser': './_assets/plugin.js',
         'ebook': './_assets/plugin.js',
-        'dependencies': {
-            'gitbook-core': '^' + GITBOOK_VERSION
-        },
         'devDependencies': {
             'gitbook-plugin': '^' + GITBOOK_VERSION,
-            'eslint': '3.7.1',
-            'eslint-config-gitbook': '1.4.0'
+            'eslint': '^3.7.1',
+            'eslint-config-gitbook': '^1.4.0'
+        },
+        'peerDependencies': {
+            'gitbook-core': '*'
         },
         'engines': {
             'gitbook': '>=4.0.0-alpha.0'
