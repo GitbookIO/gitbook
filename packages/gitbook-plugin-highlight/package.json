@@ -34,7 +34,8 @@
         "description": "Color scheme for syntax highlighting.",
         "default": "tomorrow",
         "enum": [
-            "tomorrow"
+            "tomorrow",
+            "tomorrow-night"
         ]
       }
     }
