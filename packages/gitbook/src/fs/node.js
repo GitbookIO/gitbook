@@ -14,14 +14,22 @@ function fsReadDir(folder) {
             .map((file) => {
                 if (file == '.' || file == '..') return;
 
-                const stat = fs.statSync(path.join(folder, file));
-                if (stat.isDirectory()) file = file + path.sep;
-                return file;
+                return getFile(folder, file);
             })
             .filter((file) => {
                 return Boolean(file);
             });
     });
+}
+
+function getFile(folder, file) {
+    try {
+        var stat = fs.statSync(path.join(folder, file));
+        if (stat.isDirectory()) file = file + path.sep;
+    } catch (err) {
+        if (err.code === "ENOENT") return ;
+    }
+    return file;
 }
 
 function fsLoadObject(filename) {
