@@ -10,7 +10,7 @@ const getLanguage = require('./getLanguage');
  * @return {String}
  */
 function getChildrenToText(children) {
-    return React.Children.map(children, child => {
+    return React.Children.map(children, (child) => {
         if (typeof child === 'string') {
             return child;
         } else {
@@ -20,18 +20,23 @@ function getChildrenToText(children) {
     }).join('');
 }
 
+/**
+ * Code block wrapper to highlight the code inside.
+ * @type {ReactClass}
+ */
 const CodeBlock = React.createClass({
     propTypes: {
         children:  React.PropTypes.node,
+        theme:     React.PropTypes.string.isRequired,
         className: React.PropTypes.string
     },
 
     render() {
-        const { children, className } = this.props;
+        const { children, className, theme } = this.props;
         const content = getChildrenToText(children);
         const lang = getLanguage(className || '');
 
-        const includeCSS = <GitBook.ImportCSS href="gitbook/highlight/white.css" />;
+        const includeCSS = <GitBook.ImportCSS href={`gitbook/highlight/${theme}.css`} />;
 
         try {
             const html = hljs.highlight(lang, content).value;
@@ -52,4 +57,6 @@ const CodeBlock = React.createClass({
     }
 });
 
-module.exports = CodeBlock;
+module.exports = GitBook.connect(CodeBlock, ({ config }) => ({
+    theme: config.getForPlugin('highlight').get('theme')
+}));

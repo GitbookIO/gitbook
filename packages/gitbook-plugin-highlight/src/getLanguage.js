@@ -11,7 +11,7 @@ const ALIASES = require('./ALIASES');
  */
 function getLanguage(className) {
     const lang = List(className.split(' '))
-        .map(function(cl) {
+        .map((cl) => {
             // Markdown
             if (cl.search('lang-') === 0) {
                 return cl.slice('lang-'.length);
@@ -24,7 +24,7 @@ function getLanguage(className) {
 
             return null;
         })
-        .find(function(cl) {
+        .find((cl) => {
             return Boolean(cl);
         });
 

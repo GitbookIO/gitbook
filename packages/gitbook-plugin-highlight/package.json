@@ -1,17 +1,18 @@
 {
   "name": "gitbook-plugin-highlight",
-  "description": "Syntax highlighter for Gitbook",
+  "title": "Syntax Highlighting",
+  "description": "Highlight code blocks in your pages.",
   "main": "index.js",
   "browser": "./_assets/plugin.js",
   "version": "4.0.0-alpha.4",
   "dependencies": {
-    "highlight.js": "9.7.0"
+    "highlight.js": "9.9.0"
   },
   "devDependencies": {
     "gitbook-plugin": "^4.0.0-alpha.4"
   },
   "engines": {
-    "gitbook": ">=3.0.0"
+    "gitbook": ">=4.0.0-alpha.0"
   },
   "scripts": {
     "build-js": "gitbook-plugin build ./src/index.js ./_assets/plugin.js",
@@ -24,5 +25,18 @@
   },
   "bugs": {
     "url": "https://github.com/GitbookIO/gitbook/issues"
-  }
+  },
+  "gitbook": {
+    "properties": {
+      "theme": {
+        "type": "string",
+        "title": "Theme",
+        "description": "Color scheme for syntax highlighting.",
+        "default": "tomorrow",
+        "enum": [
+            "tomorrow"
+        ]
+      }
+    }
+}
 }
