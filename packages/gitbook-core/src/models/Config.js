@@ -27,10 +27,10 @@ class Config extends Record(DEFAULTS) {
      * @param  {String} pluginName
      * @return {Map}
      */
-    getForPlugin(pluginName) {
+    getForPlugin(pluginName, defaultValue = Map()) {
         return this.getIn([
             'pluginsConfig', pluginName
-        ]);
+        ], defaultValue);
     }
 
 }

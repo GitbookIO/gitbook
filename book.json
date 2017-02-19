@@ -1,0 +1,9 @@
+{
+    "root": "./docs",
+    "pluginsConfig": {
+        "disqus": {
+            "shortName": "test"
+        }
+    },
+    "plugins": ["disqus"]
+}
