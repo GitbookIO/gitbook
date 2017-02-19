@@ -1,6 +1,7 @@
 {
   "name": "gitbook-plugin-headings",
-  "description": "Automatically add anchors to headings",
+  "title": "Anchor Header",
+  "description": "Generate anchored headings for your pages",
   "main": "index.js",
   "browser": "./_assets/plugin.js",
   "version": "4.0.0-alpha.4",
@@ -30,7 +31,11 @@
       "position": {
         "type": "string",
         "title": "Position of anchors",
-        "default": "left"
+        "default": "left",
+        "enum": [
+            "left",
+            "right"
+        ]
       }
     }
   }
