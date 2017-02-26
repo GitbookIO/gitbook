@@ -24,5 +24,24 @@
   },
   "bugs": {
     "url": "https://github.com/GitBookIO/gitbook/issues"
+  },
+  "gitbook": {
+    "blocks": {
+       "hint": {
+           "title": "Hint",
+           "description": "Display an alert message.",
+           "properties": {
+             "style": {
+               "title": "Style",
+               "type": "string",
+               "enum": ["info", "danger", "tip", "working"],
+               "default": "info"
+             },
+             "children": {
+               "type": "node"
+             }
+           }
+       }
+    }
   }
 }
