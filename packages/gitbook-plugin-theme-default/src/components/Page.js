@@ -1,6 +1,10 @@
 const GitBook = require('gitbook-core');
 const { React } = GitBook;
 
+/**
+ * Container for the page.
+ * @type {ReactClass}
+ */
 const Page = React.createClass({
     propTypes: {
         page: GitBook.PropTypes.Page
@@ -16,7 +20,7 @@ const Page = React.createClass({
                         <GitBook.InjectedComponentSet matching={{ role: 'page:header' }} props={this.props} />
 
                         <GitBook.InjectedComponent matching={{ role: 'page:container' }} props={this.props}>
-                            <GitBook.HTMLContent html={page.content} />
+                            <GitBook.PageContent document={page.document} />
                         </GitBook.InjectedComponent>
 
                         <GitBook.InjectedComponentSet matching={{ role: 'page:footer' }} props={this.props} />

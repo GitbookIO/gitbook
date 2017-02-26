@@ -10,7 +10,7 @@ const { Flex, Box } = require('reflexbox');
 
 const { InjectedComponent, InjectedComponentSet } = require('./components/InjectedComponent');
 const { ImportLink, ImportScript, ImportCSS } = require('./components/Import');
-const HTMLContent = require('./components/HTMLContent');
+const PageContent = require('./components/PageContent');
 const Link = require('./components/Link');
 const Image = require('./components/Image');
 const Icon = require('./components/Icon');
@@ -47,7 +47,7 @@ module.exports = {
     I18nProvider,
     InjectedComponent,
     InjectedComponentSet,
-    HTMLContent,
+    PageContent,
     Head,
     Panel,
     Provider,

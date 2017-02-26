@@ -55,13 +55,6 @@ const RequireInstallError = TypedError({
 });
 
 // Error for nunjucks templates
-const TemplateError = WrappedError({
-    message: 'Error compiling template "{filename}": {origMessage}',
-    type: 'template',
-    filename: null
-});
-
-// Error for nunjucks templates
 const PluginError = WrappedError({
     message: 'Error with plugin "{plugin}": {origMessage}',
     type: 'plugin',
@@ -92,7 +85,6 @@ module.exports = {
     FileNotFoundError,
     FileOutOfScopeError,
 
-    TemplateError,
     PluginError,
     ConfigurationError,
     EbookError
