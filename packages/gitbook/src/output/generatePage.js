@@ -50,7 +50,7 @@ function generatePage(output, page) {
 
             // Render with markdown/asciidoc parser
             .then((content) => {
-                content = parser.toHTML(content);
+                content = parser.toHTML(content, context);
                 return resultPage.set('content', content);
             })
 

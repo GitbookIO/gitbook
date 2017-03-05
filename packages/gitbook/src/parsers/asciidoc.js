@@ -9,6 +9,17 @@ const FILE_EXTENSIONS = [
     '.asciidoc'
 ];
 
+function getAttributes(defaultAttributes, context) {
+    const asciidocConfig = context.config.pluginsConfig.asciidoc;
+    let userAttributes;
+    if (asciidocConfig === undefined) {
+        userAttributes = [];
+    } else {
+        userAttributes = asciidocConfig.attributes || [];
+    }
+    return [...defaultAttributes, ...userAttributes];
+}
+
 /**
  * Render a document as text.
  * @param  {Document} document
@@ -32,11 +43,13 @@ function toDocument(text) {
 /**
  * Render asciidoc to HTML.
  * @param  {String} text
+ * @param  {Object} context
  * @return {String} html
  */
-function toHTML(text) {
+function toHTML(text, context) {
+    const attributes = getAttributes(['showtitle'], context);
     return asciidocjs.convert(text, {
-        attributes: 'showtitle'
+        attributes
     });
 }
 
@@ -57,7 +70,7 @@ function prepare(text) {
 function toInlineHTML(text) {
     return asciidocjs.convert(text, {
         doctype: 'inline',
-        attributes: 'showtitle'
+        attributes
     });
 }
 

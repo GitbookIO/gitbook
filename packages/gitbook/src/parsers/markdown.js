@@ -43,9 +43,10 @@ function prepare(text) {
 /**
  * Render markdown to HTML.
  * @param  {String} text
+ * @param  {Object} context
  * @return {String} html
  */
-function toHTML(text) {
+function toHTML(text, context) {
     const document = toDocument(text);
     const state = State.create(html);
 

@@ -82,6 +82,36 @@ describe('WebsiteGenerator', () => {
         });
     });
 
+    it('should generate an HTML file for each articles with Asciidoc user-defined attributes', () => {
+        return generateMock(WebsiteGenerator, {
+            'README.adoc': 'Hello World',
+            'book.json': '{ "pluginsConfig": { "asciidoc": { "attributes": ["user-name=Guillaume"] } } }',
+            'SUMMARY.md': '# Summary\n\n* [Page 1](test/page1.adoc)',
+            'test': {
+                'page1.adoc': 'Hello {user-name}'
+            }
+        })
+        .then((folder) => {
+            expect(folder).toHaveFile('index.html');
+            expect(folder).toHaveFile('test/page1.html');
+        });
+    });
+
+    it('should generate an HTML file for each articles without Asciidoc config', () => {
+        return generateMock(WebsiteGenerator, {
+            'README.adoc': 'Hello World',
+            'book.json': '{ "pluginsConfig": {} }',
+            'SUMMARY.md': '# Summary\n\n* [Page 1](test/page1.adoc)',
+            'test': {
+                'page1.adoc': 'Hello {user-name}'
+            }
+        })
+            .then((folder) => {
+                expect(folder).toHaveFile('index.html');
+                expect(folder).toHaveFile('test/page1.html');
+            });
+    });
+
     it('should generate an HTML file for each articles', () => {
         return generateMock(WebsiteGenerator, {
             'README.md': 'Hello World',
