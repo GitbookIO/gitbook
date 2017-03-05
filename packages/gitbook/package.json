@@ -6,7 +6,7 @@
   "main": "lib/index.js",
   "browser": "./lib/browser.js",
   "dependencies": {
-    "asciidoctor.js": "^1.5.5-4",
+    "asciidoctor.js": "1.5.5-4",
     "bash-color": "0.0.4",
     "cheerio": "0.20.0",
     "chokidar": "1.5.0",
