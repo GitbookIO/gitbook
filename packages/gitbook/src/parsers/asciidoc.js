@@ -36,7 +36,7 @@ function toDocument(text) {
  */
 function toHTML(text) {
     return asciidocjs.convert(text, {
-        attributes: 'showtitle'
+        attributes: ['showtitle', 'icons=font@']
     });
 }
 
