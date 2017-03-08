@@ -21,5 +21,11 @@ nodes:
           - kind: block
             type: unstyled
             nodes:
-              - kind: text
-                text: ''
+              - kind: inline
+                type: link
+                data:
+                  href: 'art1.md'
+                nodes:
+                  - kind: text
+                    text: '' # No title so ignored
+

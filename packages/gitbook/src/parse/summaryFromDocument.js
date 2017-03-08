@@ -9,17 +9,48 @@ const isLink = node => node.type === INLINES.LINK;
 /**
  * Create a summary article from a list item.
  * @param  {Block} item
- * @return {SummaryArticleLike} article
+ * @return {SummaryArticleLike | Null} article
  */
 function createArticleFromItem(item) {
     const { nodes } = item;
 
-    const titleParent = nodes.first();
-    const list = nodes.skip(1).find(isList);
+    // Find the link that represents the article's title
+    const linkParent = nodes
+        .filterNot(isList)
+        .find(node => node.findDescendant(isLink));
+
+    // Or find text that could act as title
+    const textParent = nodes.filterNot(node => isList(node) || node.isEmpty).first();
+
+    let title, ref, parent;
+    if (linkParent) {
+        const link = linkParent.findDescendant(isLink);
+
+        if (!link.isEmpty) {
+            parent = linkParent;
+            title = link.text;
+            ref = link.data.get('href');
+        }
+    }
+
+    if (!parent) {
+        // Could not find a proper link
+
+        if (textParent) {
+            parent = textParent;
+            title = textParent.text;
+            ref = null;
+        } else {
+            // This item has no proper title or link
+            return null;
+        }
+    }
+
+    const list = nodes
+        // Skip until after the article's title or link
+        .skipUntil(node => node === parent).skip(1)
+        .find(isList);
     const articles = list ? listArticles(list) : [];
-    const title = titleParent.text;
-    const link = titleParent.findDescendant(isLink);
-    const ref = link ? link.data.get('href') : null;
 
     return {
         title,
@@ -35,7 +66,9 @@ function createArticleFromItem(item) {
  */
 function listArticles(list) {
     const { nodes } = list;
-    return nodes.map(item => createArticleFromItem(item));
+    return nodes
+        .map(item => createArticleFromItem(item))
+        .filter(article => Boolean(article));
 }
 
 /**
