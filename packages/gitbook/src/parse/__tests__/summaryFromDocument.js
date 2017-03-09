@@ -92,22 +92,13 @@ describe('summaryFromDocument', () => {
         ]);
     });
 
-    it('should parse empty items', () => {
+    it('should ignore empty items', () => {
         const summary = readSummary('summary/empty-items.yaml');
 
         expectParts(summary, [
             {
                 title: '',
-                articles: [
-                    {
-                        title: '',
-                        ref: ''
-                    },
-                    {
-                        title: '',
-                        ref: ''
-                    }
-                ]
+                articles: []
             }
         ]);
     });
@@ -210,4 +201,36 @@ describe('summaryFromDocument', () => {
         expectParts(summary, [
         ]);
     });
+
+    it('should be flexible', () => {
+        const summary = readSummary('summary/flexible.yaml');
+
+        expectParts(summary, [
+            {
+                title: '',
+                articles: [
+                    {
+                        title: 'Article 1',
+                        ref: 'art1.md'
+                    },
+                    {
+                        title: 'Article 2',
+                        articles: []
+                    },
+                    {
+                        title: 'Article 3',
+                        ref: 'art3.md',
+                        articles: [
+                            {
+                                title: 'Article 2.1',
+                                ref: 'art2.1.md',
+                                articles: []
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]);
+    });
+
 });
