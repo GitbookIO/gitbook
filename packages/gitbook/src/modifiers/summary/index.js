@@ -10,6 +10,7 @@ module.exports = {
     editArticleTitle: require('./editArticleTitle'),
     editArticleRef:   require('./editArticleRef'),
     deleteByPath:     require('./deleteByPath'),
+    movePath:         require('./movePath'),
     // Parts
     insertPart:       require('./insertPart'),
     removePart:       require('./removePart'),
