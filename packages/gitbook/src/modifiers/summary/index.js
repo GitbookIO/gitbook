@@ -9,6 +9,7 @@ module.exports = {
     unshiftArticle:   require('./unshiftArticle'),
     editArticleTitle: require('./editArticleTitle'),
     editArticleRef:   require('./editArticleRef'),
+    deleteByPath:     require('./deleteByPath'),
     // Parts
     insertPart:       require('./insertPart'),
     removePart:       require('./removePart'),
