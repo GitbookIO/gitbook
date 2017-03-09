@@ -41,12 +41,16 @@ class SummaryArticle extends Record(DEFAULTS) {
     }
 
     /**
-     * Get path (without anchor) to the pointing file.
-     * It also normalizes the file path.
+     * Get path to the pointing file.
+     * It also normalizes the file
      *
+     * @param {Object} [opts]
+     *     @param {Boolean} [withAnchor=false]
      * @return {String}
      */
-    getPath() {
+    getPath(opts = {}) {
+        const { withAnchor = false } = opts;
+
         if (this.isExternal()) {
             return undefined;
         }
@@ -56,9 +60,13 @@ class SummaryArticle extends Record(DEFAULTS) {
             return undefined;
         }
 
-        const parts = ref.split('#');
-
-        const pathname = (parts.length > 1 ? parts.slice(0, -1).join('#') : ref);
+        let pathname;
+        if (withAnchor) {
+            pathname = ref;
+        } else {
+            const parts = ref.split('#');
+            pathname = (parts.length > 1 ? parts.slice(0, -1).join('#') : ref);
+        }
 
         // Normalize path to remove ('./', '/...', etc)
         return location.flatten(pathname);
