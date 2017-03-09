@@ -1,6 +1,6 @@
 {
   "name": "gitbook-core",
-  "version": "4.0.0-alpha.4",
+  "version": "4.0.0-alpha.5",
   "description": "Core for GitBook plugins API",
   "main": "./lib/index.js",
   "dependencies": {

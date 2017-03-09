@@ -1,6 +1,6 @@
 {
   "name": "gitbook-plugin",
-  "version": "4.0.0-alpha.4",
+  "version": "4.0.0-alpha.5",
   "description": "CLI for compiling and testing plugins",
   "main": "./lib/index.js",
   "dependencies": {
