@@ -98,9 +98,8 @@ describe('deleteByPath', () => {
         ]);
     });
 
-    it('should handle dirs', () => {
-        const newSummary = deleteByPath(summary, '2/');
-        expectParts(newSummary, [
+    describe('should handle dirs', () => {
+        const expectedParts = [
             {
                 articles: [
                     {
@@ -118,7 +117,15 @@ describe('deleteByPath', () => {
                     }
                 ]
             }
-        ]);
+        ];
+
+        [
+            deleteByPath(summary, '2/'),
+            deleteByPath(summary, '2')
+        ].map((newSummary, i) =>
+              it('# ' + i,
+                  () => expectParts(newSummary, expectedParts))
+        );
     });
 
     it('should not delete descendants that don\'t match', () => {

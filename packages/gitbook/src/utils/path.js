@@ -102,5 +102,6 @@ module.exports = {
     resolveInRoot,
     normalize: normalizePath,
     setExtension,
+    stripTrailingSep,
     isPureRelative
 };

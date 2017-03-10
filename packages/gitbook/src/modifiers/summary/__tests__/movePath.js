@@ -112,9 +112,8 @@ describe('movePath', () => {
         ]);
     });
 
-    it('should handle dirs', () => {
-        const newSummary = movePath(summary, '2/', '3/');
-        expectParts(newSummary, [
+    describe('should handle dirs', () => {
+        const expectedParts = [
             {
                 articles: [
                     {
@@ -146,7 +145,17 @@ describe('movePath', () => {
                     }
                 ]
             }
-        ]);
+        ];
+
+        [
+            movePath(summary, '2/', '3/'),
+            movePath(summary, '2/', '3'),
+            movePath(summary, '2', '3'),
+            movePath(summary, '2', '3/')
+        ].map((newSummary, i) =>
+              it('# ' + i,
+                  () => expectParts(newSummary, expectedParts))
+        );
     });
 });
 
