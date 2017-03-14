@@ -1,5 +1,5 @@
 const lookupStructureFile = require('./lookupStructureFile');
-const readmeFromDocument = require('./readmeFromDocument');
+const Readme = require('../models/readme');
 const error = require('../utils/error');
 
 /**
@@ -10,7 +10,6 @@ const error = require('../utils/error');
  */
 function parseReadme(book) {
     const { logger } = book;
-    const fs = book.getContentFS();
 
     return lookupStructureFile(book, 'readme')
     .then((file) => {
@@ -19,12 +18,8 @@ function parseReadme(book) {
         }
 
         logger.debug.ln(`readme found at ${file.path}`);
-        return file.parse(fs)
-        .then((document) => {
-            let readme = readmeFromDocument(document);
-            readme = readme.setFile(file);
-            return book.set('readme', readme);
-        });
+
+        return book.set('readme', Readme.create({ file }));
     });
 }
 

@@ -2,22 +2,12 @@ const { Record } = require('immutable');
 const File = require('./file');
 
 const DEFAULTS = {
-    file:        new File(),
-    title:       String(),
-    description: String()
+    file:        new File()
 };
 
 class Readme extends Record(DEFAULTS) {
     getFile() {
         return this.get('file');
-    }
-
-    getTitle() {
-        return this.get('title');
-    }
-
-    getDescription() {
-        return this.get('description');
     }
 
     /**
@@ -32,7 +22,6 @@ class Readme extends Record(DEFAULTS) {
     /**
      * Create a new readme
      *
-     * @param {File} file
      * @param {Object} def
      * @return {Readme}
      */
@@ -40,8 +29,7 @@ class Readme extends Record(DEFAULTS) {
         def = def || {};
 
         return new Readme({
-            title: def.title || '',
-            description: def.description || ''
+            file: def.file || ''
         });
     }
 }

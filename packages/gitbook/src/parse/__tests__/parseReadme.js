@@ -16,8 +16,6 @@ describe('parseReadme', () => {
             const file = readme.getFile();
 
             expect(file.exists()).toBeTruthy();
-            expect(readme.title).toBe('Hello');
-            expect(readme.description).toBe('And here is the description.');
         });
     });
 
