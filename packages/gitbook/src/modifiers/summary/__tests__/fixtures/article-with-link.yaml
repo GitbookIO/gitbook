@@ -16,15 +16,20 @@ nodes:
               - kind: inline
                 type: link
                 data:
-                  href: hello.md
+                  href: 'hello.md'
                 nodes:
                   - kind: text
-                    text: Hello
+                    text: 'Hello'
       - kind: block
         type: list_item
         nodes:
           - kind: block
             type: unstyled
             nodes:
-              - kind: text
-                text: World
+              - kind: inline
+                type: link
+                data:
+                  href: ''
+                nodes:
+                  - kind: text
+                    text: 'World'

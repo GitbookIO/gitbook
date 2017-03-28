@@ -19,8 +19,13 @@ nodes:
           - kind: block
             type: unstyled
             nodes:
-              - kind: text
-                text: 'Article 1'
+              - kind: inline
+                type: link
+                data:
+                  href: ''
+                nodes:
+                  - kind: text
+                    text: 'Article 1'
 
   - kind: block
     type: header_two
@@ -48,8 +53,13 @@ nodes:
           - kind: block
             type: unstyled
             nodes:
-              - kind: text
-                text: 'Article 2'
+              - kind: inline
+                type: link
+                data:
+                  href: ''
+                nodes:
+                  - kind: text
+                    text: 'Article 2'
 
   - kind: block
     type: header_two

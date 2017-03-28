@@ -21,7 +21,7 @@ function expectDocument(documentPath, parts) {
 
 describe('summaryToDocument', () => {
     it('should convert unlinked articles', () => {
-        expectDocument('ul.yaml', [
+        expectDocument('article-no-link.yaml', [
             {
                 title: '',
                 articles: [
@@ -39,7 +39,7 @@ describe('summaryToDocument', () => {
     });
 
     it('should convert articles with links', () => {
-        expectDocument('ul-with-link.yaml', [
+        expectDocument('article-with-link.yaml', [
             {
                 title: '',
                 articles: [
