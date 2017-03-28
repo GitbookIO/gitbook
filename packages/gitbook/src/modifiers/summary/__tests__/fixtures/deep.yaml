@@ -20,8 +20,13 @@ nodes:
           - kind: block
             type: unstyled
             nodes:
-              - kind: text
-                text: '1.1'
+              - kind: inline
+                type: link
+                data:
+                  href: ''
+                nodes:
+                  - kind: text
+                    text: '1.1'
           - kind: block
             type: unordered_list
             nodes:
@@ -31,24 +36,39 @@ nodes:
                   - kind: block
                     type: unstyled
                     nodes:
-                      - kind: text
-                        text: '1.1.1'
+                      - kind: inline
+                        type: link
+                        data:
+                          href: ''
+                        nodes:
+                          - kind: text
+                            text: '1.1.1'
               - kind: block
                 type: list_item
                 nodes:
                   - kind: block
                     type: unstyled
                     nodes:
-                      - kind: text
-                        text: '1.1.2'
+                      - kind: inline
+                        type: link
+                        data:
+                          href: ''
+                        nodes:
+                          - kind: text
+                            text: '1.1.2'
       - kind: block
         type: list_item
         nodes:
           - kind: block
             type: unstyled
             nodes:
-              - kind: text
-                text: '1.2'
+              - kind: inline
+                type: link
+                data:
+                  href: ''
+                nodes:
+                  - kind: text
+                    text: '1.2'
           - kind: block
             type: unordered_list
             nodes:
@@ -58,16 +78,26 @@ nodes:
                   - kind: block
                     type: unstyled
                     nodes:
-                      - kind: text
-                        text: '1.2.1'
+                      - kind: inline
+                        type: link
+                        data:
+                          href: ''
+                        nodes:
+                          - kind: text
+                            text: '1.2.1'
               - kind: block
                 type: list_item
                 nodes:
                   - kind: block
                     type: unstyled
                     nodes:
-                      - kind: text
-                        text: '1.2.2'
+                      - kind: inline
+                        type: link
+                        data:
+                          href: ''
+                        nodes:
+                          - kind: text
+                            text: '1.2.2'
 
   - kind: block
     type: header_two
@@ -84,8 +114,13 @@ nodes:
           - kind: block
             type: unstyled
             nodes:
-              - kind: text
-                text: '2.1'
+              - kind: inline
+                type: link
+                data:
+                  href: ''
+                nodes:
+                  - kind: text
+                    text: '2.1'
           - kind: block
             type: unordered_list
             nodes:
@@ -95,8 +130,13 @@ nodes:
                   - kind: block
                     type: unstyled
                     nodes:
-                      - kind: text
-                        text: '2.1.1'
+                      - kind: inline
+                        type: link
+                        data:
+                          href: ''
+                        nodes:
+                          - kind: text
+                            text: '2.1.1'
                   - kind: block
                     type: unordered_list
                     nodes:
@@ -106,8 +146,13 @@ nodes:
                           - kind: block
                             type: unstyled
                             nodes:
-                              - kind: text
-                                text: '2.1.1.1'
+                              - kind: inline
+                                type: link
+                                data:
+                                  href: ''
+                                nodes:
+                                  - kind: text
+                                    text: '2.1.1.1'
                           - kind: block
                             type: unordered_list
                             nodes:
@@ -117,5 +162,10 @@ nodes:
                                   - kind: block
                                     type: unstyled
                                     nodes:
-                                      - kind: text
-                                        text: '2.1.1.1.1'
+                                      - kind: inline
+                                        type: link
+                                        data:
+                                          href: ''
+                                        nodes:
+                                          - kind: text
+                                            text: '2.1.1.1.1'
