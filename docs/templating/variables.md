@@ -96,3 +96,6 @@ Languages are defined by `{ id: 'en', title: 'English' }`.
 | Variable | Description |
 | -------- | ----------- |
 | `glossary.path` | Path to the Glossary in the book |
+
+### Limitations
+Variables won't expand when used inside `SUMMARY.md`.
