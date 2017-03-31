@@ -158,6 +158,17 @@ You can create fenced code blocks by placing triple backticks ` ``` ` before and
     }
     ```
 
+If your code contains templating syntax such as `{{ this }}` (see [templating](/docs/templating/variables.md)), you can disable templating with a `raw` block:
+
+{% raw %}
+    {% raw %}
+    ```html
+    <span>{{ this will not be interpreted as templating }}</span>
+    ```
+    {% endraw %}
+{% endraw %}
+
+
 ##### Syntax highlighting
 
 You can add an optional language identifier to enable syntax highlighting in your fenced code block.
@@ -216,7 +227,7 @@ Asterisks
 
 ### Ignoring Markdown formatting
 
-You can tell GitBook to ignore (or escape) Markdown formatting by using `\` before the Markdown character.
+You can tell GitBook to ignore (escape) Markdown formatting by using `\` before the Markdown character.
 
 ```
 Let's rename \*our-new-project\* to \*our-old-project\*.

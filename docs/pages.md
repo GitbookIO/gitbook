@@ -2,9 +2,7 @@
 
 ### Summary
 
-GitBook uses a `SUMMARY.md` file to define the structure of chapters and subchapters of the book. The `SUMMARY.md` file is used to generate the book's table of contents.
-
-The format of `SUMMARY.md` is just a list of links. The link's title is used as the chapter's title, and the link's target is a path to that chapter's file.
+{{ book.GB }} uses `SUMMARY.md` file to define a structure of chapters and subchapters of a book. This file contains a list of links that are used to generate a book's table of contents: the link's title is used as the chapter's title, and the link's target (URL) is a path to that chapter's file.
 
 Adding a nested list to a parent chapter will create subchapters.
 
@@ -62,13 +60,13 @@ The Table of Contents can be divided into parts separated by headings or horizon
 * [Last part without title](part3/title.md)
 ```
 
-Parts are just groups of chapters and do not have dedicated pages, but according to the theme, it will show in the navigation.
+Parts are just groups of chapters and do not have dedicated pages, but according to the theme, they will be shown in the navigation.
 
 ### Pages
 
 #### Markdown syntax
 
-Most of the files for GitBook use the Markdown syntax by default. GitBook infers your pages's structure from it. The syntax used is similar to the [GitHub Flavored Markdown syntax](https://guides.github.com/features/mastering-markdown/). One can also opt for the [AsciiDoc syntax](syntax/asciidoc.md).
+Most of the files for {{ book.GB }} use the Markdown syntax by default. {{ book.GB }} infers your pages's structure from it. The syntax used is similar to the [GitHub Flavored Markdown syntax](https://guides.github.com/features/mastering-markdown/). One can also opt for the [AsciiDoc syntax](syntax/asciidoc.md).
 
 ##### Example of a chapter file
 
