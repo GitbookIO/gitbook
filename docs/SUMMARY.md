@@ -11,7 +11,7 @@
 * [Pages and Summary](pages.md)
 * [Configuration](config.md)
 * [Glossary](lexicon.md)
-* [Multi-Lingual](languages.md)
+* [Multilanguage](languages.md)
 * [Markdown](syntax/markdown.md)
     * [Headings](syntax/markdown.md#headings)
     * [Paragraphs](syntax/markdown.md#paragraphs)
