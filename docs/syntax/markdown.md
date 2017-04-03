@@ -1,12 +1,12 @@
 # Markdown
 
-Most of the examples from this documentation are in Markdown. Markdown is default parser for GitBook, but one can also opt for the [AsciiDoc syntax](asciidoc.md).
+Most of the examples from this documentation are in Markdown, which is the default parser for {{ book.GB }}, but you can also opt for the [AsciiDoc syntax](asciidoc.md).
 
-Here’s an overview of Markdown syntax that you can use with GitBook (same as GitHub with some additions).
+Below is a quick overview of the Markdown syntax that you can use with {{ book.GB }}.
 
 ### Headings
 
-To create a heading, add one to six `#` symbols before your heading text. The number of # you use will determine the size of the heading.
+To create a heading, add one to six `#` symbols before your heading text followed by one space.
 
 ```markdown
 # This is an <h1> tag
@@ -14,7 +14,17 @@ To create a heading, add one to six `#` symbols before your heading text. The nu
 ###### This is an <h6> tag
 ```
 
-GitBook supports a nice way for explicitly setting the header ID. If you follow the header text with an opening curly bracket (separated from the text with a least one space), a hash, the ID and a closing curly bracket, the ID is set on the header. If you use the trailing hash feature of atx style headers, the header ID has to go after the trailing hashes. For example:
+You can also add H1 and H2 headings with underlining:
+
+```
+This is an <h1> heading
+=======================
+
+This is an <h2> heading
+---------------------
+```
+
+{{ book.GB }} supports a nice way for explicitly setting the header ID. If you follow the header text with an opening curly bracket (separated from the text with a least one space), a hash, the ID and a closing curly bracket, the ID is set on the header. If you use the trailing hash feature of atx style headers, the header ID has to go after the trailing hashes. For example:
 
 ```markdown
 Hello {#id}
@@ -27,7 +37,7 @@ Hello {#id}
 
 ### Paragraphs and Line Breaks {#paragraphs}
 
-A paragraph is simply one or more consecutive lines of text, separated by one or more blank lines. (A blank line is any line that looks like a blank line — a line containing nothing but spaces or tabs is considered blank.) Normal paragraphs should not be indented with spaces or tabs.
+A paragraph is simply one or more consecutive lines of text, separated by one or more blank lines (a line containing nothing but spaces or tabs is considered blank). Normal paragraphs should not be indented with spaces or tabs.
 
 ```
 Here's a line for us to start with.
@@ -51,18 +61,7 @@ _You **can** combine them_
 
 ### Lists {#lists}
 
-Markdown supports ordered (numbered) and unordered (bulleted) lists.
-
-##### Unordered
-
-Unordered lists use asterisks, pluses, and hyphens — interchangably — as list markers:
-
-```markdown
-* Item 1
-* Item 2
-  * Item 2a
-  * Item 2b
-```
+Markdown supports ordered (numbered) and unordered (bulleted) lists with as many nested items as you want (or need). You can also combine both ordered and unordered types in one list.
 
 ##### Ordered
 
@@ -72,26 +71,42 @@ Ordered lists use numbers followed by periods:
 1. Item 1
 2. Item 2
 3. Item 3
-   * Item 3a
-   * Item 3b
+   1. Item 3a
+   2. Item 3b
+
+1. Item 1
+1. Item 2
+1. Item 3
+   1. Item 3a
+   1. Item 3b
+```
+
+##### Unordered
+
+For unordered lists you can use asterisks, pluses, or hyphens:
+
+```markdown
+* Item 1
++ Item 2
+- Item 3
+  - Item 3a
+  - Item 3b  
 ```
 
 ### Links {#links}
 
 Markdown supports two style of links: inline and reference.
 
+#### Inline
+
 A simple link can be created by surrounding the text with square brackets and the link URL with parentheses:
 
 ```markdown
-This is [an example](http://example.com/ "Title") inline link with a title.
-
-[This link](http://example.net/) has no title attribute.
+[An example inline link](http://example.com/ "Title") with a title attribute.
+[An example inline link](http://example.net/) with no title attribute.
 ```
 
-Links can point to relative paths, anchors or absolute urls.
-
-
-### References
+#### References
 
 There is another way to create links which does not interrupt the text flow. The URL and title are defined using a reference name and this reference name is then used in square brackets instead of the link URL:
 
@@ -105,17 +120,25 @@ Then, anywhere in the document, you define your link label like this, on a line 
 [id]: http://example.com/  "Optional Title Here"
 ```
 
+Both types of links can point to relative paths, anchors or absolute urls:
+
+```
+[Relative path](relative/path/)
+[Anchor](link#anchor)
+[Absolute url](http://google.com)
+```
+
 ### Images {#images}
 
-Images can be created in a similar way than links: just use an exclamation mark before the square brackets. The link text will become the alternative text of the image and the link URL specifies the image source:
+Images can be created in a similar way as links: just use an exclamation mark before the square brackets. The link text acts as an alternative text of the image and the link URL specifies the image source:
 
 ```markdown
-An image: ![gras](img/image.jpg)
+![Beautiful image](img/image.jpg)
 ```
 
 ### Blockquotes {#blockquotes}
 
-A blockquote is started using the `>` marker followed by an optional space; all following lines that are also started with the blockquote marker belong to the blockquote. You can use any block-level elements inside a blockquote:
+To create a blockquote, simply add the `>` before any text you want to quote. All the lines that are started with the `>` will be added to the blockquote. 
 
 ```markdown
 As Kanye West said:
@@ -124,9 +147,39 @@ As Kanye West said:
 > the present is our past.
 ```
 
-### Tables {#tables}
+If you want to break a blockquote in two parts, add a blank line with leading `>` between these parts:
 
-You can create tables by assembling a list of words and dividing them with hyphens `-` (for the first row), and then separating each column with a pipe `|`:
+```markdown
+> This is the first line
+> 
+> This is the second line
+```
+
+Blockquotes can also be nested:
+
+```markdown
+> The first level of quoting
+>
+> > The nested blockquote
+>
+> Another first level of quoting
+```
+
+You can use any block-level elements inside a blockquote, such as headers, lists, code blocks:
+
+~~~
+> ## Header
+> 
+> 1. List item
+> 2. List item
+> 
+> ```
+> Example code: <?php echo "Hello world"; ?>
+> ```
+~~~
+
+### Tables {#tables}
+Tables are created using pipe `|` to separate each column and hyphens `-` to separate table headers:
 
 ```markdown
 | First Header  | Second Header |
@@ -135,62 +188,70 @@ You can create tables by assembling a list of words and dividing them with hyphe
 | Content Cell  | Content Cell  |
 ```
 
-The pipes on either end of the table are optional. Cells can vary in width and do not need to be perfectly aligned within columns. There must be at least three hyphens in each column of the header row.
+Colons can be used to align columns:
+
+```markdown
+| First Header    | Second Header | Third Header     |
+| :-------------- | :-----------: | ---------------: |
+| First column    | Second column | Third column     |
+| is left-aligned | is centered   | is right-aligned |
+```
+
+The outher pipes are optional and you don't have to make a table perfectly aligned - there must be at least three hyphens in each column of the header row.
 
 ### Code {#code}
 
-Markdown supports two different code block styles. One uses lines indented with either four spaces or one tab whereas the other uses lines with tilde characters as delimiters – therefore the content does not need to be indented:
+To create a code block, indent every line of block by 4 spaces or 1 tab:
 
 ```markdown
-This is a sample code block.
+A paragraph
 
-    Continued here.
-
+   a code block
 ```
 
-##### Fenced code blocks
+or use triple backticks (`):
 
-You can create fenced code blocks by placing triple backticks ` ``` ` before and after the code block. We recommend placing a blank line before and after code blocks to make the raw formatting easier to read.
+~~~
+```
+This is a code block
+```
+~~~
 
-    ```
-    function test() {
-      console.log("notice the blank line before this function?");
-    }
-    ```
+It is recommended to place a blank line before and after code blocks to make the raw formatting easier to read.
 
-If your code contains templating syntax such as `{{ this }}` (see [templating](/docs/templating/variables.md)), you can disable templating with a `raw` block:
+##### Inline code block
 
-{% raw %}
-    {% raw %}
-    ```html
-    <span>{{ this will not be interpreted as templating }}</span>
-    ```
-    {% endraw %}
-{% endraw %}
+Text fragments can be marked up as code by surrounding them with backticks:
 
+```markdown
+Use `gitbook` to convert `text` in Markdown to `HTML`.
+```
 
 ##### Syntax highlighting
 
-You can add an optional language identifier to enable syntax highlighting in your fenced code block.
+You can explicitly define the language to be used for syntax highlighting by adding its name after the opening backticks.
 
-For example, to syntax highlight Ruby code:
+Below is the short Ruby code block:
 
-    ```ruby
-    require 'redcarpet'
-    markdown = Redcarpet.new("Hello World!")
-    puts markdown.to_html
+```ruby
+require 'redcarpet'
+markdown = Redcarpet.new("Hello World!")
+puts markdown.to_html
+```
+
+If your code contains templating syntax such as `{{ this }}` (see [templating](/docs/templating/variables.md)), you can disable templating with a `raw` block:
+
+~~~
+{% raw %}
+    ```html
+    <span>{{ this will not be interpreted as templating }}</span>
     ```
-
-##### Inline code
-
-Text phrases can be marked up as code by surrounding them with backticks:
-
-    Use `gitbook` to convert the `text` in markdown
-    syntax to HTML.
+{% endraw %}
+~~~
 
 ### Footnotes
 
-GitBook supports a simple syntax for such footnotes. Footnotes are relative to each pages.
+Footnotes are created in a way similar to reference-style links. Footnotes are relative to pages.
 
 ```markdown
 Text prior to footnote reference.[^2]
@@ -200,9 +261,9 @@ Text prior to footnote reference.[^2]
 
 ### HTML
 
-GitBook supports use of raw HTML in your text, Markdown syntax in HTML is not processed:
+{{ book.GB }} supports use of raw HTML in your text, Markdown syntax in HTML is not processed:
 
-```
+```html
 <div>
 Markdown here will not be **parsed**
 </div>
@@ -210,24 +271,32 @@ Markdown here will not be **parsed**
 
 ### Horizontal Rule
 
-Horizontal Rules can be inserted using three or more asterisks, dashes or underscores, optionally separated by spaces or tabs, on an otherwise blank line:
+Horizontal rules can be added using three or more asterisks, hyphens, or underscores. They can also be separated by spaces or tabs:
 
 ```markdown
-Three or more...
-
----
-
-Hyphens
+Asterisks
 
 ***
 
-Asterisks
+* * * 
+
+Hyphens
+
+---
+
+- - -
+
+Underscores
+
+___
+
+_ _ _
 
 ```
 
 ### Ignoring Markdown formatting
 
-You can tell GitBook to ignore (escape) Markdown formatting by using `\` before the Markdown character.
+You can tell {{ book.GB }} to ignore (escape) Markdown formatting by using `\` before the Markdown character.
 
 ```
 Let's rename \*our-new-project\* to \*our-old-project\*.
