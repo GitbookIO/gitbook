@@ -249,7 +249,7 @@ If your code contains templating syntax such as `{{ this }}` (see [templating](/
 {% endraw %}
 ~~~
 
-### Footnotes
+### Footnotes {#footnotes}
 
 Footnotes are created in a way similar to reference-style links. Footnotes are relative to pages.
 
@@ -259,7 +259,7 @@ Text prior to footnote reference.[^2]
 [^2]: Comment to include in footnote.
 ```
 
-### HTML
+### HTML {#html-syntax}
 
 {{ book.GB }} supports use of raw HTML in your text, Markdown syntax in HTML is not processed:
 
@@ -269,7 +269,7 @@ Markdown here will not be **parsed**
 </div>
 ```
 
-### Horizontal Rule
+### Horizontal Rule {#hr-syntax}
 
 Horizontal rules can be added using three or more asterisks, hyphens, or underscores. They can also be separated by spaces or tabs:
 
@@ -294,7 +294,7 @@ _ _ _
 
 ```
 
-### Ignoring Markdown formatting
+### Ignoring Markdown formatting {#ignore-md-syntax}
 
 You can tell {{ book.GB }} to ignore (escape) Markdown formatting by using `\` before the Markdown character.
 

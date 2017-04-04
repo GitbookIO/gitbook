@@ -22,8 +22,11 @@
     * [Blockquotes](syntax/markdown.md#blockquotes)
     * [Tables](syntax/markdown.md#tables)
     * [Code](syntax/markdown.md#code)
-    * [HTML](syntax/markdown.md#html)
     * [Footnotes](syntax/markdown.md#footnotes)
+    * [HTML](syntax/markdown.md#html-syntax)
+    * [Horizontal Rule](syntax/markdown.md#hr-syntax)
+    * [Ignore Markdown syntax](syntax/markdown.md#ignore-md-syntax)
+
 * [AsciiDoc](syntax/asciidoc.md)
 * [eBook and PDF](ebook.md)
 
