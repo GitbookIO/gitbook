@@ -1,6 +1,6 @@
 # Templating
 
-GitBook uses the [Nunjucks templating language](https://mozilla.github.io/nunjucks/) to process pages and theme's templates.
+{{ book.GB }} uses the [Nunjucks templating language](https://mozilla.github.io/nunjucks/) to process pages and theme's templates.
 
 The Nunjucks syntax is very similar to **Jinja2** or **Liquid**. Its syntax uses surrounding braces `{ }` to mark content that needs to be processed.
 
@@ -19,9 +19,9 @@ This looks up username from the context and displays it. Variable names can have
 {{ foo["bar"] }}
 ```
 
-If a value is undefined, nothing is displayed. The following all output nothing if foo is undefined: `{{ foo }}`, `{{ foo.bar }}`, `{{ foo.bar.baz }}`.
+If a value is undefined, nothing is displayed. The following variables will output nothing if foo is undefined: `{{ foo }}`, `{{ foo.bar }}`, `{{ foo.bar.baz }}`.
 
-GitBook provides a set of [predefined variables](variables.md) from the context.
+{{ book.GB }} provides a set of [predefined variables](variables.md) from the context.
 
 ### Filters
 
@@ -39,7 +39,7 @@ The third example shows how you can chain filters. It would display "Bar", by fi
 
 ##### if
 
-`if` tests a condition and lets you selectively display content. It behaves exactly as JavaScript's `if` behaves.
+`if` tests a condition and lets you selectively display content. It behaves exactly the same as JavaScript's `if`.
 
 ```twig
 {% if variable %}
@@ -47,9 +47,9 @@ The third example shows how you can chain filters. It would display "Bar", by fi
 {% endif %}
 ```
 
-If variable is defined and evaluates to true, "It is true" will be displayed. Otherwise, nothing will be.
+If variable is defined and resolves to true, it displays **"It is true"**, otherwise nothing will be displayed.
 
-You can specify alternate conditions with `elif` and `else`:
+You can specify alternative conditions with `elif` and `else`:
 
 ```twig
 {% if hungry %}
@@ -63,7 +63,7 @@ You can specify alternate conditions with `elif` and `else`:
 
 ##### for
 
-`for` iterates over arrays and dictionaries.
+`for` iterates over arrays and dictionaries:
 
 ```twig
 # Chapters about GitBook
@@ -75,7 +75,7 @@ You can specify alternate conditions with `elif` and `else`:
 
 ##### set
 
-`set` lets you create/modify a variable.
+`set` lets you create/modify a variable:
 
 ```twig
 {% set softwareVersion = "1.0.0" %}
@@ -86,11 +86,11 @@ Current version is {{ softwareVersion }}.
 
 ##### include and block
 
-Inclusion and inheritance is detailled in the [Content References](conrefs.md) section.
+Inclusion and inheritance are described in details in the [Content References](conrefs.md) section.
 
 ### Escaping
 
-If you want GitBook to ignore any of the special templating tags, you can use raw and anything inside of it will be output as plain text.
+If you want {{ book.GB }} to ignore any of the special templating tags, you can use raw block and anything inside of it will be output as plain text.
 
 ```twig
 {% raw %}
