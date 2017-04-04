@@ -1,10 +1,10 @@
 # AsciiDoc
 
-Since version `2.0.0`, GitBook can also accept AsciiDoc as an input format.
+Since version `2.0.0`, {{ book.GB }} can also accept AsciiDoc as an input format.
 
 Please refer to the [AsciiDoc Syntax Quick Reference](http://asciidoctor.org/docs/asciidoc-syntax-quick-reference/) for more informations about the format.
 
-Just like for markdown, GitBook is using some special files to extract structures: `README.adoc`, `SUMMARY.adoc`, `LANGS.adoc` and `GLOSSARY.adoc`.
+Just like for Markdown, {{ book.GB }} uses some special files to extract structures: `README.adoc`, `SUMMARY.adoc`, `LANGS.adoc` and `GLOSSARY.adoc`.
 
 ### README.adoc
 
@@ -32,9 +32,9 @@ Subchapters are defined simply by adding a nested list to a parent chapter.
 
 ### LANGS.adoc
 
-For [Multi-Languages](./languages.md) books, this file is used to define the different supported languages and translations.
+For [multilanguages](../languages.md) books, this file is used to define the languages and translations that will be used within these books.
 
-This file is following the same syntax as the `SUMMARY.adoc`:
+This file has the same syntax as the `SUMMARY.adoc`:
 
 ```asciidoc
 = Languages
@@ -45,7 +45,7 @@ This file is following the same syntax as the `SUMMARY.adoc`:
 
 ### GLOSSARY.adoc
 
-This file is used to define terms. [See the glossary section](./lexicon.md).
+This file is used to define terms. [See the glossary section](../lexicon.md).
 
 ```asciidoc
 = Glossary
