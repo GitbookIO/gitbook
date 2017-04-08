@@ -1,8 +1,8 @@
-# Testing your plugin
+# Testing a plugin
 
 ### On local machine
 
-Testing your plugin on your book before publishing is possible using [npm link](https://docs.npmjs.com/cli/link).
+Testing a plugin on your book before publishing is possible using [npm link](https://docs.npmjs.com/cli/link).
 
 In the plugin's folder, run:
 
