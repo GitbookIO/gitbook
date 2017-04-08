@@ -1,4 +1,4 @@
-# Context and APIs
+# API & Context
 
 {{ book.GB }} provides different APIs and contexts to plugins. These APIs can vary according to the {{ book.GB }} version, so your plugin should specify the `engines.gitbook` field in `package.json` accordingly.
 
