@@ -37,20 +37,18 @@
     * [Variables](templating/variables.md)
     * [Builtin](templating/builtin.md)
 * [Plugins](plugins/README.md)
-    * [Create a plugin](plugins/create.md)
-    * [Hooks](plugins/hooks.md)
-    * [Blocks](plugins/blocks.md)
-    * [Filters](plugins/filters.md)
-    * [API & Context](plugins/api.md)
-    * [Test your plugin](plugins/testing.md)
+    * [Plugin development](plugins/development/README.md)
+        * [Create a plugin](plugins/development/create.md)
+            * [Hooks](plugins/development/hooks.md)
+            * [Blocks](plugins/development/blocks.md)
+            * [Filters](plugins/development/filters.md)
+            * [API & Context](plugins/development/api.md)
+            * [Connect to context](plugins/development/connect.md)
+            * [Components](plugins/development/components.md)     
+        * [Test a plugin](plugins/development/test.md)
+        * [Translate a plugin](plugins/development/i18n.md)
+        * [Publish a plugin](plugins/development/publish.md)
 * [Theming](themes/README.md)
-
-### Plugin Development
-
-* [Introduction](./api/README.md)
-* [Node](./api/node.md)
-* [Connect to the context](./api/connect.md)
-* [Components](./api/components.md)
 
 --
 
