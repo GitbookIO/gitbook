@@ -1,6 +1,6 @@
 # Theming
 
-Since version 3.0.0, GitBook suppots themes. Books use the [theme-default](https://github.com/GitbookIO/theme-default) theme by default.
+Since version 3.0.0, {{ book.GB }} suppots themes. Books use the [theme-default](https://github.com/GitbookIO/theme-default) theme by default.
 
 > **Caution**: Custom theming can block some plugins from working correctly.
 
@@ -19,7 +19,7 @@ A theme is a plugin containing templates and assets. Overriding any individual t
 
 Authors can extend the templates of a theme directly from their book's source (without creating an external theme). Templates will be resolved in the `_layouts` folder of the book first, then in the installed plugins/themes.
 
-### Extend instead of Forking
+### Extend instead of forking
 
 When you want to make your theme changes available to multiple books, instead of forking the default theme, you can extend it using the [templating syntax](../templating/README.md):
 
@@ -36,4 +36,4 @@ Take a look at the [API](https://github.com/GitbookIO/theme-api) theme for a mor
 
 ### Publish a theme
 
-Themes are published as plugins ([see related docs](../plugins/README.md)) with a `theme-` prefix. For example the theme `awesome` will be loaded from the `theme-awesome` plugin, and then from the `gitbook-plugin-theme-awesome` NPM package.
+Themes are published as plugins ([see related docs](../plugins/dev/publish.md)) with a `theme-` prefix. For example the theme `awesome` will be loaded from the `theme-awesome` plugin, and then from the `gitbook-plugin-theme-awesome` NPM package.
