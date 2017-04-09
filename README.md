@@ -13,7 +13,7 @@
 <img src="https://badge.fury.io/js/gitbook.svg" />
 <a href="https://travis-ci.org/GitbookIO/gitbook"><img src="https://travis-ci.org/GitbookIO/gitbook.png?branch=master" /></a>
 <a href="https://ci.appveyor.com/project/GitBook/gitbook"><img src="https://ci.appveyor.com/api/projects/status/63nlflxcwmb2pue6?svg=true" /></a>
-<a href="https://ci.appveyor.com/project/GitBook/gitbook"><img src="https://slack.gitbook.com/badge.svg" /></a>
+<a href="https://slack.gitbook.com"><img src="https://slack.gitbook.com/badge.svg" /></a>
 </p>
 
 GitBook is a command line tool (and Node.js library) for building beautiful books using GitHub/Git and Markdown (or AsciiDoc). Here is an example: [ReduxJS documentation](http://redux.js.org/).

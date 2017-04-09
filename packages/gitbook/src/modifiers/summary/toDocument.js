@@ -8,24 +8,20 @@ const { BLOCKS, INLINES } = require('markup-it');
  */
 function articleToBlock(article) {
     const { title, ref, articles } = article;
-    const text = Text.createFromString(title);
-
-    // Text or link ?
-    const innerNode = ref ? Inline.create({
-        type: INLINES.LINK,
-        nodes: [
-            text
-        ],
-        data: {
-            href: ref
-        }
-    }) : text;
 
     const nodes = [
         Block.create({
             type: BLOCKS.TEXT,
             nodes: [
-                innerNode
+                Inline.create({
+                    type: INLINES.LINK,
+                    nodes: [
+                        Text.createFromString(title)
+                    ],
+                    data: {
+                        href: ref || ''
+                    }
+                })
             ]
         })
     ];
