@@ -8,7 +8,7 @@ GitBook is a command line tool (and Node.js library) for building beautiful book
 
 GitBook can output your content as a website ([customizable](themes/README.md) and [extensibles](plugins/README.md)) or as an ebook (PDF, ePub or Mobi).
 
-[GitBook.com](https://www.gitbook.com) is the online platform to create and host books built using the GitBook format. It offers hosting, collaboration features and an [easy-to-use editor](https://www.gitbook.com/editor).
+GitBook also has the online platform, [GitBook.com](https://www.gitbook.com), to create and host books built using the GitBook format. It offers hosting, collaboration features and an [easy-to-use editor](https://www.gitbook.com/editor).
 
 ### Help and Support
 
