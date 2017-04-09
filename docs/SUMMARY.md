@@ -11,7 +11,7 @@
 * [Pages and Summary](pages.md)
 * [Configuration](config.md)
 * [Glossary](lexicon.md)
-* [Multi-Lingual](languages.md)
+* [Multilanguage](languages.md)
 * [Markdown](syntax/markdown.md)
     * [Headings](syntax/markdown.md#headings)
     * [Paragraphs](syntax/markdown.md#paragraphs)
@@ -22,8 +22,11 @@
     * [Blockquotes](syntax/markdown.md#blockquotes)
     * [Tables](syntax/markdown.md#tables)
     * [Code](syntax/markdown.md#code)
-    * [HTML](syntax/markdown.md#html)
     * [Footnotes](syntax/markdown.md#footnotes)
+    * [HTML](syntax/markdown.md#html-syntax)
+    * [Horizontal Rule](syntax/markdown.md#hr-syntax)
+    * [Ignore Markdown syntax](syntax/markdown.md#ignore-md-syntax)
+
 * [AsciiDoc](syntax/asciidoc.md)
 * [eBook and PDF](ebook.md)
 
@@ -34,20 +37,17 @@
     * [Variables](templating/variables.md)
     * [Builtin](templating/builtin.md)
 * [Plugins](plugins/README.md)
-    * [Create a plugin](plugins/create.md)
-    * [Hooks](plugins/hooks.md)
-    * [Blocks](plugins/blocks.md)
-    * [Filters](plugins/filters.md)
-    * [API & Context](plugins/api.md)
-    * [Test your plugin](plugins/testing.md)
+    * [Create a plugin](plugins/dev/create.md)
+        * [Hooks](plugins/dev/hooks.md)
+        * [Blocks](plugins/dev/blocks.md)
+        * [Filters](plugins/dev/filters.md)
+        * [API & Context](plugins/dev/api.md)
+        * [Connect to context](plugins/dev/connect.md)
+        * [Components](plugins/dev/components.md)     
+    * [Test a plugin](plugins/dev/test.md)
+    * [Translate a plugin](plugins/dev/i18n.md)
+    * [Publish a plugin](plugins/dev/publish.md)
 * [Theming](themes/README.md)
-
-### Plugin Development
-
-* [Introduction](./api/README.md)
-* [Node](./api/node.md)
-* [Connect to the context](./api/connect.md)
-* [Components](./api/components.md)
 
 --
 

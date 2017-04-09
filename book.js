@@ -9,7 +9,9 @@ module.exports = {
     plugins: ['sitemap'],
 
     variables: {
-        version: pkg.version
+        version: pkg.gitbookversion,
+        GB: "GitBook"
+
     },
 
     pluginsConfig: {

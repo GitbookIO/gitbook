@@ -7,13 +7,13 @@ The following is a reference of the available data during book's parsing and the
 | Variable | Description |
 | -------- | ----------- |
 | `book` | Book-wide information + configuration settings from `book.json`. See below for details. |
-| `gitbook` | GitBook specific information |
+| `gitbook` | {{ book.GB }} specific information |
 | `page` | Current page specific information |
 | `file` | File associated with the current page specific information |
 | `readme` | Information about the Readme |
 | `glossary` | Information about the Glossary |
 | `summary` | Information about the table of contents |
-| `languages` | List of languages for multi-lingual books |
+| `languages` | List of languages for multilingual books |
 | `output` | Information about the output generator |
 | `config` | Dump of the `book.json` |
 
@@ -36,12 +36,12 @@ For example, with this `book.json`:
 
 ... the following text `{{ book.hello }}` will expand to `everyone`.
 
-### GitBook Variables
+### {{ book.GB }} Variables
 
 | Variable | Description |
 | -------- | ----------- |
 | `gitbook.time` | The current time (when you run the `gitbook` command). |
-| `gitbook.version` | Version of GitBook used to generate the book |
+| `gitbook.version` | Version of {{ book.GB }} used to generate the book |
 
 ### File Variables
 
@@ -70,7 +70,7 @@ The whole table of contents (`SUMMARY.md`) can be accessed:
 
 `summary.parts[0].articles[0].title` will return the title of the first article.
 
-#### Multi-lingual book Variable
+#### Multilingual book Variable
 
 | Variable | Description |
 | -------- | ----------- |
@@ -82,8 +82,8 @@ Languages are defined by `{ id: 'en', title: 'English' }`.
 
 | Variable | Description |
 | -------- | ----------- |
-| `output.name` | Name of the output generator, possible values are `website`, `json`, `ebook` |
-| `output.format` | When `output.name == "ebook"`, `format` defines the ebook format that will be generated, possible values are `pdf`, `epub` or `mobi` |
+| `output.name` | Name of the output generator. Possible values: `website`, `json`, `ebook` |
+| `output.format` | When `output.name == "ebook"`, `format` defines the ebook format that will be generated. Possible values: `pdf`, `epub` or `mobi` |
 
 ### Readme Variables
 
@@ -98,4 +98,5 @@ Languages are defined by `{ id: 'en', title: 'English' }`.
 | `glossary.path` | Path to the Glossary in the book |
 
 ### Limitations
+
 Variables won't expand when used inside `SUMMARY.md`.

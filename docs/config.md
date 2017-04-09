@@ -1,42 +1,42 @@
 # Configuration
 
-GitBook allows you to customize your book using a flexible configuration. These options are specified in a `book.json` file. For authors unfamiliar with the JSON syntax, you can validate the syntax using tools such as [JSONlint](http://jsonlint.com).
+{{ book.GB }} allows you to customize your book using a flexible configuration. These options are specified in a `book.json` file. For authors unfamiliar with the JSON syntax, you can validate the syntax using tools such as [JSONlint](http://jsonlint.com).
 
 ### General Settings
 
-| Variable | Description |
-| -------- | ----------- |
-| `root` | Path to the root folder containing all the book's files, except `book.json`|
-| `structure` | To specify paths for Readme, Summary, Glossary etc. See [Structure paragraph](#structure). |
-| `title` | Title of your book, default value is extracted from the README. On GitBook.com this field is pre-filled. |
-| `description` | Description of your book, default value is extracted from the README. On GitBook.com this field is pre-filled. |
-| `author` | Name of the author. On GitBook.com this field is pre-filled. |
-| `isbn` | ISBN of the book |
-| `language` | [ISO code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) of the book's language, default value is `en` |
-| `direction` | Text's direction. Can be `rtl` or `ltr`, the default value depends on the value of `language` |
-| `gitbook` | Version of GitBook that should be used. Uses the [SemVer](http://semver.org) specification and accepts conditions like `">= 3.0.0"` |
+| Variable      | Description |
+| ------------- | ----------- |
+| `root`        | Defines path to the root folder containing all the book's files, except `book.json`|
+| `structure`   | Specifies paths for Readme, Summary, Glossary etc. See [Structure paragraph](#structure). |
+| `title`       | Defines a title of your book (default value is extracted from the README). On Gitbook.com this field is pre-filled. |
+| `description` | Defines a description of your book, (default value is extracted from the README). On Gitbook.com this field is pre-filled. |
+| `author`      | Specifies the name of the author. On Gitbook.com this field is pre-filled. |
+| `isbn`        | ISBN of the book |
+| `language`    | [ISO code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) of the book's language, default value is `en` |
+| `direction`   | Text's direction. Can be `rtl` or `ltr`, the default value depends on the value of `language` |
+| `gitbook`     | Defines the version of {{ book.GB }} that should be used. It uses the [SemVer](http://semver.org) specification and accepts conditions like `">= 3.0.0"` |
 
 ### Plugins
 
 Plugins and their configurations are specified in the `book.json`. See [the plugins section](plugins/README.md) for more details.
 
-Since version 3.0.0, GitBook can use themes. See [the theming section](themes/README.md) for more details.
+Since version 3.0.0, {{ book.GB }} can use themes. See [the theming section](themes/README.md) for more details.
 
-| Variable | Description |
-| -------- | ----------- |
-| `plugins` | List of plugins to load |
-| `pluginsConfig` |Configuration for plugins |
+| Variable        | Description |
+| --------------- | ----------- |
+| `plugins`       | List of plugins to load |
+| `pluginsConfig` | Configuration for plugins |
 
 ### Structure
 
-In addition to the `root` variable, you can tell Gitbook the name of the files for Readme, Summary, Glossary, Languages (instead of using the default names such as `README.md`).
-These files must be at the root of your book (or the root of every language book). Paths such as `dir/MY_README.md` are not accepted.
+In addition to the `root` variable, you can tell {{ book.gb }} the name of the files for Readme, Summary, Glossary, Languages (instead of using the default names such as `README.md`).
+These files must be at the root of your book (or the root of every language book). Paths such as `dir/MY_README.md` are not supported.
 
-| Variable | Description |
-| -------- | ----------- |
-| `structure.readme` | Readme file name (defaults to `README.md`) |
-| `structure.summary` | Summary file name (defaults to `SUMMARY.md`) |
-| `structure.glossary` | Glossary file name (defaults to `GLOSSARY.md`) |
+| Variable              | Description |
+| --------------------- | ----------- |
+| `structure.readme`    | Readme file name (defaults to `README.md`) |
+| `structure.summary`   | Summary file name (defaults to `SUMMARY.md`) |
+| `structure.glossary`  | Glossary file name (defaults to `GLOSSARY.md`) |
 | `structure.languages` | Languages file name (defaults to `LANGS.md`) |
 
 ### PDF Options
@@ -53,3 +53,67 @@ PDF Output can be customized using a set of options in the `book.json`:
 | `pdf.margin.bottom` | Bottom margin (default is `56`) |
 | `pdf.margin.right` | Right margin (default is `62`) |
 | `pdf.margin.left` | Left margin (default is `62`) |
+
+### Configuration Example
+
+#### book.json Sample
+
+```json
+{
+    "root": "./docs",
+    "structure": {
+        "readme": "INDEX.md",
+        "summary": "TOC.md",
+        "glossary": "TERMS.md"
+    },
+    "title": "GitBook Test Book",
+    "description": "Short description of the book",
+    "author": "Antonio",
+    "isbn": "978-12-12345-77-5",
+    "language": "en",
+    "direction": "ltr",
+    "gitbook": ">= 3.0.0",
+    "variables": {
+        "GBD": "GitBook Toolchain Documentation"
+    },
+    "plugins": ["callouts"],
+    "pluginsConfig":
+    {
+        "callouts":
+        {
+            "showTypeInHeader": false
+        }
+    },
+    "links": {
+        "sidebar": {
+            "Contact us": "https://www.gitbook.com/contact"
+        }
+    },
+    "pdf": {
+        "pageNumbers": true,
+        "fontSize": 12,
+        "paperSize": "a4",
+        "margin": {
+            "right": 62,
+            "left": 62,
+            "top": 36,
+            "bottom": 36
+        },
+        "headerTemplate": null,
+        "footerTemplate": null
+    }
+}
+```
+
+#### File/Directory structure based on the book.json above
+
+```
+.
+├── book.json
+└── docs/
+    ├── INDEX.md
+    ├── TERMS.md
+    ├── README.md
+    ├── ANOTHER-README.md
+    └── TOC.md
+```

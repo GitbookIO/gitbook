@@ -1,11 +1,10 @@
 # Components
 
-
 ## Injection
 
 Plugins can inject components by registering React components to some roles.
 
-#### Register a components
+#### Register a component
 
 During the initialization phase of your plugin, dispatch the `GitBook.registerComponent` action:
 
@@ -15,7 +14,7 @@ dispatch(GitBook.registerComponent(MyCustomButton, { role: 'toolbar:buttons:left
 
 #### Roles
 
-Custom roles can be use for interopability with other plugins, but GitBook and the default theme set a convention for common roles:
+Custom roles can be use for interoperability with other plugins, but {{ book.GB }} and the default theme set a convention for common roles:
 
 | Role | Description | Props |
 | ---- | ----------- | ----- |
@@ -30,7 +29,7 @@ Custom roles can be use for interopability with other plugins, but GitBook and t
 
 #### `GitBook.Head`
 
-Extends the meta tags of the page. This is an alias for [react-helmet](https://github.com/nfl/react-helmet).
+Extends meta tags of a page. This is an alias for [react-helmet](https://github.com/nfl/react-helmet).
 
 ```js
 <GitBook.Head
@@ -40,7 +39,7 @@ Extends the meta tags of the page. This is an alias for [react-helmet](https://g
 
 #### `GitBook.ImportCSS`
 
-Import a CSS file by resolving the path correctly according to the current page:
+Imports a CSS file by resolving the path correctly according to the current page:
 
 ```js
 <GitBook.ImportCSS href="myfile.css" />
@@ -48,7 +47,7 @@ Import a CSS file by resolving the path correctly according to the current page:
 
 #### `GitBook.ImportJS`
 
-Import a JS file by resolving the path correctly according to the current page:
+Imports a JS file by resolving the path correctly according to the current page:
 
 ```js
 <GitBook.ImportJS src="mylib.js" />
@@ -56,7 +55,7 @@ Import a JS file by resolving the path correctly according to the current page:
 
 #### `GitBook.InjectedComponent`
 
-Inject a component matching a specific role:
+Injects a component matching a specific role:
 
 ```js
 <GitBook.InjectedComponent matching={{ role: 'mycustomrole' }} props={{ someProp: 1 }}>
@@ -66,7 +65,7 @@ Inject a component matching a specific role:
 
 #### `GitBook.InjectedComponentSet`
 
-Same API as `InjectedComponentSet` but render the matching components in chain instead of composed:
+Same API as `InjectedComponentSet` but renders the matching components in chain instead of composed:
 
 ```js
 <GitBook.InjectedComponentSet matching={{ role: 'mytoolbar' }} />

@@ -1,14 +1,14 @@
-# GitBook Toolchain Documentation
+# {{ book.GB }} Toolchain Documentation
 
-This document aims to be a comprehensive guide to GitBook. It contains the full documentation for version **{{ book.version }}**. Help for GitBook.com specific questions can be found at [help.gitbook.com](https://help.gitbook.com).
+This document aims to be a comprehensive guide to {{ book.GB }}. It contains the full documentation for version {{ book.version }}. Help for GitBook.com specific questions can be found at [help.gitbook.com](https://help.gitbook.com).
 
-### What is GitBook?
+### What is {{ book.GB }}?
 
-GitBook is a command line tool (and Node.js library) for building beautiful books using GitHub/Git and Markdown (or AsciiDoc). This documentation has been generated using GitBook.
+{{ book.GB }} is a command line tool (and Node.js library) for building beautiful books using GitHub/Git and Markdown (or AsciiDoc). This documentation has been generated using {{ book.GB }}.
 
-GitBook can output your content as a website ([customizable](themes/README.md) and [extensibles](plugins/README.md)) or as an ebook (PDF, ePub or Mobi).
+{{ book.GB }} can output your content as a website ([customizable](themes/README.md) and [extensibles](plugins/README.md)) or as an ebook (PDF, ePub or Mobi).
 
-[GitBook.com](https://www.gitbook.com) is the online platform to create and host books built using the GitBook format. It offers hosting, collaboration features and an [easy-to-use editor](https://www.gitbook.com/editor).
+{{ book.GB }} also has the online platform, [GitBook.com](https://www.gitbook.com), to create and host books built using the {{ book.GB }} format. It offers hosting, collaboration features and an [easy-to-use editor](https://www.gitbook.com/editor).
 
 ### Help and Support
 

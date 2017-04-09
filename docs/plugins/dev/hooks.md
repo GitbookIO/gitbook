@@ -1,10 +1,10 @@
 # Hooks
 
-Hooks is a method of augmenting or altering the behavior of the process, with custom callbacks.
+Hooks are a method of augmenting or altering the behavior of the process, with custom callbacks.
 
 ### List of hooks
 
-### Relative to the global pipeline
+#### Relative to the global pipeline
 
 | Name | Description | Arguments |
 | ---- | ----------- | --------- |
@@ -12,9 +12,9 @@ Hooks is a method of augmenting or altering the behavior of the process, with cu
 | `finish:before` | Called after generating the pages, before copying assets, cover, ... | None |
 | `finish` | Called after everything else. | None |
 
-### Relative to the page pipeline
+#### Relative to the page pipeline
 
-> It is recommended using [templating](./templating.md) to extend page parsing.
+> It is recommended using [templating](/templating/README.md) to extend page parsing.
 
 | Name | Description | Arguments |
 | ---- | ----------- | --------- |
@@ -25,7 +25,7 @@ Hooks is a method of augmenting or altering the behavior of the process, with cu
 
 ```js
 {
-    // Parser named
+    // Parser name
     "type": "markdown",
 
     // File Path relative to book root
@@ -43,8 +43,8 @@ Hooks is a method of augmenting or altering the behavior of the process, with cu
     "content": "# Hello"
 }
 ```
-
-##### Example to add a title
+#### Examples
+**Adding a title**
 
 In the `page:before` hook, `page.content` is the markdown/asciidoc content.
 
@@ -57,7 +57,7 @@ In the `page:before` hook, `page.content` is the markdown/asciidoc content.
 }
 ```
 
-##### Example to replace some html
+**Replacing html code**
 
 In the `page` hook, `page.content` is the HTML generated from the markdown/asciidoc conversion.
 
@@ -75,7 +75,7 @@ In the `page` hook, `page.content` is the HTML generated from the markdown/ascii
 
 Hooks callbacks can be asynchronous and return promises.
 
-Example:
+**Example:**
 
 ```js
 {

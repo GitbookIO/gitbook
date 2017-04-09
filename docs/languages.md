@@ -1,6 +1,8 @@
-# Multi-Languages
+# Multilingual books
 
-GitBook supports building books written in multiple languages. Each language should be a sub-directory following the normal GitBook format, and a file named `LANGS.md` should be present at the root of the repository with the following format:
+{{ book.GB }} supports multilingual books out-of-the-box. All files that belong to a particular language should be placed in a sub-directory, following the normal {{ book.GB }} format, whereas a `LANGS.md` file should be placed in the root directory of your project.
+
+`LANGS.md` format:
 
 ```markdown
 # Languages
@@ -12,6 +14,6 @@ GitBook supports building books written in multiple languages. Each language sho
 
 ### Configuration for each language
 
-When a language book (ex: `en`) has a `book.json`, its configuration will extend the main configuration.
+Each language book (e.g. `en`) can have a separate `book.json` file, that will extend the main configuration. Coinciding configuration options (if any) will be overridden by the main `book.json` file. 
 
-The only exception is plugins, plugins are specified globally, and language specific plugins cannot be specified.
+The only exception is that plugins can only be defined globally in the main `book.json` file, so all language specific plugins and their configurations are ignored.

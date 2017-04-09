@@ -1,41 +1,37 @@
-# Setup and Installation of GitBook
+# Setup and Installation of {{ book.GB }}
 
-Getting GitBook installed and ready-to-go should only take a few minutes.
-
-### GitBook.com
-
-[GitBook.com](https://www.gitbook.com) is an easy to use solution to write, publish and host books. It is the easiest solution for publishing your content and collaborating on it.
-
-It integrates well with the [GitBook Editor](https://www.gitbook.com/editor).
+{{ book.GB }} installation is an easy and straightforward process and it can be performed in a few minutes.
 
 ### Local Installation
 
 ##### Requirements
-
-Installing GitBook is easy and straightforward. Your system just needs to meet these two requirements:
 
 * NodeJS (v4.0.0 and above is recommended)
 * Windows, Linux, Unix, or Mac OS X
 
 ##### Install with NPM
 
-The best way to install GitBook is via **NPM**. At the terminal prompt, simply run the following command to install GitBook:
+The best way to install {{ book.GB }} is via **NPM**. At the terminal prompt, simply run the following command:
 
 ```
 $ npm install gitbook-cli -g
 ```
 
-`gitbook-cli` is an utility to install and use multiple versions of GitBook on the same system. It will automatically install the required version of GitBook to build a book.
+`gitbook-cli` is an utility to install and use multiple versions of {{ book.GB }} on the same system. It will automatically install the required version to build a book.
 
 ##### Create a book
 
-GitBook can setup a boilerplate book:
+Set up a boilerplate book in {{ book.GB }}'s root directory:
 
 ```
 $ gitbook init
 ```
 
-If you wish to create the book into a new directory, you can do so by running `gitbook init ./directory`
+or in a new directory:
+
+```
+$ gitbook init ./directory
+```
 
 Preview and serve your book using:
 
@@ -43,7 +39,7 @@ Preview and serve your book using:
 $ gitbook serve
 ```
 
-Or build the static website using:
+Or build a static website:
 
 ```
 $ gitbook build
@@ -51,7 +47,7 @@ $ gitbook build
 
 ##### Install pre-releases
 
-`gitbook-cli` makes it easy to download and install other versions of GitBook to test with your book:
+`gitbook-cli` makes it easy to download and install other versions of {{ book.GB }} to test with your book:
 
 ```
 $ gitbook fetch beta

@@ -12,7 +12,7 @@ Importing an other file's content is easy using the `include` tag:
 
 ### Importing file from another book
 
-GitBook can also resolve the include path by using git:
+{{ book.GB }} can also resolve the include path by using git:
 
 ```
 {% include "git+https://github.com/GitbookIO/documentation.git/README.md#0.0.1" %}
