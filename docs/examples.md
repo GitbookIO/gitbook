@@ -25,4 +25,5 @@ More than 50,000 books have been published on [GitBook.com](https://www.gitbook.
 - [DuckDuckHack Documentation](http://docs.duckduckhack.com) by [DuckDuckGo](https://duckduckgo.com/about)
 - [Loomio Handbook](http://loomio.coop/) and [guide to using Loomio](https://loomio.gitbooks.io/manual/content/en/index.html) both by [Loomio](https://www.loomio.org/)
 - [Enspiral Handbook](http://handbook.enspiral.com/) by [Enspiral](http://enspiral.com/)
+- [Outlandish documents](https://harryrobbins.gitbooks.io/outlandish/content/) by [Outlandish](http://outlandish.com/)
 - This documentation
