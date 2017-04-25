@@ -58,7 +58,7 @@ function copyAssets(output, plugin) {
         {
             deleteFirst: false,
             overwrite: true,
-            confirm: true
+            confirm: false // fixes Issue #1309, don't use graceful-fs.stat
         }
     );
 }
