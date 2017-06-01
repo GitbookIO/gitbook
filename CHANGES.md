@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.2.3
+- Including plugins filters when rendering templates (Fix [#1437](https://github.com/GitbookIO/gitbook/issues/1437))
+
 ## 3.2.2
 - Fix catching parsing errors leading to possible missing pages in generated book
 - Rollback markdown parser to `kramed` until `markup-it` is stable enough
