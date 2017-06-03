@@ -55,7 +55,7 @@ Markdown supports ordered (numbered) and unordered (bulleted) lists.
 
 ##### Unordered
 
-Unordered lists use asterisks, pluses, and hyphens — interchangably — as list markers:
+Unordered lists use asterisks, pluses, and hyphens — interchangeably — as list markers:
 
 ```markdown
 * Item 1
