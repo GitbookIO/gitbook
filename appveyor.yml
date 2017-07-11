@@ -6,21 +6,21 @@ init:
 environment:
   matrix:
     - nodejs_version: "6"
-    - nodejs_version: "5"
-    - nodejs_version: "4"
 
 matrix:
   fast_finish: true
 
 # Install scripts. (runs after repo cloning)
 install:
-  # Get the latest stable version of Node.js or io.js
+  # Get the latest stable version of Node.js
   - ps: Install-Product node $env:nodejs_version
   - set CI=true
+  # update npm to match version on Travis
+  - npm install -g npm@4.1.2
   # install svgexport
   - npm install svgexport -g
-  # install modules
-  - npm install
+  - yarn
+  - npm run bootstrap
 
 # Post-install test scripts.
 test_script:
