@@ -54,7 +54,7 @@ $ gitbook build
 `gitbook-cli` makes it easy to download and install other versions of GitBook to test with your book:
 
 ```
-$ gitbook fetch beta
+$ gitbook fetch pre
 ```
 
 Use `gitbook ls-remote` to list remote versions available for install.
