@@ -7,7 +7,7 @@
     "dependencies": {
         "q": "1.0.1",
         "lodash": "3.10.1",
-        "graceful-fs": "3.0.5",
+        "graceful-fs": "4.1.4",
         "resolve": "0.6.3",
         "fs-extra": "0.16.5",
         "fstream-ignore": "1.0.2",
