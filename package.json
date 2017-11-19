@@ -82,11 +82,9 @@
     "lint:docs": "prettier --ignore-path .gitignore --write \"**/*.md\"",
     "lint:script": "eslint --ignore-path .gitignore \"**/*.js\" --fix",
     "lint:style": "prettier --ignore-path .gitignore --write \"**/*.css\"",
-    "lint":
-      "npm run lint:script && npm run lint:config && npm run lint:style && npm run lint:docs",
+    "lint": "npm run lint:script && npm run lint:config && npm run lint:style && npm run lint:docs",
     "precommit": "lint-staged",
-    "test":
-      "./node_modules/.bin/mocha ./testing/setup.js \"./lib/**/*/__tests__/*.js\" --bail --reporter=list --timeout=10000"
+    "test": "./node_modules/.bin/mocha ./testing/setup.js \"./lib/**/*/__tests__/*.js\" --bail --reporter=list --timeout=10000"
   },
   "repository": {
     "type": "git",
