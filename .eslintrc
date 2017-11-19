@@ -1,23 +1,26 @@
 {
-  "rules": {
-    "linebreak-style": [2, "unix"],
-    "prettier": 2,
-    "no-unused-vars": [
-      2,
-      {
-        "vars": "all",
-        "args": "none"
-      }
-    ]
-  },
-  "env": {
-    "node": true,
-    "browser": true,
-    "mocha": true
-  },
-  "globals": {
-    "expect": true
-  },
-  "extends": ["eslint:recommended", "prettier"],
-  "plugins": ["prettier"]
+    "rules": {
+        "prettier/prettier": 2,
+        "no-unused-vars": [
+            2,
+            {
+                "vars": "all",
+                "args": "none"
+            }
+        ]
+    },
+    "env": {
+        "node": true,
+        "browser": true,
+        "mocha": true
+    },
+    "parserOptions": {
+        "ecmaVersion": 8,
+        "sourceType": "module"
+    },
+    "globals": {
+        "expect": true
+    },
+    "extends": ["prettier"],
+    "plugins": ["prettier"]
 }

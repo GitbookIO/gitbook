@@ -6,7 +6,6 @@ Plugins are the best way to extend GitBook functionalities (ebook and website). 
 
 Plugins can be easily searched on [plugins.gitbook.com](https://plugins.gitbook.com).
 
-
 ### How to install a plugin?
 
 Once you find a plugin that you want to install, you need to add it to your `book.json`:

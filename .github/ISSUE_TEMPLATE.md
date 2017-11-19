@@ -14,6 +14,6 @@ How do you think, or how would you like it should behave.
 
 Provide, if possible, your username and the URL of the concerned book.
 
-----
+---
 
 The GitBook Team

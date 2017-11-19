@@ -18,15 +18,14 @@ Any text editor should work! But we advise using the [GitBook Editor](https://ww
 
 The GitBook format supports right to left, and bi-directional writing. To enable it, you either need to specify a language (ex: `ar`), or force GitBook to use RTL in your `book.json`:
 
-``` json
+```json
 {
     "language": "ar",
     "direction": "rtl"
 }
 ```
 
-With version 3.0 of GitBook, it's automatically detected according to the content.
-_Note that, while the output book will indeed respect RTL, the Editor doesn't support RTL writing yet_.
+With version 3.0 of GitBook, it's automatically detected according to the content. _Note that, while the output book will indeed respect RTL, the Editor doesn't support RTL writing yet_.
 
 #### Should I use an `.html` or `.md` extensions in my links?
 

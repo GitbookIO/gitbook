@@ -19,12 +19,12 @@ A basic GitBook usually looks something like this:
 
 An overview of what each of these does:
 
-| File | Description |
-| -------- | ----------- |
-| `book.json` | Stores [configuration](config.md) data (__optional__) |
-| `README.md` | Preface / Introduction for your book (**required**) |
-| `SUMMARY.md` | Table of Contents (See [Pages](pages.md)) (__optional__) |
-| `GLOSSARY.md` | Lexicon / List of terms to annotate (See [Glossary](lexicon.md)) (__optional__) |
+| File          | Description                                                                     |
+| ------------- | ------------------------------------------------------------------------------- |
+| `book.json`   | Stores [configuration](config.md) data (**optional**)                           |
+| `README.md`   | Preface / Introduction for your book (**required**)                             |
+| `SUMMARY.md`  | Table of Contents (See [Pages](pages.md)) (**optional**)                        |
+| `GLOSSARY.md` | Lexicon / List of terms to annotate (See [Glossary](lexicon.md)) (**optional**) |
 
 ### Static files and Images
 
@@ -32,8 +32,7 @@ A static file is a file that is not listed in the `SUMMARY.md`. All static files
 
 ### Ignoring files & folders {#ignore}
 
-GitBook will read the `.gitignore`, `.bookignore` and `.ignore` files to get a list of files and folders to skip.
-The format inside those files, follows the same convention as `.gitignore`:
+GitBook will read the `.gitignore`, `.bookignore` and `.ignore` files to get a list of files and folders to skip. The format inside those files, follows the same convention as `.gitignore`:
 
 ```
 # This is a comment

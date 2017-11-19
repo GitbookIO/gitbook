@@ -63,7 +63,7 @@
   },
   "devDependencies": {
     "eslint": "4.11.0",
-    "eslint-config-prettier": "2.7.0",
+    "eslint-config-prettier": "^2.7.0",
     "eslint-plugin-prettier": "2.3.1",
     "expect": "^1.20.1",
     "husky": "0.14.3",
@@ -80,7 +80,7 @@
   "scripts": {
     "lint:config": "prettier --ignore-path .gitignore --write \"**/*.json\"",
     "lint:docs": "prettier --ignore-path .gitignore --write \"**/*.md\"",
-    "lint:script": "eslint --ignore-path .gitignore \"**/*.js\" -- --fix",
+    "lint:script": "eslint --ignore-path .gitignore \"**/*.js\" --fix",
     "lint:style": "prettier --ignore-path .gitignore --write \"**/*.css\"",
     "lint":
       "npm run lint:script && npm run lint:config && npm run lint:style && npm run lint:docs",

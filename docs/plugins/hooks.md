@@ -6,20 +6,20 @@ Hooks is a method of augmenting or altering the behavior of the process, with cu
 
 ### Relative to the global pipeline
 
-| Name | Description | Arguments |
-| ---- | ----------- | --------- |
-| `init` | Called after parsing the book, before generating output and pages. | None |
-| `finish:before` | Called after generating the pages, before copying assets, cover, ... | None |
-| `finish` | Called after everything else. | None |
+| Name            | Description                                                          | Arguments |
+| --------------- | -------------------------------------------------------------------- | --------- |
+| `init`          | Called after parsing the book, before generating output and pages.   | None      |
+| `finish:before` | Called after generating the pages, before copying assets, cover, ... | None      |
+| `finish`        | Called after everything else.                                        | None      |
 
 ### Relative to the page pipeline
 
 > It is recommended using [templating](./templating.md) to extend page parsing.
 
-| Name | Description | Arguments |
-| ---- | ----------- | --------- |
+| Name          | Description                                             | Arguments   |
+| ------------- | ------------------------------------------------------- | ----------- |
 | `page:before` | Called before running the templating engine on the page | Page Object |
-| `page` | Called before outputting and indexing the page. | Page Object |
+| `page`        | Called before outputting and indexing the page.         | Page Object |
 
 ##### Page Object
 
@@ -70,7 +70,6 @@ In the `page` hook, `page.content` is the HTML generated from the markdown/ascii
     }
 }
 ```
-
 
 ### Asynchronous Operations
 

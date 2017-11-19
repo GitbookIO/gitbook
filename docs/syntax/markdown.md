@@ -9,16 +9,23 @@ Here’s an overview of Markdown syntax that you can use with GitBook (same as G
 To create a heading, add one to six `#` symbols before your heading text. The number of # you use will determine the size of the heading.
 
 ```markdown
-# This is an <h1> tag
-## This is an <h2> tag
-###### This is an <h6> tag
+# This is an
+
+<h1> tag
+
+## This is an
+
+<h2> tag
+
+###### This is an
+
+<h6> tag
 ```
 
 GitBook supports a nice way for explicitly setting the header ID. If you follow the header text with an opening curly bracket (separated from the text with a least one space), a hash, the ID and a closing curly bracket, the ID is set on the header. If you use the trailing hash feature of atx style headers, the header ID has to go after the trailing hashes. For example:
 
 ```markdown
-Hello {#id}
------
+## Hello {#id}
 
 # Hello {#id}
 
@@ -38,11 +45,9 @@ This line is separated from the one above by two newlines, so it will be a *sepa
 ### Emphasis {#emphasis}
 
 ```markdown
-*This text will be italic*
-_This will also be italic_
+_This text will be italic_ _This will also be italic_
 
-**This text will be bold**
-__This will also be bold__
+**This text will be bold** **This will also be bold**
 
 ~~This text will be crossed out.~~
 
@@ -90,7 +95,6 @@ This is [an example](http://example.com/ "Title") inline link with a title.
 
 Links can point to relative paths, anchors or absolute urls.
 
-
 ### References
 
 There is another way to create links which does not interrupt the text flow. The URL and title are defined using a reference name and this reference name is then used in square brackets instead of the link URL:
@@ -102,7 +106,7 @@ This is [an example][id] reference-style link.
 Then, anywhere in the document, you define your link label like this, on a line by itself:
 
 ```markdown
-[id]: http://example.com/  "Optional Title Here"
+[id]: http://example.com/ "Optional Title Here"
 ```
 
 ### Images {#images}
@@ -120,8 +124,7 @@ A blockquote is started using the `>` marker followed by an optional space; all 
 ```markdown
 As Kanye West said:
 
-> We're living the future so
-> the present is our past.
+> We're living the future so the present is our past.
 ```
 
 ### Tables {#tables}
@@ -129,10 +132,10 @@ As Kanye West said:
 You can create tables by assembling a list of words and dividing them with hyphens `-` (for the first row), and then separating each column with a pipe `|`:
 
 ```markdown
-| First Header  | Second Header |
-| ------------- | ------------- |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
+| First Header | Second Header |
+| ------------ | ------------- |
+| Content Cell | Content Cell  |
+| Content Cell | Content Cell  |
 ```
 
 The pipes on either end of the table are optional. Cells can vary in width and do not need to be perfectly aligned within columns. There must be at least three hyphens in each column of the header row.
@@ -145,7 +148,6 @@ Markdown supports two different code block styles. One uses lines indented with 
 This is a sample code block.
 
     Continued here.
-
 ```
 
 ##### Fenced code blocks
@@ -208,10 +210,9 @@ Three or more...
 
 Hyphens
 
-***
+---
 
 Asterisks
-
 ```
 
 ### Ignoring Markdown formatting

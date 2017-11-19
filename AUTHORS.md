@@ -1,68 +1,62 @@
-Authors
-=======
+# Authors
 
-Also see https://github.com/GitbookIO/gitbook/graphs/contributors.
-Names below are ordered by first contribution.
+Also see https://github.com/GitbookIO/gitbook/graphs/contributors. Names below are ordered by first contribution.
 
-Author
-------
+## Author
 
-- Samy Pessé <samy@gitbook.com> (@SamyPesse)
-- Aaron O'Mullan <aaron@gitbook.com> (@AaronO)
-- Johan Preynat <johan@gitbook.com> (@jpreynat)
-- Nicolas Gaborit <nicolas@gitbook.com> (@soreine)
+* Samy Pessé <mailto:samy@gitbook.com> (@SamyPesse)
+* Aaron O'Mullan <mailto:aaron@gitbook.com> (@AaronO)
+* Johan Preynat <mailto:johan@gitbook.com> (@jpreynat)
+* Nicolas Gaborit <mailto:nicolas@gitbook.com> (@soreine)
 
-Contributors
-------------
+## Contributors
 
-- Nijiko Yonskai (@Nijikokun)
-- Herman Starikov (@Hermanya)
+* Nijiko Yonskai (@Nijikokun)
+* Herman Starikov (@Hermanya)
 
-Translators
-------------
+## Translators
 
-- German
-    - Winnie (@winniehell)
-- Italian
-    - Giulio Bonanome (@gbonanome)
-- Russian
-    - Andrey Akinshin (@AndreyAkinshin)
-- Norwegian
-    - Knut Melvær (@kmelve)
-- Persian (Farsi)
-    - Mohammad Hossein Mojtahedi (@mhm5000)
-- Polish
-    - Łukasz Szeremeta (@lszeremeta)
-- Portuguese
-    - Ryan O'Mullan (@RyanOM)
-- Spanish
-    - Ryan O'Mullan (@RyanOM)
-- Simplifiled Chinese
-    - Hu Hao (@howiehu)
-- Traditional Chinese
-    - Hu Hao (@howiehu)
-- French
-    - Samy Pessé (@SamyPesse)
-- Romanian
-        - Iancu Aurel (@awrelll)
-- Finnish
-    - Tommi Savikko (@savikko)
-- Japanese
-    - Iancu Aurel (@awrelll)
-- Korean
-    - Iancu Aurel (@awrelll)
-    - SangYeob Yu (@deminoth)
-- Vietnamese
-    - Hong Nguyen (@nghong)
-- Hebrew
-    - @a-moses
-- Ukrainian
-    - @Karnaukhov
-- Czech
-    - @mjanda
-- Swedish
-    - Jacob Burenstam (@buren)
-- Turkish
-    - Turan Konan (@turankonan)
-- Catalan
-    - Esaú García Sánchez-Torija (@egasato)
+* German
+  * Winnie (@winniehell)
+* Italian
+  * Giulio Bonanome (@gbonanome)
+* Russian
+  * Andrey Akinshin (@AndreyAkinshin)
+* Norwegian
+  * Knut Melvær (@kmelve)
+* Persian (Farsi)
+  * Mohammad Hossein Mojtahedi (@mhm5000)
+* Polish
+  * Łukasz Szeremeta (@lszeremeta)
+* Portuguese
+  * Ryan O'Mullan (@RyanOM)
+* Spanish
+  * Ryan O'Mullan (@RyanOM)
+* Simplifiled Chinese
+  * Hu Hao (@howiehu)
+* Traditional Chinese
+  * Hu Hao (@howiehu)
+* French
+  * Samy Pessé (@SamyPesse)
+* Romanian - Iancu Aurel (@awrelll)
+* Finnish
+  * Tommi Savikko (@savikko)
+* Japanese
+  * Iancu Aurel (@awrelll)
+* Korean
+  * Iancu Aurel (@awrelll)
+  * SangYeob Yu (@deminoth)
+* Vietnamese
+  * Hong Nguyen (@nghong)
+* Hebrew
+  * @a-moses
+* Ukrainian
+  * @Karnaukhov
+* Czech
+  * @mjanda
+* Swedish
+  * Jacob Burenstam (@buren)
+* Turkish
+  * Turan Konan (@turankonan)
+* Catalan
+  * Esaú García Sánchez-Torija (@egasato)

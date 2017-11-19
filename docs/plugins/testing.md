@@ -19,4 +19,3 @@ $ npm link gitbook-plugin-<plugin's name>
 ### Unit testing on Travis
 
 [gitbook-tester](https://github.com/todvora/gitbook-tester) makes it easy to write **Node.js/Mocha** unit tests for your plugins. Using [Travis.org](https://travis.org), tests can be run on each commits/tags.
-

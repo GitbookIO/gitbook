@@ -12,16 +12,15 @@ Filters are essentially functions that can be applied to variables. They are cal
 
 Plugins can extend filters by defining custom functions in their entry point under the `filters` scope.
 
-A filter function takes as first argument the content to filter, and should return the new content.
-Refer to [Context and APIs](./api.md) to learn more about `this` and GitBook API.
+A filter function takes as first argument the content to filter, and should return the new content. Refer to [Context and APIs](./api.md) to learn more about `this` and GitBook API.
 
 ```js
 module.exports = {
     filters: {
         hello: function(name) {
-            return 'Hello '+name;
-        }
-    }
+            return 'Hello ' + name;
+        },
+    },
 };
 ```
 
@@ -47,11 +46,11 @@ module.exports = {
         fullName: function(firstName, lastName, kwargs) {
             var name = firstName + ' ' + lastName;
 
-            if (kwargs.man) name = "Mr" + name;
-            else name = "Mrs" + name;
+            if (kwargs.man) name = 'Mr' + name;
+            else name = 'Mrs' + name;
 
             return name;
-        }
-    }
+        },
+    },
 };
 ```

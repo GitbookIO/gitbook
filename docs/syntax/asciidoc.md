@@ -12,7 +12,7 @@ This is the main entry of your book: the introduction. This file is **required**
 
 ### SUMMARY.adoc
 
-This file defines the list of chapters and subchapters. Just like  in Markdown, the `SUMMARY.adoc`'s format is simply a list of links, the name of the link is used as the chapter's name, and the target is a path to that chapter's file.
+This file defines the list of chapters and subchapters. Just like in Markdown, the `SUMMARY.adoc`'s format is simply a list of links, the name of the link is used as the chapter's name, and the target is a path to that chapter's file.
 
 Subchapters are defined simply by adding a nested list to a parent chapter.
 
@@ -47,7 +47,7 @@ This file is following the same syntax as the `SUMMARY.adoc`:
 
 This file is used to define terms. [See the glossary section](./lexicon.md).
 
-```asciidoc
+````asciidoc
 = Glossary
 
 == Magic
@@ -61,5 +61,4 @@ A popular web programming language, used by many large websites such
 as Facebook. Rasmus Lerdorf originally created PHP in 1994 to power
 his personal homepage (PHP originally stood for "Personal Home Page"
 but now stands for "PHP: Hypertext Preprocessor"). ```
-
-
+````
