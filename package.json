@@ -62,13 +62,31 @@
     "urijs": "1.18.0"
   },
   "devDependencies": {
-    "eslint": "2.10.2",
+    "eslint": "4.11.0",
+    "eslint-config-prettier": "2.7.0",
+    "eslint-plugin-prettier": "2.3.1",
     "expect": "^1.20.1",
-    "mocha": "^2.4.5"
+    "husky": "0.14.3",
+    "lint-staged": "5.0.0",
+    "mocha": "^2.4.5",
+    "prettier": "1.8.2"
+  },
+  "lint-staged": {
+    "*.js": ["eslint --fix", "git add"],
+    "*.json": ["prettier --write", "git add"],
+    "*.md": ["prettier --write", "git add"],
+    "*.css": ["prettier --write", "git add"]
   },
   "scripts": {
-    "lint": "eslint .",
-    "test": "./node_modules/.bin/mocha ./testing/setup.js \"./lib/**/*/__tests__/*.js\" --bail --reporter=list --timeout=10000"
+    "lint:config": "prettier --ignore-path .gitignore --write \"**/*.json\"",
+    "lint:docs": "prettier --ignore-path .gitignore --write \"**/*.md\"",
+    "lint:script": "eslint --ignore-path .gitignore \"**/*.js\" -- --fix",
+    "lint:style": "prettier --ignore-path .gitignore --write \"**/*.css\"",
+    "lint":
+      "npm run lint:script && npm run lint:config && npm run lint:style && npm run lint:docs",
+    "precommit": "lint-staged",
+    "test":
+      "./node_modules/.bin/mocha ./testing/setup.js \"./lib/**/*/__tests__/*.js\" --bail --reporter=list --timeout=10000"
   },
   "repository": {
     "type": "git",
@@ -77,11 +95,7 @@
   "bin": {
     "gitbook": "./bin/gitbook.js"
   },
-  "keywords": [
-    "git",
-    "book",
-    "gitbook"
-  ],
+  "keywords": ["git", "book", "gitbook"],
   "author": "FriendCode Inc. <contact@gitbook.com>",
   "license": "Apache-2.0",
   "bugs": {

@@ -1,22 +1,23 @@
 {
-    "rules": {
-        "indent": [ 2, 4 ],
-        "quotes": [ 2, "single" ],
-        "linebreak-style": [ 2, "unix" ],
-        "semi": [ 2, "always" ],
-        "no-unused-vars": [ 2, {
-            "vars": "all",
-            "args": "none"
-        } ],
-        "spaced-comment": [ 2, "always" ]
-    },
-    "env": {
-        "node": true,
-        "browser": true,
-        "mocha": true
-    },
-    "globals": {
-        "expect": true
-    },
-    "extends": "eslint:recommended"
+  "rules": {
+    "linebreak-style": [2, "unix"],
+    "prettier": 2,
+    "no-unused-vars": [
+      2,
+      {
+        "vars": "all",
+        "args": "none"
+      }
+    ]
+  },
+  "env": {
+    "node": true,
+    "browser": true,
+    "mocha": true
+  },
+  "globals": {
+    "expect": true
+  },
+  "extends": ["eslint:recommended", "prettier"],
+  "plugins": ["prettier"]
 }
