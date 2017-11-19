@@ -19,8 +19,8 @@ module.exports = {
     filters: {
         hello: function(name) {
             return 'Hello ' + name;
-        },
-    },
+        }
+    }
 };
 ```
 
@@ -50,7 +50,7 @@ module.exports = {
             else name = 'Mrs' + name;
 
             return name;
-        },
-    },
+        }
+    }
 };
 ```

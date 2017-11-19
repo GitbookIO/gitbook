@@ -7,7 +7,7 @@
     "semi": true,
     "singleQuote": true,
     "tabWidth": 4,
-    "trailingComma": "all",
+    "trailingComma": "none",
     "useTabs": false,
     "overrides": [
         {

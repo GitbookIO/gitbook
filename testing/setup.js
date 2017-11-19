@@ -17,7 +17,7 @@ expect.extend({
             exists,
             'expected %s to have file %s',
             this.actual,
-            fileName,
+            fileName
         );
         return this;
     },
@@ -29,7 +29,7 @@ expect.extend({
             !exists,
             'expected %s to not have file %s',
             this.actual,
-            fileName,
+            fileName
         );
         return this;
     },
@@ -40,7 +40,7 @@ expect.extend({
     toBeDefined: function() {
         expect.assert(
             !(is.undefined(this.actual) || is.null(this.actual)),
-            'expected to be defined',
+            'expected to be defined'
         );
         return this;
     },
@@ -52,7 +52,7 @@ expect.extend({
         expect.assert(
             is.undefined(this.actual) || is.null(this.actual),
             'expected %s to be not defined',
-            this.actual,
+            this.actual
         );
         return this;
     },
@@ -66,7 +66,7 @@ expect.extend({
         var $el = $(selector);
 
         expect.assert($el.length > 0, 'expected HTML to contains %s', selector);
-    },
+    }
 });
 
 global.expect = expect;

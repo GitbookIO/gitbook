@@ -47,7 +47,7 @@ module.exports = {
     blocks: {},
 
     // Map of new filters
-    filters: {},
+    filters: {}
 };
 ```
 

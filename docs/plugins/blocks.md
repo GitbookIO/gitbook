@@ -14,9 +14,9 @@ module.exports = {
         tag1: {
             process: function(block) {
                 return 'Hello ' + block.body + ', How are you?';
-            },
-        },
-    },
+            }
+        }
+    }
 };
 ```
 
@@ -41,9 +41,9 @@ module.exports = {
             process: function(block) {
                 // block.args equals ["argument 1", "argument 2"]
                 // block.kwargs equals { "name": "Test" }
-            },
-        },
-    },
+            }
+        }
+    }
 };
 ```
 

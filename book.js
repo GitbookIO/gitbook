@@ -12,12 +12,12 @@ module.exports = {
     plugins: ['theme-official@2.1.1', '-sharing', '-fontsettings', 'sitemap'],
 
     variables: {
-        version: pkg.version,
+        version: pkg.version
     },
 
     pluginsConfig: {
         sitemap: {
-            hostname: 'https://toolchain.gitbook.com',
-        },
-    },
+            hostname: 'https://toolchain.gitbook.com'
+        }
+    }
 };
