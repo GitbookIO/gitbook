@@ -15,6 +15,7 @@ GitBook allows you to customize your book using a flexible configuration. These 
 | `language` | [ISO code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) of the book's language, default value is `en` |
 | `direction` | Text's direction. Can be `rtl` or `ltr`, the default value depends on the value of `language` |
 | `gitbook` | Version of GitBook that should be used. Uses the [SemVer](http://semver.org) specification and accepts conditions like `">= 3.0.0"` |
+| `cover` | Specify a cover page for your pdf to be anything other than the default `cover.jpg`, i.e `cover.png`. |
 
 ### Plugins
 
