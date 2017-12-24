@@ -41,6 +41,20 @@ $ sudo ln -s ~/Applications/calibre.app/Contents/MacOS/ebook-convert /usr/bin
 
 You can replace `/usr/bin` with any directory that is in your $PATH.
 
+##### Windows
+
+Download the [Calibre application](https://calibre-ebook.com/download). You will then want to add `ebook-convert` to your path.
+
+```
+> setx path "%path%;c:\Program Files\Calibre2"
+```
+
+You may need to also install `svgexport` via npm.
+
+```
+> npm install svgexport -g
+```
+
 ### Cover
 
 Covers are used for all the ebook formats. You can either provide one yourself, or generate one using the [autocover plugin](https://plugins.gitbook.com/plugin/autocover).
