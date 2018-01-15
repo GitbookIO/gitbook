@@ -14,7 +14,7 @@ It integrates well with the [GitBook Editor](https://www.gitbook.com/editor).
 
 Installing GitBook is easy and straightforward. Your system just needs to meet these two requirements:
 
-* NodeJS (v4.0.0 and above are adviced)
+* NodeJS (v4.0.0 and above is recommended)
 * Windows, Linux, Unix, or Mac OS X
 
 ##### Install with NPM

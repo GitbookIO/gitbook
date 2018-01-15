@@ -17,7 +17,22 @@ A theme is a plugin containing templates and assets. Overriding any individual t
 
 ### Extend/Customize theme in a book
 
-Authors can extend the templates of a theme directly from their book's source (without creating an external theme). Templates will be resolved in the `_layouts` folder of the book first, then in
+Authors can extend the templates of a theme directly from their book's source (without creating an external theme). Templates will be resolved in the `_layouts` folder of the book first, then in the installed plugins/themes.
+
+### Extend instead of Forking
+
+When you want to make your theme changes available to multiple books, instead of forking the default theme, you can extend it using the [templating syntax](../templating/README.md):
+
+```html
+{% extends template.self %}
+
+{% block body %}
+    {{ super() }}
+    ... This will be added to the "body" block
+{% endblock %}
+```
+
+Take a look at the [API](https://github.com/GitbookIO/theme-api) theme for a more complete example.
 
 ### Publish a theme
 

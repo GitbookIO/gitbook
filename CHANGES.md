@@ -2,7 +2,49 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## 3.0.0 (pre)
+## 3.2.2
+- Fix catching parsing errors leading to possible missing pages in generated book
+- Rollback markdown parser to `kramed` until `markup-it` is stable enough
+
+## 3.2.1
+- Fix bug on Firefox when navigating to an url containing an hash
+- Update nunjucks to fix JS error when page contains a lot of templating blocks
+
+## 3.2.0
+- Switch markdown parser from `kramed` to `markup-it`
+- Fix support of `|` in tables
+- Fix access to `output.name` in templating
+- Fix i18n for website and PDF
+- Fix minor scrolling issues on website
+- Improve options of default search indexer (keywords, disabling per pages)
+- Improve pertinence of search results
+
+## 3.1.1
+- Fix order of plugins during loading
+- Fix error when using math and conrefs
+- Fix target attribute for external links
+- Fix serve command
+
+## 3.1.0
+- Always load themes after plugins
+- README/Introduction doesn't require to be the first entry in the summary
+- Highlight active entry in summary when scrolling a page with anchors
+- Support empty parts in summary
+
+## 3.0.3
+- Fix redirection in `gitbook serve` when accessing a folder without trailing slash
+- Fix links/annotations for glossary not being correctly resolved
+- Fix regression for supporting uppercase filenames in structure files
+- Fix `gitbook install` when using Git URLs for plugins
+
+## 3.0.2
+- Fix crash for anchor links
+
+## 3.0.1
+- Fix regression in link resolution when contain anchor
+- Fix `structure.<name>` configuration not supporting filenames with dots
+
+## 3.0.0
 - Summary can contain external links and anchors (Fix [#776](https://github.com/GitbookIO/gitbook/issues/776))
 - Summary can contain differents entitled sections
 - Glossary is generated as a normal page

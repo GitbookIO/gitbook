@@ -6,10 +6,10 @@ module.exports = {
     title: 'GitBook Toolchain Documentation',
 
     // Enforce use of GitBook v3
-    gitbook: '>=3.0.0-pre.0',
+    gitbook: '3.1.1',
 
     // Use the "official" theme
-    plugins: ['theme-official', 'sitemap'],
+    plugins: ['theme-official@2.1.1', '-sharing', '-fontsettings', 'sitemap'],
 
     variables: {
         version: pkg.version
