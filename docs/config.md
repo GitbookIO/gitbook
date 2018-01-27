@@ -53,3 +53,7 @@ PDF Output can be customized using a set of options in the `book.json`:
 | `pdf.margin.bottom` | Bottom margin (default is `56`) |
 | `pdf.margin.right` | Right margin (default is `62`) |
 | `pdf.margin.left` | Left margin (default is `62`) |
+| `pdf.pageMargin.top` | Top margin for pages (default is `72`) |
+| `pdf.pageMargin.bottom` | Bottom margin for pages (default is `72`) |
+| `pdf.pageMargin.right` | Right margin for pages (default is `72`) |
+| `pdf.pageMargin.left` | Left margin for pages (default is `72`) |
