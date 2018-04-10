@@ -2,11 +2,11 @@
 
 Getting GitBook installed and ready-to-go should only take a few minutes.
 
-### GitBook.com
+### legacy.gitbook.com
 
-[GitBook.com](https://www.gitbook.com) is an easy to use solution to write, publish and host books. It is the easiest solution for publishing your content and collaborating on it.
+[legacy.gitbook.com](https://legacy.gitbook.com) is an easy to use solution to write, publish and host books. It is the easiest solution for publishing your content and collaborating on it.
 
-It integrates well with the [GitBook Editor](https://www.gitbook.com/editor).
+It integrates well with the [GitBook Editor](https://legacy.gitbook.com/editor).
 
 ### Local Installation
 

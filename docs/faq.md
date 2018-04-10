@@ -2,15 +2,15 @@
 
 This page gathers common questions and answers concerning the GitBook format and toolchain.
 
-Questions about GitBook.com and the Editor are gather into the [help.gitbook.com's FAQ](http://help.gitbook.com/faq.html).
+Questions about the legacy platform at legacy.gitbook.com and the Editor are gather into the [legacy.help.gitbook.com's FAQ](http://legacy.help.gitbook.com/faq.html).
 
 #### How can I host/publish my book?
 
-Books can easily be published and hosted on [GitBook.com](https://www.gitbook.com). But GitBook output can be hosted on any static file hosting solution.
+Books can easily be published and hosted on [legacy.gitbook.com](https://legacy.gitbook.com). But GitBook output can be hosted on any static file hosting solution.
 
 #### What can I use to edit my content?
 
-Any text editor should work! But we advise using the [GitBook Editor](https://www.gitbook.com/editor). [GitBook.com](https://www.gitbook.com) also provides a web version of this editor.
+Any text editor should work! But we advise using the [GitBook Editor](https://legacy.gitbook.com/editor). [legacy.gitbook.com](https://legacy.gitbook.com) also provides a web version of this editor.
 
 ---
 
@@ -34,7 +34,7 @@ You should always use paths and the `.md` extensions when linking to your files,
 
 #### Can I create a GitBook in a sub-directory of my repository?
 
-Yes, GitBooks can be created in [sub-directories](structure.md#subdirectory). GitBook.com and the CLI also looks by default in a serie of [folders](structure.md).
+Yes, GitBooks can be created in [sub-directories](structure.md#subdirectory). legacy.gitbook.com and the CLI also looks by default in a serie of [folders](structure.md).
 
 #### Does GitBook supports RTL languages?
 
