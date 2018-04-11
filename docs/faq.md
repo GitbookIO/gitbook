@@ -2,7 +2,7 @@
 
 This page gathers common questions and answers concerning the GitBook format and toolchain.
 
-Questions about the legacy platform at legacy.gitbook.com and the Editor are gather into the [legacy.help.gitbook.com's FAQ](http://legacy.help.gitbook.com/faq.html).
+Questions about the legacy platform at legacy.gitbook.com and the Editor are gather into the [help.legacy.gitbook.com's FAQ](http://help.legacy.gitbook.com/faq.html).
 
 #### How can I host/publish my book?
 
