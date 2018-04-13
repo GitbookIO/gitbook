@@ -8,9 +8,9 @@ GitBook allows you to customize your book using a flexible configuration. These 
 | -------- | ----------- |
 | `root` | Path to the root folder containing all the book's files, except `book.json`|
 | `structure` | To specify paths for Readme, Summary, Glossary etc. See [Structure paragraph](#structure). |
-| `title` | Title of your book, default value is extracted from the README. On GitBook.com this field is pre-filled. |
-| `description` | Description of your book, default value is extracted from the README. On GitBook.com this field is pre-filled. |
-| `author` | Name of the author. On GitBook.com this field is pre-filled. |
+| `title` | Title of your book, default value is extracted from the README. On legacy.gitbook.com this field is pre-filled. |
+| `description` | Description of your book, default value is extracted from the README. On legacy.gitbook.com this field is pre-filled. |
+| `author` | Name of the author. On legacy.gitbook.com this field is pre-filled. |
 | `isbn` | ISBN of the book |
 | `language` | [ISO code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) of the book's language, default value is `en` |
 | `direction` | Text's direction. Can be `rtl` or `ltr`, the default value depends on the value of `language` |
