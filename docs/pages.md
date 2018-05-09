@@ -80,7 +80,7 @@ This is a great introduction.
 
 ## Section 1
 
-Markdown will dictates _most_ of your **book's structure**
+Markdown will dictate _most_ of your **book's structure**
 
 ## Section 2
 
