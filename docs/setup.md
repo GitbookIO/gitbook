@@ -17,9 +17,9 @@ Installing GitBook is easy and straightforward. Your system just needs to meet t
 * NodeJS (v4.0.0 and above is recommended)
 * Windows, Linux, Unix, or Mac OS X
 
-##### Install with NPM
+##### Install with npm
 
-The best way to install GitBook is via **NPM**. At the terminal prompt, simply run the following command to install GitBook:
+The best way to install GitBook is via **npm**. At the terminal prompt, simply run the following command to install GitBook:
 
 ```
 $ npm install gitbook-cli -g

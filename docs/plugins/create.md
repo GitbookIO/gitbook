@@ -1,6 +1,6 @@
 # Create and publish a plugin
 
-A GitBook plugin is a node package published on NPM that follow a defined convention.
+A GitBook plugin is a node package published on npm that follow a defined convention.
 
 ## Structure
 
@@ -30,7 +30,7 @@ A plugin manifest `package.json` can also contain details about the required con
 }
 ```
 
-You can learn more about `package.json` from the [NPM documentation](https://docs.npmjs.com/files/package.json).
+You can learn more about `package.json` from the [npm documentation](https://docs.npmjs.com/files/package.json).
 
 The **package name** must begin with `gitbook-plugin-` and the **package engines** should contains `gitbook`.
 
@@ -53,7 +53,7 @@ module.exports = {
 
 ## Publish your plugin
 
-GitBook plugins can be published on [NPM](https://www.npmjs.com).
+GitBook plugins can be published on [npm](https://www.npmjs.com).
 
 To publish a new plugin, you need to create an account on [npmjs.com](https://www.npmjs.com) then publish it from the command line:
 
