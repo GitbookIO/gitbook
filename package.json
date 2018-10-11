@@ -25,7 +25,7 @@
         "cheerio": "0.19.0",
         "gitbook-plugin-livereload": "0.0.1",
         "chokidar": "~1.0.5",
-        "send": "0.2.0",
+        "send": "GitbookIO/send#9081de9cb0fc85d60e871685f252c98db764cb55",
         "tiny-lr": "0.2.1",
         "tmp": "0.0.24",
         "crc": "3.2.1",
