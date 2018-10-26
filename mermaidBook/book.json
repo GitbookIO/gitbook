@@ -1,0 +1,8 @@
+{
+    "plugins": ["mermaid-cli"],
+    "pluginsConfig": {
+        "mermaid-cli": {
+            "chromeDir": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        }
+    }
+}
