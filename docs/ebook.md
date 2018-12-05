@@ -1,6 +1,6 @@
 # Generating eBooks and PDFs
 
-GitBook can generates a website, but can also output content as ebook (ePub, Mobi, PDF).
+GitBook can generate a website, but can also output content as ebook (ePub, Mobi, PDF).
 
 ```
 # Generate a PDF file
@@ -19,7 +19,7 @@ $ gitbook mobi ./ ./mybook.mobi
 
 ##### OS X
 
-Download the [Calibre application](https://calibre-ebook.com/download). After moving the `calibre.app` to your Applications folder create a symbolic link to the ebook-convert tool:
+Download the [Calibre application](https://calibre-ebook.com/download). After moving the `calibre.app` to your Applications folder, create a symbolic link to the ebook-convert tool:
 
 ```
 $ sudo ln -s ~/Applications/calibre.app/Contents/MacOS/ebook-convert /usr/bin
