@@ -114,7 +114,7 @@ Here are the options that can be stored in this file:
         // Add page numbers to the bottom of every page
         "pageNumbers": false,
 
-        // Font size for the fiel content
+        // Font size for the feel content
         "fontSize": 12,
 
         // Paper size for the pdf
