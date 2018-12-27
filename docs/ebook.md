@@ -25,6 +25,13 @@ Download the [Calibre application](https://calibre-ebook.com/download). After mo
 $ sudo ln -s ~/Applications/calibre.app/Contents/MacOS/ebook-convert /usr/bin
 ```
 
+After El Capitan you have to create `/usr/local/bin` if it doesn't exists, and create the symlink there:
+
+```
+$ mkdir -p /usr/local/bin 
+$ sudo ln -s /Applications/calibre.app/Contents/MacOS/ebook-convert /usr/local/bin
+```
+
 You can replace `/usr/bin` with any directory that is in your $PATH.
 
 ### Cover
