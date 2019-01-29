@@ -36,7 +36,7 @@ The filter `hello` can then be used in the book:
 Arguments can be passed to filters:
 
 ```
-Hello {{ "Samy"|fullName("Pesse", man=true}} }}
+Hello {{ "Samy"|fullName("Pesse", man=true) }}
 ```
 
 Arguments are passed to the function, named-arguments are passed as a last argument (object).
