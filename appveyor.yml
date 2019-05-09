@@ -1,0 +1,38 @@
+# Fix line endings in Windows. (runs before repo cloning)
+init:
+  - git config --global core.autocrlf input
+
+# Test against these versions of Node.js.
+environment:
+  matrix:
+    - nodejs_version: "6"
+    - nodejs_version: "5"
+    - nodejs_version: "4"
+
+matrix:
+  fast_finish: true
+
+# Install scripts. (runs after repo cloning)
+install:
+  # Get the latest stable version of Node.js or io.js
+  - ps: Install-Product node $env:nodejs_version
+  - set CI=true
+  # install svgexport
+  - npm install svgexport -g
+  # install modules
+  - npm install
+
+# Post-install test scripts.
+test_script:
+  # Output useful info for debugging.
+  - node --version
+  - npm --version
+  # run tests
+  - npm test
+
+# Don't actually build.
+build: off
+
+# Clone only last commit
+shallow_clone: true
+clone_depth: 1
