@@ -62,7 +62,7 @@
     "urijs": "1.18.0"
   },
   "devDependencies": {
-    "eslint": "2.10.2",
+    "eslint": "6.5.1",
     "expect": "^1.20.1",
     "mocha": "^2.4.5"
   },
