@@ -1,5 +1,5 @@
 {
-  "name": "gitbook",
+  "name": "@feedzai/gitbook",
   "version": "3.2.3",
   "homepage": "https://legacy.gitbook.com",
   "description": "Library and cmd utility to generate GitBooks",
