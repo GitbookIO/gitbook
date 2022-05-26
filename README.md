@@ -34,7 +34,7 @@ You can find a [list of real-world examples](docs/examples.md) in the documentat
 
 ## Help and Support
 
-We're always happy to help out with your books or any other questions you might have. You can ask a question on the following contact form at [gitbook.com/contact](https://legacy.gitbook.com/contact) or signal an issue on [GitHub](https://github.com/GitbookIO/gitbook).
+We're always happy to help out with your books or any other questions you might have. You can ask a question on the following contact form at [gitbook.com/contact](https://legacy.gitbook.com/contact)~~or signal an issue on [GitHub](https://github.com/GitbookIO/gitbook)~~.
 
 ## Features
 
