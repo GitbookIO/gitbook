@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2022-08-11T09:36:26.588Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36" etag="eZimmbUSyMhmpR6DNRW8" version="20.2.3" type="github">
+<mxfile host="app.diagrams.net" modified="2022-08-11T09:43:35.223Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36" etag="YPN2aPmjmecI3kw8wNOP" version="20.2.3" type="github">
   <diagram name="Page-1" id="74e2e168-ea6b-b213-b513-2b3c1d86103e">
     <mxGraphModel dx="968" dy="531" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="none" math="0" shadow="0">
       <root>
@@ -11,7 +11,7 @@
           <mxGeometry y="20" width="280" height="290" as="geometry" />
         </mxCell>
         <mxCell id="77e6c97f196da883-8" value="BOSS生产环境" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=8;align=center;" parent="77e6c97f196da883-2" vertex="1">
-          <mxGeometry x="20" y="65" width="100" height="60" as="geometry" />
+          <mxGeometry x="90" y="65" width="100" height="60" as="geometry" />
         </mxCell>
         <mxCell id="77e6c97f196da883-26" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=none;startArrow=none;startFill=0;startSize=5;endArrow=classicThin;endFill=1;endSize=5;jettySize=auto;orthogonalLoop=1;strokeWidth=1;fontFamily=Verdana;fontSize=8" parent="77e6c97f196da883-1" source="77e6c97f196da883-8" target="77e6c97f196da883-11" edge="1">
           <mxGeometry relative="1" as="geometry" />
@@ -21,11 +21,14 @@
             <mxPoint x="-17" y="1" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="77e6c97f196da883-3" value="前置机" style="swimlane;html=1;startSize=20;" parent="77e6c97f196da883-1" vertex="1">
+        <mxCell id="77e6c97f196da883-3" value="前置机" style="swimlane;html=1;startSize=20;fillColor=#d5e8d4;strokeColor=#82b366;" parent="77e6c97f196da883-1" vertex="1">
           <mxGeometry x="280" y="20" width="450" height="290" as="geometry" />
         </mxCell>
         <mxCell id="77e6c97f196da883-11" value="前置机&lt;br&gt;交易端口 15999&lt;br&gt;文件端口 1001" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=8;align=center;" parent="77e6c97f196da883-3" vertex="1">
           <mxGeometry x="140" y="65" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="SDwzeMzZmOMiavEzKnjb-7" value="&lt;h1 style=&quot;&quot;&gt;&lt;span style=&quot;font-weight: normal; font-size: 17px;&quot;&gt;10.10.170.96 是碧桂园内网ip，需要集团开通ip端口白名单&lt;/span&gt;&lt;/h1&gt;&lt;div&gt;&lt;span style=&quot;font-weight: normal; font-size: 17px;&quot;&gt;200.1.6.10 是走农行专线的ip，需要农行开通ip白名单&lt;/span&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="77e6c97f196da883-3">
+          <mxGeometry x="10" y="160" width="440" height="80" as="geometry" />
         </mxCell>
         <mxCell id="77e6c97f196da883-4" value="农行生产" style="swimlane;html=1;startSize=20;" parent="77e6c97f196da883-1" vertex="1">
           <mxGeometry x="730" y="20" width="340" height="290" as="geometry" />
