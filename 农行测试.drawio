@@ -1,1 +1,53 @@
-<mxfile host="app.diagrams.net" modified="2022-08-12T07:21:18.805Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36" version="20.2.3" etag="EvR5jhvMolKCG0JnZyfJ" type="github"><diagram id="b9RKorGwAs1O7RPQeRaa">UzV2zq1wL0osyPDNT0nNUTV2VTV2LsrPL4GwciucU3NyVI0MMlNUjV1UjYwMgFjVyA2HrCFY1qAgsSg1rwSLBiADYTaQg2Y1AA==</diagram></mxfile>
+<mxfile host="app.diagrams.net" modified="2022-08-12T07:27:24.128Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36" etag="j9WewsW7ToLfOpJMtGhY" version="20.2.3" type="github">
+  <diagram id="b9RKorGwAs1O7RPQeRaa" name="第 1 页">
+    <mxGraphModel dx="968" dy="475" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="AbcOTtoR01-K_mHgWQP5-1" value="农行银企" style="swimlane;html=1;childLayout=stackLayout;startSize=20;rounded=0;shadow=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=8;align=center;" vertex="1" parent="1">
+          <mxGeometry x="70" y="70" width="1070" height="310" as="geometry" />
+        </mxCell>
+        <mxCell id="AbcOTtoR01-K_mHgWQP5-2" value="BOSS" style="swimlane;html=1;startSize=20;" vertex="1" parent="AbcOTtoR01-K_mHgWQP5-1">
+          <mxGeometry y="20" width="280" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="AbcOTtoR01-K_mHgWQP5-3" value="BOSS生产环境" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=8;align=center;" vertex="1" parent="AbcOTtoR01-K_mHgWQP5-2">
+          <mxGeometry x="90" y="65" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="AbcOTtoR01-K_mHgWQP5-4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=none;startArrow=none;startFill=0;startSize=5;endArrow=classicThin;endFill=1;endSize=5;jettySize=auto;orthogonalLoop=1;strokeWidth=1;fontFamily=Verdana;fontSize=8" edge="1" parent="AbcOTtoR01-K_mHgWQP5-1" source="AbcOTtoR01-K_mHgWQP5-3" target="AbcOTtoR01-K_mHgWQP5-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="AbcOTtoR01-K_mHgWQP5-5" value="内网访问10.10.170.97" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;" vertex="1" connectable="0" parent="AbcOTtoR01-K_mHgWQP5-4">
+          <mxGeometry x="0.1818" y="1" relative="1" as="geometry">
+            <mxPoint x="-17" y="1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="AbcOTtoR01-K_mHgWQP5-6" value="前置机" style="swimlane;html=1;startSize=20;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="AbcOTtoR01-K_mHgWQP5-1">
+          <mxGeometry x="280" y="20" width="450" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="AbcOTtoR01-K_mHgWQP5-7" value="前置机&lt;br&gt;交易端口 15999&lt;br&gt;文件端口 1001" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=8;align=center;" vertex="1" parent="AbcOTtoR01-K_mHgWQP5-6">
+          <mxGeometry x="140" y="65" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="AbcOTtoR01-K_mHgWQP5-8" value="&lt;h1 style=&quot;&quot;&gt;&lt;span style=&quot;font-weight: normal; font-size: 17px;&quot;&gt;10.10.170.97 是碧桂园内网ip，需要集团开通ip端口白名单&lt;/span&gt;&lt;/h1&gt;&lt;br&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;span style=&quot;font-size: 17px;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;218.104.169.78是&lt;/span&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;公网的ip，需要农行开通ip白名单&lt;/span&gt;&lt;/div&gt;&lt;/span&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="AbcOTtoR01-K_mHgWQP5-6">
+          <mxGeometry x="10" y="160" width="440" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="AbcOTtoR01-K_mHgWQP5-9" value="农行" style="swimlane;html=1;startSize=20;" vertex="1" parent="AbcOTtoR01-K_mHgWQP5-1">
+          <mxGeometry x="730" y="20" width="340" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="AbcOTtoR01-K_mHgWQP5-10" value="农行测试" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=8;align=center;" vertex="1" parent="AbcOTtoR01-K_mHgWQP5-9">
+          <mxGeometry x="120" y="65" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="AbcOTtoR01-K_mHgWQP5-11" value="" style="endArrow=classic;html=1;rounded=0;fontSize=10;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="AbcOTtoR01-K_mHgWQP5-1" source="AbcOTtoR01-K_mHgWQP5-7" target="AbcOTtoR01-K_mHgWQP5-10">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="420" y="220" as="sourcePoint" />
+            <mxPoint x="470" y="170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="AbcOTtoR01-K_mHgWQP5-12" value="公网访问 183.242.60.51" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;" vertex="1" connectable="0" parent="AbcOTtoR01-K_mHgWQP5-11">
+          <mxGeometry x="-0.1319" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
