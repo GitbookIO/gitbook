@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2022-08-12T08:12:30.189Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36" etag="F2-ypJZ6rizkwbeUHEUZ" version="20.2.3" type="github">
+<mxfile host="app.diagrams.net" modified="2022-08-12T08:13:29.313Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36" etag="vUovAAFrTIMoGeC-VOBt" version="20.2.3" type="github">
   <diagram id="CsMgUj1Mont5WAsNdcey" name="第 1 页">
-    <mxGraphModel dx="968" dy="531" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="968" dy="475" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -78,7 +78,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="2r3JKYAfRwa4Y5Ds583L-16" value="银结通代扣" style="swimlane;html=1;childLayout=stackLayout;startSize=20;rounded=0;shadow=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=8;align=center;" vertex="1" parent="1">
-          <mxGeometry x="60" y="450" width="1969" height="310" as="geometry" />
+          <mxGeometry x="60" y="450" width="1070" height="310" as="geometry" />
         </mxCell>
         <mxCell id="2r3JKYAfRwa4Y5Ds583L-17" value="BOSS" style="swimlane;html=1;startSize=20;" vertex="1" parent="2r3JKYAfRwa4Y5Ds583L-16">
           <mxGeometry y="20" width="280" height="290" as="geometry" />
