@@ -1,1 +1,38 @@
-<mxfile host="app.diagrams.net" modified="2022-08-12T00:58:13.581Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36" version="20.2.3" etag="bBUE1yr3GLCTiipMe6AP" type="github"><diagram id="NykjXDxyQf3I2lPrihKn">UzV2zq1wL0osyPDNT0nNUTV2VTV2LsrPL4GwciucU3NyVI0MMlNUjV1UjYwMgFjVyA2HrCFY1qAgsSg1rwSLBiADYTaQg2Y1AA==</diagram></mxfile>
+<mxfile host="app.diagrams.net" modified="2022-08-12T01:06:37.457Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36" etag="tGcJK8bSZm0Wycvj9_pE" version="20.2.3" type="github">
+  <diagram id="NykjXDxyQf3I2lPrihKn" name="第 1 页">
+    <mxGraphModel dx="968" dy="475" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="lbFNB3Sa1TSkzl-JueUs-1" value="碧合" style="swimlane;html=1;childLayout=stackLayout;startSize=20;rounded=0;shadow=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=8;align=center;" vertex="1" parent="1">
+          <mxGeometry x="10" y="70" width="1100" height="310" as="geometry" />
+        </mxCell>
+        <mxCell id="lbFNB3Sa1TSkzl-JueUs-2" value="BOSS" style="swimlane;html=1;startSize=20;" vertex="1" parent="lbFNB3Sa1TSkzl-JueUs-1">
+          <mxGeometry y="20" width="460" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="lbFNB3Sa1TSkzl-JueUs-3" value="BOSS生产环境" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=8;align=center;" vertex="1" parent="lbFNB3Sa1TSkzl-JueUs-2">
+          <mxGeometry x="90" y="70" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="lbFNB3Sa1TSkzl-JueUs-4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=none;startArrow=none;startFill=0;startSize=5;endArrow=classicThin;endFill=1;endSize=5;jettySize=auto;orthogonalLoop=1;strokeWidth=1;fontFamily=Verdana;fontSize=8;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.75;exitDx=0;exitDy=0;" edge="1" parent="lbFNB3Sa1TSkzl-JueUs-1" source="lbFNB3Sa1TSkzl-JueUs-3" target="lbFNB3Sa1TSkzl-JueUs-10">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="190" y="130" />
+              <mxPoint x="720" y="130" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lbFNB3Sa1TSkzl-JueUs-5" value="&lt;span style=&quot;background-color: rgb(255, 255, 255);&quot;&gt;公网访问&lt;span style=&quot;color: rgb(206, 145, 120); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px;&quot;&gt;https://payapi.bgycc.com/gateway/entry.do&lt;/span&gt;&lt;/span&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;" vertex="1" connectable="0" parent="lbFNB3Sa1TSkzl-JueUs-4">
+          <mxGeometry x="0.1818" y="1" relative="1" as="geometry">
+            <mxPoint x="-53" y="-14" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lbFNB3Sa1TSkzl-JueUs-9" value="碧合生产" style="swimlane;html=1;startSize=20;" vertex="1" parent="lbFNB3Sa1TSkzl-JueUs-1">
+          <mxGeometry x="460" y="20" width="640" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="lbFNB3Sa1TSkzl-JueUs-10" value="碧合生产环境" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=8;align=center;" vertex="1" parent="lbFNB3Sa1TSkzl-JueUs-9">
+          <mxGeometry x="330" y="80" width="100" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
