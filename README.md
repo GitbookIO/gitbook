@@ -1,7 +1,9 @@
 > ## ⚠️ Deprecation warning:
 > As the efforts of the GitBook team are focused on the [GitBook.com](https://www.gitbook.com) platform, the CLI is no longer under active development.  
-> All content supported by the CLI are mostly supported by our [GitBook.com / GitHub integration](https://docs.gitbook.com/integrations/github).  
-> Content hosted on the [legacy.gitbook.com](https://legacy.gitbook.com) will continue working until further notice. For differences with the new version, check out our [documentation](https://docs.gitbook.com/v2-changes/important-differences).
+> All content supported by the CLI are mostly supported by our [GitBook.com / GitHub integration](https://docs.gitbook.com/getting-started/git-sync).  
+> Content hosted on the [legacy.gitbook.com](https://legacy.gitbook.com) will continue working until further notice. For differences with the new version, > check out our [documentation](https://docs.gitbook.com/v2-changes/important-differences).
+> 
+> Join our [GitHub community](https://github.com/GitbookIO/community) to stay up to date with the latest news at GitBook.
 
 
 GitBook
