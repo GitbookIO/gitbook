@@ -1,6 +1,6 @@
 # Generating eBooks and PDFs
 
-GitBook can generates a website, but can also output content as ebook (ePub, Mobi, PDF).
+GitBook can generate a website, but can also output content as ebook (ePub, Mobi, PDF).
 
 ```
 # Generate a PDF file
