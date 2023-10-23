@@ -2,24 +2,25 @@ import { NextResponse } from 'next/server';
 import { NextRequest } from 'next/server';
 
 /**
- * Rewrite the request to extract the spaceId from the URL
- * and pass it as a header.
+ * Middleware to add the base path to the request headers.
  */
 export function middleware(request: NextRequest) {
     const url = new URL(request.url);
-    const [space, ...pathRest] = url.pathname.slice(1).split('/');
-
     const headers = new Headers(request.headers);
-    headers.set('x-gitbook-space', space);
-    headers.set('x-gitbook-basepath', `/${space}`);
+    headers.set('x-gitbook-basepath', headers.get('x-gitbook-basepath') ?? getDefaultBasePath(url));
 
-    url.pathname = `/${pathRest.join('/')}`;
-
-    return NextResponse.rewrite(url, {
-        headers,
+    return NextResponse.next({
+        request: {
+            headers,
+        },
     });
 }
 
+function getDefaultBasePath(url: URL) {
+    const [space] = url.pathname.slice(1).split('/');
+    return `/${space}`;
+}
+
 export const config = {
-    matcher: '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    matcher: '/((?!_next/static|_next/image|favicon.ico).*)',
 };
