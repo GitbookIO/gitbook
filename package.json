@@ -12,11 +12,13 @@
     },
     "dependencies": {
         "@gitbook/api": "^0.11.0",
+        "bun-types": "^1.0.7",
         "clsx": "^2.0.0",
         "next": "13.5.6",
         "react": "^18",
         "react-dom": "^18",
-        "server-only": "^0.0.1"
+        "server-only": "^0.0.1",
+        "shiki": "^0.14.5"
     },
     "devDependencies": {
         "@types/node": "^20",

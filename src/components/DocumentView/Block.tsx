@@ -4,6 +4,7 @@ import { Heading } from './Heading';
 import { ListOrdered } from './ListOrdered';
 import { ListUnordered } from './ListUnordered';
 import { ListItem } from './ListItem';
+import { CodeBlock } from './CodeBlock';
 
 export interface BlockProps<T> {
     block: T;
@@ -26,6 +27,8 @@ export function Block<T>(props: BlockProps<T>) {
             return <ListUnordered {...props} />;
         case 'list-item':
             return <ListItem {...props} />;
+        case 'code':
+            return <CodeBlock {...props} />;
         default:
             return <div>Unsupported block {block.type}</div>;
     }

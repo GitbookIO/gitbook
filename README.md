@@ -7,3 +7,7 @@
 -   Favicon
     -   [ ] Redirect to the customization one if any
     -   [ ] Render one
+-   Blocks
+    -   [ ] Code block syntax highlighting
+-   Theme
+    -   [ ] Toggler
