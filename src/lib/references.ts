@@ -40,7 +40,7 @@ export async function resolveContentRef(
         }
     } else if ((contentRef.kind === 'page' || contentRef.kind === 'anchor') && !contentRef.space) {
         const page =
-            contentRef.page && contentRef.page !== activePage.id
+            !contentRef.page || contentRef.page === activePage.id
                 ? activePage
                 : resolvePageId(revision, contentRef.page)?.page;
         if (!page) {
