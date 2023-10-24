@@ -40,7 +40,7 @@ export function PageDocumentItem(props: {
                     descendants={
                         <PagesList
                             pages={page.pages}
-                            style={tcls('ms-4')}
+                            style={tcls('ms-2', 'ps-3', 'my-2', 'border-l', 'border-slate-200')}
                             activePage={activePage}
                             ancestors={ancestors}
                         />
