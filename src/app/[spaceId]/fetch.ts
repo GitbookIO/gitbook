@@ -1,5 +1,5 @@
 import { api } from '@/lib/api';
-import { Revision, RevisionPage, RevisionPageDocument } from '@gitbook/api';
+import { Revision, RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 
 export interface SpaceParams {
     spaceId: string;
@@ -12,6 +12,8 @@ export interface PagePathParams extends SpaceParams {
 export interface PageIdParams extends SpaceParams {
     pageId?: string;
 }
+
+type AncestorRevisionPage = RevisionPageDocument | RevisionPageGroup;
 
 /**
  * Fetch all the data needed for the page.
@@ -32,7 +34,8 @@ export async function fetchPageData(params: PagePathParams | PageIdParams) {
     return {
         space,
         revision,
-        page,
+        ancestors: [],
+        ...page,
     };
 }
 
@@ -47,8 +50,14 @@ export function getPagePath(params: PagePathParams): string {
 /**
  * Resolve a page path to a page document.
  */
-function resolvePagePath(revision: Revision, pagePath: string): RevisionPageDocument | undefined {
-    const iteratePages = (pages: RevisionPage[]): RevisionPageDocument | undefined => {
+function resolvePagePath(
+    revision: Revision,
+    pagePath: string,
+): { page: RevisionPageDocument; ancestors: AncestorRevisionPage[] } | undefined {
+    const iteratePages = (
+        pages: RevisionPage[],
+        ancestors: AncestorRevisionPage[],
+    ): { page: RevisionPageDocument; ancestors: AncestorRevisionPage[] } | undefined => {
         for (const page of pages) {
             if (page.type === 'link') {
                 continue;
@@ -56,7 +65,7 @@ function resolvePagePath(revision: Revision, pagePath: string): RevisionPageDocu
 
             if (page.path !== pagePath) {
                 // TODO: can be optimized to count the number of slashes and skip the entire subtree
-                const result = iteratePages(page.pages);
+                const result = iteratePages(page.pages, [...ancestors, page]);
                 if (result) {
                     return result;
                 }
@@ -64,12 +73,12 @@ function resolvePagePath(revision: Revision, pagePath: string): RevisionPageDocu
                 continue;
             }
 
-            return resolvePageDocument(page);
+            return resolvePageDocument(page, ancestors);
         }
     };
 
     if (!pagePath) {
-        const firstPage = resolveFirstDocument(revision.pages);
+        const firstPage = resolveFirstDocument(revision.pages, []);
         if (!firstPage) {
             return undefined;
         }
@@ -77,44 +86,56 @@ function resolvePagePath(revision: Revision, pagePath: string): RevisionPageDocu
         return firstPage;
     }
 
-    return iteratePages(revision.pages);
+    return iteratePages(revision.pages, []);
 }
 
-function resolvePageId(revision: Revision, pageId: string): RevisionPageDocument | undefined {
-    const iteratePages = (pages: RevisionPage[]): RevisionPageDocument | undefined => {
+function resolvePageId(
+    revision: Revision,
+    pageId: string,
+): { page: RevisionPageDocument; ancestors: AncestorRevisionPage[] } | undefined {
+    const iteratePages = (
+        pages: RevisionPage[],
+        ancestors: AncestorRevisionPage[],
+    ): { page: RevisionPageDocument; ancestors: AncestorRevisionPage[] } | undefined => {
         for (const page of pages) {
             if (page.type === 'link') {
                 continue;
             }
 
             if (page.id === pageId) {
-                return resolvePageDocument(page);
+                return resolvePageDocument(page, ancestors);
             }
 
-            const result = iteratePages(page.pages);
+            const result = iteratePages(page.pages, [...ancestors, page]);
             if (result) {
                 return result;
             }
         }
     };
-    return iteratePages(revision.pages);
+    return iteratePages(revision.pages, []);
 }
 
-function resolveFirstDocument(pages: RevisionPage[]): RevisionPageDocument | undefined {
+function resolveFirstDocument(
+    pages: RevisionPage[],
+    ancestors: AncestorRevisionPage[],
+): { page: RevisionPageDocument; ancestors: AncestorRevisionPage[] } | undefined {
     for (const page of pages) {
         if (page.type === 'link') {
             continue;
         }
 
-        return resolvePageDocument(page);
+        return resolvePageDocument(page, ancestors);
     }
 
     return;
 }
 
-function resolvePageDocument(page: RevisionPage): RevisionPageDocument | undefined {
+function resolvePageDocument(
+    page: RevisionPage,
+    ancestors: AncestorRevisionPage[],
+): { page: RevisionPageDocument; ancestors: AncestorRevisionPage[] } | undefined {
     if (page.type === 'group') {
-        const firstDocument = resolveFirstDocument(page.pages);
+        const firstDocument = resolveFirstDocument(page.pages, [...ancestors, page]);
         if (firstDocument) {
             return firstDocument;
         }
@@ -124,5 +145,5 @@ function resolvePageDocument(page: RevisionPage): RevisionPageDocument | undefin
         return undefined;
     }
 
-    return page;
+    return { page, ancestors };
 }

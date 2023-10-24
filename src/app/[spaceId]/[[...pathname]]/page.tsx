@@ -10,7 +10,7 @@ import { PagePathParams, fetchPageData, getPagePath } from '../fetch';
 export default async function Page(props: { params: PagePathParams }) {
     const { params } = props;
 
-    const { space, revision, page } = await fetchPageData(props.params);
+    const { space, revision, page, ancestors } = await fetchPageData(props.params);
 
     if (!page) {
         notFound();
@@ -18,7 +18,7 @@ export default async function Page(props: { params: PagePathParams }) {
         redirect(pageHref(page.path));
     }
 
-    return <SpaceContent space={space} revision={revision} page={page} />;
+    return <SpaceContent space={space} revision={revision} page={page} ancestors={ancestors} />;
 }
 
 export async function generateMetadata({ params }: { params: PagePathParams }): Promise<Metadata> {

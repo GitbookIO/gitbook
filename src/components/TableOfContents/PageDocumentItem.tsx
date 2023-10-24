@@ -1,4 +1,4 @@
-import { RevisionPageDocument } from '@gitbook/api';
+import { RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 import { clsx } from 'clsx';
 import Link, { LinkProps } from 'next/link';
 import { PagesList } from './PagesList';
@@ -8,8 +8,11 @@ import { ToggeableLinkItem } from './ToggeableLinkItem';
 export function PageDocumentItem(props: {
     page: RevisionPageDocument;
     activePage: RevisionPageDocument;
+    ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
 }) {
-    const { page, activePage } = props;
+    const { page, activePage, ancestors } = props;
+
+    const hasActiveDescendant = ancestors.some((ancestor) => ancestor.id === page.id);
 
     const linkProps = {
         href: pageHref(page.path || ''),
@@ -39,8 +42,10 @@ export function PageDocumentItem(props: {
                             pages={page.pages}
                             style={clsx('ms-4')}
                             activePage={activePage}
+                            ancestors={ancestors}
                         />
                     }
+                    defaultOpen={hasActiveDescendant || activePage.id === page.id}
                 >
                     {page.title}
                 </ToggeableLinkItem>

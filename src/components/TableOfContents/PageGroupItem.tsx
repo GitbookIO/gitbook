@@ -5,8 +5,9 @@ import { PagesList } from './PagesList';
 export function PageGroupItem(props: {
     page: RevisionPageGroup;
     activePage: RevisionPageDocument;
+    ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
 }) {
-    const { page, activePage } = props;
+    const { page, activePage, ancestors } = props;
 
     return (
         <li className={clsx('flex', 'flex-col', 'my-3')}>
@@ -14,7 +15,7 @@ export function PageGroupItem(props: {
                 {page.title}
             </div>
             {page.pages && page.pages.length ? (
-                <PagesList pages={page.pages} activePage={activePage} />
+                <PagesList pages={page.pages} activePage={activePage} ancestors={ancestors} />
             ) : null}
         </li>
     );

@@ -1,10 +1,14 @@
-import { Revision, RevisionPageDocument } from '@gitbook/api';
+import { Revision, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 import { clsx } from 'clsx';
 import { PagesList } from './PagesList';
 import { Trademark } from './Trademark';
 
-export function TableOfContents(props: { revision: Revision; activePage: RevisionPageDocument }) {
-    const { revision, activePage } = props;
+export function TableOfContents(props: {
+    revision: Revision;
+    activePage: RevisionPageDocument;
+    ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
+}) {
+    const { revision, activePage, ancestors } = props;
 
     return (
         <aside
@@ -14,7 +18,7 @@ export function TableOfContents(props: { revision: Revision; activePage: Revisio
             )}
         >
             <div className={clsx('flex-1', 'overflow-y-auto', 'pt-6 pb-14 pl-8 pr-6')}>
-                <PagesList pages={revision.pages} activePage={activePage} />
+                <PagesList pages={revision.pages} activePage={activePage} ancestors={ancestors} />
             </div>
             <Trademark />
         </aside>
