@@ -5,6 +5,7 @@ import { ListOrdered } from './ListOrdered';
 import { ListUnordered } from './ListUnordered';
 import { ListItem } from './ListItem';
 import { CodeBlock } from './CodeBlock';
+import clsx from 'clsx';
 
 export interface BlockProps<T> {
     block: T;
@@ -12,7 +13,7 @@ export interface BlockProps<T> {
 }
 
 export function Block<T>(props: BlockProps<T>) {
-    const { block } = props;
+    const { block, style } = props;
 
     switch (block.type) {
         case 'paragraph':
@@ -30,6 +31,6 @@ export function Block<T>(props: BlockProps<T>) {
         case 'code':
             return <CodeBlock {...props} />;
         default:
-            return <div>Unsupported block {block.type}</div>;
+            return <div className={clsx(style)}>Unsupported block {block.type}</div>;
     }
 }

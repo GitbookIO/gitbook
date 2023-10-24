@@ -25,6 +25,6 @@ const STYLES = {
     },
     'heading-3': {
         tag: 'h4',
-        className: ['text-3xl', 'font-semibold'],
+        className: ['text-base', 'font-semibold'],
     },
 };
