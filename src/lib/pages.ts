@@ -78,7 +78,7 @@ export function resolvePageId(
  */
 export function resolvePrevNextPages(
     revision: Revision,
-    page: RevisionPageDocument
+    page: RevisionPageDocument,
 ): { previous?: RevisionPageDocument; next?: RevisionPageDocument } {
     const flat = flattenPages(revision.pages);
 
@@ -91,10 +91,10 @@ export function resolvePrevNextPages(
     const next = flat[currentIndex + 1];
 
     return {
-        previous, next
+        previous,
+        next,
     };
 }
-
 
 function resolveFirstDocument(
     pages: RevisionPage[],
