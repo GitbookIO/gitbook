@@ -73,6 +73,29 @@ export function resolvePageId(
     return iteratePages(revision.pages, []);
 }
 
+/**
+ * Resolve the next/previous page before another one.
+ */
+export function resolvePrevNextPages(
+    revision: Revision,
+    page: RevisionPageDocument
+): { previous?: RevisionPageDocument; next?: RevisionPageDocument } {
+    const flat = flattenPages(revision.pages);
+
+    const currentIndex = flat.findIndex((p) => p.id === page.id);
+    if (currentIndex === -1) {
+        return {};
+    }
+
+    const previous = flat[currentIndex - 1];
+    const next = flat[currentIndex + 1];
+
+    return {
+        previous, next
+    };
+}
+
+
 function resolveFirstDocument(
     pages: RevisionPage[],
     ancestors: AncestorRevisionPage[],
@@ -104,4 +127,20 @@ function resolvePageDocument(
     }
 
     return { page, ancestors };
+}
+
+function flattenPages(pages: RevisionPage[]): RevisionPageDocument[] {
+    const result: RevisionPageDocument[] = [];
+    for (const page of pages) {
+        if (page.type === 'link') {
+            continue;
+        }
+
+        if (page.type === 'document') {
+            result.push(page);
+        }
+        result.push(...flattenPages(page.pages));
+    }
+
+    return result;
 }
