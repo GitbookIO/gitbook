@@ -57,3 +57,11 @@ export function getNodeText(node: any): string {
             throw new Error('Invalid node');
     }
 }
+
+/**
+ * Get a fragment by its type in a node.
+ */
+export function getNodeFragmentByType(node: any, type: string): any {
+    const fragment = node.fragments?.find((child: any) => child.type === type);
+    return fragment;
+}
