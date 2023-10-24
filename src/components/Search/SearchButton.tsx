@@ -20,7 +20,22 @@ export function SearchButton(props: { style?: ClassValue }) {
     };
 
     return (
-        <button onClick={onClick} className={tcls(style)}>
+        <button
+            onClick={onClick}
+            className={tcls(
+                'px-4',
+                'py-2',
+                'rounded',
+                'bg-slate-100',
+                'hover:bg-slate-200',
+                'text-base',
+                'text-slate-800',
+                'hover:text-slate-900',
+                'border',
+                'border-slate-300',
+                style,
+            )}
+        >
             Search
         </button>
     );
