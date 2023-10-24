@@ -1,4 +1,3 @@
-
 export interface DocumentSection {
     id: string;
     title: string;
@@ -21,8 +20,12 @@ export function getDocumentSections(document: any): DocumentSection[] {
     const sections: DocumentSection[] = [];
     let depth = 0;
 
-    document.nodes.forEach(block => {
-        if (block.type === 'heading-1' || block.type === 'heading-2' || block.type === 'heading-3') {
+    document.nodes.forEach((block) => {
+        if (
+            block.type === 'heading-1' ||
+            block.type === 'heading-2' ||
+            block.type === 'heading-3'
+        ) {
             if (block.type === 'heading-1') {
                 depth = 1;
             }
@@ -32,7 +35,7 @@ export function getDocumentSections(document: any): DocumentSection[] {
             sections.push({
                 id: block.data.id ?? title, // TODO: use slugify
                 title,
-                depth: block.type === 'heading-1' ? 1 : (depth > 0 ? 2 : 1),
+                depth: block.type === 'heading-1' ? 1 : depth > 0 ? 2 : 1,
             });
         }
     });
@@ -49,7 +52,7 @@ export function getNodeText(node: any): string {
             return node.leaves.map((leaf) => leaf.text).join('');
         case 'block':
         case 'inline':
-            return node.nodes.map(child => getNodeText(child)).join('');
+            return node.nodes.map((child) => getNodeText(child)).join('');
         default:
             throw new Error('Invalid node');
     }

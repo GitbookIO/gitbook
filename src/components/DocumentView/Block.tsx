@@ -9,6 +9,7 @@ import { tcls } from '@/lib/tailwind';
 import { Hint } from './Hint';
 import { DocumentContextProps } from './DocumentView';
 import { Images } from './Images';
+import { Tabs } from './Tabs';
 
 export interface BlockProps<T> extends DocumentContextProps {
     block: T;
@@ -37,6 +38,8 @@ export function Block<T>(props: BlockProps<T>) {
             return <Hint {...props} {...contextProps} />;
         case 'images':
             return <Images {...props} {...contextProps} />;
+        case 'tabs':
+            return <Tabs {...props} {...contextProps} />;
         default:
             return <div className={tcls(style)}>Unsupported block {block.type}</div>;
     }
