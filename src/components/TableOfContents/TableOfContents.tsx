@@ -16,18 +16,17 @@ export function TableOfContents(props: {
                 'hidden',
                 'lg:flex',
                 'flex-col',
-                'basis-80',
+                'basis-72',
                 'grow-0',
                 'shrink-0',
                 'sticky',
                 'top-16',
                 'h-[calc(100vh-4rem)]',
-                'ml-[max(0px,calc(50%-45rem))]',
                 'border-r',
                 'border-slate-200',
             )}
         >
-            <div className={tcls('flex-1', 'overflow-y-auto', 'pt-6 pb-14 pl-8 pr-6')}>
+            <div className={tcls('flex-1', 'overflow-y-auto', 'pt-6', 'pb-14', 'pr-4')}>
                 <PagesList pages={revision.pages} activePage={activePage} ancestors={ancestors} />
             </div>
             <Trademark />

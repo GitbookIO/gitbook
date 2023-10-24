@@ -8,6 +8,7 @@ import { CodeBlock } from './CodeBlock';
 import { tcls } from '@/lib/tailwind';
 import { Hint } from './Hint';
 import { DocumentContextProps } from './DocumentView';
+import { Images } from './Images';
 
 export interface BlockProps<T> extends DocumentContextProps {
     block: T;
@@ -34,6 +35,8 @@ export function Block<T>(props: BlockProps<T>) {
             return <CodeBlock {...props} {...contextProps} />;
         case 'hint':
             return <Hint {...props} {...contextProps} />;
+        case 'images':
+            return <Images {...props} {...contextProps} />;
         default:
             return <div className={tcls(style)}>Unsupported block {block.type}</div>;
     }

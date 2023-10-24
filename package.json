@@ -13,7 +13,6 @@
     "dependencies": {
         "@gitbook/api": "^0.11.0",
         "bun-types": "^1.0.7",
-        "clsx": "^2.0.0",
         "next": "13.5.6",
         "react": "^18",
         "react-dom": "^18",
@@ -30,7 +29,7 @@
         "eslint-config-next": "13.5.6",
         "postcss": "^8",
         "prettier": "^3.0.3",
-        "tailwindcss": "^3",
+        "tailwindcss": "^3.3.4",
         "typescript": "^5"
     }
 }

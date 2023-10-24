@@ -11,3 +11,9 @@
     -   [ ] Code block syntax highlighting
 -   Theme
     -   [ ] Toggler
+
+## Differences
+
+-   Full-width mode:
+    -   When off, layout is centered
+    -   It now detects based on the page

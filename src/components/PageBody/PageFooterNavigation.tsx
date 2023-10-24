@@ -14,7 +14,7 @@ export function PageFooterNavigation(props: { revision: Revision; page: Revision
     const { previous, next } = resolvePrevNextPages(revision, page);
 
     return (
-        <div className={tcls('flex', 'flex-row', 'mt-6', 'gap-2', 'max-w-3xl')}>
+        <div className={tcls('flex', 'flex-row', 'mt-6', 'gap-2', 'max-w-3xl', 'mx-auto')}>
             {previous ? (
                 <NavigationCard
                     icon={IconArrowLeft}

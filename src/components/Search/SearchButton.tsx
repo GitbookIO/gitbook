@@ -36,7 +36,7 @@ export function SearchButton(props: { style?: ClassValue }) {
                 'text-slate-800',
                 'hover:text-slate-900',
                 'border',
-                'border-slate-300',
+                'border-slate-200',
                 style,
             )}
         >

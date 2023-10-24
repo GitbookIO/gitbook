@@ -14,11 +14,12 @@ export function Trademark() {
                     'font-normal',
                     'px-4',
                     'py-3',
-                    'mx-4',
+                    'mr-4',
                     'my-4',
                     'rounded-lg',
                     'bg-white',
                     'bg-slate-50',
+                    'hover:bg-slate-100',
                 )}
             >
                 Powered by GitBook
