@@ -10,27 +10,29 @@ export const runtime = 'edge';
  */
 export async function GET(req: NextRequest, { params }: { params: PageIdParams }) {
     const { space, page } = await fetchPageData(params);
+    const url = new URL(space.urls.published);
 
     return new ImageResponse(
         (
             <div
+                tw="bg-gray-50 py-16 px-14"
                 style={{
                     height: '100%',
                     width: '100%',
                     display: 'flex',
                     flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: 'white',
                 }}
             >
-                <div tw="bg-gray-50 flex flex-1">
-                    <div tw="flex flex-col w-full py-16 px-14">
-                        <h2 tw="text-7xl font-bold tracking-tight text-gray-900 text-left">
-                            {space.title}
-                        </h2>
-                        <p tw="text-4xl text-indigo-600">{page ? page.title : 'Not found'}</p>
-                    </div>
+                <h2 tw="text-7xl font-bold tracking-tight text-gray-900 text-left">
+                    {space.title}
+                </h2>
+                <div tw="flex flex-1">
+                    <p tw="text-4xl text-indigo-600">{page ? page.title : 'Not found'}</p>
+                </div>
+                <div tw="flex">
+                    <p tw="text-4xl text-slate-500">
+                        {url.hostname + (url.pathname.length > 1 ? url.pathname : '')}
+                    </p>
                 </div>
             </div>
         ),
