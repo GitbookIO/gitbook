@@ -1,4 +1,4 @@
-import clsx from 'clsx';
+import { tcls } from '@/lib/tailwind';
 import React from 'react';
 
 export function Text(props: { text: any }) {
@@ -29,6 +29,7 @@ const MARK_STYLES = {
     bold: Bold,
     italic: Italic,
     code: Code,
+    strikethrough: Strikethrough,
 };
 
 interface MarkedLeafProps {
@@ -37,16 +38,20 @@ interface MarkedLeafProps {
 }
 
 function Bold(props: MarkedLeafProps) {
-    return <strong className={clsx('font-semibold')}>{props.children}</strong>;
+    return <strong className={tcls('font-semibold')}>{props.children}</strong>;
 }
 
 function Italic(props: MarkedLeafProps) {
-    return <i className={clsx('font-italic')}>{props.children}</i>;
+    return <i className={tcls('font-italic')}>{props.children}</i>;
+}
+
+function Strikethrough(props: MarkedLeafProps) {
+    return <s className={tcls('line-through')}>{props.children}</s>;
 }
 
 function Code(props: MarkedLeafProps) {
     return (
-        <code className={clsx('text-slate-800', 'bg-slate-100', 'rounded', 'py-0.5', 'px-1')}>
+        <code className={tcls('text-slate-800', 'bg-slate-100', 'rounded', 'py-0.5', 'px-1')}>
             {props.children}
         </code>
     );

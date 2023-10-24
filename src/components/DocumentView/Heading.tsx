@@ -1,15 +1,15 @@
-import clsx from 'clsx';
+import { tcls } from '@/lib/tailwind';
 import { BlockProps } from './Block';
 import { Inlines } from './Inlines';
 
 export function Heading(props: BlockProps<any>) {
-    const { block, style } = props;
+    const { block, style, ...contextProps } = props;
 
     const headingStyle = STYLES[block.type];
 
     return (
-        <headingStyle.tag className={clsx(headingStyle.className, style)}>
-            <Inlines nodes={block.nodes} />
+        <headingStyle.tag className={tcls(headingStyle.className, style)}>
+            <Inlines {...contextProps} nodes={block.nodes} />
         </headingStyle.tag>
     );
 }

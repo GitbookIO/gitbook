@@ -16,5 +16,15 @@ export async function PageDocument(props: {
         data: { document },
     } = await api().spaces.getPageInRevisionById(space.id, revision.id, page.id);
 
-    return <DocumentView document={document} />;
+    return (
+        <DocumentView
+            document={document}
+            style={'mt-6'}
+            context={{
+                space,
+                revision,
+                page,
+            }}
+        />
+    );
 }

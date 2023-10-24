@@ -1,5 +1,5 @@
 import { RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
-import { clsx } from 'clsx';
+import { tcls } from '@/lib/tailwind';
 import Link, { LinkProps } from 'next/link';
 import { PagesList } from './PagesList';
 import { pageHref } from '@/lib/links';
@@ -16,7 +16,7 @@ export function PageDocumentItem(props: {
 
     const linkProps = {
         href: pageHref(page.path || ''),
-        className: clsx(
+        className: tcls(
             'flex',
             'flex-row',
             'justify-between',
@@ -33,14 +33,14 @@ export function PageDocumentItem(props: {
     };
 
     return (
-        <li className={clsx('flex', 'flex-col', 'mb-0.5')}>
+        <li className={tcls('flex', 'flex-col', 'mb-0.5')}>
             {page.pages && page.pages.length ? (
                 <ToggeableLinkItem
                     {...linkProps}
                     descendants={
                         <PagesList
                             pages={page.pages}
-                            style={clsx('ms-4')}
+                            style={tcls('ms-4')}
                             activePage={activePage}
                             ancestors={ancestors}
                         />

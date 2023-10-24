@@ -1,5 +1,5 @@
 import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
-import { ClassValue, clsx } from 'clsx';
+import { ClassValue, tcls } from '@/lib/tailwind';
 import { PageDocumentItem } from './PageDocumentItem';
 import { PageGroupItem } from './PageGroupItem';
 
@@ -12,7 +12,7 @@ export function PagesList(props: {
     const { pages, activePage, ancestors, style } = props;
 
     return (
-        <ul className={clsx('flex', 'flex-col', style)}>
+        <ul className={tcls('flex', 'flex-col', style)}>
             {pages.map((page) => {
                 if (page.type === 'group') {
                     return (

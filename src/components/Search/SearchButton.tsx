@@ -1,6 +1,6 @@
 'use client';
 
-import { ClassValue } from 'clsx';
+import { ClassValue, tcls } from '@/lib/tailwind';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
 /**
@@ -20,7 +20,7 @@ export function SearchButton(props: { style?: ClassValue }) {
     };
 
     return (
-        <button onClick={onClick} style={style}>
+        <button onClick={onClick} className={tcls(style)}>
             Search
         </button>
     );

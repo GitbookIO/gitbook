@@ -1,13 +1,13 @@
-import clsx from 'clsx';
+import { tcls } from '@/lib/tailwind';
 import { BlockProps } from './Block';
 import { Inlines } from './Inlines';
 
 export function Paragraph(props: BlockProps<any>) {
-    const { block, style } = props;
+    const { block, style, ...contextProps } = props;
 
     return (
-        <p className={clsx('text-base', 'font-normal', style)}>
-            <Inlines nodes={block.nodes} />
+        <p className={tcls('text-base', 'font-normal', style)}>
+            <Inlines {...contextProps} nodes={block.nodes} />
         </p>
     );
 }

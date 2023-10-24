@@ -1,36 +1,40 @@
-import { ClassValue } from 'clsx';
+import { ClassValue } from '@/lib/tailwind';
 import { Paragraph } from './Paragraph';
 import { Heading } from './Heading';
 import { ListOrdered } from './ListOrdered';
 import { ListUnordered } from './ListUnordered';
 import { ListItem } from './ListItem';
 import { CodeBlock } from './CodeBlock';
-import clsx from 'clsx';
+import { tcls } from '@/lib/tailwind';
+import { Hint } from './Hint';
+import { DocumentContextProps } from './DocumentView';
 
-export interface BlockProps<T> {
+export interface BlockProps<T> extends DocumentContextProps {
     block: T;
     style?: ClassValue;
 }
 
 export function Block<T>(props: BlockProps<T>) {
-    const { block, style } = props;
+    const { block, style, ...contextProps } = props;
 
     switch (block.type) {
         case 'paragraph':
-            return <Paragraph {...props} />;
+            return <Paragraph {...props} {...contextProps} />;
         case 'heading-1':
         case 'heading-2':
         case 'heading-3':
-            return <Heading {...props} />;
+            return <Heading {...props} {...contextProps} />;
         case 'list-ordered':
-            return <ListOrdered {...props} />;
+            return <ListOrdered {...props} {...contextProps} />;
         case 'list-unordered':
-            return <ListUnordered {...props} />;
+            return <ListUnordered {...props} {...contextProps} />;
         case 'list-item':
-            return <ListItem {...props} />;
+            return <ListItem {...props} {...contextProps} />;
         case 'code':
-            return <CodeBlock {...props} />;
+            return <CodeBlock {...props} {...contextProps} />;
+        case 'hint':
+            return <Hint {...props} {...contextProps} />;
         default:
-            return <div className={clsx(style)}>Unsupported block {block.type}</div>;
+            return <div className={tcls(style)}>Unsupported block {block.type}</div>;
     }
 }

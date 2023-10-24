@@ -1,4 +1,4 @@
-import clsx from 'clsx';
+import { tcls } from '@/lib/tailwind';
 import { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { highlight, HighlightLine, HighlightToken } from './highlight';
@@ -9,7 +9,7 @@ export async function CodeBlock(props: BlockProps<any>) {
     const lines = await highlight(block);
 
     return (
-        <pre className={clsx('p-4', 'rounded-md', 'bg-slate-100', '[counter-reset:line]', style)}>
+        <pre className={tcls('p-4', 'rounded-md', 'bg-slate-100', '[counter-reset:line]', style)}>
             {lines.map((line, index) => (
                 <CodeHighlightLine
                     block={block}

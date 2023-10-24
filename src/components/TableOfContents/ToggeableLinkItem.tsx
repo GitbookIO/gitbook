@@ -1,6 +1,6 @@
 'use client';
 
-import clsx from 'clsx';
+import { tcls } from '@/lib/tailwind';
 import Link, { LinkProps } from 'next/link';
 import React from 'react';
 
@@ -24,7 +24,7 @@ export function ToggeableLinkItem(
             <Link {...linkProps}>
                 {children}
                 <button
-                    className={clsx('px-1')}
+                    className={tcls('px-1')}
                     onClick={(event) => {
                         event.preventDefault();
                         event.stopPropagation();

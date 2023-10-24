@@ -1,6 +1,7 @@
-import { ClassValue } from 'clsx';
+import { DocumentContextProps } from './DocumentView';
+import { Link } from './Link';
 
-export interface InlineProps<T> {
+export interface InlineProps<T> extends DocumentContextProps {
     inline: T;
 
     /**
@@ -10,9 +11,11 @@ export interface InlineProps<T> {
 }
 
 export function Inline<T>(props: InlineProps<T>) {
-    const { inline } = props;
+    const { inline, ...contextProps } = props;
 
     switch (inline.type) {
+        case 'link':
+            return <Link {...contextProps} inline={inline} />;
         default:
             return <span>Unsupported inline {inline.type}</span>;
     }

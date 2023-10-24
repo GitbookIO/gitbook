@@ -1,14 +1,14 @@
-import clsx from 'clsx';
+import { tcls } from '@/lib/tailwind';
 
 /**
  * Link to the GitBook platform.
  */
 export function Trademark() {
     return (
-        <div className={clsx('absolute', 'bottom-0', 'right-0', 'left-0', 'flex', 'flex-col')}>
+        <div className={tcls('absolute', 'bottom-0', 'right-0', 'left-0', 'flex', 'flex-col')}>
             <a
                 href="https://www.gitbook.com"
-                className={clsx(
+                className={tcls(
                     'text-m',
                     'text-slate-500',
                     'font-normal',

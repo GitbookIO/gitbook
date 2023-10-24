@@ -1,9 +1,10 @@
-import clsx from 'clsx';
+import { tcls } from '@/lib/tailwind';
 import { Text } from './Text';
 import { Inline } from './Inline';
+import { DocumentContextProps } from './DocumentView';
 
-export function Inlines<T>(props: { nodes: T[] }) {
-    const { nodes } = props;
+export function Inlines<T>(props: DocumentContextProps & { nodes: T[] }) {
+    const { nodes, ...contextProps } = props;
 
     return (
         <>
@@ -12,7 +13,7 @@ export function Inlines<T>(props: { nodes: T[] }) {
                     return <Text key={node.key} text={node} />;
                 }
 
-                return <Inline key={node.key} inline={node} />;
+                return <Inline key={node.key} inline={node} {...contextProps} />;
             })}
         </>
     );
