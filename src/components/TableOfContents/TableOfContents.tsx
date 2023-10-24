@@ -13,8 +13,18 @@ export function TableOfContents(props: {
     return (
         <aside
             className={tcls(
+                'hidden',
+                'lg:flex',
                 'flex-col',
-                'hidden lg:flex fixed z-20 inset-0 top-16 left-[max(0px,calc(50%-45rem))] right-auto w-[19rem]',
+                'basis-80',
+                'grow-0',
+                'shrink-0',
+                'sticky',
+                'top-16',
+                'h-[calc(100vh-4rem)]',
+                'ml-[max(0px,calc(50%-45rem))]',
+                'border-r',
+                'border-slate-200',
             )}
         >
             <div className={tcls('flex-1', 'overflow-y-auto', 'pt-6 pb-14 pl-8 pr-6')}>

@@ -40,6 +40,7 @@ export function Blocks<T>(
                     key={node.key}
                     block={node}
                     style={[
+                        'max-w-3xl', // Default max size for blocks, can be overridden in the block implementation
                         blockStyle,
                         index === 0 && firstBlockStyle,
                         index === nodes.length - 1 && lastBlockStyle,

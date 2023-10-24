@@ -5,7 +5,8 @@ import { tcls } from '@/lib/tailwind';
 import { Header } from '@/components/Header';
 import { PageBody } from '@/components/PageBody';
 import React from 'react';
-import { SearchModal } from '../Search';
+import { SearchModal } from '@/components/Search';
+import { Footer } from '@/components/Footer';
 
 /**
  * Render the entire content of the space (header, table of contents, footer, and page content).
@@ -21,14 +22,11 @@ export function SpaceContent(props: {
     return (
         <div>
             <Header space={space} />
-            <div className={tcls('max-w-8xl mx-auto px-4 sm:px-6 md:px-8')}>
+            <div className={tcls('flex', 'flex-row', 'max-w-8xl mx-auto px-4 sm:px-6 md:px-8')}>
                 <TableOfContents revision={revision} activePage={page} ancestors={ancestors} />
-                <div className={tcls('lg:pl-[19.5rem]')}>
-                    <div className={tcls('max-w-3xl', 'py-8', 'px-4')}>
-                        <PageBody space={space} revision={revision} page={page} />
-                    </div>
-                </div>
+                <PageBody space={space} revision={revision} page={page} />
             </div>
+            <Footer space={space} />
             <React.Suspense fallback={null}>
                 <SearchModal />
             </React.Suspense>

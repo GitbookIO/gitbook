@@ -18,7 +18,7 @@ export function Trademark() {
                     'my-4',
                     'rounded-lg',
                     'bg-white',
-                    'hover:bg-slate-50',
+                    'bg-slate-50',
                 )}
             >
                 Powered by GitBook
