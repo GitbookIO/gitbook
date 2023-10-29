@@ -2,13 +2,16 @@ import { Revision, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api'
 import { tcls } from '@/lib/tailwind';
 import { PagesList } from './PagesList';
 import { Trademark } from './Trademark';
+import { IntlContext } from '@/lib/intl';
 
-export function TableOfContents(props: {
-    revision: Revision;
-    activePage: RevisionPageDocument;
-    ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
-}) {
-    const { revision, activePage, ancestors } = props;
+export function TableOfContents(
+    props: IntlContext & {
+        revision: Revision;
+        activePage: RevisionPageDocument;
+        ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
+    },
+) {
+    const { space, revision, activePage, ancestors } = props;
 
     return (
         <aside
@@ -29,7 +32,7 @@ export function TableOfContents(props: {
             <div className={tcls('flex-1', 'overflow-y-auto', 'pt-6', 'pb-14', 'pr-4')}>
                 <PagesList pages={revision.pages} activePage={activePage} ancestors={ancestors} />
             </div>
-            <Trademark />
+            <Trademark space={space} />
         </aside>
     );
 }

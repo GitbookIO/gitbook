@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 import { SearchButton } from '../Search';
 import { CONTAINER_MAX_WIDTH_NORMAL, CONTAINER_PADDING } from '@/components/layout';
+import { t } from '@/lib/intl';
 
 /**
  * Render the header for the space.
@@ -50,7 +51,7 @@ export function Header(props: { space: Space; asFullWidth: boolean }) {
                 </Link>
                 <div>
                     <Suspense fallback={null}>
-                        <SearchButton />
+                        <SearchButton>{t({ space }, 'search')}</SearchButton>
                     </Suspense>
                 </div>
             </div>

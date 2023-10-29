@@ -35,9 +35,14 @@ export function SpaceContent(props: {
                     asFullWidth ? null : [CONTAINER_MAX_WIDTH_NORMAL, 'mx-auto'],
                 )}
             >
-                <TableOfContents revision={revision} activePage={page} ancestors={ancestors} />
+                <TableOfContents
+                    space={space}
+                    revision={revision}
+                    activePage={page}
+                    ancestors={ancestors}
+                />
                 <PageBody space={space} revision={revision} page={page} document={document} />
-                <PageAside page={page} document={document} />
+                <PageAside space={space} page={page} document={document} />
             </div>
             <Footer space={space} asFullWidth={asFullWidth} />
             <React.Suspense fallback={null}>

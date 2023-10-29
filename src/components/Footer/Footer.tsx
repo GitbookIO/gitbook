@@ -5,7 +5,7 @@ import React from 'react';
 import { CONTAINER_MAX_WIDTH_NORMAL, CONTAINER_PADDING } from '../layout';
 
 export function Footer(props: { space: Space; asFullWidth: boolean }) {
-    const { asFullWidth } = props;
+    const { space, asFullWidth } = props;
 
     return (
         <div
@@ -31,7 +31,7 @@ export function Footer(props: { space: Space; asFullWidth: boolean }) {
                 <div className={tcls('flex-1')} />
                 <div>
                     <React.Suspense fallback={null}>
-                        <ThemeToggler />
+                        <ThemeToggler space={space} />
                     </React.Suspense>
                 </div>
             </div>

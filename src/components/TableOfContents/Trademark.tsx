@@ -1,9 +1,10 @@
+import { IntlContext, t } from '@/lib/intl';
 import { tcls } from '@/lib/tailwind';
 
 /**
  * Link to the GitBook platform.
  */
-export function Trademark() {
+export function Trademark(props: IntlContext) {
     return (
         <div className={tcls('absolute', 'bottom-0', 'right-0', 'left-0', 'flex', 'flex-col')}>
             <a
@@ -22,7 +23,7 @@ export function Trademark() {
                     'hover:bg-slate-100',
                 )}
             >
-                Powered by GitBook
+                {t(props, 'powered_by_gitbook')}
             </a>
         </div>
     );

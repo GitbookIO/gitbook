@@ -7,8 +7,8 @@ import { IconSearch } from '@/components/icons/IconSearch';
 /**
  * Button to open the search modal.
  */
-export function SearchButton(props: { style?: ClassValue }) {
-    const { style } = props;
+export function SearchButton(props: { children: React.ReactNode; style?: ClassValue }) {
+    const { style, children } = props;
 
     const router = useRouter();
     const pathname = usePathname();
@@ -41,7 +41,7 @@ export function SearchButton(props: { style?: ClassValue }) {
             )}
         >
             <IconSearch className={tcls('w-4', 'h-4', 'me-2')} />
-            Search
+            {children}
         </button>
     );
 }
