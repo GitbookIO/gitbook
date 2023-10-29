@@ -82,4 +82,3 @@ export function isNodeEmpty(node: any): boolean {
     const text = getNodeText(node);
     return text.trim().length === 0;
 }
-

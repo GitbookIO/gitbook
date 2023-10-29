@@ -11,6 +11,7 @@
         "format:check": "prettier ./ --ignore-unknown --list-different"
     },
     "dependencies": {
+        "@geist-ui/icons": "^1.0.2",
         "@gitbook/api": "^0.11.0",
         "bun-types": "^1.0.7",
         "next": "13.5.6",

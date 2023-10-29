@@ -1,4 +1,4 @@
-import Image from 'next/image'
+import Image from 'next/image';
 
 import { BlockProps } from './Block';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
@@ -10,16 +10,18 @@ export function Images(props: BlockProps<any>) {
     const { block, style, ...contextProps } = props;
 
     return (
-        <div className={tcls(
-            'w-full',
-            'flex',
-            'flex-row',
-            block.data.align === 'center' && 'justify-center',
-            block.data.align === 'right' && 'justify-end',
-            block.data.align === 'left' && 'justify-start',
-            style,
-            block.data.fullWidth ? 'max-w-full' : null,
-        )}>
+        <div
+            className={tcls(
+                'w-full',
+                'flex',
+                'flex-row',
+                block.data.align === 'center' && 'justify-center',
+                block.data.align === 'right' && 'justify-end',
+                block.data.align === 'left' && 'justify-start',
+                style,
+                block.data.fullWidth ? 'max-w-full' : null,
+            )}
+        >
             {block.nodes.map((node: any, i: number) => (
                 <ImageBlock
                     key={node.key}
@@ -43,7 +45,7 @@ async function ImageBlock(props: {
 
     const [src, darkSrc] = await Promise.all([
         resolveContentRef(block.data.ref, context),
-        block.data.darkRef ? resolveContentRef(block.data.darkRef, context) : null
+        block.data.darkRef ? resolveContentRef(block.data.darkRef, context) : null,
     ]);
 
     if (!src) {
@@ -52,9 +54,7 @@ async function ImageBlock(props: {
 
     const caption = getNodeFragmentByName(block, 'caption');
 
-    const image = (
-        <img alt={block.data.alt} src={src.href} className={tcls('rounded')} />
-    );
+    const image = <img alt={block.data.alt} src={src.href} className={tcls('rounded')} />;
 
     if (!caption || isNodeEmpty(caption)) {
         return image;
