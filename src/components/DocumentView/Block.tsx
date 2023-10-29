@@ -11,6 +11,7 @@ import { DocumentContextProps } from './DocumentView';
 import { Images } from './Images';
 import { Tabs } from './Tabs';
 import { Expandable } from './Expandable';
+import { Table } from './Table';
 
 export interface BlockProps<T> extends DocumentContextProps {
     block: T;
@@ -43,6 +44,8 @@ export function Block<T>(props: BlockProps<T>) {
             return <Tabs {...props} {...contextProps} />;
         case 'expandable':
             return <Expandable {...props} {...contextProps} />;
+        case 'table':
+            return <Table {...props} {...contextProps} />
         default:
             return <div className={tcls(style)}>Unsupported block {block.type}</div>;
     }
