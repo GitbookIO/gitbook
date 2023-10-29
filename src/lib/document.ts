@@ -9,7 +9,7 @@ export interface DocumentSection {
  */
 export function hasFullWidthBlock(document: any): boolean {
     return document.nodes.some((node) => {
-        return node.data.fullWidth || node.type === 'images';
+        return node.data.fullWidth;
     });
 }
 
@@ -50,6 +50,7 @@ export function getNodeText(node: any): string {
     switch (node.object) {
         case 'text':
             return node.leaves.map((leaf) => leaf.text).join('');
+        case 'fragment':
         case 'block':
         case 'inline':
             return node.nodes.map((child) => getNodeText(child)).join('');
@@ -65,3 +66,20 @@ export function getNodeFragmentByType(node: any, type: string): any {
     const fragment = node.fragments?.find((child: any) => child.type === type);
     return fragment;
 }
+
+/**
+ * Get a fragment by its `fragment` name in a node.
+ */
+export function getNodeFragmentByName(node: any, name: string): any {
+    const fragment = node.fragments?.find((child: any) => child.fragment === name);
+    return fragment;
+}
+
+/**
+ * Test if a node is empty.
+ */
+export function isNodeEmpty(node: any): boolean {
+    const text = getNodeText(node);
+    return text.trim().length === 0;
+}
+
