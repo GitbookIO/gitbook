@@ -25,15 +25,16 @@ export function SearchButton(props: { children: React.ReactNode; style?: ClassVa
             onClick={onClick}
             className={tcls(
                 'flex',
+                'flex-1',
                 'flex-row',
                 'items-center',
                 'px-4',
-                'py-2',
+                'py-1',
                 'rounded',
                 'bg-slate-50',
                 'hover:bg-slate-100',
                 'text-base',
-                'text-slate-800',
+                'text-slate-600',
                 'hover:text-slate-900',
                 'border',
                 'border-slate-200',

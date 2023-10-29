@@ -17,6 +17,8 @@ export function Header(props: { space: Space; asFullWidth: boolean }) {
     return (
         <header
             className={tcls(
+                'flex',
+                'flex-row',
                 'h-16',
                 'sticky',
                 'top-0',
@@ -38,6 +40,7 @@ export function Header(props: { space: Space; asFullWidth: boolean }) {
             <div
                 className={tcls(
                     'flex',
+                    'flex-1',
                     'flex-row',
                     'items-center',
                     CONTAINER_PADDING,
@@ -49,7 +52,7 @@ export function Header(props: { space: Space; asFullWidth: boolean }) {
                         {space.title}
                     </h1>
                 </Link>
-                <div>
+                <div className={tcls('flex', 'basis-56', 'grow-0', 'shrink-0')}>
                     <Suspense fallback={null}>
                         <SearchButton>{t({ space }, 'search')}</SearchButton>
                     </Suspense>
