@@ -1,5 +1,5 @@
-import { BlockProps } from "../Block";
-import { ViewCards } from "./ViewCards";
+import { BlockProps } from '../Block';
+import { ViewCards } from './ViewCards';
 
 export interface TableViewProps<View> extends BlockProps<any> {
     view: View;
@@ -13,7 +13,6 @@ export function Table(props: BlockProps<any>) {
         case 'cards':
             return <ViewCards view={block.data.view} {...props} />;
         default:
-            return <div>Unsupported view {block.data.view.type}</div>
+            return <div>Unsupported view {block.data.view.type}</div>;
     }
 }
-

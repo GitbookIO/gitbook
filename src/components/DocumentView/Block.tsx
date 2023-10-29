@@ -45,7 +45,7 @@ export function Block<T>(props: BlockProps<T>) {
         case 'expandable':
             return <Expandable {...props} {...contextProps} />;
         case 'table':
-            return <Table {...props} {...contextProps} />
+            return <Table {...props} {...contextProps} />;
         default:
             return <div className={tcls(style)}>Unsupported block {block.type}</div>;
     }

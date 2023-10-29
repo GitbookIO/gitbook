@@ -29,11 +29,11 @@ export function getDocumentSections(document: any): DocumentSection[] {
             if (block.type === 'heading-1') {
                 depth = 1;
             }
-
             const title = getNodeText(block);
+            const id = block.meta?.id ?? title;
 
             sections.push({
-                id: block.data.id ?? title, // TODO: use slugify
+                id,
                 title,
                 depth: block.type === 'heading-1' ? 1 : depth > 0 ? 2 : 1,
             });
