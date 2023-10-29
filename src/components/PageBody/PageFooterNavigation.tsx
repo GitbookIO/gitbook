@@ -1,16 +1,21 @@
 import { pageHref } from '@/lib/links';
 import { resolvePrevNextPages } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
-import { Revision, RevisionPageDocument } from '@gitbook/api';
+import { Revision, RevisionPageDocument, Space } from '@gitbook/api';
 import Link from 'next/link';
 import { IconArrowLeft } from '@/components/icons/IconArrowLeft';
 import { IconArrowRight } from '@/components/icons/IconArrowRight';
+import { t } from '@/lib/intl';
 
 /**
  * Show cards to go to previous/next pages at the bottom.
  */
-export function PageFooterNavigation(props: { revision: Revision; page: RevisionPageDocument }) {
-    const { revision, page } = props;
+export function PageFooterNavigation(props: {
+    space: Space;
+    revision: Revision;
+    page: RevisionPageDocument;
+}) {
+    const { space, revision, page } = props;
     const { previous, next } = resolvePrevNextPages(revision, page);
 
     return (
@@ -18,7 +23,7 @@ export function PageFooterNavigation(props: { revision: Revision; page: Revision
             {previous ? (
                 <NavigationCard
                     icon={IconArrowLeft}
-                    label="Previous"
+                    label={t({ space }, 'previous_page')}
                     title={previous.title}
                     href={pageHref(previous.path)}
                     reversed
@@ -27,7 +32,7 @@ export function PageFooterNavigation(props: { revision: Revision; page: Revision
             {next ? (
                 <NavigationCard
                     icon={IconArrowRight}
-                    label="Next"
+                    label={t({ space }, 'next_page')}
                     title={next.title}
                     href={pageHref(next.path)}
                 />
@@ -38,7 +43,7 @@ export function PageFooterNavigation(props: { revision: Revision; page: Revision
 
 function NavigationCard(props: {
     icon: React.ComponentType<{ className: string }>;
-    label: string;
+    label: React.ReactNode;
     title: string;
     href: string;
     reversed?: boolean;

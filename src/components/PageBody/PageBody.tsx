@@ -24,7 +24,7 @@ export function PageBody(props: {
                     page,
                 }}
             />
-            <PageFooterNavigation revision={revision} page={page} />
+            <PageFooterNavigation space={space} revision={revision} page={page} />
         </main>
     );
 }
