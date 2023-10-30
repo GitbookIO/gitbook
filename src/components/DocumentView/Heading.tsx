@@ -3,19 +3,18 @@ import IconHash from '@geist-ui/icons/hash';
 import { BlockProps } from './Block';
 import { Inlines } from './Inlines';
 import { DocumentBlockHeading } from '@gitbook/api';
+import { getBlockTextStyle } from './spacing';
 
 export function Heading(props: BlockProps<DocumentBlockHeading>) {
     const { block, style, ...contextProps } = props;
 
-    const headingStyle = STYLES[block.type];
+    const textStyle = getBlockTextStyle(block);
+    const Tag = TAGS[block.type];
 
     const id = block.meta?.id ?? '';
 
     return (
-        <headingStyle.tag
-            id={id}
-            className={tcls(headingStyle.className, 'group', 'relative', style)}
-        >
+        <Tag id={id} className={tcls(textStyle.textSize, 'group', 'relative', style)}>
             <div
                 className={tcls(
                     'absolute',
@@ -27,7 +26,7 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                     'group-hover:opacity-100',
                     'group-focus:opacity-100',
                     'lg:flex',
-                    headingStyle.lineHeight,
+                    textStyle.lineHeight,
                 )}
             >
                 <a
@@ -58,24 +57,13 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
             </div>
 
             <Inlines {...contextProps} nodes={block.nodes} />
-        </headingStyle.tag>
+        </Tag>
     );
 }
 
-const STYLES = {
-    'heading-1': {
-        tag: 'h2',
-        lineHeight: 'h-9',
-        className: ['text-3xl', 'font-semibold'],
-    },
-    'heading-2': {
-        tag: 'h3',
-        lineHeight: 'h-8',
-        className: ['text-2xl', 'font-semibold'],
-    },
-    'heading-3': {
-        tag: 'h4',
-        lineHeight: 'h-6',
-        className: ['text-base', 'font-semibold'],
-    },
+const TAGS: { [type in DocumentBlockHeading['type']]: string } = {
+    // The h1 is reserved for the page title
+    'heading-1': 'h2',
+    'heading-2': 'h3',
+    'heading-3': 'h4',
 };

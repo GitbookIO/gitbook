@@ -13,6 +13,7 @@ import { Tabs } from './Tabs';
 import { Expandable } from './Expandable';
 import { Table } from './Table';
 import { Swagger } from './Swagger';
+import { Embed } from './Embed';
 
 export interface BlockProps<T> extends DocumentContextProps {
     block: T;
@@ -49,6 +50,8 @@ export function Block<T>(props: BlockProps<T>) {
             return <Table {...props} {...contextProps} />;
         case 'swagger':
             return <Swagger {...props} {...contextProps} />;
+        case 'embed':
+            return <Embed {...props} {...contextProps} />;
         default:
             return <div className={tcls(style)}>Unsupported block {block.type}</div>;
     }
