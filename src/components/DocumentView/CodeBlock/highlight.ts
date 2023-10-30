@@ -1,3 +1,4 @@
+import { DocumentBlockCode, DocumentBlockCodeLine, DocumentInlineAnnotation } from '@gitbook/api';
 import shiki, { getHighlighter } from 'shiki';
 
 export type HighlightLine = {
@@ -6,14 +7,14 @@ export type HighlightLine = {
 
 export type HighlightToken =
     | { type: 'shiki'; token: shiki.IThemedToken }
-    | { type: 'inline'; inline: any; children: HighlightToken[] };
+    | { type: 'inline'; inline: DocumentInlineAnnotation; children: HighlightToken[] };
 
 type InlineIndexed = { inline: any; start: number; end: number };
 
 /**
  * Highlight a code block while preserving inline elements.
  */
-export async function highlight(block: any): Promise<HighlightLine[]> {
+export async function highlight(block: DocumentBlockCode): Promise<HighlightLine[]> {
     const inlines: InlineIndexed[] = [];
     const code = getPlainCodeBlock(block, inlines);
 
@@ -57,10 +58,14 @@ function getPlainCodeBlock(code: any, inlines: InlineIndexed[]): string {
     return content;
 }
 
-function getPlainCodeBlockLine(codeLine: any, inlines: InlineIndexed[], index: number): string {
+function getPlainCodeBlockLine(
+    parent: DocumentBlockCodeLine | DocumentInlineAnnotation,
+    inlines: InlineIndexed[],
+    index: number,
+): string {
     let content = '';
 
-    for (const node of codeLine.nodes) {
+    for (const node of parent.nodes) {
         if (node.object === 'text') {
             content += node.leaves.map((leaf) => leaf.text).join('');
         } else {

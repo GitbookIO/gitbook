@@ -2,9 +2,10 @@ import NextLink from 'next/link';
 import { InlineProps } from './Inline';
 import { resolveContentRef } from '@/lib/references';
 import { Inlines } from './Inlines';
+import { DocumentInlineLink } from '@gitbook/api';
 
-export async function Link(props: InlineProps<any>) {
-    const { inline, children, context } = props;
+export async function Link(props: InlineProps<DocumentInlineLink>) {
+    const { inline, context } = props;
 
     const resolved = await resolveContentRef(inline.data.ref, context);
 

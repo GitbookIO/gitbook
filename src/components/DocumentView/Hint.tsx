@@ -1,8 +1,9 @@
 import { tcls } from '@/lib/tailwind';
 import { BlockProps } from './Block';
 import { Blocks } from './Blocks';
+import { DocumentBlockHint } from '@gitbook/api';
 
-export function Hint(props: BlockProps<any>) {
+export function Hint(props: BlockProps<DocumentBlockHint>) {
     const { block, style, ...contextProps } = props;
 
     return (

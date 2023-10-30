@@ -1,25 +1,26 @@
 import { tcls } from '@/lib/tailwind';
+import { DocumentNodeText, DocumentTextMark } from '@gitbook/api';
 import React from 'react';
 
-export function Text(props: { text: any }) {
+export function Text(props: { text: DocumentNodeText }) {
     const { text } = props;
 
     return (
         <>
             {text.leaves.map((leaf, index) => {
-                return leaf.marks.reduce((children, mark) => {
-                    const Mark = MARK_STYLES[mark.type];
+                return (
+                    <React.Fragment key={index}>
+                        {leaf.marks.reduce<React.ReactNode>((children, mark, index) => {
+                            const Mark = MARK_STYLES[mark.type];
 
-                    if (!Mark) {
-                        return children;
-                    }
+                            if (!Mark) {
+                                return children;
+                            }
 
-                    return (
-                        <Mark key={mark.key} mark={mark}>
-                            {children}
-                        </Mark>
-                    );
-                }, leaf.text);
+                            return <Mark mark={mark}>{children}</Mark>;
+                        }, leaf.text)}
+                    </React.Fragment>
+                );
             })}
         </>
     );
@@ -30,10 +31,11 @@ const MARK_STYLES = {
     italic: Italic,
     code: Code,
     strikethrough: Strikethrough,
+    color: Color,
 };
 
 interface MarkedLeafProps {
-    mark: any;
+    mark: DocumentTextMark;
     children: React.ReactNode;
 }
 
@@ -55,4 +57,8 @@ function Code(props: MarkedLeafProps) {
             {props.children}
         </code>
     );
+}
+
+function Color(props: MarkedLeafProps) {
+    return <span>{props.children}</span>;
 }

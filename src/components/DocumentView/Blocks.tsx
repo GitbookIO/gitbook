@@ -2,13 +2,13 @@ import { Block } from './Block';
 import { DocumentContextProps } from './DocumentView';
 import { tcls, ClassValue } from '@/lib/tailwind';
 
-export function Blocks<T>(
+export function Blocks<T extends { key?: string }, Tag extends React.ElementType = 'div'>(
     props: DocumentContextProps & {
         /** Blocks to render */
         nodes: T[];
 
         /** HTML tag to use */
-        tag?: string;
+        tag?: Tag;
 
         /** Style passed to the wrapper */
         style?: ClassValue;

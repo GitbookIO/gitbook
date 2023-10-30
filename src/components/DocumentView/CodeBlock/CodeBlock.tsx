@@ -1,10 +1,10 @@
 import { tcls } from '@/lib/tailwind';
 import { BlockProps } from '../Block';
-import { Blocks } from '../Blocks';
 import { highlight, HighlightLine, HighlightToken } from './highlight';
 import { Inline } from '../Inline';
+import { DocumentBlockCode } from '@gitbook/api';
 
-export async function CodeBlock(props: BlockProps<any>) {
+export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
     const { block, style } = props;
     const lines = await highlight(block);
 
@@ -24,7 +24,7 @@ export async function CodeBlock(props: BlockProps<any>) {
 }
 
 function CodeHighlightLine(props: {
-    block: any;
+    block: DocumentBlockCode;
     line: HighlightLine;
     lineIndex: number;
     isLast: boolean;

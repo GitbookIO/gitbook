@@ -1,4 +1,3 @@
-import { tcls } from '@/lib/tailwind';
 import { Text } from './Text';
 import { Inline } from './Inline';
 import { DocumentContextProps } from './DocumentView';

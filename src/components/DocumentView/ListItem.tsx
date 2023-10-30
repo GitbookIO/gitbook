@@ -1,8 +1,9 @@
 import { tcls } from '@/lib/tailwind';
 import { BlockProps } from './Block';
 import { Blocks } from './Blocks';
+import { DocumentBlockListItem } from '@gitbook/api';
 
-export function ListItem(props: BlockProps<any>) {
+export function ListItem(props: BlockProps<DocumentBlockListItem>) {
     const { block, ...contextProps } = props;
 
     return (

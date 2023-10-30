@@ -1,17 +1,24 @@
+import { DocumentBlockTable, DocumentTableRecord } from '@gitbook/api';
 import { BlockProps } from '../Block';
 import { ViewCards } from './ViewCards';
 
-export interface TableViewProps<View> extends BlockProps<any> {
+export type TableRecordKV = [string, DocumentTableRecord];
+
+export interface TableViewProps<View> extends BlockProps<DocumentBlockTable> {
     view: View;
-    record: any[];
+    records: TableRecordKV[];
 }
 
-export function Table(props: BlockProps<any>) {
+export function Table(props: BlockProps<DocumentBlockTable>) {
     const { block } = props;
+
+    const records: TableRecordKV[] = Object.entries(block.data.records).sort((a, b) => {
+        return a[1].orderIndex.localeCompare(b[1].orderIndex);
+    });
 
     switch (block.data.view.type) {
         case 'cards':
-            return <ViewCards view={block.data.view} {...props} />;
+            return <ViewCards view={block.data.view} records={records} {...props} />;
         default:
             return <div>Unsupported view {block.data.view.type}</div>;
     }

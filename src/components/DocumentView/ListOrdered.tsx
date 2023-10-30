@@ -1,7 +1,8 @@
+import { DocumentBlockListOrdered } from '@gitbook/api';
 import { BlockProps } from './Block';
 import { Blocks } from './Blocks';
 
-export function ListOrdered(props: BlockProps<any>) {
+export function ListOrdered(props: BlockProps<DocumentBlockListOrdered>) {
     const { block, style, ...contextProps } = props;
 
     return (

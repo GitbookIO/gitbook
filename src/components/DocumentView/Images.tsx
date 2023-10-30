@@ -1,12 +1,11 @@
-import Image from 'next/image';
-
 import { BlockProps } from './Block';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { ClassValue, tcls } from '@/lib/tailwind';
 import { getNodeFragmentByName, isNodeEmpty } from '@/lib/document';
 import { Inlines } from './Inlines';
+import { DocumentBlockImage, DocumentBlockImages } from '@gitbook/api';
 
-export function Images(props: BlockProps<any>) {
+export function Images(props: BlockProps<DocumentBlockImages>) {
     const { block, style, ...contextProps } = props;
 
     return (
@@ -36,7 +35,7 @@ export function Images(props: BlockProps<any>) {
 }
 
 async function ImageBlock(props: {
-    block: any;
+    block: DocumentBlockImage;
     style: ClassValue;
     context: ContentRefContext;
     siblings: number;
@@ -45,7 +44,7 @@ async function ImageBlock(props: {
 
     const [src, darkSrc] = await Promise.all([
         resolveContentRef(block.data.ref, context),
-        block.data.darkRef ? resolveContentRef(block.data.darkRef, context) : null,
+        block.data.refDark ? resolveContentRef(block.data.refDark, context) : null,
     ]);
 
     if (!src) {

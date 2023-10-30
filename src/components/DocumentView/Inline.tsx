@@ -1,3 +1,11 @@
+import {
+    DocumentInlineImage,
+    DocumentInlineAnnotation,
+    DocumentInlineEmoji,
+    DocumentInlineLink,
+    DocumentInlineMath,
+    DocumentInlineMention,
+} from '@gitbook/api';
 import { DocumentContextProps } from './DocumentView';
 import { Link } from './Link';
 
@@ -10,7 +18,15 @@ export interface InlineProps<T> extends DocumentContextProps {
     children?: React.ReactNode;
 }
 
-export function Inline<T>(props: InlineProps<T>) {
+export function Inline<
+    T extends
+        | DocumentInlineImage
+        | DocumentInlineAnnotation
+        | DocumentInlineEmoji
+        | DocumentInlineLink
+        | DocumentInlineMath
+        | DocumentInlineMention,
+>(props: InlineProps<T>) {
     const { inline, ...contextProps } = props;
 
     switch (inline.type) {

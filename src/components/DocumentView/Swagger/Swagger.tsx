@@ -1,13 +1,13 @@
 import { resolveContentRef } from '@/lib/references';
 import { BlockProps } from '../Block';
-import { parseOpenAPI } from '@/lib/swagger';
 import { tcls } from '@/lib/tailwind';
 import OpenAPIParser from '@readme/openapi-parser';
+import { DocumentBlockSwagger } from '@gitbook/api';
 
 /**
  * Render a Swagger block.
  */
-export async function Swagger(props: BlockProps<any>) {
+export async function Swagger(props: BlockProps<DocumentBlockSwagger>) {
     const { block, context, style } = props;
     const resolved = await resolveContentRef(block.data.ref, context);
 
@@ -16,13 +16,12 @@ export async function Swagger(props: BlockProps<any>) {
     }
 
     const api = await OpenAPIParser.validate(resolved.href);
-    // console.log(api);
-
-    const operation = api.paths?.[block.data.path]?.[block.data.method]
+    const operation =
+        block.data.path && block.data.method
+            ? api.paths?.[block.data.path]?.[block.data.method]
+            : null;
 
     console.log(operation);
-
-    // const parsed = await parseOpenAPI(resolved.href);
 
     return (
         <div
@@ -46,7 +45,9 @@ export async function Swagger(props: BlockProps<any>) {
                     <span
                         className={tcls('h-0.5 w-0.5 rounded-full bg-zinc-300 dark:bg-zinc-600')}
                     ></span>
-                    <span className={tcls('font-mono text-xs text-zinc-400')}>{block.data.path}</span>
+                    <span className={tcls('font-mono text-xs text-zinc-400')}>
+                        {block.data.path}
+                    </span>
                 </div>
                 <h2 className={tcls('mt-2 scroll-mt-32')}>{operation.summary}</h2>
             </div>

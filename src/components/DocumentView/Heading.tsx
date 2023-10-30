@@ -2,8 +2,9 @@ import { tcls } from '@/lib/tailwind';
 import IconHash from '@geist-ui/icons/hash';
 import { BlockProps } from './Block';
 import { Inlines } from './Inlines';
+import { DocumentBlockHeading } from '@gitbook/api';
 
-export function Heading(props: BlockProps<any>) {
+export function Heading(props: BlockProps<DocumentBlockHeading>) {
     const { block, style, ...contextProps } = props;
 
     const headingStyle = STYLES[block.type];

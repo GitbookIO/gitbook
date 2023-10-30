@@ -1,3 +1,5 @@
+import { JSONDocument } from '@gitbook/api';
+
 export interface DocumentSection {
     id: string;
     title: string;
@@ -7,7 +9,7 @@ export interface DocumentSection {
 /**
  * Check if the document contains one block that should be rendered in full-width mode.
  */
-export function hasFullWidthBlock(document: any): boolean {
+export function hasFullWidthBlock(document: JSONDocument['document']): boolean {
     return document.nodes.some((node) => {
         return node.data.fullWidth;
     });

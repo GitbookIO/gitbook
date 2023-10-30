@@ -2,8 +2,9 @@ import { tcls } from '@/lib/tailwind';
 import { BlockProps } from '../Block';
 import { getNodeFragmentByType } from '@/lib/document';
 import { Blocks } from '../Blocks';
+import { DocumentBlockExpandable } from '@gitbook/api';
 
-export function Expandable(props: BlockProps<any>) {
+export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
     const { block, style, context } = props;
 
     const title = getNodeFragmentByType(block, 'expandable-title');

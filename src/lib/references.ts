@@ -1,4 +1,4 @@
-import { Revision, RevisionPageDocument, Space } from '@gitbook/api';
+import { ContentRef, Revision, RevisionPageDocument, Space } from '@gitbook/api';
 import { resolvePageId } from './pages';
 import { pageHref } from './links';
 
@@ -19,7 +19,7 @@ export interface ContentRefContext {
  * Resolve a content reference to be rendered.
  */
 export async function resolveContentRef(
-    contentRef: any,
+    contentRef: ContentRef,
     { space, revision, page: activePage }: ContentRefContext,
 ): Promise<ResolvedContentRef | null> {
     // Try to resolve a local ref in the current space
