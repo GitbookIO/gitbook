@@ -16,6 +16,7 @@
         "@readme/openapi-parser": "^2.5.0",
         "assert-never": "^1.2.1",
         "bun-types": "^1.0.7",
+        "katex": "^0.16.9",
         "next": "13.5.6",
         "react": "^18",
         "react-dom": "^18",
@@ -24,6 +25,7 @@
         "tailwind-merge": "^1.14.0"
     },
     "devDependencies": {
+        "@types/katex": "^0.16.5",
         "@types/node": "^20",
         "@types/react": "^18",
         "@types/react-dom": "^18",

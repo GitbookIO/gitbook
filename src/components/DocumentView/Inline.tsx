@@ -8,6 +8,7 @@ import {
 } from '@gitbook/api';
 import { DocumentContextProps } from './DocumentView';
 import { Link } from './Link';
+import { InlineMath } from './Math';
 
 export interface InlineProps<T> extends DocumentContextProps {
     inline: T;
@@ -32,6 +33,8 @@ export function Inline<
     switch (inline.type) {
         case 'link':
             return <Link {...contextProps} inline={inline} />;
+        case 'inline-math':
+            return <InlineMath {...contextProps} inline={inline} />;
         default:
             return <span>Unsupported inline {inline.type}</span>;
     }
