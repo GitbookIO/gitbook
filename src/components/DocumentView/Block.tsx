@@ -14,44 +14,83 @@ import { Expandable } from './Expandable';
 import { Table } from './Table';
 import { Swagger } from './Swagger';
 import { Embed } from './Embed';
+import { Quote } from './Quote';
+import {
+    DocumentBlockCode,
+    DocumentBlockEmbed,
+    DocumentBlockExpandable,
+    DocumentBlockHeading,
+    DocumentBlockHint,
+    DocumentBlockImages,
+    DocumentBlockListItem,
+    DocumentBlockListOrdered,
+    DocumentBlockListTasks,
+    DocumentBlockListUnordered,
+    DocumentBlockParagraph,
+    DocumentBlockQuote,
+    DocumentBlockSwagger,
+    DocumentBlockTable,
+    DocumentBlockTabs,
+    DocumentBlockTaskListItem,
+} from '@gitbook/api';
 
-export interface BlockProps<T> extends DocumentContextProps {
-    block: T;
+export type SupportedBlock =
+    | DocumentBlockParagraph
+    | DocumentBlockHeading
+    | DocumentBlockListOrdered
+    | DocumentBlockListUnordered
+    | DocumentBlockListTasks
+    | DocumentBlockListItem
+    | DocumentBlockTaskListItem
+    | DocumentBlockHint
+    | DocumentBlockCode
+    | DocumentBlockImages
+    | DocumentBlockTabs
+    | DocumentBlockExpandable
+    | DocumentBlockSwagger
+    | DocumentBlockTable
+    | DocumentBlockEmbed
+    | DocumentBlockQuote;
+
+export interface BlockProps<Block extends SupportedBlock> extends DocumentContextProps {
+    block: Block;
     style?: ClassValue;
 }
 
-export function Block<T>(props: BlockProps<T>) {
+export function Block<T extends SupportedBlock>(props: BlockProps<T>) {
     const { block, style, ...contextProps } = props;
 
     switch (block.type) {
         case 'paragraph':
-            return <Paragraph {...props} {...contextProps} />;
+            return <Paragraph {...props} {...contextProps} block={block} />;
         case 'heading-1':
         case 'heading-2':
         case 'heading-3':
-            return <Heading {...props} {...contextProps} />;
+            return <Heading {...props} {...contextProps} block={block} />;
         case 'list-ordered':
-            return <ListOrdered {...props} {...contextProps} />;
+            return <ListOrdered {...props} {...contextProps} block={block} />;
         case 'list-unordered':
-            return <ListUnordered {...props} {...contextProps} />;
+            return <ListUnordered {...props} {...contextProps} block={block} />;
         case 'list-item':
-            return <ListItem {...props} {...contextProps} />;
+            return <ListItem {...props} {...contextProps} block={block} />;
         case 'code':
-            return <CodeBlock {...props} {...contextProps} />;
+            return <CodeBlock {...props} {...contextProps} block={block} />;
         case 'hint':
-            return <Hint {...props} {...contextProps} />;
+            return <Hint {...props} {...contextProps} block={block} />;
         case 'images':
-            return <Images {...props} {...contextProps} />;
+            return <Images {...props} {...contextProps} block={block} />;
         case 'tabs':
-            return <Tabs {...props} {...contextProps} />;
+            return <Tabs {...props} {...contextProps} block={block} />;
         case 'expandable':
-            return <Expandable {...props} {...contextProps} />;
+            return <Expandable {...props} {...contextProps} block={block} />;
         case 'table':
-            return <Table {...props} {...contextProps} />;
+            return <Table {...props} {...contextProps} block={block} />;
         case 'swagger':
-            return <Swagger {...props} {...contextProps} />;
+            return <Swagger {...props} {...contextProps} block={block} />;
         case 'embed':
-            return <Embed {...props} {...contextProps} />;
+            return <Embed {...props} {...contextProps} block={block} />;
+        case 'blockquote':
+            return <Quote {...props} {...contextProps} block={block} />;
         default:
             return <div className={tcls(style)}>Unsupported block {block.type}</div>;
     }
