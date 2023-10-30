@@ -61,7 +61,7 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
     );
 }
 
-const TAGS: { [type in DocumentBlockHeading['type']]: string } = {
+const TAGS: { [type in DocumentBlockHeading['type']]: React.ElementType } = {
     // The h1 is reserved for the page title
     'heading-1': 'h2',
     'heading-2': 'h3',
