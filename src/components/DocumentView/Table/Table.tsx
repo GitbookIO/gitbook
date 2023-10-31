@@ -1,6 +1,8 @@
 import { DocumentBlockTable, DocumentTableRecord } from '@gitbook/api';
 import { BlockProps } from '../Block';
 import { ViewCards } from './ViewCards';
+import { ViewGrid } from './ViewGrid';
+import assertNever from 'assert-never';
 
 export type TableRecordKV = [string, DocumentTableRecord];
 
@@ -19,7 +21,9 @@ export function Table(props: BlockProps<DocumentBlockTable>) {
     switch (block.data.view.type) {
         case 'cards':
             return <ViewCards view={block.data.view} records={records} {...props} />;
+        case 'grid':
+            return <ViewGrid view={block.data.view} records={records} {...props} />;
         default:
-            return <div>Unsupported view {block.data.view.type}</div>;
+            assertNever(block.data.view);
     }
 }

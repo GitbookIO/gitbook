@@ -14,6 +14,7 @@ export function Images(props: BlockProps<DocumentBlockImages>) {
                 'w-full',
                 'flex',
                 'flex-row',
+                'gap-3',
                 block.data.align === 'center' && 'justify-center',
                 block.data.align === 'right' && 'justify-end',
                 block.data.align === 'left' && 'justify-start',
