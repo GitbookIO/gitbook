@@ -19,6 +19,7 @@ import {
     DocumentBlockCode,
     DocumentBlockEmbed,
     DocumentBlockExpandable,
+    DocumentBlockFile,
     DocumentBlockHeading,
     DocumentBlockHint,
     DocumentBlockImages,
@@ -35,6 +36,7 @@ import {
     DocumentBlockTaskListItem,
 } from '@gitbook/api';
 import { BlockMath } from './Math';
+import { File } from './File';
 
 export type SupportedBlock =
     | DocumentBlockParagraph
@@ -53,7 +55,8 @@ export type SupportedBlock =
     | DocumentBlockTable
     | DocumentBlockEmbed
     | DocumentBlockQuote
-    | DocumentBlockMath;
+    | DocumentBlockMath
+    | DocumentBlockFile;
 
 export interface BlockProps<Block extends SupportedBlock> extends DocumentContextProps {
     block: Block;
@@ -96,6 +99,8 @@ export function Block<T extends SupportedBlock>(props: BlockProps<T>) {
             return <Quote {...props} {...contextProps} block={block} />;
         case 'math':
             return <BlockMath {...props} {...contextProps} block={block} />;
+        case 'file':
+            return <File {...props} {...contextProps} block={block} />;
         default:
             return <div className={tcls(style)}>Unsupported block {block.type}</div>;
     }
