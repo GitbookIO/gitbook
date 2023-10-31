@@ -9,7 +9,7 @@ import { DocumentBlockSwagger } from '@gitbook/api';
  */
 export async function Swagger(props: BlockProps<DocumentBlockSwagger>) {
     const { block, context, style } = props;
-    const resolved = await resolveContentRef(block.data.ref, context);
+    const resolved = block.data.ref ? await resolveContentRef(block.data.ref, context) : null;
 
     if (!resolved) {
         return <div>failed</div>;
