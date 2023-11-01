@@ -12,7 +12,7 @@
     },
     "dependencies": {
         "@geist-ui/icons": "^1.0.2",
-        "@gitbook/api": "^0.11.1",
+        "@gitbook/api": "^0.12.0",
         "@readme/openapi-parser": "^2.5.0",
         "ajv": "^8.12.0",
         "assert-never": "^1.2.1",

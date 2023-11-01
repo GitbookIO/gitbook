@@ -35,7 +35,7 @@ export function File(props: BlockProps<DocumentBlockFile>) {
             </div>
             <div>
                 <div className={tcls('text-base')}>{file.name}</div>
-                <div className={tcls('text-xs')}>{getHumanFileSize(file.size ?? 0)}</div>
+                <div className={tcls('text-xs')}>{getHumanFileSize(file.size)}</div>
             </div>
         </a>
     );
