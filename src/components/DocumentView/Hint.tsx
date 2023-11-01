@@ -9,7 +9,7 @@ import IconCheckInCircle from '@geist-ui/icons/checkInCircle';
 import { getBlockTextStyle } from './spacing';
 
 export function Hint(props: BlockProps<DocumentBlockHint>) {
-    const { block, style, ...contextProps } = props;
+    const { block, style, ancestorBlocks, ...contextProps } = props;
     const hintStyle = HINT_STYLES[block.data.style];
     const firstLine = getBlockTextStyle(block.nodes[0]);
 
@@ -40,7 +40,12 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
             >
                 <hintStyle.icon className={tcls('w-5', 'h-5')} />
             </div>
-            <Blocks {...contextProps} nodes={block.nodes} style={['flex-1']} />
+            <Blocks
+                {...contextProps}
+                ancestorBlocks={[...ancestorBlocks, block]}
+                nodes={block.nodes}
+                style={['flex-1']}
+            />
         </div>
     );
 }

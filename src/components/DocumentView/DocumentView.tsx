@@ -18,5 +18,13 @@ export function DocumentView(
 ) {
     const { document, style, ...context } = props;
 
-    return <Blocks nodes={document.nodes} blockStyle={'mt-6'} style={style} {...context} />;
+    return (
+        <Blocks
+            nodes={document.nodes}
+            ancestorBlocks={[]}
+            blockStyle={'mt-6'}
+            style={style}
+            {...context}
+        />
+    );
 }

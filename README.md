@@ -1,19 +1,39 @@
 # GitBook
 
-## TODOs
+Next.js application to render GitBook published content.
 
--   OG cover image
-    -   [ ] Redirect to the customization one if any
--   Favicon
-    -   [ ] Redirect to the customization one if any
-    -   [ ] Render one
--   Blocks
-    -   [ ] Code block syntax highlighting
--   Theme
-    -   [ ] Toggler
--   Page feedback
--   Edit on GitHub
--   Header links
+## Development
+
+#### Installation
+
+Clone the repository and use [Bun](https://bun.sh/) to install dependencies and run the local development server.
+
+```
+bun install
+```
+
+#### Configuration
+
+To develop and test a GitBook space locally, first create a [GitBook API token](https://app.gitbook.com/account/developer) and put it in a `.env.local` file:
+
+```
+GITBOOK_TOKEN=gb_api_abc
+```
+
+#### Start the local server
+
+Run the Next.js development server.
+
+```
+bun dev
+```
+
+Then open the space in your web browser: `http://localhost:3000/<space>/`.
+
+#### Other commands
+
+-   `bun format`: format the code
+-   `bun lint`: lint the code
 
 ## Differences
 

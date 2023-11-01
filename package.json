@@ -14,6 +14,7 @@
         "@geist-ui/icons": "^1.0.2",
         "@gitbook/api": "^0.11.1",
         "@readme/openapi-parser": "^2.5.0",
+        "ajv": "^8.12.0",
         "assert-never": "^1.2.1",
         "bun-types": "^1.0.7",
         "katex": "^0.16.9",

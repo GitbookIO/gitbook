@@ -5,7 +5,6 @@ import { ListOrdered } from './ListOrdered';
 import { ListUnordered } from './ListUnordered';
 import { ListItem } from './ListItem';
 import { CodeBlock } from './CodeBlock';
-import { tcls } from '@/lib/tailwind';
 import { Hint } from './Hint';
 import { DocumentContextProps } from './DocumentView';
 import { Images } from './Images';
@@ -17,6 +16,8 @@ import { Embed } from './Embed';
 import { Quote } from './Quote';
 import {
     DocumentBlockCode,
+    DocumentBlockDivider,
+    DocumentBlockDrawing,
     DocumentBlockEmbed,
     DocumentBlockExpandable,
     DocumentBlockFile,
@@ -33,10 +34,15 @@ import {
     DocumentBlockSwagger,
     DocumentBlockTable,
     DocumentBlockTabs,
+    DocumentBlockTabsItem,
     DocumentBlockTaskListItem,
 } from '@gitbook/api';
 import { BlockMath } from './Math';
 import { File } from './File';
+import { ListTasks } from './ListTasks';
+import { Divider } from './Divider';
+import assertNever from 'assert-never';
+import { Drawing } from './Drawing';
 
 export type SupportedBlock =
     | DocumentBlockParagraph
@@ -56,10 +62,15 @@ export type SupportedBlock =
     | DocumentBlockEmbed
     | DocumentBlockQuote
     | DocumentBlockMath
-    | DocumentBlockFile;
+    | DocumentBlockFile
+    | DocumentBlockDivider
+    | DocumentBlockDrawing;
+
+export type AncestorBlock = SupportedBlock | DocumentBlockTabsItem;
 
 export interface BlockProps<Block extends SupportedBlock> extends DocumentContextProps {
     block: Block;
+    ancestorBlocks: AncestorBlock[];
     style?: ClassValue;
 }
 
@@ -77,6 +88,8 @@ export function Block<T extends SupportedBlock>(props: BlockProps<T>) {
             return <ListOrdered {...props} {...contextProps} block={block} />;
         case 'list-unordered':
             return <ListUnordered {...props} {...contextProps} block={block} />;
+        case 'list-tasks':
+            return <ListTasks {...props} {...contextProps} block={block} />;
         case 'list-item':
             return <ListItem {...props} {...contextProps} block={block} />;
         case 'code':
@@ -101,7 +114,11 @@ export function Block<T extends SupportedBlock>(props: BlockProps<T>) {
             return <BlockMath {...props} {...contextProps} block={block} />;
         case 'file':
             return <File {...props} {...contextProps} block={block} />;
+        case 'divider':
+            return <Divider {...props} {...contextProps} block={block} />;
+        case 'drawing':
+            return <Drawing {...props} {...contextProps} block={block} />;
         default:
-            return <div className={tcls(style)}>Unsupported block {block.type}</div>;
+            assertNever(block);
     }
 }

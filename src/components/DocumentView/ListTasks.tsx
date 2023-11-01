@@ -1,8 +1,8 @@
-import { DocumentBlockListUnordered } from '@gitbook/api';
+import { DocumentBlockListTasks, DocumentBlockListUnordered } from '@gitbook/api';
 import { BlockProps } from './Block';
 import { Blocks } from './Blocks';
 
-export function ListUnordered(props: BlockProps<DocumentBlockListUnordered>) {
+export function ListTasks(props: BlockProps<DocumentBlockListTasks>) {
     const { block, style, ancestorBlocks, ...contextProps } = props;
 
     return (

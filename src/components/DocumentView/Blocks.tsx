@@ -1,11 +1,14 @@
-import { Block } from './Block';
+import { AncestorBlock, Block, SupportedBlock } from './Block';
 import { DocumentContextProps } from './DocumentView';
 import { tcls, ClassValue } from '@/lib/tailwind';
 
-export function Blocks<T extends { key?: string }, Tag extends React.ElementType = 'div'>(
+export function Blocks<T extends SupportedBlock, Tag extends React.ElementType = 'div'>(
     props: DocumentContextProps & {
         /** Blocks to render */
         nodes: T[];
+
+        /** Ancestors of the blocks */
+        ancestorBlocks: AncestorBlock[];
 
         /** HTML tag to use */
         tag?: Tag;
