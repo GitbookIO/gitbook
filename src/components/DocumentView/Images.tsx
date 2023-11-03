@@ -6,7 +6,7 @@ import { Inlines } from './Inlines';
 import { DocumentBlockImage, DocumentBlockImages } from '@gitbook/api';
 
 export function Images(props: BlockProps<DocumentBlockImages>) {
-    const { block, style, ...contextProps } = props;
+    const { block, style, context } = props;
 
     return (
         <div
@@ -28,7 +28,7 @@ export function Images(props: BlockProps<DocumentBlockImages>) {
                     block={node}
                     style={[i > 0 && 'mt-4', style]}
                     siblings={block.nodes.length}
-                    {...contextProps}
+                    context={context}
                 />
             ))}
         </div>

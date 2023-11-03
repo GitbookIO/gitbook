@@ -4,14 +4,15 @@ import { BlockProps } from './Block';
 import { Inlines } from './Inlines';
 import { DocumentBlockHeading } from '@gitbook/api';
 import { getBlockTextStyle } from './spacing';
+import { pageLocalId } from '@/lib/links';
 
 export function Heading(props: BlockProps<DocumentBlockHeading>) {
-    const { block, style, ...contextProps } = props;
+    const { block, style, context, ...rest } = props;
 
     const textStyle = getBlockTextStyle(block);
     const Tag = TAGS[block.type];
 
-    const id = block.meta?.id ?? '';
+    const id = pageLocalId(context.page, block.meta?.id ?? '', context);
 
     return (
         <Tag id={id} className={tcls(textStyle.textSize, 'group', 'relative', style)}>
@@ -56,7 +57,7 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                 </a>
             </div>
 
-            <Inlines {...contextProps} nodes={block.nodes} />
+            <Inlines {...rest} context={context} nodes={block.nodes} />
         </Tag>
     );
 }

@@ -9,19 +9,19 @@ export async function RecordCard(
         record: TableRecordKV;
     },
 ) {
-    const { block, view, record } = props;
+    const { block, view, record, context } = props;
 
     const coverFile = view.coverDefinition
         ? (record[1].values[view.coverDefinition]?.[0] as string)
         : null;
     const cover = coverFile
-        ? await resolveContentRef({ kind: 'file', file: coverFile }, props.context)
+        ? await resolveContentRef({ kind: 'file', file: coverFile }, context)
         : null;
 
     const targetRef = view.targetDefinition
         ? (record[1].values[view.targetDefinition] as ContentRef)
         : null;
-    const target = targetRef ? await resolveContentRef(targetRef, props.context) : null;
+    const target = targetRef ? await resolveContentRef(targetRef, context) : null;
 
     const body = (
         <>

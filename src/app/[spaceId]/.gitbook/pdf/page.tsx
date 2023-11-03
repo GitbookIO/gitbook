@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { api } from '@/lib/api';
 import { resolvePageId } from '@/lib/pages';
+import { pagePDFContainerId, PageHrefContext } from '@/lib/links';
 import { DocumentView } from '@/components/DocumentView';
 
 import { SpaceParams } from '../../fetch';
@@ -15,12 +16,14 @@ interface PDFSearchParams {
     only?: boolean;
 }
 
-
 /**
  * Render a space as a standalone HTML page without interactive elements.
  * The HTML can be converted to PDF.
  */
-export default async function PDFHTMLOutput(props: { params: SpaceParams; searchParams: PDFSearchParams }) {
+export default async function PDFHTMLOutput(props: {
+    params: SpaceParams;
+    searchParams: PDFSearchParams;
+}) {
     const { params, searchParams } = props;
     const { spaceId } = params;
 
@@ -31,42 +34,53 @@ export default async function PDFHTMLOutput(props: { params: SpaceParams; search
 
     const pages = selectPages(revision, searchParams).slice(0, 4); // TODO: remove slice
 
+    const linksContext: PageHrefContext = {
+        pdf: pages.map(({ page }) => page.id),
+    };
+
     return (
         <>
-            {pages.map(({ page, depth }) => (
-                page.type === 'group' ? <PDFPageGroup space={space} revision={revision} page={page} /> : <PDFPageDocument space={space} revision={revision} page={page} />
-            ))}
+            {pages.map(({ page, depth }) =>
+                page.type === 'group' ? (
+                    <PDFPageGroup key={page.id} space={space} revision={revision} page={page} />
+                ) : (
+                    <PDFPageDocument
+                        key={page.id}
+                        space={space}
+                        revision={revision}
+                        page={page}
+                        linksContext={linksContext}
+                    />
+                ),
+            )}
         </>
-    )
+    );
 }
 
-async function PDFPageGroup(props: {
-    space: Space;
-    revision: Revision;
-    page: RevisionPageGroup;
-}) {
+async function PDFPageGroup(props: { space: Space; revision: Revision; page: RevisionPageGroup }) {
     const { page } = props;
 
     return (
         <div>
             <h1>{page.title}</h1>
         </div>
-    )
+    );
 }
 
 async function PDFPageDocument(props: {
     space: Space;
     revision: Revision;
     page: RevisionPageDocument;
+    linksContext: PageHrefContext;
 }) {
-    const { space, revision, page } = props;
+    const { space, revision, page, linksContext } = props;
 
     const {
         data: { document },
     } = await api().spaces.getPageInRevisionById(space.id, revision.id, page.id);
 
     return (
-        <div>
+        <div id={pagePDFContainerId(page)}>
             <h1>{page.title}</h1>
             <DocumentView
                 document={document}
@@ -75,10 +89,11 @@ async function PDFPageDocument(props: {
                     space,
                     revision,
                     page,
+                    ...linksContext,
                 }}
             />
         </div>
-    )
+    );
 }
 
 type FlatPageEntry = { page: RevisionPageDocument | RevisionPageGroup; depth: number };
@@ -87,12 +102,17 @@ type FlatPageEntry = { page: RevisionPageDocument | RevisionPageGroup; depth: nu
  * Compute the ordered flat set of pages to render.
  */
 function selectPages(revision: Revision, params: PDFSearchParams): FlatPageEntry[] {
-    const flattenPage = (page: RevisionPageDocument | RevisionPageGroup, depth: number): FlatPageEntry[] => {
+    const flattenPage = (
+        page: RevisionPageDocument | RevisionPageGroup,
+        depth: number,
+    ): FlatPageEntry[] => {
         return [
             { page, depth },
-            ...page.pages.flatMap((child) => child.type === 'link' ? [] : flattenPage(child, depth + 1)),
+            ...page.pages.flatMap((child) =>
+                child.type === 'link' ? [] : flattenPage(child, depth + 1),
+            ),
         ];
-    }
+    };
 
     if (params.page) {
         const found = resolvePageId(revision, params.page);
@@ -107,6 +127,5 @@ function selectPages(revision: Revision, params: PDFSearchParams): FlatPageEntry
         return flattenPage(found.page, 0);
     }
 
-    return revision.pages.flatMap((page) => page.type === 'link' ? [] : flattenPage(page, 0));
+    return revision.pages.flatMap((page) => (page.type === 'link' ? [] : flattenPage(page, 0)));
 }
-

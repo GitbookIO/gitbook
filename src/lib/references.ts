@@ -1,6 +1,6 @@
 import { ContentRef, Revision, RevisionPageDocument, Space } from '@gitbook/api';
 import { resolvePageId } from './pages';
-import { pageHref } from './links';
+import { pageHref, PageHrefContext } from './links';
 
 export interface ResolvedContentRef {
     /** Text to render in the content ref */
@@ -9,7 +9,7 @@ export interface ResolvedContentRef {
     href: string;
 }
 
-export interface ContentRefContext {
+export interface ContentRefContext extends PageHrefContext {
     space: Space;
     revision: Revision;
     page: RevisionPageDocument;
@@ -20,7 +20,7 @@ export interface ContentRefContext {
  */
 export async function resolveContentRef(
     contentRef: ContentRef,
-    { space, revision, page: activePage }: ContentRefContext,
+    { space, revision, page: activePage, ...linksContext }: ContentRefContext,
 ): Promise<ResolvedContentRef | null> {
     // Try to resolve a local ref in the current space
     if (contentRef.kind === 'url') {
@@ -49,13 +49,13 @@ export async function resolveContentRef(
 
         if (contentRef.kind === 'page') {
             return {
-                href: pageHref(page.path),
+                href: pageHref(page, linksContext),
                 text: page.title,
             };
         }
 
         return {
-            href: pageHref(page.path) + '#' + contentRef.anchor,
+            href: pageHref(page, linksContext, contentRef.anchor),
             text: page.title + '#' + contentRef.anchor,
         };
     } else if (contentRef.kind === 'space' && contentRef.space === space.id) {

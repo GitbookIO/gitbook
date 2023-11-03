@@ -1,5 +1,5 @@
 import { SpaceContent } from '@/components/SpaceContent';
-import { pageHref } from '@/lib/links';
+import { PageHrefContext, absoluteHref, pageHref } from '@/lib/links';
 import { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { PagePathParams, fetchPageData, getPagePath } from '../fetch';
@@ -12,11 +12,12 @@ export default async function Page(props: { params: PagePathParams }) {
     const { params } = props;
 
     const { space, revision, page, ancestors } = await fetchPageData(props.params);
+    const linksContext: PageHrefContext = {};
 
     if (!page) {
         notFound();
     } else if (page.path !== getPagePath(params)) {
-        redirect(pageHref(page.path));
+        redirect(pageHref(page, linksContext));
     }
 
     const {
@@ -45,7 +46,7 @@ export async function generateMetadata({ params }: { params: PagePathParams }): 
         description: page.description,
         generator: 'GitBook',
         openGraph: {
-            images: [pageHref('.gitbook/ogimage/' + page.id)],
+            images: [absoluteHref('.gitbook/ogimage/' + page.id)],
         },
         robots: space.visibility === 'public' ? 'index, follow' : 'noindex, nofollow',
 

@@ -1,4 +1,4 @@
-import { pageHref } from '@/lib/links';
+import { absoluteHref } from '@/lib/links';
 import { Space } from '@gitbook/api';
 
 import { tcls } from '@/lib/tailwind';
@@ -47,7 +47,7 @@ export function Header(props: { space: Space; asFullWidth: boolean }) {
                     asFullWidth ? null : [CONTAINER_MAX_WIDTH_NORMAL, 'mx-auto'],
                 )}
             >
-                <Link href={pageHref('')} className={tcls('flex-1')}>
+                <Link href={absoluteHref('')} className={tcls('flex-1')}>
                     <h1 className={tcls('text-lg', 'text-slate-800', 'font-semibold')}>
                         {space.title}
                     </h1>

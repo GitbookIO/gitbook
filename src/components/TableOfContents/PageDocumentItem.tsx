@@ -15,7 +15,7 @@ export function PageDocumentItem(props: {
     const hasActiveDescendant = ancestors.some((ancestor) => ancestor.id === page.id);
 
     const linkProps = {
-        href: pageHref(page.path || ''),
+        href: pageHref(page),
         className: tcls(
             'flex',
             'flex-row',

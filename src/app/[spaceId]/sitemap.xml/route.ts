@@ -30,14 +30,14 @@ export async function GET(req: NextRequest, { params }: { params: SpaceParams })
             url: {
                 loc: pageHref(page.path),
                 priority: normalizedPriority,
-                ...(lastModified ? {
-                    // lastmod format is YYYY-MM-DD
-                    lastmod: new Date(lastModified)
-                        .toISOString()
-                        .split('T')[0],
-                } : {})
-            }
-        }
+                ...(lastModified
+                    ? {
+                          // lastmod format is YYYY-MM-DD
+                          lastmod: new Date(lastModified).toISOString().split('T')[0],
+                      }
+                    : {}),
+            },
+        };
     });
 
     const xml = jsontoxml(
@@ -56,7 +56,7 @@ export async function GET(req: NextRequest, { params }: { params: SpaceParams })
         {
             xmlHeader: true,
             prettyPrint: true,
-        }
+        },
     );
 
     return new Response(xml, {
@@ -69,14 +69,17 @@ export async function GET(req: NextRequest, { params }: { params: SpaceParams })
 type FlatPageEntry = { page: RevisionPageDocument; depth: number };
 
 function flattenPages(revision: Revision): FlatPageEntry[] {
-    const flattenPage = (page: RevisionPageDocument | RevisionPageGroup, depth: number): FlatPageEntry[] => {
+    const flattenPage = (
+        page: RevisionPageDocument | RevisionPageGroup,
+        depth: number,
+    ): FlatPageEntry[] => {
         return [
             ...(page.type === 'document' ? [{ page, depth }] : []),
-            ...page.pages.flatMap((child) => child.type === 'link' ? [] : flattenPage(child, depth + 1)),
+            ...page.pages.flatMap((child) =>
+                child.type === 'link' ? [] : flattenPage(child, depth + 1),
+            ),
         ];
-    }
+    };
 
-    return revision.pages.flatMap((page) => page.type === 'link' ? [] : flattenPage(page, 0));
+    return revision.pages.flatMap((page) => (page.type === 'link' ? [] : flattenPage(page, 0)));
 }
-
-
