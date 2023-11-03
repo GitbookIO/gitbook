@@ -47,5 +47,10 @@ export async function generateMetadata({ params }: { params: PagePathParams }): 
         openGraph: {
             images: [pageHref('.gitbook/ogimage/' + page.id)],
         },
+        robots: space.visibility === 'public' ? 'index, follow' : 'noindex, nofollow',
+
+        // TODO with customization
+        // themeColor
+        // colorScheme
     };
 }
