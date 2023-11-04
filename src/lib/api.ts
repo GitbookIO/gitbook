@@ -88,7 +88,7 @@ export const getSpaceCustomization = unstable_cache(
                     primaryColor: { light: '#b93d92', dark: '#346DDB' },
                 },
                 favicon: {
-                    emoji: '1f525'
+                    emoji: '1f525',
                 },
                 header: {
                     preset: 'bold',
@@ -136,7 +136,7 @@ export const getSpaceCustomization = unstable_cache(
                                     to: { kind: 'url', url: 'https://www.google.com' },
                                     title: 'Sub-link 2',
                                 },
-                            ]
+                            ],
                         },
                         {
                             title: 'Group 2',
@@ -149,9 +149,9 @@ export const getSpaceCustomization = unstable_cache(
                                     to: { kind: 'url', url: 'https://www.google.com' },
                                     title: 'Sub-link 4',
                                 },
-                            ]
-                        }
-                    ]
+                            ],
+                        },
+                    ],
                 },
                 themes: { default: 'light', toggeable: true },
                 trademark: { enabled: true },
