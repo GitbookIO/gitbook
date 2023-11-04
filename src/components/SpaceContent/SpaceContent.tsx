@@ -16,17 +16,18 @@ import { PageAside } from '../PageAside';
  */
 export function SpaceContent(props: {
     space: Space;
+    customization: any;
     revision: Revision;
     page: RevisionPageDocument;
     ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
     document: any;
 }) {
-    const { space, revision, page, ancestors, document } = props;
+    const { space, revision, customization, page, ancestors, document } = props;
     const asFullWidth = hasFullWidthBlock(document);
 
     return (
         <div>
-            <Header space={space} asFullWidth={asFullWidth} />
+            <Header space={space} customization={customization} asFullWidth={asFullWidth} />
             <div
                 className={tcls(
                     'flex',

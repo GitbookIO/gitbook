@@ -21,8 +21,6 @@ export async function Swagger(props: BlockProps<DocumentBlockSwagger>) {
             ? api.paths?.[block.data.path]?.[block.data.method]
             : null;
 
-    console.log(operation);
-
     return (
         <div
             className={tcls(

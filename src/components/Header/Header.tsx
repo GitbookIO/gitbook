@@ -1,18 +1,17 @@
-import { absoluteHref } from '@/lib/links';
 import { Space } from '@gitbook/api';
 
 import { tcls } from '@/lib/tailwind';
-import Link from 'next/link';
 import { Suspense } from 'react';
 import { SearchButton } from '../Search';
 import { CONTAINER_MAX_WIDTH_NORMAL, CONTAINER_PADDING } from '@/components/layout';
 import { t } from '@/lib/intl';
+import { HeaderLogo } from './HeaderLogo';
 
 /**
  * Render the header for the space.
  */
-export function Header(props: { space: Space; asFullWidth: boolean }) {
-    const { space, asFullWidth } = props;
+export function Header(props: { space: Space; asFullWidth: boolean; customization: any }) {
+    const { space, asFullWidth, customization } = props;
 
     return (
         <header
@@ -47,11 +46,7 @@ export function Header(props: { space: Space; asFullWidth: boolean }) {
                     asFullWidth ? null : [CONTAINER_MAX_WIDTH_NORMAL, 'mx-auto'],
                 )}
             >
-                <Link href={absoluteHref('')} className={tcls('flex-1')}>
-                    <h1 className={tcls('text-lg', 'text-slate-800', 'font-semibold')}>
-                        {space.title}
-                    </h1>
-                </Link>
+                <HeaderLogo space={space} customization={customization} />
                 <div className={tcls('flex', 'basis-56', 'grow-0', 'shrink-0')}>
                     <Suspense fallback={null}>
                         <SearchButton>{t({ space }, 'search')}</SearchButton>

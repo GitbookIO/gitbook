@@ -18,15 +18,12 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
     const inlines: InlineIndexed[] = [];
     const code = getPlainCodeBlock(block, inlines);
 
-    console.log(inlines);
-
     const highlighter = await getHighlighter({
         theme: 'github-light',
         langs: ['javascript', 'python'],
     });
 
     const lines = highlighter.codeToThemedTokens(code, 'javascript');
-    console.log(lines);
 
     return lines.map((tokens) => {
         const result: HighlightToken[] = [];

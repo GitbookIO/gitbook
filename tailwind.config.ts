@@ -1,5 +1,4 @@
 import type { Config } from 'tailwindcss';
-import colors from 'tailwindcss/colors';
 
 const config: Config = {
     darkMode: 'class',
@@ -11,7 +10,11 @@ const config: Config = {
     theme: {
         extend: {
             colors: {
-                primary: colors.blue,
+                // Dynamic color to present the space primary color
+                primary: {
+                    100: 'var(--primary-color-100)',
+                    500: 'var(--primary-color-500)',
+                },
             },
         },
     },
