@@ -64,7 +64,13 @@ export function SpaceContent(props: {
                 <PageBody space={space} revision={revision} page={page} document={document} />
                 <PageAside space={space} page={page} document={document} />
             </div>
-            <Footer space={space} asFullWidth={asFullWidth} />
+            <Footer
+                space={space}
+                revision={revision}
+                page={page}
+                customization={customization}
+                asFullWidth={asFullWidth}
+            />
             <React.Suspense fallback={null}>
                 <SearchModal />
             </React.Suspense>

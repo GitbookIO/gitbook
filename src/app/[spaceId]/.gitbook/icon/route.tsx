@@ -59,11 +59,9 @@ export async function GET(req: NextRequest, { params }: { params: SpaceParams })
                         options.theme === 'light' ? 'text-gray-900' : 'text-white',
                     )}
                 >
-                    {
-                        'emoji' in customization.favicon ?
-                            getEmojiForCode(customization.favicon.emoji) :
-                            space.title.slice(0, 1).toUpperCase()
-                    }
+                    {'emoji' in customization.favicon
+                        ? getEmojiForCode(customization.favicon.emoji)
+                        : space.title.slice(0, 1).toUpperCase()}
                 </h2>
             </div>
         ),

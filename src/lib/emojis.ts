@@ -1,4 +1,3 @@
-
 /**
  * Returns the emoji character for the given emoji code.
  */
