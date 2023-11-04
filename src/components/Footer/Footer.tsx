@@ -68,11 +68,13 @@ export function Footer(props: {
                         </p>
                     ) : null}
                 </div>
-                <div>
-                    <React.Suspense fallback={null}>
-                        <ThemeToggler space={space} />
-                    </React.Suspense>
-                </div>
+                {customization.themes.toggeable ? (
+                    <div>
+                        <React.Suspense fallback={null}>
+                            <ThemeToggler space={space} />
+                        </React.Suspense>
+                    </div>
+                ) : null}
             </div>
         </div>
     );
