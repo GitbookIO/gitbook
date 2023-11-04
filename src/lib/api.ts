@@ -2,7 +2,7 @@ import 'server-only';
 
 import { headers } from 'next/headers';
 import { unstable_cache } from 'next/cache';
-import { GitBookAPI, JSONDocument } from '@gitbook/api';
+import { ContentVisibility, GitBookAPI, JSONDocument } from '@gitbook/api';
 
 /**
  * Create an API client for the current request.
@@ -128,5 +128,34 @@ export const getSpaceCustomization = unstable_cache(
     ['api', 'customization'],
     {
         tags: ['api', 'customization'],
+    },
+);
+
+/**
+ * Get the infos about a collection by its ID.
+ */
+export const getCollection = unstable_cache(
+    async (spaceId: string) => {
+        const { data } = await api().collections.getCollectionById(spaceId);
+        return data;
+    },
+    ['api', 'collections'],
+    {
+        tags: ['api', 'collections'],
+    },
+);
+
+/**
+ * List all the spaces variants published in a collection.
+ */
+export const getCollectionSpaces = unstable_cache(
+    async (spaceId: string) => {
+        const { data } = await api().collections.listSpacesInCollectionById(spaceId);
+        // TODO: do this filtering on the API side
+        return data.items.filter((space) => space.visibility === ContentVisibility.InCollection);
+    },
+    ['api', 'collections', 'spaces'],
+    {
+        tags: ['api', 'collections'],
     },
 );

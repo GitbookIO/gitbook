@@ -1,4 +1,4 @@
-import { Revision, RevisionPageDocument, RevisionPageGroup, Space } from '@gitbook/api';
+import { Collection, Revision, RevisionPageDocument, RevisionPageGroup, Space } from '@gitbook/api';
 
 import { TableOfContents } from '@/components/TableOfContents';
 import { tcls } from '@/lib/tailwind';
@@ -16,19 +16,32 @@ import { PageAside } from '../PageAside';
  */
 export function SpaceContent(props: {
     space: Space;
+    collection: Collection | null;
+    collectionSpaces: Space[];
     customization: any;
     revision: Revision;
     page: RevisionPageDocument;
     ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
     document: any;
 }) {
-    const { space, revision, customization, page, ancestors, document } = props;
+    const {
+        space,
+        collection,
+        collectionSpaces,
+        revision,
+        customization,
+        page,
+        ancestors,
+        document,
+    } = props;
     const asFullWidth = hasFullWidthBlock(document);
 
     return (
         <div>
             <Header
                 space={space}
+                collection={collection}
+                collectionSpaces={collectionSpaces}
                 revision={revision}
                 page={page}
                 customization={customization}

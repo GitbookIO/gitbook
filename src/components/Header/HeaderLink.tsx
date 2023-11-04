@@ -2,7 +2,7 @@ import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { Revision, RevisionPageDocument, Space } from '@gitbook/api';
 import Link from 'next/link';
-import IconChevronDown from '@geist-ui/icons/chevrondown';
+import { Dropdown, DropdownChevron, DropdownMenu, DropdownMenuItem } from './Dropdown';
 
 export async function HeaderLink(props: {
     space: Space;
@@ -38,42 +38,23 @@ export async function HeaderLink(props: {
             )}
         >
             {link.title}
-            {link.links?.length > 0 ? (
-                <IconChevronDown className={tcls('w-4', 'h-4', 'ms-2')} />
-            ) : null}
+            {link.links?.length > 0 ? <DropdownChevron /> : null}
         </Link>
     );
 
     if (link.links?.length > 0) {
         return (
-            <div className={tcls('group/headerlink', 'relative')}>
-                {innerLink}
-                <div
-                    className={tcls(
-                        'absolute',
-                        'top-full',
-                        'hidden',
-                        'group-hover/headerlink:flex',
-                    )}
-                >
-                    <div
-                        className={tcls(
-                            'mt-3',
-                            'w-36',
-                            'max-h-48',
-                            'bg-white',
-                            'rounded',
-                            'p-2',
-                            'shadow',
-                            'overflow-auto',
-                        )}
-                    >
+            <Dropdown
+                dropdown={
+                    <DropdownMenu>
                         {link.links.map((subLink, index) => (
                             <SubHeaderLink key={index} {...props} link={subLink} />
                         ))}
-                    </div>
-                </div>
-            </div>
+                    </DropdownMenu>
+                }
+            >
+                {innerLink}
+            </Dropdown>
         );
     }
 
@@ -98,22 +79,5 @@ async function SubHeaderLink(props: {
         return null;
     }
 
-    return (
-        <Link
-            href={target.href}
-            className={tcls(
-                'flex',
-                'flex-row',
-                'items-center',
-                'text-base',
-                'text-slate-700',
-                'px-2',
-                'py-1',
-                'rounded',
-                target.active ? ['bg-primary-50'] : ['hover:bg-slate-100'],
-            )}
-        >
-            {link.title}
-        </Link>
-    );
+    return <DropdownMenuItem href={target.href}>{link.title}</DropdownMenuItem>;
 }

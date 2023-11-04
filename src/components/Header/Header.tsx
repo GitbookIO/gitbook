@@ -1,4 +1,4 @@
-import { Revision, RevisionPageDocument, Space } from '@gitbook/api';
+import { Collection, Revision, RevisionPageDocument, Space } from '@gitbook/api';
 
 import { tcls } from '@/lib/tailwind';
 import { Suspense } from 'react';
@@ -7,18 +7,22 @@ import { CONTAINER_MAX_WIDTH_NORMAL, CONTAINER_PADDING } from '@/components/layo
 import { t } from '@/lib/intl';
 import { HeaderLogo } from './HeaderLogo';
 import { HeaderLink } from './HeaderLink';
+import { CollectionSpacesDropdown } from './CollectionSpacesDropdown';
 
 /**
  * Render the header for the space.
  */
 export function Header(props: {
     space: Space;
+    collection: Collection | null;
+    collectionSpaces: Space[];
     revision: Revision;
     page: RevisionPageDocument;
     asFullWidth: boolean;
     customization: any;
 }) {
-    const { space, revision, page, asFullWidth, customization } = props;
+    const { space, collection, collectionSpaces, revision, page, asFullWidth, customization } =
+        props;
 
     return (
         <header
@@ -55,6 +59,7 @@ export function Header(props: {
                 )}
             >
                 <HeaderLogo
+                    collection={collection}
                     space={space}
                     customization={customization}
                     textStyle={[
@@ -62,6 +67,13 @@ export function Header(props: {
                         'group-hover/headerlogo:text-header-link-700',
                     ]}
                 />
+                {collection ? (
+                    <CollectionSpacesDropdown
+                        space={space}
+                        collection={collection}
+                        collectionSpaces={collectionSpaces}
+                    />
+                ) : null}
                 <div
                     className={tcls(
                         'flex',

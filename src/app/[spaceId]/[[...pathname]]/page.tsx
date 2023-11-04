@@ -11,7 +11,8 @@ import { getPageDocument } from '@/lib/api';
 export default async function Page(props: { params: PagePathParams }) {
     const { params } = props;
 
-    const { space, customization, revision, page, ancestors } = await fetchPageData(params);
+    const { space, customization, revision, page, collection, collectionSpaces, ancestors } =
+        await fetchPageData(params);
     const linksContext: PageHrefContext = {};
 
     if (!page) {
@@ -30,6 +31,8 @@ export default async function Page(props: { params: PagePathParams }) {
             page={page}
             ancestors={ancestors}
             document={document}
+            collection={collection}
+            collectionSpaces={collectionSpaces}
         />
     );
 }

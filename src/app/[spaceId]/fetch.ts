@@ -1,6 +1,13 @@
-import { getSpace, getCurrentRevision, getSpaceCustomization } from '@/lib/api';
+import {
+    getSpace,
+    getCurrentRevision,
+    getSpaceCustomization,
+    getCollectionSpaces,
+    getCollection,
+} from '@/lib/api';
 
 import { resolvePagePath, resolvePageId } from '@/lib/pages';
+import { ContentVisibility, Space } from '@gitbook/api';
 
 export interface SpaceParams {
     spaceId: string;
@@ -15,7 +22,7 @@ export interface PageIdParams extends SpaceParams {
 }
 
 /**
- * Fetch all the data needed for the page.
+ * Fetch all the data needed to render the content.
  */
 export async function fetchPageData(params: PagePathParams | PageIdParams) {
     const { spaceId } = params;
@@ -26,6 +33,7 @@ export async function fetchPageData(params: PagePathParams | PageIdParams) {
         getSpaceCustomization(spaceId),
     ]);
 
+    const collection = await fetchParentCollection(space);
     const page =
         'pageId' in params && params.pageId
             ? resolvePageId(revision, params.pageId)
@@ -37,7 +45,19 @@ export async function fetchPageData(params: PagePathParams | PageIdParams) {
         customization,
         ancestors: [],
         ...page,
+        ...collection,
     };
+}
+
+async function fetchParentCollection(space: Space) {
+    const parentCollectionId =
+        space.visibility === ContentVisibility.InCollection ? space.parent : undefined;
+    const [collection, collectionSpaces] = await Promise.all([
+        parentCollectionId ? getCollection(parentCollectionId) : null,
+        parentCollectionId ? getCollectionSpaces(parentCollectionId) : ([] as Space[]),
+    ]);
+
+    return { collection, collectionSpaces };
 }
 
 /**
