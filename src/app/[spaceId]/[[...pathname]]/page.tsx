@@ -3,7 +3,7 @@ import { PageHrefContext, absoluteHref, pageHref } from '@/lib/links';
 import { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { PagePathParams, fetchPageData, getPagePath } from '../fetch';
-import { api } from '@/lib/api';
+import { getPageDocument } from '@/lib/api';
 
 /**
  * Fetch and render a page.
@@ -20,9 +20,7 @@ export default async function Page(props: { params: PagePathParams }) {
         redirect(pageHref(page, linksContext));
     }
 
-    const {
-        data: { document },
-    } = await api().spaces.getPageInRevisionById(space.id, revision.id, page.id);
+    const document = await getPageDocument(space.id, revision.id, page.id);
 
     return (
         <SpaceContent

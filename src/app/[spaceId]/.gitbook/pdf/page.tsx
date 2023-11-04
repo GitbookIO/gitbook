@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { api } from '@/lib/api';
+import { getPageDocument, getSpace, getCurrentRevision } from '@/lib/api';
 import { resolvePageId } from '@/lib/pages';
 import { pagePDFContainerId, PageHrefContext } from '@/lib/links';
 import { DocumentView } from '@/components/DocumentView';
@@ -27,9 +27,9 @@ export default async function PDFHTMLOutput(props: {
     const { params, searchParams } = props;
     const { spaceId } = params;
 
-    const [{ data: space }, { data: revision }] = await Promise.all([
-        api().spaces.getSpaceById(spaceId),
-        api().spaces.getCurrentRevision(spaceId),
+    const [space, revision] = await Promise.all([
+        getSpace(spaceId),
+        getCurrentRevision(spaceId),
     ]);
 
     const pages = selectPages(revision, searchParams).slice(0, 4); // TODO: remove slice
@@ -75,9 +75,7 @@ async function PDFPageDocument(props: {
 }) {
     const { space, revision, page, linksContext } = props;
 
-    const {
-        data: { document },
-    } = await api().spaces.getPageInRevisionById(space.id, revision.id, page.id);
+    const document = await getPageDocument(space.id, revision.id, page.id);
 
     return (
         <div id={pagePDFContainerId(page)}>

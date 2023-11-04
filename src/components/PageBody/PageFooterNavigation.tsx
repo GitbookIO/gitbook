@@ -25,7 +25,7 @@ export function PageFooterNavigation(props: {
                     icon={IconArrowLeft}
                     label={t({ space }, 'previous_page')}
                     title={previous.title}
-                    href={pageHref(previous.path)}
+                    href={pageHref(previous)}
                     reversed
                 />
             ) : null}
@@ -34,7 +34,7 @@ export function PageFooterNavigation(props: {
                     icon={IconArrowRight}
                     label={t({ space }, 'next_page')}
                     title={next.title}
-                    href={pageHref(next.path)}
+                    href={pageHref(next)}
                 />
             ) : null}
         </div>

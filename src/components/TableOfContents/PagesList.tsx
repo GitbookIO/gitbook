@@ -2,6 +2,7 @@ import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/
 import { ClassValue, tcls } from '@/lib/tailwind';
 import { PageDocumentItem } from './PageDocumentItem';
 import { PageGroupItem } from './PageGroupItem';
+import { PageLinkItem } from './PageLinkItem';
 
 export function PagesList(props: {
     pages: RevisionPage[];
@@ -21,6 +22,13 @@ export function PagesList(props: {
                             page={page}
                             activePage={activePage}
                             ancestors={ancestors}
+                        />
+                    );
+                } else if (page.type === 'link') {
+                    return (
+                        <PageLinkItem
+                            key={page.id}
+                            page={page}
                         />
                     );
                 }
