@@ -36,9 +36,9 @@ export function Footer(props: {
                     'py-6',
                 )}
             >
-                <div className={tcls('flex-1', 'flex', 'flex-col', 'gap-4')}>
+                <div className={tcls('flex-1', 'flex', 'flex-col', 'gap-6')}>
                     {customization.footer.logo || customization.footer.groups?.length > 0 ? (
-                        <div className={tcls('flex', 'flex-row', 'gap-4')}>
+                        <div className={tcls('flex', 'flex-row', 'gap-20')}>
                             {customization.footer.logo ? (
                                 <div>
                                     <Image

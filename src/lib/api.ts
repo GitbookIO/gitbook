@@ -117,12 +117,39 @@ export const getSpaceCustomization = unstable_cache(
                     ],
                 },
                 footer: {
-                    groups: [],
                     copyright: 'GitBook 2023',
                     logo: {
                         light: 'https://mintlify.s3-us-west-1.amazonaws.com/flatfileinc/logo/light.svg',
                         dark: 'https://mintlify.s3-us-west-1.amazonaws.com/flatfileinc/logo/dark.svg',
                     },
+                    groups: [
+                        {
+                            title: 'Group 1',
+                            links: [
+                                {
+                                    to: { kind: 'url', url: 'https://www.google.com' },
+                                    title: 'Sub-link 1',
+                                },
+                                {
+                                    to: { kind: 'url', url: 'https://www.google.com' },
+                                    title: 'Sub-link 2',
+                                },
+                            ]
+                        },
+                        {
+                            title: 'Group 2',
+                            links: [
+                                {
+                                    to: { kind: 'url', url: 'https://www.google.com' },
+                                    title: 'Sub-link 3',
+                                },
+                                {
+                                    to: { kind: 'url', url: 'https://www.google.com' },
+                                    title: 'Sub-link 4',
+                                },
+                            ]
+                        }
+                    ]
                 },
                 themes: { default: 'light', toggeable: true },
                 trademark: { enabled: true },
