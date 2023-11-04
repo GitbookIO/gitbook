@@ -1,5 +1,17 @@
 import type { Config } from 'tailwindcss';
 
+const shades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
+
+function generateShades(varName: string) {
+    return shades.reduce(
+        (acc, shade) => {
+            acc[shade] = `var(--${varName}-${shade})`;
+            return acc;
+        },
+        {} as Record<string, string>,
+    );
+}
+
 const config: Config = {
     darkMode: 'class',
     content: [
@@ -11,10 +23,7 @@ const config: Config = {
         extend: {
             colors: {
                 // Dynamic color to present the space primary color
-                primary: {
-                    100: 'var(--primary-color-100)',
-                    500: 'var(--primary-color-500)',
-                },
+                primary: generateShades('primary-color'),
             },
         },
     },

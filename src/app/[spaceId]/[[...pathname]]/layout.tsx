@@ -1,3 +1,4 @@
+import shadesOf from 'tailwind-shades';
 import { Inter } from 'next/font/google';
 import { tcls } from '@/lib/tailwind';
 import { PagePathParams, fetchPageData } from '../fetch';
@@ -16,10 +17,16 @@ export default async function SpaceRootLayout(props: {
             <head>
                 <style>{`
                     :root {
-                        --primary-color-500: ${customization.styling.primaryColor.light};
+                        ${generateCSSVariable(
+                            'primary-color',
+                            customization.styling.primaryColor.light,
+                        )}
                     }
                     .dark {
-                        --primary-color-500: ${customization.styling.primaryColor.dark};
+                        ${generateCSSVariable(
+                            'primary-color',
+                            customization.styling.primaryColor.dark,
+                        )}
                     }
                 `}</style>
             </head>
@@ -28,4 +35,14 @@ export default async function SpaceRootLayout(props: {
             </body>
         </html>
     );
+}
+
+function generateCSSVariable(name: string, color: string) {
+    const shades: Record<number, string> = shadesOf(color);
+
+    return Object.entries(shades)
+        .map(([key, value]) => {
+            return `--${name}-${key}: ${value};`;
+        })
+        .join('\n');
 }
