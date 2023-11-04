@@ -61,3 +61,23 @@ export const getPageDocument = unstable_cache(
         tags: ['api', 'documents'],
     },
 );
+
+/**
+ * Get the customization settings for a space.
+ */
+export const getSpaceCustomization = unstable_cache(
+    async (spaceId: string) => {
+        // TODO: use function from API client once updated
+        const { data } = await api().request({
+            method: 'GET',
+            path: `/spaces/${spaceId}/publishing/customization`,
+            secure: true,
+            format: 'json',
+        });
+        return data;
+    },
+    ['api', 'customization'],
+    {
+        tags: ['api', 'customization'],
+    },
+);

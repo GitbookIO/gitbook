@@ -1,4 +1,4 @@
-import { getSpace, getCurrentRevision } from '@/lib/api';
+import { getSpace, getCurrentRevision, getSpaceCustomization } from '@/lib/api';
 
 import { resolvePagePath, resolvePageId } from '@/lib/pages';
 
@@ -20,7 +20,13 @@ export interface PageIdParams extends SpaceParams {
 export async function fetchPageData(params: PagePathParams | PageIdParams) {
     const { spaceId } = params;
 
-    const [space, revision] = await Promise.all([getSpace(spaceId), getCurrentRevision(spaceId)]);
+    const [space, revision, customization] = await Promise.all([
+        getSpace(spaceId),
+        getCurrentRevision(spaceId),
+        getSpaceCustomization(spaceId),
+    ]);
+
+    console.log(customization);
 
     const page =
         'pageId' in params && params.pageId
@@ -30,6 +36,7 @@ export async function fetchPageData(params: PagePathParams | PageIdParams) {
     return {
         space,
         revision,
+        customization,
         ancestors: [],
         ...page,
     };
