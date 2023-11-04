@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { redirect } from 'next/navigation';
 import { NextRequest, ImageResponse } from 'next/server';
 import { PageIdParams, fetchPageData } from '../../../fetch';
 
@@ -9,8 +9,13 @@ export const runtime = 'edge';
  * Render the OpenGraph image for a space.
  */
 export async function GET(req: NextRequest, { params }: { params: PageIdParams }) {
-    const { space, page } = await fetchPageData(params);
+    const { space, page, customization } = await fetchPageData(params);
     const url = new URL(space.urls.published);
+
+    if (customization.socialPreview.url) {
+        // If user configured a custom social preview, we redirect to it.
+        redirect(customization.socialPreview.url);
+    }
 
     return new ImageResponse(
         (

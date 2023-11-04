@@ -38,22 +38,36 @@ export default async function Page(props: { params: PagePathParams }) {
 }
 
 export async function generateMetadata({ params }: { params: PagePathParams }): Promise<Metadata> {
-    const { space, page } = await fetchPageData(params);
+    const { space, page, customization } = await fetchPageData(params);
     if (!page) {
         notFound();
     }
+
+    const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
 
     return {
         title: { default: page.title, template: `%s | ${space.title}` },
         description: page.description,
         generator: 'GitBook',
+        icons: {
+            icon: [
+                {
+                    url: customIcon?.light ?? absoluteHref('.gitbook/icon?size=small&theme=light'),
+                    type: 'image/png',
+                    media: '(prefers-color-scheme: light)',
+                },
+                {
+                    url: customIcon?.dark ?? absoluteHref('.gitbook/icon?size=small&theme=dark'),
+                    type: 'image/png',
+                    media: '(prefers-color-scheme: dark)',
+                },
+            ],
+        },
         openGraph: {
-            images: [absoluteHref('.gitbook/ogimage/' + page.id)],
+            images: [
+                customization.socialPreview.url ?? absoluteHref('.gitbook/ogimage/' + page.id),
+            ],
         },
         robots: space.visibility === 'public' ? 'index, follow' : 'noindex, nofollow',
-
-        // TODO with customization
-        // themeColor
-        // colorScheme
     };
 }
