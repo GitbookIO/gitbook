@@ -68,13 +68,62 @@ export const getPageDocument = unstable_cache(
 export const getSpaceCustomization = unstable_cache(
     async (spaceId: string) => {
         // TODO: use function from API client once updated
-        const { data } = await api().request({
-            method: 'GET',
-            path: `/spaces/${spaceId}/publishing/customization`,
-            secure: true,
-            format: 'json',
-        });
-        return data;
+        try {
+            throw new Error('test');
+            const { data } = await api().request({
+                method: 'GET',
+                path: `/spaces/${spaceId}/publishing/customization`,
+                secure: true,
+                format: 'json',
+            });
+            return data;
+        } catch (error) {
+            // TODO: remove hardcoded value as soon as we ship the PAI
+            return {
+                inherit: false,
+                internationalization: { inherit: false, locale: 'en' },
+                styling: {
+                    font: 'Inter',
+                    corners: 'rounded',
+                    primaryColor: { light: '#b93d92', dark: '#346DDB' },
+                },
+                favicon: {},
+                header: {
+                    preset: 'bold',
+                    links: [
+                        {
+                            links: [
+                                {
+                                    to: { kind: 'url', url: 'https://www.google.com' },
+                                    title: 'Sub-link',
+                                },
+                                {
+                                    to: { kind: 'url', url: 'https://www.google.com' },
+                                    title: 'Sub-link 2',
+                                },
+                            ],
+                            to: { kind: 'url', url: 'https://www.google.fr' },
+                            title: 'Link 1',
+                        },
+                        {
+                            links: [],
+                            to: { kind: 'url', url: 'https://www.google.com' },
+                            title: 'Link 2',
+                        },
+                    ],
+                },
+                footer: { groups: [] },
+                themes: { default: 'light', toggeable: false },
+                trademark: { enabled: true },
+                feedback: { enabled: false },
+                pdf: { enabled: false },
+                aiSearch: { enabled: false },
+                pagination: { enabled: false },
+                privacyPolicy: {},
+                socialPreview: {},
+                git: { showEditLink: false },
+            };
+        }
     },
     ['api', 'customization'],
     {

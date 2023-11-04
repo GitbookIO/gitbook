@@ -22,8 +22,10 @@ const config: Config = {
     theme: {
         extend: {
             colors: {
-                // Dynamic color to present the space primary color
+                // Dynamic colors matching the customization settings
                 primary: generateShades('primary-color'),
+                'header-background': generateShades('header-background'),
+                'header-link': generateShades('header-link'),
             },
         },
     },

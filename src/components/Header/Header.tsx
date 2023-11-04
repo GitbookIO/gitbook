@@ -31,7 +31,7 @@ export function Header(props: { space: Space; asFullWidth: boolean; customizatio
                 'lg:border-b',
                 'lg:border-slate-900/10',
                 'dark:border-slate-50/[0.06]',
-                'bg-white/95',
+                'bg-header-background-500',
                 'supports-backdrop-blur:bg-white/60',
                 'dark:bg-transparent',
             )}
@@ -46,10 +46,19 @@ export function Header(props: { space: Space; asFullWidth: boolean; customizatio
                     asFullWidth ? null : [CONTAINER_MAX_WIDTH_NORMAL, 'mx-auto'],
                 )}
             >
-                <HeaderLogo space={space} customization={customization} />
+                <HeaderLogo
+                    space={space}
+                    customization={customization}
+                    textStyle={[
+                        'text-header-link-500',
+                        'group-headerlogo/hover:text-header-link-700',
+                    ]}
+                />
                 <div className={tcls('flex', 'basis-56', 'grow-0', 'shrink-0')}>
                     <Suspense fallback={null}>
-                        <SearchButton>{t({ space }, 'search')}</SearchButton>
+                        <SearchButton style={['bg-header-background-300']}>
+                            {t({ space }, 'search')}
+                        </SearchButton>
                     </Suspense>
                 </div>
             </div>

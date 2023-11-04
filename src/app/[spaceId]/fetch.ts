@@ -26,8 +26,6 @@ export async function fetchPageData(params: PagePathParams | PageIdParams) {
         getSpaceCustomization(spaceId),
     ]);
 
-    console.log(customization);
-
     const page =
         'pageId' in params && params.pageId
             ? resolvePageId(revision, params.pageId)
