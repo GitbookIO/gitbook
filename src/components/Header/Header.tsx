@@ -1,4 +1,4 @@
-import { Space } from '@gitbook/api';
+import { Revision, RevisionPageDocument, Space } from '@gitbook/api';
 
 import { tcls } from '@/lib/tailwind';
 import { Suspense } from 'react';
@@ -6,12 +6,19 @@ import { SearchButton } from '../Search';
 import { CONTAINER_MAX_WIDTH_NORMAL, CONTAINER_PADDING } from '@/components/layout';
 import { t } from '@/lib/intl';
 import { HeaderLogo } from './HeaderLogo';
+import { HeaderLink } from './HeaderLink';
 
 /**
  * Render the header for the space.
  */
-export function Header(props: { space: Space; asFullWidth: boolean; customization: any }) {
-    const { space, asFullWidth, customization } = props;
+export function Header(props: {
+    space: Space;
+    revision: Revision;
+    page: RevisionPageDocument;
+    asFullWidth: boolean;
+    customization: any;
+}) {
+    const { space, revision, page, asFullWidth, customization } = props;
 
     return (
         <header
@@ -42,6 +49,7 @@ export function Header(props: { space: Space; asFullWidth: boolean; customizatio
                     'flex-1',
                     'flex-row',
                     'items-center',
+                    'gap-8',
                     CONTAINER_PADDING,
                     asFullWidth ? null : [CONTAINER_MAX_WIDTH_NORMAL, 'mx-auto'],
                 )}
@@ -51,9 +59,30 @@ export function Header(props: { space: Space; asFullWidth: boolean; customizatio
                     customization={customization}
                     textStyle={[
                         'text-header-link-500',
-                        'group-headerlogo/hover:text-header-link-700',
+                        'group-hover/headerlogo:text-header-link-700',
                     ]}
                 />
+                <div
+                    className={tcls(
+                        'flex',
+                        'flex-row',
+                        'flex-row',
+                        'gap-5',
+                        'flex-1',
+                        'justify-end',
+                        'items-center',
+                    )}
+                >
+                    {customization.header.links.map((link, index) => (
+                        <HeaderLink
+                            key={index}
+                            link={link}
+                            space={space}
+                            revision={revision}
+                            page={page}
+                        />
+                    ))}
+                </div>
                 <div className={tcls('flex', 'basis-56', 'grow-0', 'shrink-0')}>
                     <Suspense fallback={null}>
                         <SearchButton style={['bg-header-background-300']}>

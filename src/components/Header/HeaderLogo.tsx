@@ -19,7 +19,7 @@ export function HeaderLogo(props: {
     const { space, textStyle } = props;
 
     return (
-        <Link href={absoluteHref('')} className={tcls('flex-1', 'group/headerlogo')}>
+        <Link href={absoluteHref('')} className={tcls('group/headerlogo')}>
             <h1 className={tcls('text-lg', 'text-slate-800', 'font-semibold', textStyle)}>
                 {space.title}
             </h1>

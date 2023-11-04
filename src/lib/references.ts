@@ -7,6 +7,8 @@ export interface ResolvedContentRef {
     text: string;
     /** URL to open for the content ref */
     href: string;
+    /** True if the content ref is active */
+    active: boolean;
 }
 
 export interface ContentRefContext extends PageHrefContext {
@@ -27,6 +29,7 @@ export async function resolveContentRef(
         return {
             href: contentRef.url,
             text: contentRef.url,
+            active: false,
         };
     } else if (contentRef.kind === 'file') {
         const file = revision.files.find((file) => file.id === contentRef.file);
@@ -34,11 +37,15 @@ export async function resolveContentRef(
             return {
                 href: file.downloadURL,
                 text: file.name,
+                active: false,
             };
         } else {
             return null;
         }
-    } else if ((contentRef.kind === 'page' || contentRef.kind === 'anchor') && !contentRef.space) {
+    } else if (
+        (contentRef.kind === 'page' || contentRef.kind === 'anchor') &&
+        (contentRef.space ?? space.id) === space.id
+    ) {
         const page =
             !contentRef.page || contentRef.page === activePage.id
                 ? activePage
@@ -51,17 +58,20 @@ export async function resolveContentRef(
             return {
                 href: pageHref(page, linksContext),
                 text: page.title,
+                active: page.id === activePage.id,
             };
         }
 
         return {
             href: pageHref(page, linksContext, contentRef.anchor),
             text: page.title + '#' + contentRef.anchor,
+            active: false,
         };
     } else if (contentRef.kind === 'space' && contentRef.space === space.id) {
         return {
             href: space.urls.published ?? space.urls.app,
             text: space.title,
+            active: true,
         };
     }
 

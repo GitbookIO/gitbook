@@ -27,7 +27,13 @@ export function SpaceContent(props: {
 
     return (
         <div>
-            <Header space={space} customization={customization} asFullWidth={asFullWidth} />
+            <Header
+                space={space}
+                revision={revision}
+                page={page}
+                customization={customization}
+                asFullWidth={asFullWidth}
+            />
             <div
                 className={tcls(
                     'flex',
