@@ -4,6 +4,7 @@ import { ThemeToggler } from '../ThemeToggler';
 import React from 'react';
 import { CONTAINER_MAX_WIDTH_NORMAL, CONTAINER_PADDING } from '../layout';
 import { FooterLinksGroup } from './FooterLinksGroup';
+import { Image } from '@/components/utils';
 
 export function Footer(props: {
     space: Space;
@@ -36,19 +37,15 @@ export function Footer(props: {
                 )}
             >
                 <div className={tcls('flex-1', 'flex', 'flex-col', 'gap-4')}>
-                    {customization.footer.logo && customization.footer.groups?.length > 0 ? (
+                    {customization.footer.logo || customization.footer.groups?.length > 0 ? (
                         <div className={tcls('flex', 'flex-row', 'gap-4')}>
                             {customization.footer.logo ? (
                                 <div>
-                                    <img
-                                        src={customization.footer.logo.light}
+                                    <Image
+                                        alt="Logo"
+                                        src={customization.footer.logo}
                                         fetchPriority="low"
-                                        className={tcls('dark:hidden')}
-                                    />
-                                    <img
-                                        src={customization.footer.logo.dark}
-                                        fetchPriority="low"
-                                        className={tcls('hidden', 'dark:visible')}
+                                        style={['h-9', 'max-w-80']}
                                     />
                                 </div>
                             ) : null}

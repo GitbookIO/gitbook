@@ -90,6 +90,10 @@ export const getSpaceCustomization = unstable_cache(
                 favicon: {},
                 header: {
                     preset: 'bold',
+                    logo: {
+                        light: 'https://mintlify.s3-us-west-1.amazonaws.com/flatfileinc/logo/light.svg',
+                        dark: 'https://mintlify.s3-us-west-1.amazonaws.com/flatfileinc/logo/dark.svg',
+                    },
                     links: [
                         {
                             links: [
@@ -112,8 +116,15 @@ export const getSpaceCustomization = unstable_cache(
                         },
                     ],
                 },
-                footer: { groups: [] },
-                themes: { default: 'light', toggeable: false },
+                footer: {
+                    groups: [],
+                    copyright: 'GitBook 2023',
+                    logo: {
+                        light: 'https://mintlify.s3-us-west-1.amazonaws.com/flatfileinc/logo/light.svg',
+                        dark: 'https://mintlify.s3-us-west-1.amazonaws.com/flatfileinc/logo/dark.svg',
+                    },
+                },
+                themes: { default: 'light', toggeable: true },
                 trademark: { enabled: true },
                 feedback: { enabled: false },
                 pdf: { enabled: false },
