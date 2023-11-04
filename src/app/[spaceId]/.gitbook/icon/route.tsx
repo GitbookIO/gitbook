@@ -4,6 +4,7 @@ import { NextRequest, ImageResponse } from 'next/server';
 import { SpaceParams } from '../../fetch';
 import { getSpace, getSpaceCustomization } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
+import { getEmojiForCode } from '@/lib/emojis';
 
 export const runtime = 'edge';
 
@@ -58,7 +59,11 @@ export async function GET(req: NextRequest, { params }: { params: SpaceParams })
                         options.theme === 'light' ? 'text-gray-900' : 'text-white',
                     )}
                 >
-                    {space.title.slice(0, 1).toUpperCase()}
+                    {
+                        'emoji' in customization.favicon ?
+                            getEmojiForCode(customization.favicon.emoji) :
+                            space.title.slice(0, 1).toUpperCase()
+                    }
                 </h2>
             </div>
         ),
