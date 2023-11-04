@@ -22,32 +22,42 @@ export function api(): GitBookAPI {
 /**
  * Get a space by its ID.
  */
-export const getSpace = unstable_cache(async (spaceId: string) => {
-    const { data } = await api().spaces.getSpaceById(spaceId);
-    return data;
-}, ['api', 'spaces'], {
-    tags: ['api', 'spaces']
-});
+export const getSpace = unstable_cache(
+    async (spaceId: string) => {
+        const { data } = await api().spaces.getSpaceById(spaceId);
+        return data;
+    },
+    ['api', 'spaces'],
+    {
+        tags: ['api', 'spaces'],
+    },
+);
 
 /**
  * Get the current revision of a space
  */
-export const getCurrentRevision = unstable_cache(async (spaceId: string) => {
-    const { data } = await api().spaces.getCurrentRevision(spaceId);
-    return data;
-}, ['api', 'revisions'], {
-    tags: ['api', 'revisions']
-});
+export const getCurrentRevision = unstable_cache(
+    async (spaceId: string) => {
+        const { data } = await api().spaces.getCurrentRevision(spaceId);
+        return data;
+    },
+    ['api', 'revisions'],
+    {
+        tags: ['api', 'revisions'],
+    },
+);
 
 /**
  * Get the document for a page.
  */
-export const getPageDocument = unstable_cache(async (spaceId: string, revisionId: string, pageId: string) => {
-    const { data } = await api().spaces.getPageInRevisionById(spaceId, revisionId, pageId);
-    // @ts-ignore
-    return data.document as JSONDocument;
-}, ['api', 'documents'], {
-    tags: ['api', 'documents']
-});
-
-
+export const getPageDocument = unstable_cache(
+    async (spaceId: string, revisionId: string, pageId: string) => {
+        const { data } = await api().spaces.getPageInRevisionById(spaceId, revisionId, pageId);
+        // @ts-ignore
+        return data.document as JSONDocument;
+    },
+    ['api', 'documents'],
+    {
+        tags: ['api', 'documents'],
+    },
+);

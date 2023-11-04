@@ -25,12 +25,7 @@ export function PagesList(props: {
                         />
                     );
                 } else if (page.type === 'link') {
-                    return (
-                        <PageLinkItem
-                            key={page.id}
-                            page={page}
-                        />
-                    );
+                    return <PageLinkItem key={page.id} page={page} />;
                 }
 
                 return (

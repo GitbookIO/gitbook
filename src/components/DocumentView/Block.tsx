@@ -16,6 +16,7 @@ import { Embed } from './Embed';
 import { Quote } from './Quote';
 import {
     DocumentBlockCode,
+    DocumentBlockContentRef,
     DocumentBlockDivider,
     DocumentBlockDrawing,
     DocumentBlockEmbed,
@@ -43,6 +44,7 @@ import { ListTasks } from './ListTasks';
 import { Divider } from './Divider';
 import assertNever from 'assert-never';
 import { Drawing } from './Drawing';
+import { BlockContentRef } from './BlockContentRef';
 
 export type SupportedBlock =
     | DocumentBlockParagraph
@@ -64,7 +66,8 @@ export type SupportedBlock =
     | DocumentBlockMath
     | DocumentBlockFile
     | DocumentBlockDivider
-    | DocumentBlockDrawing;
+    | DocumentBlockDrawing
+    | DocumentBlockContentRef;
 
 export type AncestorBlock = SupportedBlock | DocumentBlockTabsItem;
 
@@ -118,6 +121,8 @@ export function Block<T extends SupportedBlock>(props: BlockProps<T>) {
             return <Divider {...props} {...contextProps} block={block} />;
         case 'drawing':
             return <Drawing {...props} {...contextProps} block={block} />;
+        case 'content-ref':
+            return <BlockContentRef {...props} {...contextProps} block={block} />;
         default:
             assertNever(block);
     }

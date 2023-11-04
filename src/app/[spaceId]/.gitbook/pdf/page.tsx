@@ -27,10 +27,7 @@ export default async function PDFHTMLOutput(props: {
     const { params, searchParams } = props;
     const { spaceId } = params;
 
-    const [space, revision] = await Promise.all([
-        getSpace(spaceId),
-        getCurrentRevision(spaceId),
-    ]);
+    const [space, revision] = await Promise.all([getSpace(spaceId), getCurrentRevision(spaceId)]);
 
     const pages = selectPages(revision, searchParams).slice(0, 4); // TODO: remove slice
 

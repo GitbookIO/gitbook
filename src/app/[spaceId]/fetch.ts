@@ -20,10 +20,7 @@ export interface PageIdParams extends SpaceParams {
 export async function fetchPageData(params: PagePathParams | PageIdParams) {
     const { spaceId } = params;
 
-    const [space, revision] = await Promise.all([
-        getSpace(spaceId),
-        getCurrentRevision(spaceId),
-    ]);
+    const [space, revision] = await Promise.all([getSpace(spaceId), getCurrentRevision(spaceId)]);
 
     const page =
         'pageId' in params && params.pageId
