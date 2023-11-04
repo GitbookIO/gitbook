@@ -87,13 +87,15 @@ export const getSpaceCustomization = unstable_cache(
                     corners: 'rounded',
                     primaryColor: { light: '#b93d92', dark: '#346DDB' },
                 },
-                favicon: {},
+                favicon: {
+                    emoji: '1f525'
+                },
                 header: {
                     preset: 'bold',
-                    logo: {
-                        light: 'https://mintlify.s3-us-west-1.amazonaws.com/flatfileinc/logo/light.svg',
-                        dark: 'https://mintlify.s3-us-west-1.amazonaws.com/flatfileinc/logo/dark.svg',
-                    },
+                    // logo: {
+                    //     light: 'https://mintlify.s3-us-west-1.amazonaws.com/flatfileinc/logo/light.svg',
+                    //     dark: 'https://mintlify.s3-us-west-1.amazonaws.com/flatfileinc/logo/dark.svg',
+                    // },
                     links: [
                         {
                             links: [
