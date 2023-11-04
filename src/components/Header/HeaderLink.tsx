@@ -1,8 +1,14 @@
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { Revision, RevisionPageDocument, Space } from '@gitbook/api';
-import Link from 'next/link';
-import { Dropdown, DropdownChevron, DropdownMenu, DropdownMenuItem } from './Dropdown';
+import Link, { LinkProps } from 'next/link';
+import {
+    Dropdown,
+    DropdownButtonProps,
+    DropdownChevron,
+    DropdownMenu,
+    DropdownMenuItem,
+} from './Dropdown';
 
 export async function HeaderLink(props: {
     space: Space;
@@ -22,8 +28,9 @@ export async function HeaderLink(props: {
         return null;
     }
 
-    const innerLink = (
+    const renderLink = (linkProps: DropdownButtonProps<HTMLAnchorElement>) => (
         <Link
+            {...linkProps}
             href={target.href}
             className={tcls(
                 'flex',
@@ -44,21 +51,17 @@ export async function HeaderLink(props: {
 
     if (link.links?.length > 0) {
         return (
-            <Dropdown
-                dropdown={
-                    <DropdownMenu>
-                        {link.links.map((subLink, index) => (
-                            <SubHeaderLink key={index} {...props} link={subLink} />
-                        ))}
-                    </DropdownMenu>
-                }
-            >
-                {innerLink}
+            <Dropdown button={renderLink}>
+                <DropdownMenu>
+                    {link.links.map((subLink, index) => (
+                        <SubHeaderLink key={index} {...props} link={subLink} />
+                    ))}
+                </DropdownMenu>
             </Dropdown>
         );
     }
 
-    return innerLink;
+    return renderLink({});
 }
 
 async function SubHeaderLink(props: {

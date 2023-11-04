@@ -1,22 +1,52 @@
 import { tcls } from '@/lib/tailwind';
 import IconChevronDown from '@geist-ui/icons/chevrondown';
 import Link from 'next/link';
+import { DetailedHTMLProps, HTMLAttributes, useId } from 'react';
+
+export type DropdownButtonProps<E extends HTMLElement = HTMLElement> = Omit<
+    Partial<DetailedHTMLProps<HTMLAttributes<E>, E>>,
+    'ref'
+>;
 
 /**
  * Button with a dropdown.
  */
-export function Dropdown(props: {
+export function Dropdown<E extends HTMLElement>(props: {
     /** Content of the button */
-    children: React.ReactNode;
+    button: (buttonProps: DropdownButtonProps<E>) => React.ReactNode;
     /** Content of the dropdown */
-    dropdown: React.ReactNode;
+    children: React.ReactNode;
 }) {
-    const { children, dropdown } = props;
+    const { button, children } = props;
+    const dropdownId = useId();
 
     return (
         <div className={tcls('group/dropdown', 'relative')}>
-            {children}
-            <div className={tcls('absolute', 'top-full', 'hidden', 'group-hover/dropdown:flex')}>
+            {button({
+                id: dropdownId,
+                tabIndex: 0,
+                'aria-expanded': true,
+                'aria-haspopup': true,
+            })}
+            <div
+                tabIndex={-1}
+                role="menu"
+                aria-orientation="vertical"
+                aria-labelledby={dropdownId}
+                className={tcls(
+                    'flex',
+                    'absolute',
+                    'top-full',
+                    'right-0',
+                    'z-10',
+                    'origin-top-right',
+                    'invisible',
+                    'transition-opacity',
+                    'duration-1000',
+                    'group-hover/dropdown:visible',
+                    'group-focus-within/dropdown:visible',
+                )}
+            >
                 <div
                     className={tcls(
                         'mt-3',
@@ -25,11 +55,15 @@ export function Dropdown(props: {
                         'bg-white',
                         'rounded',
                         'p-2',
-                        'shadow',
+                        'shadow-lg',
                         'overflow-auto',
+                        'ring-1',
+                        'ring-black',
+                        'ring-opacity-5',
+                        'focus:outline-none',
                     )}
                 >
-                    {dropdown}
+                    {children}
                 </div>
             </div>
         </div>

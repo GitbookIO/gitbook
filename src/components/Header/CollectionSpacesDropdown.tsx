@@ -12,36 +12,37 @@ export function CollectionSpacesDropdown(props: {
 
     return (
         <Dropdown
-            dropdown={
-                <DropdownMenu>
-                    {collectionSpaces.map((otherSpace) => (
-                        <DropdownMenuItem
-                            key={otherSpace.id}
-                            href={otherSpace.urls.published ?? otherSpace.urls.app}
-                            active={otherSpace.id === space.id}
-                        >
-                            {otherSpace.title}
-                        </DropdownMenuItem>
-                    ))}
-                </DropdownMenu>
-            }
+            button={(buttonProps) => (
+                <div
+                    {...buttonProps}
+                    className={tcls(
+                        'flex',
+                        'flex-row',
+                        'items-center',
+                        'text-base',
+                        'rounded-full',
+                        'px-3',
+                        'py-1',
+                        'bg-header-background-400',
+                        'text-header-link-500',
+                    )}
+                >
+                    {space.title}
+                    <DropdownChevron />
+                </div>
+            )}
         >
-            <div
-                className={tcls(
-                    'flex',
-                    'flex-row',
-                    'items-center',
-                    'text-base',
-                    'rounded-full',
-                    'px-3',
-                    'py-1',
-                    'bg-header-background-400',
-                    'text-header-link-500',
-                )}
-            >
-                {space.title}
-                <DropdownChevron />
-            </div>
+            <DropdownMenu>
+                {collectionSpaces.map((otherSpace) => (
+                    <DropdownMenuItem
+                        key={otherSpace.id}
+                        href={otherSpace.urls.published ?? otherSpace.urls.app}
+                        active={otherSpace.id === space.id}
+                    >
+                        {otherSpace.title}
+                    </DropdownMenuItem>
+                ))}
+            </DropdownMenu>
         </Dropdown>
     );
 }
