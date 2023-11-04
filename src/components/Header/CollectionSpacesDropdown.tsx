@@ -1,5 +1,5 @@
 import { Collection, Space } from '@gitbook/api';
-import IconChevronDown from '@geist-ui/icons/chevrondown';
+import IconChevronDown from '@geist-ui/icons/chevronDown';
 import { tcls } from '@/lib/tailwind';
 import { Dropdown, DropdownChevron, DropdownMenu, DropdownMenuItem } from './Dropdown';
 

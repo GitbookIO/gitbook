@@ -81,7 +81,7 @@ export const getSpaceCustomization = unstable_cache(
             // TODO: remove hardcoded value as soon as we ship the PAI
             return {
                 inherit: false,
-                internationalization: { inherit: false, locale: 'fr' },
+                internationalization: { inherit: false, locale: 'en' },
                 styling: {
                     font: 'Inter',
                     corners: 'rounded',

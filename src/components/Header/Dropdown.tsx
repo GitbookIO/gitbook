@@ -1,5 +1,5 @@
 import { tcls } from '@/lib/tailwind';
-import IconChevronDown from '@geist-ui/icons/chevrondown';
+import IconChevronDown from '@geist-ui/icons/chevronDown';
 import Link from 'next/link';
 import { DetailedHTMLProps, HTMLAttributes, useId } from 'react';
 
