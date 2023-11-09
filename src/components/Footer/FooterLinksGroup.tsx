@@ -1,8 +1,12 @@
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
+import { CustomizationContentLink, CustomizationFooterGroup } from '@gitbook/api';
 import Link from 'next/link';
 
-export function FooterLinksGroup(props: { group: any; context: ContentRefContext }) {
+export function FooterLinksGroup(props: {
+    group: CustomizationFooterGroup;
+    context: ContentRefContext;
+}) {
     const { group, context } = props;
 
     return (
@@ -17,7 +21,7 @@ export function FooterLinksGroup(props: { group: any; context: ContentRefContext
     );
 }
 
-async function FooterLink(props: { link: any; context: ContentRefContext }) {
+async function FooterLink(props: { link: CustomizationContentLink; context: ContentRefContext }) {
     const { link, context } = props;
     const resolved = await resolveContentRef(link.to, context);
 

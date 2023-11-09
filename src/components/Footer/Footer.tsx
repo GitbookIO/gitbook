@@ -1,5 +1,5 @@
 import { tcls } from '@/lib/tailwind';
-import { Revision, RevisionPageDocument, Space } from '@gitbook/api';
+import { CustomizationSettings, Revision, RevisionPageDocument, Space } from '@gitbook/api';
 import { ThemeToggler } from '../ThemeToggler';
 import React from 'react';
 import { CONTAINER_MAX_WIDTH_NORMAL, CONTAINER_PADDING } from '../layout';
@@ -10,7 +10,7 @@ export function Footer(props: {
     space: Space;
     revision: Revision;
     page: RevisionPageDocument;
-    customization: any;
+    customization: CustomizationSettings;
     asFullWidth: boolean;
 }) {
     const { space, revision, page, customization, asFullWidth } = props;

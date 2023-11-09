@@ -1,4 +1,10 @@
-import { Collection, Revision, RevisionPageDocument, Space } from '@gitbook/api';
+import {
+    Collection,
+    CustomizationSettings,
+    Revision,
+    RevisionPageDocument,
+    Space,
+} from '@gitbook/api';
 
 import { tcls } from '@/lib/tailwind';
 import { Suspense } from 'react';
@@ -19,7 +25,7 @@ export function Header(props: {
     revision: Revision;
     page: RevisionPageDocument;
     asFullWidth: boolean;
-    customization: any;
+    customization: CustomizationSettings;
 }) {
     const { space, collection, collectionSpaces, revision, page, asFullWidth, customization } =
         props;

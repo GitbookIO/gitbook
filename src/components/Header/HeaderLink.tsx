@@ -1,7 +1,13 @@
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
-import { Revision, RevisionPageDocument, Space } from '@gitbook/api';
-import Link, { LinkProps } from 'next/link';
+import {
+    CustomizationContentLink,
+    CustomizationHeaderLink,
+    Revision,
+    RevisionPageDocument,
+    Space,
+} from '@gitbook/api';
+import Link from 'next/link';
 import {
     Dropdown,
     DropdownButtonProps,
@@ -14,7 +20,7 @@ export async function HeaderLink(props: {
     space: Space;
     revision: Revision;
     page: RevisionPageDocument;
-    link: any;
+    link: CustomizationHeaderLink;
 }) {
     const { space, revision, page, link } = props;
 
@@ -45,11 +51,11 @@ export async function HeaderLink(props: {
             )}
         >
             {link.title}
-            {link.links?.length > 0 ? <DropdownChevron /> : null}
+            {link.links && link.links.length > 0 ? <DropdownChevron /> : null}
         </Link>
     );
 
-    if (link.links?.length > 0) {
+    if (link.links && link.links.length > 0) {
         return (
             <Dropdown button={renderLink}>
                 <DropdownMenu>
@@ -68,7 +74,7 @@ async function SubHeaderLink(props: {
     space: Space;
     revision: Revision;
     page: RevisionPageDocument;
-    link: any;
+    link: CustomizationContentLink;
 }) {
     const { space, revision, page, link } = props;
 

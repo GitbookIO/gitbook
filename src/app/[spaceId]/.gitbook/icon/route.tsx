@@ -1,6 +1,7 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
-import { NextRequest, ImageResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { ImageResponse } from 'next/og';
 import { SpaceParams } from '../../fetch';
 import { getSpace, getSpaceCustomization } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';

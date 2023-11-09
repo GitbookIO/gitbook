@@ -1,4 +1,11 @@
-import { Collection, Revision, RevisionPageDocument, RevisionPageGroup, Space } from '@gitbook/api';
+import {
+    Collection,
+    CustomizationSettings,
+    Revision,
+    RevisionPageDocument,
+    RevisionPageGroup,
+    Space,
+} from '@gitbook/api';
 
 import { TableOfContents } from '@/components/TableOfContents';
 import { tcls } from '@/lib/tailwind';
@@ -18,7 +25,7 @@ export function SpaceContent(props: {
     space: Space;
     collection: Collection | null;
     collectionSpaces: Space[];
-    customization: any;
+    customization: CustomizationSettings;
     revision: Revision;
     page: RevisionPageDocument;
     ancestors: Array<RevisionPageDocument | RevisionPageGroup>;

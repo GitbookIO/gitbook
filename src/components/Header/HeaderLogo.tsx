@@ -1,13 +1,13 @@
 import { absoluteHref } from '@/lib/links';
 import { ClassValue, tcls } from '@/lib/tailwind';
-import { Collection, Space } from '@gitbook/api';
+import { Collection, CustomizationSettings, Space } from '@gitbook/api';
 import Link from 'next/link';
 import { Image } from '@/components/utils';
 
 interface HeaderLogoProps {
     collection: Collection | null;
     space: Space;
-    customization: any;
+    customization: CustomizationSettings;
     /** Style applied when the logo is a text one */
     textStyle?: ClassValue;
 }
