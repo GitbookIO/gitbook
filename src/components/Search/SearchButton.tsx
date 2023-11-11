@@ -3,6 +3,7 @@
 import { ClassValue, tcls } from '@/lib/tailwind';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { IconSearch } from '@/components/icons/IconSearch';
+import { useSearch } from './useSearch';
 
 /**
  * Button to open the search modal.
@@ -10,14 +11,10 @@ import { IconSearch } from '@/components/icons/IconSearch';
 export function SearchButton(props: { children: React.ReactNode; style?: ClassValue }) {
     const { style, children } = props;
 
-    const router = useRouter();
-    const pathname = usePathname();
-    const searchParams = useSearchParams();
+    const [, setQuery] = useSearch();
 
     const onClick = () => {
-        const params = new URLSearchParams(searchParams);
-        params.set('q', '');
-        router.push(pathname + '?' + params.toString());
+        setQuery('');
     };
 
     return (

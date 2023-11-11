@@ -22,6 +22,8 @@
         "next": "^14.0.1",
         "react": "^18",
         "react-dom": "^18",
+        "react-hotkeys-hook": "^4.4.1",
+        "recoil": "^0.7.7",
         "server-only": "^0.0.1",
         "shiki": "^0.14.5",
         "tailwind-merge": "^1.14.0",

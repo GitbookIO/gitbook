@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google';
 import { tcls } from '@/lib/tailwind';
 import { PagePathParams, fetchPageData } from '../fetch';
 import assertNever from 'assert-never';
+import { ClientLayout } from './ClientLayout';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -44,7 +45,7 @@ export default async function SpaceRootLayout(props: {
                 `}</style>
             </head>
             <body className={tcls(inter.className, 'bg-white', 'dark:bg-slate-950')}>
-                {children}
+                <ClientLayout>{children}</ClientLayout>
             </body>
         </html>
     );
