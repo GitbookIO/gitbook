@@ -1,9 +1,11 @@
-import { BlockProps } from './Block';
+import { DocumentBlockImage, DocumentBlockImages } from '@gitbook/api';
+
+import { getNodeFragmentByName, isNodeEmpty } from '@/lib/document';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { ClassValue, tcls } from '@/lib/tailwind';
-import { getNodeFragmentByName, isNodeEmpty } from '@/lib/document';
+
+import { BlockProps } from './Block';
 import { Inlines } from './Inlines';
-import { DocumentBlockImage, DocumentBlockImages } from '@gitbook/api';
 
 export function Images(props: BlockProps<DocumentBlockImages>) {
     const { block, style, context } = props;
@@ -41,7 +43,7 @@ async function ImageBlock(props: {
     context: ContentRefContext;
     siblings: number;
 }) {
-    const { block, context, siblings } = props;
+    const { block, context } = props;
 
     const [src, darkSrc] = await Promise.all([
         resolveContentRef(block.data.ref, context),
@@ -53,10 +55,15 @@ async function ImageBlock(props: {
     }
 
     const caption = getNodeFragmentByName(block, 'caption');
+    const captionParagraph = caption?.nodes[0];
 
     const image = <img alt={block.data.alt} src={src.href} className={tcls('rounded')} />;
 
-    if (!caption || isNodeEmpty(caption)) {
+    if (
+        !captionParagraph ||
+        captionParagraph.type !== 'paragraph' ||
+        isNodeEmpty(captionParagraph)
+    ) {
         return image;
     }
 
@@ -64,7 +71,7 @@ async function ImageBlock(props: {
         <picture className={tcls('relative')}>
             {image}
             <figcaption className={tcls('text-sm', 'text-center', 'mt-2', 'text-slate-500')}>
-                <Inlines nodes={caption.nodes[0].nodes} context={context} />
+                <Inlines nodes={captionParagraph.nodes} context={context} />
             </figcaption>
         </picture>
     );

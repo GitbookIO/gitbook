@@ -1,10 +1,12 @@
-import { tcls } from '@/lib/tailwind';
 import { CustomizationSettings, Revision, RevisionPageDocument, Space } from '@gitbook/api';
-import { ThemeToggler } from '../ThemeToggler';
 import React from 'react';
-import { CONTAINER_MAX_WIDTH_NORMAL, CONTAINER_PADDING } from '../layout';
-import { FooterLinksGroup } from './FooterLinksGroup';
+
 import { Image } from '@/components/utils';
+import { tcls } from '@/lib/tailwind';
+
+import { FooterLinksGroup } from './FooterLinksGroup';
+import { CONTAINER_MAX_WIDTH_NORMAL, CONTAINER_PADDING } from '../layout';
+import { ThemeToggler } from '../ThemeToggler';
 
 export function Footer(props: {
     space: Space;

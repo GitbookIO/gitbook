@@ -6,16 +6,17 @@ import {
     RevisionPageGroup,
     Space,
 } from '@gitbook/api';
-
-import { TableOfContents } from '@/components/TableOfContents';
-import { tcls } from '@/lib/tailwind';
-import { Header } from '@/components/Header';
-import { PageBody } from '@/components/PageBody';
 import React from 'react';
-import { SearchModal } from '@/components/Search';
+
 import { Footer } from '@/components/Footer';
-import { hasFullWidthBlock } from '@/lib/document';
+import { Header } from '@/components/Header';
 import { CONTAINER_MAX_WIDTH_NORMAL, CONTAINER_PADDING } from '@/components/layout';
+import { PageBody } from '@/components/PageBody';
+import { SearchModal } from '@/components/Search';
+import { TableOfContents } from '@/components/TableOfContents';
+import { hasFullWidthBlock } from '@/lib/document';
+import { tcls } from '@/lib/tailwind';
+
 import { PageAside } from '../PageAside';
 
 /**

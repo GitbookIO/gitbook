@@ -1,10 +1,12 @@
-import { tcls } from '@/lib/tailwind';
 import IconHash from '@geist-ui/icons/hash';
+import { DocumentBlockHeading } from '@gitbook/api';
+
+import { pageLocalId } from '@/lib/links';
+import { tcls } from '@/lib/tailwind';
+
 import { BlockProps } from './Block';
 import { Inlines } from './Inlines';
-import { DocumentBlockHeading } from '@gitbook/api';
 import { getBlockTextStyle } from './spacing';
-import { pageLocalId } from '@/lib/links';
 
 export function Heading(props: BlockProps<DocumentBlockHeading>) {
     const { block, style, context, ...rest } = props;

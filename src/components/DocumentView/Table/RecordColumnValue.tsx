@@ -1,8 +1,10 @@
 import { DocumentBlockTable, DocumentTableViewCards } from '@gitbook/api';
+
+import { getNodeFragmentByName } from '@/lib/document';
+import { ClassValue, tcls } from '@/lib/tailwind';
+
 import { TableRecordKV, TableViewProps } from './Table';
 import { BlockProps } from '../Block';
-import { ClassValue, tcls } from '@/lib/tailwind';
-import { getNodeFragmentByName } from '@/lib/document';
 import { Blocks } from '../Blocks';
 
 /**
@@ -31,6 +33,10 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
         case 'text':
             // @ts-ignore
             const fragment = getNodeFragmentByName(block, value);
+            if (!fragment) {
+                return <Tag className={tcls([columnStyle, 'w-full'])}>{''}</Tag>;
+            }
+
             return (
                 <Blocks
                     tag={Tag}

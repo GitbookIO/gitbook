@@ -1,5 +1,7 @@
 import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
+
 import { ClassValue, tcls } from '@/lib/tailwind';
+
 import { PageDocumentItem } from './PageDocumentItem';
 import { PageGroupItem } from './PageGroupItem';
 import { PageLinkItem } from './PageLinkItem';

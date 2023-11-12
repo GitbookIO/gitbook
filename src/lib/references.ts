@@ -1,6 +1,7 @@
 import { ContentRef, Revision, RevisionPageDocument, Space } from '@gitbook/api';
-import { resolvePageId } from './pages';
+
 import { pageHref, PageHrefContext } from './links';
+import { resolvePageId } from './pages';
 
 export interface ResolvedContentRef {
     /** Text to render in the content ref */

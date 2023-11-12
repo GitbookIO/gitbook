@@ -1,11 +1,13 @@
 'use client';
 
-import { tcls } from '@/lib/tailwind';
-import React from 'react';
+import Monitor from '@geist-ui/icons/monitor';
 import Moon from '@geist-ui/icons/moon';
 import Sun from '@geist-ui/icons/sun';
-import Monitor from '@geist-ui/icons/monitor';
+import React from 'react';
+
+import { IconComponent } from '@/components/icons';
 import { IntlContext, tString } from '@/lib/intl';
+import { tcls } from '@/lib/tailwind';
 
 type ThemeMode = 'light' | 'system' | 'dark';
 
@@ -24,7 +26,7 @@ export function ThemeToggler(props: IntlContext) {
 
     React.useEffect(() => {
         const value = window.localStorage.getItem(LOCALSTORAGE_KEY);
-        if (value) {
+        if (value && (value === 'light' || value === 'system' || value === 'dark')) {
             setMode(value);
         }
     }, []);
@@ -79,7 +81,7 @@ export function ThemeToggler(props: IntlContext) {
 }
 
 function ThemeButton(props: {
-    icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+    icon: IconComponent;
     onClick: () => void;
     title: string;
     active: boolean;

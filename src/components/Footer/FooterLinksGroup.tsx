@@ -1,7 +1,8 @@
-import { ContentRefContext, resolveContentRef } from '@/lib/references';
-import { tcls } from '@/lib/tailwind';
 import { CustomizationContentLink, CustomizationFooterGroup } from '@gitbook/api';
 import Link from 'next/link';
+
+import { ContentRefContext, resolveContentRef } from '@/lib/references';
+import { tcls } from '@/lib/tailwind';
 
 export function FooterLinksGroup(props: {
     group: CustomizationFooterGroup;

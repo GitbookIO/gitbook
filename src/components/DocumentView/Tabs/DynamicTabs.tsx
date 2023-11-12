@@ -1,7 +1,8 @@
 'use client';
 
-import { ClassValue, tcls } from '@/lib/tailwind';
 import React from 'react';
+
+import { ClassValue, tcls } from '@/lib/tailwind';
 
 /**
  * Client side component for the tabs, taking care of interactions.

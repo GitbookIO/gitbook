@@ -1,6 +1,7 @@
+import { DocumentBlockQuote } from '@gitbook/api';
+
 import { BlockProps } from './Block';
 import { Blocks } from './Blocks';
-import { DocumentBlockQuote } from '@gitbook/api';
 
 export function Quote(props: BlockProps<DocumentBlockQuote>) {
     const { block, style, ancestorBlocks, ...contextProps } = props;

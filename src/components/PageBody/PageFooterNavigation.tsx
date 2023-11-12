@@ -1,11 +1,12 @@
-import { pageHref } from '@/lib/links';
-import { resolvePrevNextPages } from '@/lib/pages';
-import { tcls } from '@/lib/tailwind';
 import { Revision, RevisionPageDocument, Space } from '@gitbook/api';
 import Link from 'next/link';
+
 import { IconArrowLeft } from '@/components/icons/IconArrowLeft';
 import { IconArrowRight } from '@/components/icons/IconArrowRight';
 import { t } from '@/lib/intl';
+import { pageHref } from '@/lib/links';
+import { resolvePrevNextPages } from '@/lib/pages';
+import { tcls } from '@/lib/tailwind';
 
 /**
  * Show cards to go to previous/next pages at the bottom.

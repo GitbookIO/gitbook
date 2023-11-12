@@ -1,7 +1,9 @@
 import { DocumentTableViewGrid } from '@gitbook/api';
-import { TableRecordKV, TableViewProps } from './Table';
+
 import { tcls } from '@/lib/tailwind';
+
 import { RecordColumnValue } from './RecordColumnValue';
+import { TableRecordKV, TableViewProps } from './Table';
 
 export async function RecordRow(
     props: TableViewProps<DocumentTableViewGrid> & {

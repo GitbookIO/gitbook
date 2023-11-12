@@ -1,7 +1,8 @@
-import { tcls } from '@/lib/tailwind';
 import IconChevronDown from '@geist-ui/icons/chevronDown';
 import Link from 'next/link';
 import { DetailedHTMLProps, HTMLAttributes, useId } from 'react';
+
+import { tcls } from '@/lib/tailwind';
 
 export type DropdownButtonProps<E extends HTMLElement = HTMLElement> = Omit<
     Partial<DetailedHTMLProps<HTMLAttributes<E>, E>>,

@@ -1,8 +1,10 @@
-import { resolveContentRef } from '@/lib/references';
-import { BlockProps } from '../Block';
-import { tcls } from '@/lib/tailwind';
-import OpenAPIParser from '@readme/openapi-parser';
 import { DocumentBlockSwagger } from '@gitbook/api';
+import OpenAPIParser from '@readme/openapi-parser';
+
+import { resolveContentRef } from '@/lib/references';
+import { tcls } from '@/lib/tailwind';
+
+import { BlockProps } from '../Block';
 
 /**
  * Render a Swagger block.

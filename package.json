@@ -8,7 +8,8 @@
         "start": "next start",
         "lint": "next lint",
         "format": "prettier ./ --ignore-unknown --write",
-        "format:check": "prettier ./ --ignore-unknown --list-different"
+        "format:check": "prettier ./ --ignore-unknown --list-different",
+        "typecheck": "tsc --noEmit"
     },
     "dependencies": {
         "@geist-ui/icons": "^1.0.2",
@@ -38,6 +39,7 @@
         "autoprefixer": "^10",
         "eslint": "^8",
         "eslint-config-next": "13.5.6",
+        "eslint-plugin-import": "^2.29.0",
         "postcss": "^8",
         "prettier": "^3.0.3",
         "tailwindcss": "^3.3.4",

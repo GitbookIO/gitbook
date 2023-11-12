@@ -1,7 +1,9 @@
 import { DocumentTableViewCards } from '@gitbook/api';
-import { TableViewProps } from './Table';
+
 import { tcls } from '@/lib/tailwind';
+
 import { RecordCard } from './RecordCard';
+import { TableViewProps } from './Table';
 
 export function ViewCards(props: TableViewProps<DocumentTableViewCards>) {
     const { block, view, records, style } = props;

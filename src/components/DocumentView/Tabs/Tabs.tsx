@@ -1,8 +1,10 @@
+import { DocumentBlockTabs } from '@gitbook/api';
+
 import { tcls } from '@/lib/tailwind';
+
+import { DynamicTabs } from './DynamicTabs';
 import { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
-import { DynamicTabs } from './DynamicTabs';
-import { DocumentBlockTabs } from '@gitbook/api';
 
 export function Tabs(props: BlockProps<DocumentBlockTabs>) {
     const { block, ancestorBlocks, style, context } = props;

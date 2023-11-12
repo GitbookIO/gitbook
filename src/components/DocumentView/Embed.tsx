@@ -1,8 +1,10 @@
+import { DocumentBlockEmbed } from '@gitbook/api';
+
+import { api } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
+
 import { BlockProps } from './Block';
 import { Blocks } from './Blocks';
-import { DocumentBlockEmbed } from '@gitbook/api';
-import { api } from '@/lib/api';
 
 export async function Embed(props: BlockProps<DocumentBlockEmbed>) {
     const { block, style, ...contextProps } = props;

@@ -1,5 +1,7 @@
 import { RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
+
 import { tcls } from '@/lib/tailwind';
+
 import { PagesList } from './PagesList';
 
 export function PageGroupItem(props: {

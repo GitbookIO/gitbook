@@ -1,10 +1,12 @@
 'use client';
 
-import { useHotkeys } from 'react-hotkeys-hook';
-import { tcls } from '@/lib/tailwind';
-import { useSearch } from './useSearch';
-import React from 'react';
 import IconSearch from '@geist-ui/icons/search';
+import React from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
+
+import { tcls } from '@/lib/tailwind';
+
+import { useSearch } from './useSearch';
 
 export function SearchModal(props: {}) {
     const [query, setQuery] = useSearch();

@@ -1,6 +1,8 @@
 import { DocumentBlockDivider } from '@gitbook/api';
-import { BlockProps } from './Block';
+
 import { tcls } from '@/lib/tailwind';
+
+import { BlockProps } from './Block';
 
 export function Divider(props: BlockProps<DocumentBlockDivider>) {
     const { style } = props;

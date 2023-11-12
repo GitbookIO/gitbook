@@ -1,8 +1,9 @@
 import { DocumentBlockTable, DocumentTableRecord } from '@gitbook/api';
-import { BlockProps } from '../Block';
+import assertNever from 'assert-never';
+
 import { ViewCards } from './ViewCards';
 import { ViewGrid } from './ViewGrid';
-import assertNever from 'assert-never';
+import { BlockProps } from '../Block';
 
 export type TableRecordKV = [string, DocumentTableRecord];
 

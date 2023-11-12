@@ -5,15 +5,16 @@ import {
     RevisionPageDocument,
     Space,
 } from '@gitbook/api';
-
-import { tcls } from '@/lib/tailwind';
 import { Suspense } from 'react';
-import { SearchButton } from '../Search';
+
 import { CONTAINER_MAX_WIDTH_NORMAL, CONTAINER_PADDING } from '@/components/layout';
 import { t } from '@/lib/intl';
-import { HeaderLogo } from './HeaderLogo';
-import { HeaderLink } from './HeaderLink';
+import { tcls } from '@/lib/tailwind';
+
 import { CollectionSpacesDropdown } from './CollectionSpacesDropdown';
+import { HeaderLink } from './HeaderLink';
+import { HeaderLogo } from './HeaderLogo';
+import { SearchButton } from '../Search';
 
 /**
  * Render the header for the space.

@@ -1,8 +1,10 @@
-import { resolveContentRef } from '@/lib/references';
-import { DocumentBlockContentRef } from '@gitbook/api';
-import { BlockProps } from './Block';
-import { tcls } from '@/lib/tailwind';
 import IconFile from '@geist-ui/icons/file';
+import { DocumentBlockContentRef } from '@gitbook/api';
+
+import { resolveContentRef } from '@/lib/references';
+import { tcls } from '@/lib/tailwind';
+
+import { BlockProps } from './Block';
 
 export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>) {
     const { block, context, style } = props;

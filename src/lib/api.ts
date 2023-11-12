@@ -1,8 +1,8 @@
 import 'server-only';
 
-import { headers } from 'next/headers';
-import { unstable_cache } from 'next/cache';
 import { ContentVisibility, GitBookAPI, JSONDocument } from '@gitbook/api';
+import { unstable_cache } from 'next/cache';
+import { headers } from 'next/headers';
 
 /**
  * Create an API client for the current request.

@@ -1,5 +1,3 @@
-import { resolveContentRef } from '@/lib/references';
-import { tcls } from '@/lib/tailwind';
 import {
     CustomizationContentLink,
     CustomizationHeaderLink,
@@ -8,6 +6,10 @@ import {
     Space,
 } from '@gitbook/api';
 import Link from 'next/link';
+
+import { resolveContentRef } from '@/lib/references';
+import { tcls } from '@/lib/tailwind';
+
 import {
     Dropdown,
     DropdownButtonProps,

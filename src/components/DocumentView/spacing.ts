@@ -1,6 +1,7 @@
-import { ClassValue } from '@/lib/tailwind';
 import { DocumentBlockListItem, DocumentBlocksEssentials } from '@gitbook/api';
 import { assertNever } from 'assert-never';
+
+import { ClassValue } from '@/lib/tailwind';
 
 /**
  * Get the line height of a block

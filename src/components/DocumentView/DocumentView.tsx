@@ -1,7 +1,9 @@
-import { ClassValue } from '@/lib/tailwind';
-import { Blocks } from './Blocks';
-import { ContentRefContext } from '@/lib/references';
 import { JSONDocument } from '@gitbook/api';
+
+import { ContentRefContext } from '@/lib/references';
+import { ClassValue } from '@/lib/tailwind';
+
+import { Blocks } from './Blocks';
 
 export interface DocumentContextProps {
     context: ContentRefContext;
@@ -12,7 +14,7 @@ export interface DocumentContextProps {
  */
 export function DocumentView(
     props: DocumentContextProps & {
-        document: JSONDocument['document'];
+        document: JSONDocument;
         style?: ClassValue;
     },
 ) {

@@ -1,10 +1,13 @@
+import { CustomizationHeaderPreset, CustomizationSettings } from '@gitbook/api';
+import assertNever from 'assert-never';
+import { Inter } from 'next/font/google';
 import shadesOf from 'tailwind-shades';
 import colors from 'tailwindcss/colors';
-import { Inter } from 'next/font/google';
+
 import { tcls } from '@/lib/tailwind';
-import { PagePathParams, fetchPageData } from '../fetch';
-import assertNever from 'assert-never';
+
 import { ClientLayout } from './ClientLayout';
+import { PagePathParams, fetchPageData } from '../fetch';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -62,12 +65,13 @@ function generateCSSVariable(name: string, color: ColorInput) {
         .join('\n');
 }
 
-function generateHeaderTheme(customization: any): {
+function generateHeaderTheme(customization: CustomizationSettings): {
     backgroundColor: { light: ColorInput; dark: ColorInput };
     linkColor: { light: ColorInput; dark: ColorInput };
 } {
     switch (customization.header.preset) {
-        case 'default': {
+        case CustomizationHeaderPreset.None:
+        case CustomizationHeaderPreset.Default: {
             return {
                 backgroundColor: {
                     light: colors.white,
@@ -79,7 +83,7 @@ function generateHeaderTheme(customization: any): {
                 },
             };
         }
-        case 'bold': {
+        case CustomizationHeaderPreset.Bold: {
             return {
                 backgroundColor: {
                     light: customization.styling.primaryColor.light,
@@ -92,7 +96,7 @@ function generateHeaderTheme(customization: any): {
                 },
             };
         }
-        case 'contrast': {
+        case CustomizationHeaderPreset.Contrast: {
             return {
                 backgroundColor: {
                     light: customization.styling.primaryColor.dark,
@@ -104,7 +108,7 @@ function generateHeaderTheme(customization: any): {
                 },
             };
         }
-        case 'custom': {
+        case CustomizationHeaderPreset.Custom: {
             return {
                 backgroundColor: {
                     light: customization.header.backgroundColor?.light ?? colors.white,

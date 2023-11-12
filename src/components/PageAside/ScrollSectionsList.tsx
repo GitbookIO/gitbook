@@ -1,10 +1,11 @@
 'use client';
 
-import { DocumentSection } from '@/lib/document';
-import { tcls } from '@/lib/tailwind';
 import Link from 'next/link';
 import React from 'react';
+
 import { IconChevronRight } from '@/components/icons/IconChevronRight';
+import { DocumentSection } from '@/lib/document';
+import { tcls } from '@/lib/tailwind';
 
 export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
     const { sections } = props;

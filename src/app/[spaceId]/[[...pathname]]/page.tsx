@@ -1,9 +1,11 @@
-import { SpaceContent } from '@/components/SpaceContent';
-import { PageHrefContext, absoluteHref, pageHref } from '@/lib/links';
 import { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
-import { PagePathParams, fetchPageData, getPagePath } from '../fetch';
+
+import { SpaceContent } from '@/components/SpaceContent';
 import { getPageDocument } from '@/lib/api';
+import { PageHrefContext, absoluteHref, pageHref } from '@/lib/links';
+
+import { PagePathParams, fetchPageData, getPagePath } from '../fetch';
 
 /**
  * Fetch and render a page.

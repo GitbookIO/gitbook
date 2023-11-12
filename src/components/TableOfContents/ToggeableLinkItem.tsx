@@ -1,11 +1,11 @@
 'use client';
 
-import { tcls } from '@/lib/tailwind';
 import Link, { LinkProps } from 'next/link';
 import React from 'react';
 
 import { IconChevronDown } from '@/components/icons/IconChevronDown';
 import { IconChevronRight } from '@/components/icons/IconChevronRight';
+import { tcls } from '@/lib/tailwind';
 
 /**
  * Client component to allow toggling of a page's children.

@@ -1,83 +1,37 @@
-import { ClassValue } from '@/lib/tailwind';
-import { Paragraph } from './Paragraph';
-import { Heading } from './Heading';
-import { ListOrdered } from './ListOrdered';
-import { ListUnordered } from './ListUnordered';
-import { ListItem } from './ListItem';
-import { CodeBlock } from './CodeBlock';
-import { Hint } from './Hint';
-import { DocumentContextProps } from './DocumentView';
-import { Images } from './Images';
-import { Tabs } from './Tabs';
-import { Expandable } from './Expandable';
-import { Table } from './Table';
-import { Swagger } from './Swagger';
-import { Embed } from './Embed';
-import { Quote } from './Quote';
-import {
-    DocumentBlockCode,
-    DocumentBlockContentRef,
-    DocumentBlockDivider,
-    DocumentBlockDrawing,
-    DocumentBlockEmbed,
-    DocumentBlockExpandable,
-    DocumentBlockFile,
-    DocumentBlockHeading,
-    DocumentBlockHint,
-    DocumentBlockImages,
-    DocumentBlockListItem,
-    DocumentBlockListOrdered,
-    DocumentBlockListTasks,
-    DocumentBlockListUnordered,
-    DocumentBlockMath,
-    DocumentBlockParagraph,
-    DocumentBlockQuote,
-    DocumentBlockSwagger,
-    DocumentBlockTable,
-    DocumentBlockTabs,
-    DocumentBlockTabsItem,
-    DocumentBlockTaskListItem,
-} from '@gitbook/api';
-import { BlockMath } from './Math';
-import { File } from './File';
-import { ListTasks } from './ListTasks';
-import { Divider } from './Divider';
 import assertNever from 'assert-never';
-import { Drawing } from './Drawing';
+
+import { DocumentAnyBlock } from '@/lib/document';
+import { ClassValue } from '@/lib/tailwind';
+
 import { BlockContentRef } from './BlockContentRef';
+import { CodeBlock } from './CodeBlock';
+import { Divider } from './Divider';
+import { DocumentContextProps } from './DocumentView';
+import { Drawing } from './Drawing';
+import { Embed } from './Embed';
+import { Expandable } from './Expandable';
+import { File } from './File';
+import { Heading } from './Heading';
+import { Hint } from './Hint';
+import { Images } from './Images';
+import { ListItem } from './ListItem';
+import { ListOrdered } from './ListOrdered';
+import { ListTasks } from './ListTasks';
+import { ListUnordered } from './ListUnordered';
+import { BlockMath } from './Math';
+import { Paragraph } from './Paragraph';
+import { Quote } from './Quote';
+import { Swagger } from './Swagger';
+import { Table } from './Table';
+import { Tabs } from './Tabs';
 
-export type SupportedBlock =
-    | DocumentBlockParagraph
-    | DocumentBlockHeading
-    | DocumentBlockListOrdered
-    | DocumentBlockListUnordered
-    | DocumentBlockListTasks
-    | DocumentBlockListItem
-    | DocumentBlockTaskListItem
-    | DocumentBlockHint
-    | DocumentBlockCode
-    | DocumentBlockImages
-    | DocumentBlockTabs
-    | DocumentBlockExpandable
-    | DocumentBlockSwagger
-    | DocumentBlockTable
-    | DocumentBlockEmbed
-    | DocumentBlockQuote
-    | DocumentBlockMath
-    | DocumentBlockFile
-    | DocumentBlockDivider
-    | DocumentBlockDrawing
-    | DocumentBlockContentRef;
-
-export type AncestorBlock = SupportedBlock | DocumentBlockTabsItem;
-
-export interface BlockProps<Block extends SupportedBlock> extends DocumentContextProps {
+export interface BlockProps<Block extends DocumentAnyBlock> extends DocumentContextProps {
     block: Block;
-    ancestorBlocks: AncestorBlock[];
+    ancestorBlocks: DocumentAnyBlock[];
     style?: ClassValue;
 }
 
-export function Block<T extends SupportedBlock>(props: BlockProps<T>) {
+export function Block<T extends DocumentAnyBlock>(props: BlockProps<T>) {
     const { block, style, ...contextProps } = props;
 
     switch (block.type) {
@@ -123,6 +77,12 @@ export function Block<T extends SupportedBlock>(props: BlockProps<T>) {
             return <Drawing {...props} {...contextProps} block={block} />;
         case 'content-ref':
             return <BlockContentRef {...props} {...contextProps} block={block} />;
+        case 'image':
+        case 'code-line':
+        case 'tabs-item':
+            throw new Error('Blocks should be directly rendered by parent');
+        case 'integration':
+            return <div>TODO Not supported yet</div>;
         default:
             assertNever(block);
     }

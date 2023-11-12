@@ -1,7 +1,9 @@
 import { DocumentTableViewGrid } from '@gitbook/api';
-import { TableViewProps } from './Table';
+
 import { tcls } from '@/lib/tailwind';
+
 import { RecordRow } from './RecordRow';
+import { TableViewProps } from './Table';
 
 export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
     const { block, view, records, style } = props;

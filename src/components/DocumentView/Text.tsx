@@ -1,4 +1,3 @@
-import { tcls } from '@/lib/tailwind';
 import {
     DocumentMarkBold,
     DocumentMarkCode,
@@ -9,6 +8,8 @@ import {
     DocumentTextMark,
 } from '@gitbook/api';
 import React from 'react';
+
+import { tcls } from '@/lib/tailwind';
 
 export function Text(props: { text: DocumentNodeText }) {
     const { text } = props;

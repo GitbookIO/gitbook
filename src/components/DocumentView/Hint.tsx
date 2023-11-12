@@ -1,11 +1,13 @@
+import IconAlertCircle from '@geist-ui/icons/alertCircle';
+import IconAlertTriangle from '@geist-ui/icons/alertTriangle';
+import IconCheckInCircle from '@geist-ui/icons/checkInCircle';
+import IconInfo from '@geist-ui/icons/info';
+import { DocumentBlockHint } from '@gitbook/api';
+
 import { ClassValue, tcls } from '@/lib/tailwind';
+
 import { BlockProps } from './Block';
 import { Blocks } from './Blocks';
-import { DocumentBlockHint } from '@gitbook/api';
-import IconInfo from '@geist-ui/icons/info';
-import IconAlertTriangle from '@geist-ui/icons/alertTriangle';
-import IconAlertCircle from '@geist-ui/icons/alertCircle';
-import IconCheckInCircle from '@geist-ui/icons/checkInCircle';
 import { getBlockTextStyle } from './spacing';
 
 export function Hint(props: BlockProps<DocumentBlockHint>) {

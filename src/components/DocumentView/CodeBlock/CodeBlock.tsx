@@ -1,11 +1,14 @@
-import { tcls } from '@/lib/tailwind';
-import { BlockProps } from '../Block';
-import { highlight, HighlightLine, HighlightToken } from './highlight';
-import { Inline } from '../Inline';
 import { DocumentBlockCode } from '@gitbook/api';
 
+import { ContentRefContext } from '@/lib/references';
+import { tcls } from '@/lib/tailwind';
+
+import { highlight, HighlightLine, HighlightToken } from './highlight';
+import { BlockProps } from '../Block';
+import { Inline } from '../Inline';
+
 export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
-    const { block, style } = props;
+    const { block, style, context } = props;
     const lines = await highlight(block);
 
     return (
@@ -17,6 +20,7 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
                     line={line}
                     lineIndex={index + 1}
                     isLast={index === lines.length - 1}
+                    context={context}
                 />
             ))}
         </pre>
@@ -28,12 +32,13 @@ function CodeHighlightLine(props: {
     line: HighlightLine;
     lineIndex: number;
     isLast: boolean;
+    context: ContentRefContext;
 }) {
-    const { block, line, isLast, lineIndex } = props;
+    const { block, line, isLast, lineIndex, context } = props;
 
     const content = (
         <>
-            <CodeHighlightTokens tokens={line.tokens} />
+            <CodeHighlightTokens tokens={line.tokens} context={context} />
             {isLast ? null : '\n'}
         </>
     );
@@ -49,25 +54,25 @@ function CodeHighlightLine(props: {
     );
 }
 
-function CodeHighlightTokens(props: { tokens: HighlightToken[] }) {
-    const { tokens } = props;
+function CodeHighlightTokens(props: { tokens: HighlightToken[]; context: ContentRefContext }) {
+    const { tokens, context } = props;
 
     return (
         <>
             {tokens.map((token, index) => (
-                <CodeHighlightToken key={index} token={token} />
+                <CodeHighlightToken key={index} token={token} context={context} />
             ))}
         </>
     );
 }
 
-function CodeHighlightToken(props: { token: HighlightToken }) {
-    const { token } = props;
+function CodeHighlightToken(props: { token: HighlightToken; context: ContentRefContext }) {
+    const { token, context } = props;
 
     if (token.type === 'inline') {
         return (
-            <Inline inline={token.inline}>
-                <CodeHighlightTokens tokens={token.children} />
+            <Inline inline={token.inline} context={context}>
+                <CodeHighlightTokens tokens={token.children} context={context} />
             </Inline>
         );
     }

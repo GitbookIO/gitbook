@@ -1,7 +1,9 @@
 import { Revision, RevisionPageDocument, Space } from '@gitbook/api';
-import { PageHeader } from './PageHeader';
-import { PageFooterNavigation } from './PageFooterNavigation';
+
 import { tcls } from '@/lib/tailwind';
+
+import { PageFooterNavigation } from './PageFooterNavigation';
+import { PageHeader } from './PageHeader';
 import { DocumentView } from '../DocumentView';
 
 export function PageBody(props: {

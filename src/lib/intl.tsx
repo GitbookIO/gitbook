@@ -1,6 +1,7 @@
-import * as translations from '@/translations';
 import { Space } from '@gitbook/api';
 import React from 'react';
+
+import * as translations from '@/translations';
 
 export interface IntlContext {
     space: Space;

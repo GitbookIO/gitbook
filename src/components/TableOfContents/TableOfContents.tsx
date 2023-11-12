@@ -1,8 +1,10 @@
 import { Revision, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
+
+import { IntlContext } from '@/lib/intl';
 import { tcls } from '@/lib/tailwind';
+
 import { PagesList } from './PagesList';
 import { Trademark } from './Trademark';
-import { IntlContext } from '@/lib/intl';
 
 export function TableOfContents(
     props: IntlContext & {

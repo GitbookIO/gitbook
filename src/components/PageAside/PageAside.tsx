@@ -1,9 +1,11 @@
-import { getDocumentSections } from '@/lib/document';
-import { tcls } from '@/lib/tailwind';
 import { RevisionPageDocument, Space } from '@gitbook/api';
 import React from 'react';
-import { ScrollSectionsList } from './ScrollSectionsList';
+
+import { getDocumentSections } from '@/lib/document';
 import { t } from '@/lib/intl';
+import { tcls } from '@/lib/tailwind';
+
+import { ScrollSectionsList } from './ScrollSectionsList';
 
 /**
  * Aside listing the headings in the document.

@@ -1,8 +1,9 @@
-import { absoluteHref } from '@/lib/links';
-import { ClassValue, tcls } from '@/lib/tailwind';
 import { Collection, CustomizationSettings, Space } from '@gitbook/api';
 import Link from 'next/link';
+
 import { Image } from '@/components/utils';
+import { absoluteHref } from '@/lib/links';
+import { ClassValue, tcls } from '@/lib/tailwind';
 
 interface HeaderLogoProps {
     collection: Collection | null;

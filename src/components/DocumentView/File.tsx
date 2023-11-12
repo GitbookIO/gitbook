@@ -1,7 +1,9 @@
-import { DocumentBlockFile } from '@gitbook/api';
-import { BlockProps } from './Block';
-import { tcls } from '@/lib/tailwind';
 import IconDownload from '@geist-ui/icons/download';
+import { DocumentBlockFile } from '@gitbook/api';
+
+import { tcls } from '@/lib/tailwind';
+
+import { BlockProps } from './Block';
 
 export function File(props: BlockProps<DocumentBlockFile>) {
     const { block, context, style } = props;

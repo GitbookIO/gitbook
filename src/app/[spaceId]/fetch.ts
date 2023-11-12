@@ -1,3 +1,5 @@
+import { ContentVisibility, Space } from '@gitbook/api';
+
 import {
     getSpace,
     getCurrentRevision,
@@ -5,9 +7,7 @@ import {
     getCollectionSpaces,
     getCollection,
 } from '@/lib/api';
-
 import { resolvePagePath, resolvePageId } from '@/lib/pages';
-import { ContentVisibility, Space } from '@gitbook/api';
 
 export interface SpaceParams {
     spaceId: string;

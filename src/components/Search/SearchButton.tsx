@@ -1,8 +1,10 @@
 'use client';
 
-import { ClassValue, tcls } from '@/lib/tailwind';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+
 import { IconSearch } from '@/components/icons/IconSearch';
+import { ClassValue, tcls } from '@/lib/tailwind';
+
 import { useSearch } from './useSearch';
 
 /**

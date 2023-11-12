@@ -1,6 +1,7 @@
 import { RevisionPageLink } from '@gitbook/api';
-import { tcls } from '@/lib/tailwind';
 import Link from 'next/link';
+
+import { tcls } from '@/lib/tailwind';
 
 export function PageLinkItem(props: { page: RevisionPageLink }) {
     const { page } = props;

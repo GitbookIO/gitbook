@@ -1,15 +1,17 @@
 import { ContentRef, DocumentTableViewCards } from '@gitbook/api';
-import { TableRecordKV, TableViewProps } from './Table';
-import { tcls } from '@/lib/tailwind';
+
 import { resolveContentRef } from '@/lib/references';
+import { tcls } from '@/lib/tailwind';
+
 import { RecordColumnValue } from './RecordColumnValue';
+import { TableRecordKV, TableViewProps } from './Table';
 
 export async function RecordCard(
     props: TableViewProps<DocumentTableViewCards> & {
         record: TableRecordKV;
     },
 ) {
-    const { block, view, record, context } = props;
+    const { view, record, context } = props;
 
     const coverFile = view.coverDefinition
         ? (record[1].values[view.coverDefinition]?.[0] as string)

@@ -1,8 +1,10 @@
 import { RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
-import { tcls } from '@/lib/tailwind';
 import Link from 'next/link';
-import { PagesList } from './PagesList';
+
 import { pageHref } from '@/lib/links';
+import { tcls } from '@/lib/tailwind';
+
+import { PagesList } from './PagesList';
 import { ToggeableLinkItem } from './ToggeableLinkItem';
 
 export function PageDocumentItem(props: {

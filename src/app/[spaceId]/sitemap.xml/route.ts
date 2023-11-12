@@ -1,11 +1,11 @@
+import { Revision, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 import jsontoxml from 'jsontoxml';
+import { NextRequest } from 'next/server';
 
 import { api } from '@/lib/api';
 import { pageHref } from '@/lib/links';
 
-import { NextRequest } from 'next/server';
 import { SpaceParams } from '../fetch';
-import { Revision, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 
 export const runtime = 'edge';
 

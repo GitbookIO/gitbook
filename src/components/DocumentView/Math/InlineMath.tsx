@@ -1,6 +1,7 @@
-import { InlineProps } from '../Inline';
 import { DocumentInlineMath } from '@gitbook/api';
+
 import { KaTeX } from './KaTeX';
+import { InlineProps } from '../Inline';
 
 export async function InlineMath(props: InlineProps<DocumentInlineMath>) {
     const { inline } = props;

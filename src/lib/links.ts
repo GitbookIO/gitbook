@@ -1,7 +1,7 @@
 import 'server-only';
 
-import { headers } from 'next/headers';
 import { RevisionPageDocument } from '@gitbook/api';
+import { headers } from 'next/headers';
 
 export interface PageHrefContext {
     /**
