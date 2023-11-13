@@ -1,5 +1,6 @@
 import {
     Collection,
+    CustomizationHeaderPreset,
     CustomizationSettings,
     Revision,
     RevisionPageDocument,
@@ -9,7 +10,7 @@ import {
 import React from 'react';
 
 import { Footer } from '@/components/Footer';
-import { Header } from '@/components/Header';
+import { CompactHeader, Header } from '@/components/Header';
 import { CONTAINER_MAX_WIDTH_NORMAL, CONTAINER_PADDING } from '@/components/layout';
 import { PageBody } from '@/components/PageBody';
 import { SearchModal } from '@/components/Search';
@@ -42,19 +43,24 @@ export function SpaceContent(props: {
         ancestors,
         document,
     } = props;
+
     const asFullWidth = hasFullWidthBlock(document);
+    const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
     return (
         <div>
-            <Header
-                space={space}
-                collection={collection}
-                collectionSpaces={collectionSpaces}
-                revision={revision}
-                page={page}
-                customization={customization}
-                asFullWidth={asFullWidth}
-            />
+            {withTopHeader ? (
+                <Header
+                    space={space}
+                    collection={collection}
+                    collectionSpaces={collectionSpaces}
+                    revision={revision}
+                    page={page}
+                    customization={customization}
+                    asFullWidth={asFullWidth}
+                />
+            ) : null}
+
             <div
                 className={tcls(
                     'flex',
@@ -68,9 +74,25 @@ export function SpaceContent(props: {
                     revision={revision}
                     activePage={page}
                     ancestors={ancestors}
+                    header={
+                        withTopHeader ? null : (
+                            <CompactHeader
+                                space={space}
+                                collection={collection}
+                                collectionSpaces={collectionSpaces}
+                                customization={customization}
+                            />
+                        )
+                    }
+                    withHeaderOffset={withTopHeader}
                 />
                 <PageBody space={space} revision={revision} page={page} document={document} />
-                <PageAside space={space} page={page} document={document} />
+                <PageAside
+                    space={space}
+                    page={page}
+                    document={document}
+                    withHeaderOffset={withTopHeader}
+                />
             </div>
 
             {customization.themes.toggeable ||

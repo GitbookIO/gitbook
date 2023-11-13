@@ -6,12 +6,18 @@ import { t } from '@/lib/intl';
 import { tcls } from '@/lib/tailwind';
 
 import { ScrollSectionsList } from './ScrollSectionsList';
+import { SIDE_COLUMN_WITHOUT_HEADER, SIDE_COLUMN_WITH_HEADER } from '../layout';
 
 /**
  * Aside listing the headings in the document.
  */
-export function PageAside(props: { space: Space; page: RevisionPageDocument; document: any }) {
-    const { space, document } = props;
+export function PageAside(props: {
+    space: Space;
+    page: RevisionPageDocument;
+    document: any;
+    withHeaderOffset: boolean;
+}) {
+    const { space, document, withHeaderOffset } = props;
     const sections = getDocumentSections(document);
 
     return (
@@ -24,8 +30,7 @@ export function PageAside(props: { space: Space; page: RevisionPageDocument; doc
                 'grow-0',
                 'shrink-0',
                 'sticky',
-                'top-16',
-                'h-[calc(100vh-4rem)]',
+                withHeaderOffset ? SIDE_COLUMN_WITH_HEADER : SIDE_COLUMN_WITHOUT_HEADER,
                 'py-6',
             )}
         >

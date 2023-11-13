@@ -10,7 +10,7 @@ import { useSearch } from './useSearch';
 /**
  * Button to open the search modal.
  */
-export function SearchButton(props: { children: React.ReactNode; style?: ClassValue }) {
+export function SearchButton(props: { children?: React.ReactNode; style?: ClassValue }) {
     const { style, children } = props;
 
     const [, setQuery] = useSearch();
@@ -40,7 +40,7 @@ export function SearchButton(props: { children: React.ReactNode; style?: ClassVa
                 style,
             )}
         >
-            <IconSearch className={tcls('w-4', 'h-4', 'me-2')} />
+            <IconSearch className={tcls('w-4', 'h-4', children ? 'me-2' : null)} />
             {children}
         </button>
     );
