@@ -3,7 +3,7 @@ import { notFound, redirect } from 'next/navigation';
 
 import { SpaceContent } from '@/components/SpaceContent';
 import { getPageDocument } from '@/lib/api';
-import { PageHrefContext, absoluteHref, pageHref } from '@/lib/links';
+import { PageHrefContext, absoluteHref, baseUrl, pageHref } from '@/lib/links';
 
 import { PagePathParams, fetchPageData, getPagePath } from '../fetch';
 
@@ -51,6 +51,7 @@ export async function generateMetadata({ params }: { params: PagePathParams }): 
         title: { default: page.title, template: `%s | ${space.title}` },
         description: page.description,
         generator: 'GitBook',
+        metadataBase: new URL(baseUrl()),
         icons: {
             icon: [
                 {

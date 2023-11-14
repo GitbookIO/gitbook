@@ -13,17 +13,44 @@ export interface PageHrefContext {
 
 /**
  * Return the base path for the current request.
+ * The value will start and finish with /
  */
 export function basePath(): string {
     const headersList = headers();
-    return headersList.get('x-gitbook-basepath') ?? '';
+    let path = headersList.get('x-gitbook-basepath') ?? '/';
+
+    if (!path.startsWith('/')) {
+        path = '/' + path;
+    }
+
+    if (!path.endsWith('/')) {
+        path = path + '/';
+    }
+
+    return path;
+}
+
+/**
+ * Return the current host for the current request.
+ */
+export function host(): string {
+    const headersList = headers();
+    return headersList.get('x-gitbook-host') ?? headersList.get('host') ?? '';
+}
+
+/**
+ * Return the base URL for the current request.
+ */
+export function baseUrl(): string {
+    return `https://${host()}${basePath()}`;
 }
 
 /**
  * Create an absolute href in the current content.
  */
 export function absoluteHref(href: string): string {
-    return `${basePath()}/${href.startsWith('/') ? href.slice(1) : href}`;
+    const base = basePath();
+    return `${base === '/' ? '' : base}/${href.startsWith('/') ? href.slice(1) : href}`;
 }
 
 /**
