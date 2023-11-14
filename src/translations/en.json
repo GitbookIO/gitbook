@@ -4,6 +4,8 @@
     "switch_to_light_theme": "Switch to light theme",
     "switch_to_system_theme": "Switch to system theme",
     "search": "Search",
+    "search_input_placeholder": "Search content",
+    "search_no_results": "No results match your search.",
     "on_this_page": "On this page",
     "next_page": "Next",
     "previous_page": "Previous"

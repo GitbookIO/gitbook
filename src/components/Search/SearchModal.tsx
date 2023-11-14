@@ -6,9 +6,16 @@ import { useHotkeys } from 'react-hotkeys-hook';
 
 import { tcls } from '@/lib/tailwind';
 
+import { SearchResults, SearchResultsRef } from './SearchResults';
 import { useSearch } from './useSearch';
 
-export function SearchModal(props: {}) {
+interface SearchModalProps {
+    spaceId: string;
+    inputPlaceholder: string;
+    noResultsMessage: string;
+}
+
+export function SearchModal(props: SearchModalProps) {
     const [query, setQuery] = useSearch();
 
     useHotkeys(
@@ -48,18 +55,26 @@ export function SearchModal(props: {}) {
             )}
             onClick={onClose}
         >
-            <SearchModalBody query={query} onChangeQuery={onChangeQuery} onClose={onClose} />
+            <SearchModalBody
+                {...props}
+                query={query}
+                onChangeQuery={onChangeQuery}
+                onClose={onClose}
+            />
         </div>
     );
 }
 
-function SearchModalBody(props: {
-    query: string;
-    onChangeQuery: (newQuery: string) => void;
-    onClose: () => void;
-}) {
-    const { query, onChangeQuery, onClose } = props;
+function SearchModalBody(
+    props: SearchModalProps & {
+        query: string;
+        onChangeQuery: (newQuery: string) => void;
+        onClose: () => void;
+    },
+) {
+    const { spaceId, inputPlaceholder, noResultsMessage, query, onChangeQuery, onClose } = props;
 
+    const resultsRef = React.useRef<SearchResultsRef>(null);
     const inputRef = React.useRef<HTMLInputElement>(null);
 
     React.useEffect(() => {
@@ -69,6 +84,15 @@ function SearchModalBody(props: {
     const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Escape' || (event.key === 'Backspace' && query === '')) {
             onClose();
+        } else if (event.key === 'ArrowUp') {
+            event.preventDefault();
+            resultsRef.current?.moveUp();
+        } else if (event.key === 'ArrowDown') {
+            event.preventDefault();
+            resultsRef.current?.moveDown();
+        } else if (event.key === 'Enter') {
+            event.preventDefault();
+            resultsRef.current?.select();
         }
     };
 
@@ -83,7 +107,7 @@ function SearchModalBody(props: {
                 'flex',
                 'flex-col',
                 'bg-white',
-                'w-[500px]',
+                'w-[600px]',
                 'max-h',
                 'rounded',
                 'border-slate-500',
@@ -105,9 +129,18 @@ function SearchModalBody(props: {
                         onKeyDown={onKeyDown}
                         onChange={onChange}
                         className={tcls('w-full', 'p-2', 'text-slate-600', 'focus:outline-none')}
+                        placeholder={inputPlaceholder}
                     />
                 </div>
             </div>
+            {query ? (
+                <SearchResults
+                    ref={resultsRef}
+                    spaceId={spaceId}
+                    query={query}
+                    noResultsMessage={noResultsMessage}
+                />
+            ) : null}
         </div>
     );
 }

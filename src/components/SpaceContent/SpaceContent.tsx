@@ -16,6 +16,7 @@ import { PageBody } from '@/components/PageBody';
 import { SearchModal } from '@/components/Search';
 import { TableOfContents } from '@/components/TableOfContents';
 import { hasFullWidthBlock } from '@/lib/document';
+import { tString } from '@/lib/intl';
 import { tcls } from '@/lib/tailwind';
 
 import { PageAside } from '../PageAside';
@@ -109,7 +110,11 @@ export function SpaceContent(props: {
             ) : null}
 
             <React.Suspense fallback={null}>
-                <SearchModal />
+                <SearchModal
+                    spaceId={space.id}
+                    inputPlaceholder={tString({ space }, 'search_input_placeholder')}
+                    noResultsMessage={tString({ space }, 'search_no_results')}
+                />
             </React.Suspense>
         </div>
     );
