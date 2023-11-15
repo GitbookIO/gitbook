@@ -1,6 +1,6 @@
+import { DocumentBlock } from '@gitbook/api';
 import assertNever from 'assert-never';
 
-import { DocumentAnyBlock } from '@/lib/document';
 import { ClassValue } from '@/lib/tailwind';
 
 import { BlockContentRef } from './BlockContentRef';
@@ -25,13 +25,13 @@ import { Swagger } from './Swagger';
 import { Table } from './Table';
 import { Tabs } from './Tabs';
 
-export interface BlockProps<Block extends DocumentAnyBlock> extends DocumentContextProps {
+export interface BlockProps<Block extends DocumentBlock> extends DocumentContextProps {
     block: Block;
-    ancestorBlocks: DocumentAnyBlock[];
+    ancestorBlocks: DocumentBlock[];
     style?: ClassValue;
 }
 
-export function Block<T extends DocumentAnyBlock>(props: BlockProps<T>) {
+export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
     const { block, style, ...contextProps } = props;
 
     switch (block.type) {

@@ -5,14 +5,14 @@ import {
     DocumentInlineLink,
     DocumentInlineMath,
     DocumentInlineMention,
-    DocumentInlinesRich,
+    DocumentInline,
 } from '@gitbook/api';
 
 import { DocumentContextProps } from './DocumentView';
 import { Link } from './Link';
 import { InlineMath } from './Math';
 
-export interface InlineProps<T extends DocumentInlinesRich> extends DocumentContextProps {
+export interface InlineProps<T extends DocumentInline> extends DocumentContextProps {
     inline: T;
 
     /**

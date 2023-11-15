@@ -1,33 +1,9 @@
 import {
-    DocumentNodeText,
-    DocumentInlinesRich,
-    DocumentNodeFragment,
+    DocumentText,
+    DocumentInline,
+    DocumentFragment,
     JSONDocument,
-    DocumentBlockCode,
-    DocumentBlockContentRef,
-    DocumentBlockDivider,
-    DocumentBlockDrawing,
-    DocumentBlockEmbed,
-    DocumentBlockExpandable,
-    DocumentBlockFile,
-    DocumentBlockHeading,
-    DocumentBlockHint,
-    DocumentBlockImages,
-    DocumentBlockListItem,
-    DocumentBlockListOrdered,
-    DocumentBlockListTasks,
-    DocumentBlockListUnordered,
-    DocumentBlockMath,
-    DocumentBlockParagraph,
-    DocumentBlockQuote,
-    DocumentBlockSwagger,
-    DocumentBlockTable,
-    DocumentBlockTabs,
-    DocumentBlockTabsItem,
-    DocumentBlockTaskListItem,
-    DocumentBlockIntegration,
-    DocumentBlockImage,
-    DocumentBlockCodeLine,
+    DocumentBlock,
 } from '@gitbook/api';
 
 export interface DocumentSection {
@@ -35,33 +11,6 @@ export interface DocumentSection {
     title: string;
     depth: number;
 }
-
-export type DocumentAnyBlock =
-    | DocumentBlockParagraph
-    | DocumentBlockHeading
-    | DocumentBlockListOrdered
-    | DocumentBlockListUnordered
-    | DocumentBlockListTasks
-    | DocumentBlockListItem
-    | DocumentBlockTaskListItem
-    | DocumentBlockHint
-    | DocumentBlockCode
-    | DocumentBlockImages
-    | DocumentBlockTabs
-    | DocumentBlockTabsItem
-    | DocumentBlockExpandable
-    | DocumentBlockSwagger
-    | DocumentBlockTable
-    | DocumentBlockEmbed
-    | DocumentBlockQuote
-    | DocumentBlockMath
-    | DocumentBlockFile
-    | DocumentBlockDivider
-    | DocumentBlockDrawing
-    | DocumentBlockContentRef
-    | DocumentBlockIntegration
-    | DocumentBlockImage
-    | DocumentBlockCodeLine;
 
 /**
  * Check if the document contains one block that should be rendered in full-width mode.
@@ -106,7 +55,7 @@ export function getDocumentSections(document: JSONDocument): DocumentSection[] {
  * Get the text of a block/inline.
  */
 export function getNodeText(
-    node: DocumentNodeText | DocumentNodeFragment | DocumentInlinesRich | DocumentAnyBlock,
+    node: DocumentText | DocumentFragment | DocumentInline | DocumentBlock,
 ): string {
     switch (node.object) {
         case 'text':
@@ -128,9 +77,9 @@ export function getNodeText(
  * Get a fragment by its type in a node.
  */
 export function getNodeFragmentByType(
-    node: DocumentInlinesRich | DocumentAnyBlock,
+    node: DocumentInline | DocumentBlock,
     type: string,
-): DocumentNodeFragment | null {
+): DocumentFragment | null {
     if (!('fragments' in node)) {
         return null;
     }
@@ -142,9 +91,9 @@ export function getNodeFragmentByType(
  * Get a fragment by its `fragment` name in a node.
  */
 export function getNodeFragmentByName(
-    node: DocumentInlinesRich | DocumentAnyBlock,
+    node: DocumentInline | DocumentBlock,
     name: string,
-): DocumentNodeFragment | null {
+): DocumentFragment | null {
     if (!('fragments' in node)) {
         return null;
     }
@@ -156,7 +105,7 @@ export function getNodeFragmentByName(
  * Test if a node is empty.
  */
 export function isNodeEmpty(
-    node: DocumentNodeText | DocumentNodeFragment | DocumentInlinesRich | DocumentAnyBlock,
+    node: DocumentText | DocumentFragment | DocumentInline | DocumentBlock,
 ): boolean {
     const text = getNodeText(node);
     return text.trim().length === 0;

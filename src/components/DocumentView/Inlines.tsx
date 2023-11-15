@@ -1,10 +1,10 @@
-import { DocumentInlinesRich } from '@gitbook/api';
+import { DocumentInline, DocumentText } from '@gitbook/api';
 
 import { DocumentContextProps } from './DocumentView';
 import { Inline } from './Inline';
 import { Text } from './Text';
 
-export function Inlines<T extends DocumentInlinesRich>(
+export function Inlines<T extends DocumentInline | DocumentText>(
     props: DocumentContextProps & { nodes: T[] },
 ) {
     const { nodes, ...contextProps } = props;

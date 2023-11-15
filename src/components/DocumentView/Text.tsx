@@ -4,14 +4,14 @@ import {
     DocumentMarkColor,
     DocumentMarkItalic,
     DocumentMarkStrikethrough,
-    DocumentNodeText,
+    DocumentText,
     DocumentTextMark,
 } from '@gitbook/api';
 import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
-export function Text(props: { text: DocumentNodeText }) {
+export function Text(props: { text: DocumentText }) {
     const { text } = props;
 
     return (

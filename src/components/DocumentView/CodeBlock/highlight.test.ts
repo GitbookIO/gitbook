@@ -92,7 +92,7 @@ it('should parse code with an inline', async () => {
                                 leaves: [{ object: 'leaf', marks: [], text: 'log' }],
                             },
                         ],
-                        isVoid: true,
+                        isVoid: false,
                         fragments: [],
                     },
                     {
