@@ -23,12 +23,14 @@ export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>
                 'items-center',
                 'rounded',
                 'border',
-                'border-slate-200',
-                'hover:border-slate-300',
+                'border-dark/2',
+                'hover:border-dark/4',
                 'px-5',
                 'py-2',
-                'text-slate-500',
-                'hover:text-slate-700',
+                'hover:text-dark',
+                'dark:border-light/2',
+                'dark:hover:text-light',
+                'dark:hover:border-light/4',
                 style,
             )}
         >

@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google';
 import shadesOf from 'tailwind-shades';
 import colors from 'tailwindcss/colors';
 
+import { hexToRgb } from '@/components/utils/HexToRgb';
 import { tcls } from '@/lib/tailwind';
 
 import { ClientLayout } from './ClientLayout';
@@ -24,30 +25,30 @@ export default async function SpaceRootLayout(props: {
             <head>
                 <style>{`
                     :root {
-                        ${generateCSSVariable(
+                        ${generateColorVariable(
                             'primary-color',
                             customization.styling.primaryColor.light,
                         )}
-                        ${generateCSSVariable(
+                        ${generateColorVariable(
                             'header-background',
                             headerTheme.backgroundColor.light,
                         )}
-                        ${generateCSSVariable('header-link', headerTheme.linkColor.light)}
+                        ${generateColorVariable('header-link', headerTheme.linkColor.light)}
                     }
                     .dark {
-                        ${generateCSSVariable(
+                        ${generateColorVariable(
                             'primary-color',
                             customization.styling.primaryColor.dark,
                         )}
-                        ${generateCSSVariable(
+                        ${generateColorVariable(
                             'header-background',
                             headerTheme.backgroundColor.dark,
                         )}
-                        ${generateCSSVariable('header-link', headerTheme.linkColor.dark)}
+                        ${generateColorVariable('header-link', headerTheme.linkColor.dark)}
                     }
                 `}</style>
             </head>
-            <body className={tcls(inter.className, 'bg-white', 'dark:bg-slate-950')}>
+            <body className={tcls(inter.className, 'bg-light', 'dark:bg-dark')}>
                 <ClientLayout>{children}</ClientLayout>
             </body>
         </html>
@@ -55,12 +56,14 @@ export default async function SpaceRootLayout(props: {
 }
 
 type ColorInput = string | Record<string, string>;
-function generateCSSVariable(name: string, color: ColorInput) {
+function generateColorVariable(name: string, color: ColorInput) {
     const shades: Record<string, string> = typeof color === 'string' ? shadesOf(color) : color;
 
     return Object.entries(shades)
         .map(([key, value]) => {
-            return `--${name}-${key}: ${value};`;
+            // Check the original hex value
+            const rgbValue = hexToRgb(value);
+            return `--${name}-${key}: ${rgbValue};`;
         })
         .join('\n');
 }

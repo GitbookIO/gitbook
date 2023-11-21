@@ -52,10 +52,10 @@ export function ThemeToggler(props: IntlContext) {
             className={tcls(
                 'flex',
                 'flex-row',
-                'rounded',
+                'rounded-full',
                 'border',
-                'border-slate-200',
-                'dark:border-slate-800',
+                'border-dark/3',
+                'dark:border-light/2',
             )}
         >
             <ThemeButton
@@ -97,13 +97,20 @@ function ThemeButton(props: {
             className={tcls(
                 'p-1',
                 'm-1',
-                'rounded',
-                active ? ['bg-slate-200', 'dark:bg-slate-800'] : null,
-                'text-slate-900',
-                'dark:text-slate-400',
+                'group',
+                'rounded-full',
+                active ? ['bg-primary-600/4', 'dark:bg-primary-400/2'] : null,
+                'text-dark',
+                'dark:text-light/7',
             )}
         >
-            <Icon className={tcls('w-4', 'h-4')} />
+            <Icon
+                className={tcls(
+                    'w-4',
+                    'h-4',
+                    active ? ['stroke-primary-600', 'dark:stroke-primary-400'] : null,
+                )}
+            />
         </button>
     );
 }

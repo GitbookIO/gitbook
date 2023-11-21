@@ -20,8 +20,18 @@ export function DynamicTabs(props: {
     const [active, setActive] = React.useState<null | string>(null);
 
     return (
-        <div className={tcls('rounded', 'border', 'border-slate-200', 'flex', 'flex-col', style)}>
-            <div role="tablist" className={tcls('flex', 'flex-row', 'p-4')}>
+        <div
+            className={tcls(
+                'rounded-md',
+                'border',
+                'border-dark/2',
+                'flex',
+                'flex-col',
+                'dark:border-light/3',
+                style,
+            )}
+        >
+            <div role="tablist" className={tcls('flex', 'flex-row', 'p-4', 'space-x-2')}>
                 {tabs.map((tab) => (
                     <button
                         key={tab.id}
@@ -33,14 +43,19 @@ export function DynamicTabs(props: {
                             setActive(tab.id);
                         }}
                         className={tcls(
-                            'bg-slate-50',
+                            'bg-transparent',
                             'text-sm',
-                            'textslate-700',
-                            'rounded',
+                            'rounded-full',
                             'px-4',
                             'py-2',
-                            'me-2',
-                            active === tab.id ? ['bg-slate-100'] : null,
+                            'transition-colors',
+                            'hover:bg-dark/1',
+                            'font-semibold',
+                            'text-dark/7',
+                            'dark:text-light/6',
+                            active === tab.id
+                                ? ['text-dark', 'bg-dark/2', 'dark:bg-light/2', 'dark:text-light']
+                                : null,
                         )}
                     >
                         {tab.title}

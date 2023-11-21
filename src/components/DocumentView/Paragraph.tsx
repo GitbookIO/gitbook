@@ -9,7 +9,7 @@ export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {
     const { block, style, ...contextProps } = props;
 
     return (
-        <p className={tcls('text-base', 'font-normal', style)}>
+        <p className={tcls('font-normal', style)}>
             <Inlines {...contextProps} nodes={block.nodes} />
         </p>
     );

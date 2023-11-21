@@ -16,7 +16,16 @@ export async function RecordRow(
         <tr>
             {view.columns.map((column) => {
                 return (
-                    <td key={column} className={tcls('border', 'border-slate-700', 'px-2', 'py-1')}>
+                    <td
+                        key={column}
+                        className={tcls(
+                            'border',
+                            'border-dark/2',
+                            'px-2',
+                            'py-1',
+                            'dark:border-light/2',
+                        )}
+                    >
                         <RecordColumnValue key={column} {...props} column={column} />
                     </td>
                 );

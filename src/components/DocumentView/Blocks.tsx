@@ -21,23 +21,9 @@ export function Blocks<T extends DocumentBlock, Tag extends React.ElementType = 
 
         /** Style passed to all blocks */
         blockStyle?: ClassValue;
-
-        /** Style passed to the first block */
-        firstBlockStyle?: ClassValue;
-
-        /** Style passed to the last block */
-        lastBlockStyle?: ClassValue;
     },
 ) {
-    const {
-        nodes,
-        tag: Tag = 'div',
-        style,
-        blockStyle = ['mt-6'],
-        firstBlockStyle = ['mt-0'],
-        lastBlockStyle,
-        ...contextProps
-    } = props;
+    const { nodes, tag: Tag = 'div', style, blockStyle, ...contextProps } = props;
 
     return (
         <Tag className={tcls(style)}>
@@ -45,13 +31,7 @@ export function Blocks<T extends DocumentBlock, Tag extends React.ElementType = 
                 <Block
                     key={node.key}
                     block={node}
-                    style={[
-                        'max-w-3xl', // Default max size for blocks, can be overridden in the block implementation
-                        'mx-auto',
-                        blockStyle,
-                        index === 0 && firstBlockStyle,
-                        index === nodes.length - 1 && lastBlockStyle,
-                    ]}
+                    style={['max-w-3xl', 'w-full', 'mx-auto', 'leading-relaxed', blockStyle]}
                     {...contextProps}
                 />
             ))}

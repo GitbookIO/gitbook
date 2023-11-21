@@ -13,9 +13,7 @@ export function PageGroupItem(props: {
 
     return (
         <li className={tcls('flex', 'flex-col', 'my-3')}>
-            <div className={tcls('px-2', 'py-1.5', 'text-m', 'text-slate-900', 'font-medium')}>
-                {page.title}
-            </div>
+            <div className={tcls('px-2', 'py-2', 'text', 'font-medium')}>{page.title}</div>
             {page.pages && page.pages.length ? (
                 <PagesList pages={page.pages} activePage={activePage} ancestors={ancestors} />
             ) : null}

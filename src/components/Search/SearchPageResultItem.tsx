@@ -22,13 +22,16 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
             href={item.href}
             className={tcls(
                 'flex',
-                'flex-col',
+                'flex-row',
                 'rounded',
-                'px-3',
+                'px-6',
                 'py-3',
-                'hover:bg-slate-50',
+                'hover:bg-dark/1',
                 'text-base',
-                'text-slate-600',
+                'text-dark',
+                'font-semibold',
+                'mt-6',
+                'first:mt-0',
                 active ? ['bg-primary-50'] : null,
             )}
         >

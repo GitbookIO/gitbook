@@ -14,9 +14,6 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                 style,
                 'table-auto',
                 'w-full',
-                'border-collapse',
-                'border',
-                'border-slate-500',
                 block.data.fullWidth ? ['max-w-full'] : null,
             )}
         >
@@ -27,7 +24,13 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                             return (
                                 <th
                                     key={column}
-                                    className={tcls('border', 'border-slate-700', 'px-2', 'py-1')}
+                                    className={tcls(
+                                        'border',
+                                        'border-dark/4',
+                                        'px-2',
+                                        'py-1',
+                                        'dark:border-light/4',
+                                    )}
                                 >
                                     {block.data.definition[column].title}
                                 </th>

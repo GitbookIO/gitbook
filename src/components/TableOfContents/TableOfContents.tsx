@@ -30,8 +30,6 @@ export function TableOfContents(
                 'shrink-0',
                 'sticky',
                 withHeaderOffset ? SIDE_COLUMN_WITH_HEADER : SIDE_COLUMN_WITHOUT_HEADER,
-                'border-r',
-                'border-slate-200',
             )}
         >
             {header ? <div className={tcls('pt-6', 'pb-3', 'pr-4')}>{header}</div> : null}

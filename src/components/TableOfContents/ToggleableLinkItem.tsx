@@ -10,15 +10,16 @@ import { tcls } from '@/lib/tailwind';
 /**
  * Client component to allow toggling of a page's children.
  */
-export function ToggeableLinkItem(
+export function ToggleableLinkItem(
     props: LinkProps & {
         className?: string;
         children: React.ReactNode;
         descendants?: React.ReactNode;
         defaultOpen?: boolean;
+        isActive?: boolean;
     },
 ) {
-    const { children, descendants, defaultOpen = false, ...linkProps } = props;
+    const { children, descendants, defaultOpen = false, isActive = false, ...linkProps } = props;
 
     const [open, setOpen] = React.useState(defaultOpen);
     const Chevron = open ? IconChevronDown : IconChevronRight;
@@ -32,10 +33,14 @@ export function ToggeableLinkItem(
                         'w-5',
                         'h-5',
                         'p-0.5',
-                        'text-slate-600',
+                        'text-current',
                         'rounded',
-                        'hover:bg-slate-200',
-                        'hover:text-slate-700',
+                        'hover:bg-dark/2',
+                        'hover:text-current',
+                        'dark:hover:bg-light/2',
+                        'dark:hover:text-current',
+                        'transition-colors',
+                        isActive ? ['hover:bg-primary-500/5', 'dark:hover:bg-primary-500/5'] : [],
                     )}
                     onClick={(event) => {
                         event.preventDefault();

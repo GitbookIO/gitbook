@@ -11,16 +11,19 @@ export function Trademark(props: IntlContext) {
                 href="https://www.gitbook.com"
                 className={tcls(
                     'text-m',
-                    'text-slate-500',
+                    'text-dark/8',
                     'font-normal',
                     'px-4',
                     'py-3',
                     'mr-4',
                     'my-4',
                     'rounded-lg',
-                    'bg-white',
-                    'bg-slate-50',
-                    'hover:bg-slate-100',
+                    'bg-dark/1',
+                    'hover:bg-dark/2',
+                    'transition-colors',
+                    'dark:bg-vanta/5',
+                    'dark:text-light/5',
+                    'dark:hover:bg-vanta/6',
                 )}
             >
                 {t(props, 'powered_by_gitbook')}

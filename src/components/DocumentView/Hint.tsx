@@ -22,8 +22,7 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
                 'flex-row',
                 'px-4',
                 'py-4',
-                'bg-slate-50',
-                'dark:bg-slate-900',
+                'transition-colors',
                 'rounded',
                 'border-l-4',
                 hintStyle.style,
@@ -36,6 +35,7 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
                     'items-center',
                     'justify-center',
                     'pr-3',
+
                     firstLine.lineHeight,
                     hintStyle.iconStyle,
                 )}
@@ -46,7 +46,7 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
                 {...contextProps}
                 ancestorBlocks={[...ancestorBlocks, block]}
                 nodes={block.nodes}
-                style={['flex-1']}
+                style={['flex-1', 'space-y-8']}
             />
         </div>
     );
@@ -61,22 +61,22 @@ const HINT_STYLES: {
 } = {
     info: {
         icon: IconInfo,
-        iconStyle: ['text-blue-500'],
-        style: ['border-blue-500'],
+        iconStyle: ['text-current'],
+        style: ['border-dark/2', 'bg-dark/2', 'dark:bg-light/1', 'dark:border-light/3'],
     },
     warning: {
         icon: IconAlertCircle,
-        iconStyle: ['text-orange-500'],
-        style: ['border-orange-500'],
+        iconStyle: ['text-yellow, dark:text-yellow/1, dark:text-yellow/8'],
+        style: ['border-yellow/4', 'bg-yellow', 'dark:bg-yellow/1'],
     },
     danger: {
         icon: IconAlertTriangle,
-        iconStyle: ['text-red-500'],
-        style: ['border-red-500'],
+        iconStyle: ['text-pomegranate'],
+        style: ['border-pomegranate/4', 'bg-pomegranate/2', 'dark:bg-pomegranate/1'],
     },
     success: {
         icon: IconCheckInCircle,
-        iconStyle: ['text-green-500'],
-        style: ['border-green-500'],
+        iconStyle: ['text-teal'],
+        style: ['border-teal/4', 'bg-teal/2', 'dark:bg-teal/2'],
     },
 };

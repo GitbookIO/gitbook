@@ -5,7 +5,7 @@ import { pageHref } from '@/lib/links';
 import { tcls } from '@/lib/tailwind';
 
 import { PagesList } from './PagesList';
-import { ToggeableLinkItem } from './ToggeableLinkItem';
+import { ToggleableLinkItem } from './ToggleableLinkItem';
 
 export function PageDocumentItem(props: {
     page: RevisionPageDocument;
@@ -29,28 +29,48 @@ export function PageDocumentItem(props: {
             'transition-colors',
             'duration-100',
             activePage.id === page.id
-                ? ['bg-primary-100', 'text-primary-500', 'font-semibold']
-                : ['hover:bg-slate-100', 'text-slate-500', 'font-normal'],
+                ? [
+                      'font-semibold',
+                      'text-primary',
+                      'bg-primary-500/3',
+                      'dark:text-primary-400',
+                      'dark:hover:bg-primary-500/5',
+                  ]
+                : [
+                      'font-normal',
+                      'text-dark/7',
+                      'hover:bg-dark/1',
+                      'dark:text-light/7',
+                      'dark:hover:bg-light/2',
+                  ],
         ),
     };
 
     return (
         <li className={tcls('flex', 'flex-col', 'mb-0.5')}>
             {page.pages && page.pages.length ? (
-                <ToggeableLinkItem
+                <ToggleableLinkItem
                     {...linkProps}
                     descendants={
                         <PagesList
                             pages={page.pages}
-                            style={tcls('ms-2', 'ps-3', 'my-2', 'border-l', 'border-slate-200')}
+                            style={tcls(
+                                'ms-2',
+                                'ps-3',
+                                'my-2',
+                                'border-l',
+                                'border-dark/3',
+                                'dark:border-light/2',
+                            )}
                             activePage={activePage}
                             ancestors={ancestors}
                         />
                     }
                     defaultOpen={hasActiveDescendant || activePage.id === page.id}
+                    isActive={activePage.id === page.id}
                 >
                     {page.title}
-                </ToggeableLinkItem>
+                </ToggleableLinkItem>
             ) : (
                 <Link {...linkProps}>{page.title}</Link>
             )}

@@ -11,7 +11,7 @@ export function HighlightQuery(props: {
     /** Style to apply on matching parts (default to primary) */
     highlight?: ClassValue;
 }): React.ReactElement {
-    const { query, text, highlight = ['text-bold', 'text-primary-500'], ...textProps } = props;
+    const { query, text, highlight = ['text-bold', 'text-primary'], ...textProps } = props;
     const matches = matchString(text, query);
 
     return (

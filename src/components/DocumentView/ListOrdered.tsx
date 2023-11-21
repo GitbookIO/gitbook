@@ -12,7 +12,7 @@ export function ListOrdered(props: BlockProps<DocumentBlockListOrdered>) {
             tag="ol"
             nodes={block.nodes}
             ancestorBlocks={[...ancestorBlocks, block]}
-            style={['list-decimal', 'ps-8', style]}
+            style={['list-decimal', 'ps-8', 'space-y-2', style]}
         />
     );
 }

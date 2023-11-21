@@ -12,7 +12,7 @@ export function ListUnordered(props: BlockProps<DocumentBlockListUnordered>) {
             tag="ul"
             nodes={block.nodes}
             ancestorBlocks={[...ancestorBlocks, block]}
-            style={['list-disc', 'ps-8', style]}
+            style={['list-disc', 'ps-8', 'space-y-2', style]}
         />
     );
 }

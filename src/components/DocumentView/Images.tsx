@@ -22,6 +22,7 @@ export function Images(props: BlockProps<DocumentBlockImages>) {
                 block.data.align === 'left' && 'justify-start',
                 style,
                 block.data.fullWidth ? 'max-w-full' : null,
+                'justify-center',
             )}
         >
             {block.nodes.map((node: any, i: number) => (

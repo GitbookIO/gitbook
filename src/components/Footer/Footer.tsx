@@ -21,11 +21,11 @@ export function Footer(props: {
         <div
             className={tcls(
                 'border-t',
-                'border-slate-200',
-                'dark:border-slate-800',
-                'bg-slate-50',
-                'dark:bg-slate-900',
+                'border-dark/3',
                 'px-4',
+                'bg-metal/5',
+                'dark:border-light/3',
+                'dark:bg-vanta/4',
             )}
         >
             <div

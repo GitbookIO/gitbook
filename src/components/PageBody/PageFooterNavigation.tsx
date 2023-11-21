@@ -62,22 +62,29 @@ function NavigationCard(props: {
                 'items-center',
                 'p-4',
                 'border',
-                'border-slate-200',
+                'border-dark/3',
                 'rounded',
-                'hover:shadow',
-                'hover:border-primary-500',
+                'hover:border-primary/6',
+                'dark:border-light/2',
+                'dark:hover:border-primary-300/4',
             )}
         >
             <span className={tcls('flex', 'flex-col', 'flex-1', reversed ? 'text-right' : null)}>
-                <span className={tcls('text-xs', 'text-slate-400')}>{label}</span>
+                <span className={tcls('text-xs')}>{label}</span>
                 <span
-                    className={tcls('text-base', 'text-slate-700', 'group-hover:text-primary-600')}
+                    className={tcls('text-dark', 'dark:text-light/6', 'group-hover:text-primary')}
                 >
                     {title}
                 </span>
             </span>
             <IconCo
-                className={tcls('w-6', 'h-6', 'text-slate-400', 'group-hover:text-primary-600')}
+                className={tcls(
+                    'w-6',
+                    'h-6',
+                    'text-dark/5',
+                    'group-hover:text-primary',
+                    'dark:text-light/4',
+                )}
             />
         </Link>
     );

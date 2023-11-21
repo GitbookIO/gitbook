@@ -1,4 +1,3 @@
-import IconChevronDown from '@geist-ui/icons/chevronDown';
 import { Collection, Space } from '@gitbook/api';
 
 import { tcls } from '@/lib/tailwind';

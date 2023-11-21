@@ -12,7 +12,7 @@ export function ListTasks(props: BlockProps<DocumentBlockListTasks>) {
             tag="ul"
             nodes={block.nodes}
             ancestorBlocks={[...ancestorBlocks, block]}
-            style={['list-disc', 'ps-8', style]}
+            style={['list-none', 'ps-4', 'space-y-2', style]}
         />
     );
 }

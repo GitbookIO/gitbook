@@ -13,13 +13,14 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
     return (
         <li className={tcls('text-base', 'font-normal')}>
             {isTaskList ? (
-                <div className={tcls('flex', 'flex-row')}>
+                <div className={tcls('flex', 'flex-row', 'items-baseline')}>
                     <input type="checkbox" disabled checked={block.data?.checked} />
                     <Blocks
                         {...contextProps}
                         nodes={block.nodes}
                         ancestorBlocks={[...ancestorBlocks, block]}
-                        blockStyle={tcls('mt-6', 'first:mt-0', 'last:mt-0', 'flex-1')}
+                        blockStyle={tcls('flex-1')}
+                        style={tcls('ml-2', 'space-y-2')}
                     />
                 </div>
             ) : (
@@ -27,7 +28,7 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
                     {...contextProps}
                     nodes={block.nodes}
                     ancestorBlocks={[...ancestorBlocks, block]}
-                    blockStyle={tcls('mt-6', 'first:mt-0', 'last:mt-0')}
+                    style={tcls('space-y-2')}
                 />
             )}
         </li>

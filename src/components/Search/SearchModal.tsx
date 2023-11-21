@@ -46,9 +46,9 @@ export function SearchModal(props: SearchModalProps) {
                 'justify-center',
                 'fixed',
                 'inset-0',
-                'bg-zinc-400/25',
-                'backdrop-blur-sm',
-                'dark:bg-black/40',
+                'bg-dark/4',
+                'backdrop-blur',
+                'dark:bg-dark/9',
                 'opacity-100',
                 'z-30',
                 'pt-24',
@@ -109,17 +109,18 @@ function SearchModalBody(
                 'bg-white',
                 'w-[600px]',
                 'max-h',
-                'rounded',
+                'rounded-3xl',
                 'border-slate-500',
                 'shadow-lg',
                 'overflow-hidden',
+                'dark:bg-metal',
             )}
             onClick={(event) => {
                 event.stopPropagation();
             }}
         >
-            <div className={tcls('flex', 'flex-row', 'items-center')}>
-                <div className={tcls('text-slate-400', 'p-3')}>
+            <div className={tcls('flex', 'flex-row', 'items-center', 'border-b', 'border-dark/2')}>
+                <div className={tcls('text-dark/4', 'p-3')}>
                     <IconSearch className={tcls('w-6', 'h-6')} />
                 </div>
                 <div className={tcls('flex-1')}>
@@ -128,7 +129,13 @@ function SearchModalBody(
                         value={query}
                         onKeyDown={onKeyDown}
                         onChange={onChange}
-                        className={tcls('w-full', 'p-2', 'text-slate-600', 'focus:outline-none')}
+                        className={tcls(
+                            'w-full',
+                            'p-2',
+                            'text-dark',
+                            'focus:outline-none',
+                            'bg-transparent',
+                        )}
                         placeholder={inputPlaceholder}
                     />
                 </div>

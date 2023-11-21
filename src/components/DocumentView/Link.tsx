@@ -20,10 +20,7 @@ export async function Link(props: InlineProps<DocumentInlineLink>) {
     }
 
     return (
-        <NextLink
-            href={resolved.href}
-            className="underline text-primary-600 hover:text-primary-800"
-        >
+        <NextLink href={resolved.href} className="underline text-primary hover:text-primary-700">
             <Inlines context={context} nodes={inline.nodes} />
         </NextLink>
     );

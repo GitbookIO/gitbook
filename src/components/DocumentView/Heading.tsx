@@ -21,7 +21,9 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
             <div
                 className={tcls(
                     'absolute',
-                    ' -ml-8',
+                    '-left-7',
+                    'ml-full',
+                    'w-7',
                     'hidden',
                     'items-center',
                     'border-0',
@@ -41,21 +43,22 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                         'w-6',
                         'items-center',
                         'justify-center',
-                        'rounded-md',
-                        'text-slate-400',
-                        'shadow-sm',
-                        'ring-1',
-                        'ring-slate-900/5',
-                        'hover:text-slate-700',
-                        'hover:shadow',
-                        'hover:ring-slate-900/10',
-                        'dark:bg-slate-700',
-                        'dark:text-slate-300',
+                        'transition-colors',
+                        'dark:text-light/3',
                         'dark:shadow-none',
                         'dark:ring-0',
                     )}
                 >
-                    <IconHash className={tcls('w-4', 'h-4')} />
+                    <IconHash
+                        className={tcls(
+                            'w-4',
+                            'h-4',
+                            'stroke-dark/5',
+                            'group-hover:stroke-dark/6',
+                            'dark:stroke-light/2',
+                            'dark:group-hover:stroke-light/4',
+                        )}
+                    />
                 </a>
             </div>
 

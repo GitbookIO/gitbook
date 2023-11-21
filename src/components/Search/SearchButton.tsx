@@ -30,13 +30,12 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'px-4',
                 'py-1',
                 'rounded',
-                'bg-slate-50',
-                'hover:bg-slate-100',
-                'text-base',
-                'text-slate-600',
-                'hover:text-slate-900',
+                'dark:bg-vanta/4',
+                'hover:bg-light',
                 'border',
-                'border-slate-200',
+                'border-dark/2',
+                'shadow-lg',
+                'dark:border-light/3',
                 style,
             )}
         >

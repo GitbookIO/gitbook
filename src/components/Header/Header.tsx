@@ -41,17 +41,17 @@ export function Header(props: {
                 'top-0',
                 'z-10',
                 'w-full',
-                'backdrop-blur',
+                'backdrop-blur-lg',
                 'flex-none',
                 'transition-colors',
                 'duration-500',
                 'lg:z-10',
                 'lg:border-b',
-                'lg:border-slate-900/10',
-                'dark:border-slate-50/[0.06]',
-                'bg-header-background-500',
+                'lg:border-dark/3',
+                'bg-light/8',
                 'supports-backdrop-blur:bg-white/60',
-                'dark:bg-transparent',
+                'dark:border-light/2',
+                'dark:bg-dark/8',
             )}
         >
             <div

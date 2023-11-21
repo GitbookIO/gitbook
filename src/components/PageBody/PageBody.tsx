@@ -19,7 +19,7 @@ export function PageBody(props: {
             <PageHeader page={page} />
             <DocumentView
                 document={document}
-                style={'mt-6'}
+                style={['space-y-6']}
                 context={{
                     space,
                     revision,
