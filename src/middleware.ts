@@ -163,7 +163,10 @@ async function lookupSpaceInMultiPathMode(
 
             return {
                 target: 'content',
-                redirect: new URL(`/` + redirect.hostname + redirect.pathname + redirect.search, url).toString(),
+                redirect: new URL(
+                    `/` + redirect.hostname + redirect.pathname + redirect.search,
+                    url,
+                ).toString(),
             };
         }
 
