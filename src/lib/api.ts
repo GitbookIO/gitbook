@@ -11,8 +11,14 @@ export function api(): GitBookAPI {
     const headersList = headers();
     const apiToken = headersList.get('x-gitbook-token');
 
+    if (!apiToken) {
+        throw new Error(
+            'Missing GitBook API token, please check that the request is correctly processed by the middleware',
+        );
+    }
+
     const gitbook = new GitBookAPI({
-        authToken: apiToken || process.env.GITBOOK_TOKEN,
+        authToken: apiToken,
         endpoint: process.env.GITBOOK_API_URL,
     });
 

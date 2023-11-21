@@ -1,5 +1,5 @@
 import { DocumentBlockSwagger } from '@gitbook/api';
-import OpenAPIParser from '@readme/openapi-parser';
+// import OpenAPIParser from '@readme/openapi-parser';
 
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -17,11 +17,13 @@ export async function Swagger(props: BlockProps<DocumentBlockSwagger>) {
         return <div>failed</div>;
     }
 
-    const api = await OpenAPIParser.validate(resolved.href);
-    const operation =
-        block.data.path && block.data.method
-            ? api.paths?.[block.data.path]?.[block.data.method]
-            : null;
+    // const api = await OpenAPIParser.validate(resolved.href);
+    // const operation =
+    //     block.data.path && block.data.method
+    //         ? api.paths?.[block.data.path]?.[block.data.method]
+    //         : null;
+
+    const operation = {};
 
     return (
         <div

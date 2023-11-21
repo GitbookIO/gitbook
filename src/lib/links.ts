@@ -50,7 +50,7 @@ export function baseUrl(): string {
  */
 export function absoluteHref(href: string): string {
     const base = basePath();
-    return `${base === '/' ? '' : base}/${href.startsWith('/') ? href.slice(1) : href}`;
+    return `${base}${href.startsWith('/') ? href.slice(1) : href}`;
 }
 
 /**

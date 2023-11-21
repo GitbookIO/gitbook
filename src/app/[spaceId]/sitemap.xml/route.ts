@@ -7,7 +7,9 @@ import { pageHref } from '@/lib/links';
 
 import { SpaceParams } from '../fetch';
 
-export const runtime = 'edge';
+// Should be edge, but there is an error with the middleware
+// https://github.com/vercel/next.js/issues/48295
+export const runtime = 'nodejs';
 
 /**
  * Generate a sitemap.xml for the current space.

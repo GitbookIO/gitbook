@@ -7,7 +7,9 @@ import { getSpace, getSpaceCustomization } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 import { getEmojiForCode } from '@/lib/emojis';
 
-export const runtime = 'edge';
+// Should be edge, but there is an error with the middleware
+// https://github.com/vercel/next.js/issues/48295
+export const runtime = 'nodejs';
 
 const SIZES = {
     /** Size for a favicon */

@@ -5,6 +5,7 @@
     "scripts": {
         "dev": "next dev",
         "build": "next build",
+        "build:cloudflare": "next-on-pages",
         "start": "next start",
         "lint": "next lint",
         "format": "prettier ./ --ignore-unknown --write",
@@ -13,14 +14,14 @@
     },
     "dependencies": {
         "@geist-ui/icons": "^1.0.2",
-        "@gitbook/api": "^0.14.0",
+        "@gitbook/api": "^0.15.0",
         "@readme/openapi-parser": "^2.5.0",
         "ajv": "^8.12.0",
         "assert-never": "^1.2.1",
         "bun-types": "^1.0.7",
         "jsontoxml": "^1.0.1",
         "katex": "^0.16.9",
-        "next": "^14.0.1",
+        "next": "^14.0.3",
         "react": "^18",
         "react-dom": "^18",
         "react-hotkeys-hook": "^4.4.1",
@@ -31,6 +32,7 @@
         "tailwind-shades": "^1.1.2"
     },
     "devDependencies": {
+        "@cloudflare/next-on-pages": "^1.7.3",
         "@types/jsontoxml": "^1.0.5",
         "@types/katex": "^0.16.5",
         "@types/node": "^20",
