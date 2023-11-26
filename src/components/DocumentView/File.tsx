@@ -1,14 +1,15 @@
 import IconDownload from '@geist-ui/icons/download';
 import { DocumentBlockFile } from '@gitbook/api';
 
+import { getRevisionFile } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
 import { BlockProps } from './Block';
 
-export function File(props: BlockProps<DocumentBlockFile>) {
+export async function File(props: BlockProps<DocumentBlockFile>) {
     const { block, context, style } = props;
 
-    const file = context.revision.files.find((f) => f.id === block.data.ref.file);
+    const file = await getRevisionFile(context.content, block.data.ref.file);
     if (!file) {
         return null;
     }

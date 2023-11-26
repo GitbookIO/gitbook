@@ -15,8 +15,10 @@ import { CONTAINER_MAX_WIDTH_NORMAL, CONTAINER_PADDING } from '@/components/layo
 import { PageBody } from '@/components/PageBody';
 import { SearchModal } from '@/components/Search';
 import { TableOfContents } from '@/components/TableOfContents';
+import { ContentPointer } from '@/lib/api';
 import { hasFullWidthBlock } from '@/lib/document';
 import { tString } from '@/lib/intl';
+import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { PageAside } from '../PageAside';
@@ -25,11 +27,12 @@ import { PageAside } from '../PageAside';
  * Render the entire content of the space (header, table of contents, footer, and page content).
  */
 export function SpaceContent(props: {
+    content: ContentPointer;
     space: Space;
     collection: Collection | null;
     collectionSpaces: Space[];
     customization: CustomizationSettings;
-    revision: Revision;
+    pages: Revision['pages'];
     page: RevisionPageDocument;
     ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
     document: any;
@@ -38,7 +41,8 @@ export function SpaceContent(props: {
         space,
         collection,
         collectionSpaces,
-        revision,
+        content,
+        pages,
         customization,
         page,
         ancestors,
@@ -48,6 +52,13 @@ export function SpaceContent(props: {
     const asFullWidth = hasFullWidthBlock(document);
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
+    const contentRefContext: ContentRefContext = {
+        space,
+        pages,
+        page,
+        content,
+    };
+
     return (
         <div>
             {withTopHeader ? (
@@ -55,8 +66,7 @@ export function SpaceContent(props: {
                     space={space}
                     collection={collection}
                     collectionSpaces={collectionSpaces}
-                    revision={revision}
-                    page={page}
+                    context={contentRefContext}
                     customization={customization}
                     asFullWidth={asFullWidth}
                 />
@@ -72,9 +82,11 @@ export function SpaceContent(props: {
             >
                 <TableOfContents
                     space={space}
-                    revision={revision}
+                    content={content}
+                    pages={pages}
                     activePage={page}
                     ancestors={ancestors}
+                    context={contentRefContext}
                     header={
                         withTopHeader ? null : (
                             <CompactHeader
@@ -87,7 +99,12 @@ export function SpaceContent(props: {
                     }
                     withHeaderOffset={withTopHeader}
                 />
-                <PageBody space={space} revision={revision} page={page} document={document} />
+                <PageBody
+                    space={space}
+                    context={contentRefContext}
+                    page={page}
+                    document={document}
+                />
                 <PageAside
                     space={space}
                     page={page}
@@ -102,8 +119,7 @@ export function SpaceContent(props: {
             customization.footer.groups?.length ? (
                 <Footer
                     space={space}
-                    revision={revision}
-                    page={page}
+                    context={contentRefContext}
                     customization={customization}
                     asFullWidth={asFullWidth}
                 />

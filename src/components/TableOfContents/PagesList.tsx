@@ -1,5 +1,6 @@
 import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 
+import { ContentRefContext } from '@/lib/references';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { PageDocumentItem } from './PageDocumentItem';
@@ -10,9 +11,10 @@ export function PagesList(props: {
     pages: RevisionPage[];
     activePage: RevisionPageDocument;
     ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
+    context: ContentRefContext;
     style?: ClassValue;
 }) {
-    const { pages, activePage, ancestors, style } = props;
+    const { pages, activePage, ancestors, context, style } = props;
 
     return (
         <ul className={tcls('flex', 'flex-col', style)}>
@@ -24,10 +26,11 @@ export function PagesList(props: {
                             page={page}
                             activePage={activePage}
                             ancestors={ancestors}
+                            context={context}
                         />
                     );
                 } else if (page.type === 'link') {
-                    return <PageLinkItem key={page.id} page={page} />;
+                    return <PageLinkItem key={page.id} page={page} context={context} />;
                 }
 
                 return (
@@ -36,6 +39,7 @@ export function PagesList(props: {
                         page={page}
                         activePage={activePage}
                         ancestors={ancestors}
+                        context={context}
                     />
                 );
             })}

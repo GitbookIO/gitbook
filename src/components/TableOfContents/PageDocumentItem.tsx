@@ -2,6 +2,7 @@ import { RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 import Link from 'next/link';
 
 import { pageHref } from '@/lib/links';
+import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { PagesList } from './PagesList';
@@ -11,8 +12,9 @@ export function PageDocumentItem(props: {
     page: RevisionPageDocument;
     activePage: RevisionPageDocument;
     ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
+    context: ContentRefContext;
 }) {
-    const { page, activePage, ancestors } = props;
+    const { page, activePage, ancestors, context } = props;
 
     const hasActiveDescendant = ancestors.some((ancestor) => ancestor.id === page.id);
 
@@ -64,6 +66,7 @@ export function PageDocumentItem(props: {
                             )}
                             activePage={activePage}
                             ancestors={ancestors}
+                            context={context}
                         />
                     }
                     defaultOpen={hasActiveDescendant || activePage.id === page.id}

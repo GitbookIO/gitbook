@@ -1,8 +1,8 @@
-import { Revision, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
+import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 import jsontoxml from 'jsontoxml';
 import { NextRequest } from 'next/server';
 
-import { api } from '@/lib/api';
+import { getRevisionPages } from '@/lib/api';
 import { pageHref } from '@/lib/links';
 
 import { SpaceParams } from '../fetch';
@@ -15,11 +15,8 @@ export const runtime = 'nodejs';
  * Generate a sitemap.xml for the current space.
  */
 export async function GET(req: NextRequest, { params }: { params: SpaceParams }) {
-    const { spaceId } = params;
-
-    const { data: revision } = await api().spaces.getCurrentRevision(spaceId);
-
-    const pages = flattenPages(revision);
+    const rootPages = await getRevisionPages(params);
+    const pages = flattenPages(rootPages);
     const urls = pages.map(({ page, depth }) => {
         // Decay priority with depth
         const priority = Math.pow(2, -0.25 * depth);
@@ -70,7 +67,7 @@ export async function GET(req: NextRequest, { params }: { params: SpaceParams })
 
 type FlatPageEntry = { page: RevisionPageDocument; depth: number };
 
-function flattenPages(revision: Revision): FlatPageEntry[] {
+function flattenPages(rootPags: RevisionPage[]): FlatPageEntry[] {
     const flattenPage = (
         page: RevisionPageDocument | RevisionPageGroup,
         depth: number,
@@ -83,5 +80,5 @@ function flattenPages(revision: Revision): FlatPageEntry[] {
         ];
     };
 
-    return revision.pages.flatMap((page) => (page.type === 'link' ? [] : flattenPage(page, 0)));
+    return rootPags.flatMap((page) => (page.type === 'link' ? [] : flattenPage(page, 0)));
 }

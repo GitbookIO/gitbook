@@ -1,17 +1,18 @@
 import { RevisionPageLink } from '@gitbook/api';
 import Link from 'next/link';
 
+import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
-export function PageLinkItem(props: { page: RevisionPageLink }) {
-    const { page } = props;
+export async function PageLinkItem(props: { page: RevisionPageLink; context: ContentRefContext }) {
+    const { page, context } = props;
+
+    const resolved = await resolveContentRef(page.target, context);
 
     return (
         <li className={tcls('flex', 'flex-col', 'mb-0.5')}>
             <Link
-                href={
-                    page.href ?? '#todo' // TODO: Will be fixed soon as the `target`
-                }
+                href={resolved?.href ?? '#'}
                 className={tcls(
                     'flex',
                     'flex-row',

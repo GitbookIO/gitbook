@@ -1,14 +1,9 @@
-import {
-    Collection,
-    CustomizationSettings,
-    Revision,
-    RevisionPageDocument,
-    Space,
-} from '@gitbook/api';
+import { Collection, CustomizationSettings, Space } from '@gitbook/api';
 import { Suspense } from 'react';
 
 import { CONTAINER_MAX_WIDTH_NORMAL, CONTAINER_PADDING } from '@/components/layout';
 import { t } from '@/lib/intl';
+import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { CollectionSpacesDropdown } from './CollectionSpacesDropdown';
@@ -23,13 +18,11 @@ export function Header(props: {
     space: Space;
     collection: Collection | null;
     collectionSpaces: Space[];
-    revision: Revision;
-    page: RevisionPageDocument;
+    context: ContentRefContext;
     asFullWidth: boolean;
     customization: CustomizationSettings;
 }) {
-    const { space, collection, collectionSpaces, revision, page, asFullWidth, customization } =
-        props;
+    const { context, space, collection, collectionSpaces, asFullWidth, customization } = props;
 
     return (
         <header
@@ -93,13 +86,7 @@ export function Header(props: {
                     )}
                 >
                     {customization.header.links.map((link, index) => (
-                        <HeaderLink
-                            key={index}
-                            link={link}
-                            space={space}
-                            revision={revision}
-                            page={page}
-                        />
+                        <HeaderLink key={index} link={link} context={context} />
                     ))}
                 </div>
                 <div className={tcls('flex', 'basis-56', 'grow-0', 'shrink-0')}>

@@ -17,7 +17,7 @@ export const runtime = 'nodejs';
 export default async function Page(props: { params: PagePathParams }) {
     const { params } = props;
 
-    const { space, customization, revision, page, collection, collectionSpaces, ancestors } =
+    const { content, space, customization, pages, page, collection, collectionSpaces, ancestors } =
         await fetchPageData(params);
     const linksContext: PageHrefContext = {};
 
@@ -27,13 +27,14 @@ export default async function Page(props: { params: PagePathParams }) {
         redirect(pageHref(page, linksContext));
     }
 
-    const document = await getPageDocument(space.id, revision.id, page.id);
+    const document = await getPageDocument(content, page.id);
 
     return (
         <SpaceContent
+            content={content}
             space={space}
             customization={customization}
-            revision={revision}
+            pages={pages}
             page={page}
             ancestors={ancestors}
             document={document}

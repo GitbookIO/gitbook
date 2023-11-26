@@ -6,7 +6,7 @@ export type AncestorRevisionPage = RevisionPageDocument | RevisionPageGroup;
  * Resolve a page path to a page document.
  */
 export function resolvePagePath(
-    revision: Revision,
+    rootPages: Revision['pages'],
     pagePath: string,
 ): { page: RevisionPageDocument; ancestors: AncestorRevisionPage[] } | undefined {
     const iteratePages = (
@@ -33,7 +33,7 @@ export function resolvePagePath(
     };
 
     if (!pagePath) {
-        const firstPage = resolveFirstDocument(revision.pages, []);
+        const firstPage = resolveFirstDocument(rootPages, []);
         if (!firstPage) {
             return undefined;
         }
@@ -41,14 +41,14 @@ export function resolvePagePath(
         return firstPage;
     }
 
-    return iteratePages(revision.pages, []);
+    return iteratePages(rootPages, []);
 }
 
 /**
  * Find a page by its ID in a revision.
  */
 export function resolvePageId(
-    revision: Revision,
+    rootPages: Revision['pages'],
     pageId: string,
 ): { page: RevisionPageDocument; ancestors: AncestorRevisionPage[] } | undefined {
     const iteratePages = (
@@ -70,17 +70,17 @@ export function resolvePageId(
             }
         }
     };
-    return iteratePages(revision.pages, []);
+    return iteratePages(rootPages, []);
 }
 
 /**
  * Resolve the next/previous page before another one.
  */
 export function resolvePrevNextPages(
-    revision: Revision,
+    rootPages: Revision['pages'],
     page: RevisionPageDocument,
 ): { previous?: RevisionPageDocument; next?: RevisionPageDocument } {
-    const flat = flattenPages(revision.pages);
+    const flat = flattenPages(rootPages);
 
     const currentIndex = flat.findIndex((p) => p.id === page.id);
     if (currentIndex === -1) {

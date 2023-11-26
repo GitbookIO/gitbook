@@ -13,11 +13,11 @@ import { tcls } from '@/lib/tailwind';
  */
 export function PageFooterNavigation(props: {
     space: Space;
-    revision: Revision;
+    pages: Revision['pages'];
     page: RevisionPageDocument;
 }) {
-    const { space, revision, page } = props;
-    const { previous, next } = resolvePrevNextPages(revision, page);
+    const { space, pages, page } = props;
+    const { previous, next } = resolvePrevNextPages(pages, page);
 
     return (
         <div className={tcls('flex', 'flex-row', 'mt-6', 'gap-2', 'max-w-3xl', 'mx-auto')}>

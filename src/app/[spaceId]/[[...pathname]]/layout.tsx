@@ -5,10 +5,11 @@ import shadesOf from 'tailwind-shades';
 import colors from 'tailwindcss/colors';
 
 import { hexToRgb } from '@/components/utils/HexToRgb';
+import { getSpaceCustomization } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
 import { ClientLayout } from './ClientLayout';
-import { PagePathParams, fetchPageData } from '../fetch';
+import { PagePathParams } from '../fetch';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -16,8 +17,9 @@ export default async function SpaceRootLayout(props: {
     children: React.ReactNode;
     params: PagePathParams;
 }) {
-    const { children, params } = props;
-    const { customization } = await fetchPageData(params);
+    const { params, children } = props;
+
+    const customization = await getSpaceCustomization(params.spaceId);
     const headerTheme = generateHeaderTheme(customization);
 
     return (

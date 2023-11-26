@@ -1,7 +1,9 @@
 import { Revision, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 import React from 'react';
 
+import { ContentPointer } from '@/lib/api';
 import { IntlContext } from '@/lib/intl';
+import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { PagesList } from './PagesList';
@@ -10,14 +12,24 @@ import { SIDE_COLUMN_WITHOUT_HEADER, SIDE_COLUMN_WITH_HEADER } from '../layout';
 
 export function TableOfContents(
     props: IntlContext & {
-        revision: Revision;
+        content: ContentPointer;
+        context: ContentRefContext;
+        pages: Revision['pages'];
         activePage: RevisionPageDocument;
         ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
         header?: React.ReactNode;
         withHeaderOffset?: boolean;
     },
 ) {
-    const { space, revision, activePage, ancestors, header, withHeaderOffset = false } = props;
+    const {
+        space,
+        pages,
+        activePage,
+        ancestors,
+        header,
+        context,
+        withHeaderOffset = false,
+    } = props;
 
     return (
         <aside
@@ -42,7 +54,12 @@ export function TableOfContents(
                     'pr-4',
                 )}
             >
-                <PagesList pages={revision.pages} activePage={activePage} ancestors={ancestors} />
+                <PagesList
+                    pages={pages}
+                    activePage={activePage}
+                    ancestors={ancestors}
+                    context={context}
+                />
             </div>
             <Trademark space={space} />
         </aside>

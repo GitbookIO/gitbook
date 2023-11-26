@@ -2,16 +2,15 @@ import { ContentVisibility, Space } from '@gitbook/api';
 
 import {
     getSpace,
-    getCurrentRevision,
     getSpaceCustomization,
     getCollectionSpaces,
     getCollection,
+    ContentPointer,
+    getRevisionPages,
 } from '@/lib/api';
 import { resolvePagePath, resolvePageId } from '@/lib/pages';
 
-export interface SpaceParams {
-    spaceId: string;
-}
+export type SpaceParams = ContentPointer;
 
 export interface PagePathParams extends SpaceParams {
     pathname?: string[];
@@ -27,21 +26,28 @@ export interface PageIdParams extends SpaceParams {
 export async function fetchPageData(params: PagePathParams | PageIdParams) {
     const { spaceId } = params;
 
-    const [space, revision, customization] = await Promise.all([
+    const content: ContentPointer = {
+        spaceId: params.spaceId,
+        changeRequestId: params.changeRequestId,
+        revisionId: params.revisionId,
+    };
+
+    const [space, pages, customization] = await Promise.all([
         getSpace(spaceId),
-        getCurrentRevision(spaceId),
+        getRevisionPages(content),
         getSpaceCustomization(spaceId),
     ]);
 
     const collection = await fetchParentCollection(space);
     const page =
         'pageId' in params && params.pageId
-            ? resolvePageId(revision, params.pageId)
-            : resolvePagePath(revision, getPagePath(params));
+            ? resolvePageId(pages, params.pageId)
+            : resolvePagePath(pages, getPagePath(params));
 
     return {
+        content,
         space,
-        revision,
+        pages,
         customization,
         ancestors: [],
         ...page,

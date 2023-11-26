@@ -2,6 +2,7 @@ import { CustomizationSettings, Revision, RevisionPageDocument, Space } from '@g
 import React from 'react';
 
 import { Image } from '@/components/utils';
+import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { FooterLinksGroup } from './FooterLinksGroup';
@@ -10,12 +11,11 @@ import { ThemeToggler } from '../ThemeToggler';
 
 export function Footer(props: {
     space: Space;
-    revision: Revision;
-    page: RevisionPageDocument;
+    context: ContentRefContext;
     customization: CustomizationSettings;
     asFullWidth: boolean;
 }) {
-    const { space, revision, page, customization, asFullWidth } = props;
+    const { space, context, customization, asFullWidth } = props;
 
     return (
         <div
@@ -53,11 +53,7 @@ export function Footer(props: {
                             ) : null}
 
                             {customization.footer.groups.map((group, index) => (
-                                <FooterLinksGroup
-                                    key={index}
-                                    group={group}
-                                    context={{ space, revision, page }}
-                                />
+                                <FooterLinksGroup key={index} group={group} context={context} />
                             ))}
                         </div>
                     ) : null}

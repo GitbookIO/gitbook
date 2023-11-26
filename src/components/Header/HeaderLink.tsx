@@ -1,13 +1,7 @@
-import {
-    CustomizationContentLink,
-    CustomizationHeaderLink,
-    Revision,
-    RevisionPageDocument,
-    Space,
-} from '@gitbook/api';
+import { CustomizationContentLink, CustomizationHeaderLink } from '@gitbook/api';
 import Link from 'next/link';
 
-import { resolveContentRef } from '@/lib/references';
+import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import {
@@ -19,18 +13,12 @@ import {
 } from './Dropdown';
 
 export async function HeaderLink(props: {
-    space: Space;
-    revision: Revision;
-    page: RevisionPageDocument;
+    context: ContentRefContext;
     link: CustomizationHeaderLink;
 }) {
-    const { space, revision, page, link } = props;
+    const { context, link } = props;
 
-    const target = await resolveContentRef(link.to, {
-        space,
-        revision,
-        page,
-    });
+    const target = await resolveContentRef(link.to, context);
 
     if (!target) {
         return null;
@@ -73,18 +61,12 @@ export async function HeaderLink(props: {
 }
 
 async function SubHeaderLink(props: {
-    space: Space;
-    revision: Revision;
-    page: RevisionPageDocument;
+    context: ContentRefContext;
     link: CustomizationContentLink;
 }) {
-    const { space, revision, page, link } = props;
+    const { context, link } = props;
 
-    const target = await resolveContentRef(link.to, {
-        space,
-        revision,
-        page,
-    });
+    const target = await resolveContentRef(link.to, context);
 
     if (!target) {
         return null;

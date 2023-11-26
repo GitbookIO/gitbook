@@ -15,7 +15,7 @@ const memoryCache = new Map<string, any>();
  * Cache data from an async function.
  * We don't use the next.js cache because it has a 2MB limit.
  */
-export function cache<Args extends string[], Result>(
+export function cache<Args extends any[], Result>(
     fnName: string,
     fn: (...args: Args) => Promise<Result>,
 ): (...args: Args) => Promise<Result> {
@@ -38,8 +38,8 @@ export function cache<Args extends string[], Result>(
 /**
  * Create a cache key from a function name and its arguments.
  */
-function getCacheKey(fnName: string, args: string[]) {
-    return `${fnName}(${args.join(',')})`;
+function getCacheKey(fnName: string, args: any[]) {
+    return `${fnName}(${args.map((arg) => JSON.stringify(arg)).join(',')})`;
 }
 
 /**

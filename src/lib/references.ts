@@ -1,5 +1,6 @@
 import { ContentRef, Revision, RevisionPageDocument, Space } from '@gitbook/api';
 
+import { ContentPointer, getRevisionFile } from './api';
 import { pageHref, PageHrefContext } from './links';
 import { resolvePageId } from './pages';
 
@@ -13,8 +14,9 @@ export interface ResolvedContentRef {
 }
 
 export interface ContentRefContext extends PageHrefContext {
+    content: ContentPointer;
     space: Space;
-    revision: Revision;
+    pages: Revision['pages'];
     page: RevisionPageDocument;
 }
 
@@ -23,7 +25,7 @@ export interface ContentRefContext extends PageHrefContext {
  */
 export async function resolveContentRef(
     contentRef: ContentRef,
-    { space, revision, page: activePage, ...linksContext }: ContentRefContext,
+    { content, space, pages, page: activePage, ...linksContext }: ContentRefContext,
 ): Promise<ResolvedContentRef | null> {
     // Try to resolve a local ref in the current space
     if (contentRef.kind === 'url') {
@@ -33,7 +35,7 @@ export async function resolveContentRef(
             active: false,
         };
     } else if (contentRef.kind === 'file') {
-        const file = revision.files.find((file) => file.id === contentRef.file);
+        const file = await getRevisionFile(content, contentRef.file);
         if (file) {
             return {
                 href: file.downloadURL,
@@ -50,7 +52,7 @@ export async function resolveContentRef(
         const page =
             !contentRef.page || contentRef.page === activePage.id
                 ? activePage
-                : resolvePageId(revision, contentRef.page)?.page;
+                : resolvePageId(pages, contentRef.page)?.page;
         if (!page) {
             return null;
         }
