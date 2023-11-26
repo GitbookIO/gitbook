@@ -8,6 +8,7 @@ import {
     DocumentInline,
 } from '@gitbook/api';
 
+import { Annotation } from './Annotation/Annotation';
 import { DocumentContextProps } from './DocumentView';
 import { Link } from './Link';
 import { InlineMath } from './Math';
@@ -37,6 +38,8 @@ export function Inline<
             return <Link {...contextProps} inline={inline} />;
         case 'inline-math':
             return <InlineMath {...contextProps} inline={inline} />;
+        case 'annotation':
+            return <Annotation {...contextProps} inline={inline} />;
         default:
             return <span>Unsupported inline {inline.type}</span>;
     }
