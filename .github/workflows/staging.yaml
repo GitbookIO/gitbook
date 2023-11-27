@@ -1,0 +1,30 @@
+name: Update Staging Branch
+
+on:
+    push:
+        branches: [main]
+
+permissions:
+    contents: write
+
+jobs:
+    sync:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+              with:
+                  fetch-depth: 0
+
+            - name: Setup Git User
+              run: |
+                  git config user.name "GitHub Actions"
+                  git config user.email "github-actions@gitbook.com"
+
+            - name: Update Staging Branch
+              run: |
+                  git fetch origin
+                  git checkout staging
+                  git pull
+                  git merge
+                  git push origin staging
