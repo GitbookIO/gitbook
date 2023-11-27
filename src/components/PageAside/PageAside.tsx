@@ -1,4 +1,4 @@
-import { RevisionPageDocument, Space } from '@gitbook/api';
+import { JSONDocument, RevisionPageDocument, Space } from '@gitbook/api';
 import React from 'react';
 
 import { getDocumentSections } from '@/lib/document';
@@ -14,11 +14,11 @@ import { SIDE_COLUMN_WITHOUT_HEADER, SIDE_COLUMN_WITH_HEADER } from '../layout';
 export function PageAside(props: {
     space: Space;
     page: RevisionPageDocument;
-    document: any;
+    document: JSONDocument | null;
     withHeaderOffset: boolean;
 }) {
     const { space, document, withHeaderOffset } = props;
-    const sections = getDocumentSections(document);
+    const sections = document ? getDocumentSections(document) : [];
 
     return (
         <aside
