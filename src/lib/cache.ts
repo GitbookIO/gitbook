@@ -1,5 +1,7 @@
 import { Redis } from '@upstash/redis';
 
+const cacheNamespace = process.env.UPSTASH_REDIS_NAMESPACE ?? 'gitbook';
+
 const redis =
     process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
         ? new Redis({
@@ -39,7 +41,7 @@ export function cache<Args extends any[], Result>(
  * Create a cache key from a function name and its arguments.
  */
 function getCacheKey(fnName: string, args: any[]) {
-    return `${fnName}(${args.map((arg) => JSON.stringify(arg)).join(',')})`;
+    return `${cacheNamespace}.${fnName}(${args.map((arg) => JSON.stringify(arg)).join(',')})`;
 }
 
 /**

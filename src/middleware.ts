@@ -8,11 +8,13 @@ export const config = {
 const VISITOR_AUTH_PARAM = 'jwt_token';
 const VISITOR_AUTH_COOKIE = 'gitbook-visitor-token';
 
+type URLLookupMode = 'single' | 'multi' | 'multi-path';
+
 /**
  * Middleware to lookup the space to render.
  */
 export async function middleware(request: NextRequest) {
-    const url = getInputURL(request);
+    const { url, mode } = getInputURL(request);
 
     // The visitor authentication can either be passed as a query parameter
     // or can be stored in a cookie after the initial auth.
@@ -20,7 +22,7 @@ export async function middleware(request: NextRequest) {
         url.searchParams.get(VISITOR_AUTH_PARAM) ?? request.cookies.get(VISITOR_AUTH_COOKIE)?.value;
     url.searchParams.delete(VISITOR_AUTH_PARAM);
 
-    const resolved = await lookupSpaceForURL(stripURLSearch(url), visitorAuthToken);
+    const resolved = await lookupSpaceForURL(mode, stripURLSearch(url), visitorAuthToken);
     if (!resolved) {
         return new NextResponse(`Not found`, {
             status: 404,
@@ -38,7 +40,7 @@ export async function middleware(request: NextRequest) {
     headers.set('x-gitbook-token', resolved.apiToken);
     headers.set('x-gitbook-basepath', resolved.basePath);
 
-    const target = new URL(`/${resolved.space}${resolved.pathname}`, url.toString());
+    const target = new URL(`/${resolved.space}${resolved.pathname}`, request.nextUrl.toString());
     target.search = url.search;
 
     const response = NextResponse.rewrite(target, {
@@ -58,8 +60,10 @@ export async function middleware(request: NextRequest) {
 /**
  * Compute the input URL the user is trying to access.
  */
-function getInputURL(request: NextRequest) {
+function getInputURL(request: NextRequest): { url: URL; mode: URLLookupMode } {
     const url = new URL(request.url);
+    let mode: URLLookupMode =
+        (process.env.GITBOOK_MODE as URLLookupMode | undefined) ?? 'multi-path';
 
     // When developing locally using something.localhost:3000, the url only contains http://localhost:3000
     if (url.hostname === 'localhost') {
@@ -69,18 +73,26 @@ function getInputURL(request: NextRequest) {
     // When request is proxied, the host is passed in the x-forwarded-host header
     const xForwardedHost = request.headers.get('x-forwarded-host');
     if (xForwardedHost) {
+        url.port = '';
         url.host = xForwardedHost;
     }
 
-    return url;
+    // When request is proxied by the GitBook infrastructure, we always force the mode as 'multi
+    const xGitbookHost = request.headers.get('x-gitbook-host');
+    if (xGitbookHost) {
+        mode = 'multi';
+        url.port = '';
+        url.host = xGitbookHost;
+    }
+
+    return { url, mode };
 }
 
 async function lookupSpaceForURL(
+    mode: URLLookupMode,
     url: URL,
     visitorAuthToken: string | undefined,
 ): Promise<PublishedContentLookup | null> {
-    const mode = process.env.GITBOOK_MODE ?? 'multi-path';
-
     switch (mode) {
         case 'single': {
             return await lookupSpaceInSingleMode(url);
