@@ -16,6 +16,8 @@ export interface ContentPointer {
  */
 export function api(): GitBookAPI {
     const headersList = headers();
+
+    const apiEndpoint = headersList.get('x-gitbook-api') ?? undefined;
     const apiToken = headersList.get('x-gitbook-token');
 
     if (!apiToken) {
@@ -26,7 +28,7 @@ export function api(): GitBookAPI {
 
     const gitbook = new GitBookAPI({
         authToken: apiToken,
-        endpoint: process.env.GITBOOK_API_URL,
+        endpoint: apiEndpoint,
     });
 
     return gitbook;

@@ -22,7 +22,15 @@ export async function middleware(request: NextRequest) {
         url.searchParams.get(VISITOR_AUTH_PARAM) ?? request.cookies.get(VISITOR_AUTH_COOKIE)?.value;
     url.searchParams.delete(VISITOR_AUTH_PARAM);
 
-    const resolved = await lookupSpaceForURL(mode, stripURLSearch(url), visitorAuthToken);
+    // The API endpoint can be passed as a header
+    const apiEndpoint = request.headers.get('x-gitbook-api') ?? process.env.GITBOOK_API_URL;
+
+    const resolved = await lookupSpaceForURL(
+        mode,
+        apiEndpoint,
+        stripURLSearch(url),
+        visitorAuthToken,
+    );
     if (!resolved) {
         return new NextResponse(`Not found`, {
             status: 404,
@@ -39,6 +47,9 @@ export async function middleware(request: NextRequest) {
     const headers = new Headers(request.headers);
     headers.set('x-gitbook-token', resolved.apiToken);
     headers.set('x-gitbook-basepath', resolved.basePath);
+    if (apiEndpoint) {
+        headers.set('x-gitbook-api', apiEndpoint);
+    }
 
     const target = new URL(`/${resolved.space}${resolved.pathname}`, request.nextUrl.toString());
     target.search = url.search;
@@ -90,6 +101,7 @@ function getInputURL(request: NextRequest): { url: URL; mode: URLLookupMode } {
 
 async function lookupSpaceForURL(
     mode: URLLookupMode,
+    apiEndpoint: string | undefined,
     url: URL,
     visitorAuthToken: string | undefined,
 ): Promise<PublishedContentLookup | null> {
@@ -98,10 +110,10 @@ async function lookupSpaceForURL(
             return await lookupSpaceInSingleMode(url);
         }
         case 'multi': {
-            return await lookupSpaceInMultiMode(url, visitorAuthToken);
+            return await lookupSpaceInMultiMode(url, apiEndpoint, visitorAuthToken);
         }
         case 'multi-path': {
-            return await lookupSpaceInMultiPathMode(url, visitorAuthToken);
+            return await lookupSpaceInMultiPathMode(url, apiEndpoint, visitorAuthToken);
         }
         default:
             throw new Error(
@@ -143,9 +155,10 @@ async function lookupSpaceInSingleMode(url: URL): Promise<PublishedContentLookup
  */
 async function lookupSpaceInMultiMode(
     url: URL,
+    apiEndpoint: string | undefined,
     visitorAuthToken: string | undefined,
 ): Promise<PublishedContentLookup | null> {
-    return lookupSpaceByAPI(url, visitorAuthToken);
+    return lookupSpaceByAPI(url, apiEndpoint, visitorAuthToken);
 }
 
 /**
@@ -154,6 +167,7 @@ async function lookupSpaceInMultiMode(
  */
 async function lookupSpaceInMultiPathMode(
     url: URL,
+    apiEndpoint: string | undefined,
     visitorAuthToken: string | undefined,
 ): Promise<PublishedContentLookup | null> {
     const targetStr = `https://${url.pathname}`;
@@ -163,7 +177,7 @@ async function lookupSpaceInMultiPathMode(
     }
     const target = new URL(targetStr);
 
-    const lookup = await lookupSpaceByAPI(target, visitorAuthToken);
+    const lookup = await lookupSpaceByAPI(target, apiEndpoint, visitorAuthToken);
     if (!lookup) {
         return null;
     }
@@ -197,6 +211,7 @@ async function lookupSpaceInMultiPathMode(
  */
 async function lookupSpaceByAPI(
     url: URL,
+    apiEndpoint: string | undefined,
     visitorAuthToken: string | undefined,
 ): Promise<PublishedContentLookup | null> {
     const lookupAlternatives = computeLookupAlternatives(url);
@@ -208,7 +223,7 @@ async function lookupSpaceByAPI(
     );
 
     const gitbook = new GitBookAPI({
-        endpoint: process.env.GITBOOK_API_URL,
+        endpoint: apiEndpoint,
     });
 
     return new Promise<PublishedContentLookup>((resolve, reject) => {
