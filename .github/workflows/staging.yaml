@@ -4,8 +4,7 @@ on:
     push:
         branches: [main]
 
-permissions:
-    contents: write
+permissions: write-all
 
 jobs:
     sync:
@@ -26,5 +25,5 @@ jobs:
                   git fetch origin
                   git checkout staging
                   git pull
-                  git merge
+                  git merge origin/main
                   git push origin staging
