@@ -2,6 +2,7 @@ import {
     Collection,
     CustomizationHeaderPreset,
     CustomizationSettings,
+    JSONDocument,
     Revision,
     RevisionPageDocument,
     RevisionPageGroup,
@@ -35,7 +36,7 @@ export function SpaceContent(props: {
     pages: Revision['pages'];
     page: RevisionPageDocument;
     ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
-    document: any;
+    document: JSONDocument | null;
 }) {
     const {
         space,
@@ -49,7 +50,7 @@ export function SpaceContent(props: {
         document,
     } = props;
 
-    const asFullWidth = hasFullWidthBlock(document);
+    const asFullWidth = document ? hasFullWidthBlock(document) : false;
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
     const contentRefContext: ContentRefContext = {

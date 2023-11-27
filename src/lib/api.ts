@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { ContentVisibility, GitBookAPI, JSONDocument } from '@gitbook/api';
+import { ContentVisibility, GitBookAPI, GitBookAPIError, JSONDocument } from '@gitbook/api';
 import { headers } from 'next/headers';
 
 import { cache } from './cache';
@@ -101,9 +101,12 @@ export const getRevisionFile = cache(
                 });
             })();
             return data;
-        } catch (error) {
-            // TODO: improve error handling to throw non-404
-            return null;
+        } catch (error: any) {
+            if (error instanceof GitBookAPIError && error.code === 404) {
+                return null;
+            }
+
+            throw error;
         }
     },
 );
@@ -119,61 +122,14 @@ export const getCurrentRevision = cache('api.getCurrentRevision', async (spaceId
 });
 
 /**
- * Get the document for a page.
- */
-export const getPageDocument = cache(
-    'api.getPageDocument',
-    async (pointer: ContentPointer, pageId: string) => {
-        const { data } = await (async () => {
-            if (pointer.revisionId) {
-                return api().spaces.getPageInRevisionById(
-                    pointer.spaceId,
-                    pointer.revisionId,
-                    pageId,
-                    {
-                        format: 'document',
-                    },
-                    {
-                        cache: 'no-store',
-                    },
-                );
-            }
-
-            if (pointer.changeRequestId) {
-                return api().spaces.getPageInChangeRequestById(
-                    pointer.spaceId,
-                    pointer.changeRequestId,
-                    pageId,
-                    {
-                        format: 'document',
-                    },
-                    {
-                        cache: 'no-store',
-                    },
-                );
-            }
-
-            return api().spaces.getPageById(
-                pointer.spaceId,
-                pageId,
-                {
-                    format: 'document',
-                },
-                {
-                    cache: 'no-store',
-                },
-            );
-        })();
-        // @ts-ignore
-        return data.document as JSONDocument;
-    },
-);
-
-/**
  * Get a document by its ID.
  */
 export const getDocument = cache('api.getDocument', async (spaceId: string, documentId: string) => {
-    // TODO
+    const { data } = await api().spaces.getDocumentById(spaceId, documentId, {
+        cache: 'no-store',
+    });
+
+    return data;
 });
 
 /**

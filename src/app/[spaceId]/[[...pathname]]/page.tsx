@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 
 import { SpaceContent } from '@/components/SpaceContent';
-import { getPageDocument } from '@/lib/api';
+import { getDocument } from '@/lib/api';
 import { PageHrefContext, absoluteHref, baseUrl, pageHref } from '@/lib/links';
 
 import { PagePathParams, fetchPageData, getPagePath } from '../fetch';
@@ -27,7 +27,7 @@ export default async function Page(props: { params: PagePathParams }) {
         redirect(pageHref(page, linksContext));
     }
 
-    const document = await getPageDocument(content, page.id);
+    const document = page.documentId ? await getDocument(space.id, page.documentId) : null;
 
     return (
         <SpaceContent

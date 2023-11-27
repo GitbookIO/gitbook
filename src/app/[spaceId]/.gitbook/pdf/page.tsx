@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { getPageDocument, getSpace, getCurrentRevision } from '@/lib/api';
+import { getDocument, getSpace, getCurrentRevision } from '@/lib/api';
 import { resolvePageId } from '@/lib/pages';
 import { pagePDFContainerId, PageHrefContext } from '@/lib/links';
 import { DocumentView } from '@/components/DocumentView';
@@ -76,21 +76,25 @@ async function PDFPageDocument(props: {
 }) {
     const { space, revision, page, linksContext } = props;
 
-    const document = await getPageDocument(space.id, revision.id, page.id);
+    const document = page.documentId
+        ? await getDocument(space.id, revision.id, page.documentId)
+        : null;
 
     return (
         <div id={pagePDFContainerId(page)}>
             <h1>{page.title}</h1>
-            <DocumentView
-                document={document}
-                style={'mt-6'}
-                context={{
-                    space,
-                    revision,
-                    page,
-                    ...linksContext,
-                }}
-            />
+            {document ? (
+                <DocumentView
+                    document={document}
+                    style={'mt-6'}
+                    context={{
+                        space,
+                        revision,
+                        page,
+                        ...linksContext,
+                    }}
+                />
+            ) : null}
         </div>
     );
 }

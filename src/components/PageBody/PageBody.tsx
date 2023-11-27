@@ -1,4 +1,4 @@
-import { JSONDocument, Revision, RevisionPageDocument, Space } from '@gitbook/api';
+import { JSONDocument, RevisionPageDocument, Space } from '@gitbook/api';
 
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -11,14 +11,16 @@ export function PageBody(props: {
     space: Space;
     page: RevisionPageDocument;
     context: ContentRefContext;
-    document: JSONDocument;
+    document: JSONDocument | null;
 }) {
     const { space, context, page, document } = props;
 
     return (
         <main className={tcls('py-8', 'px-4', 'lg:px-12', 'flex-1')}>
             <PageHeader page={page} />
-            <DocumentView document={document} style={['space-y-6']} context={context} />
+            {document ? (
+                <DocumentView document={document} style={['space-y-6']} context={context} />
+            ) : null}
             <PageFooterNavigation space={space} pages={context.pages} page={page} />
         </main>
     );

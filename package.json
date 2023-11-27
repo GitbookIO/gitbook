@@ -15,7 +15,7 @@
     "dependencies": {
         "@geist-ui/icons": "^1.0.2",
         "@radix-ui/react-popover": "^1.0.7",
-        "@gitbook/api": "^0.16.0",
+        "@gitbook/api": "^0.17.0",
         "@readme/openapi-parser": "^2.5.0",
         "@upstash/redis": "^1.25.1",
         "ajv": "^8.12.0",
