@@ -3,6 +3,7 @@ import { NextResponse, NextRequest } from 'next/server';
 
 export const config = {
     matcher: '/((?!_next/static|_next/image).*)',
+    skipTrailingSlashRedirect: true,
 };
 
 const VISITOR_AUTH_PARAM = 'jwt_token';
@@ -12,6 +13,11 @@ type URLLookupMode = 'single' | 'multi' | 'multi-path';
 
 /**
  * Middleware to lookup the space to render.
+ * It takes as input a request with an URL, and a set of headers:
+ *   - x-gitbook-api: the API endpoint to use, if undefined, the default one is used
+ *   - x-gitbook-basepath: base in the path that should be ignored for routing
+ *
+ * The middleware also takes care of persisting the visitor authentication state.
  */
 export async function middleware(request: NextRequest) {
     const { url, mode } = getInputURL(request);
@@ -24,13 +30,13 @@ export async function middleware(request: NextRequest) {
 
     // The API endpoint can be passed as a header
     const apiEndpoint = request.headers.get('x-gitbook-api') ?? process.env.GITBOOK_API_URL;
+    const proxyBasePath = request.headers.get('x-gitbook-basepath') ?? '';
 
-    const resolved = await lookupSpaceForURL(
-        mode,
-        apiEndpoint,
-        stripURLSearch(url),
-        visitorAuthToken,
-    );
+    const inputURL = stripURLBasePath(stripURLSearch(url), proxyBasePath);
+
+    console.log('resolving', inputURL.toString());
+
+    const resolved = await lookupSpaceForURL(mode, apiEndpoint, inputURL, visitorAuthToken);
     if (!resolved) {
         return new NextResponse(`Not found`, {
             status: 404,
@@ -46,7 +52,7 @@ export async function middleware(request: NextRequest) {
 
     const headers = new Headers(request.headers);
     headers.set('x-gitbook-token', resolved.apiToken);
-    headers.set('x-gitbook-basepath', resolved.basePath);
+    headers.set('x-gitbook-basepath', joinPath(proxyBasePath, resolved.basePath));
     if (apiEndpoint) {
         headers.set('x-gitbook-api', apiEndpoint);
     }
@@ -326,6 +332,29 @@ function computeLookupAlternatives(url: URL) {
 
 function joinPath(...parts: string[]): string {
     return parts.join('/').replace(/\/+/g, '/');
+}
+
+function stripBasePath(pathname: string, basePath: string): string {
+    if (basePath === '') {
+        return pathname;
+    }
+
+    if (!pathname.startsWith(basePath)) {
+        throw new Error(`Invalid pathname ${pathname} for basePath ${basePath}`);
+    }
+
+    pathname = pathname.slice(basePath.length);
+    if (!pathname.startsWith('/')) {
+        pathname = '/' + pathname;
+    }
+
+    return pathname;
+}
+
+function stripURLBasePath(url: URL, basePath: string): URL {
+    const stripped = new URL(url.toString());
+    stripped.pathname = stripBasePath(stripped.pathname, basePath);
+    return stripped;
 }
 
 function stripURLSearch(url: URL): URL {
