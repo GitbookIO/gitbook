@@ -1,11 +1,10 @@
 import { CustomizationHeaderPreset, CustomizationSettings } from '@gitbook/api';
 import assertNever from 'assert-never';
 import { Inter } from 'next/font/google';
-import shadesOf from 'tailwind-shades';
 import colors from 'tailwindcss/colors';
 
-import { hexToRgb } from '@/components/utils/HexToRgb';
 import { getSpaceCustomization } from '@/lib/api';
+import { hexToRgb, shadesOfColor } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
 
 import { ClientLayout } from './ClientLayout';
@@ -59,7 +58,7 @@ export default async function SpaceRootLayout(props: {
 
 type ColorInput = string | Record<string, string>;
 function generateColorVariable(name: string, color: ColorInput) {
-    const shades: Record<string, string> = typeof color === 'string' ? shadesOf(color) : color;
+    const shades: Record<string, string> = typeof color === 'string' ? shadesOfColor(color) : color;
 
     return Object.entries(shades)
         .map(([key, value]) => {

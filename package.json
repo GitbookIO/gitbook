@@ -30,8 +30,7 @@
         "recoil": "^0.7.7",
         "server-only": "^0.0.1",
         "shiki": "^0.14.5",
-        "tailwind-merge": "^1.14.0",
-        "tailwind-shades": "^1.1.2"
+        "tailwind-merge": "^1.14.0"
     },
     "devDependencies": {
         "@cloudflare/next-on-pages": "^1.7.3",
