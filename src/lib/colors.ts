@@ -65,6 +65,9 @@ export function shadesOfColor(hex: string, halfShades = false) {
     return result;
 }
 
+/**
+ * Convert a hex color to an RGB color set.
+ */
 function hexToRgbArray(hex: string): RGBColor {
     const originalHex = hex;
 
@@ -88,6 +91,9 @@ function hexToRgbArray(hex: string): RGBColor {
     return rgb as RGBColor;
 }
 
+/**
+ * Convert a RGB color set to a hex color.
+ */
 function rgbArrayToHex(rgb: RGBColor): string {
     return (
         '#' +
