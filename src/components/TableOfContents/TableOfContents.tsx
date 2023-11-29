@@ -34,24 +34,34 @@ export function TableOfContents(
     return (
         <aside
             className={tcls(
-                'hidden',
-                'lg:flex',
+                'flex',
                 'flex-col',
-                'basis-72',
+                'basis-full',
+                'bg-light',
+                'lg:basis-72',
+                'border-dark/2',
+                'navigation-visible:border-b',
                 'grow-0',
                 'shrink-0',
                 'sticky',
+                'z-[1]',
+                'dark:bg-dark',
+                'dark:border-light/1',
                 withHeaderOffset ? SIDE_COLUMN_WITH_HEADER : SIDE_COLUMN_WITHOUT_HEADER,
             )}
         >
-            {header ? <div className={tcls('pt-6', 'pb-3', 'pr-4')}>{header}</div> : null}
+            {header ? <div className={tcls('py-3')}>{header}</div> : null}
             <div
                 className={tcls(
+                    'hidden',
+                    'lg:flex',
                     'flex-1',
+                    'flex-grow',
                     'overflow-y-auto',
+                    'gutter-stable',
+                    'navigation-visible:flex', // can be auto height animated as such https://stackoverflow.com/a/76944290
                     header ? 'pt-3' : 'pt-6',
-                    'pb-14',
-                    'pr-4',
+                    'pb-6',
                 )}
             >
                 <PagesList
@@ -62,7 +72,8 @@ export function TableOfContents(
                     context={context}
                 />
             </div>
-            <Trademark space={space} />
+            {/* TODO: integrate trademark into mobile menu */}
+            {/* <Trademark space={space} /> */}
         </aside>
     );
 }

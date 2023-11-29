@@ -35,9 +35,9 @@ export function PageDocumentItem(props: {
                 ? [
                       'font-semibold',
                       'text-primary',
-                      'bg-primary-500/3',
+                      'hover:bg-primary/3',
                       'dark:text-primary-400',
-                      'dark:hover:bg-primary-500/5',
+                      'dark:hover:bg-primary-500/3',
                   ]
                 : [
                       'font-normal',

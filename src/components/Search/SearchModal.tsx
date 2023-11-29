@@ -20,7 +20,8 @@ export function SearchModal(props: SearchModalProps) {
 
     useHotkeys(
         'ctrl+k, command+k',
-        () => {
+        (e) => {
+            e.preventDefault(); //might be inadvisable as it interferes with expected browser behavior.
             setQuery('');
         },
         [],
@@ -51,7 +52,9 @@ export function SearchModal(props: SearchModalProps) {
                 'dark:bg-dark/9',
                 'opacity-100',
                 'z-30',
-                'pt-24',
+                'px-4',
+                'pt-4',
+                'md:pt-[min(12vw,_10rem)]',
             )}
             onClick={onClose}
         >

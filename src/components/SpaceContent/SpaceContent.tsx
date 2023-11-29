@@ -76,7 +76,8 @@ export function SpaceContent(props: {
             <div
                 className={tcls(
                     'flex',
-                    'flex-row',
+                    'flex-col',
+                    'lg:flex-row',
                     CONTAINER_PADDING,
                     asFullWidth ? null : [CONTAINER_MAX_WIDTH_NORMAL, 'mx-auto'],
                 )}

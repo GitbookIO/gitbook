@@ -1,6 +1,7 @@
 import { Collection, CustomizationSettings, Space } from '@gitbook/api';
 import React from 'react';
 
+import { t } from '@/lib/intl';
 import { tcls } from '@/lib/tailwind';
 
 import { HeaderLogo } from './HeaderLogo';
@@ -18,8 +19,17 @@ export function CompactHeader(props: {
     const { space, collection, customization } = props;
 
     return (
-        <div className={tcls('flex', 'flex-row', 'items-center')}>
-            <div className={tcls('flex-1')}>
+        <div
+            className={tcls(
+                'flex',
+                'lg:flex-col',
+                'flex-wrap',
+                'gap-x-5',
+                'gap-y-3',
+                'justify-between',
+            )}
+        >
+            <div className={tcls('flex-grow-0')}>
                 <HeaderLogo
                     collection={collection}
                     space={space}
@@ -30,9 +40,11 @@ export function CompactHeader(props: {
                     ]}
                 />
             </div>
-            <div className={tcls(['ms-2'])}>
+            <div className={tcls('flex-shrink-0', 'sm:grow', 'sm:max-w-xs', 'lg:max-w-full')}>
                 <React.Suspense fallback={null}>
-                    <SearchButton />
+                    <SearchButton style={[]}>
+                        <span>{t({ space }, 'search')}</span>
+                    </SearchButton>
                 </React.Suspense>
             </div>
         </div>

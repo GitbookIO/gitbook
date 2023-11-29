@@ -100,7 +100,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     }
 
     return (
-        <div className={tcls('max-h-[60vh]', 'overflow-auto', 'px')}>
+        <div className={tcls('max-h-[60vh]', 'overflow-auto', 'px', 'inverted-theme-scroll')}>
             {results.length === 0 ? (
                 <div className={tcls('text-sm', 'text-dark', 'p-6', 'text-center')}>
                     {noResultsMessage}

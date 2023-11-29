@@ -3,6 +3,7 @@ import IconAlertTriangle from '@geist-ui/icons/alertTriangle';
 import IconCheckInCircle from '@geist-ui/icons/checkInCircle';
 import IconInfo from '@geist-ui/icons/info';
 import { DocumentBlockHint } from '@gitbook/api';
+import React from 'react';
 
 import { ClassValue, tcls } from '@/lib/tailwind';
 
@@ -14,6 +15,7 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
     const { block, style, ancestorBlocks, ...contextProps } = props;
     const hintStyle = HINT_STYLES[block.data.style];
     const firstLine = getBlockTextStyle(block.nodes[0]);
+    const RenderIcon = HINT_STYLES[block.data.style].icon;
 
     return (
         <div
@@ -24,7 +26,11 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
                 'py-4',
                 'transition-colors',
                 'rounded',
-                'border-l-4',
+                'border-b-[1px]',
+                'dark:border-t-[1px]',
+                'dark:border-b-0',
+
+                /*                 'shadow-1xs', */
                 hintStyle.style,
                 style,
             )}
@@ -40,7 +46,9 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
                     hintStyle.iconStyle,
                 )}
             >
-                <hintStyle.icon className={tcls('w-5', 'h-5')} />
+                {/*  <hintStyle.icon className={tcls('w-5', 'h-5')} /> */}
+
+                <RenderIcon />
             </div>
             <Blocks
                 {...contextProps}
@@ -52,31 +60,100 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
     );
 }
 
+const SuccessIcon = () => (
+    <div
+        className={tcls(
+            'flex',
+            'flex-col',
+            'w-[17px]',
+            'h-[17px]',
+            'bg-white',
+            'rounded-full',
+            'justify-center',
+            'items-center',
+            'dark:bg-light/3',
+        )}
+    >
+        <div
+            className={tcls(
+                'grid',
+                'justify-items-center',
+                'items-center',
+                'w-[5px]',
+                'h-[5px]',
+                'top-[-0.5px]',
+                'relative',
+            )}
+        >
+            <div
+                className={tcls(
+                    'animate-[pingAlt_8s_ease_infinite_forwards]',
+                    'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-dark/2 from-0% via-dark/2 via-55% to-dark to-100%',
+                    'grid-area-1-1',
+                    'w-[5px]',
+                    'h-[5px]',
+                    'rounded',
+                    'dark:from-light/2 dark:via-light/2 dark:to-light/8',
+                )}
+            ></div>
+            <div
+                className={tcls(
+                    'animate-[pulse_8s_ease_infinite]',
+                    'grid-area-1-1',
+                    'w-[3px]',
+                    'h-[3px]',
+                    'bg-dark/7',
+                    'rounded',
+                    'dark:bg-light/8',
+                )}
+            ></div>
+        </div>
+        <div
+            className={tcls(
+                'animate-[pulse_8s_ease_infinite]',
+                'w-[3px]',
+                'h-[7px]',
+                'bg-dark/7',
+                'rounded',
+                'dark:bg-light/8',
+            )}
+        ></div>
+    </div>
+);
+const WarningIcon = () => SuccessIcon();
+const DangerIcon = () => SuccessIcon();
+const InfoIcon = () => SuccessIcon();
+
 const HINT_STYLES: {
     [style in DocumentBlockHint['data']['style']]: {
-        icon: React.ComponentType<{ className?: string }>;
+        icon: React.ComponentType;
         iconStyle: ClassValue;
         style: ClassValue;
     };
 } = {
     info: {
-        icon: IconInfo,
+        icon: SuccessIcon,
         iconStyle: ['text-current'],
-        style: ['border-dark/2', 'bg-dark/2', 'dark:bg-light/1', 'dark:border-light/3'],
+        style: ['border-dark/1', 'bg-dark/2', 'dark:bg-light/1', 'dark:border-light/1'],
     },
     warning: {
-        icon: IconAlertCircle,
+        icon: WarningIcon,
         iconStyle: ['text-yellow, dark:text-yellow/1, dark:text-yellow/8'],
-        style: ['border-yellow/4', 'bg-yellow', 'dark:bg-yellow/1'],
+        style: ['border-yellow/6', 'bg-yellow/6', 'dark:bg-yellow/1', 'dark:border-yellow/2'],
     },
     danger: {
-        icon: IconAlertTriangle,
+        icon: DangerIcon,
         iconStyle: ['text-pomegranate'],
-        style: ['border-pomegranate/4', 'bg-pomegranate/2', 'dark:bg-pomegranate/1'],
+        style: [
+            'border-pomegranate/2',
+            'bg-pomegranate/2',
+            'dark:bg-pomegranate/1',
+            'dark:border-pomegranate/3',
+        ],
     },
     success: {
-        icon: IconCheckInCircle,
+        icon: InfoIcon,
         iconStyle: ['text-teal'],
-        style: ['border-teal/4', 'bg-teal/2', 'dark:bg-teal/2'],
+        style: ['border-teal/2', 'bg-teal/2', 'dark:bg-teal/2'],
     },
 };

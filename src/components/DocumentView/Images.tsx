@@ -21,7 +21,7 @@ export function Images(props: BlockProps<DocumentBlockImages>) {
                 block.data.align === 'right' && 'justify-end',
                 block.data.align === 'left' && 'justify-start',
                 style,
-                block.data.fullWidth ? 'max-w-full' : null,
+                block.data.fullWidth ? 'max-w-screen-2xl' : null,
                 'justify-center',
             )}
         >

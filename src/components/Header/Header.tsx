@@ -91,8 +91,8 @@ export function Header(props: {
                 </div>
                 <div className={tcls('flex', 'basis-56', 'grow-0', 'shrink-0')}>
                     <Suspense fallback={null}>
-                        <SearchButton style={['bg-header-background-300']}>
-                            {t({ space }, 'search')}
+                        <SearchButton>
+                            <span>{t({ space }, 'search')}</span>
                         </SearchButton>
                     </Suspense>
                 </div>

@@ -28,8 +28,8 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
                 'hover:border-slate-300',
                 'px-5',
                 'py-2',
-                'text-slate-500',
-                'hover:text-slate-700',
+                /* 'text-slate-500', */
+                /* 'hover:text-slate-700', */
                 style,
             )}
         >

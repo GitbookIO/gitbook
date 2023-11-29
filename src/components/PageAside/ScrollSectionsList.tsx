@@ -25,11 +25,10 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                             'flex',
                             'flex-row',
                             'text-sm',
-                            section.depth > 1
-                                ? ['font-light', 'ps-3', 'py-1', 'text-light/5']
-                                : ['py-2', 'text-light/7'],
+                            'hover:text-primary',
+                            section.depth > 1 ? ['ps-3', 'py-1', 'opacity-8'] : ['py-2'],
 
-                            activeId === section.id ? 'text-primary' : 'hover:text-light/9',
+                            activeId === section.id ? 'text-primary' : '',
                         )}
                     >
                         {section.depth > 1 ? (

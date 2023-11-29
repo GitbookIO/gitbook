@@ -18,7 +18,7 @@ export function PagesList(props: {
     const { rootPages, pages, activePage, ancestors, context, style } = props;
 
     return (
-        <ul className={tcls('flex', 'flex-col', style)}>
+        <ul className={tcls('flex', 'flex-1', 'flex-col', style)}>
             {pages.map((page) => {
                 if (page.type === 'group') {
                     return (

@@ -26,21 +26,29 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'flex',
                 'flex-1',
                 'flex-row',
+                'justify-center',
                 'items-center',
-                'px-4',
-                'py-1',
-                'rounded',
-                'dark:bg-vanta/4',
-                'hover:bg-light',
+                'px-2',
+                'min-h-[2.5rem]',
+                'w-[2.5rem]',
+                'rounded-lg',
+                'bg-dark/2',
+                'hover:bg-dark/3',
                 'border',
-                'border-dark/2',
-                'shadow-lg',
-                'dark:border-light/3',
+                'border-dark/1',
+                'dark:bg-light/1',
+                'dark:border-light/1',
+                'dark:hover:bg-light/2',
+                '[&>span]:hidden',
+                'sm:justify-between',
+                'sm:[&>span]:flex',
+                'sm:w-full',
+                'sm:px-4',
                 style,
             )}
         >
-            <IconSearch className={tcls('w-4', 'h-4', children ? 'me-2' : null)} />
             {children}
+            <IconSearch className={tcls('w-4', 'h-4')} />
         </button>
     );
 }

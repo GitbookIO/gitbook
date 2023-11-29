@@ -30,6 +30,7 @@ export function ToggleableLinkItem(
                 {children}
                 <Chevron
                     className={tcls(
+                        'flex-shrink-0',
                         'w-5',
                         'h-5',
                         'p-0.5',
