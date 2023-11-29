@@ -4,9 +4,7 @@ import { NextRequest } from 'next/server';
 import { ImageResponse } from 'next/og';
 import { PageIdParams, fetchPageData } from '../../../fetch';
 
-// Should be edge, but there is an error with the middleware
-// https://github.com/vercel/next.js/issues/48295
-export const runtime = 'nodejs';
+export const runtime = 'edge';
 
 /**
  * Render the OpenGraph image for a space.

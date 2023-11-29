@@ -7,9 +7,7 @@ import { PageHrefContext, absoluteHref, baseUrl, pageHref } from '@/lib/links';
 
 import { PagePathParams, fetchPageData, getPagePath } from '../fetch';
 
-// Should be edge, but there is an error with the middleware
-// https://github.com/vercel/next.js/issues/48295
-export const runtime = 'nodejs';
+export const runtime = 'edge';
 
 /**
  * Fetch and render a page.

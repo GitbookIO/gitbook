@@ -9,9 +9,7 @@ import { SpaceParams } from '../../fetch';
 import { Revision, RevisionPageDocument, RevisionPageGroup, Space } from '@gitbook/api';
 import { notFound } from 'next/navigation';
 
-// Should be edge, but there is an error with the middleware
-// https://github.com/vercel/next.js/issues/48295
-export const runtime = 'nodejs';
+export const runtime = 'edge';
 
 interface PDFSearchParams {
     /** Page to export. If none is passed, all pages are exported. */
