@@ -1,4 +1,4 @@
-import { RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
+import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 import Link from 'next/link';
 
 import { pageHref } from '@/lib/links';
@@ -9,17 +9,18 @@ import { PagesList } from './PagesList';
 import { ToggleableLinkItem } from './ToggleableLinkItem';
 
 export function PageDocumentItem(props: {
+    rootPages: RevisionPage[];
     page: RevisionPageDocument;
     activePage: RevisionPageDocument;
     ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
     context: ContentRefContext;
 }) {
-    const { page, activePage, ancestors, context } = props;
+    const { rootPages, page, activePage, ancestors, context } = props;
 
     const hasActiveDescendant = ancestors.some((ancestor) => ancestor.id === page.id);
 
     const linkProps = {
-        href: pageHref(page),
+        href: pageHref(rootPages, page),
         className: tcls(
             'flex',
             'flex-row',
@@ -55,6 +56,7 @@ export function PageDocumentItem(props: {
                     {...linkProps}
                     descendants={
                         <PagesList
+                            rootPages={rootPages}
                             pages={page.pages}
                             style={tcls(
                                 'ms-2',

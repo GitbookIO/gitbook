@@ -42,7 +42,7 @@ export async function fetchPageData(params: PagePathParams | PageIdParams) {
     const page =
         'pageId' in params && params.pageId
             ? resolvePageId(pages, params.pageId)
-            : resolvePagePath(pages, getPagePath(params));
+            : resolvePagePath(pages, getPathnameParam(params));
 
     return {
         content,
@@ -69,7 +69,7 @@ async function fetchParentCollection(space: Space) {
 /**
  * Get the page path from the params.
  */
-export function getPagePath(params: PagePathParams): string {
+export function getPathnameParam(params: PagePathParams): string {
     const { pathname } = params;
     return pathname ? pathname.join('/') : '';
 }

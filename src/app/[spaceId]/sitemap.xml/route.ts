@@ -25,7 +25,7 @@ export async function GET(req: NextRequest, { params }: { params: SpaceParams })
 
         return {
             url: {
-                loc: pageHref(page),
+                loc: pageHref(rootPages, page),
                 priority: normalizedPriority,
                 ...(lastModified
                     ? {

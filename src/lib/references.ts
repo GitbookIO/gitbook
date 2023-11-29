@@ -59,14 +59,14 @@ export async function resolveContentRef(
 
         if (contentRef.kind === 'page') {
             return {
-                href: pageHref(page, linksContext),
+                href: pageHref(pages, page, linksContext),
                 text: page.title,
                 active: page.id === activePage.id,
             };
         }
 
         return {
-            href: pageHref(page, linksContext, contentRef.anchor),
+            href: pageHref(pages, page, linksContext, contentRef.anchor),
             text: page.title + '#' + contentRef.anchor,
             active: false,
         };

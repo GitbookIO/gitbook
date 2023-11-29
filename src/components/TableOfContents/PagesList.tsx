@@ -8,13 +8,14 @@ import { PageGroupItem } from './PageGroupItem';
 import { PageLinkItem } from './PageLinkItem';
 
 export function PagesList(props: {
+    rootPages: RevisionPage[];
     pages: RevisionPage[];
     activePage: RevisionPageDocument;
     ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
     context: ContentRefContext;
     style?: ClassValue;
 }) {
-    const { pages, activePage, ancestors, context, style } = props;
+    const { rootPages, pages, activePage, ancestors, context, style } = props;
 
     return (
         <ul className={tcls('flex', 'flex-col', style)}>
@@ -23,6 +24,7 @@ export function PagesList(props: {
                     return (
                         <PageGroupItem
                             key={page.id}
+                            rootPages={rootPages}
                             page={page}
                             activePage={activePage}
                             ancestors={ancestors}
@@ -36,6 +38,7 @@ export function PagesList(props: {
                 return (
                     <PageDocumentItem
                         key={page.id}
+                        rootPages={rootPages}
                         page={page}
                         activePage={activePage}
                         ancestors={ancestors}

@@ -4,8 +4,9 @@ import { notFound, redirect } from 'next/navigation';
 import { SpaceContent } from '@/components/SpaceContent';
 import { getDocument } from '@/lib/api';
 import { PageHrefContext, absoluteHref, baseUrl, pageHref } from '@/lib/links';
+import { getPagePath } from '@/lib/pages';
 
-import { PagePathParams, fetchPageData, getPagePath } from '../fetch';
+import { PagePathParams, fetchPageData, getPathnameParam } from '../fetch';
 
 export const runtime = 'edge';
 
@@ -21,8 +22,8 @@ export default async function Page(props: { params: PagePathParams }) {
 
     if (!page) {
         notFound();
-    } else if (page.path !== getPagePath(params)) {
-        redirect(pageHref(page, linksContext));
+    } else if (getPagePath(pages, page) !== getPathnameParam(params)) {
+        redirect(pageHref(pages, page, linksContext));
     }
 
     const document = page.documentId ? await getDocument(space.id, page.documentId) : null;

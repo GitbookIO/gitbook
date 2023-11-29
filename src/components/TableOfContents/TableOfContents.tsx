@@ -55,6 +55,7 @@ export function TableOfContents(
                 )}
             >
                 <PagesList
+                    rootPages={pages}
                     pages={pages}
                     activePage={activePage}
                     ancestors={ancestors}

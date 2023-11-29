@@ -1,7 +1,9 @@
 import 'server-only';
 
-import { RevisionPageDocument } from '@gitbook/api';
+import { RevisionPage, RevisionPageDocument } from '@gitbook/api';
 import { headers } from 'next/headers';
+
+import { getPagePath } from './pages';
 
 export interface PageHrefContext {
     /**
@@ -57,6 +59,7 @@ export function absoluteHref(href: string): string {
  * Create a link to a page path in the current space.
  */
 export function pageHref(
+    rootPages: RevisionPage[],
     page: RevisionPageDocument,
     context: PageHrefContext = {},
     /** Anchor to link to in the page. */
@@ -74,7 +77,7 @@ export function pageHref(
         }
     }
 
-    return absoluteHref(page.path) + (anchor ? '#' + anchor : '');
+    return absoluteHref(getPagePath(rootPages, page)) + (anchor ? '#' + anchor : '');
 }
 
 /**
