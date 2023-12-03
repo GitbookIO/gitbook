@@ -100,19 +100,24 @@ export function SpaceContent(props: {
                         )
                     }
                     withHeaderOffset={withTopHeader}
+                    visibleOnDesktop={!!page.layout.tableOfContents}
                 />
                 <PageBody
                     space={space}
                     context={contentRefContext}
                     page={page}
                     document={document}
+                    withDesktopTableOfContents={!!page.layout.tableOfContents}
+                    withAside={!!page.layout.outline}
                 />
-                <PageAside
-                    space={space}
-                    page={page}
-                    document={document}
-                    withHeaderOffset={withTopHeader}
-                />
+                {page.layout.outline ? (
+                    <PageAside
+                        space={space}
+                        page={page}
+                        document={document}
+                        withHeaderOffset={withTopHeader}
+                    />
+                ) : null}
             </div>
 
             {customization.themes.toggeable ||

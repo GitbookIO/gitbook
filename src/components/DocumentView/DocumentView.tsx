@@ -24,8 +24,8 @@ export function DocumentView(
         <Blocks
             nodes={document.nodes}
             ancestorBlocks={[]}
-            blockStyle={'mt-6'}
-            style={style}
+            blockStyle={[]}
+            style={['space-y-6', style]}
             {...context}
         />
     );

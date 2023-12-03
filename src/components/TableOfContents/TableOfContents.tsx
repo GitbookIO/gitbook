@@ -18,7 +18,8 @@ export function TableOfContents(
         activePage: RevisionPageDocument;
         ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
         header?: React.ReactNode;
-        withHeaderOffset?: boolean;
+        withHeaderOffset: boolean;
+        visibleOnDesktop: boolean;
     },
 ) {
     const {
@@ -28,7 +29,8 @@ export function TableOfContents(
         ancestors,
         header,
         context,
-        withHeaderOffset = false,
+        withHeaderOffset,
+        visibleOnDesktop,
     } = props;
 
     return (
@@ -47,6 +49,7 @@ export function TableOfContents(
                 'z-[1]',
                 'dark:bg-dark',
                 'dark:border-light/1',
+                visibleOnDesktop ? null : 'lg:hidden',
                 withHeaderOffset ? SIDE_COLUMN_WITH_HEADER : SIDE_COLUMN_WITHOUT_HEADER,
             )}
         >
