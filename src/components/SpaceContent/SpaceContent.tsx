@@ -13,7 +13,7 @@ import React from 'react';
 import { Footer } from '@/components/Footer';
 import { CompactHeader, Header } from '@/components/Header';
 import { CONTAINER_MAX_WIDTH_NORMAL, CONTAINER_PADDING } from '@/components/layout';
-import { PageBody } from '@/components/PageBody';
+import { PageBody, PageCover } from '@/components/PageBody';
 import { SearchModal } from '@/components/Search';
 import { TableOfContents } from '@/components/TableOfContents';
 import { ContentPointer } from '@/lib/api';
@@ -52,6 +52,11 @@ export function SpaceContent(props: {
 
     const asFullWidth = document ? hasFullWidthBlock(document) : false;
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
+    const withFullPageCover = !!(
+        page.cover &&
+        page.layout.cover &&
+        page.layout.coverSize === 'full'
+    );
 
     const contentRefContext: ContentRefContext = {
         space,
@@ -102,22 +107,35 @@ export function SpaceContent(props: {
                     withHeaderOffset={withTopHeader}
                     visibleOnDesktop={!!page.layout.tableOfContents}
                 />
-                <PageBody
-                    space={space}
-                    context={contentRefContext}
-                    page={page}
-                    document={document}
-                    withDesktopTableOfContents={!!page.layout.tableOfContents}
-                    withAside={!!page.layout.outline}
-                />
-                {page.layout.outline ? (
-                    <PageAside
-                        space={space}
-                        page={page}
-                        document={document}
-                        withHeaderOffset={withTopHeader}
-                    />
-                ) : null}
+                <div className={tcls('flex-1', 'flex', 'flex-col')}>
+                    {withFullPageCover && page.cover ? (
+                        <PageCover
+                            as="full"
+                            page={page}
+                            cover={page.cover}
+                            context={contentRefContext}
+                        />
+                    ) : null}
+                    <div className={tcls('flex', 'flex-row')}>
+                        <PageBody
+                            space={space}
+                            context={contentRefContext}
+                            page={page}
+                            document={document}
+                            withDesktopTableOfContents={!!page.layout.tableOfContents}
+                            withAside={!!page.layout.outline}
+                        />
+                        {page.layout.outline ? (
+                            <PageAside
+                                space={space}
+                                page={page}
+                                document={document}
+                                withHeaderOffset={withTopHeader}
+                                withFullPageCover={withFullPageCover}
+                            />
+                        ) : null}
+                    </div>
+                </div>
             </div>
 
             {customization.themes.toggeable ||

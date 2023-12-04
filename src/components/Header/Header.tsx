@@ -1,7 +1,11 @@
 import { Collection, CustomizationSettings, Space } from '@gitbook/api';
 import { Suspense } from 'react';
 
-import { CONTAINER_MAX_WIDTH_NORMAL, CONTAINER_PADDING } from '@/components/layout';
+import {
+    CONTAINER_MAX_WIDTH_NORMAL,
+    CONTAINER_PADDING,
+    HEADER_HEIGHT_DESKTOP,
+} from '@/components/layout';
 import { t } from '@/lib/intl';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -29,7 +33,7 @@ export function Header(props: {
             className={tcls(
                 'flex',
                 'flex-row',
-                'h-16',
+                HEADER_HEIGHT_DESKTOP,
                 'sticky',
                 'top-0',
                 'z-10',

@@ -3,6 +3,7 @@ import { JSONDocument, RevisionPageDocument, Space } from '@gitbook/api';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
+import { PageCover } from './PageCover';
 import { PageFooterNavigation } from './PageFooterNavigation';
 import { PageHeader } from './PageHeader';
 import { DocumentView } from '../DocumentView';
@@ -28,6 +29,10 @@ export function PageBody(props: {
                 withDesktopTableOfContents ? null : 'xl:ml-72',
             )}
         >
+            {page.cover && page.layout.cover && page.layout.coverSize === 'hero' ? (
+                <PageCover as="hero" page={page} cover={page.cover} context={context} />
+            ) : null}
+
             <PageHeader page={page} />
             {document ? (
                 <DocumentView document={document} style={['space-y-6']} context={context} />

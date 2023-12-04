@@ -6,7 +6,12 @@ import { t } from '@/lib/intl';
 import { tcls } from '@/lib/tailwind';
 
 import { ScrollSectionsList } from './ScrollSectionsList';
-import { SIDE_COLUMN_WITHOUT_HEADER, SIDE_COLUMN_WITH_HEADER } from '../layout';
+import {
+    SIDE_COLUMN_WITHOUT_HEADER,
+    SIDE_COLUMN_WITHOUT_HEADER_AND_COVER,
+    SIDE_COLUMN_WITH_HEADER,
+    SIDE_COLUMN_WITH_HEADER_AND_COVER,
+} from '../layout';
 
 /**
  * Aside listing the headings in the document.
@@ -16,8 +21,9 @@ export function PageAside(props: {
     page: RevisionPageDocument;
     document: JSONDocument | null;
     withHeaderOffset: boolean;
+    withFullPageCover: boolean;
 }) {
-    const { space, document, withHeaderOffset } = props;
+    const { space, document, withHeaderOffset, withFullPageCover } = props;
     const sections = document ? getDocumentSections(document) : [];
 
     return (
@@ -30,7 +36,13 @@ export function PageAside(props: {
                 'grow-0',
                 'shrink-0',
                 'sticky',
-                withHeaderOffset ? SIDE_COLUMN_WITH_HEADER : SIDE_COLUMN_WITHOUT_HEADER,
+                withHeaderOffset
+                    ? withFullPageCover
+                        ? SIDE_COLUMN_WITH_HEADER_AND_COVER
+                        : SIDE_COLUMN_WITH_HEADER
+                    : withFullPageCover
+                    ? SIDE_COLUMN_WITHOUT_HEADER_AND_COVER
+                    : SIDE_COLUMN_WITHOUT_HEADER,
                 'py-6',
             )}
         >
