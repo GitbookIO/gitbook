@@ -36,17 +36,18 @@ export function TableOfContents(
     return (
         <aside
             className={tcls(
+                'relative',
                 'flex',
                 'flex-col',
                 'basis-full',
                 'bg-light',
-                'lg:basis-72',
                 'border-dark/2',
-                'navigation-visible:border-b',
                 'grow-0',
                 'shrink-0',
-                'sticky',
                 'z-[1]',
+                'lg:basis-72',
+                'navigation-visible:border-b',
+                'lg:sticky',
                 'dark:bg-dark',
                 'dark:border-light/1',
                 visibleOnDesktop ? null : 'lg:hidden',
@@ -62,6 +63,7 @@ export function TableOfContents(
                     'flex-grow',
                     'overflow-y-auto',
                     'gutter-stable',
+                    'pr-2',
                     'navigation-visible:flex', // can be auto height animated as such https://stackoverflow.com/a/76944290
                     header ? 'pt-3' : 'pt-6',
                     'pb-6',

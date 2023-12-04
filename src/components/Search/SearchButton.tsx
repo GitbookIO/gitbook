@@ -40,10 +40,10 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'dark:border-light/1',
                 'dark:hover:bg-light/2',
                 '[&>span]:hidden',
-                'sm:justify-between',
-                'sm:[&>span]:flex',
-                'sm:w-full',
-                'sm:px-4',
+                'md:justify-between',
+                'md:[&>span]:flex',
+                'md:w-full',
+                'md:px-4',
                 style,
             )}
         >

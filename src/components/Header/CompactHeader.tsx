@@ -24,7 +24,7 @@ export function CompactHeader(props: {
                 'flex',
                 'lg:flex-col',
                 'flex-wrap',
-                'gap-x-5',
+                'lg:gap-x-5',
                 'gap-y-3',
                 'justify-between',
             )}

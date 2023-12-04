@@ -25,17 +25,26 @@ export function HeaderLogo(props: HeaderLogoProps) {
             <HeaderMobileMenu className={tcls('lg:hidden')} />
             <Link
                 href={absoluteHref('')}
-                className={tcls('group/headerlogo', 'flex', 'flex-row', 'items-center')}
+                className={tcls('group/headerlogo', 'flex', 'flex-row', 'items-center', 'shrink-0')}
             >
                 {customization.header.logo ? (
                     <Image
                         alt="Logo"
                         src={customization.header.logo}
                         fetchPriority="high"
-                        style={['max-w-50', 'h-8']}
+                        style={tcls(
+                            'max-w-[8rem]',
+                            'lg:max-w-[12rem]',
+                            'max-h-[3rem]',
+                            'rounded',
+                            'overflow-hidden',
+                            'object-contain',
+                        )}
                     />
                 ) : (
-                    <LogoFallback {...props} />
+                    <>
+                        <LogoFallback {...props} />
+                    </>
                 )}
             </Link>
         </div>
@@ -57,7 +66,7 @@ function LogoFallback(props: HeaderLogoProps) {
                     }
                 }
                 fetchPriority="high"
-                style={['w-8', 'h-8']}
+                style={['w-8', 'h-8', 'rounded', 'overflow-hidden', 'border', 'border-dark/2']}
             />
 
             <h1
@@ -67,9 +76,8 @@ function LogoFallback(props: HeaderLogoProps) {
                     'leading-tight',
                     'tracking-tight',
                     'max-w-[13ch]',
-                    'md:max-w-none',
-                    'md:text-lg/tight',
-                    'text-slate-800',
+                    'lg:max-w-none',
+                    'lg:text-lg/tight',
                     'font-semibold',
                     'ms-3',
                     textStyle,

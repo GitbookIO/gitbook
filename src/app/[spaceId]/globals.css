@@ -8,6 +8,7 @@
         --vanta: 2 12 13;
         --light: 242 247 247;
         --metal: 222 229 229;
+        --sky: 187 221 229;
         --yellow: 244 226 141;
         --teal: 63 137 161;
         --pomegranate: 242 91 58;
@@ -16,6 +17,7 @@
     h1 {
         @apply tracking-tighter;
         @apply text-dark dark:text-light;
+        @apply textwrap-balance;
     }
     h2,
     h3,
@@ -89,5 +91,32 @@
     }
     .textwrap-pretty {
         text-wrap: pretty;
+    }
+
+    .triangle {
+        position: relative;
+        background-color: orange;
+        text-align: left;
+        transform: rotate(-60deg) skewX(-30deg) scale(1, 0.866);
+    }
+    .triangle:before,
+    .triangle:after {
+        content: '';
+        position: absolute;
+        background-color: inherit;
+    }
+    .triangle,
+    .triangle:before,
+    .triangle:after {
+        width: inherit;
+        height: inherit;
+        border-top-right-radius: 30%;
+    }
+
+    .triangle:before {
+        transform: rotate(-135deg) skewX(-45deg) scale(1.414, 0.707) translate(0, -50%);
+    }
+    .triangle:after {
+        transform: rotate(135deg) skewY(-45deg) scale(0.707, 1.414) translate(50%);
     }
 }

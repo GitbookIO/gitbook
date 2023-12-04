@@ -15,7 +15,7 @@ export function PageHeader(props: { page: RevisionPageDocument }) {
                 <h1 className={tcls('text-4xl', 'font-bold')}>{page.title}</h1>
             ) : null}
             {page.description && page.layout.description ? (
-                <p className={tcls('text-lg', 'text-slate-600')}>{page.description}</p>
+                <p className={tcls('text-lg')}>{page.description}</p>
             ) : null}
         </header>
     );

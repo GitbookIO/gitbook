@@ -19,6 +19,7 @@ export function Tabs(props: BlockProps<DocumentBlockTabs>) {
                         nodes={tab.nodes}
                         ancestorBlocks={[...ancestorBlocks, block, tab]}
                         context={context}
+                        style={tcls('w-full', 'space-y-6')}
                     />
                 ),
             }))}

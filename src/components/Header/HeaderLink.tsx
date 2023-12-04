@@ -1,4 +1,9 @@
-import { CustomizationContentLink, CustomizationHeaderLink } from '@gitbook/api';
+import {
+    CustomizationContentLink,
+    CustomizationHeaderLink,
+    CustomizationSettings,
+    CustomizationHeaderPreset,
+} from '@gitbook/api';
 import Link from 'next/link';
 
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
@@ -15,8 +20,11 @@ import {
 export async function HeaderLink(props: {
     context: ContentRefContext;
     link: CustomizationHeaderLink;
+    customization: CustomizationSettings;
 }) {
-    const { context, link } = props;
+    const { context, link, customization } = props;
+
+    const isCustomizationCustom = customization.header.preset === CustomizationHeaderPreset.Custom;
 
     const target = await resolveContentRef(link.to, context);
 
@@ -29,15 +37,22 @@ export async function HeaderLink(props: {
             {...linkProps}
             href={target.href}
             className={tcls(
+                'text-sm',
                 'flex',
                 'flex-row',
                 'items-center',
-                'text-base',
-                'text-header-link-500',
                 'px-2',
-                'py-1',
-                'rounded',
-                target.active ? ['bg-header-background-300'] : ['hover:text-header-link-700'],
+                'whitespace-nowrap',
+                'lg:text-base',
+                'shadow-[0px_-2px_0px_rgba(0,0,0,0)_inset]',
+                isCustomizationCustom ? ['text-header-link-500'] : [],
+                target.active
+                    ? [
+                          isCustomizationCustom
+                              ? ['shadow-header-link-500/7']
+                              : ['shadow-dark/6', 'dark:shadow-light/7'],
+                      ]
+                    : ['hover:text-header-link-400'],
             )}
         >
             {link.title}

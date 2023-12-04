@@ -71,7 +71,15 @@ async function ImageBlock(props: {
     return (
         <picture className={tcls('relative')}>
             {image}
-            <figcaption className={tcls('text-sm', 'text-center', 'mt-2', 'text-slate-500')}>
+            <figcaption
+                className={tcls(
+                    'text-sm',
+                    'text-center',
+                    'mt-2',
+                    'text-dark/7',
+                    'dark:text-light/6',
+                )}
+            >
                 <Inlines nodes={captionParagraph.nodes} context={context} />
             </figcaption>
         </picture>

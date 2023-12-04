@@ -50,18 +50,20 @@ export function Dropdown<E extends HTMLElement>(props: {
             >
                 <div
                     className={tcls(
-                        'mt-3',
+                        'mt-2',
                         'w-52',
                         'max-h-56',
-                        'bg-white',
-                        'rounded',
+                        'bg-light',
+                        'rounded-lg',
                         'p-2',
-                        'shadow-lg',
+                        'shadow-1xs',
                         'overflow-auto',
                         'ring-1',
-                        'ring-black',
-                        'ring-opacity-5',
+                        'ring-dark/1',
+                        'ring-opacity-8',
                         'focus:outline-none',
+                        'dark:bg-dark',
+                        'dark:ring-light/2',
                     )}
                 >
                     {children}
@@ -78,9 +80,10 @@ export function DropdownChevron(props: {}) {
     return (
         <IconChevronDown
             className={tcls(
+                'opacity-6',
                 'w-4',
                 'h-4',
-                'ms-2',
+                'ms-1',
                 'transition-transform',
                 'group-hover/dropdown:rotate-180',
             )}
@@ -115,11 +118,10 @@ export function DropdownMenuItem(props: {
                 'flex-row',
                 'items-center',
                 'text-sm',
-                'text-slate-600',
                 'px-3',
                 'py-1',
                 'rounded',
-                active ? ['bg-primary-50'] : ['hover:bg-slate-100'],
+                active ? ['bg-primary-50'] : ['hover:bg-dark/2', 'dark:hover:bg-light/2'],
             )}
         >
             {children}

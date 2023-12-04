@@ -30,7 +30,7 @@ export async function RecordCard(
             {cover ? (
                 <img alt="Cover" src={cover.href} className={tcls('w-full', 'aspect-video')} />
             ) : null}
-            <div className={tcls('flex', 'flex-col', 'p-4', 'gap-2')}>
+            <div className={tcls('flex', 'flex-col', 'p-4')}>
                 {view.columns.map((column) => {
                     return <RecordColumnValue key={column} {...props} column={column} />;
                 })}

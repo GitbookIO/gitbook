@@ -1,3 +1,4 @@
+import containerQueries from '@tailwindcss/container-queries';
 import type { Config } from 'tailwindcss';
 import plugin from 'tailwindcss/plugin';
 
@@ -40,6 +41,7 @@ const config: Config = {
                 light: 'rgb(var(--light) / <alpha-value>)',
                 vanta: 'rgb(var(--vanta) / <alpha-value>)',
                 metal: 'rgb(var(--metal) / <alpha-value>)',
+                sky: 'rgb(var(--sky) / <alpha-value>)',
                 yellow: 'rgb(var(--yellow) / <alpha-value>)',
                 periwinkle: 'rgb(var(--periwinkle) / <alpha-value>)',
                 pomegranate: 'rgb(var(--pomegranate) / <alpha-value>)',
@@ -50,14 +52,42 @@ const config: Config = {
             keyframes: {
                 pingAlt: {
                     '0%': {
-                        transform: 'scale(0.5)',
+                        transform: 'scale(0.1)',
                         opacity: '0',
                     },
                     '20%': {
                         opacity: '1',
                     },
                     '30%, 100%': {
-                        transform: 'scale(2.5)',
+                        transform: 'scale(5)',
+                        opacity: '0',
+                    },
+                },
+                wiggleAlt: {
+                    '0%': {
+                        transform: 'translateY(0px)',
+                    },
+                    '20%': {
+                        transform: 'translateY(-1px)',
+                    },
+                    '40%, 100%': {
+                        transform: 'translateY(0px)',
+                    },
+                },
+                stroke: {
+                    '0%': {
+                        strokeDasharray: '0 100',
+                        strokeDashoffset: '0',
+                        opacity: '0',
+                    },
+                    '20%, 80%': {
+                        strokeDasharray: '100 100',
+                        strokeDashoffset: '0',
+                        opacity: '1',
+                    },
+                    '100%': {
+                        strokeDasharray: '100 100',
+                        strokeDashoffset: '-100',
                         opacity: '0',
                     },
                 },
@@ -72,6 +102,7 @@ const config: Config = {
         plugin(function ({ addVariant }) {
             addVariant('navigation-visible', 'body.navigation-visible &');
         }),
+        containerQueries,
     ],
 };
 export default config;

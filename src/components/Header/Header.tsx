@@ -1,4 +1,5 @@
 import { Collection, CustomizationSettings, Space } from '@gitbook/api';
+import { CustomizationHeaderPreset } from '@gitbook/api';
 import { Suspense } from 'react';
 
 import {
@@ -12,9 +13,9 @@ import { tcls } from '@/lib/tailwind';
 
 import { CollectionSpacesDropdown } from './CollectionSpacesDropdown';
 import { HeaderLink } from './HeaderLink';
+import { HeaderLinks } from './HeaderLinks';
 import { HeaderLogo } from './HeaderLogo';
 import { SearchButton } from '../Search';
-
 /**
  * Render the header for the space.
  */
@@ -27,6 +28,9 @@ export function Header(props: {
     customization: CustomizationSettings;
 }) {
     const { context, space, collection, collectionSpaces, asFullWidth, customization } = props;
+
+    const isCustomizationDefault =
+        customization.header.preset === CustomizationHeaderPreset.Default;
 
     return (
         <header
@@ -45,19 +49,23 @@ export function Header(props: {
                 'lg:z-10',
                 'lg:border-b',
                 'lg:border-dark/3',
-                'bg-light/8',
                 'supports-backdrop-blur:bg-white/60',
                 'dark:border-light/2',
-                'dark:bg-dark/8',
+                `${isCustomizationDefault ? 'bg-light/9' : 'bg-header-background/9'}`,
+                `${isCustomizationDefault ? 'dark:bg-dark/9' : 'bg-header-background/9'}`,
             )}
         >
             <div
                 className={tcls(
-                    'flex',
-                    'flex-1',
-                    'flex-row',
-                    'items-center',
                     'gap-8',
+                    'grid',
+                    'grid-cols-[min-content_min-content]',
+                    'sm:grid-cols-[min-content_1fr_min-content]',
+                    'h-16',
+                    'items-center',
+                    'align-center',
+                    'justify-between',
+                    'w-full',
                     CONTAINER_PADDING,
                     asFullWidth ? null : [CONTAINER_MAX_WIDTH_NORMAL, 'mx-auto'],
                 )}
@@ -78,22 +86,20 @@ export function Header(props: {
                         collectionSpaces={collectionSpaces}
                     />
                 ) : null}
-                <div
-                    className={tcls(
-                        'flex',
-                        'flex-row',
-                        'flex-row',
-                        'gap-5',
-                        'flex-1',
-                        'justify-end',
-                        'items-center',
-                    )}
-                >
-                    {customization.header.links.map((link, index) => (
-                        <HeaderLink key={index} link={link} context={context} />
-                    ))}
-                </div>
-                <div className={tcls('flex', 'basis-56', 'grow-0', 'shrink-0')}>
+                <HeaderLinks>
+                    {customization.header.links.map((link, index) => {
+                        return (
+                            <HeaderLink
+                                key={index}
+                                link={link}
+                                context={context}
+                                customization={customization}
+                            />
+                        );
+                    })}
+                </HeaderLinks>
+
+                <div className={tcls('flex', 'md:w-56', 'grow-0', 'shrink-0', 'justify-self-end')}>
                     <Suspense fallback={null}>
                         <SearchButton>
                             <span>{t({ space }, 'search')}</span>

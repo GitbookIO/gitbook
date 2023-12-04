@@ -14,9 +14,10 @@
     },
     "dependencies": {
         "@geist-ui/icons": "^1.0.2",
-        "@gitbook/api": "^0.19.0",
+        "@gitbook/api": "^0.17.0",
         "@radix-ui/react-popover": "^1.0.7",
         "@readme/openapi-parser": "^2.5.0",
+        "@tailwindcss/container-queries": "^0.1.1",
         "@upstash/redis": "^1.25.1",
         "ajv": "^8.12.0",
         "assert-never": "^1.2.1",

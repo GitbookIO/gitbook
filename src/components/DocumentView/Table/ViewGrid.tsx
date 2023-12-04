@@ -14,6 +14,7 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                 style,
                 'table-auto',
                 'w-full',
+                'table-fixed',
                 block.data.fullWidth ? ['max-w-full'] : null,
             )}
         >
@@ -39,7 +40,7 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                     </tr>
                 </thead>
             )}
-            <tbody>
+            <tbody className={tcls('[&>*+*]:border-t')}>
                 {records.map((record) => {
                     return <RecordRow key={record[0]} {...props} record={record} />;
                 })}

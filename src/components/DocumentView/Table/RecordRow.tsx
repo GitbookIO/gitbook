@@ -13,20 +13,24 @@ export async function RecordRow(
     const { view } = props;
 
     return (
-        <tr>
+        <tr
+            className={tcls(
+                'border-dark/2',
+                '[&>*+*]:border-l',
+                '[&>*+*]:pl-4',
+                'flex-row',
+                'dark:border-light/2',
+            )}
+        >
             {view.columns.map((column) => {
                 return (
                     <td
                         key={column}
-                        className={tcls(
-                            'border',
-                            'border-dark/2',
-                            'px-2',
-                            'py-1',
-                            'dark:border-light/2',
-                        )}
+                        className={tcls('border-dark/2', 'py-3', 'dark:border-light/2')}
                     >
-                        <RecordColumnValue key={column} {...props} column={column} />
+                        <div className={tcls('pr-4 ', 'textwrap-balance')}>
+                            <RecordColumnValue key={column} {...props} column={column} />
+                        </div>
                     </td>
                 );
             })}

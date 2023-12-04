@@ -3,7 +3,7 @@
 import { IconMenu } from '@/components/icons/IconMenu';
 import { tcls } from '@/lib/tailwind';
 
-export const HeaderMobileMenu = (props: Partial<React.ButtonHTMLAttributes<HTMLButtonElement>>) => {
+export function HeaderMobileMenu(props: Partial<React.ButtonHTMLAttributes<HTMLButtonElement>>) {
     const toggleNavigation = () => {
         if (document.body.classList.contains('navigation-visible')) {
             document.body.classList.remove('navigation-visible');
@@ -30,4 +30,4 @@ export const HeaderMobileMenu = (props: Partial<React.ButtonHTMLAttributes<HTMLB
             />
         </button>
     );
-};
+}

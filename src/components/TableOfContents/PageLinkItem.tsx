@@ -23,9 +23,12 @@ export async function PageLinkItem(props: { page: RevisionPageLink; context: Con
                     'text-sm',
                     'transition-colors',
                     'duration-100',
-                    'hover:bg-slate-100',
-                    'text-slate-500',
+                    'text-primary',
                     'font-normal',
+                    'hover:bg-dark/2',
+                    'hover:text-current',
+                    'dark:hover:bg-primary-500/2',
+                    'dark:hover:text-primary-400',
                 )}
             >
                 {page.title}
