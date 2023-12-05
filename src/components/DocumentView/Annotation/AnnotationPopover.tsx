@@ -24,7 +24,7 @@ export function AnnotationPopover(props: { children: React.ReactNode; body: Reac
                         'shadow',
                         'p-3',
                         'border',
-                        'border-slate-300',
+                        'border-dark',
                     )}
                     sideOffset={5}
                 >

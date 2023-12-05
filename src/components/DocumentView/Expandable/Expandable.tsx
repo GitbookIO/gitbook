@@ -20,7 +20,21 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
     }
 
     return (
-        <details className={tcls(style, 'rounded', 'border', 'border-slate-300')}>
+        <details
+            className={tcls(
+                style,
+                'rounded',
+                'shadow-1xs',
+                'bg-gradient-to-t',
+                'from-white/8',
+                'to-white/6',
+                'ring-1',
+                'ring-dark/1',
+                'dark:ring-light/1',
+                'dark:from-light/[0.03]',
+                'dark:to-light/[0.01]',
+            )}
+        >
             <summary className={tcls('cursor-pointer', 'px-4', 'py-3')}>
                 <Inlines nodes={titleParagraph.nodes} context={context} />
             </summary>

@@ -28,7 +28,7 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
                 <div
                     className={tcls(
                         'flex',
-                        'items-center',
+                        'items-start',
                         'justify-center',
                         'pr-3',
                         'mix-blend-luminosity',

@@ -11,6 +11,7 @@ import {
     SIDE_COLUMN_WITHOUT_HEADER_AND_COVER,
     SIDE_COLUMN_WITH_HEADER,
     SIDE_COLUMN_WITH_HEADER_AND_COVER,
+    HEADER_HEIGHT_DESKTOP,
 } from '../layout';
 
 /**
@@ -36,14 +37,16 @@ export function PageAside(props: {
                 'grow-0',
                 'shrink-0',
                 'sticky',
-                withHeaderOffset
+                'py-6',
+                withHeaderOffset ? 'top-16' : 'top-0',
+                'h-[100vh]',
+                /*                 withHeaderOffset
                     ? withFullPageCover
                         ? SIDE_COLUMN_WITH_HEADER_AND_COVER
                         : SIDE_COLUMN_WITH_HEADER
                     : withFullPageCover
-                    ? SIDE_COLUMN_WITHOUT_HEADER_AND_COVER
-                    : SIDE_COLUMN_WITHOUT_HEADER,
-                'py-6',
+                      ? SIDE_COLUMN_WITHOUT_HEADER_AND_COVER
+                      : SIDE_COLUMN_WITHOUT_HEADER, */
             )}
         >
             {sections.length > 0 ? (

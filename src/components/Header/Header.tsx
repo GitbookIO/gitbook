@@ -37,7 +37,7 @@ export function Header(props: {
             className={tcls(
                 'flex',
                 'flex-row',
-                HEADER_HEIGHT_DESKTOP,
+                `h-[${HEADER_HEIGHT_DESKTOP}px]`,
                 'sticky',
                 'top-0',
                 'z-10',
@@ -46,11 +46,10 @@ export function Header(props: {
                 'flex-none',
                 'transition-colors',
                 'duration-500',
+                'shadow-thinbottom',
                 'lg:z-10',
-                'lg:border-b',
-                'lg:border-dark/3',
                 'supports-backdrop-blur:bg-white/60',
-                'dark:border-light/2',
+                'dark:shadow-light/2',
                 `${isCustomizationDefault ? 'bg-light/9' : 'bg-header-background/9'}`,
                 `${isCustomizationDefault ? 'dark:bg-dark/9' : 'bg-header-background/9'}`,
             )}
@@ -70,15 +69,7 @@ export function Header(props: {
                     asFullWidth ? null : [CONTAINER_MAX_WIDTH_NORMAL, 'mx-auto'],
                 )}
             >
-                <HeaderLogo
-                    collection={collection}
-                    space={space}
-                    customization={customization}
-                    textStyle={[
-                        'text-header-link-500',
-                        'group-hover/headerlogo:text-header-link-700',
-                    ]}
-                />
+                <HeaderLogo collection={collection} space={space} customization={customization} />
                 {collection ? (
                     <CollectionSpacesDropdown
                         space={space}
@@ -98,7 +89,6 @@ export function Header(props: {
                         );
                     })}
                 </HeaderLinks>
-
                 <div className={tcls('flex', 'md:w-56', 'grow-0', 'shrink-0', 'justify-self-end')}>
                     <Suspense fallback={null}>
                         <SearchButton>

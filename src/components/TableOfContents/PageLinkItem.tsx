@@ -10,7 +10,7 @@ export async function PageLinkItem(props: { page: RevisionPageLink; context: Con
     const resolved = await resolveContentRef(page.target, context);
 
     return (
-        <li className={tcls('flex', 'flex-col', 'mb-0.5')}>
+        <li className={tcls('flex', 'flex-col')}>
             <Link
                 href={resolved?.href ?? '#'}
                 className={tcls(

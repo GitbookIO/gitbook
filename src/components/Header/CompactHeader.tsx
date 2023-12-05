@@ -30,19 +30,20 @@ export function CompactHeader(props: {
             )}
         >
             <div className={tcls('flex-grow-0')}>
-                <HeaderLogo
-                    collection={collection}
-                    space={space}
-                    customization={customization}
-                    textStyle={[
-                        'text-header-link-500',
-                        'group-hover/headerlogo:text-header-link-700',
-                    ]}
-                />
+                <HeaderLogo collection={collection} space={space} customization={customization} />
             </div>
-            <div className={tcls('flex-shrink-0', 'sm:grow', 'sm:max-w-xs', 'lg:max-w-full')}>
+            <div
+                className={tcls(
+                    'flex-shrink-0',
+                    'grow-0',
+                    'md:grow',
+                    'sm:max-w-xs',
+                    'lg:max-w-full',
+                    'justify-self-end',
+                )}
+            >
                 <React.Suspense fallback={null}>
-                    <SearchButton style={[]}>
+                    <SearchButton>
                         <span>{t({ space }, 'search')}</span>
                     </SearchButton>
                 </React.Suspense>

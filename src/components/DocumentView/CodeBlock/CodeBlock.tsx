@@ -32,7 +32,7 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
                     'flex-wrap',
                     'py-4',
                     'rounded-md',
-                    'bg-slate-100',
+                    'bg-light',
                     '[counter-reset:line]',
                     withWrap ? 'whitespace-pre-wrap' : 'overflow-x-scroll',
                 )}
@@ -72,15 +72,15 @@ function CodeHighlightLine(props: {
                 'flex',
                 'flex-row',
                 'px-4',
-                line.highlighted ? 'bg-slate-200' : null,
+                line.highlighted ? 'bg-dark/5' : null,
                 withLineNumbers
                     ? [
                           'before:shrink-0',
                           'before:absolute',
                           'before:left-0',
                           'before:pl-4',
-                          line.highlighted ? 'before:bg-slate-200' : 'before:bg-slate-100',
-                          'before:text-slate-400',
+                          line.highlighted ? 'before:bg-primary-200' : 'before:bg-primary-100',
+                          'before:text-primary-400',
                           'before:content-[counter(line)]',
                           '[counter-increment:line]',
                           getLineNumberGutterWidth(block),

@@ -17,20 +17,20 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
     const id = pageLocalId(context.page, block.meta?.id ?? '', context);
 
     return (
-        <Tag id={id} className={tcls(textStyle.textSize, 'group', 'relative', style)}>
+        <Tag id={id} className={tcls(textStyle.textSize, 'group', 'relative', 'grid', style)}>
             <div
                 className={tcls(
-                    'absolute',
-                    '-left-7',
-                    'ml-full',
-                    'w-7',
                     'hidden',
-                    'items-center',
+                    'grid-area-1-1',
+                    'relative',
+                    '-ml-6',
+                    'w-7',
                     'border-0',
                     'opacity-0',
                     'group-hover:opacity-100',
                     'group-focus:opacity-100',
-                    'lg:flex',
+                    'lg:grid',
+                    'h-full',
                     textStyle.lineHeight,
                 )}
             >
@@ -38,12 +38,9 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                     href={`#${id}`}
                     aria-label="Direct link to heading"
                     className={tcls(
-                        'flex',
-                        'h-6',
-                        'w-6',
+                        'inline-flex',
+                        'h-full',
                         'items-center',
-                        'justify-center',
-                        'transition-colors',
                         'dark:text-light/3',
                         'dark:shadow-none',
                         'dark:ring-0',
@@ -53,16 +50,17 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                         className={tcls(
                             'w-4',
                             'h-4',
-                            'stroke-dark/5',
+                            'transition-colors',
+                            'stroke-transparent',
                             'group-hover:stroke-dark/6',
-                            'dark:stroke-light/2',
                             'dark:group-hover:stroke-light/4',
                         )}
                     />
                 </a>
             </div>
-
-            <Inlines {...rest} context={context} nodes={block.nodes} />
+            <div className={tcls('grid-area-1-1')}>
+                <Inlines {...rest} context={context} nodes={block.nodes} />
+            </div>
         </Tag>
     );
 }

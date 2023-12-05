@@ -113,10 +113,12 @@ function SearchModalBody(
                 'w-[600px]',
                 'max-h',
                 'rounded-3xl',
-                'border-slate-500',
-                'shadow-lg',
+                'border-dark/2',
+                'shadow-1xs',
                 'overflow-hidden',
                 'dark:bg-metal',
+                'dark:border-light/3',
+                'dark:shadow-vanta',
             )}
             onClick={(event) => {
                 event.stopPropagation();

@@ -41,7 +41,7 @@ export function PageDocumentItem(props: {
                   ]
                 : [
                       'font-normal',
-                      'text-dark/7',
+                      'text-dark/8',
                       'hover:bg-dark/1',
                       'dark:text-light/7',
                       'dark:hover:bg-light/2',
@@ -50,7 +50,7 @@ export function PageDocumentItem(props: {
     };
 
     return (
-        <li className={tcls('flex', 'flex-col', 'mb-0.5')}>
+        <li className={tcls('flex', 'flex-col')}>
             {page.pages && page.pages.length ? (
                 <ToggleableLinkItem
                     {...linkProps}

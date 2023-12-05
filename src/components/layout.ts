@@ -3,7 +3,7 @@ import { ClassValue } from '@/lib/tailwind';
 /**
  * Height of the desktop header.
  */
-export const HEADER_HEIGHT_DESKTOP = 'h-[64px]';
+export const HEADER_HEIGHT_DESKTOP = 64 as const;
 
 /**
  * Maximum width of the normal mode.

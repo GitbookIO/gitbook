@@ -58,9 +58,7 @@ export function Footer(props: {
                         </div>
                     ) : null}
                     {customization.footer.copyright ? (
-                        <p className={tcls('text-sm', 'text-slate-400')}>
-                            {customization.footer.copyright}
-                        </p>
+                        <p className={tcls('text-sm')}>{customization.footer.copyright}</p>
                     ) : null}
                 </div>
                 {customization.themes.toggeable ? (

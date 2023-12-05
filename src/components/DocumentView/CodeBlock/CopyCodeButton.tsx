@@ -39,7 +39,7 @@ export function CopyCodeButton(props: { codeId: string; style: ClassValue }) {
     };
 
     return (
-        <button onClick={onClick} className={tcls(style, 'text-sm', 'text-slate-500')}>
+        <button onClick={onClick} className={tcls(style, 'text-sm')}>
             {copied ? 'Copied!' : 'Copy'}
         </button>
     );

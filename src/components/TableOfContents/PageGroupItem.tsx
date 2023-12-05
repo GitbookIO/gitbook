@@ -15,8 +15,28 @@ export function PageGroupItem(props: {
     const { rootPages, page, activePage, ancestors, context } = props;
 
     return (
-        <li className={tcls('flex', 'flex-col', 'my-3')}>
-            <div className={tcls('px-2', 'py-2', 'text', 'font-medium')}>{page.title}</div>
+        <li className={tcls('flex', 'flex-col')}>
+            <div
+                className={tcls(
+                    'px-2',
+                    'pt-6',
+                    'pb-1.5',
+                    'text-xs',
+                    'tracking-wide',
+                    'font-semibold',
+                    'uppercase',
+                    'sticky',
+                    'top-0',
+                    'bg-gradient-to-b',
+                    'from-light',
+                    'to-transparent',
+                    'from-65%',
+                    'dark:from-dark',
+                    'dark:tracking-wider',
+                )}
+            >
+                {page.title}
+            </div>
             {page.pages && page.pages.length ? (
                 <PagesList
                     rootPages={rootPages}

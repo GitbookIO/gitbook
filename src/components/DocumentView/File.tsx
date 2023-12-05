@@ -24,12 +24,12 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
                 'items-center',
                 'rounded',
                 'border',
-                'border-slate-200',
-                'hover:border-slate-300',
                 'px-5',
                 'py-2',
-                /* 'text-slate-500', */
-                /* 'hover:text-slate-700', */
+                'border-dark/3',
+                'hover:border-dark/5',
+                'dark:border-light/3',
+                'dark:hover:border-light/4',
                 style,
             )}
         >

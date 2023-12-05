@@ -63,7 +63,28 @@ function Strikethrough(props: MarkedLeafProps<DocumentMarkStrikethrough>) {
 
 function Code(props: MarkedLeafProps<DocumentMarkCode>) {
     return (
-        <code className={tcls('text-slate-800', 'bg-slate-100', 'rounded', 'py-0.5', 'px-1')}>
+        <code
+            className={tcls(
+                'py-[1px]',
+                'px-1',
+                'min-w-[1.625rem]',
+                'inline-flex',
+                'justify-center',
+                'items-center',
+                'leading-normal',
+                'ring-1',
+                'ring-dark/1',
+                'bg-white',
+                'rounded',
+                'text-dark/8',
+                'shadow-1xs',
+                'shadow-dark/[0.02]',
+                'dark:ring-0',
+                'dark:bg-vanta',
+                'dark:shadow-none',
+                'dark:text-light',
+            )}
+        >
             {props.children}
         </code>
     );

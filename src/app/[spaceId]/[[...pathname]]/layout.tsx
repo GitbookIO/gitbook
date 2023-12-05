@@ -10,7 +10,7 @@ import { tcls } from '@/lib/tailwind';
 import { ClientLayout } from './ClientLayout';
 import { PagePathParams } from '../fetch';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export default async function SpaceRootLayout(props: {
     children: React.ReactNode;
@@ -49,7 +49,7 @@ export default async function SpaceRootLayout(props: {
                     }
                 `}</style>
             </head>
-            <body className={tcls(inter.className, 'bg-light', 'dark:bg-dark')}>
+            <body className={tcls(`${inter.className}`, 'bg-light', 'dark:bg-dark')}>
                 <ClientLayout>{children}</ClientLayout>
             </body>
         </html>

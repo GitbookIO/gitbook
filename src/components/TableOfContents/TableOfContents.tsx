@@ -8,7 +8,11 @@ import { tcls } from '@/lib/tailwind';
 
 import { PagesList } from './PagesList';
 import { Trademark } from './Trademark';
-import { SIDE_COLUMN_WITHOUT_HEADER, SIDE_COLUMN_WITH_HEADER } from '../layout';
+import {
+    HEADER_HEIGHT_DESKTOP,
+    SIDE_COLUMN_WITHOUT_HEADER,
+    SIDE_COLUMN_WITH_HEADER,
+} from '../layout';
 
 export function TableOfContents(
     props: IntlContext & {
@@ -41,17 +45,24 @@ export function TableOfContents(
                 'flex-col',
                 'basis-full',
                 'bg-light',
-                'border-dark/2',
                 'grow-0',
                 'shrink-0',
+                'shadow-transparent',
+                'shadow-thinbottom',
+                'navigation-visible:shadow-dark/2',
                 'z-[1]',
+                'top-0',
+                `h-[100vh]`,
                 'lg:basis-72',
-                'navigation-visible:border-b',
+                'lg:navigation-visible:border-b-0',
                 'lg:sticky',
                 'dark:bg-dark',
-                'dark:border-light/1',
+                'dark:navigation-visible:shadow-light/2',
+                withHeaderOffset ? 'lg:h-[calc(100vh_-_4rem)]' : 'lg:h-[100vh]',
+                withHeaderOffset ? 'lg:top-16' : 'lg:top-0',
                 visibleOnDesktop ? null : 'lg:hidden',
-                withHeaderOffset ? SIDE_COLUMN_WITH_HEADER : SIDE_COLUMN_WITHOUT_HEADER,
+
+                /*                 withHeaderOffset ? SIDE_COLUMN_WITH_HEADER : SIDE_COLUMN_WITHOUT_HEADER, */
             )}
         >
             {header ? <div className={tcls('py-3')}>{header}</div> : null}
@@ -61,12 +72,13 @@ export function TableOfContents(
                     'lg:flex',
                     'flex-1',
                     'flex-grow',
+                    'flex-col',
                     'overflow-y-auto',
-                    'gutter-stable',
-                    'pr-2',
+                    'lg:gutter-stable',
+                    'lg:pr-2',
                     'navigation-visible:flex', // can be auto height animated as such https://stackoverflow.com/a/76944290
-                    header ? 'pt-3' : 'pt-6',
-                    'pb-6',
+                    /*                     header ? 'pt-3' : 'pt-6', */
+                    'lg:pb-16',
                 )}
             >
                 <PagesList
@@ -75,10 +87,10 @@ export function TableOfContents(
                     activePage={activePage}
                     ancestors={ancestors}
                     context={context}
+                    style={tcls('mt-4')}
                 />
+                <Trademark space={space} />
             </div>
-            {/* TODO: integrate trademark into mobile menu */}
-            {/* <Trademark space={space} /> */}
         </aside>
     );
 }

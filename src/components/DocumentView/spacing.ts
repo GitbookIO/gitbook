@@ -16,27 +16,27 @@ export function getBlockTextStyle(block: DocumentBlocksEssentials | DocumentBloc
         case 'paragraph':
             return {
                 textSize: ['text-base'],
-                lineHeight: 'h-6',
+                lineHeight: 'leading-normal',
             };
         case 'heading-1':
             return {
                 textSize: ['text-3xl', 'font-semibold'],
-                lineHeight: 'h-9',
+                lineHeight: 'leading-tight',
             };
         case 'heading-2':
             return {
                 textSize: ['text-2xl', 'font-semibold'],
-                lineHeight: 'h-8',
+                lineHeight: 'leading-snug',
             };
         case 'heading-3':
             return {
                 textSize: ['text-base', 'font-semibold'],
-                lineHeight: 'h-6',
+                lineHeight: 'leading-snug',
             };
         case 'divider':
             return {
                 textSize: [],
-                lineHeight: 'h-6',
+                lineHeight: 'leading-none',
             };
         case 'list-ordered':
         case 'list-tasks':

@@ -29,14 +29,12 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
                     flexDirection: 'column',
                 }}
             >
-                <h2 tw="text-7xl font-bold tracking-tight text-gray-900 text-left">
-                    {space.title}
-                </h2>
+                <h2 tw="text-7xl font-bold tracking-tight text-left">{space.title}</h2>
                 <div tw="flex flex-1">
-                    <p tw="text-4xl text-indigo-600">{page ? page.title : 'Not found'}</p>
+                    <p tw="text-4xl">{page ? page.title : 'Not found'}</p>
                 </div>
                 <div tw="flex">
-                    <p tw="text-4xl text-slate-500">
+                    <p tw="text-4xl">
                         {url.hostname + (url.pathname.length > 1 ? url.pathname : '')}
                     </p>
                 </div>

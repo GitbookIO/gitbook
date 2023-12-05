@@ -1,7 +1,7 @@
 import { ContentRef, DocumentTableViewCards } from '@gitbook/api';
 
 import { resolveContentRef } from '@/lib/references';
-import { tcls } from '@/lib/tailwind';
+import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { RecordColumnValue } from './RecordColumnValue';
 import { TableRecordKV, TableViewProps } from './Table';
@@ -26,7 +26,7 @@ export async function RecordCard(
     const target = targetRef ? await resolveContentRef(targetRef, context) : null;
 
     const body = (
-        <>
+        <div className={tcls('grid-area-1-1', 'z-0', 'relative')}>
             {cover ? (
                 <img alt="Cover" src={cover.href} className={tcls('w-full', 'aspect-video')} />
             ) : null}
@@ -35,23 +35,36 @@ export async function RecordCard(
                     return <RecordColumnValue key={column} {...props} column={column} />;
                 })}
             </div>
-        </>
+        </div>
     );
 
     const style = [
         'group',
-        'flex',
-        'flex-col',
-        'rounded-lg',
+        'grid',
         'overflow-hidden',
-        'transition-shadow',
+        'bg-light',
+        'shadow-1xs',
         'duration-300',
-        'shadow-md',
-        'hover:shadow-lg',
-        'border',
-        'border-zinc-100',
-        'dark:border-zinc-700',
-    ];
+        'rounded-md',
+        'shadow-dark/[0.02]',
+        'hover:before:ring-dark/4',
+        'dark:bg-dark',
+        'dark:shadow-transparent',
+        'dark:hover:before:ring-light/4',
+        'z-0',
+        //before
+        'before:grid-area-1-1',
+        'before:transition-shadow',
+        'before:w-full',
+        'before:h-full',
+        'before:rounded-md',
+        'before:ring-inset',
+        'before:ring-1',
+        'before:ring-dark/2',
+        'before:z-10',
+        'before:relative',
+        'before:dark:ring-light/2',
+    ] as ClassValue;
 
     if (target) {
         return (
@@ -61,5 +74,11 @@ export async function RecordCard(
         );
     }
 
-    return <div className={tcls('rounded-lg')}>{body}</div>;
+    return (
+        <div
+            className={tcls([style, 'hover:before:ring-dark/2', 'dark:hover:before:ring-light/2'])}
+        >
+            {body}
+        </div>
+    );
 }

@@ -17,7 +17,7 @@ export function DynamicTabs(props: {
 }) {
     const { tabs, style } = props;
 
-    const [active, setActive] = React.useState<null | string>(null);
+    const [active, setActive] = React.useState<null | string>(tabs[0].id);
 
     return (
         <div

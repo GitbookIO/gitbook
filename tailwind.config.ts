@@ -34,6 +34,11 @@ const config: Config = {
     ],
     theme: {
         extend: {
+            fontFamily: {
+                sans: ['var(--font-inter)'],
+                /*  mono: ['var(--font-mono)'], */ // TODO: try Cartograph
+            },
+
             colors: {
                 // Dynamic colors matching the customization settings
                 primary: generateShades('primary-color'),
@@ -93,7 +98,8 @@ const config: Config = {
                 },
             },
             boxShadow: {
-                '1xs': '0px 1.54px 1px rgba(0, 0, 0, 0.09), 0px 3.267px 2.754px rgb(0, 0, 0, 0.05), 0px 6.278px 6.63px rgb(0, 0, 0, 0.05), 0px 14px 22px rgb(0, 0, 0, 0.04)',
+                thinbottom: '0px 1px 0px rgba(0, 0, 0, 0.05)',
+                '1xs': '0px 1px 1px rgba(0, 0, 0, 0.09), 0px 3.267px 2.754px rgb(0, 0, 0, 0.05), 0px 6.278px 6.63px rgb(0, 0, 0, 0.05), 0px 14px 22px rgb(0, 0, 0, 0.04)',
             },
         },
         opacity: opacity(),
