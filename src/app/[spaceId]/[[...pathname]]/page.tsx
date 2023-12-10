@@ -3,7 +3,7 @@ import { notFound, redirect } from 'next/navigation';
 
 import { SpaceContent } from '@/components/SpaceContent';
 import { getDocument } from '@/lib/api';
-import { PageHrefContext, absoluteHref, baseUrl, pageHref } from '@/lib/links';
+import { PageHrefContext, baseUrl, pageHref } from '@/lib/links';
 import { getPagePath } from '@/lib/pages';
 
 import { PagePathParams, fetchPageData, getPathnameParam } from '../fetch';
