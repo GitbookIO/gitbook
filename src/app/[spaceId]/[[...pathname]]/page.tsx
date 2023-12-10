@@ -52,28 +52,26 @@ export async function generateMetadata({ params }: { params: PagePathParams }): 
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
 
     return {
-        title: { default: page.title, template: `%s | ${space.title}` },
+        title: `${page.title} | ${space.title}`,
         description: page.description,
         generator: 'GitBook',
         metadataBase: new URL(baseUrl()),
         icons: {
             icon: [
                 {
-                    url: customIcon?.light ?? absoluteHref('.gitbook/icon?size=small&theme=light'),
+                    url: customIcon?.light ?? '.gitbook/icon?size=small&theme=light',
                     type: 'image/png',
                     media: '(prefers-color-scheme: light)',
                 },
                 {
-                    url: customIcon?.dark ?? absoluteHref('.gitbook/icon?size=small&theme=dark'),
+                    url: customIcon?.dark ?? '.gitbook/icon?size=small&theme=dark',
                     type: 'image/png',
                     media: '(prefers-color-scheme: dark)',
                 },
             ],
         },
         openGraph: {
-            images: [
-                customization.socialPreview.url ?? absoluteHref('.gitbook/ogimage/' + page.id),
-            ],
+            images: [customization.socialPreview.url ?? `.gitbook/ogimage/${page.id}`],
         },
         robots: space.visibility === 'public' ? 'index, follow' : 'noindex, nofollow',
     };
