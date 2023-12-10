@@ -73,6 +73,7 @@ export async function generateMetadata({ params }: { params: PagePathParams }): 
         openGraph: {
             images: [customization.socialPreview.url ?? `.gitbook/ogimage/${page.id}`],
         },
-        robots: space.visibility === 'public' ? 'index, follow' : 'noindex, nofollow',
+        // TODO: remove once the development is finished
+        robots: space.visibility === 'public' && 0 ? 'index, follow' : 'noindex, nofollow',
     };
 }
