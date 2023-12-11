@@ -1,8 +1,9 @@
 import { DocumentBlockCode, DocumentBlockCodeLine, DocumentInlineAnnotation } from '@gitbook/api';
-import shiki, { getHighlighter } from 'shiki';
-import theme from 'shiki/themes/css-variables.json';
+import { getHighlighter, loadWasm, bundledLanguages, Highlighter, ThemedToken } from 'shikiji';
+// @ts-ignore - onigWasm is a Wasm module
+import onigWasm from 'vscode-oniguruma/release/onig.wasm?module';
 
-import { getLanguageByName } from './languages';
+import { getNodeText } from '@/lib/document';
 
 export type HighlightLine = {
     highlighted: boolean;
@@ -10,12 +11,31 @@ export type HighlightLine = {
 };
 
 export type HighlightToken =
-    | { type: 'shiki'; token: shiki.IThemedToken }
+    | { type: 'plain'; content: string }
+    | { type: 'shiki'; token: ThemedToken }
     | { type: 'inline'; inline: DocumentInlineAnnotation; children: HighlightToken[] };
 
 type InlineIndexed = { inline: any; start: number; end: number };
 
-type PositionedToken = shiki.IThemedToken & { start: number; end: number };
+type PositionedToken = ThemedToken & { start: number; end: number };
+
+/**
+ * shikijs does not support the css-variables theme, so we need to map the colors
+ * Map taken from https://github.com/shikijs/shiki/blob/8be7ec435ef47970e825c5f607aaf117f6a545f1/packages/shiki/src/highlighter.ts#L51C3-L63C4
+ */
+export const colorToCSSVar: Record<string, string> = {
+    '#000001': 'var(--shiki-color-text)',
+    '#000002': 'var(--shiki-color-background)',
+    '#000004': 'var(--shiki-token-constant)',
+    '#000005': 'var(--shiki-token-string)',
+    '#000006': 'var(--shiki-token-comment)',
+    '#000007': 'var(--shiki-token-keyword)',
+    '#000008': 'var(--shiki-token-parameter)',
+    '#000009': 'var(--shiki-token-function)',
+    '#000010': 'var(--shiki-token-string-expression)',
+    '#000011': 'var(--shiki-token-punctuation)',
+    '#000012': 'var(--shiki-token-link)',
+};
 
 /**
  * Highlight a code block while preserving inline elements.
@@ -27,13 +47,19 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
         return a.start - b.start;
     });
 
-    const langs = await getLanguageByName('javascript');
-    const highlighter = await getHighlighter({
-        theme,
-        langs,
-    });
+    const langName = block.data.syntax ? getLanguageForSyntax(block.data.syntax) : null;
+    if (!langName) {
+        // Language not found, fallback to plain highlighting
+        return plainHighlighting(block);
+    }
 
-    const lines = highlighter.codeToThemedTokens(code, langs[0].id);
+    const instance = await loadHighlighter();
+    await instance.loadLanguage(langName);
+
+    const lines = instance.codeToThemedTokens(code, {
+        theme: 'css-variables',
+        lang: langName,
+    });
     let currentIndex = 0;
 
     return lines.map((tokens, index) => {
@@ -59,6 +85,54 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
         return {
             highlighted: !!lineBlock.data.highlighted,
             tokens: result,
+        };
+    });
+}
+
+/**
+ * Validate a language name.
+ */
+function getLanguageForSyntax(syntax: string): keyof typeof bundledLanguages | null {
+    // @ts-ignore
+    const lang = bundledLanguages[syntax];
+    if (!lang) {
+        return null;
+    }
+
+    // @ts-ignore
+    return syntax;
+}
+
+/**
+ * Parse a code block without highlighting it.
+ */
+function plainHighlighting(block: DocumentBlockCode): HighlightLine[] {
+    return block.nodes.map((lineBlock) => {
+        const tokens: HighlightToken[] = [];
+
+        for (const node of lineBlock.nodes) {
+            if (node.object === 'text') {
+                tokens.push({
+                    type: 'plain',
+                    content: getNodeText(node),
+                });
+            } else {
+                tokens.push({
+                    type: 'inline',
+                    inline: node,
+                    children: [
+                        {
+                            type: 'plain',
+                            content: getNodeText(node),
+                        },
+                    ],
+                });
+            }
+        }
+
+        return {
+            highlighted: !!lineBlock.data.highlighted,
+            tokens,
         };
     });
 }
@@ -203,4 +277,39 @@ function splitPositionedTokenAt(
 
 function isEmptyPositionedToken(token: PositionedToken): boolean {
     return token.start === token.end;
+}
+
+let highlighter: Highlighter | null = null;
+let highlighterPromise: Promise<Highlighter> | null = null;
+
+/**
+ * Load the highlighter, only once, and reuse it.
+ * It makes sure to handle concurrent calls.
+ */
+async function loadHighlighter() {
+    if (highlighter) {
+        return highlighter;
+    }
+
+    if (highlighterPromise) {
+        return highlighterPromise;
+    }
+
+    highlighterPromise = (async () => {
+        if (typeof onigWasm !== 'string') {
+            // When running bun test, the import is a string, we ignore it and let the module
+            // loads it on its own.
+            //
+            // Otherwise for Vercel/Cloudflare, we need to load it ourselves.
+            await loadWasm(onigWasm);
+        }
+        const instance = await getHighlighter();
+        await instance.loadTheme('css-variables');
+        return instance;
+    })();
+
+    highlighter = await highlighterPromise;
+    highlighterPromise = null;
+
+    return highlighter;
 }

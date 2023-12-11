@@ -21,6 +21,18 @@ it('should parse plain code', async () => {
             },
         ],
     });
+
+    expect(tokens).toMatchObject([
+        {
+            highlighted: false,
+            tokens: [
+                {
+                    type: 'plain',
+                    content: 'console.log("Hello World")',
+                },
+            ],
+        },
+    ]);
 });
 
 it('should parse a multilines plain code', async () => {
@@ -66,13 +78,45 @@ it('should parse a multilines plain code', async () => {
             },
         ],
     });
+
+    expect(tokens).toMatchObject([
+        {
+            highlighted: false,
+            tokens: [
+                {
+                    type: 'plain',
+                    content: 'if (value === true) {',
+                },
+            ],
+        },
+        {
+            highlighted: false,
+            tokens: [
+                {
+                    type: 'plain',
+                    content: '  console.log("Hello World")',
+                },
+            ],
+        },
+        {
+            highlighted: false,
+            tokens: [
+                {
+                    type: 'plain',
+                    content: '}',
+                },
+            ],
+        },
+    ]);
 });
 
 it('should parse code with an inline on a single line', async () => {
     const tokens = await highlight({
         object: 'block',
         type: 'code',
-        data: {},
+        data: {
+            syntax: 'javascript',
+        },
         nodes: [
             {
                 object: 'block',
@@ -161,7 +205,9 @@ it('should parse code with an inline on a multiple line', async () => {
     const tokens = await highlight({
         object: 'block',
         type: 'code',
-        data: {},
+        data: {
+            syntax: 'javascript',
+        },
         nodes: [
             {
                 object: 'block',

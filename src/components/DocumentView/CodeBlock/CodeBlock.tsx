@@ -4,7 +4,7 @@ import { ContentRefContext } from '@/lib/references';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { CopyCodeButton } from './CopyCodeButton';
-import { highlight, HighlightLine, HighlightToken } from './highlight';
+import { colorToCSSVar, highlight, HighlightLine, HighlightToken } from './highlight';
 import { BlockProps } from '../Block';
 import { Inline } from '../Inline';
 
@@ -123,11 +123,15 @@ function CodeHighlightToken(props: { token: HighlightToken; context: ContentRefC
         );
     }
 
+    if (token.type === 'plain') {
+        return <>{token.content}</>;
+    }
+
     if (!token.token.color) {
         return <>{token.token.content}</>;
     }
 
-    return <span style={{ color: token.token.color }}>{token.token.content}</span>;
+    return <span style={{ color: colorToCSSVar[token.token.color] }}>{token.token.content}</span>;
 }
 
 /**
