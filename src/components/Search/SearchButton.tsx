@@ -33,6 +33,8 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'w-[2.5rem]',
                 'rounded-lg',
                 'bg-dark/2',
+                'transition-colors',
+                'ease-out',
                 'hover:bg-dark/3',
                 'border',
                 'border-dark/1',

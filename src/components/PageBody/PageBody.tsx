@@ -35,7 +35,7 @@ export function PageBody(props: {
 
             <PageHeader page={page} />
             {document ? (
-                <DocumentView document={document} style={['space-y-6']} context={context} />
+                <DocumentView document={document} style={['space-y-6', 'grid']} context={context} />
             ) : null}
 
             {page.layout.pagination ? (

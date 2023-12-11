@@ -66,22 +66,20 @@ function Code(props: MarkedLeafProps<DocumentMarkCode>) {
         <code
             className={tcls(
                 'py-[1px]',
-                'px-1',
+                'px-1.5',
                 'min-w-[1.625rem]',
                 'inline-flex',
                 'justify-center',
                 'items-center',
                 'leading-normal',
                 'ring-1',
+                'ring-inset',
                 'ring-dark/1',
-                'bg-white',
+                'bg-dark/[0.06]',
                 'rounded',
                 'text-dark/8',
-                'shadow-1xs',
-                'shadow-dark/[0.02]',
-                'dark:ring-0',
-                'dark:bg-vanta',
-                'dark:shadow-none',
+                'dark:ring-light/1',
+                'dark:bg-light/1',
                 'dark:text-light',
             )}
         >

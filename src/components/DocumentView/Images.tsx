@@ -55,10 +55,13 @@ async function ImageBlock(props: {
         return null;
     }
 
+    const imageBorder =
+        'relative overflow-hidden rounded after:block after:absolute after:-inset-[0] after:border-dark/2 after:border after:rounded dark:after:border-light/1 dark:after:mix-blend-plus-lighter';
+
     const caption = getNodeFragmentByName(block, 'caption');
     const captionParagraph = caption?.nodes[0];
 
-    const image = <img alt={block.data.alt} src={src.href} className={tcls('rounded')} />;
+    const image = <img alt={block.data.alt} src={src.href} />;
 
     if (
         !captionParagraph ||
@@ -70,7 +73,7 @@ async function ImageBlock(props: {
 
     return (
         <picture className={tcls('relative')}>
-            {image}
+            <div className={tcls(imageBorder)}>{image}</div>
             <figcaption
                 className={tcls(
                     'text-sm',

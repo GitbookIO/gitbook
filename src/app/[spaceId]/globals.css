@@ -9,35 +9,36 @@
         --light: 242 247 247;
         --metal: 222 229 229;
         --sky: 187 221 229;
-        --yellow: 244 226 141;
-        --teal: 63 137 161;
-        --pomegranate: 242 91 58;
         --periwinkle: 172 198 238;
     }
     h1 {
-        @apply tracking-tighter;
-        @apply text-dark dark:text-light;
-        @apply textwrap-balance;
+        @apply tracking-tighter text-dark dark:text-light textwrap-balance;
     }
     h2,
     h3,
     h4,
     h5,
     h6 {
-        @apply tracking-tight;
-        @apply text-dark dark:text-light;
+        @apply tracking-tight text-dark dark:text-light;
     }
     body {
         @apply text-dark/9 dark:text-light/9;
     }
     p {
-        @apply text-dark/9 dark:text-light/8;
+        @apply leading-relaxed;
+    }
+    a,
+    button,
+    input,
+    textarea {
+        @apply outline-2 outline-primary/6;
     }
 
     /*  Light mode */
     ::-webkit-scrollbar {
         @apply bg-transparent;
         width: 8px;
+        height: 8px;
     }
 
     ::-webkit-scrollbar-thumb {

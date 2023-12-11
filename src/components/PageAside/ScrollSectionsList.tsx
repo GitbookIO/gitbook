@@ -32,7 +32,9 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                         )}
                     >
                         {section.depth > 1 ? (
-                            <IconChevronRight className={tcls('w-4', 'h-4', 'mr-1', 'mt-0.5')} />
+                            <IconChevronRight
+                                className={tcls('w-4', 'h-4', 'mr-1', 'mt-0.5', 'shrink-0')}
+                            />
                         ) : null}
                         {section.title}
                     </Link>

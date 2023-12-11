@@ -4,6 +4,7 @@ import { tcls } from '@/lib/tailwind';
 
 import { BlockProps } from './Block';
 import { Blocks } from './Blocks';
+import { Checkbox } from './Checkbox';
 
 export function ListItem(props: BlockProps<DocumentBlockListItem>) {
     const { block, ancestorBlocks, ...contextProps } = props;
@@ -11,17 +12,25 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
     const isTaskList = ancestorBlocks[ancestorBlocks.length - 1]?.type === 'list-tasks';
 
     return (
-        <li className={tcls('text-base', 'font-normal')}>
+        <li>
             {isTaskList ? (
                 <div className={tcls('flex', 'flex-row', 'items-baseline')}>
-                    <input type="checkbox" disabled checked={block.data?.checked} />
-                    <Blocks
-                        {...contextProps}
-                        nodes={block.nodes}
-                        ancestorBlocks={[...ancestorBlocks, block]}
-                        blockStyle={tcls('flex-1')}
-                        style={tcls('ml-2', 'space-y-2')}
+                    <Checkbox
+                        id={block.key!}
+                        disabled
+                        checked={block.data?.checked}
+                        className={tcls('top-0.5', 'relative')}
                     />
+
+                    <label htmlFor={block.key}>
+                        <Blocks
+                            {...contextProps}
+                            nodes={block.nodes}
+                            ancestorBlocks={[...ancestorBlocks, block]}
+                            blockStyle={tcls('flex-1')}
+                            style={tcls('ml-2', 'space-y-2')}
+                        />
+                    </label>
                 </div>
             ) : (
                 <Blocks

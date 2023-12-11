@@ -1,8 +1,9 @@
+import ChevronLeft from '@geist-ui/icons/chevronLeft';
+import ChevronRight from '@geist-ui/icons/chevronRight';
 import { Revision, RevisionPageDocument, Space } from '@gitbook/api';
 import Link from 'next/link';
+import React from 'react';
 
-import { IconArrowLeft } from '@/components/icons/IconArrowLeft';
-import { IconArrowRight } from '@/components/icons/IconArrowRight';
 import { t } from '@/lib/intl';
 import { pageHref } from '@/lib/links';
 import { resolvePrevNextPages } from '@/lib/pages';
@@ -23,7 +24,7 @@ export function PageFooterNavigation(props: {
         <div className={tcls('flex', 'flex-row', 'mt-6', 'gap-2', 'max-w-3xl', 'mx-auto')}>
             {previous ? (
                 <NavigationCard
-                    icon={IconArrowLeft}
+                    icon={ChevronLeft}
                     label={t({ space }, 'previous_page')}
                     title={previous.title}
                     href={pageHref(pages, previous)}
@@ -32,7 +33,7 @@ export function PageFooterNavigation(props: {
             ) : null}
             {next ? (
                 <NavigationCard
-                    icon={IconArrowRight}
+                    icon={ChevronRight}
                     label={t({ space }, 'next_page')}
                     title={next.title}
                     href={pageHref(pages, next)}
@@ -43,7 +44,7 @@ export function PageFooterNavigation(props: {
 }
 
 function NavigationCard(props: {
-    icon: React.ComponentType<{ className: string }>;
+    icon: React.FunctionComponent<{ className?: string }>;
     label: React.ReactNode;
     title: string;
     href: string;
@@ -79,11 +80,11 @@ function NavigationCard(props: {
             </span>
             <IconCo
                 className={tcls(
-                    'w-6',
-                    'h-6',
-                    'text-dark/5',
-                    'group-hover:text-primary',
-                    'dark:text-light/4',
+                    'w-5',
+                    'h-5',
+                    'stroke-dark/5',
+                    'group-hover:stroke-primary',
+                    'dark:stroke-light/4',
                 )}
             />
         </Link>

@@ -42,7 +42,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                     tag={Tag}
                     ancestorBlocks={[]}
                     nodes={fragment.nodes}
-                    style={[columnStyle, 'w-full', 'space-y-6']}
+                    style={[columnStyle, 'w-full', 'space-y-2', 'lg:space-y-3']}
                     context={context}
                     blockStyle={['w-full']}
                 />

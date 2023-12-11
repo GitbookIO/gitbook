@@ -50,7 +50,7 @@ export function SearchModal(props: SearchModalProps) {
                 'bg-dark/4',
                 'backdrop-blur',
                 'dark:bg-dark/9',
-                'opacity-100',
+                'opacity-[1]',
                 'z-30',
                 'px-4',
                 'pt-4',

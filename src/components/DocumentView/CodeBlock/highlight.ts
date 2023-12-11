@@ -301,7 +301,7 @@ async function loadHighlighter() {
             // loads it on its own.
             //
             // Otherwise for Vercel/Cloudflare, we need to load it ourselves.
-            await loadWasm(obj => WebAssembly.instantiate(onigWasm, obj))
+            await loadWasm((obj) => WebAssembly.instantiate(onigWasm, obj));
         }
         const instance = await getHighlighter();
         await instance.loadTheme('css-variables');

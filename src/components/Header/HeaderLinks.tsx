@@ -13,7 +13,7 @@ export async function HeaderLinks({ children }: HeaderLinksProps) {
                 '@container/headerlinks',
                 'hidden',
                 'sm:flex',
-                'justify-center',
+                'justify-end',
                 'h-full',
                 //hide children
                 `[&>*]:hidden`,

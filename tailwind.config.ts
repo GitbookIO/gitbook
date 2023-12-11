@@ -3,7 +3,7 @@ import type { Config } from 'tailwindcss';
 import plugin from 'tailwindcss/plugin';
 
 export const shades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
-export const opacities = [4, 8, 12, 16, 24, 40, 64, 72, 88, 96];
+export const opacities = [0, 4, 8, 12, 16, 24, 40, 64, 72, 88, 96];
 
 function generateShades(varName: string) {
     return shades.reduce(
@@ -18,7 +18,7 @@ function generateShades(varName: string) {
 function opacity() {
     return opacities.reduce(
         (acc, opacity, index) => {
-            acc[index + 1] = `${opacity / 100}`;
+            acc[index] = `${opacity / 100}`;
             return acc;
         },
         {} as Record<string, string>,
@@ -42,15 +42,15 @@ const config: Config = {
             colors: {
                 // Dynamic colors matching the customization settings
                 primary: generateShades('primary-color'),
+                yellow: generateShades('yellow'),
+                teal: generateShades('teal'),
+                pomegranate: generateShades('pomegranate'),
                 dark: 'rgb(var(--dark) / <alpha-value>)',
                 light: 'rgb(var(--light) / <alpha-value>)',
                 vanta: 'rgb(var(--vanta) / <alpha-value>)',
                 metal: 'rgb(var(--metal) / <alpha-value>)',
                 sky: 'rgb(var(--sky) / <alpha-value>)',
-                yellow: 'rgb(var(--yellow) / <alpha-value>)',
                 periwinkle: 'rgb(var(--periwinkle) / <alpha-value>)',
-                pomegranate: 'rgb(var(--pomegranate) / <alpha-value>)',
-                teal: 'rgb(var(--teal) / <alpha-value>)',
                 'header-background': generateShades('header-background'),
                 'header-link': generateShades('header-link'),
             },
@@ -68,15 +68,18 @@ const config: Config = {
                         opacity: '0',
                     },
                 },
-                wiggleAlt: {
-                    '0%': {
-                        transform: 'translateY(0px)',
+                wag: {
+                    '0%, 40%': {
+                        transform: 'rotate(0deg)',
                     },
-                    '20%': {
-                        transform: 'translateY(-1px)',
+                    '45%': {
+                        transform: 'rotate(-10deg)',
                     },
-                    '40%, 100%': {
-                        transform: 'translateY(0px)',
+                    '55%': {
+                        transform: 'rotate(10deg)',
+                    },
+                    '60%, 100%': {
+                        transform: 'rotate(0deg)',
                     },
                 },
                 stroke: {

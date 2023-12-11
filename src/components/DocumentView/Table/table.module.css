@@ -1,0 +1,80 @@
+@supports (animation-timeline: scroll()) {
+    .progressContainer {
+        scroll-timeline-name: --squareTimeline;
+        scroll-timeline-axis: x;
+    }
+
+    .progressOpacity {
+        animation-name: opacityProgress;
+        animation-duration: 1ms;
+        animation-direction: alternate;
+        animation-timeline: --squareTimeline;
+        animation-timing-function: linear;
+    }
+
+    .progressOpacitySharp {
+        animation-name: opacityProgressSharp;
+        animation-duration: 1ms;
+        animation-direction: alternate;
+        animation-timeline: --squareTimeline;
+        animation-timing-function: linear;
+    }
+
+    .strokeOpacityProgressInverted {
+        animation-name: strokeOpacityProgressInverted;
+        animation-duration: 1ms;
+        animation-direction: alternate;
+        animation-timeline: --squareTimeline;
+        animation-timing-function: linear;
+    }
+
+    .progressSvg {
+        animation-name: svgProgress;
+        animation-duration: 1ms;
+        animation-direction: alternate;
+        animation-timeline: --squareTimeline;
+        animation-timing-function: linear;
+    }
+
+    @keyframes opacityProgress {
+        0%,
+        50% {
+            opacity: 1;
+        }
+        100% {
+            opacity: 0;
+        }
+    }
+
+    @keyframes opacityProgressSharp {
+        0%,
+        98% {
+            opacity: 1;
+        }
+        100% {
+            opacity: 0;
+        }
+    }
+
+    @keyframes strokeOpacityProgressInverted {
+        0%,
+        10% {
+            stroke-opacity: 0;
+        }
+        30% {
+            stroke-opacity: 0.88;
+        }
+        100% {
+            stroke-opacity: 0.88;
+        }
+    }
+
+    @keyframes svgProgress {
+        from {
+            stroke-dasharray: 0 100;
+        }
+        to {
+            stroke-dasharray: 100 100;
+        }
+    }
+}
