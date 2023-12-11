@@ -1,7 +1,7 @@
 import { DocumentBlockCode, DocumentBlockCodeLine, DocumentInlineAnnotation } from '@gitbook/api';
 import { getHighlighter, loadWasm, bundledLanguages, Highlighter, ThemedToken } from 'shikiji';
 // @ts-ignore - onigWasm is a Wasm module
-import onigWasm from 'vscode-oniguruma/release/onig.wasm?module';
+import onigWasm from 'shikiji/onig.wasm?module';
 
 import { getNodeText } from '@/lib/document';
 
@@ -301,7 +301,7 @@ async function loadHighlighter() {
             // loads it on its own.
             //
             // Otherwise for Vercel/Cloudflare, we need to load it ourselves.
-            await loadWasm(onigWasm);
+            await loadWasm(obj => WebAssembly.instantiate(onigWasm, obj))
         }
         const instance = await getHighlighter();
         await instance.loadTheme('css-variables');

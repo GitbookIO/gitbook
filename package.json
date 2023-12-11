@@ -32,8 +32,7 @@
         "server-only": "^0.0.1",
         "shikiji": "^0.8.0",
         "tailwind-merge": "^1.14.0",
-        "tailwind-shades": "^1.1.2",
-        "vscode-oniguruma": "^2.0.1"
+        "tailwind-shades": "^1.1.2"
     },
     "devDependencies": {
         "@cloudflare/next-on-pages": "^1.7.3",
