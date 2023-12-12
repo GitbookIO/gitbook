@@ -1,4 +1,4 @@
-import { Redis } from '@upstash/redis';
+import { Redis } from '@upstash/redis/cloudflare';
 import parseCacheControl from 'parse-cache-control';
 
 const cacheNamespace = process.env.UPSTASH_REDIS_NAMESPACE ?? 'gitbook';
@@ -22,6 +22,16 @@ export interface CacheResult<Result> {
      */
     ttl?: number;
 }
+
+/**
+ * Options to pass to the `fetch` call to disable the Next data-cache when wrapped in `cache()`.
+ */
+export const noCacheFetchOptions: Partial<RequestInit> = {
+    // Cloudflare doesn't support the `cache` directive before next-on-pages patches the fetch function
+    // https://github.com/cloudflare/workerd/issues/698
+    // cache: 'no-store',
+    next: { revalidate: 0 },
+};
 
 /**
  * Cache data from an async function.

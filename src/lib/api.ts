@@ -8,7 +8,7 @@ import {
 } from '@gitbook/api';
 import { headers } from 'next/headers';
 
-import { cache, cacheResponse } from './cache';
+import { cache, cacheResponse, noCacheFetchOptions } from './cache';
 
 export interface ContentPointer {
     spaceId: string;
@@ -72,10 +72,7 @@ export const getPublishedContentByUrl = cache(
             secure: false,
             format: 'json',
             signal: signal,
-            // Cloudflare doesn't support the `cache` directive before next-on-pages patches the fetch function
-            // https://github.com/cloudflare/workerd/issues/698
-            // cache: 'no-store',
-            next: { revalidate: 0 },
+            ...noCacheFetchOptions,
         });
 
         return cacheResponse(response);
@@ -91,7 +88,7 @@ export const getPublishedContentByUrl = cache(
  */
 export const getSpace = cache('api.getSpace', async (spaceId: string) => {
     const response = await api().spaces.getSpaceById(spaceId, {
-        cache: 'no-store',
+        ...noCacheFetchOptions,
     });
     return cacheResponse(response);
 });
@@ -103,18 +100,18 @@ export const getRevisionPages = cache('api.getRevisionPages', async (pointer: Co
     const { data } = await (async () => {
         if (pointer.revisionId) {
             return api().spaces.listPagesInRevisionById(pointer.spaceId, pointer.revisionId, {
-                cache: 'no-store',
+                ...noCacheFetchOptions,
             });
         }
 
         if (pointer.changeRequestId) {
             return api().spaces.listPagesInChangeRequest(spaceId, pointer.changeRequestId, {
-                cache: 'no-store',
+                ...noCacheFetchOptions,
             });
         }
 
         return api().spaces.listPages(pointer.spaceId, {
-            cache: 'no-store',
+            ...noCacheFetchOptions,
         });
     })();
     return { data: data.pages! };
@@ -134,7 +131,7 @@ export const getRevisionFile = cache(
                         pointer.revisionId,
                         fileId,
                         {
-                            cache: 'no-store',
+                            ...noCacheFetchOptions,
                         },
                     );
                 }
@@ -145,13 +142,13 @@ export const getRevisionFile = cache(
                         pointer.changeRequestId,
                         fileId,
                         {
-                            cache: 'no-store',
+                            ...noCacheFetchOptions,
                         },
                     );
                 }
 
                 return api().spaces.getFileById(pointer.spaceId, fileId, {
-                    cache: 'no-store',
+                    ...noCacheFetchOptions,
                 });
             })();
             return cacheResponse(response);
@@ -170,7 +167,7 @@ export const getRevisionFile = cache(
  */
 export const getCurrentRevision = cache('api.getCurrentRevision', async (spaceId: string) => {
     const response = await api().spaces.getCurrentRevision(spaceId, {
-        cache: 'no-store',
+        ...noCacheFetchOptions,
     });
     return cacheResponse(response);
 });
@@ -180,7 +177,7 @@ export const getCurrentRevision = cache('api.getCurrentRevision', async (spaceId
  */
 export const getDocument = cache('api.getDocument', async (spaceId: string, documentId: string) => {
     const response = await api().spaces.getDocumentById(spaceId, documentId, {
-        cache: 'no-store',
+        ...noCacheFetchOptions,
     });
     return cacheResponse(response);
 });
@@ -190,7 +187,7 @@ export const getDocument = cache('api.getDocument', async (spaceId: string, docu
  */
 export const getSpaceCustomization = cache('api.getSpaceCustomization', async (spaceId: string) => {
     const response = await api().spaces.getSpacePublishingCustomizationById(spaceId, {
-        cache: 'no-store',
+        ...noCacheFetchOptions,
     });
     return cacheResponse(response);
 });
@@ -200,7 +197,7 @@ export const getSpaceCustomization = cache('api.getSpaceCustomization', async (s
  */
 export const getCollection = cache('api.getCollection', async (collectionId: string) => {
     const response = await api().collections.getCollectionById(collectionId, {
-        cache: 'no-store',
+        ...noCacheFetchOptions,
     });
     return cacheResponse(response);
 });
@@ -215,7 +212,7 @@ export const getCollectionSpaces = cache(
             collectionId,
             {},
             {
-                cache: 'no-store',
+                ...noCacheFetchOptions,
             },
         );
         // TODO: do this filtering on the API side

@@ -50,8 +50,8 @@ export function baseUrl(): string {
 /**
  * Create an absolute href in the current content.
  */
-export function absoluteHref(href: string): string {
-    const base = basePath();
+export function absoluteHref(href: string, withHost: boolean = false): string {
+    const base = withHost ? baseUrl() : basePath();
     return `${base}${href.startsWith('/') ? href.slice(1) : href}`;
 }
 

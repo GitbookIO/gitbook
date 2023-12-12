@@ -3,7 +3,7 @@ import { notFound, redirect } from 'next/navigation';
 
 import { SpaceContent } from '@/components/SpaceContent';
 import { getDocument } from '@/lib/api';
-import { PageHrefContext, baseUrl, pageHref } from '@/lib/links';
+import { PageHrefContext, absoluteHref, baseUrl, pageHref } from '@/lib/links';
 import { getPagePath } from '@/lib/pages';
 
 import { PagePathParams, fetchPageData, getPathnameParam } from '../fetch';
@@ -53,25 +53,33 @@ export async function generateMetadata({ params }: { params: PagePathParams }): 
 
     return {
         title: `${page.title} | ${space.title}`,
-        description: page.description,
+        description: page.description ?? '',
         generator: 'GitBook',
+        // We pass `metadataBase` to avoid warnings from Next, but we still use absolute URLs
+        // as metadataBase doesn't seem to work well on next-on-cloudflare.
         metadataBase: new URL(baseUrl()),
         icons: {
             icon: [
                 {
-                    url: customIcon?.light ?? '.gitbook/icon?size=small&theme=light',
+                    url:
+                        customIcon?.light ??
+                        absoluteHref('.gitbook/icon?size=small&theme=light', true),
                     type: 'image/png',
                     media: '(prefers-color-scheme: light)',
                 },
                 {
-                    url: customIcon?.dark ?? '.gitbook/icon?size=small&theme=dark',
+                    url:
+                        customIcon?.dark ??
+                        absoluteHref('.gitbook/icon?size=small&theme=dark', true),
                     type: 'image/png',
                     media: '(prefers-color-scheme: dark)',
                 },
             ],
         },
         openGraph: {
-            images: [customization.socialPreview.url ?? `.gitbook/ogimage/${page.id}`],
+            images: [
+                customization.socialPreview.url ?? absoluteHref(`.gitbook/ogimage/${page.id}`),
+            ],
         },
         // TODO: remove once the development is finished
         robots: space.visibility === 'public' && 0 ? 'index, follow' : 'noindex, nofollow',
