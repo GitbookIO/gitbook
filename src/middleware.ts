@@ -55,6 +55,16 @@ export async function middleware(request: NextRequest) {
     const headers = new Headers(request.headers);
 
     // Pass a x-forwarded-host and origin to ensure Next doesn't block server actions when proxied
+    console.log(
+        'forwarded host was',
+        request.headers.get('x-forwarded-host'),
+        'and is set now to',
+        inputURL.host,
+        'while origin was',
+        request.headers.get('origin'),
+        'and is set now to',
+        inputURL.origin,
+    );
     headers.set('x-forwarded-host', inputURL.host);
     headers.set('origin', inputURL.origin);
     headers.set('x-gitbook-token', resolved.apiToken);
