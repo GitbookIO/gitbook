@@ -54,6 +54,10 @@ export const getPublishedContentByUrl = cache(
     ) => {
         const { signal } = options;
 
+        // If the request is aborted, we don't need to make the API call
+        // We call it as this logic is wrapped in an asynchronous cache that is not tied to the signal.
+        signal?.throwIfAborted();
+
         const gitbook = new GitBookAPI({
             endpoint: apiEndpoint,
         });

@@ -2,6 +2,7 @@ import { PublishedContentLookup } from '@gitbook/api';
 import { NextResponse, NextRequest } from 'next/server';
 
 import { getPublishedContentByUrl } from './lib/api';
+import { waitForCache } from './lib/cache';
 
 export const config = {
     matcher: '/((?!_next/static|_next/image).*)',
@@ -234,7 +235,7 @@ async function lookupSpaceByAPI(
         } alternatives`,
     );
 
-    return new Promise<PublishedContentLookup>((resolve, reject) => {
+    const found = await new Promise<PublishedContentLookup>((resolve, reject) => {
         let resolved = false;
         const abort = new AbortController();
 
@@ -279,15 +280,13 @@ async function lookupSpaceByAPI(
             reject(error);
         });
     });
+
+    await waitForCache();
+
+    return found;
 }
 
 function computeLookupAlternatives(url: URL) {
-    return [
-        {
-            url: url.toString(),
-            extraPath: '',
-        }
-    ]
     const alternatives: Array<{ url: string; extraPath: string }> = [];
 
     // Match only with the host, if it can be a custom hostname
