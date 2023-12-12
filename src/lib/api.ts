@@ -68,7 +68,10 @@ export const getPublishedContentByUrl = cache(
             secure: false,
             format: 'json',
             signal: signal,
-            cache: 'no-store',
+            // Cloudflare doesn't support the `cache` directive before next-on-pages patches the fetch function
+            // https://github.com/cloudflare/workerd/issues/698
+            // cache: 'no-store',
+            next: { revalidate: 0 },
         });
 
         return cacheResponse(response);

@@ -53,6 +53,7 @@ export async function middleware(request: NextRequest) {
     console.log(`rendering ${resolved.space} ${resolved.pathname}`);
 
     const headers = new Headers(request.headers);
+    headers.set('origin', inputURL.origin);
     headers.set('x-gitbook-token', resolved.apiToken);
     headers.set('x-gitbook-basepath', joinPath(proxyBasePath, resolved.basePath));
     if (apiEndpoint) {
