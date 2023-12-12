@@ -5,10 +5,12 @@ import {
     GitBookAPI,
     GitBookAPIError,
     PublishedContentLookup,
+    Space,
 } from '@gitbook/api';
+import assertNever from 'assert-never';
 import { headers } from 'next/headers';
 
-import { cache, cacheResponse, noCacheFetchOptions } from './cache';
+import { cache, cacheResponse, noCacheFetchOptions, parseCacheResponse } from './cache';
 
 export interface ContentPointer {
     spaceId: string;
@@ -38,6 +40,11 @@ export function api(): GitBookAPI {
 
     return gitbook;
 }
+
+export type PublishedContentWithCache = PublishedContentLookup & {
+    cacheMaxAge?: number;
+    cacheTags?: string[];
+};
 
 /**
  * Resolve a URL to the content to render.
@@ -75,7 +82,25 @@ export const getPublishedContentByUrl = cache(
             ...noCacheFetchOptions,
         });
 
-        return cacheResponse(response);
+        const parsed = parseCacheResponse(response);
+
+        const tags = [
+            ...parsed.tags,
+            ...('space' in response.data
+                ? [getAPICacheTag({ tag: 'space', space: response.data.space })]
+                : []),
+        ];
+
+        const data: PublishedContentWithCache = {
+            ...response.data,
+            cacheMaxAge: parsed.ttl,
+            cacheTags: tags,
+        };
+        return {
+            tags,
+            ttl: parsed.ttl,
+            data,
+        };
     },
     {
         // Do not pass the options for the cache key
@@ -90,14 +115,19 @@ export const getSpace = cache('api.getSpace', async (spaceId: string) => {
     const response = await api().spaces.getSpaceById(spaceId, {
         ...noCacheFetchOptions,
     });
-    return cacheResponse(response);
+    return cacheResponse(response, {
+        tags: [
+            getAPICacheTag({ tag: 'space', space: spaceId }),
+            getAPICacheTag({ tag: 'space-customization', space: spaceId }),
+        ],
+    });
 });
 
 /**
  * Get all the pages in the space.
  */
 export const getRevisionPages = cache('api.getRevisionPages', async (pointer: ContentPointer) => {
-    const { data } = await (async () => {
+    const response = await (async () => {
         if (pointer.revisionId) {
             return api().spaces.listPagesInRevisionById(pointer.spaceId, pointer.revisionId, {
                 ...noCacheFetchOptions,
@@ -114,7 +144,14 @@ export const getRevisionPages = cache('api.getRevisionPages', async (pointer: Co
             ...noCacheFetchOptions,
         });
     })();
-    return { data: data.pages! };
+
+    return cacheResponse(response, {
+        data: response.data.pages,
+        tags: [
+            getAPICacheTag({ tag: 'space', space: pointer.spaceId }),
+            getAPICacheTag({ tag: 'space-pages', space: pointer.spaceId }),
+        ],
+    });
 });
 
 /**
@@ -151,7 +188,14 @@ export const getRevisionFile = cache(
                     ...noCacheFetchOptions,
                 });
             })();
-            return cacheResponse(response);
+
+            return cacheResponse(response, {
+                tags: [
+                    getAPICacheTag({ tag: 'space', space: pointer.spaceId }),
+                    getAPICacheTag({ tag: 'space-files', space: pointer.spaceId }),
+                    getAPICacheTag({ tag: 'space-file', space: pointer.spaceId, file: fileId }),
+                ],
+            });
         } catch (error: any) {
             if (error instanceof GitBookAPIError && error.code === 404) {
                 return { data: null };
@@ -169,7 +213,13 @@ export const getCurrentRevision = cache('api.getCurrentRevision', async (spaceId
     const response = await api().spaces.getCurrentRevision(spaceId, {
         ...noCacheFetchOptions,
     });
-    return cacheResponse(response);
+    return cacheResponse(response, {
+        tags: [
+            getAPICacheTag({ tag: 'space', space: spaceId }),
+            getAPICacheTag({ tag: 'space-pages', space: spaceId }),
+            getAPICacheTag({ tag: 'space-files', space: spaceId }),
+        ],
+    });
 });
 
 /**
@@ -179,7 +229,13 @@ export const getDocument = cache('api.getDocument', async (spaceId: string, docu
     const response = await api().spaces.getDocumentById(spaceId, documentId, {
         ...noCacheFetchOptions,
     });
-    return cacheResponse(response);
+    return cacheResponse(response, {
+        tags: [
+            getAPICacheTag({ tag: 'space', space: spaceId }),
+            getAPICacheTag({ tag: 'space-documents', space: spaceId }),
+            getAPICacheTag({ tag: 'space-document', space: spaceId, document: documentId }),
+        ],
+    });
 });
 
 /**
@@ -189,7 +245,12 @@ export const getSpaceCustomization = cache('api.getSpaceCustomization', async (s
     const response = await api().spaces.getSpacePublishingCustomizationById(spaceId, {
         ...noCacheFetchOptions,
     });
-    return cacheResponse(response);
+    return cacheResponse(response, {
+        tags: [
+            getAPICacheTag({ tag: 'space', space: spaceId }),
+            getAPICacheTag({ tag: 'space-customization', space: spaceId }),
+        ],
+    });
 });
 
 /**
@@ -199,7 +260,9 @@ export const getCollection = cache('api.getCollection', async (collectionId: str
     const response = await api().collections.getCollectionById(collectionId, {
         ...noCacheFetchOptions,
     });
-    return cacheResponse(response);
+    return cacheResponse(response, {
+        tags: [getAPICacheTag({ tag: 'collection', collection: collectionId })],
+    });
 });
 
 /**
@@ -208,16 +271,88 @@ export const getCollection = cache('api.getCollection', async (collectionId: str
 export const getCollectionSpaces = cache(
     'api.getCollectionSpaces',
     async (collectionId: string) => {
-        const { data } = await api().collections.listSpacesInCollectionById(
+        const response = await api().collections.listSpacesInCollectionById(
             collectionId,
             {},
             {
                 ...noCacheFetchOptions,
             },
         );
-        // TODO: do this filtering on the API side
-        return {
-            data: data.items.filter((space) => space.visibility === ContentVisibility.InCollection),
-        };
+        // @ts-ignore
+        return cacheResponse<Space[]>(response, {
+            data: response.data.items.filter(
+                (space) => space.visibility === ContentVisibility.InCollection,
+            ),
+            tags: [getAPICacheTag({ tag: 'collection', collection: collectionId })],
+        });
     },
 );
+
+/**
+ * Create a cache tag for the API.
+ */
+export function getAPICacheTag(
+    spec: // All data related to a space
+    | {
+              tag: 'space';
+              space: string;
+          }
+        // Customization info for a space
+        | {
+              tag: 'space-customization';
+              space: string;
+          }
+        // Pages in a space
+        | {
+              tag: 'space-pages';
+              space: string;
+          }
+        // All documents in a space
+        | {
+              tag: 'space-documents';
+              space: string;
+          }
+        // A specific document in a space
+        | {
+              tag: 'space-document';
+              space: string;
+              document: string;
+          }
+        // All files in a space
+        | {
+              tag: 'space-files';
+              space: string;
+          }
+        // A specific file in a space
+        | {
+              tag: 'space-file';
+              space: string;
+              file: string;
+          }
+        // All data related to a collection
+        | {
+              tag: 'collection';
+              collection: string;
+          },
+): string {
+    switch (spec.tag) {
+        case 'space':
+            return `space:${spec.space}`;
+        case 'space-customization':
+            return `space:${spec.space}.customization`;
+        case 'space-pages':
+            return `space:${spec.space}.pages`;
+        case 'space-documents':
+            return `space:${spec.space}.documents`;
+        case 'space-document':
+            return `space:${spec.space}.document:${spec.document}`;
+        case 'space-files':
+            return `space:${spec.space}.files`;
+        case 'space-file':
+            return `space:${spec.space}.file:${spec.file}`;
+        case 'collection':
+            return `collection:${spec.collection}`;
+        default:
+            assertNever(spec);
+    }
+}

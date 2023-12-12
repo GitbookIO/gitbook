@@ -1,11 +1,9 @@
-import { PublishedContentLookup } from '@gitbook/api';
 import { NextResponse, NextRequest } from 'next/server';
 
-import { getPublishedContentByUrl } from './lib/api';
-import { waitForCache } from './lib/cache';
+import { PublishedContentWithCache, getPublishedContentByUrl } from '@/lib/api';
 
 export const config = {
-    matcher: '/((?!_next/static|_next/image).*)',
+    matcher: '/((?!_next/static|_next/image|.revalidate).*)',
     skipTrailingSlashRedirect: true,
 };
 
@@ -76,6 +74,15 @@ export async function middleware(request: NextRequest) {
     // When content is authenticated, we store the state in a cookie.
     if (visitorAuthToken) {
         response.cookies.set(VISITOR_AUTH_COOKIE, visitorAuthToken);
+    } else if (process.env.NODE_ENV !== 'development' && resolved.cacheMaxAge) {
+        response.headers.set(
+            'cache-control',
+            `public, max-age=${resolved.cacheMaxAge}, s-maxage=${resolved.cacheMaxAge}, stale-while-revalidate=3600, stale-if-error=0`,
+        );
+    }
+
+    if (resolved.cacheTags && resolved.cacheTags.length > 0) {
+        response.headers.set('cache-tag', resolved.cacheTags.join(','));
     }
 
     return response;
@@ -117,7 +124,7 @@ async function lookupSpaceForURL(
     apiEndpoint: string | undefined,
     url: URL,
     visitorAuthToken: string | undefined,
-): Promise<PublishedContentLookup | null> {
+): Promise<PublishedContentWithCache | null> {
     switch (mode) {
         case 'single': {
             return await lookupSpaceInSingleMode(url);
@@ -139,7 +146,7 @@ async function lookupSpaceForURL(
  * GITBOOK_MODE=single
  * When serving a single space, configured using GITBOOK_SPACE_ID and GITBOOK_TOKEN.
  */
-async function lookupSpaceInSingleMode(url: URL): Promise<PublishedContentLookup | null> {
+async function lookupSpaceInSingleMode(url: URL): Promise<PublishedContentWithCache | null> {
     const spaceId = process.env.GITBOOK_SPACE_ID;
     if (!spaceId) {
         throw new Error(
@@ -170,7 +177,7 @@ async function lookupSpaceInMultiMode(
     url: URL,
     apiEndpoint: string | undefined,
     visitorAuthToken: string | undefined,
-): Promise<PublishedContentLookup | null> {
+): Promise<PublishedContentWithCache | null> {
     return lookupSpaceByAPI(url, apiEndpoint, visitorAuthToken);
 }
 
@@ -182,7 +189,7 @@ async function lookupSpaceInMultiPathMode(
     url: URL,
     apiEndpoint: string | undefined,
     visitorAuthToken: string | undefined,
-): Promise<PublishedContentLookup | null> {
+): Promise<PublishedContentWithCache | null> {
     const targetStr = `https://${url.pathname}`;
 
     if (!URL.canParse(targetStr)) {
@@ -226,7 +233,7 @@ async function lookupSpaceByAPI(
     url: URL,
     apiEndpoint: string | undefined,
     visitorAuthToken: string | undefined,
-): Promise<PublishedContentLookup | null> {
+): Promise<PublishedContentWithCache | null> {
     const lookupAlternatives = computeLookupAlternatives(url);
 
     console.log(
@@ -265,7 +272,9 @@ async function lookupSpaceByAPI(
                         basePath: data.basePath,
                         pathname: joinPath(data.pathname, alternative.extraPath),
                         apiToken: data.apiToken,
-                    } as PublishedContentLookup;
+                        cacheMaxAge: data.cacheMaxAge,
+                        cacheTags: data.cacheTags,
+                    } as PublishedContentWithCache;
                 } catch (error) {
                     // @ts-ignore
                     if (error.name === 'AbortError') {

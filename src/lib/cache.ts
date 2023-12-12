@@ -11,7 +11,14 @@ const redis =
           })
         : null;
 
-const memoryCache = new Map<string, any>();
+const memoryCache = new Map<
+    string,
+    {
+        data: any;
+        tags: string[];
+        expiresAt: number;
+    }
+>();
 
 export interface CacheResult<Result> {
     data: Result;
@@ -21,6 +28,11 @@ export interface CacheResult<Result> {
      * @default 60 * 60 * 24
      */
     ttl?: number;
+
+    /**
+     * Tags to associate with the cache entry.
+     */
+    tags?: string[];
 }
 
 /**
@@ -54,35 +66,84 @@ export function cache<Args extends any[], Result>(
             return cachedValue;
         }
 
-        const { data, ttl = 60 * 60 * 24 } = await fn(...args);
+        const result = await fn(...args);
+        await setCacheValue(key, result);
 
-        await setCacheValue(key, data, ttl);
-
-        return data;
+        return result.data;
     };
+}
+
+/**
+ * Parse an HTTP response into a cache entry.
+ */
+export function parseCacheResponse<Result, DefaultData = Result>(
+    response: Response,
+): {
+    ttl: number;
+    tags: string[];
+} {
+    const cacheControlHeader = response.headers.get('cache-control');
+    const cacheControl = cacheControlHeader ? parseCacheControl(cacheControlHeader) : null;
+    const cacheTagHeader =
+        response.headers.get('x-gitbook-cache-tag') ?? response.headers.get('cache-tag');
+
+    const entry = {
+        ttl: 60 * 60 * 24,
+        tags: cacheTagHeader ? cacheTagHeader.split(',').map((tag) => tag.trim()) : [],
+    };
+
+    if (cacheControl && cacheControl['max-age']) {
+        entry.ttl = cacheControl['max-age'];
+    }
+
+    return entry;
 }
 
 /**
  * Cache an HTTP response.
  */
-export function cacheResponse<Result>(
+export function cacheResponse<Result, DefaultData = Result>(
     response: Response & { data: Result },
-    /**
-     * Default time to live in seconds, when the response has no cache header.
-     */
-    defaultTtl: number = 60 * 60 * 24,
-): CacheResult<Result> {
-    const cacheControlHeader = response.headers.get('cache-control');
-    const cacheControl = cacheControlHeader ? parseCacheControl(cacheControlHeader) : null;
-
-    let ttl = defaultTtl;
-    if (cacheControl && cacheControl['max-age']) {
-        ttl = cacheControl['max-age'];
-    }
+    defaultEntry: Partial<CacheResult<DefaultData>> = {},
+): CacheResult<DefaultData extends Result ? Result : DefaultData> {
+    const parsed = parseCacheResponse(response);
 
     return {
-        data: response.data,
+        ttl: defaultEntry.ttl ?? parsed.ttl,
+        tags: [...(defaultEntry.tags ?? []), ...parsed.tags],
+        // @ts-ignore
+        data: defaultEntry.data ?? response.data,
     };
+}
+
+/**
+ * Invalidate all cache entries associated with the given tags.
+ */
+export async function invalidateCacheTags(tags: string[]) {
+    // Clear from memory cache
+    memoryCache.forEach((value, key) => {
+        if (value.tags.some((t) => tags.includes(t))) {
+            memoryCache.delete(key);
+        }
+    });
+
+    // Clear from Redis
+    if (redis) {
+        const keys = (
+            await Promise.all(tags.map((tag) => redis.smembers(getCacheTagKey(tag))))
+        ).flat();
+        const pipeline = redis.pipeline();
+
+        keys.forEach((key) => {
+            pipeline.del(key);
+        });
+
+        tags.forEach((tag) => {
+            pipeline.del(getCacheTagKey(tag));
+        });
+
+        await pipeline.exec();
+    }
 }
 
 /**
@@ -93,15 +154,37 @@ function getCacheKey(fnName: string, args: any[]) {
 }
 
 /**
+ * Get the key for a tag.
+ */
+function getCacheTagKey(tag: string) {
+    return `${cacheNamespace}.tags.${tag}`;
+}
+
+/**
  * Get a value from the cache.
  */
-async function getCacheValue(key: string) {
-    if (memoryCache.has(key)) {
-        return memoryCache.get(key);
+async function getCacheValue(key: string): Promise<any | null> {
+    const memoryEntry = memoryCache.get(key);
+    if (memoryEntry) {
+        if (memoryEntry.expiresAt > Date.now()) {
+            return memoryEntry.data;
+        }
+
+        return null;
     }
 
     if (redis) {
         const value = await redis.get(key);
+
+        // Store in memory cache at least for the current execution
+        if (value !== null) {
+            memoryCache.set(key, {
+                data: value,
+                tags: [],
+                expiresAt: Date.now() + 2 * 60,
+            });
+        }
+
         return value;
     }
 
@@ -111,12 +194,26 @@ async function getCacheValue(key: string) {
 /**
  * Set a value in the cache.
  */
-async function setCacheValue(key: string, value: any, ttl: number) {
-    memoryCache.set(key, value);
+async function setCacheValue(key: string, entry: CacheResult<any>) {
+    const ttl = entry.ttl ?? 60 * 60 * 24;
+
+    memoryCache.set(key, {
+        data: entry.data,
+        tags: entry.tags ?? [],
+        expiresAt: Date.now() + ttl * 1000,
+    });
 
     if (redis) {
-        await redis.set(key, value, {
+        const multi = redis.multi();
+
+        entry.tags?.forEach((tag) => {
+            multi.sadd(getCacheTagKey(tag), key);
+        });
+
+        multi.set(key, entry.data, {
             ex: ttl,
         });
+
+        await multi.exec();
     }
 }
