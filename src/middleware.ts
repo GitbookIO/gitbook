@@ -235,57 +235,51 @@ async function lookupSpaceByAPI(
         } alternatives`,
     );
 
-    const found = await new Promise<PublishedContentLookup>((resolve, reject) => {
-        let resolved = false;
+    console.time('lookupSpaceByAPI');
+    try {
         const abort = new AbortController();
-
-        Promise.all(
+        const matches = await Promise.all(
             lookupAlternatives.map(async (alternative) => {
-                console.log(`lookup content for url "${alternative.url}"`)
-                const data = await getPublishedContentByUrl(
-                    alternative.url,
-                    apiEndpoint,
-                    visitorAuthToken,
-                    {
-                        signal: abort.signal,
-                    },
-                );
+                try {
+                    const data = await getPublishedContentByUrl(
+                        alternative.url,
+                        apiEndpoint,
+                        visitorAuthToken,
+                        {
+                            signal: abort.signal,
+                        },
+                    );
 
-                if (resolved) {
-                    return;
-                }
-                resolved = true;
-                console.log('aborting');
-                abort.abort();
+                    if ('redirect' in data) {
+                        if (alternative.url === url.toString()) {
+                            return data;
+                        }
 
-                if (alternative.url === url.toString()) {
-                    resolve(data);
-                } else if (!('redirect' in data)) {
-                    resolve({
+                        return null;
+                    }
+
+                    // Cancel all other requests to speed up the lookup
+                    abort.abort();
+                    return {
                         space: data.space,
                         basePath: data.basePath,
                         pathname: joinPath(data.pathname, alternative.extraPath),
                         apiToken: data.apiToken,
-                    });
+                    } as PublishedContentLookup;
+                } catch (error) {
+                    // @ts-ignore
+                    if (error.name === 'AbortError') {
+                        return null;
+                    }
+
+                    throw error;
                 }
             }),
-        ).catch((error) => {
-            if (error.name === 'AbortError') {
-                return;
-            }
-
-            if (resolved) {
-                return;
-            }
-
-            resolved = true;
-            reject(error);
-        });
-    });
-
-    await waitForCache();
-
-    return found;
+        );
+        return matches.find((match) => match !== null) ?? null;
+    } finally {
+        console.timeEnd('lookupSpaceByAPI');
+    }
 }
 
 function computeLookupAlternatives(url: URL) {

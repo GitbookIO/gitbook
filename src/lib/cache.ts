@@ -12,7 +12,6 @@ const redis =
         : null;
 
 const memoryCache = new Map<string, any>();
-const pendingOps = new Set<Promise<any>>();
 
 export interface CacheResult<Result> {
     data: Result;
@@ -77,14 +76,6 @@ export function cacheResponse<Result>(
 }
 
 /**
- * Wait for all cache operations to be completed.
- * This is a workaround until https://github.com/upstash/upstash-redis/issues/778 is fixed.
- */
-export async function waitForCache() {
-    await Promise.all(pendingOps);
-}
-
-/**
  * Create a cache key from a function name and its arguments.
  */
 function getCacheKey(fnName: string, args: any[]) {
@@ -100,9 +91,7 @@ async function getCacheValue(key: string) {
     }
 
     if (redis) {
-        console.log('getCacheValue', key);
-        const value = await wrapOperation(redis.get(key));
-        console.log('done getCacheValue', key);
+        const value = await redis.get(key);
         return value;
     }
 
@@ -116,22 +105,8 @@ async function setCacheValue(key: string, value: any, ttl: number) {
     memoryCache.set(key, value);
 
     if (redis) {
-        console.log('setCacheValue', key);
-        await wrapOperation(
-            redis.set(key, value, {
-                ex: ttl,
-            }),
-        );
-        console.log('done setCacheValue', key);
+        await redis.set(key, value, {
+            ex: ttl,
+        });
     }
-}
-
-/**
- * Wrap a cache operation, it can be later awaited with `waitForCache`.
- */
-function wrapOperation<T>(op: Promise<T>): Promise<T> {
-    pendingOps.add(op);
-    return op.finally(() => {
-        pendingOps.delete(op);
-    });
 }
