@@ -53,6 +53,9 @@ export async function middleware(request: NextRequest) {
     console.log(`rendering ${resolved.space} ${resolved.pathname}`);
 
     const headers = new Headers(request.headers);
+
+    // Pass a x-forwarded-host and origin to ensure Next doesn't block server actions when proxied
+    headers.set('x-forwarded-host', inputURL.host);
     headers.set('origin', inputURL.origin);
     headers.set('x-gitbook-token', resolved.apiToken);
     headers.set('x-gitbook-basepath', joinPath(proxyBasePath, resolved.basePath));
