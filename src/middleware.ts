@@ -241,6 +241,7 @@ async function lookupSpaceByAPI(
 
         Promise.all(
             lookupAlternatives.map(async (alternative) => {
+                console.log(`lookup content for url "${alternative.url}"`)
                 const data = await getPublishedContentByUrl(
                     alternative.url,
                     apiEndpoint,
@@ -254,6 +255,7 @@ async function lookupSpaceByAPI(
                     return;
                 }
                 resolved = true;
+                console.log('aborting');
                 abort.abort();
 
                 if (alternative.url === url.toString()) {

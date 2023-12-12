@@ -100,7 +100,9 @@ async function getCacheValue(key: string) {
     }
 
     if (redis) {
+        console.log('getCacheValue', key);
         const value = await wrapOperation(redis.get(key));
+        console.log('done getCacheValue', key);
         return value;
     }
 
@@ -114,11 +116,13 @@ async function setCacheValue(key: string, value: any, ttl: number) {
     memoryCache.set(key, value);
 
     if (redis) {
+        console.log('setCacheValue', key);
         await wrapOperation(
             redis.set(key, value, {
                 ex: ttl,
             }),
         );
+        console.log('done setCacheValue', key);
     }
 }
 
