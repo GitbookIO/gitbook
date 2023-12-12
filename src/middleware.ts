@@ -1,5 +1,7 @@
-import { GitBookAPI, PublishedContentLookup } from '@gitbook/api';
+import { PublishedContentLookup } from '@gitbook/api';
 import { NextResponse, NextRequest } from 'next/server';
+
+import { getPublishedContentByUrl } from './lib/api';
 
 export const config = {
     matcher: '/((?!_next/static|_next/image).*)',
@@ -228,27 +230,20 @@ async function lookupSpaceByAPI(
         } alternatives`,
     );
 
-    const gitbook = new GitBookAPI({
-        endpoint: apiEndpoint,
-    });
-
     return new Promise<PublishedContentLookup>((resolve, reject) => {
         let resolved = false;
         const abort = new AbortController();
 
         Promise.all(
             lookupAlternatives.map(async (alternative) => {
-                const { data } = await gitbook.request<PublishedContentLookup>({
-                    method: 'GET',
-                    path: '/urls/published',
-                    query: {
-                        url: alternative.url,
-                        visitorAuthToken,
+                const data = await getPublishedContentByUrl(
+                    alternative.url,
+                    apiEndpoint,
+                    visitorAuthToken,
+                    {
+                        signal: abort.signal,
                     },
-                    secure: false,
-                    format: 'json',
-                    signal: abort.signal,
-                });
+                );
 
                 if (resolved) {
                     return;

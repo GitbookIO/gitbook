@@ -1,9 +1,14 @@
 import 'server-only';
 
-import { ContentVisibility, GitBookAPI, GitBookAPIError, JSONDocument } from '@gitbook/api';
+import {
+    ContentVisibility,
+    GitBookAPI,
+    GitBookAPIError,
+    PublishedContentLookup,
+} from '@gitbook/api';
 import { headers } from 'next/headers';
 
-import { cache } from './cache';
+import { cache, cacheResponse } from './cache';
 
 export interface ContentPointer {
     spaceId: string;
@@ -35,13 +40,53 @@ export function api(): GitBookAPI {
 }
 
 /**
+ * Resolve a URL to the content to render.
+ */
+export const getPublishedContentByUrl = cache(
+    'api.getPublishedContentByUrl',
+    async (
+        url: string,
+        apiEndpoint: string | undefined,
+        visitorAuthToken: string | undefined,
+        options: {
+            signal?: AbortSignal;
+        },
+    ) => {
+        const { signal } = options;
+
+        const gitbook = new GitBookAPI({
+            endpoint: apiEndpoint,
+        });
+
+        const response = await gitbook.request<PublishedContentLookup>({
+            method: 'GET',
+            path: '/urls/published',
+            query: {
+                url,
+                visitorAuthToken,
+            },
+            secure: false,
+            format: 'json',
+            signal: signal,
+            cache: 'no-store',
+        });
+
+        return cacheResponse(response);
+    },
+    {
+        // Do not pass the options for the cache key
+        extractArgs: (args) => args.slice(0, 3),
+    },
+);
+
+/**
  * Get a space by its ID.
  */
 export const getSpace = cache('api.getSpace', async (spaceId: string) => {
-    const { data } = await api().spaces.getSpaceById(spaceId, {
+    const response = await api().spaces.getSpaceById(spaceId, {
         cache: 'no-store',
     });
-    return data;
+    return cacheResponse(response);
 });
 
 /**
@@ -65,7 +110,7 @@ export const getRevisionPages = cache('api.getRevisionPages', async (pointer: Co
             cache: 'no-store',
         });
     })();
-    return data.pages!;
+    return { data: data.pages! };
 });
 
 /**
@@ -75,7 +120,7 @@ export const getRevisionFile = cache(
     'api.getRevisionFile',
     async (pointer: ContentPointer, fileId: string) => {
         try {
-            const { data } = await (async () => {
+            const response = await (async () => {
                 if (pointer.revisionId) {
                     return api().spaces.getFileInRevisionById(
                         pointer.spaceId,
@@ -102,10 +147,10 @@ export const getRevisionFile = cache(
                     cache: 'no-store',
                 });
             })();
-            return data;
+            return cacheResponse(response);
         } catch (error: any) {
             if (error instanceof GitBookAPIError && error.code === 404) {
-                return null;
+                return { data: null };
             }
 
             throw error;
@@ -117,41 +162,40 @@ export const getRevisionFile = cache(
  * Get the current revision of a space
  */
 export const getCurrentRevision = cache('api.getCurrentRevision', async (spaceId: string) => {
-    const { data } = await api().spaces.getCurrentRevision(spaceId, {
+    const response = await api().spaces.getCurrentRevision(spaceId, {
         cache: 'no-store',
     });
-    return data;
+    return cacheResponse(response);
 });
 
 /**
  * Get a document by its ID.
  */
 export const getDocument = cache('api.getDocument', async (spaceId: string, documentId: string) => {
-    const { data } = await api().spaces.getDocumentById(spaceId, documentId, {
+    const response = await api().spaces.getDocumentById(spaceId, documentId, {
         cache: 'no-store',
     });
-
-    return data;
+    return cacheResponse(response);
 });
 
 /**
  * Get the customization settings for a space.
  */
 export const getSpaceCustomization = cache('api.getSpaceCustomization', async (spaceId: string) => {
-    const { data } = await api().spaces.getSpacePublishingCustomizationById(spaceId, {
+    const response = await api().spaces.getSpacePublishingCustomizationById(spaceId, {
         cache: 'no-store',
     });
-    return data;
+    return cacheResponse(response);
 });
 
 /**
  * Get the infos about a collection by its ID.
  */
 export const getCollection = cache('api.getCollection', async (collectionId: string) => {
-    const { data } = await api().collections.getCollectionById(collectionId, {
+    const response = await api().collections.getCollectionById(collectionId, {
         cache: 'no-store',
     });
-    return data;
+    return cacheResponse(response);
 });
 
 /**
@@ -168,6 +212,8 @@ export const getCollectionSpaces = cache(
             },
         );
         // TODO: do this filtering on the API side
-        return data.items.filter((space) => space.visibility === ContentVisibility.InCollection);
+        return {
+            data: data.items.filter((space) => space.visibility === ContentVisibility.InCollection),
+        };
     },
 );
