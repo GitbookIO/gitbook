@@ -1,25 +1,23 @@
-import Link from 'next/link';
 import React from 'react';
 
+import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
-import { HighlightQuery } from './HighlightQuery';
-import type { ComputedPageResult } from './server-actions';
-
-export const SearchPageResultItem = React.forwardRef(function SearchPageResultItem(
+export const SearchQuestionResultItem = React.forwardRef(function SearchQuestionResultItem(
     props: {
         query: string;
-        item: ComputedPageResult;
         active: boolean;
+        onClick: () => void;
     },
-    ref: React.Ref<HTMLAnchorElement>,
+    ref: React.Ref<HTMLDivElement>,
 ) {
-    const { query, item, active } = props;
+    const { query, active, onClick } = props;
+    const language = useLanguage();
 
     return (
-        <Link
+        <div
             ref={ref}
-            href={item.href}
+            onClick={onClick}
             className={tcls(
                 'flex',
                 'flex-row',
@@ -35,7 +33,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                 active ? ['bg-primary-50'] : null,
             )}
         >
-            <HighlightQuery query={query} text={item.title} />
-        </Link>
+            {t(language, 'search_ask', [query])}
+        </div>
     );
 });

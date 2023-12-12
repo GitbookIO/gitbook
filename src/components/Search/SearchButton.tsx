@@ -1,7 +1,5 @@
 'use client';
 
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-
 import { IconSearch } from '@/components/icons/IconSearch';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
@@ -13,10 +11,13 @@ import { useSearch } from './useSearch';
 export function SearchButton(props: { children?: React.ReactNode; style?: ClassValue }) {
     const { style, children } = props;
 
-    const [, setQuery] = useSearch();
+    const [, setSearchState] = useSearch();
 
     const onClick = () => {
-        setQuery('');
+        setSearchState({
+            ask: false,
+            query: '',
+        });
     };
 
     return (

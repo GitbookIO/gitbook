@@ -2,10 +2,12 @@ import { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 
 import { SpaceContent } from '@/components/SpaceContent';
+import { getSpaceLanguage } from '@/intl/server';
 import { getDocument } from '@/lib/api';
 import { PageHrefContext, absoluteHref, baseUrl, pageHref } from '@/lib/links';
 import { getPagePath } from '@/lib/pages';
 
+import { ClientContexts } from './ClientContexts';
 import { PagePathParams, fetchPageData, getPathnameParam } from '../fetch';
 
 export const runtime = 'edge';
@@ -27,19 +29,22 @@ export default async function Page(props: { params: PagePathParams }) {
     }
 
     const document = page.documentId ? await getDocument(space.id, page.documentId) : null;
+    const language = getSpaceLanguage(customization);
 
     return (
-        <SpaceContent
-            content={content}
-            space={space}
-            customization={customization}
-            pages={pages}
-            page={page}
-            ancestors={ancestors}
-            document={document}
-            collection={collection}
-            collectionSpaces={collectionSpaces}
-        />
+        <ClientContexts language={language}>
+            <SpaceContent
+                content={content}
+                space={space}
+                customization={customization}
+                pages={pages}
+                page={page}
+                ancestors={ancestors}
+                document={document}
+                collection={collection}
+                collectionSpaces={collectionSpaces}
+            />
+        </ClientContexts>
     );
 }
 

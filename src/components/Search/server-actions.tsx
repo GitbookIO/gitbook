@@ -50,3 +50,11 @@ export async function searchContent(
         })
         .flat();
 }
+
+/**
+ * Server action to ask a question in a space.
+ */
+export async function askQuestion(spaceId: string, query: string) {
+    const { data } = await api().spaces.askQueryInSpace(spaceId, { query });
+    return data;
+}

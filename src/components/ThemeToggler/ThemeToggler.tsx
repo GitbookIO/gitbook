@@ -6,7 +6,7 @@ import Sun from '@geist-ui/icons/sun';
 import React from 'react';
 
 import { IconComponent } from '@/components/icons';
-import { IntlContext, tString } from '@/lib/intl';
+import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
 type ThemeMode = 'light' | 'system' | 'dark';
@@ -16,8 +16,10 @@ const LOCALSTORAGE_KEY = 'color-theme';
 /**
  * Buttons to toggle between light/system/dark modes.
  */
-export function ThemeToggler(props: IntlContext) {
+export function ThemeToggler(props: {}) {
     const [mode, setMode] = React.useState<ThemeMode>('system');
+
+    const language = useLanguage();
 
     const onSwitchMode = (to: ThemeMode) => {
         setMode(to);
@@ -62,19 +64,19 @@ export function ThemeToggler(props: IntlContext) {
                 active={mode === 'light'}
                 icon={Sun}
                 onClick={() => onSwitchMode('light')}
-                title={tString(props, 'switch_to_light_theme')}
+                title={tString(language, 'switch_to_light_theme')}
             />
             <ThemeButton
                 active={mode === 'system'}
                 icon={Monitor}
                 onClick={() => onSwitchMode('system')}
-                title={tString(props, 'switch_to_system_theme')}
+                title={tString(language, 'switch_to_system_theme')}
             />
             <ThemeButton
                 active={mode === 'dark'}
                 icon={Moon}
                 onClick={() => onSwitchMode('dark')}
-                title={tString(props, 'switch_to_dark_theme')}
+                title={tString(language, 'switch_to_dark_theme')}
             />
         </div>
     );

@@ -278,8 +278,7 @@ export const getCollectionSpaces = cache(
                 ...noCacheFetchOptions,
             },
         );
-        // @ts-ignore
-        return cacheResponse<Space[]>(response, {
+        return cacheResponse(response, {
             data: response.data.items.filter(
                 (space) => space.visibility === ContentVisibility.InCollection,
             ),

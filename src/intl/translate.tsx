@@ -1,24 +1,16 @@
-import { Space } from '@gitbook/api';
 import React from 'react';
 
-import * as translations from '@/translations';
-
-export interface IntlContext {
-    space: Space;
-}
+import { TranslationLanguage, TranslationKey } from './translations';
 
 /**
  * Translate a string.
  */
 export function t(
-    context: IntlContext,
-    id: keyof typeof translations.en,
+    language: TranslationLanguage,
+    id: TranslationKey,
     ...args: React.ReactNode[]
 ): React.ReactNode {
-    const locale = 'en'; // TODO
-
-    // fallback to english if no translation
-    const string = translations[locale]?.[id] || translations.en[id];
+    const string = language[id];
 
     // Now we are going to replace the arguments
     // but we want to return a string as long as it's possible
@@ -53,11 +45,11 @@ export function t(
  * Version of `t` that returns a string.
  */
 export function tString(
-    context: IntlContext,
-    id: keyof typeof translations.en,
+    language: TranslationLanguage,
+    id: TranslationKey,
     ...args: React.ReactNode[]
 ): string {
-    const result = t(context, id, ...args);
+    const result = t(language, id, ...args);
     return reactToString(result);
 }
 

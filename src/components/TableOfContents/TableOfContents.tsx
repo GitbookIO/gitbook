@@ -1,8 +1,13 @@
-import { Revision, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
+import {
+    CustomizationSettings,
+    Revision,
+    RevisionPageDocument,
+    RevisionPageGroup,
+    Space,
+} from '@gitbook/api';
 import React from 'react';
 
 import { ContentPointer } from '@/lib/api';
-import { IntlContext } from '@/lib/intl';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
@@ -14,20 +19,21 @@ import {
     SIDE_COLUMN_WITH_HEADER,
 } from '../layout';
 
-export function TableOfContents(
-    props: IntlContext & {
-        content: ContentPointer;
-        context: ContentRefContext;
-        pages: Revision['pages'];
-        activePage: RevisionPageDocument;
-        ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
-        header?: React.ReactNode;
-        withHeaderOffset: boolean;
-        visibleOnDesktop: boolean;
-    },
-) {
+export function TableOfContents(props: {
+    space: Space;
+    customization: CustomizationSettings;
+    content: ContentPointer;
+    context: ContentRefContext;
+    pages: Revision['pages'];
+    activePage: RevisionPageDocument;
+    ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
+    header?: React.ReactNode;
+    withHeaderOffset: boolean;
+    visibleOnDesktop: boolean;
+}) {
     const {
         space,
+        customization,
         pages,
         activePage,
         ancestors,
@@ -89,7 +95,7 @@ export function TableOfContents(
                     context={context}
                     style={tcls('mt-4')}
                 />
-                <Trademark space={space} />
+                <Trademark space={space} customization={customization} />
             </div>
         </aside>
     );

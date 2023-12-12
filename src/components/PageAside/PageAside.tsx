@@ -1,8 +1,8 @@
-import { JSONDocument, RevisionPageDocument, Space } from '@gitbook/api';
+import { CustomizationSettings, JSONDocument, RevisionPageDocument, Space } from '@gitbook/api';
 import React from 'react';
 
+import { t, getSpaceLanguage } from '@/intl/server';
 import { getDocumentSections } from '@/lib/document';
-import { t } from '@/lib/intl';
 import { tcls } from '@/lib/tailwind';
 
 import { ScrollSectionsList } from './ScrollSectionsList';
@@ -19,12 +19,13 @@ import {
  */
 export function PageAside(props: {
     space: Space;
+    customization: CustomizationSettings;
     page: RevisionPageDocument;
     document: JSONDocument | null;
     withHeaderOffset: boolean;
     withFullPageCover: boolean;
 }) {
-    const { space, document, withHeaderOffset, withFullPageCover } = props;
+    const { space, customization, document, withHeaderOffset, withFullPageCover } = props;
     const sections = document ? getDocumentSections(document) : [];
 
     return (
@@ -52,7 +53,7 @@ export function PageAside(props: {
             {sections.length > 0 ? (
                 <>
                     <div className={tcls('text-sm', 'font-semibold', 'pb-3')}>
-                        {t({ space }, 'on_this_page')}
+                        {t(getSpaceLanguage(customization), 'on_this_page')}
                     </div>
                     <div className={tcls('overflow-auto', 'flex-1')}>
                         <React.Suspense fallback={null}>

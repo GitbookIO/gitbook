@@ -5,7 +5,8 @@
     "switch_to_system_theme": "Switch to system theme",
     "search": "Search",
     "search_input_placeholder": "Search content",
-    "search_no_results": "No results match your search.",
+    "search_no_results": "No results for \"${1}\".",
+    "search_ask": "Ask \"${1}\"",
     "on_this_page": "On this page",
     "next_page": "Next",
     "previous_page": "Previous"

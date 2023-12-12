@@ -4,7 +4,7 @@ import React from 'react';
 import { tcls } from '@/lib/tailwind';
 
 import { HighlightQuery } from './HighlightQuery';
-import type { ComputedSectionResult } from './searchContent';
+import type { ComputedSectionResult } from './server-actions';
 
 export const SearchSectionResultItem = React.forwardRef(function SearchSectionResultItem(
     props: { query: string; item: ComputedSectionResult; active: boolean },

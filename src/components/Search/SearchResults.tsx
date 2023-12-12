@@ -1,10 +1,15 @@
+import assertNever from 'assert-never';
 import React from 'react';
 
+import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
-import { OrderedComputedResult, searchContent } from './searchContent';
+import { isQuestion } from './isQuestion';
 import { SearchPageResultItem } from './SearchPageResultItem';
+import { SearchQuestionResultItem } from './SearchQuestionResultItem';
 import { SearchSectionResultItem } from './SearchSectionResultItem';
+import { OrderedComputedResult, searchContent } from './server-actions';
+
 
 export interface SearchResultsRef {
     moveUp(): void;
@@ -12,18 +17,21 @@ export interface SearchResultsRef {
     select(): void;
 }
 
+type ResultType = OrderedComputedResult | { type: 'question'; id: string; query: string };
+
 export const SearchResults = React.forwardRef(function SearchResults(
     props: {
         query: string;
         spaceId: string;
-        noResultsMessage: string;
+        onSwitchToAsk: () => void;
     },
     ref: React.Ref<SearchResultsRef>,
 ) {
-    const { query, spaceId, noResultsMessage } = props;
+    const { query, spaceId, onSwitchToAsk } = props;
 
+    const language = useLanguage();
     const debounceTimeout = React.useRef<NodeJS.Timeout | null>(null);
-    const [results, setResults] = React.useState<OrderedComputedResult[] | null>(null);
+    const [results, setResults] = React.useState<ResultType[] | null>(null);
     const [cursor, setCursor] = React.useState<number | null>(null);
     const refs = React.useRef<(null | HTMLAnchorElement)[]>([]);
 
@@ -32,9 +40,11 @@ export const SearchResults = React.forwardRef(function SearchResults(
             clearTimeout(debounceTimeout.current);
         }
 
+        setResults((prev) => withQuestionResult(prev, query));
+
         debounceTimeout.current = setTimeout(async () => {
             setCursor(null);
-            setResults(await searchContent(spaceId, query));
+            setResults(withQuestionResult(await searchContent(spaceId, query), query));
         }, 250);
 
         return () => {
@@ -103,33 +113,65 @@ export const SearchResults = React.forwardRef(function SearchResults(
         <div className={tcls('max-h-[60vh]', 'overflow-auto', 'px', 'inverted-theme-scroll')}>
             {results.length === 0 ? (
                 <div className={tcls('text-sm', 'text-dark', 'p-6', 'text-center')}>
-                    {noResultsMessage}
+                    {t(language, 'search_no_results', query)}
                 </div>
             ) : (
                 results.map((item, index) => {
-                    return item.type === 'page' ? (
-                        <SearchPageResultItem
-                            ref={(ref) => {
-                                refs.current[index] = ref;
-                            }}
-                            key={item.id}
-                            query={query}
-                            item={item}
-                            active={index === cursor}
-                        />
-                    ) : (
-                        <SearchSectionResultItem
-                            ref={(ref) => {
-                                refs.current[index] = ref;
-                            }}
-                            key={item.id}
-                            query={query}
-                            item={item}
-                            active={index === cursor}
-                        />
-                    );
+                    switch (item.type) {
+                        case 'page': {
+                            return (
+                                <SearchPageResultItem
+                                    ref={(ref) => {
+                                        refs.current[index] = ref;
+                                    }}
+                                    key={item.id}
+                                    query={query}
+                                    item={item}
+                                    active={index === cursor}
+                                />
+                            );
+                        }
+                        case 'question': {
+                            return (
+                                <SearchQuestionResultItem
+                                    ref={(ref) => {
+                                        refs.current[index] = ref;
+                                    }}
+                                    key={item.id}
+                                    query={query}
+                                    active={index === cursor}
+                                    onClick={onSwitchToAsk}
+                                />
+                            );
+                        }
+                        case 'section': {
+                            return (
+                                <SearchSectionResultItem
+                                    ref={(ref) => {
+                                        refs.current[index] = ref;
+                                    }}
+                                    key={item.id}
+                                    query={query}
+                                    item={item}
+                                    active={index === cursor}
+                                />
+                            );
+                        }
+                        default:
+                            assertNever(item);
+                    }
                 })
             )}
         </div>
     );
 });
+
+function withQuestionResult(results: null | ResultType[], query: string): null | ResultType[] {
+    const without = results ? results.filter((result) => result.type !== 'question') : null;
+
+    if (!isQuestion(query)) {
+        return without;
+    }
+
+    return [{ type: 'question', id: 'question', query }, ...(without ?? [])];
+}

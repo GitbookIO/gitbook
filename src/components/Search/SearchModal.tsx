@@ -4,39 +4,39 @@ import IconSearch from '@geist-ui/icons/search';
 import React from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 
+import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
+import { SearchAskAnswer } from './SearchAskAnswer';
 import { SearchResults, SearchResultsRef } from './SearchResults';
-import { useSearch } from './useSearch';
+import { SearchState, useSearch } from './useSearch';
 
 interface SearchModalProps {
     spaceId: string;
-    inputPlaceholder: string;
-    noResultsMessage: string;
 }
 
 export function SearchModal(props: SearchModalProps) {
-    const [query, setQuery] = useSearch();
+    const [state, setSearchState] = useSearch();
 
     useHotkeys(
         'ctrl+k, command+k',
         (e) => {
             e.preventDefault(); //might be inadvisable as it interferes with expected browser behavior.
-            setQuery('');
+            setSearchState({ ask: false, query: '' });
         },
         [],
     );
 
-    if (query === null) {
+    if (state === null) {
         return null;
     }
 
-    const onChangeQuery = (newQuery: string) => {
-        setQuery(newQuery);
+    const onChangeQuery = (newQuery: SearchState) => {
+        setSearchState(newQuery);
     };
 
     const onClose = () => {
-        setQuery(null);
+        setSearchState(null);
     };
 
     return (
@@ -60,7 +60,7 @@ export function SearchModal(props: SearchModalProps) {
         >
             <SearchModalBody
                 {...props}
-                query={query}
+                state={state}
                 onChangeQuery={onChangeQuery}
                 onClose={onClose}
             />
@@ -70,13 +70,14 @@ export function SearchModal(props: SearchModalProps) {
 
 function SearchModalBody(
     props: SearchModalProps & {
-        query: string;
-        onChangeQuery: (newQuery: string) => void;
+        state: SearchState;
+        onChangeQuery: (newQuery: SearchState) => void;
         onClose: () => void;
     },
 ) {
-    const { spaceId, inputPlaceholder, noResultsMessage, query, onChangeQuery, onClose } = props;
+    const { spaceId, state, onChangeQuery, onClose } = props;
 
+    const language = useLanguage();
     const resultsRef = React.useRef<SearchResultsRef>(null);
     const inputRef = React.useRef<HTMLInputElement>(null);
 
@@ -85,7 +86,7 @@ function SearchModalBody(
     }, []);
 
     const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Escape' || (event.key === 'Backspace' && query === '')) {
+        if (event.key === 'Escape' || (event.key === 'Backspace' && state.query === '')) {
             onClose();
         } else if (event.key === 'ArrowUp') {
             event.preventDefault();
@@ -100,7 +101,10 @@ function SearchModalBody(
     };
 
     const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        onChangeQuery(event.target.value);
+        onChangeQuery({
+            ask: false, // When typing, we go back to the default search mode
+            query: event.target.value,
+        });
     };
 
     return (
@@ -131,7 +135,7 @@ function SearchModalBody(
                 <div className={tcls('flex-1')}>
                     <input
                         ref={inputRef}
-                        value={query}
+                        value={state.query}
                         onKeyDown={onKeyDown}
                         onChange={onChange}
                         className={tcls(
@@ -141,17 +145,25 @@ function SearchModalBody(
                             'focus:outline-none',
                             'bg-transparent',
                         )}
-                        placeholder={inputPlaceholder}
+                        placeholder={tString(language, 'search_input_placeholder')}
                     />
                 </div>
             </div>
-            {query ? (
+            {state.query && !state.ask ? (
                 <SearchResults
                     ref={resultsRef}
                     spaceId={spaceId}
-                    query={query}
-                    noResultsMessage={noResultsMessage}
+                    query={state.query}
+                    onSwitchToAsk={() => {
+                        onChangeQuery({
+                            ask: true,
+                            query: state.query,
+                        });
+                    }}
                 />
+            ) : null}
+            {state.query && state.ask ? (
+                <SearchAskAnswer spaceId={spaceId} query={state.query} />
             ) : null}
         </div>
     );

@@ -18,7 +18,6 @@ import { SearchModal } from '@/components/Search';
 import { TableOfContents } from '@/components/TableOfContents';
 import { ContentPointer } from '@/lib/api';
 import { hasFullWidthBlock } from '@/lib/document';
-import { tString } from '@/lib/intl';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
@@ -89,6 +88,7 @@ export function SpaceContent(props: {
             >
                 <TableOfContents
                     space={space}
+                    customization={customization}
                     content={content}
                     pages={pages}
                     activePage={page}
@@ -119,6 +119,7 @@ export function SpaceContent(props: {
                     <div className={tcls('flex', 'flex-row')}>
                         <PageBody
                             space={space}
+                            customization={customization}
                             context={contentRefContext}
                             page={page}
                             document={document}
@@ -128,6 +129,7 @@ export function SpaceContent(props: {
                         {page.layout.outline ? (
                             <PageAside
                                 space={space}
+                                customization={customization}
                                 page={page}
                                 document={document}
                                 withHeaderOffset={withTopHeader}
@@ -151,11 +153,7 @@ export function SpaceContent(props: {
             ) : null}
 
             <React.Suspense fallback={null}>
-                <SearchModal
-                    spaceId={space.id}
-                    inputPlaceholder={tString({ space }, 'search_input_placeholder')}
-                    noResultsMessage={tString({ space }, 'search_no_results')}
-                />
+                <SearchModal spaceId={space.id} />
             </React.Suspense>
         </div>
     );

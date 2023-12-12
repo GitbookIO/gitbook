@@ -1,7 +1,8 @@
 import { Collection, CustomizationSettings, Space } from '@gitbook/api';
 import React from 'react';
 
-import { t } from '@/lib/intl';
+import { t } from '@/intl/server';
+import { getSpaceLanguage } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
 
 import { HeaderLogo } from './HeaderLogo';
@@ -44,7 +45,7 @@ export function CompactHeader(props: {
             >
                 <React.Suspense fallback={null}>
                     <SearchButton>
-                        <span>{t({ space }, 'search')}</span>
+                        <span>{t(getSpaceLanguage(customization), 'search')}</span>
                     </SearchButton>
                 </React.Suspense>
             </div>

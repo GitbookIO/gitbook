@@ -1,10 +1,10 @@
 import ChevronLeft from '@geist-ui/icons/chevronLeft';
 import ChevronRight from '@geist-ui/icons/chevronRight';
-import { Revision, RevisionPageDocument, Space } from '@gitbook/api';
+import { CustomizationSettings, Revision, RevisionPageDocument, Space } from '@gitbook/api';
 import Link from 'next/link';
 import React from 'react';
 
-import { t } from '@/lib/intl';
+import { t, getSpaceLanguage } from '@/intl/server';
 import { pageHref } from '@/lib/links';
 import { resolvePrevNextPages } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
@@ -14,18 +14,20 @@ import { tcls } from '@/lib/tailwind';
  */
 export function PageFooterNavigation(props: {
     space: Space;
+    customization: CustomizationSettings;
     pages: Revision['pages'];
     page: RevisionPageDocument;
 }) {
-    const { space, pages, page } = props;
+    const { space, customization, pages, page } = props;
     const { previous, next } = resolvePrevNextPages(pages, page);
+    const language = getSpaceLanguage(customization);
 
     return (
         <div className={tcls('flex', 'flex-row', 'mt-6', 'gap-2', 'max-w-3xl', 'mx-auto')}>
             {previous ? (
                 <NavigationCard
                     icon={ChevronLeft}
-                    label={t({ space }, 'previous_page')}
+                    label={t(language, 'previous_page')}
                     title={previous.title}
                     href={pageHref(pages, previous)}
                     reversed
@@ -34,7 +36,7 @@ export function PageFooterNavigation(props: {
             {next ? (
                 <NavigationCard
                     icon={ChevronRight}
-                    label={t({ space }, 'next_page')}
+                    label={t(language, 'next_page')}
                     title={next.title}
                     href={pageHref(pages, next)}
                 />

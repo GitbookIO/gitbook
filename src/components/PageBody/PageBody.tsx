@@ -1,4 +1,4 @@
-import { JSONDocument, RevisionPageDocument, Space } from '@gitbook/api';
+import { CustomizationSettings, JSONDocument, RevisionPageDocument, Space } from '@gitbook/api';
 
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -10,13 +10,15 @@ import { DocumentView } from '../DocumentView';
 
 export function PageBody(props: {
     space: Space;
+    customization: CustomizationSettings;
     page: RevisionPageDocument;
     context: ContentRefContext;
     document: JSONDocument | null;
     withDesktopTableOfContents: boolean;
     withAside: boolean;
 }) {
-    const { space, context, page, document, withDesktopTableOfContents, withAside } = props;
+    const { space, customization, context, page, document, withDesktopTableOfContents, withAside } =
+        props;
 
     return (
         <main
@@ -39,7 +41,12 @@ export function PageBody(props: {
             ) : null}
 
             {page.layout.pagination ? (
-                <PageFooterNavigation space={space} pages={context.pages} page={page} />
+                <PageFooterNavigation
+                    space={space}
+                    customization={customization}
+                    pages={context.pages}
+                    page={page}
+                />
             ) : null}
         </main>
     );

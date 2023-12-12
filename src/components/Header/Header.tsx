@@ -7,7 +7,7 @@ import {
     CONTAINER_PADDING,
     HEADER_HEIGHT_DESKTOP,
 } from '@/components/layout';
-import { t } from '@/lib/intl';
+import { t, getSpaceLanguage } from '@/intl/server';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
@@ -92,7 +92,7 @@ export function Header(props: {
                 <div className={tcls('flex', 'md:w-56', 'grow-0', 'shrink-0', 'justify-self-end')}>
                     <Suspense fallback={null}>
                         <SearchButton>
-                            <span>{t({ space }, 'search')}</span>
+                            <span>{t(getSpaceLanguage(customization), 'search')}</span>
                         </SearchButton>
                     </Suspense>
                 </div>

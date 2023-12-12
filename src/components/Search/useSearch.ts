@@ -1,8 +1,11 @@
-import { usePathname } from 'next/navigation';
-import React from 'react';
 import { atom, useRecoilState } from 'recoil';
 
-const searchQueryState = atom<string | null>({
+export interface SearchState {
+    query: string;
+    ask: boolean;
+}
+
+const searchQueryState = atom<SearchState | null>({
     key: 'searchQueryState',
     default: null,
     effects: [
@@ -13,8 +16,8 @@ const searchQueryState = atom<string | null>({
                 }, 1);
             }
 
-            onSet((query, previousQuery) => {
-                if (query === previousQuery) {
+            onSet((searchState, previousState) => {
+                if (searchState === previousState) {
                     return;
                 }
 
@@ -22,25 +25,30 @@ const searchQueryState = atom<string | null>({
                 const title = window.document.title;
                 const searchParams = new URLSearchParams(window.location.search);
 
-                if (query === null) {
-                    if (!searchParams.has('q')) {
+                if (searchState === null) {
+                    if (!searchParams.has('q') && !searchParams.has('ask')) {
                         return;
                     }
 
                     searchParams.delete('q');
+                    searchParams.delete('ask');
                 } else {
-                    if (searchParams.get('q') === query) {
+                    if (
+                        searchParams.get('q') === searchState.query &&
+                        searchParams.has('ask') === searchState.ask
+                    ) {
                         return;
                     }
 
-                    searchParams.set('q', query);
+                    searchParams.set('q', searchState.query);
+                    searchState.ask ? searchParams.set('ask', 'on') : searchParams.delete('ask');
                 }
 
                 const url =
                     window.location.pathname +
                     (searchParams.size ? '?' + searchParams.toString() : '');
 
-                if (previousQuery === null && query !== null) {
+                if (previousState === null && searchState !== null) {
                     window.history.pushState(state, title, url);
                 } else {
                     window.history.replaceState(state, title, url);
@@ -53,12 +61,18 @@ const searchQueryState = atom<string | null>({
 /**
  * Hook to access the current search query and update it.
  */
-export function useSearch(): [string | null, (query: string | null) => void] {
+export function useSearch(): [SearchState | null, (query: SearchState | null) => void] {
     const [query, setQuery] = useRecoilState(searchQueryState);
     return [query, setQuery];
 }
 
-function getCurrentSearchQuery() {
+function getCurrentSearchQuery(): SearchState | null {
     const searchParams = new URLSearchParams(window.location.search);
-    return searchParams.get('q') ?? null;
+    const query = searchParams.get('q') ?? null;
+    if (!query) {
+        return null;
+    }
+
+    const ask = searchParams.has('ask');
+    return { query, ask };
 }

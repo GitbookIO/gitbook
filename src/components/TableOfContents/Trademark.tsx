@@ -1,11 +1,16 @@
-import { IntlContext, t } from '@/lib/intl';
+import { CustomizationSettings, Space } from '@gitbook/api';
+
+import { t, getSpaceLanguage } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
 
 import { IconLogo } from '../icons/IconLogo';
 /**
  * Link to the GitBook platform.
  */
-export function Trademark(props: IntlContext) {
+export function Trademark(props: { space: Space; customization: CustomizationSettings }) {
+    const { customization } = props;
+    const language = getSpaceLanguage(customization);
+
     return (
         <div
             className={tcls(
@@ -63,7 +68,7 @@ export function Trademark(props: IntlContext) {
                     )}
                 >
                     <IconLogo className={tcls('w-5', 'h-5', 'mr-3')} />
-                    {t(props, 'powered_by_gitbook')}
+                    {t(language, 'powered_by_gitbook')}
                 </a>
             </div>
         </div>
