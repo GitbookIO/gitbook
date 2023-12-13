@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { RevisionPage, RevisionPageDocument } from '@gitbook/api';
+import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 import { headers } from 'next/headers';
 
 import { getPagePath } from './pages';
@@ -60,7 +60,7 @@ export function absoluteHref(href: string, withHost: boolean = false): string {
  */
 export function pageHref(
     rootPages: RevisionPage[],
-    page: RevisionPageDocument,
+    page: RevisionPageDocument | RevisionPageGroup,
     context: PageHrefContext = {},
     /** Anchor to link to in the page. */
     anchor?: string,
@@ -83,7 +83,10 @@ export function pageHref(
 /**
  * Create the HTML ID for the container of a page during a PDF rendering.
  */
-export function pagePDFContainerId(page: RevisionPageDocument, anchor?: string): string {
+export function pagePDFContainerId(
+    page: RevisionPageDocument | RevisionPageGroup,
+    anchor?: string,
+): string {
     return `pdf-page-${page.id}` + (anchor ? `-${anchor}` : '');
 }
 

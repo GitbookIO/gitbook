@@ -99,7 +99,10 @@ export function resolvePrevNextPages(
 /**
  * Resolve a page to its canonical path.
  */
-export function getPagePath(rootPages: Revision['pages'], page: RevisionPageDocument): string {
+export function getPagePath(
+    rootPages: Revision['pages'],
+    page: RevisionPageDocument | RevisionPageGroup,
+): string {
     const firstPage = resolveFirstDocument(rootPages, []);
 
     if (firstPage && firstPage.page.id === page.id) {

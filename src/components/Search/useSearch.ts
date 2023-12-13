@@ -1,3 +1,5 @@
+import { LinkProps } from 'next/link';
+import React from 'react';
 import { atom, useRecoilState } from 'recoil';
 
 export interface SearchState {
@@ -64,6 +66,30 @@ const searchQueryState = atom<SearchState | null>({
 export function useSearch(): [SearchState | null, (query: SearchState | null) => void] {
     const [query, setQuery] = useRecoilState(searchQueryState);
     return [query, setQuery];
+}
+
+/**
+ * Hook to create a link to a search query.
+ */
+export function useSearchLink(): (query: SearchState) => LinkProps {
+    const [, setQuery] = useRecoilState(searchQueryState);
+
+    return React.useCallback(
+        (query) => {
+            const searchParams = new URLSearchParams();
+            searchParams.set('q', query.query);
+            query.ask ? searchParams.set('ask', 'on') : searchParams.delete('ask');
+            return {
+                href: '?' + searchParams.toString(),
+                prefetch: false,
+                onClick: (event) => {
+                    event.preventDefault();
+                    setQuery(query);
+                },
+            };
+        },
+        [setQuery],
+    );
 }
 
 function getCurrentSearchQuery(): SearchState | null {

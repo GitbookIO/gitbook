@@ -1,7 +1,10 @@
 'use server';
 
-import { api } from '@/lib/api';
-import { absoluteHref } from '@/lib/links';
+import { api, getRevisionPages } from '@/lib/api';
+import { absoluteHref, pageHref } from '@/lib/links';
+import { resolvePageId } from '@/lib/pages';
+import { tcls } from '@/lib/tailwind';
+import { filterOutNullable } from '@/lib/typescript';
 
 export type OrderedComputedResult = ComputedPageResult | ComputedSectionResult;
 
@@ -18,6 +21,23 @@ export interface ComputedPageResult {
     id: string;
     title: string;
     href: string;
+}
+
+export interface AskAnswerSource {
+    id: string;
+    title: string;
+    href: string;
+    ancestors: Array<{
+        id: string;
+        title: string;
+        href: string;
+    }>;
+}
+
+export interface AskAnswerResult {
+    body: React.ReactNode;
+    followupQuestions: string[];
+    sources: AskAnswerSource[];
 }
 
 /**
@@ -54,7 +74,46 @@ export async function searchContent(
 /**
  * Server action to ask a question in a space.
  */
-export async function askQuestion(spaceId: string, query: string) {
-    const { data } = await api().spaces.askQueryInSpace(spaceId, { query });
-    return data;
+export async function askQuestion(spaceId: string, query: string): Promise<AskAnswerResult | null> {
+    const [{ data }, pages] = await Promise.all([
+        api().spaces.askQueryInSpace(spaceId, { query }),
+        getRevisionPages({ spaceId }),
+    ]);
+
+    if (!data.answer) {
+        return null;
+    }
+
+    const sources = data.answer.sources
+        .map((source) => {
+            if (source.type !== 'page') {
+                return null;
+            }
+
+            const page = resolvePageId(pages, source.page);
+            if (!page) {
+                return null;
+            }
+
+            return {
+                id: page.page.id,
+                title: page.page.title,
+                href: pageHref(pages, page.page),
+                ancestors: page.ancestors.map((ancestor) => ({
+                    id: ancestor.id,
+                    title: ancestor.title,
+                    href: pageHref(pages, ancestor),
+                })),
+            };
+        })
+        .filter(filterOutNullable);
+
+    return {
+        body: (
+            // TODO: parse the markdown
+            <p className={tcls('text-base', 'font-normal')}>{data.answer.text}</p>
+        ),
+        followupQuestions: data.answer.followupQuestions,
+        sources,
+    };
 }

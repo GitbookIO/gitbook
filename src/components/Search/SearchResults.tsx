@@ -10,7 +10,6 @@ import { SearchQuestionResultItem } from './SearchQuestionResultItem';
 import { SearchSectionResultItem } from './SearchSectionResultItem';
 import { OrderedComputedResult, searchContent } from './server-actions';
 
-
 export interface SearchResultsRef {
     moveUp(): void;
     moveDown(): void;
@@ -33,7 +32,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     const debounceTimeout = React.useRef<NodeJS.Timeout | null>(null);
     const [results, setResults] = React.useState<ResultType[] | null>(null);
     const [cursor, setCursor] = React.useState<number | null>(null);
-    const refs = React.useRef<(null | HTMLAnchorElement)[]>([]);
+    const refs = React.useRef<(null | HTMLAnchorElement | HTMLDivElement)[]>([]);
 
     React.useEffect(() => {
         if (debounceTimeout.current) {
