@@ -30,10 +30,11 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
     }
 
     switch (definition.type) {
-        case 'content-ref':
-            const target = await resolveContentRef(value as any, context);
+        /*         case 'content-ref':
+            // @ts-ignore
+            const target = await resolveContentRef(value, context);
             if (!target) {
-                return null;
+                return <Tag className={tcls(['w-full'])}>{''}</Tag>;
             }
             return (
                 <Link
@@ -47,7 +48,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                 >
                     {target.text}
                 </Link>
-            );
+            ); */
         case 'checkbox':
             return (
                 <Checkbox
