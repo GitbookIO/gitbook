@@ -57,19 +57,59 @@ export function cache<Args extends any[], Result>(
         extractArgs?: (args: Args) => any[];
     } = {},
 ): (...args: Args) => Promise<Result> {
+    const fetchValue = async (key: string, ...args: Args) => {
+        // Read the cache
+        const startTime = performance.now();
+        const cachedValue = await getCacheValue(key);
+        const readCacheDuration = performance.now() - startTime;
+
+        // Returns it if it exists
+        if (cachedValue !== null) {
+            console.log(`cache: ${key} hit in ${readCacheDuration.toFixed(0)}ms`);
+            return cachedValue;
+        }
+
+        // Fetch upstream
+        const result = await fn(...args);
+        const fetchDuration = performance.now() - startTime - readCacheDuration;
+
+        // Write it to the cache
+        // As soon as it'll be possible with next-on-pages, we should `waitUntil`
+        // to delay writing the cache after the response has been sent to the client.
+        await setCacheValue(key, result);
+        const writeCacheDuration =
+            performance.now() - startTime - readCacheDuration - fetchDuration;
+
+        console.log(
+            `cache: ${key} miss in ${fetchDuration.toFixed(
+                0,
+            )}ms, read in ${readCacheDuration.toFixed(0)}ms, write in ${writeCacheDuration.toFixed(
+                0,
+            )}ms`,
+        );
+
+        return result.data;
+    };
+
+    const pendings = new Map<string, Promise<any>>();
+
     return async (...args: Args) => {
         const cacheArgs = options.extractArgs ? options.extractArgs(args) : args;
         const key = getCacheKey(fnName, cacheArgs);
 
-        const cachedValue = await getCacheValue(key);
-        if (cachedValue !== null) {
-            return cachedValue;
+        // If a pending request exists, wait for it
+        if (pendings.has(key)) {
+            return await pendings.get(key);
         }
 
-        const result = await fn(...args);
-        await setCacheValue(key, result);
+        // Otherwise, fetch the value
+        const promise = fetchValue(key, ...args);
+        pendings.set(key, promise);
 
-        return result.data;
+        // Remove the pending request once it's done
+        promise.finally(() => pendings.delete(key));
+
+        return await promise;
     };
 }
 

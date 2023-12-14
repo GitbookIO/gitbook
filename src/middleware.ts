@@ -49,7 +49,7 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(resolved.redirect);
     }
 
-    console.log(`rendering ${resolved.space} ${resolved.pathname}`);
+    console.log(`${request.method} ${resolved.space}${resolved.pathname}`);
 
     const headers = new Headers(request.headers);
 
