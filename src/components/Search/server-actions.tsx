@@ -117,3 +117,11 @@ export async function askQuestion(spaceId: string, query: string): Promise<AskAn
         sources,
     };
 }
+
+/**
+ * List suggested questions for a space.
+ */
+export async function getRecommendedQuestions(spaceId: string): Promise<string[]> {
+    const { data } = await api().spaces.getRecommendedQuestionsInSpace(spaceId);
+    return data.questions;
+}

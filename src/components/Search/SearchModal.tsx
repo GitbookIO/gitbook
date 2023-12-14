@@ -13,6 +13,7 @@ import { SearchState, useSearch } from './useSearch';
 
 interface SearchModalProps {
     spaceId: string;
+    withAsk: boolean;
 }
 
 export function SearchModal(props: SearchModalProps) {
@@ -75,7 +76,7 @@ function SearchModalBody(
         onClose: () => void;
     },
 ) {
-    const { spaceId, state, onChangeQuery, onClose } = props;
+    const { spaceId, withAsk, state, onChangeQuery, onClose } = props;
 
     const language = useLanguage();
     const resultsRef = React.useRef<SearchResultsRef>(null);
@@ -149,11 +150,12 @@ function SearchModalBody(
                     />
                 </div>
             </div>
-            {state.query && !state.ask ? (
+            {!state.ask || !withAsk ? (
                 <SearchResults
                     ref={resultsRef}
                     spaceId={spaceId}
                     query={state.query}
+                    withAsk={withAsk}
                     onSwitchToAsk={() => {
                         onChangeQuery({
                             ask: true,
@@ -162,7 +164,7 @@ function SearchModalBody(
                     }}
                 />
             ) : null}
-            {state.query && state.ask ? (
+            {state.query && state.ask && withAsk ? (
                 <SearchAskAnswer spaceId={spaceId} query={state.query} />
             ) : null}
         </div>

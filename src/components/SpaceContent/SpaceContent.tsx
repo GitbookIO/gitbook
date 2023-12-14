@@ -153,7 +153,7 @@ export function SpaceContent(props: {
             ) : null}
 
             <React.Suspense fallback={null}>
-                <SearchModal spaceId={space.id} />
+                <SearchModal spaceId={space.id} withAsk={customization.aiSearch.enabled} />
             </React.Suspense>
         </div>
     );

@@ -1,21 +1,26 @@
+import Link from 'next/link';
 import React from 'react';
 
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
+import { useSearchLink } from './useSearch';
+
 export const SearchQuestionResultItem = React.forwardRef(function SearchQuestionResultItem(
     props: {
-        query: string;
+        question: string;
         active: boolean;
         onClick: () => void;
+        recommended?: boolean;
     },
-    ref: React.Ref<HTMLDivElement>,
+    ref: React.Ref<HTMLAnchorElement>,
 ) {
-    const { query, active, onClick } = props;
+    const { question, recommended = false, active, onClick } = props;
     const language = useLanguage();
+    const getLinkProp = useSearchLink();
 
     return (
-        <div
+        <Link
             ref={ref}
             onClick={onClick}
             className={tcls(
@@ -32,8 +37,12 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                 'first:mt-0',
                 active ? ['bg-primary-50'] : null,
             )}
+            {...getLinkProp({
+                ask: true,
+                query: question,
+            })}
         >
-            {t(language, 'search_ask', [query])}
-        </div>
+            {recommended ? question : t(language, 'search_ask', [question])}
+        </Link>
     );
 });

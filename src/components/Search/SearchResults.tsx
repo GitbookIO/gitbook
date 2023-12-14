@@ -8,7 +8,7 @@ import { isQuestion } from './isQuestion';
 import { SearchPageResultItem } from './SearchPageResultItem';
 import { SearchQuestionResultItem } from './SearchQuestionResultItem';
 import { SearchSectionResultItem } from './SearchSectionResultItem';
-import { OrderedComputedResult, searchContent } from './server-actions';
+import { getRecommendedQuestions, OrderedComputedResult, searchContent } from './server-actions';
 
 export interface SearchResultsRef {
     moveUp(): void;
@@ -16,42 +16,85 @@ export interface SearchResultsRef {
     select(): void;
 }
 
-type ResultType = OrderedComputedResult | { type: 'question'; id: string; query: string };
+type ResultType =
+    | OrderedComputedResult
+    | { type: 'question'; id: string; query: string }
+    | { type: 'recommended-question'; id: string; question: string };
 
+/**
+ * Fetch the results of the keyboard navigable elements to display for a query:
+ *   - Recommended questions if no query is provided.
+ *   - Search results if a query is provided.
+ *      - If withAsk is true and the query is a question, add a question result.
+ */
 export const SearchResults = React.forwardRef(function SearchResults(
     props: {
         query: string;
         spaceId: string;
+        withAsk: boolean;
         onSwitchToAsk: () => void;
     },
     ref: React.Ref<SearchResultsRef>,
 ) {
-    const { query, spaceId, onSwitchToAsk } = props;
+    const { query, spaceId, withAsk, onSwitchToAsk } = props;
 
     const language = useLanguage();
     const debounceTimeout = React.useRef<NodeJS.Timeout | null>(null);
     const [results, setResults] = React.useState<ResultType[] | null>(null);
     const [cursor, setCursor] = React.useState<number | null>(null);
-    const refs = React.useRef<(null | HTMLAnchorElement | HTMLDivElement)[]>([]);
+    const refs = React.useRef<(null | HTMLAnchorElement)[]>([]);
+    const suggestedQuestionsRef = React.useRef<null | string[]>(null);
 
     React.useEffect(() => {
-        if (debounceTimeout.current) {
-            clearTimeout(debounceTimeout.current);
-        }
-
-        setResults((prev) => withQuestionResult(prev, query));
-
-        debounceTimeout.current = setTimeout(async () => {
-            setCursor(null);
-            setResults(withQuestionResult(await searchContent(spaceId, query), query));
-        }, 250);
-
-        return () => {
-            if (debounceTimeout.current) {
-                clearTimeout(debounceTimeout.current);
+        if (!query) {
+            if (!withAsk) {
+                return;
             }
-        };
-    }, [query, spaceId]);
+
+            let cancelled = false;
+
+            (suggestedQuestionsRef.current
+                ? Promise.resolve(suggestedQuestionsRef.current)
+                : getRecommendedQuestions(spaceId)
+            ).then((questions) => {
+                suggestedQuestionsRef.current = questions;
+
+                if (cancelled) {
+                    return;
+                }
+
+                setResults(
+                    questions.map((question) => ({
+                        type: 'recommended-question',
+                        id: question,
+                        question: question,
+                    })),
+                );
+            });
+
+            return () => {
+                cancelled = true;
+            };
+        } else {
+            if (withAsk) {
+                setResults((prev) => withQuestionResult(prev, query));
+            }
+
+            debounceTimeout.current = setTimeout(async () => {
+                setCursor(null);
+
+                const fetchedResults = await searchContent(spaceId, query);
+                setResults(withAsk ? withQuestionResult(fetchedResults, query) : fetchedResults);
+            }, 250);
+
+            return () => {
+                if (debounceTimeout.current) {
+                    clearTimeout(debounceTimeout.current);
+                    debounceTimeout.current = null;
+                }
+            };
+        }
+    }, [query, spaceId, withAsk]);
 
     // Scroll to the active result.
     React.useEffect(() => {
@@ -137,9 +180,23 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                         refs.current[index] = ref;
                                     }}
                                     key={item.id}
-                                    query={query}
+                                    question={query}
                                     active={index === cursor}
                                     onClick={onSwitchToAsk}
+                                />
+                            );
+                        }
+                        case 'recommended-question': {
+                            return (
+                                <SearchQuestionResultItem
+                                    ref={(ref) => {
+                                        refs.current[index] = ref;
+                                    }}
+                                    key={item.id}
+                                    question={item.question}
+                                    active={index === cursor}
+                                    onClick={onSwitchToAsk}
+                                    recommended
                                 />
                             );
                         }
