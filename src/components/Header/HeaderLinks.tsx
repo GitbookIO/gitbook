@@ -11,10 +11,12 @@ export async function HeaderLinks({ children }: HeaderLinksProps) {
         <div
             className={tcls(
                 '@container/headerlinks',
+                'w-full',
                 'hidden',
-                'sm:flex',
+                'sm:inline-flex',
                 'justify-end',
                 'h-full',
+                'tracking-[-0.02em]',
                 //hide children
                 `[&>*]:hidden`,
                 //hide each child per container breakpoint

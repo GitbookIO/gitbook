@@ -28,9 +28,25 @@ export async function RecordCard(
     const body = (
         <div className={tcls('grid-area-1-1', 'z-0', 'relative')}>
             {cover ? (
-                <img alt="Cover" src={cover.href} className={tcls('w-full', 'aspect-video')} />
+                <img
+                    alt="Cover"
+                    src={cover.href}
+                    className={tcls('w-full', 'aspect-video', 'object-cover')}
+                />
             ) : null}
-            <div className={tcls('flex', 'flex-col', 'p-4')}>
+            <div
+                className={tcls(
+                    'flex',
+                    'flex-col',
+                    'p-4',
+                    'text-sm',
+                    'text-dark/8',
+                    'transition-colors',
+                    'group-hover:text-dark/10',
+                    'dark:text-light/8',
+                    'dark:group-hover:text-light/10',
+                )}
+            >
                 {view.columns.map((column) => {
                     return <RecordColumnValue key={column} {...props} column={column} />;
                 })}

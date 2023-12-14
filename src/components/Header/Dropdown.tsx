@@ -121,7 +121,9 @@ export function DropdownMenuItem(props: {
                 'px-3',
                 'py-1',
                 'rounded',
-                active ? ['bg-primary-50'] : ['hover:bg-dark/2', 'dark:hover:bg-light/2'],
+                active
+                    ? ['bg-primary-100', 'dark:bg-light/2']
+                    : ['hover:bg-dark/2', 'dark:hover:bg-light/2'],
             )}
         >
             {children}

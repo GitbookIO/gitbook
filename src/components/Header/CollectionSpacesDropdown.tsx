@@ -17,6 +17,7 @@ export function CollectionSpacesDropdown(props: {
                 <div
                     {...buttonProps}
                     className={tcls(
+                        'justify-self-start',
                         'flex',
                         'flex-row',
                         'items-center',
@@ -24,8 +25,9 @@ export function CollectionSpacesDropdown(props: {
                         'rounded-full',
                         'px-3',
                         'py-1',
-                        'bg-header-background-400',
-                        'text-header-link-500',
+                        'bg-dark/2',
+                        'dark:bg-light/2',
+                        /*                         'text-header-link-500', */
                     )}
                 >
                     {space.title}

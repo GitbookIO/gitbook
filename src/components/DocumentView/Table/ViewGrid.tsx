@@ -8,11 +8,11 @@ import styles from './table.module.css';
 
 export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
     const { block, view, records, style } = props;
-    const columnsLengthThreshold = view.columns.length >= 7;
-    const tableLayout = columnsLengthThreshold ? 'table-auto' : 'table-fixed';
-    const tableWrapper = columnsLengthThreshold
+    const columnsOverThreshold = view.columns.length >= 7;
+
+    const tableWrapper = columnsOverThreshold
         ? [
-              'max-w-4xl',
+              // has over X columns
               'w-full',
               'overflow-x-auto',
               'overflow-y-hidden',
@@ -21,22 +21,47 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
               'border',
               'border-dark/2',
               'dark:border-light/2',
-              styles.progressContainer,
+              block.data.fullWidth
+                  ? [
+                        // has over X columns, and is full width
+                        'max-w-full',
+                    ]
+                  : [
+                        // NOT full width, but has over X columns
+                        'max-w-4xl',
+                    ],
           ]
-        : ['max-w-3xl', 'w-full', 'overflow-x-auto', 'overflow-y-hidden', 'mx-auto'];
+        : [
+              'w-full',
+              'overflow-x-auto',
+              'overflow-y-hidden',
+              'mx-auto',
+              // has under X columns
+              block.data.fullWidth
+                  ? [
+                        // has under X columns, and is full width
+                        'max-w-full',
+                    ]
+                  : [
+                        // NOT full width, but has under X columns
+                        'max-w-3xl',
+                    ],
+          ];
 
-    const tableTR = columnsLengthThreshold
+    const tableTR = columnsOverThreshold
         ? ['[&>*+*]:border-l', '[&>*]:px-4']
         : ['[&>*+*]:border-l', '[&>*+*]:pl-4'];
 
-    const tableTH = columnsLengthThreshold ? ['py-3'] : ['py-1', 'pt-0'];
+    const tableTH = columnsOverThreshold ? ['py-3'] : ['py-1', 'pt-0'];
 
     return (
-        <div className={`${tcls('relative', 'grid', tableWrapper)}`}>
+        <div
+            className={`${tcls(style, 'relative', 'grid', tableWrapper, styles.progressContainer)}`}
+        >
             {/* ProgressScroller: */}
             <div
                 className={`${styles.progressOpacitySharp} ${tcls(
-                    columnsLengthThreshold ? 'grid' : 'hidden',
+                    'grid',
                     'items-center',
                     'grid-area-1-1',
                     'w-[5rem]',
@@ -112,20 +137,7 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
             </div>
 
             {/* Table: */}
-            <table
-                className={tcls(
-                    style,
-                    'block',
-                    'w-full',
-                    'grid-area-1-1',
-                    tableLayout,
-                    block.data.fullWidth
-                        ? ['max-w-full']
-                        : columnsLengthThreshold
-                          ? ['max-w-full']
-                          : null,
-                )}
-            >
+            <table className={tcls('w-full', 'grid-area-1-1', 'table-auto')}>
                 {view.hideHeader ? null : (
                     <thead>
                         <tr className={tcls(tableTR)}>
@@ -138,11 +150,12 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                                             'align-baseline',
                                             'textwrap-balance',
                                             'border-b',
-                                            'border-l-light/2',
+                                            'border-b-dark/4',
                                             'text-left',
                                             'text-sm',
                                             'lg:text-base',
-                                            'dark:border-b-light/6',
+                                            'dark:border-l-light/2',
+                                            'dark:border-b-light/5',
                                         )}
                                     >
                                         {block.data.definition[column].title}

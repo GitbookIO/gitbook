@@ -13,6 +13,7 @@
     }
 
     .progressOpacitySharp {
+        opacity: 0;
         animation-name: opacityProgressSharp;
         animation-duration: 1ms;
         animation-direction: alternate;

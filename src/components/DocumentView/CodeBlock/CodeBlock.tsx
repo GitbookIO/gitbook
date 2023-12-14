@@ -21,37 +21,108 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
 
     const withLineNumbers = !!block.data.lineNumbers && block.nodes.length > 1;
     const withWrap = block.data.overflow === 'wrap';
+    const title = block.data.title;
+    const fullWidth = block.data.fullWidth;
+
+    const fullWidthStyle = fullWidth ? 'max-w-4xl' : 'max-w-3xl';
+    const titleRounding = title ? ['rounded-md', 'rounded-ss-none'] : ['rounded-md'];
 
     return (
-        <pre className={tcls('relative', style)}>
-            <code
-                id={id}
+        <div className={tcls('grid', 'grid-flow-col', style, fullWidthStyle)}>
+            <div
                 className={tcls(
                     'flex',
-                    'flex-col',
-                    'flex-wrap',
-                    'py-4',
-                    'rounded-md',
-                    'bg-light',
-                    '[counter-reset:line]',
-                    withWrap ? 'whitespace-pre-wrap' : 'overflow-x-scroll',
+                    'items-center',
+                    'justify-start',
+                    '[grid-area:1/1]',
+                    /*                     'mb-2', */
+                    'text-sm',
+                    'gap-2',
                 )}
             >
-                {lines.map((line, index) => (
-                    <CodeHighlightLine
-                        block={block}
-                        key={index}
-                        line={line}
-                        lineIndex={index + 1}
-                        isLast={index === lines.length - 1}
-                        withLineNumbers={withLineNumbers}
-                        withWrap={withWrap}
-                        context={context}
-                    />
-                ))}
-            </code>
-            <CopyCodeButton codeId={id} style={['absolute', 'top-2', 'right-2']} />
-        </pre>
+                {title ? (
+                    <div
+                        className={tcls(
+                            'text-xs',
+                            'tracking-wide',
+                            'text-dark/7',
+                            'leading-none',
+                            'inline-flex',
+                            'items-center',
+                            'justify-center',
+                            '[background-color:color-mix(in_srgb,_rgb(var(--light)),_rgb(var(--dark))_3%)]',
+                            'rounded-t',
+                            'px-3',
+                            'py-2',
+                            'dark:bg-light/1',
+                            'dark:text-light/7',
+                        )}
+                    >
+                        {title}
+                    </div>
+                ) : null}
+            </div>
+            <CopyCodeButton
+                codeId={id}
+                style={[
+                    'text-xs',
+                    '[grid-area:2/1]',
+                    'z-[1]',
+                    'justify-self-end',
+                    'backdrop-blur-md',
+                    'self-start',
+                    'ring-1',
+                    'ring-dark/2',
+                    'text-dark/7',
+                    'bg-transparent',
+                    'rounded-md',
+                    'mr-2',
+                    'mt-2',
+                    'p-1',
+                    'hover:ring-dark/3',
+                    'dark:ring-light/2',
+                    'dark:text-light/7',
+                    'dark:hover:ring-light/3',
+                ]}
+            />
+            <pre
+                className={tcls(
+                    '[grid-area:2/1]',
+                    'relative',
+                    'overflow-auto',
+                    'linear-mask-util',
+                    '[background-color:color-mix(in_srgb,_rgb(var(--light)),_rgb(var(--dark))_3%)]',
+                    'dark:bg-light/1',
+
+                    titleRounding,
+                )}
+            >
+                <code
+                    id={id}
+                    className={tcls(
+                        'min-w-full',
+                        'table',
+                        'py-2',
+                        'px-2',
+                        '[counter-reset:line]',
+                        withWrap ? 'whitespace-pre-wrap' : '',
+                    )}
+                >
+                    {lines.map((line, index) => (
+                        <CodeHighlightLine
+                            block={block}
+                            key={index}
+                            line={line}
+                            lineIndex={index + 1}
+                            isLast={index === lines.length - 1}
+                            withLineNumbers={withLineNumbers}
+                            withWrap={withWrap}
+                            context={context}
+                        />
+                    ))}
+                </code>
+            </pre>
+        </div>
     );
 }
 
@@ -65,30 +136,77 @@ function CodeHighlightLine(props: {
     context: ContentRefContext;
 }) {
     const { block, line, isLast, withLineNumbers, context } = props;
-
     return (
         <span
             className={tcls(
-                'flex',
-                'flex-row',
-                'px-4',
-                line.highlighted ? 'bg-dark/5' : null,
-                withLineNumbers
-                    ? [
-                          'before:shrink-0',
-                          'before:absolute',
-                          'before:left-0',
-                          'before:pl-4',
-                          line.highlighted ? 'before:bg-primary-200' : 'before:bg-primary-100',
-                          'before:text-primary-400',
-                          'before:content-[counter(line)]',
-                          '[counter-increment:line]',
-                          getLineNumberGutterWidth(block),
-                      ]
-                    : [],
+                'overflow-hidden',
+                'table-row',
+                'relative',
+                'linear-mask-util',
+                'ring-2',
+                /*                 'ring-inset', */
+                'ring-transparent',
+                'hover:ring-dark/2',
+                'dark:hover:ring-light/2',
+                'rounded',
+                'mask-[linear-gradient(to right, transparent, #000 1rem, #000 100%)]',
+                //first child
+                '[&.highlighted:first-child]:rounded-t-md',
+                '[&.highlighted:first-child>*]:mt-1',
+                //last child
+                '[&.highlighted:last-child]:rounded-b-md',
+                '[&.highlighted:last-child>*]:mb-1',
+                //is only child, dont hover effect line
+                '[&:only-child]:hover:ring-transparent',
+                //select all highlighted
+                '[&.highlighted]:rounded-none',
+                //select first in group
+                '[&:not(.highlighted)_+_.highlighted]:rounded-t-md',
+                '[&:not(.highlighted)_+_.highlighted>*]:mt-1',
+                //select last in group
+                '[&.highlighted:has(+:not(.highlighted))]:rounded-b-md',
+                '[&.highlighted:has(+:not(.highlighted))>*]:mb-1',
+                //select if highlight is singular in group
+                '[&:not(.highlighted)_+_.highlighted:has(+:not(.highlighted))]:rounded-md',
+
+                line.highlighted ? ['highlighted', 'bg-dark/1', 'dark:bg-sky/1'] : null,
             )}
         >
-            <span className="flex-1">
+            {withLineNumbers ? (
+                <span
+                    className={tcls(
+                        'table-cell',
+                        'w-[0.01ch]',
+                        'text-right',
+                        'pr-3',
+                        'pl-2',
+                        'sticky',
+                        'left-0',
+                        '[background:linear-gradient(to_right,_color-mix(in_srgb,_rgb(var(--light)),_rgb(var(--dark))_3%)_60%,_transparent)]',
+                        'dark:[background:linear-gradient(to_right,_color-mix(in_srgb,_rgb(var(--dark)),_rgb(var(--light))_4%)_60%,_transparent)]',
+                        /*                         '[background-color:color-mix(in_oklab,_rgb(var(--light)),_rgb(var(--dark))_97%)]', */
+                        withLineNumbers
+                            ? [
+                                  'before:text-dark/5',
+                                  'before:content-[counter(line)]',
+                                  '[counter-increment:line]',
+                                  'dark:before:text-light/4',
+
+                                  line.highlighted
+                                      ? [
+                                            'before:text-dark/6',
+                                            'dark:before:text-light/8',
+                                            '[background:linear-gradient(to_right,_color-mix(in_srgb,_rgb(var(--light)),_rgb(var(--dark))_7%)_60%,_transparent)]',
+                                            'dark:[background:linear-gradient(to_right,_color-mix(in_srgb,_rgb(var(--dark)),_rgb(var(--sky))_9%)_60%,_transparent)]',
+                                        ]
+                                      : null,
+                              ]
+                            : [],
+                    )}
+                ></span>
+            ) : null}
+
+            <span className={tcls('ml-3', 'block')}>
                 <CodeHighlightTokens tokens={line.tokens} context={context} />
                 {isLast ? null : !withLineNumbers && line.tokens.length === 0 && 0 ? (
                     <span className="ew">{'\u200B'}</span>
@@ -132,19 +250,4 @@ function CodeHighlightToken(props: { token: HighlightToken; context: ContentRefC
     }
 
     return <span style={{ color: colorToCSSVar[token.token.color] }}>{token.token.content}</span>;
-}
-
-/**
- * Compute the width ofthe gutter with the line number to align the code.
- */
-function getLineNumberGutterWidth(block: DocumentBlockCode): ClassValue {
-    if (block.nodes.length < 10) {
-        return ['before:w-8', 'ml-8'];
-    } else if (block.nodes.length < 100) {
-        return ['before:w-10', 'ml-10'];
-    } else if (block.nodes.length < 1000) {
-        return ['before:w-12', 'ml-12'];
-    } else {
-        return ['before:w-14', 'ml-14'];
-    }
 }

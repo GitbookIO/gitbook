@@ -81,6 +81,9 @@
     .linear-mask-gradient {
         mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 96px, rgba(0, 0, 0, 0));
     }
+    .linear-mask-util {
+        mask-image: linear-gradient(to bottom, white, white);
+    }
     .grid-area-1-1 {
         grid-area: 1/1;
     }

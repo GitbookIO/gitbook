@@ -58,8 +58,8 @@ export function Header(props: {
                 className={tcls(
                     'gap-8',
                     'grid',
-                    'grid-cols-[min-content_min-content]',
-                    'sm:grid-cols-[min-content_1fr_min-content]',
+                    'grid-flow-col',
+                    'auto-cols-[auto_auto_1fr_auto]',
                     'h-16',
                     'items-center',
                     'align-center',
@@ -70,13 +70,15 @@ export function Header(props: {
                 )}
             >
                 <HeaderLogo collection={collection} space={space} customization={customization} />
-                {collection ? (
-                    <CollectionSpacesDropdown
-                        space={space}
-                        collection={collection}
-                        collectionSpaces={collectionSpaces}
-                    />
-                ) : null}
+                <span>
+                    {collection ? (
+                        <CollectionSpacesDropdown
+                            space={space}
+                            collection={collection}
+                            collectionSpaces={collectionSpaces}
+                        />
+                    ) : null}
+                </span>
                 <HeaderLinks>
                     {customization.header.links.map((link, index) => {
                         return (

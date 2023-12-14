@@ -1,11 +1,14 @@
 import { DocumentBlockTable, DocumentTableViewCards } from '@gitbook/api';
+import Link from 'next/link';
 
 import { getNodeFragmentByName } from '@/lib/document';
+import { resolveContentRef } from '@/lib/references';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
-import { TableRecordKV, TableViewProps } from './Table';
+import { TableRecordKV } from './Table';
 import { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
+import { Checkbox } from '../Checkbox';
 
 /**
  * Render the value for a column in a record.
@@ -15,10 +18,9 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
         tag?: Tag;
         record: TableRecordKV;
         column: string;
-        columnStyle?: ClassValue;
     },
 ) {
-    const { tag: Tag = 'div', block, record, column, columnStyle, context } = props;
+    const { tag: Tag = 'div', block, record, column, context } = props;
 
     const definition = block.data.definition[column];
     const value = record[1].values[column];
@@ -28,13 +30,49 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
     }
 
     switch (definition.type) {
+        case 'content-ref':
+            const target = await resolveContentRef(value as any, context);
+            if (!target) {
+                return null;
+            }
+            return (
+                <Link
+                    className={tcls(
+                        'whitespace-nowrap',
+                        'text-sm',
+                        'text-primary-400',
+                        'hover:text-primary-500',
+                    )}
+                    href={target.href}
+                >
+                    {target.text}
+                </Link>
+            );
+        case 'checkbox':
+            return (
+                <Checkbox
+                    className={tcls('w-5', 'h-5')}
+                    checked={value as boolean}
+                    disabled={true}
+                />
+            );
+        case 'rating':
+            return (
+                <Tag className={tcls('text-base', 'tabular-nums', 'tracking-tighter')}>
+                    {`${value}`}
+                </Tag>
+            );
         case 'number':
-            return <Tag className={tcls('text-base', columnStyle)}>{`${value}`}</Tag>;
+            return (
+                <Tag
+                    className={tcls('text-base', 'tabular-nums', 'tracking-tighter')}
+                >{`${value}`}</Tag>
+            );
         case 'text':
             // @ts-ignore
             const fragment = getNodeFragmentByName(block, value);
             if (!fragment) {
-                return <Tag className={tcls([columnStyle, 'w-full'])}>{''}</Tag>;
+                return <Tag className={tcls(['w-full'])}>{''}</Tag>;
             }
 
             return (
@@ -42,9 +80,9 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                     tag={Tag}
                     ancestorBlocks={[]}
                     nodes={fragment.nodes}
-                    style={[columnStyle, 'w-full', 'space-y-2', 'lg:space-y-3']}
+                    style={['w-full', 'space-y-2', 'lg:space-y-3']}
                     context={context}
-                    blockStyle={['w-full']}
+                    blockStyle={['w-full', 'max-w-[unset]']}
                 />
             );
         default:
