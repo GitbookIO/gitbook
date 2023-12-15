@@ -59,9 +59,9 @@ export function cache<Args extends any[], Result>(
 ): (...args: Args) => Promise<Result> {
     const fetchValue = async (key: string, ...args: Args) => {
         // Read the cache
-        const startTime = performance.now();
+        const startTime = now();
         const cachedValue = await getCacheValue(key);
-        const readCacheDuration = performance.now() - startTime;
+        const readCacheDuration = now() - startTime;
 
         // Returns it if it exists
         if (cachedValue !== null) {
@@ -71,14 +71,13 @@ export function cache<Args extends any[], Result>(
 
         // Fetch upstream
         const result = await fn(...args);
-        const fetchDuration = performance.now() - startTime - readCacheDuration;
+        const fetchDuration = now() - startTime - readCacheDuration;
 
         // Write it to the cache
         // As soon as it'll be possible with next-on-pages, we should `waitUntil`
         // to delay writing the cache after the response has been sent to the client.
         await setCacheValue(key, result);
-        const writeCacheDuration =
-            performance.now() - startTime - readCacheDuration - fetchDuration;
+        const writeCacheDuration = now() - startTime - readCacheDuration - fetchDuration;
 
         console.log(
             `cache: ${key} miss in ${fetchDuration.toFixed(
@@ -256,4 +255,8 @@ async function setCacheValue(key: string, entry: CacheResult<any>) {
 
         await multi.exec();
     }
+}
+
+function now(): number {
+    return typeof performance !== 'undefined' ? performance.now() : Date.now();
 }

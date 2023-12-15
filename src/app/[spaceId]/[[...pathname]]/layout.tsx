@@ -1,15 +1,12 @@
 import { CustomizationHeaderPreset, CustomizationSettings } from '@gitbook/api';
 import assertNever from 'assert-never';
-import { Inter } from 'next/font/google';
 import colors from 'tailwindcss/colors';
 
-import { getSpaceCustomization } from '@/lib/api';
+import { fonts } from '@/fonts';
 import { hexToRgb, shadesOfColor } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
 
-import { PagePathParams } from '../fetch';
-
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+import { PagePathParams, fetchPageData } from '../fetch';
 
 export default async function SpaceRootLayout(props: {
     children: React.ReactNode;
@@ -17,7 +14,7 @@ export default async function SpaceRootLayout(props: {
 }) {
     const { params, children } = props;
 
-    const customization = await getSpaceCustomization(params.spaceId);
+    const { customization } = await fetchPageData(params);
     const headerTheme = generateHeaderTheme(customization);
 
     return (
@@ -51,7 +48,13 @@ export default async function SpaceRootLayout(props: {
                     }
                 `}</style>
             </head>
-            <body className={tcls(`${inter.className}`, 'bg-light', 'dark:bg-dark')}>
+            <body
+                className={tcls(
+                    `${fonts[customization.styling.font].className}`,
+                    'bg-light',
+                    'dark:bg-dark',
+                )}
+            >
                 {children}
             </body>
         </html>

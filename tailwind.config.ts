@@ -35,7 +35,7 @@ const config: Config = {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['var(--font-inter)'],
+                sans: ['var(--font-content)'],
                 /*  mono: ['var(--font-mono)'], */ // TODO: try Cartograph
             },
 
