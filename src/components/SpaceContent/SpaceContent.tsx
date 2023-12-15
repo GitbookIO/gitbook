@@ -56,6 +56,7 @@ export function SpaceContent(props: {
         page.layout.cover &&
         page.layout.coverSize === 'full'
     );
+    const withPageFeedback = customization.feedback.enabled;
 
     const contentRefContext: ContentRefContext = {
         space,
@@ -125,6 +126,10 @@ export function SpaceContent(props: {
                             document={document}
                             withDesktopTableOfContents={!!page.layout.tableOfContents}
                             withAside={!!page.layout.outline}
+                            withPageFeedback={
+                                // Display the page feedback in the page footer if the aside is not visible
+                                withPageFeedback && !page.layout.outline
+                            }
                         />
                         {page.layout.outline ? (
                             <PageAside
@@ -134,6 +139,7 @@ export function SpaceContent(props: {
                                 document={document}
                                 withHeaderOffset={withTopHeader}
                                 withFullPageCover={withFullPageCover}
+                                withPageFeedback={withPageFeedback}
                             />
                         ) : null}
                     </div>

@@ -6,13 +6,7 @@ import { getDocumentSections } from '@/lib/document';
 import { tcls } from '@/lib/tailwind';
 
 import { ScrollSectionsList } from './ScrollSectionsList';
-import {
-    SIDE_COLUMN_WITHOUT_HEADER,
-    SIDE_COLUMN_WITHOUT_HEADER_AND_COVER,
-    SIDE_COLUMN_WITH_HEADER,
-    SIDE_COLUMN_WITH_HEADER_AND_COVER,
-    HEADER_HEIGHT_DESKTOP,
-} from '../layout';
+import { PageFeedbackForm } from '../PageFeedback';
 
 /**
  * Aside listing the headings in the document.
@@ -24,8 +18,9 @@ export function PageAside(props: {
     document: JSONDocument | null;
     withHeaderOffset: boolean;
     withFullPageCover: boolean;
+    withPageFeedback: boolean;
 }) {
-    const { space, customization, document, withHeaderOffset, withFullPageCover } = props;
+    const { space, page, customization, document, withHeaderOffset, withPageFeedback } = props;
     const sections = document ? getDocumentSections(document) : [];
 
     return (
@@ -41,13 +36,6 @@ export function PageAside(props: {
                 'py-6',
                 withHeaderOffset ? 'top-16' : 'top-0',
                 'h-[100vh]',
-                /*                 withHeaderOffset
-                    ? withFullPageCover
-                        ? SIDE_COLUMN_WITH_HEADER_AND_COVER
-                        : SIDE_COLUMN_WITH_HEADER
-                    : withFullPageCover
-                      ? SIDE_COLUMN_WITHOUT_HEADER_AND_COVER
-                      : SIDE_COLUMN_WITHOUT_HEADER, */
             )}
         >
             {sections.length > 0 ? (
@@ -59,10 +47,16 @@ export function PageAside(props: {
                         <React.Suspense fallback={null}>
                             <ScrollSectionsList sections={sections} />
                         </React.Suspense>
+                        {withPageFeedback ? (
+                            <React.Suspense fallback={null}>
+                                <div className={tcls('mt-5')}>
+                                    <PageFeedbackForm spaceId={space.id} pageId={page.id} />
+                                </div>
+                            </React.Suspense>
+                        ) : null}
                     </div>
                 </>
             ) : null}
-            <div></div>
         </aside>
     );
 }

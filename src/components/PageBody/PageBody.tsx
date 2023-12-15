@@ -7,6 +7,7 @@ import { PageCover } from './PageCover';
 import { PageFooterNavigation } from './PageFooterNavigation';
 import { PageHeader } from './PageHeader';
 import { DocumentView } from '../DocumentView';
+import { PageFeedbackForm } from '../PageFeedback';
 
 export function PageBody(props: {
     space: Space;
@@ -16,9 +17,18 @@ export function PageBody(props: {
     document: JSONDocument | null;
     withDesktopTableOfContents: boolean;
     withAside: boolean;
+    withPageFeedback: boolean;
 }) {
-    const { space, customization, context, page, document, withDesktopTableOfContents, withAside } =
-        props;
+    const {
+        space,
+        customization,
+        context,
+        page,
+        document,
+        withDesktopTableOfContents,
+        withAside,
+        withPageFeedback,
+    } = props;
 
     return (
         <main
@@ -47,6 +57,21 @@ export function PageBody(props: {
                     pages={context.pages}
                     page={page}
                 />
+            ) : null}
+
+            {withPageFeedback ? (
+                <div
+                    className={tcls(
+                        'flex',
+                        'flex-row',
+                        'justify-end',
+                        'mt-6',
+                        'max-w-3xl',
+                        'mx-auto',
+                    )}
+                >
+                    <PageFeedbackForm spaceId={space.id} pageId={page.id} />
+                </div>
             ) : null}
         </main>
     );

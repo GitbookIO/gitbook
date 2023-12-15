@@ -9,5 +9,10 @@
     "search_ask": "Ask \"${1}\"",
     "on_this_page": "On this page",
     "next_page": "Next",
-    "previous_page": "Previous"
+    "previous_page": "Previous",
+    "was_this_helpful": "Was this helpful?",
+    "was_this_helpful_positive": "Yes, it was!",
+    "was_this_helpful_neutral": "Not sure",
+    "was_this_helpful_negative": "No",
+    "was_this_helpful_thank_you": "Thank you for the feedback!"
 }
