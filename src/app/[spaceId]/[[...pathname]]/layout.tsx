@@ -1,12 +1,15 @@
 import { CustomizationHeaderPreset, CustomizationSettings } from '@gitbook/api';
 import assertNever from 'assert-never';
+import Script from 'next/script';
 import colors from 'tailwindcss/colors';
 
 import { fonts } from '@/fonts';
+import { getSpaceContent } from '@/lib/api';
 import { hexToRgb, shadesOfColor } from '@/lib/colors';
+import { getContentSecurityPolicyNonce } from '@/lib/csp';
 import { tcls } from '@/lib/tailwind';
 
-import { PagePathParams, fetchPageData } from '../fetch';
+import { PagePathParams } from '../fetch';
 
 export default async function SpaceRootLayout(props: {
     children: React.ReactNode;
@@ -14,13 +17,21 @@ export default async function SpaceRootLayout(props: {
 }) {
     const { params, children } = props;
 
-    const { customization } = await fetchPageData(params);
+    const { customization, scripts } = await getSpaceContent({
+        spaceId: params.spaceId,
+    });
     const headerTheme = generateHeaderTheme(customization);
+    const nonce = getContentSecurityPolicyNonce();
 
     return (
         <html lang={customization.internationalization.locale}>
             <head>
-                <style>{`
+                <style
+                    nonce={
+                        //Since I can't get the nonce to work for inline styles, we need to allow unsafe-inline
+                        undefined
+                    }
+                >{`
                     :root {
                         ${generateColorVariable(
                             'primary-color',
@@ -56,6 +67,10 @@ export default async function SpaceRootLayout(props: {
                 )}
             >
                 {children}
+
+                {scripts.map(({ script }) => (
+                    <Script key={script} src={script} strategy="lazyOnload" nonce={nonce} />
+                ))}
             </body>
         </html>
     );

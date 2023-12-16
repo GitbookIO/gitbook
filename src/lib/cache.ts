@@ -11,15 +11,6 @@ const redis =
           })
         : null;
 
-const memoryCache = new Map<
-    string,
-    {
-        data: any;
-        tags: string[];
-        expiresAt: number;
-    }
->();
-
 export interface CacheResult<Result> {
     data: Result;
 
@@ -60,12 +51,17 @@ export function cache<Args extends any[], Result>(
     const fetchValue = async (key: string, ...args: Args) => {
         // Read the cache
         const startTime = now();
+        const hasMemoryHit = getMemoryCache().has(key);
         const cachedValue = await getCacheValue(key);
         const readCacheDuration = now() - startTime;
 
         // Returns it if it exists
         if (cachedValue !== null) {
-            console.log(`cache: ${key} hit in ${readCacheDuration.toFixed(0)}ms`);
+            console.log(
+                `cache: ${key} hit in ${readCacheDuration.toFixed(
+                    0,
+                )}ms (memory: ${hasMemoryHit}, redis: ${!!redis})`,
+            );
             return cachedValue;
         }
 
@@ -76,7 +72,9 @@ export function cache<Args extends any[], Result>(
         // Write it to the cache
         // As soon as it'll be possible with next-on-pages, we should `waitUntil`
         // to delay writing the cache after the response has been sent to the client.
-        await setCacheValue(key, result);
+        if (result.ttl && result.ttl > 0) {
+            await setCacheValue(key, result);
+        }
         const writeCacheDuration = now() - startTime - readCacheDuration - fetchDuration;
 
         console.log(
@@ -84,11 +82,14 @@ export function cache<Args extends any[], Result>(
                 0,
             )}ms, read in ${readCacheDuration.toFixed(0)}ms, write in ${writeCacheDuration.toFixed(
                 0,
-            )}ms`,
+            )}ms (redis: ${!!redis})`,
         );
 
         return result.data;
     };
+
+    // During development, for now it fetches data twice between the middleware and the handler.
+    // TODO: find a way to share the cache between the two.
 
     const pendings = new Map<string, Promise<any>>();
 
@@ -106,21 +107,25 @@ export function cache<Args extends any[], Result>(
         pendings.set(key, promise);
 
         // Remove the pending request once it's done
-        promise.finally(() => pendings.delete(key));
-
-        return await promise;
+        try {
+            const result = await promise;
+            return result;
+        } finally {
+            pendings.delete(key);
+        }
     };
 }
 
 /**
  * Parse an HTTP response into a cache entry.
  */
-export function parseCacheResponse<Result, DefaultData = Result>(
-    response: Response,
-): {
+export function parseCacheResponse(response: Response): {
     ttl: number;
     tags: string[];
 } {
+    const ageHeader = response.headers.get('age');
+    const age = ageHeader ? parseInt(ageHeader, 10) : 0;
+
     const cacheControlHeader = response.headers.get('cache-control');
     const cacheControl = cacheControlHeader ? parseCacheControl(cacheControlHeader) : null;
     const cacheTagHeader =
@@ -132,7 +137,7 @@ export function parseCacheResponse<Result, DefaultData = Result>(
     };
 
     if (cacheControl && cacheControl['max-age']) {
-        entry.ttl = cacheControl['max-age'];
+        entry.ttl = Math.max(0, cacheControl['max-age'] - age - 60);
     }
 
     return entry;
@@ -160,6 +165,7 @@ export function cacheResponse<Result, DefaultData = Result>(
  */
 export async function invalidateCacheTags(tags: string[]) {
     // Clear from memory cache
+    const memoryCache = getMemoryCache();
     memoryCache.forEach((value, key) => {
         if (value.tags.some((t) => tags.includes(t))) {
             memoryCache.delete(key);
@@ -203,13 +209,12 @@ function getCacheTagKey(tag: string) {
  * Get a value from the cache.
  */
 async function getCacheValue(key: string): Promise<any | null> {
+    const memoryCache = getMemoryCache();
     const memoryEntry = memoryCache.get(key);
     if (memoryEntry) {
         if (memoryEntry.expiresAt > Date.now()) {
             return memoryEntry.data;
         }
-
-        return null;
     }
 
     if (redis) {
@@ -220,7 +225,7 @@ async function getCacheValue(key: string): Promise<any | null> {
             memoryCache.set(key, {
                 data: value,
                 tags: [],
-                expiresAt: Date.now() + 2 * 60,
+                expiresAt: Date.now() + 60 * 1000,
             });
         }
 
@@ -236,6 +241,7 @@ async function getCacheValue(key: string): Promise<any | null> {
 async function setCacheValue(key: string, entry: CacheResult<any>) {
     const ttl = entry.ttl ?? 60 * 60 * 24;
 
+    const memoryCache = getMemoryCache();
     memoryCache.set(key, {
         data: entry.data,
         tags: entry.tags ?? [],
@@ -255,6 +261,28 @@ async function setCacheValue(key: string, entry: CacheResult<any>) {
 
         await multi.exec();
     }
+}
+
+/**
+ * With next-on-pages, the code seems to be isolated between the middleware and the handler.
+ * To share the cache between the two, we use a global variable.
+ */
+function getMemoryCache(): Map<
+    string,
+    {
+        data: any;
+        tags: string[];
+        expiresAt: number;
+    }
+> {
+    // @ts-ignore
+    if (!globalThis.gitbookMemoryCache) {
+        // @ts-ignore
+        globalThis.gitbookMemoryCache = new Map();
+    }
+
+    // @ts-ignore
+    return globalThis.gitbookMemoryCache;
 }
 
 function now(): number {

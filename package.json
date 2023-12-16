@@ -23,6 +23,7 @@
         "ajv": "^8.12.0",
         "assert-never": "^1.2.1",
         "bun-types": "^1.0.7",
+        "content-security-policy-merger": "^1.0.0",
         "framer-motion": "^10.16.14",
         "js-cookie": "^3.0.5",
         "jsontoxml": "^1.0.1",

@@ -1,11 +1,11 @@
 import 'server-only';
+import { AsyncLocalStorage } from 'node:async_hooks';
 
 import {
     ContentVisibility,
     GitBookAPI,
     GitBookAPIError,
     PublishedContentLookup,
-    Space,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 import { headers } from 'next/headers';
@@ -18,12 +18,18 @@ export interface ContentPointer {
     revisionId?: string;
 }
 
+const apiSyncStorage = new AsyncLocalStorage<GitBookAPI>();
+
 /**
  * Create an API client for the current request.
  */
 export function api(): GitBookAPI {
-    const headersList = headers();
+    const existing = apiSyncStorage.getStore();
+    if (existing) {
+        return existing;
+    }
 
+    const headersList = headers();
     const apiEndpoint = headersList.get('x-gitbook-api') ?? undefined;
     const apiToken = headersList.get('x-gitbook-token');
 
@@ -41,6 +47,13 @@ export function api(): GitBookAPI {
     return gitbook;
 }
 
+/**
+ * Use an API client for an async function.
+ */
+export function withAPI<T>(client: GitBookAPI, fn: () => Promise<T>): Promise<T> {
+    return apiSyncStorage.run(client, fn);
+}
+
 export type PublishedContentWithCache = PublishedContentLookup & {
     cacheMaxAge?: number;
     cacheTags?: string[];
@@ -53,7 +66,6 @@ export const getPublishedContentByUrl = cache(
     'api.getPublishedContentByUrl',
     async (
         url: string,
-        apiEndpoint: string | undefined,
         visitorAuthToken: string | undefined,
         options: {
             signal?: AbortSignal;
@@ -65,11 +77,7 @@ export const getPublishedContentByUrl = cache(
         // We call it as this logic is wrapped in an asynchronous cache that is not tied to the signal.
         signal?.throwIfAborted();
 
-        const gitbook = new GitBookAPI({
-            endpoint: apiEndpoint,
-        });
-
-        const response = await gitbook.request<PublishedContentLookup>({
+        const response = await api().request<PublishedContentLookup>({
             method: 'GET',
             path: '/urls/published',
             query: {
@@ -122,6 +130,24 @@ export const getSpace = cache('api.getSpace', async (spaceId: string) => {
         ],
     });
 });
+
+/**
+ * List the scripts to load for the space.
+ */
+export const getSpaceIntegrationScripts = cache(
+    'api.getSpaceIntegrationScripts',
+    async (spaceId: string) => {
+        const response = await api().spaces.listSpaceIntegrationScripts(spaceId, {
+            ...noCacheFetchOptions,
+        });
+        return cacheResponse(response, {
+            tags: [
+                getAPICacheTag({ tag: 'space', space: spaceId }),
+                getAPICacheTag({ tag: 'space-customization', space: spaceId }),
+            ],
+        });
+    },
+);
 
 /**
  * Get all the pages in the space.
@@ -286,6 +312,27 @@ export const getCollectionSpaces = cache(
         });
     },
 );
+
+/**
+ * Fetch all the information about a space at once.
+ * This function executes the requests in parallel and should be used as early as possible
+ * instead of calling the individual functions.
+ */
+export async function getSpaceContent(pointer: ContentPointer) {
+    const [space, pages, customization, scripts] = await Promise.all([
+        getSpace(pointer.spaceId),
+        getRevisionPages(pointer),
+        getSpaceCustomization(pointer.spaceId),
+        getSpaceIntegrationScripts(pointer.spaceId),
+    ]);
+
+    return {
+        space,
+        pages,
+        customization,
+        scripts,
+    };
+}
 
 /**
  * Create a cache tag for the API.

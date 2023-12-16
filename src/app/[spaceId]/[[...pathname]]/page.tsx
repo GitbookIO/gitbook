@@ -1,9 +1,9 @@
-import { Metadata } from 'next';
+import { CustomizationThemeMode } from '@gitbook/api';
+import { Metadata, Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
 
 import { SpaceContent } from '@/components/SpaceContent';
 import { getSpaceLanguage } from '@/intl/server';
-import { getDocument } from '@/lib/api';
 import { PageHrefContext, absoluteHref, baseUrl, pageHref } from '@/lib/links';
 import { getPagePath } from '@/lib/pages';
 
@@ -18,8 +18,17 @@ export const runtime = 'edge';
 export default async function Page(props: { params: PagePathParams }) {
     const { params } = props;
 
-    const { content, space, customization, pages, page, collection, collectionSpaces, ancestors } =
-        await fetchPageData(params);
+    const {
+        content,
+        space,
+        customization,
+        pages,
+        page,
+        collection,
+        collectionSpaces,
+        ancestors,
+        document,
+    } = await fetchPageData(params);
     const linksContext: PageHrefContext = {};
 
     if (!page) {
@@ -28,7 +37,6 @@ export default async function Page(props: { params: PagePathParams }) {
         redirect(pageHref(pages, page, linksContext));
     }
 
-    const document = page.documentId ? await getDocument(space.id, page.documentId) : null;
     const language = getSpaceLanguage(customization);
 
     return (
@@ -46,6 +54,17 @@ export default async function Page(props: { params: PagePathParams }) {
             />
         </ClientContexts>
     );
+}
+
+export async function generateViewport({ params }: { params: PagePathParams }): Promise<Viewport> {
+    const { customization } = await fetchPageData(params);
+    return {
+        colorScheme: customization.themes.toggeable
+            ? customization.themes.default === CustomizationThemeMode.Dark
+                ? 'dark light'
+                : 'light dark'
+            : customization.themes.default,
+    };
 }
 
 export async function generateMetadata({ params }: { params: PagePathParams }): Promise<Metadata> {

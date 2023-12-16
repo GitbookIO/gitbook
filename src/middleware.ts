@@ -1,6 +1,13 @@
+import { GitBookAPI } from '@gitbook/api';
 import { NextResponse, NextRequest } from 'next/server';
 
-import { PublishedContentWithCache, getPublishedContentByUrl } from '@/lib/api';
+import {
+    PublishedContentWithCache,
+    getPublishedContentByUrl,
+    getSpaceContent,
+    withAPI,
+} from '@/lib/api';
+import { createContentSecurityPolicyNonce, getContentSecurityPolicy } from '@/lib/csp';
 
 export const config = {
     matcher: '/((?!_next/static|_next/image|.revalidate).*)',
@@ -37,7 +44,12 @@ export async function middleware(request: NextRequest) {
 
     console.log('resolving', inputURL.toString());
 
-    const resolved = await lookupSpaceForURL(mode, apiEndpoint, inputURL, visitorAuthToken);
+    const resolved = await withAPI(
+        new GitBookAPI({
+            endpoint: apiEndpoint,
+        }),
+        () => lookupSpaceForURL(mode, inputURL, visitorAuthToken),
+    );
     if (!resolved) {
         return new NextResponse(`Not found`, {
             status: 404,
@@ -51,8 +63,24 @@ export async function middleware(request: NextRequest) {
 
     console.log(`${request.method} ${resolved.space}${resolved.pathname}`);
 
-    const headers = new Headers(request.headers);
+    const nonce = createContentSecurityPolicyNonce();
+    const csp = await withAPI(
+        new GitBookAPI({
+            endpoint: apiEndpoint,
+            authToken: resolved.apiToken,
+        }),
+        async () => {
+            const content = await getSpaceContent({
+                spaceId: resolved.space,
+            });
+            return getContentSecurityPolicy(content.scripts, nonce);
+        },
+    );
 
+    const headers = new Headers(request.headers);
+    // https://nextjs.org/docs/app/building-your-application/configuring/content-security-policy
+    headers.set('x-nonce', nonce);
+    headers.set('content-security-policy', csp);
     // Pass a x-forwarded-host and origin to ensure Next doesn't block server actions when proxied
     headers.set('x-forwarded-host', inputURL.host);
     headers.set('origin', inputURL.origin);
@@ -70,6 +98,9 @@ export async function middleware(request: NextRequest) {
             headers,
         },
     });
+
+    // Add Content Security Policy header
+    response.headers.set('content-security-policy', csp);
 
     // When content is authenticated, we store the state in a cookie.
     if (visitorAuthToken) {
@@ -121,7 +152,6 @@ function getInputURL(request: NextRequest): { url: URL; mode: URLLookupMode } {
 
 async function lookupSpaceForURL(
     mode: URLLookupMode,
-    apiEndpoint: string | undefined,
     url: URL,
     visitorAuthToken: string | undefined,
 ): Promise<PublishedContentWithCache | null> {
@@ -130,10 +160,10 @@ async function lookupSpaceForURL(
             return await lookupSpaceInSingleMode(url);
         }
         case 'multi': {
-            return await lookupSpaceInMultiMode(url, apiEndpoint, visitorAuthToken);
+            return await lookupSpaceInMultiMode(url, visitorAuthToken);
         }
         case 'multi-path': {
-            return await lookupSpaceInMultiPathMode(url, apiEndpoint, visitorAuthToken);
+            return await lookupSpaceInMultiPathMode(url, visitorAuthToken);
         }
         default:
             throw new Error(
@@ -175,10 +205,9 @@ async function lookupSpaceInSingleMode(url: URL): Promise<PublishedContentWithCa
  */
 async function lookupSpaceInMultiMode(
     url: URL,
-    apiEndpoint: string | undefined,
     visitorAuthToken: string | undefined,
 ): Promise<PublishedContentWithCache | null> {
-    return lookupSpaceByAPI(url, apiEndpoint, visitorAuthToken);
+    return lookupSpaceByAPI(url, visitorAuthToken);
 }
 
 /**
@@ -187,7 +216,6 @@ async function lookupSpaceInMultiMode(
  */
 async function lookupSpaceInMultiPathMode(
     url: URL,
-    apiEndpoint: string | undefined,
     visitorAuthToken: string | undefined,
 ): Promise<PublishedContentWithCache | null> {
     const targetStr = `https://${url.pathname}`;
@@ -197,7 +225,7 @@ async function lookupSpaceInMultiPathMode(
     }
     const target = new URL(targetStr);
 
-    const lookup = await lookupSpaceByAPI(target, apiEndpoint, visitorAuthToken);
+    const lookup = await lookupSpaceByAPI(target, visitorAuthToken);
     if (!lookup) {
         return null;
     }
@@ -231,7 +259,6 @@ async function lookupSpaceInMultiPathMode(
  */
 async function lookupSpaceByAPI(
     url: URL,
-    apiEndpoint: string | undefined,
     visitorAuthToken: string | undefined,
 ): Promise<PublishedContentWithCache | null> {
     const lookupAlternatives = computeLookupAlternatives(url);
@@ -242,65 +269,76 @@ async function lookupSpaceByAPI(
         } alternatives`,
     );
 
-    console.time('lookupSpaceByAPI');
-    try {
-        const abort = new AbortController();
-        const matches = await Promise.all(
-            lookupAlternatives.map(async (alternative) => {
-                try {
-                    const data = await getPublishedContentByUrl(
-                        alternative.url,
-                        apiEndpoint,
-                        visitorAuthToken,
-                        {
-                            signal: abort.signal,
-                        },
-                    );
+    const startTime = Date.now();
+    const abort = new AbortController();
+    const matches = await Promise.all(
+        lookupAlternatives.map(async (alternative) => {
+            try {
+                const data = await getPublishedContentByUrl(alternative.url, visitorAuthToken, {
+                    signal: abort.signal,
+                });
 
-                    if ('redirect' in data) {
-                        if (alternative.url === url.toString()) {
-                            return data;
-                        }
-
-                        return null;
+                if ('redirect' in data) {
+                    if (alternative.url === url.toString()) {
+                        return data;
                     }
 
-                    // Cancel all other requests to speed up the lookup
-                    abort.abort();
-                    return {
-                        space: data.space,
-                        basePath: data.basePath,
-                        pathname: joinPath(data.pathname, alternative.extraPath),
-                        apiToken: data.apiToken,
-                        cacheMaxAge: data.cacheMaxAge,
-                        cacheTags: data.cacheTags,
-                    } as PublishedContentWithCache;
-                } catch (error) {
-                    // @ts-ignore
-                    if (error.name === 'AbortError') {
-                        return null;
-                    }
-
-                    throw error;
+                    return null;
                 }
-            }),
-        );
-        return matches.find((match) => match !== null) ?? null;
-    } finally {
-        console.timeEnd('lookupSpaceByAPI');
-    }
+
+                // Cancel all other requests to speed up the lookup
+                abort.abort();
+                return {
+                    space: data.space,
+                    basePath: data.basePath,
+                    pathname: joinPath(data.pathname, alternative.extraPath),
+                    apiToken: data.apiToken,
+                    cacheMaxAge: data.cacheMaxAge,
+                    cacheTags: data.cacheTags,
+                } as PublishedContentWithCache;
+            } catch (error) {
+                // @ts-ignore
+                if (error.name === 'AbortError') {
+                    return null;
+                }
+                throw error;
+            }
+        }),
+    );
+
+    console.log(`lookup took ${Date.now() - startTime}ms`);
+    return matches.find((match) => match !== null) ?? null;
 }
 
 function computeLookupAlternatives(url: URL) {
     const alternatives: Array<{ url: string; extraPath: string }> = [];
 
+    const pushAlternative = (url: URL, extraPath: string) => {
+        const existing = alternatives.find((alt) => alt.url === url.toString());
+        if (existing) {
+            if (existing.extraPath !== extraPath) {
+                throw new Error(
+                    `Invalid extraPath ${extraPath} for url ${url.toString()}, already set to ${
+                        existing.extraPath
+                    }`,
+                );
+            }
+            return;
+        }
+
+        alternatives.push({
+            url: url.toString(),
+            extraPath,
+        });
+    };
+
     // Match only with the host, if it can be a custom hostname
     // It should cover most cases of custom domains, and with caching, it should be fast.
     if (!url.hostname.includes('.gitbook.io')) {
-        alternatives.push({
-            url: url.origin,
-            extraPath: url.pathname,
-        });
+        const noPathURL = new URL(url);
+        noPathURL.pathname = '/';
+
+        pushAlternative(noPathURL, url.pathname.slice(1));
     }
 
     const pathSegments = url.pathname.slice(1).split('/');
@@ -311,10 +349,8 @@ function computeLookupAlternatives(url: URL) {
     if (pathSegments.length > 0) {
         const shortURL = new URL(url);
         shortURL.pathname = pathSegments[0];
-        alternatives.push({
-            url: shortURL.toString(),
-            extraPath: pathSegments.slice(1).join('/'),
-        });
+
+        pushAlternative(shortURL, pathSegments.slice(1).join('/'));
     }
 
     // URL looks like a collection url (with /v/ in the path)
@@ -322,18 +358,13 @@ function computeLookupAlternatives(url: URL) {
         const collectionURL = new URL(url);
         const vIndex = pathSegments.indexOf('v');
         collectionURL.pathname = pathSegments.slice(0, vIndex + 1).join('/');
-        alternatives.push({
-            url: collectionURL.toString(),
-            extraPath: pathSegments.slice(vIndex + 1).join('/'),
-        });
+
+        pushAlternative(collectionURL, pathSegments.slice(vIndex + 1).join('/'));
     }
 
     // Always try with the full URL
     if (!alternatives.some((alt) => alt.url === url.toString())) {
-        alternatives.push({
-            url: url.toString(),
-            extraPath: '',
-        });
+        pushAlternative(url, '');
     }
 
     return alternatives;

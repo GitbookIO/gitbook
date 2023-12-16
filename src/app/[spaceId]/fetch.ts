@@ -1,12 +1,11 @@
 import { ContentVisibility, Space } from '@gitbook/api';
 
 import {
-    getSpace,
-    getSpaceCustomization,
     getCollectionSpaces,
     getCollection,
     ContentPointer,
-    getRevisionPages,
+    getSpaceContent,
+    getDocument,
 } from '@/lib/api';
 import { resolvePagePath, resolvePageId } from '@/lib/pages';
 
@@ -22,36 +21,37 @@ export interface PageIdParams extends SpaceParams {
 
 /**
  * Fetch all the data needed to render the content.
+ * Optimized to fetch in parallel as much as possible.
  */
 export async function fetchPageData(params: PagePathParams | PageIdParams) {
-    const { spaceId } = params;
-
     const content: ContentPointer = {
         spaceId: params.spaceId,
         changeRequestId: params.changeRequestId,
         revisionId: params.revisionId,
     };
 
-    const [space, pages, customization] = await Promise.all([
-        getSpace(spaceId),
-        getRevisionPages(content),
-        getSpaceCustomization(spaceId),
-    ]);
+    const { space, pages, customization, scripts } = await getSpaceContent(content);
 
-    const collection = await fetchParentCollection(space);
     const page =
         'pageId' in params && params.pageId
             ? resolvePageId(pages, params.pageId)
             : resolvePagePath(pages, getPathnameParam(params));
+
+    const [collection, document] = await Promise.all([
+        fetchParentCollection(space),
+        page && page.page.documentId ? await getDocument(space.id, page.page.documentId) : null,
+    ]);
 
     return {
         content,
         space,
         pages,
         customization,
+        scripts,
         ancestors: [],
         ...page,
         ...collection,
+        document,
     };
 }
 
