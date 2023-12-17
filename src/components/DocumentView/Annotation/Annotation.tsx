@@ -8,10 +8,12 @@ import { InlineProps } from '../Inline';
 import { Inlines } from '../Inlines';
 
 export async function Annotation(props: InlineProps<DocumentInlineAnnotation>) {
-    const { inline, context, children } = props;
+    const { inline, context, document, children } = props;
 
     const fragment = getNodeFragmentByType(inline, 'annotation-body');
-    const content = children ?? <Inlines context={context} nodes={inline.nodes} />;
+    const content = children ?? (
+        <Inlines document={document} context={context} nodes={inline.nodes} />
+    );
 
     if (!fragment) {
         return <>{content}</>;
@@ -19,7 +21,14 @@ export async function Annotation(props: InlineProps<DocumentInlineAnnotation>) {
 
     return (
         <AnnotationPopover
-            body={<Blocks ancestorBlocks={[]} context={context} nodes={fragment.nodes} />}
+            body={
+                <Blocks
+                    document={document}
+                    ancestorBlocks={[]}
+                    context={context}
+                    nodes={fragment.nodes}
+                />
+            }
         >
             {content}
         </AnnotationPopover>

@@ -23,6 +23,7 @@ export function DocumentView(
     return (
         <Blocks
             nodes={document.nodes}
+            document={document}
             ancestorBlocks={[]}
             blockStyle={[]}
             style={['space-y-6', style]}

@@ -1,4 +1,4 @@
-import { CustomizationSettings, Revision, RevisionPageDocument, Space } from '@gitbook/api';
+import { CustomizationSettings, Space } from '@gitbook/api';
 import React from 'react';
 
 import { Image } from '@/components/utils';
@@ -15,7 +15,7 @@ export function Footer(props: {
     customization: CustomizationSettings;
     asFullWidth: boolean;
 }) {
-    const { space, context, customization, asFullWidth } = props;
+    const { context, customization, asFullWidth } = props;
 
     return (
         <div
@@ -45,8 +45,17 @@ export function Footer(props: {
                                 <div>
                                     <Image
                                         alt="Logo"
-                                        src={customization.footer.logo}
-                                        fetchPriority="low"
+                                        sources={{
+                                            light: {
+                                                src: customization.footer.logo.light,
+                                            },
+                                            dark: customization.footer.logo.dark
+                                                ? {
+                                                      src: customization.footer.logo.dark,
+                                                  }
+                                                : null,
+                                        }}
+                                        priority="lazy"
                                         style={['h-9', 'max-w-80']}
                                     />
                                 </div>

@@ -1,6 +1,7 @@
 import { DocumentBlockTable, DocumentTableViewCards } from '@gitbook/api';
 import Link from 'next/link';
 
+import { Checkbox } from '@/components/utils';
 import { getNodeFragmentByName } from '@/lib/document';
 import { resolveContentRef } from '@/lib/references';
 import { ClassValue, tcls } from '@/lib/tailwind';
@@ -8,7 +9,6 @@ import { ClassValue, tcls } from '@/lib/tailwind';
 import { TableRecordKV } from './Table';
 import { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
-import { Checkbox } from '../Checkbox';
 
 /**
  * Render the value for a column in a record.
@@ -20,7 +20,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
         column: string;
     },
 ) {
-    const { tag: Tag = 'div', block, record, column, context } = props;
+    const { tag: Tag = 'div', block, document, record, column, context } = props;
 
     const definition = block.data.definition[column];
     const value = record[1].values[column];
@@ -79,6 +79,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             return (
                 <Blocks
                     tag={Tag}
+                    document={document}
                     ancestorBlocks={[]}
                     nodes={fragment.nodes}
                     style={['w-full', 'space-y-2', 'lg:space-y-3']}

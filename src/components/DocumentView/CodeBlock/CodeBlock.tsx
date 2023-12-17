@@ -1,4 +1,4 @@
-import { DocumentBlockCode } from '@gitbook/api';
+import { DocumentBlockCode, JSONDocument } from '@gitbook/api';
 
 import { ContentRefContext } from '@/lib/references';
 import { ClassValue, tcls } from '@/lib/tailwind';
@@ -14,7 +14,7 @@ import './theme.css';
  * Render an entire code-block. The syntax highlighting is done server-side.
  */
 export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
-    const { block, style, context } = props;
+    const { block, document, style, context } = props;
     const lines = await highlight(block);
 
     const id = block.key!;
@@ -111,6 +111,7 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
                     {lines.map((line, index) => (
                         <CodeHighlightLine
                             block={block}
+                            document={document}
                             key={index}
                             line={line}
                             lineIndex={index + 1}
@@ -128,6 +129,7 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
 
 function CodeHighlightLine(props: {
     block: DocumentBlockCode;
+    document: JSONDocument;
     line: HighlightLine;
     lineIndex: number;
     isLast: boolean;
@@ -135,7 +137,7 @@ function CodeHighlightLine(props: {
     withWrap: boolean;
     context: ContentRefContext;
 }) {
-    const { block, line, isLast, withLineNumbers, context } = props;
+    const { block, document, line, isLast, withLineNumbers, context } = props;
     return (
         <span
             className={tcls(
@@ -207,7 +209,7 @@ function CodeHighlightLine(props: {
             ) : null}
 
             <span className={tcls('ml-3', 'block')}>
-                <CodeHighlightTokens tokens={line.tokens} context={context} />
+                <CodeHighlightTokens tokens={line.tokens} document={document} context={context} />
                 {isLast ? null : !withLineNumbers && line.tokens.length === 0 && 0 ? (
                     <span className="ew">{'\u200B'}</span>
                 ) : (
@@ -218,25 +220,42 @@ function CodeHighlightLine(props: {
     );
 }
 
-function CodeHighlightTokens(props: { tokens: HighlightToken[]; context: ContentRefContext }) {
-    const { tokens, context } = props;
+function CodeHighlightTokens(props: {
+    tokens: HighlightToken[];
+    document: JSONDocument;
+    context: ContentRefContext;
+}) {
+    const { tokens, document, context } = props;
 
     return (
         <>
             {tokens.map((token, index) => (
-                <CodeHighlightToken key={index} token={token} context={context} />
+                <CodeHighlightToken
+                    key={index}
+                    token={token}
+                    document={document}
+                    context={context}
+                />
             ))}
         </>
     );
 }
 
-function CodeHighlightToken(props: { token: HighlightToken; context: ContentRefContext }) {
-    const { token, context } = props;
+function CodeHighlightToken(props: {
+    token: HighlightToken;
+    document: JSONDocument;
+    context: ContentRefContext;
+}) {
+    const { token, document, context } = props;
 
     if (token.type === 'inline') {
         return (
-            <Inline inline={token.inline} context={context}>
-                <CodeHighlightTokens tokens={token.children} context={context} />
+            <Inline inline={token.inline} document={document} context={context}>
+                <CodeHighlightTokens
+                    tokens={token.children}
+                    document={document}
+                    context={context}
+                />
             </Inline>
         );
     }

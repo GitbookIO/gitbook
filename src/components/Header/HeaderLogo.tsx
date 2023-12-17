@@ -30,8 +30,26 @@ export function HeaderLogo(props: HeaderLogoProps) {
                 {customization.header.logo ? (
                     <Image
                         alt="Logo"
-                        src={customization.header.logo}
-                        fetchPriority="high"
+                        sources={{
+                            light: {
+                                src: customization.header.logo.light,
+                            },
+                            dark: customization.header.logo.dark
+                                ? {
+                                      src: customization.header.logo.dark,
+                                  }
+                                : null,
+                        }}
+                        sizes={[
+                            {
+                                media: '(max-width: 1024px)',
+                                width: 128,
+                            },
+                            {
+                                width: 192,
+                            },
+                        ]}
+                        priority="high"
                         style={tcls(
                             'max-w-[8rem]',
                             'lg:max-w-[12rem]',
@@ -59,12 +77,32 @@ function LogoFallback(props: HeaderLogoProps) {
         <>
             <Image
                 alt="Logo"
-                src={
-                    customIcon ?? {
-                        light: absoluteHref('.gitbook/icon?size=medium&theme=light'),
-                        dark: absoluteHref('.gitbook/icon?size=medium&theme=dark'),
-                    }
+                sources={
+                    customIcon
+                        ? {
+                              light: {
+                                  src: customIcon.light,
+                                  size: { aspectRatio: 1 },
+                              },
+                              dark: customIcon.dark
+                                  ? {
+                                        src: customIcon.dark,
+                                        size: { aspectRatio: 1 },
+                                    }
+                                  : null,
+                          }
+                        : {
+                              light: {
+                                  src: absoluteHref('.gitbook/icon?size=medium&theme=light'),
+                                  size: { width: 256, height: 256 },
+                              },
+                              dark: {
+                                  src: absoluteHref('.gitbook/icon?size=medium&theme=dark'),
+                                  size: { width: 256, height: 256 },
+                              },
+                          }
                 }
+                sizes={[]}
                 fetchPriority="high"
                 style={['w-8', 'h-8', 'rounded', 'overflow-hidden', 'border', 'border-dark/2']}
             />

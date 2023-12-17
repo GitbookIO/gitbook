@@ -1,5 +1,6 @@
 import { ContentRef, DocumentTableViewCards } from '@gitbook/api';
 
+import { Image } from '@/components/utils';
 import { resolveContentRef } from '@/lib/references';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
@@ -11,7 +12,7 @@ export async function RecordCard(
         record: TableRecordKV;
     },
 ) {
-    const { view, record, context } = props;
+    const { view, record, context, isOffscreen } = props;
 
     const coverFile = view.coverDefinition
         ? (record[1].values[view.coverDefinition]?.[0] as string)
@@ -28,10 +29,22 @@ export async function RecordCard(
     const body = (
         <div className={tcls('grid-area-1-1', 'z-0', 'relative')}>
             {cover ? (
-                <img
+                <Image
                     alt="Cover"
-                    src={cover.href}
+                    sources={{
+                        light: {
+                            src: cover.href,
+                            size: cover.fileDimensions,
+                        },
+                    }}
+                    sizes={[
+                        {
+                            width: view.cardSize === 'medium' ? 245 : 376,
+                        },
+                    ]}
                     className={tcls('w-full', 'aspect-video', 'object-cover')}
+                    priority={isOffscreen ? 'lazy' : 'high'}
+                    preload
                 />
             ) : null}
             <div

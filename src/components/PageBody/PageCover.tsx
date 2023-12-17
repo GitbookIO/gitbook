@@ -1,5 +1,6 @@
 import { RevisionPageDocument, RevisionPageDocumentCover } from '@gitbook/api';
 
+import { Image } from '@/components/utils';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
@@ -29,10 +30,33 @@ export async function PageCover(props: {
                     : ['max-w-3xl', 'mx-auto', 'rounded-md', 'mb-8'],
             )}
         >
-            <img
+            <Image
                 alt="Page cover image"
-                src={resolved?.href ?? defaultPageCover.src}
-                fetchPriority="low"
+                sources={{
+                    light: {
+                        src: resolved?.href ?? defaultPageCover.src,
+                        size: resolved
+                            ? resolved?.fileDimensions
+                            : { width: defaultPageCover.width, height: defaultPageCover.height },
+                    },
+                }}
+                resize={
+                    // When using the default cover, we don't want to resize as it's a SVG
+                    !!resolved
+                }
+                sizes={[
+                    // Cover takes the full width on mobile/table
+                    {
+                        media: '(max-width: 768px)',
+                        width: 768,
+                    },
+                    {
+                        media: '(max-width: 1024px)',
+                        width: 1024,
+                    },
+                    // Maximum size of the cover
+                    { width: 1248 },
+                ]}
                 className={tcls('w-full', 'h-full', 'object-cover', 'object-center')}
             />
         </div>

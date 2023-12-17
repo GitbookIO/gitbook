@@ -7,7 +7,7 @@ import { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 
 export function Tabs(props: BlockProps<DocumentBlockTabs>) {
-    const { block, ancestorBlocks, style, context } = props;
+    const { block, ancestorBlocks, document, style, context } = props;
 
     return (
         <DynamicTabs
@@ -17,6 +17,7 @@ export function Tabs(props: BlockProps<DocumentBlockTabs>) {
                 children: (
                     <Blocks
                         nodes={tab.nodes}
+                        document={document}
                         ancestorBlocks={[...ancestorBlocks, block, tab]}
                         context={context}
                         style={tcls('w-full', 'space-y-6')}

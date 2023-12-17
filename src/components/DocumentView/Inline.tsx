@@ -6,6 +6,7 @@ import {
     DocumentInlineMath,
     DocumentInlineMention,
     DocumentInline,
+    JSONDocument,
 } from '@gitbook/api';
 
 import { Annotation } from './Annotation/Annotation';
@@ -15,6 +16,11 @@ import { InlineMath } from './Math';
 
 export interface InlineProps<T extends DocumentInline> extends DocumentContextProps {
     inline: T;
+
+    /**
+     * Document being rendered.
+     */
+    document: JSONDocument;
 
     /**
      * If defined, replace the content of the inline.

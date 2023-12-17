@@ -28,6 +28,7 @@
         "js-cookie": "^3.0.5",
         "jsontoxml": "^1.0.1",
         "katex": "^0.16.9",
+        "memoizee": "^0.4.15",
         "next": "^14.0.4",
         "parse-cache-control": "^1.0.1",
         "react": "^18",

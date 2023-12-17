@@ -41,10 +41,35 @@ export function host(): string {
 }
 
 /**
- * Return the base URL for the current request.
+ * Return the root URL for the GitBook Open instance (not the content).
+ * Use `baseUrl` to get the base URL for the current content.
+ *
+ * The URL will end with "/".
+ */
+export function rootUrl(): string {
+    const headersList = headers();
+    const protocol = headersList.get('x-forwarded-proto') ?? 'https';
+    let path = headersList.get('x-gitbook-origin-basepath') ?? '/';
+
+    if (!path.startsWith('/')) {
+        path = '/' + path;
+    }
+
+    if (!path.endsWith('/')) {
+        path = path + '/';
+    }
+
+    return `${protocol}://${host()}${path}`;
+}
+
+/**
+ * Return the base URL for the current content.
+ * The URL will end with "/".
  */
 export function baseUrl(): string {
-    return `https://${host()}${basePath()}`;
+    const headersList = headers();
+    const protocol = headersList.get('x-forwarded-proto') ?? 'https';
+    return `${protocol}://${host()}${basePath()}`;
 }
 
 /**

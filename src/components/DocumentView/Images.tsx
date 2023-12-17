@@ -1,14 +1,18 @@
-import { DocumentBlockImage, DocumentBlockImages } from '@gitbook/api';
+import { DocumentBlockImage, DocumentBlockImages, JSONDocument } from '@gitbook/api';
 
+import { Image } from '@/components/utils';
 import { getNodeFragmentByName, isNodeEmpty } from '@/lib/document';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { BlockProps } from './Block';
 import { Inlines } from './Inlines';
+import { isBlockOffscreen } from './utils';
 
 export function Images(props: BlockProps<DocumentBlockImages>) {
-    const { block, style, context } = props;
+    const { document, block, ancestorBlocks, style, context } = props;
+
+    const isOffscreen = isBlockOffscreen({ document, block, ancestorBlocks });
 
     return (
         <div
@@ -29,9 +33,11 @@ export function Images(props: BlockProps<DocumentBlockImages>) {
                 <ImageBlock
                     key={node.key}
                     block={node}
+                    document={document}
                     style={[i > 0 && 'mt-4', style]}
                     siblings={block.nodes.length}
                     context={context}
+                    isOffscreen={isOffscreen}
                 />
             ))}
         </div>
@@ -40,11 +46,13 @@ export function Images(props: BlockProps<DocumentBlockImages>) {
 
 async function ImageBlock(props: {
     block: DocumentBlockImage;
+    document: JSONDocument;
     style: ClassValue;
     context: ContentRefContext;
     siblings: number;
+    isOffscreen: boolean;
 }) {
-    const { block, context } = props;
+    const { block, document, context, isOffscreen } = props;
 
     const [src, darkSrc] = await Promise.all([
         resolveContentRef(block.data.ref, context),
@@ -61,7 +69,34 @@ async function ImageBlock(props: {
     const caption = getNodeFragmentByName(block, 'caption');
     const captionParagraph = caption?.nodes[0];
 
-    const image = <img alt={block.data.alt} src={src.href} />;
+    const image = (
+        <Image
+            alt={block.data.alt ?? ''}
+            sizes={[
+                {
+                    media: '(max-width: 640px)',
+                    width: 400,
+                },
+                {
+                    width: 768,
+                },
+            ]}
+            sources={{
+                light: {
+                    src: src.href,
+                    size: src.fileDimensions,
+                },
+                dark: darkSrc
+                    ? {
+                          src: darkSrc.href,
+                          size: darkSrc.fileDimensions,
+                      }
+                    : null,
+            }}
+            priority={isOffscreen ? 'lazy' : 'high'}
+            preload
+        />
+    );
 
     if (
         !captionParagraph ||
@@ -83,7 +118,7 @@ async function ImageBlock(props: {
                     'dark:text-light/6',
                 )}
             >
-                <Inlines nodes={captionParagraph.nodes} context={context} />
+                <Inlines nodes={captionParagraph.nodes} document={document} context={context} />
             </figcaption>
         </picture>
     );

@@ -11,6 +11,8 @@ export interface ResolvedContentRef {
     href: string;
     /** True if the content ref is active */
     active: boolean;
+    /** Image size, if the reference is a image file */
+    fileDimensions?: { width: number; height: number };
 }
 
 export interface ContentRefContext extends PageHrefContext {
@@ -41,6 +43,7 @@ export async function resolveContentRef(
                 href: file.downloadURL,
                 text: file.name,
                 active: false,
+                fileDimensions: file.dimensions,
             };
         } else {
             return null;

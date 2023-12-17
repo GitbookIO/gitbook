@@ -1,4 +1,4 @@
-import { DocumentBlock } from '@gitbook/api';
+import { DocumentBlock, JSONDocument } from '@gitbook/api';
 
 import { tcls, ClassValue } from '@/lib/tailwind';
 
@@ -9,6 +9,9 @@ export function Blocks<T extends DocumentBlock, Tag extends React.ElementType = 
     props: DocumentContextProps & {
         /** Blocks to render */
         nodes: T[];
+
+        /** Document being rendered */
+        document: JSONDocument;
 
         /** Ancestors of the blocks */
         ancestorBlocks: DocumentBlock[];

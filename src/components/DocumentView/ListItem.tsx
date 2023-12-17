@@ -1,10 +1,10 @@
 import { DocumentBlockListItem } from '@gitbook/api';
 
+import { Checkbox } from '@/components/utils';
 import { tcls } from '@/lib/tailwind';
 
 import { BlockProps } from './Block';
 import { Blocks } from './Blocks';
-import { Checkbox } from './Checkbox';
 
 export function ListItem(props: BlockProps<DocumentBlockListItem>) {
     const { block, ancestorBlocks, ...contextProps } = props;

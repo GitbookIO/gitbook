@@ -8,7 +8,7 @@ import { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { Inlines } from '../Inlines';
 export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
-    const { block, style, ancestorBlocks, context } = props;
+    const { block, style, ancestorBlocks, document, context } = props;
 
     const title = getNodeFragmentByType(block, 'expandable-title');
     const body = getNodeFragmentByType(block, 'expandable-body');
@@ -63,10 +63,11 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                         'group-open:rotate-90',
                     )}
                 />
-                <Inlines nodes={titleParagraph.nodes} context={context} />
+                <Inlines nodes={titleParagraph.nodes} document={document} context={context} />
             </summary>
             <Blocks
                 nodes={body.nodes}
+                document={document}
                 ancestorBlocks={[...ancestorBlocks, block]}
                 context={context}
                 style={['px-5', 'py-3', 'space-y-3']}

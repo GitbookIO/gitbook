@@ -1,4 +1,4 @@
-import { DocumentBlock } from '@gitbook/api';
+import { DocumentBlock, JSONDocument } from '@gitbook/api';
 import assertNever from 'assert-never';
 
 import { ClassValue } from '@/lib/tailwind';
@@ -27,6 +27,7 @@ import { Tabs } from './Tabs';
 
 export interface BlockProps<Block extends DocumentBlock> extends DocumentContextProps {
     block: Block;
+    document: JSONDocument;
     ancestorBlocks: DocumentBlock[];
     style?: ClassValue;
 }

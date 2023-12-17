@@ -10,7 +10,7 @@ import {
 import { createContentSecurityPolicyNonce, getContentSecurityPolicy } from '@/lib/csp';
 
 export const config = {
-    matcher: '/((?!_next/static|_next/image|.revalidate).*)',
+    matcher: '/((?!_next/static|_next/image|.gitbook/revalidate|.gitbook/image).*)',
     skipTrailingSlashRedirect: true,
 };
 
@@ -38,9 +38,9 @@ export async function middleware(request: NextRequest) {
 
     // The API endpoint can be passed as a header
     const apiEndpoint = request.headers.get('x-gitbook-api') ?? process.env.GITBOOK_API_URL;
-    const proxyBasePath = request.headers.get('x-gitbook-basepath') ?? '';
+    const originBasePath = request.headers.get('x-gitbook-basepath') ?? '';
 
-    const inputURL = stripURLBasePath(stripURLSearch(url), proxyBasePath);
+    const inputURL = stripURLBasePath(stripURLSearch(url), originBasePath);
 
     console.log('resolving', inputURL.toString());
 
@@ -85,7 +85,8 @@ export async function middleware(request: NextRequest) {
     headers.set('x-forwarded-host', inputURL.host);
     headers.set('origin', inputURL.origin);
     headers.set('x-gitbook-token', resolved.apiToken);
-    headers.set('x-gitbook-basepath', joinPath(proxyBasePath, resolved.basePath));
+    headers.set('x-gitbook-origin-basepath', originBasePath);
+    headers.set('x-gitbook-basepath', joinPath(originBasePath, resolved.basePath));
     if (apiEndpoint) {
         headers.set('x-gitbook-api', apiEndpoint);
     }
