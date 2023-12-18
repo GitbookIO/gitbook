@@ -1,9 +1,12 @@
 'use client';
 
 import { IconMenu } from '@/components/icons/IconMenu';
+import { useLanguage, tString } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
 export function HeaderMobileMenu(props: Partial<React.ButtonHTMLAttributes<HTMLButtonElement>>) {
+    const language = useLanguage();
+
     const toggleNavigation = () => {
         if (document.body.classList.contains('navigation-visible')) {
             document.body.classList.remove('navigation-visible');
@@ -12,7 +15,11 @@ export function HeaderMobileMenu(props: Partial<React.ButtonHTMLAttributes<HTMLB
         }
     };
     return (
-        <button {...props} onClick={toggleNavigation}>
+        <button
+            {...props}
+            aria-label={tString(language, 'table_of_contents_button_label')}
+            onClick={toggleNavigation}
+        >
             <IconMenu
                 className={tcls(
                     'w-8',

@@ -1,6 +1,7 @@
 'use client';
 
 import { IconSearch } from '@/components/icons/IconSearch';
+import { useLanguage, tString } from '@/intl/client';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { useSearch } from './useSearch';
@@ -11,6 +12,7 @@ import { useSearch } from './useSearch';
 export function SearchButton(props: { children?: React.ReactNode; style?: ClassValue }) {
     const { style, children } = props;
 
+    const language = useLanguage();
     const [, setSearchState] = useSearch();
 
     const onClick = () => {
@@ -23,6 +25,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
     return (
         <button
             onClick={onClick}
+            aria-label={tString(language, 'search')}
             className={tcls(
                 'flex',
                 'flex-1',

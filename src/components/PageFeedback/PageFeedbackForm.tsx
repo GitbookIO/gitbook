@@ -73,6 +73,7 @@ function RatingButton(props: { emoji: string; label: string; onClick: () => void
                 'focus:ring-offset-2',
                 'focus:ring-offset-white',
             )}
+            aria-label={label}
             title={label}
             onClick={onClick}
         >

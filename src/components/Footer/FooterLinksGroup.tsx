@@ -12,7 +12,7 @@ export function FooterLinksGroup(props: {
 
     return (
         <div className={tcls('flex', 'flex-col', 'gap-3')}>
-            <h4 className={tcls('text-base')}>{group.title}</h4>
+            <p className={tcls('text-base')}>{group.title}</p>
             {group.links.map((link, index) => {
                 return <FooterLink key={index} link={link} context={context} />;
             })}

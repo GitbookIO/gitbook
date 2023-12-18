@@ -3,15 +3,18 @@
 import * as Popover from '@radix-ui/react-popover';
 import React from 'react';
 
+import { useLanguage, tString } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
 export function AnnotationPopover(props: { children: React.ReactNode; body: React.ReactNode }) {
     const { children, body } = props;
+    const language = useLanguage();
 
     return (
         <Popover.Root>
             <Popover.Trigger asChild>
                 <button
+                    aria-label={tString(language, 'annotation_button_label')}
                     className={tcls(
                         'decoration-dotted',
                         'decoration-1',

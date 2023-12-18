@@ -2,6 +2,7 @@
 
 import React from 'react';
 
+import { t, useLanguage } from '@/intl/client';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 /**
@@ -11,6 +12,7 @@ import { ClassValue, tcls } from '@/lib/tailwind';
 export function CopyCodeButton(props: { codeId: string; style: ClassValue }) {
     const { codeId, style } = props;
 
+    const language = useLanguage();
     const [copied, setCopied] = React.useState(false);
 
     React.useEffect(() => {
@@ -40,7 +42,7 @@ export function CopyCodeButton(props: { codeId: string; style: ClassValue }) {
 
     return (
         <button onClick={onClick} className={tcls(style)}>
-            {copied ? 'Copied!' : 'Copy'}
+            {t(language, copied ? 'code_copied' : 'code_copy')}
         </button>
     );
 }
