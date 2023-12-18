@@ -55,7 +55,7 @@ export function SearchModal(props: SearchModalProps) {
                 'z-30',
                 'px-4',
                 'pt-4',
-                'md:pt-[min(12vw,_10rem)]',
+                'md:pt-[min(8vw,_6rem)]',
             )}
             onClick={onClose}
         >
