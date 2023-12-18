@@ -64,6 +64,11 @@ export async function GET(request: NextRequest) {
         options.format = 'jpeg';
     }
 
-    const response = await resizeImage(url, options);
-    return response;
+    try {
+        const response = await resizeImage(url, options);
+        return response;
+    } catch (error) {
+        // Redirect to the original image if resizing fails
+        return Response.redirect(url, 302);
+    }
 }
