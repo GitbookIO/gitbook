@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { invalidateCacheTags } from '@/lib/cache';
+import { revalidateTags } from '@/lib/cache';
 
 export const runtime = 'edge';
 
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
         );
     }
 
-    await invalidateCacheTags(json.tags);
+    await revalidateTags(json.tags);
 
     return NextResponse.json({
         success: true,
