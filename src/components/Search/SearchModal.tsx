@@ -28,6 +28,18 @@ export function SearchModal(props: SearchModalProps) {
         [],
     );
 
+    // Add a global class on the body when the search modal is open
+    const isSearchOpened = state !== null;
+    React.useEffect(() => {
+        if (isSearchOpened) {
+            document.body.classList.add('search-open');
+        }
+
+        return () => {
+            document.body.classList.remove('search-open');
+        };
+    }, [isSearchOpened]);
+
     if (state === null) {
         return null;
     }
