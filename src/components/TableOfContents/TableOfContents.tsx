@@ -56,15 +56,15 @@ export function TableOfContents(props: {
                 'shrink-0',
                 'shadow-transparent',
                 'shadow-thinbottom',
-                'navigation-visible:shadow-dark/2',
+                'navigation-open:shadow-dark/2',
                 'z-[1]',
                 'top-0',
                 `h-[100vh]`,
                 'lg:basis-72',
-                'lg:navigation-visible:border-b-0',
+                'lg:navigation-open:border-b-0',
                 'lg:sticky',
                 'dark:bg-dark',
-                'dark:navigation-visible:shadow-light/2',
+                'dark:navigation-open:shadow-light/2',
                 withHeaderOffset ? 'lg:h-[calc(100vh_-_4rem)]' : 'lg:h-[100vh]',
                 withHeaderOffset ? 'lg:top-16' : 'lg:top-0',
                 visibleOnDesktop ? null : 'lg:hidden',
@@ -91,7 +91,7 @@ export function TableOfContents(props: {
                     'dark:[&::-webkit-scrollbar-thumb]:bg-transparent',
                     'dark:group-hover:[&::-webkit-scrollbar]:bg-light/1',
                     'dark:group-hover:[&::-webkit-scrollbar-thumb]:bg-light/3',
-                    'navigation-visible:flex', // can be auto height animated as such https://stackoverflow.com/a/76944290
+                    'navigation-open:flex', // can be auto height animated as such https://stackoverflow.com/a/76944290
                     /*                     header ? 'pt-3' : 'pt-6', */
                     'lg:pb-16',
                 )}

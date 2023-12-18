@@ -11,6 +11,12 @@
         --sky: 187 221 229;
         --periwinkle: 172 198 238;
     }
+    body {
+        @apply text-dark/9 dark:text-light/9;
+    }
+    html {
+        @apply gutter-stable;
+    }
     h1 {
         @apply tracking-[-0.025em] text-dark dark:text-light textwrap-balance;
     }
@@ -21,9 +27,7 @@
     h6 {
         @apply tracking-[-0.0125em] text-dark dark:text-light;
     }
-    body {
-        @apply text-dark/9 dark:text-light/9;
-    }
+
     p {
         @apply leading-relaxed;
     }

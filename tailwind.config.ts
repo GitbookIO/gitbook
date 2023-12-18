@@ -126,7 +126,8 @@ const config: Config = {
     },
     plugins: [
         plugin(function ({ addVariant }) {
-            addVariant('navigation-visible', 'body.navigation-visible &');
+            addVariant('navigation-open', 'body.navigation-open &');
+            addVariant('search-open', 'body.search-open &');
         }),
         containerQueries,
     ],

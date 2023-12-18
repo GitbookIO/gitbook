@@ -33,10 +33,16 @@ export function SearchModal(props: SearchModalProps) {
     React.useEffect(() => {
         if (isSearchOpened) {
             document.body.classList.add('search-open');
+            Object.assign(document.body.style, {
+                overflow: 'hidden',
+            });
         }
 
         return () => {
             document.body.classList.remove('search-open');
+            Object.assign(document.body.style, {
+                overflow: 'auto',
+            });
         };
     }, [isSearchOpened]);
 

@@ -8,10 +8,10 @@ export function HeaderMobileMenu(props: Partial<React.ButtonHTMLAttributes<HTMLB
     const language = useLanguage();
 
     const toggleNavigation = () => {
-        if (document.body.classList.contains('navigation-visible')) {
-            document.body.classList.remove('navigation-visible');
+        if (document.body.classList.contains('navigation-open')) {
+            document.body.classList.remove('navigation-open');
         } else {
-            document.body.classList.add('navigation-visible');
+            document.body.classList.add('navigation-open');
         }
     };
     return (
