@@ -111,7 +111,9 @@ export async function askQuestion(spaceId: string, query: string): Promise<AskAn
     return {
         body: (
             // TODO: parse the markdown
-            <p className={tcls('text-base', 'font-normal')}>{data.answer.text}</p>
+            <p className={tcls('text-base', 'font-normal', 'whitespace-pre-line')}>
+                {data.answer.text}
+            </p>
         ),
         followupQuestions: data.answer.followupQuestions,
         sources,

@@ -82,6 +82,23 @@ const config: Config = {
                         transform: 'rotate(0deg)',
                     },
                 },
+                pathLoading: {
+                    '0%': {
+                        strokeDasharray: '0 100',
+                        strokeDashoffset: '0',
+                        opacity: '0',
+                    },
+                    '40%, 60%': {
+                        strokeDasharray: '100 100',
+                        strokeDashoffset: '0',
+                        opacity: '1',
+                    },
+                    '100%': {
+                        strokeDasharray: '100 100',
+                        strokeDashoffset: '-100',
+                        opacity: '0',
+                    },
+                },
                 stroke: {
                     '0%': {
                         strokeDasharray: '0 100',

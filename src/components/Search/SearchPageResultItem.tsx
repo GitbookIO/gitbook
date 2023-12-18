@@ -23,15 +23,16 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
             className={tcls(
                 'flex',
                 'flex-row',
-                'rounded',
                 'px-6',
                 'py-3',
                 'hover:bg-dark/1',
                 'text-base',
                 'text-dark',
                 'font-semibold',
-                'mt-6',
                 'first:mt-0',
+                '[&:has(+.search-section-result-item):not(:first-child)]:mt-6',
+                'dark:text-light',
+                'dark:hover:bg-light/1',
                 active ? ['bg-primary-50'] : null,
             )}
         >

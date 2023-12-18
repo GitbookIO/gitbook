@@ -17,16 +17,18 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
             ref={ref}
             href={item.href}
             className={tcls(
+                'search-section-result-item',
                 'flex',
                 'flex-col',
                 'pl-6',
                 'hover:bg-dark/1',
+                'dark:hover:bg-light/1',
                 active ? ['bg-primary-50'] : null,
             )}
         >
-            <div className={tcls('border-l', 'p-3', 'border-dark/2')}>
+            <div className={tcls('border-l', 'p-3', 'border-dark/2', 'dark:border-light/2')}>
                 {item.title ? (
-                    <p className={tcls('text-base', 'text-dark/7', 'dark:text-dark/7')}>
+                    <p className={tcls('text-base', 'text-dark/7', 'dark:text-light/8')}>
                         <HighlightQuery query={query} text={item.title} />
                     </p>
                 ) : null}
@@ -37,7 +39,7 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                             'text-dark',
                             'line-clamp-6',
                             'linear-mask-gradient',
-                            'dark:text-dark',
+                            'dark:text-light/8',
                         )}
                     >
                         <HighlightQuery query={query} text={item.body} />

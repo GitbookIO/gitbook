@@ -105,12 +105,7 @@ const abcFavorit = localFont({
     src: [
         {
             path: './ABCFavorit/ABCFavorit-Variable.woff2',
-            weight: '100',
-            style: 'normal',
-        },
-        {
-            path: './ABCFavorit/ABCFavorit-Variable.woff2',
-            weight: '900',
+            weight: '400 700',
             style: 'normal',
         },
         {
@@ -129,6 +124,7 @@ const abcFavorit = localFont({
             style: 'italic',
         },
     ],
+    declarations: [{ prop: 'ascent-override', value: '100%' }],
 });
 
 /**

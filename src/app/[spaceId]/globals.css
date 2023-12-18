@@ -12,14 +12,14 @@
         --periwinkle: 172 198 238;
     }
     h1 {
-        @apply tracking-tighter text-dark dark:text-light textwrap-balance;
+        @apply tracking-[-0.025em] text-dark dark:text-light textwrap-balance;
     }
     h2,
     h3,
     h4,
     h5,
     h6 {
-        @apply tracking-tight text-dark dark:text-light;
+        @apply tracking-[-0.0125em] text-dark dark:text-light;
     }
     body {
         @apply text-dark/9 dark:text-light/9;
@@ -36,7 +36,7 @@
 
     /*  Light mode */
     ::-webkit-scrollbar {
-        @apply bg-transparent;
+        @apply bg-dark/1;
         width: 8px;
         height: 8px;
     }

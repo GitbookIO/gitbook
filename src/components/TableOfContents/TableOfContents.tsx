@@ -47,6 +47,7 @@ export function TableOfContents(props: {
         <aside
             className={tcls(
                 'relative',
+                'group',
                 'flex',
                 'flex-col',
                 'basis-full',
@@ -82,6 +83,14 @@ export function TableOfContents(props: {
                     'overflow-y-auto',
                     'lg:gutter-stable',
                     'lg:pr-2',
+                    'group-hover:[&::-webkit-scrollbar]:bg-dark/1',
+                    'group-hover:[&::-webkit-scrollbar-thumb]:bg-dark/3',
+                    '[&::-webkit-scrollbar]:bg-transparent',
+                    '[&::-webkit-scrollbar-thumb]:bg-transparent',
+                    'dark:[&::-webkit-scrollbar]:bg-transparent',
+                    'dark:[&::-webkit-scrollbar-thumb]:bg-transparent',
+                    'dark:group-hover:[&::-webkit-scrollbar]:bg-light/1',
+                    'dark:group-hover:[&::-webkit-scrollbar-thumb]:bg-light/3',
                     'navigation-visible:flex', // can be auto height animated as such https://stackoverflow.com/a/76944290
                     /*                     header ? 'pt-3' : 'pt-6', */
                     'lg:pb-16',

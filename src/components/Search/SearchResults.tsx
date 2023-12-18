@@ -152,9 +152,25 @@ export const SearchResults = React.forwardRef(function SearchResults(
     }
 
     return (
-        <div className={tcls('max-h-[60vh]', 'overflow-auto', 'px', 'inverted-theme-scroll')}>
+        <div
+            className={tcls(
+                'max-h-[60vh]',
+                'overflow-auto',
+                'border-t',
+                'border-dark/2',
+                'dark:border-light/1',
+            )}
+        >
             {results.length === 0 ? (
-                <div className={tcls('text-sm', 'text-dark', 'p-6', 'text-center')}>
+                <div
+                    className={tcls(
+                        'text-sm',
+                        'text-dark',
+                        'p-6',
+                        'text-center',
+                        'dark:text-light/8',
+                    )}
+                >
                     {t(language, 'search_no_results', query)}
                 </div>
             ) : (

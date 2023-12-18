@@ -1,3 +1,5 @@
+import IconBox from '@geist-ui/icons/box';
+import IconSearch from '@geist-ui/icons/search';
 import Link from 'next/link';
 import React from 'react';
 
@@ -5,6 +7,7 @@ import { tcls } from '@/lib/tailwind';
 
 import { AskAnswerResult, askQuestion } from './server-actions';
 import { useSearch, useSearchLink } from './useSearch';
+import { Loading } from '../utils/Loading';
 
 /**
  * Fetch and render the answers to a question.
@@ -42,12 +45,32 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
     }, [spaceId, query]);
 
     return (
-        <div className={tcls('p-4')}>
+        <div
+            className={tcls(
+                'max-h-[60vh]',
+                'overflow-y-auto',
+                'border-t',
+                'border-dark/2',
+                'dark:border-light/1',
+            )}
+        >
             {state?.type === 'answer' ? (
-                <div>{state.answer ? <AnswerBody answer={state.answer} /> : 'No answer'}</div>
+                <>
+                    {state.answer ? (
+                        <div className={tcls('w-full')}>
+                            <AnswerBody answer={state.answer} />
+                        </div>
+                    ) : (
+                        <div className={tcls('p-4')}>No answer</div>
+                    )}
+                </>
             ) : null}
             {state?.type === 'error' ? <div>Failed to fetch answer</div> : null}
-            {!state ? <div>Loading...</div> : null}
+            {!state ? (
+                <div className={tcls('w-full', 'flex', 'items-center', 'justify-center')}>
+                    <Loading className={tcls('w-5', 'py-4', 'text-primary')} />
+                </div>
+            ) : null}
         </div>
     );
 }
@@ -57,53 +80,94 @@ function AnswerBody(props: { answer: AskAnswerResult }) {
     const getSearchLinkProps = useSearchLink();
 
     return (
-        <div>
-            <div>{answer.body}</div>
+        <>
+            <div className={tcls('mt-4', 'px-4', 'text-dark/9', 'dark:text-light/8')}>
+                {answer.body}
+            </div>
             {answer.followupQuestions.length > 0 ? (
-                <div className={tcls('mt-4')}>
+                <div className={tcls('mt-7', 'flex', 'flex-col', 'flex-wrap', 'gap-1')}>
                     {answer.followupQuestions.map((question) => (
                         <Link
                             key={question}
                             className={tcls(
-                                'me-2',
-                                'mt-2',
+                                'text-sm',
+                                'font-medium',
+                                'inline-flex',
+                                'items-start',
+                                'gap-2',
+                                'px-4',
+                                'py-1',
                                 'text-primary-500',
-                                'underline',
                                 'focus-within:text-primary-700',
+                                'hover:bg-primary/2',
+                                'dark:hover:bg-primary-400/4',
                             )}
                             {...getSearchLinkProps({
                                 query: question,
                                 ask: true,
                             })}
                         >
-                            {question}
+                            <IconSearch
+                                className={tcls(
+                                    'w-[15px]',
+                                    'h-[15px]',
+                                    'shrink-0',
+                                    'mt-0.5',
+                                    '[&>path]:[stroke-opacity:0.64]',
+                                )}
+                            />
+                            <span>{question}</span>
                         </Link>
                     ))}
                 </div>
             ) : null}
             {answer.sources.length > 0 ? (
-                <div className={tcls('mt-5')}>
-                    <p className={tcls('text-base')}>Sources</p>
-                    <div className={tcls('mt-3')}>
-                        {answer.sources.map((source) => (
+                <div
+                    className={tcls(
+                        'flex',
+                        'flex-wrap',
+                        'gap-2',
+                        'mt-7',
+                        'py-4',
+                        'px-4',
+                        'border-t',
+                        'border-dark/2',
+                        'dark:border-light/1',
+                    )}
+                >
+                    <span className={tcls('text-sm')}>Sources</span>
+
+                    {answer.sources.map((source) => (
+                        <span key={source.id} className={tcls()}>
                             <Link
-                                key={source.id}
                                 className={tcls(
-                                    'me-2',
-                                    'mt-2',
-                                    'text-primary-500',
-                                    'underline',
+                                    'flex',
+                                    'text-sm',
+                                    'text-dark/7',
+                                    'hover:underline',
                                     'focus-within:text-primary-700',
+                                    'dark:text-light/8',
                                 )}
                                 href={source.href}
                                 prefetch={false}
                             >
+                                <IconBox
+                                    className={tcls(
+                                        'stroke-dark/6',
+                                        'w-[15px]',
+                                        'h-[15px]',
+                                        'shrink-0',
+                                        'mt-0.5',
+                                        'mr-0.5',
+                                        'dark:stroke-light/6',
+                                    )}
+                                />
                                 {source.title}
                             </Link>
-                        ))}
-                    </div>
+                        </span>
+                    ))}
                 </div>
             ) : null}
-        </div>
+        </>
     );
 }

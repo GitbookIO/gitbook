@@ -49,7 +49,7 @@ export function SearchModal(props: SearchModalProps) {
                 'fixed',
                 'inset-0',
                 'bg-dark/4',
-                'backdrop-blur',
+                'backdrop-blur-lg',
                 'dark:bg-dark/9',
                 'opacity-[1]',
                 'z-30',
@@ -80,14 +80,14 @@ function SearchModalBody(
 
     const language = useLanguage();
     const resultsRef = React.useRef<SearchResultsRef>(null);
-    const inputRef = React.useRef<HTMLInputElement>(null);
+    const inputRef = React.useRef<HTMLTextAreaElement>(null);
 
     React.useEffect(() => {
         inputRef.current?.focus();
     }, []);
 
-    const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Escape' || (event.key === 'Backspace' && state.query === '')) {
+    const onKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (event.key === 'Escape') {
             onClose();
         } else if (event.key === 'ArrowUp') {
             event.preventDefault();
@@ -101,7 +101,7 @@ function SearchModalBody(
         }
     };
 
-    const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const onChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         onChangeQuery({
             ask: false, // When typing, we go back to the default search mode
             query: event.target.value,
@@ -115,38 +115,46 @@ function SearchModalBody(
                 'flex',
                 'flex-col',
                 'bg-white',
-                'w-[600px]',
+                'max-w-[720px]',
+                'w-full',
                 'max-h',
                 'rounded-3xl',
-                'border-dark/2',
+                'ring-1',
+                'ring-dark/1',
                 'shadow-1xs',
                 'overflow-hidden',
-                'dark:bg-metal',
-                'dark:border-light/3',
-                'dark:shadow-vanta',
+                'dark:[background-color:color-mix(in_srgb,_rgb(var(--dark)),_rgb(var(--light))_4%)]',
+                'dark:ring-light/2',
             )}
             onClick={(event) => {
                 event.stopPropagation();
             }}
         >
-            <div className={tcls('flex', 'flex-row', 'items-center', 'border-b', 'border-dark/2')}>
-                <div className={tcls('text-dark/4', 'p-3')}>
+            <div className={tcls('flex', 'flex-row', 'items-center')}>
+                <div className={tcls('text-dark/4', 'p-3', 'dark:text-light/5')}>
                     <IconSearch className={tcls('w-6', 'h-6')} />
                 </div>
                 <div className={tcls('flex-1')}>
-                    <input
+                    <textarea
                         ref={inputRef}
                         value={state.query}
                         onKeyDown={onKeyDown}
                         onChange={onChange}
                         className={tcls(
-                            'w-full',
-                            'p-2',
                             'text-dark',
+                            'flex',
+                            'resize-none',
+                            'w-full',
+                            'h-12',
+                            'p-2',
+                            'pt-3',
                             'focus:outline-none',
                             'bg-transparent',
+                            'whitespace-pre-line',
+                            'dark:text-white',
                         )}
                         placeholder={tString(language, 'search_input_placeholder')}
+                        rows={1}
                     />
                 </div>
             </div>

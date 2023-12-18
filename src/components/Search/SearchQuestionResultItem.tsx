@@ -1,3 +1,4 @@
+import IconSearch from '@geist-ui/icons/search';
 import Link from 'next/link';
 import React from 'react';
 
@@ -26,15 +27,16 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
             className={tcls(
                 'flex',
                 'flex-row',
-                'rounded',
-                'px-6',
-                'py-3',
+                'px-4',
+                'py-2',
                 'hover:bg-dark/1',
-                'text-base',
-                'text-dark',
-                'font-semibold',
-                'mt-6',
+                'text-dark/7',
+                'text-sm',
+                'font-medium',
                 'first:mt-0',
+                'last:pb-3',
+                'dark:text-light/8',
+                'dark:hover:bg-light/1',
                 active ? ['bg-primary-50'] : null,
             )}
             {...getLinkProp({
@@ -42,6 +44,17 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                 query: question,
             })}
         >
+            <IconSearch
+                className={tcls(
+                    'w-[15px]',
+                    'h-[15px]',
+                    'shrink-0',
+                    'mt-0.5',
+                    'mr-2',
+                    'stroke-dark/5',
+                    'dark:stroke-light/5',
+                )}
+            />
             {recommended ? question : t(language, 'search_ask', [question])}
         </Link>
     );

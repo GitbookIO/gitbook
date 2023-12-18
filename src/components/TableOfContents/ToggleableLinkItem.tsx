@@ -65,6 +65,7 @@ export function ToggleableLinkItem(
                 {children}
                 <span
                     className={tcls(
+                        'group',
                         'relative',
                         'rounded-full',
                         'w-5',
@@ -95,8 +96,12 @@ export function ToggleableLinkItem(
                             'w-5',
                             'h-5',
                             'p-0.5',
+                            '[&>path]:transition-[stroke-opacity]',
                             'text-current',
                             'transition-transform',
+                            '[&>path]:[stroke-opacity:0.40]',
+                            'group-hover:[&>path]:[stroke-opacity:1]',
+
                             isVisible ? ['rotate-90'] : ['rotate-0'],
                         )}
                     />
