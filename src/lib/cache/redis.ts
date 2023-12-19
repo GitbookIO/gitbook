@@ -62,16 +62,22 @@ export const redisCache: CacheBackend | null = redis
           },
 
           async revalidateTags(tags) {
-              const keys = (
-                  await Promise.all(tags.map((tag) => redis.smembers(getCacheTagKey(tag))))
-              ).flat();
+              const keys = new Set(
+                  (
+                      await Promise.all(tags.map((tag) => redis.smembers(getCacheTagKey(tag))))
+                  ).flat(),
+              );
 
               const pipeline = redis.pipeline();
               let metas: Array<CacheEntryMeta | null> = [];
 
-              if (keys.length > 0) {
+              if (keys.size > 0) {
                   metas = (
-                      await redis.json.mget(keys, '$.meta')
+                      await redis.json.mget(
+                          // Hard limit to avoid fetching a massive list of data
+                          Array.from(keys).slice(0, 1000),
+                          '$.meta',
+                      )
                   ).flat() as Array<CacheEntryMeta | null>;
 
                   // Finally, delete all keys
