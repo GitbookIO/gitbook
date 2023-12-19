@@ -306,9 +306,7 @@ export const getDocument = cache('api.getDocument', async (spaceId: string, docu
     });
     return cacheResponse(response, {
         tags: [
-            getAPICacheTag({ tag: 'space', space: spaceId }),
-            getAPICacheTag({ tag: 'space-documents', space: spaceId }),
-            getAPICacheTag({ tag: 'space-document', space: spaceId, document: documentId }),
+            // No tags as documents are immutable
         ],
     });
 });
@@ -402,17 +400,6 @@ export function getAPICacheTag(
               tag: 'space-pages';
               space: string;
           }
-        // All documents in a space
-        | {
-              tag: 'space-documents';
-              space: string;
-          }
-        // A specific document in a space
-        | {
-              tag: 'space-document';
-              space: string;
-              document: string;
-          }
         // All files in a space
         | {
               tag: 'space-files';
@@ -437,10 +424,6 @@ export function getAPICacheTag(
             return `space:${spec.space}.customization`;
         case 'space-pages':
             return `space:${spec.space}.pages`;
-        case 'space-documents':
-            return `space:${spec.space}.documents`;
-        case 'space-document':
-            return `space:${spec.space}.document:${spec.document}`;
         case 'space-files':
             return `space:${spec.space}.files`;
         case 'space-file':
