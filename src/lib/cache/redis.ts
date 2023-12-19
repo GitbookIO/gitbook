@@ -17,12 +17,25 @@ const cacheVersion = 1;
 export const redisCache: CacheBackend | null = redis
     ? {
           async get(key) {
-              const redisEntry = (await redis.json.get(getRedisKey(key))) as CacheEntry | null;
-              if (!redisEntry) {
-                  return null;
-              }
+              try {
+                  const [, redisEntry] = await redis
+                      .multi()
+                      .json.numincrby(getRedisKey(key), '$.meta.hits', 1)
+                      .json.get(getRedisKey(key))
+                      .exec<[any, CacheEntry | null]>();
+                  if (!redisEntry) {
+                      return null;
+                  }
 
-              return redisEntry;
+                  return redisEntry;
+              } catch (error) {
+                  // "JSON.NUMINCRBY" throws an error if the key does not exist
+                  if ((error as Error).message.includes('ERR no such key')) {
+                      return null;
+                  }
+
+                  throw error;
+              }
           },
 
           async set(key, entry) {

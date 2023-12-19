@@ -55,6 +55,7 @@ export function cache<Args extends any[], Result>(
                 tags: result.tags ?? [],
                 expiresAt: Date.now() + (result.ttl ?? 60 * 60 * 24) * 1000,
                 args,
+                hits: 1,
             },
         };
 
@@ -164,12 +165,17 @@ async function getCacheEntry(key: string): Promise<CacheEntry | null> {
         return memoryEntry;
     }
 
-    const redisEntry = (await redisCache?.get(key)) ?? null;
-    if (redisEntry) {
-        await memoryCache.set(key, redisEntry);
-    }
+    try {
+        const redisEntry = (await redisCache?.get(key)) ?? null;
+        if (redisEntry) {
+            await memoryCache.set(key, redisEntry);
+        }
 
-    return redisEntry;
+        return redisEntry;
+    } catch (error) {
+        console.error(`Error while getting cache entry for ${key} from redis`, error);
+        return null;
+    }
 }
 
 function now(): number {

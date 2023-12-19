@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
         );
     }
 
-    await revalidateTags(json.tags);
+    await revalidateTags(json.tags, !!json.purge);
 
     return NextResponse.json({
         success: true,

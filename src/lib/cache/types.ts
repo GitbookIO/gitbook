@@ -18,6 +18,11 @@ export interface CacheEntryMeta {
      * Arguments that were passed to the function.
      */
     args: any[];
+
+    /**
+     * Number of hits on this entry.
+     */
+    hits: number;
 }
 
 export interface CacheEntry {
