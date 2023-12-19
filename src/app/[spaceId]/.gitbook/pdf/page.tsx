@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { getDocument, getSpace, getCurrentRevision } from '@/lib/api';
+import { getDocument, getSpace, getRevisionPages, ContentPointer } from '@/lib/api';
 import { resolvePageId } from '@/lib/pages';
 import { pagePDFContainerId, PageHrefContext } from '@/lib/links';
 import { DocumentView } from '@/components/DocumentView';
@@ -8,6 +8,7 @@ import { DocumentView } from '@/components/DocumentView';
 import { SpaceParams } from '../../fetch';
 import { Revision, RevisionPageDocument, RevisionPageGroup, Space } from '@gitbook/api';
 import { notFound } from 'next/navigation';
+import { ContentRefContext } from '@/lib/references';
 
 export const runtime = 'edge';
 
@@ -29,9 +30,16 @@ export default async function PDFHTMLOutput(props: {
     const { params, searchParams } = props;
     const { spaceId } = params;
 
-    const [space, revision] = await Promise.all([getSpace(spaceId), getCurrentRevision(spaceId)]);
+    const contentPointer: ContentPointer = {
+        spaceId,
+    };
 
-    const pages = selectPages(revision, searchParams).slice(0, 4); // TODO: remove slice
+    const [space, rootPages] = await Promise.all([
+        getSpace(spaceId),
+        getRevisionPages(contentPointer),
+    ]);
+
+    const pages = selectPages(rootPages, searchParams).slice(0, 4); // TODO: remove slice
 
     const linksContext: PageHrefContext = {
         pdf: pages.map(({ page }) => page.id),
@@ -41,14 +49,19 @@ export default async function PDFHTMLOutput(props: {
         <>
             {pages.map(({ page, depth }) =>
                 page.type === 'group' ? (
-                    <PDFPageGroup key={page.id} space={space} revision={revision} page={page} />
+                    <PDFPageGroup key={page.id} space={space} page={page} />
                 ) : (
                     <PDFPageDocument
                         key={page.id}
                         space={space}
-                        revision={revision}
                         page={page}
-                        linksContext={linksContext}
+                        refContext={{
+                            content: contentPointer,
+                            space,
+                            pages: rootPages,
+                            page,
+                            ...linksContext,
+                        }}
                     />
                 ),
             )}
@@ -56,7 +69,7 @@ export default async function PDFHTMLOutput(props: {
     );
 }
 
-async function PDFPageGroup(props: { space: Space; revision: Revision; page: RevisionPageGroup }) {
+async function PDFPageGroup(props: { space: Space; page: RevisionPageGroup }) {
     const { page } = props;
 
     return (
@@ -68,30 +81,18 @@ async function PDFPageGroup(props: { space: Space; revision: Revision; page: Rev
 
 async function PDFPageDocument(props: {
     space: Space;
-    revision: Revision;
     page: RevisionPageDocument;
-    linksContext: PageHrefContext;
+    refContext: ContentRefContext;
 }) {
-    const { space, revision, page, linksContext } = props;
+    const { space, page, refContext } = props;
 
-    const document = page.documentId
-        ? await getDocument(space.id, revision.id, page.documentId)
-        : null;
+    const document = page.documentId ? await getDocument(space.id, page.documentId) : null;
 
     return (
         <div id={pagePDFContainerId(page)}>
             <h1>{page.title}</h1>
             {document ? (
-                <DocumentView
-                    document={document}
-                    style={'mt-6'}
-                    context={{
-                        space,
-                        revision,
-                        page,
-                        ...linksContext,
-                    }}
-                />
+                <DocumentView document={document} style={'mt-6'} context={refContext} />
             ) : null}
         </div>
     );
@@ -102,7 +103,7 @@ type FlatPageEntry = { page: RevisionPageDocument | RevisionPageGroup; depth: nu
 /**
  * Compute the ordered flat set of pages to render.
  */
-function selectPages(revision: Revision, params: PDFSearchParams): FlatPageEntry[] {
+function selectPages(rootPages: Revision['pages'], params: PDFSearchParams): FlatPageEntry[] {
     const flattenPage = (
         page: RevisionPageDocument | RevisionPageGroup,
         depth: number,
@@ -116,8 +117,8 @@ function selectPages(revision: Revision, params: PDFSearchParams): FlatPageEntry
     };
 
     if (params.page) {
-        const found = resolvePageId(revision, params.page);
-        if (!found || found.page.type === 'link') {
+        const found = resolvePageId(rootPages, params.page);
+        if (!found) {
             notFound();
         }
 
@@ -128,5 +129,5 @@ function selectPages(revision: Revision, params: PDFSearchParams): FlatPageEntry
         return flattenPage(found.page, 0);
     }
 
-    return revision.pages.flatMap((page) => (page.type === 'link' ? [] : flattenPage(page, 0)));
+    return rootPages.flatMap((page) => (page.type === 'link' ? [] : flattenPage(page, 0)));
 }

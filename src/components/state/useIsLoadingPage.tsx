@@ -5,17 +5,20 @@ const loadingPageAtom = atom({
     default: false,
     effects: [
         ({ setSelf }) => {
+            // @ts-ignore
             if (typeof window === 'undefined' || !window.navigation) {
                 return;
             }
 
+            // @ts-ignore
             window.navigation.addEventListener('navigate', () => {
                 // Next.js finished fetching the page and update the URL.
                 setSelf(false);
             });
 
             document.addEventListener('click', (event) => {
-                if (event.target.tagName !== 'A') {
+                // @ts-ignore
+                if (!event.target || event.target.tagName !== 'A') {
                     return;
                 }
 

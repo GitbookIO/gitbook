@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     // Cloudflare-specific options are in the cf object.
     const options: CloudflareImageOptions = {
         fit: 'scale-down',
-        format: 'auto',
+        format: 'jpeg',
         quality: 100,
     };
 
@@ -60,8 +60,6 @@ export async function GET(request: NextRequest) {
         options.format = 'avif';
     } else if (accept && /image\/webp/.test(accept)) {
         options.format = 'webp';
-    } else {
-        options.format = 'jpeg';
     }
 
     try {

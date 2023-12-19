@@ -17,7 +17,7 @@ export interface CloudflareImageJsonFormat {
  * https://developers.cloudflare.com/images/image-resizing/resize-with-workers/
  */
 export interface CloudflareImageOptions {
-    format?: 'webp' | 'avif' | 'json';
+    format?: 'webp' | 'avif' | 'json' | 'jpeg';
     fit?: 'scale-down' | 'contain' | 'cover' | 'fill' | 'inside' | 'outside';
     width?: number;
     height?: number;

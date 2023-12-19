@@ -230,7 +230,7 @@ export const getRevisionPageByPath = cache(
                 ],
             });
         } catch (error) {
-            if (error.code === 404) {
+            if ((error as GitBookAPIError).code === 404) {
                 return {
                     data: null,
                     tags: [
@@ -296,22 +296,6 @@ export const getRevisionFile = cache(
         }
     },
 );
-
-/**
- * Get the current revision of a space
- */
-export const getCurrentRevision = cache('api.getCurrentRevision', async (spaceId: string) => {
-    const response = await api().spaces.getCurrentRevision(spaceId, {
-        ...noCacheFetchOptions,
-    });
-    return cacheResponse(response, {
-        tags: [
-            getAPICacheTag({ tag: 'space', space: spaceId }),
-            getAPICacheTag({ tag: 'space-pages', space: spaceId }),
-            getAPICacheTag({ tag: 'space-files', space: spaceId }),
-        ],
-    });
-});
 
 /**
  * Get a document by its ID.

@@ -78,7 +78,7 @@ function getOptions(inputUrl: string): {
     theme: 'light' | 'dark';
 } {
     const url = new URL(inputUrl);
-    const sizeParam = url.searchParams.get('size') ?? 'small';
+    const sizeParam = (url.searchParams.get('size') ?? 'small') as keyof typeof SIZES;
     const themeParam = url.searchParams.get('theme') ?? 'light';
 
     if (!SIZES[sizeParam] || !['light', 'dark'].includes(themeParam)) {

@@ -11,7 +11,7 @@ export const runtime = 'edge';
  */
 export async function GET(req: NextRequest, { params }: { params: PageIdParams }) {
     const { space, page, customization } = await fetchPageData(params);
-    const url = new URL(space.urls.published);
+    const url = new URL(space.urls.published ?? space.urls.app);
 
     if (customization.socialPreview.url) {
         // If user configured a custom social preview, we redirect to it.
