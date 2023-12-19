@@ -42,12 +42,15 @@
         "tailwind-shades": "^1.1.2"
     },
     "devDependencies": {
+        "@argos-ci/cli": "^1.0.4",
+        "@argos-ci/puppeteer": "^1.2.1",
         "@cloudflare/next-on-pages": "^1.7.3",
         "@types/js-cookie": "^3.0.6",
         "@types/jsontoxml": "^1.0.5",
         "@types/katex": "^0.16.5",
         "@types/node": "^20",
         "@types/parse-cache-control": "^1.0.4",
+        "@types/psi": "^4.1.6",
         "@types/react": "^18",
         "@types/react-dom": "^18",
         "autoprefixer": "^10",
@@ -56,6 +59,8 @@
         "eslint-plugin-import": "^2.29.0",
         "postcss": "^8",
         "prettier": "^3.0.3",
+        "psi": "^4.1.0",
+        "puppeteer": "^21.6.1",
         "tailwindcss": "^3.3.4",
         "typescript": "^5"
     }

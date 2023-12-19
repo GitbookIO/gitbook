@@ -1,0 +1,72 @@
+on: [push]
+name: CI
+
+jobs:
+    deploy:
+        name: Deploy to Cloudflare Pages
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            deployments: write
+        outputs:
+            deployment_url: ${{ steps.cloudflare.outputs.url }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Setup bun
+              uses: oven-sh/setup-bun@v1
+            - name: Install dependencies
+              run: bun install
+            - name: Build Next.js with next-on-pages
+              run: bun run build:cloudflare
+            - id: cloudflare
+              name: Publish to Cloudflare Pages
+              uses: cloudflare/pages-action@v1
+              with:
+                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+                  projectName: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
+                  directory: ./.vercel/output/static
+                  gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+                  workingDirectory: ./
+            - name: Outputs
+              run: |
+                  echo "ID: ${{ steps.cloudflare.outputs.id }}"
+                  echo "URL: ${{ steps.cloudflare.outputs.url }}"
+                  echo "Environment: ${{ steps.cloudflare.outputs.environment }}"
+                  echo "Alias: ${{ steps.cloudflare.outputs.alias }}"
+    visual-testing:
+        runs-on: ubuntu-latest
+        name: Visual Testing
+        needs: deploy
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Setup bun
+              uses: oven-sh/setup-bun@v1
+            - name: Install dependencies
+              run: bun install
+            - name: Run visual tests
+              run: bun ./tests/visual-testing.ts $DEPLOYMENT_URL
+              env:
+                  DEPLOYMENT_URL: ${{needs.deploy.outputs.deployment_url}}
+            - name: Upload to Argos
+              run: bun x argos upload --token $ARGOS_TOKEN ./screenshots
+              env:
+                  ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
+    pagespeed-testing:
+        runs-on: ubuntu-latest
+        name: PageSpeed Testing
+        needs: deploy
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Setup bun
+              uses: oven-sh/setup-bun@v1
+            - name: Install dependencies
+              run: bun install
+            - name: Run visual tests
+              run: bun ./tests/pagespeed-testing.ts $DEPLOYMENT_URL
+              env:
+                  DEPLOYMENT_URL: ${{needs.deploy.outputs.deployment_url}}
+                  PAGESPEED_API_KEY: ${{ secrets.PAGESPEED_API_KEY }}
