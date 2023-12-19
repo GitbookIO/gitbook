@@ -1,4 +1,5 @@
 import { CustomizationSettings, JSONDocument, RevisionPageDocument, Space } from '@gitbook/api';
+import React from 'react';
 
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -6,6 +7,7 @@ import { tcls } from '@/lib/tailwind';
 import { PageCover } from './PageCover';
 import { PageFooterNavigation } from './PageFooterNavigation';
 import { PageHeader } from './PageHeader';
+import { PageLoading } from './PageLoading';
 import { DocumentView } from '../DocumentView';
 import { PageFeedbackForm } from '../PageFeedback';
 
@@ -33,6 +35,7 @@ export function PageBody(props: {
     return (
         <main
             className={tcls(
+                'relative',
                 'py-8',
                 'px-4',
                 'lg:px-12',
@@ -73,6 +76,10 @@ export function PageBody(props: {
                     <PageFeedbackForm spaceId={space.id} pageId={page.id} />
                 </div>
             ) : null}
+
+            <React.Suspense fallback={null}>
+                <PageLoading />
+            </React.Suspense>
         </main>
     );
 }
