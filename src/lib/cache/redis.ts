@@ -37,10 +37,7 @@ export const redisCache: CacheBackend | null = redis
                   multi.sadd(redisTagKey, redisKey);
 
                   // Set am expiration on the tag to be the maximum of the expiration of all keys
-
-                  // @ts-ignore - https://github.com/upstash/upstash-redis/issues/789
                   multi.expire(redisTagKey, expire, 'GT');
-                  // @ts-ignore
                   multi.expire(redisTagKey, expire, 'NX');
               });
 
