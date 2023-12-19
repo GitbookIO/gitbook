@@ -1,4 +1,4 @@
-import { ContentVisibility, Space } from '@gitbook/api';
+import { ContentVisibility, RevisionPage, Space } from '@gitbook/api';
 
 import {
     getCollectionSpaces,
@@ -6,6 +6,7 @@ import {
     ContentPointer,
     getSpaceContent,
     getDocument,
+    getRevisionPageByPath,
 } from '@/lib/api';
 import { resolvePagePath, resolvePageId } from '@/lib/pages';
 
@@ -32,11 +33,7 @@ export async function fetchPageData(params: PagePathParams | PageIdParams) {
 
     const { space, pages, customization, scripts } = await getSpaceContent(content);
 
-    const page =
-        'pageId' in params && params.pageId
-            ? resolvePageId(pages, params.pageId)
-            : resolvePagePath(pages, getPathnameParam(params));
-
+    const page = await resolvePage(pages, content, params);
     const [collection, document] = await Promise.all([
         fetchParentCollection(space),
         page && page.page.documentId ? await getDocument(space.id, page.page.documentId) : null,
@@ -53,6 +50,34 @@ export async function fetchPageData(params: PagePathParams | PageIdParams) {
         ...collection,
         document,
     };
+}
+
+/**
+ * Resolve a page from the params.
+ * If the path can't be found, we try to resolve it from the API to handle redirects.
+ */
+async function resolvePage(
+    pages: RevisionPage[],
+    content: ContentPointer,
+    params: PagePathParams | PageIdParams,
+) {
+    if ('pageId' in params && params.pageId) {
+        return resolvePageId(pages, params.pageId);
+    }
+
+    const pathParam = getPathnameParam(params);
+    const page = resolvePagePath(pages, pathParam);
+    if (page) {
+        return page;
+    }
+
+    // If page can't be found, we try with the API, in case we have a redirect
+    const resolved = await getRevisionPageByPath(content, pathParam);
+    if (resolved) {
+        return resolvePageId(pages, resolved.id);
+    }
+
+    return undefined;
 }
 
 async function fetchParentCollection(space: Space) {

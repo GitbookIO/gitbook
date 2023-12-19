@@ -181,6 +181,71 @@ export const getRevisionPages = cache('api.getRevisionPages', async (pointer: Co
 });
 
 /**
+ * Get a revision page by its path
+ */
+export const getRevisionPageByPath = cache(
+    'api.getRevisionPageByPath',
+    async (pointer: ContentPointer, pagePath: string) => {
+        try {
+            const response = await (async () => {
+                if (pointer.revisionId) {
+                    return api().spaces.getPageInRevisionByPath(
+                        pointer.spaceId,
+                        pointer.revisionId,
+                        pagePath,
+                        {},
+                        {
+                            ...noCacheFetchOptions,
+                        },
+                    );
+                }
+
+                if (pointer.changeRequestId) {
+                    return api().spaces.getPageInChangeRequestByPath(
+                        spaceId,
+                        pointer.changeRequestId,
+                        pagePath,
+                        {},
+                        {
+                            ...noCacheFetchOptions,
+                        },
+                    );
+                }
+
+                return api().spaces.getPageByPath(
+                    pointer.spaceId,
+                    pagePath,
+                    {},
+                    {
+                        ...noCacheFetchOptions,
+                    },
+                );
+            })();
+
+            return cacheResponse(response, {
+                data: response.data,
+                tags: [
+                    getAPICacheTag({ tag: 'space', space: pointer.spaceId }),
+                    getAPICacheTag({ tag: 'space-pages', space: pointer.spaceId }),
+                ],
+            });
+        } catch (error) {
+            if (error.code === 404) {
+                return {
+                    data: null,
+                    tags: [
+                        getAPICacheTag({ tag: 'space', space: pointer.spaceId }),
+                        getAPICacheTag({ tag: 'space-pages', space: pointer.spaceId }),
+                    ],
+                };
+            }
+
+            throw error;
+        }
+    },
+);
+
+/**
  * Resolve a file by its ID.
  */
 export const getRevisionFile = cache(
