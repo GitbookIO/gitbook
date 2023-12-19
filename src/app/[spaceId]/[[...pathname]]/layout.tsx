@@ -26,6 +26,9 @@ export default async function SpaceRootLayout(props: {
     return (
         <html lang={customization.internationalization.locale}>
             <head>
+                {customization.privacyPolicy.url ? (
+                    <link rel="privacy-policy" href={customization.privacyPolicy.url} />
+                ) : null}
                 <style
                     nonce={
                         //Since I can't get the nonce to work for inline styles, we need to allow unsafe-inline

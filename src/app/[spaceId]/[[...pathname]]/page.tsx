@@ -6,6 +6,7 @@ import { SpaceContent } from '@/components/SpaceContent';
 import { getSpaceLanguage } from '@/intl/server';
 import { PageHrefContext, absoluteHref, baseUrl, pageHref } from '@/lib/links';
 import { getPagePath } from '@/lib/pages';
+import { shouldIndexSpace } from '@/lib/seo';
 
 import { ClientContexts } from './ClientContexts';
 import { PagePathParams, fetchPageData, getPathnameParam } from '../fetch';
@@ -68,7 +69,7 @@ export async function generateViewport({ params }: { params: PagePathParams }): 
 }
 
 export async function generateMetadata({ params }: { params: PagePathParams }): Promise<Metadata> {
-    const { space, page, customization } = await fetchPageData(params);
+    const { space, collection, page, customization } = await fetchPageData(params);
     if (!page) {
         notFound();
     }
@@ -105,7 +106,6 @@ export async function generateMetadata({ params }: { params: PagePathParams }): 
                 customization.socialPreview.url ?? absoluteHref(`.gitbook/ogimage/${page.id}`),
             ],
         },
-        // TODO: remove once the development is finished
-        robots: space.visibility === 'public' && 0 ? 'index, follow' : 'noindex, nofollow',
+        robots: shouldIndexSpace({ space, collection }) ? 'index, follow' : 'noindex, nofollow',
     };
 }
