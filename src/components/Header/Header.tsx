@@ -44,8 +44,6 @@ export function Header(props: {
                 'w-full',
                 'backdrop-blur-lg',
                 'flex-none',
-                'transition-colors',
-                'duration-500',
                 'shadow-thinbottom',
                 'lg:z-10',
                 'supports-backdrop-blur:bg-white/60',
