@@ -47,6 +47,7 @@ export async function middleware(request: NextRequest) {
     const resolved = await withAPI(
         new GitBookAPI({
             endpoint: apiEndpoint,
+            authToken: process.env.GITBOOK_TOKEN,
         }),
         () => lookupSpaceForURL(mode, inputURL, visitorAuthToken),
     );
