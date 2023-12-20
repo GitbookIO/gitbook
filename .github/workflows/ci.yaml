@@ -16,7 +16,17 @@ jobs:
             - name: Setup bun
               uses: oven-sh/setup-bun@v1
             - name: Install dependencies
-              run: bun install
+              run: bun install --frozen-lockfile
+            - name: Cache Next.js build
+              uses: actions/cache@v3
+              with:
+                  path: |
+                      ${{ github.workspace }}/.next/cache
+                  # Generate a new cache whenever packages or source files change.
+                  key: ${{ runner.os }}-nextjs-${{ hashFiles('**/bun.lockb') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+                  # If source files changed but packages didn't, rebuild from a prior cache.
+                  restore-keys: |
+                      ${{ runner.os }}-nextjs-${{ hashFiles('**/bun.lockb') }}-
             - name: Build Next.js with next-on-pages
               run: bun run build:cloudflare
             - id: cloudflare
@@ -45,7 +55,7 @@ jobs:
             - name: Setup bun
               uses: oven-sh/setup-bun@v1
             - name: Install dependencies
-              run: bun install
+              run: bun install --frozen-lockfile
             - name: Run visual tests
               run: bun ./tests/visual-testing.ts $DEPLOYMENT_URL
               env:
@@ -64,9 +74,42 @@ jobs:
             - name: Setup bun
               uses: oven-sh/setup-bun@v1
             - name: Install dependencies
-              run: bun install
+              run: bun install --frozen-lockfile
             - name: Run visual tests
               run: bun ./tests/pagespeed-testing.ts $DEPLOYMENT_URL
               env:
                   DEPLOYMENT_URL: ${{needs.deploy.outputs.deployment_url}}
                   PAGESPEED_API_KEY: ${{ secrets.PAGESPEED_API_KEY }}
+    format:
+        runs-on: ubuntu-latest
+        name: Format
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Setup bun
+              uses: oven-sh/setup-bun@v1
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+            - run: bun format --check .
+    lint:
+        runs-on: ubuntu-latest
+        name: Lint
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Setup bun
+              uses: oven-sh/setup-bun@v1
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+            - run: bun lint
+    typecheck:
+        runs-on: ubuntu-latest
+        name: Typecheck
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Setup bun
+              uses: oven-sh/setup-bun@v1
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+            - run: bun typecheck

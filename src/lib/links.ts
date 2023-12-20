@@ -1,6 +1,11 @@
 import 'server-only';
 
-import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
+import {
+    RevisionPage,
+    RevisionPageDocument,
+    RevisionPageGroup,
+    RevisionPageType,
+} from '@gitbook/api';
 import { headers } from 'next/headers';
 
 import { getPagePath } from './pages';
@@ -96,9 +101,12 @@ export function pageHref(
         if (pdf.includes(page.id)) {
             return '#' + pagePDFContainerId(page, anchor);
         } else {
+            if (page.type === RevisionPageType.Group) {
+                return '#';
+            }
+
             // Use an absolute URL to the page
-            // TODO: we need to extend RevisionPageDocument with "urls"
-            return page.urls?.published || '/todo';
+            return page.urls.app;
         }
     }
 

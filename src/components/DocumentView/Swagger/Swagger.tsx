@@ -23,7 +23,9 @@ export async function Swagger(props: BlockProps<DocumentBlockSwagger>) {
     //         ? api.paths?.[block.data.path]?.[block.data.method]
     //         : null;
 
-    const operation = {};
+    const operation = {
+        summary: '',
+    };
 
     return (
         <div
@@ -42,7 +44,7 @@ export async function Swagger(props: BlockProps<DocumentBlockSwagger>) {
                             'font-mono text-[0.625rem] font-semibold leading-6 rounded-lg px-1.5 ring-1 ring-inset ring-emerald-300 dark:ring-emerald-400/30 bg-emerald-400/10 text-emerald-500 dark:text-emerald-400',
                         )}
                     >
-                        {block.data.method.toUpperCase()}
+                        {block.data.method?.toUpperCase()}
                     </span>
                     <span
                         className={tcls('h-0.5 w-0.5 rounded-full bg-zinc-300 dark:bg-zinc-600')}

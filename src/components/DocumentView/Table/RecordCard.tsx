@@ -6,6 +6,7 @@ import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { RecordColumnValue } from './RecordColumnValue';
 import { TableRecordKV, TableViewProps } from './Table';
+import { getRecordValue } from './utils';
 
 export async function RecordCard(
     props: TableViewProps<DocumentTableViewCards> & {
@@ -15,7 +16,7 @@ export async function RecordCard(
     const { view, record, context, isOffscreen } = props;
 
     const coverFile = view.coverDefinition
-        ? (record[1].values[view.coverDefinition]?.[0] as string)
+        ? getRecordValue<string[]>(record[1], view.coverDefinition)?.[0]
         : null;
     const cover = coverFile
         ? await resolveContentRef({ kind: 'file', file: coverFile }, context)
