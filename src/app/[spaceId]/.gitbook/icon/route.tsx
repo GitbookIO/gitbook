@@ -3,9 +3,10 @@ import { notFound } from 'next/navigation';
 import { NextRequest } from 'next/server';
 import { ImageResponse } from 'next/og';
 import { SpaceParams } from '../../fetch';
-import { getSpace, getSpaceCustomization } from '@/lib/api';
+import { getCollection, getSpace, getSpaceCustomization } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 import { getEmojiForCode } from '@/lib/emojis';
+import { ContentVisibility } from '@gitbook/api';
 
 export const runtime = 'edge';
 
@@ -39,6 +40,11 @@ export async function GET(req: NextRequest, { params }: { params: SpaceParams })
         getSpace(spaceId),
         getSpaceCustomization(spaceId),
     ]);
+    const collection =
+        space.visibility === ContentVisibility.InCollection && space.parent
+            ? await getCollection(space.parent)
+            : null;
+    const contentTitle = collection?.title ?? customization.title ?? space.title;
 
     return new ImageResponse(
         (
@@ -62,7 +68,7 @@ export async function GET(req: NextRequest, { params }: { params: SpaceParams })
                 >
                     {'emoji' in customization.favicon
                         ? getEmojiForCode(customization.favicon.emoji)
-                        : space.title.slice(0, 1).toUpperCase()}
+                        : contentTitle.slice(0, 1).toUpperCase()}
                 </h2>
             </div>
         ),

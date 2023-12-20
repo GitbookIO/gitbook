@@ -219,6 +219,17 @@ async function lookupSpaceInMultiPathMode(
     url: URL,
     visitorAuthToken: string | undefined,
 ): Promise<PublishedContentWithCache | null> {
+    // Skip useless requests
+    if (
+        url.pathname === '/favicon.ico' ||
+        url.pathname === '/robots.txt' ||
+        url.pathname === '/sitemap.xml' ||
+        // Match something that starts with a domain like
+        !url.pathname.match(/^.+\..+/)
+    ) {
+        return null;
+    }
+
     const targetStr = `https://${url.pathname}`;
 
     if (!URL.canParse(targetStr)) {
