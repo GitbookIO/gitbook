@@ -12,24 +12,22 @@ Clone the repository and use [Bun](https://bun.sh/) to install dependencies and 
 bun install
 ```
 
-To test multiple GitBook content locally, create a `.env.local` file, with the following content:
-
-```
-GITBOOK_MODE=multi-path
-```
-
 Run the Next.js development server:
 
 ```
 bun dev
 ```
 
-Then open the space in your web browser, using `http://localhost:3000/<url>` (example: `http://localhost:3000/docs.gitbook.com`).
+Then open the space in your web browser, using `http://localhost:3000/<host>/<path>` (example: `http://localhost:3000/docs.gitbook.com`).
 
 #### Other development commands
 
 -   `bun format`: format the code
 -   `bun lint`: lint the code
+
+#### CI and testing
+
+All pull-requests will be tested against both visual and performances testing to prevent regressions.
 
 ## Self-hosting
 

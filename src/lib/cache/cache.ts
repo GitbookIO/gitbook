@@ -1,3 +1,5 @@
+import hash from 'object-hash';
+
 import { memoryCache } from './memory';
 import { redisCache } from './redis';
 import { CacheEntry } from './types';
@@ -152,7 +154,14 @@ export function getCache(name: string): CacheFunction<any[], any> | null {
 }
 
 function getCacheKey(fnName: string, args: any[]) {
-    return `${fnName}(${args.map((arg) => JSON.stringify(arg)).join(',')})`;
+    let innerKey = args.map((arg) => JSON.stringify(arg)).join(',');
+
+    // Avoid crazy long keys, by fallbacking to a hash
+    if (innerKey.length > 128) {
+        innerKey = hash(args);
+    }
+
+    return `${fnName}(${innerKey})`;
 }
 
 async function setCacheEntry(key: string, entry: CacheEntry) {

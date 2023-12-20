@@ -112,7 +112,7 @@ export const getPublishedContentByUrl = cache(
     },
     {
         // Do not pass the options for the cache key
-        extractArgs: (args) => args.slice(0, 3),
+        extractArgs: (args) => args.slice(0, 2),
     },
 );
 
