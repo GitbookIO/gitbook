@@ -1,7 +1,9 @@
 import { CustomizationThemeMode } from '@gitbook/api';
 import { Metadata, Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
+import React from 'react';
 
+import { CookiesToast } from '@/components/Cookies';
 import { SpaceContent } from '@/components/SpaceContent';
 import { getSpaceLanguage } from '@/intl/server';
 import { PageHrefContext, absoluteHref, baseUrl, pageHref } from '@/lib/links';
@@ -29,6 +31,7 @@ export default async function Page(props: { params: PagePathParams }) {
         collectionSpaces,
         ancestors,
         document,
+        scripts,
     } = await fetchPageData(params);
     const linksContext: PageHrefContext = {};
 
@@ -53,6 +56,11 @@ export default async function Page(props: { params: PagePathParams }) {
                 collection={collection}
                 collectionSpaces={collectionSpaces}
             />
+            {scripts.some((script) => script.cookies) || customization.privacyPolicy.url ? (
+                <React.Suspense fallback={null}>
+                    <CookiesToast privacyPolicy={customization.privacyPolicy.url} />
+                </React.Suspense>
+            ) : null}
         </ClientContexts>
     );
 }

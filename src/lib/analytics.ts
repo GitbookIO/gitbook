@@ -3,6 +3,7 @@
 import cookies from 'js-cookie';
 
 const VISITORID_COOKIE = '__session';
+const GRANTED_COOKIE = '__gitbook_cookie_granted';
 
 let visitorId: string | null = null;
 let pendingVisitorId: Promise<string> | null = null;
@@ -28,6 +29,12 @@ export async function getVisitorId(): Promise<string> {
  * Propose a visitor identifier to the GitBook.com server and get the devideId back.
  */
 async function fetchVisitorID(): Promise<string> {
+    const withoutCookies = isCookiesTrackingDisabled();
+
+    if (withoutCookies) {
+        return getNewVisitorId();
+    }
+
     const existingTrackingCookie = cookies.get(VISITORID_COOKIE);
 
     if (existingTrackingCookie) {
@@ -35,7 +42,7 @@ async function fetchVisitorID(): Promise<string> {
         return existingTrackingCookie;
     } else {
         // No tracking deviceId set, we'll need to consolidate with the server.
-        const proposed = `${crypto.randomUUID()}R`;
+        const proposed = getNewVisitorId();
 
         const url = new URL(process.env.NEXT_PUBLIC_GITBOOK_APP_URL ?? `https://app.gitbook.com`);
         url.pathname = '/__session';
@@ -55,4 +62,34 @@ async function fetchVisitorID(): Promise<string> {
             return proposed;
         }
     }
+}
+
+/**
+ * Accept or reject cookies.
+ */
+export function setCookiesTracking(enabled: boolean) {
+    cookies.set(GRANTED_COOKIE, enabled ? 'yes' : 'no');
+}
+
+/**
+ * Return true if cookies are accepted or not.
+ * Return `undefined` if state is not known.
+ */
+export function isCookiesTrackingDisabled() {
+    const state = cookies.get(GRANTED_COOKIE);
+
+    if (state === 'yes') {
+        return false;
+    } else if (state === 'no') {
+        return true;
+    }
+
+    return undefined;
+}
+
+/**
+ * Get a proposed visitor ID.
+ */
+function getNewVisitorId(): string {
+    return `${crypto.randomUUID()}R`;
 }
