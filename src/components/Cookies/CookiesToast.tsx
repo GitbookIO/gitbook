@@ -1,15 +1,17 @@
 'use client';
 
+import IconX from '@geist-ui/icons/x';
 import * as React from 'react';
 
+import { Button } from '@/components/primitives';
 import { useLanguage } from '@/intl/client';
 import { t } from '@/intl/translate';
 import { isCookiesTrackingDisabled, setCookiesTracking } from '@/lib/analytics';
 import { tcls } from '@/lib/tailwind';
-
 /**
  * Toast to accept or reject the use of cookies.
  */
+
 export function CookiesToast(props: { privacyPolicy?: string }) {
     const { privacyPolicy = 'https://policies.gitbook.com/privacy/cookies' } = props;
     const [show, setShow] = React.useState(false);
@@ -36,17 +38,18 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                 'fixed',
                 'z-10',
                 'bg-white',
-                'dark:bg-slate-800',
                 'rounded',
-                'border-slate-400',
-                'dark:border-slate-700',
-                'shadow-md',
+                'ring-1',
+                'ring-dark/2',
+                'shadow-1xs',
                 'p-4',
                 'bottom-4',
                 'right-4',
-                'left-4',
+                'left-16',
                 'max-w-sm',
                 'sm:left-auto',
+                'dark:ring-light/2',
+                'dark:bg-dark',
             )}
         >
             <p className={tcls('text-sm')}>
@@ -55,56 +58,54 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                     'cookies_prompt',
                     <a
                         href={privacyPolicy}
-                        className={tcls('text-primary-500', 'hover:text-primary-700', 'underline')}
+                        className={tcls(
+                            'text-primary-500',
+                            'hover:text-primary-600',
+                            'hover:underline',
+                        )}
                     >
                         {t(language, 'cookies_prompt_privacy')}
                     </a>,
                 )}
             </p>
-            <div className={tcls('mt-3', 'flex', 'flex-row', 'gap-4')}>
-                <ToastButton
+            <button
+                onClick={() => setShow(false)}
+                className={tcls(
+                    'absolute',
+                    'top-2',
+                    'right-2',
+                    'w-5',
+                    'h-5',
+                    'flex',
+                    'justify-center',
+                    'items-center',
+                    'rounded-sm',
+                    'hover:bg-dark/2',
+                    'dark:hover:bg-light/1',
+                )}
+            >
+                <IconX className={tcls('w-4')} />
+            </button>
+            <div className={tcls('mt-3', 'flex', 'flex-row', 'gap-2')}>
+                <Button
+                    variant="primary"
+                    size="small"
                     onClick={() => {
                         onUpdateState(true);
                     }}
                 >
                     {t(language, 'cookies_accept')}
-                </ToastButton>
-                <ToastButton
+                </Button>
+                <Button
+                    variant="secondary"
+                    size="small"
                     onClick={() => {
                         onUpdateState(false);
                     }}
                 >
                     {t(language, 'cookies_reject')}
-                </ToastButton>
+                </Button>
             </div>
         </div>
-    );
-}
-
-function ToastButton(props: { onClick: () => void; children: React.ReactNode }) {
-    const { onClick, children } = props;
-
-    return (
-        <button
-            onClick={onClick}
-            className={tcls(
-                'bg-white',
-                'dark:bg-slate-800',
-                'text-xs',
-                'text-slate-800',
-                'dark:text-slate-200',
-                'rounded',
-                'border',
-                'border-slate-300',
-                'dark:border-slate-700',
-                'px-2',
-                'py-1',
-                'shadow-md',
-                'hover:bg-slate-100',
-                'dark:hover:bg-slate-700',
-            )}
-        >
-            {children}
-        </button>
     );
 }

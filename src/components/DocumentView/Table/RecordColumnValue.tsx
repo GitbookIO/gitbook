@@ -1,7 +1,7 @@
 import { DocumentBlockTable, DocumentTableViewCards } from '@gitbook/api';
 import Link from 'next/link';
 
-import { Checkbox } from '@/components/utils';
+import { Checkbox } from '@/components/primitives';
 import { getNodeFragmentByName } from '@/lib/document';
 import { resolveContentRef } from '@/lib/references';
 import { ClassValue, tcls } from '@/lib/tailwind';

@@ -3,11 +3,11 @@ import IconSearch from '@geist-ui/icons/search';
 import Link from 'next/link';
 import React from 'react';
 
+import { Loading } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
 
 import { AskAnswerResult, askQuestion } from './server-actions';
 import { useSearch, useSearchLink } from './useSearch';
-import { Loading } from '../utils/Loading';
 
 /**
  * Fetch and render the answers to a question.

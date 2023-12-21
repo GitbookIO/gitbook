@@ -62,6 +62,7 @@ export function Trademark(props: { space: Space; customization: CustomizationSet
                         'rounded-md',
                         'hover:backdrop-blur-sm',
                         'lg:ring-0',
+                        'tracking-[-0.016em]',
                         'dark:hover:bg-light/1',
                         'dark:ring-light/1',
                         'dark:font-normal',

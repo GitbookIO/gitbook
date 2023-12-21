@@ -1,6 +1,6 @@
 import { DocumentBlockListItem } from '@gitbook/api';
 
-import { Checkbox } from '@/components/utils';
+import { Checkbox } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
 
 import { BlockProps } from './Block';

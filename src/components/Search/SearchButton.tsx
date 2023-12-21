@@ -33,6 +33,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'justify-center',
                 'items-center',
                 'px-2',
+                'text-dark/6',
                 'min-h-[2.5rem]',
                 'w-[2.5rem]',
                 'rounded-lg',
@@ -45,6 +46,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'dark:bg-light/1',
                 'dark:border-light/1',
                 'dark:hover:bg-light/2',
+                'dark:text-light/6',
                 '[&>span]:hidden',
                 'md:justify-between',
                 'md:[&>span]:flex',
@@ -54,7 +56,14 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
             )}
         >
             {children}
-            <IconSearch className={tcls('w-4', 'h-4')} />
+            <IconSearch
+                className={tcls(
+                    'w-4',
+                    'h-4',
+                    '[color:color-mix(in_srgb,_rgb(var(--light)),_rgb(var(--dark))_32%)]',
+                    'dark:[color:color-mix(in_srgb,_rgb(var(--dark)),_rgb(var(--light))_32%)]',
+                )}
+            />
         </button>
     );
 }
