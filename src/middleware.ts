@@ -108,10 +108,10 @@ export async function middleware(request: NextRequest) {
     if (visitorAuthToken) {
         response.cookies.set(VISITOR_AUTH_COOKIE, visitorAuthToken);
     } else if (process.env.NODE_ENV !== 'development' && resolved.cacheMaxAge) {
-        response.headers.set(
-            'cache-control',
-            `public, max-age=${resolved.cacheMaxAge}, s-maxage=${resolved.cacheMaxAge}, stale-while-revalidate=3600, stale-if-error=0`,
-        );
+        const cacheControl = `public, max-age=${resolved.cacheMaxAge}, s-maxage=${resolved.cacheMaxAge}, stale-while-revalidate=3600, stale-if-error=0`;
+
+        response.headers.set('cache-control', cacheControl);
+        response.headers.set('Cloudflare-CDN-Cache-Control', cacheControl);
     }
 
     if (resolved.cacheTags && resolved.cacheTags.length > 0) {
