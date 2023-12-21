@@ -3,7 +3,7 @@ import assertNever from 'assert-never';
 import Script from 'next/script';
 import colors from 'tailwindcss/colors';
 
-import { fonts } from '@/fonts';
+import { fonts, ibmPlexMono } from '@/fonts';
 import { getSpaceContent } from '@/lib/api';
 import { hexToRgb, shadesOfColor } from '@/lib/colors';
 import { getContentSecurityPolicyNonce } from '@/lib/csp';
@@ -65,6 +65,7 @@ export default async function SpaceRootLayout(props: {
             <body
                 className={tcls(
                     `${fonts[customization.styling.font].className}`,
+                    `${ibmPlexMono.variable}`,
                     'bg-light',
                     'dark:bg-dark',
                 )}

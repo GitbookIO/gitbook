@@ -3,6 +3,7 @@ import {
     Inter,
     Fira_Sans_Extra_Condensed,
     IBM_Plex_Serif,
+    IBM_Plex_Mono,
     Lato,
     Merriweather,
     Noto_Sans,
@@ -19,6 +20,13 @@ import localFont from 'next/font/local';
 
 const inter = Inter({
     variable: '--font-content',
+    preload: false,
+});
+
+export const ibmPlexMono = IBM_Plex_Mono({
+    weight: ['400'],
+    variable: '--font-mono',
+    style: 'normal',
     preload: false,
 });
 
@@ -132,6 +140,7 @@ const abcFavorit = localFont({
  */
 export const fonts: { [fontName in CustomizationFont]: { className: string } } = {
     [CustomizationFont.Inter]: inter,
+    [CustomizationFont.IBMPlexMono]: ibmPlexMono,
     [CustomizationFont.FiraSans]: firaSans,
     [CustomizationFont.IBMPlexSerif]: ibmPlexSerif,
     [CustomizationFont.Lato]: lato,

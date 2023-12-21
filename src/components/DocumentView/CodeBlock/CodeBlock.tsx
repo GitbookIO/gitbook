@@ -35,7 +35,6 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
                     'items-center',
                     'justify-start',
                     '[grid-area:1/1]',
-                    /*                     'mb-2', */
                     'text-sm',
                     'gap-2',
                 )}
@@ -146,7 +145,6 @@ function CodeHighlightLine(props: {
                 'relative',
                 'linear-mask-util',
                 'ring-2',
-                /*                 'ring-inset', */
                 'ring-transparent',
                 'hover:ring-dark/2',
                 'dark:hover:ring-light/2',
@@ -178,6 +176,7 @@ function CodeHighlightLine(props: {
                 <span
                     className={tcls(
                         'table-cell',
+                        'text-sm',
                         'w-[0.01ch]',
                         'text-right',
                         'pr-3',
@@ -186,7 +185,6 @@ function CodeHighlightLine(props: {
                         'left-0',
                         '[background:linear-gradient(to_right,_color-mix(in_srgb,_rgb(var(--light)),_rgb(var(--dark))_3%)_60%,_transparent)]',
                         'dark:[background:linear-gradient(to_right,_color-mix(in_srgb,_rgb(var(--dark)),_rgb(var(--light))_4%)_60%,_transparent)]',
-                        /*                         '[background-color:color-mix(in_oklab,_rgb(var(--light)),_rgb(var(--dark))_97%)]', */
                         withLineNumbers
                             ? [
                                   'before:text-dark/5',
@@ -208,7 +206,7 @@ function CodeHighlightLine(props: {
                 ></span>
             ) : null}
 
-            <span className={tcls('ml-3', 'block')}>
+            <span className={tcls('ml-3', 'block', 'text-sm')}>
                 <CodeHighlightTokens tokens={line.tokens} document={document} context={context} />
                 {isLast ? null : !withLineNumbers && line.tokens.length === 0 && 0 ? (
                     <span className="ew">{'\u200B'}</span>

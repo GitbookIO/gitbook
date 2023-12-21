@@ -36,7 +36,7 @@ const config: Config = {
         extend: {
             fontFamily: {
                 sans: ['var(--font-content)'],
-                /*  mono: ['var(--font-mono)'], */ // TODO: try Cartograph
+                mono: ['var(--font-mono)'],
             },
 
             colors: {
