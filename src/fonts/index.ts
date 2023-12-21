@@ -140,7 +140,6 @@ const abcFavorit = localFont({
  */
 export const fonts: { [fontName in CustomizationFont]: { className: string } } = {
     [CustomizationFont.Inter]: inter,
-    [CustomizationFont.IBMPlexMono]: ibmPlexMono,
     [CustomizationFont.FiraSans]: firaSans,
     [CustomizationFont.IBMPlexSerif]: ibmPlexSerif,
     [CustomizationFont.Lato]: lato,
