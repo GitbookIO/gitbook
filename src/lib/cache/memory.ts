@@ -1,6 +1,8 @@
 import { CacheBackend, CacheEntry } from './types';
 
 export const memoryCache: CacheBackend = {
+    name: 'memory',
+    fallback: true,
     async get(key) {
         const memoryCache = getMemoryCache();
         const memoryEntry = memoryCache.get(key);

@@ -3,98 +3,115 @@ import { Redis } from '@upstash/redis/cloudflare';
 import { CacheBackend, CacheEntry, CacheEntryMeta } from './types';
 import { filterOutNullable } from '../typescript';
 
-const redis =
-    process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-        ? new Redis({
-              url: process.env.UPSTASH_REDIS_REST_URL,
-              token: process.env.UPSTASH_REDIS_REST_TOKEN,
-          })
-        : null;
-
 const cacheNamespace = process.env.UPSTASH_REDIS_NAMESPACE ?? 'gitbook';
 const cacheVersion = 1;
 
-export const redisCache: CacheBackend | null = redis
-    ? {
-          async get(key) {
-              try {
-                  const [, redisEntry] = await redis
-                      .multi()
-                      .json.numincrby(getRedisKey(key), '$.meta.hits', 1)
-                      .json.get(getRedisKey(key))
-                      .exec<[any, CacheEntry | null]>();
-                  if (!redisEntry) {
-                      return null;
-                  }
+export const redisCache: CacheBackend = {
+    name: 'redis',
+    async get(key, options) {
+        const redis = getRedis(options?.signal);
+        if (!redis) {
+            return null;
+        }
 
-                  return redisEntry;
-              } catch (error) {
-                  // "JSON.NUMINCRBY" throws an error if the key does not exist
-                  if ((error as Error).message.includes('ERR no such key')) {
-                      return null;
-                  }
+        try {
+            const [, redisEntry] = await redis
+                .multi()
+                .json.numincrby(getRedisKey(key), '$.meta.hits', 1)
+                .json.get(getRedisKey(key))
+                .exec<[any, CacheEntry | null]>();
+            if (!redisEntry) {
+                return null;
+            }
 
-                  throw error;
-              }
-          },
+            return redisEntry;
+        } catch (error) {
+            // "JSON.NUMINCRBY" throws an error if the key does not exist
+            if ((error as Error).message.includes('ERR no such key')) {
+                return null;
+            }
 
-          async set(key, entry) {
-              const multi = redis.multi();
+            throw error;
+        }
+    },
 
-              const redisKey = getRedisKey(key);
-              const expire = Math.max(0, (entry.meta.expiresAt - Date.now()) / 1000);
+    async set(key, entry) {
+        const redis = getRedis();
+        if (!redis) {
+            return;
+        }
 
-              entry.meta.tags.forEach((tag) => {
-                  const redisTagKey = getCacheTagKey(tag);
+        const multi = redis.multi();
 
-                  multi.sadd(redisTagKey, redisKey);
+        const redisKey = getRedisKey(key);
+        const expire = Math.max(0, (entry.meta.expiresAt - Date.now()) / 1000);
 
-                  // Set am expiration on the tag to be the maximum of the expiration of all keys
-                  multi.expire(redisTagKey, expire, 'GT');
-                  multi.expire(redisTagKey, expire, 'NX');
-              });
+        entry.meta.tags.forEach((tag) => {
+            const redisTagKey = getCacheTagKey(tag);
 
-              // @ts-ignore
-              multi.json.set(redisKey, '$', entry);
-              multi.expire(redisKey, expire);
+            multi.sadd(redisTagKey, redisKey);
 
-              await multi.exec();
-          },
+            // Set am expiration on the tag to be the maximum of the expiration of all keys
+            multi.expire(redisTagKey, expire, 'GT');
+            multi.expire(redisTagKey, expire, 'NX');
+        });
 
-          async revalidateTags(tags) {
-              const keys = new Set(
-                  (
-                      await Promise.all(tags.map((tag) => redis.smembers(getCacheTagKey(tag))))
-                  ).flat(),
-              );
+        // @ts-ignore
+        multi.json.set(redisKey, '$', entry);
+        multi.expire(redisKey, expire);
 
-              const pipeline = redis.pipeline();
-              let metas: Array<CacheEntryMeta | null> = [];
+        await multi.exec();
+    },
 
-              if (keys.size > 0) {
-                  metas = (
-                      await redis.json.mget(
-                          // Hard limit to avoid fetching a massive list of data
-                          Array.from(keys).slice(0, 1000),
-                          '$.meta',
-                      )
-                  ).flat() as Array<CacheEntryMeta | null>;
+    async revalidateTags(tags) {
+        const redis = getRedis();
+        if (!redis) {
+            return [];
+        }
 
-                  // Finally, delete all keys
-                  keys.forEach((key) => {
-                      pipeline.del(key);
-                  });
-              }
+        const keys = new Set(
+            (await Promise.all(tags.map((tag) => redis.smembers(getCacheTagKey(tag))))).flat(),
+        );
 
-              tags.forEach((tag) => {
-                  pipeline.del(getCacheTagKey(tag));
-              });
+        const pipeline = redis.pipeline();
+        let metas: Array<CacheEntryMeta | null> = [];
 
-              await pipeline.exec();
-              return metas.filter(filterOutNullable);
-          },
-      }
-    : null;
+        if (keys.size > 0) {
+            metas = (
+                await redis.json.mget(
+                    // Hard limit to avoid fetching a massive list of data
+                    Array.from(keys).slice(0, 1000),
+                    '$.meta',
+                )
+            ).flat() as Array<CacheEntryMeta | null>;
+
+            // Finally, delete all keys
+            keys.forEach((key) => {
+                pipeline.del(key);
+            });
+        }
+
+        tags.forEach((tag) => {
+            pipeline.del(getCacheTagKey(tag));
+        });
+
+        await pipeline.exec();
+        return metas.filter(filterOutNullable);
+    },
+};
+
+/**
+ * Get the redis client.
+ */
+export function getRedis(signal?: AbortSignal) {
+    return process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
+        ? new Redis({
+              url: process.env.UPSTASH_REDIS_REST_URL,
+              token: process.env.UPSTASH_REDIS_REST_TOKEN,
+              signal,
+          })
+        : null;
+}
 
 /**
  * Get the key for a tag.

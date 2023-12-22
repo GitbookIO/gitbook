@@ -1,0 +1,89 @@
+diff --git a/node_modules/@cloudflare/next-on-pages/dist/helpers/getRequestCloudflareContext.d.ts b/node_modules/@cloudflare/next-on-pages/dist/helpers/getRequestCloudflareContext.d.ts
+new file mode 100644
+index 0000000..e575127
+--- /dev/null
++++ b/node_modules/@cloudflare/next-on-pages/dist/helpers/getRequestCloudflareContext.d.ts
+@@ -0,0 +1,11 @@
++/// <reference types="@cloudflare/workers-types" />
++/**
++ * returns the request's execution context (usually referred as ctx).
++ *
++ * Note:
++ *   This function throws when run on the client, where there is execution context.
++ *   This function returns the mocked execution context in non pages environments.
++ *
++ * @returns the request's execution context
++ */
++export declare const getRequestCloudflareContext: () => { ctx: ExecutionContext, cf: IncomingRequestCfProperties<any> };
+diff --git a/node_modules/@cloudflare/next-on-pages/dist/helpers/index.d.ts b/node_modules/@cloudflare/next-on-pages/dist/helpers/index.d.ts
+new file mode 100644
+index 0000000..4a415d2
+--- /dev/null
++++ b/node_modules/@cloudflare/next-on-pages/dist/helpers/index.d.ts
+@@ -0,0 +1 @@
++export * from './getRequestCloudflareContext';
+diff --git a/node_modules/@cloudflare/next-on-pages/dist/helpers/index.js b/node_modules/@cloudflare/next-on-pages/dist/helpers/index.js
+new file mode 100644
+index 0000000..c6e2065
+--- /dev/null
++++ b/node_modules/@cloudflare/next-on-pages/dist/helpers/index.js
+@@ -0,0 +1,15 @@
++// src/helpers/getRequestExecutionContext.ts
++var getRequestCloudflareContext = () => {
++    if (typeof process === "undefined") {
++      throw new Error(
++        "Error: trying to access the request execution context on the client"
++      );
++    }
++    const cloudflare = process.env.cloudflare;
++    if (cloudflare)
++      return cloudflare;
++    return null;
++  };
++  export {
++    getRequestCloudflareContext
++  };
+\ No newline at end of file
+diff --git a/node_modules/@cloudflare/next-on-pages/package.json b/node_modules/@cloudflare/next-on-pages/package.json
+index 494e9a9..f0e1e21 100644
+--- a/node_modules/@cloudflare/next-on-pages/package.json
++++ b/node_modules/@cloudflare/next-on-pages/package.json
+@@ -3,12 +3,16 @@
+ 	"version": "1.8.2",
+ 	"bin": "./bin/index.js",
+ 	"exports": {
+-		"./__experimental__next-dev": "./dist/next-dev/index.cjs"
++		"./__experimental__next-dev": "./dist/next-dev/index.cjs",
++		"./helpers": "./dist/helpers/index.js"
+ 	},
+ 	"typesVersions": {
+ 		"*": {
+ 			"__experimental__next-dev": [
+ 				"./dist/next-dev/index.d.ts"
++			],
++			"helpers": [
++				"./dist/helpers/index.d.ts"
+ 			]
+ 		}
+ 	},
+diff --git a/node_modules/@cloudflare/next-on-pages/templates/_worker.js/index.ts b/node_modules/@cloudflare/next-on-pages/templates/_worker.js/index.ts
+index 929f6cc..7164930 100644
+--- a/node_modules/@cloudflare/next-on-pages/templates/_worker.js/index.ts
++++ b/node_modules/@cloudflare/next-on-pages/templates/_worker.js/index.ts
+@@ -33,9 +33,15 @@ export default {
+ 			return new Response(responseBody, { status: 503 });
+ 		}
+ 
++		const cloudflare = {
++			cf: request.cf,
++			env,
++			ctx,
++		};
++
+ 		return envAsyncLocalStorage.run(
+ 			// NOTE: The `SUSPENSE_CACHE_URL` is used to tell the Next.js Fetch Cache where to send requests.
+-			{ ...env, NODE_ENV: __NODE_ENV__, SUSPENSE_CACHE_URL },
++			{ ...env, cloudflare, NODE_ENV: __NODE_ENV__, SUSPENSE_CACHE_URL },
+ 			async () => {
+ 				const url = new URL(request.url);
+ 				if (url.pathname.startsWith('/_next/image')) {

@@ -1,8 +1,8 @@
 import pMap from 'p-map';
 
-import { getCache } from './cache';
-import { memoryCache } from './memory';
-import { redisCache } from './redis';
+import { cacheBackends } from './backends';
+import { getCache, getCacheKey } from './cache';
+import { CacheEntryMeta } from './types';
 
 /**
  * Revalidate all values associated with tags.
@@ -13,9 +13,21 @@ export async function revalidateTags(tags: string[], purge: boolean): Promise<vo
         return;
     }
 
-    await memoryCache.revalidateTags(tags);
+    const processed = new Set<string>();
+    const metas: CacheEntryMeta[] = [];
 
-    const metas = await redisCache?.revalidateTags(tags);
+    await Promise.all(
+        cacheBackends.map(async (backend) => {
+            const addedMetas = await backend.revalidateTags(tags);
+            addedMetas.forEach((meta) => {
+                const key = getCacheKey(meta.cache, meta.args);
+                if (!processed.has(key)) {
+                    metas.push(meta);
+                    processed.add(key);
+                }
+            });
+        }),
+    );
 
     // Refresh the values in the cache
     if (metas && !purge) {

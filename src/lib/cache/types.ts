@@ -31,10 +31,17 @@ export interface CacheEntry {
 }
 
 export interface CacheBackend {
+    name: string;
+
+    /**
+     * If true, we'll set entries in this cache that have been found in another cache.
+     */
+    fallback?: boolean;
+
     /**
      * Get a value from the cache.
      */
-    get(key: string): Promise<CacheEntry | null>;
+    get(key: string, options?: { signal?: AbortSignal }): Promise<CacheEntry | null>;
 
     /**
      * Set a value in the cache.

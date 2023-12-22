@@ -56,7 +56,7 @@ async function fetchVisitorID(): Promise<string> {
                 mode: 'cors', // Need to use cors as we are on a different domain.
             });
 
-            const { deviceId } = await resp.json();
+            const { deviceId } = (await resp.json()) as { deviceId: string };
             return deviceId;
         } catch (error) {
             return proposed;

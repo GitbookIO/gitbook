@@ -10,7 +10,8 @@
         "lint": "next lint",
         "format": "prettier ./ --ignore-unknown --write",
         "format:check": "prettier ./ --ignore-unknown --list-different",
-        "typecheck": "tsc --noEmit"
+        "typecheck": "tsc --noEmit",
+        "postinstall": "bunx patch-package"
     },
     "dependencies": {
         "@geist-ui/icons": "^1.0.2",
@@ -46,6 +47,7 @@
         "@argos-ci/cli": "^1.0.4",
         "@argos-ci/puppeteer": "^1.2.1",
         "@cloudflare/next-on-pages": "^1.7.3",
+        "@cloudflare/workers-types": "^4.20231218.0",
         "@types/js-cookie": "^3.0.6",
         "@types/jsontoxml": "^1.0.5",
         "@types/katex": "^0.16.5",
@@ -59,6 +61,7 @@
         "eslint": "^8",
         "eslint-config-next": "13.5.6",
         "eslint-plugin-import": "^2.29.0",
+        "patch-package": "^8.0.0",
         "postcss": "^8",
         "prettier": "^3.0.3",
         "psi": "^4.1.0",

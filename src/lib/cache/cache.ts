@@ -1,8 +1,8 @@
 import hash from 'object-hash';
 
-import { memoryCache } from './memory';
-import { redisCache } from './redis';
+import { cacheBackends } from './backends';
 import { CacheEntry } from './types';
+import { waitUntil } from './waitUntil';
 
 export type CacheFunction<Args extends any[], Result> = ((...args: Args) => Promise<Result>) & {
     /**
@@ -62,10 +62,8 @@ export function cache<Args extends any[], Result>(
         };
 
         // Write it to the cache
-        // As soon as it'll be possible with next-on-pages, we should `waitUntil`
-        // to delay writing the cache after the response has been sent to the client.
         if (result.ttl && result.ttl > 0) {
-            await setCacheEntry(key, cacheEntry);
+            await waitUntil(setCacheEntry(key, cacheEntry));
         }
         const writeCacheDuration = now() - startTime - fetchDuration;
 
@@ -79,18 +77,15 @@ export function cache<Args extends any[], Result>(
     const fetchValue = async (key: string, ...args: Args) => {
         // Read the cache
         const startTime = now();
-        const hasMemoryHit = !!(await memoryCache.get(key));
         const cachedEntry = await getCacheEntry(key);
         const readCacheDuration = now() - startTime;
 
         // Returns it if it exists
         if (cachedEntry !== null) {
             console.log(
-                `cache: ${key} hit in ${readCacheDuration.toFixed(
-                    0,
-                )}ms (memory: ${hasMemoryHit}, redis: ${!!redisCache})`,
+                `cache: ${key} hit on ${cachedEntry[1]} in ${readCacheDuration.toFixed(0)}ms`,
             );
-            return cachedEntry.data;
+            return cachedEntry[0].data;
         }
 
         const fetched = await revalidate(key, ...args);
@@ -99,7 +94,7 @@ export function cache<Args extends any[], Result>(
                 0,
             )}ms, read in ${readCacheDuration.toFixed(
                 0,
-            )}ms, write in ${fetched.writeCacheDuration.toFixed(0)}ms (redis: ${!!redisCache})`,
+            )}ms, write in ${fetched.writeCacheDuration.toFixed(0)}ms`,
         );
 
         return fetched.data;
@@ -153,7 +148,10 @@ export function getCache(name: string): CacheFunction<any[], any> | null {
     return registeredCaches.get(name) ?? null;
 }
 
-function getCacheKey(fnName: string, args: any[]) {
+/**
+ * Get a cache key for a function and its arguments.
+ */
+export function getCacheKey(fnName: string, args: any[]) {
     let innerKey = args.map((arg) => JSON.stringify(arg)).join(',');
 
     // Avoid crazy long keys, by fallbacking to a hash
@@ -165,26 +163,42 @@ function getCacheKey(fnName: string, args: any[]) {
 }
 
 async function setCacheEntry(key: string, entry: CacheEntry) {
-    await Promise.all([memoryCache.set(key, entry), redisCache?.set(key, entry)]);
+    await Promise.all(cacheBackends.map((backend) => backend.set(key, entry)));
 }
 
-async function getCacheEntry(key: string): Promise<CacheEntry | null> {
-    const memoryEntry = await memoryCache.get(key);
-    if (memoryEntry) {
-        return memoryEntry;
+async function getCacheEntry(key: string): Promise<[CacheEntry, string] | null> {
+    const abort = new AbortController();
+
+    let result: [CacheEntry, string] | null = null;
+
+    await Promise.all(
+        cacheBackends.map(async (backend) => {
+            try {
+                const entry = await backend.get(key, { signal: abort.signal });
+                if (entry && !result) {
+                    result = [entry, backend.name];
+                    abort.abort();
+                }
+            } catch (error) {
+                // Ignore all errors
+            }
+        }),
+    );
+
+    // Write to the fallback caches
+    if (result) {
+        const [savedEntry, backendName] = result as [CacheEntry, string];
+
+        await waitUntil(
+            Promise.all(
+                cacheBackends
+                    .filter((backend) => backend.name !== backendName && backend.fallback)
+                    .map((backend) => backend.set(key, savedEntry)),
+            ),
+        );
     }
 
-    try {
-        const redisEntry = (await redisCache?.get(key)) ?? null;
-        if (redisEntry) {
-            await memoryCache.set(key, redisEntry);
-        }
-
-        return redisEntry;
-    } catch (error) {
-        console.error(`Error while getting cache entry for ${key} from redis`, error);
-        return null;
-    }
+    return result;
 }
 
 function now(): number {
