@@ -4,11 +4,13 @@ import Script from 'next/script';
 import colors from 'tailwindcss/colors';
 
 import { fonts, ibmPlexMono } from '@/fonts';
+import { getSpaceLanguage } from '@/intl/server';
 import { getSpaceContent } from '@/lib/api';
 import { hexToRgb, shadesOfColor } from '@/lib/colors';
 import { getContentSecurityPolicyNonce } from '@/lib/csp';
 import { tcls } from '@/lib/tailwind';
 
+import { ClientContexts } from './ClientContexts';
 import { PagePathParams } from '../fetch';
 
 export default async function SpaceRootLayout(props: {
@@ -22,6 +24,7 @@ export default async function SpaceRootLayout(props: {
     });
     const headerTheme = generateHeaderTheme(customization);
     const nonce = getContentSecurityPolicyNonce();
+    const language = getSpaceLanguage(customization);
 
     return (
         <html lang={customization.internationalization.locale}>
@@ -70,7 +73,7 @@ export default async function SpaceRootLayout(props: {
                     'dark:bg-dark',
                 )}
             >
-                {children}
+                <ClientContexts language={language}>{children}</ClientContexts>
 
                 {scripts.map(({ script }) => (
                     <Script key={script} src={script} strategy="lazyOnload" nonce={nonce} />

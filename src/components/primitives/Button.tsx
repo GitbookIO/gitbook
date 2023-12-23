@@ -1,3 +1,5 @@
+'use client';
+
 import { tcls, ClassValue } from '@/lib/tailwind';
 
 type ButtonProps = {

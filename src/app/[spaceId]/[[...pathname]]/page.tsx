@@ -41,10 +41,8 @@ export default async function Page(props: { params: PagePathParams }) {
         redirect(pageHref(pages, page, linksContext));
     }
 
-    const language = getSpaceLanguage(customization);
-
     return (
-        <ClientContexts language={language}>
+        <>
             <SpaceContent
                 content={content}
                 space={space}
@@ -61,7 +59,7 @@ export default async function Page(props: { params: PagePathParams }) {
                     <CookiesToast privacyPolicy={customization.privacyPolicy.url} />
                 </React.Suspense>
             ) : null}
-        </ClientContexts>
+        </>
     );
 }
 

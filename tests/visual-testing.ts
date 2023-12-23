@@ -34,6 +34,10 @@ const testCases: TestsCase[] = [
                 name: 'AI Search',
                 url: '?q=What+is+GitBook%3F&ask=1',
             },
+            {
+                name: 'Not found',
+                url: 'content-not-found',
+            },
         ],
     },
     {

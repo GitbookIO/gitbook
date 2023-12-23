@@ -22,5 +22,11 @@
     "cookies_prompt": "This site uses cookies to deliver its service and to analyse traffic. By browsing this site, you accept the ${1}.",
     "cookies_prompt_privacy": "privacy policy",
     "cookies_accept": "Accept",
-    "cookies_reject": "Reject"
+    "cookies_reject": "Reject",
+    "notfound_title": "Page not found",
+    "notfound": "The page you are looking for doesn't exist.",
+    "notfound_go_home": "Back to front page",
+    "unexpected_error_title": "An error occurred",
+    "unexpected_error": "Sorry, an unexpected error has occurred. Please try again later.",
+    "unexpected_error_retry": "Retry"
 }
