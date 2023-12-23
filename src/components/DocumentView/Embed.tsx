@@ -1,32 +1,64 @@
 import { DocumentBlockEmbed } from '@gitbook/api';
 
+import { Card } from '@/components/primitives';
 import { api } from '@/lib/api';
-import { tcls } from '@/lib/tailwind';
+import { getNodeFragmentByName, isNodeEmpty } from '@/lib/document';
+import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { BlockProps } from './Block';
-import { Blocks } from './Blocks';
+import { Inlines } from './Inlines';
 
 export async function Embed(props: BlockProps<DocumentBlockEmbed>) {
-    const { block, style, ...contextProps } = props;
+    const { block, style, document, context } = props;
 
     const { data: embed } = await api().urls.getEmbedByUrl({ url: block.data.url });
+    const caption = getNodeFragmentByName(block, 'caption');
+    const captionParagraph = caption?.nodes[0];
 
-    // TODO caption
-
-    if (embed.type === 'rich') {
-        return (
+    const content = (wrapStyle: ClassValue) =>
+        embed.type === 'rich' ? (
             <div
-                className={tcls(style)}
+                className={tcls(wrapStyle)}
                 dangerouslySetInnerHTML={{
                     __html: embed.html,
                 }}
             />
+        ) : (
+            <Card
+                leadingIcon={
+                    embed.icon ? (
+                        <img src={embed.icon} className={tcls('w-5', 'h-5')} alt="Logo" />
+                    ) : null
+                }
+                href={block.data.url}
+                title={embed.title}
+                postTitle={embed.site}
+                style={wrapStyle}
+            />
         );
-    } else {
-        return (
-            <div className={tcls(style)}>
-                <div>{embed.title}</div>
-            </div>
-        );
+
+    if (
+        !captionParagraph ||
+        captionParagraph.type !== 'paragraph' ||
+        isNodeEmpty(captionParagraph)
+    ) {
+        return content(style);
     }
+
+    return (
+        <figure className={tcls(style)}>
+            {content(null)}
+            <figcaption
+                className={tcls(
+                    'text-sm',
+                    'text-center',
+                    'mt-2',
+                    'text-dark/7',
+                    'dark:text-light/6',
+                )}
+            >
+                <Inlines nodes={captionParagraph.nodes} document={document} context={context} />
+            </figcaption>
+        </figure>
+    );
 }

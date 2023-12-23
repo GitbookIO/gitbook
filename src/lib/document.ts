@@ -5,6 +5,7 @@ import {
     JSONDocument,
     DocumentBlock,
 } from '@gitbook/api';
+import assertNever from 'assert-never';
 
 export interface DocumentSection {
     id: string;
@@ -69,7 +70,7 @@ export function getNodeText(
 
             return node.nodes.map((child) => getNodeText(child)).join('');
         default:
-            throw new Error('Invalid node');
+            assertNever(node);
     }
 }
 
