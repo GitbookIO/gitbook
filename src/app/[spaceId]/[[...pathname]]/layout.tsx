@@ -27,7 +27,17 @@ export default async function SpaceRootLayout(props: {
     const language = getSpaceLanguage(customization);
 
     return (
-        <html lang={customization.internationalization.locale}>
+        <html
+            lang={customization.internationalization.locale}
+            className={tcls(
+                customization.header.preset === CustomizationHeaderPreset.None
+                    ? null
+                    : [
+                          // Take the sticky header in consideration for the scrolling
+                          `scroll-pt-[76px]`,
+                      ],
+            )}
+        >
             <head>
                 {customization.privacyPolicy.url ? (
                     <link rel="privacy-policy" href={customization.privacyPolicy.url} />
