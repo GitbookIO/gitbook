@@ -11,6 +11,7 @@ import {
 
 import { Annotation } from './Annotation/Annotation';
 import { DocumentContextProps } from './DocumentView';
+import { Emoji } from './Emoji';
 import { Link } from './Link';
 import { InlineMath } from './Math';
 
@@ -46,6 +47,8 @@ export function Inline<
             return <InlineMath {...contextProps} inline={inline} />;
         case 'annotation':
             return <Annotation {...contextProps} inline={inline} />;
+        case 'emoji':
+            return <Emoji {...contextProps} inline={inline} />;
         default:
             return <span>Unsupported inline {inline.type}</span>;
     }
