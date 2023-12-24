@@ -5,7 +5,7 @@ import * as React from 'react';
 
 import { Button } from '@/components/primitives';
 import { useLanguage } from '@/intl/client';
-import { t } from '@/intl/translate';
+import { t, tString } from '@/intl/translate';
 import { isCookiesTrackingDisabled, setCookiesTracking } from '@/lib/analytics';
 import { tcls } from '@/lib/tailwind';
 /**
@@ -32,8 +32,13 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
         window.location.reload();
     };
 
+    const describedById = 'cookies-description';
+
     return (
         <div
+            role="dialog"
+            aria-modal="true"
+            aria-describedby={describedById}
             className={tcls(
                 'fixed',
                 'z-10',
@@ -52,17 +57,13 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                 'dark:bg-dark',
             )}
         >
-            <p className={tcls('text-sm')}>
+            <p id={describedById} className={tcls('text-sm')}>
                 {t(
                     language,
                     'cookies_prompt',
                     <a
                         href={privacyPolicy}
-                        className={tcls(
-                            'text-primary-500',
-                            'hover:text-primary-600',
-                            'hover:underline',
-                        )}
+                        className={tcls('text-primary-500', 'hover:text-primary-600', 'underline')}
                     >
                         {t(language, 'cookies_prompt_privacy')}
                     </a>,
@@ -83,6 +84,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                     'hover:bg-dark/2',
                     'dark:hover:bg-light/1',
                 )}
+                title={tString(language, 'cookies_close')}
             >
                 <IconX className={tcls('w-4')} />
             </button>
