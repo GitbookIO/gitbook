@@ -18,12 +18,22 @@ export function PageFooterNavigation(props: {
     pages: Revision['pages'];
     page: RevisionPageDocument;
 }) {
-    const { space, customization, pages, page } = props;
+    const { customization, pages, page } = props;
     const { previous, next } = resolvePrevNextPages(pages, page);
     const language = getSpaceLanguage(customization);
 
     return (
-        <div className={tcls('flex', 'flex-row', 'mt-6', 'gap-2', 'max-w-3xl', 'mx-auto')}>
+        <div
+            className={tcls(
+                'flex',
+                'flex-col',
+                'md:flex-row',
+                'mt-6',
+                'gap-2',
+                'max-w-3xl',
+                'mx-auto',
+            )}
+        >
             {previous ? (
                 <NavigationCard
                     icon={ChevronLeft}
