@@ -1,10 +1,11 @@
-import puppeteer from 'puppeteer';
+import puppeteer, { Page } from 'puppeteer';
 import { argosScreenshot } from '@argos-ci/puppeteer';
 import { getContentTestURL, getTargetURL } from './utils';
 
 interface Test {
     name: string;
     url: string;
+    wait?: (page: Page) => Promise<any>;
 }
 
 interface TestsCase {
@@ -29,10 +30,12 @@ const testCases: TestsCase[] = [
             {
                 name: 'Search Results',
                 url: '?q=gitsync',
+                wait: (page) => page.waitForSelector('[data-test="search-results"]'),
             },
             {
                 name: 'AI Search',
                 url: '?q=What+is+GitBook%3F&ask=1',
+                wait: (page) => page.waitForSelector('[data-test="search-ask-answer"]'),
             },
             {
                 name: 'Not found',

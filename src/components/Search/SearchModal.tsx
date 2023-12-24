@@ -60,6 +60,7 @@ export function SearchModal(props: SearchModalProps) {
 
     return (
         <div
+            role="dialog"
             className={tcls(
                 'flex',
                 'items-start',
@@ -129,6 +130,7 @@ function SearchModalBody(
     return (
         <div
             role="dialog"
+            aria-label={tString(language, 'search')}
             className={tcls(
                 'flex',
                 'flex-col',
@@ -173,6 +175,9 @@ function SearchModalBody(
                         )}
                         placeholder={tString(language, 'search_input_placeholder')}
                         rows={1}
+                        spellCheck="false"
+                        autoComplete="off"
+                        autoCorrect="off"
                     />
                 </div>
             </div>

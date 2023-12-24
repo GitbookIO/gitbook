@@ -4,16 +4,20 @@ import Link from 'next/link';
 import React from 'react';
 
 import { Loading } from '@/components/primitives';
+import { useLanguage } from '@/intl/client';
+import { t } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 
 import { AskAnswerResult, askQuestion } from './server-actions';
-import { useSearch, useSearchLink } from './useSearch';
+import { useSearchLink } from './useSearch';
 
 /**
  * Fetch and render the answers to a question.
  */
 export function SearchAskAnswer(props: { spaceId: string; query: string }) {
     const { spaceId, query } = props;
+
+    const language = useLanguage();
 
     const [state, setState] = React.useState<
         | {
@@ -61,11 +65,11 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
                             <AnswerBody answer={state.answer} />
                         </div>
                     ) : (
-                        <div className={tcls('p-4')}>No answer</div>
+                        <div className={tcls('p-4')}>{t(language, 'search_ask_no_answer')}</div>
                     )}
                 </>
             ) : null}
-            {state?.type === 'error' ? <div>Failed to fetch answer</div> : null}
+            {state?.type === 'error' ? <div>{t(language, 'search_ask_error')}</div> : null}
             {!state ? (
                 <div className={tcls('w-full', 'flex', 'items-center', 'justify-center')}>
                     <Loading className={tcls('w-5', 'py-4', 'text-primary')} />
@@ -78,10 +82,14 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
 function AnswerBody(props: { answer: AskAnswerResult }) {
     const { answer } = props;
     const getSearchLinkProps = useSearchLink();
+    const language = useLanguage();
 
     return (
         <>
-            <div className={tcls('mt-4', 'px-4', 'text-dark/9', 'dark:text-light/8')}>
+            <div
+                data-test="search-ask-answer"
+                className={tcls('mt-4', 'px-4', 'text-dark/9', 'dark:text-light/8')}
+            >
                 {answer.body}
             </div>
             {answer.followupQuestions.length > 0 ? (
@@ -135,7 +143,7 @@ function AnswerBody(props: { answer: AskAnswerResult }) {
                         'dark:border-light/1',
                     )}
                 >
-                    <span className={tcls('text-sm')}>Sources</span>
+                    <span className={tcls('text-sm')}>{t(language, 'search_ask_sources')}</span>
 
                     {answer.sources.map((source) => (
                         <span key={source.id} className={tcls()}>

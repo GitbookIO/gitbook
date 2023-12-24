@@ -163,6 +163,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
         >
             {results.length === 0 ? (
                 <div
+                    data-test="search-noresults"
                     className={tcls(
                         'text-sm',
                         'text-dark',
@@ -174,65 +175,67 @@ export const SearchResults = React.forwardRef(function SearchResults(
                     {t(language, 'search_no_results', query)}
                 </div>
             ) : (
-                results.map((item, index) => {
-                    switch (item.type) {
-                        case 'page': {
-                            return (
-                                <SearchPageResultItem
-                                    ref={(ref) => {
-                                        refs.current[index] = ref;
-                                    }}
-                                    key={item.id}
-                                    query={query}
-                                    item={item}
-                                    active={index === cursor}
-                                />
-                            );
+                <div data-test="search-results">
+                    {results.map((item, index) => {
+                        switch (item.type) {
+                            case 'page': {
+                                return (
+                                    <SearchPageResultItem
+                                        ref={(ref) => {
+                                            refs.current[index] = ref;
+                                        }}
+                                        key={item.id}
+                                        query={query}
+                                        item={item}
+                                        active={index === cursor}
+                                    />
+                                );
+                            }
+                            case 'question': {
+                                return (
+                                    <SearchQuestionResultItem
+                                        ref={(ref) => {
+                                            refs.current[index] = ref;
+                                        }}
+                                        key={item.id}
+                                        question={query}
+                                        active={index === cursor}
+                                        onClick={onSwitchToAsk}
+                                    />
+                                );
+                            }
+                            case 'recommended-question': {
+                                return (
+                                    <SearchQuestionResultItem
+                                        ref={(ref) => {
+                                            refs.current[index] = ref;
+                                        }}
+                                        key={item.id}
+                                        question={item.question}
+                                        active={index === cursor}
+                                        onClick={onSwitchToAsk}
+                                        recommended
+                                    />
+                                );
+                            }
+                            case 'section': {
+                                return (
+                                    <SearchSectionResultItem
+                                        ref={(ref) => {
+                                            refs.current[index] = ref;
+                                        }}
+                                        key={item.id}
+                                        query={query}
+                                        item={item}
+                                        active={index === cursor}
+                                    />
+                                );
+                            }
+                            default:
+                                assertNever(item);
                         }
-                        case 'question': {
-                            return (
-                                <SearchQuestionResultItem
-                                    ref={(ref) => {
-                                        refs.current[index] = ref;
-                                    }}
-                                    key={item.id}
-                                    question={query}
-                                    active={index === cursor}
-                                    onClick={onSwitchToAsk}
-                                />
-                            );
-                        }
-                        case 'recommended-question': {
-                            return (
-                                <SearchQuestionResultItem
-                                    ref={(ref) => {
-                                        refs.current[index] = ref;
-                                    }}
-                                    key={item.id}
-                                    question={item.question}
-                                    active={index === cursor}
-                                    onClick={onSwitchToAsk}
-                                    recommended
-                                />
-                            );
-                        }
-                        case 'section': {
-                            return (
-                                <SearchSectionResultItem
-                                    ref={(ref) => {
-                                        refs.current[index] = ref;
-                                    }}
-                                    key={item.id}
-                                    query={query}
-                                    item={item}
-                                    active={index === cursor}
-                                />
-                            );
-                        }
-                        default:
-                            assertNever(item);
-                    }
-                })
+                    })}
+                </div>
             )}
         </div>
     );
