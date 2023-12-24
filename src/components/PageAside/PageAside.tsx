@@ -1,5 +1,7 @@
+import IconArrowUpRight from '@geist-ui/icons/arrowUpRight';
 import { CustomizationSettings, JSONDocument, RevisionPageDocument, Space } from '@gitbook/api';
 import React from 'react';
+import urlJoin from 'url-join';
 
 import { t, getSpaceLanguage } from '@/intl/server';
 import { getDocumentSections } from '@/lib/document';
@@ -22,6 +24,7 @@ export function PageAside(props: {
 }) {
     const { space, page, customization, document, withHeaderOffset, withPageFeedback } = props;
     const sections = document ? getDocumentSections(document) : [];
+    const language = getSpaceLanguage(customization);
 
     return (
         <aside
@@ -38,25 +41,51 @@ export function PageAside(props: {
                 'h-[100vh]',
             )}
         >
-            {sections.length > 0 ? (
-                <>
-                    <div className={tcls('text-sm', 'font-semibold', 'pb-3')}>
-                        {t(getSpaceLanguage(customization), 'on_this_page')}
-                    </div>
-                    <div className={tcls('overflow-auto', 'flex-1')}>
+            <div className={tcls('overflow-auto', 'flex-1', 'flex', 'flex-col', 'gap-4')}>
+                {sections.length > 0 ? (
+                    <div>
+                        <div className={tcls('text-sm', 'font-semibold', 'pb-3')}>
+                            {t(language, 'on_this_page')}
+                        </div>
                         <React.Suspense fallback={null}>
                             <ScrollSectionsList sections={sections} />
                         </React.Suspense>
-                        {withPageFeedback ? (
-                            <React.Suspense fallback={null}>
-                                <div className={tcls('mt-5')}>
-                                    <PageFeedbackForm spaceId={space.id} pageId={page.id} />
-                                </div>
-                            </React.Suspense>
-                        ) : null}
                     </div>
-                </>
-            ) : null}
+                ) : null}
+                {customization.git.showEditLink && space.gitSync?.url && page.git ? (
+                    <div>
+                        <a
+                            href={urlJoin(space.gitSync.url, page.git.path)}
+                            className={tcls(
+                                'flex',
+                                'flex-row',
+                                'text-sm',
+                                'hover:text-primary',
+                                'py-2',
+                            )}
+                        >
+                            {t(language, 'edit_on_git', getGitSyncName(space))}
+                            <IconArrowUpRight className={tcls('size-4', 'ml-1.5')} />
+                        </a>
+                    </div>
+                ) : null}
+
+                {withPageFeedback ? (
+                    <React.Suspense fallback={null}>
+                        <PageFeedbackForm spaceId={space.id} pageId={page.id} />
+                    </React.Suspense>
+                ) : null}
+            </div>
         </aside>
     );
+}
+
+function getGitSyncName(space: Space): string {
+    if (space.gitSync?.installationProvider === 'github') {
+        return 'GitHub';
+    } else if (space.gitSync?.installationProvider === 'gitlab') {
+        return 'GitLab';
+    }
+
+    return 'Git';
 }
