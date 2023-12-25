@@ -9,7 +9,9 @@ import { BlockProps } from './Block';
 export async function File(props: BlockProps<DocumentBlockFile>) {
     const { block, context, style } = props;
 
-    const file = await getRevisionFile(context.content, block.data.ref.file);
+    const file = context.content
+        ? await getRevisionFile(context.content, block.data.ref.file)
+        : null;
     if (!file) {
         return null;
     }

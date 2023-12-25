@@ -1,7 +1,7 @@
 import { CustomizationSettings, JSONDocument, RevisionPageDocument, Space } from '@gitbook/api';
 import React from 'react';
 
-import { ContentRefContext } from '@/lib/references';
+import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { PageCover } from './PageCover';
@@ -50,7 +50,14 @@ export function PageBody(props: {
 
             <PageHeader page={page} />
             {document ? (
-                <DocumentView document={document} style={['space-y-6', 'grid']} context={context} />
+                <DocumentView
+                    document={document}
+                    style={['space-y-6', 'grid']}
+                    context={{
+                        content: context.content,
+                        resolveContentRef: (ref) => resolveContentRef(ref, context),
+                    }}
+                />
             ) : null}
 
             {page.layout.pagination ? (

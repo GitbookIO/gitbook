@@ -8,10 +8,10 @@ import { useLanguage } from '@/intl/client';
 import { t, tString } from '@/intl/translate';
 import { isCookiesTrackingDisabled, setCookiesTracking } from '@/lib/analytics';
 import { tcls } from '@/lib/tailwind';
+
 /**
  * Toast to accept or reject the use of cookies.
  */
-
 export function CookiesToast(props: { privacyPolicy?: string }) {
     const { privacyPolicy = 'https://policies.gitbook.com/privacy/cookies' } = props;
     const [show, setShow] = React.useState(false);

@@ -1,7 +1,6 @@
 import IconHash from '@geist-ui/icons/hash';
 import { DocumentBlockHeading } from '@gitbook/api';
 
-import { pageLocalId } from '@/lib/links';
 import { tcls } from '@/lib/tailwind';
 
 import { BlockProps } from './Block';
@@ -14,7 +13,8 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
     const textStyle = getBlockTextStyle(block);
     const Tag = TAGS[block.type];
 
-    const id = pageLocalId(context.page, block.meta?.id ?? '', context);
+    let id = block.meta?.id ?? '';
+    id = context.getId ? context.getId(id) : id;
 
     return (
         <Tag id={id} className={tcls(textStyle.textSize, 'group', 'relative', 'grid', style)}>

@@ -11,6 +11,9 @@ export function t(
     ...args: React.ReactNode[]
 ): React.ReactNode {
     const string = language[id];
+    if (!string) {
+        throw new Error(`Translation not found for "${id}"`);
+    }
 
     // Now we are going to replace the arguments
     // but we want to return a string as long as it's possible

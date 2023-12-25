@@ -1,12 +1,30 @@
-import { JSONDocument } from '@gitbook/api';
+import { ContentRef, JSONDocument } from '@gitbook/api';
 
-import { ContentRefContext } from '@/lib/references';
+import { ContentPointer } from '@/lib/api';
+import { ResolvedContentRef } from '@/lib/references';
 import { ClassValue } from '@/lib/tailwind';
 
 import { Blocks } from './Blocks';
 
+export interface DocumentContext {
+    /**
+     * Content being rendered.
+     */
+    content?: ContentPointer;
+
+    /**
+     * Resolve a content reference.
+     */
+    resolveContentRef: (ref: ContentRef) => Promise<ResolvedContentRef | null>;
+
+    /**
+     * Transform an ID to be added to the DOM.
+     */
+    getId?: (id: string) => string;
+}
+
 export interface DocumentContextProps {
-    context: ContentRefContext;
+    context: DocumentContext;
 }
 
 /**
@@ -18,7 +36,7 @@ export function DocumentView(
         style?: ClassValue;
     },
 ) {
-    const { document, style, ...context } = props;
+    const { document, style, context } = props;
 
     return (
         <Blocks
@@ -27,7 +45,7 @@ export function DocumentView(
             ancestorBlocks={[]}
             blockStyle={[]}
             style={['space-y-6', style]}
-            {...context}
+            context={context}
         />
     );
 }

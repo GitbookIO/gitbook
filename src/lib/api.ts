@@ -5,7 +5,9 @@ import {
     ContentVisibility,
     GitBookAPI,
     GitBookAPIError,
+    JSONDocument,
     PublishedContentLookup,
+    SearchAIAnswer,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 import { headers } from 'next/headers';
@@ -380,6 +382,63 @@ export async function getSpaceContent(pointer: ContentPointer) {
         scripts,
     };
 }
+
+/**
+ * Search content in a space.
+ */
+export const searchSpaceContent = cache(
+    'api.searchSpaceContent',
+    async (spaceId: string, query: string) => {
+        const response = await api().spaces.searchSpaceContent(
+            spaceId,
+            { query },
+            {
+                ...noCacheFetchOptions,
+            },
+        );
+        return cacheResponse(response, {
+            tags: [getAPICacheTag({ tag: 'space', space: spaceId })],
+        });
+    },
+);
+
+/**
+ * Ask question in a space.
+ */
+export const askQueryInSpace = cache(
+    'api.askQueryInSpace',
+    async (spaceId: string, query: string) => {
+        const response = await api().spaces.askQueryInSpace(
+            spaceId,
+            { query },
+            {
+                format: 'document',
+            },
+            {
+                ...noCacheFetchOptions,
+            },
+        );
+
+        return cacheResponse(response, {
+            tags: [getAPICacheTag({ tag: 'space', space: spaceId })],
+        });
+    },
+);
+
+/**
+ * Get a list of recommended questions in a space.
+ */
+export const getRecommendedQuestionsInSpace = cache(
+    'api.getRecommendedQuestionsInSpace',
+    async (spaceId: string) => {
+        const response = await api().spaces.getRecommendedQuestionsInSpace(spaceId, {
+            ...noCacheFetchOptions,
+        });
+        return cacheResponse(response, {
+            tags: [getAPICacheTag({ tag: 'space', space: spaceId })],
+        });
+    },
+);
 
 /**
  * Create a cache tag for the API.

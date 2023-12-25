@@ -8,7 +8,7 @@ import { DocumentView } from '@/components/DocumentView';
 import { SpaceParams } from '../../fetch';
 import { Revision, RevisionPageDocument, RevisionPageGroup, Space } from '@gitbook/api';
 import { notFound } from 'next/navigation';
-import { ContentRefContext } from '@/lib/references';
+import { ContentRefContext, resolveContentRef } from '@/lib/references';
 
 export const runtime = 'edge';
 
@@ -92,7 +92,14 @@ async function PDFPageDocument(props: {
         <div id={pagePDFContainerId(page)}>
             <h1>{page.title}</h1>
             {document ? (
-                <DocumentView document={document} style={'mt-6'} context={refContext} />
+                <DocumentView
+                    document={document}
+                    style={'mt-6'}
+                    context={{
+                        resolveContentRef: (ref) => resolveContentRef(ref, refContext),
+                        getId: (id) => pagePDFContainerId(page, id),
+                    }}
+                />
             ) : null}
         </div>
     );

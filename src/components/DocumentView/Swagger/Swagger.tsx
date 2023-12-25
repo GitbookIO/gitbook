@@ -1,7 +1,6 @@
 import { DocumentBlockSwagger } from '@gitbook/api';
 // import OpenAPIParser from '@readme/openapi-parser';
 
-import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { BlockProps } from '../Block';
@@ -11,7 +10,7 @@ import { BlockProps } from '../Block';
  */
 export async function Swagger(props: BlockProps<DocumentBlockSwagger>) {
     const { block, context, style } = props;
-    const resolved = block.data.ref ? await resolveContentRef(block.data.ref, context) : null;
+    const resolved = block.data.ref ? await context.resolveContentRef(block.data.ref) : null;
 
     if (!resolved) {
         return <div>failed</div>;

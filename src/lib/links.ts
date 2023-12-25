@@ -122,19 +122,3 @@ export function pagePDFContainerId(
 ): string {
     return `pdf-page-${page.id}` + (anchor ? `-${anchor}` : '');
 }
-
-/**
- * Create an HTML ID for a block in a page.
- * It ensures the ID is unique in the entire HTML page (in case we are generating a PDF with multiple pages).
- */
-export function pageLocalId(
-    page: RevisionPageDocument,
-    localId: string,
-    context: PageHrefContext,
-): string {
-    if (!context.pdf?.length) {
-        return localId;
-    }
-
-    return pagePDFContainerId(page, localId);
-}

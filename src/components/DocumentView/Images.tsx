@@ -2,10 +2,10 @@ import { DocumentBlockImage, DocumentBlockImages, JSONDocument } from '@gitbook/
 
 import { Image } from '@/components/utils';
 import { getNodeFragmentByName, isNodeEmpty } from '@/lib/document';
-import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { BlockProps } from './Block';
+import { DocumentContext } from './DocumentView';
 import { Inlines } from './Inlines';
 import { isBlockOffscreen } from './utils';
 
@@ -48,15 +48,15 @@ async function ImageBlock(props: {
     block: DocumentBlockImage;
     document: JSONDocument;
     style: ClassValue;
-    context: ContentRefContext;
+    context: DocumentContext;
     siblings: number;
     isOffscreen: boolean;
 }) {
     const { block, document, context, isOffscreen } = props;
 
     const [src, darkSrc] = await Promise.all([
-        resolveContentRef(block.data.ref, context),
-        block.data.refDark ? resolveContentRef(block.data.refDark, context) : null,
+        context.resolveContentRef(block.data.ref),
+        block.data.refDark ? context.resolveContentRef(block.data.refDark) : null,
     ]);
 
     if (!src) {

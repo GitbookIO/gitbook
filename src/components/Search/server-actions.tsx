@@ -1,10 +1,17 @@
 'use server';
 
-import { api, getRevisionPages } from '@/lib/api';
+import {
+    askQueryInSpace,
+    getRecommendedQuestionsInSpace,
+    getRevisionPages,
+    searchSpaceContent,
+} from '@/lib/api';
 import { absoluteHref, pageHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import { filterOutNullable } from '@/lib/typescript';
+
+import { DocumentView } from '../DocumentView';
 
 export type OrderedComputedResult = ComputedPageResult | ComputedSectionResult;
 
@@ -47,7 +54,7 @@ export async function searchContent(
     spaceId: string,
     query: string,
 ): Promise<OrderedComputedResult[]> {
-    const { data } = await api().spaces.searchSpaceContent(spaceId, { query });
+    const data = await searchSpaceContent(spaceId, query);
     return data.items
         .map((item) => {
             const sections =
@@ -75,16 +82,16 @@ export async function searchContent(
  * Server action to ask a question in a space.
  */
 export async function askQuestion(spaceId: string, query: string): Promise<AskAnswerResult | null> {
-    const [{ data }, pages] = await Promise.all([
-        api().spaces.askQueryInSpace(spaceId, { query }),
+    const [{ answer }, pages] = await Promise.all([
+        askQueryInSpace(spaceId, query),
         getRevisionPages({ spaceId }),
     ]);
 
-    if (!data.answer) {
+    if (!answer || !('document' in answer.answer)) {
         return null;
     }
 
-    const sources = data.answer.sources
+    const sources = answer.sources
         .map((source) => {
             if (source.type !== 'page') {
                 return null;
@@ -110,12 +117,14 @@ export async function askQuestion(spaceId: string, query: string): Promise<AskAn
 
     return {
         body: (
-            // TODO: parse the markdown
-            <p className={tcls('text-base', 'font-normal', 'whitespace-pre-line')}>
-                {data.answer.text}
-            </p>
+            <DocumentView
+                document={answer.answer.document}
+                context={{
+                    resolveContentRef: async () => null,
+                }}
+            />
         ),
-        followupQuestions: data.answer.followupQuestions,
+        followupQuestions: answer.followupQuestions,
         sources,
     };
 }
@@ -124,6 +133,6 @@ export async function askQuestion(spaceId: string, query: string): Promise<AskAn
  * List suggested questions for a space.
  */
 export async function getRecommendedQuestions(spaceId: string): Promise<string[]> {
-    const { data } = await api().spaces.getRecommendedQuestionsInSpace(spaceId);
+    const data = await getRecommendedQuestionsInSpace(spaceId);
     return data.questions;
 }

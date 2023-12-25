@@ -1,7 +1,6 @@
 import { ContentRef, DocumentTableViewCards } from '@gitbook/api';
 
 import { Image } from '@/components/utils';
-import { resolveContentRef } from '@/lib/references';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { RecordColumnValue } from './RecordColumnValue';
@@ -19,13 +18,13 @@ export async function RecordCard(
         ? getRecordValue<string[]>(record[1], view.coverDefinition)?.[0]
         : null;
     const cover = coverFile
-        ? await resolveContentRef({ kind: 'file', file: coverFile }, context)
+        ? await context.resolveContentRef({ kind: 'file', file: coverFile })
         : null;
 
     const targetRef = view.targetDefinition
         ? (record[1].values[view.targetDefinition] as ContentRef)
         : null;
-    const target = targetRef ? await resolveContentRef(targetRef, context) : null;
+    const target = targetRef ? await context.resolveContentRef(targetRef) : null;
 
     const body = (
         <div className={tcls('grid-area-1-1', 'z-0', 'relative')}>
