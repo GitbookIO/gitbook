@@ -85,17 +85,27 @@ export async function Image(
                 light: ImageSource;
                 dark?: ImageSource | null;
             };
+
+            /**
+             * Render image as inline.
+             */
+            inline?: boolean;
         } & ImageCommonProps
     >,
 ) {
-    const { sources, style, ...rest } = props;
+    const { sources, style, inline = false, ...rest } = props;
 
     return (
         <>
             <ImagePicture
                 {...rest}
                 source={sources.light}
-                className={tcls(rest.className, sources.dark ? 'dark:hidden' : null, style)}
+                className={tcls(
+                    rest.className,
+                    inline ? 'inline' : 'block',
+                    sources.dark ? 'dark:hidden' : null,
+                    style,
+                )}
             />
             {sources.dark ? (
                 <ImagePicture
@@ -104,7 +114,12 @@ export async function Image(
                     // We don't want to preload the dark image, because it's not visible
                     // TODO: adapt based on the default theme
                     priority="lazy"
-                    className={tcls(rest.className, 'hidden', 'dark:block', style)}
+                    className={tcls(
+                        rest.className,
+                        'hidden',
+                        inline ? 'dark:inline' : 'dark:block',
+                        style,
+                    )}
                 />
             ) : null}
         </>

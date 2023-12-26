@@ -8,10 +8,12 @@ import {
     DocumentInline,
     JSONDocument,
 } from '@gitbook/api';
+import assertNever from 'assert-never';
 
 import { Annotation } from './Annotation/Annotation';
 import { DocumentContextProps } from './DocumentView';
 import { Emoji } from './Emoji';
+import { InlineImage } from './InlineImage';
 import { Link } from './Link';
 import { InlineMath } from './Math';
 import { Mention } from './Mention';
@@ -52,7 +54,9 @@ export function Inline<
             return <Emoji {...contextProps} inline={inline} />;
         case 'mention':
             return <Mention {...contextProps} inline={inline} />;
+        case 'inline-image':
+            return <InlineImage {...contextProps} inline={inline} />;
         default:
-            return <span>Unsupported inline {inline.type}</span>;
+            assertNever(inline);
     }
 }
