@@ -51,6 +51,10 @@ const testCases: TestsCase[] = [
                 name: 'Home',
                 url: '',
             },
+            {
+                name: 'PDF',
+                url: '~gitbook/pdf?limit=10',
+            },
         ],
     },
     {
@@ -60,6 +64,10 @@ const testCases: TestsCase[] = [
             {
                 name: 'Home',
                 url: '',
+            },
+            {
+                name: 'PDF',
+                url: '~gitbook/pdf?limit=10',
             },
         ],
     },

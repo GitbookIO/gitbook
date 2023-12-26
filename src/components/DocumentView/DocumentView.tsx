@@ -33,17 +33,22 @@ export interface DocumentContextProps {
 export function DocumentView(
     props: DocumentContextProps & {
         document: JSONDocument;
+
+        /** Style passed to the container */
         style?: ClassValue;
+
+        /** Style passed to all blocks */
+        blockStyle?: ClassValue;
     },
 ) {
-    const { document, style, context } = props;
+    const { document, style, blockStyle = [], context } = props;
 
     return (
         <Blocks
             nodes={document.nodes}
             document={document}
             ancestorBlocks={[]}
-            blockStyle={[]}
+            blockStyle={blockStyle}
             style={['space-y-6', style]}
             context={context}
         />

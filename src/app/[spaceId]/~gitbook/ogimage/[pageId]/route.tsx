@@ -1,7 +1,8 @@
-import React from 'react';
 import { redirect } from 'next/navigation';
-import { NextRequest } from 'next/server';
 import { ImageResponse } from 'next/og';
+import { NextRequest } from 'next/server';
+import React from 'react';
+
 import { PageIdParams, fetchPageData } from '../../../fetch';
 
 export const runtime = 'edge';

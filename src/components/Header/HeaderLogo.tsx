@@ -93,11 +93,11 @@ function LogoFallback(props: HeaderLogoProps) {
                           }
                         : {
                               light: {
-                                  src: absoluteHref('.gitbook/icon?size=medium&theme=light'),
+                                  src: absoluteHref('~gitbook/icon?size=medium&theme=light'),
                                   size: { width: 256, height: 256 },
                               },
                               dark: {
-                                  src: absoluteHref('.gitbook/icon?size=medium&theme=dark'),
+                                  src: absoluteHref('~gitbook/icon?size=medium&theme=dark'),
                                   size: { width: 256, height: 256 },
                               },
                           }

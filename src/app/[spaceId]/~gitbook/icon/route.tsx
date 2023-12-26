@@ -1,12 +1,14 @@
-import React from 'react';
-import { notFound } from 'next/navigation';
-import { NextRequest } from 'next/server';
-import { ImageResponse } from 'next/og';
-import { SpaceParams } from '../../fetch';
-import { getCollection, getSpace, getSpaceCustomization } from '@/lib/api';
-import { tcls } from '@/lib/tailwind';
-import { getEmojiForCode } from '@/lib/emojis';
 import { ContentVisibility } from '@gitbook/api';
+import { notFound } from 'next/navigation';
+import { ImageResponse } from 'next/og';
+import { NextRequest } from 'next/server';
+import React from 'react';
+
+import { getCollection, getSpace, getSpaceCustomization } from '@/lib/api';
+import { getEmojiForCode } from '@/lib/emojis';
+import { tcls } from '@/lib/tailwind';
+
+import { SpaceParams } from '../../fetch';
 
 export const runtime = 'edge';
 

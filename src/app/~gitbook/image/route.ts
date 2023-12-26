@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Prevent infinite loops
-    if (url.includes('/.gitbook/image')) {
+    if (url.includes('/~gitbook/image')) {
         return new Response('Invalid url parameter', { status: 400 });
     }
 

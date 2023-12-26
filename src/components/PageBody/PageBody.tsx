@@ -49,7 +49,6 @@ export function PageBody(props: {
 
             <PageHeader page={page} />
             {document ? (
-
                 <DocumentView
                     document={document}
                     style={['space-y-5', 'grid']}
@@ -58,7 +57,6 @@ export function PageBody(props: {
                         resolveContentRef: (ref) => resolveContentRef(ref, context),
                     }}
                 />
-
             ) : null}
 
             {page.layout.pagination ? (

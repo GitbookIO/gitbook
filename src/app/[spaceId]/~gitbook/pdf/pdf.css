@@ -1,0 +1,8 @@
+@page {
+    size: A4;
+    margin: 60pt 60pt;
+
+    @bottom-right {
+        content: counter(page);
+    }
+}

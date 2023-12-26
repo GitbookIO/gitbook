@@ -23,7 +23,7 @@ export async function GET(req: NextRequest, { params }: { params: SpaceParams })
 
     const lines = [
         `User-agent: *`,
-        'Disallow: /.gitbook/',
+        'Disallow: /~gitbook/',
         ...(shouldIndexSpace({ space, collection })
             ? [`Allow: /`, `Sitemap: ${absoluteHref(`/sitemap.xml`, true)}`]
             : [`Disallow: /`]),

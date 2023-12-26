@@ -1,16 +1,16 @@
 import { CustomizationThemeMode } from '@gitbook/api';
 import { Metadata, Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
+import Script from 'next/script';
 import React from 'react';
 
 import { CookiesToast } from '@/components/Cookies';
 import { SpaceContent } from '@/components/SpaceContent';
-import { getSpaceLanguage } from '@/intl/server';
+import { getContentSecurityPolicyNonce } from '@/lib/csp';
 import { PageHrefContext, absoluteHref, baseUrl, pageHref } from '@/lib/links';
 import { getPagePath } from '@/lib/pages';
 import { shouldIndexSpace } from '@/lib/seo';
 
-import { ClientContexts } from './ClientContexts';
 import { PagePathParams, fetchPageData, getPathnameParam } from '../fetch';
 
 export const runtime = 'edge';
@@ -21,6 +21,7 @@ export const runtime = 'edge';
 export default async function Page(props: { params: PagePathParams }) {
     const { params } = props;
 
+    const nonce = getContentSecurityPolicyNonce();
     const {
         content,
         space,
@@ -54,6 +55,11 @@ export default async function Page(props: { params: PagePathParams }) {
                 collection={collection}
                 collectionSpaces={collectionSpaces}
             />
+
+            {scripts.map(({ script }) => (
+                <Script key={script} src={script} strategy="lazyOnload" nonce={nonce} />
+            ))}
+
             {scripts.some((script) => script.cookies) || customization.privacyPolicy.url ? (
                 <React.Suspense fallback={null}>
                     <CookiesToast privacyPolicy={customization.privacyPolicy.url} />
@@ -94,14 +100,14 @@ export async function generateMetadata({ params }: { params: PagePathParams }): 
                 {
                     url:
                         customIcon?.light ??
-                        absoluteHref('.gitbook/icon?size=small&theme=light', true),
+                        absoluteHref('~gitbook/icon?size=small&theme=light', true),
                     type: 'image/png',
                     media: '(prefers-color-scheme: light)',
                 },
                 {
                     url:
                         customIcon?.dark ??
-                        absoluteHref('.gitbook/icon?size=small&theme=dark', true),
+                        absoluteHref('~gitbook/icon?size=small&theme=dark', true),
                     type: 'image/png',
                     media: '(prefers-color-scheme: dark)',
                 },
@@ -109,7 +115,7 @@ export async function generateMetadata({ params }: { params: PagePathParams }): 
         },
         openGraph: {
             images: [
-                customization.socialPreview.url ?? absoluteHref(`.gitbook/ogimage/${page.id}`),
+                customization.socialPreview.url ?? absoluteHref(`~gitbook/ogimage/${page.id}`),
             ],
         },
         robots: shouldIndexSpace({ space, collection }) ? 'index, follow' : 'noindex, nofollow',

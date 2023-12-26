@@ -10,7 +10,7 @@ import {
 import { createContentSecurityPolicyNonce, getContentSecurityPolicy } from '@/lib/csp';
 
 export const config = {
-    matcher: '/((?!_next/static|_next/image|.gitbook/revalidate|.gitbook/image).*)',
+    matcher: '/((?!_next/static|_next/image|~gitbook/revalidate|~gitbook/image).*)',
     skipTrailingSlashRedirect: true,
 };
 
