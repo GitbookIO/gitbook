@@ -13,11 +13,6 @@ import { tcls } from '@/lib/tailwind';
 
 import { PagesList } from './PagesList';
 import { Trademark } from './Trademark';
-import {
-    HEADER_HEIGHT_DESKTOP,
-    SIDE_COLUMN_WITHOUT_HEADER,
-    SIDE_COLUMN_WITH_HEADER,
-} from '../layout';
 
 export function TableOfContents(props: {
     space: Space;
@@ -72,12 +67,12 @@ export function TableOfContents(props: {
                 /*                 withHeaderOffset ? SIDE_COLUMN_WITH_HEADER : SIDE_COLUMN_WITHOUT_HEADER, */
             )}
         >
-            {header ? <div className={tcls('py-3')}>{header}</div> : null}
+            {header ? header : null}
             <div
                 className={tcls(
+                    withHeaderOffset ? 'pt-4' : null,
                     'hidden',
                     'lg:flex',
-                    'flex-1',
                     'flex-grow',
                     'flex-col',
                     'overflow-y-auto',
@@ -93,6 +88,7 @@ export function TableOfContents(props: {
                     'dark:group-hover:[&::-webkit-scrollbar-thumb]:bg-light/3',
                     'navigation-open:flex', // can be auto height animated as such https://stackoverflow.com/a/76944290
                     /*                     header ? 'pt-3' : 'pt-6', */
+                    'lg:-ml-5',
                     'lg:pb-16',
                 )}
             >
@@ -102,7 +98,6 @@ export function TableOfContents(props: {
                     activePage={activePage}
                     ancestors={ancestors}
                     context={context}
-                    style={tcls('mt-4')}
                 />
                 <Trademark space={space} customization={customization} />
             </div>

@@ -26,11 +26,24 @@ export function Header(props: {
     context: ContentRefContext;
     asFullWidth: boolean;
     customization: CustomizationSettings;
+    withTopHeader?: boolean;
 }) {
-    const { context, space, collection, collectionSpaces, asFullWidth, customization } = props;
+    const {
+        context,
+        space,
+        collection,
+        collectionSpaces,
+        asFullWidth,
+        customization,
+        withTopHeader,
+    } = props;
 
     const isCustomizationDefault =
         customization.header.preset === CustomizationHeaderPreset.Default;
+
+    const isCustomizationCustom = customization.header.preset === CustomizationHeaderPreset.Custom;
+
+    console.log('Header.tsx: isCustomizationDefault: ', isCustomizationDefault);
 
     return (
         <header
@@ -42,19 +55,22 @@ export function Header(props: {
                 'top-0',
                 'z-10',
                 'w-full',
-                'backdrop-blur-lg',
                 'flex-none',
                 'shadow-thinbottom',
+                withTopHeader ? null : 'lg:hidden',
                 'lg:z-10',
-                'supports-backdrop-blur:bg-white/60',
-                'dark:shadow-light/2',
-                `${isCustomizationDefault ? 'bg-light/9' : 'bg-header-background/9'}`,
-                `${isCustomizationDefault ? 'dark:bg-dark/9' : 'bg-header-background/9'}`,
+                'dark:shadow-light/1',
+                `${isCustomizationDefault || !withTopHeader ? 'bg-light' : 'bg-header-background'}`,
+                `${
+                    isCustomizationDefault || !withTopHeader
+                        ? 'dark:bg-dark'
+                        : 'bg-header-background'
+                }`,
             )}
         >
             <div
                 className={tcls(
-                    'gap-8',
+                    'gap-4',
                     'grid',
                     'grid-flow-col',
                     'auto-cols-[auto_auto_1fr_auto]',
@@ -91,7 +107,19 @@ export function Header(props: {
                 </HeaderLinks>
                 <div className={tcls('flex', 'md:w-56', 'grow-0', 'shrink-0', 'justify-self-end')}>
                     <Suspense fallback={null}>
-                        <SearchButton>
+                        <SearchButton
+                            style={
+                                !isCustomizationDefault && withTopHeader
+                                    ? [
+                                          'bg-header-background-400/6',
+                                          'text-header-background-200',
+                                          'ring-light/2',
+                                          '[&>span]:text-header-background-200',
+                                          '[&_svg]:stroke-header-background-200',
+                                      ]
+                                    : null
+                            }
+                        >
                             <span>{t(getSpaceLanguage(customization), 'search')}</span>
                         </SearchButton>
                     </Suspense>

@@ -15,6 +15,7 @@ export function Trademark(props: { space: Space; customization: CustomizationSet
         <div
             className={tcls(
                 'relative',
+                'z-[2]',
                 'lg:absolute',
                 'bottom-0',
                 'right-0',
@@ -22,21 +23,23 @@ export function Trademark(props: { space: Space; customization: CustomizationSet
                 'flex',
                 'flex-col',
                 'pointer-events-none',
+                'lg:-left-5',
             )}
         >
             <div
                 className={tcls(
                     'text-sm',
                     'text-dark/8',
-                    'pr-2',
+                    'pr-0',
                     'pt-2',
                     'pb-2',
-                    'mt-0',
+                    'mt-4',
                     'mb-4',
                     'bg-[size:250%_125%]',
                     'bg-[position:50%_35%]',
                     'bg-[radial-gradient(farthest-side_at_50%_-70%,_var(--tw-gradient-stops))] from-transparent from-60% to-light to-80%',
-                    'lg:mr-4',
+                    'lg:pr-2',
+                    'lg:mt-0',
                     'lg:mb-0',
                     'lg:mr-2',
                     'lg:pt-16',
@@ -45,6 +48,7 @@ export function Trademark(props: { space: Space; customization: CustomizationSet
                 )}
             >
                 <a
+                    target="_blank"
                     href="https://www.gitbook.com"
                     className={tcls(
                         'font-semibold',
@@ -57,7 +61,7 @@ export function Trademark(props: { space: Space; customization: CustomizationSet
                         'flex-row',
                         'items-center',
                         'hover:bg-dark/1',
-                        'px-2',
+                        'px-4',
                         'py-2',
                         'rounded-md',
                         'hover:backdrop-blur-sm',

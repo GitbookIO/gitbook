@@ -67,6 +67,7 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                     'w-[5rem]',
                     'h-full',
                     'top-0',
+                    'z-[1]',
                     'sticky',
                     'left-[calc(100%-5rem)]',
                 )}`}
@@ -124,13 +125,13 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                 <div
                     className={`${styles.progressOpacity}  ${tcls(
                         'bg-gradient-to-r',
-                        'from-light/0',
+                        'from-transparent',
                         'to-light',
                         'to-40%',
                         'grid-area-1-1',
                         'w-full',
                         'h-full',
-                        'dark:from-dark/0',
+                        'dark:from-transparent',
                         'dark:to-dark/10',
                     )}`}
                 ></div>
@@ -155,7 +156,7 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                                             'text-sm',
                                             'lg:text-base',
                                             'dark:border-l-light/2',
-                                            'dark:border-b-light/5',
+                                            'dark:border-b-light/4',
                                         )}
                                     >
                                         {block.data.definition[column].title}

@@ -18,13 +18,14 @@ export function PageGroupItem(props: {
         <li className={tcls('flex', 'flex-col')}>
             <div
                 className={tcls(
-                    'px-2',
+                    'px-5',
                     'pt-6',
                     'pb-1.5',
                     'text-xs',
                     'tracking-wide',
                     'font-semibold',
                     'uppercase',
+                    'z-[1]',
                     'sticky',
                     'top-0',
                     'bg-gradient-to-b',
@@ -33,6 +34,7 @@ export function PageGroupItem(props: {
                     'from-65%',
                     'dark:from-dark',
                     'dark:tracking-wider',
+                    'dark:to-transparent',
                 )}
             >
                 {page.title}

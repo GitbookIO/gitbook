@@ -67,16 +67,15 @@ export function SpaceContent(props: {
 
     return (
         <div>
-            {withTopHeader ? (
-                <Header
-                    space={space}
-                    collection={collection}
-                    collectionSpaces={collectionSpaces}
-                    context={contentRefContext}
-                    customization={customization}
-                    asFullWidth={asFullWidth}
-                />
-            ) : null}
+            <Header
+                withTopHeader={withTopHeader}
+                space={space}
+                collection={collection}
+                collectionSpaces={collectionSpaces}
+                context={contentRefContext}
+                customization={customization}
+                asFullWidth={asFullWidth}
+            />
 
             <div
                 className={tcls(

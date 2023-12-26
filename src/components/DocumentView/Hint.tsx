@@ -43,7 +43,7 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
                     ancestorBlocks={[...ancestorBlocks, block]}
                     nodes={block.nodes}
                     blockStyle={tcls(hintStyle.anchorColor)}
-                    style={['flex-1', 'space-y-4', '[&>p]:text-sm']}
+                    style={['flex-1', 'space-y-4', '[&>p]:text-sm', '[&>p]:leading-relaxed']}
                 />
             </div>
         </div>
@@ -62,6 +62,7 @@ const HINT_STYLES: {
         anchorColor: [
             '[&>a]:text-dark/9',
             '[&>a:hover]:text-vanta',
+            'text-dark',
 
             'fill-dark',
             'dark:[&>a]:text-light',
@@ -69,6 +70,7 @@ const HINT_STYLES: {
             'decoration-dark/6',
             'dark:decoration-light/5',
             'dark:fill-light',
+            'dark:text-light',
         ],
         style: [
             'bg-gradient-to-b',

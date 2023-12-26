@@ -20,7 +20,7 @@ export function SearchModal(props: SearchModalProps) {
     const [state, setSearchState] = useSearch();
 
     useHotkeys(
-        'ctrl+k, command+k',
+        'mod+k',
         (e) => {
             e.preventDefault(); //might be inadvisable as it interferes with expected browser behavior.
             setSearchState({ ask: false, query: '' });
@@ -68,7 +68,7 @@ export function SearchModal(props: SearchModalProps) {
                 'fixed',
                 'inset-0',
                 'bg-dark/4',
-                'backdrop-blur-lg',
+                'backdrop-blur-2xl',
                 'dark:bg-dark/9',
                 'opacity-[1]',
                 'z-30',
@@ -138,12 +138,12 @@ function SearchModalBody(
                 'max-w-[720px]',
                 'w-full',
                 'max-h',
-                'rounded-3xl',
+                'rounded-lg',
                 'ring-1',
                 'ring-dark/1',
                 'shadow-1xs',
                 'overflow-hidden',
-                'dark:[background-color:color-mix(in_srgb,_rgb(var(--dark)),_rgb(var(--light))_4%)]',
+                'dark:bg-light/1',
                 'dark:ring-light/2',
             )}
             onClick={(event) => {
@@ -162,6 +162,7 @@ function SearchModalBody(
                         onChange={onChange}
                         className={tcls(
                             'text-dark',
+                            'placeholder:text-dark/7',
                             'flex',
                             'resize-none',
                             'w-full',
@@ -171,7 +172,8 @@ function SearchModalBody(
                             'focus:outline-none',
                             'bg-transparent',
                             'whitespace-pre-line',
-                            'dark:text-white',
+                            'dark:text-light',
+                            'dark:placeholder:text-light/7',
                         )}
                         placeholder={tString(language, 'search_input_placeholder')}
                         rows={1}

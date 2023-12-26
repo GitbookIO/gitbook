@@ -49,11 +49,11 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
                             'inline-flex',
                             'items-center',
                             'justify-center',
-                            '[background-color:color-mix(in_srgb,_rgb(var(--light)),_rgb(var(--dark))_3%)]',
+                            'bg-light-2',
                             'rounded-t',
                             'px-3',
                             'py-2',
-                            'dark:bg-light/1',
+                            'dark:bg-dark-2',
                             'dark:text-light/7',
                         )}
                     >
@@ -69,6 +69,7 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
                     'z-[1]',
                     'justify-self-end',
                     'backdrop-blur-md',
+                    'leading-none',
                     'self-start',
                     'ring-1',
                     'ring-dark/2',
@@ -90,8 +91,9 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
                     'relative',
                     'overflow-auto',
                     'linear-mask-util',
-                    '[background-color:color-mix(in_srgb,_rgb(var(--light)),_rgb(var(--dark))_3%)]',
-                    'dark:bg-light/1',
+                    'bg-light-2',
+                    /*                     '[background-color:color-mix(in_srgb,_rgb(var(--light)),_rgb(var(--dark))_3%)]', */
+                    'dark:bg-dark-2',
 
                     titleRounding,
                 )}
@@ -149,7 +151,6 @@ function CodeHighlightLine(props: {
                 'hover:ring-dark/2',
                 'dark:hover:ring-light/2',
                 'rounded',
-                'mask-[linear-gradient(to right, transparent, #000 1rem, #000 100%)]',
                 //first child
                 '[&.highlighted:first-child]:rounded-t-md',
                 '[&.highlighted:first-child>*]:mt-1',
@@ -169,7 +170,7 @@ function CodeHighlightLine(props: {
                 //select if highlight is singular in group
                 '[&:not(.highlighted)_+_.highlighted:has(+:not(.highlighted))]:rounded-md',
 
-                line.highlighted ? ['highlighted', 'bg-dark/1', 'dark:bg-sky/1'] : null,
+                line.highlighted ? ['highlighted', 'bg-light-3', 'dark:bg-dark-3'] : null,
             )}
         >
             {withLineNumbers ? (
@@ -183,8 +184,12 @@ function CodeHighlightLine(props: {
                         'pl-2',
                         'sticky',
                         'left-0',
-                        '[background:linear-gradient(to_right,_color-mix(in_srgb,_rgb(var(--light)),_rgb(var(--dark))_3%)_60%,_transparent)]',
-                        'dark:[background:linear-gradient(to_right,_color-mix(in_srgb,_rgb(var(--dark)),_rgb(var(--light))_4%)_60%,_transparent)]',
+                        'bg-gradient-to-r',
+                        'from-60%',
+                        'from-light-2',
+                        'to-transparent',
+                        'dark:from-dark-2',
+                        'dark:to-transparent',
                         withLineNumbers
                             ? [
                                   'before:text-dark/5',
@@ -196,8 +201,12 @@ function CodeHighlightLine(props: {
                                       ? [
                                             'before:text-dark/6',
                                             'dark:before:text-light/8',
-                                            '[background:linear-gradient(to_right,_color-mix(in_srgb,_rgb(var(--light)),_rgb(var(--dark))_7%)_60%,_transparent)]',
-                                            'dark:[background:linear-gradient(to_right,_color-mix(in_srgb,_rgb(var(--dark)),_rgb(var(--sky))_9%)_60%,_transparent)]',
+                                            'bg-gradient-to-r',
+                                            'from-60%',
+                                            'from-light-3',
+                                            'to-transparent',
+                                            'dark:from-dark-3',
+                                            'dark:to-transparent',
                                         ]
                                       : null,
                               ]

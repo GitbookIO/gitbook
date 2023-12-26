@@ -1,6 +1,8 @@
 'use client';
 
-import { IconSearch } from '@/components/icons/IconSearch';
+import IconSearch from '@geist-ui/icons/search';
+import { useEffect, useState } from 'react';
+
 import { useLanguage, tString } from '@/intl/client';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
@@ -9,6 +11,7 @@ import { useSearch } from './useSearch';
 /**
  * Button to open the search modal.
  */
+
 export function SearchButton(props: { children?: React.ReactNode; style?: ClassValue }) {
     const { style, children } = props;
 
@@ -33,37 +36,78 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'justify-center',
                 'items-center',
                 'px-2',
+                'gap-3',
                 'text-dark/6',
                 'min-h-[2.5rem]',
                 'w-[2.5rem]',
                 'rounded-lg',
                 'bg-dark/2',
                 'transition-colors',
+                'transition-opacity',
                 'ease-out',
-                'hover:bg-dark/3',
-                'border',
-                'border-dark/1',
+                'hover:opacity-8',
+                'ring-1',
+                'ring-inset',
+                'ring-dark/1',
                 'dark:bg-light/1',
-                'dark:border-light/1',
-                'dark:hover:bg-light/2',
+                'dark:ring-light/1',
                 'dark:text-light/6',
                 '[&>span]:hidden',
-                'md:justify-between',
+                'md:justify-start',
                 'md:[&>span]:flex',
                 'md:w-full',
-                'md:px-4',
+                'md:px-3.5',
                 style,
             )}
         >
-            {children}
-            <IconSearch
+            <div
                 className={tcls(
-                    'w-4',
-                    'h-4',
-                    '[color:color-mix(in_srgb,_rgb(var(--light)),_rgb(var(--dark))_32%)]',
-                    'dark:[color:color-mix(in_srgb,_rgb(var(--dark)),_rgb(var(--light))_32%)]',
+                    'text-dark/7',
+                    'md:text-dark/4',
+                    'pt-1.5',
+                    'pb-2',
+                    'dark:text-light/6',
+                    'md:dark:text-light/5',
                 )}
-            />
+            >
+                <IconSearch className={tcls('shrink-0', 'w-5', 'h-5')} />
+            </div>
+            {children}
+            <Shortcut />
         </button>
     );
 }
+
+const Shortcut = () => {
+    const [operatingSystem, setOperatingSystem] = useState('win');
+
+    useEffect(() => {
+        function getOperatingSystem() {
+            const platform = navigator.platform.toLowerCase();
+
+            if (platform.includes('mac')) return 'mac';
+            if (platform.includes('win')) return 'win';
+
+            return 'win';
+        }
+
+        setOperatingSystem(getOperatingSystem());
+    }, []);
+
+    return (
+        <span
+            className={tcls(
+                'hidden',
+                'md:inline',
+                'justify-end',
+                'w-full',
+                'text-xs',
+                'text-dark/5',
+                'dark:text-light/5',
+                `[font-feature-settings:"calt",_"case"]`,
+            )}
+        >
+            {operatingSystem === 'mac' ? '⌘' : 'Ctrl'} + K
+        </span>
+    );
+};

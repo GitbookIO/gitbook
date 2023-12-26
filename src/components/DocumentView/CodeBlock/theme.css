@@ -1,5 +1,5 @@
 :root {
-    --shiki-color-text: theme('colors.dark/.88');
+    --shiki-color-text: theme('colors.dark.DEFAULT/.88');
     --shiki-token-constant: #0a6355;
     --shiki-token-string: #8b6d32;
     --shiki-token-comment: theme('colors.teal.700/.64');
@@ -8,18 +8,18 @@
     --shiki-token-function: #8250df;
     --shiki-token-string-expression: #6a4906;
     --shiki-token-punctuation: theme('colors.pomegranate.700/.92');
-    --shiki-token-link: theme('colors.dark');
+    --shiki-token-link: theme('colors.dark.DEFAULT');
 }
 
 html.dark {
-    --shiki-color-text: theme('colors.light/.88');
+    --shiki-color-text: theme('colors.light.DEFAULT/0.88');
     --shiki-token-constant: #d19a66;
     --shiki-token-string: theme('colors.pomegranate.300');
     --shiki-token-comment: theme('colors.teal.300/.64');
     --shiki-token-keyword: theme('colors.pomegranate.400');
     --shiki-token-parameter: theme('colors.yellow.500');
     --shiki-token-function: #56b6c2;
-    --shiki-token-string-expression: theme('colors.pomegranate.400');
+    --shiki-token-string-expression: theme('colors.light.5');
     --shiki-token-punctuation: theme('colors.periwinkle');
     --shiki-token-link: theme('colors.pomegranate.400');
 }

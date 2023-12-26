@@ -27,7 +27,16 @@ export async function RecordCard(
     const target = targetRef ? await context.resolveContentRef(targetRef) : null;
 
     const body = (
-        <div className={tcls('grid-area-1-1', 'z-0', 'relative')}>
+        <div
+            className={tcls(
+                'grid-area-1-1',
+                'z-0',
+                'relative',
+                'grid',
+                'grid-cols-[40%,_1fr]',
+                'min-[432px]:grid-cols-none',
+            )}
+        >
             {cover ? (
                 <Image
                     alt="Cover"
@@ -42,7 +51,13 @@ export async function RecordCard(
                             width: view.cardSize === 'medium' ? 245 : 376,
                         },
                     ]}
-                    className={tcls('w-full', 'aspect-video', 'object-cover')}
+                    className={tcls(
+                        'w-full',
+                        'h-full',
+                        'object-cover',
+                        'min-[432px]:h-auto',
+                        'min-[432px]:aspect-video',
+                    )}
                     priority={isOffscreen ? 'lazy' : 'high'}
                     preload
                 />
@@ -73,6 +88,7 @@ export async function RecordCard(
         'overflow-hidden',
         'bg-light',
         'shadow-1xs',
+        'items-start',
         'duration-300',
         'rounded-md',
         'shadow-dark/[0.02]',

@@ -26,6 +26,9 @@ export async function HeaderLink(props: {
 
     const isCustomizationCustom = customization.header.preset === CustomizationHeaderPreset.Custom;
 
+    const isCustomizationDefault =
+        customization.header.preset === CustomizationHeaderPreset.Default;
+
     const target = await resolveContentRef(link.to, context);
 
     if (!target) {
@@ -45,7 +48,10 @@ export async function HeaderLink(props: {
                 'whitespace-nowrap',
                 'lg:text-base',
                 'shadow-[0px_-2px_0px_rgba(0,0,0,0)_inset]',
-                isCustomizationCustom ? ['text-header-link-500'] : [],
+
+                !isCustomizationDefault
+                    ? ['text-header-link-500']
+                    : ['text-dark/8', 'dark:text-light/8', 'dark:hover:text-light'],
                 target.active
                     ? [
                           isCustomizationCustom

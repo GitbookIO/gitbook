@@ -12,11 +12,14 @@ export function ViewCards(props: TableViewProps<DocumentTableViewCards>) {
         <div
             className={tcls(
                 style,
-                'grid',
-                'sm:grid-cols-1',
-                view.cardSize === 'large' ? 'md:grid-cols-2' : 'md:grid-cols-3',
+                'max-w-full',
+                'md:max-w-3xl',
+                'inline-grid',
                 'gap-4',
 
+                view.cardSize === 'large'
+                    ? 'grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))]'
+                    : 'grid-cols-[repeat(auto-fit,_minmax(184px,_1fr))]',
                 block.data.fullWidth ? ['max-w-full', 'large:flex-column'] : null,
             )}
         >

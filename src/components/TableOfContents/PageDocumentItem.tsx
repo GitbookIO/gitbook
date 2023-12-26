@@ -25,26 +25,40 @@ export function PageDocumentItem(props: {
             'flex',
             'flex-row',
             'justify-between',
-            'rounded',
-            'px-2',
+            'pl-5',
+            'pr-1.5',
             'py-1.5',
             'text-sm',
             'transition-colors',
-            'duration-100',
+            'relative',
+            'textwrap-balance',
+            'before:border-l',
+            'before:absolute',
+            'before:left-[-1px]',
+            'before:top-0',
+            'before:h-full',
+            'rounded-md',
+            '[&+div_a]:rounded-l-none',
             activePage.id === page.id
                 ? [
+                      'before:border-primary/6',
                       'font-semibold',
                       'text-primary',
                       'hover:bg-primary/3',
                       'dark:text-primary-400',
+                      'hover:before:border-primary',
                       'dark:hover:bg-primary-500/3',
+                      'dark:hover:before:border-primary',
                   ]
                 : [
+                      'before:border-transparent',
                       'font-normal',
                       'text-dark/8',
                       'hover:bg-dark/1',
+                      'hover:before:border-dark/3',
                       'dark:text-light/7',
                       'dark:hover:bg-light/2',
+                      'dark:hover:before:border-light/3',
                   ],
         ),
     };
@@ -59,8 +73,7 @@ export function PageDocumentItem(props: {
                             rootPages={rootPages}
                             pages={page.pages}
                             style={tcls(
-                                'ms-2',
-                                'ps-3',
+                                'ms-5',
                                 'my-2',
                                 'border-l',
                                 'border-dark/3',

@@ -69,7 +69,9 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
                     )}
                 </>
             ) : null}
-            {state?.type === 'error' ? <div>{t(language, 'search_ask_error')}</div> : null}
+            {state?.type === 'error' ? (
+                <div className={tcls('p-4')}>{t(language, 'search_ask_error')}</div>
+            ) : null}
             {!state ? (
                 <div className={tcls('w-full', 'flex', 'items-center', 'justify-center')}>
                     <Loading className={tcls('w-5', 'py-4', 'text-primary')} />

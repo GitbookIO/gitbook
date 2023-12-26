@@ -25,44 +25,55 @@ export function PageFeedbackForm(props: { spaceId: string; pageId: string }) {
     };
 
     return (
-        <div>
+        <div className={tcls('mt-2')}>
             <p className={tcls('text-sm', 'text-dark/6', 'dark:text-light/5')}>
                 {t(languages, 'was_this_helpful')}
             </p>
-
-            {submitted ? (
-                <p>{t(languages, 'was_this_helpful_thank_you')}</p>
-            ) : (
-                <div
-                    className={tcls(
-                        'inline-flex',
-                        'mt-2',
-                        'flex-row',
-                        'rounded-full',
-                        'ring-1',
-                        'ring-inset',
-                        'ring-dark/2',
-                        'dark:ring-light/1',
-                        '[&>*:not(:last-child,_:first-child)]:rounded-none',
-                    )}
-                >
-                    <RatingButton
-                        rating={0}
-                        label={tString(languages, 'was_this_helpful_negative')}
-                        onClick={() => onSubmit(PageFeedbackRating.Bad)}
-                    />
-                    <RatingButton
-                        rating={1}
-                        label={tString(languages, 'was_this_helpful_neutral')}
-                        onClick={() => onSubmit(PageFeedbackRating.Ok)}
-                    />
-                    <RatingButton
-                        rating={2}
-                        label={tString(languages, 'was_this_helpful_positive')}
-                        onClick={() => onSubmit(PageFeedbackRating.Good)}
-                    />
-                </div>
-            )}
+            <div
+                className={tcls(
+                    'inline-flex',
+                    'items-center',
+                    'justify-center',
+                    'mt-2',
+                    'flex-row',
+                    'rounded-full',
+                    'ring-1',
+                    'ring-inset',
+                    'ring-dark/2',
+                    'h-8',
+                    'dark:ring-light/1',
+                )}
+            >
+                {submitted ? (
+                    <p className={tcls('text-sm', 'px-4', 'text-dark/7', 'dark:text-light/6')}>
+                        {t(languages, 'was_this_helpful_thank_you')}
+                    </p>
+                ) : (
+                    <div
+                        className={tcls(
+                            'inline-flex',
+                            '[&>*:last-child]:rounded-r-full',
+                            '[&>*:first-child]:rounded-l-full',
+                        )}
+                    >
+                        <RatingButton
+                            rating={0}
+                            label={tString(languages, 'was_this_helpful_negative')}
+                            onClick={() => onSubmit(PageFeedbackRating.Bad)}
+                        />
+                        <RatingButton
+                            rating={1}
+                            label={tString(languages, 'was_this_helpful_neutral')}
+                            onClick={() => onSubmit(PageFeedbackRating.Ok)}
+                        />
+                        <RatingButton
+                            rating={2}
+                            label={tString(languages, 'was_this_helpful_positive')}
+                            onClick={() => onSubmit(PageFeedbackRating.Good)}
+                        />
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
@@ -80,8 +91,9 @@ function RatingButton(props: { rating: number; label: string; onClick: () => voi
                 'flex-col',
                 'items-center',
                 'justify-center',
-                'p-2',
-                'rounded-full',
+                'h-8',
+                'w-8',
+                'rounded-sm',
                 'text-dark/6',
                 'hover:bg-primary/4',
                 'hover:text-primary-600',

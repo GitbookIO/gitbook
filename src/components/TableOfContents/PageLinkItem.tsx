@@ -1,3 +1,4 @@
+import IconExternal from '@geist-ui/icons/externalLink';
 import { RevisionPageLink } from '@gitbook/api';
 import Link from 'next/link';
 
@@ -16,22 +17,34 @@ export async function PageLinkItem(props: { page: RevisionPageLink; context: Con
                 className={tcls(
                     'flex',
                     'flex-row',
-                    'justify-between',
-                    'rounded',
-                    'px-2',
+                    'justify-start',
+                    'items-center',
+                    'gap-3',
+                    'pl-5',
+                    'pr-1.5',
                     'py-1.5',
                     'text-sm',
                     'transition-colors',
                     'duration-100',
-                    'text-primary',
+                    'text-dark/8',
+                    'dark:text-light/7',
                     'font-normal',
-                    'hover:bg-dark/2',
-                    'hover:text-current',
-                    'dark:hover:bg-primary-500/2',
-                    'dark:hover:text-primary-400',
+                    'hover:bg-dark/1',
+                    'dark:hover:bg-light/2',
                 )}
             >
                 {page.title}
+                <IconExternal
+                    className={tcls(
+                        'w-3',
+                        'h-3',
+                        'stroke-current',
+                        'transition-colors',
+                        '[&>path]:transition-[stroke-opacity]',
+                        '[&>path]:[stroke-opacity:0.40]',
+                        'group-hover:[&>path]:[stroke-opacity:1]',
+                    )}
+                />
             </Link>
         </li>
     );

@@ -4,12 +4,13 @@
 
 @layer base {
     :root {
-        --dark: 24 28 31;
+        --dark: 24 24 24;
+        --light: 249 250 250;
         --vanta: 2 12 13;
-        --light: 242 247 247;
         --metal: 222 229 229;
         --sky: 187 221 229;
         --periwinkle: 172 198 238;
+        @apply leading-relaxed;
     }
     body {
         @apply text-dark/9 dark:text-light/9;
@@ -28,14 +29,20 @@
         @apply tracking-[-0.0125em] text-dark dark:text-light;
     }
 
-    p {
-        @apply leading-relaxed;
-    }
     a,
     button,
     input,
     textarea {
         @apply outline-2 outline-primary/6;
+    }
+
+    /*  text selection color */
+    ::selection {
+        @apply bg-primary-700 text-white;
+    }
+
+    .dark ::selection {
+        @apply bg-primary-700 text-white;
     }
 
     /*  Light mode */

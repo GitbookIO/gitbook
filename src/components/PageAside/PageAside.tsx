@@ -1,4 +1,5 @@
-import IconArrowUpRight from '@geist-ui/icons/arrowUpRight';
+import Github from '@geist-ui/icons/github';
+import Gitlab from '@geist-ui/icons/gitlab';
 import { CustomizationSettings, JSONDocument, RevisionPageDocument, Space } from '@gitbook/api';
 import React from 'react';
 import urlJoin from 'url-join';
@@ -36,21 +37,37 @@ export function PageAside(props: {
                 'grow-0',
                 'shrink-0',
                 'sticky',
-                'py-6',
+                'py-8',
+                withHeaderOffset ? 'lg:h-[calc(100vh_-_4rem)]' : 'lg:h-[100vh]',
                 withHeaderOffset ? 'top-16' : 'top-0',
                 'h-[100vh]',
             )}
         >
-            <div className={tcls('overflow-auto', 'flex-1', 'flex', 'flex-col', 'gap-4')}>
+            <div
+                className={tcls(
+                    'overflow-auto',
+                    'flex-1',
+                    'flex',
+                    'flex-col',
+                    'gap-4',
+                    '[&::-webkit-scrollbar]:bg-transparent',
+                    '[&::-webkit-scrollbar-thumb]:bg-transparent',
+                )}
+            >
                 {sections.length > 0 ? (
                     <div>
-                        <div className={tcls('text-sm', 'font-semibold', 'pb-3')}>
+                        {/*                         <div className={tcls('text-sm', 'font-semibold')}>
                             {t(language, 'on_this_page')}
-                        </div>
+                        </div> */}
                         <React.Suspense fallback={null}>
                             <ScrollSectionsList sections={sections} />
                         </React.Suspense>
                     </div>
+                ) : null}
+                {withPageFeedback ? (
+                    <React.Suspense fallback={null}>
+                        <PageFeedbackForm spaceId={space.id} pageId={page.id} />
+                    </React.Suspense>
                 ) : null}
                 {customization.git.showEditLink && space.gitSync?.url && page.git ? (
                     <div>
@@ -59,21 +76,23 @@ export function PageAside(props: {
                             className={tcls(
                                 'flex',
                                 'flex-row',
+                                'items-center',
                                 'text-sm',
+                                'text-dark/6',
                                 'hover:text-primary',
                                 'py-2',
+                                /*  '[&>svg]:[stroke-opacity:0.64]', */
+                                'dark:text-light/5',
                             )}
                         >
+                            {getGitSyncName(space) === 'GitHub' ? (
+                                <Github className={tcls('size-4', 'mr-1.5')} />
+                            ) : (
+                                <Gitlab className={tcls('size-4', 'mr-1.5')} />
+                            )}
                             {t(language, 'edit_on_git', getGitSyncName(space))}
-                            <IconArrowUpRight className={tcls('size-4', 'ml-1.5')} />
                         </a>
                     </div>
-                ) : null}
-
-                {withPageFeedback ? (
-                    <React.Suspense fallback={null}>
-                        <PageFeedbackForm spaceId={space.id} pageId={page.id} />
-                    </React.Suspense>
                 ) : null}
             </div>
         </aside>

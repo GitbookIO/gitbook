@@ -37,7 +37,6 @@ export function PageBody(props: {
             className={tcls(
                 'relative',
                 'py-8',
-                'px-4',
                 'lg:px-12',
                 'flex-1',
                 withAside ? null : 'mr-56',
@@ -50,14 +49,16 @@ export function PageBody(props: {
 
             <PageHeader page={page} />
             {document ? (
+
                 <DocumentView
                     document={document}
-                    style={['space-y-6', 'grid']}
+                    style={['space-y-5', 'grid']}
                     context={{
                         content: context.content,
                         resolveContentRef: (ref) => resolveContentRef(ref, context),
                     }}
                 />
+
             ) : null}
 
             {page.layout.pagination ? (

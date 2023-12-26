@@ -11,6 +11,7 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
     const { block, style, context, ...rest } = props;
 
     const textStyle = getBlockTextStyle(block);
+
     const Tag = TAGS[block.type];
 
     let id = block.meta?.id ?? '';
@@ -48,6 +49,7 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                 >
                     <IconHash
                         className={tcls(
+                            textStyle.marginTop,
                             'w-4',
                             'h-4',
                             'transition-colors',
@@ -58,7 +60,7 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                     />
                 </a>
             </div>
-            <div className={tcls('grid-area-1-1')}>
+            <div className={tcls('grid-area-1-1', textStyle.marginTop)}>
                 <Inlines {...rest} context={context} nodes={block.nodes} />
             </div>
         </Tag>

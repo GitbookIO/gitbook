@@ -22,15 +22,17 @@ export function CompactHeader(props: {
     return (
         <div
             className={tcls(
-                'flex',
+                'hidden',
+                'lg:flex',
                 'lg:flex-col',
                 'flex-wrap',
                 'lg:gap-x-5',
                 'gap-y-3',
+                'dark:shadow-light/1',
                 'justify-between',
             )}
         >
-            <div className={tcls('flex-grow-0')}>
+            <div className={tcls('flex-grow-0', 'mt-5')}>
                 <HeaderLogo collection={collection} space={space} customization={customization} />
             </div>
             <div
@@ -39,6 +41,7 @@ export function CompactHeader(props: {
                     'grow-0',
                     'md:grow',
                     'sm:max-w-xs',
+                    'lg:my-4',
                     'lg:max-w-full',
                     'justify-self-end',
                 )}

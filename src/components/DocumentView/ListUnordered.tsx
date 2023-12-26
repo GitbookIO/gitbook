@@ -20,7 +20,7 @@ export function ListUnordered(props: BlockProps<DocumentBlockListUnordered>) {
                 'marker:content-["–"]',
                 'marker:text-dark/6',
                 '[&>li]:pl-[1.25ch]',
-                'dark:marker:text-light/4',
+                'dark:marker:text-light/5',
                 style,
             ]}
         />

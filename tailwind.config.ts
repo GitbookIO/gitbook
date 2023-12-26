@@ -38,15 +38,28 @@ const config: Config = {
                 sans: ['var(--font-content)'],
                 mono: ['var(--font-mono)'],
             },
-
             colors: {
                 // Dynamic colors matching the customization settings
                 primary: generateShades('primary-color'),
+                light: {
+                    1: `color-mix(in srgb, rgb(var(--primary-color-600)), rgb(var(--light) / <alpha-value>) 98%)`,
+                    DEFAULT: `color-mix(in srgb, rgb(var(--primary-color-700)), rgb(var(--light) / <alpha-value>) 96%)`,
+                    2: `color-mix(in srgb, rgb(var(--primary-color-800)), rgb(var(--light) / <alpha-value>) 92%)`,
+                    3: `color-mix(in srgb, rgb(var(--primary-color-800)), rgb(var(--light) / <alpha-value>) 88%)`,
+                    4: `color-mix(in srgb, rgb(var(--primary-color-800)), rgb(var(--light) / <alpha-value>) 82%)`,
+                    5: `color-mix(in srgb, rgb(var(--primary-color-800)), rgb(var(--light) / <alpha-value>) 64%)`,
+                },
+                dark: {
+                    1: `color-mix(in srgb, rgb(var(--primary-color-100)), rgb(var(--dark) / <alpha-value>) 98%)`,
+                    DEFAULT: `color-mix(in srgb, rgb(var(--primary-color-300)), rgb(var(--dark) / <alpha-value>) 96%)`,
+                    2: `color-mix(in srgb, rgb(var(--primary-color-200)), rgb(var(--dark) / <alpha-value>) 92%)`,
+                    3: `color-mix(in srgb, rgb(var(--primary-color-200)), rgb(var(--dark) / <alpha-value>) 88%)`,
+                    4: `color-mix(in srgb, rgb(var(--primary-color-200)), rgb(var(--dark) / <alpha-value>) 82%)`,
+                    5: `color-mix(in srgb, rgb(var(--primary-color-200)), rgb(var(--dark) / <alpha-value>) 64%)`,
+                },
                 yellow: generateShades('yellow'),
                 teal: generateShades('teal'),
                 pomegranate: generateShades('pomegranate'),
-                dark: 'rgb(var(--dark) / <alpha-value>)',
-                light: 'rgb(var(--light) / <alpha-value>)',
                 vanta: 'rgb(var(--vanta) / <alpha-value>)',
                 metal: 'rgb(var(--metal) / <alpha-value>)',
                 sky: 'rgb(var(--sky) / <alpha-value>)',

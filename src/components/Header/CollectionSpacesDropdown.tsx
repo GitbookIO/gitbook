@@ -21,13 +21,9 @@ export function CollectionSpacesDropdown(props: {
                         'flex',
                         'flex-row',
                         'items-center',
-                        'text-base',
-                        'rounded-full',
                         'px-3',
-                        'py-1',
-                        'bg-dark/2',
-                        'dark:bg-light/2',
-                        /*                         'text-header-link-500', */
+                        'py-1.5',
+                        'text-header-link-500',
                     )}
                 >
                     {space.title}

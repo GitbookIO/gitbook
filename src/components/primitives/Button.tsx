@@ -50,7 +50,7 @@ export function Button({
         <button
             onClick={onClick}
             className={tcls(
-                'rounded',
+                'rounded-md',
                 'place-self-start',
                 'ring-1',
                 'ring-inset',

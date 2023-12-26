@@ -54,7 +54,15 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
             threshold: SECTION_INTERSECTING_THRESHOLD,
         });
 
-        sections.forEach((section) => {
+        //sanitize sections from foreign characters
+        const sanitizedSections = sections.map((section) => {
+            return {
+                ...section,
+                id: section.id.replace(/[^a-zA-Z0-9-_]/g, ''),
+            };
+        });
+
+        sanitizedSections.forEach((section) => {
             const headingElement = document.querySelector(`#${section.id}`);
             if (headingElement) {
                 observer.observe(headingElement);
@@ -67,7 +75,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
     }, [sections]);
 
     return (
-        <ul>
+        <ul className={tcls('border-l', 'border-dark/2', 'dark:border-light/1', 'space-y-1')}>
             {sections.map((section) => (
                 <li key={section.id} className={tcls('flex', 'flex-row')}>
                     <Link
@@ -75,18 +83,32 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                         className={tcls(
                             'flex',
                             'flex-row',
+                            'left-[-1px]',
+                            'relative',
                             'text-sm',
+                            'py-1',
+                            'ps-3',
                             'hover:text-primary',
-                            section.depth > 1 ? ['ps-3', 'py-1', 'opacity-8'] : ['py-2'],
-
-                            activeId === section.id ? ['text-primary', 'font-bold'] : '',
+                            'transition-colors',
+                            'duration-200',
+                            'border-l',
+                            'border-transparent',
+                            section.depth > 1 ? ['ps-6', 'opacity-8'] : null,
+                            activeId === section.id
+                                ? [
+                                      'text-primary',
+                                      'border-primary',
+                                      'dark:text-primary-400',
+                                      'dark:border-primary-400',
+                                  ]
+                                : '',
                         )}
                     >
-                        {section.depth > 1 ? (
+                        {/*                         {section.depth > 1 ? (
                             <IconChevronRight
                                 className={tcls('w-4', 'h-4', 'mr-1', 'mt-0.5', 'shrink-0')}
                             />
-                        ) : null}
+                        ) : null} */}
                         {section.title}
                     </Link>
                 </li>

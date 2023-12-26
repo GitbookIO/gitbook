@@ -11,6 +11,8 @@ export function getBlockTextStyle(block: DocumentBlocksEssentials | DocumentBloc
     textSize: ClassValue;
     /** Tailwind class for the height (h-*) */
     lineHeight: ClassValue;
+    /** Tailwind class for the margin top (mt-*) */
+    marginTop?: ClassValue;
 } {
     switch (block.type) {
         case 'paragraph':
@@ -22,16 +24,19 @@ export function getBlockTextStyle(block: DocumentBlocksEssentials | DocumentBloc
             return {
                 textSize: ['text-3xl', 'font-semibold'],
                 lineHeight: 'leading-tight',
+                marginTop: '[margin-top:_1em]',
             };
         case 'heading-2':
             return {
                 textSize: ['text-2xl', 'font-semibold'],
                 lineHeight: 'leading-snug',
+                marginTop: '[margin-top:_0.75em]',
             };
         case 'heading-3':
             return {
                 textSize: ['text-base', 'font-semibold'],
                 lineHeight: 'leading-snug',
+                marginTop: '[margin-top:_0.5em]',
             };
         case 'divider':
             return {

@@ -57,7 +57,15 @@ export async function PageCover(props: {
                     // Maximum size of the cover
                     { width: 1248 },
                 ]}
-                className={tcls('w-full', 'h-full', 'object-cover', 'object-center')}
+                className={tcls(
+                    'w-full',
+                    'h-full',
+                    'object-cover',
+                    'object-center',
+                    as === 'full'
+                        ? ['[mask-image:linear-gradient(rgba(0,0,0,1),_rgba(0,0,0,0.5))]']
+                        : null,
+                )}
             />
         </div>
     );

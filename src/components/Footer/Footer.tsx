@@ -21,11 +21,10 @@ export function Footer(props: {
         <div
             className={tcls(
                 'border-t',
-                'border-dark/3',
-                'px-4',
-                'bg-metal/5',
-                'dark:border-light/3',
-                'dark:bg-vanta/4',
+                'border-dark/2',
+                'bg-light-3',
+                'dark:border-light/2',
+                'dark:bg-dark-2',
             )}
         >
             <div
@@ -67,7 +66,9 @@ export function Footer(props: {
                         </div>
                     ) : null}
                     {customization.footer.copyright ? (
-                        <p className={tcls('text-sm')}>{customization.footer.copyright}</p>
+                        <p className={tcls('text-xs', 'text-dark/7', 'dark:text-light/6')}>
+                            {customization.footer.copyright}
+                        </p>
                     ) : null}
                 </div>
                 {customization.themes.toggeable ? (
