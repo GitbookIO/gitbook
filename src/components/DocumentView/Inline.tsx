@@ -14,6 +14,7 @@ import { DocumentContextProps } from './DocumentView';
 import { Emoji } from './Emoji';
 import { Link } from './Link';
 import { InlineMath } from './Math';
+import { Mention } from './Mention';
 
 export interface InlineProps<T extends DocumentInline> extends DocumentContextProps {
     inline: T;
@@ -49,6 +50,8 @@ export function Inline<
             return <Annotation {...contextProps} inline={inline} />;
         case 'emoji':
             return <Emoji {...contextProps} inline={inline} />;
+        case 'mention':
+            return <Mention {...contextProps} inline={inline} />;
         default:
             return <span>Unsupported inline {inline.type}</span>;
     }

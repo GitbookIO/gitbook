@@ -86,6 +86,16 @@ export function absoluteHref(href: string, withHost: boolean = false): string {
 }
 
 /**
+ * Create an absolute href in the GitBook application.
+ */
+export function gitbookAppHref(pathname: string): string {
+    const appUrl = new URL(process.env.NEXT_PUBLIC_GITBOOK_APP_URL ?? `https://app.gitbook.com`);
+    appUrl.pathname = pathname;
+
+    return appUrl.toString();
+}
+
+/**
  * Create a link to a page path in the current space.
  */
 export function pageHref(

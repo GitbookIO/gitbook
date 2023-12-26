@@ -62,6 +62,29 @@ export type PublishedContentWithCache = PublishedContentLookup & {
 };
 
 /**
+ * Get a user by its ID.
+ */
+export const getUserById = cache('api.getUserById', async (userId: string) => {
+    try {
+        const response = await api().users.getUserById(userId, {
+            ...noCacheFetchOptions,
+        });
+        return cacheResponse(response, {
+            tags: [],
+        });
+    } catch (error) {
+        if ((error as GitBookAPIError).code === 404) {
+            return {
+                data: null,
+                tags: [],
+            };
+        }
+
+        throw error;
+    }
+});
+
+/**
  * Resolve a URL to the content to render.
  */
 export const getPublishedContentByUrl = cache(

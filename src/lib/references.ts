@@ -1,7 +1,8 @@
 import { ContentRef, Revision, RevisionPageDocument, Space } from '@gitbook/api';
+import assertNever from 'assert-never';
 
-import { ContentPointer, getRevisionFile } from './api';
-import { pageHref, PageHrefContext } from './links';
+import { ContentPointer, getRevisionFile, getSpace, getUserById } from './api';
+import { gitbookAppHref, pageHref, PageHrefContext } from './links';
 import { resolvePageId } from './pages';
 
 export interface ResolvedContentRef {
@@ -81,7 +82,34 @@ export async function resolveContentRef(
         };
     }
 
-    // Other use the API to resolve
-    // TODO
-    return null;
+    if (contentRef.kind === 'user') {
+        const user = await getUserById(contentRef.user);
+        if (user) {
+            return {
+                href: `mailto:${user.email}`,
+                text: user.displayName ?? user.email,
+                active: false,
+            };
+        } else {
+            return null;
+        }
+    }
+
+    // For absolute content outside the current space, we mock GitBook URLs.
+    if (contentRef.kind === 'space' || contentRef.kind === 'anchor' || contentRef.kind === 'page') {
+        return {
+            href: gitbookAppHref(`/s/${contentRef.space!}`),
+            text: 'space',
+            active: false,
+        };
+    }
+    if (contentRef.kind === 'collection') {
+        return {
+            href: gitbookAppHref(`/c/${contentRef.collection}`),
+            text: 'collection',
+            active: false,
+        };
+    }
+
+    assertNever(contentRef);
 }
