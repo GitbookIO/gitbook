@@ -1,9 +1,12 @@
 'use client';
 
+import Link from 'next/link';
+
 import { tcls, ClassValue } from '@/lib/tailwind';
 
 type ButtonProps = {
-    onClick: () => void;
+    href?: string;
+    onClick?: () => void;
     children: React.ReactNode;
     variant?: 'primary' | 'secondary';
     size?: 'default' | 'small';
@@ -11,6 +14,7 @@ type ButtonProps = {
 };
 
 export function Button({
+    href,
     onClick,
     children,
     variant = 'primary',
@@ -46,21 +50,28 @@ export function Button({
             : // SMALL
               ['text-xs', 'px-3 py-2'];
 
+    const domClassName = tcls(
+        'rounded-md',
+        'place-self-start',
+        'ring-1',
+        'ring-inset',
+        'grow-0',
+        'shrink-0',
+        variantClasses,
+        sizeClasses,
+        className,
+    );
+
+    if (href) {
+        return (
+            <Link href={href} className={domClassName}>
+                {children}
+            </Link>
+        );
+    }
+
     return (
-        <button
-            onClick={onClick}
-            className={tcls(
-                'rounded-md',
-                'place-self-start',
-                'ring-1',
-                'ring-inset',
-                'grow-0',
-                'shrink-0',
-                variantClasses,
-                sizeClasses,
-                className,
-            )}
-        >
+        <button onClick={onClick} className={domClassName}>
             {children}
         </button>
     );

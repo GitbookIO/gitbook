@@ -1,27 +1,37 @@
+import { ArrowLeft, Printer } from '@geist-ui/icons';
 import { Revision, RevisionPageDocument, RevisionPageGroup, Space } from '@gitbook/api';
+import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import * as React from 'react';
 
 import { DocumentView } from '@/components/DocumentView';
-import { getDocument, getSpace, getRevisionPages, ContentPointer } from '@/lib/api';
-import { pagePDFContainerId, PageHrefContext } from '@/lib/links';
+import { PolymorphicComponentProp } from '@/components/utils/types';
+import { getSpaceLanguage } from '@/intl/server';
+import { tString } from '@/intl/translate';
+import {
+    getDocument,
+    getSpace,
+    getRevisionPages,
+    ContentPointer,
+    getSpaceCustomization,
+} from '@/lib/api';
+import { pagePDFContainerId, PageHrefContext, absoluteHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
-import { OpenPrintDialog } from './OpenPrintDialog';
-import { SpaceParams } from '../../fetch';
 import './pdf.css';
+import { PageControlButtons } from './PageControlButtons';
+import { PDFSearchParams } from './params';
+import { PrintButton } from './PrintButton';
+import { SpaceParams } from '../../fetch';
 
 export const runtime = 'edge';
 
-interface PDFSearchParams {
-    /** Page to export. If none is passed, all pages are exported. */
-    page?: string;
-    /** If true, only the `page` is exported, and not its descendant */
-    only?: boolean;
-    /** Limit the number of pages */
-    limit?: number;
+export async function generateMetadata({ params }: { params: SpaceParams }): Promise<Metadata> {
+    return {
+        title: 'Print',
+    };
 }
 
 /**
@@ -39,34 +49,86 @@ export default async function PDFHTMLOutput(props: {
         spaceId,
     };
 
-    const [space, rootPages] = await Promise.all([
+    const [space, customization, rootPages] = await Promise.all([
         getSpace(spaceId),
+        getSpaceCustomization(spaceId),
         getRevisionPages(contentPointer),
     ]);
 
-    const pages = selectPages(rootPages, searchParams).slice(0, searchParams.limit ?? 10);
+    const language = getSpaceLanguage(customization);
+    const { pages, total } = selectPages(rootPages, searchParams);
 
     const linksContext: PageHrefContext = {
         pdf: pages.map(({ page }) => page.id),
     };
 
+    const pageIds = pages.map(
+        ({ page }) => [page.id, pagePDFContainerId(page)] as [string, string],
+    );
+
     return (
-        <div
-            className={tcls(
-                'my-11',
-                'print:my-0',
-                'mx-auto',
-                'max-w-4xl',
-                'w-full',
-                'p-12',
-                'print:p-0',
-                'shadow-xl',
-                'print:shadow-none',
-                'rounded-sm',
-                'bg-white',
-            )}
-        >
-            <SpaceIntro space={space} />
+        <>
+            {searchParams.back !== 'false' ? (
+                <div className={tcls('fixed', 'left-12', 'top-12', 'print:hidden')}>
+                    <a
+                        title={tString(language, 'pdf_goback')}
+                        href={searchParams.back ?? absoluteHref('')}
+                        className={tcls(
+                            'flex',
+                            'flex-row',
+                            'items-center',
+                            'justify-center',
+                            'text-sm',
+                            'text-dark/6',
+                            'hover:text-primary',
+                            'p-4',
+                            'dark:text-light/5',
+                            'rounded-full',
+                            'bg-white',
+                            'shadow-sm',
+                            'hover:shadow-md',
+                            'border-slate-300',
+                            'border',
+                        )}
+                    >
+                        <ArrowLeft className={tcls('size-6')} />
+                    </a>
+                </div>
+            ) : null}
+
+            <div className={tcls('fixed', 'right-12', 'top-12', 'print:hidden')}>
+                <PrintButton
+                    title={tString(language, 'pdf_print')}
+                    className={tcls(
+                        'flex',
+                        'flex-row',
+                        'items-center',
+                        'justify-center',
+                        'text-sm',
+                        'text-dark/6',
+                        'hover:text-primary',
+                        'p-4',
+                        'dark:text-light/5',
+                        'rounded-full',
+                        'bg-white',
+                        'shadow-sm',
+                        'hover:shadow-md',
+                        'border-slate-300',
+                        'border',
+                    )}
+                >
+                    <Printer className={tcls('size-6')} />
+                </PrintButton>
+            </div>
+
+            <PageControlButtons
+                pageIds={pageIds}
+                pdfParams={searchParams}
+                pdfHref={absoluteHref('~gitbook/pdf')}
+                total={total}
+            />
+
+            {searchParams.only ? null : <SpaceIntro space={space} />}
             {pages.map(({ page, depth }) =>
                 page.type === 'group' ? (
                     <PDFPageGroup key={page.id} space={space} page={page} />
@@ -86,9 +148,7 @@ export default async function PDFHTMLOutput(props: {
                     </React.Suspense>
                 ),
             )}
-
-            <OpenPrintDialog />
-        </div>
+        </>
     );
 }
 
@@ -96,9 +156,11 @@ async function SpaceIntro(props: { space: Space }) {
     const { space } = props;
 
     return (
-        <div className={tcls('flex', 'items-center', 'justify-center', 'py-12')}>
-            <h1 className={tcls('text-6xl', 'font-bold')}>{space.title}</h1>
-        </div>
+        <PrintPage isFirst>
+            <div className={tcls('flex', 'items-center', 'justify-center', 'py-12')}>
+                <h1 className={tcls('text-6xl', 'font-bold')}>{space.title}</h1>
+            </div>
+        </PrintPage>
     );
 }
 
@@ -106,19 +168,21 @@ async function PDFPageGroup(props: { space: Space; page: RevisionPageGroup }) {
     const { page } = props;
 
     return (
-        <div
-            className={tcls(
-                'break-before-page',
-                'mt-10',
-                'print:mt-0',
-                'flex',
-                'items-center',
-                'justify-center',
-                'py-12',
-            )}
-        >
-            <h1 className={tcls('text-5xl', 'font-bold')}>{page.title}</h1>
-        </div>
+        <PrintPage id={pagePDFContainerId(page)}>
+            <div
+                className={tcls(
+                    'break-before-page',
+                    'mt-10',
+                    'print:mt-0',
+                    'flex',
+                    'items-center',
+                    'justify-center',
+                    'py-12',
+                )}
+            >
+                <h1 className={tcls('text-5xl', 'font-bold')}>{page.title}</h1>
+            </div>
+        </PrintPage>
     );
 }
 
@@ -132,11 +196,12 @@ async function PDFPageDocument(props: {
     const document = page.documentId ? await getDocument(space.id, page.documentId) : null;
 
     return (
-        <div
-            id={pagePDFContainerId(page)}
-            className={tcls('break-before-page', 'mt-10', 'print:mt-0')}
-        >
-            <h1 className={tcls('text-3xl', 'font-bold')}>{page.title}</h1>
+        <PrintPage id={pagePDFContainerId(page)}>
+            <h1 className={tcls('text-4xl', 'font-bold')}>{page.title}</h1>
+            {page.description ? (
+                <p className={tcls('decoration-primary/6', 'mt-2', 'mb-3')}>{page.description}</p>
+            ) : null}
+
             {document ? (
                 <DocumentView
                     document={document}
@@ -148,6 +213,42 @@ async function PDFPageDocument(props: {
                     }}
                 />
             ) : null}
+        </PrintPage>
+    );
+}
+
+function PrintPage(
+    props: PolymorphicComponentProp<
+        'div',
+        {
+            isFirst?: boolean;
+        }
+    >,
+) {
+    const { children, isFirst, className, ...rest } = props;
+
+    return (
+        <div
+            {...rest}
+            className={tcls(
+                className,
+                'my-11',
+                'print:my-0',
+                'mx-auto',
+                'max-w-4xl',
+                'w-full',
+                'p-12',
+                'print:p-0',
+                'shadow-xl',
+                'print:shadow-none',
+                'rounded-sm',
+                'bg-white',
+                'min-h-[29.7cm]',
+                'print:min-h-0',
+                isFirst ? null : 'break-before-page',
+            )}
+        >
+            {children}
         </div>
     );
 }
@@ -157,7 +258,10 @@ type FlatPageEntry = { page: RevisionPageDocument | RevisionPageGroup; depth: nu
 /**
  * Compute the ordered flat set of pages to render.
  */
-function selectPages(rootPages: Revision['pages'], params: PDFSearchParams): FlatPageEntry[] {
+function selectPages(
+    rootPages: Revision['pages'],
+    params: PDFSearchParams,
+): { pages: FlatPageEntry[]; total: number } {
     const flattenPage = (
         page: RevisionPageDocument | RevisionPageGroup,
         depth: number,
@@ -170,6 +274,14 @@ function selectPages(rootPages: Revision['pages'], params: PDFSearchParams): Fla
         ];
     };
 
+    const limitTo = (entries: FlatPageEntry[]) => {
+        return {
+            // Apply a soft-limit, the limit can be controlled by the URL to allow testing
+            pages: entries.slice(0, params.limit ?? 100),
+            total: entries.length,
+        };
+    };
+
     if (params.page) {
         const found = resolvePageId(rootPages, params.page);
         if (!found) {
@@ -177,11 +289,14 @@ function selectPages(rootPages: Revision['pages'], params: PDFSearchParams): Fla
         }
 
         if (!params.only) {
-            return [{ page: found.page, depth: 0 }];
+            return limitTo([{ page: found.page, depth: 0 }]);
         }
 
-        return flattenPage(found.page, 0);
+        return limitTo(flattenPage(found.page, 0));
     }
 
-    return rootPages.flatMap((page) => (page.type === 'link' ? [] : flattenPage(page, 0)));
+    const allPages = rootPages.flatMap((page) =>
+        page.type === 'link' ? [] : flattenPage(page, 0),
+    );
+    return limitTo(allPages);
 }

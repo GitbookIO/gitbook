@@ -49,7 +49,7 @@ export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
             style={[
                 inline.data.size === 'original'
                     ? 'max-w-[300px]'
-                    : ['max-h-[1.6em]', 'h-[1.6em]', 'w-auto'],
+                    : ['max-h-[1lh]', 'h-[1lh]', 'w-auto'],
             ]}
             inline
         />

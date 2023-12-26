@@ -1,3 +1,4 @@
+import DownloadCloud from '@geist-ui/icons/downloadCloud';
 import Github from '@geist-ui/icons/github';
 import Gitlab from '@geist-ui/icons/gitlab';
 import { CustomizationSettings, JSONDocument, RevisionPageDocument, Space } from '@gitbook/api';
@@ -6,6 +7,7 @@ import urlJoin from 'url-join';
 
 import { t, getSpaceLanguage } from '@/intl/server';
 import { getDocumentSections } from '@/lib/document';
+import { absoluteHref } from '@/lib/links';
 import { tcls } from '@/lib/tailwind';
 
 import { ScrollSectionsList } from './ScrollSectionsList';
@@ -69,31 +71,52 @@ export function PageAside(props: {
                         <PageFeedbackForm spaceId={space.id} pageId={page.id} />
                     </React.Suspense>
                 ) : null}
-                {customization.git.showEditLink && space.gitSync?.url && page.git ? (
-                    <div>
-                        <a
-                            href={urlJoin(space.gitSync.url, page.git.path)}
-                            className={tcls(
-                                'flex',
-                                'flex-row',
-                                'items-center',
-                                'text-sm',
-                                'text-dark/6',
-                                'hover:text-primary',
-                                'py-2',
-                                /*  '[&>svg]:[stroke-opacity:0.64]', */
-                                'dark:text-light/5',
-                            )}
-                        >
-                            {getGitSyncName(space) === 'GitHub' ? (
-                                <Github className={tcls('size-4', 'mr-1.5')} />
-                            ) : (
-                                <Gitlab className={tcls('size-4', 'mr-1.5')} />
-                            )}
-                            {t(language, 'edit_on_git', getGitSyncName(space))}
-                        </a>
-                    </div>
-                ) : null}
+                <div>
+                    {customization.git.showEditLink && space.gitSync?.url && page.git ? (
+                        <div>
+                            <a
+                                href={urlJoin(space.gitSync.url, page.git.path)}
+                                className={tcls(
+                                    'flex',
+                                    'flex-row',
+                                    'items-center',
+                                    'text-sm',
+                                    'text-dark/6',
+                                    'hover:text-primary',
+                                    'py-2',
+                                    'dark:text-light/5',
+                                )}
+                            >
+                                {space.gitSync.installationProvider === 'gitlab' ? (
+                                    <Gitlab className={tcls('size-4', 'mr-1.5')} />
+                                ) : (
+                                    <Github className={tcls('size-4', 'mr-1.5')} />
+                                )}
+                                {t(language, 'edit_on_git', getGitSyncName(space))}
+                            </a>
+                        </div>
+                    ) : null}
+                    {customization.pdf.enabled ? (
+                        <div>
+                            <a
+                                href={absoluteHref('~gitbook/pdf')}
+                                className={tcls(
+                                    'flex',
+                                    'flex-row',
+                                    'items-center',
+                                    'text-sm',
+                                    'text-dark/6',
+                                    'hover:text-primary',
+                                    'py-2',
+                                    'dark:text-light/5',
+                                )}
+                            >
+                                <DownloadCloud className={tcls('size-4', 'mr-1.5')} />
+                                {t(language, 'pdf_download')}
+                            </a>
+                        </div>
+                    ) : null}
+                </div>
             </div>
         </aside>
     );

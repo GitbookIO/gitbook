@@ -34,5 +34,12 @@
     "notfound_go_home": "Back to front page",
     "unexpected_error_title": "An error occurred",
     "unexpected_error": "Sorry, an unexpected error has occurred. Please try again later.",
-    "unexpected_error_retry": "Retry"
+    "unexpected_error_retry": "Retry",
+    "pdf_download": "Export as PDF",
+    "pdf_goback": "Go back to content",
+    "pdf_print": "Print or Save as PDF",
+    "pdf_page_of": "${1} of ${2}",
+    "pdf_mode_only_page": "Only this page",
+    "pdf_mode_all": "All pages",
+    "pdf_limit_reached": "Couldn't generate the PDF for ${1} pages, generation stopped at ${2}."
 }
