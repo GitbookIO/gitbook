@@ -1,9 +1,12 @@
 import { GitBookAPI } from '@gitbook/api';
+import assertNever from 'assert-never';
 import { NextResponse, NextRequest } from 'next/server';
 
 import {
     PublishedContentWithCache,
+    api,
     getPublishedContentByUrl,
+    getSpace,
     getSpaceContent,
     withAPI,
 } from '@/lib/api';
@@ -17,7 +20,30 @@ export const config = {
 const VISITOR_AUTH_PARAM = 'jwt_token';
 const VISITOR_AUTH_COOKIE = 'gitbook-visitor-token';
 
-type URLLookupMode = 'single' | 'multi' | 'multi-path';
+const QUERY_AUTH_TOKEN = 'token';
+
+type URLLookupMode =
+    /**
+     * Only a single space is served on this instance, defined by the env GITBOOK_SPACE_ID.
+     * This mode is useful when self-hosting a single space.
+     */
+    | 'single'
+    /**
+     * Spaces are located using the incoming URL (using forwarded host headers).
+     * This mode is the default one when serving on the GitBook infrastructure.
+     */
+    | 'multi'
+    /**
+     * Spaces are located using the first segments of the url (open.gitbook.com/docs.mycompany.com).
+     * This mode is the default one when developing.
+     */
+    | 'multi-path'
+    /**
+     * Spaces are located using an ID stored in the first segments of the URL (open.gitbook.com/~space/:id/).
+     * This mode is automatically detected and doesn't need to be configured.
+     * When this mode is used, an authentication token should be passed as a query parameter (`token`).
+     */
+    | 'multi-id';
 
 /**
  * Middleware to lookup the space to render.
@@ -36,7 +62,8 @@ export async function middleware(request: NextRequest) {
         url.searchParams.get(VISITOR_AUTH_PARAM) ?? request.cookies.get(VISITOR_AUTH_COOKIE)?.value;
     url.searchParams.delete(VISITOR_AUTH_PARAM);
 
-    // The API endpoint can be passed as a header
+    // The API endpoint can be passed as a header, making it possible to use the same GitBook Open target
+    // accross multiple GitBook instances.
     const apiEndpoint = request.headers.get('x-gitbook-api') ?? process.env.GITBOOK_API_URL;
     const originBasePath = request.headers.get('x-gitbook-basepath') ?? '';
 
@@ -141,12 +168,17 @@ function getInputURL(request: NextRequest): { url: URL; mode: URLLookupMode } {
         url.host = xForwardedHost;
     }
 
-    // When request is proxied by the GitBook infrastructure, we always force the mode as 'multi
+    // When request is proxied by the GitBook infrastructure, we always force the mode as 'multi'.
     const xGitbookHost = request.headers.get('x-gitbook-host');
     if (xGitbookHost) {
         mode = 'multi';
         url.port = '';
         url.host = xGitbookHost;
+    }
+
+    // When request started with ~space/:id, we force the mode as 'multi-id'.
+    if (url.pathname.startsWith('/~space/')) {
+        mode = 'multi-id';
     }
 
     return { url, mode };
@@ -167,10 +199,11 @@ async function lookupSpaceForURL(
         case 'multi-path': {
             return await lookupSpaceInMultiPathMode(url, visitorAuthToken);
         }
+        case 'multi-id': {
+            return await lookupSpaceInMultiIdMode(url);
+        }
         default:
-            throw new Error(
-                `Invalid GITBOOK_MODE environment variable. It should be one of: single, multi, multipath.`,
-            );
+            assertNever(mode);
     }
 }
 
@@ -210,6 +243,45 @@ async function lookupSpaceInMultiMode(
     visitorAuthToken: string | undefined,
 ): Promise<PublishedContentWithCache | null> {
     return lookupSpaceByAPI(url, visitorAuthToken);
+}
+
+/**
+ * GITBOOK_MODE=multi-id
+ * When serving multi spaces with the ID passed in the path.
+ */
+async function lookupSpaceInMultiIdMode(url: URL): Promise<PublishedContentWithCache | null> {
+    // Extract the iD from the path
+    const pathSegments = url.pathname.slice(1).split('/');
+    if (pathSegments[0] !== '~space') {
+        return null;
+    }
+    const spaceId = pathSegments[1];
+    if (!spaceId) {
+        return null;
+    }
+
+    // Get the auth token from the URL query
+    const apiToken = url.searchParams.get(QUERY_AUTH_TOKEN);
+    if (!apiToken) {
+        return null;
+    }
+
+    // Verify access to the space to avoid leaking cached data in this mode
+    // (the cache is not dependend on the auth token, so it could leak data)
+    await withAPI(
+        new GitBookAPI({
+            endpoint: api().endpoint,
+            authToken: apiToken,
+        }),
+        () => getSpace.revalidate(spaceId),
+    );
+
+    return {
+        space: spaceId,
+        basePath: `/~space/${spaceId}`,
+        pathname: pathSegments.slice(2).join('/'),
+        apiToken,
+    };
 }
 
 /**
