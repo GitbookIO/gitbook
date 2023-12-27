@@ -20,8 +20,6 @@ export const config = {
 const VISITOR_AUTH_PARAM = 'jwt_token';
 const VISITOR_AUTH_COOKIE = 'gitbook-visitor-token';
 
-const QUERY_AUTH_TOKEN = 'token';
-
 type URLLookupMode =
     /**
      * Only a single space is served on this instance, defined by the env GITBOOK_SPACE_ID.
@@ -45,6 +43,11 @@ type URLLookupMode =
      */
     | 'multi-id';
 
+export type LookupResult = PublishedContentWithCache & {
+    /** API endpoint to use for the content post lookup */
+    apiEndpoint?: string;
+};
+
 /**
  * Middleware to lookup the space to render.
  * It takes as input a request with an URL, and a set of headers:
@@ -64,7 +67,7 @@ export async function middleware(request: NextRequest) {
 
     // The API endpoint can be passed as a header, making it possible to use the same GitBook Open target
     // accross multiple GitBook instances.
-    const apiEndpoint = request.headers.get('x-gitbook-api') ?? process.env.GITBOOK_API_URL;
+    let apiEndpoint = request.headers.get('x-gitbook-api') ?? process.env.GITBOOK_API_URL;
     const originBasePath = request.headers.get('x-gitbook-basepath') ?? '';
 
     const inputURL = stripURLBasePath(stripURLSearch(url), originBasePath);
@@ -90,6 +93,9 @@ export async function middleware(request: NextRequest) {
     }
 
     console.log(`${request.method} ${resolved.space}${resolved.pathname}`);
+
+    // Resolution might have changed the API endpoint
+    apiEndpoint = resolved.apiEndpoint ?? apiEndpoint;
 
     const nonce = createContentSecurityPolicyNonce();
     const csp = await withAPI(
@@ -188,7 +194,7 @@ async function lookupSpaceForURL(
     mode: URLLookupMode,
     url: URL,
     visitorAuthToken: string | undefined,
-): Promise<PublishedContentWithCache | null> {
+): Promise<LookupResult | null> {
     switch (mode) {
         case 'single': {
             return await lookupSpaceInSingleMode(url);
@@ -211,7 +217,7 @@ async function lookupSpaceForURL(
  * GITBOOK_MODE=single
  * When serving a single space, configured using GITBOOK_SPACE_ID and GITBOOK_TOKEN.
  */
-async function lookupSpaceInSingleMode(url: URL): Promise<PublishedContentWithCache | null> {
+async function lookupSpaceInSingleMode(url: URL): Promise<LookupResult | null> {
     const spaceId = process.env.GITBOOK_SPACE_ID;
     if (!spaceId) {
         throw new Error(
@@ -241,7 +247,7 @@ async function lookupSpaceInSingleMode(url: URL): Promise<PublishedContentWithCa
 async function lookupSpaceInMultiMode(
     url: URL,
     visitorAuthToken: string | undefined,
-): Promise<PublishedContentWithCache | null> {
+): Promise<LookupResult | null> {
     return lookupSpaceByAPI(url, visitorAuthToken);
 }
 
@@ -249,7 +255,7 @@ async function lookupSpaceInMultiMode(
  * GITBOOK_MODE=multi-id
  * When serving multi spaces with the ID passed in the path.
  */
-async function lookupSpaceInMultiIdMode(url: URL): Promise<PublishedContentWithCache | null> {
+async function lookupSpaceInMultiIdMode(url: URL): Promise<LookupResult | null> {
     // Extract the iD from the path
     const pathSegments = url.pathname.slice(1).split('/');
     if (pathSegments[0] !== '~space') {
@@ -261,16 +267,18 @@ async function lookupSpaceInMultiIdMode(url: URL): Promise<PublishedContentWithC
     }
 
     // Get the auth token from the URL query
-    const apiToken = url.searchParams.get(QUERY_AUTH_TOKEN);
+    const apiToken = url.searchParams.get('token');
     if (!apiToken) {
         return null;
     }
+
+    const apiEndpoint = url.searchParams.get('api') ?? api().endpoint;
 
     // Verify access to the space to avoid leaking cached data in this mode
     // (the cache is not dependend on the auth token, so it could leak data)
     await withAPI(
         new GitBookAPI({
-            endpoint: api().endpoint,
+            endpoint: apiEndpoint,
             authToken: apiToken,
         }),
         () => getSpace.revalidate(spaceId),
@@ -281,6 +289,7 @@ async function lookupSpaceInMultiIdMode(url: URL): Promise<PublishedContentWithC
         basePath: `/~space/${spaceId}`,
         pathname: pathSegments.slice(2).join('/'),
         apiToken,
+        apiEndpoint,
     };
 }
 
@@ -291,7 +300,7 @@ async function lookupSpaceInMultiIdMode(url: URL): Promise<PublishedContentWithC
 async function lookupSpaceInMultiPathMode(
     url: URL,
     visitorAuthToken: string | undefined,
-): Promise<PublishedContentWithCache | null> {
+): Promise<LookupResult | null> {
     // Skip useless requests
     if (
         url.pathname === '/favicon.ico' ||
@@ -345,7 +354,7 @@ async function lookupSpaceInMultiPathMode(
 async function lookupSpaceByAPI(
     url: URL,
     visitorAuthToken: string | undefined,
-): Promise<PublishedContentWithCache | null> {
+): Promise<LookupResult | null> {
     const lookupAlternatives = computeLookupAlternatives(url);
 
     console.log(
