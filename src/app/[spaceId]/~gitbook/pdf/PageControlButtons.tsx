@@ -8,20 +8,21 @@ import { Button } from '@/components/primitives';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
-import { PDFSearchParams, getPDFParams } from './params';
+import { getPDFUrl } from './params';
 
 /**
  * Dynamic controls to show active page and to let the user select between modes.
  */
 export function PageControlButtons(props: {
-    pdfParams: PDFSearchParams;
     pdfHref: string;
     /** Array of the [pageId, divId] */
     pageIds: Array<[string, string]>;
     /** Total number of pages targetted by the generation */
     total: number;
+    /** Trademark to display */
+    trademark?: React.ReactNode;
 }) {
-    const { pdfParams, pdfHref, pageIds, total } = props;
+    const { pdfHref, pageIds, total, trademark } = props;
 
     const language = useLanguage();
 
@@ -49,23 +50,22 @@ export function PageControlButtons(props: {
                 )}
             >
                 <Button
-                    href={
-                        pdfHref +
-                        '?' +
-                        getPDFParams({ ...pdfParams, page: activePageId, only: true })
-                    }
+                    href={getPDFUrl(new URL(pdfHref), {
+                        page: activePageId,
+                        only: true,
+                    }).toString()}
                     variant="secondary"
                 >
                     {t(language, 'pdf_mode_only_page')}
                 </Button>
                 <Button
-                    href={
-                        pdfHref + '?' + getPDFParams({ ...pdfParams, page: undefined, only: false })
-                    }
+                    href={getPDFUrl(new URL(pdfHref), { page: undefined, only: false }).toString()}
                     variant="secondary"
                 >
                     {t(language, 'pdf_mode_all')}
                 </Button>
+
+                {trademark ? <div className={tcls('mt-5')}>{trademark}</div> : null}
             </div>
 
             <div
@@ -103,7 +103,6 @@ export function PageControlButtons(props: {
                         {t(language, 'pdf_limit_reached', total, pageIds.length)}
                     </div>
                 ) : null}
-                {/* <div className={tcls('flex', 'flex-row')}> */}
                 <div
                     className={tcls(
                         'flex',
@@ -123,7 +122,6 @@ export function PageControlButtons(props: {
                 >
                     {t(language, 'pdf_page_of', activeIndex, pageIds.length)}
                 </div>
-                {/* </div> */}
             </div>
         </>
     );

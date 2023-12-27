@@ -70,7 +70,7 @@ export async function middleware(request: NextRequest) {
     let apiEndpoint = request.headers.get('x-gitbook-api') ?? process.env.GITBOOK_API_URL;
     const originBasePath = request.headers.get('x-gitbook-basepath') ?? '';
 
-    const inputURL = stripURLBasePath(stripURLSearch(url), originBasePath);
+    const inputURL = stripURLBasePath(url, originBasePath);
 
     console.log('resolving', inputURL.toString());
 
@@ -92,7 +92,9 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(resolved.redirect);
     }
 
-    console.log(`${request.method} ${resolved.space}${resolved.pathname}`);
+    const rewritePathname = `/${resolved.space}${normalizePathname(resolved.pathname)}`;
+
+    console.log(`${request.method} ${rewritePathname}`);
 
     // Resolution might have changed the API endpoint
     apiEndpoint = resolved.apiEndpoint ?? apiEndpoint;
@@ -125,7 +127,7 @@ export async function middleware(request: NextRequest) {
         headers.set('x-gitbook-api', apiEndpoint);
     }
 
-    const target = new URL(`/${resolved.space}${resolved.pathname}`, request.nextUrl.toString());
+    const target = new URL(rewritePathname, request.nextUrl.toString());
     target.search = url.search;
 
     const response = NextResponse.rewrite(target, {
@@ -234,7 +236,7 @@ async function lookupSpaceInSingleMode(url: URL): Promise<LookupResult | null> {
 
     return {
         space: spaceId,
-        basePath: ``,
+        basePath: '',
         pathname: url.pathname,
         apiToken,
     };
@@ -259,21 +261,23 @@ async function lookupSpaceInMultiIdMode(url: URL): Promise<LookupResult | null> 
     // Extract the iD from the path
     const pathSegments = url.pathname.slice(1).split('/');
     if (pathSegments[0] !== '~space') {
+        throw new Error(`Invalid path, expected ~space`);
         return null;
     }
     const spaceId = pathSegments[1];
     if (!spaceId) {
+        throw new Error(`Missing space ID in the path`);
         return null;
     }
 
     // Get the auth token from the URL query
     const apiToken = url.searchParams.get('token');
     if (!apiToken) {
+        throw new Error(`Missing token query parameter`);
         return null;
     }
 
     const apiEndpoint = url.searchParams.get('api') ?? api().endpoint;
-
     // Verify access to the space to avoid leaking cached data in this mode
     // (the cache is not dependend on the auth token, so it could leak data)
     await withAPI(
@@ -287,7 +291,7 @@ async function lookupSpaceInMultiIdMode(url: URL): Promise<LookupResult | null> 
     return {
         space: spaceId,
         basePath: `/~space/${spaceId}`,
-        pathname: pathSegments.slice(2).join('/'),
+        pathname: normalizePathname(pathSegments.slice(2).join('/')),
         apiToken,
         apiEndpoint,
     };
@@ -355,7 +359,7 @@ async function lookupSpaceByAPI(
     url: URL,
     visitorAuthToken: string | undefined,
 ): Promise<LookupResult | null> {
-    const lookupAlternatives = computeLookupAlternatives(url);
+    const lookupAlternatives = computeLookupAlternatives(stripURLSearch(url));
 
     console.log(
         `lookup content for url "${url.toString()}", with ${
@@ -489,6 +493,14 @@ function stripURLBasePath(url: URL, basePath: string): URL {
     const stripped = new URL(url.toString());
     stripped.pathname = stripBasePath(stripped.pathname, basePath);
     return stripped;
+}
+
+function normalizePathname(pathname: string): string {
+    if (!pathname.startsWith('/')) {
+        pathname = '/' + pathname;
+    }
+
+    return pathname;
 }
 
 function stripURLSearch(url: URL): URL {

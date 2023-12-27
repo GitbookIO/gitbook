@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import * as React from 'react';
 
 import { DocumentView } from '@/components/DocumentView';
+import { TrademarkLink } from '@/components/TableOfContents/Trademark';
 import { PolymorphicComponentProp } from '@/components/utils/types';
 import { getSpaceLanguage } from '@/intl/server';
 import { tString } from '@/intl/translate';
@@ -22,7 +23,7 @@ import { tcls } from '@/lib/tailwind';
 
 import './pdf.css';
 import { PageControlButtons } from './PageControlButtons';
-import { PDFSearchParams } from './params';
+import { PDFSearchParams, getPDFSearchParams } from './params';
 import { PrintButton } from './PrintButton';
 import { SpaceParams } from '../../fetch';
 
@@ -31,48 +32,53 @@ export const runtime = 'edge';
 export async function generateMetadata({ params }: { params: SpaceParams }): Promise<Metadata> {
     return {
         title: 'Print',
+        robots: 'noindex, nofollow',
     };
 }
 
 /**
- * Render a space as a standalone HTML page without interactive elements.
- * The HTML can be converted to PDF.
+ * Render a space as a standalone HTML page that can be printed as a PDF.
  */
 export default async function PDFHTMLOutput(props: {
     params: SpaceParams;
-    searchParams: PDFSearchParams;
+    searchParams: { [key: string]: string };
 }) {
-    const { params, searchParams } = props;
-    const { spaceId } = params;
+    const { spaceId } = props.params;
 
+    const searchParams = new URLSearchParams(props.searchParams);
+    const pdfParams = getPDFSearchParams(new URLSearchParams(searchParams));
+
+    // Build current PDF URL and preserve all search params
+    let currentPDFUrl = absoluteHref('~gitbook/pdf', true);
+    currentPDFUrl += '?' + searchParams.toString();
+
+    // Load the content
     const contentPointer: ContentPointer = {
         spaceId,
     };
-
     const [space, customization, rootPages] = await Promise.all([
         getSpace(spaceId),
         getSpaceCustomization(spaceId),
         getRevisionPages(contentPointer),
     ]);
-
     const language = getSpaceLanguage(customization);
-    const { pages, total } = selectPages(rootPages, searchParams);
 
+    // Compute the pages to render
+    const { pages, total } = selectPages(rootPages, pdfParams);
+    const pageIds = pages.map(
+        ({ page }) => [page.id, pagePDFContainerId(page)] as [string, string],
+    );
     const linksContext: PageHrefContext = {
         pdf: pages.map(({ page }) => page.id),
     };
 
-    const pageIds = pages.map(
-        ({ page }) => [page.id, pagePDFContainerId(page)] as [string, string],
-    );
-
     return (
         <>
-            {searchParams.back !== 'false' ? (
+            {pdfParams.back !== 'false' ? (
                 <div className={tcls('fixed', 'left-12', 'top-12', 'print:hidden', 'z-50')}>
                     <a
                         title={tString(language, 'pdf_goback')}
-                        href={searchParams.back ?? absoluteHref('')}
+                        href={pdfParams.back ?? absoluteHref('')}
                         className={tcls(
                             'flex',
                             'flex-row',
@@ -123,12 +129,16 @@ export default async function PDFHTMLOutput(props: {
 
             <PageControlButtons
                 pageIds={pageIds}
-                pdfParams={searchParams}
-                pdfHref={absoluteHref('~gitbook/pdf')}
+                pdfHref={currentPDFUrl}
                 total={total}
+                trademark={
+                    customization.trademark.enabled ? (
+                        <TrademarkLink space={space} customization={customization} />
+                    ) : null
+                }
             />
 
-            {searchParams.only ? null : <SpaceIntro space={space} />}
+            {pdfParams.only ? null : <PDFSpaceIntro space={space} />}
             {pages.map(({ page, depth }) =>
                 page.type === 'group' ? (
                     <PDFPageGroup key={page.id} space={space} page={page} />
@@ -159,7 +169,7 @@ export default async function PDFHTMLOutput(props: {
     );
 }
 
-async function SpaceIntro(props: { space: Space }) {
+async function PDFSpaceIntro(props: { space: Space }) {
     const { space } = props;
 
     return (

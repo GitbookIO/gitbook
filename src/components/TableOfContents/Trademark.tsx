@@ -4,13 +4,11 @@ import { t, getSpaceLanguage } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
 
 import { IconLogo } from '../icons/IconLogo';
+
 /**
- * Link to the GitBook platform.
+ * Trademark link to the GitBook.
  */
 export function Trademark(props: { space: Space; customization: CustomizationSettings }) {
-    const { customization } = props;
-    const language = getSpaceLanguage(customization);
-
     return (
         <div
             className={tcls(
@@ -47,35 +45,52 @@ export function Trademark(props: { space: Space; customization: CustomizationSet
                     'dark:dark:to-dark',
                 )}
             >
-                <a
-                    target="_blank"
-                    href="https://www.gitbook.com"
-                    className={tcls(
-                        'font-semibold',
-                        'ring-1',
-                        'ring-inset',
-                        'ring-dark/2',
-                        'pointer-events-auto',
-                        'transition-colors',
-                        'flex',
-                        'flex-row',
-                        'items-center',
-                        'hover:bg-dark/1',
-                        'px-4',
-                        'py-2',
-                        'rounded-md',
-                        'hover:backdrop-blur-sm',
-                        'lg:ring-0',
-                        'tracking-[-0.016em]',
-                        'dark:hover:bg-light/1',
-                        'dark:ring-light/1',
-                        'dark:font-normal',
-                    )}
-                >
-                    <IconLogo className={tcls('w-5', 'h-5', 'mr-3')} />
-                    {t(language, 'powered_by_gitbook')}
-                </a>
+                <TrademarkLink {...props} />
             </div>
         </div>
+    );
+}
+
+/**
+ * Trademark link to the GitBook.
+ */
+export function TrademarkLink(props: { space: Space; customization: CustomizationSettings }) {
+    const { space, customization } = props;
+    const language = getSpaceLanguage(customization);
+
+    const url = new URL('https://www.gitbook.com');
+    url.searchParams.set('utm_source', 'content');
+    url.searchParams.set('utm_medium', 'trademark');
+    url.searchParams.set('utm_campaign', space.id);
+
+    return (
+        <a
+            target="_blank"
+            href={url.toString()}
+            className={tcls(
+                'font-semibold',
+                'ring-1',
+                'ring-inset',
+                'ring-dark/2',
+                'pointer-events-auto',
+                'transition-colors',
+                'flex',
+                'flex-row',
+                'items-center',
+                'hover:bg-dark/1',
+                'px-4',
+                'py-2',
+                'rounded-md',
+                'hover:backdrop-blur-sm',
+                'lg:ring-0',
+                'tracking-[-0.016em]',
+                'dark:hover:bg-light/1',
+                'dark:ring-light/1',
+                'dark:font-normal',
+            )}
+        >
+            <IconLogo className={tcls('w-5', 'h-5', 'mr-3')} />
+            {t(language, 'powered_by_gitbook')}
+        </a>
     );
 }
