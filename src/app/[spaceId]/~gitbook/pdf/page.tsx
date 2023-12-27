@@ -69,7 +69,7 @@ export default async function PDFHTMLOutput(props: {
     return (
         <>
             {searchParams.back !== 'false' ? (
-                <div className={tcls('fixed', 'left-12', 'top-12', 'print:hidden')}>
+                <div className={tcls('fixed', 'left-12', 'top-12', 'print:hidden', 'z-50')}>
                     <a
                         title={tString(language, 'pdf_goback')}
                         href={searchParams.back ?? absoluteHref('')}
@@ -96,7 +96,7 @@ export default async function PDFHTMLOutput(props: {
                 </div>
             ) : null}
 
-            <div className={tcls('fixed', 'right-12', 'top-12', 'print:hidden')}>
+            <div className={tcls('fixed', 'right-12', 'top-12', 'print:hidden', 'z-50')}>
                 <PrintButton
                     title={tString(language, 'pdf_print')}
                     className={tcls(
@@ -133,7 +133,14 @@ export default async function PDFHTMLOutput(props: {
                 page.type === 'group' ? (
                     <PDFPageGroup key={page.id} space={space} page={page} />
                 ) : (
-                    <React.Suspense key={page.id} fallback={null}>
+                    <React.Suspense
+                        key={page.id}
+                        fallback={
+                            <PrintPage id={pagePDFContainerId(page)}>
+                                <p>Loading...</p>
+                            </PrintPage>
+                        }
+                    >
                         <PDFPageDocument
                             space={space}
                             page={page}

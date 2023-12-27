@@ -11,12 +11,6 @@ export function PrintButton(props: PolymorphicComponentProp<'button'>) {
         window.print();
     }, []);
 
-    React.useEffect(() => {
-        if (process.env.NODE_ENV !== 'development') {
-            onClick();
-        }
-    }, [onClick]);
-
     return (
         <button {...rest} onClick={onClick} className={className}>
             {children}

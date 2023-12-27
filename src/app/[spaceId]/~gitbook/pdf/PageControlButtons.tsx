@@ -45,6 +45,7 @@ export function PageControlButtons(props: {
                     'flex-col',
                     'gap-2',
                     'print:hidden',
+                    'z-50',
                 )}
             >
                 <Button
@@ -77,6 +78,7 @@ export function PageControlButtons(props: {
                     'items-end',
                     'gap-2',
                     'print:hidden',
+                    'z-50',
                 )}
             >
                 {total !== pageIds.length ? (
