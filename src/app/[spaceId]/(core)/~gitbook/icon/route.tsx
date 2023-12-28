@@ -8,7 +8,7 @@ import { getCollection, getSpace, getSpaceCustomization } from '@/lib/api';
 import { getEmojiForCode } from '@/lib/emojis';
 import { tcls } from '@/lib/tailwind';
 
-import { SpaceParams } from '../../fetch';
+import { SpaceParams } from '../../../fetch';
 
 export const runtime = 'edge';
 

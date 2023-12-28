@@ -2,11 +2,7 @@ import { Collection, CustomizationSettings, Space } from '@gitbook/api';
 import { CustomizationHeaderPreset } from '@gitbook/api';
 import { Suspense } from 'react';
 
-import {
-    CONTAINER_MAX_WIDTH_NORMAL,
-    CONTAINER_PADDING,
-    HEADER_HEIGHT_DESKTOP,
-} from '@/components/layout';
+import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '@/components/layout';
 import { t, getSpaceLanguage } from '@/intl/server';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -24,26 +20,13 @@ export function Header(props: {
     collection: Collection | null;
     collectionSpaces: Space[];
     context: ContentRefContext;
-    asFullWidth: boolean;
     customization: CustomizationSettings;
     withTopHeader?: boolean;
 }) {
-    const {
-        context,
-        space,
-        collection,
-        collectionSpaces,
-        asFullWidth,
-        customization,
-        withTopHeader,
-    } = props;
+    const { context, space, collection, collectionSpaces, customization, withTopHeader } = props;
 
     const isCustomizationDefault =
         customization.header.preset === CustomizationHeaderPreset.Default;
-
-    const isCustomizationCustom = customization.header.preset === CustomizationHeaderPreset.Custom;
-
-    console.log('Header.tsx: isCustomizationDefault: ', isCustomizationDefault);
 
     return (
         <header
@@ -79,8 +62,7 @@ export function Header(props: {
                     'align-center',
                     'justify-between',
                     'w-full',
-                    CONTAINER_PADDING,
-                    asFullWidth ? null : [CONTAINER_MAX_WIDTH_NORMAL, 'mx-auto'],
+                    CONTAINER_STYLE,
                 )}
             >
                 <HeaderLogo collection={collection} space={space} customization={customization} />

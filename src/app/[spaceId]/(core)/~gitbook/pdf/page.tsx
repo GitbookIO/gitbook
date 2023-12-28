@@ -25,7 +25,7 @@ import './pdf.css';
 import { PageControlButtons } from './PageControlButtons';
 import { PDFSearchParams, getPDFSearchParams } from './params';
 import { PrintButton } from './PrintButton';
-import { SpaceParams } from '../../fetch';
+import { SpaceParams } from '../../../fetch';
 
 export const runtime = 'edge';
 

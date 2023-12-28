@@ -11,15 +11,17 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
         query: string;
         item: ComputedPageResult;
         active: boolean;
+        onClick: () => void;
     },
     ref: React.Ref<HTMLAnchorElement>,
 ) {
-    const { query, item, active } = props;
+    const { query, item, active, onClick } = props;
 
     return (
         <Link
             ref={ref}
             href={item.href}
+            onClick={onClick}
             className={tcls(
                 'flex',
                 'flex-row',

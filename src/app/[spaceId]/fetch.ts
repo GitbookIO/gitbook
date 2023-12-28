@@ -5,8 +5,8 @@ import {
     getCollection,
     ContentPointer,
     getSpaceContent,
-    getDocument,
     getRevisionPageByPath,
+    getDocument,
 } from '@/lib/api';
 import { resolvePagePath, resolvePageId } from '@/lib/pages';
 
@@ -18,6 +18,30 @@ export interface PagePathParams extends SpaceParams {
 
 export interface PageIdParams extends SpaceParams {
     pageId?: string;
+}
+
+/**
+ * Fetch all the data needed to render the space layout.
+ */
+export async function fetchSpaceData(params: PagePathParams | PageIdParams) {
+    const content: ContentPointer = {
+        spaceId: params.spaceId,
+        changeRequestId: params.changeRequestId,
+        revisionId: params.revisionId,
+    };
+
+    const { space, pages, customization, scripts } = await getSpaceContent(content);
+    const collection = await fetchParentCollection(space);
+
+    return {
+        content,
+        space,
+        pages,
+        customization,
+        scripts,
+        ancestors: [],
+        ...collection,
+    };
 }
 
 /**
@@ -36,7 +60,7 @@ export async function fetchPageData(params: PagePathParams | PageIdParams) {
     const page = await resolvePage(pages, content, params);
     const [collection, document] = await Promise.all([
         fetchParentCollection(space),
-        page && page.page.documentId ? await getDocument(space.id, page.page.documentId) : null,
+        page?.page.documentId ? getDocument(space.id, page.page.documentId) : null,
     ]);
 
     return {

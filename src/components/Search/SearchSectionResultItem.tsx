@@ -7,15 +7,16 @@ import { HighlightQuery } from './HighlightQuery';
 import type { ComputedSectionResult } from './server-actions';
 
 export const SearchSectionResultItem = React.forwardRef(function SearchSectionResultItem(
-    props: { query: string; item: ComputedSectionResult; active: boolean },
+    props: { query: string; item: ComputedSectionResult; active: boolean; onClick: () => void },
     ref: React.Ref<HTMLAnchorElement>,
 ) {
-    const { query, item, active } = props;
+    const { query, item, active, onClick } = props;
 
     return (
         <Link
             ref={ref}
             href={item.href}
+            onClick={onClick}
             className={tcls(
                 'search-section-result-item',
                 'flex',

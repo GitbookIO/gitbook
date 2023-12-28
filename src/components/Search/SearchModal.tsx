@@ -195,6 +195,7 @@ function SearchModalBody(
                             query: state.query,
                         });
                     }}
+                    onClose={onClose}
                 />
             ) : null}
             {state.query && state.ask && withAsk ? (

@@ -5,7 +5,7 @@ import { getCollection, getSpace } from '@/lib/api';
 import { absoluteHref } from '@/lib/links';
 import { shouldIndexSpace } from '@/lib/seo';
 
-import { SpaceParams } from '../fetch';
+import { SpaceParams } from '../../fetch';
 
 export const runtime = 'edge';
 

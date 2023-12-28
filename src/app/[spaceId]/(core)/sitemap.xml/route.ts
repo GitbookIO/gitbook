@@ -5,7 +5,7 @@ import { NextRequest } from 'next/server';
 import { getRevisionPages } from '@/lib/api';
 import { pageHref } from '@/lib/links';
 
-import { SpaceParams } from '../fetch';
+import { SpaceParams } from '../../fetch';
 
 export const runtime = 'edge';
 

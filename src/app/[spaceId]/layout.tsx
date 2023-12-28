@@ -12,6 +12,10 @@ import { ClientContexts } from './ClientContexts';
 import { SpaceParams } from './fetch';
 import './globals.css';
 
+/**
+ * Layout shared between the content and the PDF renderer.
+ * It takes care of setting the theme and the language.
+ */
 export default async function SpaceRootLayout(props: {
     children: React.ReactNode;
     params: SpaceParams;

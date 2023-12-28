@@ -8,11 +8,10 @@ import { PagesList } from './PagesList';
 export function PageGroupItem(props: {
     rootPages: RevisionPage[];
     page: RevisionPageGroup;
-    activePage: RevisionPageDocument;
     ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
     context: ContentRefContext;
 }) {
-    const { rootPages, page, activePage, ancestors, context } = props;
+    const { rootPages, page, ancestors, context } = props;
 
     return (
         <li className={tcls('flex', 'flex-col')}>
@@ -43,7 +42,6 @@ export function PageGroupItem(props: {
                 <PagesList
                     rootPages={rootPages}
                     pages={page.pages}
-                    activePage={activePage}
                     ancestors={ancestors}
                     context={context}
                 />

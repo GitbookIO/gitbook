@@ -1,6 +1,13 @@
 import { DocumentBlock, JSONDocument } from '@gitbook/api';
 import assertNever from 'assert-never';
+import React from 'react';
 
+import {
+    SkeletonParagraph,
+    SkeletonHeading,
+    SkeletonCard,
+    SkeletonImage,
+} from '@/components/primitives';
 import { ClassValue } from '@/lib/tailwind';
 
 import { BlockContentRef } from './BlockContentRef';
@@ -35,55 +42,103 @@ export interface BlockProps<Block extends DocumentBlock> extends DocumentContext
 export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
     const { block, style, ...contextProps } = props;
 
+    const content = (() => {
+        switch (block.type) {
+            case 'paragraph':
+                return <Paragraph {...props} {...contextProps} block={block} />;
+            case 'heading-1':
+            case 'heading-2':
+            case 'heading-3':
+                return <Heading {...props} {...contextProps} block={block} />;
+            case 'list-ordered':
+                return <ListOrdered {...props} {...contextProps} block={block} />;
+            case 'list-unordered':
+                return <ListUnordered {...props} {...contextProps} block={block} />;
+            case 'list-tasks':
+                return <ListTasks {...props} {...contextProps} block={block} />;
+            case 'list-item':
+                return <ListItem {...props} {...contextProps} block={block} />;
+            case 'code':
+                return <CodeBlock {...props} {...contextProps} block={block} />;
+            case 'hint':
+                return <Hint {...props} {...contextProps} block={block} />;
+            case 'images':
+                return <Images {...props} {...contextProps} block={block} />;
+            case 'tabs':
+                return <Tabs {...props} {...contextProps} block={block} />;
+            case 'expandable':
+                return <Expandable {...props} {...contextProps} block={block} />;
+            case 'table':
+                return <Table {...props} {...contextProps} block={block} />;
+            case 'swagger':
+                return <Swagger {...props} {...contextProps} block={block} />;
+            case 'embed':
+                return <Embed {...props} {...contextProps} block={block} />;
+            case 'blockquote':
+                return <Quote {...props} {...contextProps} block={block} />;
+            case 'math':
+                return <BlockMath {...props} {...contextProps} block={block} />;
+            case 'file':
+                return <File {...props} {...contextProps} block={block} />;
+            case 'divider':
+                return <Divider {...props} {...contextProps} block={block} />;
+            case 'drawing':
+                return <Drawing {...props} {...contextProps} block={block} />;
+            case 'content-ref':
+                return <BlockContentRef {...props} {...contextProps} block={block} />;
+            case 'image':
+            case 'code-line':
+            case 'tabs-item':
+                throw new Error('Blocks should be directly rendered by parent');
+            case 'integration':
+                return <div>TODO Not supported yet</div>;
+            default:
+                assertNever(block);
+        }
+    })();
+
+    return (
+        <React.Suspense fallback={<BlockPlaceholder block={block} style={style} />}>
+            {content}
+        </React.Suspense>
+    );
+}
+
+function BlockPlaceholder(props: { block: DocumentBlock; style: ClassValue }) {
+    const { block, style } = props;
+
     switch (block.type) {
-        case 'paragraph':
-            return <Paragraph {...props} {...contextProps} block={block} />;
         case 'heading-1':
         case 'heading-2':
         case 'heading-3':
-            return <Heading {...props} {...contextProps} block={block} />;
+            return <SkeletonHeading style={style} />;
+        case 'paragraph':
         case 'list-ordered':
-            return <ListOrdered {...props} {...contextProps} block={block} />;
         case 'list-unordered':
-            return <ListUnordered {...props} {...contextProps} block={block} />;
         case 'list-tasks':
-            return <ListTasks {...props} {...contextProps} block={block} />;
         case 'list-item':
-            return <ListItem {...props} {...contextProps} block={block} />;
-        case 'code':
-            return <CodeBlock {...props} {...contextProps} block={block} />;
-        case 'hint':
-            return <Hint {...props} {...contextProps} block={block} />;
-        case 'images':
-            return <Images {...props} {...contextProps} block={block} />;
-        case 'tabs':
-            return <Tabs {...props} {...contextProps} block={block} />;
-        case 'expandable':
-            return <Expandable {...props} {...contextProps} block={block} />;
-        case 'table':
-            return <Table {...props} {...contextProps} block={block} />;
-        case 'swagger':
-            return <Swagger {...props} {...contextProps} block={block} />;
-        case 'embed':
-            return <Embed {...props} {...contextProps} block={block} />;
         case 'blockquote':
-            return <Quote {...props} {...contextProps} block={block} />;
+        case 'code':
+        case 'hint':
+            return <SkeletonParagraph style={style} />;
+        case 'tabs':
+        case 'expandable':
+        case 'table':
+        case 'swagger':
         case 'math':
-            return <BlockMath {...props} {...contextProps} block={block} />;
         case 'file':
-            return <File {...props} {...contextProps} block={block} />;
         case 'divider':
-            return <Divider {...props} {...contextProps} block={block} />;
         case 'drawing':
-            return <Drawing {...props} {...contextProps} block={block} />;
         case 'content-ref':
-            return <BlockContentRef {...props} {...contextProps} block={block} />;
+        case 'integration':
+            return <SkeletonCard style={style} />;
+        case 'embed':
+        case 'images':
+            return <SkeletonImage style={style} />;
         case 'image':
         case 'code-line':
         case 'tabs-item':
             throw new Error('Blocks should be directly rendered by parent');
-        case 'integration':
-            return <div>TODO Not supported yet</div>;
         default:
             assertNever(block);
     }

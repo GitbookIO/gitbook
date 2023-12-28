@@ -141,6 +141,7 @@ const config: Config = {
         plugin(function ({ addVariant }) {
             addVariant('navigation-open', 'body.navigation-open &');
             addVariant('search-open', 'body.search-open &');
+            addVariant('page-full-width', 'body.page-full-width &');
         }),
         containerQueries,
     ],

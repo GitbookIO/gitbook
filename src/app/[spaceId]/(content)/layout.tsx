@@ -1,25 +1,26 @@
 import { CustomizationThemeMode } from '@gitbook/api';
 import { Metadata, Viewport } from 'next';
-import { notFound, redirect } from 'next/navigation';
 import Script from 'next/script';
 import React from 'react';
 
 import { CookiesToast } from '@/components/Cookies';
-import { SpaceContent } from '@/components/SpaceContent';
+import { SpaceLayout } from '@/components/SpaceLayout';
 import { getContentSecurityPolicyNonce } from '@/lib/csp';
-import { PageHrefContext, absoluteHref, baseUrl, pageHref } from '@/lib/links';
-import { getPagePath } from '@/lib/pages';
+import { absoluteHref, baseUrl } from '@/lib/links';
 import { shouldIndexSpace } from '@/lib/seo';
 
-import { PagePathParams, fetchPageData, getPathnameParam } from '../fetch';
+import { SpaceParams, fetchSpaceData } from '../fetch';
 
 export const runtime = 'edge';
 
 /**
- * Fetch and render a page.
+ * Layout when rendering the content.
  */
-export default async function Page(props: { params: PagePathParams }) {
-    const { params } = props;
+export default async function ContentLayout(props: {
+    params: SpaceParams;
+    children: React.ReactNode;
+}) {
+    const { params, children } = props;
 
     const nonce = getContentSecurityPolicyNonce();
     const {
@@ -27,34 +28,25 @@ export default async function Page(props: { params: PagePathParams }) {
         space,
         customization,
         pages,
-        page,
         collection,
         collectionSpaces,
         ancestors,
-        document,
         scripts,
-    } = await fetchPageData(params);
-    const linksContext: PageHrefContext = {};
-
-    if (!page) {
-        notFound();
-    } else if (getPagePath(pages, page) !== getPathnameParam(params)) {
-        redirect(pageHref(pages, page, linksContext));
-    }
+    } = await fetchSpaceData(params);
 
     return (
         <>
-            <SpaceContent
-                content={content}
+            <SpaceLayout
                 space={space}
-                customization={customization}
-                pages={pages}
-                page={page}
-                ancestors={ancestors}
-                document={document}
                 collection={collection}
                 collectionSpaces={collectionSpaces}
-            />
+                customization={customization}
+                pages={pages}
+                ancestors={ancestors}
+                content={content}
+            >
+                {children}
+            </SpaceLayout>
 
             {scripts.map(({ script }) => (
                 <Script key={script} src={script} strategy="lazyOnload" nonce={nonce} />
@@ -69,8 +61,8 @@ export default async function Page(props: { params: PagePathParams }) {
     );
 }
 
-export async function generateViewport({ params }: { params: PagePathParams }): Promise<Viewport> {
-    const { customization } = await fetchPageData(params);
+export async function generateViewport({ params }: { params: SpaceParams }): Promise<Viewport> {
+    const { customization } = await fetchSpaceData(params);
     return {
         colorScheme: customization.themes.toggeable
             ? customization.themes.default === CustomizationThemeMode.Dark
@@ -80,17 +72,12 @@ export async function generateViewport({ params }: { params: PagePathParams }): 
     };
 }
 
-export async function generateMetadata({ params }: { params: PagePathParams }): Promise<Metadata> {
-    const { space, collection, page, customization } = await fetchPageData(params);
-    if (!page) {
-        notFound();
-    }
-
+export async function generateMetadata({ params }: { params: SpaceParams }): Promise<Metadata> {
+    const { space, collection, customization } = await fetchSpaceData(params);
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
 
     return {
-        title: `${page.title} | ${space.title}`,
-        description: page.description ?? '',
+        title: `${space.title}`,
         generator: 'GitBook',
         // We pass `metadataBase` to avoid warnings from Next, but we still use absolute URLs
         // as metadataBase doesn't seem to work well on next-on-cloudflare.
@@ -111,11 +98,6 @@ export async function generateMetadata({ params }: { params: PagePathParams }): 
                     type: 'image/png',
                     media: '(prefers-color-scheme: dark)',
                 },
-            ],
-        },
-        openGraph: {
-            images: [
-                customization.socialPreview.url ?? absoluteHref(`~gitbook/ogimage/${page.id}`),
             ],
         },
         robots: shouldIndexSpace({ space, collection }) ? 'index, follow' : 'noindex, nofollow',

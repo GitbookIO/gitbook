@@ -20,7 +20,7 @@ export interface ContentRefContext extends PageHrefContext {
     content: ContentPointer;
     space: Space;
     pages: Revision['pages'];
-    page: RevisionPageDocument;
+    page?: RevisionPageDocument;
 }
 
 /**
@@ -54,7 +54,7 @@ export async function resolveContentRef(
         (contentRef.space ?? space.id) === space.id
     ) {
         const page =
-            !contentRef.page || contentRef.page === activePage.id
+            !contentRef.page || contentRef.page === activePage?.id
                 ? activePage
                 : resolvePageId(pages, contentRef.page)?.page;
         if (!page) {
@@ -65,7 +65,7 @@ export async function resolveContentRef(
             return {
                 href: pageHref(pages, page, linksContext),
                 text: page.title,
-                active: page.id === activePage.id,
+                active: page.id === activePage?.id,
             };
         }
 

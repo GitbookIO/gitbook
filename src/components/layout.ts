@@ -6,14 +6,16 @@ import { ClassValue } from '@/lib/tailwind';
 export const HEADER_HEIGHT_DESKTOP = 64 as const;
 
 /**
- * Maximum width of the normal mode.
+ * Style for the container to adapt between normal and full width.
  */
-export const CONTAINER_MAX_WIDTH_NORMAL = 'max-w-screen-2xl';
-
-/**
- * Padding of the container.
- */
-export const CONTAINER_PADDING: ClassValue = ['px-4', 'sm:px-6', 'md:px-8'];
+export const CONTAINER_STYLE: ClassValue = [
+    'px-4',
+    'sm:px-6',
+    'md:px-8',
+    'max-w-screen-2xl',
+    'mx-auto',
+    'page-full-width:max-w-full',
+];
 
 /**
  * Height of the page cover.

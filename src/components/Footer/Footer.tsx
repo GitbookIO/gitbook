@@ -6,16 +6,15 @@ import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { FooterLinksGroup } from './FooterLinksGroup';
-import { CONTAINER_MAX_WIDTH_NORMAL, CONTAINER_PADDING } from '../layout';
+import { CONTAINER_STYLE } from '../layout';
 import { ThemeToggler } from '../ThemeToggler';
 
 export function Footer(props: {
     space: Space;
     context: ContentRefContext;
     customization: CustomizationSettings;
-    asFullWidth: boolean;
 }) {
-    const { context, customization, asFullWidth } = props;
+    const { context, customization } = props;
 
     return (
         <div
@@ -27,16 +26,7 @@ export function Footer(props: {
                 'dark:bg-dark-2',
             )}
         >
-            <div
-                className={tcls(
-                    'flex',
-                    'flex-row',
-                    CONTAINER_PADDING,
-                    asFullWidth ? null : [CONTAINER_MAX_WIDTH_NORMAL, 'mx-auto'],
-
-                    'py-6',
-                )}
-            >
+            <div className={tcls('flex', 'flex-row', CONTAINER_STYLE, 'py-6')}>
                 <div className={tcls('flex-1', 'flex', 'flex-col', 'gap-6')}>
                     {customization.footer.logo || customization.footer.groups?.length > 0 ? (
                         <div className={tcls('flex', 'flex-row', 'gap-20')}>

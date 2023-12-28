@@ -20,7 +20,6 @@ export function TableOfContents(props: {
     content: ContentPointer;
     context: ContentRefContext;
     pages: Revision['pages'];
-    activePage: RevisionPageDocument;
     ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
     header?: React.ReactNode;
     withHeaderOffset: boolean;
@@ -30,7 +29,6 @@ export function TableOfContents(props: {
         space,
         customization,
         pages,
-        activePage,
         ancestors,
         header,
         context,
@@ -95,7 +93,6 @@ export function TableOfContents(props: {
                 <PagesList
                     rootPages={pages}
                     pages={pages}
-                    activePage={activePage}
                     ancestors={ancestors}
                     context={context}
                 />

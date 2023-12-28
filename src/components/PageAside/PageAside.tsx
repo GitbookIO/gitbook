@@ -6,6 +6,7 @@ import React from 'react';
 import urlJoin from 'url-join';
 
 import { t, getSpaceLanguage } from '@/intl/server';
+import { getDocument } from '@/lib/api';
 import { getDocumentSections } from '@/lib/document';
 import { absoluteHref } from '@/lib/links';
 import { tcls } from '@/lib/tailwind';
@@ -16,7 +17,7 @@ import { PageFeedbackForm } from '../PageFeedback';
 /**
  * Aside listing the headings in the document.
  */
-export function PageAside(props: {
+export async function PageAside(props: {
     space: Space;
     customization: CustomizationSettings;
     page: RevisionPageDocument;
@@ -25,7 +26,8 @@ export function PageAside(props: {
     withFullPageCover: boolean;
     withPageFeedback: boolean;
 }) {
-    const { space, page, customization, document, withHeaderOffset, withPageFeedback } = props;
+    const { space, page, document, customization, withHeaderOffset, withPageFeedback } = props;
+
     const sections = document ? getDocumentSections(document) : [];
     const language = getSpaceLanguage(customization);
 
