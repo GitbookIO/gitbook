@@ -1,6 +1,7 @@
 import { CustomizationSettings, JSONDocument, RevisionPageDocument, Space } from '@gitbook/api';
 import React from 'react';
 
+import { api } from '@/lib/api';
 import { hasFullWidthBlock } from '@/lib/document';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -9,6 +10,7 @@ import { PageCover } from './PageCover';
 import { PageFooterNavigation } from './PageFooterNavigation';
 import { PageHeader } from './PageHeader';
 import { TogglePageFullWidth } from './TogglePageFullWidth';
+import { TrackPageView } from './TrackPageView';
 import { DocumentView } from '../DocumentView';
 import { PageFeedbackForm } from '../PageFeedback';
 
@@ -88,6 +90,9 @@ export function PageBody(props: {
                     </div>
                 ) : null}
             </main>
+            <React.Suspense fallback={null}>
+                <TrackPageView spaceId={space.id} pageId={page.id} apiHost={api().endpoint} />
+            </React.Suspense>
         </>
     );
 }
