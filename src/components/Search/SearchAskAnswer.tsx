@@ -65,13 +65,13 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
                 });
             },
         );
-    }, [spaceId, query, setSearchState]);
+    }, [spaceId, query, setSearchState, setState]);
 
     React.useEffect(() => {
         return () => {
             setState(null);
         };
-    }, []);
+    }, [setState]);
 
     return (
         <div

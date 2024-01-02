@@ -1,5 +1,6 @@
 import { DocumentInlineMention } from '@gitbook/api';
-import NextLink from 'next/link';
+
+import { Link } from '@/components/primitives';
 
 import { InlineProps } from './Inline';
 
@@ -12,12 +13,5 @@ export async function Mention(props: InlineProps<DocumentInlineMention>) {
         return null;
     }
 
-    return (
-        <NextLink
-            href={resolved.href}
-            className="underline underline-offset-2 text-primary hover:text-primary-700 transition-colors "
-        >
-            {resolved.text}
-        </NextLink>
-    );
+    return <Link href={resolved.href}>{resolved.text}</Link>;
 }

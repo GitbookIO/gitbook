@@ -1,8 +1,11 @@
-import { DocumentBlockTable } from '@gitbook/api';
+import IconStar from '@geist-ui/icons/star';
+import { ContentRef, DocumentBlockTable } from '@gitbook/api';
+import assertNever from 'assert-never';
 
-import { Checkbox } from '@/components/primitives';
+import { Checkbox, Link } from '@/components/primitives';
 import { getNodeFragmentByName } from '@/lib/document';
 import { tcls } from '@/lib/tailwind';
+import { filterOutNullable } from '@/lib/typescript';
 
 import { TableRecordKV } from './Table';
 import { BlockProps } from '../Block';
@@ -28,25 +31,6 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
     }
 
     switch (definition.type) {
-        /*         case 'content-ref':
-            // @ts-ignore
-            const target = await resolveContentRef(value, context);
-            if (!target) {
-                return <Tag className={tcls(['w-full'])}>{''}</Tag>;
-            }
-            return (
-                <Link
-                    className={tcls(
-                        'whitespace-nowrap',
-                        'text-sm',
-                        'text-primary-400',
-                        'hover:text-primary-500',
-                    )}
-                    href={target.href}
-                >
-                    {target.text}
-                </Link>
-            ); */
         case 'checkbox':
             return (
                 <Checkbox
@@ -56,9 +40,24 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                 />
             );
         case 'rating':
+            const rating = value as number;
+
             return (
-                <Tag className={tcls('text-base', 'tabular-nums', 'tracking-tighter')}>
-                    {`${value}`}
+                <Tag className={tcls('text-primary')}>
+                    {value ? (
+                        <span
+                            role="meter"
+                            aria-label={definition.title ?? ''}
+                            aria-valuenow={rating}
+                            aria-valuemin={1}
+                            aria-valuemax={definition.max}
+                            className={tcls('inline-flex', 'gap-1')}
+                        >
+                            {Array.from({ length: rating }).map((_, i) => (
+                                <IconStar key={i} className={tcls('size-4')} />
+                            ))}
+                        </span>
+                    ) : null}
                 </Tag>
             );
         case 'number':
@@ -85,7 +84,87 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                     blockStyle={['w-full', 'max-w-[unset]']}
                 />
             );
+        case 'files':
+            const files = await Promise.all(
+                (value as string[]).map((fileId) =>
+                    context.resolveContentRef({
+                        kind: 'file',
+                        file: fileId,
+                    }),
+                ),
+            );
+
+            return (
+                <Tag className={tcls('text-base')}>
+                    {files.filter(filterOutNullable).map((file, index) => (
+                        <Link key={index} href={file.href}>
+                            {file.text}
+                        </Link>
+                    ))}
+                </Tag>
+            );
+        case 'content-ref': {
+            const resolved = value ? await context.resolveContentRef(value as ContentRef) : null;
+            return (
+                <Tag className={tcls('text-base')}>
+                    {resolved ? <Link href={resolved.href}>{resolved.text}</Link> : null}
+                </Tag>
+            );
+        }
+        case 'users': {
+            const resolved = await Promise.all(
+                (value as string[]).map((userId) =>
+                    context.resolveContentRef({
+                        kind: 'user',
+                        user: userId,
+                    }),
+                ),
+            );
+
+            return (
+                <Tag className={tcls('text-base')}>
+                    {resolved.filter(filterOutNullable).map((file, index) => (
+                        <Link key={index} href={file.href}>
+                            {file.text}
+                        </Link>
+                    ))}
+                </Tag>
+            );
+        }
+        case 'select': {
+            return (
+                <Tag className={tcls()}>
+                    <span className={tcls('inline-flex', 'gap-2')}>
+                        {(value as string[]).map((selectId) => {
+                            const option = definition.options.find(
+                                (option) => option.value === selectId,
+                            );
+
+                            if (!option) {
+                                return null;
+                            }
+
+                            return (
+                                <span
+                                    key={option.value}
+                                    className={tcls(
+                                        'text-sm',
+                                        'rounded',
+                                        'py-1',
+                                        'px-2',
+                                        'bg-primary-100',
+                                        'text-primary-800',
+                                    )}
+                                >
+                                    {option.label}
+                                </span>
+                            );
+                        })}
+                    </span>
+                </Tag>
+            );
+        }
         default:
-            return null;
+            assertNever(definition);
     }
 }

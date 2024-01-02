@@ -143,6 +143,8 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                     <thead>
                         <tr className={tcls(tableTR)}>
                             {view.columns.map((column) => {
+                                const columnWidth = view.columnWidths?.[column];
+
                                 return (
                                     <th
                                         key={column}
@@ -158,6 +160,7 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                                             'dark:border-l-light/2',
                                             'dark:border-b-light/4',
                                         )}
+                                        style={columnWidth ? { width: columnWidth } : undefined}
                                     >
                                         {block.data.definition[column].title}
                                     </th>
