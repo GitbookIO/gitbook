@@ -6,7 +6,7 @@ import { hasFullWidthBlock, isNodeEmpty } from '@/lib/document';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
-import { PageBodyBlankslate } from '.';
+import { PageBodyBlankslate } from './PageBodyBlankslate';
 import { PageCover } from './PageCover';
 import { PageFooterNavigation } from './PageFooterNavigation';
 import { PageHeader } from './PageHeader';
@@ -56,7 +56,7 @@ export function PageBody(props: {
                 ) : null}
 
                 <PageHeader page={page} />
-                {document && isNodeEmpty(document) ? (
+                {document && !isNodeEmpty(document) ? (
                     <DocumentView
                         document={document}
                         style={['[&>*+*]:mt-5', 'grid']}
