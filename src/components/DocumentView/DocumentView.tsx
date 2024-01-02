@@ -49,7 +49,7 @@ export function DocumentView(
             document={document}
             ancestorBlocks={[]}
             blockStyle={blockStyle}
-            style={['space-y-6', style]}
+            style={[style]}
             context={context}
         />
     );

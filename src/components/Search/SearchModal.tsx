@@ -1,15 +1,18 @@
 'use client';
 
 import IconSearch from '@geist-ui/icons/search';
+import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { useRecoilValue } from 'recoil';
 
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
-import { SearchAskAnswer } from './SearchAskAnswer';
+import { SearchAskAnswer, searchAskState } from './SearchAskAnswer';
 import { SearchResults, SearchResultsRef } from './SearchResults';
 import { SearchState, useSearch } from './useSearch';
+import { LoadingPane } from '../primitives/LoadingPane';
 
 interface SearchModalProps {
     spaceId: string;
@@ -18,11 +21,12 @@ interface SearchModalProps {
 
 export function SearchModal(props: SearchModalProps) {
     const [state, setSearchState] = useSearch();
+    const askState = useRecoilValue(searchAskState);
 
     useHotkeys(
         'mod+k',
         (e) => {
-            e.preventDefault(); //might be inadvisable as it interferes with expected browser behavior.
+            e.preventDefault();
             setSearchState({ ask: false, query: '' });
         },
         [],
@@ -59,32 +63,60 @@ export function SearchModal(props: SearchModalProps) {
     };
 
     return (
-        <div
-            role="dialog"
-            className={tcls(
-                'flex',
-                'items-start',
-                'justify-center',
-                'fixed',
-                'inset-0',
-                'bg-dark/4',
-                'backdrop-blur-2xl',
-                'dark:bg-dark/9',
-                'opacity-[1]',
-                'z-30',
-                'px-4',
-                'pt-4',
-                'md:pt-[min(8vw,_6rem)]',
-            )}
-            onClick={onClose}
-        >
-            <SearchModalBody
-                {...props}
-                state={state}
-                onChangeQuery={onChangeQuery}
-                onClose={onClose}
-            />
-        </div>
+        <>
+            <div
+                role="dialog"
+                className={tcls(
+                    'flex',
+                    'items-start',
+                    'justify-center',
+                    'fixed',
+                    'inset-0',
+                    'bg-dark/4',
+                    'backdrop-blur-2xl',
+                    'opacity-[1]',
+                    'z-30',
+                    'px-4',
+                    'pt-4',
+                    'dark:bg-dark/8',
+                    'md:pt-[min(8vw,_6rem)]',
+                )}
+                onClick={onClose}
+            >
+                <AnimatePresence>
+                    {askState?.type === 'loading' ? (
+                        <motion.div
+                            key="loading"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 1 }}
+                            className={tcls(
+                                'w-[100vw]',
+                                'h-[100vh]',
+                                'fixed',
+                                'inset-0',
+                                'z-10',
+                                'pointer-events-none',
+                            )}
+                        >
+                            <LoadingPane
+                                gridStyle={['h-[100vh]', 'aspect-auto', 'top-[-30%]']}
+                                pulse
+                                tile={96}
+                                style={['grid']}
+                            />
+                        </motion.div>
+                    ) : null}
+                </AnimatePresence>
+                <SearchModalBody
+                    {...props}
+                    state={state}
+                    onChangeQuery={onChangeQuery}
+                    onClose={onClose}
+                />
+            </div>
+        </>
     );
 }
 
@@ -132,18 +164,22 @@ function SearchModalBody(
             role="dialog"
             aria-label={tString(language, 'search')}
             className={tcls(
+                'z-40',
                 'flex',
                 'flex-col',
                 'bg-white',
-                'max-w-[720px]',
+                'max-w-[768px]',
+                'mt-[-1px]',
                 'w-full',
                 'max-h',
                 'rounded-lg',
                 'ring-1',
                 'ring-dark/1',
-                'shadow-1xs',
+                'shadow-2xl',
+                'backdrop-blur-lg',
                 'overflow-hidden',
-                'dark:bg-light/1',
+                'dark:ring-inset',
+                'dark:bg-dark-4',
                 'dark:ring-light/2',
             )}
             onClick={(event) => {

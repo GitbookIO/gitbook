@@ -111,10 +111,11 @@ export function ToggleableLinkItem(props: {
                     '[&+div_a]:rounded-l-none',
                     isActive
                         ? [
-                              'before:border-primary/6',
+                              'before:border-primary-500',
                               'font-semibold',
                               'text-primary',
                               'hover:bg-primary/3',
+                              'dark:before:border-primary-400',
                               'dark:text-primary-400',
                               'hover:before:border-primary',
                               'dark:hover:bg-primary-500/3',
@@ -179,7 +180,6 @@ export function ToggleableLinkItem(props: {
                     </span>
                 ) : null}
             </Link>
-            {/*  TODO: fix recursive issue */}
             {hasDescendants ? (
                 <motion.div
                     ref={scope}

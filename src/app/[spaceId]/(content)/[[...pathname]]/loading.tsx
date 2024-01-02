@@ -10,7 +10,7 @@ export default function PageSkeleton() {
             className={tcls(
                 'relative',
                 'py-8',
-                'lg:px-12',
+                'lg:px-16',
                 'flex-1',
                 'mr-56',
                 // withDesktopTableOfContents ? null : 'xl:ml-72',

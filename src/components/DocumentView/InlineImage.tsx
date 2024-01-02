@@ -48,7 +48,7 @@ export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
             preload
             style={[
                 inline.data.size === 'original'
-                    ? 'max-w-[300px]'
+                    ? ['max-w-[300px]', 'w-full']
                     : ['max-h-[1lh]', 'h-[1lh]', 'w-auto'],
             ]}
             inline

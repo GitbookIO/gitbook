@@ -68,6 +68,35 @@ const config: Config = {
                 'header-link': generateShades('header-link'),
             },
             keyframes: {
+                pulse: {
+                    '0%': {
+                        transform: 'scale(0.01)',
+                        opacity: '0',
+                    },
+                    '70%': {
+                        opacity: '1',
+                    },
+                    '100%': {
+                        transform: 'scale(2.8)',
+                        opacity: '0',
+                    },
+                },
+                fadeIn: {
+                    '0%': {
+                        opacity: '0',
+                    },
+                    '100%': {
+                        opacity: '1',
+                    },
+                },
+                rotateLoop: {
+                    '0%': {
+                        transform: 'rotate(0deg) scaleY(2.5) scaleX(2.5)',
+                    },
+                    '100%': {
+                        transform: 'rotate(360deg) scaleY(2.5) scaleX(2.5)',
+                    },
+                },
                 pingAlt: {
                     '0%': {
                         transform: 'scale(0.1)',

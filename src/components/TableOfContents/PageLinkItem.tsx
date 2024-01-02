@@ -14,6 +14,7 @@ export async function PageLinkItem(props: { page: RevisionPageLink; context: Con
         <li className={tcls('flex', 'flex-col')}>
             <Link
                 href={resolved?.href ?? '#'}
+                target="_blank"
                 className={tcls(
                     'flex',
                     'flex-row',
@@ -27,6 +28,7 @@ export async function PageLinkItem(props: { page: RevisionPageLink; context: Con
                     'transition-colors',
                     'duration-100',
                     'text-dark/8',
+                    'rounded-md',
                     'dark:text-light/7',
                     'font-normal',
                     'hover:bg-dark/1',
@@ -38,6 +40,10 @@ export async function PageLinkItem(props: { page: RevisionPageLink; context: Con
                     className={tcls(
                         'w-3',
                         'h-3',
+                        'mr-1',
+                        'mt-1',
+                        'place-self-start',
+                        'shrink-0',
                         'stroke-current',
                         'transition-colors',
                         '[&>path]:transition-[stroke-opacity]',

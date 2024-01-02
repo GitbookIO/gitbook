@@ -37,7 +37,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'items-center',
                 'px-2',
                 'gap-3',
-                'text-dark/6',
+                'text-dark/7',
                 'min-h-[2.5rem]',
                 'w-[2.5rem]',
                 'rounded-lg',
@@ -51,7 +51,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'ring-dark/1',
                 'dark:bg-light/1',
                 'dark:ring-light/1',
-                'dark:text-light/6',
+                'dark:text-light/7',
                 '[&>span]:hidden',
                 'md:justify-start',
                 'md:[&>span]:flex',
@@ -60,16 +60,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 style,
             )}
         >
-            <div
-                className={tcls(
-                    'text-dark/7',
-                    'md:text-dark/4',
-                    'pt-1.5',
-                    'pb-2',
-                    'dark:text-light/6',
-                    'md:dark:text-light/5',
-                )}
-            >
+            <div className={tcls('text-dark/7', 'pt-1.5', 'pb-2', 'dark:text-light/7')}>
                 <IconSearch className={tcls('shrink-0', 'w-5', 'h-5')} />
             </div>
             {children}

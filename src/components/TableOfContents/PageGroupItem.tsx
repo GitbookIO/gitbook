@@ -26,7 +26,7 @@ export function PageGroupItem(props: {
                     'uppercase',
                     'z-[1]',
                     'sticky',
-                    'top-0',
+                    '-top-4',
                     'bg-gradient-to-b',
                     'from-light',
                     'to-transparent',

@@ -23,32 +23,48 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
         <details
             className={tcls(
                 style,
-                'rounded',
-                'shadow-1xs',
+
                 'shadow-dark/1',
                 'bg-gradient-to-t',
-                'from-white/8',
-                'to-white/6',
-                'ring-1',
-                'ring-dark/1',
+                'from-light-1',
+                'to-light-1',
+                'border',
+                'border-b-0',
+                'border-light-3/8',
                 'transition-color',
+                //all
+                '[&]:mt-[0px]',
+                //select first child
+                '[&:first-child]:mt-5',
+                '[&:first-child]:rounded-t-lg',
+                //select first in group
+                '[:not(&)_+&]:mt-5',
+                '[:not(&)_+&]:rounded-t-lg',
+                //select last in group
+                '[&:not(:has(+_&))]:mb-5',
+                '[&:not(:has(+_&))]:rounded-b-lg',
+                '[&:not(:has(+_&))]:border-b',
+                /* '[&:not(:has(+_&))]:shadow-1xs', */
 
-                'dark:ring-light/1',
+                'dark:border-dark-3/6',
                 'dark:from-light/[0.03]',
-                'dark:to-light/[0.01]',
+                'dark:to-light/[0.03]',
                 'dark:shadow-none',
 
-                'group open:dark:to-light/[0.03]',
-                'group open:to-white/9',
+                'group open:dark:to-light/[0.01]',
+                'group open:to-light',
             )}
         >
             <summary
                 className={tcls(
                     'cursor-pointer',
                     'px-4',
-                    'py-3',
+                    'py-4',
                     'list-none',
                     'select-none',
+                    'transition-colors',
+                    'group-open:text-dark-5/7',
+                    'dark:group-open:text-light-5',
                     '[&::-webkit-details-marker]:hidden',
                 )}
             >
@@ -70,7 +86,7 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                 document={document}
                 ancestorBlocks={[...ancestorBlocks, block]}
                 context={context}
-                style={['px-5', 'py-3', 'space-y-3']}
+                style={['px-10', 'pb-3', 'space-y-3']}
             />
         </details>
     );

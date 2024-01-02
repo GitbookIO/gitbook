@@ -1,0 +1,8 @@
+{
+    "tailwindCSS.experimental.classRegex": [
+        ["Style \\=([^;]*);", "'([^']*)'"],
+        ["Style \\=([^;]*);", "\"([^\"]*)\""],
+        ["Style \\=([^;]*);", "\\`([^\\`]*)\\`"]
+    ],
+    "tailwindCSS.classAttributes": ["class", "className", "style", ".*Style"]
+}

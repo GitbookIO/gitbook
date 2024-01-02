@@ -2,6 +2,7 @@ import IconBox from '@geist-ui/icons/box';
 import IconSearch from '@geist-ui/icons/search';
 import Link from 'next/link';
 import React from 'react';
+import { atom, useRecoilState } from 'recoil';
 
 import { Loading } from '@/components/primitives';
 import { useLanguage } from '@/intl/client';
@@ -9,7 +10,28 @@ import { t } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 
 import { AskAnswerResult, askQuestion } from './server-actions';
-import { useSearchLink } from './useSearch';
+import { useSearch, useSearchLink } from './useSearch';
+
+/**
+ * Store the state of the answer in a global state so that it can be
+ * accessed from anywhere to show a loading indicator.
+ */
+export const searchAskState = atom<
+    | {
+          type: 'answer';
+          answer: AskAnswerResult | null;
+      }
+    | {
+          type: 'error';
+      }
+    | {
+          type: 'loading';
+      }
+    | null
+>({
+    key: 'searchAskState',
+    default: null,
+});
 
 /**
  * Fetch and render the answers to a question.
@@ -18,23 +40,20 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
     const { spaceId, query } = props;
 
     const language = useLanguage();
-
-    const [state, setState] = React.useState<
-        | {
-              type: 'answer';
-              answer: AskAnswerResult | null;
-          }
-        | {
-              type: 'error';
-          }
-        | null
-    >(null);
+    const [, setSearchState] = useSearch();
+    const [state, setState] = useRecoilState(searchAskState);
 
     React.useEffect(() => {
-        setState(null);
+        setState({
+            type: 'loading',
+        });
 
         askQuestion(spaceId, query).then(
             (answer) => {
+                setSearchState({
+                    ask: true,
+                    query,
+                });
                 setState({
                     type: 'answer',
                     answer,
@@ -46,7 +65,13 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
                 });
             },
         );
-    }, [spaceId, query]);
+    }, [spaceId, query, setSearchState]);
+
+    React.useEffect(() => {
+        return () => {
+            setState(null);
+        };
+    }, []);
 
     return (
         <div
@@ -72,7 +97,7 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
             {state?.type === 'error' ? (
                 <div className={tcls('p-4')}>{t(language, 'search_ask_error')}</div>
             ) : null}
-            {!state ? (
+            {state?.type === 'loading' ? (
                 <div className={tcls('w-full', 'flex', 'items-center', 'justify-center')}>
                     <Loading className={tcls('w-5', 'py-4', 'text-primary')} />
                 </div>
@@ -85,6 +110,11 @@ function AnswerBody(props: { answer: AskAnswerResult }) {
     const { answer } = props;
     const getSearchLinkProps = useSearchLink();
     const language = useLanguage();
+
+    const [, setSearchState] = useSearch();
+    const onClose = () => {
+        setSearchState(null);
+    };
 
     return (
         <>
@@ -110,7 +140,8 @@ function AnswerBody(props: { answer: AskAnswerResult }) {
                                 'text-primary-500',
                                 'focus-within:text-primary-700',
                                 'hover:bg-primary/2',
-                                'dark:hover:bg-primary-400/4',
+                                'dark:text-primary-400',
+                                'dark:hover:bg-primary-500/3',
                             )}
                             {...getSearchLinkProps({
                                 query: question,
@@ -150,6 +181,7 @@ function AnswerBody(props: { answer: AskAnswerResult }) {
                     {answer.sources.map((source) => (
                         <span key={source.id} className={tcls()}>
                             <Link
+                                onClick={onClose}
                                 className={tcls(
                                     'flex',
                                     'text-sm',

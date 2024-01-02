@@ -122,6 +122,7 @@ export async function askQuestion(spaceId: string, query: string): Promise<AskAn
                 context={{
                     resolveContentRef: async () => null,
                 }}
+                style={['space-y-5']}
             />
         ),
         followupQuestions: answer.followupQuestions,

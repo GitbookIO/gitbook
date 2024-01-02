@@ -222,7 +222,7 @@ async function PDFPageDocument(props: {
             {document ? (
                 <DocumentView
                     document={document}
-                    style={'mt-6'}
+                    style={'mt-6 space-y-6'}
                     blockStyle={['max-w-full']}
                     context={{
                         resolveContentRef: (ref) => resolveContentRef(ref, refContext),

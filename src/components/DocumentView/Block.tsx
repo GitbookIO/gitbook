@@ -7,6 +7,7 @@ import {
     SkeletonHeading,
     SkeletonCard,
     SkeletonImage,
+    SkeletonSmall,
 } from '@/components/primitives';
 import { ClassValue } from '@/lib/tailwind';
 
@@ -111,8 +112,10 @@ function BlockPlaceholder(props: { block: DocumentBlock; style: ClassValue }) {
         case 'heading-1':
         case 'heading-2':
         case 'heading-3':
+        case 'file':
             return <SkeletonHeading style={style} />;
         case 'paragraph':
+            return <SkeletonSmall style={style} />;
         case 'list-ordered':
         case 'list-unordered':
         case 'list-tasks':
@@ -120,20 +123,19 @@ function BlockPlaceholder(props: { block: DocumentBlock; style: ClassValue }) {
         case 'blockquote':
         case 'code':
         case 'hint':
-            return <SkeletonParagraph style={style} />;
         case 'tabs':
+            return <SkeletonParagraph style={style} />;
         case 'expandable':
         case 'table':
         case 'swagger':
         case 'math':
-        case 'file':
         case 'divider':
-        case 'drawing':
         case 'content-ref':
         case 'integration':
             return <SkeletonCard style={style} />;
         case 'embed':
         case 'images':
+        case 'drawing':
             return <SkeletonImage style={style} />;
         case 'image':
         case 'code-line':

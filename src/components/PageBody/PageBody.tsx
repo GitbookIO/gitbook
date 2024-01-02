@@ -58,7 +58,7 @@ export function PageBody(props: {
                 {document ? (
                     <DocumentView
                         document={document}
-                        style={['space-y-5', 'grid']}
+                        style={['[&>*+*]:mt-5', 'grid']}
                         context={{
                             content: context.content,
                             resolveContentRef: (ref) => resolveContentRef(ref, context),

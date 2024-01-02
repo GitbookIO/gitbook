@@ -16,6 +16,7 @@ export function ListOrdered(props: BlockProps<DocumentBlockListOrdered>) {
                 'space-y-2',
                 'list-decimal',
                 'ps-[2ch]',
+                'marker:[font-variant-numeric:normal]',
                 'marker:text-dark/6',
                 '[&>li]:pl-[.25ch]',
                 'dark:marker:text-light/6',

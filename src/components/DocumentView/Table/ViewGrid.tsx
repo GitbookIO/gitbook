@@ -50,7 +50,7 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
 
     const tableTR = columnsOverThreshold
         ? ['[&>*+*]:border-l', '[&>*]:px-4']
-        : ['[&>*+*]:border-l', '[&>*+*]:pl-4'];
+        : ['[&>*+*]:border-l', '[&>*+*]:px-4'];
 
     const tableTH = columnsOverThreshold ? ['py-3'] : ['py-1', 'pt-0'];
 
@@ -153,7 +153,7 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                                             'border-b',
                                             'border-b-dark/4',
                                             'text-left',
-                                            'text-sm',
+                                            'text-xs',
                                             'lg:text-base',
                                             'dark:border-l-light/2',
                                             'dark:border-b-light/4',

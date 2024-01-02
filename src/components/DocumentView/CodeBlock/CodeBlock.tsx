@@ -28,7 +28,7 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
     const titleRounding = title ? ['rounded-md', 'rounded-ss-none'] : ['rounded-md'];
 
     return (
-        <div className={tcls('grid', 'grid-flow-col', style, fullWidthStyle)}>
+        <div className={tcls('group/codeblock', 'grid', 'grid-flow-col', style, fullWidthStyle)}>
             <div
                 className={tcls(
                     'flex',
@@ -64,6 +64,10 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
             <CopyCodeButton
                 codeId={id}
                 style={[
+                    'group-hover/codeblock:opacity-[1]',
+                    'transition-opacity',
+                    'duration-75',
+                    'opacity-0',
                     'text-xs',
                     '[grid-area:2/1]',
                     'z-[1]',

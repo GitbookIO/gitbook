@@ -25,12 +25,11 @@ export async function RecordRow(
                         key={column}
                         className={tcls(
                             'align-baseline',
-                            'min-w-[10rem]',
+                            'min-w-[8rem]',
                             'border-dark/2',
                             'py-3',
                             'text-sm',
                             'lg:text-base',
-                            'lg:min-w-[12rem]',
                             'dark:border-light/2',
                         )}
                     >
