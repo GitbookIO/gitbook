@@ -2,10 +2,11 @@ import { CustomizationSettings, JSONDocument, RevisionPageDocument, Space } from
 import React from 'react';
 
 import { api } from '@/lib/api';
-import { hasFullWidthBlock } from '@/lib/document';
+import { hasFullWidthBlock, isNodeEmpty } from '@/lib/document';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
+import { PageBodyBlankslate } from '.';
 import { PageCover } from './PageCover';
 import { PageFooterNavigation } from './PageFooterNavigation';
 import { PageHeader } from './PageHeader';
@@ -55,7 +56,7 @@ export function PageBody(props: {
                 ) : null}
 
                 <PageHeader page={page} />
-                {document ? (
+                {document && isNodeEmpty(document) ? (
                     <DocumentView
                         document={document}
                         style={['[&>*+*]:mt-5', 'grid']}
@@ -64,7 +65,9 @@ export function PageBody(props: {
                             resolveContentRef: (ref) => resolveContentRef(ref, context),
                         }}
                     />
-                ) : null}
+                ) : (
+                    <PageBodyBlankslate page={page} rootPages={context.pages} />
+                )}
 
                 {page.layout.pagination ? (
                     <PageFooterNavigation

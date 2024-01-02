@@ -106,8 +106,16 @@ export function getNodeFragmentByName(
  * Test if a node is empty.
  */
 export function isNodeEmpty(
-    node: DocumentText | DocumentFragment | DocumentInline | DocumentBlock,
+    node: DocumentText | DocumentFragment | DocumentInline | DocumentBlock | JSONDocument,
 ): boolean {
+    if (node.object !== 'text' && 'nodes' in node) {
+        if (node.nodes.length > 0) {
+            return false;
+        }
+
+        return node.nodes.every((child) => isNodeEmpty(child));
+    }
+
     const text = getNodeText(node);
     return text.trim().length === 0;
 }
