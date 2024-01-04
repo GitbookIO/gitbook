@@ -68,7 +68,7 @@ const config: Config = {
                 'header-link': generateShades('header-link'),
             },
             keyframes: {
-                pulse: {
+                pulseAlt: {
                     '0%': {
                         transform: 'scale(0.01)',
                         opacity: '0',

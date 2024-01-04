@@ -23,7 +23,7 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
         <details
             className={tcls(
                 style,
-
+                'group/expandable',
                 'shadow-dark/1',
                 'bg-gradient-to-t',
                 'from-light-1',
@@ -31,7 +31,6 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                 'border',
                 'border-b-0',
                 'border-light-3/8',
-                'transition-color',
                 //all
                 '[&]:mt-[0px]',
                 //select first child
@@ -63,8 +62,10 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                     'list-none',
                     'select-none',
                     'transition-colors',
+                    'group-hover/expandable:text-dark-5/7',
                     'group-open:text-dark-5/7',
                     'dark:group-open:text-light-5',
+                    'dark:group-hover/expandable:text-light-5',
                     '[&::-webkit-details-marker]:hidden',
                 )}
             >
@@ -74,8 +75,9 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                         'w-4',
                         'h-4',
                         'mr-2',
+                        'mb-1',
+                        'transition-transform',
                         'shrink-0',
-                        'transition-all',
                         'group-open:rotate-90',
                     )}
                 />
@@ -86,7 +88,7 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                 document={document}
                 ancestorBlocks={[...ancestorBlocks, block]}
                 context={context}
-                style={['px-10', 'pb-3', 'space-y-3']}
+                style={['px-10', 'pb-5', 'space-y-3']}
             />
         </details>
     );

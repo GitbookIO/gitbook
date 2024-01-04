@@ -31,7 +31,17 @@ export function DynamicTabs(props: {
                 style,
             )}
         >
-            <div role="tablist" className={tcls('flex', 'flex-row', 'p-4', 'space-x-1.5')}>
+            <div
+                role="tablist"
+                className={tcls(
+                    'group/tabs',
+                    'inline-flex',
+                    'flex-row',
+                    'p-4',
+                    'self-start',
+                    'space-x-1.5',
+                )}
+            >
                 {tabs.map((tab) => (
                     <button
                         key={tab.id}
@@ -51,14 +61,33 @@ export function DynamicTabs(props: {
                             'transition-colors',
                             'font-semibold',
                             'text-dark-4',
+
+                            'after:transition-colors',
+                            'after:group-hover/tabs:border-transparent',
+                            'after:border-r',
+
+                            'after:border-dark/4',
+                            'after:left-4',
+                            'after:relative',
+
+                            'last:after:border-transparent',
                             'hover:bg-light-2',
+
                             'dark:text-light-5',
                             'dark:hover:bg-dark-2',
                             'dark:hover:text-light-4',
+                            'dark:after:border-light/2',
+
                             active === tab.id
                                 ? [
+                                      'active-tab',
                                       'text-dark-4',
                                       'bg-light-3',
+
+                                      'after:[&.active-tab]:border-transparent',
+                                      'after:[:has(+_&.active-tab)]:border-transparent',
+                                      'after:[:has(&_+)]:border-transparent',
+
                                       'hover:bg-light-4',
                                       'dark:bg-dark-4',
                                       'dark:text-light',

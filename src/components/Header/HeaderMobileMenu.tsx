@@ -43,9 +43,10 @@ export function HeaderMobileMenu(props: Partial<React.ButtonHTMLAttributes<HTMLB
         >
             <IconMenu
                 className={tcls(
-                    'w-8',
-                    'h-8',
+                    'w-7',
+                    'h-7',
                     'rounded',
+                    'text-inherit',
                     'hover:bg-dark/3',
                     'p-[0.25rem]',
                     'dark:hover:bg-light/2',

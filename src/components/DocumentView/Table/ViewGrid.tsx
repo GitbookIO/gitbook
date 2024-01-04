@@ -151,7 +151,7 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                                         className={tcls(
                                             tableTH,
                                             'align-baseline',
-                                            'textwrap-balance',
+                                            'text-balance',
                                             'border-b',
                                             'border-b-dark/4',
                                             'text-left',

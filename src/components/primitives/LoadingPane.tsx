@@ -62,7 +62,7 @@ export const LoadingPane = (props: {
                         'will-change-transform',
 
                         pulse
-                            ? 'animate-[pulse_6s_cubic-bezier(.44,.12,.29,.94)_infinite]'
+                            ? 'animate-[pulseAlt_6s_cubic-bezier(.44,.12,.29,.94)_infinite]'
                             : 'animate-[rotateLoop_2s_linear_infinite]',
                         pulse
                             ? `[background-image:radial-gradient(circle_closest-side,_var(--tw-gradient-stops)_0,_var(--tw-gradient-stops)_33%,_var(--tw-gradient-stops)_66%)]`

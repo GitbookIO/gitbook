@@ -23,6 +23,7 @@ export function CompactHeader(props: {
         <div
             className={tcls(
                 'hidden',
+                'pr-4',
                 'lg:flex',
                 'lg:flex-col',
                 'flex-wrap',

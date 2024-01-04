@@ -43,8 +43,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                             'py-1',
                             'ps-3',
                             'hover:text-primary',
-                            'transition-colors',
-                            'duration-200',
+                            'transition-all',
                             'border-l',
                             'border-transparent',
                             section.depth > 1 ? ['ps-6', 'opacity-8'] : null,
@@ -54,6 +53,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                                       'border-primary',
                                       'dark:text-primary-400',
                                       'dark:border-primary-400',
+                                      'opacity-[1]',
                                   ]
                                 : '',
                         )}

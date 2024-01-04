@@ -68,7 +68,7 @@ export function TableOfContents(props: {
             {header ? header : null}
             <div
                 className={tcls(
-                    withHeaderOffset ? 'pt-4' : null,
+                    withHeaderOffset ? 'pt-4' : ['pt-4', 'lg:pt-0'],
                     'hidden',
                     'lg:flex',
                     'flex-grow',

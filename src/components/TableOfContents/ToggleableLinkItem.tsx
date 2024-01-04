@@ -101,7 +101,7 @@ export function ToggleableLinkItem(props: {
                     'text-sm',
                     'transition-colors',
                     'relative',
-                    'textwrap-balance',
+                    'text-balance',
                     'before:border-l',
                     'before:absolute',
                     'before:left-[-1px]',

@@ -1,4 +1,4 @@
-import { Collection, CustomizationSettings, Space } from '@gitbook/api';
+import { Collection, CustomizationHeaderPreset, CustomizationSettings, Space } from '@gitbook/api';
 import Link from 'next/link';
 
 import { HeaderMobileMenu } from '@/components/Header/HeaderMobileMenu';
@@ -17,12 +17,19 @@ interface HeaderLogoProps {
 /**
  * Render the logo for a space using the customization settings.
  */
+
 export function HeaderLogo(props: HeaderLogoProps) {
     const { customization } = props;
-
+    const isCustomizationDefault =
+        customization.header.preset === CustomizationHeaderPreset.Default;
     return (
         <div className={tcls('flex', 'flex-row', 'gap-3')}>
-            <HeaderMobileMenu className={tcls('lg:hidden')} />
+            <HeaderMobileMenu
+                className={tcls(
+                    'lg:hidden',
+                    isCustomizationDefault ? ['text-dark', 'dark:text-light'] : 'text-header-link',
+                )}
+            />
             <Link
                 href={absoluteHref('')}
                 className={tcls('group/headerlogo', 'flex', 'flex-row', 'items-center', 'shrink-0')}
@@ -104,12 +111,12 @@ function LogoFallback(props: HeaderLogoProps) {
                 }
                 sizes={[]}
                 fetchPriority="high"
-                style={['w-8', 'h-8', 'rounded', 'overflow-hidden', 'border', 'border-dark/2']}
+                style={['w-8', 'h-8']}
             />
 
             <h1
                 className={tcls(
-                    'textwrap-balance',
+                    'text-balance',
                     'flex',
                     'leading-tight',
                     'tracking-tight',

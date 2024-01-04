@@ -12,6 +12,7 @@ export function Link(props: LinkProps & { children: React.ReactNode }) {
             className={tcls(
                 'underline',
                 'underline-offset-2',
+                'decoration-primary/6',
                 'text-primary',
                 'hover:text-primary-700',
                 'transition-colors',

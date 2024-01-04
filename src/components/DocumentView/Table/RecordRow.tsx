@@ -33,7 +33,7 @@ export async function RecordRow(
                             'dark:border-light/2',
                         )}
                     >
-                        <div className={tcls('pr-4 ', 'textwrap-balance')}>
+                        <div className={tcls('pr-4 ', 'text-balance')}>
                             <RecordColumnValue key={column} {...props} column={column} />
                         </div>
                     </td>

@@ -41,22 +41,40 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             );
         case 'rating':
             const rating = value as number;
+            const max = definition.max;
 
             return (
-                <Tag className={tcls('text-primary')}>
+                <Tag className={tcls('inline-grid')}>
                     {value ? (
-                        <span
-                            role="meter"
-                            aria-label={definition.title ?? ''}
-                            aria-valuenow={rating}
-                            aria-valuemin={1}
-                            aria-valuemax={definition.max}
-                            className={tcls('inline-flex', 'gap-1')}
-                        >
-                            {Array.from({ length: rating }).map((_, i) => (
-                                <IconStar key={i} className={tcls('size-4')} />
-                            ))}
-                        </span>
+                        <>
+                            <span className={tcls('inline-flex', 'grid-area-1-1', 'gap-0.5')}>
+                                {Array.from({ length: max }).map((_, i) => (
+                                    <IconStar
+                                        key={i}
+                                        className={tcls(
+                                            'size-[15px]',
+                                            'stroke-primary-700/5',
+                                            'dark:stroke-primary-300/5',
+                                        )}
+                                    />
+                                ))}
+                            </span>
+                            <span
+                                role="meter"
+                                aria-label={definition.title ?? ''}
+                                aria-valuenow={rating}
+                                aria-valuemin={1}
+                                aria-valuemax={definition.max}
+                                className={tcls('inline-flex', 'grid-area-1-1', 'gap-0.5')}
+                            >
+                                {Array.from({ length: rating }).map((_, i) => (
+                                    <IconStar
+                                        key={i}
+                                        className={tcls('size-[15px]', 'stroke-primary')}
+                                    />
+                                ))}
+                            </span>
+                        </>
                     ) : null}
                 </Tag>
             );
@@ -106,7 +124,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
         case 'content-ref': {
             const resolved = value ? await context.resolveContentRef(value as ContentRef) : null;
             return (
-                <Tag className={tcls('text-base')}>
+                <Tag className={tcls('text-base', 'text-balance')}>
                     {resolved ? <Link href={resolved.href}>{resolved.text}</Link> : null}
                 </Tag>
             );

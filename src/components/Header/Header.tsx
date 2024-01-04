@@ -93,16 +93,21 @@ export function Header(props: {
                             style={
                                 !isCustomizationDefault && withTopHeader
                                     ? [
-                                          'bg-header-background-400/6',
-                                          'text-header-background-200',
-                                          'ring-light/2',
-                                          '[&>span]:text-header-background-200',
-                                          '[&_svg]:stroke-header-background-200',
+                                          'bg-header-background-400/8',
+                                          'shadow-sm',
+                                          'text-header-link/8',
+                                          'ring-header-background-200/5',
+                                          '[&>span]:text-header-link/7',
+                                          '[&_svg]:stroke-header-link',
+                                          'dark:bg-header-link-600/3',
+                                          'dark:ring-header-link-600/2',
+                                          'dark:text-header-link/7',
+                                          'dark:[&_svg]:stroke-header-link/7',
                                       ]
                                     : null
                             }
                         >
-                            <span>{t(getSpaceLanguage(customization), 'search')}</span>
+                            <p>{t(getSpaceLanguage(customization), 'search')}</p>
                         </SearchButton>
                     </Suspense>
                 </div>

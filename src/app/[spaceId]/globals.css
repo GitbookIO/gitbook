@@ -19,7 +19,7 @@
         @apply gutter-stable;
     }
     h1 {
-        @apply tracking-[-0.025em] text-dark dark:text-light textwrap-balance;
+        @apply tracking-[-0.025em] text-dark dark:text-light text-balance;
     }
     h2,
     h3,
@@ -100,12 +100,6 @@
     }
     .gutter-stable {
         scrollbar-gutter: stable;
-    }
-    .textwrap-balance {
-        text-wrap: balance;
-    }
-    .textwrap-pretty {
-        text-wrap: pretty;
     }
 
     .triangle {
