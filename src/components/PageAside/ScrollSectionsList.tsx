@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import React from 'react';
 
 import { useScrollActiveId } from '@/components/hooks';
@@ -32,7 +31,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
         <ul className={tcls('border-l', 'border-dark/2', 'dark:border-light/1', 'space-y-1')}>
             {sections.map((section) => (
                 <li key={section.id} className={tcls('flex', 'flex-row')}>
-                    <Link
+                    <a
                         href={`#${section.id}`}
                         className={tcls(
                             'flex',
@@ -59,7 +58,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                         )}
                     >
                         {section.title}
-                    </Link>
+                    </a>
                 </li>
             ))}
         </ul>
