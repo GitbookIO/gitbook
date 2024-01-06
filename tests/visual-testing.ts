@@ -1,3 +1,4 @@
+import fs from 'node:fs/promises';
 import puppeteer, { Page } from 'puppeteer';
 import { argosScreenshot } from '@argos-ci/puppeteer';
 import { getContentTestURL, getTargetURL } from './utils';
@@ -162,26 +163,42 @@ console.log(`Starting visual testing with ${getTargetURL()}...`);
 const browser = await puppeteer.launch({
     headless: 'new',
 });
-const page = await browser.newPage();
 
 for (const testCase of testCases) {
     for (const test of testCase.tests) {
+        const page = await browser.newPage();
         const contentUrl = new URL(test.url, testCase.baseUrl);
         const url = getContentTestURL(contentUrl.toString());
         const start = Date.now();
 
         console.log(`Testing ${testCase.name} - ${test.name} (${url})...`);
 
-        await page.goto(url, { waitUntil: 'networkidle2' });
+        const screenshotName = `${testCase.name} - ${test.name}.png`;
 
-        await argosScreenshot(page, `${testCase.name} - ${test.name}.png`, {
-            viewports: ['iphone-x', 'ipad-2', 'macbook-13'],
+        try {
+            await page.goto(url, { waitUntil: test.wait ? 'load' : 'networkidle2' });
+
+            if (test.wait) {
+                await test.wait(page);
+            }
+        } catch (error) {
+            await fs.mkdir('screenshots/errors', {
+                recursive: true,
+            });
+
+            await page.screenshot({ path: `screenshots/errors/${screenshotName}` });
+            console.log(`❌ Failed in ${((Date.now() - start) / 1000).toFixed(2)}s`);
+            throw error;
+        }
+
+        await argosScreenshot(page, screenshotName, {
+            viewports: ['macbook-13', 'iphone-x', 'ipad-2'],
         });
         console.log(`✅ Done in ${((Date.now() - start) / 1000).toFixed(2)}s`);
         console.log('');
+        await page.close();
     }
 }
-await page.close();
 await browser.close();
 
 console.log('All done!');

@@ -64,6 +64,11 @@ jobs:
               run: bun x argos upload --token $ARGOS_TOKEN ./screenshots
               env:
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
+            - name: Upload failed tests as artifacts
+              uses: actions/upload-artifact@v3
+              with:
+                  name: error-screenshots
+                  path: screenshots/errors/
     pagespeed-testing:
         runs-on: ubuntu-latest
         name: PageSpeed Testing
