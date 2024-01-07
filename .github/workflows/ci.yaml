@@ -66,6 +66,7 @@ jobs:
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
             - name: Upload failed tests as artifacts
               uses: actions/upload-artifact@v3
+              if: ${{ failure() }}
               with:
                   name: error-screenshots
                   path: screenshots/errors/

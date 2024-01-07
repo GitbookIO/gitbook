@@ -156,6 +156,16 @@ const testCases: TestsCase[] = [
             },
         ],
     },
+    {
+        name: 'ThousandEyes',
+        baseUrl: 'https://docs.thousandeyes.com/',
+        tests: [
+            {
+                name: 'Home',
+                url: '',
+            },
+        ],
+    },
 ];
 
 console.log(`Starting visual testing with ${getTargetURL()}...`);

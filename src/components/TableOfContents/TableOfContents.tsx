@@ -87,7 +87,7 @@ export function TableOfContents(props: {
                     'navigation-open:flex', // can be auto height animated as such https://stackoverflow.com/a/76944290
                     /*                     header ? 'pt-3' : 'pt-6', */
                     'lg:-ml-5',
-                    'lg:pb-16',
+                    customization.trademark.enabled ? 'lg:pb-16' : 'lg:pb-4',
                 )}
             >
                 <PagesList
@@ -96,7 +96,9 @@ export function TableOfContents(props: {
                     ancestors={ancestors}
                     context={context}
                 />
-                <Trademark space={space} customization={customization} />
+                {customization.trademark.enabled ? (
+                    <Trademark space={space} customization={customization} />
+                ) : null}
             </div>
         </aside>
     );
