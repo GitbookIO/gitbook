@@ -441,23 +441,25 @@ function computeLookupAlternatives(url: URL) {
 
     const pathSegments = url.pathname.slice(1).split('/');
 
-    // Match with only the first segment of the path
+    // URL looks like a collection url (with /v/ in the path)
+    // We only start matching after the /v/ segment and we ignore everything before it
+    // to avoid potentially matching as a page not found under the default space in the collection
+    if (pathSegments.includes('v')) {
+        const collectionURL = new URL(url);
+        const vIndex = pathSegments.indexOf('v');
+        collectionURL.pathname = pathSegments.slice(0, vIndex + 2).join('/');
+
+        pushAlternative(collectionURL, pathSegments.slice(vIndex + 2).join('/'));
+    }
+
+    // Otherwise match with only the first segment of the path
     // as it could potentially a space in an organization or collection domain
     // or a space using a share link secret
-    if (pathSegments.length > 0) {
+    else if (pathSegments.length > 0) {
         const shortURL = new URL(url);
         shortURL.pathname = pathSegments[0];
 
         pushAlternative(shortURL, pathSegments.slice(1).join('/'));
-    }
-
-    // URL looks like a collection url (with /v/ in the path)
-    if (pathSegments.includes('v')) {
-        const collectionURL = new URL(url);
-        const vIndex = pathSegments.indexOf('v');
-        collectionURL.pathname = pathSegments.slice(0, vIndex + 1).join('/');
-
-        pushAlternative(collectionURL, pathSegments.slice(vIndex + 1).join('/'));
     }
 
     // Always try with the full URL
