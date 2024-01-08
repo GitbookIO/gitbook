@@ -95,7 +95,12 @@ export function SpaceLayout(props: {
             ) : null}
 
             <React.Suspense fallback={null}>
-                <SearchModal spaceId={space.id} withAsk={customization.aiSearch.enabled} />
+                <SearchModal
+                    spaceId={space.id}
+                    spaceTitle={customization.title ?? space.title}
+                    withAsk={customization.aiSearch.enabled}
+                    collectionId={collection && collectionSpaces.length > 1 ? collection.id : null}
+                />
             </React.Suspense>
         </div>
     );

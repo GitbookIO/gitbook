@@ -426,6 +426,24 @@ export const searchSpaceContent = cache(
 );
 
 /**
+ * Search content accross all spaces in a collection.
+ */
+export const searchCollectionContent = cache(
+    'api.searchCollectionContent',
+    async (collectionId: string, query: string) => {
+        const response = await api().search.searchContent(
+            { query },
+            {
+                ...noCacheFetchOptions,
+            },
+        );
+        return cacheResponse(response, {
+            tags: [getAPICacheTag({ tag: 'collection', collection: collectionId })],
+        });
+    },
+);
+
+/**
  * Ask question in a space.
  */
 export const askQueryInSpace = cache(

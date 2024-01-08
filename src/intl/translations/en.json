@@ -6,6 +6,8 @@
     "search": "Search",
     "search_input_placeholder": "Search content",
     "search_no_results": "No results for \"${1}\".",
+    "search_scope_space": "Only in ${1}",
+    "search_scope_all": "All the content",
     "search_ask": "Ask \"${1}\"",
     "search_ask_sources": "Sources",
     "search_ask_no_answer": "No answer could be found for your question, try with another one.",

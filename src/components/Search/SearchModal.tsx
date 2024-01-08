@@ -11,11 +11,14 @@ import { tcls } from '@/lib/tailwind';
 
 import { SearchAskAnswer, searchAskState } from './SearchAskAnswer';
 import { SearchResults, SearchResultsRef } from './SearchResults';
+import { SearchScopeToggle } from './SearchScopeToggle';
 import { SearchState, useSearch } from './useSearch';
 import { LoadingPane } from '../primitives/LoadingPane';
 
 interface SearchModalProps {
     spaceId: string;
+    spaceTitle: string;
+    collectionId: string | null;
     withAsk: boolean;
 }
 
@@ -27,7 +30,7 @@ export function SearchModal(props: SearchModalProps) {
         'mod+k',
         (e) => {
             e.preventDefault();
-            setSearchState({ ask: false, query: '' });
+            setSearchState({ ask: false, query: '', global: false });
         },
         [],
     );
@@ -127,7 +130,7 @@ function SearchModalBody(
         onClose: () => void;
     },
 ) {
-    const { spaceId, withAsk, state, onChangeQuery, onClose } = props;
+    const { spaceId, spaceTitle, withAsk, collectionId, state, onChangeQuery, onClose } = props;
 
     const language = useLanguage();
     const resultsRef = React.useRef<SearchResultsRef>(null);
@@ -156,6 +159,7 @@ function SearchModalBody(
         onChangeQuery({
             ask: false, // When typing, we go back to the default search mode
             query: event.target.value,
+            global: state.global,
         });
     };
 
@@ -220,19 +224,26 @@ function SearchModalBody(
                 </div>
             </div>
             {!state.ask || !withAsk ? (
-                <SearchResults
-                    ref={resultsRef}
-                    spaceId={spaceId}
-                    query={state.query}
-                    withAsk={withAsk}
-                    onSwitchToAsk={() => {
-                        onChangeQuery({
-                            ask: true,
-                            query: state.query,
-                        });
-                    }}
-                    onClose={onClose}
-                />
+                <>
+                    {collectionId && state.query ? (
+                        <SearchScopeToggle spaceTitle={spaceTitle} />
+                    ) : null}
+                    <SearchResults
+                        ref={resultsRef}
+                        spaceId={spaceId}
+                        collectionId={state.global ? collectionId : null}
+                        query={state.query}
+                        withAsk={withAsk}
+                        onSwitchToAsk={() => {
+                            onChangeQuery({
+                                ask: true,
+                                query: state.query,
+                                global: state.global,
+                            });
+                        }}
+                        onClose={onClose}
+                    />
+                </>
             ) : null}
             {state.query && state.ask && withAsk ? (
                 <SearchAskAnswer spaceId={spaceId} query={state.query} />

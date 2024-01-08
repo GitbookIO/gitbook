@@ -21,6 +21,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
     const onClick = () => {
         setSearchState({
             ask: false,
+            global: false,
             query: '',
         });
     };

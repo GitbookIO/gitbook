@@ -1,10 +1,11 @@
 import { LinkProps } from 'next/link';
 import React from 'react';
-import { atom, useRecoilState } from 'recoil';
+import { SetterOrUpdater, atom, useRecoilState } from 'recoil';
 
 export interface SearchState {
     query: string;
     ask: boolean;
+    global: boolean;
 }
 
 const searchQueryState = atom<SearchState | null>({
@@ -34,16 +35,21 @@ const searchQueryState = atom<SearchState | null>({
 
                     searchParams.delete('q');
                     searchParams.delete('ask');
+                    searchParams.delete('global');
                 } else {
                     if (
                         searchParams.get('q') === searchState.query &&
-                        searchParams.has('ask') === searchState.ask
+                        searchParams.has('ask') === searchState.ask &&
+                        searchParams.has('global') === searchState.global
                     ) {
                         return;
                     }
 
                     searchParams.set('q', searchState.query);
                     searchState.ask ? searchParams.set('ask', 'on') : searchParams.delete('ask');
+                    searchState.global
+                        ? searchParams.set('global', 'on')
+                        : searchParams.delete('global');
                 }
 
                 const url =
@@ -63,7 +69,7 @@ const searchQueryState = atom<SearchState | null>({
 /**
  * Hook to access the current search query and update it.
  */
-export function useSearch(): [SearchState | null, (query: SearchState | null) => void] {
+export function useSearch(): [SearchState | null, SetterOrUpdater<SearchState | null>] {
     const [query, setQuery] = useRecoilState(searchQueryState);
     return [query, setQuery];
 }
@@ -71,20 +77,27 @@ export function useSearch(): [SearchState | null, (query: SearchState | null) =>
 /**
  * Hook to create a link to a search query.
  */
-export function useSearchLink(): (query: SearchState) => LinkProps {
+export function useSearchLink(): (query: Partial<SearchState>) => LinkProps {
     const [, setQuery] = useRecoilState(searchQueryState);
 
     return React.useCallback(
         (query) => {
             const searchParams = new URLSearchParams();
-            searchParams.set('q', query.query);
+            searchParams.set('q', query.query ?? '');
             query.ask ? searchParams.set('ask', 'on') : searchParams.delete('ask');
+            query.global ? searchParams.set('global', 'on') : searchParams.delete('global');
             return {
                 href: '?' + searchParams.toString(),
                 prefetch: false,
                 onClick: (event) => {
                     event.preventDefault();
-                    setQuery(query);
+                    setQuery((prev) => ({
+                        query: '',
+                        ask: false,
+                        global: false,
+                        ...(prev ?? {}),
+                        ...query,
+                    }));
                 },
             };
         },
@@ -100,5 +113,6 @@ function getCurrentSearchQuery(): SearchState | null {
     }
 
     const ask = searchParams.has('ask');
-    return { query, ask };
+    const global = searchParams.has('global');
+    return { query, ask, global };
 }

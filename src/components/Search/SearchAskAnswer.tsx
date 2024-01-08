@@ -50,10 +50,15 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
 
         askQuestion(spaceId, query).then(
             (answer) => {
-                setSearchState({
-                    ask: true,
-                    query,
-                });
+                setSearchState((prev) =>
+                    prev
+                        ? {
+                              ...prev,
+                              ask: true,
+                              query,
+                          }
+                        : null,
+                );
                 setState({
                     type: 'answer',
                     answer,

@@ -8,7 +8,12 @@ import { isQuestion } from './isQuestion';
 import { SearchPageResultItem } from './SearchPageResultItem';
 import { SearchQuestionResultItem } from './SearchQuestionResultItem';
 import { SearchSectionResultItem } from './SearchSectionResultItem';
-import { getRecommendedQuestions, OrderedComputedResult, searchContent } from './server-actions';
+import {
+    getRecommendedQuestions,
+    OrderedComputedResult,
+    searchCollectionContent,
+    searchSpaceContent,
+} from './server-actions';
 
 export interface SearchResultsRef {
     moveUp(): void;
@@ -31,13 +36,14 @@ export const SearchResults = React.forwardRef(function SearchResults(
     props: {
         query: string;
         spaceId: string;
+        collectionId: string | null;
         withAsk: boolean;
         onSwitchToAsk: () => void;
         onClose: () => void;
     },
     ref: React.Ref<SearchResultsRef>,
 ) {
-    const { query, spaceId, withAsk, onSwitchToAsk, onClose } = props;
+    const { query, spaceId, collectionId, withAsk, onSwitchToAsk, onClose } = props;
 
     const language = useLanguage();
     const debounceTimeout = React.useRef<NodeJS.Timeout | null>(null);
@@ -84,7 +90,9 @@ export const SearchResults = React.forwardRef(function SearchResults(
             debounceTimeout.current = setTimeout(async () => {
                 setCursor(null);
 
-                const fetchedResults = await searchContent(spaceId, query);
+                const fetchedResults = await (collectionId
+                    ? searchCollectionContent(collectionId, query)
+                    : searchSpaceContent(spaceId, query));
                 setResults(withAsk ? withQuestionResult(fetchedResults, query) : fetchedResults);
             }, 250);
 
@@ -95,7 +103,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 }
             };
         }
-    }, [query, spaceId, withAsk]);
+    }, [query, spaceId, collectionId, withAsk]);
 
     // Scroll to the active result.
     React.useEffect(() => {

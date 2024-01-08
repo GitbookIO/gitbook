@@ -38,6 +38,11 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                 active ? ['bg-primary-50'] : null,
             )}
         >
+            {item.spaceTitle ? (
+                <span className={tcls('opacity-6', 'font-normal', 'mr-2')}>
+                    {item.spaceTitle + ' ›'}
+                </span>
+            ) : null}
             <HighlightQuery query={query} text={item.title} />
         </Link>
     );

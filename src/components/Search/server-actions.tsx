@@ -1,11 +1,8 @@
 'use server';
 
-import {
-    askQueryInSpace,
-    getRecommendedQuestionsInSpace,
-    getRevisionPages,
-    searchSpaceContent,
-} from '@/lib/api';
+import { SearchPageResult } from '@gitbook/api';
+
+import * as api from '@/lib/api';
 import { absoluteHref, pageHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
@@ -28,6 +25,9 @@ export interface ComputedPageResult {
     id: string;
     title: string;
     href: string;
+
+    /** When part of a multi-spaces search, the title of the space */
+    spaceTitle?: string;
 }
 
 export interface AskAnswerSource {
@@ -48,34 +48,30 @@ export interface AskAnswerResult {
 }
 
 /**
- * Server action to search content in a space.
+ * Server action to search content in a space
  */
-export async function searchContent(
+export async function searchSpaceContent(
     spaceId: string,
     query: string,
 ): Promise<OrderedComputedResult[]> {
-    const data = await searchSpaceContent(spaceId, query);
+    const data = await api.searchSpaceContent(spaceId, query);
+    return data.items.map((item) => transformPageResult(item, undefined)).flat();
+}
+
+/**
+ * Server action to search content in a collection
+ */
+export async function searchCollectionContent(
+    collectionId: string,
+    query: string,
+): Promise<OrderedComputedResult[]> {
+    const data = await api.searchCollectionContent(collectionId, query);
+
     return data.items
-        .map((item) => {
-            const sections =
-                item.sections?.map<ComputedSectionResult>((section) => ({
-                    type: 'section',
-                    id: item.id + '/' + section.id,
-                    title: section.title,
-                    href: absoluteHref(section.path),
-                    body: section.body,
-                })) ?? [];
-
-            const page: ComputedPageResult = {
-                type: 'page',
-                id: item.id,
-                title: item.title,
-                href: absoluteHref(item.path),
-            };
-
-            return [page, ...sections];
+        .map((spaceItem) => {
+            return spaceItem.pages.map((item) => transformPageResult(item, spaceItem.title));
         })
-        .flat();
+        .flat(2);
 }
 
 /**
@@ -83,8 +79,8 @@ export async function searchContent(
  */
 export async function askQuestion(spaceId: string, query: string): Promise<AskAnswerResult | null> {
     const [{ answer }, pages] = await Promise.all([
-        askQueryInSpace(spaceId, query),
-        getRevisionPages({ spaceId }),
+        api.askQueryInSpace(spaceId, query),
+        api.getRevisionPages({ spaceId }),
     ]);
 
     if (!answer || !('document' in answer.answer)) {
@@ -134,6 +130,27 @@ export async function askQuestion(spaceId: string, query: string): Promise<AskAn
  * List suggested questions for a space.
  */
 export async function getRecommendedQuestions(spaceId: string): Promise<string[]> {
-    const data = await getRecommendedQuestionsInSpace(spaceId);
+    const data = await api.getRecommendedQuestionsInSpace(spaceId);
     return data.questions;
+}
+
+function transformPageResult(item: SearchPageResult, spaceTitle?: string) {
+    const sections =
+        item.sections?.map<ComputedSectionResult>((section) => ({
+            type: 'section',
+            id: item.id + '/' + section.id,
+            title: section.title,
+            href: absoluteHref(section.path),
+            body: section.body,
+        })) ?? [];
+
+    const page: ComputedPageResult = {
+        type: 'page',
+        id: item.id,
+        title: item.title,
+        href: absoluteHref(item.path),
+        spaceTitle,
+    };
+
+    return [page, ...sections];
 }
