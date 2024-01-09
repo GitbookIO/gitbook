@@ -64,6 +64,10 @@ export async function GET(request: NextRequest) {
 
     try {
         const response = await resizeImage(url, options);
+        if (!response.ok) {
+            throw new Error('Failed to resize image');
+        }
+
         return response;
     } catch (error) {
         // Redirect to the original image if resizing fails
