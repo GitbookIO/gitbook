@@ -1,4 +1,5 @@
 import { Collection, ContentVisibility, Space } from '@gitbook/api';
+import { headers } from 'next/headers';
 
 /**
  * Return true if a space should be indexed by search engines.
@@ -10,7 +11,9 @@ export function shouldIndexSpace({
     space: Space;
     collection: Collection | null;
 }) {
-    if (process.env.GITBOOK_BLOCK_SEARCH_INDEXATION) {
+    const headerSet = headers()
+
+    if (process.env.GITBOOK_BLOCK_SEARCH_INDEXATION && !headerSet.has('x-gitbook-search-indexation')) {
         return false;
     }
 
