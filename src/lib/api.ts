@@ -209,15 +209,17 @@ export const getRevisionPages = cache('api.getRevisionPages', async (pointer: Co
  * Get a revision page by its path
  */
 export const getRevisionPageByPath = cache(
-    'api.getRevisionPageByPath',
+    'api.getRevisionPageByPath.v2',
     async (pointer: ContentPointer, pagePath: string) => {
+        const encodedPath = encodeURIComponent(pagePath);
+
         try {
             const response = await (async () => {
                 if (pointer.revisionId) {
                     return api().spaces.getPageInRevisionByPath(
                         pointer.spaceId,
                         pointer.revisionId,
-                        pagePath,
+                        encodedPath,
                         {},
                         {
                             ...noCacheFetchOptions,
@@ -229,7 +231,7 @@ export const getRevisionPageByPath = cache(
                     return api().spaces.getPageInChangeRequestByPath(
                         spaceId,
                         pointer.changeRequestId,
-                        pagePath,
+                        encodedPath,
                         {},
                         {
                             ...noCacheFetchOptions,
@@ -239,7 +241,7 @@ export const getRevisionPageByPath = cache(
 
                 return api().spaces.getPageByPath(
                     pointer.spaceId,
-                    pagePath,
+                    encodedPath,
                     {},
                     {
                         ...noCacheFetchOptions,

@@ -90,7 +90,6 @@ async function resolvePage(
     }
 
     const pathParam = getPathnameParam(params);
-    console.log('pathParam', pathParam)
     const page = resolvePagePath(pages, pathParam);
     if (page) {
         return page;
@@ -121,6 +120,5 @@ async function fetchParentCollection(space: Space) {
  */
 export function getPathnameParam(params: PagePathParams): string {
     const { pathname } = params;
-    console.log(pathname);
     return pathname ? pathname.map(part => decodeURIComponent(part)).join('/') : '';
 }
