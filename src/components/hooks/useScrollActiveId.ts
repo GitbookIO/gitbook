@@ -52,9 +52,13 @@ export function useScrollActiveId(
         });
 
         ids.forEach((id) => {
-            const element = document.querySelector(`#${id}`);
-            if (element) {
-                observer.observe(element);
+            try {
+                const element = document.getElementById(id);
+                if (element) {
+                    observer.observe(element);
+                }
+            } catch (error) {
+                console.log(error);
             }
         });
 
