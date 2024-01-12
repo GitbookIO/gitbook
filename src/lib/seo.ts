@@ -11,9 +11,12 @@ export function shouldIndexSpace({
     space: Space;
     collection: Collection | null;
 }) {
-    const headerSet = headers()
+    const headerSet = headers();
 
-    if (process.env.GITBOOK_BLOCK_SEARCH_INDEXATION && !headerSet.has('x-gitbook-search-indexation')) {
+    if (
+        process.env.GITBOOK_BLOCK_SEARCH_INDEXATION &&
+        !headerSet.has('x-gitbook-search-indexation')
+    ) {
         return false;
     }
 

@@ -14,6 +14,7 @@ import {
     searchCollectionContent,
     searchSpaceContent,
 } from './server-actions';
+import { Loading } from '../primitives';
 
 export interface SearchResultsRef {
     moveUp(): void;
@@ -157,6 +158,14 @@ export const SearchResults = React.forwardRef(function SearchResults(
     );
 
     if (!results) {
+        if (query) {
+            return (
+                <div className={tcls('flex', 'items-center', 'justify-center', 'py-8')}>
+                    <Loading className={tcls('w-6', 'text-primary')} />
+                </div>
+            );
+        }
+
         return null;
     }
 
