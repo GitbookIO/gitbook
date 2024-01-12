@@ -56,6 +56,10 @@ const testCases: TestsCase[] = [
                 name: 'PDF',
                 url: '~gitbook/pdf?limit=10',
             },
+            {
+                name: 'Encoded URL',
+                url: 'scan-using-snyk/supported-languages-and-frameworks/c-c++'
+            }
         ],
     },
     {

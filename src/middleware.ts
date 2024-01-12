@@ -72,8 +72,6 @@ export async function middleware(request: NextRequest) {
 
     const inputURL = stripURLBasePath(url, originBasePath);
 
-    console.log('resolving', inputURL.toString());
-
     const resolved = await withAPI(
         new GitBookAPI({
             endpoint: apiEndpoint,
@@ -92,7 +90,8 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(resolved.redirect);
     }
 
-    const rewritePathname = `/${resolved.space}${normalizePathname(resolved.pathname)}`;
+    // Because of how Next will encode, we need to encode ourselves the pathname before reriting to it.
+    const rewritePathname = `/${resolved.space}${normalizePathname(encodePathname(resolved.pathname))}`;
 
     console.log(`${request.method} ${rewritePathname}`);
 
@@ -509,4 +508,8 @@ function stripURLSearch(url: URL): URL {
     const stripped = new URL(url.toString());
     stripped.search = '';
     return stripped;
+}
+
+function encodePathname(pathname: string): string {
+    return pathname.split('/').map(encodeURIComponent).join('/');
 }

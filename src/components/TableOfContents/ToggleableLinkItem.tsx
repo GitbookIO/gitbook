@@ -35,7 +35,8 @@ export function ToggleableLinkItem(props: {
 }) {
     const { href, children, descendants, pathname } = props;
 
-    const activeSegment = useSelectedLayoutSegment() ?? '';
+    const rawActiveSegment = useSelectedLayoutSegment() ?? '';
+    const activeSegment = decodeURIComponent(rawActiveSegment);
 
     const isActive = activeSegment === pathname;
     const hasDescendants = !!descendants;
@@ -50,6 +51,7 @@ export function ToggleableLinkItem(props: {
         if (!hasDescendants) {
             return;
         }
+
         setIsVisible((prev) => prev || hasActiveDescendant);
     }, [hasActiveDescendant, hasDescendants]);
 
