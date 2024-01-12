@@ -51,10 +51,6 @@ export function ToggleableLinkItem(props: {
             return;
         }
         setIsVisible((prev) => prev || hasActiveDescendant);
-
-        if (hasActiveDescendant) {
-            console.log('activeSegment', { isActive, activeSegment, pathname });
-        }
     }, [hasActiveDescendant, hasDescendants]);
 
     // Animate the visibility of the children
