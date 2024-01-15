@@ -41,6 +41,9 @@ export function cache<Args extends any[], Result>(
     options: {
         /** Filter the arguments that should be taken into consideration for cachine */
         extractArgs?: (args: Args) => any[];
+
+        /** Default ttl (in seconds) */
+        defaultTtl?: number;
     } = {},
 ): CacheFunction<Args, Result> {
     const revalidate = async (key: string, ...args: Args) => {
@@ -55,7 +58,7 @@ export function cache<Args extends any[], Result>(
             meta: {
                 cache: cacheName,
                 tags: result.tags ?? [],
-                expiresAt: Date.now() + (result.ttl ?? 60 * 60 * 24) * 1000,
+                expiresAt: Date.now() + (result.ttl ?? options.defaultTtl ?? 60 * 60 * 24) * 1000,
                 args,
                 hits: 1,
             },

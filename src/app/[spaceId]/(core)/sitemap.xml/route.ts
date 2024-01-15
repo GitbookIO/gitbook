@@ -5,7 +5,7 @@ import { NextRequest } from 'next/server';
 import { getRevisionPages } from '@/lib/api';
 import { pageHref } from '@/lib/links';
 
-import { SpaceParams } from '../../fetch';
+import { SpaceParams, getContentPointer } from '../../fetch';
 
 export const runtime = 'edge';
 
@@ -13,7 +13,7 @@ export const runtime = 'edge';
  * Generate a sitemap.xml for the current space.
  */
 export async function GET(req: NextRequest, { params }: { params: SpaceParams }) {
-    const rootPages = await getRevisionPages(params);
+    const rootPages = await getRevisionPages(getContentPointer(params));
     const pages = flattenPages(rootPages);
     const urls = pages.map(({ page, depth }) => {
         // Decay priority with depth

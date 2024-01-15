@@ -1,4 +1,5 @@
 import { ContentVisibility, RevisionPage, Space } from '@gitbook/api';
+import { headers } from 'next/headers';
 
 import {
     getCollectionSpaces,
@@ -10,7 +11,9 @@ import {
 } from '@/lib/api';
 import { resolvePagePath, resolvePageId } from '@/lib/pages';
 
-export type SpaceParams = ContentPointer;
+export interface SpaceParams {
+    spaceId: string;
+}
 
 export interface PagePathParams extends SpaceParams {
     pathname?: string[];
@@ -21,15 +24,24 @@ export interface PageIdParams extends SpaceParams {
 }
 
 /**
+ * Get the current content pointer from the params.
+ */
+export function getContentPointer(params: PagePathParams | PageIdParams) {
+    const headerSet = headers();
+    const content: ContentPointer = {
+        spaceId: params.spaceId,
+        revisionId: headerSet.get('x-gitbook-content-revision') ?? undefined,
+        changeRequestId: headerSet.get('x-gitbook-content-changerequest') ?? undefined,
+    };
+
+    return content;
+}
+
+/**
  * Fetch all the data needed to render the space layout.
  */
 export async function fetchSpaceData(params: PagePathParams | PageIdParams) {
-    const content: ContentPointer = {
-        spaceId: params.spaceId,
-        changeRequestId: params.changeRequestId,
-        revisionId: params.revisionId,
-    };
-
+    const content = getContentPointer(params);
     const { space, pages, customization, scripts } = await getSpaceContent(content);
     const collection = await fetchParentCollection(space);
 
@@ -49,12 +61,7 @@ export async function fetchSpaceData(params: PagePathParams | PageIdParams) {
  * Optimized to fetch in parallel as much as possible.
  */
 export async function fetchPageData(params: PagePathParams | PageIdParams) {
-    const content: ContentPointer = {
-        spaceId: params.spaceId,
-        changeRequestId: params.changeRequestId,
-        revisionId: params.revisionId,
-    };
-
+    const content = getContentPointer(params);
     const { space, pages, customization, scripts } = await getSpaceContent(content);
 
     const page = await resolvePage(pages, content, params);
@@ -120,5 +127,5 @@ async function fetchParentCollection(space: Space) {
  */
 export function getPathnameParam(params: PagePathParams): string {
     const { pathname } = params;
-    return pathname ? pathname.map(part => decodeURIComponent(part)).join('/') : '';
+    return pathname ? pathname.map((part) => decodeURIComponent(part)).join('/') : '';
 }

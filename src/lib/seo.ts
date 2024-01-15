@@ -20,10 +20,17 @@ export function shouldIndexSpace({
         return false;
     }
 
+    // Prevent indexation of preview of revisions / change-requests
+    if (
+        headerSet.get('x-gitbook-content-revision') ||
+        headerSet.get('x-gitbook-content-changerequest')
+    ) {
+        return false;
+    }
+
     if (space.visibility === ContentVisibility.InCollection) {
         return collection ? shouldIndexVisibility(collection.visibility) : false;
     }
-
     return shouldIndexVisibility(space.visibility);
 }
 

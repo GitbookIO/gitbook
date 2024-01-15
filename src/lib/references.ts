@@ -111,5 +111,13 @@ export async function resolveContentRef(
         };
     }
 
+    if (contentRef.kind === 'snippet') {
+        return {
+            href: gitbookAppHref(`/o/${contentRef.organization}/snippet/${contentRef.snippet}`),
+            text: 'snippet',
+            active: false,
+        };
+    }
+
     assertNever(contentRef);
 }

@@ -3,6 +3,7 @@ import { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import React from 'react';
 
+import { AdminToolbar } from '@/components/AdminToolbar';
 import { CookiesToast } from '@/components/Cookies';
 import { SpaceLayout } from '@/components/SpaceLayout';
 import { getContentSecurityPolicyNonce } from '@/lib/csp';
@@ -56,6 +57,10 @@ export default async function ContentLayout(props: {
                 <React.Suspense fallback={null}>
                     <CookiesToast privacyPolicy={customization.privacyPolicy.url} />
                 </React.Suspense>
+            ) : null}
+
+            {content.revisionId || content.changeRequestId ? (
+                <AdminToolbar content={content} />
             ) : null}
         </>
     );

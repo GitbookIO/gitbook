@@ -12,6 +12,8 @@ import {
 } from '@/lib/api';
 import { createContentSecurityPolicyNonce, getContentSecurityPolicy } from '@/lib/csp';
 
+import { getURLLookupAlternatives } from './lib/middleware';
+
 export const config = {
     matcher: '/((?!_next/static|_next/image|~gitbook/revalidate|~gitbook/image).*)',
     skipTrailingSlashRedirect: true,
@@ -91,7 +93,9 @@ export async function middleware(request: NextRequest) {
     }
 
     // Because of how Next will encode, we need to encode ourselves the pathname before reriting to it.
-    const rewritePathname = `/${resolved.space}${normalizePathname(encodePathname(resolved.pathname))}`;
+    const rewritePathname = `/${resolved.space}${normalizePathname(
+        encodePathname(resolved.pathname),
+    )}`;
 
     console.log(`${request.method} ${rewritePathname}`);
 
@@ -122,6 +126,13 @@ export async function middleware(request: NextRequest) {
     headers.set('x-gitbook-token', resolved.apiToken);
     headers.set('x-gitbook-origin-basepath', originBasePath);
     headers.set('x-gitbook-basepath', joinPath(originBasePath, resolved.basePath));
+    if (resolved.revision) {
+        headers.set('x-gitbook-content-revision', resolved.revision);
+    }
+    if (resolved.changeRequest) {
+        headers.set('x-gitbook-content-changerequest', resolved.changeRequest);
+    }
+
     if (apiEndpoint) {
         headers.set('x-gitbook-api', apiEndpoint);
     }
@@ -358,7 +369,7 @@ async function lookupSpaceByAPI(
     url: URL,
     visitorAuthToken: string | undefined,
 ): Promise<LookupResult | null> {
-    const lookupAlternatives = computeLookupAlternatives(stripURLSearch(url));
+    const lookupAlternatives = getURLLookupAlternatives(stripURLSearch(url));
 
     console.log(
         `lookup content for url "${url.toString()}", with ${
@@ -387,6 +398,8 @@ async function lookupSpaceByAPI(
                 abort.abort();
                 return {
                     space: data.space,
+                    changeRequest: data.changeRequest,
+                    revision: data.revision,
                     basePath: data.basePath,
                     pathname: joinPath(data.pathname, alternative.extraPath),
                     apiToken: data.apiToken,
@@ -405,68 +418,6 @@ async function lookupSpaceByAPI(
 
     console.log(`lookup took ${Date.now() - startTime}ms`);
     return matches.find((match) => match !== null) ?? null;
-}
-
-function computeLookupAlternatives(url: URL) {
-    const alternatives: Array<{ url: string; extraPath: string }> = [];
-
-    const pushAlternative = (url: URL, extraPath: string) => {
-        const existing = alternatives.find((alt) => alt.url === url.toString());
-        if (existing) {
-            if (existing.extraPath !== extraPath) {
-                throw new Error(
-                    `Invalid extraPath ${extraPath} for url ${url.toString()}, already set to ${
-                        existing.extraPath
-                    }`,
-                );
-            }
-            return;
-        }
-
-        alternatives.push({
-            url: url.toString(),
-            extraPath,
-        });
-    };
-
-    // Match only with the host, if it can be a custom hostname
-    // It should cover most cases of custom domains, and with caching, it should be fast.
-    if (!url.hostname.includes('.gitbook.io')) {
-        const noPathURL = new URL(url);
-        noPathURL.pathname = '/';
-
-        pushAlternative(noPathURL, url.pathname.slice(1));
-    }
-
-    const pathSegments = url.pathname.slice(1).split('/');
-
-    // URL looks like a collection url (with /v/ in the path)
-    // We only start matching after the /v/ segment and we ignore everything before it
-    // to avoid potentially matching as a page not found under the default space in the collection
-    if (pathSegments.includes('v')) {
-        const collectionURL = new URL(url);
-        const vIndex = pathSegments.indexOf('v');
-        collectionURL.pathname = pathSegments.slice(0, vIndex + 2).join('/');
-
-        pushAlternative(collectionURL, pathSegments.slice(vIndex + 2).join('/'));
-    }
-
-    // Otherwise match with only the first segment of the path
-    // as it could potentially a space in an organization or collection domain
-    // or a space using a share link secret
-    else if (pathSegments.length > 0) {
-        const shortURL = new URL(url);
-        shortURL.pathname = pathSegments[0];
-
-        pushAlternative(shortURL, pathSegments.slice(1).join('/'));
-    }
-
-    // Always try with the full URL
-    if (!alternatives.some((alt) => alt.url === url.toString())) {
-        pushAlternative(url, '');
-    }
-
-    return alternatives;
 }
 
 function joinPath(...parts: string[]): string {

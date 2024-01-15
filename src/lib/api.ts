@@ -157,6 +157,25 @@ export const getSpace = cache('api.getSpace', async (spaceId: string) => {
 });
 
 /**
+ * Get a change request by its ID.
+ */
+export const getChangeRequest = cache(
+    'api.getChangeRequest',
+    async (spaceId: string, changeRequestId: string) => {
+        const response = await api().spaces.getChangeRequestById(spaceId, changeRequestId, {
+            ...noCacheFetchOptions,
+        });
+        return cacheResponse(response, {
+            tags: [],
+        });
+    },
+    {
+        // We don't cache for long s we currently don't invalidate change-request cache
+        defaultTtl: 60 * 60,
+    },
+);
+
+/**
  * List the scripts to load for the space.
  */
 export const getSpaceIntegrationScripts = cache(
@@ -175,6 +194,22 @@ export const getSpaceIntegrationScripts = cache(
 );
 
 /**
+ * Get a revision by its ID.
+ */
+export const getRevision = cache('api.getRevision', async (spaceId: string, revisionId: string) => {
+    const response = await api().spaces.getRevisionById(spaceId, revisionId, {
+        ...noCacheFetchOptions,
+    });
+
+    return cacheResponse(response, {
+        data: response.data,
+        tags: [
+            // Revision are immutable so we don't cache
+        ],
+    });
+});
+
+/**
  * Get all the pages in the space.
  */
 export const getRevisionPages = cache('api.getRevisionPages', async (pointer: ContentPointer) => {
@@ -186,7 +221,7 @@ export const getRevisionPages = cache('api.getRevisionPages', async (pointer: Co
         }
 
         if (pointer.changeRequestId) {
-            return api().spaces.listPagesInChangeRequest(spaceId, pointer.changeRequestId, {
+            return api().spaces.listPagesInChangeRequest(pointer.spaceId, pointer.changeRequestId, {
                 ...noCacheFetchOptions,
             });
         }

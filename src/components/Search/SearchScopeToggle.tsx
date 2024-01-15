@@ -18,7 +18,7 @@ export function SearchScopeToggle(props: { spaceTitle: string }) {
 
     return (
         <div
-            aria-role="toolbar"
+            role="toolbar"
             aria-orientation="horizontal"
             className={tcls('flex', 'flex-row', 'gap-3', 'py-3', 'px-4', 'pt-0')}
         >
@@ -53,6 +53,8 @@ function ToggleButton(props: { onClick: () => void; children: React.ReactNode; a
 
     return (
         <button
+            role="tab"
+            type="button"
             aria-selected={active}
             onClick={onClick}
             className={tcls(

@@ -77,7 +77,7 @@ export function ToggleableLinkItem(props: {
         else {
             animate('& > ul > li', { opacity: 0 });
         }
-    }, [isVisible, hasDescendants]);
+    }, [isVisible, hasDescendants, animate, scope]);
 
     // Track if the component is mounted.
     const mountedRef = React.useRef(false);
