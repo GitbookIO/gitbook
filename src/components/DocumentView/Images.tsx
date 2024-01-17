@@ -66,8 +66,20 @@ async function ImageBlock(props: {
         return null;
     }
 
-    const imageBorder =
-        'relative overflow-hidden rounded after:block after:absolute after:-inset-[0] after:border-dark/2 after:border after:rounded dark:after:border-light/1 dark:after:mix-blend-plus-lighter';
+    const imageBorder = tcls(
+        'relative',
+        'overflow-hidden',
+        'rounded',
+        'after:block',
+        'after:absolute',
+        'after:-inset-[0]',
+        'after:border-dark/2',
+        'after:border',
+        'after:rounded',
+        'dark:after:border-light/1',
+        'dark:after:mix-blend-plus-lighter',
+        'after:pointer-events-none',
+    );
 
     const caption = getNodeFragmentByName(block, 'caption');
     const captionParagraph = caption?.nodes[0];
