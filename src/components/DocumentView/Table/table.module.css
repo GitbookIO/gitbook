@@ -1,3 +1,8 @@
+/* Hide it on browsers (firefox / safari) that do not support it */
+.progressOpacitySharp {
+    display: none;
+}
+
 @supports (animation-timeline: scroll()) {
     .progressContainer {
         scroll-timeline-name: --squareTimeline;
@@ -13,6 +18,7 @@
     }
 
     .progressOpacitySharp {
+        display: grid;
         opacity: 0;
         animation-name: opacityProgressSharp;
         animation-duration: 1ms;
