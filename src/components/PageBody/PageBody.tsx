@@ -1,6 +1,8 @@
 import { CustomizationSettings, JSONDocument, RevisionPageDocument, Space } from '@gitbook/api';
 import React from 'react';
 
+import { getSpaceLanguage } from '@/intl/server';
+import { t } from '@/intl/translate';
 import { api } from '@/lib/api';
 import { hasFullWidthBlock, isNodeEmpty } from '@/lib/document';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
@@ -14,6 +16,7 @@ import { TogglePageFullWidth } from './TogglePageFullWidth';
 import { TrackPageView } from './TrackPageView';
 import { DocumentView } from '../DocumentView';
 import { PageFeedbackForm } from '../PageFeedback';
+import { DateRelative } from '../primitives';
 
 export function PageBody(props: {
     space: Space;
@@ -37,6 +40,7 @@ export function PageBody(props: {
     } = props;
 
     const asFullWidth = document ? hasFullWidthBlock(document) : false;
+    const language = getSpaceLanguage(customization);
 
     return (
         <>
@@ -78,20 +82,33 @@ export function PageBody(props: {
                     />
                 ) : null}
 
-                {withPageFeedback ? (
-                    <div
-                        className={tcls(
-                            'flex',
-                            'flex-row',
-                            'justify-end',
-                            'mt-6',
-                            'max-w-3xl',
-                            'mx-auto',
+                <div
+                    className={tcls(
+                        'flex',
+                        'flex-row',
+                        'items-center',
+                        'mt-6',
+                        'max-w-3xl',
+                        'mx-auto',
+                    )}
+                >
+                    <p className={tcls('flex-1', 'text-sm', 'text-dark/6', 'dark:text-light/5')}>
+                        {t(
+                            language,
+                            'page_last_modified',
+                            <DateRelative
+                                value={page.updatedAt ?? page.createdAt ?? new Date().toISOString()}
+                            />,
                         )}
-                    >
-                        <PageFeedbackForm spaceId={space.id} pageId={page.id} />
-                    </div>
-                ) : null}
+                    </p>
+                    {withPageFeedback ? (
+                        <PageFeedbackForm
+                            orientation="horizontal"
+                            spaceId={space.id}
+                            pageId={page.id}
+                        />
+                    ) : null}
+                </div>
             </main>
             <React.Suspense fallback={null}>
                 <TrackPageView spaceId={space.id} pageId={page.id} apiHost={api().endpoint} />

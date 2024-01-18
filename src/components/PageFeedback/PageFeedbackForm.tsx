@@ -13,8 +13,13 @@ import { postPageFeedback } from './server-actions';
 /**
  * Form to submit feedback on a page.
  */
-export function PageFeedbackForm(props: { spaceId: string; pageId: string }) {
-    const { spaceId, pageId } = props;
+export function PageFeedbackForm(props: {
+    orientation?: 'horizontal' | 'vertical';
+    spaceId: string;
+    pageId: string;
+    className?: string;
+}) {
+    const { orientation = 'vertical', spaceId, pageId, className } = props;
     const languages = useLanguage();
     const [submitted, setSubmitted] = React.useState(false);
 
@@ -25,7 +30,16 @@ export function PageFeedbackForm(props: { spaceId: string; pageId: string }) {
     };
 
     return (
-        <div className={tcls('mt-2')}>
+        <div
+            className={tcls(
+                'flex',
+                orientation === 'vertical'
+                    ? ['flex-col', 'items-start']
+                    : ['flex-row', 'items-center'],
+                'gap-2',
+                className,
+            )}
+        >
             <p className={tcls('text-sm', 'text-dark/6', 'dark:text-light/5')}>
                 {t(languages, 'was_this_helpful')}
             </p>
@@ -34,7 +48,6 @@ export function PageFeedbackForm(props: { spaceId: string; pageId: string }) {
                     'inline-flex',
                     'items-center',
                     'justify-center',
-                    'mt-2',
                     'flex-row',
                     'rounded-full',
                     'ring-1',

@@ -4,3 +4,4 @@ export * from './Loading';
 export * from './Card';
 export * from './Skeleton';
 export * from './Link';
+export * from './DateRelative';

@@ -1,4 +1,5 @@
 {
+    "locale": "en",
     "powered_by_gitbook": "Powered by GitBook",
     "switch_to_dark_theme": "Switch to dark theme",
     "switch_to_light_theme": "Switch to light theme",
@@ -15,6 +16,7 @@
     "on_this_page": "On this page",
     "next_page": "Next",
     "previous_page": "Previous",
+    "page_last_modified": "Last updated ${1}",
     "was_this_helpful": "Was this helpful?",
     "was_this_helpful_positive": "Yes, it was!",
     "was_this_helpful_neutral": "Not sure",

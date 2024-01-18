@@ -70,7 +70,11 @@ export async function PageAside(props: {
                 ) : null}
                 {withPageFeedback ? (
                     <React.Suspense fallback={null}>
-                        <PageFeedbackForm spaceId={space.id} pageId={page.id} />
+                        <PageFeedbackForm
+                            spaceId={space.id}
+                            pageId={page.id}
+                            className={tcls('mt-2')}
+                        />
                     </React.Suspense>
                 ) : null}
                 <div>
