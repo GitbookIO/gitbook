@@ -5,9 +5,7 @@ import {
     ContentVisibility,
     GitBookAPI,
     GitBookAPIError,
-    JSONDocument,
     PublishedContentLookup,
-    SearchAIAnswer,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 import { headers } from 'next/headers';
@@ -44,6 +42,7 @@ export function api(): GitBookAPI {
     const gitbook = new GitBookAPI({
         authToken: apiToken,
         endpoint: apiEndpoint,
+        userAgent: userAgent(),
     });
 
     return gitbook;
@@ -570,4 +569,20 @@ export function getAPICacheTag(
         default:
             assertNever(spec);
     }
+}
+
+/**
+ * Return the user agent to use for API requests.
+ */
+export function userAgent(): string {
+    if (process.env.GITBOOK_USER_AGENT) {
+        return process.env.GITBOOK_USER_AGENT;
+    }
+
+    let result = `GitBook-Open/${process.env.BUILD_ID}`;
+    if (process.env.GITBOOK_USER_AGENT_COMMENT) {
+        result += ` (${process.env.GITBOOK_USER_AGENT_COMMENT})`;
+    }
+
+    return result;
 }

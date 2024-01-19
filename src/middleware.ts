@@ -8,6 +8,7 @@ import {
     getPublishedContentByUrl,
     getSpace,
     getSpaceContent,
+    userAgent,
     withAPI,
 } from '@/lib/api';
 import { createContentSecurityPolicyNonce, getContentSecurityPolicy } from '@/lib/csp';
@@ -78,6 +79,7 @@ export async function middleware(request: NextRequest) {
         new GitBookAPI({
             endpoint: apiEndpoint,
             authToken: process.env.GITBOOK_TOKEN,
+            userAgent: userAgent(),
         }),
         () => lookupSpaceForURL(mode, inputURL, visitorAuthToken),
     );
@@ -107,6 +109,7 @@ export async function middleware(request: NextRequest) {
         new GitBookAPI({
             endpoint: apiEndpoint,
             authToken: resolved.apiToken,
+            userAgent: userAgent(),
         }),
         async () => {
             const content = await getSpaceContent({
@@ -294,6 +297,7 @@ async function lookupSpaceInMultiIdMode(url: URL): Promise<LookupResult | null> 
         new GitBookAPI({
             endpoint: apiEndpoint,
             authToken: apiToken,
+            userAgent: userAgent(),
         }),
         () => getSpace.revalidate(spaceId),
     );
