@@ -5,7 +5,7 @@ const nextConfig = {
         ignoreBuildErrors: true,
     },
     env: {
-        BUILD_ID: (process.env.GITHUB_SHA ?? '').slice(0, 7),
+        BUILD_VERSION: (process.env.GITHUB_SHA ?? '').slice(0, 7),
     },
 };
 

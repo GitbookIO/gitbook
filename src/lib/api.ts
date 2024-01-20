@@ -10,6 +10,7 @@ import {
 import assertNever from 'assert-never';
 import { headers } from 'next/headers';
 
+import { buildVersion } from './build';
 import { cache, cacheResponse, noCacheFetchOptions, parseCacheResponse } from './cache';
 
 export interface ContentPointer {
@@ -579,7 +580,7 @@ export function userAgent(): string {
         return process.env.GITBOOK_USER_AGENT;
     }
 
-    let result = `GitBook-Open/${process.env.BUILD_ID}`;
+    let result = `GitBook-Open/${buildVersion()}`;
     if (process.env.GITBOOK_USER_AGENT_COMMENT) {
         result += ` (${process.env.GITBOOK_USER_AGENT_COMMENT})`;
     }

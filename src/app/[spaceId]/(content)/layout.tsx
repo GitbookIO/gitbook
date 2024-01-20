@@ -6,6 +6,7 @@ import React from 'react';
 import { AdminToolbar } from '@/components/AdminToolbar';
 import { CookiesToast } from '@/components/Cookies';
 import { SpaceLayout } from '@/components/SpaceLayout';
+import { buildVersion } from '@/lib/build';
 import { getContentSecurityPolicyNonce } from '@/lib/csp';
 import { absoluteHref, baseUrl } from '@/lib/links';
 import { shouldIndexSpace } from '@/lib/seo';
@@ -83,7 +84,7 @@ export async function generateMetadata({ params }: { params: SpaceParams }): Pro
 
     return {
         title: `${space.title}`,
-        generator: 'GitBook',
+        generator: `GitBook (${buildVersion()})`,
         // We pass `metadataBase` to avoid warnings from Next, but we still use absolute URLs
         // as metadataBase doesn't seem to work well on next-on-cloudflare.
         metadataBase: new URL(baseUrl()),

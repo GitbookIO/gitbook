@@ -13,6 +13,7 @@ import {
 } from '@/lib/api';
 import { createContentSecurityPolicyNonce, getContentSecurityPolicy } from '@/lib/csp';
 
+import { buildVersion } from './lib/build';
 import { getURLLookupAlternatives } from './lib/middleware';
 
 export const config = {
@@ -84,8 +85,11 @@ export async function middleware(request: NextRequest) {
         () => lookupSpaceForURL(mode, inputURL, visitorAuthToken),
     );
     if (!resolved) {
-        return new NextResponse(`Not found`, {
+        return new NextResponse(`Content not found`, {
             status: 404,
+            headers: {
+                'x-gitbook-version': buildVersion(),
+            },
         });
     }
 
@@ -148,6 +152,8 @@ export async function middleware(request: NextRequest) {
             headers,
         },
     });
+
+    response.headers.set('x-gitbook-version', buildVersion());
 
     // Add Content Security Policy header
     response.headers.set('content-security-policy', csp);
