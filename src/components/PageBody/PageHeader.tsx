@@ -1,5 +1,6 @@
 import { RevisionPageDocument } from '@gitbook/api';
 
+import { Emoji } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
 
 export function PageHeader(props: { page: RevisionPageDocument }) {
@@ -12,7 +13,10 @@ export function PageHeader(props: { page: RevisionPageDocument }) {
     return (
         <header className={tcls('max-w-3xl', 'mx-auto', 'mb-6', 'space-y-3')}>
             {page.layout.title ? (
-                <h1 className={tcls('text-4xl', 'font-bold')}>{page.title}</h1>
+                <h1 className={tcls('text-4xl', 'font-bold')}>
+                    {page.emoji ? <Emoji code={page.emoji} style={['mr-3']} /> : null}
+                    {page.title}
+                </h1>
             ) : null}
             {page.description && page.layout.description ? (
                 <p className={tcls('text-lg', 'text-dark-5', 'dark:text-light-5')}>

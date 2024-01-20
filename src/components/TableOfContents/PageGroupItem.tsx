@@ -1,5 +1,6 @@
 import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 
+import { Emoji } from '@/components/primitives';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
@@ -36,6 +37,7 @@ export function PageGroupItem(props: {
                     'dark:to-transparent',
                 )}
             >
+                {page.emoji ? <Emoji code={page.emoji} style={['mr-3']} /> : null}
                 {page.title}
             </div>
             {page.pages && page.pages.length ? (

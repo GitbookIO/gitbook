@@ -1,5 +1,6 @@
 import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 
+import { Emoji } from '@/components/primitives';
 import { pageHref } from '@/lib/links';
 import { getPagePath } from '@/lib/pages';
 import { ContentRefContext } from '@/lib/references';
@@ -39,7 +40,14 @@ export function PageDocumentItem(props: {
                     ) : null
                 }
             >
-                {page.title}
+                {page.emoji ? (
+                    <span className={tcls('flex', 'gap-3', 'flex-row')}>
+                        <Emoji code={page.emoji} />
+                        {page.title}
+                    </span>
+                ) : (
+                    page.title
+                )}
             </ToggleableLinkItem>
         </li>
     );

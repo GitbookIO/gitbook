@@ -2,6 +2,7 @@ import IconExternal from '@geist-ui/icons/externalLink';
 import { RevisionPageLink } from '@gitbook/api';
 import Link from 'next/link';
 
+import { Emoji } from '@/components/primitives';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
@@ -35,6 +36,7 @@ export async function PageLinkItem(props: { page: RevisionPageLink; context: Con
                     'dark:hover:bg-light/2',
                 )}
             >
+                {page.emoji ? <Emoji code={page.emoji} /> : null}
                 {page.title}
                 <IconExternal
                     className={tcls(
