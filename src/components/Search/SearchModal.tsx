@@ -134,13 +134,13 @@ function SearchModalBody(
 
     const language = useLanguage();
     const resultsRef = React.useRef<SearchResultsRef>(null);
-    const inputRef = React.useRef<HTMLTextAreaElement>(null);
+    const inputRef = React.useRef<HTMLInputElement>(null);
 
     React.useEffect(() => {
         inputRef.current?.focus();
     }, []);
 
-    const onKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Escape') {
             onClose();
         } else if (event.key === 'ArrowUp') {
@@ -155,7 +155,7 @@ function SearchModalBody(
         }
     };
 
-    const onChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         onChangeQuery({
             ask: false, // When typing, we go back to the default search mode
             query: event.target.value,
@@ -195,7 +195,7 @@ function SearchModalBody(
                     <IconSearch className={tcls('w-6', 'h-6')} />
                 </div>
                 <div className={tcls('flex-1')}>
-                    <textarea
+                    <input
                         ref={inputRef}
                         value={state.query}
                         onKeyDown={onKeyDown}
@@ -216,7 +216,6 @@ function SearchModalBody(
                             'dark:placeholder:text-light/7',
                         )}
                         placeholder={tString(language, 'search_input_placeholder')}
-                        rows={1}
                         spellCheck="false"
                         autoComplete="off"
                         autoCorrect="off"
