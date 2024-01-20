@@ -5,6 +5,7 @@ import { tcls } from '@/lib/tailwind';
 import { RecordRow } from './RecordRow';
 import { TableViewProps } from './Table';
 import styles from './table.module.css';
+import { getColumnAlignment } from './utils';
 
 export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
     const { block, view, records, style } = props;
@@ -144,6 +145,7 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                         <tr className={tcls(tableTR)}>
                             {view.columns.map((column) => {
                                 const columnWidth = view.columnWidths?.[column];
+                                const alignment = getColumnAlignment(block.data.definition[column]);
 
                                 return (
                                     <th
@@ -159,6 +161,8 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                                             'lg:text-base',
                                             'dark:border-l-light/2',
                                             'dark:border-b-light/4',
+                                            alignment === 'right' ? 'text-right' : null,
+                                            alignment === 'center' ? 'text-center' : null,
                                         )}
                                         style={columnWidth ? { width: columnWidth } : undefined}
                                     >

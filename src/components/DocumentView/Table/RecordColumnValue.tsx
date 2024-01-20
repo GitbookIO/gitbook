@@ -8,6 +8,7 @@ import { tcls } from '@/lib/tailwind';
 import { filterOutNullable } from '@/lib/typescript';
 
 import { TableRecordKV } from './Table';
+import { getColumnAlignment } from './utils';
 import { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 
@@ -91,13 +92,22 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                 return <Tag className={tcls(['w-full'])}>{''}</Tag>;
             }
 
+            const alignment = getColumnAlignment(definition);
+
             return (
                 <Blocks
                     tag={Tag}
                     document={document}
                     ancestorBlocks={[]}
                     nodes={fragment.nodes}
-                    style={['w-full', 'space-y-2', 'lg:space-y-3', 'leading-normal']}
+                    style={[
+                        'w-full',
+                        'space-y-2',
+                        'lg:space-y-3',
+                        'leading-normal',
+                        alignment === 'right' ? 'text-right' : null,
+                        alignment === 'center' ? 'text-center' : null,
+                    ]}
                     context={context}
                     blockStyle={['w-full', 'max-w-[unset]']}
                 />
