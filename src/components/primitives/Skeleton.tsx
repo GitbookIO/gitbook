@@ -9,7 +9,7 @@ import { LoadingPane } from './LoadingPane';
 export function SkeletonParagraph(props: { style?: ClassValue }) {
     const { style } = props;
     return (
-        <div role="status" className="skeleton-paragraph">
+        <div role="status" aria-busy className="skeleton-paragraph">
             <LoadingPane
                 style={[
                     'rounded-md',
@@ -28,7 +28,7 @@ export function SkeletonParagraph(props: { style?: ClassValue }) {
 export function SkeletonHeading(props: { style?: ClassValue }) {
     const { style } = props;
     return (
-        <div role="status" className="skeleton-heading">
+        <div role="status" aria-busy className="skeleton-heading">
             <LoadingPane
                 tile={12}
                 style={['rounded-md', 'h-[47px]', '[max-width:calc(48rem-1px)]', style]}
@@ -43,7 +43,7 @@ export function SkeletonHeading(props: { style?: ClassValue }) {
 export function SkeletonImage(props: { style?: ClassValue }) {
     const { style } = props;
     return (
-        <div role="status" className="skeleton-image">
+        <div role="status" aria-busy className="skeleton-image">
             <LoadingPane
                 tile={96}
                 style={[
@@ -64,7 +64,7 @@ export function SkeletonImage(props: { style?: ClassValue }) {
 export function SkeletonCard(props: { style?: ClassValue }) {
     const { style } = props;
     return (
-        <div role="status" className={tcls('skeleton-card', 'flex', 'gap-[25px]', style)}>
+        <div role="status" aria-busy className={tcls('skeleton-card', 'flex', 'gap-[25px]', style)}>
             <LoadingPane tile={24} style={['rounded-md', 'aspect-[1/1.2]', 'w-full']} />
             <LoadingPane tile={24} style={['rounded-md', 'aspect-[1/1.2]', 'w-full']} />
             <LoadingPane tile={24} style={['rounded-md', 'aspect-[1/1.2]', 'w-full']} />
@@ -78,7 +78,7 @@ export function SkeletonCard(props: { style?: ClassValue }) {
 export function SkeletonSmall(props: { style?: ClassValue }) {
     const { style } = props;
     return (
-        <div role="status" className="skeleton-small">
+        <div role="status" aria-busy className="skeleton-small">
             <LoadingPane
                 tile={12}
                 style={['rounded-md', 'h-[35px]', '[max-width:calc(48rem-1px)]', style]}

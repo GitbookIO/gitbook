@@ -10,6 +10,7 @@ export const Loading = (props: Partial<SVGProps<SVGSVGElement>>) => {
             preserveAspectRatio="xMaxYMid meet"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
+            aria-busy
             {...props}
         >
             <path
