@@ -64,6 +64,7 @@ export function HeaderLogo(props: HeaderLogoProps) {
                             'rounded',
                             'overflow-hidden',
                             'object-contain',
+                            'object-left',
                         )}
                     />
                 ) : (
