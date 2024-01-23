@@ -79,17 +79,21 @@ async function serializeKey(key: string): Promise<string> {
 function serializeEntry(entry: CacheEntry): WorkerResponse {
     const headers = new Headers();
     headers.set('Content-Type', 'application/json');
+    const cacheTags = ['gitbook-open', ...entry.meta.tags];
 
     // Limit the cloudflare cache to 5 minutes
     headers.set(
         'Cache-Control',
         `public, max-age=${Math.min((entry.meta.expiresAt - Date.now()) / 1000, 5 * 60)}`,
     );
-    headers.set('Cache-Tag', ['gitbook-open', ...entry.meta.tags].join(','));
+    headers.set('Cache-Tag', cacheTags.join(','));
 
     // @ts-ignore
     return new Response(JSON.stringify(entry), {
         headers,
+        cf: {
+            cacheTags,
+        },
     });
 }
 

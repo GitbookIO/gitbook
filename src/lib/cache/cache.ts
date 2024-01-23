@@ -2,7 +2,7 @@ import hash from 'object-hash';
 
 import { cacheBackends } from './backends';
 import { CacheEntry } from './types';
-import { waitUntil } from './waitUntil';
+import { getGlobalContext, waitUntil } from './waitUntil';
 
 export type CacheFunction<Args extends any[], Result> = ((...args: Args) => Promise<Result>) & {
     /**
@@ -106,11 +106,20 @@ export function cache<Args extends any[], Result>(
     // During development, for now it fetches data twice between the middleware and the handler.
     // TODO: find a way to share the cache between the two.
 
-    const pendings = new Map<string, Promise<any>>();
+    // On Cloudflare Workers, we can't share promises between requests:
+    // > Cannot perform I/O on behalf of a different request. I/O objects (such as streams, request/response bodies, and others)
+    // > created in the context of one request handler cannot be accessed from a different request's handler.
+    //
+    // To avoid this limitation and still avoid concurrent requests, we use a WeakMap to store the pending requests.
+    const contextPendings = new WeakMap<object, Map<string, Promise<any>>>();
 
     const cacheFn = async (...args: Args) => {
         const cacheArgs = options.extractArgs ? options.extractArgs(args) : args;
         const key = getCacheKey(cacheName, cacheArgs);
+
+        const context = getGlobalContext();
+        const pendings = contextPendings.get(context) ?? new Map<string, Promise<any>>();
+        contextPendings.set(context, pendings);
 
         // If a pending request exists, wait for it
         if (pendings.has(key)) {
