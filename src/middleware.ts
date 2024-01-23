@@ -1,4 +1,5 @@
 import { GitBookAPI } from '@gitbook/api';
+import * as Sentry from '@sentry/nextjs';
 import assertNever from 'assert-never';
 import { NextResponse, NextRequest } from 'next/server';
 
@@ -17,7 +18,8 @@ import { buildVersion } from './lib/build';
 import { getURLLookupAlternatives } from './lib/middleware';
 
 export const config = {
-    matcher: '/((?!_next/static|_next/image|~gitbook/revalidate|~gitbook/image).*)',
+    matcher:
+        '/((?!_next/static|_next/image|~gitbook/revalidate|~gitbook/image|~gitbook/monitoring).*)',
     skipTrailingSlashRedirect: true,
 };
 
@@ -63,6 +65,13 @@ export type LookupResult = PublishedContentWithCache & {
 export async function middleware(request: NextRequest) {
     const { url, mode } = getInputURL(request);
 
+    Sentry.setTag('url', request.url);
+    Sentry.setContext('request', {
+        method: request.method,
+        url: request.url,
+        userAgent: userAgent(),
+    });
+
     // The visitor authentication can either be passed as a query parameter
     // or can be stored in a cookie after the initial auth.
     const visitorAuthToken =
@@ -97,6 +106,13 @@ export async function middleware(request: NextRequest) {
         console.log(`redirecting (${resolved.target}) to ${resolved.redirect}`);
         return NextResponse.redirect(resolved.redirect);
     }
+
+    Sentry.setTag('space', resolved.space);
+    Sentry.setContext('content', {
+        space: resolved.space,
+        changeRequest: resolved.changeRequest,
+        revision: resolved.revision,
+    });
 
     // Because of how Next will encode, we need to encode ourselves the pathname before reriting to it.
     const rewritePathname = `/${resolved.space}${normalizePathname(

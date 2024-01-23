@@ -19,6 +19,7 @@
         "@radix-ui/react-checkbox": "^1.0.4",
         "@radix-ui/react-popover": "^1.0.7",
         "@readme/openapi-parser": "^2.5.0",
+        "@sentry/nextjs": "^7.94.1",
         "@tailwindcss/container-queries": "^0.1.1",
         "@upstash/redis": "^1.27.1",
         "ajv": "^8.12.0",

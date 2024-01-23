@@ -36,3 +36,6 @@ next-env.d.ts
 
 # visual tests
 screenshots/
+
+# Sentry Config File
+.sentryclirc

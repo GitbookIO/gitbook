@@ -1,5 +1,6 @@
 'use client';
 
+import * as Sentry from '@sentry/nextjs';
 import React from 'react';
 
 import { Button } from '@/components/primitives/Button';
@@ -12,6 +13,15 @@ export default function ErrorPage(props: {
 }) {
     const { error, reset } = props;
     const language = useLanguage();
+
+    const isNotFound = error.message === 'NEXT_NOT_FOUND';
+
+    React.useEffect(() => {
+        // Log the error to Sentry
+        if (!isNotFound) {
+            Sentry.captureException(error);
+        }
+    }, [error, isNotFound]);
 
     return (
         <div
@@ -27,23 +37,15 @@ export default function ErrorPage(props: {
         >
             <div>
                 <h2 className={tcls('text-2xl', 'font-semibold', 'mb-2')}>
-                    {t(
-                        language,
-                        error.message === 'NEXT_NOT_FOUND'
-                            ? 'notfound_title'
-                            : 'unexpected_error_title',
-                    )}
+                    {t(language, isNotFound ? 'notfound_title' : 'unexpected_error_title')}
                 </h2>
                 <p className={tcls('text-base', 'mb-4')}>
-                    {t(
-                        language,
-                        error.message === 'NEXT_NOT_FOUND' ? 'notfound' : 'unexpected_error',
-                    )}
+                    {t(language, isNotFound ? 'notfound' : 'unexpected_error')}
                 </p>
                 <div>
                     <Button
                         onClick={() => {
-                            if (error.message === 'NEXT_NOT_FOUND') {
+                            if (isNotFound) {
                                 window.location.href = '/';
                             } else {
                                 reset();
@@ -52,12 +54,7 @@ export default function ErrorPage(props: {
                         variant="secondary"
                         size="small"
                     >
-                        {t(
-                            language,
-                            error.message === 'NEXT_NOT_FOUND'
-                                ? 'notfound_go_home'
-                                : 'unexpected_error_retry',
-                        )}
+                        {t(language, isNotFound ? 'notfound_go_home' : 'unexpected_error_retry')}
                     </Button>
                 </div>
             </div>
