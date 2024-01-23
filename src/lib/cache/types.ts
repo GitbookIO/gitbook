@@ -49,8 +49,16 @@ export interface CacheBackend {
     set(key: string, entry: CacheEntry): Promise<void>;
 
     /**
+     * Delete a value from the cache.
+     */
+    del(keys: string[]): Promise<void>;
+
+    /**
      * Revalidate all keys associated with tags.
      * It should return the meta of all entries that were revalidated.
      */
-    revalidateTags(tags: string[]): Promise<CacheEntryMeta[]>;
+    revalidateTags(
+        tags: string[],
+        purge: boolean,
+    ): Promise<{ keys: string[]; metas: CacheEntryMeta[] }>;
 }

@@ -65,10 +65,11 @@ export type LookupResult = PublishedContentWithCache & {
 export async function middleware(request: NextRequest) {
     const { url, mode } = getInputURL(request);
 
-    Sentry.setTag('url', request.url);
+    Sentry.setTag('url', url.toString());
     Sentry.setContext('request', {
         method: request.method,
-        url: request.url,
+        url: url.toString(),
+        rawRequestURL: request.url,
         userAgent: userAgent(),
     });
 

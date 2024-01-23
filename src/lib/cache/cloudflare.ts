@@ -33,8 +33,22 @@ export const cloudflareCache: CacheBackend = {
             await cache.put(cacheKey, serializeEntry(entry));
         }
     },
+    async del(keys) {
+        const cache = getCache();
+        if (cache) {
+            await Promise.all(
+                keys.map(async (key) => {
+                    const cacheKey = await serializeKey(key);
+                    await cache.delete(cacheKey);
+                }),
+            );
+        }
+    },
     async revalidateTags(tags) {
-        return [];
+        return {
+            keys: [],
+            metas: [],
+        };
     },
 };
 
@@ -64,6 +78,7 @@ function serializeEntry(entry: CacheEntry): WorkerResponse {
     const headers = new Headers();
     headers.set('Content-Type', 'application/json');
     headers.set('Cache-Control', `public, max-age=${(entry.meta.expiresAt - Date.now()) / 1000}`);
+    headers.set('Cache-Tag', ['gitbook-open', ...entry.meta.tags].join(','));
 
     // @ts-ignore
     return new Response(JSON.stringify(entry), {

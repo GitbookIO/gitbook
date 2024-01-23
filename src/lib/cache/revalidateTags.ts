@@ -8,17 +8,32 @@ import { CacheEntryMeta } from './types';
  * Revalidate all values associated with tags.
  * It clears the values from the caches, but also start a background task to revalidate them.
  */
-export async function revalidateTags(tags: string[], purge: boolean): Promise<void> {
+export async function revalidateTags(
+    tags: string[],
+    purge: boolean,
+): Promise<{
+    keys: string[];
+}> {
     if (tags.length === 0) {
-        return;
+        return { keys: [] };
     }
 
     const processed = new Set<string>();
+
+    const keysByBackend = new Map<number, string[]>();
+    const keys = new Set<string>();
     const metas: CacheEntryMeta[] = [];
 
     await Promise.all(
-        cacheBackends.map(async (backend) => {
-            const addedMetas = await backend.revalidateTags(tags);
+        cacheBackends.map(async (backend, backendIndex) => {
+            const { keys: addedKeys, metas: addedMetas } = await backend.revalidateTags(
+                tags,
+                purge,
+            );
+            addedKeys.forEach((key) => {
+                keys.add(key);
+                keysByBackend.set(backendIndex, [...(keysByBackend.get(backendIndex) ?? []), key]);
+            });
             addedMetas.forEach((meta) => {
                 const key = getCacheKey(meta.cache, meta.args);
                 if (!processed.has(key)) {
@@ -26,6 +41,19 @@ export async function revalidateTags(tags: string[], purge: boolean): Promise<vo
                     processed.add(key);
                 }
             });
+        }),
+    );
+
+    // Clear the keys on the backends that didn't return them
+    await Promise.all(
+        cacheBackends.map(async (backend, backendIndex) => {
+            const unclearedKeys = Array.from(keys).filter(
+                (key) => !keysByBackend.get(backendIndex)?.includes(key),
+            );
+
+            if (unclearedKeys.length > 0) {
+                await backend.del(unclearedKeys);
+            }
         }),
     );
 
@@ -46,4 +74,8 @@ export async function revalidateTags(tags: string[], purge: boolean): Promise<vo
             },
         );
     }
+
+    return {
+        keys: Array.from(keys.keys()),
+    };
 }

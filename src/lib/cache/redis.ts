@@ -63,10 +63,24 @@ export const redisCache: CacheBackend = {
         await multi.exec();
     },
 
-    async revalidateTags(tags) {
+    async del(keys) {
         const redis = getRedis();
         if (!redis) {
-            return [];
+            return;
+        }
+
+        const multi = redis.multi();
+        keys.forEach((key) => {
+            multi.del(getRedisKey(key));
+        });
+
+        await multi.exec();
+    },
+
+    async revalidateTags(tags, purge) {
+        const redis = getRedis();
+        if (!redis) {
+            return { keys: [], metas: [] };
         }
 
         const keys = new Set(
@@ -77,13 +91,15 @@ export const redisCache: CacheBackend = {
         let metas: Array<CacheEntryMeta | null> = [];
 
         if (keys.size > 0) {
-            metas = (
-                await redis.json.mget(
-                    // Hard limit to avoid fetching a massive list of data
-                    Array.from(keys).slice(0, 1000),
-                    '$.meta',
-                )
-            ).flat() as Array<CacheEntryMeta | null>;
+            if (!purge) {
+                metas = (
+                    await redis.json.mget(
+                        // Hard limit to avoid fetching a massive list of data
+                        Array.from(keys).slice(0, 1000),
+                        '$.meta',
+                    )
+                ).flat() as Array<CacheEntryMeta | null>;
+            }
 
             // Finally, delete all keys
             keys.forEach((key) => {
@@ -96,7 +112,7 @@ export const redisCache: CacheBackend = {
         });
 
         await pipeline.exec();
-        return metas.filter(filterOutNullable);
+        return { keys: Array.from(keys), metas: metas.filter(filterOutNullable) };
     },
 };
 

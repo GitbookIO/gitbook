@@ -23,6 +23,10 @@ export const memoryCache: CacheBackend = {
         const memoryCache = getMemoryCache();
         memoryCache.set(key, entry);
     },
+    async del(keys) {
+        const memoryCache = getMemoryCache();
+        keys.forEach((key) => memoryCache.delete(key));
+    },
     async revalidateTags(tags) {
         const memoryCache = getMemoryCache();
 
@@ -32,7 +36,10 @@ export const memoryCache: CacheBackend = {
             }
         });
 
-        return [];
+        return {
+            keys: [],
+            metas: [],
+        };
     },
 };
 
