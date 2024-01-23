@@ -35,6 +35,7 @@ type ResultType =
  */
 export const SearchResults = React.forwardRef(function SearchResults(
     props: {
+        children?: React.ReactNode;
         query: string;
         spaceId: string;
         collectionId: string | null;
@@ -44,7 +45,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     },
     ref: React.Ref<SearchResultsRef>,
 ) {
-    const { query, spaceId, collectionId, withAsk, onSwitchToAsk, onClose } = props;
+    const { children, query, spaceId, collectionId, withAsk, onSwitchToAsk, onClose } = props;
 
     const language = useLanguage();
     const debounceTimeout = React.useRef<NodeJS.Timeout | null>(null);
@@ -174,11 +175,18 @@ export const SearchResults = React.forwardRef(function SearchResults(
             className={tcls(
                 'max-h-[60vh]',
                 'overflow-auto',
-                'border-t',
-                'border-dark/2',
-                'dark:border-light/1',
+                'relative',
+                'before:w-full',
+                'before:h-[1px]',
+                'before:fixed',
+                'before:top-12',
+                'before:left-0',
+                'before:bg-dark/2',
+                'before:z-[1]',
+                'dark:before:bg-light/2',
             )}
         >
+            {children}
             {results.length === 0 ? (
                 <div
                     data-test="search-noresults"

@@ -89,6 +89,15 @@
 }
 
 @layer utilities {
+    /*  hide scroll bar but still scroll */
+    .hide-scroll::-webkit-scrollbar {
+        display: none;
+    }
+    .hide-scroll {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
     .linear-mask-gradient {
         mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 96px, rgba(0, 0, 0, 0));
     }

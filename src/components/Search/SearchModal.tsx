@@ -224,9 +224,6 @@ function SearchModalBody(
             </div>
             {!state.ask || !withAsk ? (
                 <>
-                    {collectionId && state.query ? (
-                        <SearchScopeToggle spaceTitle={spaceTitle} />
-                    ) : null}
                     <SearchResults
                         ref={resultsRef}
                         spaceId={spaceId}
@@ -241,7 +238,11 @@ function SearchModalBody(
                             });
                         }}
                         onClose={onClose}
-                    />
+                    >
+                        {collectionId && state.query ? (
+                            <SearchScopeToggle spaceTitle={spaceTitle} />
+                        ) : null}
+                    </SearchResults>
                 </>
             ) : null}
             {state.query && state.ask && withAsk ? (

@@ -35,7 +35,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                 '[&:has(+.search-section-result-item):not(:first-child)]:mt-6',
                 'dark:text-light',
                 'dark:hover:bg-light/1',
-                active ? ['bg-primary-50'] : null,
+                active ? ['bg-dark/1', 'dark:bg-light/1'] : null,
             )}
         >
             {item.spaceTitle ? (

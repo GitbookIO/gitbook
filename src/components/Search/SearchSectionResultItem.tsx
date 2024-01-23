@@ -24,7 +24,7 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                 'pl-6',
                 'hover:bg-dark/1',
                 'dark:hover:bg-light/1',
-                active ? ['bg-primary-50'] : null,
+                active ? ['bg-dark/1', 'dark:bg-light/1'] : null,
             )}
         >
             <div className={tcls('border-l', 'p-3', 'border-dark/2', 'dark:border-light/2')}>
@@ -40,6 +40,8 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                             'text-dark',
                             'line-clamp-6',
                             'linear-mask-gradient',
+                            'z-[-1]', //to force stacking order
+                            'relative',
                             'dark:text-light/8',
                         )}
                     >

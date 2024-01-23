@@ -37,7 +37,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                 'last:pb-3',
                 'dark:text-light/8',
                 'dark:hover:bg-light/1',
-                active ? ['bg-primary-50'] : null,
+                active ? ['bg-dark/1', 'dark:bg-light/1'] : null,
             )}
             {...getLinkProp({
                 ask: true,

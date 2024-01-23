@@ -30,8 +30,8 @@ export function Button({
                   'ring-dark/2',
                   'hover:bg-primary-500',
                   'dark:ring-light/3',
-                  'dark:bg-primary-500',
-                  'dark:hover:bg-primary-400',
+                  'dark:bg-primary-600',
+                  'dark:hover:bg-primary-700',
               ]
             : // SECONDARY
               [
