@@ -4,6 +4,8 @@ import type { CacheStorage, Cache, Response as WorkerResponse } from '@cloudflar
 
 import { CacheBackend, CacheEntry } from './types';
 
+const cacheVersion = 1;
+
 /**
  * Cache implementation using the Cloudflare Cache API.
  * https://developers.cloudflare.com/workers/runtime-apis/cache/
@@ -71,13 +73,18 @@ async function serializeKey(key: string): Promise<string> {
 
     const hash = Buffer.from(digest).toString('base64');
 
-    return `gitbook://gitbook.com/${hash}`;
+    return `gitbook://${cacheVersion}.gitbook.com/${hash}`;
 }
 
 function serializeEntry(entry: CacheEntry): WorkerResponse {
     const headers = new Headers();
     headers.set('Content-Type', 'application/json');
-    headers.set('Cache-Control', `public, max-age=${(entry.meta.expiresAt - Date.now()) / 1000}`);
+
+    // Limit the cloudflare cache to 5 minutes
+    headers.set(
+        'Cache-Control',
+        `public, max-age=${Math.min((entry.meta.expiresAt - Date.now()) / 1000, 5 * 60)}`,
+    );
     headers.set('Cache-Tag', ['gitbook-open', ...entry.meta.tags].join(','));
 
     // @ts-ignore
