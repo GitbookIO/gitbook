@@ -264,7 +264,7 @@ export const getRevisionPageByPath = cache(
 
                 if (pointer.changeRequestId) {
                     return api().spaces.getPageInChangeRequestByPath(
-                        spaceId,
+                        pointer.spaceId,
                         pointer.changeRequestId,
                         encodedPath,
                         {},
@@ -328,7 +328,7 @@ export const getRevisionFile = cache(
 
                 if (pointer.changeRequestId) {
                     return api().spaces.getFileInChangeRequestById(
-                        spaceId,
+                        pointer.spaceId,
                         pointer.changeRequestId,
                         fileId,
                         {
