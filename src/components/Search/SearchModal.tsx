@@ -2,6 +2,7 @@
 
 import IconSearch from '@geist-ui/icons/search';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import React from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useRecoilValue } from 'recoil';
@@ -25,6 +26,7 @@ interface SearchModalProps {
 export function SearchModal(props: SearchModalProps) {
     const [state, setSearchState] = useSearch();
     const askState = useRecoilValue(searchAskState);
+    const router = useRouter();
 
     useHotkeys(
         'mod+k',
@@ -40,16 +42,12 @@ export function SearchModal(props: SearchModalProps) {
     React.useEffect(() => {
         if (isSearchOpened) {
             document.body.classList.add('search-open');
-            Object.assign(document.body.style, {
-                overflow: 'hidden',
-            });
+            document.body.style.overflow = 'hidden';
         }
 
         return () => {
             document.body.classList.remove('search-open');
-            Object.assign(document.body.style, {
-                overflow: 'auto',
-            });
+            document.body.style.overflow = 'auto';
         };
     }, [isSearchOpened]);
 
@@ -61,8 +59,11 @@ export function SearchModal(props: SearchModalProps) {
         setSearchState(newQuery);
     };
 
-    const onClose = () => {
-        setSearchState(null);
+    const onClose = async (to?: string) => {
+        await setSearchState(null);
+        if (to) {
+            router.push(to);
+        }
     };
 
     return (
@@ -84,7 +85,9 @@ export function SearchModal(props: SearchModalProps) {
                     'dark:bg-dark/8',
                     'md:pt-[min(8vw,_6rem)]',
                 )}
-                onClick={onClose}
+                onClick={() => {
+                    onClose();
+                }}
             >
                 <AnimatePresence>
                     {askState?.type === 'loading' ? (
@@ -127,7 +130,7 @@ function SearchModalBody(
     props: SearchModalProps & {
         state: SearchState;
         onChangeQuery: (newQuery: SearchState) => void;
-        onClose: () => void;
+        onClose: (to?: string) => void;
     },
 ) {
     const { spaceId, spaceTitle, withAsk, collectionId, state, onChangeQuery, onClose } = props;

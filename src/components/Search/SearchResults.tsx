@@ -41,7 +41,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
         collectionId: string | null;
         withAsk: boolean;
         onSwitchToAsk: () => void;
-        onClose: () => void;
+        onClose: (to?: string) => void;
     },
     ref: React.Ref<SearchResultsRef>,
 ) {

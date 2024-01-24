@@ -35,7 +35,7 @@ const testCases: TestsCase[] = [
             },
             {
                 name: 'AI Search',
-                url: '?q=What+is+GitBook%3F&ask=1',
+                url: '?q=What+is+GitBook%3F&ask=true',
                 wait: (page) => page.waitForSelector('[data-test="search-ask-answer"]'),
             },
             {
