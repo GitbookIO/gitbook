@@ -1,5 +1,8 @@
 import { DocumentInlineImage } from '@gitbook/api';
 
+import { getImageSize } from '@/lib/images';
+import { ResolvedContentRef } from '@/lib/references';
+
 import { InlineProps } from './Inline';
 import { Image } from '../utils';
 
@@ -18,20 +21,7 @@ export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
     return (
         <Image
             alt={inline.data.caption ?? ''}
-            sizes={
-                inline.data.size === 'original'
-                    ? [
-                          {
-                              width: 300,
-                          },
-                      ]
-                    : [
-                          {
-                              // Estimate of common images as max-height is 1.6em
-                              width: 64,
-                          },
-                      ]
-            }
+            sizes={await getImageSizes(inline, src)}
             sources={{
                 light: {
                     src: src.href,
@@ -54,4 +44,31 @@ export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
             inline
         />
     );
+}
+
+async function getImageSizes(inline: DocumentInlineImage, src: ResolvedContentRef) {
+    if (inline.data.size === 'original') {
+        // The max-width is 300px
+        return [
+            {
+                width: 300,
+            },
+        ];
+    }
+
+    // We estimate that the maximum height of the line will be 40px
+    // and from the aspect-ratio, we can deduce the width
+    const lineHeight = 40;
+    const imageSize =
+        src.fileDimensions ??
+        (await getImageSize(src.href, {
+            dpr: 3,
+        }));
+    const aspectRatio = imageSize ? imageSize.width / imageSize.height : 1;
+
+    return [
+        {
+            width: Math.floor(lineHeight * aspectRatio),
+        },
+    ];
 }
