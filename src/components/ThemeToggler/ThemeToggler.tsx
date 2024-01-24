@@ -3,6 +3,7 @@
 import Monitor from '@geist-ui/icons/monitor';
 import Moon from '@geist-ui/icons/moon';
 import Sun from '@geist-ui/icons/sun';
+import { useTheme } from 'next-themes';
 import React from 'react';
 
 import { IconComponent } from '@/components/icons';
@@ -11,42 +12,22 @@ import { tcls } from '@/lib/tailwind';
 
 type ThemeMode = 'light' | 'system' | 'dark';
 
-const LOCALSTORAGE_KEY = 'color-theme';
-
 /**
  * Buttons to toggle between light/system/dark modes.
  */
 export function ThemeToggler(props: {}) {
-    const [mode, setMode] = React.useState<ThemeMode>('system');
-
     const language = useLanguage();
 
-    const onSwitchMode = (to: ThemeMode) => {
-        setMode(to);
-        window.localStorage.setItem(LOCALSTORAGE_KEY, to);
-    };
+    const [mounted, setMounted] = React.useState(false);
+    const { theme, setTheme } = useTheme();
 
     React.useEffect(() => {
-        const value = window.localStorage.getItem(LOCALSTORAGE_KEY);
-        if (value && (value === 'light' || value === 'system' || value === 'dark')) {
-            setMode(value);
-        }
+        setMounted(true);
     }, []);
 
-    React.useEffect(() => {
-        const applied =
-            mode === 'system'
-                ? window.matchMedia('(prefers-color-scheme: dark)').matches
-                    ? 'dark'
-                    : 'light'
-                : mode;
-
-        if (applied === 'light') {
-            document.documentElement.classList.remove('dark');
-        } else {
-            document.documentElement.classList.add('dark');
-        }
-    }, [mode]);
+    const onSwitchMode = (to: ThemeMode) => {
+        setTheme(to);
+    };
 
     return (
         <div
@@ -61,19 +42,19 @@ export function ThemeToggler(props: {}) {
             )}
         >
             <ThemeButton
-                active={mode === 'light'}
+                active={mounted && theme === 'light'}
                 icon={Sun}
                 onClick={() => onSwitchMode('light')}
                 title={tString(language, 'switch_to_light_theme')}
             />
             <ThemeButton
-                active={mode === 'system'}
+                active={mounted && theme === 'system'}
                 icon={Monitor}
                 onClick={() => onSwitchMode('system')}
                 title={tString(language, 'switch_to_system_theme')}
             />
             <ThemeButton
-                active={mode === 'dark'}
+                active={mounted && theme === 'dark'}
                 icon={Moon}
                 onClick={() => onSwitchMode('dark')}
                 title={tString(language, 'switch_to_dark_theme')}

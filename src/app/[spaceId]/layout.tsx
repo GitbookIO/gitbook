@@ -6,6 +6,7 @@ import { fonts, ibmPlexMono } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
 import { getSpaceContent } from '@/lib/api';
 import { hexToRgb, shadesOfColor } from '@/lib/colors';
+import { getContentSecurityPolicyNonce } from '@/lib/csp';
 import { tcls } from '@/lib/tailwind';
 
 import { ClientContexts } from './ClientContexts';
@@ -27,9 +28,11 @@ export default async function SpaceRootLayout(props: {
     });
     const headerTheme = generateHeaderTheme(customization);
     const language = getSpaceLanguage(customization);
+    const nonce = getContentSecurityPolicyNonce();
 
     return (
         <html
+            suppressHydrationWarning
             lang={customization.internationalization.locale}
             className={tcls(
                 customization.header.preset === CustomizationHeaderPreset.None
@@ -85,7 +88,15 @@ export default async function SpaceRootLayout(props: {
                     'dark:bg-dark',
                 )}
             >
-                <ClientContexts language={language}>{children}</ClientContexts>
+                <ClientContexts
+                    nonce={nonce}
+                    language={language}
+                    forcedTheme={
+                        customization.themes.toggeable ? undefined : customization.themes.default
+                    }
+                >
+                    {children}
+                </ClientContexts>
             </body>
         </html>
     );
