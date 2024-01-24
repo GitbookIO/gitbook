@@ -12,15 +12,16 @@ export function ListUnordered(props: BlockProps<DocumentBlockListUnordered>) {
             tag="ul"
             nodes={block.nodes}
             ancestorBlocks={[...ancestorBlocks, block]}
-            /*             style={['list-disc', 'ps-[1ch]', 'space-y-2', style]} */
             style={[
-                'space-y-2',
-                'ps-[1ch]',
                 'list-none',
-                'marker:content-["–"]',
-                'marker:text-dark/6',
-                '[&>li]:pl-[1.25ch]',
-                'dark:marker:text-light/5',
+                'space-y-2',
+                '[&>li]:relative',
+                '[&>li]:ps-[2.25ch]',
+                '[&>li]:before:text-dark/6',
+                '[&>li]:before:content-["–"]',
+                '[&>li]:before:absolute',
+                '[&>li]:before:left-0',
+                'dark:[&>li]:before:text-light/6',
                 style,
             ]}
         />
