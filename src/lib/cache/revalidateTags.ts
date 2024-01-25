@@ -3,6 +3,7 @@ import pMap from 'p-map';
 import { cacheBackends } from './backends';
 import { getCache, getCacheKey } from './cache';
 import { CacheEntryMeta } from './types';
+import { waitUntil } from './waitUntil';
 
 /**
  * Revalidate all values associated with tags.
@@ -57,21 +58,26 @@ export async function revalidateTags(
         }),
     );
 
-    // Refresh the values in the cache
+    // Refresh the values in the cache in the background
     if (metas && !purge) {
-        await pMap(
-            // Sort to process the entries with the most hits first
-            metas.sort((a, b) => b.hits - a.hits),
-            async (meta) => {
-                console.log(`revalidating ${meta.cache} (${meta.hits} hits) with args`, meta.args);
-                const cache = getCache(meta.cache);
-                if (cache) {
-                    await cache.revalidate(...meta.args);
-                }
-            },
-            {
-                concurrency: 5,
-            },
+        await waitUntil(
+            pMap(
+                // Sort to process the entries with the most hits first
+                metas.sort((a, b) => b.hits - a.hits),
+                async (meta) => {
+                    console.log(
+                        `revalidating ${meta.cache} (${meta.hits} hits) with args`,
+                        meta.args,
+                    );
+                    const cache = getCache(meta.cache);
+                    if (cache) {
+                        await cache.revalidate(...meta.args);
+                    }
+                },
+                {
+                    concurrency: 5,
+                },
+            ),
         );
     }
 

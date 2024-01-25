@@ -5,6 +5,7 @@ import type { CacheStorage, Cache, Response as WorkerResponse } from '@cloudflar
 import { CacheBackend, CacheEntry } from './types';
 
 const cacheVersion = 1;
+const cacheMaxAge = 5 * 60;
 
 /**
  * Cache implementation using the Cloudflare Cache API.
@@ -84,7 +85,7 @@ function serializeEntry(entry: CacheEntry): WorkerResponse {
     // Limit the cloudflare cache to 5 minutes
     headers.set(
         'Cache-Control',
-        `public, max-age=${Math.min((entry.meta.expiresAt - Date.now()) / 1000, 5 * 60)}`,
+        `public, max-age=${Math.min((entry.meta.expiresAt - Date.now()) / 1000, cacheMaxAge)}`,
     );
     headers.set('Cache-Tag', cacheTags.join(','));
 

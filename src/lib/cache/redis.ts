@@ -95,7 +95,10 @@ export const redisCache: CacheBackend = {
                 metas = (
                     await redis.json.mget(
                         // Hard limit to avoid fetching a massive list of data
-                        Array.from(keys).slice(0, 1000),
+                        // Starts with the smallest keys.
+                        Array.from(keys)
+                            .sort((a, b) => a.length - b.length)
+                            .slice(0, 10),
                         '$.meta',
                     )
                 ).flat() as Array<CacheEntryMeta | null>;
