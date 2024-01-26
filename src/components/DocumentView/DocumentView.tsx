@@ -49,7 +49,13 @@ export function DocumentView(
             document={document}
             ancestorBlocks={[]}
             blockStyle={blockStyle}
-            style={[style]}
+            style={[
+                style,
+                // Preserve adjacent whitespace and new lines.
+                'whitespace-pre-wrap',
+                // Allow words to break if they are too long.
+                'break-words',
+            ]}
             context={context}
         />
     );
