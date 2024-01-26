@@ -78,12 +78,15 @@ function Code(props: MarkedLeafProps<DocumentMarkCode>) {
                 'ring-dark/1',
                 'bg-dark/[0.06]',
                 'rounded',
-                'text-sm',
                 'text-dark/8',
                 'dark:ring-light/1',
                 'dark:bg-light/1',
                 'dark:text-light/7',
                 '[&>*]:font-normal',
+                // Text size is proportional to the font-size of the parent element
+                'text-[.875em]',
+                // We ensure that the code is not making the parent bigger, especially in headings
+                'leading-[calc(max(1.20em,1.25rem))]',
             )}
         >
             {props.children}
