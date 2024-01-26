@@ -4,7 +4,7 @@ const dsn = process.env.SENTRY_DSN;
 if (dsn) {
     Sentry.init({
         dsn,
-        tracesSampleRate: 1,
+        tracesSampleRate: 0.01,
         debug: false,
         integrations: [],
     });
