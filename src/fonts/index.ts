@@ -24,7 +24,7 @@ const inter = Inter({
 });
 
 export const ibmPlexMono = IBM_Plex_Mono({
-    weight: ['400'],
+    weight: ['400', '600'],
     variable: '--font-mono',
     style: 'normal',
     preload: false,

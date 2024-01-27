@@ -65,7 +65,6 @@ function Code(props: MarkedLeafProps<DocumentMarkCode>) {
     return (
         <code
             className={tcls(
-                'font-normal',
                 'py-[1px]',
                 'px-1.5',
                 'min-w-[1.625rem]',
@@ -82,7 +81,6 @@ function Code(props: MarkedLeafProps<DocumentMarkCode>) {
                 'dark:ring-light/1',
                 'dark:bg-light/1',
                 'dark:text-light/7',
-                '[&>*]:font-normal',
                 // Text size is proportional to the font-size of the parent element
                 'text-[.875em]',
                 // We ensure that the code is not making the parent bigger, especially in headings
