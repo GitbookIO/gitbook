@@ -72,6 +72,7 @@ export default async function Page(props: { params: PagePathParams }) {
                         withHeaderOffset={withTopHeader}
                         withFullPageCover={withFullPageCover}
                         withPageFeedback={withPageFeedback}
+                        context={contentRefContext}
                     />
                 ) : null}
             </div>

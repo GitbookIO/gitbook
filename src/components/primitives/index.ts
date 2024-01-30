@@ -6,3 +6,4 @@ export * from './Skeleton';
 export * from './Link';
 export * from './DateRelative';
 export * from './Emoji';
+export * from './LoadingPane';

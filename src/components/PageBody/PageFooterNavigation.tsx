@@ -32,6 +32,7 @@ export function PageFooterNavigation(props: {
                 'gap-2',
                 'max-w-3xl',
                 'mx-auto',
+                'page-api-block:ml-0',
             )}
         >
             {previous ? (

@@ -1,7 +1,7 @@
 import { ContentRef, Revision, RevisionPageDocument, Space } from '@gitbook/api';
 import assertNever from 'assert-never';
 
-import { ContentPointer, getRevisionFile, getSpace, getUserById } from './api';
+import { ContentPointer, getRevisionFile, getUserById } from './api';
 import { gitbookAppHref, pageHref, PageHrefContext } from './links';
 import { resolvePageId } from './pages';
 

@@ -36,6 +36,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                         className={tcls(
                             'flex',
                             'flex-row',
+                            'items-baseline',
                             'left-[-1px]',
                             'relative',
                             'text-sm',
@@ -57,6 +58,14 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                                 : '',
                         )}
                     >
+                        {section.tag ? (
+                            <span
+                                className={`openapi-method openapi-method-${section.tag.toLowerCase()}`}
+                            >
+                                {section.tag}
+                            </span>
+                        ) : null}
+
                         {section.title}
                     </a>
                 </li>

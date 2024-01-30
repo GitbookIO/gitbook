@@ -27,9 +27,9 @@ import { ListOrdered } from './ListOrdered';
 import { ListTasks } from './ListTasks';
 import { ListUnordered } from './ListUnordered';
 import { BlockMath } from './Math';
+import { OpenAPI } from './OpenAPI';
 import { Paragraph } from './Paragraph';
 import { Quote } from './Quote';
-import { Swagger } from './Swagger';
 import { Table } from './Table';
 import { Tabs } from './Tabs';
 
@@ -72,7 +72,7 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
             case 'table':
                 return <Table {...props} {...contextProps} block={block} />;
             case 'swagger':
-                return <Swagger {...props} {...contextProps} block={block} />;
+                return <OpenAPI {...props} {...contextProps} block={block} />;
             case 'embed':
                 return <Embed {...props} {...contextProps} block={block} />;
             case 'blockquote':

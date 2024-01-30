@@ -1,0 +1,317 @@
+.openapi-operation {
+    @apply flex-1 flex flex-col gap-6;
+}
+
+.openapi-columns {
+    @apply flex flex-row gap-6;
+}
+
+/** Intro */
+
+.openapi-intro {
+    @apply flex flex-col gap-3 max-w-3xl;
+}
+
+.openapi-summary {
+    @apply font-semibold text-xl;
+}
+
+.openapi-description.openapi-markdown {
+    @apply prose-base;
+}
+
+/** Method tag */
+
+.openapi-method {
+    @apply rounded font-mono text-sm px-1  mr-2 border;
+}
+
+.openapi-method-get {
+    @apply bg-green-100 text-green-800 border-green-500;
+}
+
+.openapi-method-post {
+    @apply bg-blue-100 text-blue-800 border-blue-500;
+}
+
+.openapi-method-put {
+    @apply bg-yellow-100 text-yellow-800 border-yellow-500;
+}
+
+.openapi-method-patch {
+    @apply bg-yellow-100 text-yellow-800 border-yellow-500;
+}
+
+.openapi-method-delete {
+    @apply bg-red-100 text-red-800 border-red-500;
+}
+
+.openapi-method-head,
+.openapi-method-options,
+.openapi-method-trace {
+    @apply bg-gray-100 text-gray-800 border-gray-500;
+}
+
+/** URL */
+
+.openapi-url {
+    @apply font-mono text-sm text-dark/8 dark:text-light/8;
+}
+
+.openapi-url-var {
+    @apply text-dark/7 underline underline-offset-2 decoration-dark/5 dark:decoration-light/5 dark:text-light/6;
+}
+
+/** Columns */
+
+.openapi-column-spec {
+    @apply flex flex-col flex-1 gap-4 max-w-3xl;
+}
+
+.openapi-column-preview {
+    @apply flex flex-col flex-1 max-w-3xl;
+}
+
+.openapi-column-preview-body {
+    @apply flex flex-col gap-4 sticky top-4 space-header:top-20 page-api-block:xl:max-2xl:top-32;
+}
+
+.openapi-column-preview pre {
+    @apply max-h-60;
+}
+
+/** Schemas */
+
+.openapi-schema .openapi-schema-properties {
+    @apply border rounded border-dark/2 dark:border-light/2;
+}
+
+.openapi-schema .openapi-schema-properties:not(:has(.openapi-schema-properties:hover)):hover {
+    @apply border-dark/4 dark:border-light/4;
+}
+
+.openapi-schema-properties .openapi-schema {
+    @apply border-b px-3 py-2 border-dark/1 dark:border-light/1;
+}
+
+.openapi-schema-properties .openapi-schema:last-child {
+    @apply border-b-0;
+}
+
+.openapi-schema-properties .openapi-schema-opened {
+    @apply pb-3;
+}
+
+.openapi-schema > .openapi-schema-properties {
+    @apply mt-3;
+}
+
+.openapi-schema-propertyname {
+    @apply font-medium text-base text-dark/10 dark:text-light/10;
+}
+
+.openapi-schema-required {
+    @apply font-normal text-yellow-600;
+}
+
+.openapi-schema-type {
+    @apply font-mono ml-3 text-base text-dark-5/8 dark:text-light-5;
+}
+
+.openapi-schema-type:only-child {
+    @apply ml-0;
+}
+
+.openapi-schema-header {
+    @apply flex flex-row items-center;
+}
+
+.openapi-schema-intro {
+    @apply flex-1;
+}
+
+.openapi-schema-body {
+    @apply mt-2;
+}
+
+.openapi-schema-circular {
+    @apply text-xs text-dark/6 dark:text-light/6;
+}
+
+.openapi-schema-circular a {
+    @apply underline;
+}
+
+.openapi-schema-circular-glyph {
+    @apply text-base;
+}
+
+.openapi-schema-enum {
+    @apply flex flex-row flex-wrap mt-1;
+}
+
+.openapi-schema-enum-value {
+    @apply font-mono text-xs px-1.5 py-1 border border-light-4 ml-[-1px] mt-[-1px] text-dark/8 dark:text-light/8 dark:border-dark-4;
+}
+
+.openapi-schema-enum-value:first-child {
+    @apply rounded-l ml-0;
+}
+
+.openapi-schema-enum-value:last-child {
+    @apply rounded-r;
+}
+
+.openapi-schema-description.openapi-markdown {
+    @apply prose-sm;
+}
+
+/** Authentication */
+
+.openapi-authentication {
+    @apply border rounded border-dark/2 dark:border-light/2;
+}
+
+.openapi-authentication-header {
+    @apply px-3 py-2;
+}
+
+.openapi-authentication-header-content {
+    @apply font-semibold text-base text-dark-2 dark:text-light-5;
+}
+
+/** Parameters */
+
+.openapi-parameters {
+    @apply border rounded border-dark/2 dark:border-light/2;
+}
+
+.openapi-parameters.openapi-parameters-closed:hover {
+    @apply border-dark/3 dark:border-light/3 cursor-pointer;
+}
+
+.openapi-parameters-header {
+    @apply px-3 py-2;
+}
+
+.openapi-parameters-header-content {
+    @apply font-semibold text-base text-dark-2 dark:text-light-5;
+}
+
+/** Request body */
+.openapi-requestbody {
+    @apply border rounded border-dark/2 dark:border-light/2;
+}
+
+.openapi-requestbody-header {
+    @apply px-3 py-2;
+}
+
+.openapi-requestbody-header-content {
+    @apply font-semibold text-base text-dark-2 dark:text-light-5;
+}
+
+/** Responses */
+.openapi-responses {
+    @apply border rounded border-dark/2 dark:border-light/2;
+}
+
+.openapi-responses-header {
+    @apply px-3 py-2;
+}
+
+.openapi-responses-body {
+    @apply flex flex-col gap-3;
+}
+
+.openapi-responses-header-content {
+    @apply font-semibold text-dark-2 dark:text-light-5;
+}
+
+/** Response */
+.openapi-responsebody-header,
+.openapi-responseheaders-header {
+    @apply px-3 py-1;
+}
+
+.openapi-responsebody-header-content,
+.openapi-responseheaders-header-content {
+    @apply text-base text-dark/8 dark:text-light/8;
+}
+
+/** Code sample */
+
+.openapi-codesample {
+    @apply border rounded bg-light-2 border-dark/1 dark:bg-dark-2 dark:border-light/2;
+}
+
+.openapi-codesample-header {
+    @apply flex flex-row items-center px-3 py-2;
+}
+
+.openapi-codesample-title {
+    @apply flex-1 font-semibold text-base;
+}
+
+/** Response example */
+
+.openapi-response-example {
+    @apply border rounded bg-light-2 border-dark/1 dark:bg-dark-2 dark:border-light/2;
+}
+
+.openapi-response-example-header {
+    @apply flex flex-row items-center px-3 py-2;
+}
+
+.openapi-response-example-title {
+    @apply flex-1 font-semibold text-base;
+}
+
+/** Common */
+
+.openapi-select {
+    @apply max-w-48 rounded font-mono text-xs leading-6 px-1 py-0.5 border border-dark-2/2 bg-light-2 dark:bg-dark-2 dark:border-light/1;
+}
+
+/** Section */
+
+.openapi-section {
+}
+
+.openapi-section-header {
+    @apply flex flex-row items-start;
+}
+
+.openapi-section-header-content {
+    @apply flex-1;
+}
+
+.openapi-section-header-controls {
+    @apply flex flex-row items-center gap-2;
+}
+
+.openapi-section-toggle {
+    @apply flex items-center justify-end size-6 text-dark/6 dark:text-light/6;
+}
+
+.openapi-section-toggle:focus-visible,
+.openapi-section-toggle:focus-visible {
+    @apply text-primary-500;
+}
+
+.openapi-section-toggle svg {
+    @apply size-4;
+}
+
+/** Markdown */
+.openapi-markdown {
+    @apply prose dark:prose-invert max-w-none whitespace-normal;
+}
+
+.openapi-markdown > *:first-child {
+    @apply mt-0;
+}
+
+.openapi-markdown > *:last-child {
+    @apply mb-0;
+}

@@ -40,10 +40,8 @@ export function SpaceLayout(props: {
         customization,
         ancestors,
         children,
-        // document,
     } = props;
 
-    // const asFullWidth = document ? hasFullWidthBlock(document) : false;
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
     const contentRefContext: ContentRefContext = {

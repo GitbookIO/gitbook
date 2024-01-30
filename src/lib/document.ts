@@ -4,11 +4,16 @@ import {
     DocumentFragment,
     JSONDocument,
     DocumentBlock,
+    ContentRef,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 
+import { fetchOpenAPIBlock } from './openapi';
+import { ResolvedContentRef } from './references';
+
 export interface DocumentSection {
     id: string;
+    tag?: string;
     title: string;
     depth: number;
 }
@@ -16,30 +21,44 @@ export interface DocumentSection {
 /**
  * Check if the document contains one block that should be rendered in full-width mode.
  */
-export function hasFullWidthBlock(document: JSONDocument): boolean {
-    return document.nodes.some((node) => {
-        return node.data && 'fullWidth' in node.data && node.data.fullWidth;
-    });
+export function hasFullWidthBlock(document: JSONDocument): { apiBlock: boolean } | false {
+    let fullWidth = false;
+
+    for (const node of document.nodes) {
+        if (node.data && 'fullWidth' in node.data && node.data.fullWidth) {
+            fullWidth = true;
+        }
+
+        if (node.type === 'swagger') {
+            return { apiBlock: true };
+        }
+    }
+
+    return fullWidth ? { apiBlock: false } : false;
 }
 
 /**
  * Extract a list of sections from a document.
  */
-export function getDocumentSections(document: JSONDocument): DocumentSection[] {
+export async function getDocumentSections(
+    document: JSONDocument,
+    resolveContentRef: (ref: ContentRef) => Promise<ResolvedContentRef | null>,
+): Promise<DocumentSection[]> {
     const sections: DocumentSection[] = [];
     let depth = 0;
 
-    document.nodes.forEach((block) => {
+    for (const block of document.nodes) {
         if (
-            block.type === 'heading-1' ||
-            block.type === 'heading-2' ||
-            block.type === 'heading-3'
+            (block.type === 'heading-1' ||
+                block.type === 'heading-2' ||
+                block.type === 'heading-3') &&
+            block.meta?.id
         ) {
             if (block.type === 'heading-1') {
                 depth = 1;
             }
             const title = getNodeText(block);
-            const id = block.meta?.id ?? title;
+            const id = block.meta?.id;
 
             sections.push({
                 id,
@@ -47,7 +66,19 @@ export function getDocumentSections(document: JSONDocument): DocumentSection[] {
                 depth: block.type === 'heading-1' ? 1 : depth > 0 ? 2 : 1,
             });
         }
-    });
+
+        if (block.type === 'swagger' && block.meta?.id) {
+            const operation = await fetchOpenAPIBlock(block, resolveContentRef);
+            if (operation) {
+                sections.push({
+                    id: block.meta.id,
+                    tag: operation.method.toUpperCase(),
+                    title: operation.operation.summary ?? operation.path,
+                    depth: 1,
+                });
+            }
+        }
+    }
 
     return sections;
 }

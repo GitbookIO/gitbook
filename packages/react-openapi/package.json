@@ -1,0 +1,16 @@
+{
+    "name": "@gitbook/react-openapi",
+    "main": "./src/index.ts",
+    "dependencies": {
+        "openapi-types": "^12.1.3",
+        "classnames": "^2.5.1",
+        "json-pointer": "^0.6.2",
+        "flatted": "^3.2.9"
+    },
+    "devDependencies": {
+        "@types/json-pointer": "^1.0.34"
+    },
+    "peerDependencies": {
+        "react": "*"
+    }
+}

@@ -138,3 +138,10 @@
         transform: rotate(135deg) skewY(-45deg) scale(0.707, 1.414) translate(50%);
     }
 }
+
+html {
+    color-scheme: light;
+}
+html.dark {
+    color-scheme: dark light;
+}

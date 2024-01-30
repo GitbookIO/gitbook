@@ -12,7 +12,6 @@ import { PageBodyBlankslate } from './PageBodyBlankslate';
 import { PageCover } from './PageCover';
 import { PageFooterNavigation } from './PageFooterNavigation';
 import { PageHeader } from './PageHeader';
-import { TogglePageFullWidth } from './TogglePageFullWidth';
 import { TrackPageView } from './TrackPageView';
 import { DocumentView } from '../DocumentView';
 import { PageFeedbackForm } from '../PageFeedback';
@@ -44,16 +43,25 @@ export function PageBody(props: {
 
     return (
         <>
-            {asFullWidth ? <TogglePageFullWidth /> : null}
             <main
-                className={tcls(
-                    'relative',
-                    'py-8',
-                    'lg:px-12',
-                    'flex-1',
-                    withAside ? null : 'mr-56',
-                    withDesktopTableOfContents ? null : 'xl:ml-72',
-                )}
+                className={
+                    tcls(
+                        'flex-1',
+                        'relative',
+                        'py-8',
+                        'lg:px-12',
+                        // When in api page mode without the aside, we align with the border of the main content
+                        'page-api-block:xl:max-2xl:pr-0',
+                        // Max size to ensure one column in api is aligned with rest of content (2 x 3xl) + (gap-3 + 2) * px-12
+                        'page-api-block:max-w-[1654px]',
+                        'page-api-block:mx-auto',
+
+                        withAside ? null : 'mr-56',
+                        withDesktopTableOfContents ? null : 'xl:ml-72',
+                    ) +
+                    (asFullWidth ? ' page-full-width' : '') +
+                    (asFullWidth && asFullWidth.apiBlock ? ' page-api-block' : '')
+                }
             >
                 {page.cover && page.layout.cover && page.layout.coverSize === 'hero' ? (
                     <PageCover as="hero" page={page} cover={page.cover} context={context} />
@@ -64,6 +72,7 @@ export function PageBody(props: {
                     <DocumentView
                         document={document}
                         style={['[&>*+*]:mt-5', 'grid']}
+                        blockStyle={['page-api-block:ml-0']}
                         context={{
                             content: context.content,
                             resolveContentRef: (ref) => resolveContentRef(ref, context),
@@ -90,6 +99,7 @@ export function PageBody(props: {
                         'mt-6',
                         'max-w-3xl',
                         'mx-auto',
+                        'page-api-block:ml-0',
                     )}
                 >
                     <p className={tcls('flex-1', 'text-sm', 'text-dark/6', 'dark:text-light/5')}>

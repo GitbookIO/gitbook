@@ -1,4 +1,5 @@
 import containerQueries from '@tailwindcss/container-queries';
+import typography from '@tailwindcss/typography';
 import type { Config } from 'tailwindcss';
 import plugin from 'tailwindcss/plugin';
 
@@ -168,11 +169,33 @@ const config: Config = {
     },
     plugins: [
         plugin(function ({ addVariant }) {
+            /**
+             * Variant when the Table of Content navigation is open.
+             */
             addVariant('navigation-open', 'body.navigation-open &');
+
+            /**
+             * Variant when the search overlay is open.
+             */
             addVariant('search-open', 'body.search-open &');
-            addVariant('page-full-width', 'body.page-full-width &');
+
+            /**
+             * Variant when a header is displayed.
+             */
+            addVariant('space-header', 'body:has(header) &');
+
+            /**
+             * Variant when the page contains a block that will be rendered in full-width mode.
+             */
+            addVariant('page-full-width', 'body:has(.page-full-width) &');
+
+            /**
+             * Variant when the page contains an OpenAPI block.
+             */
+            addVariant('page-api-block', 'body:has(.page-api-block) &');
         }),
         containerQueries,
+        typography,
     ],
 };
 export default config;
