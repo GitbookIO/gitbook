@@ -191,10 +191,7 @@ function CodeHighlightLine(props: {
                                   'dark:before:text-light/4',
 
                                   line.highlighted
-                                      ? [
-                                            'before:text-dark/6',
-                                            'dark:before:text-light/8',
-                                        ]
+                                      ? ['before:text-dark/6', 'dark:before:text-light/8']
                                       : null,
                               ]
                             : [],

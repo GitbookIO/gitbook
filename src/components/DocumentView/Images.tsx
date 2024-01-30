@@ -1,12 +1,11 @@
 import { DocumentBlockImage, DocumentBlockImages, JSONDocument } from '@gitbook/api';
 
 import { Image } from '@/components/utils';
-import { getNodeFragmentByName, isNodeEmpty } from '@/lib/document';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { BlockProps } from './Block';
+import { Caption } from './Caption';
 import { DocumentContext } from './DocumentView';
-import { Inlines } from './Inlines';
 import { isBlockOffscreen } from './utils';
 
 export function Images(props: BlockProps<DocumentBlockImages>) {
@@ -55,7 +54,7 @@ async function ImageBlock(props: {
     siblings: number;
     isOffscreen: boolean;
 }) {
-    const { block, document, context, isOffscreen } = props;
+    const { block, context, isOffscreen } = props;
 
     const [src, darkSrc] = await Promise.all([
         context.resolveContentRef(block.data.ref),
@@ -66,75 +65,34 @@ async function ImageBlock(props: {
         return null;
     }
 
-    const imageBorder = tcls(
-        'relative',
-        'overflow-hidden',
-        'rounded',
-        'after:block',
-        'after:absolute',
-        'after:-inset-[0]',
-        'after:border-dark/2',
-        'after:border',
-        'after:rounded',
-        'dark:after:border-light/1',
-        'dark:after:mix-blend-plus-lighter',
-        'after:pointer-events-none',
-    );
-
-    const caption = getNodeFragmentByName(block, 'caption');
-    const captionParagraph = caption?.nodes[0];
-
-    const image = (
-        <Image
-            alt={block.data.alt ?? ''}
-            sizes={[
-                {
-                    media: '(max-width: 640px)',
-                    width: 400,
-                },
-                {
-                    width: 768,
-                },
-            ]}
-            sources={{
-                light: {
-                    src: src.href,
-                    size: src.fileDimensions,
-                },
-                dark: darkSrc
-                    ? {
-                          src: darkSrc.href,
-                          size: darkSrc.fileDimensions,
-                      }
-                    : null,
-            }}
-            priority={isOffscreen ? 'lazy' : 'high'}
-            preload
-        />
-    );
-
-    if (
-        !captionParagraph ||
-        captionParagraph.type !== 'paragraph' ||
-        isNodeEmpty(captionParagraph)
-    ) {
-        return image;
-    }
-
     return (
-        <picture className={tcls('relative')}>
-            <div className={tcls(imageBorder)}>{image}</div>
-            <figcaption
-                className={tcls(
-                    'text-sm',
-                    'text-center',
-                    'mt-2',
-                    'text-dark/7',
-                    'dark:text-light/6',
-                )}
-            >
-                <Inlines nodes={captionParagraph.nodes} document={document} context={context} />
-            </figcaption>
-        </picture>
+        <Caption {...props}>
+            <Image
+                alt={block.data.alt ?? ''}
+                sizes={[
+                    {
+                        media: '(max-width: 640px)',
+                        width: 400,
+                    },
+                    {
+                        width: 768,
+                    },
+                ]}
+                sources={{
+                    light: {
+                        src: src.href,
+                        size: src.fileDimensions,
+                    },
+                    dark: darkSrc
+                        ? {
+                              src: darkSrc.href,
+                              size: darkSrc.fileDimensions,
+                          }
+                        : null,
+                }}
+                priority={isOffscreen ? 'lazy' : 'high'}
+                preload
+            />
+        </Caption>
     );
 }

@@ -140,7 +140,7 @@ export function isNodeEmpty(
     node: DocumentText | DocumentFragment | DocumentInline | DocumentBlock | JSONDocument,
 ): boolean {
     if (node.object !== 'text' && 'nodes' in node) {
-        if (node.nodes.length > 0) {
+        if (node.nodes.length > 1) {
             return false;
         }
 

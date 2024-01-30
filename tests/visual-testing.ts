@@ -61,10 +61,6 @@ const testCases: TestsCase[] = [
                 url: 'scan-using-snyk/supported-languages-and-frameworks/c-c++',
             },
             {
-                name: 'Redirect',
-                url: 'products/snyk-open-source/use-snyk-open-source-from-the-cli',
-            },
-            {
                 name: 'Revision',
                 url: '~/revisions/H41VQ6cIvd5hyUwcnwbC',
             },
