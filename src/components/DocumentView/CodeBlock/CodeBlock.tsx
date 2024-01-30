@@ -96,9 +96,7 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
                     'overflow-auto',
                     'linear-mask-util',
                     'bg-light-2',
-                    /*                     '[background-color:color-mix(in_srgb,_rgb(var(--light)),_rgb(var(--dark))_3%)]', */
                     'dark:bg-dark-2',
-
                     titleRounding,
                 )}
             >
@@ -147,13 +145,11 @@ function CodeHighlightLine(props: {
         <span
             className={tcls(
                 'overflow-hidden',
-                'table-row',
+                'flex',
+                'flex-row',
                 'relative',
-                'linear-mask-util',
                 'ring-2',
                 'ring-transparent',
-                'hover:ring-dark/2',
-                'dark:hover:ring-light/2',
                 'rounded',
                 //first child
                 '[&.highlighted:first-child]:rounded-t-md',
@@ -161,8 +157,6 @@ function CodeHighlightLine(props: {
                 //last child
                 '[&.highlighted:last-child]:rounded-b-md',
                 '[&.highlighted:last-child>*]:mb-1',
-                //is only child, dont hover effect line
-                '[&:only-child]:hover:ring-transparent',
                 //select all highlighted
                 '[&.highlighted]:rounded-none',
                 //select first in group
@@ -179,21 +173,16 @@ function CodeHighlightLine(props: {
         >
             {withLineNumbers ? (
                 <span
+                    style={{ width: `${getGutterWidth(block.nodes.length)}ch` }}
                     className={tcls(
-                        'table-cell',
+                        'flex',
+                        'flex-row',
                         'text-sm',
-                        'w-[0.01ch]',
                         'text-right',
-                        'pr-3',
-                        'pl-2',
+                        'justify-end',
                         'sticky',
                         'left-0',
-                        'bg-gradient-to-r',
-                        'from-60%',
-                        'from-light-2',
-                        'to-transparent',
-                        'dark:from-dark-2',
-                        'dark:to-transparent',
+                        'rounded-md',
                         withLineNumbers
                             ? [
                                   'before:text-dark/5',
@@ -205,12 +194,6 @@ function CodeHighlightLine(props: {
                                       ? [
                                             'before:text-dark/6',
                                             'dark:before:text-light/8',
-                                            'bg-gradient-to-r',
-                                            'from-60%',
-                                            'from-light-3',
-                                            'to-transparent',
-                                            'dark:from-dark-3',
-                                            'dark:to-transparent',
                                         ]
                                       : null,
                               ]
@@ -280,4 +263,8 @@ function CodeHighlightToken(props: {
     }
 
     return <span style={{ color: colorToCSSVar[token.token.color] }}>{token.token.content}</span>;
+}
+
+function getGutterWidth(lineCount: number) {
+    return Math.max(1, lineCount.toString().length) + 1;
 }
