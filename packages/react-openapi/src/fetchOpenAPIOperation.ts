@@ -12,7 +12,7 @@ export interface OpenAPIOperationData {
     operation: OpenAPIV3.OperationObject;
 
     /** Securities that should be used for this operation */
-    securities: OpenAPIV3.SecuritySchemeObject[];
+    securities: [string, OpenAPIV3.SecuritySchemeObject][];
 }
 
 export { toJSON, fromJSON };
@@ -33,7 +33,8 @@ export interface OpenAPIFetcher {
     parseMarkdown?: (input: string) => Promise<string>;
 }
 
-export const SYMBOL_REF_RESOLVED = Symbol('REF_RESOLVED');
+export const SYMBOL_REF_RESOLVED = '__$refResolved';
+export const SYMBOL_MARKDOWN_PARSED = '__$markdownParsed';
 
 /**
  * Resolve an OpenAPI operation in a file and compile it to a more usable format.
@@ -60,7 +61,7 @@ export async function fetchOpenAPIOperation<Markdown>(
     const servers = await resolveOpenAPI<OpenAPIV3.ServerObject[]>(input.url, ['servers'], fetcher);
 
     // Resolve securities
-    const securities: OpenAPIV3.SecuritySchemeObject[] = [];
+    const securities: OpenAPIOperationData['securities'] = [];
     for (const security of operation.security ?? []) {
         const securityKey = Object.keys(security)[0];
 
@@ -71,7 +72,7 @@ export async function fetchOpenAPIOperation<Markdown>(
         );
 
         if (securityScheme) {
-            securities.push(securityScheme);
+            securities.push([securityKey, securityScheme]);
         }
     }
 
@@ -133,8 +134,14 @@ async function transformAll(
 ): Promise<void> {
     const value = data[key];
 
-    if (typeof value === 'string' && key === 'description' && fetcher.parseMarkdown) {
+    if (
+        typeof value === 'string' &&
+        key === 'description' &&
+        fetcher.parseMarkdown &&
+        !data[SYMBOL_MARKDOWN_PARSED]
+    ) {
         // Parse markdown
+        data[SYMBOL_MARKDOWN_PARSED] = true;
         data[key] = await fetcher.parseMarkdown(value);
     } else if (
         typeof value === 'string' ||

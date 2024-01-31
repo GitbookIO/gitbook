@@ -69,6 +69,7 @@ export async function PageAside(props: {
                     'hidden',
                     'page-api-block:xl:max-2xl:flex',
                     'flex-row',
+                    'items-center',
                     'gap-3',
                     'text-sm',
                     'font-semibold',

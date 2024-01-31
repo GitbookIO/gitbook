@@ -82,12 +82,12 @@
 
 /** Schemas */
 
-.openapi-schema .openapi-schema-properties {
-    @apply border rounded border-dark/2 dark:border-light/2;
+.openapi-schema-root {
+    @apply mx-3 mb-3 mt-2;
 }
 
-.openapi-schema .openapi-schema-properties:not(:has(.openapi-schema-properties:hover)):hover {
-    @apply border-dark/4 dark:border-light/4;
+.openapi-schema .openapi-schema-properties {
+    @apply border rounded border-dark/2 dark:border-light/2;
 }
 
 .openapi-schema-properties .openapi-schema {
@@ -176,8 +176,24 @@
     @apply px-3 py-2;
 }
 
+.openapi-authentication.openapi-authentication-closed:hover {
+    @apply border-dark/3 dark:border-light/3 cursor-pointer;
+}
+
 .openapi-authentication-header-content {
     @apply font-semibold text-base text-dark-2 dark:text-light-5;
+}
+
+.openapi-authentication-body {
+    @apply mx-3 mb-2 flex flex-col gap-2;
+}
+
+.openapi-authentication-description.openapi-markdown {
+    @apply prose-sm;
+}
+
+.openapi-authentication-label {
+    @apply font-medium text-sm text-dark-2 dark:text-light-5;
 }
 
 /** Parameters */
@@ -211,6 +227,10 @@
     @apply font-semibold text-base text-dark-2 dark:text-light-5;
 }
 
+.openapi-requestbody-description.openapi-markdown {
+    @apply px-3 prose-sm;
+}
+
 /** Responses */
 .openapi-responses {
     @apply border rounded border-dark/2 dark:border-light/2;
@@ -229,6 +249,10 @@
 }
 
 /** Response */
+.openapi-response-description.openapi-markdown {
+    @apply px-3 prose-sm;
+}
+
 .openapi-responsebody-header,
 .openapi-responseheaders-header {
     @apply px-3 py-1;

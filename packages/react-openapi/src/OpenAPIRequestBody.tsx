@@ -1,8 +1,9 @@
 import { OpenAPIV3 } from 'openapi-types';
-import { OpenAPISchemaProperties, getSchemaProperties } from './OpenAPISchema';
+import { OpenAPIRootSchema } from './OpenAPISchema';
 import { noReference } from './utils';
 import { OpenAPIClientContext } from './types';
 import { InteractiveSection } from './InteractiveSection';
+import { Markdown } from './Markdown';
 
 /**
  * Display an interactive request body.
@@ -23,18 +24,21 @@ export function OpenAPIRequestBody(props: {
                         key: contentType,
                         label: contentType,
                         body: (
-                            <OpenAPISchemaProperties
-                                properties={
-                                    getSchemaProperties(
-                                        noReference(mediaTypeObject.schema) ?? {},
-                                    ) ?? []
-                                }
+                            <OpenAPIRootSchema
+                                schema={noReference(mediaTypeObject.schema) ?? {}}
                                 context={context}
                             />
                         ),
                     };
                 },
             )}
-        />
+        >
+            {requestBody.description ? (
+                <Markdown
+                    source={requestBody.description}
+                    className="openapi-requestbody-description"
+                />
+            ) : null}
+        </InteractiveSection>
     );
 }

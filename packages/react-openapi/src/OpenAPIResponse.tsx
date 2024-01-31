@@ -1,9 +1,10 @@
 import classNames from 'classnames';
 import { OpenAPIV3 } from 'openapi-types';
-import { OpenAPISchemaProperties, getSchemaProperties } from './OpenAPISchema';
+import { OpenAPIRootSchema, OpenAPISchemaProperties } from './OpenAPISchema';
 import { noReference } from './utils';
 import { OpenAPIClientContext } from './types';
 import { InteractiveSection } from './InteractiveSection';
+import { Markdown } from './Markdown';
 
 /**
  * Display an interactive response body.
@@ -25,6 +26,10 @@ export function OpenAPIResponse(props: {
 
     return (
         <>
+            {response.description ? (
+                <Markdown source={response.description} className="openapi-response-description" />
+            ) : null}
+
             {headers.length > 0 ? (
                 <InteractiveSection
                     toggeable
@@ -52,10 +57,8 @@ export function OpenAPIResponse(props: {
                         key: contentType,
                         label: contentType,
                         body: (
-                            <OpenAPISchemaProperties
-                                properties={
-                                    getSchemaProperties(noReference(mediaType.schema) ?? {}) ?? []
-                                }
+                            <OpenAPIRootSchema
+                                schema={noReference(mediaType.schema) ?? {}}
                                 context={context}
                             />
                         ),

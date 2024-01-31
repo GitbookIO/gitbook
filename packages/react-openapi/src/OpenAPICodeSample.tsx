@@ -74,14 +74,18 @@ export function OpenAPICodeSample(props: {
     );
 }
 
-function getSecurityHeaders(securities: OpenAPIV3.SecuritySchemeObject[]): {
+function getSecurityHeaders(securities: OpenAPIOperationData['securities']): {
     [key: string]: string;
 } {
     const security = securities[0];
-    switch (security?.type) {
+    if (!security) {
+        return {};
+    }
+
+    switch (security[1].type) {
         case 'http': {
             return {
-                Authorization: security.scheme + ' ' + (security.bearerFormat ?? '<token>'),
+                Authorization: security[1].scheme + ' ' + (security[1].bearerFormat ?? '<token>'),
             };
         }
         default: {
