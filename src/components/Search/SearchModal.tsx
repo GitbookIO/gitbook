@@ -211,7 +211,6 @@ function SearchModalBody(
                             'w-full',
                             'h-12',
                             'p-2',
-                            'pt-3',
                             'focus:outline-none',
                             'bg-transparent',
                             'whitespace-pre-line',

@@ -176,14 +176,9 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 'max-h-[60vh]',
                 'overflow-auto',
                 'relative',
-                'before:w-full',
-                'before:h-[1px]',
-                'before:fixed',
-                'before:top-12',
-                'before:left-0',
-                'before:bg-dark/2',
-                'before:z-[1]',
-                'dark:before:bg-light/2',
+                'shadow-[0_1px_0_0_inset]',
+                'shadow-dark/2',
+                'dark:shadow-light/2',
             )}
         >
             {children}

@@ -25,7 +25,7 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
     const fullWidth = block.data.fullWidth;
 
     const fullWidthStyle = fullWidth ? 'max-w-4xl' : 'max-w-3xl';
-    const titleRounding = title ? ['rounded-md', 'rounded-ss-none'] : ['rounded-md'];
+    const titleRoundingStyle = title ? ['rounded-md', 'rounded-ss-none'] : ['rounded-md'];
 
     return (
         <div className={tcls('group/codeblock', 'grid', 'grid-flow-col', style, fullWidthStyle)}>
@@ -70,7 +70,7 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
                     'opacity-0',
                     'text-xs',
                     '[grid-area:2/1]',
-                    'z-[1]',
+                    'z-[2]',
                     'justify-self-end',
                     'backdrop-blur-md',
                     'leading-none',
@@ -94,17 +94,18 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
                     '[grid-area:2/1]',
                     'relative',
                     'overflow-auto',
-                    'linear-mask-util',
                     'bg-light-2',
                     'dark:bg-dark-2',
-                    titleRounding,
+                    'hide-scroll',
+                    titleRoundingStyle,
                 )}
             >
                 <code
                     id={id}
                     className={tcls(
                         'min-w-full',
-                        'table',
+                        'inline-grid',
+                        '[grid-template-columns:auto_1fr]',
                         'py-2',
                         'px-2',
                         '[counter-reset:line]',
@@ -144,12 +145,15 @@ function CodeHighlightLine(props: {
     return (
         <span
             className={tcls(
-                'overflow-hidden',
-                'flex',
-                'flex-row',
+                'grid',
+                '[grid-template-columns:subgrid]',
+                'col-span-2',
                 'relative',
-                'ring-2',
+                'ring-1',
                 'ring-transparent',
+                'hover:ring-dark/2',
+                'hover:z-[1]',
+                'dark:hover:ring-light/2',
                 'rounded',
                 //first child
                 '[&.highlighted:first-child]:rounded-t-md',
@@ -157,6 +161,8 @@ function CodeHighlightLine(props: {
                 //last child
                 '[&.highlighted:last-child]:rounded-b-md',
                 '[&.highlighted:last-child>*]:mb-1',
+                //is only child, dont hover effect line
+                '[&:only-child]:hover:ring-transparent',
                 //select all highlighted
                 '[&.highlighted]:rounded-none',
                 //select first in group
@@ -173,16 +179,20 @@ function CodeHighlightLine(props: {
         >
             {withLineNumbers ? (
                 <span
-                    style={{ width: `${getGutterWidth(block.nodes.length)}ch` }}
                     className={tcls(
-                        'flex',
-                        'flex-row',
                         'text-sm',
                         'text-right',
-                        'justify-end',
+                        'pr-3.5',
+                        'rounded-l',
+                        'pl-2',
                         'sticky',
-                        'left-0',
-                        'rounded-md',
+                        'left-[-3px]',
+                        'bg-gradient-to-r',
+                        'from-80%',
+                        'from-light-2',
+                        'to-transparent',
+                        'dark:from-dark-2',
+                        'dark:to-transparent',
                         withLineNumbers
                             ? [
                                   'before:text-dark/5',
@@ -191,7 +201,16 @@ function CodeHighlightLine(props: {
                                   'dark:before:text-light/4',
 
                                   line.highlighted
-                                      ? ['before:text-dark/6', 'dark:before:text-light/8']
+                                      ? [
+                                            'before:text-dark/6',
+                                            'dark:before:text-light/8',
+                                            'bg-gradient-to-r',
+                                            'from-80%',
+                                            'from-light-3',
+                                            'to-transparent',
+                                            'dark:from-dark-3',
+                                            'dark:to-transparent',
+                                        ]
                                       : null,
                               ]
                             : [],
@@ -260,8 +279,4 @@ function CodeHighlightToken(props: {
     }
 
     return <span style={{ color: colorToCSSVar[token.token.color] }}>{token.token.content}</span>;
-}
-
-function getGutterWidth(lineCount: number) {
-    return Math.max(1, lineCount.toString().length) + 1;
 }

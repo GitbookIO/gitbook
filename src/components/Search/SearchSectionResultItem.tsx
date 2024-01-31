@@ -27,6 +27,7 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
             }}
             className={tcls(
                 'search-section-result-item',
+                '[&:has(+:not(&))]:mb-6',
                 'flex',
                 'flex-col',
                 'pl-6',
