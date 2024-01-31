@@ -139,6 +139,10 @@ export function getNodeFragmentByName(
 export function isNodeEmpty(
     node: DocumentText | DocumentFragment | DocumentInline | DocumentBlock | JSONDocument,
 ): boolean {
+    if ((node.object === 'block' || node.object === 'inline') && node.isVoid) {
+        return false;
+    }
+
     if (node.object !== 'text' && 'nodes' in node) {
         if (node.nodes.length > 1) {
             return false;
