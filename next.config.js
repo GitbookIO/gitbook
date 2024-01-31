@@ -7,11 +7,24 @@ module.exports = withSentryConfig(
             SENTRY_DSN: process.env.SENTRY_DSN ?? '',
             SENTRY_ENVIRONMENT: process.env.SENTRY_ENVIRONMENT ?? 'development',
         },
+
+        webpack(config) {
+            config.resolve.fallback = {
+                ...config.resolve.fallback,
+
+                // Required for `swagger2openapi` to work:
+                fs: false,
+                path: false,
+                http: false,
+            };
+
+            return config;
+        },
     },
     {
         silent: true,
-        org: 'gitbook-x',
-        project: 'gitbook-open',
+        org: process.env.SENTRY_ORG,
+        project: process.env.SENTRY_PROJECT,
     },
     {
         // Upload a larger set of source maps for prettier stack traces (increases build time)

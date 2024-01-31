@@ -9,6 +9,7 @@ import rehypeSanitize from 'rehype-sanitize';
 import rehypeStringify from 'rehype-stringify';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
+import swagger2openapi, { ConvertOutputOptions } from 'swagger2openapi';
 import { unified } from 'unified';
 
 import { cache, parseCacheResponse, noCacheFetchOptions } from '@/lib/cache';
@@ -62,6 +63,18 @@ const fetcher: OpenAPIFetcher = {
                     //
                 }
             }
+        }
+
+        // @ts-ignore
+        if (data && data.swagger) {
+            // Convert Swagger 2.0 to OpenAPI 3.0
+            // @ts-ignore
+            const result = (await swagger2openapi.convertObj(data, {
+                resolve: false,
+                resolveInternal: false,
+            })) as ConvertOutputOptions;
+
+            data = result.openapi;
         }
 
         return {
