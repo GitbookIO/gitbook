@@ -253,6 +253,10 @@
     @apply px-3 prose-sm;
 }
 
+.openapi-response-description:last-child {
+    @apply mb-3;
+}
+
 .openapi-responsebody-header,
 .openapi-responseheaders-header {
     @apply px-3 py-1;

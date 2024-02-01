@@ -15,14 +15,13 @@ export function OpenAPIResponse(props: {
 }) {
     const { response, context } = props;
     const content = Object.entries(response.content ?? {});
-
-    if (content.length === 0) {
-        return null;
-    }
-
     const headers = Object.entries(response.headers ?? {}).map(
         ([name, header]) => [name, noReference(header) ?? {}] as const,
     );
+
+    if (content.length === 0 && !response.description && headers.length === 0) {
+        return null;
+    }
 
     return (
         <>
@@ -49,22 +48,24 @@ export function OpenAPIResponse(props: {
                     />
                 </InteractiveSection>
             ) : null}
-            <InteractiveSection
-                header="Body"
-                className={classNames('openapi-responsebody')}
-                tabs={content.map(([contentType, mediaType]) => {
-                    return {
-                        key: contentType,
-                        label: contentType,
-                        body: (
-                            <OpenAPIRootSchema
-                                schema={noReference(mediaType.schema) ?? {}}
-                                context={context}
-                            />
-                        ),
-                    };
-                })}
-            />
+            {content.length > 0 ? (
+                <InteractiveSection
+                    header="Body"
+                    className={classNames('openapi-responsebody')}
+                    tabs={content.map(([contentType, mediaType]) => {
+                        return {
+                            key: contentType,
+                            label: contentType,
+                            body: (
+                                <OpenAPIRootSchema
+                                    schema={noReference(mediaType.schema) ?? {}}
+                                    context={context}
+                                />
+                            ),
+                        };
+                    })}
+                />
+            ) : null}
         </>
     );
 }
