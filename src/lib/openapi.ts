@@ -50,15 +50,19 @@ const fetcher: OpenAPIFetcher = {
         let data: unknown = null;
 
         if (response.ok) {
-            if (response.headers.get('content-type')?.includes('yaml')) {
+            const text = await response.text();
+
+            // Try with JSON
+            try {
+                data = JSON.parse(text);
+            } catch (error) {
+                //
+            }
+
+            // Try with YAML
+            if (!data) {
                 try {
-                    data = yaml.load(await response.text());
-                } catch (error) {
-                    //
-                }
-            } else if (response.headers.get('content-type')?.includes('json')) {
-                try {
-                    data = await response.json();
+                    data = yaml.load(text);
                 } catch (error) {
                     //
                 }

@@ -49,15 +49,30 @@ export async function fetchOpenAPIOperation<Markdown>(
 ): Promise<OpenAPIOperationData | null> {
     const fetcher = cacheFetcher(rawFetcher);
 
-    const operation = await resolveOpenAPI<OpenAPIV3.OperationObject>(
+    let operation = await resolveOpenAPI<OpenAPIV3.OperationObject>(
         input.url,
         ['paths', input.path, input.method],
         fetcher,
     );
+
     if (!operation) {
         return null;
     }
 
+    // Resolve common parameters
+    const commonParameters = await resolveOpenAPI<OpenAPIV3.ParameterObject[]>(
+        input.url,
+        ['paths', input.path, 'parameters'],
+        fetcher,
+    );
+    if (commonParameters) {
+        operation = {
+            ...operation,
+            parameters: [...commonParameters, ...(operation.parameters ?? [])],
+        };
+    }
+
+    // Resolve servers
     const servers = await resolveOpenAPI<OpenAPIV3.ServerObject[]>(input.url, ['servers'], fetcher);
 
     // Resolve securities
