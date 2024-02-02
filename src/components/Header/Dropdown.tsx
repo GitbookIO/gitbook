@@ -55,6 +55,7 @@ export function Dropdown<E extends HTMLElement>(props: {
                         'max-h-56',
                         'bg-light',
                         'rounded-lg',
+                        'straight-corners:rounded-sm',
                         'p-2',
                         'shadow-1xs',
                         'overflow-auto',
@@ -121,6 +122,7 @@ export function DropdownMenuItem(props: {
                 'px-3',
                 'py-1',
                 'rounded',
+                'straight-corners:rounded-sm',
                 active
                     ? ['bg-primary/3', 'dark:bg-light/2', 'text-primary-600']
                     : ['hover:bg-dark/2', 'dark:hover:bg-light/2'],

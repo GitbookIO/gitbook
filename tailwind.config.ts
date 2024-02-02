@@ -185,6 +185,11 @@ const config: Config = {
             addVariant('space-header', 'body:has(header) &');
 
             /**
+             * Variant when the space is configured with straight corners.
+             */
+            addVariant('straight-corners', 'body.straight-corners &');
+
+            /**
              * Variant when the page contains a block that will be rendered in full-width mode.
              */
             addVariant('page-full-width', 'body:has(.page-full-width) &');

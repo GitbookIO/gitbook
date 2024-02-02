@@ -30,6 +30,7 @@ export async function PageLinkItem(props: { page: RevisionPageLink; context: Con
                     'duration-100',
                     'text-dark/8',
                     'rounded-md',
+                    'straight-corners:rounded-none',
                     'dark:text-light/7',
                     'font-normal',
                     'hover:bg-dark/1',

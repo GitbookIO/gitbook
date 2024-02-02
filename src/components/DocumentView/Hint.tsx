@@ -20,6 +20,7 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
                 'py-4',
                 'transition-colors',
                 'rounded-md',
+                'straight-corners:rounded-none',
                 hintStyle.style,
                 style,
             )}

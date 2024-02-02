@@ -52,6 +52,7 @@ export function Button({
 
     const domClassName = tcls(
         'rounded-md',
+        'straight-corners:rounded-none',
         'place-self-start',
         'ring-1',
         'ring-inset',

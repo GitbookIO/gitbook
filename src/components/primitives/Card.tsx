@@ -26,6 +26,7 @@ export async function Card(props: {
                 'ring-1',
                 'ring-dark/3',
                 'rounded',
+                'straight-corners:rounded-none',
                 'px-5',
                 'py-3',
                 'transition-shadow',

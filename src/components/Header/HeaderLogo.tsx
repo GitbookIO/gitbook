@@ -62,6 +62,7 @@ export function HeaderLogo(props: HeaderLogoProps) {
                             'lg:max-w-[12rem]',
                             'max-h-[3rem]',
                             'rounded',
+                            'straight-corners:rounded-sm',
                             'overflow-hidden',
                             'object-contain',
                             'object-left',

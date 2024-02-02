@@ -59,6 +59,7 @@ export function HeaderMobileMenu(props: Partial<React.ButtonHTMLAttributes<HTMLB
                     'w-7',
                     'h-7',
                     'rounded',
+                    'straight-corners:rounded-sm',
                     'text-inherit',
                     'hover:bg-dark/3',
                     'p-[0.25rem]',

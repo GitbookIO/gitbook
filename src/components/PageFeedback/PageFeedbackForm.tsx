@@ -50,6 +50,7 @@ export function PageFeedbackForm(props: {
                     'justify-center',
                     'flex-row',
                     'rounded-full',
+                    'straight-corners:rounded-sm',
                     'ring-1',
                     'ring-inset',
                     'ring-dark/2',
@@ -67,6 +68,8 @@ export function PageFeedbackForm(props: {
                             'inline-flex',
                             '[&>*:last-child]:rounded-r-full',
                             '[&>*:first-child]:rounded-l-full',
+                            'straight-corners:[&>*:last-child]:rounded-none',
+                            'straight-corners:[&>*:first-child]:rounded-none',
                         )}
                     >
                         <RatingButton

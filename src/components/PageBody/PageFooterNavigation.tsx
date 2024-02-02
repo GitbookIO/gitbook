@@ -82,6 +82,7 @@ function NavigationCard(props: {
                 'border',
                 'border-dark/3',
                 'rounded',
+                'straight-corners:rounded-none',
                 'hover:border-primary/6',
                 'dark:border-light/2',
                 'textwrap-pretty',

@@ -81,6 +81,7 @@ export function TrademarkLink(props: { space: Space; customization: Customizatio
                 'px-4',
                 'py-2',
                 'rounded-md',
+                'straight-corners:rounded-none',
                 'hover:backdrop-blur-sm',
                 'lg:ring-0',
                 'tracking-[-0.016em]',

@@ -45,6 +45,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                 'z-10',
                 'bg-white',
                 'rounded',
+                'straight-corners:rounded-none',
                 'ring-1',
                 'ring-dark/2',
                 'shadow-1xs',

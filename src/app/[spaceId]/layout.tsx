@@ -1,4 +1,8 @@
-import { CustomizationHeaderPreset, CustomizationSettings } from '@gitbook/api';
+import {
+    CustomizationCorners,
+    CustomizationHeaderPreset,
+    CustomizationSettings,
+} from '@gitbook/api';
 import assertNever from 'assert-never';
 import colors from 'tailwindcss/colors';
 
@@ -81,12 +85,17 @@ export default async function SpaceRootLayout(props: {
                 `}</style>
             </head>
             <body
-                className={tcls(
-                    `${fonts[customization.styling.font].className}`,
-                    `${ibmPlexMono.variable}`,
-                    'bg-light',
-                    'dark:bg-dark',
-                )}
+                className={
+                    tcls(
+                        `${fonts[customization.styling.font].className}`,
+                        `${ibmPlexMono.variable}`,
+                        'bg-light',
+                        'dark:bg-dark',
+                    ) +
+                    (customization.styling.corners === CustomizationCorners.Straight
+                        ? ' straight-corners'
+                        : '')
+                }
             >
                 <ClientContexts
                     nonce={nonce}

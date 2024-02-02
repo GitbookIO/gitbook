@@ -41,6 +41,7 @@ export async function RecordCard(
                 'h-[calc(100%+2px)]',
                 'inset-[-1px]',
                 'rounded-[7px]',
+                'straight-corners:rounded-none',
                 'overflow-hidden',
                 'dark:bg-dark',
             )}
@@ -97,6 +98,7 @@ export async function RecordCard(
         'shadow-1xs',
         'shadow-dark/[0.02]',
         'rounded-md',
+        'straight-corners:rounded-none',
         'hover:before:ring-dark/4',
         'dark:shadow-transparent',
         'dark:hover:before:ring-light/4',

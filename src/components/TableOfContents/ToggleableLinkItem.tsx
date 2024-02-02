@@ -106,6 +106,7 @@ export function ToggleableLinkItem(props: {
                     'before:top-0',
                     'before:h-full',
                     'rounded-md',
+                    'straight-corners:rounded-none',
                     '[&+div_a]:rounded-l-none',
                     isActive
                         ? [
@@ -138,6 +139,7 @@ export function ToggleableLinkItem(props: {
                             'group',
                             'relative',
                             'rounded-full',
+                            'straight-corners:rounded-sm',
                             'w-5',
                             'h-5',
                             'after:grid-area-1-1',
