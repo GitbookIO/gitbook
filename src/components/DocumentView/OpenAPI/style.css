@@ -168,31 +168,31 @@
 
 /** Authentication */
 
-.openapi-authentication {
+.openapi-securities {
     @apply border rounded border-dark/2 dark:border-light/2;
 }
 
-.openapi-authentication-header {
+.openapi-securities-header {
     @apply px-3 py-2;
 }
 
-.openapi-authentication.openapi-authentication-closed:hover {
+.openapi-securities.openapi-securities-closed:hover {
     @apply border-dark/3 dark:border-light/3 cursor-pointer;
 }
 
-.openapi-authentication-header-content {
+.openapi-securities-header-content {
     @apply font-semibold text-base text-dark-2 dark:text-light-5;
 }
 
-.openapi-authentication-body {
+.openapi-securities-body {
     @apply mx-3 mb-2 flex flex-col gap-2;
 }
 
-.openapi-authentication-description.openapi-markdown {
+.openapi-securities-description.openapi-markdown {
     @apply prose-sm;
 }
 
-.openapi-authentication-label {
+.openapi-securities-label {
     @apply font-medium text-sm text-dark-2 dark:text-light-5;
 }
 

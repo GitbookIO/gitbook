@@ -5,7 +5,7 @@ import { Markdown } from './Markdown';
 import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 
 /**
- * Present authentication that can be used for this operation.
+ * Present securities authorization that can be used for this operation.
  */
 export function OpenAPISecurities(props: {
     securities: OpenAPIOperationData['securities'];
@@ -19,8 +19,8 @@ export function OpenAPISecurities(props: {
 
     return (
         <InteractiveSection
-            header="Authentication"
-            className="openapi-authentication"
+            header="Authorization"
+            className="openapi-securities"
             toggeable
             defaultOpened={false}
             toggleCloseIcon={context.icons.chevronDown}
@@ -31,13 +31,13 @@ export function OpenAPISecurities(props: {
                     label: key,
                     body: (
                         <>
-                            <p className="openapi-authentication-label">
+                            <p className="openapi-securities-label">
                                 {getLabelForType(security)}
                             </p>
                             {security.description ? (
                                 <Markdown
                                     source={security.description}
-                                    className="openapi-authentication-description"
+                                    className="openapi-securities-description"
                                 />
                             ) : null}
                         </>
