@@ -40,7 +40,7 @@ export function AnnotationPopover(props: { children: React.ReactNode; body: Reac
                         '[&_p]:leading-snug',
                         'dark:bg-dark',
                         'dark:ring-light/2',
-                        'dark:shadow-vanta/4',
+                        'dark:shadow-dark/4',
                         '-outline-offset-2',
                         'outline-2',
                         'outline-primary/8',

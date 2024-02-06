@@ -19,7 +19,7 @@ html.dark {
     --shiki-token-keyword: theme('colors.pomegranate.400');
     --shiki-token-parameter: theme('colors.yellow.500');
     --shiki-token-function: #56b6c2;
-    --shiki-token-string-expression: theme('colors.light.5');
-    --shiki-token-punctuation: theme('colors.periwinkle');
+    --shiki-token-string-expression: theme('colors.light.4');
+    --shiki-token-punctuation: #acc6ee;
     --shiki-token-link: theme('colors.pomegranate.400');
 }

@@ -21,7 +21,7 @@ export function Footer(props: {
             className={tcls(
                 'border-t',
                 'border-dark/2',
-                'bg-light-3',
+                'bg-light-2',
                 'dark:border-light/2',
                 'dark:bg-dark-2',
             )}

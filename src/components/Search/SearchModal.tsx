@@ -186,7 +186,7 @@ function SearchModalBody(
                 'backdrop-blur-lg',
                 'overflow-hidden',
                 'dark:ring-inset',
-                'dark:bg-dark-4',
+                'dark:bg-dark-3',
                 'dark:ring-light/2',
             )}
             onClick={(event) => {

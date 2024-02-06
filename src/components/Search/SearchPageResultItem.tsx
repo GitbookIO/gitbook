@@ -30,14 +30,14 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                 'flex-row',
                 'px-6',
                 'py-3',
-                'hover:bg-dark/1',
+                'hover:bg-dark-4/2',
                 'text-base',
                 'text-dark',
                 'font-semibold',
                 'first:mt-0',
                 '[&:has(+.search-section-result-item):not(:first-child)]:mt-6',
                 'dark:text-light',
-                'dark:hover:bg-light/1',
+                'dark:hover:bg-light-4/2',
                 active ? ['bg-dark/1', 'dark:bg-light/1'] : null,
             )}
         >

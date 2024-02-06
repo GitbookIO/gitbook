@@ -31,8 +31,8 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                 'flex',
                 'flex-col',
                 'pl-6',
-                'hover:bg-dark/1',
-                'dark:hover:bg-light/1',
+                'hover:bg-dark-4/2',
+                'dark:hover:bg-light-4/2',
                 active ? ['bg-dark/1', 'dark:bg-light/1'] : null,
             )}
         >

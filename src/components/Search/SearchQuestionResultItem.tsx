@@ -29,14 +29,14 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                 'flex-row',
                 'px-4',
                 'py-2',
-                'hover:bg-dark/1',
+                'hover:bg-dark-4/2',
                 'text-dark/7',
                 'text-sm',
                 'font-medium',
                 'first:mt-0',
                 'last:pb-3',
                 'dark:text-light/8',
-                'dark:hover:bg-light/1',
+                'dark:hover:bg-light-4/2',
                 active ? ['bg-dark/1', 'dark:bg-light/1'] : null,
             )}
             {...getLinkProp({

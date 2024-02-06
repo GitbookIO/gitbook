@@ -60,39 +60,41 @@ export function DynamicTabs(props: {
                             'py-2',
                             'transition-colors',
                             'font-semibold',
-                            'text-dark-4',
+                            'text-dark-3',
+                            'relative',
 
                             'after:transition-colors',
                             'after:group-hover/tabs:border-transparent',
                             'after:border-r',
-
+                            'after:absolute',
+                            'after:left-[unset]',
+                            'after:-right-[calc(0.25rem-.5px)]',
                             'after:border-dark/4',
-                            'after:left-4',
-                            'after:relative',
+                            'after:top-[10%]',
+                            'after:h-[80%]',
+                            'after:w-[1px]',
 
                             'last:after:border-transparent',
                             'hover:bg-light-2',
 
-                            'dark:text-light-5',
+                            'dark:text-light-3',
                             'dark:hover:bg-dark-2',
-                            'dark:hover:text-light-4',
                             'dark:after:border-light/2',
 
                             active === tab.id
                                 ? [
                                       'active-tab',
-                                      'text-dark-4',
-                                      'bg-light-3',
+                                      'text-dark-3',
+                                      'bg-light-3/7',
 
                                       'after:[&.active-tab]:border-transparent',
                                       'after:[:has(+_&.active-tab)]:border-transparent',
                                       'after:[:has(&_+)]:border-transparent',
 
-                                      'hover:bg-light-4',
-                                      'dark:bg-dark-4',
+                                      'hover:bg-light-4/6',
+                                      'dark:bg-dark-3',
                                       'dark:text-light',
-                                      'dark:hover:bg-dark-4/2',
-                                      'dark:hover:text-light-3',
+                                      'dark:hover:bg-dark-4/7',
                                   ]
                                 : null,
                         )}

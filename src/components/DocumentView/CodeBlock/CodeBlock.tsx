@@ -151,9 +151,9 @@ function CodeHighlightLine(props: {
                 'relative',
                 'ring-1',
                 'ring-transparent',
-                'hover:ring-dark/2',
+                'hover:ring-dark-4/5',
                 'hover:z-[1]',
-                'dark:hover:ring-light/2',
+                'dark:hover:ring-light-4/4',
                 'rounded',
                 //first child
                 '[&.highlighted:first-child]:rounded-t-md',

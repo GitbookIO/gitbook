@@ -43,28 +43,22 @@ const config: Config = {
                 // Dynamic colors matching the customization settings
                 primary: generateShades('primary-color'),
                 light: {
-                    1: `color-mix(in srgb, rgb(var(--primary-color-600)), rgb(var(--light) / <alpha-value>) 98%)`,
-                    DEFAULT: `color-mix(in srgb, rgb(var(--primary-color-700)), rgb(var(--light) / <alpha-value>) 96%)`,
-                    2: `color-mix(in srgb, rgb(var(--primary-color-800)), rgb(var(--light) / <alpha-value>) 92%)`,
-                    3: `color-mix(in srgb, rgb(var(--primary-color-800)), rgb(var(--light) / <alpha-value>) 88%)`,
-                    4: `color-mix(in srgb, rgb(var(--primary-color-800)), rgb(var(--light) / <alpha-value>) 82%)`,
-                    5: `color-mix(in srgb, rgb(var(--primary-color-800)), rgb(var(--light) / <alpha-value>) 64%)`,
+                    1: `color-mix(in srgb, color-mix(in srgb, rgb(var(--primary-color-600)), rgb(var(--light)) 99%), transparent calc(100% - 100% * <alpha-value>))`, //1 99%
+              DEFAULT: `color-mix(in srgb, color-mix(in srgb, rgb(var(--primary-color-700)), rgb(var(--light)) 96%), transparent calc(100% - 100% * <alpha-value>))`, //(default) 96%
+                    2: `color-mix(in srgb, color-mix(in srgb, rgb(var(--primary-color-800)), rgb(var(--light)) 92%), transparent calc(100% - 100% * <alpha-value>))`, //2 92%
+                    3: `color-mix(in srgb, color-mix(in srgb, rgb(var(--primary-color-800)), rgb(var(--light)) 88%), transparent calc(100% - 100% * <alpha-value>))`, //4 82%
+                    4: `color-mix(in srgb, color-mix(in srgb, rgb(var(--primary-color-800)), rgb(var(--light)) 72%), transparent calc(100% - 100% * <alpha-value>))`, //5 64%
                 },
                 dark: {
-                    1: `color-mix(in srgb, rgb(var(--primary-color-100)), rgb(var(--dark) / <alpha-value>) 98%)`,
-                    DEFAULT: `color-mix(in srgb, rgb(var(--primary-color-300)), rgb(var(--dark) / <alpha-value>) 96%)`,
-                    2: `color-mix(in srgb, rgb(var(--primary-color-200)), rgb(var(--dark) / <alpha-value>) 92%)`,
-                    3: `color-mix(in srgb, rgb(var(--primary-color-200)), rgb(var(--dark) / <alpha-value>) 88%)`,
-                    4: `color-mix(in srgb, rgb(var(--primary-color-200)), rgb(var(--dark) / <alpha-value>) 82%)`,
-                    5: `color-mix(in srgb, rgb(var(--primary-color-200)), rgb(var(--dark) / <alpha-value>) 64%)`,
+                    1: `color-mix(in srgb, color-mix(in srgb, rgb(var(--primary-color-100)), rgb(var(--dark)) 99%), transparent calc(100% - 100% * <alpha-value>))`, //1 99%
+              DEFAULT: `color-mix(in srgb, color-mix(in srgb, rgb(var(--primary-color-300)), rgb(var(--dark)) 96%), transparent calc(100% - 100% * <alpha-value>))`, //(default) 96%
+                    2: `color-mix(in srgb, color-mix(in srgb, rgb(var(--primary-color-200)), rgb(var(--dark)) 92%), transparent calc(100% - 100% * <alpha-value>))`, //2 92%
+                    3: `color-mix(in srgb, color-mix(in srgb, rgb(var(--primary-color-200)), rgb(var(--dark)) 88%), transparent calc(100% - 100% * <alpha-value>))`, //4 82%
+                    4: `color-mix(in srgb, color-mix(in srgb, rgb(var(--primary-color-200)), rgb(var(--dark)) 64%), transparent calc(100% - 100% * <alpha-value>))`, //5 64%
                 },
                 yellow: generateShades('yellow'),
                 teal: generateShades('teal'),
                 pomegranate: generateShades('pomegranate'),
-                vanta: 'rgb(var(--vanta) / <alpha-value>)',
-                metal: 'rgb(var(--metal) / <alpha-value>)',
-                sky: 'rgb(var(--sky) / <alpha-value>)',
-                periwinkle: 'rgb(var(--periwinkle) / <alpha-value>)',
                 'header-background': generateShades('header-background'),
                 'header-link': generateShades('header-link'),
             },

@@ -24,11 +24,11 @@ export const Checkbox = React.forwardRef<
             'ring-inset',
             'grid',
             'place-items-center',
-            'data-[state=checked]:bg-dark-5/4',
+            'data-[state=checked]:bg-light-4/7',
             '[&>*:has(svg)]:absolute',
             'dark:bg-dark-2',
             'dark:ring-light/3',
-            'dark:data-[state=checked]:bg-dark-5',
+            'dark:data-[state=checked]:bg-dark-4',
             className,
         )}
         {...props}

@@ -4,12 +4,8 @@
 
 @layer base {
     :root {
-        --dark: 24 24 24;
-        --light: 249 250 250;
-        --vanta: 2 12 13;
-        --metal: 222 229 229;
-        --sky: 187 221 229;
-        --periwinkle: 172 198 238;
+        --dark: 23 23 23;
+        --light: 250 251 251;
         @apply leading-relaxed;
     }
     body {

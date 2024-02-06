@@ -30,7 +30,7 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                 'to-light-1',
                 'border',
                 'border-b-0',
-                'border-light-3/8',
+                'border-light-3/9',
                 //all
                 '[&]:mt-[0px]',
                 //select first child
@@ -45,13 +45,13 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                 '[&:not(:has(+_&))]:border-b',
                 /* '[&:not(:has(+_&))]:shadow-1xs', */
 
-                'dark:border-dark-3/6',
-                'dark:from-light/[0.03]',
-                'dark:to-light/[0.03]',
+                'dark:border-dark-3/10',
+                'dark:from-dark-2',
+                'dark:to-dark-2',
                 'dark:shadow-none',
 
-                'group open:dark:to-light/[0.01]',
-                'group open:to-light',
+                'group open:dark:to-dark-2/8',
+                'group open:to-light-1/6',
             )}
         >
             <summary
@@ -62,10 +62,10 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                     'list-none',
                     'select-none',
                     'transition-colors',
-                    'group-hover/expandable:text-dark-5/7',
-                    'group-open:text-dark-5/7',
-                    'dark:group-open:text-light-5',
-                    'dark:group-hover/expandable:text-light-5',
+                    'group-hover/expandable:text-dark-4/7',
+                    'group-open:text-dark-3/7',
+                    'dark:group-open:text-light-3/7',
+                    'dark:group-hover/expandable:text-light-3/7',
                     '[&::-webkit-details-marker]:hidden',
                 )}
             >

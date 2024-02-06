@@ -65,9 +65,9 @@ export function SkeletonCard(props: { style?: ClassValue }) {
     const { style } = props;
     return (
         <div role="status" aria-busy className={tcls('skeleton-card', 'flex', 'gap-[25px]', style)}>
-            <LoadingPane tile={24} style={['rounded-md', 'aspect-[1/1.2]', 'w-full']} />
-            <LoadingPane tile={24} style={['rounded-md', 'aspect-[1/1.2]', 'w-full']} />
-            <LoadingPane tile={24} style={['rounded-md', 'aspect-[1/1.2]', 'w-full']} />
+            <LoadingPane tile={24} delay={0} style={['rounded-md', 'aspect-[1/1.2]', 'w-full']} />
+            <LoadingPane tile={24} delay={1} style={['rounded-md', 'aspect-[1/1.2]', 'w-full']} />
+            <LoadingPane tile={24} delay={2} style={['rounded-md', 'aspect-[1/1.2]', 'w-full']} />
         </div>
     );
 }

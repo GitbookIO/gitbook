@@ -108,7 +108,7 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
                 <div
                     className={tcls(
                         'text-xs',
-                        'text-dark-5/8',
+                        'text-dark-4/8',
                         'group-hover/file:text-dark',
                         'dark:text-light-4/7',
                         'dark:group-hover/file:text-light',

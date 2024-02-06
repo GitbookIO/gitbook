@@ -62,9 +62,8 @@ const HINT_STYLES: {
         icon: InfoIcon,
         anchorColor: [
             '[&>a]:text-dark/9',
-            '[&>a:hover]:text-vanta',
+            '[&>a:hover]:text-dark',
             'text-dark',
-
             'fill-dark',
             'dark:[&>a]:text-light',
             'dark:[&>a:hover]:text-light/8',

@@ -12,6 +12,7 @@ import React from 'react';
 import { Footer } from '@/components/Footer';
 import { CompactHeader, Header } from '@/components/Header';
 import { CONTAINER_STYLE } from '@/components/layout';
+import { ColorDebugger } from '@/components/primitives/ColorDebugger';
 import { SearchModal } from '@/components/Search';
 import { TableOfContents } from '@/components/TableOfContents';
 import { ContentPointer } from '@/lib/api';
@@ -52,6 +53,7 @@ export function SpaceLayout(props: {
 
     return (
         <div>
+            {/* <ColorDebugger /> */}
             <Header
                 withTopHeader={withTopHeader}
                 space={space}

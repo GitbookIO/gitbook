@@ -115,7 +115,7 @@
 }
 
 .openapi-schema-type {
-    @apply font-mono ml-3 text-base text-dark-5/8 dark:text-light-5;
+    @apply font-mono ml-3 text-base text-dark-4/8 dark:text-light-4;
 }
 
 .openapi-schema-type:only-child {
@@ -181,7 +181,7 @@
 }
 
 .openapi-securities-header-content {
-    @apply font-semibold text-base text-dark-2 dark:text-light-5;
+    @apply font-semibold text-base text-dark-2 dark:text-light-4;
 }
 
 .openapi-securities-body {
@@ -193,7 +193,7 @@
 }
 
 .openapi-securities-label {
-    @apply font-medium text-sm text-dark-2 dark:text-light-5;
+    @apply font-medium text-sm text-dark-2 dark:text-light-4;
 }
 
 /** Parameters */
@@ -211,7 +211,7 @@
 }
 
 .openapi-parameters-header-content {
-    @apply font-semibold text-base text-dark-2 dark:text-light-5;
+    @apply font-semibold text-base text-dark-2 dark:text-light-4;
 }
 
 /** Request body */
@@ -224,7 +224,15 @@
 }
 
 .openapi-requestbody-header-content {
-    @apply font-semibold text-base text-dark-2 dark:text-light-5;
+    @apply font-semibold text-base text-dark-2 dark:text-light-4;
+}
+
+.openapi-requestbody-description.openapi-markdown {
+    @apply px-3 prose-sm;
+}
+
+.openapi-requestbody-description.openapi-markdown {
+    @apply px-3 prose-sm;
 }
 
 .openapi-requestbody-description.openapi-markdown {
@@ -245,7 +253,7 @@
 }
 
 .openapi-responses-header-content {
-    @apply font-semibold text-dark-2 dark:text-light-5;
+    @apply font-semibold text-dark-2 dark:text-light-4;
 }
 
 /** Response */
