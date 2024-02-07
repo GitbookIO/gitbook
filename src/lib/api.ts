@@ -363,9 +363,16 @@ export const getRevisionFile = cache(
  * Get a document by its ID.
  */
 export const getDocument = cache('api.getDocument', async (spaceId: string, documentId: string) => {
-    const response = await api().spaces.getDocumentById(spaceId, documentId, {
-        ...noCacheFetchOptions,
-    });
+    const response = await api().spaces.getDocumentById(
+        spaceId,
+        documentId,
+        {
+            schema: 'next',
+        },
+        {
+            ...noCacheFetchOptions,
+        },
+    );
     return cacheResponse(response, {
         tags: [
             // No tags as documents are immutable

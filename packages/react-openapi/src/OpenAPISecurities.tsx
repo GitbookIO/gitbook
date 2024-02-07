@@ -31,9 +31,7 @@ export function OpenAPISecurities(props: {
                     label: key,
                     body: (
                         <>
-                            <p className="openapi-securities-label">
-                                {getLabelForType(security)}
-                            </p>
+                            <p className="openapi-securities-label">{getLabelForType(security)}</p>
                             {security.description ? (
                                 <Markdown
                                     source={security.description}
