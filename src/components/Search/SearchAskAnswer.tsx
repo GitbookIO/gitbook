@@ -7,9 +7,10 @@ import { atom, useRecoilState } from 'recoil';
 import { Loading } from '@/components/primitives';
 import { useLanguage } from '@/intl/client';
 import { t } from '@/intl/translate';
+import { iterateStreamResponse } from '@/lib/actions';
 import { tcls } from '@/lib/tailwind';
 
-import { AskAnswerResult, askQuestion } from './server-actions';
+import { AskAnswerResult, streamAskQuestion } from './server-actions';
 import { useSearch, useSearchLink } from './useSearch';
 
 /**
@@ -44,32 +45,47 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
     const [state, setState] = useRecoilState(searchAskState);
 
     React.useEffect(() => {
+        let cancelled = false;
+
         setState({
             type: 'loading',
         });
 
-        askQuestion(spaceId, query).then(
-            (answer) => {
-                setSearchState((prev) =>
-                    prev
-                        ? {
-                              ...prev,
-                              ask: true,
-                              query,
-                          }
-                        : null,
-                );
+        (async () => {
+            const stream = iterateStreamResponse(streamAskQuestion(spaceId, query));
+
+            setSearchState((prev) =>
+                prev
+                    ? {
+                          ...prev,
+                          ask: true,
+                          query,
+                      }
+                    : null,
+            );
+
+            for await (const chunk of stream) {
+                if (cancelled) {
+                    return;
+                }
+
                 setState({
                     type: 'answer',
-                    answer,
+                    answer: chunk,
                 });
-            },
-            (error) => {
-                setState({
-                    type: 'error',
-                });
-            },
-        );
+            }
+        })().catch((error) => {
+            if (cancelled) {
+                return;
+            }
+            setState({
+                type: 'error',
+            });
+        });
+
+        return () => {
+            cancelled = true;
+        };
     }, [spaceId, query, setSearchState, setState]);
 
     React.useEffect(() => {

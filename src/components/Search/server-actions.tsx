@@ -1,11 +1,11 @@
 'use server';
 
-import { SearchPageResult } from '@gitbook/api';
+import { RevisionPage, SearchAIAnswer, SearchPageResult } from '@gitbook/api';
 
+import { streamResponse } from '@/lib/actions';
 import * as api from '@/lib/api';
 import { absoluteHref, pageHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
-import { tcls } from '@/lib/tailwind';
 import { filterOutNullable } from '@/lib/typescript';
 
 import { DocumentView } from '../DocumentView';
@@ -77,12 +77,36 @@ export async function searchCollectionContent(
 /**
  * Server action to ask a question in a space.
  */
+export const streamAskQuestion = streamResponse(async function* (spaceId: string, query: string) {
+    const stream = api.api().spaces.streamAskInSpace(spaceId, { query, format: 'document' });
+    const pages = await api.getRevisionPages({ spaceId });
+
+    for await (const chunk of stream) {
+        yield transformAnswer(chunk.answer, pages);
+    }
+});
+
 export async function askQuestion(spaceId: string, query: string): Promise<AskAnswerResult | null> {
     const [{ answer }, pages] = await Promise.all([
         api.askQueryInSpace(spaceId, query),
         api.getRevisionPages({ spaceId }),
     ]);
 
+    return transformAnswer(answer, pages);
+}
+
+/**
+ * List suggested questions for a space.
+ */
+export async function getRecommendedQuestions(spaceId: string): Promise<string[]> {
+    const data = await api.getRecommendedQuestionsInSpace(spaceId);
+    return data.questions;
+}
+
+function transformAnswer(
+    answer: SearchAIAnswer | undefined,
+    pages: RevisionPage[],
+): AskAnswerResult | null {
     if (!answer || !('document' in answer.answer)) {
         return null;
     }
@@ -124,14 +148,6 @@ export async function askQuestion(spaceId: string, query: string): Promise<AskAn
         followupQuestions: answer.followupQuestions,
         sources,
     };
-}
-
-/**
- * List suggested questions for a space.
- */
-export async function getRecommendedQuestions(spaceId: string): Promise<string[]> {
-    const data = await api.getRecommendedQuestionsInSpace(spaceId);
-    return data.questions;
 }
 
 function transformPageResult(item: SearchPageResult, spaceTitle?: string) {

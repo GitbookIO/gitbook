@@ -87,11 +87,12 @@ export async function getDocumentSections(
  * Get the text of a block/inline.
  */
 export function getNodeText(
-    node: DocumentText | DocumentFragment | DocumentInline | DocumentBlock,
+    node: JSONDocument | DocumentText | DocumentFragment | DocumentInline | DocumentBlock,
 ): string {
     switch (node.object) {
         case 'text':
             return node.leaves.map((leaf) => leaf.text).join('');
+        case 'document':
         case 'fragment':
         case 'block':
         case 'inline':
