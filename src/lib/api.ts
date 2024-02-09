@@ -143,13 +143,12 @@ export const getPublishedContentByUrl = cache(
                 data,
             };
         } catch (error) {
-            const httpError = error as GitBookAPIError;
-            if (httpError.code < 500) {
+            if (error instanceof GitBookAPIError && error.code >= 400 && error.code < 500) {
                 return {
                     data: {
                         error: {
-                            code: httpError.code,
-                            message: httpError.errorMessage || httpError.message,
+                            code: error.code,
+                            message: error.errorMessage || error.message,
                         },
                     } as PublishedContentWithCache,
                     // Cache errors for max 10 minutes in case the user is making changes to its content configuration
