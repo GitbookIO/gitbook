@@ -49,7 +49,12 @@ export function CompactHeader(props: {
             >
                 <React.Suspense fallback={null}>
                     <SearchButton>
-                        <span>{t(getSpaceLanguage(customization), 'search')}</span>
+                        <span className={tcls('flex-1')}>
+                            {t(
+                                getSpaceLanguage(customization),
+                                customization.aiSearch.enabled ? 'search_or_ask' : 'search',
+                            )}
+                        </span>
                     </SearchButton>
                 </React.Suspense>
             </div>
