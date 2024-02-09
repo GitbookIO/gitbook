@@ -107,7 +107,12 @@ export function Header(props: {
                                     : null
                             }
                         >
-                            <p>{t(getSpaceLanguage(customization), 'search')}</p>
+                            <p className={tcls('flex-1')}>
+                                {t(
+                                    getSpaceLanguage(customization),
+                                    customization.aiSearch.enabled ? 'search_or_ask' : 'search',
+                                )}
+                            </p>
                         </SearchButton>
                     </Suspense>
                 </div>

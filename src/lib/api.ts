@@ -488,29 +488,6 @@ export const searchCollectionContent = cache(
 );
 
 /**
- * Ask question in a space.
- */
-export const askQueryInSpace = cache(
-    'api.askQueryInSpace',
-    async (spaceId: string, query: string) => {
-        const response = await api().spaces.askQueryInSpace(
-            spaceId,
-            { query },
-            {
-                format: 'document',
-            },
-            {
-                ...noCacheFetchOptions,
-            },
-        );
-
-        return cacheResponse(response, {
-            tags: [getAPICacheTag({ tag: 'space', space: spaceId })],
-        });
-    },
-);
-
-/**
  * Get a list of recommended questions in a space.
  */
 export const getRecommendedQuestionsInSpace = cache(

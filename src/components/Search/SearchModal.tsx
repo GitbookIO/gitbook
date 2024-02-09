@@ -217,7 +217,10 @@ function SearchModalBody(
                             'dark:text-light',
                             'dark:placeholder:text-light/7',
                         )}
-                        placeholder={tString(language, 'search_input_placeholder')}
+                        placeholder={tString(
+                            language,
+                            withAsk ? 'search_ask_input_placeholder' : 'search_input_placeholder',
+                        )}
                         spellCheck="false"
                         autoComplete="off"
                         autoCorrect="off"

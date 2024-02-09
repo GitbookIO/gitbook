@@ -11,7 +11,6 @@ import { useSearch } from './useSearch';
 /**
  * Button to open the search modal.
  */
-
 export function SearchButton(props: { children?: React.ReactNode; style?: ClassValue }) {
     const { style, children } = props;
 
@@ -61,6 +60,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'md:[&>span]:flex',
                 'md:w-full',
                 'md:px-3.5',
+                'text-base',
                 style,
             )}
         >
@@ -95,7 +95,6 @@ const Shortcut = () => {
                 'hidden',
                 'md:inline',
                 'justify-end',
-                'w-full',
                 'text-xs',
                 'text-dark/5',
                 'dark:text-light/5',

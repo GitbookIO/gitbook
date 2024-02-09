@@ -34,11 +34,6 @@ export interface AskAnswerSource {
     id: string;
     title: string;
     href: string;
-    ancestors: Array<{
-        id: string;
-        title: string;
-        href: string;
-    }>;
 }
 
 export interface AskAnswerResult {
@@ -79,21 +74,14 @@ export async function searchCollectionContent(
  */
 export const streamAskQuestion = streamResponse(async function* (spaceId: string, query: string) {
     const stream = api.api().spaces.streamAskInSpace(spaceId, { query, format: 'document' });
-    const pages = await api.getRevisionPages({ spaceId });
+    const pagesPromise = api.getRevisionPages({ spaceId });
 
     for await (const chunk of stream) {
+        // We run the AI search and fetch the pages in parallel
+        const pages = await pagesPromise;
         yield transformAnswer(chunk.answer, pages);
     }
 });
-
-export async function askQuestion(spaceId: string, query: string): Promise<AskAnswerResult | null> {
-    const [{ answer }, pages] = await Promise.all([
-        api.askQueryInSpace(spaceId, query),
-        api.getRevisionPages({ spaceId }),
-    ]);
-
-    return transformAnswer(answer, pages);
-}
 
 /**
  * List suggested questions for a space.
@@ -126,11 +114,6 @@ function transformAnswer(
                 id: page.page.id,
                 title: page.page.title,
                 href: pageHref(pages, page.page),
-                ancestors: page.ancestors.map((ancestor) => ({
-                    id: ancestor.id,
-                    title: ancestor.title,
-                    href: pageHref(pages, ancestor),
-                })),
             };
         })
         .filter(filterOutNullable);
