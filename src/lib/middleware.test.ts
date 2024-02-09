@@ -64,4 +64,30 @@ describe('getURLLookupAlternatives', () => {
             },
         ]);
     });
+
+    it('should normalize duplicated slashes', () => {
+        expect(getURLLookupAlternatives(new URL('https://docs.mycompany.com//hello'))).toEqual([
+            {
+                extraPath: 'hello',
+                url: 'https://docs.mycompany.com/',
+            },
+            {
+                extraPath: '',
+                url: 'https://docs.mycompany.com/hello',
+            },
+        ]);
+    });
+
+    it('should normalize trailing slash', () => {
+        expect(getURLLookupAlternatives(new URL('https://docs.mycompany.com/hello/'))).toEqual([
+            {
+                extraPath: 'hello',
+                url: 'https://docs.mycompany.com/',
+            },
+            {
+                extraPath: '',
+                url: 'https://docs.mycompany.com/hello',
+            },
+        ]);
+    });
 });

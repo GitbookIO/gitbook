@@ -2,7 +2,8 @@
  * For a given GitBook URL, return a list of alternative URLs that could be matched against to lookup the content.
  * The approach is optimized to aim at reusing cached lookup results as much as possible.
  */
-export function getURLLookupAlternatives(url: URL) {
+export function getURLLookupAlternatives(input: URL) {
+    const url = normalizeURL(input);
     const alternatives: Array<{ url: string; extraPath: string }> = [];
 
     const pushAlternative = (url: URL, extraPath: string) => {
@@ -84,4 +85,13 @@ export function getURLLookupAlternatives(url: URL) {
     }
 
     return alternatives;
+}
+
+/**
+ * Normalize a URL to remove duplicate slashes and trailing slashes
+ */
+export function normalizeURL(url: URL) {
+    const result = new URL(url);
+    result.pathname = url.pathname.replace(/\/{2,}/g, '/').replace(/\/$/, '');
+    return result;
 }

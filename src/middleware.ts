@@ -12,10 +12,9 @@ import {
     userAgent,
     withAPI,
 } from '@/lib/api';
+import { buildVersion } from '@/lib/build';
 import { createContentSecurityPolicyNonce, getContentSecurityPolicy } from '@/lib/csp';
-
-import { buildVersion } from './lib/build';
-import { getURLLookupAlternatives } from './lib/middleware';
+import { getURLLookupAlternatives, normalizeURL } from '@/lib/middleware';
 
 export const config = {
     matcher:
@@ -72,6 +71,12 @@ export async function middleware(request: NextRequest) {
         rawRequestURL: request.url,
         userAgent: userAgent(),
     });
+
+    // Redirect to normalize the URL
+    const normalized = normalizeURL(url);
+    if (normalized.toString() !== url.toString()) {
+        return NextResponse.redirect(normalized.toString());
+    }
 
     // The visitor authentication can either be passed as a query parameter
     // or can be stored in a cookie after the initial auth.
