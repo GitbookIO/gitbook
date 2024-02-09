@@ -56,10 +56,17 @@ export function withAPI<T>(client: GitBookAPI, fn: () => Promise<T>): Promise<T>
     return apiSyncStorage.run(client, fn);
 }
 
-export type PublishedContentWithCache = PublishedContentLookup & {
-    cacheMaxAge?: number;
-    cacheTags?: string[];
-};
+export type PublishedContentWithCache =
+    | (PublishedContentLookup & {
+          cacheMaxAge?: number;
+          cacheTags?: string[];
+      })
+    | {
+          error: {
+              code: number;
+              message: string;
+          };
+      };
 
 /**
  * Get a user by its ID.
@@ -102,38 +109,57 @@ export const getPublishedContentByUrl = cache(
         // We call it as this logic is wrapped in an asynchronous cache that is not tied to the signal.
         signal?.throwIfAborted();
 
-        const response = await api().request<PublishedContentLookup>({
-            method: 'GET',
-            path: '/urls/published',
-            query: {
-                url,
-                visitorAuthToken,
-            },
-            secure: false,
-            format: 'json',
-            signal: signal,
-            ...noCacheFetchOptions,
-        });
+        try {
+            const response = await api().request<PublishedContentLookup>({
+                method: 'GET',
+                path: '/urls/published',
+                query: {
+                    url,
+                    visitorAuthToken,
+                },
+                secure: false,
+                format: 'json',
+                signal: signal,
+                ...noCacheFetchOptions,
+            });
 
-        const parsed = parseCacheResponse(response);
+            const parsed = parseCacheResponse(response);
 
-        const tags = [
-            ...parsed.tags,
-            ...('space' in response.data
-                ? [getAPICacheTag({ tag: 'space', space: response.data.space })]
-                : []),
-        ];
+            const tags = [
+                ...parsed.tags,
+                ...('space' in response.data
+                    ? [getAPICacheTag({ tag: 'space', space: response.data.space })]
+                    : []),
+            ];
 
-        const data: PublishedContentWithCache = {
-            ...response.data,
-            cacheMaxAge: parsed.ttl,
-            cacheTags: tags,
-        };
-        return {
-            tags,
-            ttl: parsed.ttl,
-            data,
-        };
+            const data: PublishedContentWithCache = {
+                ...response.data,
+                cacheMaxAge: parsed.ttl,
+                cacheTags: tags,
+            };
+            return {
+                tags,
+                ttl: parsed.ttl,
+                data,
+            };
+        } catch (error) {
+            const httpError = error as GitBookAPIError;
+            if (httpError.code < 500) {
+                return {
+                    data: {
+                        error: {
+                            code: httpError.code,
+                            message: httpError.errorMessage || httpError.message,
+                        },
+                    } as PublishedContentWithCache,
+                    // Cache errors for max 10 minutes in case the user is making changes to its content configuration
+                    ttl: 60 * 10,
+                    tags: [],
+                };
+            }
+
+            throw error;
+        }
     },
     {
         // Do not pass the options for the cache key

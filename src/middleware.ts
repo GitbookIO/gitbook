@@ -99,9 +99,9 @@ export async function middleware(request: NextRequest) {
         }),
         () => lookupSpaceForURL(mode, inputURL, visitorAuthToken),
     );
-    if (!resolved) {
-        return new NextResponse(`Content not found`, {
-            status: 404,
+    if ('error' in resolved) {
+        return new NextResponse(resolved.error.message, {
+            status: resolved.error.code,
             headers: {
                 'x-gitbook-version': buildVersion(),
             },
@@ -237,7 +237,7 @@ async function lookupSpaceForURL(
     mode: URLLookupMode,
     url: URL,
     visitorAuthToken: string | undefined,
-): Promise<LookupResult | null> {
+): Promise<LookupResult> {
     switch (mode) {
         case 'single': {
             return await lookupSpaceInSingleMode(url);
@@ -260,7 +260,7 @@ async function lookupSpaceForURL(
  * GITBOOK_MODE=single
  * When serving a single space, configured using GITBOOK_SPACE_ID and GITBOOK_TOKEN.
  */
-async function lookupSpaceInSingleMode(url: URL): Promise<LookupResult | null> {
+async function lookupSpaceInSingleMode(url: URL): Promise<LookupResult> {
     const spaceId = process.env.GITBOOK_SPACE_ID;
     if (!spaceId) {
         throw new Error(
@@ -290,7 +290,7 @@ async function lookupSpaceInSingleMode(url: URL): Promise<LookupResult | null> {
 async function lookupSpaceInMultiMode(
     url: URL,
     visitorAuthToken: string | undefined,
-): Promise<LookupResult | null> {
+): Promise<LookupResult> {
     return lookupSpaceByAPI(url, visitorAuthToken);
 }
 
@@ -298,24 +298,36 @@ async function lookupSpaceInMultiMode(
  * GITBOOK_MODE=multi-id
  * When serving multi spaces with the ID passed in the path.
  */
-async function lookupSpaceInMultiIdMode(url: URL): Promise<LookupResult | null> {
+async function lookupSpaceInMultiIdMode(url: URL): Promise<LookupResult> {
     // Extract the iD from the path
     const pathSegments = url.pathname.slice(1).split('/');
     if (pathSegments[0] !== '~space') {
-        throw new Error(`Invalid path, expected ~space`);
-        return null;
+        return {
+            error: {
+                code: 400,
+                message: `Missing space ID in the path`,
+            },
+        };
     }
     const spaceId = pathSegments[1];
     if (!spaceId) {
-        throw new Error(`Missing space ID in the path`);
-        return null;
+        return {
+            error: {
+                code: 400,
+                message: `Missing space ID in the path`,
+            },
+        };
     }
 
     // Get the auth token from the URL query
     const apiToken = url.searchParams.get('token');
     if (!apiToken) {
-        throw new Error(`Missing token query parameter`);
-        return null;
+        return {
+            error: {
+                code: 400,
+                message: `Missing token query parameter`,
+            },
+        };
     }
 
     const apiEndpoint = url.searchParams.get('api') ?? api().endpoint;
@@ -346,28 +358,45 @@ async function lookupSpaceInMultiIdMode(url: URL): Promise<LookupResult | null> 
 async function lookupSpaceInMultiPathMode(
     url: URL,
     visitorAuthToken: string | undefined,
-): Promise<LookupResult | null> {
+): Promise<LookupResult> {
     // Skip useless requests
     if (
         url.pathname === '/favicon.ico' ||
         url.pathname === '/robots.txt' ||
-        url.pathname === '/sitemap.xml' ||
-        // Match something that starts with a domain like
-        !url.pathname.match(/^.+\..+/)
+        url.pathname === '/sitemap.xml'
     ) {
-        return null;
+        return {
+            error: {
+                code: 404,
+                message: `favicon.ico, robots.txt, sitemap.xml should be accessed under a content`,
+            },
+        };
+    }
+    // Only match something that starts with a domain like
+    if (!url.pathname.match(/^.+\..+/)) {
+        return {
+            error: {
+                code: 404,
+                message: `Invalid URL in the path, should start with a domain`,
+            },
+        };
     }
 
     const targetStr = `https://${url.pathname}`;
 
     if (!URL.canParse(targetStr)) {
-        throw new Error(`Invalid URL in the path`);
+        return {
+            error: {
+                code: 404,
+                message: `Invalid URL in the path`,
+            },
+        };
     }
     const target = new URL(targetStr);
 
     const lookup = await lookupSpaceByAPI(target, visitorAuthToken);
-    if (!lookup) {
-        return null;
+    if ('error' in lookup) {
+        return lookup;
     }
 
     if ('redirect' in lookup) {
@@ -400,7 +429,7 @@ async function lookupSpaceInMultiPathMode(
 async function lookupSpaceByAPI(
     url: URL,
     visitorAuthToken: string | undefined,
-): Promise<LookupResult | null> {
+): Promise<LookupResult> {
     const lookupAlternatives = getURLLookupAlternatives(stripURLSearch(url));
 
     console.log(
@@ -417,6 +446,10 @@ async function lookupSpaceByAPI(
                 const data = await getPublishedContentByUrl(alternative.url, visitorAuthToken, {
                     signal: abort.signal,
                 });
+
+                if ('error' in data) {
+                    return data;
+                }
 
                 if ('redirect' in data) {
                     if (alternative.url === url.toString()) {
@@ -449,7 +482,14 @@ async function lookupSpaceByAPI(
     );
 
     console.log(`lookup took ${Date.now() - startTime}ms`);
-    return matches.find((match) => match !== null) ?? null;
+    return (
+        matches.find((match) => match !== null) ?? {
+            error: {
+                code: 404,
+                message: `No content found`,
+            },
+        }
+    );
 }
 
 function joinPath(...parts: string[]): string {
