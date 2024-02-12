@@ -1,4 +1,5 @@
 import {
+    CustomizationBackground,
     CustomizationCorners,
     CustomizationHeaderPreset,
     CustomizationSettings,
@@ -38,14 +39,22 @@ export default async function SpaceRootLayout(props: {
         <html
             suppressHydrationWarning
             lang={customization.internationalization.locale}
-            className={tcls(
-                customization.header.preset === CustomizationHeaderPreset.None
-                    ? null
-                    : [
-                          // Take the sticky header in consideration for the scrolling
-                          `scroll-pt-[76px]`,
-                      ],
-            )}
+            className={
+                tcls(
+                    customization.header.preset === CustomizationHeaderPreset.None
+                        ? null
+                        : [
+                              // Take the sticky header in consideration for the scrolling
+                              `scroll-pt-[76px]`,
+                          ],
+                ) +
+                (customization.styling.corners === CustomizationCorners.Straight
+                    ? ' straight-corners'
+                    : '') +
+                (customization.styling.background === CustomizationBackground.Plain
+                    ? ' plain-background'
+                    : '')
+            }
         >
             <head>
                 {customization.privacyPolicy.url ? (
@@ -63,6 +72,10 @@ export default async function SpaceRootLayout(props: {
                             customization.styling.primaryColor.light,
                         )}
                         ${generateColorVariable(
+                            'primary-base',
+                            customization.styling.primaryColor.light,
+                        )}
+                        ${generateColorVariable(
                             'header-background',
                             headerTheme.backgroundColor.light,
                         )}
@@ -77,6 +90,10 @@ export default async function SpaceRootLayout(props: {
                             customization.styling.primaryColor.dark,
                         )}
                         ${generateColorVariable(
+                            'primary-base',
+                            customization.styling.primaryColor.dark,
+                        )}
+                        ${generateColorVariable(
                             'header-background',
                             headerTheme.backgroundColor.dark,
                         )}
@@ -85,17 +102,12 @@ export default async function SpaceRootLayout(props: {
                 `}</style>
             </head>
             <body
-                className={
-                    tcls(
-                        `${fonts[customization.styling.font].className}`,
-                        `${ibmPlexMono.variable}`,
-                        'bg-light',
-                        'dark:bg-dark',
-                    ) +
-                    (customization.styling.corners === CustomizationCorners.Straight
-                        ? ' straight-corners'
-                        : '')
-                }
+                className={tcls(
+                    `${fonts[customization.styling.font].className}`,
+                    `${ibmPlexMono.variable}`,
+                    'bg-light',
+                    'dark:bg-dark',
+                )}
             >
                 <ClientContexts
                     nonce={nonce}

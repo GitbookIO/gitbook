@@ -41,20 +41,26 @@ const config: Config = {
             },
             colors: {
                 // Dynamic colors matching the customization settings
+
+                /** primary-color used to accent elements, these colors remain unchanged when toggling between the CustomizationBackground options**/
                 primary: generateShades('primary-color'),
+
+                /** primary-base is an internal color that generates the same colors as primary-color. But it's shades will change into a grayscale if CustomizationBackground.Plain is selected. (globals.css) **/
+                primarybase: generateShades('primary-base'),
+                
                 light: {
-                    1: `color-mix(in srgb, color-mix(in srgb, rgb(var(--primary-color-600)), rgb(var(--light)) 99%), transparent calc(100% - 100% * <alpha-value>))`, //1 99%
-                    DEFAULT: `color-mix(in srgb, color-mix(in srgb, rgb(var(--primary-color-700)), rgb(var(--light)) 96%), transparent calc(100% - 100% * <alpha-value>))`, //(default) 96%
-                    2: `color-mix(in srgb, color-mix(in srgb, rgb(var(--primary-color-800)), rgb(var(--light)) 92%), transparent calc(100% - 100% * <alpha-value>))`, //2 92%
-                    3: `color-mix(in srgb, color-mix(in srgb, rgb(var(--primary-color-800)), rgb(var(--light)) 88%), transparent calc(100% - 100% * <alpha-value>))`, //4 82%
-                    4: `color-mix(in srgb, color-mix(in srgb, rgb(var(--primary-color-800)), rgb(var(--light)) 72%), transparent calc(100% - 100% * <alpha-value>))`, //5 64%
+                    1: `color-mix(in srgb, var(--light-1), transparent calc(100% - 100% * <alpha-value>))`, //1 99%
+              DEFAULT: `color-mix(in srgb, var(--light-DEFAULT), transparent calc(100% - 100% * <alpha-value>))`, //(default) 96%
+                    2: `color-mix(in srgb, var(--light-2), transparent calc(100% - 100% * <alpha-value>))`, //2 92%
+                    3: `color-mix(in srgb, var(--light-3), transparent calc(100% - 100% * <alpha-value>))`, //4 82%
+                    4: `color-mix(in srgb, var(--light-4), transparent calc(100% - 100% * <alpha-value>))`, //5 64%
                 },
                 dark: {
-                    1: `color-mix(in srgb, color-mix(in srgb, rgb(var(--primary-color-100)), rgb(var(--dark)) 99%), transparent calc(100% - 100% * <alpha-value>))`, //1 99%
-                    DEFAULT: `color-mix(in srgb, color-mix(in srgb, rgb(var(--primary-color-300)), rgb(var(--dark)) 96%), transparent calc(100% - 100% * <alpha-value>))`, //(default) 96%
-                    2: `color-mix(in srgb, color-mix(in srgb, rgb(var(--primary-color-200)), rgb(var(--dark)) 92%), transparent calc(100% - 100% * <alpha-value>))`, //2 92%
-                    3: `color-mix(in srgb, color-mix(in srgb, rgb(var(--primary-color-200)), rgb(var(--dark)) 88%), transparent calc(100% - 100% * <alpha-value>))`, //4 82%
-                    4: `color-mix(in srgb, color-mix(in srgb, rgb(var(--primary-color-200)), rgb(var(--dark)) 64%), transparent calc(100% - 100% * <alpha-value>))`, //5 64%
+                    1: `color-mix(in srgb, var(--dark-1), transparent calc(100% - 100% * <alpha-value>))`, //1 99%
+              DEFAULT: `color-mix(in srgb, var(--dark-DEFAULT), transparent calc(100% - 100% * <alpha-value>))`, //(default) 96%
+                    2: `color-mix(in srgb, var(--dark-2), transparent calc(100% - 100% * <alpha-value>))`, //2 92%
+                    3: `color-mix(in srgb, var(--dark-3), transparent calc(100% - 100% * <alpha-value>))`, //4 82%
+                    4: `color-mix(in srgb, var(--dark-4), transparent calc(100% - 100% * <alpha-value>))`, //5 64%
                 },
                 yellow: generateShades('yellow'),
                 teal: generateShades('teal'),
@@ -181,7 +187,12 @@ const config: Config = {
             /**
              * Variant when the space is configured with straight corners.
              */
-            addVariant('straight-corners', 'body.straight-corners &');
+            addVariant('straight-corners', 'html.straight-corners &');
+
+            /**
+             * Variant when the space is configured with a theme matching background.
+             */
+            addVariant('plain-background', 'html.plain-background &');
 
             /**
              * Variant when the page contains a block that will be rendered in full-width mode.

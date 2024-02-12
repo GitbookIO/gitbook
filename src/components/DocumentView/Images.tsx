@@ -18,14 +18,13 @@ export function Images(props: BlockProps<DocumentBlockImages>) {
     return (
         <div
             className={tcls(
-                'w-full',
+                style,
                 'flex',
                 'flex-row',
                 'gap-3',
                 block.data.align === 'center' && 'justify-center',
                 block.data.align === 'right' && 'justify-end',
                 block.data.align === 'left' && 'justify-start',
-                style,
                 isMultipleImages && ['grid', 'grid-flow-col', 'max-w-none'],
                 block.data.fullWidth ? 'max-w-screen-2xl' : null,
                 'justify-center',
@@ -36,7 +35,7 @@ export function Images(props: BlockProps<DocumentBlockImages>) {
                     key={node.key}
                     block={node}
                     document={document}
-                    style={[i > 0 && 'mt-4', style]}
+                    style={[]}
                     siblings={block.nodes.length}
                     context={context}
                     isOffscreen={isOffscreen}

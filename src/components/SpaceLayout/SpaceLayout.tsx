@@ -53,7 +53,7 @@ export function SpaceLayout(props: {
 
     return (
         <div>
-            {/* <ColorDebugger /> */}
+            {/*             <ColorDebugger /> */}
             <Header
                 withTopHeader={withTopHeader}
                 space={space}
