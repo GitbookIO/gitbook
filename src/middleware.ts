@@ -51,6 +51,8 @@ type URLLookupMode =
 export type LookupResult = PublishedContentWithCache & {
     /** API endpoint to use for the content post lookup */
     apiEndpoint?: string;
+    /** Cookies to store on the response */
+    cookies?: Record<string, string>;
 };
 
 /**
@@ -94,10 +96,10 @@ export async function middleware(request: NextRequest) {
     const resolved = await withAPI(
         new GitBookAPI({
             endpoint: apiEndpoint,
-            authToken: process.env.GITBOOK_TOKEN,
+            authToken: process.env.GITBOOK_API_TOKEN,
             userAgent: userAgent(),
         }),
-        () => lookupSpaceForURL(mode, inputURL, visitorAuthToken),
+        () => lookupSpaceForURL(mode, request, inputURL, visitorAuthToken),
     );
     if ('error' in resolved) {
         return new NextResponse(resolved.error.message, {
@@ -110,7 +112,7 @@ export async function middleware(request: NextRequest) {
 
     if ('redirect' in resolved) {
         console.log(`redirecting (${resolved.target}) to ${resolved.redirect}`);
-        return NextResponse.redirect(resolved.redirect);
+        return writeCookies(NextResponse.redirect(resolved.redirect), resolved.cookies);
     }
 
     Sentry.setTag('space', resolved.space);
@@ -169,11 +171,14 @@ export async function middleware(request: NextRequest) {
     const target = new URL(rewritePathname, request.nextUrl.toString());
     target.search = url.search;
 
-    const response = NextResponse.rewrite(target, {
-        request: {
-            headers,
-        },
-    });
+    const response = writeCookies(
+        NextResponse.rewrite(target, {
+            request: {
+                headers,
+            },
+        }),
+        resolved.cookies,
+    );
 
     response.headers.set('x-gitbook-version', buildVersion());
 
@@ -235,6 +240,7 @@ function getInputURL(request: NextRequest): { url: URL; mode: URLLookupMode } {
 
 async function lookupSpaceForURL(
     mode: URLLookupMode,
+    request: NextRequest,
     url: URL,
     visitorAuthToken: string | undefined,
 ): Promise<LookupResult> {
@@ -249,7 +255,7 @@ async function lookupSpaceForURL(
             return await lookupSpaceInMultiPathMode(url, visitorAuthToken);
         }
         case 'multi-id': {
-            return await lookupSpaceInMultiIdMode(url);
+            return await lookupSpaceInMultiIdMode(request, url);
         }
         default:
             assertNever(mode);
@@ -298,7 +304,7 @@ async function lookupSpaceInMultiMode(
  * GITBOOK_MODE=multi-id
  * When serving multi spaces with the ID passed in the path.
  */
-async function lookupSpaceInMultiIdMode(url: URL): Promise<LookupResult> {
+async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise<LookupResult> {
     // Extract the iD from the path
     const pathSegments = url.pathname.slice(1).split('/');
     if (pathSegments[0] !== '~space') {
@@ -320,7 +326,12 @@ async function lookupSpaceInMultiIdMode(url: URL): Promise<LookupResult> {
     }
 
     // Get the auth token from the URL query
-    const apiToken = url.searchParams.get('token');
+    const AUTH_TOKEN_QUERY = 'token';
+    const AUTH_TOKEN_COOKIE = 'gitbook-token';
+
+    const apiToken =
+        url.searchParams.get(AUTH_TOKEN_QUERY) ??
+        decodeGitBookTokenCookie(spaceId, request.cookies.get(AUTH_TOKEN_COOKIE)?.value);
     if (!apiToken) {
         return {
             error: {
@@ -342,12 +353,29 @@ async function lookupSpaceInMultiIdMode(url: URL): Promise<LookupResult> {
         () => getSpace.revalidate(spaceId),
     );
 
+    const cookies = {
+        [AUTH_TOKEN_COOKIE]: encodeGitBookTokenCookie(spaceId, apiToken),
+    };
+
+    // Get rid of the token from the URL
+    if (url.searchParams.has(AUTH_TOKEN_QUERY)) {
+        const withoutToken = new URL(url);
+        withoutToken.searchParams.delete(AUTH_TOKEN_QUERY);
+
+        return {
+            target: 'external',
+            redirect: withoutToken.toString(),
+            cookies,
+        };
+    }
+
     return {
         space: spaceId,
         basePath: `/~space/${spaceId}`,
         pathname: normalizePathname(pathSegments.slice(2).join('/')),
         apiToken,
         apiEndpoint,
+        cookies,
     };
 }
 
@@ -535,4 +563,34 @@ function stripURLSearch(url: URL): URL {
 
 function encodePathname(pathname: string): string {
     return pathname.split('/').map(encodeURIComponent).join('/');
+}
+
+function decodeGitBookTokenCookie(spaceId: string, cookie: string | undefined): string | undefined {
+    if (!cookie) {
+        return;
+    }
+
+    try {
+        const parsed = JSON.parse(cookie);
+        if (typeof parsed.t === 'string' && parsed.s === spaceId) {
+            return parsed.t;
+        }
+    } catch (error) {
+        // ignore
+    }
+}
+
+function encodeGitBookTokenCookie(spaceId: string, token: string): string {
+    return JSON.stringify({ s: spaceId, t: token });
+}
+
+function writeCookies<R extends NextResponse>(
+    response: R,
+    cookies: Record<string, string> = {},
+): R {
+    Object.entries(cookies).forEach(([key, value]) => {
+        response.cookies.set(key, value);
+    });
+
+    return response;
 }
