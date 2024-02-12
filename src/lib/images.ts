@@ -18,7 +18,7 @@ export interface CloudflareImageJsonFormat {
  */
 export interface CloudflareImageOptions {
     format?: 'webp' | 'avif' | 'json' | 'jpeg';
-    fit?: 'scale-down' | 'contain' | 'cover' | 'fill' | 'inside' | 'outside';
+    fit?: 'scale-down' | 'contain' | 'cover' | 'crop' | 'pad';
     width?: number;
     height?: number;
     dpr?: number;
