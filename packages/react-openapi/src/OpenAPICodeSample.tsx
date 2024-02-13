@@ -84,8 +84,13 @@ function getSecurityHeaders(securities: OpenAPIOperationData['securities']): {
 
     switch (security[1].type) {
         case 'http': {
+            let scheme = security[1].scheme;
+            if (scheme === 'bearer') {
+                scheme = 'Bearer';
+            }
+
             return {
-                Authorization: security[1].scheme + ' ' + (security[1].bearerFormat ?? '<token>'),
+                Authorization: scheme + ' ' + (security[1].bearerFormat ?? '<token>'),
             };
         }
         default: {
