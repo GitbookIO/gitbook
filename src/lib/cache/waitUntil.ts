@@ -1,10 +1,21 @@
 import { getRequestContext } from '@cloudflare/next-on-pages';
 
+const cloudflareRequestContextSymbol = Symbol.for('__cloudflare-request-context__');
+
 /**
- * Get the global context object for the current request.
+ * Get a global context object for the current request.
+ * This object can be used as a key to store request-specific data in a WeakMap.
  */
 export function getGlobalContext(): object {
-    return getCloudflareContext()?.ctx ?? globalThis;
+    // See https://github.com/cloudflare/next-on-pages/discussions/596#discussioncomment-8450986
+    // we need a reliable object that will be different per request
+    const cloudflareRequestContext = (
+        globalThis as unknown as {
+            [cloudflareRequestContextSymbol]: object;
+        }
+    )[cloudflareRequestContextSymbol];
+
+    return cloudflareRequestContext ?? globalThis;
 }
 
 /**

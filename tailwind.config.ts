@@ -47,17 +47,17 @@ const config: Config = {
 
                 /** primary-base is an internal color that generates the same colors as primary-color. But it's shades will change into a grayscale if CustomizationBackground.Plain is selected. (globals.css) **/
                 primarybase: generateShades('primary-base'),
-                
+
                 light: {
                     1: `color-mix(in srgb, var(--light-1), transparent calc(100% - 100% * <alpha-value>))`, //1 99%
-              DEFAULT: `color-mix(in srgb, var(--light-DEFAULT), transparent calc(100% - 100% * <alpha-value>))`, //(default) 96%
+                    DEFAULT: `color-mix(in srgb, var(--light-DEFAULT), transparent calc(100% - 100% * <alpha-value>))`, //(default) 96%
                     2: `color-mix(in srgb, var(--light-2), transparent calc(100% - 100% * <alpha-value>))`, //2 92%
                     3: `color-mix(in srgb, var(--light-3), transparent calc(100% - 100% * <alpha-value>))`, //4 82%
                     4: `color-mix(in srgb, var(--light-4), transparent calc(100% - 100% * <alpha-value>))`, //5 64%
                 },
                 dark: {
                     1: `color-mix(in srgb, var(--dark-1), transparent calc(100% - 100% * <alpha-value>))`, //1 99%
-              DEFAULT: `color-mix(in srgb, var(--dark-DEFAULT), transparent calc(100% - 100% * <alpha-value>))`, //(default) 96%
+                    DEFAULT: `color-mix(in srgb, var(--dark-DEFAULT), transparent calc(100% - 100% * <alpha-value>))`, //(default) 96%
                     2: `color-mix(in srgb, var(--dark-2), transparent calc(100% - 100% * <alpha-value>))`, //2 92%
                     3: `color-mix(in srgb, var(--dark-3), transparent calc(100% - 100% * <alpha-value>))`, //4 82%
                     4: `color-mix(in srgb, var(--dark-4), transparent calc(100% - 100% * <alpha-value>))`, //5 64%
