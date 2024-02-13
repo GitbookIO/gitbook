@@ -71,6 +71,11 @@ interface ImageCommonProps {
     preload?: boolean;
 
     /**
+     * Render image as inline.
+     */
+    inline?: boolean;
+
+    /**
      * The `style` attribute is used to apply custom styles.
      */
     style?: ClassValue;
@@ -92,11 +97,6 @@ export async function Image(
                 light: ImageSource;
                 dark?: ImageSource | null;
             };
-
-            /**
-             * Render image as inline.
-             */
-            inline?: boolean;
         } & ImageCommonProps
     >,
 ) {
@@ -106,6 +106,7 @@ export async function Image(
         <>
             <ImagePicture
                 {...rest}
+                inline={inline}
                 source={sources.light}
                 className={tcls(
                     rest.className,
@@ -118,6 +119,7 @@ export async function Image(
                 <ImagePicture
                     source={sources.dark}
                     {...rest}
+                    inline={inline}
                     // We don't want to preload the dark image, because it's not visible
                     // TODO: adapt based on the default theme
                     priority="lazy"
@@ -148,6 +150,7 @@ async function ImagePicture(
         alt,
         quality = 100,
         priority = 'normal',
+        inline = false,
         zoom = false,
         resize = true,
         preload = false,
@@ -246,5 +249,5 @@ async function ImagePicture(
         />
     );
 
-    return zoom ? <Zoom>{img}</Zoom> : img;
+    return zoom ? <Zoom wrapElement={inline ? 'span' : 'div'}>{img}</Zoom> : img;
 }
