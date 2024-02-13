@@ -5,6 +5,7 @@ import { getImageSize, getResizedImageURL, isImageResizingEnabled } from '@/lib/
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { PolymorphicComponentProp } from './types';
+import { Zoom } from './Zoom';
 
 type ImageSize = { width: number; height: number } | { aspectRatio: number };
 
@@ -44,6 +45,12 @@ interface ImageCommonProps {
      * Whether to resize the image.
      */
     resize?: boolean;
+
+    /**
+     * Whether to allow the user to zoom on the image.
+     * @default false
+     */
+    zoom?: boolean;
 
     /**
      * Priority of the image.
@@ -141,6 +148,7 @@ async function ImagePicture(
         alt,
         quality = 100,
         priority = 'normal',
+        zoom = false,
         resize = true,
         preload = false,
         ...rest
@@ -225,7 +233,7 @@ async function ImagePicture(
         });
     }
 
-    return (
+    const img = (
         <img
             srcSet={srcSet}
             sizes={sizesAttr}
@@ -237,4 +245,6 @@ async function ImagePicture(
             {...sizeAttrs}
         />
     );
+
+    return zoom ? <Zoom>{img}</Zoom> : img;
 }

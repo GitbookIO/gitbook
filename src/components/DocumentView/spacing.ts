@@ -1,4 +1,9 @@
-import { DocumentBlockListItem, DocumentBlocksEssentials } from '@gitbook/api';
+import {
+    DocumentBlock,
+    DocumentBlockCode,
+    DocumentBlockListItem,
+    DocumentBlocksEssentials,
+} from '@gitbook/api';
 import { assertNever } from 'assert-never';
 
 import { ClassValue } from '@/lib/tailwind';
@@ -6,7 +11,7 @@ import { ClassValue } from '@/lib/tailwind';
 /**
  * Get the line height of a block
  */
-export function getBlockTextStyle(block: DocumentBlocksEssentials | DocumentBlockListItem): {
+export function getBlockTextStyle(block: DocumentBlock): {
     /** Tailwind class for the text size */
     textSize: ClassValue;
     /** Tailwind class for the height (h-*) */
@@ -50,6 +55,9 @@ export function getBlockTextStyle(block: DocumentBlocksEssentials | DocumentBloc
         case 'list-item':
             return getBlockTextStyle(block.nodes[0]);
         default:
-            assertNever(block);
+            return {
+                textSize: ['text-base'],
+                lineHeight: 'leading-normal',
+            };
     }
 }

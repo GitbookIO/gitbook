@@ -44,6 +44,7 @@ export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
                     : ['max-w-[300px]', 'w-full'],
             ]}
             inline
+            zoom
         />
     );
 }

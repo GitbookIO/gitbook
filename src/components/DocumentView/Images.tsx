@@ -91,6 +91,7 @@ async function ImageBlock(props: {
                 }}
                 priority={isOffscreen ? 'lazy' : 'high'}
                 preload
+                zoom
             />
         </Caption>
     );
