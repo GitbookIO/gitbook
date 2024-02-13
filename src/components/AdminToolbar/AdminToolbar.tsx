@@ -95,7 +95,7 @@ async function ShareFeedbackToolbar(props: { space: Space }) {
 
     return (
         <ToolbarButton
-            href={`https://survey.refiner.io/e61q1m-dz5gpn?response_organization_id=${space.organization}&response_space_id=${space.id}&response_org_id=${space.organization}&contact_space=${space.id}&response_source=open-preview-feedback`}
+            href={`https://survey.refiner.io/e61q1m-ejr82o?response_organization_id=${space.organization}&response_space_id=${space.id}&response_org_id=${space.organization}&contact_space=${space.id}&response_source=open-preview-feedback`}
         >
             Share feedback about the new version
         </ToolbarButton>
