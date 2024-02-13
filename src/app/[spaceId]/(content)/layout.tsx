@@ -60,9 +60,7 @@ export default async function ContentLayout(props: {
                 </React.Suspense>
             ) : null}
 
-            {content.revisionId || content.changeRequestId ? (
-                <AdminToolbar content={content} />
-            ) : null}
+            <AdminToolbar space={space} content={content} />
         </>
     );
 }
