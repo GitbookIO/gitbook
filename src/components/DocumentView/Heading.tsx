@@ -21,18 +21,20 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
         <Tag id={id} className={tcls(textStyle.textSize, 'group', 'relative', 'grid', style)}>
             <div
                 className={tcls(
-                    'hidden',
+                    'grid',
+                    'bg-light',
                     'grid-area-1-1',
                     'relative',
                     '-ml-6',
                     'w-7',
                     'border-0',
                     'opacity-0',
-                    'group-hover:opacity-10',
-                    'group-focus:opacity-10',
-                    'lg:grid',
-                    'h-full',
-                    textStyle.lineHeight,
+                    'group-hover:opacity-[0]',
+                    'group-focus:opacity-[0]',
+                    'dark:bg-dark',
+                    'md:group-hover:md:opacity-[1]',
+                    'md:group-focus:md:opacity-[1]',
+                    textStyle.marginTop,
                 )}
             >
                 <a
@@ -41,26 +43,27 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                     className={tcls(
                         'inline-flex',
                         'h-full',
-                        'items-center',
+                        'items-start',
                         'dark:text-light/3',
                         'dark:shadow-none',
                         'dark:ring-0',
+                        textStyle.lineHeight,
                     )}
                 >
                     <IconHash
                         className={tcls(
-                            textStyle.marginTop,
-                            'w-4',
-                            'h-4',
+                            'w-3.5',
+                            'h-[1lh]',
                             'transition-colors',
                             'stroke-transparent',
                             'group-hover:stroke-dark/6',
-                            'dark:group-hover:stroke-light/4',
+                            'dark:group-hover:stroke-light/5',
+                            'lg:w-4',
                         )}
                     />
                 </a>
             </div>
-            <div className={tcls('grid-area-1-1', textStyle.marginTop)}>
+            <div className={tcls('grid-area-1-1', 'z-[1]', textStyle.marginTop)}>
                 <Inlines {...rest} context={context} nodes={block.nodes} />
             </div>
         </Tag>

@@ -14,12 +14,30 @@ export function ListOrdered(props: BlockProps<DocumentBlockListOrdered>) {
             ancestorBlocks={[...ancestorBlocks, block]}
             style={[
                 'space-y-2',
-                'list-decimal',
-                'ps-[2ch]',
-                'marker:[font-variant-numeric:normal]',
-                'marker:text-dark/6',
-                '[&>li]:pl-[.25ch]',
-                'dark:marker:text-light/6',
+                'flex',
+                'flex-col',
+                '[&>li]:gap-[1ch]',
+
+                '[counter-reset:list-decimal]',
+
+                '[&>li]:flex',
+                '[&>li]:flex-row',
+
+                /* '[&>li>.bullet]:w-[1ch]', */
+                '[&>li>.bullet]:[font-variant-numeric:tabular-nums]',
+                '[&>li>.bullet]:[counter-increment:list-decimal]',
+
+                '[&>li>.bullet]:before:h-[1lh]',
+                '[&>li>.bullet]:before:leading-[inherit]',
+                '[&>li>.bullet]:before:flex',
+                '[&>li>.bullet]:before:[content:counter(list-decimal)]',
+                /* '[&>li>.bullet]:before:pr-[1ch]', */
+                '[&>li>.bullet]:text-dark/6',
+
+                //remove any spacing when using heading as list item
+                '[&>li>div_div]:mt-0',
+
+                'dark:[&>li>.bullet]:text-light/6',
                 style,
             ]}
         />

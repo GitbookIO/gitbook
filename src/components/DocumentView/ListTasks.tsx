@@ -12,7 +12,14 @@ export function ListTasks(props: BlockProps<DocumentBlockListTasks>) {
             tag="ul"
             nodes={block.nodes}
             ancestorBlocks={[...ancestorBlocks, block]}
-            style={['list-none', '[&>li]:pl-[.25ch]', 'space-y-2', style]}
+            style={[
+                'list-none',
+                '[&>li]:pl-[.25ch]',
+                //remove any spacing when using heading as list item
+                '[&>li>div_div]:mt-0',
+                'space-y-2',
+                style,
+            ]}
         />
     );
 }
