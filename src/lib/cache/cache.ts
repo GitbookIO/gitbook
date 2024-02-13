@@ -2,7 +2,8 @@ import hash from 'object-hash';
 
 import { cacheBackends } from './backends';
 import { CacheEntry } from './types';
-import { getGlobalContext, waitUntil } from './waitUntil';
+import { race } from '../async';
+import { getGlobalContext, waitUntil } from '../waitUntil';
 
 export type CacheFunction<Args extends any[], Result> = ((...args: Args) => Promise<Result>) & {
     /**
@@ -178,24 +179,11 @@ async function setCacheEntry(key: string, entry: CacheEntry) {
     await Promise.all(cacheBackends.map((backend) => backend.set(key, entry)));
 }
 
-async function getCacheEntry(key: string): Promise<[CacheEntry, string] | null> {
-    const abort = new AbortController();
-
-    let result: [CacheEntry, string] | null = null;
-
-    await Promise.all(
-        cacheBackends.map(async (backend) => {
-            try {
-                const entry = await backend.get(key, { signal: abort.signal });
-                if (entry && !result) {
-                    result = [entry, backend.name];
-                    abort.abort();
-                }
-            } catch (error) {
-                // Ignore all errors
-            }
-        }),
-    );
+async function getCacheEntry(key: string): Promise<readonly [CacheEntry, string] | null> {
+    const result = await race(cacheBackends, async (backend, { signal }) => {
+        const entry = await backend.get(key, { signal });
+        return entry ? ([entry, backend.name] as const) : null;
+    });
 
     // Write to the fallback caches
     if (result) {

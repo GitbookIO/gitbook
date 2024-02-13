@@ -2,6 +2,7 @@ import { Redis } from '@upstash/redis/cloudflare';
 
 import { CacheBackend, CacheEntry, CacheEntryMeta } from './types';
 import { filterOutNullable } from '../typescript';
+import { waitUntil } from '../waitUntil';
 
 const cacheNamespace = process.env.UPSTASH_REDIS_NAMESPACE ?? 'gitbook';
 const cacheVersion = 1;
@@ -14,25 +15,19 @@ export const redisCache: CacheBackend = {
             return null;
         }
 
-        try {
-            const [, redisEntry] = await redis
-                .multi()
-                .json.numincrby(getRedisKey(key), '$.meta.hits', 1)
-                .json.get(getRedisKey(key))
-                .exec<[any, CacheEntry | null]>();
-            if (!redisEntry) {
-                return null;
-            }
-
-            return redisEntry;
-        } catch (error) {
-            // "JSON.NUMINCRBY" throws an error if the key does not exist
-            if ((error as Error).message.includes('ERR no such key')) {
-                return null;
-            }
-
-            throw error;
+        const redisKey = getRedisKey(key);
+        const redisEntry = await redis.json.get(redisKey);
+        if (!redisEntry) {
+            return null;
         }
+
+        await waitUntil(
+            redis.json.numincrby(redisKey, '$.meta.hits', 1).catch((error) => {
+                // Ignore errors
+            }),
+        );
+
+        return redisEntry as CacheEntry;
     },
 
     async set(key, entry) {

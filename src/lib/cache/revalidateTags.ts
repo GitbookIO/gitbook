@@ -3,7 +3,7 @@ import pMap from 'p-map';
 import { cacheBackends } from './backends';
 import { getCache, getCacheKey } from './cache';
 import { CacheEntryMeta } from './types';
-import { waitUntil } from './waitUntil';
+import { waitUntil } from '../waitUntil';
 
 /**
  * Revalidate all values associated with tags.

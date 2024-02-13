@@ -5,7 +5,7 @@ import type { CacheStorage, Cache, Response as WorkerResponse } from '@cloudflar
 import { CacheBackend, CacheEntry } from './types';
 
 const cacheVersion = 1;
-const cacheMaxAge = 5 * 60;
+const cacheMaxAge = 2 * 60;
 
 /**
  * Cache implementation using the Cloudflare Cache API.
@@ -22,7 +22,8 @@ export const cloudflareCache: CacheBackend = {
 
         const cacheKey = await serializeKey(key);
         const response = await cache.match(cacheKey);
-        if (!response || options?.signal?.aborted) {
+        options?.signal?.throwIfAborted();
+        if (!response) {
             return null;
         }
 
@@ -82,7 +83,7 @@ function serializeEntry(entry: CacheEntry): WorkerResponse {
     headers.set('Content-Type', 'application/json');
     const cacheTags = ['gitbook-open', ...entry.meta.tags];
 
-    // Limit the cloudflare cache to 5 minutes
+    // Limit the cloudflare cache to a low fix duration
     headers.set(
         'Cache-Control',
         `public, max-age=${Math.min((entry.meta.expiresAt - Date.now()) / 1000, cacheMaxAge)}`,

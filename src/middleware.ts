@@ -16,6 +16,8 @@ import { buildVersion } from '@/lib/build';
 import { createContentSecurityPolicyNonce, getContentSecurityPolicy } from '@/lib/csp';
 import { getURLLookupAlternatives, normalizeURL } from '@/lib/middleware';
 
+import { race } from './lib/async';
+
 export const config = {
     matcher:
         '/((?!_next/static|_next/image|~gitbook/revalidate|~gitbook/image|~gitbook/monitoring).*)',
@@ -189,8 +191,7 @@ export async function middleware(request: NextRequest) {
     if (visitorAuthToken) {
         response.cookies.set(VISITOR_AUTH_COOKIE, visitorAuthToken);
     } else if (process.env.NODE_ENV !== 'development' && resolved.cacheMaxAge) {
-        const cacheControl = `public, max-age=${resolved.cacheMaxAge}, s-maxage=${resolved.cacheMaxAge}, stale-while-revalidate=3600, stale-if-error=0`;
-
+        const cacheControl = `public, max-age=60, s-maxage=${resolved.cacheMaxAge}, stale-while-revalidate=60, stale-if-error=0`;
         response.headers.set('cache-control', cacheControl);
         response.headers.set('Cloudflare-CDN-Cache-Control', cacheControl);
     }
@@ -467,51 +468,39 @@ async function lookupSpaceByAPI(
     );
 
     const startTime = Date.now();
-    const abort = new AbortController();
-    const matches = await Promise.all(
-        lookupAlternatives.map(async (alternative) => {
-            try {
-                const data = await getPublishedContentByUrl(alternative.url, visitorAuthToken, {
-                    signal: abort.signal,
-                });
 
-                if ('error' in data) {
-                    return data;
-                }
+    const result = await race(lookupAlternatives, async (alternative, { signal }) => {
+        const data = await getPublishedContentByUrl(alternative.url, visitorAuthToken, {
+            signal,
+        });
 
-                if ('redirect' in data) {
-                    if (alternative.url === url.toString()) {
-                        return data;
-                    }
+        if ('error' in data) {
+            return data;
+        }
 
-                    return null;
-                }
-
-                // Cancel all other requests to speed up the lookup
-                abort.abort();
-                return {
-                    space: data.space,
-                    changeRequest: data.changeRequest,
-                    revision: data.revision,
-                    basePath: data.basePath,
-                    pathname: joinPath(data.pathname, alternative.extraPath),
-                    apiToken: data.apiToken,
-                    cacheMaxAge: data.cacheMaxAge,
-                    cacheTags: data.cacheTags,
-                } as PublishedContentWithCache;
-            } catch (error) {
-                // @ts-ignore
-                if (error.name === 'AbortError') {
-                    return null;
-                }
-                throw error;
+        if ('redirect' in data) {
+            if (alternative.url === url.toString()) {
+                return data;
             }
-        }),
-    );
+
+            return null;
+        }
+
+        return {
+            space: data.space,
+            changeRequest: data.changeRequest,
+            revision: data.revision,
+            basePath: data.basePath,
+            pathname: joinPath(data.pathname, alternative.extraPath),
+            apiToken: data.apiToken,
+            cacheMaxAge: data.cacheMaxAge,
+            cacheTags: data.cacheTags,
+        } as PublishedContentWithCache;
+    });
 
     console.log(`lookup took ${Date.now() - startTime}ms`);
     return (
-        matches.find((match) => match !== null) ?? {
+        result ?? {
             error: {
                 code: 404,
                 message: `No content found`,
