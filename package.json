@@ -61,7 +61,7 @@
     "devDependencies": {
         "@argos-ci/cli": "^1.0.4",
         "@argos-ci/puppeteer": "^1.2.1",
-        "@cloudflare/next-on-pages": "beta",
+        "@cloudflare/next-on-pages": "^1.9.0",
         "@cloudflare/workers-types": "^4.20231218.0",
         "@types/js-cookie": "^3.0.6",
         "@types/js-yaml": "^4.0.9",
