@@ -46,6 +46,11 @@ export function Footer(props: {
                                         }}
                                         priority="lazy"
                                         style={['h-9', 'max-w-80']}
+                                        sizes={[
+                                            {
+                                                width: 320,
+                                            },
+                                        ]}
                                     />
                                 </div>
                             ) : null}

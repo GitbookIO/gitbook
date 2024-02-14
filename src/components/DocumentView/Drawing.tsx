@@ -2,6 +2,7 @@ import { DocumentBlockDrawing } from '@gitbook/api';
 
 import { BlockProps } from './Block';
 import { Caption } from './Caption';
+import { imageBlockSizes } from './Images';
 import { Image } from '../utils';
 
 export async function Drawing(props: BlockProps<DocumentBlockDrawing>) {
@@ -22,6 +23,7 @@ export async function Drawing(props: BlockProps<DocumentBlockDrawing>) {
                     },
                 }}
                 alt="Drawing"
+                sizes={imageBlockSizes}
             />
         </Caption>
     );

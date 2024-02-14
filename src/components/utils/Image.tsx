@@ -14,7 +14,7 @@ type ImageSource = {
     size?: ImageSize;
 };
 
-type ImageResponsiveSize = {
+export type ImageResponsiveSize = {
     /** Media query to apply this width for */
     media?: string;
 
@@ -28,7 +28,7 @@ interface ImageCommonProps {
     /**
      * Response sizes.
      */
-    sizes?: ImageResponsiveSize[];
+    sizes: ImageResponsiveSize[];
 
     /**
      * The `alt` attribute is required for accessibility.
@@ -145,7 +145,7 @@ async function ImagePicture(
 ) {
     const {
         source,
-        sizes = [],
+        sizes,
         style,
         alt,
         quality = 100,
@@ -160,6 +160,10 @@ async function ImagePicture(
     let srcSet: undefined | string;
     let sizesAttr: undefined | string;
     let src = source.src;
+
+    if (process.env.NODE_ENV === 'development' && sizes.length === 0) {
+        throw new Error('You must provide at least one size for the image.');
+    }
 
     // Responsive sizes
     if (resize && isImageResizingEnabled()) {

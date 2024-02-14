@@ -1,6 +1,6 @@
 import { DocumentBlockImage, DocumentBlockImages, JSONDocument } from '@gitbook/api';
 
-import { Image } from '@/components/utils';
+import { Image, ImageResponsiveSize } from '@/components/utils';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { BlockProps } from './Block';
@@ -45,6 +45,19 @@ export function Images(props: BlockProps<DocumentBlockImages>) {
     );
 }
 
+/**
+ * Sizes for image blocks.
+ */
+export const imageBlockSizes: ImageResponsiveSize[] = [
+    {
+        media: '(max-width: 640px)',
+        width: 400,
+    },
+    {
+        width: 768,
+    },
+];
+
 async function ImageBlock(props: {
     block: DocumentBlockImage;
     document: JSONDocument;
@@ -68,15 +81,7 @@ async function ImageBlock(props: {
         <Caption {...props}>
             <Image
                 alt={block.data.alt ?? ''}
-                sizes={[
-                    {
-                        media: '(max-width: 640px)',
-                        width: 400,
-                    },
-                    {
-                        width: 768,
-                    },
-                ]}
+                sizes={imageBlockSizes}
                 sources={{
                     light: {
                         src: src.href,

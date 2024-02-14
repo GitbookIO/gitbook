@@ -111,9 +111,13 @@ function LogoFallback(props: HeaderLogoProps) {
                               },
                           }
                 }
-                sizes={[]}
+                sizes={[
+                    {
+                        width: 32,
+                    },
+                ]}
                 fetchPriority="high"
-                style={['w-8', 'h-8']}
+                style={['w-8', 'h-8', 'object-contain']}
             />
 
             <h1
