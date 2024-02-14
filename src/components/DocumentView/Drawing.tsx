@@ -24,6 +24,7 @@ export async function Drawing(props: BlockProps<DocumentBlockDrawing>) {
                 }}
                 alt="Drawing"
                 sizes={imageBlockSizes}
+                zoom
             />
         </Caption>
     );
