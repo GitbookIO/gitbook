@@ -8,6 +8,8 @@ import { resolvePageId } from './pages';
 export interface ResolvedContentRef {
     /** Text to render in the content ref */
     text: string;
+    /** Emoji associated with the reference */
+    emoji?: string;
     /** URL to open for the content ref */
     href: string;
     /** True if the content ref is active */
@@ -65,13 +67,16 @@ export async function resolveContentRef(
             return {
                 href: pageHref(pages, page, linksContext),
                 text: page.title,
+                emoji: page.emoji,
                 active: page.id === activePage?.id,
             };
         }
 
+        const isCurrentPage = page.id === activePage?.id;
         return {
             href: pageHref(pages, page, linksContext, contentRef.anchor),
-            text: page.title + '#' + contentRef.anchor,
+            text: (isCurrentPage ? '' : page.title) + '#' + contentRef.anchor,
+            emoji: isCurrentPage ? undefined : page.emoji,
             active: false,
         };
     } else if (contentRef.kind === 'space' && contentRef.space === space.id) {

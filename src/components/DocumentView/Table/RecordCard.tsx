@@ -78,11 +78,15 @@ export async function RecordCard(
                     'place-self-start',
                     'p-4',
                     'text-sm',
-                    'text-dark/8',
-                    'transition-colors',
-                    'group-hover:text-dark/10',
-                    'dark:text-light/8',
-                    'dark:group-hover:text-light/10',
+                    target
+                        ? [
+                              'transition-colors',
+                              'text-dark/8',
+                              'dark:text-light/8',
+                              'group-hover:text-dark/10',
+                              'dark:group-hover:text-light/10',
+                          ]
+                        : ['text-dark/10', 'dark:text-light/10'],
                 )}
             >
                 {view.columns.map((column) => {
@@ -99,9 +103,7 @@ export async function RecordCard(
         'shadow-dark/[0.02]',
         'rounded-md',
         'straight-corners:rounded-none',
-        'hover:before:ring-dark/4',
         'dark:shadow-transparent',
-        'dark:hover:before:ring-light/4',
         'z-0',
         'before:pointer-events-none',
         'before:grid-area-1-1',
@@ -118,17 +120,17 @@ export async function RecordCard(
 
     if (target) {
         return (
-            <a href={target.href} className={tcls(style)}>
+            <a
+                href={target.href}
+                className={tcls(style, [
+                    'hover:before:ring-dark/4',
+                    'dark:hover:before:ring-light/4',
+                ])}
+            >
                 {body}
             </a>
         );
     }
 
-    return (
-        <div
-            className={tcls([style, 'hover:before:ring-dark/2', 'dark:hover:before:ring-light/2'])}
-        >
-            {body}
-        </div>
-    );
+    return <div className={tcls(style)}>{body}</div>;
 }
