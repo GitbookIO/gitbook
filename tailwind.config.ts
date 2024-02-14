@@ -200,6 +200,12 @@ const config: Config = {
             addVariant('page-full-width', 'body:has(.page-full-width) &');
 
             /**
+             * Variant when the page is configured to hide the table of content.
+             * `page.layout.tableOfContents` is set to false.
+             */
+            addVariant('page-no-toc', 'body:has(.page-no-toc) &');
+
+            /**
              * Variant when the page contains an OpenAPI block.
              */
             addVariant('page-api-block', 'body:has(.page-api-block) &');

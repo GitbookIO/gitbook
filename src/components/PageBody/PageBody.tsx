@@ -23,8 +23,6 @@ export function PageBody(props: {
     page: RevisionPageDocument;
     document: JSONDocument | null;
     context: ContentRefContext;
-    withDesktopTableOfContents: boolean;
-    withAside: boolean;
     withPageFeedback: boolean;
 }) {
     const {
@@ -33,8 +31,6 @@ export function PageBody(props: {
         context,
         page,
         document,
-        withDesktopTableOfContents,
-        withAside,
         withPageFeedback,
     } = props;
 
@@ -56,11 +52,12 @@ export function PageBody(props: {
                         'page-api-block:max-w-[1654px]',
                         'page-api-block:mx-auto',
 
-                        withAside ? null : 'mr-56',
-                        withDesktopTableOfContents ? null : 'xl:ml-72',
+                        page.layout.outline ? null : 'xl:mr-56',
+                        page.layout.tableOfContents ? null : 'xl:ml-56',
                     ) +
                     (asFullWidth ? ' page-full-width' : '') +
-                    (asFullWidth && asFullWidth.apiBlock ? ' page-api-block' : '')
+                    (asFullWidth && asFullWidth.apiBlock ? ' page-api-block' : '') +
+                    (!page.layout.tableOfContents ? ' page-no-toc' : '')
                 }
             >
                 {page.cover && page.layout.cover && page.layout.coverSize === 'hero' ? (

@@ -8,15 +8,18 @@ export default function PageSkeleton() {
     return (
         <div
             className={tcls(
+                'flex',
+                'flex-row',
+                'flex-1',
                 'relative',
                 'py-8',
                 'lg:px-16',
-                'flex-1',
-                'mr-56',
-                // withDesktopTableOfContents ? null : 'xl:ml-72',
+                'xl:mr-56',
+                'items-center',
+                'lg:items-start',
             )}
         >
-            <div className={tcls('max-w-3xl', 'mx-auto')}>
+            <div className={tcls('flex-1', 'max-w-3xl')}>
                 <SkeletonHeading style={tcls('mb-8')} />
                 <SkeletonParagraph style={tcls('mb-4')} />
             </div>

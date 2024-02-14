@@ -23,7 +23,6 @@ export function TableOfContents(props: {
     ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
     header?: React.ReactNode;
     withHeaderOffset: boolean;
-    visibleOnDesktop: boolean;
 }) {
     const {
         space,
@@ -33,7 +32,6 @@ export function TableOfContents(props: {
         header,
         context,
         withHeaderOffset,
-        visibleOnDesktop,
     } = props;
 
     return (
@@ -60,9 +58,7 @@ export function TableOfContents(props: {
                 'dark:navigation-open:shadow-light/2',
                 withHeaderOffset ? 'lg:h-[calc(100vh_-_4rem)]' : 'lg:h-[100vh]',
                 withHeaderOffset ? 'lg:top-16' : 'lg:top-0',
-                visibleOnDesktop ? null : 'lg:hidden',
-
-                /*                 withHeaderOffset ? SIDE_COLUMN_WITH_HEADER : SIDE_COLUMN_WITHOUT_HEADER, */
+                'page-no-toc:lg:hidden',
             )}
         >
             {header ? header : null}
@@ -85,7 +81,6 @@ export function TableOfContents(props: {
                     'dark:group-hover:[&::-webkit-scrollbar]:bg-light/1',
                     'dark:group-hover:[&::-webkit-scrollbar-thumb]:bg-light/3',
                     'navigation-open:flex', // can be auto height animated as such https://stackoverflow.com/a/76944290
-                    /*                     header ? 'pt-3' : 'pt-6', */
                     'lg:-ml-5',
                     customization.trademark.enabled ? 'lg:pb-16' : 'lg:pb-4',
                 )}

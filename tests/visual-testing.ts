@@ -45,6 +45,16 @@ const testCases: TestsCase[] = [
         ],
     },
     {
+        name: 'GitBook Examples',
+        baseUrl: 'https://examples.gitbook.com',
+        tests: [
+            {
+                name: 'Landing page',
+                url: '',
+            },
+        ],
+    },
+    {
         name: 'Snyk',
         baseUrl: 'https://docs.snyk.io',
         tests: [

@@ -56,8 +56,6 @@ export default async function Page(props: { params: PagePathParams }) {
                     context={contentRefContext}
                     page={page}
                     document={document}
-                    withDesktopTableOfContents={!!page.layout.tableOfContents}
-                    withAside={!!page.layout.outline}
                     withPageFeedback={
                         // Display the page feedback in the page footer if the aside is not visible
                         withPageFeedback && !page.layout.outline

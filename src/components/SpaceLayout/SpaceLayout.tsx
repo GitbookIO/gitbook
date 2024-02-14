@@ -82,7 +82,6 @@ export function SpaceLayout(props: {
                         )
                     }
                     withHeaderOffset={withTopHeader}
-                    visibleOnDesktop={true /*!!page.layout.tableOfContents */}
                 />
                 <div className={tcls('flex-1', 'flex', 'flex-col')}>{children}</div>
             </div>
