@@ -4,8 +4,8 @@
 
 @layer base {
     :root {
-        --dark-base: 23 23 23;
-        --light-base: 249 250 250;
+        --dark-base: 20 20 20;
+        --light-base: 251 252 252;
 
         --light-1: color-mix(in srgb, rgb(var(--primary-base-600)), rgb(var(--light-base)) 99%);
         --light-DEFAULT: color-mix(
@@ -17,15 +17,15 @@
         --light-3: color-mix(in srgb, rgb(var(--primary-base-800)), rgb(var(--light-base)) 88%);
         --light-4: color-mix(in srgb, rgb(var(--primary-base-800)), rgb(var(--light-base)) 72%);
 
-        --dark-1: color-mix(in srgb, rgb(var(--primary-base-100)), rgb(var(--dark-base)) 99%);
-        --dark-DEFAULT: color-mix(in srgb, rgb(var(--primary-base-300)), rgb(var(--dark-base)) 96%);
+        --dark-1: color-mix(in srgb, rgb(var(--primary-base-100)), rgb(1 1 1) 96%);
+        --dark-DEFAULT: color-mix(in srgb, rgb(var(--primary-base-300)), rgb(var(--dark-base)) 94.5%);
         --dark-2: color-mix(in srgb, rgb(var(--primary-base-200)), rgb(var(--dark-base)) 92%);
-        --dark-3: color-mix(in srgb, rgb(var(--primary-base-200)), rgb(var(--dark-base)) 88%);
+        --dark-3: color-mix(in srgb, rgb(var(--primary-base-200)), rgb(25 25 25) 91%);
         --dark-4: color-mix(in srgb, rgb(var(--primary-base-200)), rgb(var(--dark-base)) 64%);
         @apply leading-relaxed;
     }
     body {
-        @apply text-dark/9 dark:text-light/9;
+        @apply text-dark dark:text-light;
     }
     html {
         @apply gutter-stable;

@@ -30,7 +30,7 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                 'to-light-1',
                 'border',
                 'border-b-0',
-                'border-light-3/9',
+                'border-dark-3/3',
                 //all
                 '[&]:mt-[0px]',
                 //select first child
@@ -45,7 +45,7 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                 '[&:not(:has(+_&))]:border-b',
                 /* '[&:not(:has(+_&))]:shadow-1xs', */
 
-                'dark:border-dark-3/10',
+                'dark:border-light-2/[0.06]',
                 'dark:from-dark-2',
                 'dark:to-dark-2',
                 'dark:shadow-none',

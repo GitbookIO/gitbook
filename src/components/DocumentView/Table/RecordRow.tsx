@@ -18,7 +18,7 @@ export async function RecordRow(
         : ['[&>*+*]:border-l', '[&>*+*]:pl-4'];
 
     return (
-        <tr className={tcls(tableTR, 'border-dark/2', 'dark:border-light/2')}>
+        <tr className={tcls(tableTR, 'border-dark/3', 'dark:border-light/2')}>
             {view.columns.map((column) => {
                 return (
                     <td

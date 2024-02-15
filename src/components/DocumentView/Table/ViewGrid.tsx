@@ -20,7 +20,7 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
               'mx-auto',
               'rounded-md',
               'border',
-              'border-dark/2',
+              'border-dark/3',
               'dark:border-light/2',
               block.data.fullWidth
                   ? [
@@ -155,7 +155,7 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                                             'align-baseline',
                                             'text-balance',
                                             'border-b',
-                                            'border-b-dark/4',
+                                            'border-b-dark/5',
                                             'text-left',
                                             'text-xs',
                                             'lg:text-base',

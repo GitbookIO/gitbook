@@ -125,10 +125,12 @@ export function ToggleableLinkItem(props: {
                               'font-normal',
                               'text-dark/8',
                               'hover:bg-dark/1',
+                              'hover:text-dark/9',
                               'hover:before:border-dark/3',
-                              'dark:text-light/7',
+                              'dark:text-light/8',
                               'dark:hover:bg-light/2',
                               'dark:hover:before:border-light/3',
+                              'dark:hover:text-light/9',
                           ],
                 )}
             >
