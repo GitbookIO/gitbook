@@ -122,6 +122,15 @@ export async function resizeImage(
 ): Promise<Response> {
     const { signal, ...resizeOptions } = options;
 
+    const parsed = new URL(input);
+    if (parsed.protocol === 'data:') {
+        throw new Error('Cannot resize data: URLs');
+    }
+
+    if (parsed.hostname === 'localhost') {
+        throw new Error('Cannot resize localhost URLs');
+    }
+
     // Since Cloudflare Images options on fetch are not supported on Cloudflare Pages,
     // we need to use the Cloudflare Image Resize API directly.
     if (process.env.GITBOOK_IMAGE_RESIZE_URL) {
