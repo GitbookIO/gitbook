@@ -18,7 +18,11 @@
         --light-4: color-mix(in srgb, rgb(var(--primary-base-800)), rgb(var(--light-base)) 72%);
 
         --dark-1: color-mix(in srgb, rgb(var(--primary-base-100)), rgb(1 1 1) 96%);
-        --dark-DEFAULT: color-mix(in srgb, rgb(var(--primary-base-300)), rgb(var(--dark-base)) 94.5%);
+        --dark-DEFAULT: color-mix(
+            in srgb,
+            rgb(var(--primary-base-300)),
+            rgb(var(--dark-base)) 94.5%
+        );
         --dark-2: color-mix(in srgb, rgb(var(--primary-base-200)), rgb(var(--dark-base)) 92%);
         --dark-3: color-mix(in srgb, rgb(var(--primary-base-200)), rgb(25 25 25) 91%);
         --dark-4: color-mix(in srgb, rgb(var(--primary-base-200)), rgb(var(--dark-base)) 64%);

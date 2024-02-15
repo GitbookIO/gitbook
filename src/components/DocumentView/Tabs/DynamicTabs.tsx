@@ -23,6 +23,7 @@ export function DynamicTabs(props: {
         <div
             className={tcls(
                 'rounded-lg',
+                'straight-corners:rounded-sm',
                 'ring-1',
                 'ring-inset',
                 'ring-dark/3',

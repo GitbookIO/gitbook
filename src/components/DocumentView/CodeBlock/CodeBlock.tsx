@@ -25,7 +25,11 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
     const fullWidth = block.data.fullWidth;
 
     const fullWidthStyle = fullWidth ? 'max-w-4xl' : 'max-w-3xl';
-    const titleRoundingStyle = title ? ['rounded-md', 'rounded-ss-none'] : ['rounded-md'];
+    const titleRoundingStyle = [
+        'rounded-md',
+        'straight-corners:rounded-sm',
+        title ? 'rounded-ss-none' : null,
+    ];
 
     return (
         <div className={tcls('group/codeblock', 'grid', 'grid-flow-col', style, fullWidthStyle)}>
@@ -51,6 +55,7 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
                             'justify-center',
                             'bg-light-2',
                             'rounded-t',
+                            'straight-corners:rounded-t-s',
                             'px-3',
                             'py-2',
                             'dark:bg-dark-2',

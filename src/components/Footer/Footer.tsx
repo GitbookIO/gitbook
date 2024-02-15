@@ -26,10 +26,29 @@ export function Footer(props: {
                 'dark:bg-dark-2',
             )}
         >
-            <div className={tcls('flex', 'flex-col', CONTAINER_STYLE, 'py-6', 'md:flex-row', 'gap-6')}>
+            <div
+                className={tcls(
+                    'flex',
+                    'flex-col',
+                    CONTAINER_STYLE,
+                    'py-6',
+                    'md:flex-row',
+                    'gap-6',
+                )}
+            >
                 <div className={tcls('flex-1', 'flex', 'flex-col', 'gap-6')}>
                     {customization.footer.logo || customization.footer.groups?.length > 0 ? (
-                        <div className={tcls('flex', 'flex-col', 'gap-10', 'sm:gap-20', 'sm:flex-row', 'items-center', 'flex-wrap')}>
+                        <div
+                            className={tcls(
+                                'flex',
+                                'flex-col',
+                                'gap-10',
+                                'sm:gap-20',
+                                'sm:flex-row',
+                                'items-center',
+                                'flex-wrap',
+                            )}
+                        >
                             {customization.footer.logo ? (
                                 <div>
                                     <Image
@@ -45,7 +64,13 @@ export function Footer(props: {
                                                 : null,
                                         }}
                                         priority="lazy"
-                                        style={['h-10', 'md:h-24', 'max-w-full', 'sm:max-w-80', 'object-contain']}
+                                        style={[
+                                            'h-10',
+                                            'md:h-24',
+                                            'max-w-full',
+                                            'sm:max-w-80',
+                                            'object-contain',
+                                        ]}
                                         sizes={[
                                             {
                                                 width: 320,

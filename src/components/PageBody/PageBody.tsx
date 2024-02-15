@@ -25,14 +25,7 @@ export function PageBody(props: {
     context: ContentRefContext;
     withPageFeedback: boolean;
 }) {
-    const {
-        space,
-        customization,
-        context,
-        page,
-        document,
-        withPageFeedback,
-    } = props;
+    const { space, customization, context, page, document, withPageFeedback } = props;
 
     const asFullWidth = document ? hasFullWidthBlock(document) : false;
     const language = getSpaceLanguage(customization);

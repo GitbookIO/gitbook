@@ -24,15 +24,7 @@ export function TableOfContents(props: {
     header?: React.ReactNode;
     withHeaderOffset: boolean;
 }) {
-    const {
-        space,
-        customization,
-        pages,
-        ancestors,
-        header,
-        context,
-        withHeaderOffset,
-    } = props;
+    const { space, customization, pages, ancestors, header, context, withHeaderOffset } = props;
 
     return (
         <aside

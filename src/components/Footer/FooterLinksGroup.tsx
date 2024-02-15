@@ -11,7 +11,17 @@ export function FooterLinksGroup(props: {
     const { group, context } = props;
 
     return (
-        <div className={tcls('flex', 'flex-col', 'gap-3', 'items-center', 'text-center', 'sm:items-start', 'sm:text-start')}>
+        <div
+            className={tcls(
+                'flex',
+                'flex-col',
+                'gap-3',
+                'items-center',
+                'text-center',
+                'sm:items-start',
+                'sm:text-start',
+            )}
+        >
             <p className={tcls('text-base', 'font-medium')}>{group.title}</p>
             {group.links.map((link, index) => {
                 return <FooterLink key={index} link={link} context={context} />;
