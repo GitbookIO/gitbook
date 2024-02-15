@@ -5,6 +5,8 @@ import {
     ContentVisibility,
     GitBookAPI,
     GitBookAPIError,
+    HttpResponse,
+    List,
     PublishedContentLookup,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
@@ -438,13 +440,12 @@ export const getCollection = cache('api.getCollection', async (collectionId: str
 export const getCollectionSpaces = cache(
     'api.getCollectionSpaces',
     async (collectionId: string) => {
-        const response = await api().collections.listSpacesInCollectionById(
-            collectionId,
-            {},
-            {
+        const response = await getAll((params) =>
+            api().collections.listSpacesInCollectionById(collectionId, params, {
                 ...noCacheFetchOptions,
-            },
+            }),
         );
+
         return cacheResponse(response, {
             data: response.data.items.filter(
                 (space) => space.visibility === ContentVisibility.InCollection,
@@ -595,4 +596,44 @@ export function userAgent(): string {
     }
 
     return result;
+}
+
+/**
+ * Iterate over a paginated API endpoint and return all the items.
+ */
+async function getAll<T, E>(
+    getPage: (params: { page?: string; limit?: number }) => Promise<
+        HttpResponse<
+            List & {
+                items: T[];
+            },
+            E
+        >
+    >,
+): Promise<
+    HttpResponse<
+        List & {
+            items: T[];
+        },
+        E
+    >
+> {
+    const limit = 100;
+
+    let page: string | undefined = undefined;
+    const result: T[] = [];
+
+    while (1) {
+        const response = await getPage({ page, limit });
+        result.push(...response.data.items);
+
+        if (response.data.next) {
+            page = response.data.next.page;
+        } else {
+            response.data.items = result;
+            return response;
+        }
+    }
+
+    throw new Error('Unreachable');
 }
