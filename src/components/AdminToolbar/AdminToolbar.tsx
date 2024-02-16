@@ -52,13 +52,14 @@ export function AdminToolbar(props: AdminToolbarProps) {
                 'transform',
                 '-translate-x-1/2',
                 'rounded-full',
-                'bg-slate-950',
+                'bg-dark-1/9',
                 'shadow-lg',
                 'min-h-10',
                 'min-w-40',
                 'p-2',
                 'max-w-md',
-                'border-slate-300',
+                'border-dark-1',
+                'backdrop-blur-sm',
             )}
         >
             <React.Suspense fallback={null}>{toolbar}</React.Suspense>
@@ -113,11 +114,13 @@ function ToolbarButton(props: { href: string; children: React.ReactNode }) {
                 'text-sm',
                 'px-4',
                 'py-1',
-                'text-slate-400',
                 'rounded-full',
-                'hover:bg-slate-800',
+                'hover:bg-dark-1',
                 'hover:text-white',
                 'truncate',
+                'text-light',
+                'dark:text-light',
+                'dark:hover:bg-dark-2',
             )}
         >
             {children}

@@ -54,6 +54,9 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                                       'dark:text-primary-400',
                                       'dark:border-primary-400',
                                       'opacity-[1]',
+                                      '[&>span]:bg-primary-400',
+                                      'dark:[&>span]:bg-primary-600',
+                                      'dark:[&>span]:text-dark',
                                   ]
                                 : '',
                         )}

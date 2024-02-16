@@ -42,7 +42,7 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
                                     {...contextProps}
                                     nodes={block.nodes}
                                     ancestorBlocks={[...ancestorBlocks, block]}
-                                    blockStyle={tcls('flex-1')}
+                                    blockStyle={tcls('flex-1', 'flip-heading-hash')}
                                     style={tcls('ml-2', 'space-y-2')}
                                 />
                             </label>
@@ -61,7 +61,12 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
                             nodes={block.nodes}
                             ancestorBlocks={[...ancestorBlocks, block]}
                             style={tcls('space-y-2', 'flex', 'flex-col')}
-                            blockStyle={tcls(textStyle.lineHeight, 'min-h-[1lh]')}
+                            blockStyle={tcls(
+                                textStyle.lineHeight,
+                                'min-h-[1lh]',
+                                //flip heading hash icon if list item is a heading
+                                'flip-heading-hash',
+                            )}
                         />
                     </li>
                 );
@@ -75,7 +80,11 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
                             nodes={block.nodes}
                             ancestorBlocks={[...ancestorBlocks, block]}
                             style={tcls('space-y-2', 'flex', 'flex-col')}
-                            blockStyle={tcls('min-h-[1lh]')}
+                            blockStyle={tcls(
+                                'min-h-[1lh]',
+                                //flip heading hash icon if list item is a heading
+                                'flip-heading-hash',
+                            )}
                         />
                     </li>
                 );

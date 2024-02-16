@@ -43,7 +43,11 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
                     {...contextProps}
                     ancestorBlocks={[...ancestorBlocks, block]}
                     nodes={block.nodes}
-                    blockStyle={tcls(hintStyle.anchorColor)}
+                    blockStyle={tcls(
+                        hintStyle.anchorColor,
+                        // render hash icon on the other side of the heading
+                        'flip-heading-hash',
+                    )}
                     style={['flex-1', 'space-y-4', '[&>p]:text-sm', '[&>p]:leading-relaxed']}
                 />
             </div>

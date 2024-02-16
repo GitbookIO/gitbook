@@ -8,15 +8,17 @@ export function ListUnordered(props: BlockProps<DocumentBlockListUnordered>) {
 
     const nestedBulletStyle = [
         // Level 1
-        '[&>li>.bullet:before]:bullet-dash',
+        '[&>li>.bullet:before]:bullet-circleFilled',
         // Level 2
-        `[&_&>li>.bullet:before]:bullet-circleFilled`,
+        `[&_&>li>.bullet:before]:bullet-circle`,
         // Level 3
-        `[&_&_&>li>.bullet:before]:bullet-circle`,
+        `[&_&_&>li>.bullet:before]:bullet-dash`,
         // Level 4
         `[&_&_&_&>li>.bullet:before]:bullet-squareFilled`,
         // Level 5
         `[&_&_&_&_&>li>.bullet:before]:bullet-square`,
+        // Level 6 // reset back to reg bullets here
+        `[&_&_&_&_&_&>li>.bullet:before]:bullet-circleFilled`,
     ];
 
     return (

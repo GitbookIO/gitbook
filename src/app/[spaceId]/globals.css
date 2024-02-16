@@ -127,6 +127,13 @@
         @apply bg-dark/6;
     }
 
+    .flip-heading-hash {
+        @apply [&:is(h1,h2,h3,h4)]:content-start;
+        @apply [&:is(h1,h2,h3,h4)]:[grid-auto-columns:auto_1fr];
+        @apply [&:is(h1,h2,h3,h4)>div:first-child]:[grid-area:1/2];
+        @apply [&:is(h1,h2,h3,h4)>div:first-child]:ml-1;
+    }
+
     /*  bullet icons */
     .bullet-dash {
         @apply [mask-image:url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iNyIgdmlld0JveD0iMCAwIDEwIDciIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHg9IjEiIHk9IjIuNSIgd2lkdGg9IjgiIGhlaWdodD0iMS41IiByeD0iMC42NiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg==")];

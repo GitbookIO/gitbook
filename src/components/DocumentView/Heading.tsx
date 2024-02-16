@@ -22,7 +22,6 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
             <div
                 className={tcls(
                     'grid',
-                    'bg-light',
                     'grid-area-1-1',
                     'relative',
                     '-ml-6',
@@ -31,7 +30,6 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                     'opacity-0',
                     'group-hover:opacity-[0]',
                     'group-focus:opacity-[0]',
-                    'dark:bg-dark',
                     'md:group-hover:md:opacity-[1]',
                     'md:group-focus:md:opacity-[1]',
                     textStyle.marginTop,
