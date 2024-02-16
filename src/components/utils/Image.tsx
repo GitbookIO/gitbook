@@ -79,6 +79,11 @@ interface ImageCommonProps {
      * The `style` attribute is used to apply custom styles.
      */
     style?: ClassValue;
+
+    /**
+     * The `style` attribute is used to apply custom styles.
+     */
+    inlineStyle?: React.CSSProperties;
 }
 
 /**
@@ -154,6 +159,7 @@ async function ImagePicture(
         zoom = false,
         resize = true,
         preload = false,
+        inlineStyle,
         ...rest
     } = props;
 
@@ -246,6 +252,7 @@ async function ImagePicture(
             sizes={sizesAttr}
             src={src}
             alt={alt}
+            style={inlineStyle}
             {...(priority === 'lazy' ? { loading: 'lazy', fetchPriority: 'low' } : {})}
             {...(priority === 'high' ? { fetchPriority: 'high' } : {})}
             {...rest}

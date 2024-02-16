@@ -1,4 +1,9 @@
-import { DocumentBlockImage, DocumentBlockImages, JSONDocument } from '@gitbook/api';
+import {
+    DocumentBlockImage,
+    DocumentBlockImageDimension,
+    DocumentBlockImages,
+    JSONDocument,
+} from '@gitbook/api';
 
 import { Image, ImageResponsiveSize } from '@/components/utils';
 import { ClassValue, tcls } from '@/lib/tailwind';
@@ -12,8 +17,8 @@ export function Images(props: BlockProps<DocumentBlockImages>) {
     const { document, block, ancestorBlocks, style, context } = props;
 
     const isOffscreen = isBlockOffscreen({ document, block, ancestorBlocks });
-
     const isMultipleImages = block.nodes.length > 1;
+    const { align = 'center' } = block.data;
 
     return (
         <div
@@ -22,12 +27,11 @@ export function Images(props: BlockProps<DocumentBlockImages>) {
                 'flex',
                 'flex-row',
                 'gap-3',
-                block.data.align === 'center' && 'justify-center',
-                block.data.align === 'right' && 'justify-end',
-                block.data.align === 'left' && 'justify-start',
+                align === 'center' && 'justify-center',
+                align === 'right' && 'justify-end',
+                align === 'left' && 'justify-start',
                 isMultipleImages && ['grid', 'grid-flow-col', 'max-w-none'],
                 block.data.fullWidth ? 'max-w-screen-2xl' : null,
-                'justify-center',
             )}
         >
             {block.nodes.map((node: any, i: number) => (
@@ -97,7 +101,30 @@ async function ImageBlock(props: {
                 priority={isOffscreen ? 'lazy' : 'high'}
                 preload
                 zoom
+                inlineStyle={{
+                    width: getImageDimension(block.data.width, '100%'),
+                    height: getImageDimension(block.data.height, 'auto'),
+                }}
             />
         </Caption>
     );
+}
+
+/**
+ * This function converts a dimension value to a string representation with 'px' as the unit,
+ * or returns the default value if the dimension is not valid.
+ * When using absolute values, the converted dimension will be the actual size in pixels.
+ * When using relative values, the converted dimension will be relative to the parent element's size.
+ */
+function getImageDimension(
+    dimension: DocumentBlockImageDimension | undefined,
+    defaultValue: string,
+): string {
+    if (typeof dimension === 'number') {
+        return `${dimension}px`;
+    } else if (dimension?.unit === 'px') {
+        return `${dimension.value}${dimension.unit}`;
+    } else {
+        return defaultValue;
+    }
 }
