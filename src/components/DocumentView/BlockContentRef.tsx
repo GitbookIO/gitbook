@@ -1,7 +1,8 @@
 import { DocumentBlockContentRef } from '@gitbook/api';
 
+import { Card, Emoji } from '@/components/primitives';
+
 import { BlockProps } from './Block';
-import { Card } from '../primitives';
 
 export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>) {
     const { block, context, style } = props;
@@ -12,5 +13,15 @@ export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>
         return null;
     }
 
-    return <Card href={resolved.href} preTitle={kind} title={resolved.text} style={style} />;
+    return (
+        <Card
+            leadingIcon={
+                resolved.emoji ? <Emoji code={resolved.emoji} style={['text-xl']} /> : null
+            }
+            href={resolved.href}
+            preTitle={kind}
+            title={resolved.text}
+            style={style}
+        />
+    );
 }

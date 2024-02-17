@@ -38,7 +38,7 @@ export async function Card(props: {
                 style,
             )}
         >
-            {leadingIcon ? <span className={tcls('mr-3')}>{leadingIcon}</span> : null}
+            {leadingIcon ? <span className={tcls('mr-4')}>{leadingIcon}</span> : null}
             <span className={tcls('flex', 'flex-col', 'flex-1')}>
                 {preTitle ? (
                     <span
