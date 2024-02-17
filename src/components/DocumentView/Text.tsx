@@ -9,7 +9,7 @@ import {
 } from '@gitbook/api';
 import React from 'react';
 
-import { tcls } from '@/lib/tailwind';
+import { ClassValue, tcls } from '@/lib/tailwind';
 
 export function Text(props: { text: DocumentText }) {
     const { text } = props;
@@ -19,16 +19,21 @@ export function Text(props: { text: DocumentText }) {
             {text.leaves.map((leaf, index) => {
                 return (
                     <React.Fragment key={index}>
-                        {leaf.marks.reduce<React.ReactNode>((children, mark, index) => {
-                            const Mark = MARK_STYLES[mark.type];
+                        {leaf.marks
+                            // Sort to have code marks at the end, so that they don't interfere with other marks
+                            .sort(
+                                (a, b) => (a.type === 'code' ? 1 : 0) - (b.type === 'code' ? 1 : 0),
+                            )
+                            .reduce<React.ReactNode>((children, mark, index) => {
+                                const Mark = MARK_STYLES[mark.type];
 
-                            if (!Mark) {
-                                return children;
-                            }
+                                if (!Mark) {
+                                    return children;
+                                }
 
-                            // @ts-ignore
-                            return <Mark mark={mark}>{children}</Mark>;
-                        }, leaf.text)}
+                                // @ts-ignore
+                                return <Mark mark={mark}>{children}</Mark>;
+                            }, leaf.text)}
                     </React.Fragment>
                 );
             })}
@@ -93,6 +98,35 @@ function Code(props: MarkedLeafProps<DocumentMarkCode>) {
 }
 
 function Color(props: MarkedLeafProps<DocumentMarkColor>) {
-    // TODO
-    return <span>{props.children}</span>;
+    const { mark, children } = props;
+    return (
+        <span
+            className={tcls([
+                textColorToStyle[mark.data.text],
+                backgroundColorToStyle[mark.data.background],
+            ])}
+        >
+            {children}
+        </span>
+    );
 }
+
+const textColorToStyle: { [color in DocumentMarkColor['data']['text']]: ClassValue } = {
+    default: [],
+    blue: ['text-blue-500'],
+    red: ['text-red-500'],
+    green: ['text-green-500'],
+    yellow: ['text-yellow-600'],
+    purple: ['text-purple-500'],
+    orange: ['text-orange-500'],
+};
+
+const backgroundColorToStyle: { [color in DocumentMarkColor['data']['background']]: ClassValue } = {
+    default: [],
+    blue: ['bg-blue-200', 'dark:bg-blue-900'],
+    red: ['bg-red-200', 'dark:bg-red-900'],
+    green: ['bg-green-200', 'dark:bg-green-900'],
+    yellow: ['bg-yellow-100', 'dark:bg-yellow-900'],
+    purple: ['bg-purple-200', 'dark:bg-purple-900'],
+    orange: ['bg-orange-200', 'dark:bg-orange-900'],
+};

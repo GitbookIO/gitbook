@@ -185,6 +185,28 @@ const testCases: TestsCase[] = [
             },
         ],
     },
+    {
+        name: 'Content tests',
+        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        tests: [
+            {
+                name: 'Images',
+                url: 'blocks/block-images',
+            },
+            {
+                name: 'Inline Images',
+                url: 'blocks/inline-images',
+            },
+            {
+                name: 'Tabs',
+                url: 'blocks/tabs',
+            },
+            {
+                name: 'Marks',
+                url: 'blocks/marks',
+            },
+        ],
+    },
 ];
 
 console.log(`Starting visual testing with ${getTargetURL()}...`);
