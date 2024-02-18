@@ -102,7 +102,8 @@ async function ImageBlock(props: {
                 preload
                 zoom
                 inlineStyle={{
-                    width: getImageDimension(block.data.width, '100%'),
+                    maxWidth: '100%',
+                    width: getImageDimension(block.data.width, undefined),
                     height: getImageDimension(block.data.height, 'auto'),
                 }}
             />
@@ -116,10 +117,10 @@ async function ImageBlock(props: {
  * When using absolute values, the converted dimension will be the actual size in pixels.
  * When using relative values, the converted dimension will be relative to the parent element's size.
  */
-function getImageDimension(
+function getImageDimension<DefaultValue>(
     dimension: DocumentBlockImageDimension | undefined,
-    defaultValue: string,
-): string {
+    defaultValue: DefaultValue,
+): string | DefaultValue {
     if (typeof dimension === 'number') {
         return `${dimension}px`;
     } else if (dimension?.unit === 'px') {
