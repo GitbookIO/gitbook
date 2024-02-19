@@ -1,4 +1,5 @@
 import ChevronRight from '@geist-ui/icons/chevronRight';
+import IconHash from '@geist-ui/icons/hash';
 import { DocumentBlockExpandable } from '@gitbook/api';
 
 import { getNodeFragmentByType } from '@/lib/document';
@@ -7,6 +8,7 @@ import { tcls } from '@/lib/tailwind';
 import { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { Inlines } from '../Inlines';
+
 export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
     const { block, style, ancestorBlocks, document, context } = props;
 
@@ -19,8 +21,12 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
         return null;
     }
 
+    let id = block.meta?.id ?? '';
+    id = context.getId ? context.getId(id) : id;
+
     return (
         <details
+            id={id}
             className={tcls(
                 style,
                 'group/expandable',
@@ -58,7 +64,9 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                 className={tcls(
                     'cursor-pointer',
                     'px-4',
+                    'pr-10',
                     'py-4',
+                    'relative',
                     'list-none',
                     'select-none',
                     'transition-colors',
@@ -82,6 +90,33 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                     )}
                 />
                 <Inlines nodes={titleParagraph.nodes} document={document} context={context} />
+                <a
+                    href={`#${id}`}
+                    aria-label="Direct link to heading"
+                    className={tcls(
+                        'absolute',
+                        'top-2',
+                        'bottom-2',
+                        'right-4',
+                        'flex',
+                        'items-center',
+                        'dark:text-light/3',
+                        'dark:shadow-none',
+                        'dark:ring-0',
+                    )}
+                >
+                    <IconHash
+                        className={tcls(
+                            'inline-block',
+                            'w-4',
+                            'h-4',
+                            'transition-colors',
+                            'stroke-transparent',
+                            'group-hover:stroke-dark/6',
+                            'dark:group-hover:stroke-light/5',
+                        )}
+                    />
+                </a>
             </summary>
             <Blocks
                 nodes={body.nodes}

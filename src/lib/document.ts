@@ -48,17 +48,12 @@ export async function getDocumentSections(
     let depth = 0;
 
     for (const block of document.nodes) {
-        if (
-            (block.type === 'heading-1' ||
-                block.type === 'heading-2' ||
-                block.type === 'heading-3') &&
-            block.meta?.id
-        ) {
+        if ((block.type === 'heading-1' || block.type === 'heading-2') && block.meta?.id) {
             if (block.type === 'heading-1') {
                 depth = 1;
             }
             const title = getNodeText(block);
-            const id = block.meta?.id;
+            const id = block.meta.id;
 
             sections.push({
                 id,
