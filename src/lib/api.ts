@@ -62,6 +62,7 @@ export type PublishedContentWithCache =
     | (PublishedContentLookup & {
           cacheMaxAge?: number;
           cacheTags?: string[];
+          visitorAuthToken?: string;
       })
     | {
           error: {

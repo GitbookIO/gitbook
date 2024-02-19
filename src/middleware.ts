@@ -12,20 +12,21 @@ import {
     userAgent,
     withAPI,
 } from '@/lib/api';
+import { race } from '@/lib/async';
 import { buildVersion } from '@/lib/build';
 import { createContentSecurityPolicyNonce, getContentSecurityPolicy } from '@/lib/csp';
 import { getURLLookupAlternatives, normalizeURL } from '@/lib/middleware';
-
-import { race } from './lib/async';
+import {
+    getVisitorAuthCookieName,
+    getVisitorAuthCookieValue,
+    getVisitorAuthToken,
+} from '@/lib/visitor-auth';
 
 export const config = {
     matcher:
         '/((?!_next/static|_next/image|~gitbook/revalidate|~gitbook/image|~gitbook/monitoring).*)',
     skipTrailingSlashRedirect: true,
 };
-
-const VISITOR_AUTH_PARAM = 'jwt_token';
-const VISITOR_AUTH_COOKIE = 'gitbook-visitor-token';
 
 type URLLookupMode =
     /**
@@ -82,12 +83,6 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(normalized.toString());
     }
 
-    // The visitor authentication can either be passed as a query parameter
-    // or can be stored in a cookie after the initial auth.
-    const visitorAuthToken =
-        url.searchParams.get(VISITOR_AUTH_PARAM) ?? request.cookies.get(VISITOR_AUTH_COOKIE)?.value;
-    url.searchParams.delete(VISITOR_AUTH_PARAM);
-
     // The API endpoint can be passed as a header, making it possible to use the same GitBook Open target
     // accross multiple GitBook instances.
     let apiEndpoint = request.headers.get('x-gitbook-api') ?? process.env.GITBOOK_API_URL;
@@ -101,7 +96,7 @@ export async function middleware(request: NextRequest) {
             authToken: process.env.GITBOOK_API_TOKEN,
             userAgent: userAgent(),
         }),
-        () => lookupSpaceForURL(mode, request, inputURL, visitorAuthToken),
+        () => lookupSpaceForURL(mode, request, inputURL),
     );
     if ('error' in resolved) {
         return new NextResponse(resolved.error.message, {
@@ -189,8 +184,14 @@ export async function middleware(request: NextRequest) {
     response.headers.set('content-security-policy', csp);
 
     // When content is authenticated, we store the state in a cookie.
-    if (visitorAuthToken) {
-        response.cookies.set(VISITOR_AUTH_COOKIE, visitorAuthToken);
+    if ('visitorAuthToken' in resolved && resolved.visitorAuthToken) {
+        response.cookies.set(
+            getVisitorAuthCookieName(resolved.basePath),
+            getVisitorAuthCookieValue(resolved.basePath, resolved.visitorAuthToken),
+            {
+                httpOnly: true,
+            },
+        );
     } else if (process.env.NODE_ENV !== 'development' && resolved.cacheMaxAge) {
         const cacheControl = `public, max-age=60, s-maxage=${resolved.cacheMaxAge}, stale-while-revalidate=60, stale-if-error=0`;
         response.headers.set('cache-control', cacheControl);
@@ -244,17 +245,16 @@ async function lookupSpaceForURL(
     mode: URLLookupMode,
     request: NextRequest,
     url: URL,
-    visitorAuthToken: string | undefined,
 ): Promise<LookupResult> {
     switch (mode) {
         case 'single': {
             return await lookupSpaceInSingleMode(url);
         }
         case 'multi': {
-            return await lookupSpaceInMultiMode(url, visitorAuthToken);
+            return await lookupSpaceInMultiMode(request, url);
         }
         case 'multi-path': {
-            return await lookupSpaceInMultiPathMode(url, visitorAuthToken);
+            return await lookupSpaceInMultiPathMode(request, url);
         }
         case 'multi-id': {
             return await lookupSpaceInMultiIdMode(request, url);
@@ -295,11 +295,13 @@ async function lookupSpaceInSingleMode(url: URL): Promise<LookupResult> {
  * GITBOOK_MODE=multi
  * When serving multi spaces based on the current URL.
  */
-async function lookupSpaceInMultiMode(
-    url: URL,
-    visitorAuthToken: string | undefined,
-): Promise<LookupResult> {
-    return lookupSpaceByAPI(url, visitorAuthToken);
+async function lookupSpaceInMultiMode(request: NextRequest, url: URL): Promise<LookupResult> {
+    const visitorAuthToken = getVisitorAuthToken(request, url);
+    const lookup = await lookupSpaceByAPI(url, visitorAuthToken);
+    return {
+        ...lookup,
+        visitorAuthToken,
+    };
 }
 
 /**
@@ -385,10 +387,7 @@ async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise
  * GITBOOK_MODE=multi-path
  * When serving multi spaces with the url passed in the path.
  */
-async function lookupSpaceInMultiPathMode(
-    url: URL,
-    visitorAuthToken: string | undefined,
-): Promise<LookupResult> {
+async function lookupSpaceInMultiPathMode(request: NextRequest, url: URL): Promise<LookupResult> {
     // Skip useless requests
     if (
         url.pathname === '/favicon.ico' ||
@@ -423,6 +422,7 @@ async function lookupSpaceInMultiPathMode(
         };
     }
     const target = new URL(targetStr);
+    const visitorAuthToken = getVisitorAuthToken(request, target);
 
     const lookup = await lookupSpaceByAPI(target, visitorAuthToken);
     if ('error' in lookup) {
@@ -449,6 +449,7 @@ async function lookupSpaceInMultiPathMode(
     return {
         ...lookup,
         basePath: joinPath(target.host, lookup.basePath),
+        visitorAuthToken,
     };
 }
 
