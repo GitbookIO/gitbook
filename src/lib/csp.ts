@@ -4,6 +4,10 @@ import { headers } from 'next/headers';
 
 import { filterOutNullable } from './typescript';
 
+const assetsDomain = process.env.GITBOOK_ASSETS_PREFIX
+    ? new URL(process.env.GITBOOK_ASSETS_PREFIX).host
+    : undefined;
+
 /**
  * Get the current nonce for the current request.
  */
@@ -34,16 +38,16 @@ export function getContentSecurityPolicy(scripts: SpaceIntegrationScript[], nonc
     //
     // Since I can't get the nonce to work for inline styles, we need to allow unsafe-inline
     const defaultCSP = `
-        default-src 'self';
-        script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline' 'unsafe-eval' integrations.gitbook.com https://cdn.iframe.ly;
-        style-src 'self' fonts.googleapis.com 'unsafe-inline';
-        img-src * 'self' blob: data: files.gitbook.com;
-        connect-src * 'self' integrations.gitbook.com app.gitbook.com;
-        font-src 'self' fonts.gstatic.com;
+        default-src 'self' ${assetsDomain};
+        script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline' 'unsafe-eval' ${assetsDomain} integrations.gitbook.com https://cdn.iframe.ly;
+        style-src 'self' ${assetsDomain} fonts.googleapis.com 'unsafe-inline';
+        img-src * 'self' blob: data: files.gitbook.com ${assetsDomain};
+        connect-src * 'self' integrations.gitbook.com app.gitbook.com ${assetsDomain};
+        font-src 'self' fonts.gstatic.com ${assetsDomain};
         frame-src *;
         object-src 'none';
-        base-uri 'self';
-        form-action 'self';
+        base-uri 'self' ${assetsDomain};
+        form-action 'self' ${assetsDomain};
         frame-ancestors 'none';
     `;
 

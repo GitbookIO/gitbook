@@ -6,6 +6,7 @@ module.exports = withSentryConfig(
             BUILD_VERSION: (process.env.GITHUB_SHA ?? '').slice(0, 7),
             SENTRY_DSN: process.env.SENTRY_DSN ?? '',
             SENTRY_ENVIRONMENT: process.env.SENTRY_ENVIRONMENT ?? 'development',
+            GITBOOK_ASSETS_PREFIX: process.env.GITBOOK_ASSETS_PREFIX,
         },
 
         webpack(config) {
@@ -20,6 +21,8 @@ module.exports = withSentryConfig(
 
             return config;
         },
+
+        assetPrefix: process.env.GITBOOK_ASSETS_PREFIX,
     },
     {
         silent: true,

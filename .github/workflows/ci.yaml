@@ -30,6 +30,8 @@ jobs:
             - name: Sets env vars for production
               run: |
                   echo "SENTRY_ENVIRONMENT=production" >> $GITHUB_ENV
+                  echo "GITBOOK_ASSETS_PREFIX=https://open.gitbook.com" >> $GITHUB_ENV
+              if: startsWith(github.ref, 'refs/tags/main')
             - name: Sets env vars for preview
               run: |
                   echo "SENTRY_ENVIRONMENT=preview" >> $GITHUB_ENV
