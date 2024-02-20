@@ -172,8 +172,8 @@ function generateHeaderTheme(customization: CustomizationSettings): {
         case CustomizationHeaderPreset.Contrast: {
             return {
                 backgroundColor: {
-                    light: customization.styling.primaryColor.dark,
-                    dark: customization.styling.primaryColor.light,
+                    light: colors.black,
+                    dark: colors.white,
                 },
                 linkColor: {
                     light: colors.white,
