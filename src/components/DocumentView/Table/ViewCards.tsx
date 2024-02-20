@@ -16,10 +16,11 @@ export function ViewCards(props: TableViewProps<DocumentTableViewCards>) {
                 'md:max-w-3xl',
                 'inline-grid',
                 'gap-4',
-
+                'grid-cols-1',
+                'min-[432px]:grid-cols-2',
                 view.cardSize === 'large'
-                    ? 'grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))]'
-                    : 'grid-cols-[repeat(auto-fit,_minmax(184px,_1fr))]',
+                    ? 'md:grid-cols-2'
+                    : 'md:grid-cols-3',
                 block.data.fullWidth ? ['max-w-full', 'large:flex-column'] : null,
             )}
         >
