@@ -1,0 +1,24 @@
+[class*='emoji'] {
+    font-family: var(--font-emojis-cbdt);
+}
+
+/* Safari Only CSS here */
+_::-webkit-full-page-media,
+_:future,
+:root [class*='emoji'] {
+    font-family: var(--font-emojis-sbix);
+}
+
+/* Chrome Only CSS here */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+    .emoji {
+        font-family: var(--font-emojis-svg);
+    }
+}
+
+/* Firefox Only CSS here */
+@-moz-document url-prefix() {
+    .emoji {
+        font-family: var(--font-emojis-svg);
+    }
+}

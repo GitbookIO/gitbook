@@ -15,9 +15,7 @@ export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>
 
     return (
         <Card
-            leadingIcon={
-                resolved.emoji ? <Emoji code={resolved.emoji} style={['text-xl']} /> : null
-            }
+            leadingIcon={resolved.emoji ? <Emoji code={resolved.emoji} /> : null}
             href={resolved.href}
             preTitle={kind}
             title={resolved.text}

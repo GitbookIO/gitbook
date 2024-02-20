@@ -7,6 +7,7 @@ import {
 import assertNever from 'assert-never';
 import colors from 'tailwindcss/colors';
 
+import { emojiFontClassName } from '@/components/primitives';
 import { fonts, ibmPlexMono } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
 import { getSpaceContent } from '@/lib/api';
@@ -103,6 +104,7 @@ export default async function SpaceRootLayout(props: {
             </head>
             <body
                 className={tcls(
+                    emojiFontClassName,
                     `${fonts[customization.styling.font].className}`,
                     `${ibmPlexMono.variable}`,
                     'bg-light',

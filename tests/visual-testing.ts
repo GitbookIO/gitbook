@@ -213,6 +213,10 @@ const testCases: TestsCase[] = [
                 name: 'Marks',
                 url: 'blocks/marks',
             },
+            {
+                name: 'Emojis',
+                url: 'blocks/emojis',
+            },
         ],
     },
 ];
