@@ -20,6 +20,7 @@ import {
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
     getVisitorAuthToken,
+    sanitizeVisitorAuthURL,
 } from '@/lib/visitor-auth';
 
 export const config = {
@@ -166,8 +167,10 @@ export async function middleware(request: NextRequest) {
         headers.set('x-gitbook-api', apiEndpoint);
     }
 
-    const target = new URL(rewritePathname, request.nextUrl.toString());
-    target.search = url.search;
+    const rewrite = new URL(rewritePathname, request.nextUrl.toString());
+    rewrite.search = url.search;
+    // Make sure the target URL is clean of any va token before we use it for response
+    const target = sanitizeVisitorAuthURL(rewrite);
 
     const response = writeCookies(
         NextResponse.rewrite(target, {

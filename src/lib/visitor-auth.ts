@@ -39,12 +39,22 @@ export function getVisitorAuthCookieValue(basePath: string, token: string): stri
 }
 
 /**
+ * Sanitize the URL by removing the visitor authentication token from the query parameters (if present).
+ */
+export function sanitizeVisitorAuthURL(url: URL): URL {
+    const withoutVAParam = new URL(url);
+    withoutVAParam.searchParams.delete(VISITOR_AUTH_PARAM);
+    return withoutVAParam;
+}
+
+/**
  * Find the visitor authentication token from the request cookies. This is done by
  * checking all cookies for a matching "visitor authentication cookie" and returning the
  * best possible match for the current URL.
  */
 function getVisitorAuthTokenFromCookies(request: NextRequest, url: URL): string | undefined {
-    const urlBasePath = url.pathname.split('/').filter(Boolean)[0] ?? '';
+    const urlPathParts = url.pathname.split('/').filter(Boolean);
+    const urlBasePath = urlPathParts.length === 0 ? `/` : `/${urlPathParts[0]}/`;
 
     return Array.from(request.cookies).reduce<string | undefined>((acc, [name, cookie]) => {
         if (name === getVisitorAuthCookieName(urlBasePath)) {
