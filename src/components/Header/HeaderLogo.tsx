@@ -10,8 +10,6 @@ interface HeaderLogoProps {
     collection: Collection | null;
     space: Space;
     customization: CustomizationSettings;
-    /** Style applied when the logo is a text one */
-    textStyle?: ClassValue;
 }
 
 /**
@@ -20,14 +18,15 @@ interface HeaderLogoProps {
 
 export function HeaderLogo(props: HeaderLogoProps) {
     const { customization } = props;
-    const isCustomizationDefault =
-        customization.header.preset === CustomizationHeaderPreset.Default;
+
     return (
         <div className={tcls('flex', 'flex-row', 'gap-3')}>
             <HeaderMobileMenu
                 className={tcls(
                     'lg:hidden',
-                    isCustomizationDefault ? ['text-dark', 'dark:text-light'] : 'text-header-link',
+                    customization.header.preset === CustomizationHeaderPreset.Default
+                        ? ['text-dark', 'dark:text-light']
+                        : 'text-header-link',
                 )}
             />
             <Link
@@ -79,7 +78,7 @@ export function HeaderLogo(props: HeaderLogoProps) {
 }
 
 function LogoFallback(props: HeaderLogoProps) {
-    const { collection, space, customization, textStyle } = props;
+    const { collection, space, customization } = props;
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
 
     return (
@@ -131,7 +130,9 @@ function LogoFallback(props: HeaderLogoProps) {
                     'lg:text-lg/tight',
                     'font-semibold',
                     'ms-3',
-                    textStyle,
+                    customization.header.preset === CustomizationHeaderPreset.Default
+                        ? ['text-dark', 'dark:text-light']
+                        : 'text-header-link',
                 )}
             >
                 {collection ? collection.title : space.title}
