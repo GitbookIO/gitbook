@@ -4,14 +4,14 @@
  */
 export function getURLLookupAlternatives(input: URL) {
     const url = normalizeURL(input);
-    const alternatives: Array<{ url: string; extraPath: string }> = [];
+    const alternatives: Array<{ url: string; extraPath: string; primary: boolean }> = [];
 
-    const pushAlternative = (url: URL, extraPath: string) => {
-        const existing = alternatives.find((alt) => alt.url === url.toString());
+    const pushAlternative = (adding: URL, extraPath: string) => {
+        const existing = alternatives.find((alt) => alt.url === adding.toString());
         if (existing) {
             if (existing.extraPath !== extraPath) {
                 throw new Error(
-                    `Invalid extraPath ${extraPath} for url ${url.toString()}, already set to ${
+                    `Invalid extraPath ${extraPath} for url ${adding.toString()}, already set to ${
                         existing.extraPath
                     }`,
                 );
@@ -20,8 +20,9 @@ export function getURLLookupAlternatives(input: URL) {
         }
 
         alternatives.push({
-            url: url.toString(),
+            url: adding.toString(),
             extraPath,
+            primary: adding.toString() === url.toString(),
         });
     };
 

@@ -219,6 +219,20 @@ const testCases: TestsCase[] = [
             },
         ],
     },
+    {
+        name: 'Share links',
+        baseUrl: 'https://gitbook.gitbook.io/test-share-links/',
+        tests: [
+            {
+                name: 'Valid link',
+                url: 'Fc6mMII9FKgnwm7qqynx/',
+            },
+            {
+                name: 'Invalid link',
+                url: 'invalid/',
+            },
+        ],
+    },
 ];
 
 console.log(`Starting visual testing with ${getTargetURL()}...`);

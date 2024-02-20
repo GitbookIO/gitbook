@@ -480,7 +480,12 @@ async function lookupSpaceByAPI(
         });
 
         if ('error' in data) {
-            return data;
+            if (alternative.primary) {
+                // We only return an error for the primary alternative (full URL),
+                // as other parts could result in errors due to the URL being incomplete (share links, etc).
+                return data;
+            }
+            return null;
         }
 
         if ('redirect' in data) {

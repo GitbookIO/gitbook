@@ -8,14 +8,17 @@ describe('getURLLookupAlternatives', () => {
             {
                 extraPath: 'a/b/c',
                 url: 'https://docs.mycompany.com/',
+                primary: false,
             },
             {
                 extraPath: 'b/c',
                 url: 'https://docs.mycompany.com/a',
+                primary: false,
             },
             {
                 extraPath: '',
                 url: 'https://docs.mycompany.com/a/b/c',
+                primary: true,
             },
         ]);
     });
@@ -27,10 +30,12 @@ describe('getURLLookupAlternatives', () => {
             {
                 url: 'https://test.gitbook.io/v/variant',
                 extraPath: 'space',
+                primary: false,
             },
             {
                 url: 'https://test.gitbook.io/v/variant/space',
                 extraPath: '',
+                primary: true,
             },
         ]);
     });
@@ -42,10 +47,12 @@ describe('getURLLookupAlternatives', () => {
             {
                 extraPath: 'hello',
                 url: 'https://docs.mycompany.com/~/revisions/id',
+                primary: false,
             },
             {
                 extraPath: '',
                 url: 'https://docs.mycompany.com/~/revisions/id/hello',
+                primary: true,
             },
         ]);
     });
@@ -57,10 +64,12 @@ describe('getURLLookupAlternatives', () => {
             {
                 extraPath: 'hello',
                 url: 'https://docs.mycompany.com/~/changes/id',
+                primary: false,
             },
             {
                 extraPath: '',
                 url: 'https://docs.mycompany.com/~/changes/id/hello',
+                primary: true,
             },
         ]);
     });
@@ -70,10 +79,12 @@ describe('getURLLookupAlternatives', () => {
             {
                 extraPath: 'hello',
                 url: 'https://docs.mycompany.com/',
+                primary: false,
             },
             {
                 extraPath: '',
                 url: 'https://docs.mycompany.com/hello',
+                primary: true,
             },
         ]);
     });
@@ -83,10 +94,12 @@ describe('getURLLookupAlternatives', () => {
             {
                 extraPath: 'hello',
                 url: 'https://docs.mycompany.com/',
+                primary: false,
             },
             {
                 extraPath: '',
                 url: 'https://docs.mycompany.com/hello',
+                primary: true,
             },
         ]);
     });
