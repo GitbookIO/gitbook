@@ -18,9 +18,7 @@ export function ViewCards(props: TableViewProps<DocumentTableViewCards>) {
                 'gap-4',
                 'grid-cols-1',
                 'min-[432px]:grid-cols-2',
-                view.cardSize === 'large'
-                    ? 'md:grid-cols-2'
-                    : 'md:grid-cols-3',
+                view.cardSize === 'large' ? 'md:grid-cols-2' : 'md:grid-cols-3',
                 block.data.fullWidth ? ['max-w-full', 'large:flex-column'] : null,
             )}
         >

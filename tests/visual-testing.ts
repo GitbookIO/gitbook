@@ -202,6 +202,10 @@ const testCases: TestsCase[] = [
                 url: 'blocks/tabs',
             },
             {
+                name: 'Tables',
+                url: 'blocks/tables',
+            },
+            {
                 name: 'Expandables',
                 url: 'blocks/expandables',
             },

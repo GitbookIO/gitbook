@@ -17,6 +17,8 @@ jobs:
               uses: oven-sh/setup-bun@v1
             - name: Install dependencies
               run: bun install --frozen-lockfile
+              env:
+                  PUPPETEER_SKIP_DOWNLOAD: 1
             - name: Cache Next.js build
               uses: actions/cache@v3
               with:
@@ -95,6 +97,8 @@ jobs:
               uses: oven-sh/setup-bun@v1
             - name: Install dependencies
               run: bun install --frozen-lockfile
+              env:
+                  PUPPETEER_SKIP_DOWNLOAD: 1
             - name: Run visual tests
               run: bun ./tests/pagespeed-testing.ts $DEPLOYMENT_URL
               env:
@@ -110,6 +114,8 @@ jobs:
               uses: oven-sh/setup-bun@v1
             - name: Install dependencies
               run: bun install --frozen-lockfile
+              env:
+                  PUPPETEER_SKIP_DOWNLOAD: 1
             - run: bun format --check .
     lint:
         runs-on: ubuntu-latest
@@ -121,6 +127,8 @@ jobs:
               uses: oven-sh/setup-bun@v1
             - name: Install dependencies
               run: bun install --frozen-lockfile
+              env:
+                  PUPPETEER_SKIP_DOWNLOAD: 1
             - run: bun lint
     typecheck:
         runs-on: ubuntu-latest
@@ -132,4 +140,6 @@ jobs:
               uses: oven-sh/setup-bun@v1
             - name: Install dependencies
               run: bun install --frozen-lockfile
+              env:
+                  PUPPETEER_SKIP_DOWNLOAD: 1
             - run: bun typecheck

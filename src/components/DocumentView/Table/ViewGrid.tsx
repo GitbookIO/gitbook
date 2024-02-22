@@ -55,6 +55,11 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
 
     const tableTH = columnsOverThreshold ? ['py-3'] : ['py-1', 'pt-0'];
 
+    // Only show the header when configured and not empty
+    const withHeader =
+        !view.hideHeader &&
+        view.columns.some((columnId) => block.data.definition[columnId].title.trim().length > 0);
+
     return (
         <div
             className={`${tcls(style, 'relative', 'grid', tableWrapper, styles.progressContainer)}`}
@@ -140,7 +145,7 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
 
             {/* Table: */}
             <table className={tcls('w-full', 'grid-area-1-1', 'table-auto')}>
-                {view.hideHeader ? null : (
+                {withHeader ? (
                     <thead>
                         <tr className={tcls(tableTR)}>
                             {view.columns.map((column) => {
@@ -172,7 +177,7 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                             })}
                         </tr>
                     </thead>
-                )}
+                ) : null}
                 <tbody className={tcls('[&>*+*]:border-t')}>
                     {records.map((record) => {
                         return <RecordRow key={record[0]} {...props} record={record} />;
