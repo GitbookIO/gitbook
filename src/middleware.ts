@@ -21,7 +21,7 @@ import {
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
     getVisitorAuthToken,
-    sanitizeVisitorAuthURL,
+    normalizeVisitorAuthURL,
 } from '@/lib/visitor-auth';
 
 export const config = {
@@ -120,6 +120,14 @@ export async function middleware(request: NextRequest) {
         return writeCookies(NextResponse.redirect(resolved.redirect), resolved.cookies);
     }
 
+    // Make sure the URL is clean of any va token after a successful lookup
+    // The token is stored in a cookie that is set on the redirect response
+    const normalizedVA = normalizeVisitorAuthURL(normalized);
+    if (normalizedVA.toString() !== normalized.toString()) {
+        console.log(`redirecting to ${normalizedVA.toString()}`);
+        return writeCookies(NextResponse.redirect(normalizedVA.toString()), resolved.cookies);
+    }
+
     Sentry.setTag('space', resolved.space);
     Sentry.setContext('content', {
         space: resolved.space,
@@ -174,15 +182,8 @@ export async function middleware(request: NextRequest) {
         headers.set('x-gitbook-api', apiEndpoint);
     }
 
-    const rewrite = new URL(rewritePathname, request.nextUrl.toString());
-    rewrite.search = url.search;
-    // Make sure the target URL is clean of any va token before we use it for response
-    const target = sanitizeVisitorAuthURL(rewrite);
-
-    if (target.toString() !== rewrite.toString()) {
-        console.log(`redirecting to ${target.toString()}`);
-        return writeCookies(NextResponse.redirect(target.toString()), resolved.cookies);
-    }
+    const target = new URL(rewritePathname, request.nextUrl.toString());
+    target.search = url.search;
 
     const response = writeCookies(
         NextResponse.rewrite(target, {

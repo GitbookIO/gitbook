@@ -39,9 +39,9 @@ export function getVisitorAuthCookieValue(basePath: string, token: string): stri
 }
 
 /**
- * Sanitize the URL by removing the visitor authentication token from the query parameters (if present).
+ * Normalize the URL by removing the visitor authentication token from the query parameters (if present).
  */
-export function sanitizeVisitorAuthURL(url: URL): URL {
+export function normalizeVisitorAuthURL(url: URL): URL {
     const withoutVAParam = new URL(url);
     withoutVAParam.searchParams.delete(VISITOR_AUTH_PARAM);
     return withoutVAParam;
