@@ -1,6 +1,7 @@
 import { GitBookAPI } from '@gitbook/api';
 import * as Sentry from '@sentry/nextjs';
 import assertNever from 'assert-never';
+import type { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 import { NextResponse, NextRequest } from 'next/server';
 
 import {
@@ -56,7 +57,13 @@ export type LookupResult = PublishedContentWithCache & {
     /** API endpoint to use for the content post lookup */
     apiEndpoint?: string;
     /** Cookies to store on the response */
-    cookies?: Record<string, string>;
+    cookies?: Record<
+        string,
+        {
+            value: string;
+            options?: Partial<ResponseCookie>;
+        }
+    >;
 };
 
 /**
@@ -172,6 +179,11 @@ export async function middleware(request: NextRequest) {
     // Make sure the target URL is clean of any va token before we use it for response
     const target = sanitizeVisitorAuthURL(rewrite);
 
+    if (target.toString() !== rewrite.toString()) {
+        console.log(`redirecting to ${target.toString()}`);
+        return writeCookies(NextResponse.redirect(target.toString()), resolved.cookies);
+    }
+
     const response = writeCookies(
         NextResponse.rewrite(target, {
             request: {
@@ -186,16 +198,7 @@ export async function middleware(request: NextRequest) {
     // Add Content Security Policy header
     response.headers.set('content-security-policy', csp);
 
-    // When content is authenticated, we store the state in a cookie.
-    if ('visitorAuthToken' in resolved && resolved.visitorAuthToken) {
-        response.cookies.set(
-            getVisitorAuthCookieName(resolved.basePath),
-            getVisitorAuthCookieValue(resolved.basePath, resolved.visitorAuthToken),
-            {
-                httpOnly: true,
-            },
-        );
-    } else if (process.env.NODE_ENV !== 'development' && resolved.cacheMaxAge) {
+    if (process.env.NODE_ENV !== 'development' && resolved.cacheMaxAge) {
         const cacheControl = `public, max-age=60, s-maxage=${resolved.cacheMaxAge}, stale-while-revalidate=60, stale-if-error=0`;
         response.headers.set('cache-control', cacheControl);
         response.headers.set('Cloudflare-CDN-Cache-Control', cacheControl);
@@ -303,7 +306,9 @@ async function lookupSpaceInMultiMode(request: NextRequest, url: URL): Promise<L
     const lookup = await lookupSpaceByAPI(url, visitorAuthToken);
     return {
         ...lookup,
-        visitorAuthToken,
+        ...('basePath' in lookup && visitorAuthToken
+            ? getLookupResultForVisitorAuth(lookup.basePath, visitorAuthToken)
+            : {}),
     };
 }
 
@@ -361,7 +366,9 @@ async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise
     );
 
     const cookies = {
-        [AUTH_TOKEN_COOKIE]: encodeGitBookTokenCookie(spaceId, apiToken),
+        [AUTH_TOKEN_COOKIE]: {
+            value: encodeGitBookTokenCookie(spaceId, apiToken),
+        },
     };
 
     // Get rid of the token from the URL
@@ -452,7 +459,9 @@ async function lookupSpaceInMultiPathMode(request: NextRequest, url: URL): Promi
     return {
         ...lookup,
         basePath: joinPath(target.host, lookup.basePath),
-        visitorAuthToken,
+        ...('basePath' in lookup && visitorAuthToken
+            ? getLookupResultForVisitorAuth(lookup.basePath, visitorAuthToken)
+            : {}),
     };
 }
 
@@ -517,6 +526,29 @@ async function lookupSpaceByAPI(
             },
         }
     );
+}
+
+/**
+ * Return the lookup result for content served with visitor auth. It basically disables caching
+ * and sets a cookie with the visitor auth token.
+ */
+function getLookupResultForVisitorAuth(
+    basePath: string,
+    visitorAuthToken: string,
+): Partial<LookupResult> {
+    return {
+        // No caching for content served with visitor auth
+        cacheMaxAge: undefined,
+        cacheTags: [],
+        cookies: {
+            [getVisitorAuthCookieName(basePath)]: {
+                value: getVisitorAuthCookieValue(basePath, visitorAuthToken),
+                options: {
+                    httpOnly: true,
+                },
+            },
+        },
+    };
 }
 
 function joinPath(...parts: string[]): string {
@@ -585,10 +617,16 @@ function encodeGitBookTokenCookie(spaceId: string, token: string): string {
 
 function writeCookies<R extends NextResponse>(
     response: R,
-    cookies: Record<string, string> = {},
+    cookies: Record<
+        string,
+        {
+            value: string;
+            options?: Partial<ResponseCookie>;
+        }
+    > = {},
 ): R {
-    Object.entries(cookies).forEach(([key, value]) => {
-        response.cookies.set(key, value);
+    Object.entries(cookies).forEach(([key, { value, options }]) => {
+        response.cookies.set(key, value, options);
     });
 
     return response;
