@@ -63,7 +63,18 @@ export function SpaceLayout(props: {
                 customization={customization}
             />
 
-            <div className={tcls('flex', 'flex-col', 'lg:flex-row', CONTAINER_STYLE)}>
+            <div
+                className={tcls(
+                    'flex',
+                    'flex-col',
+                    'lg:flex-row',
+                    CONTAINER_STYLE,
+
+                    // Ensure the footer is display below the viewport even if the content is not enough
+                    `min-h-[calc(100vh-64px)]`,
+                    withTopHeader ? null : 'lg:min-h-screen',
+                )}
+            >
                 <TableOfContents
                     space={space}
                     customization={customization}

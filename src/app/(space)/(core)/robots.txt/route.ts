@@ -5,17 +5,15 @@ import { getCollection, getSpace } from '@/lib/api';
 import { absoluteHref } from '@/lib/links';
 import { shouldIndexSpace } from '@/lib/seo';
 
-import { SpaceParams } from '../../fetch';
+import { getContentPointer } from '../../fetch';
 
 export const runtime = 'edge';
 
 /**
  * Generate a robots.txt for the current space.
  */
-export async function GET(req: NextRequest, { params }: { params: SpaceParams }) {
-    const { spaceId } = params;
-
-    const space = await getSpace(spaceId);
+export async function GET(req: NextRequest) {
+    const space = await getSpace(getContentPointer().spaceId);
     const collection =
         space.visibility === ContentVisibility.InCollection && space.parent
             ? await getCollection(space.parent)

@@ -11,25 +11,28 @@ import {
 } from '@/lib/api';
 import { resolvePagePath, resolvePageId } from '@/lib/pages';
 
-export interface SpaceParams {
-    spaceId: string;
-}
-
-export interface PagePathParams extends SpaceParams {
+export interface PagePathParams {
     pathname?: string[];
 }
 
-export interface PageIdParams extends SpaceParams {
-    pageId?: string;
+export interface PageIdParams {
+    pageId: string;
 }
 
 /**
  * Get the current content pointer from the params.
  */
-export function getContentPointer(params: PagePathParams | PageIdParams) {
+export function getContentPointer() {
     const headerSet = headers();
+    const spaceId = headerSet.get('x-gitbook-content-space');
+    if (!spaceId) {
+        throw new Error(
+            'getContentPointer is called outside the scope of a request processed by the middleware',
+        );
+    }
+
     const content: ContentPointer = {
-        spaceId: params.spaceId,
+        spaceId,
         revisionId: headerSet.get('x-gitbook-content-revision') ?? undefined,
         changeRequestId: headerSet.get('x-gitbook-content-changerequest') ?? undefined,
     };
@@ -40,8 +43,8 @@ export function getContentPointer(params: PagePathParams | PageIdParams) {
 /**
  * Fetch all the data needed to render the space layout.
  */
-export async function fetchSpaceData(params: PagePathParams | PageIdParams) {
-    const content = getContentPointer(params);
+export async function fetchSpaceData() {
+    const content = getContentPointer();
     const { space, pages, customization, scripts } = await getSpaceContent(content);
     const collection = await fetchParentCollection(space);
 
@@ -61,7 +64,7 @@ export async function fetchSpaceData(params: PagePathParams | PageIdParams) {
  * Optimized to fetch in parallel as much as possible.
  */
 export async function fetchPageData(params: PagePathParams | PageIdParams) {
-    const content = getContentPointer(params);
+    const content = getContentPointer();
     const { space, pages, customization, scripts } = await getSpaceContent(content);
 
     const page = await resolvePage(pages, content, params);
@@ -92,7 +95,7 @@ async function resolvePage(
     content: ContentPointer,
     params: PagePathParams | PageIdParams,
 ) {
-    if ('pageId' in params && params.pageId) {
+    if ('pageId' in params) {
         return resolvePageId(pages, params.pageId);
     }
 

@@ -12,18 +12,15 @@ import { getContentSecurityPolicyNonce } from '@/lib/csp';
 import { absoluteHref, baseUrl } from '@/lib/links';
 import { shouldIndexSpace } from '@/lib/seo';
 
-import { SpaceParams, fetchSpaceData } from '../fetch';
+import { fetchSpaceData } from '../fetch';
 
 export const runtime = 'edge';
 
 /**
  * Layout when rendering the content.
  */
-export default async function ContentLayout(props: {
-    params: SpaceParams;
-    children: React.ReactNode;
-}) {
-    const { params, children } = props;
+export default async function ContentLayout(props: { children: React.ReactNode }) {
+    const { children } = props;
 
     const nonce = getContentSecurityPolicyNonce();
     const {
@@ -35,7 +32,7 @@ export default async function ContentLayout(props: {
         collectionSpaces,
         ancestors,
         scripts,
-    } = await fetchSpaceData(params);
+    } = await fetchSpaceData();
 
     scripts.forEach(({ script }) => {
         ReactDOM.preload(script, {
@@ -78,8 +75,8 @@ export default async function ContentLayout(props: {
     );
 }
 
-export async function generateViewport({ params }: { params: SpaceParams }): Promise<Viewport> {
-    const { customization } = await fetchSpaceData(params);
+export async function generateViewport(): Promise<Viewport> {
+    const { customization } = await fetchSpaceData();
     return {
         colorScheme: customization.themes.toggeable
             ? customization.themes.default === CustomizationThemeMode.Dark
@@ -89,8 +86,8 @@ export async function generateViewport({ params }: { params: SpaceParams }): Pro
     };
 }
 
-export async function generateMetadata({ params }: { params: SpaceParams }): Promise<Metadata> {
-    const { space, collection, customization } = await fetchSpaceData(params);
+export async function generateMetadata(): Promise<Metadata> {
+    const { space, collection, customization } = await fetchSpaceData();
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
 
     return {

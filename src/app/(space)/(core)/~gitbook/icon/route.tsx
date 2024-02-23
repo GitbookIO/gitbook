@@ -4,11 +4,10 @@ import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 import React from 'react';
 
+import { getContentPointer } from '@/app/(space)/fetch';
 import { getCollection, getSpace, getSpaceCustomization } from '@/lib/api';
 import { getEmojiForCode } from '@/lib/emojis';
 import { tcls } from '@/lib/tailwind';
-
-import { SpaceParams } from '../../../fetch';
 
 export const runtime = 'edge';
 
@@ -32,11 +31,11 @@ const SIZES = {
 /**
  * Render an icon for the space.
  */
-export async function GET(req: NextRequest, { params }: { params: SpaceParams }) {
-    const { spaceId } = params;
-
+export async function GET(req: NextRequest) {
     const options = getOptions(req.url);
     const size = SIZES[options.size];
+
+    const spaceId = getContentPointer().spaceId;
 
     const [space, customization] = await Promise.all([
         getSpace(spaceId),

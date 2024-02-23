@@ -16,22 +16,17 @@ import { getContentSecurityPolicyNonce } from '@/lib/csp';
 import { tcls } from '@/lib/tailwind';
 
 import { ClientContexts } from './ClientContexts';
-import { SpaceParams } from './fetch';
 import './globals.css';
+import { getContentPointer } from './fetch';
 
 /**
  * Layout shared between the content and the PDF renderer.
  * It takes care of setting the theme and the language.
  */
-export default async function SpaceRootLayout(props: {
-    children: React.ReactNode;
-    params: SpaceParams;
-}) {
-    const { params, children } = props;
+export default async function SpaceRootLayout(props: { children: React.ReactNode }) {
+    const { children } = props;
 
-    const { customization } = await getSpaceContent({
-        spaceId: params.spaceId,
-    });
+    const { customization } = await getSpaceContent(getContentPointer());
     const headerTheme = generateHeaderTheme(customization);
     const language = getSpaceLanguage(customization);
     const nonce = getContentSecurityPolicyNonce();

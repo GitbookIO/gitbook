@@ -4,6 +4,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import * as React from 'react';
 
+import { getContentPointer } from '@/app/(space)/fetch';
 import { DocumentView } from '@/components/DocumentView';
 import { TrademarkLink } from '@/components/TableOfContents/Trademark';
 import { PolymorphicComponentProp } from '@/components/utils/types';
@@ -25,11 +26,10 @@ import './pdf.css';
 import { PageControlButtons } from './PageControlButtons';
 import { PDFSearchParams, getPDFSearchParams } from './params';
 import { PrintButton } from './PrintButton';
-import { SpaceParams } from '../../../fetch';
 
 export const runtime = 'edge';
 
-export async function generateMetadata({ params }: { params: SpaceParams }): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
     return {
         title: 'Print',
         robots: 'noindex, nofollow',
@@ -39,11 +39,8 @@ export async function generateMetadata({ params }: { params: SpaceParams }): Pro
 /**
  * Render a space as a standalone HTML page that can be printed as a PDF.
  */
-export default async function PDFHTMLOutput(props: {
-    params: SpaceParams;
-    searchParams: { [key: string]: string };
-}) {
-    const { spaceId } = props.params;
+export default async function PDFHTMLOutput(props: { searchParams: { [key: string]: string } }) {
+    const { spaceId } = getContentPointer();
 
     const searchParams = new URLSearchParams(props.searchParams);
     const pdfParams = getPDFSearchParams(new URLSearchParams(searchParams));

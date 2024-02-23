@@ -138,11 +138,9 @@ export async function middleware(request: NextRequest) {
     });
 
     // Because of how Next will encode, we need to encode ourselves the pathname before reriting to it.
-    const rewritePathname = `/${resolved.space}${normalizePathname(
-        encodePathname(resolved.pathname),
-    )}`;
+    const rewritePathname = normalizePathname(encodePathname(resolved.pathname));
 
-    console.log(`${request.method} ${rewritePathname}`);
+    console.log(`${request.method} (${resolved.space}) ${rewritePathname}`);
 
     // Resolution might have changed the API endpoint
     apiEndpoint = resolved.apiEndpoint ?? apiEndpoint;
@@ -173,6 +171,7 @@ export async function middleware(request: NextRequest) {
     headers.set('x-gitbook-mode', mode);
     headers.set('x-gitbook-origin-basepath', originBasePath);
     headers.set('x-gitbook-basepath', joinPath(originBasePath, resolved.basePath));
+    headers.set('x-gitbook-content-space', resolved.space);
     if (resolved.revision) {
         headers.set('x-gitbook-content-revision', resolved.revision);
     }
