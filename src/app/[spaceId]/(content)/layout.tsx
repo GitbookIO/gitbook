@@ -1,10 +1,11 @@
 import { CustomizationThemeMode } from '@gitbook/api';
 import { Metadata, Viewport } from 'next';
-import Script from 'next/script';
 import React from 'react';
+import * as ReactDOM from 'react-dom';
 
 import { AdminToolbar } from '@/components/AdminToolbar';
 import { CookiesToast } from '@/components/Cookies';
+import { LoadIntegrations } from '@/components/Integrations';
 import { SpaceLayout } from '@/components/SpaceLayout';
 import { buildVersion } from '@/lib/build';
 import { getContentSecurityPolicyNonce } from '@/lib/csp';
@@ -36,6 +37,13 @@ export default async function ContentLayout(props: {
         scripts,
     } = await fetchSpaceData(params);
 
+    scripts.forEach(({ script }) => {
+        ReactDOM.preload(script, {
+            as: 'script',
+            nonce,
+        });
+    });
+
     return (
         <>
             <SpaceLayout
@@ -50,9 +58,14 @@ export default async function ContentLayout(props: {
                 {children}
             </SpaceLayout>
 
-            {scripts.map(({ script }) => (
-                <Script key={script} src={script} strategy="lazyOnload" nonce={nonce} />
-            ))}
+            {scripts.length > 0 ? (
+                <>
+                    <LoadIntegrations />
+                    {scripts.map(({ script }) => (
+                        <script key={script} async src={script} nonce={nonce} />
+                    ))}
+                </>
+            ) : null}
 
             {scripts.some((script) => script.cookies) || customization.privacyPolicy.url ? (
                 <React.Suspense fallback={null}>
