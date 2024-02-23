@@ -77,6 +77,8 @@ export type LookupResult = PublishedContentWithCache & {
 export async function middleware(request: NextRequest) {
     const { url, mode } = getInputURL(request);
 
+    console.log(`handling request with cookies ${request.cookies.toString()}`);
+
     Sentry.setTag('url', url.toString());
     Sentry.setContext('request', {
         method: request.method,
