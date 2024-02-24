@@ -167,7 +167,7 @@ async function PageAsideSections(props: { document: JSONDocument; context: Conte
 
     const sections = await getDocumentSections(document, (ref) => resolveContentRef(ref, context));
 
-    return sections.length > 0 ? <ScrollSectionsList sections={sections} /> : null;
+    return sections.length > 1 ? <ScrollSectionsList sections={sections} /> : null;
 }
 
 function getGitSyncName(space: Space): string {
