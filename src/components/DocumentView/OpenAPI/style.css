@@ -3,7 +3,7 @@
 }
 
 .openapi-columns {
-    @apply flex flex-row gap-6;
+    @apply flex flex-col md:flex-row gap-6;
 }
 
 /** Intro */
