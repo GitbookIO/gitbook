@@ -190,6 +190,14 @@ const testCases: TestsCase[] = [
         baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
         tests: [
             {
+                name: 'Text',
+                url: 'text-page',
+            },
+            {
+                name: 'Long text',
+                url: 'text-page/long-text',
+            },
+            {
                 name: 'Images',
                 url: 'blocks/block-images',
             },

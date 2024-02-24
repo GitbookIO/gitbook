@@ -39,6 +39,8 @@ export function PageBody(props: {
                         'relative',
                         'py-8',
                         'lg:px-12',
+                        // Allow words to break if they are too long.
+                        'break-anywhere',
                         // When in api page mode without the aside, we align with the border of the main content
                         'page-api-block:xl:max-2xl:pr-0',
                         // Max size to ensure one column in api is aligned with rest of content (2 x 3xl) + (gap-3 + 2) * px-12
