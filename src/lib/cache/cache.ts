@@ -118,7 +118,7 @@ export function cache<Args extends any[], Result>(
         const cacheArgs = options.extractArgs ? options.extractArgs(args) : args;
         const key = getCacheKey(cacheName, cacheArgs);
 
-        const context = getGlobalContext();
+        const context = await getGlobalContext();
         const pendings = contextPendings.get(context) ?? new Map<string, Promise<any>>();
         contextPendings.set(context, pendings);
 

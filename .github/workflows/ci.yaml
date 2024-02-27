@@ -130,6 +130,19 @@ jobs:
               env:
                   PUPPETEER_SKIP_DOWNLOAD: 1
             - run: bun lint
+    test:
+        runs-on: ubuntu-latest
+        name: Test
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Setup bun
+              uses: oven-sh/setup-bun@v1
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+              env:
+                  PUPPETEER_SKIP_DOWNLOAD: 1
+            - run: bun test
     typecheck:
         runs-on: ubuntu-latest
         name: Typecheck

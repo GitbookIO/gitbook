@@ -174,20 +174,38 @@ function matchTokenAndInlines(
             throw new Error(`expect afterBefore to not be empty`);
         }
 
-        const [inside, after] = splitPositionedTokenAt(afterBefore, inline.end);
+        token = afterBefore;
+        const children: HighlightToken[] = [];
+
+        // If shiki token finished before the end of the annotation or the annotation contains multiple tokens
+        while (token.end < inline.end) {
+            // console.log('push inner', { token, inlineStart: inline.start, inlineEnd: inline.end })
+            children.push({
+                type: 'shiki',
+                token: token,
+            });
+
+            const next = eat();
+            if (!next) {
+                throw new Error(`expect token to not be empty`);
+            }
+            token = next;
+        }
+
+        const [inside, after] = splitPositionedTokenAt(token, inline.end);
         if (!inside) {
             throw new Error(`expect inside to not be empty`);
         }
 
+        children.push({
+            type: 'shiki',
+            token: inside,
+        });
+
         result.push({
             type: 'inline',
             inline: inline.inline,
-            children: [
-                {
-                    type: 'shiki',
-                    token: inside,
-                },
-            ],
+            children,
         });
 
         if (after) {
@@ -259,7 +277,7 @@ function splitPositionedTokenAt(
     absoluteIndex: number,
 ): [PositionedToken | null, PositionedToken | null] {
     if (absoluteIndex < token.start || absoluteIndex > token.end) {
-        throw new Error('index out of bound');
+        throw new Error(`index (${absoluteIndex}) out of bound (${token.start}:${token.end})`);
     }
 
     const before = slicePositionedToken(token, 0, absoluteIndex - token.start);
