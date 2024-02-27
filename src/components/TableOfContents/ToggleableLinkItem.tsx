@@ -62,20 +62,26 @@ export function ToggleableLinkItem(props: {
             return;
         }
 
-        animate(scope.current, isVisible ? show : hide, {
-            duration: 0.1,
-        });
+        try {
+            animate(scope.current, isVisible ? show : hide, {
+                duration: 0.1,
+            });
 
-        if (isVisible)
-            animate(
-                '& > ul > li',
-                { opacity: 1 },
-                {
-                    delay: staggerMenuItems,
-                },
-            );
-        else {
-            animate('& > ul > li', { opacity: 0 });
+            const selector = '& > ul > li';
+            if (isVisible)
+                animate(
+                    selector,
+                    { opacity: 1 },
+                    {
+                        delay: staggerMenuItems,
+                    },
+                );
+            else {
+                animate(selector, { opacity: 0 });
+            }
+        } catch (error) {
+            // The selector can crash in some browsers, we ignore it as the animation is not critical.
+            console.error(error);
         }
     }, [isVisible, hasDescendants, animate, scope]);
 
