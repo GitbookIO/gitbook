@@ -5,7 +5,7 @@
 export async function getGlobalContext(): Promise<object> {
     // We lazy-load the next-on-pages package to avoid errors when running tests because of 'server-only'.
     const { getOptionalRequestContext } = await import('@cloudflare/next-on-pages');
-    return getOptionalRequestContext() ?? globalThis;
+    return getOptionalRequestContext()?.ctx ?? globalThis;
 }
 
 /**
