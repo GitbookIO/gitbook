@@ -59,6 +59,7 @@ async function fetchVisitorID(): Promise<string> {
             const { deviceId } = (await resp.json()) as { deviceId: string };
             return deviceId;
         } catch (error) {
+            console.error('Failed to fetch visitor session ID', error);
             return proposed;
         }
     }

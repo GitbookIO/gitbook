@@ -54,11 +54,15 @@ async function trackPageView(apiHost: string, spaceId: string, pageId: string | 
     const url = new URL(apiHost);
     url.pathname = `/v1/spaces/${spaceId}/insights/track_view`;
 
-    await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-    });
+    try {
+        await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body),
+        });
+    } catch (error) {
+        console.error('Failed to track page view', error);
+    }
 }
