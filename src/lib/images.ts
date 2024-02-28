@@ -1,5 +1,7 @@
 import 'server-only';
 
+import { noCacheFetchOptions } from '@/lib/cache/http';
+
 import { rootUrl } from './links';
 
 export interface CloudflareImageJsonFormat {
@@ -147,6 +149,7 @@ export async function resizeImage(
                             : `image/${resizeOptions.format || 'jpeg'}`,
                 },
                 signal,
+                ...noCacheFetchOptions,
             },
         );
 

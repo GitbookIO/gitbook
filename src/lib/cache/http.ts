@@ -9,7 +9,11 @@ export const noCacheFetchOptions: Partial<RequestInit> = {
     // Cloudflare doesn't support the `cache` directive before next-on-pages patches the fetch function
     // https://github.com/cloudflare/workerd/issues/698
     // cache: 'no-store',
-    next: { revalidate: 0 },
+    next: {
+        revalidate: 0,
+        // @ts-ignore - experiment to bypass potential I/O sharing in Next
+        internal: true,
+    },
 };
 
 /**
