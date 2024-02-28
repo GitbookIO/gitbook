@@ -92,5 +92,10 @@ export function isCookiesTrackingDisabled() {
  * Get a proposed visitor ID.
  */
 function getNewVisitorId(): string {
-    return `${crypto.randomUUID()}R`;
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        return `${crypto.randomUUID()}R`;
+    }
+
+    // Fallback for old browsers
+    return `${Math.random().toString(36).substring(2)}R`;
 }
