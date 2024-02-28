@@ -61,6 +61,11 @@ jobs:
                   echo "URL: ${{ steps.cloudflare.outputs.url }}"
                   echo "Environment: ${{ steps.cloudflare.outputs.environment }}"
                   echo "Alias: ${{ steps.cloudflare.outputs.alias }}"
+            - name: Archive build output
+              uses: actions/upload-artifact@v4
+              with:
+                  name: build-output
+                  path: .vercel/
     visual-testing:
         runs-on: ubuntu-latest
         name: Visual Testing
