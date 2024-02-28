@@ -135,7 +135,7 @@ function LogoFallback(props: HeaderLogoProps) {
                         : 'text-header-link',
                 )}
             >
-                {collection ? collection.title : space.title}
+                {collection ? collection.title : customization.title ?? space.title}
             </h1>
         </>
     );

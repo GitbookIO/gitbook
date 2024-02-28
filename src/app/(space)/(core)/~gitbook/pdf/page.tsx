@@ -1,5 +1,11 @@
 import { ArrowLeft, Printer } from '@geist-ui/icons';
-import { Revision, RevisionPageDocument, RevisionPageGroup, Space } from '@gitbook/api';
+import {
+    CustomizationSettings,
+    Revision,
+    RevisionPageDocument,
+    RevisionPageGroup,
+    Space,
+} from '@gitbook/api';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import * as React from 'react';
@@ -135,7 +141,7 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
                 }
             />
 
-            {pdfParams.only ? null : <PDFSpaceIntro space={space} />}
+            {pdfParams.only ? null : <PDFSpaceIntro space={space} customization={customization} />}
             {pages.map(({ page, depth }) =>
                 page.type === 'group' ? (
                     <PDFPageGroup key={page.id} space={space} page={page} />
@@ -166,13 +172,15 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
     );
 }
 
-async function PDFSpaceIntro(props: { space: Space }) {
-    const { space } = props;
+async function PDFSpaceIntro(props: { space: Space; customization: CustomizationSettings }) {
+    const { space, customization } = props;
 
     return (
         <PrintPage isFirst>
             <div className={tcls('flex', 'items-center', 'justify-center', 'py-12')}>
-                <h1 className={tcls('text-6xl', 'font-bold')}>{space.title}</h1>
+                <h1 className={tcls('text-6xl', 'font-bold')}>
+                    {customization.title ?? space.title}
+                </h1>
             </div>
         </PrintPage>
     );

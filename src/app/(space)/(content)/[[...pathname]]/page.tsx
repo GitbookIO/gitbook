@@ -90,13 +90,15 @@ export async function generateViewport({ params }: { params: PagePathParams }): 
 }
 
 export async function generateMetadata({ params }: { params: PagePathParams }): Promise<Metadata> {
-    const { space, page, customization } = await fetchPageData(params);
+    const { space, page, customization, collection } = await fetchPageData(params);
     if (!page) {
         notFound();
     }
 
     return {
-        title: `${page.title} | ${space.title}`,
+        title: [page.title, customization.title ?? space.title, collection?.title]
+            .filter(Boolean)
+            .join(' | '),
         description: page.description ?? '',
         openGraph: {
             images: [
