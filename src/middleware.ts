@@ -77,8 +77,6 @@ export type LookupResult = PublishedContentWithCache & {
 export async function middleware(request: NextRequest) {
     const { url, mode } = getInputURL(request);
 
-    console.log(`handling request with cookies ${request.cookies.toString()}`);
-
     Sentry.setTag('url', url.toString());
     Sentry.setContext('request', {
         method: request.method,
@@ -177,6 +175,11 @@ export async function middleware(request: NextRequest) {
     }
     if (resolved.changeRequest) {
         headers.set('x-gitbook-content-changerequest', resolved.changeRequest);
+    }
+
+    const customization = url.searchParams.get('customization');
+    if (customization) {
+        headers.set('x-gitbook-customization', customization);
     }
 
     if (apiEndpoint) {

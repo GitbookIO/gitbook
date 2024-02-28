@@ -1,7 +1,9 @@
 import fs from 'node:fs/promises';
+import rison from 'rison';
 import puppeteer, { Page } from 'puppeteer';
 import { argosScreenshot } from '@argos-ci/puppeteer';
 import { getContentTestURL, getTargetURL } from './utils';
+import { CustomizationHeaderPreset, CustomizationSettings } from '@gitbook/api';
 
 interface Test {
     name: string;
@@ -136,16 +138,6 @@ const testCases: TestsCase[] = [
         ],
     },
     {
-        name: 'Castordoc',
-        baseUrl: 'https://docs.castordoc.com/',
-        tests: [
-            {
-                name: 'Home',
-                url: '',
-            },
-        ],
-    },
-    {
         name: 'Nimbleway',
         baseUrl: 'https://docs.nimbleway.com/',
         tests: [
@@ -240,6 +232,21 @@ const testCases: TestsCase[] = [
         ],
     },
     {
+        name: 'Customization',
+        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        tests: [
+            {
+                name: 'Without header',
+                url: getCustomizationURL({
+                    header: {
+                        preset: CustomizationHeaderPreset.None,
+                        links: [],
+                    },
+                }),
+            },
+        ],
+    },
+    {
         name: 'Share links',
         baseUrl: 'https://gitbook.gitbook.io/test-share-links/',
         tests: [
@@ -299,3 +306,15 @@ for (const testCase of testCases) {
 await browser.close();
 
 console.log('All done!');
+
+/**
+ * Create a URL with customization settings.
+ */
+function getCustomizationURL(partial: Partial<CustomizationSettings>): string {
+    const encoded = rison.encode_object(partial);
+
+    const searchParams = new URLSearchParams();
+    searchParams.set('customization', encoded);
+
+    return `?${searchParams.toString()}`;
+}

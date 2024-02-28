@@ -3,6 +3,7 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 
 import {
     ContentVisibility,
+    CustomizationSettings,
     GitBookAPI,
     GitBookAPIError,
     HttpResponse,
@@ -12,6 +13,7 @@ import {
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 import { headers } from 'next/headers';
+import rison from 'rison';
 
 import { buildVersion } from './build';
 import { cache, cacheResponse, noCacheFetchOptions, parseCacheResponse } from './cache';
@@ -409,19 +411,38 @@ export const getDocument = cache('api.getDocument', async (spaceId: string, docu
 });
 
 /**
- * Get the customization settings for a space.
+ * Get the customization settings for a space from the API.
  */
-export const getSpaceCustomization = cache('api.getSpaceCustomization', async (spaceId: string) => {
-    const response = await api().spaces.getSpacePublishingCustomizationById(spaceId, {
-        ...noCacheFetchOptions,
-    });
-    return cacheResponse(response, {
-        tags: [
-            getAPICacheTag({ tag: 'space', space: spaceId }),
-            getAPICacheTag({ tag: 'space-customization', space: spaceId }),
-        ],
-    });
-});
+export const getSpaceCustomizationFromAPI = cache(
+    'api.getSpaceCustomization',
+    async (spaceId: string) => {
+        const response = await api().spaces.getSpacePublishingCustomizationById(spaceId, {
+            ...noCacheFetchOptions,
+        });
+        return cacheResponse(response, {
+            tags: [
+                getAPICacheTag({ tag: 'space', space: spaceId }),
+                getAPICacheTag({ tag: 'space-customization', space: spaceId }),
+            ],
+        });
+    },
+);
+
+/**
+ * Get the customization settings for a space from the API.
+ */
+export async function getSpaceCustomization(spaceId: string): Promise<CustomizationSettings> {
+    const headersList = headers();
+    const raw = await getSpaceCustomizationFromAPI(spaceId);
+
+    const extend = headersList.get('x-gitbook-customization');
+    if (extend) {
+        const parsed = rison.decode_object<Partial<CustomizationSettings>>(extend);
+        return { ...raw, ...parsed };
+    }
+
+    return raw;
+}
 
 /**
  * Get the infos about a collection by its ID.
