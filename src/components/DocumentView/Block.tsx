@@ -22,6 +22,7 @@ import { File } from './File';
 import { Heading } from './Heading';
 import { Hint } from './Hint';
 import { Images } from './Images';
+import { IntegrationBlock } from './Integration';
 import { ListItem } from './ListItem';
 import { ListOrdered } from './ListOrdered';
 import { ListTasks } from './ListTasks';
@@ -92,7 +93,7 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
             case 'tabs-item':
                 throw new Error('Blocks should be directly rendered by parent');
             case 'integration':
-                return <div>TODO Not supported yet</div>;
+                return <IntegrationBlock {...props} {...contextProps} block={block} />;
             default:
                 assertNever(block);
         }
@@ -141,6 +142,8 @@ function BlockPlaceholder(props: { block: DocumentBlock; style: ClassValue }) {
         case 'code-line':
         case 'tabs-item':
             throw new Error('Blocks should be directly rendered by parent');
+        case 'integration':
+            return <SkeletonCard style={style} />;
         default:
             assertNever(block);
     }

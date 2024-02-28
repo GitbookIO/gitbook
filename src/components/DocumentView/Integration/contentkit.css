@@ -1,0 +1,171 @@
+/** Stacks */
+.contentkit-stack {
+    @apply flex gap-4;
+}
+
+.contentkit-hstack {
+    @apply flex-row gap-4 items-center;
+}
+.contentkit-hstack.contentkit-stack-align-center {
+    @apply justify-center;
+}
+.contentkit-hstack.contentkit-stack-align-end {
+    @apply justify-end;
+}
+
+.contentkit-vstack {
+    @apply flex-col gap-4;
+}
+.contentkit-vstack.contentkit-stack-align-center {
+    @apply items-center;
+}
+.contentkit-vstack.contentkit-stack-align-end {
+    @apply items-end;
+}
+
+/** Text */
+.contentkit-text.contentkit-text-bold {
+    @apply font-bold;
+}
+
+.contentkit-text.contentkit-text-italic {
+    @apply italic;
+}
+
+.contentkit-text.contentkit-text-code {
+    @apply font-mono;
+}
+
+.contentkit-text.contentkit-text-strikethrough {
+    @apply line-through;
+}
+
+/** Webframe */
+.contentkit-webframe {
+    @apply relative;
+}
+
+/** Card */
+.contentkit-card {
+    @apply flex flex-col border rounded border-dark/2 dark:border-light/2;
+}
+.contentkit-card.contentkit-card-pressable {
+    @apply cursor-pointer hover:border-dark/3 hover:dark:border-light/3;
+}
+
+.contentkit-card-header {
+    @apply flex flex-row gap-4 px-4 py-2 items-center;
+}
+
+.contentkit-card-header-content {
+    @apply flex-1;
+}
+
+.contentkit-card-title {
+    @apply text-base font-medium text-dark-2 dark:text-light-4;
+}
+
+.contentkit-card-icon {
+}
+
+.contentkit-card-buttons {
+    @apply flex flex-row gap-2;
+}
+
+.contentkit-card-body {
+    @apply m-4;
+}
+
+.contentkit-card-header + .contentkit-card-body {
+    @apply mt-2;
+}
+
+/** Image */
+.contentkit-image {
+    @apply w-4 h-4 object-cover;
+}
+
+/** Buttons */
+.contentkit-button {
+    @apply flex gap-2 items-center justify-center px-2 py-1 rounded
+        border border-dark/2 dark:border-light/2 hover:border-dark/3 hover:dark:border-light/3
+        text-dark-2 dark:text-light-4 hover:text-dark-3 hover:dark:text-light-3;
+}
+
+.contentkit-button .contentkit-icon {
+    @apply w-4 h-4;
+}
+
+.contentkit-button .contentkit-button-label {
+    @apply text-sm font-medium text-dark-2 dark:text-light-4;
+}
+
+/** Modals */
+.contentkit-modal-backdrop {
+    @apply fixed inset-0 z-40 px-7 pb-11 pt-4 md:pt-[min(8vw,_6rem)] flex items-start justify-center backdrop-blur-2xl bg-dark/4 dark:bg-dark/8;
+}
+.contentkit-modal {
+    @apply flex flex-col gap-6 relative z-50 bg-white dark:bg-dark-2
+        rounded shadow-lg opacity-0 transition-opacity duration-300 border border-dark/2 dark:border-light/2
+        w-full max-w-[768px] max-h-[90vh] overflow-y-auto;
+}
+.contentkit-modal.contentkit-modal-opened {
+    @apply opacity-[1];
+}
+
+.contentkit-modal-header {
+    @apply flex flex-col gap-2 px-4 py-2;
+}
+
+.contentkit-modal-title {
+    @apply text-2xl font-medium text-dark-2 dark:text-light-4;
+}
+
+.contentkit-modal-body {
+    @apply px-4 py-4;
+}
+
+.contentkit-modal-header + .contentkit-modal-body {
+    @apply pt-0;
+}
+
+/** Markdown */
+.contentkit-markdown {
+    @apply prose dark:prose-invert prose-sm;
+}
+.contentkit-markdown > *:first-child {
+    @apply mt-0;
+}
+.contentkit-markdown > *:last-child {
+    @apply mb-0;
+}
+
+/** Text input */
+.contentkit-textinput {
+    @apply w-full px-2 py-1 rounded border border-dark/2 dark:border-light/2 text-sm text-dark-2 dark:text-light-4;
+}
+
+/** Dividers */
+.contentkit-divider {
+    @apply border-dark/2 dark:border-light/2;
+}
+
+.contentkit-vstack > .contentkit-divider {
+    @apply border-t h-0 w-full;
+}
+.contentkit-vstack > .contentkit-divider-small {
+    @apply my-0;
+}
+.contentkit-vstack > .contentkit-divider-large {
+    @apply my-4;
+}
+
+.contentkit-hstack > .contentkit-divider {
+    @apply border-l h-full w-0;
+}
+.contentkit-hstack > .contentkit-divider-small {
+    @apply mx-0;
+}
+.contentkit-hstack > .contentkit-divider-large {
+    @apply mx-4;
+}

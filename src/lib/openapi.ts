@@ -5,15 +5,11 @@ import {
     OpenAPIFetcher,
 } from '@gitbook/react-openapi';
 import yaml from 'js-yaml';
-import rehypeSanitize from 'rehype-sanitize';
-import rehypeStringify from 'rehype-stringify';
-import remarkParse from 'remark-parse';
-import remarkRehype from 'remark-rehype';
 import swagger2openapi, { ConvertOutputOptions } from 'swagger2openapi';
-import { unified } from 'unified';
 
 import { cache, parseCacheResponse, noCacheFetchOptions } from '@/lib/cache';
 
+import { parseMarkdown } from './markdown';
 import { ResolvedContentRef } from './references';
 
 /**
@@ -86,14 +82,5 @@ const fetcher: OpenAPIFetcher = {
             data,
         };
     }),
-    parseMarkdown: async (markdown: string) => {
-        const file = await unified()
-            .use(remarkParse)
-            .use(remarkRehype)
-            .use(rehypeSanitize)
-            .use(rehypeStringify)
-            .process(markdown);
-
-        return file.toString();
-    },
+    parseMarkdown,
 };

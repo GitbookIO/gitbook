@@ -8,6 +8,7 @@ import {
     HttpResponse,
     List,
     PublishedContentLookup,
+    RequestRenderIntegrationUI,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 import { headers } from 'next/headers';
@@ -524,6 +525,25 @@ export const getRecommendedQuestionsInSpace = cache(
         });
         return cacheResponse(response, {
             tags: [getAPICacheTag({ tag: 'space', space: spaceId })],
+        });
+    },
+);
+
+/**
+ * Render an integration contentkit UI
+ */
+export const renderIntegrationUi = cache(
+    'api.renderIntegrationUi',
+    async (integrationName: string, request: RequestRenderIntegrationUI) => {
+        const response = await api().integrations.renderIntegrationUiWithPost(
+            integrationName,
+            request,
+            {
+                ...noCacheFetchOptions,
+            },
+        );
+        return cacheResponse(response, {
+            tags: [],
         });
     },
 );
