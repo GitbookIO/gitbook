@@ -3,6 +3,7 @@ import { getHighlighter, loadWasm, bundledLanguages, Highlighter, ThemedToken } 
 // @ts-ignore - onigWasm is a Wasm module
 import onigWasm from 'shikiji/onig.wasm?module';
 
+import { singleton } from '@/lib/async';
 import { getNodeText } from '@/lib/document';
 
 export type HighlightLine = {
@@ -297,37 +298,19 @@ function isEmptyPositionedToken(token: PositionedToken): boolean {
     return token.start === token.end;
 }
 
-let highlighter: Highlighter | null = null;
-let highlighterPromise: Promise<Highlighter> | null = null;
-
 /**
  * Load the highlighter, only once, and reuse it.
  * It makes sure to handle concurrent calls.
  */
-async function loadHighlighter() {
-    if (highlighter) {
-        return highlighter;
+const loadHighlighter = singleton(async () => {
+    if (typeof onigWasm !== 'string') {
+        // When running bun test, the import is a string, we ignore it and let the module
+        // loads it on its own.
+        //
+        // Otherwise for Vercel/Cloudflare, we need to load it ourselves.
+        await loadWasm((obj) => WebAssembly.instantiate(onigWasm, obj));
     }
-
-    if (highlighterPromise) {
-        return highlighterPromise;
-    }
-
-    highlighterPromise = (async () => {
-        if (typeof onigWasm !== 'string') {
-            // When running bun test, the import is a string, we ignore it and let the module
-            // loads it on its own.
-            //
-            // Otherwise for Vercel/Cloudflare, we need to load it ourselves.
-            await loadWasm((obj) => WebAssembly.instantiate(onigWasm, obj));
-        }
-        const instance = await getHighlighter();
-        await instance.loadTheme('css-variables');
-        return instance;
-    })();
-
-    highlighter = await highlighterPromise;
-    highlighterPromise = null;
-
-    return highlighter;
-}
+    const instance = await getHighlighter();
+    await instance.loadTheme('css-variables');
+    return instance;
+});
