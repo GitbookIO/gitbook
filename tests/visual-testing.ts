@@ -3,7 +3,11 @@ import rison from 'rison';
 import puppeteer, { Page } from 'puppeteer';
 import { argosScreenshot } from '@argos-ci/puppeteer';
 import { getContentTestURL, getTargetURL } from './utils';
-import { CustomizationHeaderPreset, CustomizationSettings } from '@gitbook/api';
+import {
+    CustomizationHeaderPreset,
+    CustomizationLocale,
+    CustomizationSettings,
+} from '@gitbook/api';
 
 interface Test {
     name: string;
@@ -16,6 +20,13 @@ interface TestsCase {
     baseUrl: string;
     tests: Array<Test>;
 }
+
+const allLocales: CustomizationLocale[] = [
+    CustomizationLocale.Fr,
+    CustomizationLocale.Es,
+    CustomizationLocale.Ja,
+    CustomizationLocale.Zh,
+];
 
 const testCases: TestsCase[] = [
     {
@@ -259,6 +270,19 @@ const testCases: TestsCase[] = [
                 url: 'invalid/',
             },
         ],
+    },
+    {
+        name: 'Languages',
+        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        tests: allLocales.map((locale) => ({
+            name: locale,
+            url: getCustomizationURL({
+                internationalization: {
+                    locale,
+                    inherit: false,
+                },
+            }),
+        })),
     },
 ];
 
