@@ -437,8 +437,12 @@ export async function getSpaceCustomization(spaceId: string): Promise<Customizat
 
     const extend = headersList.get('x-gitbook-customization');
     if (extend) {
-        const parsed = rison.decode_object<Partial<CustomizationSettings>>(extend);
-        return { ...raw, ...parsed };
+        try {
+            const parsed = rison.decode_object<Partial<CustomizationSettings>>(extend);
+            return { ...raw, ...parsed };
+        } catch (error) {
+            console.error('Failed to parse x-gitbook-customization header (ignored)', error);
+        }
     }
 
     return raw;

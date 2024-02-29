@@ -6,8 +6,8 @@ import { NextResponse, NextRequest } from 'next/server';
 
 import {
     PublishedContentWithCache,
-    api,
     getPublishedContentByUrl,
+    api,
     getSpace,
     getSpaceContent,
     userAgent,
@@ -344,11 +344,19 @@ async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise
 
     // Get the auth token from the URL query
     const AUTH_TOKEN_QUERY = 'token';
-    const AUTH_TOKEN_COOKIE = 'gitbook-token';
+    const API_ENDPOINT_QUERY = 'api';
+    const cookieName = `gitbook-token-${spaceId}`;
 
-    const apiToken =
-        url.searchParams.get(AUTH_TOKEN_QUERY) ??
-        decodeGitBookTokenCookie(spaceId, request.cookies.get(AUTH_TOKEN_COOKIE)?.value);
+    const { apiToken, apiEndpoint } = url.searchParams.has(AUTH_TOKEN_QUERY)
+        ? {
+              apiToken: url.searchParams.get(AUTH_TOKEN_QUERY) ?? '',
+              apiEndpoint: url.searchParams.get(API_ENDPOINT_QUERY) ?? undefined,
+          }
+        : decodeGitBookTokenCookie(spaceId, request.cookies.get(cookieName)?.value) ?? {
+              apiToken: undefined,
+              apiEndpoint: undefined,
+          };
+
     if (!apiToken) {
         return {
             error: {
@@ -358,12 +366,11 @@ async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise
         };
     }
 
-    const apiEndpoint = url.searchParams.get('api') ?? api().endpoint;
     // Verify access to the space to avoid leaking cached data in this mode
     // (the cache is not dependend on the auth token, so it could leak data)
     await withAPI(
         new GitBookAPI({
-            endpoint: apiEndpoint,
+            endpoint: apiEndpoint ?? api().endpoint,
             authToken: apiToken,
             userAgent: userAgent(),
         }),
@@ -371,15 +378,20 @@ async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise
     );
 
     const cookies = {
-        [AUTH_TOKEN_COOKIE]: {
-            value: encodeGitBookTokenCookie(spaceId, apiToken),
+        [cookieName]: {
+            value: encodeGitBookTokenCookie(spaceId, apiToken, apiEndpoint),
+            options: {
+                httpOnly: true,
+                maxAge: 60 * 30,
+            },
         },
     };
 
     // Get rid of the token from the URL
-    if (url.searchParams.has(AUTH_TOKEN_QUERY)) {
+    if (url.searchParams.has(AUTH_TOKEN_QUERY) || url.searchParams.has(API_ENDPOINT_QUERY)) {
         const withoutToken = new URL(url);
         withoutToken.searchParams.delete(AUTH_TOKEN_QUERY);
+        withoutToken.searchParams.delete(API_ENDPOINT_QUERY);
 
         return {
             target: 'external',
@@ -601,7 +613,10 @@ function encodePathname(pathname: string): string {
     return pathname.split('/').map(encodeURIComponent).join('/');
 }
 
-function decodeGitBookTokenCookie(spaceId: string, cookie: string | undefined): string | undefined {
+function decodeGitBookTokenCookie(
+    spaceId: string,
+    cookie: string | undefined,
+): { apiToken: string; apiEndpoint: string | undefined } | undefined {
     if (!cookie) {
         return;
     }
@@ -609,15 +624,22 @@ function decodeGitBookTokenCookie(spaceId: string, cookie: string | undefined): 
     try {
         const parsed = JSON.parse(cookie);
         if (typeof parsed.t === 'string' && parsed.s === spaceId) {
-            return parsed.t;
+            return {
+                apiToken: parsed.t,
+                apiEndpoint: typeof parsed.e === 'string' ? parsed.e : undefined,
+            };
         }
     } catch (error) {
         // ignore
     }
 }
 
-function encodeGitBookTokenCookie(spaceId: string, token: string): string {
-    return JSON.stringify({ s: spaceId, t: token });
+function encodeGitBookTokenCookie(
+    spaceId: string,
+    token: string,
+    apiEndpoint: string | undefined,
+): string {
+    return JSON.stringify({ s: spaceId, t: token, e: apiEndpoint });
 }
 
 function writeCookies<R extends NextResponse>(
