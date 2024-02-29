@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import hash from 'object-hash';
 
 import { cacheBackends } from './backends';
@@ -48,60 +49,89 @@ export function cache<Args extends any[], Result>(
     } = {},
 ): CacheFunction<Args, Result> {
     const revalidate = async (key: string, ...args: Args) => {
-        const startTime = now();
-
-        // Fetch upstream
-        const result = await fn(...args);
-        const fetchDuration = now() - startTime;
-
-        const cacheEntry: CacheEntry = {
-            data: result.data,
-            meta: {
-                cache: cacheName,
-                tags: result.tags ?? [],
-                expiresAt: Date.now() + (result.ttl ?? options.defaultTtl ?? 60 * 60 * 24) * 1000,
-                args,
-                hits: 1,
+        return await Sentry.startSpan(
+            {
+                name: `cache.revalidate(${key})`,
+                op: 'cache.revalidate',
+                attributes: {
+                    cacheKey: key,
+                },
             },
-        };
+            async (trace) => {
+                const startTime = now();
 
-        // Write it to the cache
-        if (result.ttl && result.ttl > 0) {
-            await waitUntil(setCacheEntry(key, cacheEntry));
-        }
-        const writeCacheDuration = now() - startTime - fetchDuration;
+                // Fetch upstream
+                const result = await fn(...args);
+                const fetchDuration = now() - startTime;
 
-        return {
-            data: result.data,
-            fetchDuration,
-            writeCacheDuration,
-        };
+                const cacheEntry: CacheEntry = {
+                    data: result.data,
+                    meta: {
+                        cache: cacheName,
+                        tags: result.tags ?? [],
+                        expiresAt:
+                            Date.now() + (result.ttl ?? options.defaultTtl ?? 60 * 60 * 24) * 1000,
+                        args,
+                        hits: 1,
+                    },
+                };
+
+                trace?.setAttribute('cacheTtl', result.ttl ?? 0);
+
+                // Write it to the cache
+                if (result.ttl && result.ttl > 0) {
+                    await waitUntil(setCacheEntry(key, cacheEntry));
+                }
+                const writeCacheDuration = now() - startTime - fetchDuration;
+
+                return {
+                    data: result.data,
+                    fetchDuration,
+                    writeCacheDuration,
+                };
+            },
+        );
     };
 
     const fetchValue = async (key: string, ...args: Args) => {
-        // Read the cache
-        const startTime = now();
-        const cachedEntry = await getCacheEntry(key);
-        const readCacheDuration = now() - startTime;
+        return await Sentry.startSpan(
+            {
+                name: `cache.fetch(${key})`,
+                op: 'cache.fetch',
+                attributes: {
+                    cacheKey: key,
+                },
+            },
+            async (trace) => {
+                // Read the cache
+                const startTime = now();
+                const cachedEntry = await getCacheEntry(key);
+                const readCacheDuration = now() - startTime;
 
-        // Returns it if it exists
-        if (cachedEntry !== null) {
-            console.log(
-                `cache: ${key} hit on ${cachedEntry[1]} in ${readCacheDuration.toFixed(0)}ms`,
-            );
-            return cachedEntry[0].data;
-        }
+                trace?.setAttribute('cacheStatus', cachedEntry ? 'hit' : 'miss');
 
-        const fetched = await revalidate(key, ...args);
-        console.log(
-            `cache: ${key} miss in ${fetched.fetchDuration.toFixed(
-                0,
-            )}ms, read in ${readCacheDuration.toFixed(
-                0,
-            )}ms, write in ${fetched.writeCacheDuration.toFixed(0)}ms`,
+                // Returns it if it exists
+                if (cachedEntry !== null) {
+                    console.log(
+                        `cache: ${key} hit on ${cachedEntry[1]} in ${readCacheDuration.toFixed(
+                            0,
+                        )}ms`,
+                    );
+                    return cachedEntry[0].data;
+                }
+
+                const fetched = await revalidate(key, ...args);
+                console.log(
+                    `cache: ${key} miss in ${fetched.fetchDuration.toFixed(
+                        0,
+                    )}ms, read in ${readCacheDuration.toFixed(
+                        0,
+                    )}ms, write in ${fetched.writeCacheDuration.toFixed(0)}ms`,
+                );
+
+                return fetched.data;
+            },
         );
-
-        return fetched.data;
     };
 
     // During development, for now it fetches data twice between the middleware and the handler.
@@ -118,26 +148,42 @@ export function cache<Args extends any[], Result>(
         const cacheArgs = options.extractArgs ? options.extractArgs(args) : args;
         const key = getCacheKey(cacheName, cacheArgs);
 
-        const context = await getGlobalContext();
-        const pendings = contextPendings.get(context) ?? new Map<string, Promise<any>>();
-        contextPendings.set(context, pendings);
+        return await Sentry.startSpan(
+            {
+                name: `cache.get(${key})`,
+                op: 'cache.get',
+                attributes: {
+                    cacheKey: key,
+                    functionArgs: JSON.stringify(cacheArgs),
+                },
+            },
+            async (trace) => {
+                const context = await getGlobalContext();
+                const pendings = contextPendings.get(context) ?? new Map<string, Promise<any>>();
+                contextPendings.set(context, pendings);
 
-        // If a pending request exists, wait for it
-        if (pendings.has(key)) {
-            return await pendings.get(key);
-        }
+                // @ts-ignore
+                trace?.setAttribute('cacheContextTlsClientRandom', context.tlsClientRandom);
 
-        // Otherwise, fetch the value
-        const promise = fetchValue(key, ...args);
-        pendings.set(key, promise);
+                // If a pending request exists, wait for it
+                if (pendings.has(key)) {
+                    trace?.setAttribute('cacheStatus', 'pending');
+                    return await pendings.get(key);
+                }
 
-        // Remove the pending request once it's done
-        try {
-            const result = await promise;
-            return result;
-        } finally {
-            pendings.delete(key);
-        }
+                // Otherwise, fetch the value
+                const promise = fetchValue(key, ...args);
+                pendings.set(key, promise);
+
+                // Remove the pending request once it's done
+                try {
+                    const result = await promise;
+                    return result;
+                } finally {
+                    pendings.delete(key);
+                }
+            },
+        );
     };
 
     cacheFn.revalidate = async (...args: Args) => {
@@ -176,29 +222,54 @@ export function getCacheKey(fnName: string, args: any[]) {
 }
 
 async function setCacheEntry(key: string, entry: CacheEntry) {
-    await Promise.all(cacheBackends.map((backend) => backend.set(key, entry)));
+    return await Sentry.startSpan(
+        {
+            name: `cache.setCacheEntry(${key})`,
+            op: 'cache.setCacheEntry',
+            attributes: {
+                cacheKey: key,
+            },
+        },
+        async () => {
+            await Promise.all(cacheBackends.map((backend) => backend.set(key, entry)));
+        },
+    );
 }
 
 async function getCacheEntry(key: string): Promise<readonly [CacheEntry, string] | null> {
-    const result = await race(cacheBackends, async (backend, { signal }) => {
-        const entry = await backend.get(key, { signal });
-        return entry ? ([entry, backend.name] as const) : null;
-    });
+    return await Sentry.startSpan(
+        {
+            name: `cache.getCacheEntry(${key})`,
+            op: 'cache.getCacheEntry',
+            attributes: {
+                cacheKey: key,
+            },
+        },
+        async (trace) => {
+            const result = await race(cacheBackends, async (backend, { signal }) => {
+                const entry = await backend.get(key, { signal });
+                return entry ? ([entry, backend.name] as const) : null;
+            });
 
-    // Write to the fallback caches
-    if (result) {
-        const [savedEntry, backendName] = result as [CacheEntry, string];
+            trace?.setAttribute('cacheStatus', result ? 'hit' : 'miss');
 
-        await waitUntil(
-            Promise.all(
-                cacheBackends
-                    .filter((backend) => backend.name !== backendName && backend.fallback)
-                    .map((backend) => backend.set(key, savedEntry)),
-            ),
-        );
-    }
+            // Write to the fallback caches
+            if (result) {
+                const [savedEntry, backendName] = result as [CacheEntry, string];
+                trace?.setAttribute('cacheBackend', backendName);
 
-    return result;
+                await waitUntil(
+                    Promise.all(
+                        cacheBackends
+                            .filter((backend) => backend.name !== backendName && backend.fallback)
+                            .map((backend) => backend.set(key, savedEntry)),
+                    ),
+                );
+            }
+
+            return result;
+        },
+    );
 }
 
 function now(): number {
