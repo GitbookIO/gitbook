@@ -53,17 +53,19 @@ type URLLookupMode =
      */
     | 'multi-id';
 
+export type LookupCookies = Record<
+    string,
+    {
+        value: string;
+        options?: Partial<ResponseCookie>;
+    }
+>;
+
 export type LookupResult = PublishedContentWithCache & {
     /** API endpoint to use for the content post lookup */
     apiEndpoint?: string;
     /** Cookies to store on the response */
-    cookies?: Record<
-        string,
-        {
-            value: string;
-            options?: Partial<ResponseCookie>;
-        }
-    >;
+    cookies?: LookupCookies;
 };
 
 /**
@@ -377,12 +379,14 @@ async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise
         () => getSpace.revalidate(spaceId),
     );
 
-    const cookies = {
+    const cookies: LookupCookies = {
         [cookieName]: {
             value: encodeGitBookTokenCookie(spaceId, apiToken, apiEndpoint),
             options: {
                 httpOnly: true,
                 maxAge: 60 * 30,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'none',
             },
         },
     };
