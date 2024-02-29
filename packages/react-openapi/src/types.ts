@@ -9,4 +9,10 @@ export interface OpenAPIClientContext {
         chevronDown: React.ReactNode;
         chevronRight: React.ReactNode;
     };
+
+    /**
+     * Force all sections to be opened by default.
+     * @default false
+     */
+    defaultInteractiveOpened?: boolean;
 }

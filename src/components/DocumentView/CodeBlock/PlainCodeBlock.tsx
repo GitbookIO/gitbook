@@ -44,6 +44,7 @@ export function PlainCodeBlock(props: { code: string; syntax: string }) {
         <CodeBlock
             document={document}
             context={{
+                mode: 'default',
                 resolveContentRef: async () => null,
             }}
             block={block}

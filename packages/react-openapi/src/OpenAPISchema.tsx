@@ -52,7 +52,7 @@ export function OpenAPISchemaProperty(
             id={id}
             className={classNames('openapi-schema', className)}
             toggeable={!!properties || !!alternatives}
-            defaultOpened={false}
+            defaultOpened={!!context.defaultInteractiveOpened}
             toggleOpenIcon={context.icons.chevronRight}
             toggleCloseIcon={context.icons.chevronDown}
             tabs={alternatives?.[0].map((alternative, index) => ({

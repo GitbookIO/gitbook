@@ -32,7 +32,7 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
     ];
 
     return (
-        <div className={tcls('group/codeblock', 'grid', 'grid-flow-col', style, fullWidthStyle)}>
+        <div className={tcls('group/codeblock', 'grid', 'grid-flow-col', fullWidthStyle, style)}>
             <div
                 className={tcls(
                     'flex',

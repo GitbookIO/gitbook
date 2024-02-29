@@ -66,6 +66,7 @@ export function PageBody(props: {
                         style={['[&>*+*]:mt-5', 'grid']}
                         blockStyle={['page-api-block:ml-0']}
                         context={{
+                            mode: 'default',
                             content: context.content,
                             resolveContentRef: (ref) => resolveContentRef(ref, context),
                         }}

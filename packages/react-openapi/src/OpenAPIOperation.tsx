@@ -19,6 +19,7 @@ export function OpenAPIOperation(props: {
     const { operation, servers, method, path } = data;
 
     const clientContext: OpenAPIClientContext = {
+        defaultInteractiveOpened: context.defaultInteractiveOpened,
         icons: context.icons,
     };
 

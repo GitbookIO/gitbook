@@ -123,6 +123,7 @@ function transformAnswer(
             <DocumentView
                 document={answer.answer.document}
                 context={{
+                    mode: 'default',
                     resolveContentRef: async () => null,
                 }}
                 style={['space-y-5']}

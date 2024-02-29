@@ -32,6 +32,7 @@ export function OpenAPIRequestBody(props: {
                     };
                 },
             )}
+            defaultOpened={context.defaultInteractiveOpened}
         >
             {requestBody.description ? (
                 <Markdown

@@ -27,6 +27,7 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
     return (
         <details
             id={id}
+            open={context.mode === 'print'}
             className={tcls(
                 style,
                 'group/expandable',

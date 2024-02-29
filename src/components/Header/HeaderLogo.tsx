@@ -31,7 +31,14 @@ export function HeaderLogo(props: HeaderLogoProps) {
             />
             <Link
                 href={absoluteHref('')}
-                className={tcls('group/headerlogo', 'flex-1', 'flex', 'flex-row', 'items-center', 'shrink-0')}
+                className={tcls(
+                    'group/headerlogo',
+                    'flex-1',
+                    'flex',
+                    'flex-row',
+                    'items-center',
+                    'shrink-0',
+                )}
             >
                 {customization.header.logo ? (
                     <Image
@@ -131,7 +138,7 @@ function LogoFallback(props: HeaderLogoProps) {
                     'font-semibold',
                     'ms-3',
                     customization.header.preset === CustomizationHeaderPreset.Default ||
-                    customization.header.preset === CustomizationHeaderPreset.None
+                        customization.header.preset === CustomizationHeaderPreset.None
                         ? ['text-dark', 'dark:text-light']
                         : 'text-header-link',
                 )}

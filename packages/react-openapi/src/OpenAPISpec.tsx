@@ -36,7 +36,7 @@ export function OpenAPISpec(props: { rawData: any; context: OpenAPIClientContext
                     toggleOpenIcon={context.icons.chevronRight}
                     toggleCloseIcon={context.icons.chevronDown}
                     header={group.label}
-                    defaultOpened={group.key === 'path'}
+                    defaultOpened={group.key === 'path' || context.defaultInteractiveOpened}
                 >
                     <OpenAPISchemaProperties
                         properties={group.parameters.map((parameter) => ({

@@ -215,6 +215,10 @@
 
 html {
     color-scheme: light;
+
+    /** Ensure PDF export and print correctly displays the background colors */
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
 }
 html.dark {
     color-scheme: dark light;

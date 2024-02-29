@@ -3,7 +3,7 @@
 }
 
 .openapi-columns {
-    @apply flex flex-col md:flex-row gap-6;
+    @apply flex flex-col md:flex-row gap-6 print-mode:flex-col;
 }
 
 /** Intro */
@@ -73,11 +73,11 @@
 }
 
 .openapi-column-preview-body {
-    @apply flex flex-col gap-4 sticky top-4 space-header:top-20 page-api-block:xl:max-2xl:top-32;
+    @apply flex flex-col gap-4 sticky top-4 space-header:top-20 page-api-block:xl:max-2xl:top-32 print-mode:static;
 }
 
 .openapi-column-preview pre {
-    @apply max-h-60;
+    @apply max-h-60 print-mode:max-h-none;
 }
 
 /** Schemas */

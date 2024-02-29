@@ -8,6 +8,12 @@ import { Blocks } from './Blocks';
 
 export interface DocumentContext {
     /**
+     * Mode to render the document in.
+     * This can be used to render the document in a different mode, such as "default" or "print".
+     */
+    mode: 'default' | 'print';
+
+    /**
      * Content being rendered.
      */
     content?: ContentPointer;

@@ -32,7 +32,7 @@ export function OpenAPIResponse(props: {
             {headers.length > 0 ? (
                 <InteractiveSection
                     toggeable
-                    defaultOpened={false}
+                    defaultOpened={!!context.defaultInteractiveOpened}
                     toggleCloseIcon={context.icons.chevronDown}
                     toggleOpenIcon={context.icons.chevronRight}
                     header="Headers"

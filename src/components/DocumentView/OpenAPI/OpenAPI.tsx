@@ -48,6 +48,7 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockSwagger>) {
                     chevronRight: <ChevronRight />,
                 },
                 CodeBlock: PlainCodeBlock,
+                defaultInteractiveOpened: context.mode === 'print',
             }}
         />
     );

@@ -75,19 +75,6 @@ const testCases: TestsCase[] = [
                 name: 'Home',
                 url: '',
             },
-            {
-                name: 'PDF',
-                url: '~gitbook/pdf?limit=10',
-            },
-            // TODO: It currently crash with an error from puppeteer
-            // {
-            //     name: 'Encoded URL',
-            //     url: 'scan-using-snyk/supported-languages-and-frameworks/c-c++',
-            // },
-            {
-                name: 'Revision',
-                url: '~/revisions/H41VQ6cIvd5hyUwcnwbC',
-            },
         ],
     },
     {
@@ -185,6 +172,26 @@ const testCases: TestsCase[] = [
             {
                 name: 'Home',
                 url: '',
+            },
+        ],
+    },
+    {
+        name: 'Versioning',
+        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        tests: [
+            {
+                name: 'Revision',
+                url: '~/revisions/S55pwsEr5UVoroaOiWnP',
+            },
+        ],
+    },
+    {
+        name: 'PDF',
+        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        tests: [
+            {
+                name: 'PDF',
+                url: '~gitbook/pdf?limit=10',
             },
         ],
     },

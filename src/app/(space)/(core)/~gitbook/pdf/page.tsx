@@ -36,8 +36,14 @@ import { PrintButton } from './PrintButton';
 export const runtime = 'edge';
 
 export async function generateMetadata(): Promise<Metadata> {
+    const contentPointer = getContentPointer();
+    const [space, customization] = await Promise.all([
+        getSpace(contentPointer.spaceId),
+        getSpaceCustomization(contentPointer.spaceId),
+    ]);
+
     return {
-        title: 'Print',
+        title: customization.title ?? space.title,
         robots: 'noindex, nofollow',
     };
 }
@@ -46,7 +52,7 @@ export async function generateMetadata(): Promise<Metadata> {
  * Render a space as a standalone HTML page that can be printed as a PDF.
  */
 export default async function PDFHTMLOutput(props: { searchParams: { [key: string]: string } }) {
-    const { spaceId } = getContentPointer();
+    const contentPointer = getContentPointer();
 
     const searchParams = new URLSearchParams(props.searchParams);
     const pdfParams = getPDFSearchParams(new URLSearchParams(searchParams));
@@ -55,13 +61,10 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
     let currentPDFUrl = absoluteHref('~gitbook/pdf', true);
     currentPDFUrl += '?' + searchParams.toString();
 
-    // Load the content
-    const contentPointer: ContentPointer = {
-        spaceId,
-    };
+    // Load the content,
     const [space, customization, rootPages] = await Promise.all([
-        getSpace(spaceId),
-        getSpaceCustomization(spaceId),
+        getSpace(contentPointer.spaceId),
+        getSpaceCustomization(contentPointer.spaceId),
         getRevisionPages(contentPointer),
     ]);
     const language = getSpaceLanguage(customization);
@@ -76,7 +79,7 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
     };
 
     return (
-        <>
+        <div className="print-mode">
             {pdfParams.back !== 'false' ? (
                 <div className={tcls('fixed', 'left-12', 'top-12', 'print:hidden', 'z-50')}>
                     <a
@@ -157,6 +160,7 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
                         <PDFPageDocument
                             space={space}
                             page={page}
+                            contentPointer={contentPointer}
                             refContext={{
                                 content: contentPointer,
                                 space,
@@ -168,7 +172,7 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
                     </React.Suspense>
                 ),
             )}
-        </>
+        </div>
     );
 }
 
@@ -211,9 +215,10 @@ async function PDFPageGroup(props: { space: Space; page: RevisionPageGroup }) {
 async function PDFPageDocument(props: {
     space: Space;
     page: RevisionPageDocument;
+    contentPointer: ContentPointer;
     refContext: ContentRefContext;
 }) {
-    const { space, page, refContext } = props;
+    const { space, page, contentPointer, refContext } = props;
 
     const document = page.documentId ? await getDocument(space.id, page.documentId) : null;
 
@@ -230,6 +235,8 @@ async function PDFPageDocument(props: {
                     style={'mt-6 space-y-6'}
                     blockStyle={['max-w-full']}
                     context={{
+                        mode: 'print',
+                        content: contentPointer,
                         resolveContentRef: (ref) => resolveContentRef(ref, refContext),
                         getId: (id) => pagePDFContainerId(page, id),
                     }}
@@ -268,6 +275,7 @@ function PrintPage(
                 'min-h-[29.7cm]',
                 'print:min-h-0',
                 isFirst ? null : 'break-before-page',
+                'break-anywhere',
             )}
         >
             {children}
