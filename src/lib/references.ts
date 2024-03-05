@@ -8,6 +8,7 @@ import {
     getRevisionPages,
     getSpace,
     getUserById,
+    ignoreAPIError,
 } from './api';
 import { gitbookAppHref, pageHref, PageHrefContext } from './links';
 import { resolvePageId } from './pages';
@@ -98,7 +99,7 @@ export async function resolveContentRef(
             const targetSpace =
                 contentRef.space === space.id
                     ? space
-                    : await ignoreError(getSpace(contentRef.space));
+                    : await ignoreAPIError(getSpace(contentRef.space));
             if (!targetSpace) {
                 return {
                     href: gitbookAppHref(`/s/${contentRef.space}`),
@@ -136,7 +137,7 @@ export async function resolveContentRef(
         }
 
         case 'collection': {
-            const collection = await ignoreError(getCollection(contentRef.collection));
+            const collection = await ignoreAPIError(getCollection(contentRef.collection));
             if (!collection) {
                 return {
                     href: gitbookAppHref(`/s/${contentRef.collection}`),
@@ -157,25 +158,14 @@ export async function resolveContentRef(
     }
 }
 
-async function ignoreError<T>(promise: Promise<T>): Promise<T | null> {
-    try {
-        return await promise;
-    } catch (error) {
-        const code = (error as GitBookAPIError).code;
-        if (code >= 400 && code < 500) {
-            return null;
-        }
-
-        throw error;
-    }
-}
-
 async function resolveContentRefInSpace(spaceId: string, contentRef: ContentRef) {
     const pointer: ContentPointer = {
         spaceId,
     };
 
-    const result = await ignoreError(Promise.all([getSpace(spaceId), getRevisionPages(pointer)]));
+    const result = await ignoreAPIError(
+        Promise.all([getSpace(spaceId), getRevisionPages(pointer)]),
+    );
     if (!result) {
         return null;
     }

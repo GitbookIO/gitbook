@@ -17,7 +17,7 @@ import {
 import { ContentKitContext, DocumentBlockIntegration } from '@gitbook/api';
 import { ContentKit, ContentKitOutput, ContentKitServerContext } from '@gitbook/react-contentkit';
 
-import { renderIntegrationUi } from '@/lib/api';
+import { ignoreAPIError, renderIntegrationUi } from '@/lib/api';
 import { parseMarkdown } from '@/lib/markdown';
 import { tcls } from '@/lib/tailwind';
 
@@ -72,7 +72,12 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
         context: contentKitContext,
     };
 
-    const initialOutput = await renderIntegrationUi(block.data.integration, initialInput);
+    const initialOutput = await ignoreAPIError(
+        renderIntegrationUi(block.data.integration, initialInput),
+    );
+    if (!initialOutput) {
+        return null;
+    }
 
     return (
         <div className={tcls(style)}>
