@@ -42,7 +42,7 @@ export function OpenAPICodeSample(props: {
         },
     };
 
-    const defaultSamples = codeSampleGenerators.map((generator) => ({
+    const samples = codeSampleGenerators.map((generator) => ({
         key: `default-${generator.id}`,
         label: generator.label,
         body: <context.CodeBlock code={generator.generate(input)} syntax={generator.syntax} />,
@@ -54,24 +54,25 @@ export function OpenAPICodeSample(props: {
         'x-custom-examples'?: RedoclyCodeSample[];
     };
 
-    const redoclySamples =
-        (
-            redoclyOperation['x-custom-examples'] ??
-            redoclyOperation['x-codeSamples'] ??
-            redoclyOperation['x-code-samples']
-        )?.map((sample) => ({
-            key: `redocly-${sample.lang}`,
-            label: sample.label,
-            body: <context.CodeBlock code={sample.source} syntax={sample.lang} />,
-        })) ?? [];
+    (
+        redoclyOperation['x-custom-examples'] ??
+        redoclyOperation['x-codeSamples'] ??
+        redoclyOperation['x-code-samples']
+    )?.forEach((sample) => {
+        if (
+            typeof sample.lang === 'string' &&
+            typeof sample.source === 'string' &&
+            typeof sample.label === 'string'
+        ) {
+            samples.push({
+                key: `redocly-${sample.lang}`,
+                label: sample.label,
+                body: <context.CodeBlock code={sample.source} syntax={sample.lang} />,
+            });
+        }
+    });
 
-    return (
-        <InteractiveSection
-            header="Request"
-            className="openapi-codesample"
-            tabs={[...redoclySamples, ...defaultSamples]}
-        />
-    );
+    return <InteractiveSection header="Request" className="openapi-codesample" tabs={samples} />;
 }
 
 function getSecurityHeaders(securities: OpenAPIOperationData['securities']): {

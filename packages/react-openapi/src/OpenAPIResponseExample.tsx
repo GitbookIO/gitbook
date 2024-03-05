@@ -50,12 +50,14 @@ export function OpenAPIResponseExample(props: {
         return null;
     }
 
+    const example = generateSchemaExample(schema);
+    if (example === undefined) {
+        return null;
+    }
+
     return (
         <InteractiveSection header="Response" className="openapi-response-example">
-            <context.CodeBlock
-                code={JSON.stringify(generateSchemaExample(schema), null, 2)}
-                syntax="json"
-            />
+            <context.CodeBlock code={JSON.stringify(example, null, 2)} syntax="json" />
         </InteractiveSection>
     );
 }
