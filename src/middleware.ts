@@ -205,10 +205,15 @@ export async function middleware(request: NextRequest) {
     // Add Content Security Policy header
     response.headers.set('content-security-policy', csp);
 
-    if (process.env.NODE_ENV !== 'development' && resolved.cacheMaxAge) {
+    if (resolved.cacheMaxAge) {
         const cacheControl = `public, max-age=60, s-maxage=${resolved.cacheMaxAge}, stale-while-revalidate=60, stale-if-error=0`;
-        response.headers.set('cache-control', cacheControl);
-        response.headers.set('Cloudflare-CDN-Cache-Control', cacheControl);
+
+        if (process.env.GITBOOK_OUTPUT_CACHE === 'true' && process.env.NODE_ENV !== 'development') {
+            response.headers.set('cache-control', cacheControl);
+            response.headers.set('Cloudflare-CDN-Cache-Control', cacheControl);
+        } else {
+            response.headers.set('x-gitbook-cache-control', cacheControl);
+        }
     }
 
     if (resolved.cacheTags && resolved.cacheTags.length > 0) {
