@@ -651,3 +651,110 @@ it('should support multiple code tokens in an annotation', async () => {
         },
     ]);
 });
+
+it('should handle \\r', async () => {
+    const tokens = await highlight({
+        object: 'block',
+        type: 'code',
+        data: {
+            syntax: 'javascript',
+        },
+        nodes: [
+            {
+                object: 'block',
+                type: 'code-line',
+                data: {},
+                nodes: [
+                    {
+                        object: 'text',
+                        leaves: [{ object: 'leaf', marks: [], text: 'console.log("Hello")' }],
+                    },
+                ],
+            },
+            {
+                object: 'block',
+                type: 'code-line',
+                data: {},
+                nodes: [
+                    {
+                        object: 'text',
+                        leaves: [{ object: 'leaf', marks: [], text: '\rconsole.log("World")' }],
+                    },
+                ],
+            },
+        ],
+    });
+
+    expect(tokens).toMatchObject([
+        {
+            highlighted: false,
+            tokens: [
+                {
+                    type: 'shiki',
+                    token: {
+                        content: 'console',
+                    },
+                },
+                {
+                    type: 'shiki',
+                    token: {
+                        content: '.log',
+                    },
+                },
+                {
+                    type: 'shiki',
+                    token: {
+                        content: '(',
+                    },
+                },
+                {
+                    type: 'shiki',
+                    token: {
+                        content: '"Hello"',
+                    },
+                },
+                {
+                    type: 'shiki',
+                    token: {
+                        content: ')',
+                    },
+                },
+            ],
+        },
+        {
+            highlighted: false,
+            tokens: [
+                {
+                    type: 'shiki',
+                    token: {
+                        content: 'console',
+                    },
+                },
+                {
+                    type: 'shiki',
+                    token: {
+                        content: '.log',
+                    },
+                },
+                {
+                    type: 'shiki',
+                    token: {
+                        content: '(',
+                    },
+                },
+                {
+                    type: 'shiki',
+                    token: {
+                        content: '"World"',
+                    },
+                },
+                {
+                    type: 'shiki',
+                    token: {
+                        content: ')',
+                    },
+                },
+            ],
+        },
+    ]);
+});

@@ -44,6 +44,7 @@ export const colorToCSSVar: Record<string, string> = {
 export async function highlight(block: DocumentBlockCode): Promise<HighlightLine[]> {
     const inlines: InlineIndexed[] = [];
     const code = getPlainCodeBlock(block, inlines);
+
     inlines.sort((a, b) => {
         return a.start - b.start;
     });
@@ -180,7 +181,6 @@ function matchTokenAndInlines(
 
         // If shiki token finished before the end of the annotation or the annotation contains multiple tokens
         while (token.end < inline.end) {
-            // console.log('push inner', { token, inlineStart: inline.start, inlineEnd: inline.end })
             children.push({
                 type: 'shiki',
                 token: token,
@@ -243,7 +243,7 @@ function getPlainCodeBlockLine(
 
     for (const node of parent.nodes) {
         if (node.object === 'text') {
-            content += node.leaves.map((leaf) => leaf.text).join('');
+            content += cleanupLine(node.leaves.map((leaf) => leaf.text).join(''));
         } else {
             const start = index + content.length;
             content += getPlainCodeBlockLine(node, inlines, index + content.length);
@@ -296,6 +296,14 @@ function splitPositionedTokenAt(
 
 function isEmptyPositionedToken(token: PositionedToken): boolean {
     return token.start === token.end;
+}
+
+/**
+ * Currently it's possible for some lines to contain \r characters, we need to remove them
+ * as they are considered as new lines by shikijs.
+ */
+function cleanupLine(line: string): string {
+    return line.replace(/\r/g, '');
 }
 
 /**
