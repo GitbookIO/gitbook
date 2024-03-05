@@ -111,9 +111,15 @@ export function DropdownMenuItem(props: {
 }) {
     const { children, active = false, href } = props;
 
+    // Use a real anchor tag for external links, and a Next.js Link for internal links.
+    // The main reason is to prevent a bug where next.js Link will result in the page not changing when navigating between spaces in a collection
+    const isExternal = href.startsWith('http');
+    const A = isExternal ? 'a' : Link;
+
     return (
-        <Link
+        <A
             href={href}
+            {...(isExternal ? {} : { prefetch: false })}
             className={tcls(
                 'flex',
                 'flex-row',
@@ -129,6 +135,6 @@ export function DropdownMenuItem(props: {
             )}
         >
             {children}
-        </Link>
+        </A>
     );
 }
