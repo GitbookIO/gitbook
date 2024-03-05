@@ -1,7 +1,14 @@
-import { ContentRef, Revision, RevisionPageDocument, Space } from '@gitbook/api';
+import { ContentRef, GitBookAPIError, Revision, RevisionPageDocument, Space } from '@gitbook/api';
 import assertNever from 'assert-never';
 
-import { ContentPointer, getRevisionFile, getUserById } from './api';
+import {
+    ContentPointer,
+    getCollection,
+    getRevisionFile,
+    getRevisionPages,
+    getSpace,
+    getUserById,
+} from './api';
 import { gitbookAppHref, pageHref, PageHrefContext } from './links';
 import { resolvePageId } from './pages';
 
@@ -32,97 +39,147 @@ export async function resolveContentRef(
     contentRef: ContentRef,
     { content, space, pages, page: activePage, ...linksContext }: ContentRefContext,
 ): Promise<ResolvedContentRef | null> {
-    // Try to resolve a local ref in the current space
-    if (contentRef.kind === 'url') {
-        return {
-            href: contentRef.url,
-            text: contentRef.url,
-            active: false,
-        };
-    } else if (contentRef.kind === 'file') {
-        const file = await getRevisionFile(content, contentRef.file);
-        if (file) {
+    switch (contentRef.kind) {
+        case 'url': {
             return {
-                href: file.downloadURL,
-                text: file.name,
-                active: false,
-                fileDimensions: file.dimensions,
-            };
-        } else {
-            return null;
-        }
-    } else if (
-        (contentRef.kind === 'page' || contentRef.kind === 'anchor') &&
-        (contentRef.space ?? space.id) === space.id
-    ) {
-        const page =
-            !contentRef.page || contentRef.page === activePage?.id
-                ? activePage
-                : resolvePageId(pages, contentRef.page)?.page;
-        if (!page) {
-            return null;
-        }
-
-        if (contentRef.kind === 'page') {
-            return {
-                href: pageHref(pages, page, linksContext),
-                text: page.title,
-                emoji: page.emoji,
-                active: page.id === activePage?.id,
-            };
-        }
-
-        const isCurrentPage = page.id === activePage?.id;
-        return {
-            href: pageHref(pages, page, linksContext, contentRef.anchor),
-            text: (isCurrentPage ? '' : page.title) + '#' + contentRef.anchor,
-            emoji: isCurrentPage ? undefined : page.emoji,
-            active: false,
-        };
-    } else if (contentRef.kind === 'space' && contentRef.space === space.id) {
-        return {
-            href: space.urls.published ?? space.urls.app,
-            text: space.title,
-            active: true,
-        };
-    }
-
-    if (contentRef.kind === 'user') {
-        const user = await getUserById(contentRef.user);
-        if (user) {
-            return {
-                href: `mailto:${user.email}`,
-                text: user.displayName ?? user.email,
+                href: contentRef.url,
+                text: contentRef.url,
                 active: false,
             };
-        } else {
+        }
+
+        case 'file': {
+            const file = await getRevisionFile(content, contentRef.file);
+            if (file) {
+                return {
+                    href: file.downloadURL,
+                    text: file.name,
+                    active: false,
+                    fileDimensions: file.dimensions,
+                };
+            } else {
+                return null;
+            }
+        }
+
+        case 'anchor':
+        case 'page': {
+            if (contentRef.space && contentRef.space !== space.id) {
+                return resolveContentRefInSpace(contentRef.space, contentRef);
+            }
+
+            const page =
+                !contentRef.page || contentRef.page === activePage?.id
+                    ? activePage
+                    : resolvePageId(pages, contentRef.page)?.page;
+            if (!page) {
+                return null;
+            }
+
+            if (contentRef.kind === 'page') {
+                return {
+                    href: pageHref(pages, page, linksContext),
+                    text: page.title,
+                    emoji: page.emoji,
+                    active: page.id === activePage?.id,
+                };
+            }
+
+            const isCurrentPage = page.id === activePage?.id;
+            return {
+                href: pageHref(pages, page, linksContext, contentRef.anchor),
+                text: (isCurrentPage ? '' : page.title) + '#' + contentRef.anchor,
+                emoji: isCurrentPage ? undefined : page.emoji,
+                active: false,
+            };
+        }
+
+        case 'space': {
+            const targetSpace =
+                contentRef.space === space.id
+                    ? space
+                    : await ignoreError(getSpace(contentRef.space));
+            if (!targetSpace) {
+                return {
+                    href: gitbookAppHref(`/s/${contentRef.space}`),
+                    text: 'space',
+                    active: false,
+                };
+            }
+
+            return {
+                href: targetSpace.urls.published ?? targetSpace.urls.app,
+                text: targetSpace.title,
+                active: true,
+            };
+        }
+
+        case 'user': {
+            const user = await getUserById(contentRef.user);
+            if (user) {
+                return {
+                    href: `mailto:${user.email}`,
+                    text: user.displayName ?? user.email,
+                    active: false,
+                };
+            } else {
+                return null;
+            }
+        }
+
+        case 'snippet': {
+            return {
+                href: gitbookAppHref(`/o/${contentRef.organization}/snippet/${contentRef.snippet}`),
+                text: 'snippet',
+                active: false,
+            };
+        }
+
+        case 'collection': {
+            const collection = await ignoreError(getCollection(contentRef.collection));
+            if (!collection) {
+                return {
+                    href: gitbookAppHref(`/s/${contentRef.collection}`),
+                    text: 'collection',
+                    active: false,
+                };
+            }
+
+            return {
+                href: collection.urls.app,
+                text: collection.title,
+                active: false,
+            };
+        }
+
+        default:
+            assertNever(contentRef);
+    }
+}
+
+async function ignoreError<T>(promise: Promise<T>): Promise<T | null> {
+    try {
+        return await promise;
+    } catch (error) {
+        const code = (error as GitBookAPIError).code;
+        if (code >= 400 && code < 500) {
             return null;
         }
-    }
 
-    // For absolute content outside the current space, we mock GitBook URLs.
-    if (contentRef.kind === 'space' || contentRef.kind === 'anchor' || contentRef.kind === 'page') {
-        return {
-            href: gitbookAppHref(`/s/${contentRef.space!}`),
-            text: 'space',
-            active: false,
-        };
+        throw error;
     }
-    if (contentRef.kind === 'collection') {
-        return {
-            href: gitbookAppHref(`/c/${contentRef.collection}`),
-            text: 'collection',
-            active: false,
-        };
-    }
+}
 
-    if (contentRef.kind === 'snippet') {
-        return {
-            href: gitbookAppHref(`/o/${contentRef.organization}/snippet/${contentRef.snippet}`),
-            text: 'snippet',
-            active: false,
-        };
-    }
+async function resolveContentRefInSpace(spaceId: string, contentRef: ContentRef) {
+    const pointer: ContentPointer = {
+        spaceId,
+    };
 
-    assertNever(contentRef);
+    const [space, pages] = await Promise.all([getSpace(spaceId), getRevisionPages(pointer)]);
+
+    return resolveContentRef(contentRef, {
+        content: pointer,
+        space,
+        pages,
+    });
 }
