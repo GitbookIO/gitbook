@@ -11,12 +11,16 @@ export function KaTeX(props: { formula: string; inline: boolean; className?: str
     const html = katex.renderToString(formula, {
         displayMode: !inline,
         output: 'htmlAndMathml',
+        throwOnError: false,
+        strict: false,
     });
 
     // While loading the CSS, we fallback to rendering the MathML.
     const mathml = katex.renderToString(formula, {
         displayMode: !inline,
         output: 'mathml',
+        throwOnError: false,
+        strict: false,
     });
     const fallback = inline ? (
         <span className={className} dangerouslySetInnerHTML={{ __html: mathml }} />
