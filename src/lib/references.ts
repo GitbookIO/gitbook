@@ -175,8 +175,12 @@ async function resolveContentRefInSpace(spaceId: string, contentRef: ContentRef)
         spaceId,
     };
 
-    const [space, pages] = await Promise.all([getSpace(spaceId), getRevisionPages(pointer)]);
+    const result = await ignoreError(Promise.all([getSpace(spaceId), getRevisionPages(pointer)]));
+    if (!result) {
+        return null;
+    }
 
+    const [space, pages] = result;
     return resolveContentRef(contentRef, {
         content: pointer,
         space,

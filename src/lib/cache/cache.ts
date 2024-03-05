@@ -120,16 +120,21 @@ export function cache<Args extends any[], Result>(
                     return cachedEntry[0].data;
                 }
 
-                const fetched = await revalidate(key, ...args);
-                console.log(
-                    `cache: ${key} miss in ${fetched.fetchDuration.toFixed(
-                        0,
-                    )}ms, read in ${readCacheDuration.toFixed(
-                        0,
-                    )}ms, write in ${fetched.writeCacheDuration.toFixed(0)}ms`,
-                );
+                try {
+                    const fetched = await revalidate(key, ...args);
+                    console.log(
+                        `cache: ${key} miss in ${fetched.fetchDuration.toFixed(
+                            0,
+                        )}ms, read in ${readCacheDuration.toFixed(
+                            0,
+                        )}ms, write in ${fetched.writeCacheDuration.toFixed(0)}ms`,
+                    );
 
-                return fetched.data;
+                    return fetched.data;
+                } catch (error) {
+                    console.error(`cache: ${key} error: ${error}`);
+                    throw error;
+                }
             },
         );
     };
