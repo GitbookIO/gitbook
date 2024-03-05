@@ -24,7 +24,7 @@ export async function RecordRow(
                     <td
                         key={column}
                         className={tcls(
-                            'align-baseline',
+                            'align-middle',
                             'min-w-[8rem]',
                             'border-dark/2',
                             'py-3',
