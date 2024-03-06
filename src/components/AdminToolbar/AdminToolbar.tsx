@@ -1,8 +1,7 @@
 import { Space } from '@gitbook/api';
-import { headers } from 'next/headers';
 import React from 'react';
 
-import { ContentPointer, getChangeRequest, getRevision, getRevisionPages } from '@/lib/api';
+import { ContentPointer, getChangeRequest, getRevision } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
 interface AdminToolbarProps {
@@ -14,8 +13,7 @@ interface AdminToolbarProps {
  * Toolbar with information for the content admin when previewing a revision or change-request.
  */
 export function AdminToolbar(props: AdminToolbarProps) {
-    const { content, space } = props;
-    const headersSet = headers();
+    const { content } = props;
 
     const toolbar = (() => {
         if (content.changeRequestId) {
@@ -29,10 +27,6 @@ export function AdminToolbar(props: AdminToolbarProps) {
 
         if (content.revisionId) {
             return <RevisionToolbar spaceId={content.spaceId} revisionId={content.revisionId} />;
-        }
-
-        if (headersSet.get('x-gitbook-mode') === 'multi-id') {
-            return <ShareFeedbackToolbar space={space} />;
         }
 
         return null;
@@ -87,18 +81,6 @@ async function RevisionToolbar(props: { spaceId: string; revisionId: string }) {
     return (
         <ToolbarButton href={revision.urls.app}>
             Revision created on {new Date(revision.createdAt).toLocaleDateString()}
-        </ToolbarButton>
-    );
-}
-
-async function ShareFeedbackToolbar(props: { space: Space }) {
-    const { space } = props;
-
-    return (
-        <ToolbarButton
-            href={`https://survey.refiner.io/e61q1m-ejr82o?response_organization_id=${space.organization}&response_space_id=${space.id}&response_org_id=${space.organization}&contact_space=${space.id}&response_source=open-preview-feedback`}
-        >
-            Share feedback about the new version
         </ToolbarButton>
     );
 }
