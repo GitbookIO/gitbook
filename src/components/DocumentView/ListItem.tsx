@@ -1,4 +1,9 @@
-import { DocumentBlockListItem } from '@gitbook/api';
+import {
+    DocumentBlockListItem,
+    DocumentBlockListOrdered,
+    DocumentBlockListTasks,
+    DocumentBlockListUnordered,
+} from '@gitbook/api';
 
 import { Checkbox } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
@@ -12,10 +17,14 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
 
     const textStyle = getBlockTextStyle(block);
 
-    const listType = ancestorBlocks[ancestorBlocks.length - 1]?.type;
+    const parent = ancestorBlocks[ancestorBlocks.length - 1] as
+        | DocumentBlockListOrdered
+        | DocumentBlockListUnordered
+        | DocumentBlockListTasks
+        | undefined;
 
     const ListItemType = () => {
-        switch (listType) {
+        switch (parent?.type) {
             case 'list-tasks':
                 return (
                     <li>
@@ -50,10 +59,20 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
                     </li>
                 );
             case 'list-ordered':
+                const start = parent.data.start ?? 1;
+                const indexInParent = parent.nodes.findIndex((node) => node.key === block.key) ?? 0;
+                const index = indexInParent + start;
+
                 return (
-                    <li className={tcls(textStyle.lineHeight)}>
+                    <li value={index} className={tcls(textStyle.lineHeight)}>
                         <div
-                            className={tcls('bullet', textStyle.textSize, 'leading-[inherit]')}
+                            data-value={index}
+                            className={tcls(
+                                'bullet',
+                                textStyle.textSize,
+                                'leading-[inherit]',
+                                'before:content-[attr(data-value)]',
+                            )}
                         ></div>
                         {/* zero width space to force layouts with empty lists */}
                         <Blocks

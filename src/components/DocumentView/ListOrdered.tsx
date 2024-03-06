@@ -30,7 +30,6 @@ export function ListOrdered(props: BlockProps<DocumentBlockListOrdered>) {
                 '[&>li>.bullet]:before:h-[1lh]',
                 '[&>li>.bullet]:before:leading-[inherit]',
                 '[&>li>.bullet]:before:flex',
-                '[&>li>.bullet]:before:[content:counter(list-decimal)]',
                 /* '[&>li>.bullet]:before:pr-[1ch]', */
                 '[&>li>.bullet]:text-dark/6',
 
