@@ -8,7 +8,12 @@ import { waitUntil, getGlobalContext } from './waitUntil';
 export async function race<I, R>(
     inputs: I[],
     execute: (input: I, options: { signal: AbortSignal }) => Promise<R | null>,
+    options: {
+        timeout?: number;
+    } = {},
 ): Promise<R | null> {
+    const { timeout } = options;
+
     const abort = new AbortController();
     const pendingReads: Array<Promise<void>> = [];
 
@@ -16,16 +21,26 @@ export async function race<I, R>(
     const result = await new Promise<R | null>((resolve, reject) => {
         let resolved = false;
         let pending = inputs.length;
+        let timeoutId: NodeJS.Timeout | null = null;
+
+        const respondWith = (value: R | null) => {
+            if (!resolved) {
+                resolved = true;
+                if (timeoutId) {
+                    clearTimeout(timeoutId!);
+                }
+                resolve(value);
+                abort.abort();
+            }
+        };
 
         inputs.forEach((input) => {
             pendingReads.push(
                 execute(input, { signal: abort.signal })
                     .then(
                         (inputResult) => {
-                            if (!resolved && inputResult !== null) {
-                                resolved = true;
-                                resolve(inputResult);
-                                abort.abort();
+                            if (inputResult !== null) {
+                                respondWith(inputResult);
                             }
                         },
                         (error) => {
@@ -40,6 +55,12 @@ export async function race<I, R>(
                     }),
             );
         });
+
+        if (timeout) {
+            timeoutId = setTimeout(() => {
+                respondWith(null);
+            }, timeout);
+        }
     });
 
     // Wait for all reads to finish after responding to the request

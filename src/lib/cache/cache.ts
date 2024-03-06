@@ -251,10 +251,16 @@ async function getCacheEntry(key: string): Promise<readonly [CacheEntry, string]
             },
         },
         async (trace) => {
-            const result = await race(cacheBackends, async (backend, { signal }) => {
-                const entry = await backend.get(key, { signal });
-                return entry ? ([entry, backend.name] as const) : null;
-            });
+            const result = await race(
+                cacheBackends,
+                async (backend, { signal }) => {
+                    const entry = await backend.get(key, { signal });
+                    return entry ? ([entry, backend.name] as const) : null;
+                },
+                {
+                    timeout: 200,
+                },
+            );
 
             trace?.setAttribute('cacheStatus', result ? 'hit' : 'miss');
 
