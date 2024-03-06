@@ -175,7 +175,9 @@ async function transformAll(
         delete value.$ref;
 
         data[key] = await resolveReference(url, ref, fetcher);
-        data[key][SYMBOL_REF_RESOLVED] = extractRefName(ref);
+        if (data[key]) {
+            data[key][SYMBOL_REF_RESOLVED] = extractRefName(ref);
+        }
     } else if (Array.isArray(value)) {
         // Recursively resolve all references in the array
         await Promise.all(value.map((item, index) => transformAll(url, value, index, fetcher)));
