@@ -54,16 +54,31 @@ export function normalizeVisitorAuthURL(url: URL): URL {
  */
 function getVisitorAuthTokenFromCookies(request: NextRequest, url: URL): string | undefined {
     const urlPathParts = url.pathname.split('/').filter(Boolean);
-    const urlBasePath = urlPathParts.length === 0 ? `/` : `/${urlPathParts[0]}/`;
+    const urlBasePath = urlPathParts.length === 0 ? null : `/${urlPathParts[0]}/`;
+    /**
+     * First, try to find a visitor authentication token for the current URL. The request could be
+     * something like example.gitbook.io/foo/bar, and we want to find the token for the `/foo/` base path.
+     * If we can't find a token for the current URL, we'll try to find a token for the `/` base path. These
+     * are the only two possible base paths for a given URL for which we try to find a token.
+     */
+    const found = urlBasePath ? findVisitorAuthCookieForBasePath(request, urlBasePath) : null;
+    return found ?? findVisitorAuthCookieForBasePath(request, '/');
+}
 
+/**
+ * Loop through all cookies and find the visitor authentication token for a given base path.
+ */
+function findVisitorAuthCookieForBasePath(
+    request: NextRequest,
+    basePath: string,
+): string | undefined {
     return Array.from(request.cookies).reduce<string | undefined>((acc, [name, cookie]) => {
-        if (name === getVisitorAuthCookieName(urlBasePath)) {
+        if (name === getVisitorAuthCookieName(basePath)) {
             const value = JSON.parse(cookie.value) as VisitorAuthCookieValue;
-            if (value.basePath === urlBasePath) {
+            if (value.basePath === basePath) {
                 acc = value.token;
             }
         }
-
         return acc;
     }, undefined);
 }
