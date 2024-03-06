@@ -35,6 +35,12 @@ export function DateRelative(props: { value: string }) {
 }
 
 function formatDiff(locale: string, diff: number) {
+    if (typeof Intl === 'undefined' || typeof Intl.RelativeTimeFormat === 'undefined') {
+        // Fallback for old browsers
+        const days = Math.floor(diff / 24 / 60 / 60 / 1000);
+        return `${days} days ago`;
+    }
+
     const rtf = new Intl.RelativeTimeFormat(locale, { style: 'long' });
 
     if (diff < 60 * 60 * 1000) {
