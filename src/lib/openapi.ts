@@ -67,14 +67,23 @@ const fetcher: OpenAPIFetcher = {
 
         // @ts-ignore
         if (data && data.swagger) {
-            // Convert Swagger 2.0 to OpenAPI 3.0
-            // @ts-ignore
-            const result = (await swagger2openapi.convertObj(data, {
-                resolve: false,
-                resolveInternal: false,
-            })) as ConvertOutputOptions;
+            try {
+                // Convert Swagger 2.0 to OpenAPI 3.0
+                // @ts-ignore
+                const result = (await swagger2openapi.convertObj(data, {
+                    resolve: false,
+                    resolveInternal: false,
+                    laxDefaults: true,
+                    laxurls: true,
+                    lint: false,
+                    prevalidate: false,
+                })) as ConvertOutputOptions;
 
-            data = result.openapi;
+                data = result.openapi;
+            } catch (error) {
+                console.warn('Failed to convert Swagger 2.0 to OpenAPI 3.0', error);
+                data = null;
+            }
         }
 
         return {

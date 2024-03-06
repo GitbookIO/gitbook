@@ -50,13 +50,18 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockSwagger>) {
                 CodeBlock: PlainCodeBlock,
                 defaultInteractiveOpened: context.mode === 'print',
             }}
+            className="openapi-block"
         />
     );
 }
 
 function OpenAPIFallback() {
     return (
-        <div role="status" aria-busy className={tcls('flex', 'flex-1', 'flex-col', 'gap-3')}>
+        <div
+            role="status"
+            aria-busy
+            className={'openapi-block ' + tcls('flex', 'flex-1', 'flex-col', 'gap-3')}
+        >
             <LoadingPane
                 tile={12}
                 style={['rounded-md', 'h-[47px]', '[max-width:calc(48rem-1px)]']}

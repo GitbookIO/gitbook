@@ -51,7 +51,6 @@ export function PageBody(props: {
                         page.layout.tableOfContents ? null : 'xl:ml-56',
                     ) +
                     (asFullWidth ? ' page-full-width' : '') +
-                    (asFullWidth && asFullWidth.apiBlock ? ' page-api-block' : '') +
                     (!page.layout.tableOfContents ? ' page-no-toc' : '')
                 }
             >

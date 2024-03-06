@@ -208,7 +208,7 @@ const config: Config = {
             /**
              * Variant when the page contains an OpenAPI block.
              */
-            addVariant('page-api-block', 'body:has(.page-api-block) &');
+            addVariant('page-api-block', 'body:has(.openapi-block) &');
 
             /**
              * Variant when the page is displayed in print mode.

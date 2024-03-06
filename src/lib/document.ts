@@ -21,20 +21,17 @@ export interface DocumentSection {
 /**
  * Check if the document contains one block that should be rendered in full-width mode.
  */
-export function hasFullWidthBlock(document: JSONDocument): { apiBlock: boolean } | false {
-    let fullWidth = false;
-
+export function hasFullWidthBlock(document: JSONDocument): boolean {
     for (const node of document.nodes) {
         if (node.data && 'fullWidth' in node.data && node.data.fullWidth) {
-            fullWidth = true;
+            return true;
         }
-
         if (node.type === 'swagger') {
-            return { apiBlock: true };
+            return true;
         }
     }
 
-    return fullWidth ? { apiBlock: false } : false;
+    return false;
 }
 
 /**

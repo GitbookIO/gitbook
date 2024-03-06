@@ -12,10 +12,11 @@ import { Markdown } from './Markdown';
  * Display an interactive OpenAPI operation.
  */
 export function OpenAPIOperation(props: {
+    className?: string;
     data: OpenAPIOperationData;
     context: OpenAPIContextProps;
 }) {
-    const { data, context } = props;
+    const { className, data, context } = props;
     const { operation, servers, method, path } = data;
 
     const clientContext: OpenAPIClientContext = {
@@ -24,7 +25,7 @@ export function OpenAPIOperation(props: {
     };
 
     return (
-        <div className={classNames('openapi-operation')}>
+        <div className={classNames('openapi-operation', className)}>
             <div className="openapi-intro">
                 <h2 className="openapi-summary">{operation.summary}</h2>
                 {operation.description ? (
