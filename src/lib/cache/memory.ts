@@ -16,7 +16,6 @@ export const memoryCache: CacheBackend = {
         }
 
         if (memoryEntry.meta.expiresAt > Date.now()) {
-            memoryEntry.meta.hits + 1;
             return memoryEntry;
         } else {
             memoryCache.delete(key);

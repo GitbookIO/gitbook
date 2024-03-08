@@ -62,13 +62,9 @@ export async function revalidateTags(
     if (metas && !purge) {
         await waitUntil(
             pMap(
-                // Sort to process the entries with the most hits first
-                metas.sort((a, b) => b.hits - a.hits),
+                metas,
                 async (meta) => {
-                    console.log(
-                        `revalidating ${meta.cache} (${meta.hits} hits) with args`,
-                        meta.args,
-                    );
+                    console.log(`revalidating ${meta.cache} with args`, meta.args);
                     const cache = getCache(meta.cache);
                     if (cache) {
                         await cache.revalidate(...meta.args);

@@ -1,13 +1,13 @@
-export interface Trace {
+export interface TraceSpan {
     setAttribute: (label: string, value: boolean | string | number) => void;
 }
 
 /**
  * Record a performance trace for the given function.
  */
-export async function trace<T>(name: string, fn: (trace: Trace) => Promise<T>): Promise<T> {
+export async function trace<T>(name: string, fn: (span: TraceSpan) => Promise<T>): Promise<T> {
     const attributes: Record<string, boolean | string | number> = {};
-    const trace: Trace = {
+    const span: TraceSpan = {
         setAttribute(label, value) {
             attributes[label] = value;
         },
@@ -15,9 +15,9 @@ export async function trace<T>(name: string, fn: (trace: Trace) => Promise<T>): 
 
     let start = now();
     try {
-        return await fn(trace);
+        return await fn(span);
     } catch (error) {
-        trace.setAttribute('error', true);
+        span.setAttribute('error', true);
         throw error;
     } finally {
         let end = now();

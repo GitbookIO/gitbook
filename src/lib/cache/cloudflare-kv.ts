@@ -24,7 +24,7 @@ export const cloudflareKVCache: CacheBackend = {
             return null;
         }
 
-        return trace(`cloudflareKV.get(${key})`, async (trace) => {
+        return trace(`cloudflareKV.get(${key})`, async (span) => {
             const kvKey = getValueKey(key);
 
             const entry = await kv.get<CacheEntry>(kvKey, {
@@ -32,7 +32,7 @@ export const cloudflareKVCache: CacheBackend = {
                 cacheTtl: 2 * 60,
             });
 
-            trace.setAttribute('hit', !!entry);
+            span.setAttribute('hit', !!entry);
 
             return entry;
         });

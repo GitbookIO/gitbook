@@ -21,10 +21,10 @@ export const cloudflareCache: CacheBackend = {
         if (!cache) {
             return null;
         }
-        return trace(`cloudflareCache.get(${key})`, async (trace) => {
+        return trace(`cloudflareCache.get(${key})`, async (span) => {
             const cacheKey = await serializeKey(key);
             const response = await cache.match(cacheKey);
-            trace.setAttribute('hit', !!response);
+            span.setAttribute('hit', !!response);
 
             options?.signal?.throwIfAborted();
             if (!response) {

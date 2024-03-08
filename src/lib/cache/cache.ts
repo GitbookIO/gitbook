@@ -76,7 +76,6 @@ export function cache<Args extends any[], Result>(
                         expiresAt:
                             Date.now() + (result.ttl ?? options.defaultTtl ?? 60 * 60 * 24) * 1000,
                         args,
-                        hits: 1,
                     },
                 };
 
