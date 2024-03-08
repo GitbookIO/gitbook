@@ -10,7 +10,9 @@
         "lint": "next lint",
         "format": "prettier ./ --ignore-unknown --write",
         "format:check": "prettier ./ --ignore-unknown --list-different",
-        "typecheck": "tsc --noEmit"
+        "typecheck": "tsc --noEmit",
+        "unit": "bun test {src,packages}/**/*.test.ts",
+        "e2e": "playwright test"
     },
     "workspaces": [
         "packages/*"
@@ -61,9 +63,10 @@
     },
     "devDependencies": {
         "@argos-ci/cli": "^1.0.4",
-        "@argos-ci/puppeteer": "^1.2.1",
+        "@argos-ci/playwright": "^1.9.3",
         "@cloudflare/next-on-pages": "^1.9.0",
         "@cloudflare/workers-types": "^4.20231218.0",
+        "@playwright/test": "^1.42.1",
         "@types/js-cookie": "^3.0.6",
         "@types/js-yaml": "^4.0.9",
         "@types/jsontoxml": "^1.0.5",
@@ -83,7 +86,6 @@
         "postcss": "^8",
         "prettier": "^3.0.3",
         "psi": "^4.1.0",
-        "puppeteer": "^21.6.1",
         "tailwindcss": "^3.4.0",
         "typescript": "^5"
     }

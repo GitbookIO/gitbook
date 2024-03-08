@@ -1,0 +1,35 @@
+name: 'Setup Playwright'
+description: 'Install Playwright and dependencies'
+runs:
+    using: 'composite'
+    steps:
+        # Run npm ci and get Playwright version
+        - name: 🏗 Prepare Playwright env
+          shell: bash
+          run: |
+              PLAYWRIGHT_VERSION=$(npm ls --json @playwright/test | jq --raw-output '.dependencies["@playwright/test"].version')
+              echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
+
+        # Cache browser binaries, cache key is based on Playwright version and OS
+        - name: 🧰 Cache Playwright browser binaries
+          uses: actions/cache@v3
+          id: playwright-cache
+          with:
+              path: '~/.cache/ms-playwright'
+              key: '${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}'
+              restore-keys: |
+                  ${{ runner.os }}-playwright-
+
+        # Install browser binaries & OS dependencies if cache missed
+        - name: 🏗 Install Playwright browser binaries & OS dependencies
+          if: steps.playwright-cache.outputs.cache-hit != 'true'
+          shell: bash
+          run: |
+              bun x playwright install --with-deps chromium
+
+        # Install only the OS dependencies if cache hit
+        - name: 🏗 Install Playwright OS dependencies
+          if: steps.playwright-cache.outputs.cache-hit == 'true'
+          shell: bash
+          run: |
+              bun x playwright install-deps

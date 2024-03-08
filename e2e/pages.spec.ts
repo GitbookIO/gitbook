@@ -1,18 +1,18 @@
-import fs from 'node:fs/promises';
-import rison from 'rison';
-import puppeteer, { Page } from 'puppeteer';
-import { argosScreenshot } from '@argos-ci/puppeteer';
-import { getContentTestURL, getTargetURL } from './utils';
+import { argosScreenshot } from '@argos-ci/playwright';
 import {
     CustomizationHeaderPreset,
     CustomizationLocale,
     CustomizationSettings,
 } from '@gitbook/api';
+import { test, Page } from '@playwright/test';
+import rison from 'rison';
+
+import { getContentTestURL } from '../tests/utils';
 
 interface Test {
     name: string;
     url: string;
-    wait?: (page: Page) => Promise<any>;
+    run?: (page: Page) => Promise<unknown>;
 }
 
 interface TestsCase {
@@ -44,12 +44,12 @@ const testCases: TestsCase[] = [
             {
                 name: 'Search Results',
                 url: '?q=gitbook',
-                wait: (page) => page.waitForSelector('[data-test="search-results"]'),
+                run: (page) => page.waitForSelector('[data-test="search-results"]'),
             },
             {
                 name: 'AI Search',
                 url: '?q=What+is+GitBook%3F&ask=true',
-                wait: (page) => page.waitForSelector('[data-test="search-ask-answer"]'),
+                run: (page) => page.waitForSelector('[data-test="search-ask-answer"]'),
             },
             {
                 name: 'Not found',
@@ -293,50 +293,23 @@ const testCases: TestsCase[] = [
     },
 ];
 
-console.log(`Starting visual testing with ${getTargetURL()}...`);
-
-const browser = await puppeteer.launch({
-    headless: 'new',
-});
-
 for (const testCase of testCases) {
-    for (const test of testCase.tests) {
-        const page = await browser.newPage();
-        const contentUrl = new URL(test.url, testCase.baseUrl);
-        const url = getContentTestURL(contentUrl.toString());
-        const start = Date.now();
-
-        console.log(`Testing ${testCase.name} - ${test.name} (${url})...`);
-
-        const screenshotName = `${testCase.name} - ${test.name}.png`;
-
-        try {
-            await page.goto(url, { waitUntil: test.wait ? 'load' : 'networkidle2' });
-
-            if (test.wait) {
-                await test.wait(page);
-            }
-        } catch (error) {
-            await fs.mkdir('screenshots/errors', {
-                recursive: true,
+    test.describe(testCase.name, () => {
+        for (const testEntry of testCase.tests) {
+            test(testEntry.name, async ({ page, baseURL }) => {
+                const contentUrl = new URL(testEntry.url, testCase.baseUrl);
+                const url = getContentTestURL(contentUrl.toString(), baseURL);
+                await page.goto(url);
+                if (testEntry.run) {
+                    await testEntry.run(page);
+                }
+                await argosScreenshot(page, `${testCase.name} - ${testEntry.name}`, {
+                    viewports: ['macbook-13', 'iphone-x', 'ipad-2'],
+                });
             });
-
-            await page.screenshot({ path: `screenshots/errors/${screenshotName}` });
-            console.log(`❌ Failed in ${((Date.now() - start) / 1000).toFixed(2)}s`);
-            throw error;
         }
-
-        await argosScreenshot(page, screenshotName, {
-            viewports: ['macbook-13', 'iphone-x', 'ipad-2'],
-        });
-        console.log(`✅ Done in ${((Date.now() - start) / 1000).toFixed(2)}s`);
-        console.log('');
-        await page.close();
-    }
+    });
 }
-await browser.close();
-
-console.log('All done!');
 
 /**
  * Create a URL with customization settings.

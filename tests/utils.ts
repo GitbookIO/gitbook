@@ -11,11 +11,16 @@ export function getTargetURL() {
     return targetUrl;
 }
 
+export function getContentPathName(input: string): string {
+    const contentUrl = new URL(input);
+    return `${contentUrl.host}${contentUrl.pathname}`;
+}
+
 /**
  * Get the URL to load for a content
  */
-export function getContentTestURL(input: string): string {
-    const url = new URL(getTargetURL());
+export function getContentTestURL(input: string, baseUrl: string = getTargetURL()): string {
+    const url = new URL(baseUrl);
     const contentUrl = new URL(input);
 
     url.pathname = `${contentUrl.host}${contentUrl.pathname}`;

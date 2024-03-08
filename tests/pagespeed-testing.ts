@@ -1,4 +1,5 @@
 import psi from 'psi';
+
 import { getContentTestURL, getTargetURL } from './utils';
 
 interface Test {

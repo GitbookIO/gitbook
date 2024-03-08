@@ -4,7 +4,7 @@ Next.js application to render GitBook published content.
 
 ## Development
 
-#### Start the local server
+### Start the local server
 
 Clone the repository and use [Bun](https://bun.sh/) to install dependencies and run the local development server.
 
@@ -20,12 +20,15 @@ bun dev
 
 Then open the space in your web browser, using `http://localhost:3000/<host>/<path>` (example: `http://localhost:3000/docs.gitbook.com`).
 
-#### Other development commands
+### Other development commands
 
 -   `bun format`: format the code
 -   `bun lint`: lint the code
 
-#### CI and testing
+### Testing and CI
+
+-   Run unit tests with `bun unit`.
+-   Run E2E tests with `bun e2e` (be sure to have your dev server running locally).
 
 All pull-requests will be tested against both visual and performances testing to prevent regressions.
 
