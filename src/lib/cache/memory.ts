@@ -7,7 +7,7 @@ const cacheMaxAge = process.env.NODE_ENV === 'development' ? Infinity : 5 * 60;
 
 export const memoryCache: CacheBackend = {
     name: 'memory',
-    fallback: true,
+    replication: 'local',
     async get(key) {
         const memoryCache = getMemoryCache();
         const memoryEntry = memoryCache.get(key);

@@ -8,11 +8,8 @@ import { CacheResult } from './cache';
 export const noCacheFetchOptions: Partial<RequestInit> = {
     // Cloudflare doesn't support the `cache` directive before next-on-pages patches the fetch function
     // https://github.com/cloudflare/workerd/issues/698
-    // cache: 'no-store',
     next: {
         revalidate: 0,
-        // @ts-ignore - experiment to bypass potential I/O sharing in Next
-        internal: true,
     },
 };
 
@@ -28,12 +25,10 @@ export function parseCacheResponse(response: Response): {
 
     const cacheControlHeader = response.headers.get('cache-control');
     const cacheControl = cacheControlHeader ? parseCacheControl(cacheControlHeader) : null;
-    const cacheTagHeader =
-        response.headers.get('x-gitbook-cache-tag') ?? response.headers.get('cache-tag');
 
     const entry = {
         ttl: 60 * 60 * 24,
-        tags: cacheTagHeader ? cacheTagHeader.split(',').map((tag) => tag.trim()) : [],
+        tags: [],
     };
 
     if (cacheControl && cacheControl['max-age']) {

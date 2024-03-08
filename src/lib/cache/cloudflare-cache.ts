@@ -3,6 +3,8 @@ import { Buffer } from 'node:buffer';
 import type { CacheStorage, Cache, Response as WorkerResponse } from '@cloudflare/workers-types';
 
 import { CacheBackend, CacheEntry } from './types';
+import { getCacheMaxAge } from './utils';
+import { trace } from '../tracing';
 
 const cacheVersion = 1;
 const cacheMaxAge = 2 * 60;
@@ -13,28 +15,33 @@ const cacheMaxAge = 2 * 60;
  */
 export const cloudflareCache: CacheBackend = {
     name: 'cloudflare',
-    fallback: true,
+    replication: 'local',
     async get(key, options) {
         const cache = getCache();
         if (!cache) {
             return null;
         }
+        return trace(`cloudflareCache.get(${key})`, async (trace) => {
+            const cacheKey = await serializeKey(key);
+            const response = await cache.match(cacheKey);
+            trace.setAttribute('hit', !!response);
 
-        const cacheKey = await serializeKey(key);
-        const response = await cache.match(cacheKey);
-        options?.signal?.throwIfAborted();
-        if (!response) {
-            return null;
-        }
+            options?.signal?.throwIfAborted();
+            if (!response) {
+                return null;
+            }
 
-        const entry = await deserializeEntry(response);
-        return entry;
+            const entry = await deserializeEntry(response);
+            return entry;
+        });
     },
     async set(key, entry) {
         const cache = getCache();
         if (cache) {
-            const cacheKey = await serializeKey(key);
-            await cache.put(cacheKey, serializeEntry(entry));
+            await trace(`cloudflareCache.set(${key})`, async () => {
+                const cacheKey = await serializeKey(key);
+                await cache.put(cacheKey, serializeEntry(entry));
+            });
         }
     },
     async del(keys) {
@@ -84,10 +91,7 @@ function serializeEntry(entry: CacheEntry): WorkerResponse {
     const cacheTags = ['gitbook-open', ...entry.meta.tags];
 
     // Limit the cloudflare cache to a low fix duration
-    headers.set(
-        'Cache-Control',
-        `public, max-age=${Math.min((entry.meta.expiresAt - Date.now()) / 1000, cacheMaxAge)}`,
-    );
+    headers.set('Cache-Control', `public, max-age=${getCacheMaxAge(entry.meta, 10, cacheMaxAge)}`);
     headers.set('Cache-Tag', cacheTags.join(','));
 
     // @ts-ignore

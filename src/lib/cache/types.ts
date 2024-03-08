@@ -34,9 +34,11 @@ export interface CacheBackend {
     name: string;
 
     /**
-     * If true, we'll set entries in this cache that have been found in another cache.
+     * Define the type of cache and how replication should be managed between them.
+     * Value read from local cache will not be replicated to global cache.
+     * Value read from global cache will be replicated to local cache.
      */
-    fallback?: boolean;
+    replication: 'local' | 'global';
 
     /**
      * Get a value from the cache.

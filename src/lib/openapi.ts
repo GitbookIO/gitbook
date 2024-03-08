@@ -7,7 +7,7 @@ import {
 import yaml from 'js-yaml';
 import swagger2openapi, { ConvertOutputOptions } from 'swagger2openapi';
 
-import { cache, parseCacheResponse, noCacheFetchOptions } from '@/lib/cache';
+import { cache, parseCacheResponse, noCacheFetchOptions, CacheFunctionOptions } from '@/lib/cache';
 
 import { parseMarkdown } from './markdown';
 import { ResolvedContentRef } from './references';
@@ -38,9 +38,10 @@ export async function fetchOpenAPIBlock(
 }
 
 const fetcher: OpenAPIFetcher = {
-    fetch: cache('openapi.fetch', async (url: string) => {
+    fetch: cache('openapi.fetch', async (url: string, options: CacheFunctionOptions) => {
         const response = await fetch(url, {
             ...noCacheFetchOptions,
+            signal: options.signal,
         });
 
         let data: unknown = null;

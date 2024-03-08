@@ -1,6 +1,8 @@
 import { Redis } from '@upstash/redis/cloudflare';
 
 import { CacheBackend, CacheEntry, CacheEntryMeta } from './types';
+import { getCacheMaxAge } from './utils';
+import { trace } from '../tracing';
 import { filterOutNullable } from '../typescript';
 import { waitUntil } from '../waitUntil';
 
@@ -9,25 +11,30 @@ const cacheVersion = 1;
 
 export const redisCache: CacheBackend = {
     name: 'redis',
+    replication: 'global',
     async get(key, options) {
         const redis = getRedis(options?.signal);
         if (!redis) {
             return null;
         }
+        return trace(`redis.get(${key})`, async (trace) => {
+            const redisKey = getRedisKey(key);
+            const redisEntry = await redis.json.get(redisKey);
 
-        const redisKey = getRedisKey(key);
-        const redisEntry = await redis.json.get(redisKey);
-        if (!redisEntry) {
-            return null;
-        }
+            trace.setAttribute('hit', !!redisEntry);
 
-        await waitUntil(
-            redis.json.numincrby(redisKey, '$.meta.hits', 1).catch((error) => {
-                // Ignore errors
-            }),
-        );
+            if (!redisEntry) {
+                return null;
+            }
 
-        return redisEntry as CacheEntry;
+            await waitUntil(
+                redis.json.numincrby(redisKey, '$.meta.hits', 1).catch((error) => {
+                    // Ignore errors
+                }),
+            );
+
+            return redisEntry as CacheEntry;
+        });
     },
 
     async set(key, entry) {
@@ -36,26 +43,33 @@ export const redisCache: CacheBackend = {
             return;
         }
 
-        const multi = redis.multi();
+        return trace(`redis.set(${key})`, async (trace) => {
+            const multi = redis.multi();
 
-        const redisKey = getRedisKey(key);
-        const expire = Math.max(0, (entry.meta.expiresAt - Date.now()) / 1000);
+            const redisKey = getRedisKey(key);
+            const expire = getCacheMaxAge(entry.meta);
 
-        entry.meta.tags.forEach((tag) => {
-            const redisTagKey = getCacheTagKey(tag);
+            // Don't cache for less than 1min, as it's not worth it
+            if (expire <= 10 * 60) {
+                return;
+            }
 
-            multi.sadd(redisTagKey, redisKey);
+            entry.meta.tags.forEach((tag) => {
+                const redisTagKey = getCacheTagKey(tag);
 
-            // Set am expiration on the tag to be the maximum of the expiration of all keys
-            multi.expire(redisTagKey, expire, 'GT');
-            multi.expire(redisTagKey, expire, 'NX');
+                multi.sadd(redisTagKey, redisKey);
+
+                // Set am expiration on the tag to be the maximum of the expiration of all keys
+                multi.expire(redisTagKey, expire, 'GT');
+                multi.expire(redisTagKey, expire, 'NX');
+            });
+
+            // @ts-ignore
+            multi.json.set(redisKey, '$', entry);
+            multi.expire(redisKey, expire);
+
+            await multi.exec();
         });
-
-        // @ts-ignore
-        multi.json.set(redisKey, '$', entry);
-        multi.expire(redisKey, expire);
-
-        await multi.exec();
     },
 
     async del(keys) {
