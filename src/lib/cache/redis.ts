@@ -1,6 +1,6 @@
 import { Redis } from '@upstash/redis/cloudflare';
 
-import { CacheBackend, CacheEntryMeta } from './types';
+import { CacheBackend, CacheEntry, CacheEntryMeta } from './types';
 import { getCacheMaxAge } from './utils';
 import { trace } from '../tracing';
 import { filterOutNullable } from '../typescript';
@@ -18,7 +18,7 @@ export const redisCache: CacheBackend = {
         }
         return trace(`redis.get(${key})`, async (span) => {
             const valueKey = getCacheEntryKey(key, 'value');
-            const redisEntry = await redis.get<string>(valueKey);
+            const redisEntry = await redis.get<CacheEntry>(valueKey);
 
             span.setAttribute('hit', !!redisEntry);
 
@@ -26,7 +26,7 @@ export const redisCache: CacheBackend = {
                 return null;
             }
 
-            return JSON.parse(redisEntry);
+            return redisEntry;
         });
     },
 
@@ -58,8 +58,8 @@ export const redisCache: CacheBackend = {
                 multi.expire(redisTagKey, expire, 'NX');
             });
 
-            multi.set(valueKey, JSON.stringify(entry));
-            multi.set(metaKey, JSON.stringify(entry.meta));
+            multi.set(valueKey, entry);
+            multi.set(metaKey, entry.meta);
             multi.expire(valueKey, expire);
             multi.expire(metaKey, expire);
 
@@ -99,7 +99,7 @@ export const redisCache: CacheBackend = {
             // Read the meta
             if (!purge) {
                 metas = (
-                    await redis.mget<Array<string | null>>(
+                    await redis.mget<Array<CacheEntryMeta | null>>(
                         // Hard limit to avoid fetching a massive list of data
                         // Starts with the smallest keys.
                         Array.from(keys)
@@ -109,12 +109,6 @@ export const redisCache: CacheBackend = {
                     )
                 )
                     .flat()
-                    .map((rawMeta) => {
-                        if (!rawMeta) {
-                            return null;
-                        }
-                        return JSON.parse(rawMeta);
-                    })
                     .filter(filterOutNullable);
             }
 
@@ -143,6 +137,7 @@ export function getRedis(signal?: AbortSignal) {
               url: process.env.UPSTASH_REDIS_REST_URL,
               token: process.env.UPSTASH_REDIS_REST_TOKEN,
               signal,
+              automaticDeserialization: true,
           })
         : null;
 }

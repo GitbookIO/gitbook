@@ -132,6 +132,8 @@ export async function race<I, R>(
                         resolveWith(fallbackResult);
                     },
                     (error) => {
+                        logIgnoredError('blockFallback failed with', error);
+
                         if (pending === 0 && fallbackOnNull) {
                             rejectWith(error);
                         } else {
@@ -156,7 +158,7 @@ export async function race<I, R>(
             blockTimeoutId = setTimeout(runFallback, blockTimeout);
         }
 
-        inputs.forEach((input) => {
+        inputs.forEach((input, inputIndex) => {
             waitUntil(
                 execute(input, { signal: abort.signal })
                     .then(
@@ -173,6 +175,7 @@ export async function race<I, R>(
                         },
                         (error) => {
                             // Ignore errors
+                            logIgnoredError(`input ${inputIndex} failed with`, error);
                         },
                     )
                     .finally(() => {
@@ -194,6 +197,18 @@ export async function race<I, R>(
     signal?.throwIfAborted();
 
     return result;
+}
+
+/**
+ * Log and ignore an error.
+ * It skips the error if it's an AbortError.
+ */
+function logIgnoredError(message: string, error: Error) {
+    if (error.name === 'AbortError') {
+        return;
+    }
+
+    console.error(message, error);
 }
 
 const UndefinedSymbol = Symbol('Undefined');
