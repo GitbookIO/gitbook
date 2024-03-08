@@ -41,7 +41,7 @@ export function cache<Args extends any[], Result>(
     cacheName: string,
     fn: (...args: Args) => Promise<CacheResult<Result>>,
     options: {
-        /** Filter the arguments that should be taken into consideration for cachine */
+        /** Filter the arguments that should be taken into consideration for caching */
         extractArgs?: (args: Args) => any[];
 
         /** Default ttl (in seconds) */

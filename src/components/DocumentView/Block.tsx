@@ -12,6 +12,7 @@ import {
 import { ClassValue } from '@/lib/tailwind';
 
 import { BlockContentRef } from './BlockContentRef';
+import { BlockSyncedBlock } from './BlockSyncedBlock';
 import { CodeBlock } from './CodeBlock';
 import { Divider } from './Divider';
 import { DocumentContextProps } from './DocumentView';
@@ -94,6 +95,8 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
                 throw new Error('Blocks should be directly rendered by parent');
             case 'integration':
                 return <IntegrationBlock {...props} {...contextProps} block={block} />;
+            case 'synced-block':
+                return <BlockSyncedBlock {...props} {...contextProps} block={block} />;
             default:
                 assertNever(block);
         }
@@ -125,6 +128,7 @@ function BlockPlaceholder(props: { block: DocumentBlock; style: ClassValue }) {
         case 'code':
         case 'hint':
         case 'tabs':
+        case 'synced-block':
             return <SkeletonParagraph style={style} />;
         case 'expandable':
         case 'table':

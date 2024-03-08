@@ -2,6 +2,7 @@ import 'server-only';
 import { AsyncLocalStorage } from 'node:async_hooks';
 
 import {
+    ContentRefSyncedBlock,
     ContentVisibility,
     CustomizationSettings,
     GitBookAPI,
@@ -26,6 +27,19 @@ export interface ContentPointer {
 
 const apiSyncStorage = new AsyncLocalStorage<GitBookAPI>();
 
+export function apiWithToken(apiToken: string): GitBookAPI {
+    const headersList = headers();
+    const apiEndpoint = headersList.get('x-gitbook-api') ?? undefined;
+
+    const gitbook = new GitBookAPI({
+        authToken: apiToken,
+        endpoint: apiEndpoint,
+        userAgent: userAgent(),
+    });
+
+    return gitbook;
+}
+
 /**
  * Create an API client for the current request.
  */
@@ -36,7 +50,6 @@ export function api(): GitBookAPI {
     }
 
     const headersList = headers();
-    const apiEndpoint = headersList.get('x-gitbook-api') ?? undefined;
     const apiToken = headersList.get('x-gitbook-token');
 
     if (!apiToken) {
@@ -45,13 +58,7 @@ export function api(): GitBookAPI {
         );
     }
 
-    const gitbook = new GitBookAPI({
-        authToken: apiToken,
-        endpoint: apiEndpoint,
-        userAgent: userAgent(),
-    });
-
-    return gitbook;
+    return apiWithToken(apiToken);
 }
 
 /**
@@ -96,6 +103,39 @@ export const getUserById = cache('api.getUserById', async (userId: string) => {
     }
 });
 
+/**
+ * Get a synced block by its ref.
+ */
+export const getSyncedBlock = cache(
+    'api.getSyncedBlock',
+    async (apiToken: string, organizationId: string, syncedBlockId: string) => {
+        try {
+            const response = await apiWithToken(apiToken).orgs.getSyncedBlock(
+                organizationId,
+                syncedBlockId,
+                {
+                    ...noCacheFetchOptions,
+                },
+            );
+            return cacheResponse(response, {
+                tags: [],
+            });
+        } catch (error) {
+            if ((error as GitBookAPIError).code === 404) {
+                return {
+                    data: null,
+                    tags: [],
+                };
+            }
+
+            throw error;
+        }
+    },
+    {
+        // We don't cache apiToken as it's not a stable key
+        extractArgs: (args) => [args[1], args[2]],
+    },
+);
 /**
  * Resolve a URL to the content to render.
  */

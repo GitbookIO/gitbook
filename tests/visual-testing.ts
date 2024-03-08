@@ -43,7 +43,7 @@ const testCases: TestsCase[] = [
             },
             {
                 name: 'Search Results',
-                url: '?q=gitsync',
+                url: '?q=gitbook',
                 wait: (page) => page.waitForSelector('[data-test="search-results"]'),
             },
             {

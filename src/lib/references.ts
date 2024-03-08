@@ -153,6 +153,10 @@ export async function resolveContentRef(
             };
         }
 
+        case 'synced-block': {
+            return null;
+        }
+
         default:
             assertNever(contentRef);
     }
