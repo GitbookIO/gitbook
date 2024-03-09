@@ -11,6 +11,7 @@ export const memoryCache: CacheBackend = {
     async get(key) {
         const memoryCache = getMemoryCache();
         const memoryEntry = memoryCache.get(key);
+
         if (!memoryEntry) {
             return null;
         }

@@ -21,27 +21,39 @@ export const cloudflareCache: CacheBackend = {
         if (!cache) {
             return null;
         }
-        return trace(`cloudflareCache.get(${key})`, async (span) => {
-            const cacheKey = await serializeKey(key);
-            const response = await cache.match(cacheKey);
-            span.setAttribute('hit', !!response);
+        return trace(
+            {
+                operation: `cloudflareCache.get`,
+                name: key,
+            },
+            async (span) => {
+                const cacheKey = await serializeKey(key);
+                const response = await cache.match(cacheKey);
+                span.setAttribute('hit', !!response);
 
-            options?.signal?.throwIfAborted();
-            if (!response) {
-                return null;
-            }
+                options?.signal?.throwIfAborted();
+                if (!response) {
+                    return null;
+                }
 
-            const entry = await deserializeEntry(response);
-            return entry;
-        });
+                const entry = await deserializeEntry(response);
+                return entry;
+            },
+        );
     },
     async set(key, entry) {
         const cache = getCache();
         if (cache) {
-            await trace(`cloudflareCache.set(${key})`, async () => {
-                const cacheKey = await serializeKey(key);
-                await cache.put(cacheKey, serializeEntry(entry));
-            });
+            await trace(
+                {
+                    operation: `cloudflareCache.set`,
+                    name: key,
+                },
+                async () => {
+                    const cacheKey = await serializeKey(key);
+                    await cache.put(cacheKey, serializeEntry(entry));
+                },
+            );
         }
     },
     async del(keys) {

@@ -16,18 +16,24 @@ export const redisCache: CacheBackend = {
         if (!redis) {
             return null;
         }
-        return trace(`redis.get(${key})`, async (span) => {
-            const valueKey = getCacheEntryKey(key, 'value');
-            const redisEntry = await redis.get<CacheEntry>(valueKey);
+        return trace(
+            {
+                operation: `redis.get`,
+                name: key,
+            },
+            async (span) => {
+                const valueKey = getCacheEntryKey(key, 'value');
+                const redisEntry = await redis.get<CacheEntry>(valueKey);
 
-            span.setAttribute('hit', !!redisEntry);
+                span.setAttribute('hit', !!redisEntry);
 
-            if (!redisEntry) {
-                return null;
-            }
+                if (!redisEntry) {
+                    return null;
+                }
 
-            return redisEntry;
-        });
+                return redisEntry;
+            },
+        );
     },
 
     async set(key, entry) {
@@ -36,35 +42,41 @@ export const redisCache: CacheBackend = {
             return;
         }
 
-        return trace(`redis.set(${key})`, async () => {
-            const expire = getCacheMaxAge(entry.meta);
+        return trace(
+            {
+                operation: `redis.set`,
+                name: key,
+            },
+            async () => {
+                const expire = getCacheMaxAge(entry.meta);
 
-            // Don't cache for less than 10min, as it's not worth it
-            if (expire <= 10 * 60) {
-                return;
-            }
+                // Don't cache for less than 10min, as it's not worth it
+                if (expire <= 10 * 60) {
+                    return;
+                }
 
-            const multi = redis.multi();
-            const valueKey = getCacheEntryKey(key, 'value');
-            const metaKey = getCacheEntryKey(key, 'meta');
+                const multi = redis.multi();
+                const valueKey = getCacheEntryKey(key, 'value');
+                const metaKey = getCacheEntryKey(key, 'meta');
 
-            entry.meta.tags.forEach((tag) => {
-                const redisTagKey = getCacheTagKey(tag);
+                entry.meta.tags.forEach((tag) => {
+                    const redisTagKey = getCacheTagKey(tag);
 
-                multi.sadd(redisTagKey, key);
+                    multi.sadd(redisTagKey, key);
 
-                // Set am expiration on the tag to be the maximum of the expiration of all keys
-                multi.expire(redisTagKey, expire, 'GT');
-                multi.expire(redisTagKey, expire, 'NX');
-            });
+                    // Set am expiration on the tag to be the maximum of the expiration of all keys
+                    multi.expire(redisTagKey, expire, 'GT');
+                    multi.expire(redisTagKey, expire, 'NX');
+                });
 
-            multi.set(valueKey, entry);
-            multi.set(metaKey, entry.meta);
-            multi.expire(valueKey, expire);
-            multi.expire(metaKey, expire);
+                multi.set(valueKey, entry);
+                multi.set(metaKey, entry.meta);
+                multi.expire(valueKey, expire);
+                multi.expire(metaKey, expire);
 
-            await multi.exec();
-        });
+                await multi.exec();
+            },
+        );
     },
 
     async del(keys) {

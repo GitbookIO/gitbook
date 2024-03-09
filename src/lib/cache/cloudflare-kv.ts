@@ -24,18 +24,24 @@ export const cloudflareKVCache: CacheBackend = {
             return null;
         }
 
-        return trace(`cloudflareKV.get(${key})`, async (span) => {
-            const kvKey = getValueKey(key);
+        return trace(
+            {
+                operation: `cloudflareKV.get`,
+                name: key,
+            },
+            async (span) => {
+                const kvKey = getValueKey(key);
 
-            const entry = await kv.get<CacheEntry>(kvKey, {
-                type: 'json',
-                cacheTtl: 2 * 60,
-            });
+                const entry = await kv.get<CacheEntry>(kvKey, {
+                    type: 'json',
+                    cacheTtl: 2 * 60,
+                });
 
-            span.setAttribute('hit', !!entry);
+                span.setAttribute('hit', !!entry);
 
-            return entry;
-        });
+                return entry;
+            },
+        );
     },
     async set(key, entry) {
         const kv = await getKVNamespace();
@@ -43,39 +49,45 @@ export const cloudflareKVCache: CacheBackend = {
             return;
         }
 
-        return trace(`cloudflareKV.set(${key})`, async () => {
-            const secondsFromNow = getCacheMaxAge(entry.meta, 0, 60 * 60 * 24);
+        return trace(
+            {
+                operation: `cloudflareKV.set`,
+                name: key,
+            },
+            async () => {
+                const secondsFromNow = getCacheMaxAge(entry.meta, 0, 60 * 60 * 24);
 
-            if (secondsFromNow < 60 * 60) {
-                // We don't cache entries that expire in less than an hour because it takes time for KV to propagate changes.
-                return;
-            }
+                if (secondsFromNow < 60 * 60) {
+                    // We don't cache entries that expire in less than an hour because it takes time for KV to propagate changes.
+                    return;
+                }
 
-            const kvKey = getValueKey(key);
-            await kv.put(kvKey, JSON.stringify(entry), {
-                expirationTtl: secondsFromNow,
-            });
+                const kvKey = getValueKey(key);
+                await kv.put(kvKey, JSON.stringify(entry), {
+                    expirationTtl: secondsFromNow,
+                });
 
-            if (entry.meta.tags.length > 0) {
-                const metadata: KVTagMetadata = {
-                    key: key,
-                    meta: entry.meta,
-                };
-                const jsonMetadata = JSON.stringify(metadata);
+                if (entry.meta.tags.length > 0) {
+                    const metadata: KVTagMetadata = {
+                        key: key,
+                        meta: entry.meta,
+                    };
+                    const jsonMetadata = JSON.stringify(metadata);
 
-                // Write a key for each tag
-                await Promise.all(
-                    entry.meta.tags.map(async (tag) => {
-                        const tagKey = getTagKey(tag, key);
+                    // Write a key for each tag
+                    await Promise.all(
+                        entry.meta.tags.map(async (tag) => {
+                            const tagKey = getTagKey(tag, key);
 
-                        await kv.put(tagKey, jsonMetadata, {
-                            metadata,
-                            expirationTtl: secondsFromNow,
-                        });
-                    }),
-                );
-            }
-        });
+                            await kv.put(tagKey, jsonMetadata, {
+                                metadata,
+                                expirationTtl: secondsFromNow,
+                            });
+                        }),
+                    );
+                }
+            },
+        );
     },
     async del(keys) {
         const kv = await getKVNamespace();

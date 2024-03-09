@@ -1,9 +1,9 @@
-import * as Sentry from '@sentry/nextjs';
 import hash from 'object-hash';
 
 import { cacheBackends } from './backends';
 import { CacheEntry } from './types';
 import { race } from '../async';
+import { TraceSpan, trace } from '../tracing';
 import { getGlobalContext, waitUntil } from '../waitUntil';
 
 export type CacheFunctionOptions = {
@@ -55,15 +55,12 @@ export function cache<Args extends any[], Result>(
     } = {},
 ): CacheFunction<Args, Result> {
     const revalidate = async (signal: AbortSignal | undefined, key: string, ...args: Args) => {
-        return await Sentry.startSpan(
+        return await trace(
             {
-                name: `cache.revalidate(${key})`,
-                op: 'cache.revalidate',
-                attributes: {
-                    cacheKey: key,
-                },
+                name: key,
+                operation: `cache.revalidate`,
             },
-            async (trace) => {
+            async (span) => {
                 // Fetch upstream
                 const result = await fn(...args, { signal });
                 signal?.throwIfAborted();
@@ -79,7 +76,7 @@ export function cache<Args extends any[], Result>(
                     },
                 };
 
-                trace?.setAttribute('cacheTtl', result.ttl ?? 0);
+                span.setAttribute('cacheTtl', result.ttl ?? 0);
 
                 // Write it to the cache
                 if (result.ttl && result.ttl > 0) {
@@ -91,100 +88,95 @@ export function cache<Args extends any[], Result>(
         );
     };
 
-    const fetchValue = async (signal: AbortSignal | undefined, key: string, ...args: Args) => {
-        return await Sentry.startSpan(
-            {
-                name: `cache.fetch(${key})`,
-                op: 'cache.fetch',
-                attributes: {
-                    cacheKey: key,
+    const fetchValue = async (
+        signal: AbortSignal | undefined,
+        span: TraceSpan,
+        key: string,
+        ...args: Args
+    ) => {
+        const timeStart = now();
+        let readCacheDuration = 0;
+        let fetchDuration = 0;
+
+        let result: readonly [CacheEntry, string] | null = null;
+
+        // Try the memory backend, independently of the other backends as it doesn't have a network cost
+        const memoryEntry = await cacheBackends
+            .find((backend) => backend.name === 'memory')
+            ?.get(key);
+        if (memoryEntry) {
+            span.setAttribute('memory', true);
+            result = [memoryEntry, 'memory'] as const;
+        } else {
+            result = await race(
+                cacheBackends,
+                async (backend, { signal }) => {
+                    const entry = await backend.get(key, { signal });
+                    return entry ? ([entry, backend.name] as const) : null;
                 },
-            },
-            async (trace) => {
-                const timeStart = now();
-                let readCacheDuration = 0;
-                let fetchDuration = 0;
+                {
+                    signal,
 
-                let result: readonly [CacheEntry, string] | null = null;
+                    // We stop everything after 10s to avoid pending requests
+                    timeout: 10 * 1000,
 
-                // Try the memory backend, independently of the other backends as it doesn't have a network cost
-                const memoryEntry = await cacheBackends
-                    .find((backend) => backend.name === 'memory')
-                    ?.get(key);
-                if (memoryEntry) {
-                    result = [memoryEntry, 'memory'] as const;
-                } else {
-                    result = await race(
-                        cacheBackends,
-                        async (backend, { signal }) => {
-                            const entry = await backend.get(key, { signal });
-                            return entry ? ([entry, backend.name] as const) : null;
-                        },
-                        {
-                            signal,
+                    // We give 70ms to the caches to respond, otherwise we start fallbacking to the actual fetch
+                    // It should represents a bit more than the 90th percentile of the KV cache response time
+                    blockTimeout: 70,
 
-                            // We stop everything after 10s to avoid pending requests
-                            timeout: 10 * 1000,
+                    blockFallback: async (fallbackOps) => {
+                        const timeFetch = now();
+                        const upstream = await revalidate(fallbackOps.signal, key, ...args);
 
-                            // We give 70ms to the caches to respond, otherwise we start fallbacking to the actual fetch
-                            // It should represents a bit more than the 90th percentile of the KV cache response time
-                            blockTimeout: 70,
+                        readCacheDuration = timeFetch - timeStart;
+                        fetchDuration = now() - timeFetch;
+                        return [upstream, 'fetch'] as const;
+                    },
 
-                            blockFallback: async (fallbackOps) => {
-                                const timeFetch = now();
-                                const upstream = await revalidate(fallbackOps.signal, key, ...args);
+                    // If no entry is found in the cache backends, we fallback to the fetch
+                    fallbackOnNull: true,
+                },
+            );
+        }
 
-                                readCacheDuration = timeFetch - timeStart;
-                                fetchDuration = now() - timeFetch;
-                                return [upstream, 'fetch'] as const;
-                            },
+        if (!readCacheDuration) {
+            readCacheDuration = now() - timeStart;
+        }
 
-                            // If no entry is found in the cache backends, we fallback to the fetch
-                            fallbackOnNull: true,
-                        },
-                    );
-                }
+        if (!result) {
+            throw new Error(`Failed to fetch the value "${key}", timeout exceeded`);
+        }
 
-                if (!readCacheDuration) {
-                    readCacheDuration = now() - timeStart;
-                }
+        const [savedEntry, backendName] = result;
+        span.setAttribute('cacheBackend', backendName);
 
-                if (!result) {
-                    throw new Error(`Failed to fetch the value "${key}", timeout exceeded`);
-                }
+        const cacheStatus: 'miss' | 'hit' = backendName === 'fetch' ? 'miss' : 'hit';
+        span.setAttribute('cacheStatus', cacheStatus);
 
-                const [savedEntry, backendName] = result;
-                trace?.setAttribute('cacheBackend', backendName);
+        // Replicate to other backends if needed
+        const fromBackend = cacheBackends.find((backend) => backend.name === backendName);
+        if (cacheStatus === 'miss' || fromBackend?.replication !== 'local') {
+            await waitUntil(
+                Promise.all(
+                    cacheBackends
+                        .filter((backend) => backend.name !== backendName)
+                        .map((backend) => backend.set(key, savedEntry)),
+                ),
+            );
+        }
 
-                const cacheStatus: 'miss' | 'hit' = backendName === 'fetch' ? 'miss' : 'hit';
-                trace?.setAttribute('cacheStatus', cacheStatus);
+        const totalDuration = now() - timeStart;
 
-                // Replicate to other backends if needed
-                const fromBackend = cacheBackends.find((backend) => backend.name === backendName);
-                if (cacheStatus === 'miss' || fromBackend?.replication !== 'local') {
-                    await waitUntil(
-                        Promise.all(
-                            cacheBackends
-                                .filter((backend) => backend.name !== backendName)
-                                .map((backend) => backend.set(key, savedEntry)),
-                        ),
-                    );
-                }
-
-                const totalDuration = now() - timeStart;
-
-                // Log
-                console.log(
-                    `cache: ${key} ${cacheStatus}${
-                        cacheStatus === 'hit' ? ` on ${backendName}` : ''
-                    } in total ${totalDuration.toFixed(0)}ms, fetch in ${fetchDuration.toFixed(
-                        0,
-                    )}ms, read in ${readCacheDuration.toFixed(0)}ms`,
-                );
-
-                return savedEntry.data;
-            },
+        // Log
+        console.log(
+            `cache: ${key} ${cacheStatus}${
+                cacheStatus === 'hit' ? ` on ${backendName}` : ''
+            } in total ${totalDuration.toFixed(0)}ms, fetch in ${fetchDuration.toFixed(
+                0,
+            )}ms, read in ${readCacheDuration.toFixed(0)}ms`,
         );
+
+        return savedEntry.data;
     };
 
     // During development, for now it fetches data twice between the middleware and the handler.
@@ -203,33 +195,26 @@ export function cache<Args extends any[], Result>(
         const cacheArgs = options.extractArgs ? options.extractArgs(args) : args;
         const key = getCacheKey(cacheName, cacheArgs);
 
-        return await Sentry.startSpan(
+        return await trace(
             {
-                name: `cache.get(${key})`,
-                op: 'cache.get',
-                attributes: {
-                    cacheKey: key,
-                    functionArgs: JSON.stringify(cacheArgs),
-                },
+                name: key,
+                operation: `cache.get`,
             },
-            async (trace) => {
+            async (span) => {
                 const context = await getGlobalContext();
                 signal?.throwIfAborted();
 
                 const pendings = contextPendings.get(context) ?? new Map<string, Promise<any>>();
                 contextPendings.set(context, pendings);
 
-                // @ts-ignore
-                trace?.setAttribute('cacheContextTlsClientRandom', context.tlsClientRandom);
-
                 // If a pending request exists, wait for it
                 if (pendings.has(key)) {
-                    trace?.setAttribute('cacheStatus', 'pending');
+                    span.setAttribute('cacheStatus', 'pending');
                     return await pendings.get(key);
                 }
 
                 // Otherwise, fetch the value
-                const promise = fetchValue(signal, key, ...args);
+                const promise = fetchValue(signal, span, key, ...args);
                 pendings.set(key, promise);
 
                 // Remove the pending request once it's done
@@ -280,13 +265,10 @@ export function getCacheKey(fnName: string, args: any[]) {
 }
 
 async function setCacheEntry(key: string, entry: CacheEntry) {
-    return await Sentry.startSpan(
+    return await trace(
         {
-            name: `cache.setCacheEntry(${key})`,
-            op: 'cache.setCacheEntry',
-            attributes: {
-                cacheKey: key,
-            },
+            operation: `cache.setCacheEntry`,
+            name: key,
         },
         async () => {
             await Promise.all(cacheBackends.map((backend) => backend.set(key, entry)));
