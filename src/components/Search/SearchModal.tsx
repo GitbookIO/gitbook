@@ -18,11 +18,15 @@ import { LoadingPane } from '../primitives/LoadingPane';
 
 interface SearchModalProps {
     spaceId: string;
+    revisionId: string;
     spaceTitle: string;
     collectionId: string | null;
     withAsk: boolean;
 }
 
+/**
+ * Client component to render the search modal when the url contains a search query.
+ */
 export function SearchModal(props: SearchModalProps) {
     const [state, setSearchState] = useSearch();
     const askState = useRecoilValue(searchAskState);
@@ -133,7 +137,16 @@ function SearchModalBody(
         onClose: (to?: string) => void;
     },
 ) {
-    const { spaceId, spaceTitle, withAsk, collectionId, state, onChangeQuery, onClose } = props;
+    const {
+        spaceId,
+        revisionId,
+        spaceTitle,
+        withAsk,
+        collectionId,
+        state,
+        onChangeQuery,
+        onClose,
+    } = props;
 
     const language = useLanguage();
     const resultsRef = React.useRef<SearchResultsRef>(null);
@@ -232,6 +245,7 @@ function SearchModalBody(
                     <SearchResults
                         ref={resultsRef}
                         spaceId={spaceId}
+                        revisionId={revisionId}
                         collectionId={state.global ? collectionId : null}
                         query={state.query}
                         withAsk={withAsk}

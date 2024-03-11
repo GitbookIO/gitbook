@@ -1,6 +1,6 @@
 import { ContentRef, JSONDocument } from '@gitbook/api';
 
-import { ContentPointer } from '@/lib/api';
+import { ContentTarget } from '@/lib/api';
 import { ResolvedContentRef } from '@/lib/references';
 import { ClassValue } from '@/lib/tailwind';
 
@@ -14,9 +14,9 @@ export interface DocumentContext {
     mode: 'default' | 'print';
 
     /**
-     * Content being rendered.
+     * Space content being rendered.
      */
-    content?: ContentPointer;
+    content?: ContentTarget;
 
     /**
      * Resolve a content reference.

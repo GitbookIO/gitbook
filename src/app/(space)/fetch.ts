@@ -5,9 +5,10 @@ import {
     getCollectionSpaces,
     getCollection,
     ContentPointer,
-    getSpaceContent,
     getRevisionPageByPath,
     getDocument,
+    getSpaceData,
+    ContentTarget,
 } from '@/lib/api';
 import { resolvePagePath, resolvePageId } from '@/lib/pages';
 
@@ -45,11 +46,12 @@ export function getContentPointer() {
  */
 export async function fetchSpaceData() {
     const content = getContentPointer();
-    const { space, pages, customization, scripts } = await getSpaceContent(content);
+    const { space, contentTarget, pages, customization, scripts } = await getSpaceData(content);
     const collection = await fetchParentCollection(space);
 
     return {
         content,
+        contentTarget,
         space,
         pages,
         customization,
@@ -65,9 +67,9 @@ export async function fetchSpaceData() {
  */
 export async function fetchPageData(params: PagePathParams | PageIdParams) {
     const content = getContentPointer();
-    const { space, pages, customization, scripts } = await getSpaceContent(content);
+    const { space, contentTarget, pages, customization, scripts } = await getSpaceData(content);
 
-    const page = await resolvePage(pages, content, params);
+    const page = await resolvePage(contentTarget, pages, params);
     const [collection, document] = await Promise.all([
         fetchParentCollection(space),
         page?.page.documentId ? getDocument(space.id, page.page.documentId) : null,
@@ -75,6 +77,7 @@ export async function fetchPageData(params: PagePathParams | PageIdParams) {
 
     return {
         content,
+        contentTarget,
         space,
         pages,
         customization,
@@ -91,8 +94,8 @@ export async function fetchPageData(params: PagePathParams | PageIdParams) {
  * If the path can't be found, we try to resolve it from the API to handle redirects.
  */
 async function resolvePage(
+    contentTarget: ContentTarget,
     pages: RevisionPage[],
-    content: ContentPointer,
     params: PagePathParams | PageIdParams,
 ) {
     if ('pageId' in params) {
@@ -106,7 +109,11 @@ async function resolvePage(
     }
 
     // If page can't be found, we try with the API, in case we have a redirect
-    const resolved = await getRevisionPageByPath(content, pathParam);
+    const resolved = await getRevisionPageByPath(
+        contentTarget.spaceId,
+        contentTarget.revisionId,
+        pathParam,
+    );
     if (resolved) {
         return resolvePageId(pages, resolved.id);
     }

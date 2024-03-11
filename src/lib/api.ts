@@ -2,7 +2,6 @@ import 'server-only';
 import { AsyncLocalStorage } from 'node:async_hooks';
 
 import {
-    ContentRefSyncedBlock,
     ContentVisibility,
     CustomizationSettings,
     GitBookAPI,
@@ -25,14 +24,40 @@ import {
     parseCacheResponse,
 } from './cache';
 
+/**
+ * Pointer to a relative content, it might change overtime, the pointer is relative in the content history.
+ */
 export interface ContentPointer {
     spaceId: string;
     changeRequestId?: string;
     revisionId?: string;
 }
 
+/**
+ * Pointer to a content that is immutable, it will never change.
+ */
+export interface ContentTarget {
+    spaceId: string;
+    revisionId: string;
+}
+
+/**
+ * Parameter to cache an entry as an immutable one (ex: revisions, documents).
+ * It'll cache it for 1 week and revalidate it 24h before expiration.
+ * 
+ * We don't cache for more than this to ensure we don't use too much storage and keep the cache small.
+ */
+const immutableCacheTtl = {
+    revalidateBefore: 24 * 60 * 60,
+    ttl: 7 * 24 * 60 * 60,
+    tags: [],
+};
+
 const apiSyncStorage = new AsyncLocalStorage<GitBookAPI>();
 
+/**
+ * Create a new API client with a token.
+ */
 export function apiWithToken(apiToken: string): GitBookAPI {
     const headersList = headers();
     const apiEndpoint = headersList.get('x-gitbook-api') ?? undefined;
@@ -98,11 +123,13 @@ export const getUserById = cache(
                 ...noCacheFetchOptions,
             });
             return cacheResponse(response, {
+                revalidateBefore: 60 * 60,
                 tags: [],
             });
         } catch (error) {
             if ((error as GitBookAPIError).code === 404) {
                 return {
+                    revalidateBefore: 60 * 60,
                     data: null,
                     tags: [],
                 };
@@ -134,11 +161,13 @@ export const getSyncedBlock = cache(
                 },
             );
             return cacheResponse(response, {
+                revalidateBefore: 60 * 60,
                 tags: [],
             });
         } catch (error) {
             if ((error as GitBookAPIError).code === 404) {
                 return {
+                    revalidateBefore: 60 * 60,
                     data: null,
                     tags: [],
                 };
@@ -159,18 +188,17 @@ export const getPublishedContentByUrl = cache(
     'api.getPublishedContentByUrl',
     async (url: string, visitorAuthToken: string | undefined, options: CacheFunctionOptions) => {
         try {
-            const response = await api().request<PublishedContentLookup>({
-                method: 'GET',
-                path: '/urls/published',
-                query: {
+            const response = await api().urls.getPublishedContentByUrl(
+                {
                     url,
                     visitorAuthToken,
                 },
-                secure: false,
-                format: 'json',
-                signal: options.signal,
-                ...noCacheFetchOptions,
-            });
+                {
+                    secure: false,
+                    signal: options.signal,
+                    ...noCacheFetchOptions,
+                },
+            );
 
             const parsed = parseCacheResponse(response);
 
@@ -222,6 +250,7 @@ export const getSpace = cache(
             signal: options.signal,
         });
         return cacheResponse(response, {
+            revalidateBefore: 60 * 60,
             tags: [getAPICacheTag({ tag: 'space', space: spaceId })],
         });
     },
@@ -238,12 +267,12 @@ export const getChangeRequest = cache(
             signal: options.signal,
         });
         return cacheResponse(response, {
+            // We don't cache for long as we currently don't invalidate change-request cache
+            // and it's only used  for preview where perfs are not critical
+            ttl: 60 * 60,
+            revalidateBefore: 10 * 60,
             tags: [],
         });
-    },
-    {
-        // We don't cache for long s we currently don't invalidate change-request cache
-        defaultTtl: 60 * 60,
     },
 );
 
@@ -258,6 +287,7 @@ export const getSpaceIntegrationScripts = cache(
             signal: options.signal,
         });
         return cacheResponse(response, {
+            revalidateBefore: 60 * 60,
             tags: [getAPICacheTag({ tag: 'space', space: spaceId })],
         });
     },
@@ -274,49 +304,24 @@ export const getRevision = cache(
             signal: options.signal,
         });
 
-        return cacheResponse(response, {
-            data: response.data,
-            tags: [
-                // Revision are immutable so we don't cache
-            ],
-        });
+        return cacheResponse(response, immutableCacheTtl);
     },
 );
 
 /**
- * Get all the pages in the space.
+ * Get all the pages in a revision of a space.
  */
 export const getRevisionPages = cache(
-    'api.getRevisionPages',
-    async (pointer: ContentPointer, options: CacheFunctionOptions) => {
-        const response = await (async () => {
-            if (pointer.revisionId) {
-                return api().spaces.listPagesInRevisionById(pointer.spaceId, pointer.revisionId, {
-                    ...noCacheFetchOptions,
-                    signal: options.signal,
-                });
-            }
-
-            if (pointer.changeRequestId) {
-                return api().spaces.listPagesInChangeRequest(
-                    pointer.spaceId,
-                    pointer.changeRequestId,
-                    {
-                        ...noCacheFetchOptions,
-                        signal: options.signal,
-                    },
-                );
-            }
-
-            return api().spaces.listPages(pointer.spaceId, {
-                ...noCacheFetchOptions,
-                signal: options.signal,
-            });
-        })();
+    'api.getRevisionPages.v2',
+    async (spaceId: string, revisionId: string, options: CacheFunctionOptions) => {
+        const response = await api().spaces.listPagesInRevisionById(spaceId, revisionId, {
+            ...noCacheFetchOptions,
+            signal: options.signal,
+        });
 
         return cacheResponse(response, {
+            ...immutableCacheTtl,
             data: response.data.pages,
-            tags: [getAPICacheTag({ tag: 'space', space: pointer.spaceId })],
         });
     },
 );
@@ -326,57 +331,32 @@ export const getRevisionPages = cache(
  */
 export const getRevisionPageByPath = cache(
     'api.getRevisionPageByPath.v2',
-    async (pointer: ContentPointer, pagePath: string, options: CacheFunctionOptions) => {
+    async (
+        spaceId: string,
+        revisionId: string,
+        pagePath: string,
+        options: CacheFunctionOptions,
+    ) => {
         const encodedPath = encodeURIComponent(pagePath);
 
         try {
-            const response = await (async () => {
-                if (pointer.revisionId) {
-                    return api().spaces.getPageInRevisionByPath(
-                        pointer.spaceId,
-                        pointer.revisionId,
-                        encodedPath,
-                        {},
-                        {
-                            ...noCacheFetchOptions,
-                            signal: options.signal,
-                        },
-                    );
-                }
+            const response = await api().spaces.getPageInRevisionByPath(
+                spaceId,
+                revisionId,
+                encodedPath,
+                {},
+                {
+                    ...noCacheFetchOptions,
+                    signal: options.signal,
+                },
+            );
 
-                if (pointer.changeRequestId) {
-                    return api().spaces.getPageInChangeRequestByPath(
-                        pointer.spaceId,
-                        pointer.changeRequestId,
-                        encodedPath,
-                        {},
-                        {
-                            ...noCacheFetchOptions,
-                            signal: options.signal,
-                        },
-                    );
-                }
-
-                return api().spaces.getPageByPath(
-                    pointer.spaceId,
-                    encodedPath,
-                    {},
-                    {
-                        ...noCacheFetchOptions,
-                        signal: options.signal,
-                    },
-                );
-            })();
-
-            return cacheResponse(response, {
-                data: response.data,
-                tags: [getAPICacheTag({ tag: 'space', space: pointer.spaceId })],
-            });
+            return cacheResponse(response, immutableCacheTtl);
         } catch (error) {
             if ((error as GitBookAPIError).code === 404) {
                 return {
                     data: null,
-                    tags: [getAPICacheTag({ tag: 'space', space: pointer.spaceId })],
+                    ...immutableCacheTtl,
                 };
             }
 
@@ -389,45 +369,20 @@ export const getRevisionPageByPath = cache(
  * Resolve a file by its ID.
  */
 export const getRevisionFile = cache(
-    'api.getRevisionFile',
-    async (pointer: ContentPointer, fileId: string, options: CacheFunctionOptions) => {
+    'api.getRevisionFile.v2',
+    async (spaceId: string, revisionId: string, fileId: string, options: CacheFunctionOptions) => {
         try {
             const response = await (async () => {
-                if (pointer.revisionId) {
-                    return api().spaces.getFileInRevisionById(
-                        pointer.spaceId,
-                        pointer.revisionId,
-                        fileId,
-                        {
-                            ...noCacheFetchOptions,
-                            signal: options.signal,
-                        },
-                    );
-                }
-
-                if (pointer.changeRequestId) {
-                    return api().spaces.getFileInChangeRequestById(
-                        pointer.spaceId,
-                        pointer.changeRequestId,
-                        fileId,
-                        {
-                            ...noCacheFetchOptions,
-                            signal: options.signal,
-                        },
-                    );
-                }
-
-                return api().spaces.getFileById(pointer.spaceId, fileId, {
+                return api().spaces.getFileInRevisionById(spaceId, revisionId, fileId, {
                     ...noCacheFetchOptions,
+                    signal: options.signal,
                 });
             })();
 
-            return cacheResponse(response, {
-                tags: [getAPICacheTag({ tag: 'space', space: pointer.spaceId })],
-            });
+            return cacheResponse(response, immutableCacheTtl);
         } catch (error: any) {
             if (error instanceof GitBookAPIError && error.code === 404) {
-                return { data: null };
+                return { data: null, ...immutableCacheTtl };
             }
 
             throw error;
@@ -452,11 +407,7 @@ export const getDocument = cache(
                 ...noCacheFetchOptions,
             },
         );
-        return cacheResponse(response, {
-            tags: [
-                // No tags as documents are immutable
-            ],
-        });
+        return cacheResponse(response, immutableCacheTtl);
     },
 );
 
@@ -471,6 +422,7 @@ export const getSpaceCustomizationFromAPI = cache(
             ...noCacheFetchOptions,
         });
         return cacheResponse(response, {
+            revalidateBefore: 60 * 60,
             tags: [getAPICacheTag({ tag: 'space', space: spaceId })],
         });
     },
@@ -507,6 +459,7 @@ export const getCollection = cache(
             signal: options.signal,
         });
         return cacheResponse(response, {
+            revalidateBefore: 60 * 60,
             tags: [getAPICacheTag({ tag: 'collection', collection: collectionId })],
         });
     },
@@ -526,6 +479,7 @@ export const getCollectionSpaces = cache(
         );
 
         return cacheResponse(response, {
+            revalidateBefore: 60 * 60,
             data: response.data.items.filter(
                 (space) => space.visibility === ContentVisibility.InCollection,
             ),
@@ -535,21 +489,57 @@ export const getCollectionSpaces = cache(
 );
 
 /**
- * Fetch all the information about a space at once.
- * This function executes the requests in parallel and should be used as early as possible
- * instead of calling the individual functions.
+ * Fetch all the data to render a space at once.
  */
-export async function getSpaceContent(pointer: ContentPointer) {
-    const [space, pages, customization, scripts] = await Promise.all([
-        getSpace(pointer.spaceId),
-        getRevisionPages(pointer),
-        getSpaceCustomization(pointer.spaceId),
-        getSpaceIntegrationScripts(pointer.spaceId),
+export async function getSpaceData(pointer: ContentPointer) {
+    const [{ space, pages, contentTarget }, { customization, scripts }] = await Promise.all([
+        getSpaceContentData(pointer),
+        getSpaceLayoutData(pointer.spaceId),
     ]);
 
     return {
         space,
         pages,
+        contentTarget,
+        customization,
+        scripts,
+    };
+}
+
+/**
+ * Fetch all the content data about a space at once.
+ * This function executes the requests in parallel and should be used as early as possible
+ * instead of calling the individual functions.
+ */
+export async function getSpaceContentData(pointer: ContentPointer) {
+    const [space, changeRequest] = await Promise.all([
+        getSpace(pointer.spaceId),
+        pointer.changeRequestId ? getChangeRequest(pointer.spaceId, pointer.changeRequestId) : null,
+    ]);
+
+    const contentTarget: ContentTarget = {
+        spaceId: pointer.spaceId,
+        revisionId: changeRequest?.revision ?? pointer.revisionId ?? space.revision,
+    };
+    const [pages] = await Promise.all([getRevisionPages(space.id, contentTarget.revisionId)]);
+
+    return {
+        space,
+        pages,
+        contentTarget,
+    };
+}
+
+/**
+ * Fetch all the layout data about a space at once.
+ */
+export async function getSpaceLayoutData(spaceId: string) {
+    const [customization, scripts] = await Promise.all([
+        getSpaceCustomization(spaceId),
+        getSpaceIntegrationScripts(spaceId),
+    ]);
+
+    return {
         customization,
         scripts,
     };
@@ -560,7 +550,13 @@ export async function getSpaceContent(pointer: ContentPointer) {
  */
 export const searchSpaceContent = cache(
     'api.searchSpaceContent',
-    async (spaceId: string, query: string, options: CacheFunctionOptions) => {
+    async (
+        spaceId: string,
+        /** The revision ID is used as a cache bust key, to avoid revalidating lot of cache entries by tags */
+        revisionId: string,
+        query: string,
+        options: CacheFunctionOptions,
+    ) => {
         const response = await api().spaces.searchSpaceContent(
             spaceId,
             { query },
@@ -570,7 +566,7 @@ export const searchSpaceContent = cache(
             },
         );
         return cacheResponse(response, {
-            tags: [getAPICacheTag({ tag: 'space', space: spaceId })],
+            tags: [],
         });
     },
 );
@@ -589,7 +585,8 @@ export const searchCollectionContent = cache(
             },
         );
         return cacheResponse(response, {
-            tags: [getAPICacheTag({ tag: 'collection', collection: collectionId })],
+            ttl: 60 * 60,
+            tags: [],
         });
     },
 );
@@ -605,7 +602,7 @@ export const getRecommendedQuestionsInSpace = cache(
             signal: options.signal,
         });
         return cacheResponse(response, {
-            tags: [getAPICacheTag({ tag: 'space', space: spaceId })],
+            tags: [],
         });
     },
 );

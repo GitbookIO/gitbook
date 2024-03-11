@@ -10,7 +10,7 @@ import colors from 'tailwindcss/colors';
 import { emojiFontClassName } from '@/components/primitives';
 import { fonts, ibmPlexMono } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
-import { getSpaceContent } from '@/lib/api';
+import { getSpaceLayoutData } from '@/lib/api';
 import { hexToRgb, shadesOfColor } from '@/lib/colors';
 import { getContentSecurityPolicyNonce } from '@/lib/csp';
 import { tcls } from '@/lib/tailwind';
@@ -26,7 +26,7 @@ import { getContentPointer } from './fetch';
 export default async function SpaceRootLayout(props: { children: React.ReactNode }) {
     const { children } = props;
 
-    const { customization } = await getSpaceContent(getContentPointer());
+    const { customization } = await getSpaceLayoutData(getContentPointer().spaceId);
     const headerTheme = generateHeaderTheme(customization);
     const language = getSpaceLanguage(customization);
     const nonce = getContentSecurityPolicyNonce();

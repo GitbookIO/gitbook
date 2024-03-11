@@ -242,3 +242,35 @@ export function singleton<R>(execute: () => Promise<R>): () => Promise<R> {
         return result;
     };
 }
+
+/**
+ * Create a map of singleton operations in a safe way for Cloudflare worker
+ */
+export function singletonMap<Args extends any[], Result>(
+    execute: (key: string, ...args: Args) => Promise<Result>,
+): (key: string, ...args: Args) => Promise<Result> {
+    const states = new WeakMap<object, Map<string, Promise<Result>>>();
+
+    return async (key, ...args) => {
+        const ctx = await getGlobalContext();
+        let current = states.get(ctx);
+        if (current) {
+            const existing = current.get(key);
+            if (existing) {
+                return existing;
+            }
+        }
+
+        if (!current) {
+            current = new Map();
+            states.set(ctx, current);
+        }
+
+        const promise = execute(key, ...args).finally(() => {
+            current!.delete(key);
+        });
+        current.set(key, promise);
+
+        return promise;
+    };
+}

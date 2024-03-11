@@ -38,6 +38,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
         children?: React.ReactNode;
         query: string;
         spaceId: string;
+        revisionId: string;
         collectionId: string | null;
         withAsk: boolean;
         onSwitchToAsk: () => void;
@@ -45,7 +46,8 @@ export const SearchResults = React.forwardRef(function SearchResults(
     },
     ref: React.Ref<SearchResultsRef>,
 ) {
-    const { children, query, spaceId, collectionId, withAsk, onSwitchToAsk, onClose } = props;
+    const { children, query, spaceId, revisionId, collectionId, withAsk, onSwitchToAsk, onClose } =
+        props;
 
     const language = useLanguage();
     const debounceTimeout = React.useRef<NodeJS.Timeout | null>(null);
@@ -94,7 +96,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
                 const fetchedResults = await (collectionId
                     ? searchCollectionContent(collectionId, query)
-                    : searchSpaceContent(spaceId, query));
+                    : searchSpaceContent(spaceId, revisionId, query));
                 setResults(withAsk ? withQuestionResult(fetchedResults, query) : fetchedResults);
             }, 250);
 
@@ -105,7 +107,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 }
             };
         }
-    }, [query, spaceId, collectionId, withAsk]);
+    }, [query, spaceId, revisionId, collectionId, withAsk]);
 
     // Scroll to the active result.
     React.useEffect(() => {

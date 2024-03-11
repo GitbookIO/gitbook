@@ -22,6 +22,7 @@ import {
     getRevisionPages,
     ContentPointer,
     getSpaceCustomization,
+    getSpaceContentData,
 } from '@/lib/api';
 import { pagePDFContainerId, PageHrefContext, absoluteHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
@@ -62,10 +63,9 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
     currentPDFUrl += '?' + searchParams.toString();
 
     // Load the content,
-    const [space, customization, rootPages] = await Promise.all([
-        getSpace(contentPointer.spaceId),
+    const [customization, { space, contentTarget, pages: rootPages }] = await Promise.all([
         getSpaceCustomization(contentPointer.spaceId),
-        getRevisionPages(contentPointer),
+        getSpaceContentData(contentPointer),
     ]);
     const language = getSpaceLanguage(customization);
 
@@ -160,10 +160,9 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
                         <PDFPageDocument
                             space={space}
                             page={page}
-                            contentPointer={contentPointer}
                             refContext={{
-                                content: contentPointer,
                                 space,
+                                revisionId: contentTarget.revisionId,
                                 pages: rootPages,
                                 page,
                                 ...linksContext,
@@ -215,10 +214,9 @@ async function PDFPageGroup(props: { space: Space; page: RevisionPageGroup }) {
 async function PDFPageDocument(props: {
     space: Space;
     page: RevisionPageDocument;
-    contentPointer: ContentPointer;
     refContext: ContentRefContext;
 }) {
-    const { space, page, contentPointer, refContext } = props;
+    const { space, page, refContext } = props;
 
     const document = page.documentId ? await getDocument(space.id, page.documentId) : null;
 
@@ -236,7 +234,10 @@ async function PDFPageDocument(props: {
                     blockStyle={['max-w-full']}
                     context={{
                         mode: 'print',
-                        content: contentPointer,
+                        content: {
+                            spaceId: space.id,
+                            revisionId: refContext.revisionId,
+                        },
                         resolveContentRef: (ref) => resolveContentRef(ref, refContext),
                         getId: (id) => pagePDFContainerId(page, id),
                     }}

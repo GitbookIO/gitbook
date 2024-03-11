@@ -47,9 +47,10 @@ export interface AskAnswerResult {
  */
 export async function searchSpaceContent(
     spaceId: string,
+    revisionId: string,
     query: string,
 ): Promise<OrderedComputedResult[]> {
-    const data = await api.searchSpaceContent(spaceId, query);
+    const data = await api.searchSpaceContent(spaceId, revisionId, query);
     return data.items.map((item) => transformPageResult(item, undefined)).flat();
 }
 
@@ -74,11 +75,11 @@ export async function searchCollectionContent(
  */
 export const streamAskQuestion = streamResponse(async function* (spaceId: string, query: string) {
     const stream = api.api().spaces.streamAskInSpace(spaceId, { query, format: 'document' });
-    const pagesPromise = api.getRevisionPages({ spaceId });
+    const pagesPromise = api.getSpaceContentData({ spaceId });
 
     for await (const chunk of stream) {
         // We run the AI search and fetch the pages in parallel
-        const pages = await pagesPromise;
+        const { pages } = await pagesPromise;
         yield transformAnswer(chunk.answer, pages);
     }
 });

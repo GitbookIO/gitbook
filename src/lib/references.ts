@@ -1,12 +1,12 @@
-import { ContentRef, GitBookAPIError, Revision, RevisionPageDocument, Space } from '@gitbook/api';
+import { ContentRef, Revision, RevisionPageDocument, Space } from '@gitbook/api';
 import assertNever from 'assert-never';
 
 import {
     ContentPointer,
     getCollection,
     getRevisionFile,
-    getRevisionPages,
     getSpace,
+    getSpaceContentData,
     getUserById,
     ignoreAPIError,
 } from './api';
@@ -27,8 +27,8 @@ export interface ResolvedContentRef {
 }
 
 export interface ContentRefContext extends PageHrefContext {
-    content: ContentPointer;
     space: Space;
+    revisionId: string;
     pages: Revision['pages'];
     page?: RevisionPageDocument;
 }
@@ -38,7 +38,7 @@ export interface ContentRefContext extends PageHrefContext {
  */
 export async function resolveContentRef(
     contentRef: ContentRef,
-    { content, space, pages, page: activePage, ...linksContext }: ContentRefContext,
+    { space, revisionId, pages, page: activePage, ...linksContext }: ContentRefContext,
 ): Promise<ResolvedContentRef | null> {
     switch (contentRef.kind) {
         case 'url': {
@@ -50,7 +50,7 @@ export async function resolveContentRef(
         }
 
         case 'file': {
-            const file = await getRevisionFile(content, contentRef.file);
+            const file = await getRevisionFile(space.id, revisionId, contentRef.file);
             if (file) {
                 return {
                     href: file.downloadURL,
@@ -167,17 +167,15 @@ async function resolveContentRefInSpace(spaceId: string, contentRef: ContentRef)
         spaceId,
     };
 
-    const result = await ignoreAPIError(
-        Promise.all([getSpace(spaceId), getRevisionPages(pointer)]),
-    );
+    const result = await ignoreAPIError(getSpaceContentData(pointer));
     if (!result) {
         return null;
     }
 
-    const [space, pages] = result;
+    const { space, pages } = result;
     return resolveContentRef(contentRef, {
-        content: pointer,
         space,
+        revisionId: space.revision,
         pages,
     });
 }

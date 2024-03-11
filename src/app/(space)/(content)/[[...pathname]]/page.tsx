@@ -20,7 +20,8 @@ export const runtime = 'edge';
 export default async function Page(props: { params: PagePathParams }) {
     const { params } = props;
 
-    const { content, space, customization, pages, page, document } = await fetchPageData(params);
+    const { contentTarget, space, customization, pages, page, document } =
+        await fetchPageData(params);
     const linksContext: PageHrefContext = {};
 
     if (!page) {
@@ -39,9 +40,9 @@ export default async function Page(props: { params: PagePathParams }) {
 
     const contentRefContext: ContentRefContext = {
         space,
+        revisionId: contentTarget.revisionId,
         pages,
         page,
-        content,
     };
 
     return (
@@ -52,6 +53,7 @@ export default async function Page(props: { params: PagePathParams }) {
             <div className={tcls('flex', 'flex-row')}>
                 <PageBody
                     space={space}
+                    contentTarget={contentTarget}
                     customization={customization}
                     context={contentRefContext}
                     page={page}

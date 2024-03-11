@@ -15,7 +15,7 @@ import { CONTAINER_STYLE } from '@/components/layout';
 import { ColorDebugger } from '@/components/primitives/ColorDebugger';
 import { SearchModal } from '@/components/Search';
 import { TableOfContents } from '@/components/TableOfContents';
-import { ContentPointer } from '@/lib/api';
+import { ContentPointer, ContentTarget } from '@/lib/api';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
@@ -24,6 +24,7 @@ import { tcls } from '@/lib/tailwind';
  */
 export function SpaceLayout(props: {
     content: ContentPointer;
+    contentTarget: ContentTarget;
     space: Space;
     collection: Collection | null;
     collectionSpaces: Space[];
@@ -34,6 +35,7 @@ export function SpaceLayout(props: {
 }) {
     const {
         space,
+        contentTarget,
         collection,
         collectionSpaces,
         content,
@@ -47,8 +49,8 @@ export function SpaceLayout(props: {
 
     const contentRefContext: ContentRefContext = {
         space,
+        revisionId: contentTarget.revisionId,
         pages,
-        content,
     };
 
     return (
@@ -106,7 +108,8 @@ export function SpaceLayout(props: {
 
             <React.Suspense fallback={null}>
                 <SearchModal
-                    spaceId={space.id}
+                    spaceId={contentTarget.spaceId}
+                    revisionId={contentTarget.revisionId}
                     spaceTitle={customization.title ?? space.title}
                     withAsk={customization.aiSearch.enabled}
                     collectionId={collection && collectionSpaces.length > 1 ? collection.id : null}

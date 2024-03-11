@@ -9,9 +9,10 @@ import {
     getPublishedContentByUrl,
     api,
     getSpace,
-    getSpaceContent,
+    getSpaceContentData,
     userAgent,
     withAPI,
+    getSpaceLayoutData,
 } from '@/lib/api';
 import { race } from '@/lib/async';
 import { buildVersion } from '@/lib/build';
@@ -23,6 +24,8 @@ import {
     getVisitorAuthToken,
     normalizeVisitorAuthURL,
 } from '@/lib/visitor-auth';
+
+import { waitUntil } from './lib/waitUntil';
 
 export const config = {
     matcher:
@@ -153,10 +156,18 @@ export async function middleware(request: NextRequest) {
             userAgent: userAgent(),
         }),
         async () => {
-            const content = await getSpaceContent({
-                spaceId: resolved.space,
-            });
-            return getContentSecurityPolicy(content.scripts, nonce);
+            // Start fetching everything as soon as possible, but do not block the middleware on it
+            // the cache will handle concurrent calls
+            await waitUntil(
+                getSpaceContentData({
+                    spaceId: resolved.space,
+                    changeRequestId: resolved.changeRequest,
+                    revisionId: resolved.revision,
+                }),
+            );
+
+            const { scripts } = await getSpaceLayoutData(resolved.space);
+            return getContentSecurityPolicy(scripts, nonce);
         },
     );
 

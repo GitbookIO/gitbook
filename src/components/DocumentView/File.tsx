@@ -13,7 +13,11 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
     const { block, context, style } = props;
 
     const file = context.content
-        ? await getRevisionFile(context.content, block.data.ref.file)
+        ? await getRevisionFile(
+              context.content.spaceId,
+              context.content.revisionId,
+              block.data.ref.file,
+          )
         : null;
     if (!file) {
         return null;

@@ -5,9 +5,14 @@ export interface CacheEntryMeta {
     cache: string;
 
     /**
-     * When the entry expires.
+     * Timestamp when the entry expires.
      */
     expiresAt: number;
+
+    /**
+     * Timestamp after which the entry should be revalidated.
+     */
+    revalidatesAt?: number;
 
     /**
      * Tags associated with the entry.

@@ -26,6 +26,7 @@ export default async function ContentLayout(props: { children: React.ReactNode }
     const {
         content,
         space,
+        contentTarget,
         customization,
         pages,
         collection,
@@ -45,6 +46,7 @@ export default async function ContentLayout(props: { children: React.ReactNode }
         <>
             <SpaceLayout
                 space={space}
+                contentTarget={contentTarget}
                 collection={collection}
                 collectionSpaces={collectionSpaces}
                 customization={customization}

@@ -3,7 +3,7 @@ import React from 'react';
 
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
-import { api } from '@/lib/api';
+import { ContentTarget, api } from '@/lib/api';
 import { hasFullWidthBlock, isNodeEmpty } from '@/lib/document';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -19,13 +19,15 @@ import { DateRelative } from '../primitives';
 
 export function PageBody(props: {
     space: Space;
+    contentTarget: ContentTarget;
     customization: CustomizationSettings;
     page: RevisionPageDocument;
     document: JSONDocument | null;
     context: ContentRefContext;
     withPageFeedback: boolean;
 }) {
-    const { space, customization, context, page, document, withPageFeedback } = props;
+    const { space, contentTarget, customization, context, page, document, withPageFeedback } =
+        props;
 
     const asFullWidth = document ? hasFullWidthBlock(document) : false;
     const language = getSpaceLanguage(customization);
@@ -66,7 +68,7 @@ export function PageBody(props: {
                         blockStyle={['page-api-block:ml-0']}
                         context={{
                             mode: 'default',
-                            content: context.content,
+                            content: contentTarget,
                             resolveContentRef: (ref) => resolveContentRef(ref, context),
                         }}
                     />

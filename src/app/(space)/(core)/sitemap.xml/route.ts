@@ -2,7 +2,7 @@ import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/
 import jsontoxml from 'jsontoxml';
 import { NextRequest } from 'next/server';
 
-import { getRevisionPages } from '@/lib/api';
+import { getSpaceContentData } from '@/lib/api';
 import { pageHref } from '@/lib/links';
 
 import { getContentPointer } from '../../fetch';
@@ -13,7 +13,7 @@ export const runtime = 'edge';
  * Generate a sitemap.xml for the current space.
  */
 export async function GET(req: NextRequest) {
-    const rootPages = await getRevisionPages(getContentPointer());
+    const { pages: rootPages } = await getSpaceContentData(getContentPointer());
     const pages = flattenPages(rootPages);
     const urls = pages.map(({ page, depth }) => {
         // Decay priority with depth
