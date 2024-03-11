@@ -228,7 +228,9 @@ export async function middleware(request: NextRequest) {
     }
 
     if (resolved.cacheTags && resolved.cacheTags.length > 0) {
-        response.headers.set('cache-tag', resolved.cacheTags.join(','));
+        const headerCacheTag = resolved.cacheTags.join(',');
+        response.headers.set('cache-tag', headerCacheTag);
+        response.headers.set('x-gitbook-cache-tag', headerCacheTag);
     }
 
     return response;
