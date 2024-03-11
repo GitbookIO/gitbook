@@ -3,10 +3,15 @@ import typography from '@tailwindcss/typography';
 import type { Config } from 'tailwindcss';
 import plugin from 'tailwindcss/plugin';
 
+import { hexToRgb, shadesOfColor } from './src/lib/colors';
+
 export const shades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
 export const opacities = [0, 4, 8, 12, 16, 24, 40, 64, 72, 88, 96];
 
-function generateShades(varName: string) {
+/**
+ * Generate a Tailwind color shades from a variable.
+ */
+function generateVarShades(varName: string) {
     return shades.reduce(
         (acc, shade) => {
             acc[shade] = `rgb(var(--${varName}-${shade}) / <alpha-value>)`;
@@ -14,6 +19,24 @@ function generateShades(varName: string) {
         },
         { DEFAULT: `rgb(var(--${varName}-500) / <alpha-value>)` } as Record<string, string>,
     );
+}
+
+/**
+ * Generate a Tailwind color shades from a HEX color.
+ */
+function generateShades(color: string) {
+    const rawShades = shadesOfColor(color);
+    const shadeMap = shades.reduce(
+        (acc, shade) => {
+            acc[shade] = `rgb(${hexToRgb(rawShades[`${shade}`])} / <alpha-value>)`;
+            return acc;
+        },
+        {} as Record<string, string>,
+    );
+
+    shadeMap.DEFAULT = shadeMap[500];
+
+    return shadeMap;
 }
 
 function opacity() {
@@ -43,10 +66,13 @@ const config: Config = {
                 // Dynamic colors matching the customization settings
 
                 /** primary-color used to accent elements, these colors remain unchanged when toggling between the CustomizationBackground options**/
-                primary: generateShades('primary-color'),
+                primary: generateVarShades('primary-color'),
 
                 /** primary-base is an internal color that generates the same colors as primary-color. But it's shades will change into a grayscale if CustomizationBackground.Plain is selected. (globals.css) **/
-                primarybase: generateShades('primary-base'),
+                primarybase: generateVarShades('primary-base'),
+
+                'header-background': generateVarShades('header-background'),
+                'header-link': generateVarShades('header-link'),
 
                 light: {
                     1: `color-mix(in srgb, var(--light-1), transparent calc(100% - 100% * <alpha-value>))`, //1 99%
@@ -62,12 +88,10 @@ const config: Config = {
                     3: `color-mix(in srgb, var(--dark-3), transparent calc(100% - 100% * <alpha-value>))`, //4 82%
                     4: `color-mix(in srgb, var(--dark-4), transparent calc(100% - 100% * <alpha-value>))`, //5 64%
                 },
-                yellow: generateShades('yellow'),
-                teal: generateShades('teal'),
-                pomegranate: generateShades('pomegranate'),
-                periwinkle: generateShades('periwinkle'),
-                'header-background': generateShades('header-background'),
-                'header-link': generateShades('header-link'),
+                yellow: generateShades('#f4e28d'),
+                teal: generateShades('#3f89a1'),
+                pomegranate: generateShades('#f25b3a'),
+                periwinkle: generateShades('#acc6ee'),
             },
             keyframes: {
                 pulseAlt: {

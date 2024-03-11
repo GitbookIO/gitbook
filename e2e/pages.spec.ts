@@ -220,6 +220,10 @@ const testCases: TestsCase[] = [
                 url: 'blocks/tabs',
             },
             {
+                name: 'Hints',
+                url: 'blocks/hints',
+            },
+            {
                 name: 'Integration Blocks',
                 url: 'blocks/integrations',
             },

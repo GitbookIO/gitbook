@@ -76,10 +76,6 @@ export default async function SpaceRootLayout(props: { children: React.ReactNode
                             headerTheme.backgroundColor.light,
                         )}
                         ${generateColorVariable('header-link', headerTheme.linkColor.light)}
-                        ${generateColorVariable('yellow', '#f4e28d')}
-                        ${generateColorVariable('teal', '#3f89a1')}
-                        ${generateColorVariable('pomegranate', '#f25b3a')}
-                        ${generateColorVariable('periwinkle', '#acc6ee')}
                     }
                     .dark {
                         ${generateColorVariable(
