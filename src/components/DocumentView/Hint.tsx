@@ -65,27 +65,36 @@ const HINT_STYLES: {
     info: {
         icon: InfoIcon,
         anchorColor: [
-            '[&>a]:text-dark/9',
-            '[&>a:hover]:text-dark',
-            'text-dark',
-            'fill-dark',
-            'dark:[&>a]:text-light',
-            'dark:[&>a:hover]:text-light/8',
-            'decoration-dark/6',
-            'dark:decoration-light/5',
-            'dark:fill-light',
-            'dark:text-light',
+            '[&>a]:text-periwinkle-700',
+            '[&>a:hover]:text-periwinkle-800',
+            '[&>code]:bg-periwinkle-700/4',
+            '[&>code]:text-inherit',
+            '[&>code]:shadow-none',
+
+            'text-periwinkle-900',
+            'fill-periwinkle-700',
+            'stroke-periwinkle-700',
+
+            'dark:text-periwinkle-200',
+            'dark:[&>a]:text-periwinkle',
+            'dark:[&>a:hover]:text-periwinkle-600',
+            'dark:[&>code]:bg-periwinkle-200/2',
+            'dark:[&>code]:text-inherit',
+            'decoration-periwinkle-700/6',
+            'dark:decoration-periwinkle/6',
+            'dark:fill-periwinkle-400',
+            'dark:stroke-periwinkle-400',
         ],
         style: [
             'bg-gradient-to-b',
-            'from-dark/2',
-            'to-dark/1',
+            'from-periwinkle/6',
+            'to-periwinkle/5',
             'ring-1',
             'ring-inset',
             'ring-dark/1',
-            'dark:ring-light/[0.02]',
-            'dark:from-light/[0.03]',
-            'dark:to-light/1',
+            'dark:ring-periwinkle/1',
+            'dark:from-periwinkle/2',
+            'dark:to-periwinkle/[0.1]',
         ],
     },
     warning: {
@@ -117,7 +126,7 @@ const HINT_STYLES: {
             'ring-inset',
             'ring-dark/1',
             'dark:ring-yellow/[0.02]',
-            'dark:from-yellow/1',
+            'dark:from-yellow/[0.06]',
             'dark:to-yellow/2',
         ],
     },
@@ -150,15 +159,15 @@ const HINT_STYLES: {
             'ring-inset',
             'ring-dark/1',
             'dark:ring-pomegranate/1',
-            'dark:from-pomegranate/1',
-            'dark:to-pomegranate/2',
+            'dark:from-pomegranate/2',
+            'dark:to-pomegranate/3',
         ],
     },
     success: {
         icon: SuccessIcon,
         anchorColor: [
             '[&>a]:text-teal-600',
-            '[&>a:hover]:text-teal-700',
+            '[&>a:hover]:text-teal-800',
             '[&>code]:bg-teal-600/4',
             '[&>code]:text-inherit',
             '[&>code]:shadow-none',
@@ -167,15 +176,15 @@ const HINT_STYLES: {
             'fill-teal-700',
             'stroke-teal-700',
 
-            'dark:text-teal-200',
+            'dark:text-teal-100',
             'dark:[&>a]:text-teal-400',
-            'dark:[&>a:hover]:text-teal-700',
+            'dark:[&>a:hover]:text-teal-500',
             'dark:[&>code]:bg-teal-200/2',
             'dark:[&>code]:text-inherit',
             'decoration-teal/6',
             'dark:decoration-teal/6',
             'dark:fill-teal-400',
-            'dark:stroke-teal-400',
+            'dark:stroke-teal-300',
         ],
         style: [
             'bg-gradient-to-b',
@@ -185,8 +194,8 @@ const HINT_STYLES: {
             'ring-inset',
             'ring-dark/1',
             'dark:ring-teal/1',
-            'dark:from-teal/1',
-            'dark:to-teal/2',
+            'dark:from-teal/2',
+            'dark:to-teal/3',
         ],
     },
 };
@@ -200,13 +209,13 @@ function InfoIcon() {
             xmlns="http://www.w3.org/2000/svg"
             className={tcls('overflow-visible')}
         >
-            <circle cx="8" cy="4.5" r="1.5" fill="inherit" fillOpacity="0.64" stroke="none" />
+            <circle cx="8" cy="4.5" r="1.5" fill="inherit" fillOpacity="1" stroke="none" />
             <circle
                 cx="8"
                 cy="4.5"
                 r="1.5"
                 fill="inherit"
-                fillOpacity="0.12"
+                fillOpacity="0.2"
                 stroke="none"
                 className={tcls(
                     'animate-[pingAlt_8s_ease_infinite_forwards]',
@@ -222,15 +231,15 @@ function InfoIcon() {
                 rx="1"
                 height="6"
                 fill="inherit"
-                fillOpacity="0.64"
+                fillOpacity="1"
                 stroke="none"
             />
-            <circle cx="8" cy="8" r="8" fill="inherit" fillOpacity="0.12" stroke="none" />
+            <circle cx="8" cy="8" r="8" fill="inherit" fillOpacity="0.16" stroke="none" />
         </svg>
     );
 }
 
-function WarningIcon() {
+function DangerIcon() {
     return (
         <svg width="18" height="16" viewBox="0 0 18 16" xmlns="http://www.w3.org/2000/svg">
             <path
@@ -260,7 +269,7 @@ function WarningIcon() {
     );
 }
 
-function DangerIcon() {
+function WarningIcon() {
     return (
         <svg width="16" height="18" viewBox="0 0 16 18" xmlns="http://www.w3.org/2000/svg">
             <path

@@ -65,6 +65,7 @@ const config: Config = {
                 yellow: generateShades('yellow'),
                 teal: generateShades('teal'),
                 pomegranate: generateShades('pomegranate'),
+                periwinkle: generateShades('periwinkle'),
                 'header-background': generateShades('header-background'),
                 'header-link': generateShades('header-link'),
             },
