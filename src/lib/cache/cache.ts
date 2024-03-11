@@ -71,14 +71,17 @@ export function cache<Args extends any[], Result>(
                     const result = await fn(...args, { signal });
                     signal?.throwIfAborted();
 
+                    const setAt = Date.now();
                     const expiresAt =
-                        Date.now() + (result.ttl ?? options.defaultTtl ?? 60 * 60 * 24) * 1000;
+                        setAt + (result.ttl ?? options.defaultTtl ?? 60 * 60 * 24) * 1000;
 
                     const cacheEntry: CacheEntry = {
                         data: result.data,
                         meta: {
+                            key,
                             cache: cacheName,
                             tags: result.tags ?? [],
+                            setAt,
                             expiresAt,
                             revalidatesAt: result.revalidateBefore
                                 ? expiresAt - result.revalidateBefore * 1000
@@ -242,9 +245,7 @@ export function getCache(name: string): CacheFunction<any[], any> | null {
  * Get a cache key for a function and its arguments.
  */
 export function getCacheKey(fnName: string, args: any[]) {
-    let innerKey = args
-        .map((arg) => (typeof arg === 'object' && !!arg ? hash(arg) : JSON.stringify(arg)))
-        .join(',');
+    let innerKey = args.map((arg) => hashValue(arg)).join(',');
 
     // Avoid crazy long keys, by fallbacking to a hash
     if (innerKey.length > 400) {
@@ -252,6 +253,18 @@ export function getCacheKey(fnName: string, args: any[]) {
     }
 
     return `${fnName}(${innerKey})`;
+}
+
+function hashValue(arg: any): string {
+    if (arg === undefined) {
+        return '';
+    }
+
+    if (typeof arg === 'object' && !!arg) {
+        return hash(arg);
+    }
+
+    return JSON.stringify(arg);
 }
 
 async function setCacheEntry(key: string, entry: CacheEntry) {

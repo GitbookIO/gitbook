@@ -94,7 +94,7 @@ export const redisCache: CacheBackend = {
         await multi.exec();
     },
 
-    async revalidateTags(tags, purge) {
+    async revalidateTags(tags) {
         const redis = getRedis();
         if (!redis) {
             return { keys: [], metas: [] };
@@ -109,20 +109,18 @@ export const redisCache: CacheBackend = {
 
         if (keys.size > 0) {
             // Read the meta
-            if (!purge) {
-                metas = (
-                    await redis.mget<Array<CacheEntryMeta | null>>(
-                        // Hard limit to avoid fetching a massive list of data
-                        // Starts with the smallest keys.
-                        Array.from(keys)
-                            .sort((a, b) => a.length - b.length)
-                            .slice(0, 50)
-                            .map((key) => getCacheEntryKey(key, 'meta')),
-                    )
+            metas = (
+                await redis.mget<Array<CacheEntryMeta | null>>(
+                    // Hard limit to avoid fetching a massive list of data
+                    // Starts with the smallest keys.
+                    Array.from(keys)
+                        .sort((a, b) => a.length - b.length)
+                        .slice(0, 50)
+                        .map((key) => getCacheEntryKey(key, 'meta')),
                 )
-                    .flat()
-                    .filter(filterOutNullable);
-            }
+            )
+                .flat()
+                .filter(filterOutNullable);
 
             // Delete all keys
             keys.forEach((key) => {

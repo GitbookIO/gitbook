@@ -25,10 +25,11 @@ export async function POST(req: NextRequest) {
         );
     }
 
-    const result = await revalidateTags(json.tags, !!json.purge);
+    const result = await revalidateTags(json.tags);
 
     return NextResponse.json({
         success: true,
         keys: result.keys,
+        stats: result.stats,
     });
 }

@@ -1,23 +1,29 @@
-import pMap from 'p-map';
-
 import { cacheBackends } from './backends';
-import { getCache, getCacheKey } from './cache';
+import { getCacheKey } from './cache';
 import { CacheEntryMeta } from './types';
-import { waitUntil } from '../waitUntil';
+
+interface RevalidateTagsStats {
+    [key: string]: {
+        /**
+         * Backends that have the key.
+         */
+        [backend: string]: { set: boolean; setAt?: number; expiresAt?: number };
+    };
+}
 
 /**
  * Revalidate all values associated with tags.
  * It clears the values from the caches, but also start a background task to revalidate them.
  */
-export async function revalidateTags(
-    tags: string[],
-    purge: boolean,
-): Promise<{
+export async function revalidateTags(tags: string[]): Promise<{
     keys: string[];
+    stats: RevalidateTagsStats;
 }> {
     if (tags.length === 0) {
-        return { keys: [] };
+        return { keys: [], stats: {} };
     }
+
+    const stats: RevalidateTagsStats = {};
 
     const processed = new Set<string>();
 
@@ -27,16 +33,24 @@ export async function revalidateTags(
 
     await Promise.all(
         cacheBackends.map(async (backend, backendIndex) => {
-            const { keys: addedKeys, metas: addedMetas } = await backend.revalidateTags(
-                tags,
-                purge,
-            );
+            const { keys: addedKeys, metas: addedMetas } = await backend.revalidateTags(tags);
+
+            console.log('revalidateTags', backend.name, addedKeys);
+
             addedKeys.forEach((key) => {
+                stats[key] = stats[key] ?? {};
+                stats[key][backend.name] = { set: true };
+
                 keys.add(key);
                 keysByBackend.set(backendIndex, [...(keysByBackend.get(backendIndex) ?? []), key]);
             });
             addedMetas.forEach((meta) => {
-                const key = getCacheKey(meta.cache, meta.args);
+                const key = meta.key ?? getCacheKey(meta.cache, meta.args);
+                stats[key] = stats[key] ?? {};
+                stats[key][backend.name] = { set: true };
+                stats[key][backend.name].setAt = meta.setAt;
+                stats[key][backend.name].expiresAt = meta.expiresAt;
+
                 if (!processed.has(key)) {
                     metas.push(meta);
                     processed.add(key);
@@ -53,31 +67,17 @@ export async function revalidateTags(
             );
 
             if (unclearedKeys.length > 0) {
+                unclearedKeys.forEach((key) => {
+                    stats[key][backend.name] = { set: false };
+                });
+
                 await backend.del(unclearedKeys);
             }
         }),
     );
 
-    // Refresh the values in the cache in the background
-    if (metas && !purge) {
-        await waitUntil(
-            pMap(
-                metas,
-                async (meta) => {
-                    console.log(`revalidating ${meta.cache} with args`, meta.args);
-                    const cache = getCache(meta.cache);
-                    if (cache) {
-                        await cache.revalidate(...meta.args);
-                    }
-                },
-                {
-                    concurrency: 5,
-                },
-            ),
-        );
-    }
-
     return {
         keys: Array.from(keys.keys()),
+        stats,
     };
 }

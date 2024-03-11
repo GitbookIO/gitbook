@@ -44,7 +44,7 @@ export interface ContentTarget {
 /**
  * Parameter to cache an entry as an immutable one (ex: revisions, documents).
  * It'll cache it for 1 week and revalidate it 24h before expiration.
- * 
+ *
  * We don't cache for more than this to ensure we don't use too much storage and keep the cache small.
  */
 const immutableCacheTtl = {
@@ -202,20 +202,13 @@ export const getPublishedContentByUrl = cache(
 
             const parsed = parseCacheResponse(response);
 
-            const tags = [
-                ...parsed.tags,
-                ...('space' in response.data
-                    ? [getAPICacheTag({ tag: 'space', space: response.data.space })]
-                    : []),
-            ];
-
             const data: PublishedContentWithCache = {
                 ...response.data,
                 cacheMaxAge: parsed.ttl,
-                cacheTags: tags,
+                cacheTags: parsed.tags,
             };
             return {
-                tags,
+                tags: parsed.tags,
                 ttl: parsed.ttl,
                 data,
             };

@@ -1,4 +1,11 @@
 export interface CacheEntryMeta {
+    key?: string;
+
+    /**
+     * Timestamp when the entry was created.
+     */
+    setAt: number;
+
     /**
      * Name of the function that was cached.
      */
@@ -59,8 +66,5 @@ export interface CacheBackend {
      * Revalidate all keys associated with tags.
      * It should return the meta of all entries that were revalidated.
      */
-    revalidateTags(
-        tags: string[],
-        purge: boolean,
-    ): Promise<{ keys: string[]; metas: CacheEntryMeta[] }>;
+    revalidateTags(tags: string[]): Promise<{ keys: string[]; metas: CacheEntryMeta[] }>;
 }

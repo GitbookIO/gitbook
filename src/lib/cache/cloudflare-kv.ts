@@ -34,7 +34,7 @@ export const cloudflareKVCache: CacheBackend = {
 
                 const entry = await kv.get<CacheEntry>(kvKey, {
                     type: 'json',
-                    cacheTtl: 2 * 60,
+                    cacheTtl: 60,
                 });
 
                 span.setAttribute('hit', !!entry);
@@ -69,7 +69,7 @@ export const cloudflareKVCache: CacheBackend = {
 
                 if (entry.meta.tags.length > 0) {
                     const metadata: KVTagMetadata = {
-                        key: key,
+                        key, // TODO: Remove this key from the metadata in 1 day
                         meta: entry.meta,
                     };
                     const jsonMetadata = JSON.stringify(metadata);
@@ -113,6 +113,8 @@ export const cloudflareKVCache: CacheBackend = {
             return result;
         }
 
+        const pendingDeletions: Array<Promise<unknown>> = [];
+
         await Promise.all(
             tags.map(async (tag) => {
                 const entries = await kv.list({
@@ -124,12 +126,21 @@ export const cloudflareKVCache: CacheBackend = {
                 for (const entry of entries.keys) {
                     if (entry.metadata) {
                         const metadata = entry.metadata as KVTagMetadata;
+
+                        const key = metadata.meta.key ?? metadata.key;
+
                         result.metas.push(metadata.meta);
-                        result.keys.push(metadata.key);
+                        result.keys.push(key);
+
+                        // Delete the tag key and the value key
+                        pendingDeletions.push(kv.delete(getValueKey(key)));
+                        pendingDeletions.push(kv.delete(entry.name));
                     }
                 }
             }),
         );
+
+        await Promise.all(pendingDeletions);
 
         return result;
     },
