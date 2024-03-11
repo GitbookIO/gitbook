@@ -76,15 +76,6 @@
         @apply outline-2 outline-primary/6;
     }
 
-    /*  text selection color */
-    ::selection {
-        @apply bg-primary-700 text-white;
-    }
-
-    .dark ::selection {
-        @apply bg-primary-700 text-white;
-    }
-
     /*  Light mode */
     ::-webkit-scrollbar {
         @apply bg-dark/1;
