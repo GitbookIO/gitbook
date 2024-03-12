@@ -305,7 +305,7 @@ export const getRevision = cache(
  * Get all the pages in a revision of a space.
  */
 export const getRevisionPages = cache(
-    'api.getRevisionPages.v2',
+    'api.getRevisionPages.v3',
     async (spaceId: string, revisionId: string, options: CacheFunctionOptions) => {
         const response = await api().spaces.listPagesInRevisionById(spaceId, revisionId, {
             ...noCacheFetchOptions,
