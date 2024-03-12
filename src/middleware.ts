@@ -106,7 +106,7 @@ export async function middleware(request: NextRequest) {
     const resolved = await withAPI(
         new GitBookAPI({
             endpoint: apiEndpoint,
-            authToken: process.env.GITBOOK_API_TOKEN,
+            authToken: process.env.GITBOOK_TOKEN,
             userAgent: userAgent(),
         }),
         () => lookupSpaceForURL(mode, request, inputURL),
