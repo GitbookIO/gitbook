@@ -98,6 +98,7 @@ export function resolvePrevNextPages(
 
 /**
  * Resolve a page to its canonical path.
+ * The path will NOT start with "/".
  */
 export function getPagePath(
     rootPages: Revision['pages'],

@@ -11,7 +11,7 @@ import {
     ignoreAPIError,
 } from './api';
 import { gitbookAppHref, pageHref, PageHrefContext } from './links';
-import { resolvePageId } from './pages';
+import { getPagePath, resolvePageId } from './pages';
 
 export interface ResolvedContentRef {
     /** Text to render in the content ref */
@@ -27,9 +27,29 @@ export interface ResolvedContentRef {
 }
 
 export interface ContentRefContext extends PageHrefContext {
+    /**
+     * Base URL to use to prepend to relative URLs.
+     */
+    baseUrl?: string;
+
+    /**
+     * Space in which we are resolving the content reference.
+     */
     space: Space;
+
+    /**
+     * Revision in which we are resolving the content reference.
+     */
     revisionId: string;
+
+    /**
+     * Pages in the revision.
+     */
     pages: Revision['pages'];
+
+    /**
+     * Page in which the content reference is being resolved.
+     */
     page?: RevisionPageDocument;
 }
 
@@ -38,8 +58,10 @@ export interface ContentRefContext extends PageHrefContext {
  */
 export async function resolveContentRef(
     contentRef: ContentRef,
-    { space, revisionId, pages, page: activePage, ...linksContext }: ContentRefContext,
+    context: ContentRefContext,
 ): Promise<ResolvedContentRef | null> {
+    const { space, revisionId, pages, page: activePage, ...linksContext } = context;
+
     switch (contentRef.kind) {
         case 'url': {
             return {
@@ -87,8 +109,21 @@ export async function resolveContentRef(
             }
 
             const isCurrentPage = page.id === activePage?.id;
+            let href = '';
+            if (context.baseUrl) {
+                // Page in another content
+                href = new URL(getPagePath(pages, page), context.baseUrl).toString();
+
+                if (contentRef.anchor) {
+                    href += '#' + contentRef.anchor;
+                }
+            } else {
+                // Page in the current content
+                href = pageHref(pages, page, linksContext, contentRef.anchor);
+            }
+
             return {
-                href: pageHref(pages, page, linksContext, contentRef.anchor),
+                href,
                 text: (isCurrentPage ? '' : page.title) + '#' + contentRef.anchor,
                 emoji: isCurrentPage ? undefined : page.emoji,
                 active: false,
@@ -173,9 +208,17 @@ async function resolveContentRefInSpace(spaceId: string, contentRef: ContentRef)
     }
 
     const { space, pages } = result;
+
+    // Base URL to use to prepend to relative URLs.
+    let baseUrl = space.urls.published ?? space.urls.app;
+    if (!baseUrl.endsWith('/')) {
+        baseUrl += '/';
+    }
+
     return resolveContentRef(contentRef, {
         space,
         revisionId: space.revision,
         pages,
+        baseUrl,
     });
 }
