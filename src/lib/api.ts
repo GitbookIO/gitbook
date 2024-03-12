@@ -194,7 +194,6 @@ export const getPublishedContentByUrl = cache(
                     visitorAuthToken,
                 },
                 {
-                    secure: false,
                     signal: options.signal,
                     ...noCacheFetchOptions,
                 },
