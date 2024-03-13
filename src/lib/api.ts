@@ -47,9 +47,14 @@ export interface ContentTarget {
  *
  * We don't cache for more than this to ensure we don't use too much storage and keep the cache small.
  */
-const immutableCacheTtl = {
+const immutableCacheTtl_7days = {
     revalidateBefore: 24 * 60 * 60,
     ttl: 7 * 24 * 60 * 60,
+    tags: [],
+};
+const immutableCacheTtl_1day = {
+    revalidateBefore: 60 * 60,
+    ttl: 24 * 60 * 60,
     tags: [],
 };
 
@@ -285,18 +290,46 @@ export const getSpaceIntegrationScripts = cache(
     },
 );
 
+interface GetRevisionOptions {
+    /**
+     * Whether to fetch the Git metadata of the pages.
+     * Passing `false` can optimize performances and generally should be when the Git sync is disabled (we don't need to display "Edit git" on the page).
+     *
+     * These options don't impact the cache key and it means revisions can be shared between different fetches with different metadata options.
+     */
+    metadata: boolean;
+}
+
 /**
  * Get a revision by its ID.
  */
 export const getRevision = cache(
     'api.getRevision',
-    async (spaceId: string, revisionId: string, options: CacheFunctionOptions) => {
-        const response = await api().spaces.getRevisionById(spaceId, revisionId, {
-            ...noCacheFetchOptions,
-            signal: options.signal,
-        });
+    async (
+        spaceId: string,
+        revisionId: string,
+        fetchOptions: GetRevisionOptions,
+        options: CacheFunctionOptions,
+    ) => {
+        const response = await api().spaces.getRevisionById(
+            spaceId,
+            revisionId,
+            {
+                metadata: fetchOptions.metadata,
+            },
+            {
+                ...noCacheFetchOptions,
+                signal: options.signal,
+            },
+        );
 
-        return cacheResponse(response, immutableCacheTtl);
+        return cacheResponse(
+            response,
+            fetchOptions.metadata ? immutableCacheTtl_7days : immutableCacheTtl_1day,
+        );
+    },
+    {
+        extractArgs: (args) => [args[1], args[2]],
     },
 );
 
@@ -305,16 +338,31 @@ export const getRevision = cache(
  */
 export const getRevisionPages = cache(
     'api.getRevisionPages.v3',
-    async (spaceId: string, revisionId: string, options: CacheFunctionOptions) => {
-        const response = await api().spaces.listPagesInRevisionById(spaceId, revisionId, {
-            ...noCacheFetchOptions,
-            signal: options.signal,
-        });
+    async (
+        spaceId: string,
+        revisionId: string,
+        fetchOptions: GetRevisionOptions,
+        options: CacheFunctionOptions,
+    ) => {
+        const response = await api().spaces.listPagesInRevisionById(
+            spaceId,
+            revisionId,
+            {
+                metadata: fetchOptions.metadata,
+            },
+            {
+                ...noCacheFetchOptions,
+                signal: options.signal,
+            },
+        );
 
         return cacheResponse(response, {
-            ...immutableCacheTtl,
+            ...(fetchOptions.metadata ? immutableCacheTtl_7days : immutableCacheTtl_1day),
             data: response.data.pages,
         });
+    },
+    {
+        extractArgs: (args) => [args[1], args[2]],
     },
 );
 
@@ -336,19 +384,21 @@ export const getRevisionPageByPath = cache(
                 spaceId,
                 revisionId,
                 encodedPath,
-                {},
+                {
+                    metadata: false,
+                },
                 {
                     ...noCacheFetchOptions,
                     signal: options.signal,
                 },
             );
 
-            return cacheResponse(response, immutableCacheTtl);
+            return cacheResponse(response, immutableCacheTtl_7days);
         } catch (error) {
             if ((error as GitBookAPIError).code === 404) {
                 return {
                     data: null,
-                    ...immutableCacheTtl,
+                    ...immutableCacheTtl_7days,
                 };
             }
 
@@ -365,16 +415,24 @@ export const getRevisionFile = cache(
     async (spaceId: string, revisionId: string, fileId: string, options: CacheFunctionOptions) => {
         try {
             const response = await (async () => {
-                return api().spaces.getFileInRevisionById(spaceId, revisionId, fileId, {
-                    ...noCacheFetchOptions,
-                    signal: options.signal,
-                });
+                return api().spaces.getFileInRevisionById(
+                    spaceId,
+                    revisionId,
+                    fileId,
+                    {
+                        metadata: false,
+                    },
+                    {
+                        ...noCacheFetchOptions,
+                        signal: options.signal,
+                    },
+                );
             })();
 
-            return cacheResponse(response, immutableCacheTtl);
+            return cacheResponse(response, immutableCacheTtl_7days);
         } catch (error: any) {
             if (error instanceof GitBookAPIError && error.code === 404) {
-                return { data: null, ...immutableCacheTtl };
+                return { data: null, ...immutableCacheTtl_7days };
             }
 
             throw error;
@@ -399,7 +457,7 @@ export const getDocument = cache(
                 ...noCacheFetchOptions,
             },
         );
-        return cacheResponse(response, immutableCacheTtl);
+        return cacheResponse(response, immutableCacheTtl_7days);
     },
 );
 
@@ -517,7 +575,13 @@ export async function getSpaceContentData(pointer: ContentPointer) {
         spaceId: pointer.spaceId,
         revisionId: changeRequest?.revision ?? pointer.revisionId ?? space.revision,
     };
-    const [pages] = await Promise.all([getRevisionPages(space.id, contentTarget.revisionId)]);
+    const [pages] = await Promise.all([
+        getRevisionPages(space.id, contentTarget.revisionId, {
+            // We only care about the Git metadata when the Git sync is enabled
+            // otherwise we can optimize performance by not fetching it
+            metadata: !!space.gitSync,
+        }),
+    ]);
 
     return {
         space,

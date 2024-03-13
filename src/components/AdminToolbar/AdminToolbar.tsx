@@ -76,7 +76,9 @@ async function ChangeRequestToolbar(props: { spaceId: string; changeRequestId: s
 async function RevisionToolbar(props: { spaceId: string; revisionId: string }) {
     const { spaceId, revisionId } = props;
 
-    const revision = await getRevision(spaceId, revisionId);
+    const revision = await getRevision(spaceId, revisionId, {
+        metadata: false,
+    });
 
     return (
         <ToolbarButton href={revision.urls.app}>
