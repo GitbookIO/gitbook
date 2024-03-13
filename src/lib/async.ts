@@ -1,3 +1,5 @@
+import { MaybePromise } from 'p-map';
+
 import { waitUntil, getGlobalContext } from './waitUntil';
 
 /**
@@ -251,15 +253,22 @@ export function singleton<R>(execute: () => Promise<R>): () => Promise<R> {
     };
 }
 
+type SingletonFunction<Args extends any[], Result> = ((
+    key: string,
+    ...args: Args
+) => Promise<Result>) & {
+    isRunning(key: string): Promise<boolean>;
+};
+
 /**
  * Create a map of singleton operations in a safe way for Cloudflare worker
  */
 export function singletonMap<Args extends any[], Result>(
     execute: (key: string, ...args: Args) => Promise<Result>,
-): (key: string, ...args: Args) => Promise<Result> {
+): SingletonFunction<Args, Result> {
     const states = new WeakMap<object, Map<string, Promise<Result>>>();
 
-    return async (key, ...args) => {
+    const fn: SingletonFunction<Args, Result> = async (key, ...args) => {
         const ctx = await getGlobalContext();
         let current = states.get(ctx);
         if (current) {
@@ -280,5 +289,75 @@ export function singletonMap<Args extends any[], Result>(
         current.set(key, promise);
 
         return promise;
+    };
+
+    fn.isRunning = async (key: string) => {
+        const ctx = await getGlobalContext();
+        const current = states.get(ctx);
+        return current?.has(key) ?? false;
+    };
+
+    return fn;
+}
+
+/**
+ * Batch the calls to a function and resolve them all ar once
+ */
+export function batch<Args extends any[], R>(
+    fn: (executions: Args[]) => Promise<R[]>,
+    options: {
+        /**
+         * Maximum delay in milliseconds before the batch is resolved.
+         */
+        delay: number;
+
+        /**
+         * Group the calls by a key.
+         * @default () => 'default'
+         */
+        groupBy?: (...args: Args) => string;
+
+        /**
+         * Skip the batching for a single call.
+         */
+        skip?: (...args: Args) => MaybePromise<boolean>;
+    },
+): (...args: Args) => Promise<R> {
+    const { delay, groupBy = () => 'default', skip = () => false } = options;
+
+    const groups = new Map<string, Array<[Args, (r: R) => void, (error: Error) => void]>>();
+    let timeoutId: NodeJS.Timeout | null = null;
+
+    return async (...args) => {
+        if (await skip(...args)) {
+            const results = await fn([args]);
+            return results[0];
+        }
+
+        return new Promise<R>((resolve, reject) => {
+            const groupId = groupBy(...args);
+            const executions = groups.get(groupId) ?? [];
+            groups.set(groupId, executions);
+
+            executions.push([args, resolve, reject]);
+            if (executions.length === 1) {
+                timeoutId = setTimeout(() => {
+                    const currentExecutions = executions.splice(0, executions.length);
+                    const batchArgs = currentExecutions.map(([args]) => args);
+                    fn(batchArgs).then(
+                        (results) => {
+                            currentExecutions.forEach(([, resolve], index) => {
+                                resolve(results[index]);
+                            });
+                        },
+                        (error) => {
+                            currentExecutions.forEach(([, , reject]) => {
+                                reject(error);
+                            });
+                        },
+                    );
+                }, delay);
+            }
+        });
     };
 }

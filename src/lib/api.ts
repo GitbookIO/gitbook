@@ -10,11 +10,13 @@ import {
     List,
     PublishedContentLookup,
     RequestRenderIntegrationUI,
+    RevisionFile,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 import { headers } from 'next/headers';
 import rison from 'rison';
 
+import { batch } from './async';
 import { buildVersion } from './build';
 import {
     CacheFunctionOptions,
@@ -415,8 +417,9 @@ export const getRevisionPageByPath = cache(
 
 /**
  * Resolve a file by its ID.
+ * It should not be used directly, use `getRevisionFile` instead.
  */
-export const getRevisionFile = cache(
+const getRevisionFileById = cache(
     'api.getRevisionFile.v2',
     async (spaceId: string, revisionId: string, fileId: string, options: CacheFunctionOptions) => {
         try {
@@ -443,6 +446,94 @@ export const getRevisionFile = cache(
 
             throw error;
         }
+    },
+);
+
+/**
+ * Get all the files in a revision of a space.
+ * It should not be used directly, use `getRevisionFile` instead.
+ */
+const getRevisionAllFiles = cache(
+    'api.getRevisionAllFiles',
+    async (spaceId: string, revisionId: string, options: CacheFunctionOptions) => {
+        const response = await getAll(
+            (params) =>
+                api().spaces.listFilesInRevisionById(
+                    spaceId,
+                    revisionId,
+                    {
+                        ...params,
+                        metadata: false,
+                    },
+                    {
+                        ...noCacheFetchOptions,
+                        signal: options.signal,
+                    },
+                ),
+            {
+                limit: 1000,
+            },
+        );
+
+        const files: { [fileId: string]: RevisionFile } = {};
+        response.data.items.forEach((file) => {
+            files[file.id] = file;
+        });
+
+        return cacheResponse(response, { ...immutableCacheTtl_7days, data: files });
+    },
+);
+
+/**
+ * Resolve a file by its ID.
+ * The approach is optimized to use the entire list of files in the revision if it has been fetched
+ * or to use a per-file approach if not.
+ */
+export const getRevisionFile = batch<[string, string, string], RevisionFile | null>(
+    async (executions) => {
+        const [spaceId, revisionId] = executions[0];
+
+        const hasRevisionInMemory = await getRevision.hasInMemory(spaceId, revisionId, {
+            metadata: false,
+        });
+        const hasRevisionFilesInMemory = await getRevisionAllFiles.hasInMemory(spaceId, revisionId);
+
+        // When fetching more than 5 files, we should bundle them all into one call to get the entire revision
+        if (executions.length > 5 || hasRevisionFilesInMemory || hasRevisionInMemory) {
+            let files: Record<string, RevisionFile> = {};
+
+            if (hasRevisionInMemory) {
+                const revision = await getRevision(spaceId, revisionId, { metadata: false });
+                files = {};
+                revision.files.forEach((file) => {
+                    files[file.id] = file;
+                });
+            } else {
+                files = await getRevisionAllFiles(spaceId, revisionId);
+            }
+
+            return executions.map(([spaceId, revisionId, fileId]) => files[fileId] ?? null);
+        } else {
+            // Fetch file individually
+            return Promise.all(
+                executions.map(([spaceId, revisionId, fileId]) =>
+                    getRevisionFileById(spaceId, revisionId, fileId),
+                ),
+            );
+        }
+    },
+    {
+        delay: 20,
+        groupBy: (spaceId, revisionId) => spaceId + '/' + revisionId,
+        skip: async (spaceId, revisionId, fileId) => {
+            return (
+                (await getRevision.hasInMemory(spaceId, revisionId, {
+                    metadata: false,
+                })) ||
+                (await getRevisionAllFiles.hasInMemory(spaceId, revisionId)) ||
+                (await getRevisionFileById.hasInMemory(spaceId, revisionId, fileId))
+            );
+        },
     },
 );
 
@@ -774,6 +865,9 @@ async function getAll<T, E>(
             E
         >
     >,
+    options: {
+        limit?: number;
+    } = {},
 ): Promise<
     HttpResponse<
         List & {
@@ -782,7 +876,7 @@ async function getAll<T, E>(
         E
     >
 > {
-    const limit = 100;
+    const { limit = 100 } = options;
 
     let page: string | undefined = undefined;
     const result: T[] = [];

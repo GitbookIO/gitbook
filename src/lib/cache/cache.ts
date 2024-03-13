@@ -1,6 +1,7 @@
 import hash from 'object-hash';
 
 import { cacheBackends } from './backends';
+import { memoryCache } from './memory';
 import { CacheEntry } from './types';
 import { race, singletonMap } from '../async';
 import { TraceSpan, trace } from '../tracing';
@@ -17,6 +18,11 @@ export type CacheFunction<Args extends any[], Result> = ((
      * Refetch the data and update the cache.
      */
     revalidate: (...args: Args | [...Args, CacheFunctionOptions]) => Promise<void>;
+
+    /**
+     * Check if a value is in the memory cache.
+     */
+    hasInMemory: (...args: Args) => Promise<boolean>;
 };
 
 /**
@@ -112,9 +118,7 @@ export function cache<Args extends any[], Result>(
             let result: readonly [CacheEntry, string] | null = null;
 
             // Try the memory backend, independently of the other backends as it doesn't have a network cost
-            const memoryEntry = await cacheBackends
-                .find((backend) => backend.name === 'memory')
-                ?.get(key);
+            const memoryEntry = await memoryCache.get(key);
             if (memoryEntry) {
                 span.setAttribute('memory', true);
                 result = [memoryEntry, 'memory'] as const;
@@ -225,6 +229,18 @@ export function cache<Args extends any[], Result>(
         const key = getCacheKey(cacheName, cacheArgs);
 
         await revalidate(key, signal, ...args);
+    };
+
+    cacheFn.hasInMemory = async (...args: Args) => {
+        const cacheArgs = options.extractArgs ? options.extractArgs(args) : args;
+        const key = getCacheKey(cacheName, cacheArgs);
+
+        const memoryEntry = await memoryCache.get(key);
+        if (memoryEntry) {
+            return true;
+        }
+
+        return fetchValue.isRunning(key);
     };
 
     // @ts-ignore
