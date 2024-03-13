@@ -329,7 +329,7 @@ export const getRevision = cache(
         );
     },
     {
-        extractArgs: (args) => [args[1], args[2]],
+        extractArgs: (args) => [args[0], args[1]],
     },
 );
 
@@ -362,7 +362,7 @@ export const getRevisionPages = cache(
         });
     },
     {
-        extractArgs: (args) => [args[1], args[2]],
+        extractArgs: (args) => [args[0], args[1]],
     },
 );
 
