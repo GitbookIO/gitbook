@@ -108,7 +108,11 @@ export async function getImageSize(
             height: json.original.height,
         };
     } catch (error) {
-        console.error(`failed to fetch image size for ${input}`, error);
+        console.error(
+            `failed to fetch image size for ${input}: ${
+                (error as Error).stack ?? (error as Error).message ?? error
+            }`,
+        );
         return null;
     }
 }

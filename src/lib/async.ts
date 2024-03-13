@@ -208,7 +208,7 @@ function logIgnoredError(message: string, error: Error) {
         return;
     }
 
-    console.error(message, error);
+    console.error(`${message}: ${error.stack ?? error.message ?? error}`);
 }
 
 const UndefinedSymbol = Symbol('Undefined');
