@@ -75,6 +75,8 @@ export async function race<I, R>(
         let pending = inputs.length;
         let timeoutId: NodeJS.Timeout | null = null;
         let blockFallbackStarted = false;
+        let blockFallbackRunning = false;
+        let blockFallbackError: Error | null = null;
         let blockTimeoutId: NodeJS.Timeout | null = null;
         const abort = new AbortController();
 
@@ -115,7 +117,7 @@ export async function race<I, R>(
                 throw new Error('blockFallback is required');
             }
 
-            if (blockFallbackStarted) {
+            if (blockFallbackRunning || blockFallbackStarted) {
                 throw new Error('blockFallback already started');
             }
 
@@ -124,6 +126,7 @@ export async function race<I, R>(
             }
 
             blockFallbackStarted = true;
+            blockFallbackRunning = true;
             waitUntil(
                 blockFallback({
                     signal: abort.signal,
@@ -134,10 +137,11 @@ export async function race<I, R>(
                     (error) => {
                         logIgnoredError('blockFallback failed with', error);
 
-                        if (pending === 0 && fallbackOnNull) {
+                        if (pending === 0) {
                             rejectWith(error);
                         } else {
-                            resolveWith(null);
+                            blockFallbackError = error;
+                            blockFallbackRunning = false;
                         }
                     },
                 ),
@@ -180,11 +184,15 @@ export async function race<I, R>(
                     )
                     .finally(() => {
                         pending -= 1;
-                        if (pending === 0 && !resolved && !blockFallbackStarted) {
-                            if (fallbackOnNull) {
+                        if (pending === 0 && !resolved && !blockFallbackRunning) {
+                            if (fallbackOnNull && !blockFallbackStarted) {
                                 runFallback();
                             } else {
-                                resolveWith(null);
+                                if (blockFallbackError) {
+                                    rejectWith(blockFallbackError);
+                                } else {
+                                    resolveWith(null);
+                                }
                             }
                         }
                     }),
@@ -204,7 +212,7 @@ export async function race<I, R>(
  * It skips the error if it's an AbortError.
  */
 function logIgnoredError(message: string, error: Error) {
-    if (error.name === 'AbortError') {
+    if (error.name === 'AbortError' || process.env.NODE_ENV === 'test') {
         return;
     }
 

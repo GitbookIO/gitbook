@@ -241,7 +241,7 @@ describe('race', () => {
             expect(pendings).toHaveLength(0);
         });
 
-        it('should throw error from fallback if fallbackOnNull is set to true', async () => {
+        it('should throw error from fallback if fallbackOnNull is set to true after inputs finished', async () => {
             await expect(
                 race(
                     [
@@ -268,6 +268,109 @@ describe('race', () => {
                             throw new Error('Fallback error');
                         },
                         fallbackOnNull: true,
+                    },
+                ),
+            ).rejects.toThrow('Fallback error');
+
+            const pendings = await flushWaitUntil();
+            expect(pendings).toHaveLength(0);
+        });
+
+        it('should throw error from fallback if fallbackOnNull is set to true before inputs finished with null', async () => {
+            await expect(
+                race(
+                    [
+                        [null, 30],
+                        [null, 40],
+                        [null, 50],
+                    ] as const,
+                    async ([value, timeout], { signal }) => {
+                        await new Promise((resolve, reject) => {
+                            const timeoutId = setTimeout(resolve, timeout);
+
+                            signal.addEventListener('abort', () => {
+                                clearTimeout(timeoutId);
+                                reject(new Error('Aborted'));
+                            });
+                        });
+
+                        return value;
+                    },
+                    {
+                        blockTimeout: 5,
+                        blockFallback: async () => {
+                            throw new Error('Fallback error');
+                        },
+                        fallbackOnNull: true,
+                    },
+                ),
+            ).rejects.toThrow('Fallback error');
+
+            const pendings = await flushWaitUntil();
+            expect(pendings).toHaveLength(0);
+        });
+
+        it('should not throw error from fallback if fallbackOnNull is set to true before inputs finished with non-null null', async () => {
+            const result = await race(
+                [
+                    [null, 10],
+                    ['done', 15],
+                    [null, 20],
+                ] as const,
+                async ([value, timeout], { signal }) => {
+                    await new Promise((resolve, reject) => {
+                        const timeoutId = setTimeout(resolve, timeout);
+
+                        signal.addEventListener('abort', () => {
+                            clearTimeout(timeoutId);
+                            reject(new Error('Aborted'));
+                        });
+                    });
+
+                    return value;
+                },
+                {
+                    blockTimeout: 5,
+                    blockFallback: async () => {
+                        throw new Error('Fallback error');
+                    },
+                    fallbackOnNull: true,
+                },
+            );
+            expect(result).toBe('done');
+
+            const pendings = await flushWaitUntil();
+            expect(pendings).toHaveLength(2);
+        });
+
+        it('should throw the error if the blockFallback fails after the inputs with fallbackOnNull=false', async () => {
+            await expect(
+                race(
+                    [
+                        [null, 10],
+                        [null, 15],
+                        [null, 20],
+                    ] as const,
+                    async ([value, timeout], { signal }) => {
+                        await new Promise((resolve, reject) => {
+                            const timeoutId = setTimeout(resolve, timeout);
+
+                            signal.addEventListener('abort', () => {
+                                clearTimeout(timeoutId);
+                                reject(new Error('Aborted'));
+                            });
+                        });
+
+                        return value;
+                    },
+                    {
+                        blockTimeout: 5,
+                        blockFallback: async () => {
+                            // Sleep 30ms to make sure all inputs are resolved
+                            await new Promise((resolve) => setTimeout(resolve, 30));
+                            throw new Error('Fallback error');
+                        },
+                        fallbackOnNull: false,
                     },
                 ),
             ).rejects.toThrow('Fallback error');
