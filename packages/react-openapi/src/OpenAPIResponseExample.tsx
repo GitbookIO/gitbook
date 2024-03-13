@@ -13,6 +13,11 @@ export function OpenAPIResponseExample(props: {
 }) {
     const { data, context } = props;
 
+    // if there are no responses defined for the operation
+    if (!data.operation.responses) {
+        return null;
+    }
+
     const responses = Object.entries(data.operation.responses);
     // Sort response to get 200, and 2xx first
     responses.sort(([a], [b]) => {
