@@ -471,6 +471,8 @@ async function lookupSpaceInMultiPathMode(request: NextRequest, url: URL): Promi
         };
     }
     const target = new URL(targetStr);
+    target.search = url.search;
+
     const visitorAuthToken = getVisitorAuthToken(request, target);
 
     const lookup = await lookupSpaceByAPI(target, visitorAuthToken);
