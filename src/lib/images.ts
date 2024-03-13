@@ -44,6 +44,13 @@ export async function getResizedImageURL(
 ): Promise<
     (options: { width?: number; height?: number; dpr?: number; quality?: number }) => string
 > {
+    // Skip it for non-http(s) URLs (data, etc).
+    const protocol = URL.canParse(input) ? new URL(input).protocol : '';
+    if (protocol !== 'http:' && protocol !== 'https:') {
+        return () => input;
+    }
+
+
     const signature = await generateSignature(input);
     if (!signature) {
         return () => input;
