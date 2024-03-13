@@ -5,6 +5,7 @@ import {
     CustomizationSettings,
 } from '@gitbook/api';
 import { test, Page } from '@playwright/test';
+import jwt from 'jsonwebtoken';
 import rison from 'rison';
 
 import { getContentTestURL } from '../tests/utils';
@@ -279,6 +280,184 @@ const testCases: TestsCase[] = [
             {
                 name: 'Invalid link',
                 url: 'invalid/',
+            },
+        ],
+    },
+    {
+        name: 'Visitor Auth - Space',
+        baseUrl: `https://gitbook.gitbook.io/gbo-va-space/`,
+        tests: [
+            {
+                name: 'First',
+                url: (() => {
+                    const privateKey = '70b844d0-c519-4532-8586-5970ce48c537';
+                    const token = jwt.sign(
+                        {
+                            name: 'gitbook-open-tests',
+                        },
+                        privateKey,
+                        {
+                            expiresIn: '24h',
+                        },
+                    );
+                    return `first?jwt_token=${token}`;
+                })(),
+            },
+            {
+                name: 'Second',
+                url: (() => {
+                    const privateKey = '70b844d0-c519-4532-8586-5970ce48c537';
+                    const token = jwt.sign(
+                        {
+                            name: 'gitbook-open-tests',
+                        },
+                        privateKey,
+                        {
+                            expiresIn: '24h',
+                        },
+                    );
+                    return `second?jwt_token=${token}`;
+                })(),
+            },
+        ],
+    },
+    {
+        name: 'Visitor Auth - Collection',
+        baseUrl: `https://gitbook.gitbook.io/gbo-va-collection/`,
+        tests: [
+            {
+                name: 'Root',
+                url: (() => {
+                    const privateKey = 'af5688dc-f0b6-4146-9b1d-6d834c62c980';
+                    const token = jwt.sign(
+                        {
+                            name: 'gitbook-open-tests',
+                        },
+                        privateKey,
+                        {
+                            expiresIn: '24h',
+                        },
+                    );
+                    return `?jwt_token=${token}`;
+                })(),
+            },
+            {
+                name: 'Primary (Space A)',
+                url: (() => {
+                    const privateKey = 'af5688dc-f0b6-4146-9b1d-6d834c62c980';
+                    const token = jwt.sign(
+                        {
+                            name: 'gitbook-open-tests',
+                        },
+                        privateKey,
+                        {
+                            expiresIn: '24h',
+                        },
+                    );
+                    return `v/spacea?jwt_token=${token}`;
+                })(),
+            },
+            {
+                name: 'Space B',
+                url: (() => {
+                    const privateKey = 'af5688dc-f0b6-4146-9b1d-6d834c62c980';
+                    const token = jwt.sign(
+                        {
+                            name: 'gitbook-open-tests',
+                        },
+                        privateKey,
+                        {
+                            expiresIn: '24h',
+                        },
+                    );
+                    return `v/spaceb?jwt_token=${token}`;
+                })(),
+            },
+            {
+                name: 'Space C',
+                url: (() => {
+                    const privateKey = 'af5688dc-f0b6-4146-9b1d-6d834c62c980';
+                    const token = jwt.sign(
+                        {
+                            name: 'gitbook-open-tests',
+                        },
+                        privateKey,
+                        {
+                            expiresIn: '24h',
+                        },
+                    );
+                    return `v/spacec?jwt_token=${token}`;
+                })(),
+            },
+        ],
+    },
+    {
+        name: 'Visitor Auth - Space (custom domain)',
+        baseUrl: `https://test.gitbook.community/`,
+        tests: [
+            {
+                name: 'Root',
+                url: (() => {
+                    const privateKey = '19c8166f-c436-4ed1-a24e-60954b804021';
+                    const token = jwt.sign(
+                        {
+                            name: 'gitbook-open-tests',
+                        },
+                        privateKey,
+                        {
+                            expiresIn: '24h',
+                        },
+                    );
+                    return `?jwt_token=${token}`;
+                })(),
+            },
+            {
+                name: 'First',
+                url: (() => {
+                    const privateKey = '19c8166f-c436-4ed1-a24e-60954b804021';
+                    const token = jwt.sign(
+                        {
+                            name: 'gitbook-open-tests',
+                        },
+                        privateKey,
+                        {
+                            expiresIn: '24h',
+                        },
+                    );
+                    return `first?jwt_token=${token}`;
+                })(),
+            },
+            {
+                name: 'Custom page',
+                url: (() => {
+                    const privateKey = '19c8166f-c436-4ed1-a24e-60954b804021';
+                    const token = jwt.sign(
+                        {
+                            name: 'gitbook-open-tests',
+                        },
+                        privateKey,
+                        {
+                            expiresIn: '24h',
+                        },
+                    );
+                    return `custom-page?jwt_token=${token}`;
+                })(),
+            },
+            {
+                name: 'Inner page',
+                url: (() => {
+                    const privateKey = '19c8166f-c436-4ed1-a24e-60954b804021';
+                    const token = jwt.sign(
+                        {
+                            name: 'gitbook-open-tests',
+                        },
+                        privateKey,
+                        {
+                            expiresIn: '24h',
+                        },
+                    );
+                    return `custom-page/inner-page?jwt_token=${token}`;
+                })(),
             },
         ],
     },

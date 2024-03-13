@@ -484,6 +484,7 @@ async function lookupSpaceInMultiPathMode(request: NextRequest, url: URL): Promi
         if (lookup.target === 'content') {
             // Redirect to the content URL in the same application
             const redirect = new URL(lookup.redirect);
+            redirect.search = url.search;
 
             return {
                 target: 'content',

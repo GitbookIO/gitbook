@@ -48,21 +48,40 @@ export function normalizeVisitorAuthURL(url: URL): URL {
 }
 
 /**
+ * Get all possible basePaths for a given URL. This is used to find the visitor
+ * authentication cookie token.
+ * It returns the longest one first, and the shortest one last.
+ */
+function getUrlBasePathCombinations(url: URL): string[] {
+    const parts = url.pathname.split('/').filter(Boolean);
+    const baseNames = ['/'];
+
+    for (let index = 0; index < parts.length; index++) {
+        baseNames.push('/' + parts.slice(0, index + 1).join('/') + '/');
+    }
+
+    return baseNames.reverse();
+}
+
+/**
  * Find the visitor authentication token from the request cookies. This is done by
  * checking all cookies for a matching "visitor authentication cookie" and returning the
  * best possible match for the current URL.
  */
 function getVisitorAuthTokenFromCookies(request: NextRequest, url: URL): string | undefined {
-    const urlPathParts = url.pathname.split('/').filter(Boolean);
-    const urlBasePath = urlPathParts.length === 0 ? null : `/${urlPathParts[0]}/`;
-    /**
-     * First, try to find a visitor authentication token for the current URL. The request could be
-     * something like example.gitbook.io/foo/bar, and we want to find the token for the `/foo/` base path.
-     * If we can't find a token for the current URL, we'll try to find a token for the `/` base path. These
-     * are the only two possible base paths for a given URL for which we try to find a token.
-     */
-    const found = urlBasePath ? findVisitorAuthCookieForBasePath(request, urlBasePath) : null;
-    return found ?? findVisitorAuthCookieForBasePath(request, '/');
+    const urlBasePaths = getUrlBasePathCombinations(url);
+    // Try to find a visitor authentication token for the current URL. The request
+    // for the content could be hosted on a base path like `/foo/v/bar` or `/foo` or just `/`
+    // We keep trying to find with each of these base paths until we find a token.
+    for (const basePath of urlBasePaths) {
+        const found = findVisitorAuthCookieForBasePath(request, basePath);
+        if (found) {
+            return found;
+        }
+    }
+
+    // couldn't find any token for the current URL
+    return undefined;
 }
 
 /**
