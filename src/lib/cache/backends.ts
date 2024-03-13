@@ -9,7 +9,7 @@ export const cacheBackends = [
     memoryCache,
     // Global cache shared between all processes
     // with proper replication and invalidation
-    redisCache,
+    // redisCache, // Disabled as we investigate high amount of fetch requests
     // Cache local to the datacenter
     // It can't be purged globally but it's faster
     cloudflareCache,
