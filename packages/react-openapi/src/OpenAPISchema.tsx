@@ -233,7 +233,8 @@ function getSchemaProperties(schema: OpenAPIV3.SchemaObject): null | OpenAPISche
         }, [] as OpenAPISchemaPropertyEntry[]);
     }
 
-    if (schema.type === 'array') {
+    // check array AND schema.items as this is sometimes null despite what the type indicates
+    if (schema.type === 'array' && !!schema.items) {
         const items = noReference(schema.items);
         const itemProperties = getSchemaProperties(items);
         if (itemProperties) {
@@ -352,7 +353,8 @@ function getSchemaTitle(
 
     if (schema.enum) {
         type = 'enum';
-    } else if (schema.type === 'array') {
+        // check array AND schema.items as this is sometimes null despite what the type indicates
+    } else if (schema.type === 'array' && !!schema.items) {
         type = `array of ${getSchemaTitle(noReference(schema.items))}`;
     } else if (schema.type || schema.properties) {
         type = schema.type ?? 'object';
