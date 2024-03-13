@@ -12,3 +12,10 @@ export function getCacheMaxAge(meta: CacheEntryMeta, min?: number, max?: number)
 
     return maxAge;
 }
+
+/**
+ * Return true if a cache entry can be considered immutable.
+ */
+export function isCacheEntryImmutable(meta: CacheEntryMeta): boolean {
+    return !meta.tags || meta.tags.length === 0;
+}

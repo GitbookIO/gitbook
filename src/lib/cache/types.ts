@@ -22,7 +22,8 @@ export interface CacheEntryMeta {
     revalidatesAt?: number;
 
     /**
-     * Tags associated with the entry.
+     * Tags associated with the entry, used for revalidation.
+     * If no tags is present, the entry is considered immutable.
      */
     tags: string[];
 

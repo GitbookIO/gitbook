@@ -1,9 +1,5 @@
 import { CacheBackend, CacheEntry } from './types';
-
-/**
- * In production, we limit the cache to 5 minutes as it can't be invalidated on all instances.
- */
-const cacheMaxAge = process.env.NODE_ENV === 'development' ? Infinity : 5 * 60;
+import { isCacheEntryImmutable } from './utils';
 
 export const memoryCache: CacheBackend = {
     name: 'memory',
@@ -30,7 +26,16 @@ export const memoryCache: CacheBackend = {
             ...entry,
             meta: {
                 ...entry.meta,
-                expiresAt: Math.min(Date.now() + cacheMaxAge * 1000, entry.meta.expiresAt),
+                ...(isCacheEntryImmutable(entry.meta) || process.env.NODE_ENV === 'development'
+                    ? {}
+                    : {
+                          // For mutable entries, we limit the cache to 1 minute
+                          // as it could be invalidated at any time.
+                          expiresAt: Math.min(
+                              entry.meta.setAt ?? Date.now() + 60 * 1000,
+                              entry.meta.expiresAt,
+                          ),
+                      }),
             },
         });
     },

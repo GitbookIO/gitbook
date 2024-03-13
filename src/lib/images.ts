@@ -50,7 +50,6 @@ export async function getResizedImageURL(
         return () => input;
     }
 
-
     const signature = await generateSignature(input);
     if (!signature) {
         return () => input;
