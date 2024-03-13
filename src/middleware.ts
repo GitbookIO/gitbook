@@ -511,10 +511,11 @@ async function lookupSpaceInMultiPathMode(request: NextRequest, url: URL): Promi
  * To optimize caching, we try multiple lookup alternatives and return the first one that matches.
  */
 async function lookupSpaceByAPI(
-    url: URL,
+    lookupURL: URL,
     visitorAuthToken: string | undefined,
 ): Promise<LookupResult> {
-    const lookupAlternatives = getURLLookupAlternatives(stripURLSearch(url));
+    const url = stripURLSearch(lookupURL);
+    const lookupAlternatives = getURLLookupAlternatives(url);
 
     console.log(
         `lookup content for url "${url.toString()}", with ${
