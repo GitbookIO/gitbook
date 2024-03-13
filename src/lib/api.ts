@@ -167,7 +167,13 @@ export const getSyncedBlock = cache(
             );
             return cacheResponse(response, {
                 revalidateBefore: 60 * 60,
-                tags: [],
+                tags: [
+                    getAPICacheTag({
+                        tag: 'synced-block',
+                        organization: organizationId,
+                        syncedBlock: syncedBlockId,
+                    }),
+                ],
             });
         } catch (error) {
             if ((error as GitBookAPIError).code === 404) {
@@ -704,6 +710,12 @@ export function getAPICacheTag(
         | {
               tag: 'collection';
               collection: string;
+          }
+        // All data related to a synced block
+        | {
+              tag: 'synced-block';
+              syncedBlock: string;
+              organization: string;
           },
 ): string {
     switch (spec.tag) {
@@ -711,6 +723,8 @@ export function getAPICacheTag(
             return `space:${spec.space}`;
         case 'collection':
             return `collection:${spec.collection}`;
+        case 'synced-block':
+            return `synced-block:${spec.organization}:${spec.syncedBlock}`;
         default:
             assertNever(spec);
     }
