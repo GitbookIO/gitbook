@@ -12,6 +12,7 @@ import { getContentSecurityPolicyNonce } from '@/lib/csp';
 import { absoluteHref, baseUrl } from '@/lib/links';
 import { shouldIndexSpace } from '@/lib/seo';
 
+import { ClientContexts } from './ClientContexts';
 import { fetchSpaceData } from '../fetch';
 
 export const runtime = 'edge';
@@ -43,7 +44,10 @@ export default async function ContentLayout(props: { children: React.ReactNode }
     });
 
     return (
-        <>
+        <ClientContexts
+            nonce={nonce}
+            forcedTheme={customization.themes.toggeable ? undefined : customization.themes.default}
+        >
             <SpaceLayout
                 space={space}
                 contentTarget={contentTarget}
@@ -73,7 +77,7 @@ export default async function ContentLayout(props: { children: React.ReactNode }
             ) : null}
 
             <AdminToolbar space={space} content={content} />
-        </>
+        </ClientContexts>
     );
 }
 

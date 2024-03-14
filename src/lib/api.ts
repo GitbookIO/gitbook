@@ -484,7 +484,7 @@ const getRevisionAllFiles = cache(
     },
     {
         timeout: 60 * 1000,
-    }
+    },
 );
 
 /**

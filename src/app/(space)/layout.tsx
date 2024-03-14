@@ -12,7 +12,6 @@ import { fonts, ibmPlexMono } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
 import { getSpaceLayoutData } from '@/lib/api';
 import { hexToRgb, shadesOfColor } from '@/lib/colors';
-import { getContentSecurityPolicyNonce } from '@/lib/csp';
 import { tcls } from '@/lib/tailwind';
 
 import { ClientContexts } from './ClientContexts';
@@ -29,7 +28,6 @@ export default async function SpaceRootLayout(props: { children: React.ReactNode
     const { customization } = await getSpaceLayoutData(getContentPointer().spaceId);
     const headerTheme = generateHeaderTheme(customization);
     const language = getSpaceLanguage(customization);
-    const nonce = getContentSecurityPolicyNonce();
 
     return (
         <html
@@ -103,15 +101,7 @@ export default async function SpaceRootLayout(props: { children: React.ReactNode
                     'dark:bg-dark',
                 )}
             >
-                <ClientContexts
-                    nonce={nonce}
-                    language={language}
-                    forcedTheme={
-                        customization.themes.toggeable ? undefined : customization.themes.default
-                    }
-                >
-                    {children}
-                </ClientContexts>
+                <ClientContexts language={language}>{children}</ClientContexts>
             </body>
         </html>
     );

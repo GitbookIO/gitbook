@@ -560,7 +560,6 @@ async function lookupSpaceByAPI(
         } as PublishedContentWithCache;
     });
 
-    console.log(`lookup took ${Date.now() - startTime}ms`);
     return (
         result ?? {
             error: {
