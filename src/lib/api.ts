@@ -482,6 +482,9 @@ const getRevisionAllFiles = cache(
 
         return cacheResponse(response, { ...immutableCacheTtl_7days, data: files });
     },
+    {
+        timeout: 60 * 1000,
+    }
 );
 
 /**

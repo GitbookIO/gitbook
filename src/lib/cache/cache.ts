@@ -63,8 +63,14 @@ export function cache<Args extends any[], Result>(
 
         /** Default ttl (in seconds) */
         defaultTtl?: number;
+
+        /** When a request to the underlying resource will timeout. */
+        timeout?: number;
     } = {},
 ): CacheFunction<Args, Result> {
+    // We stop everything after 10s to avoid pending requests
+    const timeout = options.timeout ?? 1000 * 10;
+
     const revalidate = singletonMap(
         async (key: string, signal: AbortSignal | undefined, ...args: Args) => {
             return await trace(
@@ -131,9 +137,7 @@ export function cache<Args extends any[], Result>(
                     },
                     {
                         signal,
-
-                        // We stop everything after 10s to avoid pending requests
-                        timeout: 10 * 1000,
+                        timeout,
 
                         // We give 70ms to the caches to respond, otherwise we start fallbacking to the actual fetch
                         // It should represents a bit more than the 90th percentile of the KV cache response time
