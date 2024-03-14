@@ -559,6 +559,12 @@ export const getDocument = cache(
         );
         return cacheResponse(response, immutableCacheTtl_7days);
     },
+    {
+        // Temporarily allow for a longer timeout than the default 10s
+        // because GitBook's API currently re-normalizes all documents
+        // and it can take more than 10s...
+        timeout: 20 * 1000,
+    },
 );
 
 /**
