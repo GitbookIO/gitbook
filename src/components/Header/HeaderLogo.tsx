@@ -95,15 +95,9 @@ function LogoFallback(props: HeaderLogoProps) {
                 sources={
                     customIcon
                         ? {
-                              light: {
-                                  src: customIcon.light,
-                                  size: { aspectRatio: 1 },
-                              },
+                              light: { src: customIcon.light, aspectRatio: '1' },
                               dark: customIcon.dark
-                                  ? {
-                                        src: customIcon.dark,
-                                        size: { aspectRatio: 1 },
-                                    }
+                                  ? { src: customIcon.dark, aspectRatio: '1' }
                                   : null,
                           }
                         : {

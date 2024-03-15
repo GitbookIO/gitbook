@@ -36,24 +36,43 @@ export function isImageResizingEnabled(): boolean {
 }
 
 /**
+ * Check if a URL is an HTTP URL.
+ */
+export function checkIsHttpURL(input: string): boolean {
+    if (!URL.canParse(input)) {
+        return false;
+    }
+    const parsed = new URL(input);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+}
+
+/**
+ * Check if an image URL is resizable.
+ * Skip it for non-http(s) URLs (data, etc).
+ * Skip it for SVGs.
+ */
+function checkIsSizableImageURL(input: string): boolean {
+    if (input.endsWith('.svg')) {
+        return false;
+    }
+    return checkIsHttpURL(input);
+}
+
+/**
  * Create a new URL for an image with resized parameters.
  * The URL is signed and verified by the server.
  */
 export async function getResizedImageURL(
     input: string,
 ): Promise<
-    (options: { width?: number; height?: number; dpr?: number; quality?: number }) => string
+    | ((options: { width?: number; height?: number; dpr?: number; quality?: number }) => string)
+    | null
 > {
-    // Skip it for non-http(s) URLs (data, etc).
-    const protocol = URL.canParse(input) ? new URL(input).protocol : '';
-    if (protocol !== 'http:' && protocol !== 'https:') {
-        return () => input;
+    if (!checkIsSizableImageURL(input)) {
+        return null;
     }
 
     const signature = await generateSignature(input);
-    if (!signature) {
-        return () => input;
-    }
 
     return (options) => {
         const url = new URL('/~gitbook/image', rootUrl());
@@ -93,7 +112,7 @@ export async function getImageSize(
     input: string,
     defaultSize: Partial<CloudflareImageOptions> = {},
 ): Promise<{ width: number; height: number } | null> {
-    if (!isImageResizingEnabled()) {
+    if (!isImageResizingEnabled() || !checkIsSizableImageURL(input)) {
         return null;
     }
 
@@ -181,12 +200,8 @@ function stringifyOptions(options: CloudflareImageOptions): string {
     }, '');
 }
 
-async function generateSignature(input: string): Promise<string | null> {
-    if (!isImageResizingEnabled()) {
-        return null;
-    }
-
-    const all = [input, process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY].join(':');
+async function generateSignature(input: string): Promise<string> {
+    const all = [input, process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY].filter(Boolean).join(':');
     const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(all));
 
     // Convert ArrayBuffer to hex string

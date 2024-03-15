@@ -1,17 +1,18 @@
 /* eslint-disable @next/next/no-img-element */
 import ReactDOM from 'react-dom';
 
-import { getImageSize, getResizedImageURL, isImageResizingEnabled } from '@/lib/images';
+import { checkIsHttpURL, getImageSize, getResizedImageURL } from '@/lib/images';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { PolymorphicComponentProp } from './types';
 import { Zoom } from './Zoom';
 
-type ImageSize = { width: number; height: number } | { aspectRatio: number };
+type ImageSize = { width: number; height: number };
 
 type ImageSource = {
     src: string;
     size?: ImageSize;
+    aspectRatio?: string;
 };
 
 export type ImageResponsiveSize = {
@@ -140,6 +141,92 @@ export async function Image(
     );
 }
 
+/**
+ * Get the attributes for an image.
+ * src, srcSet, sizes, width, height, etc.
+ */
+async function getImageAttributes(params: {
+    sizes: ImageResponsiveSize[];
+    source: ImageSource;
+    quality: number;
+    resize: boolean;
+}): Promise<{
+    src: string;
+    srcSet?: string;
+    sizes?: string;
+    width?: number;
+    height?: number;
+}> {
+    const { sizes, source, quality, resize } = params;
+    let src = source.src;
+
+    const getURL = resize ? await getResizedImageURL(source.src) : null;
+
+    if (!getURL) {
+        return {
+            src: source.src,
+            ...source.size,
+        };
+    }
+
+    const sources: string[] = [];
+    const sourceSizes: string[] = [];
+    let defaultSize: ImageResponsiveSize | undefined;
+
+    sizes.map((size) => {
+        for (let dpr = 1; dpr <= MAX_DPR; dpr++) {
+            const resizedURL = getURL({
+                width: size.width,
+                quality,
+                dpr,
+            });
+
+            if (!size.media) {
+                // Use the resize URL as the default source.
+                src = resizedURL;
+                defaultSize = size;
+            }
+
+            sources.push(`${resizedURL} ${size.width * dpr}w`);
+        }
+
+        if (size.media) {
+            sourceSizes.push(`${size.media} ${size.width}px`);
+        }
+    });
+
+    // Push the default size at the end.
+    if (defaultSize) {
+        sourceSizes.push(`${defaultSize.width}px`);
+    }
+
+    // If we don't know the size of the image, we can try reading it from the image itself.
+    const size =
+        source.size ?? (await getImageSize(source.src, { width: defaultSize?.width, dpr: 3 }));
+
+    if (!size) {
+        return { src };
+    }
+
+    return {
+        src,
+        srcSet: sources.join(', '),
+        sizes: sourceSizes.join(', '),
+        ...size,
+    };
+}
+
+function getFetchPriority(priority: ImageCommonProps['priority']) {
+    switch (priority) {
+        case 'lazy':
+            return 'low';
+        case 'high':
+            return 'high';
+        default:
+            return undefined;
+    }
+}
+
 async function ImagePicture(
     props: PolymorphicComponentProp<
         'img',
@@ -151,7 +238,7 @@ async function ImagePicture(
     const {
         source,
         sizes,
-        style,
+        style: _style,
         alt,
         quality = 100,
         priority = 'normal',
@@ -163,100 +250,35 @@ async function ImagePicture(
         ...rest
     } = props;
 
-    let srcSet: undefined | string;
-    let sizesAttr: undefined | string;
-    let src = source.src;
-
     if (process.env.NODE_ENV === 'development' && sizes.length === 0) {
         throw new Error('You must provide at least one size for the image.');
     }
 
-    // Responsive sizes
-    if (resize && isImageResizingEnabled()) {
-        const getURL = await getResizedImageURL(source.src);
-
-        const srcSetAlts: string[] = [];
-        const sizeAlts: string[] = [];
-        let defaultSize: ImageResponsiveSize | undefined;
-
-        sizes.map(async (size, index) => {
-            for (let dpr = 1; dpr <= MAX_DPR; dpr++) {
-                const resizedURL = getURL({
-                    width: size.width,
-                    quality,
-                    dpr,
-                });
-
-                if (!size.media) {
-                    // Use the resize URL as the default source.
-                    src = resizedURL;
-                    defaultSize = size;
-                }
-
-                srcSetAlts.push(`${resizedURL} ${size.width * dpr}w`);
-            }
-
-            if (size.media) {
-                sizeAlts.push(`${size.media} ${size.width}px`);
-            }
-        });
-
-        // Push the default size at the end.
-        if (defaultSize) {
-            sizeAlts.push(`${defaultSize.width}px`);
-        }
-
-        srcSet = srcSetAlts.join(', ');
-        sizesAttr = sizeAlts.join(', ');
-
-        // If we don't know the size of the image, we can try reading it from the
-        // image itself.
-        if (!source.size) {
-            const size = await getImageSize(source.src, {
-                width: defaultSize?.width,
-                dpr: 3,
-            });
-            if (size) {
-                source.size = size;
-            }
-        }
-    }
-
-    // Avoid layout shift by setting the width and height attributes,
-    // or the aspect ratio.
-    const sizeAttrs: Partial<React.ComponentPropsWithoutRef<'img'>> = {};
-    if (source.size && 'width' in source.size && 'height' in source.size) {
-        // Set the width and height attributes if we know them.
-        sizeAttrs.width = source.size.width;
-        sizeAttrs.height = source.size.height;
-    } else if (source.size && 'aspectRatio' in source.size) {
-        // Or fallback to the aspect ratio.
-        sizeAttrs.style = {
-            aspectRatio: source.size.aspectRatio,
-        };
-    }
+    const attrs = await getImageAttributes({ sizes, source, quality, resize });
+    const canBeFetched = checkIsHttpURL(attrs.src);
+    const fetchPriority = canBeFetched ? getFetchPriority(priority) : undefined;
+    const loading = priority === 'lazy' ? 'lazy' : undefined;
+    const aspectRatioStyle = source.aspectRatio ? { aspectRatio: source.aspectRatio } : {};
+    const style = { ...aspectRatioStyle, ...inlineStyle };
 
     // Preload the image if needed.
-    if (priority === 'high' || preload) {
-        ReactDOM.preload(src, {
+    if (fetchPriority === 'high' || preload) {
+        ReactDOM.preload(attrs.src, {
             as: 'image',
-            imageSrcSet: srcSet,
-            imageSizes: sizesAttr,
-            fetchPriority: priority === 'high' ? 'high' : 'low',
+            imageSrcSet: attrs.srcSet,
+            imageSizes: attrs.sizes,
+            fetchPriority,
         });
     }
 
     const img = (
         <img
-            srcSet={srcSet}
-            sizes={sizesAttr}
-            src={src}
             alt={alt}
-            style={inlineStyle}
-            {...(priority === 'lazy' ? { loading: 'lazy', fetchPriority: 'low' } : {})}
-            {...(priority === 'high' ? { fetchPriority: 'high' } : {})}
+            style={style}
+            loading={loading}
+            fetchPriority={fetchPriority}
             {...rest}
-            {...sizeAttrs}
+            {...attrs}
         />
     );
 
