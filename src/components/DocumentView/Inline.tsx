@@ -14,7 +14,7 @@ import { Annotation } from './Annotation/Annotation';
 import { DocumentContextProps } from './DocumentView';
 import { Emoji } from './Emoji';
 import { InlineImage } from './InlineImage';
-import { Link } from './Link';
+import { InlineLink } from './InlineLink';
 import { InlineMath } from './Math';
 import { Mention } from './Mention';
 
@@ -45,7 +45,7 @@ export function Inline<
 
     switch (inline.type) {
         case 'link':
-            return <Link {...contextProps} inline={inline} />;
+            return <InlineLink {...contextProps} inline={inline} />;
         case 'inline-math':
             return <InlineMath {...contextProps} inline={inline} />;
         case 'annotation':

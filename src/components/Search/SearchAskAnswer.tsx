@@ -1,6 +1,5 @@
 import IconBox from '@geist-ui/icons/box';
 import IconSearch from '@geist-ui/icons/search';
-import Link from 'next/link';
 import React from 'react';
 import { atom, useRecoilState } from 'recoil';
 
@@ -12,6 +11,7 @@ import { tcls } from '@/lib/tailwind';
 
 import { AskAnswerResult, streamAskQuestion } from './server-actions';
 import { useSearch, useSearchLink } from './useSearch';
+import { Link } from '../primitives';
 
 /**
  * Store the state of the answer in a global state so that it can be

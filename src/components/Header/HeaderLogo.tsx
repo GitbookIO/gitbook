@@ -1,10 +1,11 @@
 import { Collection, CustomizationHeaderPreset, CustomizationSettings, Space } from '@gitbook/api';
-import Link from 'next/link';
 
 import { HeaderMobileMenu } from '@/components/Header/HeaderMobileMenu';
 import { Image } from '@/components/utils';
 import { absoluteHref } from '@/lib/links';
-import { ClassValue, tcls } from '@/lib/tailwind';
+import { tcls } from '@/lib/tailwind';
+
+import { Link } from '../primitives';
 
 interface HeaderLogoProps {
     collection: Collection | null;

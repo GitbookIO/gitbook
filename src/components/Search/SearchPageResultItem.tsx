@@ -1,10 +1,10 @@
-import Link from 'next/link';
 import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
 import { HighlightQuery } from './HighlightQuery';
 import type { ComputedPageResult } from './server-actions';
+import { Link } from '../primitives';
 
 export const SearchPageResultItem = React.forwardRef(function SearchPageResultItem(
     props: {

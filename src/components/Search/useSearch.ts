@@ -1,6 +1,7 @@
-import { LinkProps } from 'next/link';
 import { useQueryStates, parseAsBoolean, parseAsString, UseQueryStatesOptions } from 'nuqs';
 import React from 'react';
+
+import { LinkProps } from '../primitives';
 
 export interface SearchState {
     query: string;

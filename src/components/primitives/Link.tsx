@@ -1,24 +1,31 @@
-import NextLink, { LinkProps } from 'next/link';
+import NextLink, { LinkProps as NextLinkProps } from 'next/link';
 
-import { tcls } from '@/lib/tailwind';
+// Props from Next, which includes NextLinkProps and all the things anchor elements support.
+type BaseLinkProps = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, keyof NextLinkProps> &
+    NextLinkProps & {
+        children?: React.ReactNode;
+    } & React.RefAttributes<HTMLAnchorElement>;
+
+// Enforce href is passed as a string (not a URL).
+export type LinkProps = Omit<BaseLinkProps, 'href'> & { href: string };
 
 /**
- * Styled version of Next.js Link component.
+ * Low-level Link component that handles navigation to external urls.
+ * It does not contain any styling.
  */
-export function Link(props: LinkProps & { children: React.ReactNode }) {
-    return (
-        <NextLink
-            {...props}
-            className={tcls(
-                'underline',
-                'underline-offset-2',
-                'decoration-primary/6',
-                'text-primary',
-                'hover:text-primary-700',
-                'transition-colors',
-            )}
-        >
-            {props.children}
-        </NextLink>
-    );
+export function Link(props: LinkProps) {
+    const { href, prefetch, children, ...domProps } = props;
+
+    // Use a real anchor tag for external links,s and a Next.js Link for internal links.
+    // If we use a NextLink for external links, Nextjs won't rerender the top-level layouts.
+    const isExternal = URL.canParse(props.href);
+    if (isExternal) {
+        return (
+            <a {...domProps} href={href}>
+                {children}
+            </a>
+        );
+    }
+
+    return <NextLink {...props}>{children}</NextLink>;
 }

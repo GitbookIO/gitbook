@@ -1,8 +1,8 @@
 'use client';
 
-import Link from 'next/link';
-
 import { tcls, ClassValue } from '@/lib/tailwind';
+
+import { Link } from './Link';
 
 type ButtonProps = {
     href?: string;

@@ -1,8 +1,7 @@
 import IconExternal from '@geist-ui/icons/externalLink';
 import { RevisionPageLink } from '@gitbook/api';
-import Link from 'next/link';
 
-import { Emoji } from '@/components/primitives';
+import { Emoji, Link } from '@/components/primitives';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 

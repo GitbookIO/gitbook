@@ -1,7 +1,8 @@
 import ChevronRight from '@geist-ui/icons/chevronRight';
-import Link from 'next/link';
 
 import { ClassValue, tcls } from '@/lib/tailwind';
+
+import { Link } from './Link';
 
 export async function Card(props: {
     href: string;

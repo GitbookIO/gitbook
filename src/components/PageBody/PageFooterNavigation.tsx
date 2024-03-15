@@ -1,13 +1,14 @@
 import ChevronLeft from '@geist-ui/icons/chevronLeft';
 import ChevronRight from '@geist-ui/icons/chevronRight';
 import { CustomizationSettings, Revision, RevisionPageDocument, Space } from '@gitbook/api';
-import Link from 'next/link';
 import React from 'react';
 
 import { t, getSpaceLanguage } from '@/intl/server';
 import { pageHref } from '@/lib/links';
 import { resolvePrevNextPages } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
+
+import { Link } from '../primitives';
 
 /**
  * Show cards to go to previous/next pages at the bottom.

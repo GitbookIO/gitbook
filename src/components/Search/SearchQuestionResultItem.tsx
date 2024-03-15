@@ -1,11 +1,11 @@
 import IconSearch from '@geist-ui/icons/search';
-import Link from 'next/link';
 import React from 'react';
 
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
 import { useSearchLink } from './useSearch';
+import { Link } from '../primitives';
 
 export const SearchQuestionResultItem = React.forwardRef(function SearchQuestionResultItem(
     props: {

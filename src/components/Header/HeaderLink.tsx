@@ -4,7 +4,6 @@ import {
     CustomizationSettings,
     CustomizationHeaderPreset,
 } from '@gitbook/api';
-import Link from 'next/link';
 
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -16,6 +15,7 @@ import {
     DropdownMenu,
     DropdownMenuItem,
 } from './Dropdown';
+import { Link } from '../primitives';
 
 export async function HeaderLink(props: {
     context: ContentRefContext;

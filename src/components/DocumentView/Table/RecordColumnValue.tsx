@@ -2,7 +2,8 @@ import IconStar from '@geist-ui/icons/star';
 import { ContentRef, DocumentBlockTable } from '@gitbook/api';
 import assertNever from 'assert-never';
 
-import { Checkbox, Emoji, Link } from '@/components/primitives';
+import { Checkbox, Emoji } from '@/components/primitives';
+import { StyledLink } from '@/components/primitives';
 import { getNodeFragmentByName } from '@/lib/document';
 import { tcls } from '@/lib/tailwind';
 import { filterOutNullable } from '@/lib/typescript';
@@ -125,9 +126,9 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             return (
                 <Tag className={tcls('text-base')}>
                     {files.filter(filterOutNullable).map((file, index) => (
-                        <Link key={index} href={file.href}>
+                        <StyledLink key={index} href={file.href}>
                             {file.text}
-                        </Link>
+                        </StyledLink>
                     ))}
                 </Tag>
             );
@@ -138,7 +139,9 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                     {resolved && resolved.emoji ? (
                         <Emoji code={resolved.emoji} style={['mr-2']} />
                     ) : null}
-                    {resolved ? <Link href={resolved.href}>{resolved.text}</Link> : null}
+                    {resolved ? (
+                        <StyledLink href={resolved.href}>{resolved.text}</StyledLink>
+                    ) : null}
                 </Tag>
             );
         }
@@ -155,9 +158,9 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             return (
                 <Tag className={tcls('text-base')}>
                     {resolved.filter(filterOutNullable).map((file, index) => (
-                        <Link key={index} href={file.href}>
+                        <StyledLink key={index} href={file.href}>
                             {file.text}
-                        </Link>
+                        </StyledLink>
                     ))}
                 </Tag>
             );
