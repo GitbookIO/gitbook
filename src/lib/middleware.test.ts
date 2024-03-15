@@ -117,16 +117,4 @@ describe('normalizeURL', () => {
             new URL('https://docs.mycompany.com/hello/there'),
         );
     });
-
-    // it('should convert uppercase characters in the path to lowercase', () => {
-    //     expect(normalizeURL(new URL('https://docs.mycompany.com/Hello/My/pAge'))).toEqual(
-    //         new URL('https://docs.mycompany.com/hello/my/page'),
-    //     );
-    // });
-
-    // it('should not affect uppercase characters in querystring parameters', () => {
-    //     expect(normalizeURL(new URL('https://docs.mycompany.com/Hello/My/pAge?Q=MySearch'))).toEqual(
-    //         new URL('https://docs.mycompany.com/hello/my/page?Q=MySearch'),
-    //     );
-    // });
-});
+})

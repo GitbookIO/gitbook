@@ -94,7 +94,6 @@ export function getURLLookupAlternatives(input: URL) {
  */
 export function normalizeURL(url: URL) {
     const result = new URL(url);
-    // TODO fix lowercasing only the pathname without share links...
-    result.pathname = url.pathname.replace(/\/{2,}/g, '/').replace(/\/$/, ''); // .toLowerCase();
+    result.pathname = url.pathname.replace(/\/{2,}/g, '/').replace(/\/$/, '');
     return result;
 }

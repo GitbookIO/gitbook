@@ -20,13 +20,20 @@ export const runtime = 'edge';
 export default async function Page(props: { params: PagePathParams }) {
     const { params } = props;
 
+    // Redirects to the lowercase version of the path if it contains uppercase characters
+    const pathname = getPathnameParam(params);
+    const lowerCasePathname = pathname.toLowerCase();
+    if (pathname !== lowerCasePathname) {
+        redirect(absoluteHref(lowerCasePathname));
+    }
+
     const { contentTarget, space, customization, pages, page, document } =
         await fetchPageData(params);
     const linksContext: PageHrefContext = {};
 
     if (!page) {
         notFound();
-    } else if (getPagePath(pages, page) !== getPathnameParam(params)) {
+    } else if (getPagePath(pages, page) !== pathname) {
         redirect(pageHref(pages, page, linksContext));
     }
 
