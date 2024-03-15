@@ -11,6 +11,7 @@ import { getDocumentSections } from '@/lib/document';
 import { absoluteHref } from '@/lib/links';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
+import { getPDFUrl, getPDFUrlSearchParams } from '@/lib/urls';
 
 import { ScrollSectionsList } from './ScrollSectionsList';
 import { PageFeedbackForm } from '../PageFeedback';
@@ -139,7 +140,12 @@ export async function PageAside(props: {
                     {customization.pdf.enabled ? (
                         <div>
                             <a
-                                href={absoluteHref('~gitbook/pdf')}
+                                href={absoluteHref(
+                                    `~gitbook/pdf?${getPDFUrlSearchParams({
+                                        page: page.id,
+                                        only: true,
+                                    }).toString()}`,
+                                )}
                                 className={tcls(
                                     'flex',
                                     'flex-row',

@@ -28,10 +28,10 @@ import { pagePDFContainerId, PageHrefContext, absoluteHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
+import { PDFSearchParams, getPDFSearchParams } from '@/lib/urls';
 
 import './pdf.css';
 import { PageControlButtons } from './PageControlButtons';
-import { PDFSearchParams, getPDFSearchParams } from './params';
 import { PrintButton } from './PrintButton';
 
 export const runtime = 'edge';
@@ -136,6 +136,7 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
             <PageControlButtons
                 pageIds={pageIds}
                 pdfHref={currentPDFUrl}
+                singlePageMode={!!pdfParams.only}
                 total={total}
                 trademark={
                     customization.trademark.enabled ? (

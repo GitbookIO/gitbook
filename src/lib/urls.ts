@@ -36,25 +36,32 @@ export function getPDFSearchParams(searchParams: URLSearchParams): PDFSearchPara
  */
 export function getPDFUrl(url: URL, params: PDFSearchParams): URL {
     const copy = new URL(url);
+    getPDFUrlSearchParams(params, copy.searchParams);
+    return copy;
+}
 
+export function getPDFUrlSearchParams(
+    params: PDFSearchParams,
+    searchParams = new URLSearchParams({}),
+): URLSearchParams {
     if (params?.page) {
-        copy.searchParams.set('page', params.page);
+        searchParams.set('page', params.page);
     } else {
-        copy.searchParams.delete('page');
+        searchParams.delete('page');
     }
     if (params?.only) {
-        copy.searchParams.set('only', 'yes');
+        searchParams.set('only', 'yes');
     } else {
-        copy.searchParams.delete('only');
+        searchParams.delete('only');
     }
 
     // Persist limit and back
     if (params?.limit) {
-        copy.searchParams.set('limit', String(params.limit));
+        searchParams.set('limit', String(params.limit));
     }
     if (params?.back) {
-        copy.searchParams.set('back', String(params.back));
+        searchParams.set('back', String(params.back));
     }
 
-    return copy;
+    return searchParams;
 }

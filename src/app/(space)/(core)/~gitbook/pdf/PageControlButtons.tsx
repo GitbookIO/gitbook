@@ -7,14 +7,14 @@ import { useScrollActiveId } from '@/components/hooks';
 import { Button } from '@/components/primitives';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
-
-import { getPDFUrl } from './params';
+import { getPDFUrl } from '@/lib/urls';
 
 /**
  * Dynamic controls to show active page and to let the user select between modes.
  */
 export function PageControlButtons(props: {
     pdfHref: string;
+    singlePageMode: boolean;
     /** Array of the [pageId, divId] */
     pageIds: Array<[string, string]>;
     /** Total number of pages targetted by the generation */
@@ -22,7 +22,7 @@ export function PageControlButtons(props: {
     /** Trademark to display */
     trademark?: React.ReactNode;
 }) {
-    const { pdfHref, pageIds, total, trademark } = props;
+    const { pdfHref, singlePageMode, pageIds, total, trademark } = props;
 
     const language = useLanguage();
 
@@ -49,15 +49,17 @@ export function PageControlButtons(props: {
                     'z-50',
                 )}
             >
-                <Button
-                    href={getPDFUrl(new URL(pdfHref), {
-                        page: activePageId,
-                        only: true,
-                    }).toString()}
-                    variant="secondary"
-                >
-                    {t(language, 'pdf_mode_only_page')}
-                </Button>
+                {singlePageMode ? null : (
+                    <Button
+                        href={getPDFUrl(new URL(pdfHref), {
+                            page: activePageId,
+                            only: true,
+                        }).toString()}
+                        variant="secondary"
+                    >
+                        {t(language, 'pdf_mode_only_page')}
+                    </Button>
+                )}
                 <Button
                     href={getPDFUrl(new URL(pdfHref), { page: undefined, only: false }).toString()}
                     variant="secondary"
