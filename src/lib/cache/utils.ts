@@ -1,6 +1,12 @@
 import { CacheEntryMeta } from './types';
 
 /**
+ * For mutable entries, we limit the cache to 1 minute
+ * as it could be invalidated at any time.
+ */
+export const NON_IMMUTABLE_LOCAL_CACHE_MAX_AGE_SECONDS = 60;
+
+/**
  * Get the max-age in seconds for a cache entry.
  */
 export function getCacheMaxAge(meta: CacheEntryMeta, min?: number, max?: number): number {

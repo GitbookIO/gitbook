@@ -3,7 +3,11 @@ import { Buffer } from 'node:buffer';
 import type { CacheStorage, Cache, Response as WorkerResponse } from '@cloudflare/workers-types';
 
 import { CacheBackend, CacheEntry } from './types';
-import { getCacheMaxAge, isCacheEntryImmutable } from './utils';
+import {
+    NON_IMMUTABLE_LOCAL_CACHE_MAX_AGE_SECONDS,
+    getCacheMaxAge,
+    isCacheEntryImmutable,
+} from './utils';
 import { trace } from '../tracing';
 
 const cacheVersion = 2;
@@ -101,16 +105,14 @@ function serializeEntry(entry: CacheEntry): WorkerResponse {
     headers.set('Content-Type', 'application/json');
     const cacheTags = ['gitbook-open', ...entry.meta.tags];
 
-    // When the entry is immutable, we can cache it for the entire duration.
-    // If the entry can be invalidated, we cache it for maximum 2 minutes as it could be invalidated in another data center.
-    headers.set(
-        'Cache-Control',
-        `public, max-age=${getCacheMaxAge(
-            entry.meta,
-            10,
-            isCacheEntryImmutable(entry.meta) ? undefined : 2 * 60,
-        )}`,
+    const maxAge = getCacheMaxAge(
+        entry.meta,
+        10,
+        // When the entry is immutable, we can cache it for the entire duration.
+        // Else we cache it for a very short time.
+        isCacheEntryImmutable(entry.meta) ? undefined : NON_IMMUTABLE_LOCAL_CACHE_MAX_AGE_SECONDS,
     );
+    headers.set('Cache-Control', `public, max-age=${maxAge}`);
     headers.set('Cache-Tag', cacheTags.join(','));
 
     // @ts-ignore

@@ -1,5 +1,5 @@
 import { CacheBackend, CacheEntry } from './types';
-import { isCacheEntryImmutable } from './utils';
+import { NON_IMMUTABLE_LOCAL_CACHE_MAX_AGE_SECONDS, isCacheEntryImmutable } from './utils';
 
 export const memoryCache: CacheBackend = {
     name: 'memory',
@@ -22,22 +22,23 @@ export const memoryCache: CacheBackend = {
     },
     async set(key, entry) {
         const memoryCache = getMemoryCache();
-        memoryCache.set(key, {
-            ...entry,
-            meta: {
-                ...entry.meta,
-                ...(isCacheEntryImmutable(entry.meta) || process.env.NODE_ENV === 'development'
-                    ? {}
-                    : {
-                          // For mutable entries, we limit the cache to 1 minute
-                          // as it could be invalidated at any time.
-                          expiresAt: Math.min(
-                              entry.meta.setAt ?? Date.now() + 60 * 1000,
-                              entry.meta.expiresAt,
-                          ),
-                      }),
-            },
-        });
+        // When the entry is immutable, we can cache it for the entire duration.
+        // Else we cache it for a very short time.
+        const expiresAt =
+            isCacheEntryImmutable(entry.meta) || process.env.NODE_ENV === 'development'
+                ? null
+                : Math.min(
+                      Date.now() + NON_IMMUTABLE_LOCAL_CACHE_MAX_AGE_SECONDS * 1000,
+                      entry.meta.expiresAt,
+                  );
+
+        const meta = { ...entry.meta };
+
+        if (expiresAt) {
+            meta.expiresAt = expiresAt;
+        }
+
+        memoryCache.set(key, { ...entry, meta });
     },
     async del(keys) {
         const memoryCache = getMemoryCache();
