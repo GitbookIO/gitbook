@@ -1,10 +1,10 @@
 import { CacheEntryMeta } from './types';
 
 /**
- * For mutable entries, we limit the cache to 1 minute
+ * For mutable entries, we limit the cache to 30 seconds
  * as it could be invalidated at any time.
  */
-export const NON_IMMUTABLE_LOCAL_CACHE_MAX_AGE_SECONDS = 60;
+export const NON_IMMUTABLE_LOCAL_CACHE_MAX_AGE_SECONDS = 30;
 
 /**
  * Get the max-age in seconds for a cache entry.
