@@ -99,14 +99,7 @@ export async function resolveContentRef(
                 return null;
             }
 
-            if (contentRef.kind === 'page') {
-                return {
-                    href: pageHref(pages, page, linksContext),
-                    text: page.title,
-                    emoji: page.emoji,
-                    active: page.id === activePage?.id,
-                };
-            }
+            let anchor = contentRef.kind === 'page' ? undefined : contentRef.anchor;
 
             const isCurrentPage = page.id === activePage?.id;
             let href = '';
@@ -114,19 +107,19 @@ export async function resolveContentRef(
                 // Page in another content
                 href = new URL(getPagePath(pages, page), context.baseUrl).toString();
 
-                if (contentRef.anchor) {
-                    href += '#' + contentRef.anchor;
+                if (anchor) {
+                    href += '#' + anchor;
                 }
             } else {
                 // Page in the current content
-                href = pageHref(pages, page, linksContext, contentRef.anchor);
+                href = pageHref(pages, page, linksContext, anchor);
             }
 
             return {
                 href,
-                text: (isCurrentPage ? '' : page.title) + '#' + contentRef.anchor,
+                text: anchor ? (isCurrentPage ? '' : page.title) + '#' + anchor : page.title,
                 emoji: isCurrentPage ? undefined : page.emoji,
-                active: false,
+                active: !anchor && page.id === activePage?.id,
             };
         }
 
