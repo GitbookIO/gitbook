@@ -90,9 +90,10 @@ export function getURLLookupAlternatives(input: URL) {
 
 /**
  * Normalize a URL to remove duplicate slashes and trailing slashes
+ * and transform the pathname to lowercase.
  */
 export function normalizeURL(url: URL) {
     const result = new URL(url);
-    result.pathname = url.pathname.replace(/\/{2,}/g, '/').replace(/\/$/, '');
+    result.pathname = url.pathname.replace(/\/{2,}/g, '/').replace(/\/$/, '').toLowerCase();
     return result;
 }

@@ -140,7 +140,7 @@ export async function middleware(request: NextRequest) {
         revision: resolved.revision,
     });
 
-    // Because of how Next will encode, we need to encode ourselves the pathname before reriting to it.
+    // Because of how Next will encode, we need to encode ourselves the pathname before rewriting to it.
     const rewritePathname = normalizePathname(encodePathname(resolved.pathname));
 
     console.log(`${request.method} (${resolved.space}) ${rewritePathname}`);

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'bun:test';
 
-import { getURLLookupAlternatives } from './middleware';
+import { getURLLookupAlternatives, normalizeURL } from './middleware';
 
 describe('getURLLookupAlternatives', () => {
     it('should return all URLs up to the root', () => {
@@ -104,3 +104,29 @@ describe('getURLLookupAlternatives', () => {
         ]);
     });
 });
+
+describe('normalizeURL', () => {
+    it('should remove trailing slashes', () => {
+        expect(normalizeURL(new URL('https://docs.mycompany.com/hello/'))).toEqual(
+            new URL('https://docs.mycompany.com/hello'),
+        );
+    });
+
+    it('should remove duplicate slashes', () => {
+        expect(normalizeURL(new URL('https://docs.mycompany.com//hello//there'))).toEqual(
+            new URL('https://docs.mycompany.com/hello/there'),
+        );
+    });
+
+    it('should convert uppercase characters in the path to lowercase', () => {
+        expect(normalizeURL(new URL('https://docs.mycompany.com/Hello/My/pAge'))).toEqual(
+            new URL('https://docs.mycompany.com/hello/my/page'),
+        );
+    });
+
+    it('should not affect uppercase characters in querystring parameters', () => {
+        expect(normalizeURL(new URL('https://docs.mycompany.com/Hello/My/pAge?Q=MySearch'))).toEqual(
+            new URL('https://docs.mycompany.com/hello/my/page?Q=MySearch'),
+        );
+    });
+})
