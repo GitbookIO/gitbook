@@ -177,16 +177,12 @@ export function cache<Args extends any[], Result>(
             // If the resolution came from a fetch (fromBackend is undefined), we don't need to update caches as it was
             // done in the revalidate function above.
             if (fromBackend?.replication === 'global') {
-                // Write and await to the memory cache, so future requests are guaranteed to hit it.
-                await memoryCache.set(key, savedEntry);
-            
-                // Write to other local caches, but don't await (debugging hanging pages)
-                waitUntil(
+                await waitUntil(
                     Promise.all(
                         cacheBackends
                             .filter(
                                 (backend) =>
-                                    backend.name !== backendName && backend.name !== memoryCache.name && backend.replication === 'local',
+                                    backend.name !== backendName && backend.replication === 'local',
                             )
                             .map((backend) => backend.set(key, savedEntry)),
                     ),
