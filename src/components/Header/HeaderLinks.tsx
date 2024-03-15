@@ -2,34 +2,29 @@ import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
+import styles from './headerLinks.module.css';
+
 interface HeaderLinksProps {
     children: React.ReactNode;
 }
 
 export async function HeaderLinks({ children }: HeaderLinksProps) {
     return (
-        <div
-            className={tcls(
-                '@container/headerlinks',
-                'w-full',
-                'hidden',
-                'sm:inline-flex',
-                'justify-end',
-                'h-full',
-                'tracking-[-0.02em]',
-                //hide children
-                `[&>*]:hidden`,
-                //hide each child per container breakpoint
-                `@[440px]/headerlinks:[&>*:nth-last-child(4)]:flex`,
-                `@[560px]/headerlinks:[&>*:nth-last-child(3)]:flex`,
-                `@[720px]/headerlinks:[&>*:nth-last-child(2)]:flex`,
-                `@[868px]/headerlinks:[&>*:nth-last-child(1)]:flex`,
-                `[&>*:nth-last-child(n_+_5)]:flex`,
-                // show container on larger screens
-                `@[320px]:flex`,
-            )}
-        >
-            {children}
+        <div className={tcls('w-full', 'h-full', 'inline-flex', 'tracking-[-0.02em]')}>
+            <div
+                className={`${styles.containerHeaderlinks} ${tcls(
+                    'flex',
+                    'w-full',
+                    'h-full',
+                    'justify-end',
+                    'gap-x-2.5',
+                    'mr-2.5',
+                    'lg:gap-x-5',
+                    '*:max-w-56',
+                )}`}
+            >
+                {children}
+            </div>
         </div>
     );
 }

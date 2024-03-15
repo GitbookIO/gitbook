@@ -40,14 +40,13 @@ export async function HeaderLink(props: {
             {...linkProps}
             href={target.href}
             className={tcls(
+                'overflow-hidden',
                 'text-sm',
                 'flex',
                 'flex-row',
                 'items-center',
-                'px-2',
                 'whitespace-nowrap',
                 'lg:text-base',
-                'shadow-[0px_-2px_0px_rgba(0,0,0,0)_inset]',
 
                 !isCustomizationDefault
                     ? ['text-header-link-500']
@@ -61,7 +60,8 @@ export async function HeaderLink(props: {
                     : ['hover:text-header-link-400'],
             )}
         >
-            {link.title}
+            <span className={tcls('truncate')}> {link.title}</span>
+
             {link.links && link.links.length > 0 ? <DropdownChevron /> : null}
         </Link>
     );

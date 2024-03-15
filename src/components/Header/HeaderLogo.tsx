@@ -128,12 +128,12 @@ function LogoFallback(props: HeaderLogoProps) {
 
             <h1
                 className={tcls(
-                    'text-balance',
-                    'flex',
-                    'leading-tight',
+                    'text-pretty',
+                    'line-clamp-3',
+                    'leading-[1.1]',
                     'tracking-tight',
-                    'max-w-[13ch]',
-                    'lg:max-w-none',
+                    'max-w-[18ch]',
+                    'lg:max-w-[24ch]',
                     'lg:text-lg/tight',
                     'font-semibold',
                     'ms-3',

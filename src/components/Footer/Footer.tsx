@@ -31,12 +31,67 @@ export function Footer(props: {
                     'flex',
                     'flex-col',
                     CONTAINER_STYLE,
+
                     'py-6',
-                    'md:flex-row',
                     'gap-6',
+                    'md:flex-row',
+                    'md:gap-10',
+
+                    //override CONTAINER_STYLE px
+                    'px-0',
+                    'sm:px-0',
                 )}
             >
-                <div className={tcls('flex-1', 'flex', 'flex-col', 'gap-6')}>
+                {' '}
+                {customization.footer.logo ? (
+                    <div
+                        className={tcls(
+                            'pt-8',
+                            'border-t',
+                            'border-dark/2',
+                            'dark:border-light/1',
+                            'px-4',
+                            'sm:px-6',
+                            'md:px-0',
+                            'md:pr-10',
+                            'md:border-r',
+                            'md:border-t-0',
+                            'md:pt-0',
+                        )}
+                    >
+                        <Image
+                            alt="Logo"
+                            sources={{
+                                light: {
+                                    src: customization.footer.logo.light,
+                                },
+                                dark: customization.footer.logo.dark
+                                    ? {
+                                          src: customization.footer.logo.dark,
+                                      }
+                                    : null,
+                            }}
+                            priority="lazy"
+                            style={['h-auto', 'w-full', 'max-w-12', 'object-contain']}
+                            sizes={[
+                                {
+                                    width: 320,
+                                },
+                            ]}
+                        />
+                    </div>
+                ) : null}
+                <div
+                    className={tcls(
+                        'flex-1',
+                        'flex',
+                        'flex-col',
+                        'gap-6',
+                        'px-4',
+                        'sm:px-6',
+                        'md:px-0',
+                    )}
+                >
                     {customization.footer.logo || customization.footer.groups?.length > 0 ? (
                         <div
                             className={tcls(
@@ -45,41 +100,10 @@ export function Footer(props: {
                                 'gap-10',
                                 'sm:gap-20',
                                 'sm:flex-row',
-                                'items-center',
+                                'items-start',
                                 'flex-wrap',
                             )}
                         >
-                            {customization.footer.logo ? (
-                                <div>
-                                    <Image
-                                        alt="Logo"
-                                        sources={{
-                                            light: {
-                                                src: customization.footer.logo.light,
-                                            },
-                                            dark: customization.footer.logo.dark
-                                                ? {
-                                                      src: customization.footer.logo.dark,
-                                                  }
-                                                : null,
-                                        }}
-                                        priority="lazy"
-                                        style={[
-                                            'h-10',
-                                            'md:h-24',
-                                            'max-w-full',
-                                            'sm:max-w-80',
-                                            'object-contain',
-                                        ]}
-                                        sizes={[
-                                            {
-                                                width: 320,
-                                            },
-                                        ]}
-                                    />
-                                </div>
-                            ) : null}
-
                             {customization.footer.groups.map((group, index) => (
                                 <FooterLinksGroup key={index} group={group} context={context} />
                             ))}
@@ -92,7 +116,18 @@ export function Footer(props: {
                     ) : null}
                 </div>
                 {customization.themes.toggeable ? (
-                    <div className={tcls('flex', 'flex-col', 'items-center')}>
+                    <div
+                        className={tcls(
+                            'flex',
+                            'flex-col',
+                            'items-start',
+                            'order-[-1]',
+                            'px-4',
+                            'sm:px-6',
+                            'md:px-0',
+                            'md:order-1',
+                        )}
+                    >
                         <React.Suspense fallback={null}>
                             <ThemeToggler />
                         </React.Suspense>
