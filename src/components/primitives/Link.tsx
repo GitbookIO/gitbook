@@ -18,7 +18,7 @@ export function Link(props: LinkProps) {
 
     // Use a real anchor tag for external links,s and a Next.js Link for internal links.
     // If we use a NextLink for external links, Nextjs won't rerender the top-level layouts.
-    const isExternal = URL.canParse(props.href);
+    const isExternal = URL.canParse ? URL.canParse(props.href) : props.href.startsWith('http');
     if (isExternal) {
         return (
             <a {...domProps} href={href}>

@@ -117,4 +117,4 @@ describe('normalizeURL', () => {
             new URL('https://docs.mycompany.com/hello/there'),
         );
     });
-})
+});
