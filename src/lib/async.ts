@@ -85,7 +85,7 @@ export async function race<I, R>(
         const done = () => {
             resolved = true;
             if (timeoutId) {
-                clearTimeout(timeoutId!);
+                clearTimeout(timeoutId);
             }
             if (blockTimeoutId) {
                 clearTimeout(blockTimeoutId);
