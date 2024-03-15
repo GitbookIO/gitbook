@@ -172,9 +172,11 @@ export function cache<Args extends any[], Result>(
             const cacheStatus: 'miss' | 'hit' = backendName === 'fetch' ? 'miss' : 'hit';
             span.setAttribute('cacheStatus', cacheStatus);
 
-            // Replicate to local backends if needed
             const fromBackend = cacheBackends.find((backend) => backend.name === backendName);
-            if (cacheStatus === 'miss' || fromBackend?.replication !== 'local') {
+            // If the resolution came from a global cache, we update the local caches.
+            // If the resolution came from a fetch (fromBackend is undefined), we don't need to update caches as it was
+            // done in the revalidate function above.
+            if (fromBackend?.replication === 'global') {
                 await waitUntil(
                     Promise.all(
                         cacheBackends

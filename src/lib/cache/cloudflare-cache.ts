@@ -6,7 +6,7 @@ import { CacheBackend, CacheEntry } from './types';
 import { getCacheMaxAge, isCacheEntryImmutable } from './utils';
 import { trace } from '../tracing';
 
-const cacheVersion = 1;
+const cacheVersion = 2;
 
 /**
  * Cache implementation using the Cloudflare Cache API.
@@ -108,7 +108,7 @@ function serializeEntry(entry: CacheEntry): WorkerResponse {
         `public, max-age=${getCacheMaxAge(
             entry.meta,
             10,
-            isCacheEntryImmutable(entry.meta) ? 2 * 60 : undefined,
+            isCacheEntryImmutable(entry.meta) ? undefined : 2 * 60,
         )}`,
     );
     headers.set('Cache-Tag', cacheTags.join(','));
