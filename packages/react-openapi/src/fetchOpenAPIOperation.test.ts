@@ -1,5 +1,7 @@
 import { it, expect } from 'bun:test';
-import { OpenAPIFetcher, fetchOpenAPIOperation } from './fetchOpenAPIOperation';
+
+import { fetchOpenAPIOperation } from './fetchOpenAPIOperation';
+import { OpenAPIFetcher } from './types';
 
 const fetcher: OpenAPIFetcher = {
     fetch: async (url) => {
@@ -62,4 +64,17 @@ it('should resolve circular refs', async () => {
             operationId: 'askQuery',
         },
     });
+});
+
+it('should resolve to null if the method is not supported', async () => {
+    const resolved = await fetchOpenAPIOperation(
+        {
+            url: 'https://petstore3.swagger.io/api/v3/openapi.json',
+            method: 'dontexist',
+            path: '/pet',
+        },
+        fetcher,
+    );
+
+    expect(resolved).toBe(null);
 });

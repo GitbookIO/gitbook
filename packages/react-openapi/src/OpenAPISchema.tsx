@@ -1,12 +1,12 @@
 import classNames from 'classnames';
-
 import { OpenAPIV3 } from 'openapi-types';
-import { noReference } from './utils';
-import { OpenAPIClientContext } from './types';
-import { InteractiveSection } from './InteractiveSection';
-import { SYMBOL_REF_RESOLVED } from './fetchOpenAPIOperation';
 import React, { useId } from 'react';
+
+import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
+import { SYMBOL_REF_RESOLVED } from './resolveOpenAPIPath';
+import { OpenAPIClientContext } from './types';
+import { noReference } from './utils';
 
 type CircularRefsIds = Map<OpenAPIV3.SchemaObject, string>;
 
