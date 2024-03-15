@@ -78,6 +78,7 @@ const fetcher: OpenAPIFetcher = {
                     laxurls: true,
                     lint: false,
                     prevalidate: false,
+                    anchors: true,
                 })) as ConvertOutputOptions;
 
                 data = result.openapi;
