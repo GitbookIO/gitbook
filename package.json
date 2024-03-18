@@ -62,8 +62,7 @@
         "url-join": "^5.0.0"
     },
     "devDependencies": {
-        "@argos-ci/cli": "^1.0.4",
-        "@argos-ci/playwright": "^1.9.3",
+        "@argos-ci/playwright": "^2.0.0",
         "@cloudflare/next-on-pages": "^1.9.0",
         "@cloudflare/workers-types": "^4.20231218.0",
         "@playwright/test": "^1.42.1",

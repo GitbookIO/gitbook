@@ -4,7 +4,7 @@ import {
     CustomizationLocale,
     CustomizationSettings,
 } from '@gitbook/api';
-import { test, Page } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 import jwt from 'jsonwebtoken';
 import rison from 'rison';
 
@@ -14,6 +14,7 @@ interface Test {
     name: string;
     url: string;
     run?: (page: Page) => Promise<unknown>;
+    fullPage?: false;
 }
 
 interface TestsCase {
@@ -29,6 +30,14 @@ const allLocales: CustomizationLocale[] = [
     CustomizationLocale.Zh,
 ];
 
+async function waitForCookiesDialog(page: Page) {
+    const dialog = page.getByRole('dialog', { name: 'Cookies' });
+    const accept = dialog.getByRole('button', { name: 'Accept' });
+    const reject = dialog.getByRole('button', { name: 'Reject' });
+    await expect(accept).toBeVisible();
+    await expect(reject).toBeVisible();
+}
+
 const testCases: TestsCase[] = [
     {
         name: 'GitBook',
@@ -37,24 +46,32 @@ const testCases: TestsCase[] = [
             {
                 name: 'Home',
                 url: '',
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Search',
                 url: '?q=',
+                fullPage: false,
             },
             {
                 name: 'Search Results',
                 url: '?q=gitbook',
-                run: (page) => page.waitForSelector('[data-test="search-results"]'),
+                run: async (page) => {
+                    await page.waitForSelector('[data-test="search-results"]');
+                },
+                fullPage: false,
             },
             {
                 name: 'AI Search',
                 url: '?q=What+is+GitBook%3F&ask=true',
-                run: (page) => page.waitForSelector('[data-test="search-ask-answer"]'),
+                run: async (page) => {
+                    await page.waitForSelector('[data-test="search-ask-answer"]');
+                },
             },
             {
                 name: 'Not found',
                 url: 'content-not-found',
+                run: waitForCookiesDialog,
             },
         ],
     },
@@ -65,6 +82,7 @@ const testCases: TestsCase[] = [
             {
                 name: 'Landing page',
                 url: '',
+                run: waitForCookiesDialog,
             },
         ],
     },
@@ -75,6 +93,7 @@ const testCases: TestsCase[] = [
             {
                 name: 'Home',
                 url: '',
+                run: waitForCookiesDialog,
             },
         ],
     },
@@ -85,6 +104,7 @@ const testCases: TestsCase[] = [
             {
                 name: 'Home',
                 url: '',
+                run: waitForCookiesDialog,
             },
         ],
     },
@@ -95,6 +115,7 @@ const testCases: TestsCase[] = [
             {
                 name: 'Revision',
                 url: '~/revisions/S55pwsEr5UVoroaOiWnP',
+                run: waitForCookiesDialog,
             },
         ],
     },
@@ -115,58 +136,72 @@ const testCases: TestsCase[] = [
             {
                 name: 'Text',
                 url: 'text-page',
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Long text',
                 url: 'text-page/long-text',
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Images',
                 url: 'blocks/block-images',
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Inline Images',
                 url: 'blocks/inline-images',
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Tabs',
                 url: 'blocks/tabs',
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Hints',
                 url: 'blocks/hints',
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Integration Blocks',
                 url: 'blocks/integrations',
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Tables',
                 url: 'blocks/tables',
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Expandables',
                 url: 'blocks/expandables',
+                run: waitForCookiesDialog,
             },
             {
                 name: 'API Blocks',
                 url: 'blocks/api-blocks',
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Headings',
                 url: 'blocks/headings',
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Marks',
                 url: 'blocks/marks',
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Emojis',
                 url: 'blocks/emojis',
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Links',
                 url: 'blocks/links',
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Lists',
@@ -186,6 +221,7 @@ const testCases: TestsCase[] = [
                         links: [],
                     },
                 }),
+                run: waitForCookiesDialog,
             },
         ],
     },
@@ -196,10 +232,16 @@ const testCases: TestsCase[] = [
             {
                 name: 'Valid link',
                 url: 'Fc6mMII9FKgnwm7qqynx/',
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Invalid link',
                 url: 'invalid/',
+                run: async (page) => {
+                    await expect(
+                        page.getByText('Authentication missing to access this content'),
+                    ).toBeVisible();
+                },
             },
         ],
     },
@@ -222,6 +264,7 @@ const testCases: TestsCase[] = [
                     );
                     return `first?jwt_token=${token}`;
                 })(),
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Second',
@@ -238,6 +281,7 @@ const testCases: TestsCase[] = [
                     );
                     return `second?jwt_token=${token}`;
                 })(),
+                run: waitForCookiesDialog,
             },
         ],
     },
@@ -260,6 +304,7 @@ const testCases: TestsCase[] = [
                     );
                     return `?jwt_token=${token}`;
                 })(),
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Primary (Space A)',
@@ -276,6 +321,7 @@ const testCases: TestsCase[] = [
                     );
                     return `v/spacea?jwt_token=${token}`;
                 })(),
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Space B',
@@ -292,6 +338,7 @@ const testCases: TestsCase[] = [
                     );
                     return `v/spaceb?jwt_token=${token}`;
                 })(),
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Space C',
@@ -308,6 +355,7 @@ const testCases: TestsCase[] = [
                     );
                     return `v/spacec?jwt_token=${token}`;
                 })(),
+                run: waitForCookiesDialog,
             },
         ],
     },
@@ -330,6 +378,7 @@ const testCases: TestsCase[] = [
                     );
                     return `?jwt_token=${token}`;
                 })(),
+                run: waitForCookiesDialog,
             },
             {
                 name: 'First',
@@ -346,6 +395,7 @@ const testCases: TestsCase[] = [
                     );
                     return `first?jwt_token=${token}`;
                 })(),
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Custom page',
@@ -362,6 +412,7 @@ const testCases: TestsCase[] = [
                     );
                     return `custom-page?jwt_token=${token}`;
                 })(),
+                run: waitForCookiesDialog,
             },
             {
                 name: 'Inner page',
@@ -378,6 +429,7 @@ const testCases: TestsCase[] = [
                     );
                     return `custom-page/inner-page?jwt_token=${token}`;
                 })(),
+                run: waitForCookiesDialog,
             },
         ],
     },
@@ -392,6 +444,10 @@ const testCases: TestsCase[] = [
                     inherit: false,
                 },
             }),
+            run: async (page) => {
+                const dialog = page.getByTestId('cookies-dialog');
+                await expect(dialog).toBeVisible();
+            },
         })),
     },
 ];
@@ -414,6 +470,7 @@ for (const testCase of testCases) {
                             display: none !important;
                         }
                     `,
+                    fullPage: testEntry.fullPage,
                 });
             });
         }
