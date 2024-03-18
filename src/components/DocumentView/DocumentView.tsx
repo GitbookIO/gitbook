@@ -1,7 +1,7 @@
 import { ContentRef, JSONDocument } from '@gitbook/api';
 
 import { ContentTarget } from '@/lib/api';
-import { ResolvedContentRef } from '@/lib/references';
+import { ResolveContentRefOptions, ResolvedContentRef } from '@/lib/references';
 import { ClassValue } from '@/lib/tailwind';
 
 import { Blocks } from './Blocks';
@@ -21,7 +21,10 @@ export interface DocumentContext {
     /**
      * Resolve a content reference.
      */
-    resolveContentRef: (ref: ContentRef) => Promise<ResolvedContentRef | null>;
+    resolveContentRef: (
+        ref: ContentRef,
+        options?: ResolveContentRefOptions,
+    ) => Promise<ResolvedContentRef | null>;
 
     /**
      * Transform an ID to be added to the DOM.

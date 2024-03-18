@@ -4,12 +4,14 @@ import assertNever from 'assert-never';
 import {
     ContentPointer,
     getCollection,
+    getDocument,
     getRevisionFile,
     getSpace,
     getSpaceContentData,
     getUserById,
     ignoreAPIError,
 } from './api';
+import { getBlockById, getBlockTitle } from './document';
 import { gitbookAppHref, pageHref, PageHrefContext } from './links';
 import { getPagePath, resolvePageId } from './pages';
 
@@ -53,13 +55,23 @@ export interface ContentRefContext extends PageHrefContext {
     page?: RevisionPageDocument;
 }
 
+export interface ResolveContentRefOptions {
+    /**
+     * Should the content ref be rendered as text.
+     * @default false
+     */
+    resolveAnchorText?: boolean;
+}
+
 /**
  * Resolve a content reference to be rendered.
  */
 export async function resolveContentRef(
     contentRef: ContentRef,
     context: ContentRefContext,
+    options: ResolveContentRefOptions = {},
 ): Promise<ResolvedContentRef | null> {
+    const { resolveAnchorText = false } = options;
     const { space, revisionId, pages, page: activePage, ...linksContext } = context;
 
     switch (contentRef.kind) {
@@ -100,9 +112,33 @@ export async function resolveContentRef(
             }
 
             let anchor = contentRef.kind === 'page' ? undefined : contentRef.anchor;
-
             const isCurrentPage = page.id === activePage?.id;
+
             let href = '';
+            let text = '';
+            let emoji: string | undefined = undefined;
+
+            // Compute the text to display for the link
+            if (anchor) {
+                text = '#' + anchor;
+
+                if (resolveAnchorText) {
+                    const document = page.documentId
+                        ? await getDocument(space.id, page.documentId)
+                        : null;
+                    if (document) {
+                        const block = getBlockById(document, anchor);
+                        if (block) {
+                            text = getBlockTitle(block);
+                        }
+                    }
+                }
+            } else {
+                text = page.title;
+                emoji = isCurrentPage ? undefined : page.emoji;
+            }
+
+            // Compute the href for the link
             if (context.baseUrl) {
                 // Page in another content
                 href = new URL(getPagePath(pages, page), context.baseUrl).toString();
@@ -117,8 +153,8 @@ export async function resolveContentRef(
 
             return {
                 href,
-                text: anchor ? (isCurrentPage ? '' : page.title) + '#' + anchor : page.title,
-                emoji: isCurrentPage ? undefined : page.emoji,
+                text,
+                emoji,
                 active: !anchor && page.id === activePage?.id,
             };
         }

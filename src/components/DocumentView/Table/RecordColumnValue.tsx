@@ -133,7 +133,11 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                 </Tag>
             );
         case 'content-ref': {
-            const resolved = value ? await context.resolveContentRef(value as ContentRef) : null;
+            const resolved = value
+                ? await context.resolveContentRef(value as ContentRef, {
+                      resolveAnchorText: true,
+                  })
+                : null;
             return (
                 <Tag className={tcls('text-base', 'text-balance')}>
                     {resolved && resolved.emoji ? (

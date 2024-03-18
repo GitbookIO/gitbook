@@ -147,3 +147,84 @@ export function isNodeEmpty(
     const text = getNodeText(node);
     return text.trim().length === 0;
 }
+
+/**
+ * Get the title for a node.
+ */
+export function getBlockTitle(block: DocumentBlock): string {
+    switch (block.type) {
+        case 'expandable': {
+            const titleFragment = getNodeFragmentByType(block, 'title');
+            if (titleFragment) {
+                return getNodeText(titleFragment);
+            }
+            return '';
+        }
+
+        case 'tabs-item': {
+            return block.data.title ?? '';
+        }
+
+        case 'swagger': {
+            return `${block.data.method?.toUpperCase()} ${block.data.path}`;
+        }
+
+        case 'heading-1':
+        case 'heading-2':
+        case 'heading-3':
+        default:
+            return getNodeText(block);
+    }
+}
+
+/**
+ * Get a block by its ID in the document.
+ */
+export function getBlockById(document: JSONDocument, id: string): DocumentBlock | null {
+    return findBlock(document, (block) => {
+        if ('meta' in block && block.meta && 'id' in block.meta) {
+            return block.meta.id === id;
+        }
+        return false;
+    });
+}
+
+/**
+ * Find a block by a predicate in the document.
+ */
+function findBlock(
+    container: JSONDocument | DocumentBlock | DocumentFragment,
+    test: (block: DocumentBlock) => boolean,
+): DocumentBlock | null {
+    if (!('nodes' in container)) {
+        return null;
+    }
+
+    for (const block of container.nodes) {
+        if (block.object !== 'block') {
+            return null;
+        }
+
+        if (test(block)) {
+            return block;
+        }
+
+        if (block.object === 'block' && 'nodes' in block) {
+            const result = findBlock(block, test);
+            if (result) {
+                return result;
+            }
+        }
+
+        if (block.object === 'block' && 'fragments' in block) {
+            for (const fragment of block.fragments) {
+                const result = findBlock(fragment, test);
+                if (result) {
+                    return result;
+                }
+            }
+        }
+    }
+
+    return null;
+}
