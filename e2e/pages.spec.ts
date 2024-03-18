@@ -15,6 +15,7 @@ interface Test {
     url: string;
     run?: (page: Page) => Promise<unknown>;
     fullPage?: false;
+    screenshot?: false;
 }
 
 interface TestsCase {
@@ -67,6 +68,7 @@ const testCases: TestsCase[] = [
                 run: async (page) => {
                     await page.waitForSelector('[data-test="search-ask-answer"]');
                 },
+                screenshot: false,
             },
             {
                 name: 'Not found',
@@ -462,16 +464,18 @@ for (const testCase of testCases) {
                 if (testEntry.run) {
                     await testEntry.run(page);
                 }
-                await argosScreenshot(page, `${testCase.name} - ${testEntry.name}`, {
-                    viewports: ['macbook-13', 'iphone-x', 'ipad-2'],
-                    argosCSS: `
+                if (testEntry.screenshot !== false) {
+                    await argosScreenshot(page, `${testCase.name} - ${testEntry.name}`, {
+                        viewports: ['macbook-13', 'iphone-x', 'ipad-2'],
+                        argosCSS: `
                         /* Hide Intercom */
                         .intercom-lightweight-app {
                             display: none !important;
                         }
                     `,
-                    fullPage: testEntry.fullPage,
-                });
+                        fullPage: testEntry.fullPage,
+                    });
+                }
             });
         }
     });
