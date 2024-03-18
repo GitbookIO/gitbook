@@ -168,6 +168,10 @@ const testCases: TestsCase[] = [
                 name: 'Links',
                 url: 'blocks/links',
             },
+            {
+                name: 'Lists',
+                url: 'blocks/lists',
+            },
         ],
     },
     {

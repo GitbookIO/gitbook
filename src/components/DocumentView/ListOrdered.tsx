@@ -24,8 +24,9 @@ export function ListOrdered(props: BlockProps<DocumentBlockListOrdered>) {
                 '[&>li]:flex-row',
 
                 /* '[&>li>.bullet]:w-[1ch]', */
-                '[&>li>.bullet]:[font-variant-numeric:tabular-nums]',
-                '[&>li>.bullet]:[counter-increment:list-decimal]',
+                '[&>li>.bullet]:tabular-nums',
+                '[&>li>.bullet]:whitespace-nowrap',
+                '[&>li>.bullet]:list-decimal',
 
                 '[&>li>.bullet]:before:h-[1lh]',
                 '[&>li>.bullet]:before:leading-[inherit]',
