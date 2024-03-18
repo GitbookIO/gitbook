@@ -111,15 +111,16 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
 
 function BlockPlaceholder(props: { block: DocumentBlock; style: ClassValue }) {
     const { block, style } = props;
+    const id = 'meta' in block && block.meta && 'id' in block.meta ? block.meta.id : undefined;
 
     switch (block.type) {
         case 'heading-1':
         case 'heading-2':
         case 'heading-3':
         case 'file':
-            return <SkeletonHeading style={style} />;
+            return <SkeletonHeading id={id} style={style} />;
         case 'paragraph':
-            return <SkeletonSmall style={style} />;
+            return <SkeletonSmall id={id} style={style} />;
         case 'list-ordered':
         case 'list-unordered':
         case 'list-tasks':
@@ -129,7 +130,7 @@ function BlockPlaceholder(props: { block: DocumentBlock; style: ClassValue }) {
         case 'hint':
         case 'tabs':
         case 'synced-block':
-            return <SkeletonParagraph style={style} />;
+            return <SkeletonParagraph id={id} style={style} />;
         case 'expandable':
         case 'table':
         case 'swagger':
@@ -137,17 +138,17 @@ function BlockPlaceholder(props: { block: DocumentBlock; style: ClassValue }) {
         case 'divider':
         case 'content-ref':
         case 'integration':
-            return <SkeletonCard style={style} />;
+            return <SkeletonCard id={id} style={style} />;
         case 'embed':
         case 'images':
         case 'drawing':
-            return <SkeletonImage style={style} />;
+            return <SkeletonImage id={id} style={style} />;
         case 'image':
         case 'code-line':
         case 'tabs-item':
             throw new Error('Blocks should be directly rendered by parent');
         case 'integration':
-            return <SkeletonCard style={style} />;
+            return <SkeletonCard id={id} style={style} />;
         default:
             assertNever(block);
     }

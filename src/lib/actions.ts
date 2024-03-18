@@ -12,7 +12,7 @@ export type StreamResponseChunk<T> = {
 export function streamResponse<T, P extends any[]>(
     createGenerator: (...args: P) => AsyncGenerator<T>,
 ) {
-    return (...args: Parameters<typeof createGenerator>) => {
+    return async (...args: Parameters<typeof createGenerator>) => {
         const generator = createGenerator(...args);
         return streamChunk<T>(generator);
     };

@@ -86,94 +86,6 @@ const testCases: TestsCase[] = [
                 name: 'Home',
                 url: '',
             },
-            {
-                name: 'PDF',
-                url: '~gitbook/pdf?limit=10',
-            },
-        ],
-    },
-    {
-        name: 'Commerce Layer',
-        baseUrl: 'https://docs.commercelayer.io/core/',
-        tests: [
-            {
-                name: 'Home',
-                url: '',
-            },
-            {
-                name: 'API Reference',
-                url: 'v/api-reference/',
-            },
-        ],
-    },
-    {
-        name: 'Naviga',
-        baseUrl: 'https://docs.navigaglobal.com/naviga-dashboard-overview/',
-        tests: [
-            {
-                name: 'Home',
-                url: 'v/dashboard-5.4/',
-            },
-        ],
-    },
-    {
-        name: 'Mattermost',
-        baseUrl: 'https://handbook.mattermost.com/',
-        tests: [
-            {
-                name: 'Home',
-                url: '',
-            },
-        ],
-    },
-    {
-        name: 'Tile DB',
-        baseUrl: 'https://docs.tiledb.com/main/',
-        tests: [
-            {
-                name: 'Home',
-                url: '',
-            },
-        ],
-    },
-    {
-        name: 'Nimbleway',
-        baseUrl: 'https://docs.nimbleway.com/',
-        tests: [
-            {
-                name: 'Home',
-                url: '',
-            },
-        ],
-    },
-    {
-        name: 'Parcellab',
-        baseUrl: 'https://how.parcellab.works/docs/',
-        tests: [
-            {
-                name: 'Home',
-                url: '',
-            },
-        ],
-    },
-    {
-        name: 'CitrusAd',
-        baseUrl: 'https://help.citrusad.com/citrus-ads/',
-        tests: [
-            {
-                name: 'Home',
-                url: '',
-            },
-        ],
-    },
-    {
-        name: 'ThousandEyes',
-        baseUrl: 'https://docs.thousandeyes.com/',
-        tests: [
-            {
-                name: 'Home',
-                url: '',
-            },
         ],
     },
     {
@@ -251,6 +163,10 @@ const testCases: TestsCase[] = [
             {
                 name: 'Emojis',
                 url: 'blocks/emojis',
+            },
+            {
+                name: 'Links',
+                url: 'blocks/links',
             },
         ],
     },

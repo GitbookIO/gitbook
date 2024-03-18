@@ -10,6 +10,7 @@ import { getPagePath } from '@/lib/pages';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
+import { PageClientLayout } from './PageClientLayout';
 import { PagePathParams, fetchPageData, getPathnameParam } from '../../fetch';
 
 export const runtime = 'edge';
@@ -83,6 +84,9 @@ export default async function Page(props: { params: PagePathParams }) {
                     />
                 ) : null}
             </div>
+            <React.Suspense fallback={null}>
+                <PageClientLayout />
+            </React.Suspense>
         </>
     );
 }
