@@ -6,7 +6,6 @@ import * as ReactDOM from 'react-dom';
 import { AdminToolbar } from '@/components/AdminToolbar';
 import { CookiesToast } from '@/components/Cookies';
 import { LoadIntegrations } from '@/components/Integrations';
-import { RocketLoaderDetector } from '@/components/RocketLoaderDetector';
 import { SpaceLayout } from '@/components/SpaceLayout';
 import { buildVersion } from '@/lib/build';
 import { getContentSecurityPolicyNonce } from '@/lib/csp';
@@ -14,6 +13,7 @@ import { absoluteHref, baseUrl } from '@/lib/links';
 import { shouldIndexSpace } from '@/lib/seo';
 
 import { ClientContexts } from './ClientContexts';
+import { RocketLoaderDetector } from './RocketLoaderDetector';
 import { fetchSpaceData } from '../fetch';
 
 export const runtime = 'edge';
