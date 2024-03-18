@@ -12,6 +12,7 @@ export function RocketLoaderDetector(props: { nonce: string }) {
             data-cfasync="false"
             dangerouslySetInnerHTML={{
                 __html: `
+        document.addEventListener("DOMContentLoaded", () => {
           if (Array.from(document.scripts).find(script => script.src.includes('rocket-loader.min.js'))) {
             const alert = document.createElement('div');
             alert.className = 'p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 mt-8 mx-8';
@@ -21,7 +22,8 @@ export function RocketLoaderDetector(props: { nonce: string }) {
               \`;
 
             document.body.prepend(alert);
-          }`,
+          }
+        });`,
             }}
         />
     );
