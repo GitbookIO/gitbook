@@ -7,7 +7,7 @@ import { ClassValue, tcls } from '@/lib/tailwind';
 import { PolymorphicComponentProp } from './types';
 import { Zoom } from './Zoom';
 
-type ImageSize = { width: number; height: number };
+export type ImageSize = { width: number; height: number };
 
 type ImageSource = {
     src: string;

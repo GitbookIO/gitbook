@@ -28,7 +28,12 @@ export function DateRelative(props: { value: string }) {
     const date = new Date(value);
     const diff = now - date.getTime();
     return (
-        <time suppressHydrationWarning={true} dateTime={value} title={date.toLocaleString()}>
+        <time
+            data-visual-test="transparent"
+            suppressHydrationWarning={true}
+            dateTime={value}
+            title={date.toLocaleString()}
+        >
             {formatDiff(language.locale, diff)}
         </time>
     );

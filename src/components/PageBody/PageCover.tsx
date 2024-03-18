@@ -1,11 +1,13 @@
 import { RevisionPageDocument, RevisionPageDocumentCover } from '@gitbook/api';
 
-import { Image } from '@/components/utils';
+import { Image, ImageSize } from '@/components/utils';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import defaultPageCover from './default-page-cover.svg';
 import { PAGE_COVER_HEIGHT } from '../layout';
+
+const PAGE_COVER_SIZE: ImageSize = { width: 1990, height: 480 };
 
 /**
  * Cover for the page.
@@ -22,23 +24,29 @@ export async function PageCover(props: {
     return (
         <div
             className={tcls(
-                PAGE_COVER_HEIGHT,
                 'overflow-hidden',
+                '-mx-4',
                 // Negative margin to balance the container padding
                 as === 'full'
-                    ? ['-mx-4', 'sm:-mx-6', 'md:-mx-8']
-                    : ['max-w-3xl', 'mx-auto', 'rounded-md', 'mb-8'],
+                    ? ['sm:-mx-6', 'md:-mx-8', 'lg:ml-0', '-lg:mr-8']
+                    : ['sm:mx-auto', 'max-w-3xl', 'sm:rounded-md', 'mb-8'],
             )}
         >
             <Image
                 alt="Page cover image"
                 sources={{
-                    light: {
-                        src: resolved?.href ?? defaultPageCover.src,
-                        size: resolved
-                            ? resolved?.fileDimensions
-                            : { width: defaultPageCover.width, height: defaultPageCover.height },
-                    },
+                    light: resolved
+                        ? {
+                              src: resolved.href,
+                              size: resolved.fileDimensions,
+                          }
+                        : {
+                              src: defaultPageCover.src,
+                              size: {
+                                  width: defaultPageCover.width,
+                                  height: defaultPageCover.height,
+                              },
+                          },
                 }}
                 resize={
                     // When using the default cover, we don't want to resize as it's a SVG
@@ -59,13 +67,13 @@ export async function PageCover(props: {
                 ]}
                 className={tcls(
                     'w-full',
-                    'h-full',
                     'object-cover',
                     'object-center',
                     as === 'full'
                         ? ['[mask-image:linear-gradient(rgba(0,0,0,1),_rgba(0,0,0,0.5))]']
                         : null,
                 )}
+                inlineStyle={{ aspectRatio: `${PAGE_COVER_SIZE.width}/${PAGE_COVER_SIZE.height}` }}
             />
         </div>
     );

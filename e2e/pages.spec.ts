@@ -404,6 +404,12 @@ for (const testCase of testCases) {
                 }
                 await argosScreenshot(page, `${testCase.name} - ${testEntry.name}`, {
                     viewports: ['macbook-13', 'iphone-x', 'ipad-2'],
+                    argosCSS: `
+                        /* Hide Intercom */
+                        .intercom-lightweight-app {
+                            display: none !important;
+                        }
+                    `,
                 });
             });
         }
