@@ -74,6 +74,7 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
 
     const initialOutput = await ignoreAPIError(
         renderIntegrationUi(block.data.integration, initialInput),
+        true,
     );
     if (!initialOutput) {
         return null;

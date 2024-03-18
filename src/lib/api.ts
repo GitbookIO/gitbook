@@ -849,12 +849,15 @@ export function userAgent(): string {
 /**
  * Ignore error for an API call.
  */
-export async function ignoreAPIError<T>(promise: Promise<T>): Promise<T | null> {
+export async function ignoreAPIError<T>(
+    promise: Promise<T>,
+    ignoreAll: boolean = false,
+): Promise<T | null> {
     try {
         return await promise;
     } catch (error) {
         const code = (error as GitBookAPIError).code;
-        if (code >= 400 && code < 500) {
+        if (ignoreAll || (code >= 400 && code < 500)) {
             return null;
         }
 
