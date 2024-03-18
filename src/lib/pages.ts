@@ -113,7 +113,10 @@ export function getPagePath(
     return page.path;
 }
 
-function resolveFirstDocument(
+/**
+ * Resolve the first page document in a list of pages.
+ */
+export function resolveFirstDocument(
     pages: RevisionPage[],
     ancestors: AncestorRevisionPage[],
 ): { page: RevisionPageDocument; ancestors: AncestorRevisionPage[] } | undefined {
@@ -122,7 +125,10 @@ function resolveFirstDocument(
             continue;
         }
 
-        return resolvePageDocument(page, ancestors);
+        const result = resolvePageDocument(page, ancestors);
+        if (result) {
+            return result;
+        }
     }
 
     return;
