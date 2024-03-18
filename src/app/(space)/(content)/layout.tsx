@@ -77,7 +77,7 @@ export default async function ContentLayout(props: { children: React.ReactNode }
                 </React.Suspense>
             ) : null}
 
-            <RocketLoaderDetector />
+            <RocketLoaderDetector nonce={nonce} />
 
             <AdminToolbar space={space} content={content} />
         </ClientContexts>
