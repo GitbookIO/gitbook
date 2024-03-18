@@ -31,6 +31,7 @@ export function PageBody(props: {
 
     const asFullWidth = document ? hasFullWidthBlock(document) : false;
     const language = getSpaceLanguage(customization);
+    const updatedAt = page.updatedAt ?? page.createdAt;
 
     return (
         <>
@@ -96,15 +97,18 @@ export function PageBody(props: {
                         'page-api-block:ml-0',
                     )}
                 >
-                    <p className={tcls('flex-1', 'text-sm', 'text-dark/6', 'dark:text-light/5')}>
-                        {t(
-                            language,
-                            'page_last_modified',
-                            <DateRelative
-                                value={page.updatedAt ?? page.createdAt ?? new Date().toISOString()}
-                            />,
-                        )}
-                    </p>
+                    {updatedAt ? (
+                        <p
+                            className={tcls(
+                                'flex-1',
+                                'text-sm',
+                                'text-dark/6',
+                                'dark:text-light/5',
+                            )}
+                        >
+                            {t(language, 'page_last_modified', <DateRelative value={updatedAt} />)}
+                        </p>
+                    ) : null}
                     {withPageFeedback ? (
                         <PageFeedbackForm
                             orientation="horizontal"
