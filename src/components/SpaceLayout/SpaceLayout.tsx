@@ -96,7 +96,9 @@ export function SpaceLayout(props: {
                     }
                     withHeaderOffset={withTopHeader}
                 />
-                <div className={tcls('flex-1', 'flex', 'flex-col')}>{children}</div>
+                <div id="gitbook-main-content" className={tcls('flex-1', 'flex', 'flex-col')}>
+                    {children}
+                </div>
             </div>
 
             {customization.themes.toggeable ||

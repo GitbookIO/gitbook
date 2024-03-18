@@ -6,6 +6,7 @@ import * as ReactDOM from 'react-dom';
 import { AdminToolbar } from '@/components/AdminToolbar';
 import { CookiesToast } from '@/components/Cookies';
 import { LoadIntegrations } from '@/components/Integrations';
+import { RocketLoaderDetector } from '@/components/RocketLoaderDetector';
 import { SpaceLayout } from '@/components/SpaceLayout';
 import { buildVersion } from '@/lib/build';
 import { getContentSecurityPolicyNonce } from '@/lib/csp';
@@ -75,6 +76,8 @@ export default async function ContentLayout(props: { children: React.ReactNode }
                     <CookiesToast privacyPolicy={customization.privacyPolicy.url} />
                 </React.Suspense>
             ) : null}
+
+            <RocketLoaderDetector />
 
             <AdminToolbar space={space} content={content} />
         </ClientContexts>
