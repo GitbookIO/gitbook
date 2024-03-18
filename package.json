@@ -54,7 +54,7 @@
         "remark-rehype": "^11.1.0",
         "rison": "^0.1.1",
         "server-only": "^0.0.1",
-        "shikiji": "^0.8.0",
+        "shiki": "^1.2.0",
         "swagger2openapi": "^7.0.8",
         "tailwind-merge": "^2.2.0",
         "tailwind-shades": "^1.1.2",

@@ -1,7 +1,13 @@
 import { DocumentBlockCode, DocumentBlockCodeLine, DocumentInlineAnnotation } from '@gitbook/api';
-import { getHighlighter, loadWasm, bundledLanguages, Highlighter, ThemedToken } from 'shikiji';
+import {
+    loadWasm,
+    bundledLanguages,
+    ThemedToken,
+    getHighlighter,
+    createCssVariablesTheme,
+} from 'shiki';
 // @ts-ignore - onigWasm is a Wasm module
-import onigWasm from 'shikiji/onig.wasm?module';
+import onigWasm from 'shiki/onig.wasm?module';
 
 import { singleton } from '@/lib/async';
 import { getNodeText } from '@/lib/document';
@@ -55,11 +61,10 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
         return plainHighlighting(block);
     }
 
-    const instance = await loadHighlighter();
-    await instance.loadLanguage(langName);
+    const highlighter = await loadHighlighter();
+    await highlighter.loadLanguage(langName);
 
-    const lines = instance.codeToThemedTokens(code, {
-        theme: 'css-variables',
+    const lines = highlighter.codeToTokensBase(code, {
         lang: langName,
     });
     let currentIndex = 0;
@@ -318,7 +323,9 @@ const loadHighlighter = singleton(async () => {
         // Otherwise for Vercel/Cloudflare, we need to load it ourselves.
         await loadWasm((obj) => WebAssembly.instantiate(onigWasm, obj));
     }
-    const instance = await getHighlighter();
-    await instance.loadTheme('css-variables');
-    return instance;
+    const highlighter = await getHighlighter({
+        themes: [createCssVariablesTheme()],
+        langs: [],
+    });
+    return highlighter;
 });

@@ -283,5 +283,5 @@ function CodeHighlightToken(props: {
         return <>{token.token.content}</>;
     }
 
-    return <span style={{ color: colorToCSSVar[token.token.color] }}>{token.token.content}</span>;
+    return <span style={{ color: token.token.color }}>{token.token.content}</span>;
 }
