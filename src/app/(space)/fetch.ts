@@ -102,17 +102,22 @@ async function resolvePage(
         return resolvePageId(pages, params.pageId);
     }
 
-    const pathParam = getPathnameParam(params);
-    const page = resolvePagePath(pages, pathParam);
+    const rawPathname = getPathnameParam(params);
+    const pathname = normalizePathname(rawPathname);
+
+    // When resolving a page, we use the lowercased pathname
+    const page = resolvePagePath(pages, pathname);
     if (page) {
         return page;
     }
 
     // If page can't be found, we try with the API, in case we have a redirect
+    // We use the raw pathname to handle special/malformed redirects setup by users in the GitSync.
+    // The page rendering will take care of redirecting to a normalized pathname.
     const resolved = await getRevisionPageByPath(
         contentTarget.spaceId,
         contentTarget.revisionId,
-        pathParam,
+        rawPathname,
     );
     if (resolved) {
         return resolvePageId(pages, resolved.id);
@@ -138,4 +143,11 @@ async function fetchParentCollection(space: Space) {
 export function getPathnameParam(params: PagePathParams): string {
     const { pathname } = params;
     return pathname ? pathname.map((part) => decodeURIComponent(part)).join('/') : '';
+}
+
+/**
+ * Normalize the URL pathname into the format used in the revision page path.
+ */
+export function normalizePathname(pathname: string) {
+    return pathname.toLowerCase();
 }

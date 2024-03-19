@@ -11,7 +11,7 @@ import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { PageClientLayout } from './PageClientLayout';
-import { PagePathParams, fetchPageData, getPathnameParam } from '../../fetch';
+import { PagePathParams, fetchPageData, getPathnameParam, normalizePathname } from '../../fetch';
 
 export const runtime = 'edge';
 
@@ -21,20 +21,21 @@ export const runtime = 'edge';
 export default async function Page(props: { params: PagePathParams }) {
     const { params } = props;
 
-    // Redirects to the lowercase version of the path if it contains uppercase characters
-    const pathname = getPathnameParam(params);
-    const lowerCasePathname = pathname.toLowerCase();
-    if (pathname !== lowerCasePathname) {
-        redirect(absoluteHref(lowerCasePathname));
-    }
-
+    const rawPathname = getPathnameParam(params);
     const { contentTarget, space, customization, pages, page, document } =
         await fetchPageData(params);
     const linksContext: PageHrefContext = {};
 
     if (!page) {
-        notFound();
-    } else if (getPagePath(pages, page) !== pathname) {
+        const pathname = normalizePathname(rawPathname);
+        if (pathname !== rawPathname) {
+            // If the pathname was not normalized, redirect to the normalized version
+            // before trying to resolve the page again
+            redirect(pathname);
+        } else {
+            notFound();
+        }
+    } else if (getPagePath(pages, page) !== rawPathname) {
         redirect(pageHref(pages, page, linksContext));
     }
 
