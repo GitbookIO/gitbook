@@ -9,12 +9,6 @@ import { ScalarApiButton } from './ScalarApiButton';
 import { OpenAPIContextProps } from './types';
 import { noReference } from './utils';
 
-interface RedoclyCodeSample {
-    lang: string;
-    label: string;
-    source: string;
-}
-
 /**
  * Display code samples to execute the operation.
  * It supports the Redocly custom syntax as well (https://redocly.com/docs/api-reference-docs/specification-extensions/x-code-samples/)
@@ -44,35 +38,33 @@ export function OpenAPICodeSample(props: {
         },
     };
 
-    const samples = codeSampleGenerators.map((generator) => ({
+    const autoCodeSamples = codeSampleGenerators.map((generator) => ({
         key: `default-${generator.id}`,
         label: generator.label,
         body: <context.CodeBlock code={generator.generate(input)} syntax={generator.syntax} />,
     }));
 
-    const redoclyOperation = data.operation as OpenAPIV3.OperationObject & {
-        'x-code-samples'?: RedoclyCodeSample[];
-        'x-codeSamples'?: RedoclyCodeSample[];
-        'x-custom-examples'?: RedoclyCodeSample[];
-    };
-
-    (
-        redoclyOperation['x-custom-examples'] ??
-        redoclyOperation['x-codeSamples'] ??
-        redoclyOperation['x-code-samples']
-    )?.forEach((sample) => {
-        if (
-            typeof sample.lang === 'string' &&
-            typeof sample.source === 'string' &&
-            typeof sample.label === 'string'
-        ) {
-            samples.push({
+    // Use custom samples if defined
+    let customCodeSamples: null | Array<{
+        key: string;
+        label: string;
+        body: React.ReactNode;
+    }> = null;
+    (['x-custom-examples', 'x-code-samples', 'x-codeSamples'] as const).forEach((key) => {
+        const customSamples = data.operation[key];
+        if (customSamples) {
+            customCodeSamples = customSamples.map((sample) => ({
                 key: `redocly-${sample.lang}`,
                 label: sample.label,
                 body: <context.CodeBlock code={sample.source} syntax={sample.lang} />,
-            });
+            }));
         }
     });
+
+    const samples = customCodeSamples ?? (data['x-codeSamples'] !== false ? autoCodeSamples : []);
+    if (samples.length === 0) {
+        return null;
+    }
 
     async function fetchOperationData() {
         'use server';
@@ -84,7 +76,11 @@ export function OpenAPICodeSample(props: {
             header="Request"
             className="openapi-codesample"
             tabs={samples}
-            overlay={<ScalarApiButton fetchOperationData={fetchOperationData} />}
+            overlay={
+                data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'] ? null : (
+                    <ScalarApiButton fetchOperationData={fetchOperationData} />
+                )
+            }
         />
     );
 }
