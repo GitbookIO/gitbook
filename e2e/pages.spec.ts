@@ -209,6 +209,10 @@ const testCases: TestsCase[] = [
                 name: 'Lists',
                 url: 'blocks/lists',
             },
+            {
+                name: 'Math',
+                url: 'blocks/math',
+            },
         ],
     },
     {

@@ -12,7 +12,8 @@
         "format:check": "prettier ./ --ignore-unknown --list-different",
         "typecheck": "tsc --noEmit",
         "unit": "bun test {src,packages}/**/*.test.ts",
-        "e2e": "playwright test"
+        "e2e": "playwright test",
+        "postinstall": "rm -rf ./public/~gitbook/static/mathjax@3.2.2 && mkdir -p ./public/~gitbook/static/ && cp -R node_modules/mathjax/es5 ./public/~gitbook/static/mathjax@3.2.2"
     },
     "workspaces": [
         "packages/*"
@@ -59,7 +60,8 @@
         "tailwind-merge": "^2.2.0",
         "tailwind-shades": "^1.1.2",
         "unified": "^11.0.4",
-        "url-join": "^5.0.0"
+        "url-join": "^5.0.0",
+        "mathjax": "^3.2.2"
     },
     "devDependencies": {
         "@argos-ci/playwright": "^2.0.0",

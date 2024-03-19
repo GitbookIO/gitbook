@@ -1,13 +1,14 @@
 import { ContentRef, DocumentBlockSwagger } from '@gitbook/api';
+import yaml from 'js-yaml';
+import swagger2openapi, { ConvertOutputOptions } from 'swagger2openapi';
+
+import { cache, parseCacheResponse, noCacheFetchOptions, CacheFunctionOptions } from '@/lib/cache';
+
 import {
     OpenAPIOperationData,
     fetchOpenAPIOperation,
     OpenAPIFetcher,
 } from '@gitbook/react-openapi';
-import yaml from 'js-yaml';
-import swagger2openapi, { ConvertOutputOptions } from 'swagger2openapi';
-
-import { cache, parseCacheResponse, noCacheFetchOptions, CacheFunctionOptions } from '@/lib/cache';
 
 import { parseMarkdown } from './markdown';
 import { ResolvedContentRef } from './references';

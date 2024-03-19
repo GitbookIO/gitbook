@@ -13,6 +13,11 @@
                         "pattern": "@/**",
                         "group": "external",
                         "position": "after"
+                    },
+                    {
+                        "pattern": "@gitbook/**",
+                        "group": "external",
+                        "position": "after"
                     }
                 ],
                 "alphabetize": {

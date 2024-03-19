@@ -2,14 +2,8 @@ import { SpaceIntegrationScript } from '@gitbook/api';
 import { merge } from 'content-security-policy-merger';
 import { headers } from 'next/headers';
 
+import { assetsDomain } from './assets';
 import { filterOutNullable } from './typescript';
-
-let assetsDomain = '';
-if (process.env.GITBOOK_ASSETS_PREFIX) {
-    const parsed = new URL(process.env.GITBOOK_ASSETS_PREFIX);
-    assetsDomain = `${parsed.protocol}//${parsed.host}`;
-}
-
 /**
  * Get the current nonce for the current request.
  */

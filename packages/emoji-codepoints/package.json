@@ -2,7 +2,7 @@
     "name": "@gitbook/emoji-codepoints",
     "description": "Optimized mapping of codepoints to the fully qualified emoji codepoints",
     "private": true,
-    "main": "./index.ts",
+    "exports": "./index.ts",
     "dependencies": {},
     "devDependencies": {
         "emoji-assets": "^8.0.0"

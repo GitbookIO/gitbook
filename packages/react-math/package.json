@@ -1,0 +1,10 @@
+{
+    "name": "@gitbook/react-math",
+    "exports": "./src/index.ts",
+    "dependencies": {
+        "object-hash": "^3.0.0"
+    },
+    "peerDependencies": {
+        "react": "*"
+    }
+}

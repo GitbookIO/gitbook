@@ -16,7 +16,7 @@ jobs:
             - name: Setup bun
               uses: oven-sh/setup-bun@v1
               with:
-                  bun-version: 1.0.30
+                  bun-version: 1.0.33
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:
@@ -78,7 +78,7 @@ jobs:
             - name: Setup bun
               uses: oven-sh/setup-bun@v1
               with:
-                  bun-version: 1.0.30
+                  bun-version: 1.0.33
             - name: Install dependencies
               run: bun install --frozen-lockfile
             - name: Setup Playwright
@@ -98,7 +98,7 @@ jobs:
             - name: Setup bun
               uses: oven-sh/setup-bun@v1
               with:
-                  bun-version: 1.0.30
+                  bun-version: 1.0.33
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:
@@ -117,7 +117,7 @@ jobs:
             - name: Setup bun
               uses: oven-sh/setup-bun@v1
               with:
-                  bun-version: 1.0.30
+                  bun-version: 1.0.33
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:
@@ -132,12 +132,12 @@ jobs:
             - name: Setup bun
               uses: oven-sh/setup-bun@v1
               with:
-                  bun-version: 1.0.30
+                  bun-version: 1.0.33
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:
                   PUPPETEER_SKIP_DOWNLOAD: 1
-            - run: bun lint
+            - run: bun lint --no-cache
     test:
         runs-on: ubuntu-latest
         name: Test
@@ -147,7 +147,7 @@ jobs:
             - name: Setup bun
               uses: oven-sh/setup-bun@v1
               with:
-                  bun-version: 1.0.30
+                  bun-version: 1.0.33
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:
@@ -162,7 +162,7 @@ jobs:
             - name: Setup bun
               uses: oven-sh/setup-bun@v1
               with:
-                  bun-version: 1.0.30
+                  bun-version: 1.0.33
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:

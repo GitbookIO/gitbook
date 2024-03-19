@@ -22,7 +22,23 @@ module.exports = withSentryConfig(
             return config;
         },
 
+        async headers() {
+            return [
+                // Cache all static assets for 1 year
+                {
+                    source: '/~gitbook/static/:path*',
+                    headers: [
+                        {
+                            key: 'Cache-Control',
+                            value: 'public, max-age=31536000, immutable',
+                        },
+                    ],
+                },
+            ];
+        },
+
         assetPrefix: process.env.GITBOOK_ASSETS_PREFIX,
+        poweredByHeader: false,
     },
     {
         silent: true,

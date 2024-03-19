@@ -1,0 +1,9 @@
+/** Hide the KaTeX HTML output, while it's loading */
+.katex-html {
+    display: none;
+}
+
+/** Align the MathJax output with the font-size used by KaTeX */
+mjx-container[jax='CHTML'] {
+    font-size: 1.21em;
+}

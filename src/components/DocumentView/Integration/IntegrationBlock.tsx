@@ -15,11 +15,12 @@ import {
     Lock,
 } from '@geist-ui/icons';
 import { ContentKitContext, DocumentBlockIntegration } from '@gitbook/api';
-import { ContentKit, ContentKitOutput, ContentKitServerContext } from '@gitbook/react-contentkit';
 
 import { ignoreAPIError, renderIntegrationUi } from '@/lib/api';
 import { parseMarkdown } from '@/lib/markdown';
 import { tcls } from '@/lib/tailwind';
+
+import { ContentKit, ContentKitOutput, ContentKitServerContext } from '@gitbook/react-contentkit';
 
 import type { BlockProps } from '../Block';
 import './contentkit.css';

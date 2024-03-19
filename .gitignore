@@ -43,3 +43,6 @@ screenshots/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Generated public files
+/public/~gitbook/static/
