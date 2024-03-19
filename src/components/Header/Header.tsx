@@ -51,70 +51,84 @@ export function Header(props: {
                 }`,
             )}
         >
-            <div
-                className={tcls(
-                    'gap-4',
-                    'grid',
-                    'grid-flow-col',
-                    'auto-cols-[auto_auto_1fr_auto]',
-                    'h-16',
-                    'items-center',
-                    'align-center',
-                    'justify-between',
-                    'w-full',
-                    CONTAINER_STYLE,
-                )}
-            >
-                <HeaderLogo collection={collection} space={space} customization={customization} />
-                <span>
-                    {collection ? (
-                        <CollectionSpacesDropdown
-                            space={space}
-                            collection={collection}
-                            collectionSpaces={collectionSpaces}
-                        />
-                    ) : null}
-                </span>
-                <HeaderLinks>
-                    {customization.header.links.map((link, index) => {
-                        return (
-                            <HeaderLink
-                                key={index}
-                                link={link}
-                                context={context}
-                                customization={customization}
+            <div className={tcls('scroll-nojump')}>
+                <div
+                    className={tcls(
+                        'gap-4',
+                        'grid',
+                        'grid-flow-col',
+                        'auto-cols-[auto_auto_1fr_auto]',
+                        'h-16',
+                        'items-center',
+                        'align-center',
+                        'justify-between',
+                        'w-full',
+                        CONTAINER_STYLE,
+                    )}
+                >
+                    <HeaderLogo
+                        collection={collection}
+                        space={space}
+                        customization={customization}
+                    />
+                    <span>
+                        {collection ? (
+                            <CollectionSpacesDropdown
+                                space={space}
+                                collection={collection}
+                                collectionSpaces={collectionSpaces}
                             />
-                        );
-                    })}
-                </HeaderLinks>
-                <div className={tcls('flex', 'md:w-56', 'grow-0', 'shrink-0', 'justify-self-end')}>
-                    <Suspense fallback={null}>
-                        <SearchButton
-                            style={
-                                !isCustomizationDefault && withTopHeader
-                                    ? [
-                                          'bg-header-background-400/8',
-                                          'shadow-sm',
-                                          'text-header-link/8',
-                                          'ring-header-background-200/5',
-                                          '[&>span]:text-header-link/7',
-                                          '[&_svg]:stroke-header-link',
-                                          'dark:bg-header-link-600/3',
-                                          'dark:ring-header-link-600/2',
-                                          'dark:text-header-link/7',
-                                          'dark:[&_svg]:stroke-header-link/7',
-                                      ]
-                                    : null
-                            }
-                        >
-                            <span className={tcls('flex-1')}>
-                                {t(
-                                    getSpaceLanguage(customization),
-                                    customization.aiSearch.enabled ? 'search_or_ask' : 'search',
-                                )}
-                            </span>
-                        </SearchButton>
-                    </Suspense>
+                        ) : null}
+                    </span>
+                    <HeaderLinks>
+                        {customization.header.links.map((link, index) => {
+                            return (
+                                <HeaderLink
+                                    key={index}
+                                    link={link}
+                                    context={context}
+                                    customization={customization}
+                                />
+                            );
+                        })}
+                    </HeaderLinks>
+                    <div
+                        className={tcls(
+                            'flex',
+                            'md:w-56',
+                            'grow-0',
+                            'shrink-0',
+                            'justify-self-end',
+                        )}
+                    >
+                        <Suspense fallback={null}>
+                            <SearchButton
+                                style={
+                                    !isCustomizationDefault && withTopHeader
+                                        ? [
+                                              'bg-header-background-400/8',
+                                              'shadow-sm',
+                                              'text-header-link/8',
+                                              'ring-header-background-200/5',
+                                              '[&>span]:text-header-link/7',
+                                              '[&_svg]:stroke-header-link',
+                                              'dark:bg-header-link-600/3',
+                                              'dark:ring-header-link-600/2',
+                                              'dark:text-header-link/7',
+                                              'dark:[&_svg]:stroke-header-link/7',
+                                          ]
+                                        : null
+                                }
+                            >
+                                <span className={tcls('flex-1')}>
+                                    {t(
+                                        getSpaceLanguage(customization),
+                                        customization.aiSearch.enabled ? 'search_or_ask' : 'search',
+                                    )}
+                                </span>
+                            </SearchButton>
+                        </Suspense>
+                    </div>
                 </div>
             </div>
         </header>

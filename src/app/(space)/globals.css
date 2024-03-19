@@ -4,6 +4,8 @@
 
 @layer base {
     :root {
+        --scrollbar-width: calc(100vw - 100%);
+
         --dark-base: 20 20 20;
         --light-base: 251 252 252;
 
@@ -200,6 +202,23 @@
         .break-anywhere {
             word-break: break-word;
             overflow-wrap: anywhere;
+        }
+    }
+
+    /**
+     * Utility to prevent horizontal jumps when the vertical scrollbar appears
+     * It should be used on main containers of the layout, while preserving horizontal delimiters.
+     * It basically adds a margin-left with the width of the scrollbar, and a width that compensates for it; when a scrollbar is displayed.
+     * Inspired by https://aykevl.nl/2014/09/fix-jumping-scrollbar, but adapted to work on child elements of "html"
+     */
+    .scroll-nojump {
+        width: 100%;
+    }
+    @media screen and (min-width: 1536px) {
+        .scroll-nojump {
+            margin-left: var(--scrollbar-width);
+            margin-right: 0;
+            width: calc(100% - var(--scrollbar-width));
         }
     }
 }

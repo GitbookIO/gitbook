@@ -54,7 +54,7 @@ export function SpaceLayout(props: {
     };
 
     return (
-        <div>
+        <>
             {/* <ColorDebugger /> */}
             <Header
                 withTopHeader={withTopHeader}
@@ -65,39 +65,39 @@ export function SpaceLayout(props: {
                 customization={customization}
             />
 
-            <div
-                className={tcls(
-                    'flex',
-                    'flex-col',
-                    'lg:flex-row',
-                    CONTAINER_STYLE,
+            <div className={tcls('scroll-nojump')}>
+                <div
+                    className={tcls(
+                        'flex',
+                        'flex-col',
+                        'lg:flex-row',
+                        CONTAINER_STYLE,
 
-                    // Ensure the footer is display below the viewport even if the content is not enough
-                    `min-h-[calc(100vh-64px)]`,
-                    withTopHeader ? null : 'lg:min-h-screen',
-                )}
-            >
-                <TableOfContents
-                    space={space}
-                    customization={customization}
-                    content={content}
-                    pages={pages}
-                    ancestors={ancestors}
-                    context={contentRefContext}
-                    header={
-                        withTopHeader ? null : (
-                            <CompactHeader
-                                space={space}
-                                collection={collection}
-                                collectionSpaces={collectionSpaces}
-                                customization={customization}
-                            />
-                        )
-                    }
-                    withHeaderOffset={withTopHeader}
-                />
-                <div id="gitbook-main-content" className={tcls('flex-1', 'flex', 'flex-col')}>
-                    {children}
+                        // Ensure the footer is display below the viewport even if the content is not enough
+                        `min-h-[calc(100vh-64px)]`,
+                        withTopHeader ? null : 'lg:min-h-screen',
+                    )}
+                >
+                    <TableOfContents
+                        space={space}
+                        customization={customization}
+                        content={content}
+                        pages={pages}
+                        ancestors={ancestors}
+                        context={contentRefContext}
+                        header={
+                            withTopHeader ? null : (
+                                <CompactHeader
+                                    space={space}
+                                    collection={collection}
+                                    collectionSpaces={collectionSpaces}
+                                    customization={customization}
+                                />
+                            )
+                        }
+                        withHeaderOffset={withTopHeader}
+                    />
+                    <div className={tcls('flex-1', 'flex', 'flex-col')}>{children}</div>
                 </div>
             </div>
 
@@ -117,6 +117,6 @@ export function SpaceLayout(props: {
                     collectionId={collection && collectionSpaces.length > 1 ? collection.id : null}
                 />
             </React.Suspense>
-        </div>
+        </>
     );
 }
