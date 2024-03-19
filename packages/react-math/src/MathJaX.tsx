@@ -24,16 +24,10 @@ export interface MathJaXFormulaProps {
 export default function MathJaXFormula(props: MathJaXFormulaProps) {
     const { formula, inline, className, mathJaxUrl } = props;
 
+    React.use(loadMathJaxScript(mathJaxUrl));
     const [html, setHTML] = React.useState('');
 
     const containerRef = React.useRef<HTMLDivElement | HTMLSpanElement>(null);
-
-    if (typeof window !== 'undefined') {
-        const promise = loadMathJaxScript(mathJaxUrl);
-        if (promise) {
-            React.use(promise);
-        }
-    }
 
     // Typeset the formula
     React.useEffect(() => {
@@ -67,40 +61,38 @@ function loadMathJaxScript(url: string) {
         return mathJaxPromise;
     }
 
-    // @ts-ignore
-    if (window.MathJax) {
-        return;
-    }
-
     mathJaxPromise = new Promise<void>((resolve, reject) => {
-        // @ts-ignore
-        window.MathJax = {
-            tex: {
-                inlineMath: [],
-            },
-            options: {
-                enableMenu: false,
-            },
-            startup: {
-                elements: null,
-                typeset: false,
-            },
-        };
-
-        const script = document.createElement('script');
-        script.src = url;
-        script.id = 'MathJax-script';
-        script.async = true;
-        document.head.appendChild(script);
-
-        script.onload = () => {
+        if (typeof window === 'undefined') {
             resolve();
-        };
-        script.onerror = () => {
-            reject(new Error('Failed to load MathJax'));
-        };
-    }).finally(() => {
-        mathJaxPromise = null;
+            return;
+        } else {
+            // @ts-ignore
+            window.MathJax = {
+                tex: {
+                    inlineMath: [],
+                },
+                options: {
+                    enableMenu: false,
+                },
+                startup: {
+                    elements: null,
+                    typeset: false,
+                },
+            };
+
+            const script = document.createElement('script');
+            script.src = url;
+            script.id = 'MathJax-script';
+            script.async = true;
+            document.head.appendChild(script);
+
+            script.onload = () => {
+                resolve();
+            };
+            script.onerror = () => {
+                reject(new Error('Failed to load MathJax'));
+            };
+        }
     });
 
     return mathJaxPromise;

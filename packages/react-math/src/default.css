@@ -1,5 +1,5 @@
 /** Hide the KaTeX HTML output, while it's loading */
-.katex-html {
+body:not(.katex-loaded) .katex-html {
     display: none;
 }
 
