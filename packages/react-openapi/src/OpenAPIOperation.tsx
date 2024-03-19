@@ -1,12 +1,13 @@
 import classNames from 'classnames';
 
 import { OpenAPIOperationData, toJSON } from './fetchOpenAPIOperation';
-import { OpenAPIServerURL } from './OpenAPIServerURL';
-import { OpenAPIClientContext, OpenAPIContextProps } from './types';
-import { OpenAPICodeSample } from './OpenAPICodeSample';
-import { OpenAPISpec } from './OpenAPISpec';
-import { OpenAPIResponseExample } from './OpenAPIResponseExample';
 import { Markdown } from './Markdown';
+import { OpenAPICodeSample } from './OpenAPICodeSample';
+import { OpenAPIResponseExample } from './OpenAPIResponseExample';
+import { OpenAPIServerURL } from './OpenAPIServerURL';
+import { OpenAPISpec } from './OpenAPISpec';
+import { ScalarApiClient } from './ScalarApiButton';
+import { OpenAPIClientContext, OpenAPIContextProps } from './types';
 
 /**
  * Display an interactive OpenAPI operation.
@@ -25,39 +26,40 @@ export function OpenAPIOperation(props: {
     };
 
     return (
-        <div className={classNames('openapi-operation', className)}>
-            <div className="openapi-intro">
-                <h2 className="openapi-summary">{operation.summary}</h2>
-                {operation.description ? (
-                    <Markdown className="openapi-description" source={operation.description} />
-                ) : null}
-                <div className="openapi-target">
-                    <span
-                        className={classNames(
-                            'openapi-method',
-                            `openapi-method-${method.toLowerCase()}`,
-                        )}
-                    >
-                        {method.toUpperCase()}
-                    </span>
-                    <span className="openapi-url">
-                        <OpenAPIServerURL servers={servers} />
-                        {path}
-                    </span>
+        <ScalarApiClient>
+            <div className={classNames('openapi-operation', className)}>
+                <div className="openapi-intro">
+                    <h2 className="openapi-summary">{operation.summary}</h2>
+                    {operation.description ? (
+                        <Markdown className="openapi-description" source={operation.description} />
+                    ) : null}
+                    <div className="openapi-target">
+                        <span
+                            className={classNames(
+                                'openapi-method',
+                                `openapi-method-${method.toLowerCase()}`,
+                            )}
+                        >
+                            {method.toUpperCase()}
+                        </span>
+                        <span className="openapi-url">
+                            <OpenAPIServerURL servers={servers} />
+                            {path}
+                        </span>
+                    </div>
                 </div>
-            </div>
-
-            <div className={classNames('openapi-columns')}>
-                <div className={classNames('openapi-column-spec')}>
-                    <OpenAPISpec rawData={toJSON(data)} context={clientContext} />
-                </div>
-                <div className={classNames('openapi-column-preview')}>
-                    <div className={classNames('openapi-column-preview-body')}>
-                        <OpenAPICodeSample {...props} />
-                        <OpenAPIResponseExample {...props} />
+                <div className={classNames('openapi-columns')}>
+                    <div className={classNames('openapi-column-spec')}>
+                        <OpenAPISpec rawData={toJSON(data)} context={clientContext} />
+                    </div>
+                    <div className={classNames('openapi-column-preview')}>
+                        <div className={classNames('openapi-column-preview-body')}>
+                            <OpenAPICodeSample {...props} />
+                            <OpenAPIResponseExample {...props} />
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </ScalarApiClient>
     );
 }

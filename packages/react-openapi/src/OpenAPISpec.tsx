@@ -1,14 +1,15 @@
 'use client';
 
 import { OpenAPIV3 } from 'openapi-types';
+
+import { OpenAPIOperationData, fromJSON } from './fetchOpenAPIOperation';
 import { InteractiveSection } from './InteractiveSection';
 import { OpenAPIRequestBody } from './OpenAPIRequestBody';
 import { OpenAPIResponses } from './OpenAPIResponses';
 import { OpenAPISchemaProperties } from './OpenAPISchema';
-import { OpenAPIOperationData, fromJSON } from './fetchOpenAPIOperation';
+import { OpenAPISecurities } from './OpenAPISecurities';
 import { OpenAPIClientContext } from './types';
 import { noReference } from './utils';
-import { OpenAPISecurities } from './OpenAPISecurities';
 
 /**
  * Client component to render the spec for the request and response.
@@ -18,7 +19,9 @@ import { OpenAPISecurities } from './OpenAPISecurities';
  */
 export function OpenAPISpec(props: { rawData: any; context: OpenAPIClientContext }) {
     const { rawData, context } = props;
-    const { operation, securities } = fromJSON(rawData) as OpenAPIOperationData;
+
+    const parsedData = fromJSON(rawData) as OpenAPIOperationData;
+    const { operation, securities } = parsedData;
 
     const parameterGroups = groupParameters((operation.parameters || []).map(noReference));
 
@@ -55,7 +58,6 @@ export function OpenAPISpec(props: { rawData: any; context: OpenAPIClientContext
                     context={context}
                 />
             ) : null}
-
             {operation.responses ? (
                 <OpenAPIResponses responses={noReference(operation.responses)} context={context} />
             ) : null}

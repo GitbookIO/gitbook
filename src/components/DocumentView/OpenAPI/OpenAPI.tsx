@@ -12,6 +12,7 @@ import { BlockProps } from '../Block';
 import { PlainCodeBlock } from '../CodeBlock';
 
 import './style.css';
+import './scalar.css';
 
 /**
  * Render an OpenAPI block.

@@ -29,7 +29,7 @@ import { waitUntil } from './lib/waitUntil';
 
 export const config = {
     matcher:
-        '/((?!_next/static|_next/image|~gitbook/revalidate|~gitbook/image|~gitbook/monitoring|~gitbook/static).*)',
+        '/((?!_next/static|_next/image|~gitbook/revalidate|~gitbook/image|~gitbook/monitoring|~gitbook/static|~scalar/proxy).*)',
     skipTrailingSlashRedirect: true,
 };
 

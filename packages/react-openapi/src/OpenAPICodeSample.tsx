@@ -1,9 +1,11 @@
 import { OpenAPIV3 } from 'openapi-types';
+
+import { CodeSampleInput, codeSampleGenerators } from './code-samples';
+import { OpenAPIOperationData, toJSON } from './fetchOpenAPIOperation';
+import { generateMediaTypeExample } from './generateSchemaExample';
 import { InteractiveSection } from './InteractiveSection';
 import { getServersURL } from './OpenAPIServerURL';
-import { CodeSampleInput, codeSampleGenerators } from './code-samples';
-import { OpenAPIOperationData } from './fetchOpenAPIOperation';
-import { generateMediaTypeExample } from './generateSchemaExample';
+import { ScalarApiButton } from './ScalarApiButton';
 import { OpenAPIContextProps } from './types';
 import { noReference } from './utils';
 
@@ -72,7 +74,19 @@ export function OpenAPICodeSample(props: {
         }
     });
 
-    return <InteractiveSection header="Request" className="openapi-codesample" tabs={samples} />;
+    async function fetchOperationData() {
+        'use server';
+        return toJSON(data);
+    }
+
+    return (
+        <InteractiveSection
+            header="Request"
+            className="openapi-codesample"
+            tabs={samples}
+            overlay={<ScalarApiButton fetchOperationData={fetchOperationData} />}
+        />
+    );
 }
 
 function getSecurityHeaders(securities: OpenAPIOperationData['securities']): {

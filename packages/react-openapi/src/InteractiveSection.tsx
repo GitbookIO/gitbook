@@ -30,6 +30,8 @@ export function InteractiveSection(props: {
     header: React.ReactNode;
     /** Body of the section */
     children?: React.ReactNode;
+    /** Children to display within the container */
+    overlay?: React.ReactNode;
 }) {
     const {
         id,
@@ -40,6 +42,7 @@ export function InteractiveSection(props: {
         defaultTab = tabs[0]?.key,
         header,
         children,
+        overlay,
         toggleOpenIcon = '▶',
         toggleCloseIcon = '▼',
     } = props;
@@ -120,6 +123,7 @@ export function InteractiveSection(props: {
                     {tabBody}
                 </div>
             ) : null}
+            {overlay}
         </div>
     );
 }
