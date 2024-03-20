@@ -354,8 +354,15 @@ async function lookupSpaceInMultiMode(request: NextRequest, url: URL): Promise<L
 /**
  * GITBOOK_MODE=multi-id
  * When serving multi spaces with the ID passed in the path.
+ *
+ * The format of the path is:
+ *   - /~space/:id/:path
+ *   - /~space/:id/~changes/:changeId/:path
+ *   - /~space/:id/~revisions/:revisionId/:path
  */
 async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise<LookupResult> {
+    const basePathParts: string[] = [];
+
     // Extract the iD from the path
     const pathSegments = url.pathname.slice(1).split('/');
     if (pathSegments[0] !== '~space') {
@@ -366,7 +373,9 @@ async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise
             },
         };
     }
-    const spaceId = pathSegments[1];
+    basePathParts.push(pathSegments.shift()!);
+    const spaceId = pathSegments.shift();
+    basePathParts.push(spaceId!);
     if (!spaceId) {
         return {
             error: {
@@ -374,6 +383,19 @@ async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise
                 message: `Missing space ID in the path`,
             },
         };
+    }
+
+    // Extract the change request or revision ID from the path
+    let changeRequestId: string | undefined;
+    let revisionId: string | undefined;
+    if (pathSegments[1] === '~changes') {
+        basePathParts.push(pathSegments.shift()!);
+        changeRequestId = pathSegments.shift();
+        basePathParts.push(changeRequestId!);
+    } else if (pathSegments[1] === '~revisions') {
+        basePathParts.push(pathSegments.shift()!);
+        revisionId = pathSegments.shift();
+        basePathParts.push(revisionId!);
     }
 
     // Get the auth token from the URL query
@@ -438,8 +460,10 @@ async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise
 
     return {
         space: spaceId,
-        basePath: `/~space/${spaceId}`,
-        pathname: normalizePathname(pathSegments.slice(2).join('/')),
+        changeRequest: changeRequestId,
+        revision: revisionId,
+        basePath: normalizePathname(basePathParts.join('/')),
+        pathname: normalizePathname(pathSegments.join('/')),
         apiToken,
         apiEndpoint,
         cookies,
@@ -537,8 +561,6 @@ async function lookupSpaceByAPI(
             lookupAlternatives.length
         } alternatives`,
     );
-
-    const startTime = Date.now();
 
     const result = await race(lookupAlternatives, async (alternative, { signal }) => {
         const data = await getPublishedContentByUrl(alternative.url, visitorAuthToken, {
@@ -656,6 +678,7 @@ function stripURLBasePath(url: URL, basePath: string): URL {
     return stripped;
 }
 
+/** Normalize a pathname to make it start with a slash */
 function normalizePathname(pathname: string): string {
     if (!pathname.startsWith('/')) {
         pathname = '/' + pathname;
