@@ -362,20 +362,23 @@ async function lookupSpaceInMultiMode(request: NextRequest, url: URL): Promise<L
  */
 async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise<LookupResult> {
     const basePathParts: string[] = [];
-
-    // Extract the iD from the path
     const pathSegments = url.pathname.slice(1).split('/');
-    if (pathSegments[0] !== '~space') {
-        return {
-            error: {
-                code: 400,
-                message: `Missing space ID in the path`,
-            },
-        };
-    }
-    basePathParts.push(pathSegments.shift()!);
-    const spaceId = pathSegments.shift();
-    basePathParts.push(spaceId!);
+
+    const eatPathId = (prefix: string): string | undefined => {
+        if (pathSegments[0] !== prefix || pathSegments.length < 2) {
+            return;
+        }
+
+        const prefixSegment = pathSegments.shift();
+        basePathParts.push(prefixSegment!);
+
+        const id = pathSegments.shift();
+        basePathParts.push(id!);
+
+        return id;
+    };
+
+    const spaceId = eatPathId('~space');
     if (!spaceId) {
         return {
             error: {
@@ -386,17 +389,8 @@ async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise
     }
 
     // Extract the change request or revision ID from the path
-    let changeRequestId: string | undefined;
-    let revisionId: string | undefined;
-    if (pathSegments[1] === '~changes') {
-        basePathParts.push(pathSegments.shift()!);
-        changeRequestId = pathSegments.shift();
-        basePathParts.push(changeRequestId!);
-    } else if (pathSegments[1] === '~revisions') {
-        basePathParts.push(pathSegments.shift()!);
-        revisionId = pathSegments.shift();
-        basePathParts.push(revisionId!);
-    }
+    const changeRequestId = eatPathId('~changes');
+    const revisionId = eatPathId('~revisions');
 
     // Get the auth token from the URL query
     const AUTH_TOKEN_QUERY = 'token';
