@@ -1,6 +1,6 @@
-import { emojiCodepoints } from '@gitbook/emoji-codepoints';
 import localFont from 'next/font/local';
 
+import { getEmojiForCode } from '@/lib/emojis';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import './emoji.css';
@@ -39,17 +39,6 @@ export const emojiFontClassName = [svgFont.variable, sbixFont.variable, cbdtFont
 export async function Emoji(props: { code: string; style?: ClassValue }) {
     const { code, style } = props;
 
-    const fullCode = emojiCodepoints[code] ?? code;
-    const fallback = getEmojiForCodepoint(fullCode);
-
+    const fallback = getEmojiForCode(code);
     return <span className={'emoji ' + tcls(style)}>{fallback}</span>;
-}
-
-function getEmojiForCodepoint(unicode: string): string {
-    if (!unicode) {
-        return '';
-    }
-
-    const codePoints = unicode.split('-').map((elt) => parseInt(elt, 16));
-    return String.fromCodePoint(...codePoints);
 }
