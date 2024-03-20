@@ -50,4 +50,5 @@ export const fr: TranslationLanguage = {
     pdf_mode_only_page: 'Seulement cette page',
     pdf_mode_all: 'Toutes les pages',
     pdf_limit_reached: 'Impossible de générer le PDF pour ${1} pages, génération arrêtée à ${2}.',
+    pdf_limit_reached_continue: 'Étendre avec ${1} pages supplémentaires.',
 };

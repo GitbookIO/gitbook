@@ -51,4 +51,5 @@ export const ja: TranslationLanguage = {
     pdf_mode_only_page: 'このページのみ',
     pdf_mode_all: '全てのページ',
     pdf_limit_reached: '${1}ページのPDFを生成できませんでした、${2}で生成が停止しました。',
+    pdf_limit_reached_continue: 'さらに${1}ページで拡張',
 };

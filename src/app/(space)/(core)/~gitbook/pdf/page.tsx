@@ -16,14 +16,7 @@ import { TrademarkLink } from '@/components/TableOfContents/Trademark';
 import { PolymorphicComponentProp } from '@/components/utils/types';
 import { getSpaceLanguage } from '@/intl/server';
 import { tString } from '@/intl/translate';
-import {
-    getDocument,
-    getSpace,
-    getRevisionPages,
-    ContentPointer,
-    getSpaceCustomization,
-    getSpaceContentData,
-} from '@/lib/api';
+import { getDocument, getSpace, getSpaceCustomization, getSpaceContentData } from '@/lib/api';
 import { pagePDFContainerId, PageHrefContext, absoluteHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
@@ -33,6 +26,8 @@ import { PDFSearchParams, getPDFSearchParams } from '@/lib/urls';
 import './pdf.css';
 import { PageControlButtons } from './PageControlButtons';
 import { PrintButton } from './PrintButton';
+
+const DEFAULT_LIMIT = 100;
 
 export const runtime = 'edge';
 
@@ -138,6 +133,7 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
                 pdfHref={currentPDFUrl}
                 singlePageMode={!!pdfParams.only}
                 total={total}
+                limit={pdfParams.limit ?? DEFAULT_LIMIT}
                 trademark={
                     customization.trademark.enabled ? (
                         <TrademarkLink space={space} customization={customization} />
@@ -146,7 +142,7 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
             />
 
             {pdfParams.only ? null : <PDFSpaceIntro space={space} customization={customization} />}
-            {pages.map(({ page, depth }) =>
+            {pages.map(({ page }) =>
                 page.type === 'group' ? (
                     <PDFPageGroup key={page.id} space={space} page={page} />
                 ) : (
@@ -309,7 +305,7 @@ function selectPages(
     const limitTo = (entries: FlatPageEntry[]) => {
         return {
             // Apply a soft-limit, the limit can be controlled by the URL to allow testing
-            pages: entries.slice(0, params.limit ?? 100),
+            pages: entries.slice(0, params.limit ?? DEFAULT_LIMIT),
             total: entries.length,
         };
     };

@@ -9,6 +9,8 @@ import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import { getPDFUrl } from '@/lib/urls';
 
+const limitExtend = 50;
+
 /**
  * Dynamic controls to show active page and to let the user select between modes.
  */
@@ -17,12 +19,14 @@ export function PageControlButtons(props: {
     singlePageMode: boolean;
     /** Array of the [pageId, divId] */
     pageIds: Array<[string, string]>;
+    /** Current limit */
+    limit: number;
     /** Total number of pages targetted by the generation */
     total: number;
     /** Trademark to display */
     trademark?: React.ReactNode;
 }) {
-    const { pdfHref, singlePageMode, pageIds, total, trademark } = props;
+    const { pdfHref, singlePageMode, pageIds, limit, total, trademark } = props;
 
     const language = useLanguage();
 
@@ -102,7 +106,21 @@ export function PageControlButtons(props: {
                         )}
                     >
                         <AlertTriangle className={tcls('size-6', 'mr-3', 'mt-1')} />{' '}
-                        {t(language, 'pdf_limit_reached', total, pageIds.length)}
+                        <div>
+                            <div>{t(language, 'pdf_limit_reached', total, pageIds.length)}</div>
+                            <div>
+                                <a
+                                    href={getPDFUrl(new URL(pdfHref), {
+                                        page: undefined,
+                                        only: false,
+                                        limit: limit + limitExtend,
+                                    }).toString()}
+                                    className={tcls('underline')}
+                                >
+                                    {t(language, 'pdf_limit_reached_continue', limitExtend)}
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 ) : null}
                 <div

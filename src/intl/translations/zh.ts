@@ -49,4 +49,5 @@ export const zh: TranslationLanguage = {
     pdf_mode_only_page: '仅本页',
     pdf_mode_all: '所有页面',
     pdf_limit_reached: '无法为${1}页生成 PDF，生成在${2}页时停止。',
+    pdf_limit_reached_continue: '使用${1}页进行扩展。',
 };
