@@ -3,7 +3,8 @@ import jsontoxml from 'jsontoxml';
 import { NextRequest } from 'next/server';
 
 import { getSpaceContentData } from '@/lib/api';
-import { pageHref } from '@/lib/links';
+import { absoluteHref } from '@/lib/links';
+import { getPagePath } from '@/lib/pages';
 
 import { getContentPointer } from '../../fetch';
 
@@ -25,7 +26,7 @@ export async function GET(req: NextRequest) {
 
         return {
             url: {
-                loc: pageHref(rootPages, page),
+                loc: absoluteHref(getPagePath(rootPages, page), true),
                 priority: normalizedPriority,
                 ...(lastModified
                     ? {
