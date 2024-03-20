@@ -7,7 +7,6 @@ import { trace } from '../tracing';
 const cacheVersion = 1;
 
 interface KVTagMetadata {
-    key: string;
     meta: CacheEntryMeta;
 }
 
@@ -69,7 +68,6 @@ export const cloudflareKVCache: CacheBackend = {
 
                 if (entry.meta.tags.length > 0) {
                     const metadata: KVTagMetadata = {
-                        key, // TODO: Remove this key from the metadata in 1 day
                         meta: entry.meta,
                     };
                     const jsonMetadata = JSON.stringify(metadata);
@@ -115,28 +113,35 @@ export const cloudflareKVCache: CacheBackend = {
 
         const pendingDeletions: Array<Promise<unknown>> = [];
 
+        const iterateKVPage = async (prefix: string, cursor: string | null, max: number = 3) => {
+            const entries = await kv.list<KVTagMetadata>({
+                prefix,
+                cursor,
+                limit: 100,
+            });
+
+            for (const entry of entries.keys) {
+                if (entry.metadata) {
+                    const metadata = entry.metadata;
+                    const key = metadata.meta.key;
+
+                    result.metas.push(metadata.meta);
+                    result.keys.push(key);
+
+                    // Delete the tag key and the value key
+                    pendingDeletions.push(kv.delete(getValueKey(key)));
+                    pendingDeletions.push(kv.delete(entry.name));
+                }
+            }
+
+            if (!entries.list_complete && max > 0) {
+                await iterateKVPage(prefix, entries.cursor, max - 1);
+            }
+        };
+
         await Promise.all(
             tags.map(async (tag) => {
-                const entries = await kv.list({
-                    prefix: getTagPrefix(tag),
-                    // We don't paginate at the moment and only get the first 100 keys.
-                    limit: 100,
-                });
-
-                for (const entry of entries.keys) {
-                    if (entry.metadata) {
-                        const metadata = entry.metadata as KVTagMetadata;
-
-                        const key = metadata.meta.key ?? metadata.key;
-
-                        result.metas.push(metadata.meta);
-                        result.keys.push(key);
-
-                        // Delete the tag key and the value key
-                        pendingDeletions.push(kv.delete(getValueKey(key)));
-                        pendingDeletions.push(kv.delete(entry.name));
-                    }
-                }
+                await iterateKVPage(getTagPrefix(tag), null);
             }),
         );
 

@@ -1,5 +1,5 @@
 export interface CacheEntryMeta {
-    key?: string;
+    key: string;
 
     /**
      * Timestamp when the entry was created.
