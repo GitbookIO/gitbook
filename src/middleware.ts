@@ -13,6 +13,7 @@ import {
     userAgent,
     withAPI,
     getSpaceLayoutData,
+    DEFAULT_API_ENDPOINT,
 } from '@/lib/api';
 import { race } from '@/lib/async';
 import { buildVersion } from '@/lib/build';
@@ -98,7 +99,7 @@ export async function middleware(request: NextRequest) {
 
     // The API endpoint can be passed as a header, making it possible to use the same GitBook Open target
     // accross multiple GitBook instances.
-    let apiEndpoint = request.headers.get('x-gitbook-api') ?? process.env.GITBOOK_API_URL;
+    let apiEndpoint = request.headers.get('x-gitbook-api') ?? DEFAULT_API_ENDPOINT;
     const originBasePath = request.headers.get('x-gitbook-basepath') ?? '';
 
     const inputURL = stripURLBasePath(url, originBasePath);
@@ -106,7 +107,7 @@ export async function middleware(request: NextRequest) {
     const resolved = await withAPI(
         new GitBookAPI({
             endpoint: apiEndpoint,
-            authToken: process.env.GITBOOK_TOKEN,
+            authToken: getDefaultAPIToken(apiEndpoint),
             userAgent: userAgent(),
         }),
         () => lookupSpaceForURL(mode, request, inputURL),
@@ -320,7 +321,7 @@ async function lookupSpaceInSingleMode(url: URL): Promise<LookupResult> {
         );
     }
 
-    const apiToken = process.env.GITBOOK_TOKEN;
+    const apiToken = getDefaultAPIToken(api().endpoint);
     if (!apiToken) {
         throw new Error(
             `Missing GITBOOK_TOKEN environment variable. It should be passed when using GITBOOK_MODE=single.`,
@@ -607,6 +608,25 @@ function getLookupResultForVisitorAuth(
             },
         },
     };
+}
+
+/**
+ * Get the default API token for an API endpoint.
+ * The default token is configured globally in the instance using `GITBOOK_TOKEN`,
+ * but it's scoped to the default API endpoint.
+ */
+function getDefaultAPIToken(apiEndpoint: string): string | undefined {
+    const defaultToken = process.env.GITBOOK_TOKEN;
+    if (!defaultToken) {
+        return;
+    }
+
+    if (apiEndpoint !== DEFAULT_API_ENDPOINT) {
+        // The default token is only used for the default API endpoint
+        return;
+    }
+
+    return defaultToken;
 }
 
 function joinPath(...parts: string[]): string {
