@@ -14,7 +14,6 @@ export async function PageLinkItem(props: { page: RevisionPageLink; context: Con
         <li className={tcls('flex', 'flex-col')}>
             <Link
                 href={resolved?.href ?? '#'}
-                target="_blank"
                 className={tcls(
                     'flex',
                     'flex-row',

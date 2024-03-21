@@ -75,7 +75,7 @@ export function PageBody(props: {
                         }}
                     />
                 ) : (
-                    <PageBodyBlankslate page={page} rootPages={context.pages} />
+                    <PageBodyBlankslate page={page} rootPages={context.pages} context={context} />
                 )}
 
                 {page.layout.pagination && customization.pagination.enabled ? (
