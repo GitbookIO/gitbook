@@ -11,17 +11,17 @@ export function HighlightQuery(props: {
     /** Style to apply on matching parts (default to primary) */
     highlight?: ClassValue;
 }): React.ReactElement {
-    const { query, text, highlight = ['text-bold', 'text-primary'], ...textProps } = props;
+    const { query, text, highlight = ['text-bold', 'text-primary'] } = props;
     const matches = matchString(text, query);
 
     return (
-        <>
+        <span className={tcls('whitespace-break-spaces')}>
             {matches.map((entry, index) => (
                 <span key={index} className={tcls(entry.match ? highlight : null)}>
                     {entry.text}
                 </span>
             ))}
-        </>
+        </span>
     );
 }
 
@@ -51,7 +51,9 @@ function matchWordInParts(parts: TextMatch[], word: string): TextMatch[] {
             const inner = text.slice(index, index + word.length);
             const after = text.slice(index + word.length);
 
-            result.push({ text: before }, { text: inner, match: word }, { text: after });
+            if (before.length > 0) result.push({ text: before });
+            if (inner.length > 0) result.push({ text: inner, match: word });
+            if (after.length > 0) result.push({ text: after });
 
             return result;
         }
