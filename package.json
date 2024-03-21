@@ -61,7 +61,8 @@
         "tailwind-shades": "^1.1.2",
         "unified": "^11.0.4",
         "url-join": "^5.0.0",
-        "mathjax": "^3.2.2"
+        "mathjax": "^3.2.2",
+        "classnames": "^2.5.1"
     },
     "devDependencies": {
         "@argos-ci/playwright": "^2.0.0",

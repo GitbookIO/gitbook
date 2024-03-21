@@ -4,12 +4,14 @@ import {
     DocumentBlockListTasks,
     DocumentBlockListUnordered,
 } from '@gitbook/api';
+import classNames from 'classnames';
 
 import { Checkbox } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
 
 import { BlockProps } from './Block';
 import { Blocks } from './Blocks';
+import styles from './ListItem.module.css';
 import { getBlockTextStyle } from './spacing';
 
 export function ListItem(props: BlockProps<DocumentBlockListItem>) {
@@ -46,12 +48,12 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
                                 />
                             </div>
 
-                            <label htmlFor={block.key}>
+                            <label htmlFor={block.key} className={tcls('flex-1')}>
                                 <Blocks
                                     {...contextProps}
                                     nodes={block.nodes}
                                     ancestorBlocks={[...ancestorBlocks, block]}
-                                    blockStyle={tcls('flex-1', 'flip-heading-hash')}
+                                    blockStyle={tcls('flip-heading-hash')}
                                     style={tcls('ml-2', 'space-y-2')}
                                 />
                             </label>
@@ -67,11 +69,10 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
                     <li value={index} className={tcls(textStyle.lineHeight)}>
                         <div
                             data-value={index}
-                            className={tcls(
+                            className={classNames(
                                 'bullet',
-                                textStyle.textSize,
-                                'leading-[inherit]',
-                                'before:content-[attr(data-value)]',
+                                styles.olListItemBullet,
+                                tcls(textStyle.textSize),
                             )}
                         ></div>
                         {/* zero width space to force layouts with empty lists */}
@@ -79,7 +80,7 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
                             {...contextProps}
                             nodes={block.nodes}
                             ancestorBlocks={[...ancestorBlocks, block]}
-                            style={tcls('space-y-2', 'flex', 'flex-col')}
+                            style={tcls('space-y-2', 'flex-1', 'flex', 'flex-col')}
                             blockStyle={tcls(
                                 textStyle.lineHeight,
                                 'min-h-[1lh]',
@@ -90,7 +91,6 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
                     </li>
                 );
             default:
-                // 'list-unordered'
                 return (
                     <li className={tcls(textStyle.lineHeight)}>
                         <div className={tcls('bullet', textStyle.textSize)}></div>

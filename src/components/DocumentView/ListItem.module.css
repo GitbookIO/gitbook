@@ -1,0 +1,13 @@
+.olListItemBullet {
+    /* Align the bullet container with the first line of text */
+    line-height: inherit;
+    height: 1lh;
+    /* Align the bullet content with the middle of the text */
+    display: flex;
+    align-items: center;
+}
+.olListItemBullet::before {
+    @apply text-base;
+    --tw-content: attr(data-value) '. ';
+    content: var(--tw-content);
+}

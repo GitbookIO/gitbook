@@ -14,7 +14,7 @@ interface Test {
     name: string;
     url: string;
     run?: (page: Page) => Promise<unknown>;
-    fullPage?: false;
+    fullPage?: boolean;
     screenshot?: false;
 }
 
@@ -208,6 +208,7 @@ const testCases: TestsCase[] = [
             {
                 name: 'Lists',
                 url: 'blocks/lists',
+                fullPage: true,
             },
             {
                 name: 'Math',
