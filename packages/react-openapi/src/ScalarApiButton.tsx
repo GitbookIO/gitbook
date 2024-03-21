@@ -128,27 +128,14 @@ export function ScalarApiClient(props: { children: React.ReactNode }) {
                 <div className="scalar">
                     <div className="scalar-container">
                         <div className="scalar-app">
-                            <div className="scalar-app-header">
-                                <span>API Client </span>
-                                <a
-                                    href="https://www.scalar.com?utm_campaign=gitbook"
-                                    target="_blank"
-                                >
-                                    Powered by scalar.com
-                                </a>
-                            </div>
-                            {request ? (
-                                <React.Suspense fallback={<ScalarLoading />}>
-                                    <ApiClientReact
-                                        close={onClose}
-                                        proxy={proxy}
-                                        isOpen={true}
-                                        request={request}
-                                    />
-                                </React.Suspense>
-                            ) : (
-                                <ScalarLoading />
-                            )}
+                            <React.Suspense fallback={<ScalarLoading />}>
+                                <ApiClientReact
+                                    close={onClose}
+                                    proxy={proxy}
+                                    isOpen={true}
+                                    request={request}
+                                />
+                            </React.Suspense>
                         </div>
                         <div onClick={() => onClose()} className="scalar-app-exit"></div>
                     </div>
