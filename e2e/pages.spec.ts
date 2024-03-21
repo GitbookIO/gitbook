@@ -211,6 +211,11 @@ const testCases: TestsCase[] = [
                 fullPage: true,
             },
             {
+                name: 'Cards',
+                url: 'blocks/cards',
+                fullPage: true,
+            },
+            {
                 name: 'Math',
                 url: 'blocks/math',
             },

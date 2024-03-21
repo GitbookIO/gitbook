@@ -73,6 +73,7 @@ export async function RecordCard(
             ) : null}
             <div
                 className={tcls(
+                    'w-full',
                     'flex',
                     'flex-col',
                     'place-self-start',
