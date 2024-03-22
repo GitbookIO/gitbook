@@ -3,7 +3,7 @@ import { DocumentBlockCode, JSONDocument } from '@gitbook/api';
 import { tcls } from '@/lib/tailwind';
 
 import { CopyCodeButton } from './CopyCodeButton';
-import { colorToCSSVar, highlight, HighlightLine, HighlightToken } from './highlight';
+import { highlight, HighlightLine, HighlightToken } from './highlight';
 import { BlockProps } from '../Block';
 import { DocumentContext } from '../DocumentView';
 import { Inline } from '../Inline';

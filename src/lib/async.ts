@@ -253,8 +253,8 @@ export function singleton<R>(execute: () => Promise<R>): () => Promise<R> {
     };
 }
 
-type SingletonFunction<Args extends any[], Result> = ((
-    key: string,
+type SingletonFunction<Key extends string, Args extends any[], Result> = ((
+    key: Key,
     ...args: Args
 ) => Promise<Result>) & {
     isRunning(key: string): Promise<boolean>;
@@ -263,12 +263,12 @@ type SingletonFunction<Args extends any[], Result> = ((
 /**
  * Create a map of singleton operations in a safe way for Cloudflare worker
  */
-export function singletonMap<Args extends any[], Result>(
-    execute: (key: string, ...args: Args) => Promise<Result>,
-): SingletonFunction<Args, Result> {
+export function singletonMap<Key extends string, Args extends any[], Result>(
+    execute: (key: Key, ...args: Args) => Promise<Result>,
+): SingletonFunction<Key, Args, Result> {
     const states = new WeakMap<object, Map<string, Promise<Result>>>();
 
-    const fn: SingletonFunction<Args, Result> = async (key, ...args) => {
+    const fn: SingletonFunction<Key, Args, Result> = async (key, ...args) => {
         const ctx = await getGlobalContext();
         let current = states.get(ctx);
         if (current) {

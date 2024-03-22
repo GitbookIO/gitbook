@@ -9,8 +9,9 @@ import {
 // @ts-ignore - onigWasm is a Wasm module
 import onigWasm from 'shiki/onig.wasm?module';
 
-import { singleton } from '@/lib/async';
+import { singleton, singletonMap } from '@/lib/async';
 import { getNodeText } from '@/lib/document';
+import { trace } from '@/lib/tracing';
 
 export type HighlightLine = {
     highlighted: boolean;
@@ -27,27 +28,15 @@ type InlineIndexed = { inline: any; start: number; end: number };
 type PositionedToken = ThemedToken & { start: number; end: number };
 
 /**
- * shikijs does not support the css-variables theme, so we need to map the colors
- * Map taken from https://github.com/shikijs/shiki/blob/8be7ec435ef47970e825c5f607aaf117f6a545f1/packages/shiki/src/highlighter.ts#L51C3-L63C4
- */
-export const colorToCSSVar: Record<string, string> = {
-    '#000001': 'var(--shiki-color-text)',
-    '#000002': 'var(--shiki-color-background)',
-    '#000004': 'var(--shiki-token-constant)',
-    '#000005': 'var(--shiki-token-string)',
-    '#000006': 'var(--shiki-token-comment)',
-    '#000007': 'var(--shiki-token-keyword)',
-    '#000008': 'var(--shiki-token-parameter)',
-    '#000009': 'var(--shiki-token-function)',
-    '#000010': 'var(--shiki-token-string-expression)',
-    '#000011': 'var(--shiki-token-punctuation)',
-    '#000012': 'var(--shiki-token-link)',
-};
-
-/**
  * Highlight a code block while preserving inline elements.
  */
 export async function highlight(block: DocumentBlockCode): Promise<HighlightLine[]> {
+    const langName = block.data.syntax ? getLanguageForSyntax(block.data.syntax) : null;
+    if (!langName) {
+        // Language not found, fallback to plain highlighting
+        return plainHighlighting(block);
+    }
+
     const inlines: InlineIndexed[] = [];
     const code = getPlainCodeBlock(block, inlines);
 
@@ -55,15 +44,8 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
         return a.start - b.start;
     });
 
-    const langName = block.data.syntax ? getLanguageForSyntax(block.data.syntax) : null;
-    if (!langName) {
-        // Language not found, fallback to plain highlighting
-        return plainHighlighting(block);
-    }
-
     const highlighter = await loadHighlighter();
-    await highlighter.loadLanguage(langName);
-
+    await loadHighlighterLanguage(langName);
     const lines = highlighter.codeToTokensBase(code, {
         lang: langName,
     });
@@ -113,7 +95,7 @@ function getLanguageForSyntax(syntax: string): keyof typeof bundledLanguages | n
 /**
  * Parse a code block without highlighting it.
  */
-function plainHighlighting(block: DocumentBlockCode): HighlightLine[] {
+export function plainHighlighting(block: DocumentBlockCode): HighlightLine[] {
     return block.nodes.map((lineBlock) => {
         const tokens: HighlightToken[] = [];
 
@@ -316,16 +298,26 @@ function cleanupLine(line: string): string {
  * It makes sure to handle concurrent calls.
  */
 const loadHighlighter = singleton(async () => {
-    if (typeof onigWasm !== 'string') {
-        // When running bun test, the import is a string, we ignore it and let the module
-        // loads it on its own.
-        //
-        // Otherwise for Vercel/Cloudflare, we need to load it ourselves.
-        await loadWasm((obj) => WebAssembly.instantiate(onigWasm, obj));
-    }
-    const highlighter = await getHighlighter({
-        themes: [createCssVariablesTheme()],
-        langs: [],
+    return await trace('highlighting.loadHighlighter', async () => {
+        if (typeof onigWasm !== 'string') {
+            // When running bun test, the import is a string, we ignore it and let the module
+            // loads it on its own.
+            //
+            // Otherwise for Vercel/Cloudflare, we need to load it ourselves.
+            await loadWasm((obj) => WebAssembly.instantiate(onigWasm, obj));
+        }
+        const highlighter = await getHighlighter({
+            themes: [createCssVariablesTheme()],
+            langs: [],
+        });
+        return highlighter;
     });
-    return highlighter;
+});
+
+const loadHighlighterLanguage = singletonMap(async (lang: keyof typeof bundledLanguages) => {
+    const highlighter = await loadHighlighter();
+    await trace(
+        `highlighting.loadLanguage(${lang})`,
+        async () => await highlighter.loadLanguage(lang),
+    );
 });
