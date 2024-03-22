@@ -12,7 +12,7 @@ export async function Annotation(props: InlineProps<DocumentInlineAnnotation>) {
 
     const fragment = getNodeFragmentByType(inline, 'annotation-body');
     const content = children ?? (
-        <Inlines document={document} context={context} nodes={inline.nodes} />
+        <Inlines document={document} context={context} nodes={inline.nodes} ancestorInlines={[]} />
     );
 
     if (!fragment) {

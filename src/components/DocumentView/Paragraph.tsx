@@ -10,7 +10,7 @@ export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {
 
     return (
         <p className={tcls(style)}>
-            <Inlines {...contextProps} nodes={block.nodes} />
+            <Inlines {...contextProps} nodes={block.nodes} ancestorInlines={[]} />
         </p>
     );
 }

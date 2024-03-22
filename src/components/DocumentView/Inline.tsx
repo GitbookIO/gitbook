@@ -27,6 +27,11 @@ export interface InlineProps<T extends DocumentInline> extends DocumentContextPr
     document: JSONDocument;
 
     /**
+     * Inline ancestors of the current inline.
+     */
+    ancestorInlines: DocumentInline[];
+
+    /**
      * If defined, replace the content of the inline.
      */
     children?: React.ReactNode;

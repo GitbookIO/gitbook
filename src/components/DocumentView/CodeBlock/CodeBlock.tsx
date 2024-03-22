@@ -265,7 +265,12 @@ function CodeHighlightToken(props: {
 
     if (token.type === 'inline') {
         return (
-            <Inline inline={token.inline} document={document} context={context}>
+            <Inline
+                inline={token.inline}
+                document={document}
+                context={context}
+                ancestorInlines={[]}
+            >
                 <CodeHighlightTokens
                     tokens={token.children}
                     document={document}

@@ -9,7 +9,7 @@ import { InlineProps } from './Inline';
 import { Image } from '../utils';
 
 export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
-    const { inline, context } = props;
+    const { inline, context, ancestorInlines } = props;
     const { size = 'original' } = inline.data;
 
     const [src, darkSrc] = await Promise.all([
@@ -20,6 +20,8 @@ export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
     if (!src) {
         return null;
     }
+
+    const isInLink = ancestorInlines.some((ancestor) => ancestor.type === 'link');
 
     return (
         /* Ensure images dont expand to the size of the container where this Image may be nested in. Now it's always nested in a size-restricted container */
@@ -43,7 +45,7 @@ export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
                 preload
                 style={[size === 'line' ? ['max-h-[1lh]', 'h-[1lh]', 'w-auto'] : null]}
                 inline
-                zoom
+                zoom={!isInLink}
             />
         </span>
     );

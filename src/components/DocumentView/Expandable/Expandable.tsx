@@ -90,7 +90,12 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                         'group-open:rotate-90',
                     )}
                 />
-                <Inlines nodes={titleParagraph.nodes} document={document} context={context} />
+                <Inlines
+                    nodes={titleParagraph.nodes}
+                    document={document}
+                    context={context}
+                    ancestorInlines={[]}
+                />
                 <a
                     href={`#${id}`}
                     aria-label="Direct link to heading"

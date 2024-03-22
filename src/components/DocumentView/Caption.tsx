@@ -70,7 +70,12 @@ export function Caption(
                     'dark:text-light/6',
                 )}
             >
-                <Inlines nodes={captionParagraph.nodes} document={document} context={context} />
+                <Inlines
+                    nodes={captionParagraph.nodes}
+                    document={document}
+                    context={context}
+                    ancestorInlines={[]}
+                />
             </figcaption>
         </picture>
     );

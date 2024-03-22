@@ -11,10 +11,18 @@ export function Inlines<T extends DocumentInline | DocumentText>(
          */
         document: JSONDocument;
 
+        /**
+         * Ancestors of the current inline.
+         */
+        ancestorInlines: DocumentInline[];
+
+        /**
+         * Nodes to render
+         */
         nodes: T[];
     },
 ) {
-    const { nodes, document, ...contextProps } = props;
+    const { nodes, document, ancestorInlines, ...contextProps } = props;
 
     return (
         <>
@@ -24,7 +32,13 @@ export function Inlines<T extends DocumentInline | DocumentText>(
                 }
 
                 return (
-                    <Inline key={node.key} inline={node} document={document} {...contextProps} />
+                    <Inline
+                        key={node.key}
+                        inline={node}
+                        document={document}
+                        ancestorInlines={ancestorInlines}
+                        {...contextProps}
+                    />
                 );
             })}
         </>
