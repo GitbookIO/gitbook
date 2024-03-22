@@ -31,7 +31,7 @@ export default async function Page(props: { params: PagePathParams }) {
         if (pathname !== rawPathname) {
             // If the pathname was not normalized, redirect to the normalized version
             // before trying to resolve the page again
-            redirect(pathname);
+            redirect(absoluteHref(pathname));
         } else {
             notFound();
         }
@@ -104,7 +104,7 @@ export async function generateViewport({ params }: { params: PagePathParams }): 
 }
 
 export async function generateMetadata({ params }: { params: PagePathParams }): Promise<Metadata> {
-    const { space, page, customization, collection } = await fetchPageData(params);
+    const { space, pages, page, customization, collection } = await fetchPageData(params);
     if (!page) {
         notFound();
     }
@@ -114,9 +114,13 @@ export async function generateMetadata({ params }: { params: PagePathParams }): 
             .filter(Boolean)
             .join(' | '),
         description: page.description ?? '',
+        alternates: {
+            canonical: absoluteHref(getPagePath(pages, page), true),
+        },
         openGraph: {
             images: [
-                customization.socialPreview.url ?? absoluteHref(`~gitbook/ogimage/${page.id}`),
+                customization.socialPreview.url ??
+                    absoluteHref(`~gitbook/ogimage/${page.id}`, true),
             ],
         },
     };

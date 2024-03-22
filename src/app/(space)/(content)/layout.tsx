@@ -102,8 +102,6 @@ export async function generateMetadata(): Promise<Metadata> {
     return {
         title: `${collection ? collection.title : customization.title ?? space.title}`,
         generator: `GitBook (${buildVersion()})`,
-        // We pass `metadataBase` to avoid warnings from Next, but we still use absolute URLs
-        // as metadataBase doesn't seem to work well on next-on-cloudflare.
         metadataBase: new URL(baseUrl()),
         icons: {
             icon: [
