@@ -202,6 +202,8 @@ export const getSyncedBlock = cache(
 export const getPublishedContentByUrl = cache(
     'api.getPublishedContentByUrl',
     async (url: string, visitorAuthToken: string | undefined, options: CacheFunctionOptions) => {
+        const parsedURL = new URL(url);
+
         try {
             const response = await api().urls.getPublishedContentByUrl(
                 {
@@ -222,7 +224,12 @@ export const getPublishedContentByUrl = cache(
                 cacheTags: parsed.tags,
             };
             return {
-                tags: parsed.tags,
+                tags: [
+                    getAPICacheTag({
+                        tag: 'url',
+                        hostname: parsedURL.hostname,
+                    }),
+                ],
                 ttl: parsed.ttl,
                 data,
             };
@@ -236,8 +243,14 @@ export const getPublishedContentByUrl = cache(
                         },
                     } as PublishedContentWithCache,
                     // Cache errors for max 10 minutes in case the user is making changes to its content configuration
+                    // and to avoid caching too many entries when being spammed by botss
                     ttl: 60 * 10,
-                    tags: [],
+                    tags: [
+                        getAPICacheTag({
+                            tag: 'url',
+                            hostname: parsedURL.hostname,
+                        }),
+                    ],
                 };
             }
 
@@ -808,6 +821,11 @@ export function getAPICacheTag(
               tag: 'space';
               space: string;
           }
+        // All data related to the URL of a content
+        | {
+              tag: 'url';
+              hostname: string;
+          }
         // All data related to a collection
         | {
               tag: 'collection';
@@ -821,6 +839,8 @@ export function getAPICacheTag(
           },
 ): string {
     switch (spec.tag) {
+        case 'url':
+            return `url:${spec.hostname}`;
         case 'space':
             return `space:${spec.space}`;
         case 'collection':

@@ -116,7 +116,7 @@ const testCases: TestsCase[] = [
         tests: [
             {
                 name: 'Revision',
-                url: '~/revisions/S55pwsEr5UVoroaOiWnP',
+                url: '~/revisions/S55pwsEr5UVoroaOiWnP/blocks/headings',
                 run: waitForCookiesDialog,
             },
         ],

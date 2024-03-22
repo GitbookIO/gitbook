@@ -548,15 +548,13 @@ async function lookupSpaceByAPI(
     visitorAuthToken: string | undefined,
 ): Promise<LookupResult> {
     const url = stripURLSearch(lookupURL);
-    const lookupAlternatives = getURLLookupAlternatives(url);
+    const lookup = getURLLookupAlternatives(url);
 
     console.log(
-        `lookup content for url "${url.toString()}", with ${
-            lookupAlternatives.length
-        } alternatives`,
+        `lookup content for url "${url.toString()}", with ${lookup.urls.length} alternatives`,
     );
 
-    const result = await race(lookupAlternatives, async (alternative, { signal }) => {
+    const result = await race(lookup.urls, async (alternative, { signal }) => {
         const data = await getPublishedContentByUrl(alternative.url, visitorAuthToken, {
             signal,
         });
@@ -580,9 +578,9 @@ async function lookupSpaceByAPI(
 
         return {
             space: data.space,
-            changeRequest: data.changeRequest,
-            revision: data.revision,
-            basePath: data.basePath,
+            changeRequest: data.changeRequest ?? lookup.changeRequest,
+            revision: data.revision ?? lookup.revision,
+            basePath: joinPath(data.basePath, lookup.basePath ?? ''),
             pathname: joinPath(data.pathname, alternative.extraPath),
             apiToken: data.apiToken,
             cacheMaxAge: data.cacheMaxAge,
