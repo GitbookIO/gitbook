@@ -68,7 +68,7 @@ export function DynamicTabs(props: {
                             //next from active-tab
                             '[.active-tab_+_:after]:rounded-br-md',
 
-                            'inline-flex',
+                            'inline-block',
                             'text-sm',
                             'px-3.5',
                             'py-2',
@@ -99,8 +99,12 @@ export function DynamicTabs(props: {
                             'dark:after:border-light/2',
                             'dark:hover:text-light-3',
 
+                            'truncate',
+                            'max-w-full',
+
                             active === tab.id
                                 ? [
+                                      'shrink-0',
                                       'active-tab',
                                       'text-dark-2',
                                       'bg-transparent',
