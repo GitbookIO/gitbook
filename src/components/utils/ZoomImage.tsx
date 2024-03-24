@@ -1,6 +1,6 @@
 'use client';
 
-import IconX from '@geist-ui/icons/x';
+import IconMinimize from '@geist-ui/icons/minimize';
 import classNames from 'classnames';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -11,6 +11,7 @@ import styles from './ZoomImage.module.css';
 
 /**
  * Replacement for an <img> tag that allows zooming.
+ * The implementation uses the experimental View Transition API in Chrome for a smooth transition.
  */
 export function ZoomImage(
     props: React.ComponentPropsWithoutRef<'img'> & {
@@ -21,6 +22,15 @@ export function ZoomImage(
 
     const [active, setActive] = React.useState(false);
     const [opened, setOpened] = React.useState(false);
+
+    const preloadImage = React.useCallback((onLoad?: () => void) => {
+        const image = new Image();
+        image.src = rest.src;
+
+        image.onload = () => {
+            onLoad?.();
+        };
+    }, []);
 
     const onClose = React.useCallback(() => {
         startViewTransition(
@@ -43,18 +53,19 @@ export function ZoomImage(
             ) : (
                 <img
                     {...rest}
+                    onMouseEnter={() => {
+                        preloadImage();
+                    }}
                     onClick={() => {
-                        const image = new Image();
-                        image.src = rest.src;
-
-                        image.onload = () => {
+                        // Preload the image before opening the modal to ensure the animation is smooth
+                        preloadImage(() => {
                             const change = () => {
                                 setOpened(true);
                             };
 
                             setActive(true);
                             startViewTransition(change);
-                        };
+                        });
                     }}
                     className={classNames(
                         rest.className,
@@ -70,6 +81,8 @@ export function ZoomImage(
 function ZoomImageModal(props: { src: string; alt: string; onClose: () => void }) {
     const { src, alt, onClose } = props;
 
+    const buttonRef = React.useRef<HTMLButtonElement>(null);
+
     React.useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
@@ -84,6 +97,10 @@ function ZoomImageModal(props: { src: string; alt: string; onClose: () => void }
         };
     }, [onClose]);
 
+    React.useEffect(() => {
+        buttonRef.current?.focus();
+    }, []);
+
     return (
         <div className={styles.zoomModal} onClick={onClose}>
             <img
@@ -96,12 +113,10 @@ function ZoomImageModal(props: { src: string; alt: string; onClose: () => void }
                     'bg-light',
                     'dark:bg-dark',
                 )}
-                onClick={(event) => {
-                    event.stopPropagation();
-                }}
             />
 
             <button
+                ref={buttonRef}
                 className={tcls(
                     'absolute',
                     'top-5',
@@ -127,7 +142,7 @@ function ZoomImageModal(props: { src: string; alt: string; onClose: () => void }
                 )}
                 onClick={onClose}
             >
-                <IconX />
+                <IconMinimize />
             </button>
         </div>
     );

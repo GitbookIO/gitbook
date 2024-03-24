@@ -25,4 +25,5 @@ html:has(.zoomModal) {
 
 .zoomModal img {
     view-transition-name: zoom-image;
+    cursor: zoom-out;
 }
