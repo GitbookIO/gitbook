@@ -11,11 +11,17 @@ import './ZoomImage.css';
 /**
  * Replacement for an <img> tag that allows zooming.
  */
-export function ZoomImage(props: React.ComponentPropsWithoutRef<'img'>) {
+export function ZoomImage(props: React.ComponentPropsWithoutRef<'img'> & {
+    src: string;
+}) {
     const { ...rest } = props;
 
     const imgRef = React.useRef<HTMLImageElement>(null);
     const [opened, setOpened] = React.useState(false);
+
+    const onClose = React.useCallback(() => {
+        setOpened(false);
+    }, [setOpened]);
 
     return (
         <>
@@ -27,16 +33,16 @@ export function ZoomImage(props: React.ComponentPropsWithoutRef<'img'>) {
                         setOpened(true);
                     };
 
-                    const img = imgRef.current;
-                    if (img) {
-                        // @ts-ignore
-                        img.style.viewTransitionName = 'zoom-image';
-                    }
+                    // const img = imgRef.current;
+                    // if (img) {
+                    //     // @ts-ignore
+                    //     img.style.viewTransitionName = 'zoom-image';
+                    // }
                     startViewTransition(() => {
-                        if (img) {
-                            // @ts-ignore
-                            img.style.viewTransitionName = '';
-                        }
+                        // if (img) {
+                        //     // @ts-ignore
+                        //     img.style.viewTransitionName = '';
+                        // }
                         change();
                     });
                 }}
@@ -44,14 +50,42 @@ export function ZoomImage(props: React.ComponentPropsWithoutRef<'img'>) {
             />
             {opened
                 ? ReactDOM.createPortal(
-                      <div className={styles.zoomModal}>
-                          <img src={rest.src} />
-                      </div>,
+                      <ZoomImageModal src={rest.src} alt={rest.alt ?? ''} onClose={onClose} />,
                       document.body,
                   )
                 : null}
         </>
     );
+}
+
+function ZoomImageModal(props: {
+    src: string;
+    alt: string;
+    onClose: () => void;
+}) {
+    const { src, alt, onClose } = props;
+
+    React.useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                onClose();
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [onClose]);
+
+    return (
+        <div className={styles.zoomModal} onClick={onClose}>
+            <img src={src} alt={alt} className={styles.zoomModalImg} onClick={(event) => {
+                event.stopPropagation();
+            }} />
+        </div>
+    )
 }
 
 function startViewTransition(callback: () => void) {
