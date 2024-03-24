@@ -18,17 +18,22 @@ export async function PageCover(props: {
     cover: RevisionPageDocumentCover;
     context: ContentRefContext;
 }) {
-    const { as, cover, context } = props;
+    const { as, page, cover, context } = props;
     const resolved = cover.ref ? await resolveContentRef(cover.ref, context) : null;
 
     return (
         <div
             className={tcls(
                 'overflow-hidden',
-                '-mx-4',
                 // Negative margin to balance the container padding
+                '-mx-4',
                 as === 'full'
-                    ? ['sm:-mx-6', 'md:-mx-8', 'lg:ml-0', '-lg:mr-8']
+                    ? [
+                          'sm:-mx-6',
+                          'md:-mx-8',
+                          '-lg:mr-8',
+                          page.layout.tableOfContents ? 'lg:ml-0' : null,
+                      ]
                     : ['sm:mx-auto', 'max-w-3xl', 'sm:rounded-md', 'mb-8'],
             )}
         >

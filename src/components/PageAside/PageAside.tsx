@@ -46,7 +46,8 @@ export async function PageAside(props: {
                 'sticky',
                 'py-8',
                 'break-anywhere', // To prevent long words in headings from breaking the layout
-                withHeaderOffset ? 'lg:h-[calc(100vh_-_4rem)]' : 'lg:h-[100vh]',
+                'lg:h-full',
+                withHeaderOffset ? 'lg:max-h-[calc(100vh_-_4rem)]' : 'lg:max-h-[100vh]',
                 withHeaderOffset ? 'top-16' : 'top-0',
                 'h-[100vh]',
 

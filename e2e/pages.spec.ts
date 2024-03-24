@@ -78,30 +78,8 @@ const testCases: TestsCase[] = [
         ],
     },
     {
-        name: 'GitBook Examples',
-        baseUrl: 'https://examples.gitbook.com',
-        tests: [
-            {
-                name: 'Landing page',
-                url: '',
-                run: waitForCookiesDialog,
-            },
-        ],
-    },
-    {
         name: 'Snyk',
         baseUrl: 'https://docs.snyk.io',
-        tests: [
-            {
-                name: 'Home',
-                url: '',
-                run: waitForCookiesDialog,
-            },
-        ],
-    },
-    {
-        name: 'Rocket.Chat',
-        baseUrl: 'https://docs.rocket.chat',
         tests: [
             {
                 name: 'Home',
@@ -218,6 +196,27 @@ const testCases: TestsCase[] = [
             {
                 name: 'Math',
                 url: 'blocks/math',
+            },
+        ],
+    },
+    {
+        name: 'Page options',
+        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        tests: [
+            {
+                name: 'With cover',
+                url: 'page-options/page-with-cover',
+                run: waitForCookiesDialog,
+            },
+            {
+                name: 'With hero cover',
+                url: 'page-options/page-with-hero-cover',
+                run: waitForCookiesDialog,
+            },
+            {
+                name: 'With cover and no TOC',
+                url: 'page-options/page-with-cover-and-no-toc',
+                run: waitForCookiesDialog,
             },
         ],
     },
