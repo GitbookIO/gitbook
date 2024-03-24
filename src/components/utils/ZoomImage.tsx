@@ -4,9 +4,11 @@ import classNames from 'classnames';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import IconX from '@geist-ui/icons/x';
+
 import styles from './ZoomImage.module.css';
 
-import './ZoomImage.css';
+import { tcls } from '@/lib/tailwind';
 
 /**
  * Replacement for an <img> tag that allows zooming.
@@ -25,7 +27,14 @@ export function ZoomImage(props: React.ComponentPropsWithoutRef<'img'> & {
 
     return (
         <>
-            <img
+            
+            {opened
+                ? ReactDOM.createPortal(
+                      <ZoomImageModal src={rest.src} alt={rest.alt ?? ''} onClose={onClose} />,
+                      document.body,
+                  )
+                : (
+                    <img
                 ref={imgRef}
                 {...rest}
                 onClick={() => {
@@ -33,27 +42,22 @@ export function ZoomImage(props: React.ComponentPropsWithoutRef<'img'> & {
                         setOpened(true);
                     };
 
-                    // const img = imgRef.current;
-                    // if (img) {
-                    //     // @ts-ignore
-                    //     img.style.viewTransitionName = 'zoom-image';
-                    // }
+                    const img = imgRef.current;
+                    if (img) {
+                        // @ts-ignore
+                        img.style.viewTransitionName = 'zoom-image';
+                    }
                     startViewTransition(() => {
                         // if (img) {
                         //     // @ts-ignore
                         //     img.style.viewTransitionName = '';
                         // }
-                        change();
+                        ReactDOM.flushSync(() => change());
                     });
                 }}
-                className={classNames(rest.className, styles.zoomImg)}
+                className={classNames(rest.className, styles.zoomImg, opened ? styles.zoomImageActive : null)}
             />
-            {opened
-                ? ReactDOM.createPortal(
-                      <ZoomImageModal src={rest.src} alt={rest.alt ?? ''} onClose={onClose} />,
-                      document.body,
-                  )
-                : null}
+                )}
         </>
     );
 }
@@ -81,9 +85,35 @@ function ZoomImageModal(props: {
 
     return (
         <div className={styles.zoomModal} onClick={onClose}>
-            <img src={src} alt={alt} className={styles.zoomModalImg} onClick={(event) => {
+            <img src={src} alt={alt} className={tcls('max-w-full', 'max-h-full', 'object-contain', 'bg-light', 'dark:bg-dark')} onClick={(event) => {
                 event.stopPropagation();
             }} />
+
+            <button className={tcls(
+                'absolute',
+                'top-5',
+                'right-5',
+                'flex',
+                'flex-row',
+                'items-center',
+                'justify-center',
+                'text-sm',
+                'text-dark/6',
+                'dark:text-light/5',
+                'hover:text-primary',
+                'p-4',
+                'dark:text-light/5',
+                'rounded-full',
+                'bg-white',
+                'dark:bg-dark/3',
+                'shadow-sm',
+                'hover:shadow-md',
+                'border-slate-300',
+                'dark:border-dark/2',
+                'border',
+            )} onClick={onClose}>
+                <IconX />
+            </button>
         </div>
     )
 }
