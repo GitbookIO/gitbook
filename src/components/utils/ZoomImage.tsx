@@ -38,22 +38,27 @@ export function ZoomImage(props: React.ComponentPropsWithoutRef<'img'> & {
                 ref={imgRef}
                 {...rest}
                 onClick={() => {
-                    const change = () => {
-                        setOpened(true);
-                    };
+                    const image = new Image();
+                    image.src = rest.src;
 
-                    const img = imgRef.current;
-                    if (img) {
-                        // @ts-ignore
-                        img.style.viewTransitionName = 'zoom-image';
+                    image.onload = () => {
+                        const change = () => {
+                            setOpened(true);
+                        };
+
+                        const img = imgRef.current;
+                        if (img) {
+                            // @ts-ignore
+                            img.style.viewTransitionName = 'zoom-image';
+                        }
+                        startViewTransition(() => {
+                            if (img) {
+                                // @ts-ignore
+                                img.style.viewTransitionName = '';
+                            }
+                            ReactDOM.flushSync(() => change());
+                        });
                     }
-                    startViewTransition(() => {
-                        // if (img) {
-                        //     // @ts-ignore
-                        //     img.style.viewTransitionName = '';
-                        // }
-                        ReactDOM.flushSync(() => change());
-                    });
                 }}
                 className={classNames(rest.className, styles.zoomImg, opened ? styles.zoomImageActive : null)}
             />
