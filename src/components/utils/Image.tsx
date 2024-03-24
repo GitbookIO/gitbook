@@ -271,7 +271,7 @@ async function ImagePicture(
         });
     }
 
-    const imgProps: React.ComponentPropsWithoutRef<'img'> = {
+    const imgProps: React.ComponentPropsWithoutRef<'img'> & { src: string } = {
         alt,
         style,
         loading,
