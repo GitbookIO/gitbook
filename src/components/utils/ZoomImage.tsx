@@ -27,6 +27,11 @@ export function ZoomImage(
 
     // Only allow zooming when image will not actually be larger and on mobile
     React.useEffect(() => {
+        if (isTouchDevice()) {
+            setZoomable(false);
+            return;
+        }
+
         const imageWidth = typeof width === 'number' ? width : 0;
         let viewWidth = 0;
 
@@ -242,4 +247,13 @@ function startViewTransition(callback: () => void, onEnd?: () => void) {
         callback();
         onEnd?.();
     }
+}
+
+function isTouchDevice(): boolean {
+    return (
+        'ontouchstart' in window ||
+        navigator.maxTouchPoints > 0 ||
+        // @ts-ignore
+        navigator.msMaxTouchPoints > 0
+    );
 }
