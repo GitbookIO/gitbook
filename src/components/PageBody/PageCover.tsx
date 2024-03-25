@@ -5,7 +5,6 @@ import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import defaultPageCover from './default-page-cover.svg';
-import { PAGE_COVER_HEIGHT } from '../layout';
 
 const PAGE_COVER_SIZE: ImageSize = { width: 1990, height: 480 };
 
@@ -43,7 +42,7 @@ export async function PageCover(props: {
                     light: resolved
                         ? {
                               src: resolved.href,
-                              size: resolved.fileDimensions,
+                              size: resolved.file?.dimensions,
                           }
                         : {
                               src: defaultPageCover.src,
