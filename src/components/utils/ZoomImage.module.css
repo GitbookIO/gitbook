@@ -1,0 +1,19 @@
+html:has(.zoomModal) {
+    overflow: hidden;
+}
+
+.zoomImg {
+    cursor: zoom-in;
+}
+
+.zoomImageActive {
+    view-transition-name: zoom-image;
+}
+
+.zoomModal {
+}
+
+.zoomModal img {
+    view-transition-name: zoom-image;
+    cursor: zoom-out;
+}

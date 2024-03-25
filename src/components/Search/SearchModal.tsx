@@ -45,12 +45,10 @@ export function SearchModal(props: SearchModalProps) {
     const isSearchOpened = state !== null;
     React.useEffect(() => {
         if (isSearchOpened) {
-            document.body.classList.add('search-open');
             document.body.style.overflow = 'hidden';
         }
 
         return () => {
-            document.body.classList.remove('search-open');
             document.body.style.overflow = 'auto';
         };
     }, [isSearchOpened]);

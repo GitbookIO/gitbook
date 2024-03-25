@@ -5,7 +5,7 @@ import { checkIsHttpURL, getImageSize, getResizedImageURL } from '@/lib/images';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { PolymorphicComponentProp } from './types';
-import { Zoom } from './Zoom';
+import { ZoomImage } from './ZoomImage';
 
 export type ImageSize = { width: number; height: number };
 
@@ -85,6 +85,10 @@ interface ImageCommonProps {
      * The `style` attribute is used to apply custom styles.
      */
     inlineStyle?: React.CSSProperties;
+}
+
+interface ImgDOMPropsWithSrc extends React.ComponentPropsWithoutRef<'img'> {
+    src: string;
 }
 
 /**
@@ -271,16 +275,14 @@ async function ImagePicture(
         });
     }
 
-    const img = (
-        <img
-            alt={alt}
-            style={style}
-            loading={loading}
-            fetchPriority={fetchPriority}
-            {...rest}
-            {...attrs}
-        />
-    );
+    const imgProps: ImgDOMPropsWithSrc = {
+        alt,
+        style,
+        loading,
+        fetchPriority,
+        ...rest,
+        ...attrs,
+    };
 
-    return zoom ? <Zoom wrapElement={inline ? 'span' : 'div'}>{img}</Zoom> : img;
+    return zoom ? <ZoomImage {...imgProps} /> : <img {...imgProps} alt={imgProps.alt ?? ''} />;
 }
