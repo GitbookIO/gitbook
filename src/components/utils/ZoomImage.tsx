@@ -125,7 +125,12 @@ export function ZoomImage(
                     ) : null}
 
                     {ReactDOM.createPortal(
-                        <ZoomImageModal src={src} alt={alt ?? ''} onClose={onClose} />,
+                        <ZoomImageModal
+                            src={src}
+                            crossOrigin={props.crossOrigin}
+                            alt={alt ?? ''}
+                            onClose={onClose}
+                        />,
                         document.body,
                     )}
                 </>
@@ -166,8 +171,13 @@ export function ZoomImage(
     );
 }
 
-function ZoomImageModal(props: { src: string; alt: string; onClose: () => void }) {
-    const { src, alt, onClose } = props;
+function ZoomImageModal(props: {
+    src: string;
+    alt: string;
+    crossOrigin: React.ComponentPropsWithoutRef<'img'>['crossOrigin'];
+    onClose: () => void;
+}) {
+    const { src, alt, crossOrigin, onClose } = props;
 
     const buttonRef = React.useRef<HTMLButtonElement>(null);
 
@@ -210,6 +220,7 @@ function ZoomImageModal(props: { src: string; alt: string; onClose: () => void }
             <img
                 src={src}
                 alt={alt}
+                crossOrigin={crossOrigin}
                 className={tcls(
                     'max-w-full',
                     'max-h-full',
