@@ -280,5 +280,5 @@ async function ImagePicture(
         ...attrs,
     };
 
-    return zoom ? <ZoomImage {...imgProps} /> : <img {...imgProps} />;
+    return zoom ? <ZoomImage {...imgProps} /> : <img {...imgProps} alt={imgProps.alt ?? ''} />;
 }

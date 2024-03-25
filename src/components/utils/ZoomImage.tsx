@@ -18,20 +18,74 @@ export function ZoomImage(
         src: string;
     },
 ) {
-    const { ...rest } = props;
+    const { src, alt, width } = props;
 
+    const imgRef = React.useRef<HTMLImageElement>(null);
+    const [zoomable, setZoomable] = React.useState(false);
     const [active, setActive] = React.useState(false);
     const [opened, setOpened] = React.useState(false);
 
-    const preloadImage = React.useCallback((onLoad?: () => void) => {
-        const image = new Image();
-        image.src = rest.src;
+    // Only allow zooming when image will not actually be larger and on mobile
+    React.useEffect(() => {
+        const imageWidth = typeof width === 'number' ? width : 0;
+        let viewWidth = 0;
 
-        image.onload = () => {
-            onLoad?.();
+        const mediaQueryList = window.matchMedia('(min-width: 768px)');
+        const resizeObserver =
+            width && typeof ResizeObserver !== 'undefined'
+                ? new ResizeObserver((entries) => {
+                      viewWidth = entries[0]?.contentRect.width;
+                      onChange();
+                  })
+                : null;
+
+        const onChange = () => {
+            if (!mediaQueryList.matches) {
+                // Don't allow zooming on mobile
+                setZoomable(false);
+            } else if (resizeObserver && imageWidth && viewWidth && imageWidth <= viewWidth) {
+                // Image can't be zoomed if it's already rendered as it's largest size
+                setZoomable(false);
+            } else {
+                setZoomable(true);
+            }
         };
-    }, []);
 
+        mediaQueryList.addEventListener('change', onChange);
+        if (imgRef.current) {
+            resizeObserver?.observe(imgRef.current);
+        }
+
+        if (!resizeObserver) {
+            // When resizeObserver is available, it'll take care of calling the changelog as soon as the element is observed
+            onChange();
+        }
+
+        return () => {
+            resizeObserver?.disconnect();
+            mediaQueryList.removeEventListener('change', onChange);
+        };
+    }, [imgRef, width, setZoomable]);
+
+    // Preload the image that will be displayed in the modal
+    if (zoomable) {
+        ReactDOM.preload(src, {
+            as: 'image',
+        });
+    }
+    const preloadImage = React.useCallback(
+        (onLoad?: () => void) => {
+            const image = new Image();
+            image.src = src;
+
+            image.onload = () => {
+                onLoad?.();
+            };
+        },
+        [src],
+    );
+
+    // When closing the modal, animate the transition back to the original image
     const onClose = React.useCallback(() => {
         startViewTransition(
             () => {
@@ -47,29 +101,37 @@ export function ZoomImage(
         <>
             {opened ? (
                 ReactDOM.createPortal(
-                    <ZoomImageModal src={rest.src} alt={rest.alt ?? ''} onClose={onClose} />,
+                    <ZoomImageModal src={src} alt={alt ?? ''} onClose={onClose} />,
                     document.body,
                 )
             ) : (
                 <img
-                    {...rest}
+                    ref={imgRef}
+                    {...props}
+                    alt={alt ?? ''}
                     onMouseEnter={() => {
-                        preloadImage();
+                        if (zoomable) {
+                            preloadImage();
+                        }
                     }}
                     onClick={() => {
+                        if (!zoomable) {
+                            return;
+                        }
+
                         // Preload the image before opening the modal to ensure the animation is smooth
                         preloadImage(() => {
                             const change = () => {
                                 setOpened(true);
                             };
 
-                            setActive(true);
+                            ReactDOM.flushSync(() => setActive(true));
                             startViewTransition(change);
                         });
                     }}
                     className={classNames(
-                        rest.className,
-                        styles.zoomImg,
+                        props.className,
+                        zoomable ? styles.zoomImg : null,
                         active ? styles.zoomImageActive : null,
                     )}
                 />
@@ -102,7 +164,23 @@ function ZoomImageModal(props: { src: string; alt: string; onClose: () => void }
     }, []);
 
     return (
-        <div className={styles.zoomModal} onClick={onClose}>
+        <div
+            className={classNames(
+                styles.zoomModal,
+                tcls(
+                    'fixed',
+                    'inset-0',
+                    'z-50',
+                    'flex',
+                    'items-center',
+                    'justify-center',
+                    'bg-light',
+                    'dark:bg-dark',
+                    'p-8',
+                ),
+            )}
+            onClick={onClose}
+        >
             <img
                 src={src}
                 alt={alt}
