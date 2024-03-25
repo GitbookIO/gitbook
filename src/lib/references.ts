@@ -1,4 +1,4 @@
-import { ContentRef, Revision, RevisionPageDocument, Space } from '@gitbook/api';
+import { ContentRef, Revision, RevisionFile, RevisionPageDocument, Space } from '@gitbook/api';
 import assertNever from 'assert-never';
 
 import {
@@ -24,8 +24,8 @@ export interface ResolvedContentRef {
     href: string;
     /** True if the content ref is active */
     active: boolean;
-    /** Image size, if the reference is a image file */
-    fileDimensions?: { width: number; height: number };
+    /** File, if the reference is a file */
+    file?: RevisionFile;
 }
 
 export interface ContentRefContext extends PageHrefContext {
@@ -90,7 +90,7 @@ export async function resolveContentRef(
                     href: file.downloadURL,
                     text: file.name,
                     active: false,
-                    fileDimensions: file.dimensions,
+                    file,
                 };
             } else {
                 return null;
@@ -250,4 +250,23 @@ async function resolveContentRefInSpace(spaceId: string, contentRef: ContentRef)
         pages,
         baseUrl,
     });
+}
+
+export function resolveContentRefWithFiles(
+    files: RevisionFile[],
+    contentRef: ContentRef,
+): ResolvedContentRef | null | undefined {
+    if (contentRef.kind === 'file') {
+        const file = files.find((file) => file.id === contentRef.file);
+        if (file) {
+            return {
+                href: file.downloadURL,
+                text: file.name,
+                active: false,
+                file,
+            };
+        }
+        return null;
+    }
+    return undefined;
 }

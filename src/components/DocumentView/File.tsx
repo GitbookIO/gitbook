@@ -4,7 +4,6 @@ import IconImage from '@geist-ui/icons/image';
 import IconPaperClip from '@geist-ui/icons/paperclip';
 import { DocumentBlockFile } from '@gitbook/api';
 
-import { getRevisionFile } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
 import { BlockProps } from './Block';
@@ -12,13 +11,9 @@ import { BlockProps } from './Block';
 export async function File(props: BlockProps<DocumentBlockFile>) {
     const { block, context, style } = props;
 
-    const file = context.content
-        ? await getRevisionFile(
-              context.content.spaceId,
-              context.content.revisionId,
-              block.data.ref.file,
-          )
-        : null;
+    const contentRef = await context.resolveContentRef(block.data.ref);
+    const file = contentRef?.file;
+
     if (!file) {
         return null;
     }

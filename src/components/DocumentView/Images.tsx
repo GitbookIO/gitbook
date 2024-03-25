@@ -89,12 +89,12 @@ async function ImageBlock(props: {
                 sources={{
                     light: {
                         src: src.href,
-                        size: src.fileDimensions,
+                        size: src.file?.dimensions,
                     },
                     dark: darkSrc
                         ? {
                               src: darkSrc.href,
-                              size: darkSrc.fileDimensions,
+                              size: darkSrc.file?.dimensions,
                           }
                         : null,
                 }}

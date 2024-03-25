@@ -52,7 +52,7 @@ export async function RecordCard(
                     sources={{
                         light: {
                             src: cover.href,
-                            size: cover.fileDimensions,
+                            size: cover.file?.dimensions,
                         },
                     }}
                     sizes={[
