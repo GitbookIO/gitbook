@@ -24,6 +24,7 @@ export function ZoomImage(
     const [zoomable, setZoomable] = React.useState(false);
     const [active, setActive] = React.useState(false);
     const [opened, setOpened] = React.useState(false);
+    const [placeholderRect, setPlaceholderRect] = React.useState<DOMRect | null>(null);
 
     // Only allow zooming when image will not actually be larger and on mobile
     React.useEffect(() => {
@@ -36,10 +37,17 @@ export function ZoomImage(
 
         const mediaQueryList = window.matchMedia('(min-width: 768px)');
         const resizeObserver =
-            width && typeof ResizeObserver !== 'undefined'
+            typeof ResizeObserver !== 'undefined'
                 ? new ResizeObserver((entries) => {
-                      viewWidth = entries[0]?.contentRect.width;
-                      onChange();
+                      const imgEntry = entries[0];
+
+                      // Since the image is removed from the DOM when the modal is opened,
+                      // We only care when the size is defined.
+                      if (imgEntry && imgEntry.contentRect.width !== 0) {
+                          viewWidth = entries[0]?.contentRect.width;
+                          setPlaceholderRect(entries[0].contentRect);
+                          onChange();
+                      }
                   })
                 : null;
 
@@ -104,11 +112,25 @@ export function ZoomImage(
     return (
         <>
             {opened ? (
-                ReactDOM.createPortal(
-                    <ZoomImageModal src={src} alt={alt ?? ''} onClose={onClose} />,
-                    document.body,
-                )
+                <>
+                    {placeholderRect ? (
+                        // Placeholder to keep the layout stable when the image is removed from the DOM
+                        <span
+                            style={{
+                                display: 'block',
+                                width: placeholderRect.width,
+                                height: placeholderRect.height,
+                            }}
+                        />
+                    ) : null}
+
+                    {ReactDOM.createPortal(
+                        <ZoomImageModal src={src} alt={alt ?? ''} onClose={onClose} />,
+                        document.body,
+                    )}
+                </>
             ) : (
+                // When zooming, remove the image from the DOM to let the browser animates it with View Transition.
                 <img
                     ref={imgRef}
                     {...props}
