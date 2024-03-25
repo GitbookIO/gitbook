@@ -43,6 +43,7 @@ export function Caption(
             'dark:after:border-light/1',
             'dark:after:mix-blend-plus-lighter',
             'after:pointer-events-none',
+            'w-fit',
         ],
         style,
     } = props;
