@@ -87,6 +87,10 @@ interface ImageCommonProps {
     inlineStyle?: React.CSSProperties;
 }
 
+interface ImgDOMPropsWithSrc extends React.ComponentPropsWithoutRef<'img'> {
+    src: string;
+}
+
 /**
  * Render an image that will be swapped depending on the theme.
  * We don't use the `next/image` component because we need to load images from external sources,
@@ -271,7 +275,7 @@ async function ImagePicture(
         });
     }
 
-    const imgProps: React.ComponentPropsWithoutRef<'img'> & { src: string } = {
+    const imgProps: ImgDOMPropsWithSrc = {
         alt,
         style,
         loading,

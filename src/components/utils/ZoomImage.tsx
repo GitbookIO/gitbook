@@ -28,7 +28,6 @@ export function ZoomImage(
     // Only allow zooming when image will not actually be larger and on mobile
     React.useEffect(() => {
         if (isTouchDevice()) {
-            setZoomable(false);
             return;
         }
 
@@ -70,7 +69,7 @@ export function ZoomImage(
             resizeObserver?.disconnect();
             mediaQueryList.removeEventListener('change', onChange);
         };
-    }, [imgRef, width, setZoomable]);
+    }, [imgRef, width]);
 
     // Preload the image that will be displayed in the modal
     if (zoomable) {
@@ -100,7 +99,7 @@ export function ZoomImage(
                 setActive(false);
             },
         );
-    }, [setOpened]);
+    }, []);
 
     return (
         <>
