@@ -35,31 +35,31 @@ it('should parse plain code', async () => {
     ]);
 });
 
-
 it('should parse different code in parallel', async () => {
     await Promise.all(
-        ['shell', 'scss', 'markdown', 'less', 'scss', 'css', 'scss', 'yaml'].map(async (syntax) => highlight({
-            object: 'block',
-            type: 'code',
-            data: {
-                syntax: syntax,
-            },
-            nodes: [
-                {
-                    object: 'block',
-                    type: 'code-line',
-                    data: {
-                        
-                    },
-                    nodes: [
-                        {
-                            object: 'text',
-                            leaves: [{ object: 'leaf', marks: [], text: 'Hello world' }],
-                        },
-                    ],
+        ['shell', 'scss', 'markdown', 'less', 'scss', 'css', 'scss', 'yaml'].map(async (syntax) =>
+            highlight({
+                object: 'block',
+                type: 'code',
+                data: {
+                    syntax: syntax,
                 },
-            ],
-        })));
+                nodes: [
+                    {
+                        object: 'block',
+                        type: 'code-line',
+                        data: {},
+                        nodes: [
+                            {
+                                object: 'text',
+                                leaves: [{ object: 'leaf', marks: [], text: 'Hello world' }],
+                            },
+                        ],
+                    },
+                ],
+            }),
+        ),
+    );
 });
 
 it('should parse a multilines plain code', async () => {
