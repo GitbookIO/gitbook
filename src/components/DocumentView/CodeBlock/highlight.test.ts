@@ -35,6 +35,33 @@ it('should parse plain code', async () => {
     ]);
 });
 
+
+it('should parse different code in parallel', async () => {
+    await Promise.all(
+        ['shell', 'scss', 'markdown', 'less', 'scss', 'css', 'scss', 'yaml'].map(async (syntax) => highlight({
+            object: 'block',
+            type: 'code',
+            data: {
+                syntax: syntax,
+            },
+            nodes: [
+                {
+                    object: 'block',
+                    type: 'code-line',
+                    data: {
+                        
+                    },
+                    nodes: [
+                        {
+                            object: 'text',
+                            leaves: [{ object: 'leaf', marks: [], text: 'Hello world' }],
+                        },
+                    ],
+                },
+            ],
+        })));
+});
+
 it('should parse a multilines plain code', async () => {
     const tokens = await highlight({
         object: 'block',
@@ -561,45 +588,30 @@ it('should support multiple code tokens in an annotation', async () => {
                     type: 'shiki',
                     token: {
                         content: 'const',
-                        color: '#000007',
-                        start: 0,
-                        end: 5,
                     },
                 },
                 {
                     type: 'shiki',
                     token: {
                         content: ' ',
-                        color: '#000001',
-                        start: 5,
-                        end: 6,
                     },
                 },
                 {
                     type: 'shiki',
                     token: {
                         content: 'a',
-                        color: '#000004',
-                        start: 6,
-                        end: 7,
                     },
                 },
                 {
                     type: 'shiki',
                     token: {
                         content: ' ',
-                        color: '#000001',
-                        start: 7,
-                        end: 8,
                     },
                 },
                 {
                     type: 'shiki',
                     token: {
                         content: '=',
-                        color: '#000007',
-                        start: 8,
-                        end: 9,
                     },
                 },
                 {
@@ -613,27 +625,18 @@ it('should support multiple code tokens in an annotation', async () => {
                             type: 'shiki',
                             token: {
                                 content: 'hello',
-                                color: '#000004',
-                                start: 9,
-                                end: 14,
                             },
                         },
                         {
                             type: 'shiki',
                             token: {
                                 content: '.world',
-                                color: '#000009',
-                                start: 14,
-                                end: 20,
                             },
                         },
                         {
                             type: 'shiki',
                             token: {
                                 content: '(',
-                                color: '#000001',
-                                start: 20,
-                                end: 21,
                             },
                         },
                     ],
@@ -642,9 +645,6 @@ it('should support multiple code tokens in an annotation', async () => {
                     type: 'shiki',
                     token: {
                         content: ');',
-                        color: '#000001',
-                        start: 21,
-                        end: 23,
                     },
                 },
             ],

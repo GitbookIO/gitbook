@@ -361,3 +361,112 @@ export function batch<Args extends any[], R>(
         });
     };
 }
+
+type MutexOperationOptions = {
+    /**
+     * If true, fail the operation if a pending operation on the mutex fails.
+     * Defaults to true.
+     */
+    failOnMutexError?: boolean;
+};
+
+export type AsyncMutexFunction<T> = ((fn: () => Promise<T>) => Promise<T>) & {
+    /**
+     * Wait for a pending operation to complete.
+     */
+    wait: () => Promise<unknown>;
+
+    /**
+     * Execute a function after the previous operation completes.
+     */
+    runAfter: (fn: () => Promise<T>, options?: MutexOperationOptions) => Promise<T>;
+
+    /**
+     * Execute a function that blocks the mutex, but does not influence the return value of the mutex.
+     */
+    runBlocking: <ReturnType>(
+        fn: () => Promise<ReturnType>,
+        options?: MutexOperationOptions
+    ) => Promise<ReturnType>;
+};
+
+/**
+ * Creates a function that will only call the given function once at a time.
+ */
+export function asyncMutexFunction<T>(): AsyncMutexFunction<T> {
+    let pending:
+        | undefined
+        | { kind: 'value'; promise: Promise<T> }
+        | { kind: 'blocking'; promise: Promise<unknown> };
+
+    const mutex: AsyncMutexFunction<T> = async (fn) => {
+        if (pending?.kind === 'value') {
+            return pending.promise;
+        }
+
+        while (pending) {
+            await pending.promise;
+        }
+
+        const promise = fn();
+        pending = { kind: 'value', promise };
+        try {
+            const result = await promise;
+            return result;
+        } finally {
+            pending = undefined;
+        }
+    };
+
+    mutex.wait = async () => {
+        return pending?.promise;
+    };
+
+    mutex.runBlocking = async (fn, options) => {
+        const failOnMutexError = options?.failOnMutexError ?? true;
+
+        while (pending) {
+            try {
+                await pending.promise;
+            } catch (err) {
+                if (failOnMutexError) {
+                    throw err;
+                }
+            }
+        }
+
+        const promise = fn();
+        pending = { kind: 'blocking', promise };
+        try {
+            const result = await promise;
+            return result;
+        } finally {
+            pending = undefined;
+        }
+    };
+
+    mutex.runAfter = async (fn, options) => {
+        const failOnMutexError = options?.failOnMutexError ?? true;
+
+        while (pending) {
+            try {
+                await pending.promise;
+            } catch (err) {
+                if (failOnMutexError) {
+                    throw err;
+                }
+            }
+        }
+
+        const promise = fn();
+        pending = { kind: 'value', promise };
+        try {
+            const result = await pending.promise;
+            return result;
+        } finally {
+            pending = undefined;
+        }
+    };
+
+    return mutex;
+}
