@@ -386,7 +386,7 @@ export type AsyncMutexFunction<T> = ((fn: () => Promise<T>) => Promise<T>) & {
      */
     runBlocking: <ReturnType>(
         fn: () => Promise<ReturnType>,
-        options?: MutexOperationOptions
+        options?: MutexOperationOptions,
     ) => Promise<ReturnType>;
 };
 
