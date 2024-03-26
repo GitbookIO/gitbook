@@ -14,6 +14,7 @@ export function AnnotationPopover(props: { children: React.ReactNode; body: Reac
         <Popover.Root>
             <Popover.Trigger asChild>
                 <button
+                    data-testid="annotation-button"
                     aria-label={tString(language, 'annotation_button_label')}
                     className={tcls(
                         'decoration-dotted',
