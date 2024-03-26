@@ -125,6 +125,7 @@ const testCases: TestsCase[] = [
                 name: 'Images',
                 url: 'blocks/block-images',
                 run: waitForCookiesDialog,
+                fullPage: true,
             },
             {
                 name: 'Inline Images',
