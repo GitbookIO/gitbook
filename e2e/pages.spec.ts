@@ -196,6 +196,14 @@ const testCases: TestsCase[] = [
                 name: 'Math',
                 url: 'blocks/math',
             },
+            {
+                name: 'Annotations',
+                url: 'blocks/annotations',
+                run: async (page) => {
+                    await page.waitForSelector('[data-testid="annotation-button"]');
+                    await page.click('[data-testid="annotation-button"]');
+                },
+            },
         ],
     },
     {
