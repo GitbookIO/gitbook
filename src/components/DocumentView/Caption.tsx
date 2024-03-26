@@ -44,7 +44,6 @@ export function Caption(
             'dark:after:mix-blend-plus-lighter',
             'after:pointer-events-none',
             'w-fit',
-            'mx-auto',
         ],
         style,
     } = props;
@@ -62,7 +61,7 @@ export function Caption(
 
     return (
         <picture className={tcls('relative', style)}>
-            <div className={tcls(wrapperStyle)}>{children}</div>
+            <div className={tcls(wrapperStyle, 'mx-auto')}>{children}</div>
             <figcaption
                 className={tcls(
                     'text-sm',
