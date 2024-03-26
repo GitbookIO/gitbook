@@ -44,6 +44,7 @@ export function Caption(
             'dark:after:mix-blend-plus-lighter',
             'after:pointer-events-none',
             'w-fit',
+            'mx-auto',
         ],
         style,
     } = props;
