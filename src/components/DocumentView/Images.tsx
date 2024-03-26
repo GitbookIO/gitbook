@@ -82,7 +82,7 @@ async function ImageBlock(props: {
     }
 
     return (
-        <Caption {...props}>
+        <Caption {...props} fit>
             <Image
                 alt={block.data.alt ?? ''}
                 sizes={imageBlockSizes}

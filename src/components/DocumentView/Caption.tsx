@@ -19,6 +19,7 @@ export function Caption(
         children: React.ReactNode;
         document: JSONDocument;
         style?: ClassValue;
+        fit?: boolean;
         wrapperStyle?: ClassValue;
         block: DocumentBlockImage | DocumentBlockDrawing | DocumentBlockEmbed;
     } & DocumentContextProps,
@@ -28,6 +29,7 @@ export function Caption(
         document,
         block,
         context,
+        fit = false,
         wrapperStyle = [
             'relative',
             'overflow-hidden',
@@ -43,7 +45,7 @@ export function Caption(
             'dark:after:border-light/1',
             'dark:after:mix-blend-plus-lighter',
             'after:pointer-events-none',
-            'w-fit',
+            fit ? 'w-fit' : null,
         ],
         style,
     } = props;
