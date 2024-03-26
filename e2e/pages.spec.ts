@@ -197,6 +197,10 @@ const testCases: TestsCase[] = [
                 url: 'blocks/math',
             },
             {
+                name: 'Embeds',
+                url: 'blocks/embeds',
+            },
+            {
                 name: 'Annotations',
                 url: 'blocks/annotations',
                 run: async (page) => {
