@@ -44,6 +44,7 @@ export function AnnotationPopover(props: { children: React.ReactNode; body: Reac
                         '-outline-offset-2',
                         'outline-2',
                         'outline-primary/8',
+                        'z-20',
                     )}
                     sideOffset={5}
                 >
