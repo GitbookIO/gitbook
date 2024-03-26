@@ -23,7 +23,7 @@
 /** Method tag */
 
 .openapi-method {
-    @apply rounded font-mono font-bold text-[11.5px] px-1 py-0.5 mr-2 text-dark-1/8 leading-tight align-middle inline-flex ring-1 ring-inset ring-dark-1/1 dark:ring-light-1/1;
+    @apply rounded font-mono font-bold text-[11.5px] px-1 py-0.5 mr-2 text-dark-1/8 leading-tight align-middle inline-flex ring-1 ring-inset ring-dark-1/1 dark:ring-light-1/1 whitespace-nowrap;
 }
 
 .openapi-method-get {
