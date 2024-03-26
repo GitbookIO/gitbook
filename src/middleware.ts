@@ -569,7 +569,20 @@ async function lookupSpaceByAPI(
         }
 
         if ('redirect' in data) {
-            if (alternative.url === url.toString()) {
+            if (alternative.primary) {
+                // Append the path to the redirect URL if it's a VA redirect
+                const redirect = new URL(data.redirect);
+                if (redirect.searchParams.has('location')) {
+                    redirect.searchParams.set(
+                        'location',
+                        joinPath(
+                            redirect.searchParams.get('location') ?? '',
+                            alternative.extraPath,
+                        ),
+                    );
+                    data.redirect = redirect.toString();
+                }
+
                 return data;
             }
 
