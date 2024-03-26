@@ -280,7 +280,6 @@ async function ImagePicture(
         style,
         loading,
         fetchPriority,
-        crossOrigin: 'anonymous',
         ...rest,
         ...attrs,
     };
