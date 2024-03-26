@@ -52,7 +52,6 @@ const testCases: TestsCase[] = [
             {
                 name: 'Search',
                 url: '?q=',
-                fullPage: false,
             },
             {
                 name: 'Search Results',
@@ -60,7 +59,6 @@ const testCases: TestsCase[] = [
                 run: async (page) => {
                     await page.waitForSelector('[data-test="search-results"]');
                 },
-                fullPage: false,
             },
             {
                 name: 'AI Search',
@@ -482,7 +480,7 @@ for (const testCase of testCases) {
                             display: none !important;
                         }
                     `,
-                        fullPage: testEntry.fullPage,
+                        fullPage: testEntry.fullPage ?? false,
                     });
                 }
             });
