@@ -38,6 +38,10 @@
 
     --theme-scrollbar-color: rgba(255, 255, 255, 0.24);
     --theme-scrollbar-color-active: rgba(255, 255, 255, 0.48);
+
+    --default-theme-button-1: rgba(0, 0, 0, 1);
+    --default-theme-button-1-hover: rgba(0, 0, 0, 0.8);
+    --default-theme-button-1-color: rgba(255, 255, 255, 0.9);
 }
 .dark .scalar-modal-layout,
 .dark .scalar {
@@ -78,6 +82,10 @@
 
     --theme-scrollbar-color: rgba(0, 0, 0, 0.18);
     --theme-scrollbar-color-active: rgba(0, 0, 0, 0.36);
+
+    --default-theme-button-1: rgba(255, 255, 255, 1);
+    --default-theme-button-1-hover: rgba(255, 255, 255, 0.9);
+    --default-theme-button-1-color: black;
 }
 .scalar-modal-layout,
 .scalar {
