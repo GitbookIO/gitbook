@@ -61,6 +61,7 @@ export async function RecordCard(
                         },
                     ]}
                     className={tcls(
+                        'min-w-0',
                         'w-full',
                         'h-full',
                         'object-cover',
@@ -73,6 +74,7 @@ export async function RecordCard(
             ) : null}
             <div
                 className={tcls(
+                    'min-w-0',
                     'w-full',
                     'flex',
                     'flex-col',
