@@ -1,4 +1,5 @@
 import { DocumentBlockCode, JSONDocument } from '@gitbook/api';
+import { useId } from 'react';
 
 import { CodeBlock } from './CodeBlock';
 
@@ -8,8 +9,10 @@ import { CodeBlock } from './CodeBlock';
  */
 export function PlainCodeBlock(props: { code: string; syntax: string }) {
     const { code, syntax } = props;
+    const id = useId();
 
     const block: DocumentBlockCode = {
+        key: id,
         object: 'block',
         type: 'code',
         data: {
