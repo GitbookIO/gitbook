@@ -79,6 +79,7 @@ export async function RecordCard(
                     'flex',
                     'flex-col',
                     'place-self-start',
+                    'gap-3',
                     'p-4',
                     'text-sm',
                     target
