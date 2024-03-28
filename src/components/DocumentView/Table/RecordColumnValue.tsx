@@ -172,7 +172,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
         case 'select': {
             return (
                 <Tag className={tcls()}>
-                    <span className={tcls('inline-flex', 'gap-2')}>
+                    <span className={tcls('inline-flex', 'gap-2', 'flex-wrap')}>
                         {(value as string[]).map((selectId) => {
                             const option = definition.options.find(
                                 (option) => option.value === selectId,
