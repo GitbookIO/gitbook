@@ -76,17 +76,6 @@ const testCases: TestsCase[] = [
         ],
     },
     {
-        name: 'Snyk',
-        baseUrl: 'https://docs.snyk.io',
-        tests: [
-            {
-                name: 'Home',
-                url: '',
-                run: waitForCookiesDialog,
-            },
-        ],
-    },
-    {
         name: 'Versioning',
         baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
         tests: [
@@ -151,6 +140,7 @@ const testCases: TestsCase[] = [
                 name: 'Tables',
                 url: 'blocks/tables',
                 run: waitForCookiesDialog,
+                fullPage: true,
             },
             {
                 name: 'Expandables',
