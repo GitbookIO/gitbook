@@ -261,7 +261,9 @@ function getSchemaProperties(schema: OpenAPIV3.SchemaObject): null | OpenAPISche
 
                 result.push({
                     propertyName,
-                    required: schema.required?.includes(propertyName),
+                    required: Array.isArray(schema.required)
+                        ? schema.required.includes(propertyName)
+                        : undefined,
                     schema: propertySchema,
                 });
             });
