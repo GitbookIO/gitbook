@@ -1,7 +1,7 @@
 import { ContentRef, JSONDocument } from '@gitbook/api';
 
 import { ContentTarget } from '@/lib/api';
-import { ResolveContentRefOptions, ResolvedContentRef } from '@/lib/references';
+import { ContentRefContext, ResolveContentRefOptions, ResolvedContentRef } from '@/lib/references';
 import { ClassValue } from '@/lib/tailwind';
 
 import { Blocks } from './Blocks';
@@ -17,6 +17,12 @@ export interface DocumentContext {
      * Space content being rendered.
      */
     content?: ContentTarget;
+
+    /**
+     * The context for resolving content refs.
+     * If null, content refs cannot be resolved.
+     */
+    contentRefContext: ContentRefContext | null;
 
     /**
      * Resolve a content reference.

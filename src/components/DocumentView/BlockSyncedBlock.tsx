@@ -1,6 +1,6 @@
 import { DocumentBlockSyncedBlock } from '@gitbook/api';
 
-import { getSyncedBlock } from '@/lib/api';
+import { getSyncedBlockContent } from '@/lib/api';
 import { resolveContentRefWithFiles } from '@/lib/references';
 
 import { BlockProps } from './Block';
@@ -14,9 +14,14 @@ export async function BlockSyncedBlock(props: BlockProps<DocumentBlockSyncedBloc
         return null;
     }
 
-    const syncedBlock = await getSyncedBlock(
+    // We can't resolve the synced block without an organization context.
+    if (!context.contentRefContext) {
+        return null;
+    }
+
+    const syncedBlock = await getSyncedBlockContent(
         apiToken,
-        block.data.ref.organization,
+        context.contentRefContext.space.organization,
         block.data.ref.syncedBlock,
     );
 

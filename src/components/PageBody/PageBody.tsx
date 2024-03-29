@@ -70,6 +70,7 @@ export function PageBody(props: {
                         context={{
                             mode: 'default',
                             content: contentTarget,
+                            contentRefContext: context,
                             resolveContentRef: (ref, options) =>
                                 resolveContentRef(ref, context, options),
                         }}
