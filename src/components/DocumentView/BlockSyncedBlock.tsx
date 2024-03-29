@@ -14,7 +14,7 @@ export async function BlockSyncedBlock(props: BlockProps<DocumentBlockSyncedBloc
         return null;
     }
 
-    // We can't resolve th synced block without an organization context.
+    // We can't resolve the synced block without an organization context.
     if (!context.contentRefContext) {
         return null;
     }
