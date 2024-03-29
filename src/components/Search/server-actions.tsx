@@ -125,6 +125,7 @@ function transformAnswer(
                 document={answer.answer.document}
                 context={{
                     mode: 'default',
+                    contentRefContext: null,
                     resolveContentRef: async () => null,
                 }}
                 style={['space-y-5']}
