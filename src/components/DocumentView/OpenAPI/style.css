@@ -23,7 +23,7 @@
 /** Method tag */
 
 .openapi-method {
-    @apply rounded font-mono font-bold text-[11.5px] px-1 py-0.5 mr-2 text-dark-1/8 leading-tight align-middle inline-flex ring-1 ring-inset ring-dark-1/1 dark:ring-light-1/1;
+    @apply rounded font-mono font-bold text-[11.5px] px-1 py-0.5 mr-2 text-dark-1/8 leading-tight align-middle inline-flex ring-1 ring-inset ring-dark-1/1 dark:ring-light-1/1 whitespace-nowrap;
 }
 
 .openapi-method-get {
@@ -106,8 +106,14 @@
     @apply mt-3;
 }
 
+.openapi-schema-name {
+    /* To make double click on the property name select only the name,
+    we disable selection on the parent and re-enable it on the children. */
+    @apply select-none;
+}
+
 .openapi-schema-propertyname {
-    @apply font-medium text-base text-dark/10 dark:text-light/10;
+    @apply select-all font-medium text-base text-dark/10 dark:text-light/10;
 }
 
 .openapi-schema-required {
@@ -115,7 +121,7 @@
 }
 
 .openapi-schema-type {
-    @apply font-mono ml-3 text-base text-dark-4/8 dark:text-light-4;
+    @apply font-mono ml-3 text-base text-dark-4/8 dark:text-light-4 select-text;
 }
 
 .openapi-schema-type:only-child {

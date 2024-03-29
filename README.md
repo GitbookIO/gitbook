@@ -1,7 +1,3 @@
-<!-- <p align="center">
-  <img alt="GitBook Open Header" src="./assets/gitbook-open-header.png">
-</p> -->
-
 <h1 align="center">GitBook</h1>
 
 <p align="center">
@@ -28,8 +24,10 @@
 
 -   [Getting Started](#getting-started)
 -   [Contributing](#contributing)
--   [Types of contributions](#types-of-contributions)
+    -   [Types of contributions](#types-of-contributions)
 -   [Licensing](#license)
+-   [Acknowledgements](#acknowledgements)
+-   [Legacy GitBook](#legacy-gitbook-deprecated)
 
 ## Getting Started
 
@@ -120,3 +118,7 @@ GitBook wouldn't be possible without these projects:
 -   [Bun](https://bun.sh/)
 -   [Tailwind CSS](https://tailwindcss.com/)
 -   [Framer Motion](https://www.npmjs.com/package/framer-motion)
+
+## Legacy GitBook (Deprecated)
+
+Our previous version of GitBook and it's CLI tool are now deprecated. You can still view the old repository and it's commits on this [branch](https://github.com/GitbookIO/gitbook/tree/legacy).

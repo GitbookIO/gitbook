@@ -200,11 +200,6 @@ const config: Config = {
             addVariant('navigation-open', 'body.navigation-open &');
 
             /**
-             * Variant when the search overlay is open.
-             */
-            addVariant('search-open', 'body.search-open &');
-
-            /**
              * Variant when a header is displayed.
              */
             addVariant('space-header', 'body:has(header) &');

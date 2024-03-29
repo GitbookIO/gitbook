@@ -82,19 +82,19 @@ async function ImageBlock(props: {
     }
 
     return (
-        <Caption {...props}>
+        <Caption {...props} fit>
             <Image
                 alt={block.data.alt ?? ''}
                 sizes={imageBlockSizes}
                 sources={{
                     light: {
                         src: src.href,
-                        size: src.fileDimensions,
+                        size: src.file?.dimensions,
                     },
                     dark: darkSrc
                         ? {
                               src: darkSrc.href,
-                              size: darkSrc.fileDimensions,
+                              size: darkSrc.file?.dimensions,
                           }
                         : null,
                 }}

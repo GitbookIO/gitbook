@@ -32,12 +32,12 @@ export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
                 sources={{
                     light: {
                         src: src.href,
-                        size: src.fileDimensions,
+                        size: src.file?.dimensions,
                     },
                     dark: darkSrc
                         ? {
                               src: darkSrc.href,
-                              size: darkSrc.fileDimensions,
+                              size: darkSrc.file?.dimensions,
                           }
                         : null,
                 }}
@@ -55,7 +55,7 @@ async function getImageSizes(size: 'original' | 'line', src: ResolvedContentRef)
     switch (size) {
         case 'line': {
             const imageSize =
-                src.fileDimensions ??
+                src.file?.dimensions ??
                 (await getImageSize(src.href, {
                     dpr: 3,
                 }));

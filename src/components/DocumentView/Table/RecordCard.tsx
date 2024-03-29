@@ -52,7 +52,7 @@ export async function RecordCard(
                     sources={{
                         light: {
                             src: cover.href,
-                            size: cover.fileDimensions,
+                            size: cover.file?.dimensions,
                         },
                     }}
                     sizes={[
@@ -61,6 +61,7 @@ export async function RecordCard(
                         },
                     ]}
                     className={tcls(
+                        'min-w-0',
                         'w-full',
                         'h-full',
                         'object-cover',
@@ -73,10 +74,12 @@ export async function RecordCard(
             ) : null}
             <div
                 className={tcls(
+                    'min-w-0',
                     'w-full',
                     'flex',
                     'flex-col',
                     'place-self-start',
+                    'gap-3',
                     'p-4',
                     'text-sm',
                     target

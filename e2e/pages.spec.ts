@@ -52,7 +52,6 @@ const testCases: TestsCase[] = [
             {
                 name: 'Search',
                 url: '?q=',
-                fullPage: false,
             },
             {
                 name: 'Search Results',
@@ -60,7 +59,6 @@ const testCases: TestsCase[] = [
                 run: async (page) => {
                     await page.waitForSelector('[data-test="search-results"]');
                 },
-                fullPage: false,
             },
             {
                 name: 'AI Search',
@@ -73,17 +71,6 @@ const testCases: TestsCase[] = [
             {
                 name: 'Not found',
                 url: 'content-not-found',
-                run: waitForCookiesDialog,
-            },
-        ],
-    },
-    {
-        name: 'Snyk',
-        baseUrl: 'https://docs.snyk.io',
-        tests: [
-            {
-                name: 'Home',
-                url: '',
                 run: waitForCookiesDialog,
             },
         ],
@@ -127,6 +114,7 @@ const testCases: TestsCase[] = [
                 name: 'Images',
                 url: 'blocks/block-images',
                 run: waitForCookiesDialog,
+                fullPage: true,
             },
             {
                 name: 'Inline Images',
@@ -152,6 +140,7 @@ const testCases: TestsCase[] = [
                 name: 'Tables',
                 url: 'blocks/tables',
                 run: waitForCookiesDialog,
+                fullPage: true,
             },
             {
                 name: 'Expandables',
@@ -196,6 +185,18 @@ const testCases: TestsCase[] = [
             {
                 name: 'Math',
                 url: 'blocks/math',
+            },
+            {
+                name: 'Embeds',
+                url: 'blocks/embeds',
+            },
+            {
+                name: 'Annotations',
+                url: 'blocks/annotations',
+                run: async (page) => {
+                    await page.waitForSelector('[data-testid="annotation-button"]');
+                    await page.click('[data-testid="annotation-button"]');
+                },
             },
         ],
     },
@@ -482,7 +483,7 @@ for (const testCase of testCases) {
                             display: none !important;
                         }
                     `,
-                        fullPage: testEntry.fullPage,
+                        fullPage: testEntry.fullPage ?? false,
                     });
                 }
             });

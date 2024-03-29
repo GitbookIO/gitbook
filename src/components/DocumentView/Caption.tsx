@@ -19,6 +19,7 @@ export function Caption(
         children: React.ReactNode;
         document: JSONDocument;
         style?: ClassValue;
+        fit?: boolean;
         wrapperStyle?: ClassValue;
         block: DocumentBlockImage | DocumentBlockDrawing | DocumentBlockEmbed;
     } & DocumentContextProps,
@@ -28,6 +29,7 @@ export function Caption(
         document,
         block,
         context,
+        fit = false,
         wrapperStyle = [
             'relative',
             'overflow-hidden',
@@ -43,6 +45,7 @@ export function Caption(
             'dark:after:border-light/1',
             'dark:after:mix-blend-plus-lighter',
             'after:pointer-events-none',
+            fit ? 'w-fit' : null,
         ],
         style,
     } = props;
@@ -60,7 +63,7 @@ export function Caption(
 
     return (
         <picture className={tcls('relative', style)}>
-            <div className={tcls(wrapperStyle)}>{children}</div>
+            <div className={tcls(wrapperStyle, 'mx-auto')}>{children}</div>
             <figcaption
                 className={tcls(
                     'text-sm',
