@@ -176,7 +176,7 @@ export async function parseOpenAPIV3(url: string, text: string): Promise<OpenAPI
             // Try with YAML
             data = YAML.parse(text);
         } catch (yamlError) {
-            if (yamlError instanceof YAML.YAMLParseError) {
+            if (yamlError instanceof Error && yamlError.name.startsWith('YAML')) {
                 throw new OpenAPIFetchError('Failed to parse YAML: ' + yamlError.message, url);
             } else {
                 throw yamlError;
