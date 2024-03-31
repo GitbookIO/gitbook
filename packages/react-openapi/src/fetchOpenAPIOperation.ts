@@ -1,5 +1,7 @@
 import { toJSON, fromJSON } from 'flatted';
 import { OpenAPIV3 } from 'openapi-types';
+import yaml from 'js-yaml';
+import swagger2openapi, { ConvertOutputOptions } from 'swagger2openapi';
 
 import { resolveOpenAPIPath } from './resolveOpenAPIPath';
 import { OpenAPIFetcher } from './types';
@@ -67,7 +69,7 @@ export { toJSON, fromJSON };
 /**
  * Resolve an OpenAPI operation in a file and compile it to a more usable format.
  */
-export async function fetchOpenAPIOperation<Markdown>(
+export async function fetchOpenAPIOperation(
     input: {
         url: string;
         path: string;
@@ -155,4 +157,65 @@ function cacheFetcher(fetcher: OpenAPIFetcher): OpenAPIFetcher {
         },
         parseMarkdown: fetcher.parseMarkdown,
     };
+}
+
+/**
+ * Parse a text into an OpenAPI V3 object.
+ */
+export async function parseOpenAPIV3(url: string, text: string): Promise<OpenAPIV3.Document> {
+    // Parse the JSON or YAML
+    let data: unknown;
+
+    // Try with JSON
+    try {
+        data = JSON.parse(text);
+    } catch (jsonError) {
+        try {
+            // Try with YAML
+            data = yaml.load(text);
+        } catch (yamlError) {
+            if ((yamlError as Error).name === 'YAMLException') {
+                throw new OpenAPIFetchError('Failed to parse YAML: ' + (yamlError as Error).message, url);
+            } else {
+                throw yamlError;
+            }
+        }
+    }
+
+    // Convert Swagger 2.0 to OpenAPI 3.0
+    // @ts-ignore
+    if (data && data.swagger) {
+        try {
+            // Convert Swagger 2.0 to OpenAPI 3.0
+            // @ts-ignore
+            const result = (await swagger2openapi.convertObj(data, {
+                resolve: false,
+                resolveInternal: false,
+                laxDefaults: true,
+                laxurls: true,
+                lint: false,
+                prevalidate: false,
+                anchors: true,
+            })) as ConvertOutputOptions;
+
+            data = result.openapi;
+        } catch (error) {
+            if ((error as Error).name === 'S2OError') {
+                throw new OpenAPIFetchError('Failed to convert Swagger 2.0 to OpenAPI 3.0: ' + (error as Error).message, url);
+            } else {
+                throw error;
+            }
+        }
+    }
+
+    // @ts-ignore
+    return data;
+}
+
+export class OpenAPIFetchError extends Error {
+    public name = 'OpenAPIFetchError';
+
+    constructor(message: string, public readonly url: string) {
+        super(message);
+    }
 }

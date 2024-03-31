@@ -35,7 +35,15 @@ export async function OpenAPI(props: BlockProps<DocumentBlockSwagger>) {
 
 async function OpenAPIBody(props: BlockProps<DocumentBlockSwagger>) {
     const { block, context } = props;
-    const data = await fetchOpenAPIBlock(block, context.resolveContentRef);
+    const { data, error  } = await fetchOpenAPIBlock(block, context.resolveContentRef);
+
+    if (error) {
+        return (
+            <div className={tcls('hidden')}>
+                <p>Error with {error.url}: {error.message}</p>
+            </div>
+        )
+    }
 
     if (!data) {
         return null;

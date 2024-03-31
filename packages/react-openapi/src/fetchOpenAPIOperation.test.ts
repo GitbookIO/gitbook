@@ -1,12 +1,12 @@
 import { it, expect } from 'bun:test';
 
-import { fetchOpenAPIOperation } from './fetchOpenAPIOperation';
+import { fetchOpenAPIOperation, parseOpenAPIV3 } from './fetchOpenAPIOperation';
 import { OpenAPIFetcher } from './types';
 
 const fetcher: OpenAPIFetcher = {
     fetch: async (url) => {
         const response = await fetch(url);
-        return response.json();
+        return parseOpenAPIV3(url, await response.text());
     },
 };
 
@@ -14,6 +14,40 @@ it('should resolve refs', async () => {
     const resolved = await fetchOpenAPIOperation(
         {
             url: 'https://petstore3.swagger.io/api/v3/openapi.json',
+            method: 'put',
+            path: '/pet',
+        },
+        fetcher,
+    );
+
+    expect(resolved).toMatchObject({
+        servers: [
+            {
+                url: '/api/v3',
+            },
+        ],
+        operation: {
+            tags: ['pet'],
+            summary: 'Update an existing pet',
+            description: 'Update an existing pet by Id',
+            requestBody: {
+                content: {
+                    'application/json': {
+                        schema: {
+                            type: 'object',
+                            required: ['name', 'photoUrls'],
+                        },
+                    },
+                },
+            },
+        },
+    });
+});
+
+it('should support yaml', async () => {
+    const resolved = await fetchOpenAPIOperation(
+        {
+            url: 'https://petstore3.swagger.io/api/v3/openapi.yaml',
             method: 'put',
             path: '/pet',
         },
@@ -78,3 +112,41 @@ it('should resolve to null if the method is not supported', async () => {
 
     expect(resolved).toBe(null);
 });
+
+it('should parse Swagger 2.0', async () => {
+    const resolved = await fetchOpenAPIOperation(
+        {
+            url: 'https://petstore.swagger.io/v2/swagger.json',
+            method: 'put',
+            path: '/pet',
+        },
+        fetcher,
+    );
+
+    expect(resolved).toMatchObject({
+        servers: [
+            {
+                url: "https://petstore.swagger.io/v2",
+            },
+            {
+                url: "http://petstore.swagger.io/v2",
+            },
+        ],
+        operation: {
+            tags: ['pet'],
+            summary: 'Update an existing pet',
+            description: '',
+            requestBody: {
+                content: {
+                    'application/json': {
+                        schema: {
+                            type: 'object',
+                            required: ['name', 'photoUrls'],
+                        },
+                    },
+                },
+            },
+        },
+    });
+});
+

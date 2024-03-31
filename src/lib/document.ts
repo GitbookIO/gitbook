@@ -60,7 +60,7 @@ export async function getDocumentSections(
         }
 
         if (block.type === 'swagger' && block.meta?.id) {
-            const operation = await fetchOpenAPIBlock(block, resolveContentRef);
+            const { data: operation } = await fetchOpenAPIBlock(block, resolveContentRef);
             if (operation) {
                 sections.push({
                     id: block.meta.id,
