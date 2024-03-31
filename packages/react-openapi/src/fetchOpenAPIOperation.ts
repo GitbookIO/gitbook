@@ -196,6 +196,7 @@ export async function parseOpenAPIV3(url: string, text: string): Promise<OpenAPI
                 lint: false,
                 prevalidate: false,
                 anchors: true,
+                patch: true,
             })) as ConvertOutputOptions;
 
             data = result.openapi;
