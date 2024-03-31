@@ -1,6 +1,6 @@
 import { toJSON, fromJSON } from 'flatted';
 import { OpenAPIV3 } from 'openapi-types';
-import yaml from 'js-yaml';
+import YAML from 'yaml';
 import swagger2openapi, { ConvertOutputOptions } from 'swagger2openapi';
 
 import { resolveOpenAPIPath } from './resolveOpenAPIPath';
@@ -174,13 +174,10 @@ export async function parseOpenAPIV3(url: string, text: string): Promise<OpenAPI
     } catch (jsonError) {
         try {
             // Try with YAML
-            data = yaml.load(text);
+            data = YAML.parse(text);
         } catch (yamlError) {
-            if ((yamlError as Error).name === 'YAMLException') {
-                throw new OpenAPIFetchError(
-                    'Failed to parse YAML: ' + (yamlError as Error).message,
-                    url,
-                );
+            if (yamlError instanceof YAML.YAMLParseError) {
+                throw new OpenAPIFetchError('Failed to parse YAML: ' + yamlError.message, url);
             } else {
                 throw yamlError;
             }
