@@ -160,7 +160,9 @@ function cacheFetcher(fetcher: OpenAPIFetcher): OpenAPIFetcher {
 }
 
 /**
- * Parse a text into an OpenAPI V3 object.
+ * Parse a raw string into an OpenAPI document.
+ * It will also convert Swagger 2.0 to OpenAPI 3.0.
+ * It can throw an `OpenAPIFetchError` if the document is invalid.
  */
 export async function parseOpenAPIV3(url: string, text: string): Promise<OpenAPIV3.Document> {
     // Parse the JSON or YAML

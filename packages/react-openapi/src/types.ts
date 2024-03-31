@@ -19,8 +19,7 @@ export interface OpenAPIClientContext {
 
 export interface OpenAPIFetcher {
     /**
-     * Fetch an OpenAPI file by its URL.
-     * It can be a JSON or YAML file.
+     * Fetch an OpenAPI file by its URL. It should return a fully parsed OpenAPI v3 document.
      */
     fetch: (url: string) => Promise<any>;
 
