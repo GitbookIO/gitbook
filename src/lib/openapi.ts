@@ -19,7 +19,10 @@ import { ResolvedContentRef } from './references';
 export async function fetchOpenAPIBlock(
     block: DocumentBlockSwagger,
     resolveContentRef: (ref: ContentRef) => Promise<ResolvedContentRef | null>,
-): Promise<{ data: OpenAPIOperationData | null; error?: undefined } | { error: OpenAPIFetchError; data?: undefined; }> {
+): Promise<
+    | { data: OpenAPIOperationData | null; error?: undefined }
+    | { error: OpenAPIFetchError; data?: undefined }
+> {
     const resolved = block.data.ref ? await resolveContentRef(block.data.ref) : null;
     if (!resolved || !block.data.path || !block.data.method) {
         return { data: null };
@@ -38,7 +41,7 @@ export async function fetchOpenAPIBlock(
         return { data };
     } catch (error) {
         if (error instanceof OpenAPIFetchError) {
-            return { error }
+            return { error };
         }
 
         throw error;

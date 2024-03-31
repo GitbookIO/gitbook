@@ -33,7 +33,6 @@
         "content-security-policy-merger": "^1.0.0",
         "framer-motion": "^10.16.14",
         "js-cookie": "^3.0.5",
-        
         "jsontoxml": "^1.0.1",
         "katex": "^0.16.9",
         "memoizee": "^0.4.15",

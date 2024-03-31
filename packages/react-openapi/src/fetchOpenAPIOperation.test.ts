@@ -126,10 +126,10 @@ it('should parse Swagger 2.0', async () => {
     expect(resolved).toMatchObject({
         servers: [
             {
-                url: "https://petstore.swagger.io/v2",
+                url: 'https://petstore.swagger.io/v2',
             },
             {
-                url: "http://petstore.swagger.io/v2",
+                url: 'http://petstore.swagger.io/v2',
             },
         ],
         operation: {
@@ -149,4 +149,3 @@ it('should parse Swagger 2.0', async () => {
         },
     });
 });
-

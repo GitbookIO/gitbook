@@ -175,7 +175,10 @@ export async function parseOpenAPIV3(url: string, text: string): Promise<OpenAPI
             data = yaml.load(text);
         } catch (yamlError) {
             if ((yamlError as Error).name === 'YAMLException') {
-                throw new OpenAPIFetchError('Failed to parse YAML: ' + (yamlError as Error).message, url);
+                throw new OpenAPIFetchError(
+                    'Failed to parse YAML: ' + (yamlError as Error).message,
+                    url,
+                );
             } else {
                 throw yamlError;
             }
@@ -202,7 +205,10 @@ export async function parseOpenAPIV3(url: string, text: string): Promise<OpenAPI
             data = result.openapi;
         } catch (error) {
             if ((error as Error).name === 'S2OError') {
-                throw new OpenAPIFetchError('Failed to convert Swagger 2.0 to OpenAPI 3.0: ' + (error as Error).message, url);
+                throw new OpenAPIFetchError(
+                    'Failed to convert Swagger 2.0 to OpenAPI 3.0: ' + (error as Error).message,
+                    url,
+                );
             } else {
                 throw error;
             }
@@ -216,7 +222,10 @@ export async function parseOpenAPIV3(url: string, text: string): Promise<OpenAPI
 export class OpenAPIFetchError extends Error {
     public name = 'OpenAPIFetchError';
 
-    constructor(message: string, public readonly url: string) {
+    constructor(
+        message: string,
+        public readonly url: string,
+    ) {
         super(message);
     }
 }
