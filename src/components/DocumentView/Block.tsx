@@ -147,8 +147,6 @@ function BlockPlaceholder(props: { block: DocumentBlock; style: ClassValue }) {
         case 'code-line':
         case 'tabs-item':
             throw new Error('Blocks should be directly rendered by parent');
-        case 'integration':
-            return <SkeletonCard id={id} style={style} />;
         default:
             assertNever(block);
     }

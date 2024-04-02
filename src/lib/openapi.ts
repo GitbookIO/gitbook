@@ -1,6 +1,4 @@
 import { ContentRef, DocumentBlockSwagger } from '@gitbook/api';
-import yaml from 'js-yaml';
-import swagger2openapi, { ConvertOutputOptions } from 'swagger2openapi';
 
 import { cache, parseCacheResponse, noCacheFetchOptions, CacheFunctionOptions } from '@/lib/cache';
 
@@ -8,6 +6,8 @@ import {
     OpenAPIOperationData,
     fetchOpenAPIOperation,
     OpenAPIFetcher,
+    parseOpenAPIV3,
+    OpenAPIFetchError,
 } from '@gitbook/react-openapi';
 
 import { parseMarkdown } from './markdown';
@@ -19,23 +19,33 @@ import { ResolvedContentRef } from './references';
 export async function fetchOpenAPIBlock(
     block: DocumentBlockSwagger,
     resolveContentRef: (ref: ContentRef) => Promise<ResolvedContentRef | null>,
-): Promise<OpenAPIOperationData | null> {
+): Promise<
+    | { data: OpenAPIOperationData | null; error?: undefined }
+    | { error: OpenAPIFetchError; data?: undefined }
+> {
     const resolved = block.data.ref ? await resolveContentRef(block.data.ref) : null;
-
     if (!resolved || !block.data.path || !block.data.method) {
-        return null;
+        return { data: null };
     }
 
-    const data = await fetchOpenAPIOperation(
-        {
-            url: resolved.href,
-            path: block.data.path,
-            method: block.data.method,
-        },
-        fetcher,
-    );
+    try {
+        const data = await fetchOpenAPIOperation(
+            {
+                url: resolved.href,
+                path: block.data.path,
+                method: block.data.method,
+            },
+            fetcher,
+        );
 
-    return data;
+        return { data };
+    } catch (error) {
+        if (error instanceof OpenAPIFetchError) {
+            return { error };
+        }
+
+        throw error;
+    }
 }
 
 const fetcher: OpenAPIFetcher = {
@@ -45,50 +55,12 @@ const fetcher: OpenAPIFetcher = {
             signal: options.signal,
         });
 
-        let data: unknown = null;
-
-        if (response.ok) {
-            const text = await response.text();
-
-            // Try with JSON
-            try {
-                data = JSON.parse(text);
-            } catch (error) {
-                //
-            }
-
-            // Try with YAML
-            if (!data) {
-                try {
-                    data = yaml.load(text);
-                } catch (error) {
-                    //
-                }
-            }
+        if (!response.ok) {
+            throw new Error(`Failed to fetch OpenAPI file: ${response.statusText}`);
         }
 
-        // @ts-ignore
-        if (data && data.swagger) {
-            try {
-                // Convert Swagger 2.0 to OpenAPI 3.0
-                // @ts-ignore
-                const result = (await swagger2openapi.convertObj(data, {
-                    resolve: false,
-                    resolveInternal: false,
-                    laxDefaults: true,
-                    laxurls: true,
-                    lint: false,
-                    prevalidate: false,
-                    anchors: true,
-                })) as ConvertOutputOptions;
-
-                data = result.openapi;
-            } catch (error) {
-                console.warn('Failed to convert Swagger 2.0 to OpenAPI 3.0', error);
-                data = null;
-            }
-        }
-
+        const text = await response.text();
+        const data = await parseOpenAPIV3(url, text);
         return {
             ...parseCacheResponse(response),
             data,

@@ -19,11 +19,7 @@ export interface OpenAPIClientContext {
 
 export interface OpenAPIFetcher {
     /**
-     * Fetch an OpenAPI file by its URL.
-     * It should the parsed JSON object or throw an error if the file is not found or can't be parsed.
-     *
-     * It should return a V3 spec.
-     * The data will be mutated.
+     * Fetch an OpenAPI file by its URL. It should return a fully parsed OpenAPI v3 document.
      */
     fetch: (url: string) => Promise<any>;
 
