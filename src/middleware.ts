@@ -618,8 +618,6 @@ async function lookupSpaceByAPI(
         }
 
         return {
-            site: 'site' in data ? data.site : undefined,
-            siteSpace: 'siteSpace' in data ? data.siteSpace : undefined,
             space: data.space,
             changeRequest: data.changeRequest ?? lookup.changeRequest,
             revision: data.revision ?? lookup.revision,
@@ -628,6 +626,9 @@ async function lookupSpaceByAPI(
             apiToken: data.apiToken,
             cacheMaxAge: data.cacheMaxAge,
             cacheTags: data.cacheTags,
+            ...('site' in data ? { site: data.site } : {}),
+            ...('siteSpace' in data ? { siteSpace: data.siteSpace } : {}),
+            ...('organization' in data ? { organization: data.organization } : {}),
         } as PublishedContentWithCache;
     });
 
