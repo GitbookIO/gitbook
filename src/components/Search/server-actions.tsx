@@ -55,13 +55,13 @@ export async function searchSpaceContent(
 }
 
 /**
- * Server action to search content in a collection
+ * Server action to search content in a parent (site or collection)
  */
-export async function searchCollectionContent(
-    collectionId: string,
+export async function searchParentContent(
+    parentId: string,
     query: string,
 ): Promise<OrderedComputedResult[]> {
-    const data = await api.searchCollectionContent(collectionId, query);
+    const data = await api.searchParentContent(parentId, query);
 
     return data.items
         .map((spaceItem) => {

@@ -1,4 +1,4 @@
-import { Collection, ContentVisibility, Space } from '@gitbook/api';
+import { Collection, ContentVisibility, Site, SiteVisibility, Space } from '@gitbook/api';
 import { headers } from 'next/headers';
 
 /**
@@ -6,10 +6,10 @@ import { headers } from 'next/headers';
  */
 export function shouldIndexSpace({
     space,
-    collection,
+    parent,
 }: {
     space: Space;
-    collection: Collection | null;
+    parent: Site | Collection | null;
 }) {
     const headerSet = headers();
 
@@ -28,12 +28,18 @@ export function shouldIndexSpace({
         return false;
     }
 
+    if (parent && parent.object === 'site') {
+        return shouldIndexVisibility(parent.visibility);
+    }
+
     if (space.visibility === ContentVisibility.InCollection) {
-        return collection ? shouldIndexVisibility(collection.visibility) : false;
+        return parent && parent.object === 'collection'
+            ? shouldIndexVisibility(parent.visibility)
+            : false;
     }
     return shouldIndexVisibility(space.visibility);
 }
 
-function shouldIndexVisibility(visibility: ContentVisibility) {
+function shouldIndexVisibility(visibility: ContentVisibility | SiteVisibility) {
     return visibility === ContentVisibility.Public;
 }

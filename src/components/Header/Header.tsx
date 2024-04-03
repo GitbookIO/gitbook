@@ -1,4 +1,10 @@
-import { Collection, CustomizationSettings, Space } from '@gitbook/api';
+import {
+    Collection,
+    CustomizationSettings,
+    Site,
+    SiteCustomizationSettings,
+    Space,
+} from '@gitbook/api';
 import { CustomizationHeaderPreset } from '@gitbook/api';
 import { Suspense } from 'react';
 
@@ -7,23 +13,23 @@ import { t, getSpaceLanguage } from '@/intl/server';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
-import { CollectionSpacesDropdown } from './CollectionSpacesDropdown';
 import { HeaderLink } from './HeaderLink';
 import { HeaderLinks } from './HeaderLinks';
 import { HeaderLogo } from './HeaderLogo';
+import { SpacesDropdown } from './SpacesDropdown';
 import { SearchButton } from '../Search';
 /**
  * Render the header for the space.
  */
 export function Header(props: {
     space: Space;
-    collection: Collection | null;
-    collectionSpaces: Space[];
+    parent: Site | Collection | null;
+    spaces: Space[];
     context: ContentRefContext;
-    customization: CustomizationSettings;
+    customization: CustomizationSettings | SiteCustomizationSettings;
     withTopHeader?: boolean;
 }) {
-    const { context, space, collection, collectionSpaces, customization, withTopHeader } = props;
+    const { context, space, parent, spaces, customization, withTopHeader } = props;
 
     const isCustomizationDefault =
         customization.header.preset === CustomizationHeaderPreset.Default;
@@ -66,20 +72,8 @@ export function Header(props: {
                         CONTAINER_STYLE,
                     )}
                 >
-                    <HeaderLogo
-                        collection={collection}
-                        space={space}
-                        customization={customization}
-                    />
-                    <span>
-                        {collection ? (
-                            <CollectionSpacesDropdown
-                                space={space}
-                                collection={collection}
-                                collectionSpaces={collectionSpaces}
-                            />
-                        ) : null}
-                    </span>
+                    <HeaderLogo parent={parent} space={space} customization={customization} />
+                    <span>{parent ? <SpacesDropdown space={space} spaces={spaces} /> : null}</span>
                     <HeaderLinks>
                         {customization.header.links.map((link, index) => {
                             return (

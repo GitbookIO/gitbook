@@ -14,6 +14,7 @@ import {
     withAPI,
     getSpaceLayoutData,
     DEFAULT_API_ENDPOINT,
+    getSiteSpaceLayoutData,
 } from '@/lib/api';
 import { race } from '@/lib/async';
 import { buildVersion } from '@/lib/build';
@@ -139,6 +140,7 @@ export async function middleware(request: NextRequest) {
         space: resolved.space,
         changeRequest: resolved.changeRequest,
         revision: resolved.revision,
+        ...('site' in resolved ? { site: resolved.site, siteSpace: resolved.siteSpace } : {}),
     });
 
     // Because of how Next will encode, we need to encode ourselves the pathname before rewriting to it.
@@ -167,7 +169,14 @@ export async function middleware(request: NextRequest) {
                 }),
             );
 
-            const { scripts } = await getSpaceLayoutData(resolved.space);
+            const { scripts } = await ('site' in resolved
+                ? getSiteSpaceLayoutData({
+                      organizationId: resolved.organization,
+                      siteId: resolved.site,
+                      siteSpaceId: resolved.siteSpace,
+                      spaceId: resolved.space,
+                  })
+                : getSpaceLayoutData(resolved.space));
             return getContentSecurityPolicy(scripts, nonce);
         },
     );
@@ -184,6 +193,11 @@ export async function middleware(request: NextRequest) {
     headers.set('x-gitbook-origin-basepath', originBasePath);
     headers.set('x-gitbook-basepath', joinPath(originBasePath, resolved.basePath));
     headers.set('x-gitbook-content-space', resolved.space);
+    if ('site' in resolved) {
+        headers.set('x-gitbook-content-organization', resolved.organization);
+        headers.set('x-gitbook-content-site', resolved.site);
+        headers.set('x-gitbook-content-site-space', resolved.siteSpace);
+    }
     if (resolved.revision) {
         headers.set('x-gitbook-content-revision', resolved.revision);
     }
@@ -577,6 +591,8 @@ async function lookupSpaceByAPI(
         }
 
         return {
+            site: 'site' in data ? data.site : undefined,
+            siteSpace: 'siteSpace' in data ? data.siteSpace : undefined,
             space: data.space,
             changeRequest: data.changeRequest ?? lookup.changeRequest,
             revision: data.revision ?? lookup.revision,

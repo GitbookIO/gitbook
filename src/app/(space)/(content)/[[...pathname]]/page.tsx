@@ -104,13 +104,13 @@ export async function generateViewport({ params }: { params: PagePathParams }): 
 }
 
 export async function generateMetadata({ params }: { params: PagePathParams }): Promise<Metadata> {
-    const { space, pages, page, customization, collection } = await fetchPageData(params);
+    const { space, pages, page, customization, parent } = await fetchPageData(params);
     if (!page) {
         notFound();
     }
 
     return {
-        title: [page.title, customization.title ?? space.title, collection?.title]
+        title: [page.title, customization.title ?? space.title, parent?.title]
             .filter(Boolean)
             .join(' | '),
         description: page.description ?? '',

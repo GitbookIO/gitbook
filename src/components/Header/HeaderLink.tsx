@@ -3,6 +3,7 @@ import {
     CustomizationHeaderLink,
     CustomizationSettings,
     CustomizationHeaderPreset,
+    SiteCustomizationSettings,
 } from '@gitbook/api';
 
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
@@ -20,7 +21,7 @@ import { Link } from '../primitives';
 export async function HeaderLink(props: {
     context: ContentRefContext;
     link: CustomizationHeaderLink;
-    customization: CustomizationSettings;
+    customization: CustomizationSettings | SiteCustomizationSettings;
 }) {
     const { context, link, customization } = props;
 

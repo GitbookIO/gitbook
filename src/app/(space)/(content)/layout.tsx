@@ -31,8 +31,8 @@ export default async function ContentLayout(props: { children: React.ReactNode }
         contentTarget,
         customization,
         pages,
-        collection,
-        collectionSpaces,
+        parent,
+        spaces,
         ancestors,
         scripts,
     } = await fetchSpaceData();
@@ -52,8 +52,8 @@ export default async function ContentLayout(props: { children: React.ReactNode }
             <SpaceLayout
                 space={space}
                 contentTarget={contentTarget}
-                collection={collection}
-                collectionSpaces={collectionSpaces}
+                parent={parent}
+                spaces={spaces}
                 customization={customization}
                 pages={pages}
                 ancestors={ancestors}
@@ -96,11 +96,11 @@ export async function generateViewport(): Promise<Viewport> {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-    const { space, collection, customization } = await fetchSpaceData();
+    const { space, parent, customization } = await fetchSpaceData();
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
 
     return {
-        title: `${collection ? collection.title : customization.title ?? space.title}`,
+        title: `${parent ? parent.title : customization.title ?? space.title}`,
         generator: `GitBook (${buildVersion()})`,
         metadataBase: new URL(baseUrl()),
         icons: {
@@ -121,6 +121,6 @@ export async function generateMetadata(): Promise<Metadata> {
                 },
             ],
         },
-        robots: shouldIndexSpace({ space, collection }) ? 'index, follow' : 'noindex, nofollow',
+        robots: shouldIndexSpace({ space, parent }) ? 'index, follow' : 'noindex, nofollow',
     };
 }

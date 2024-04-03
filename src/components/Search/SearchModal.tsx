@@ -20,7 +20,7 @@ interface SearchModalProps {
     spaceId: string;
     revisionId: string;
     spaceTitle: string;
-    collectionId: string | null;
+    parentId: string | null;
     withAsk: boolean;
 }
 
@@ -137,16 +137,8 @@ function SearchModalBody(
         onClose: (to?: string) => void;
     },
 ) {
-    const {
-        spaceId,
-        revisionId,
-        spaceTitle,
-        withAsk,
-        collectionId,
-        state,
-        onChangeQuery,
-        onClose,
-    } = props;
+    const { spaceId, revisionId, spaceTitle, withAsk, parentId, state, onChangeQuery, onClose } =
+        props;
 
     const language = useLanguage();
     const resultsRef = React.useRef<SearchResultsRef>(null);
@@ -246,7 +238,7 @@ function SearchModalBody(
                         ref={resultsRef}
                         spaceId={spaceId}
                         revisionId={revisionId}
-                        collectionId={state.global ? collectionId : null}
+                        parentId={state.global ? parentId : null}
                         query={state.query}
                         withAsk={withAsk}
                         onSwitchToAsk={() => {
@@ -258,7 +250,7 @@ function SearchModalBody(
                         }}
                         onClose={onClose}
                     >
-                        {collectionId && state.query ? (
+                        {parentId && state.query ? (
                             <SearchScopeToggle spaceTitle={spaceTitle} />
                         ) : null}
                     </SearchResults>
