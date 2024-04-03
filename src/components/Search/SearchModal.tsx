@@ -1,6 +1,7 @@
 'use client';
 
 import IconSearch from '@geist-ui/icons/search';
+import { Collection, Site } from '@gitbook/api';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import React from 'react';
@@ -20,7 +21,7 @@ interface SearchModalProps {
     spaceId: string;
     revisionId: string;
     spaceTitle: string;
-    parentId: string | null;
+    parent: Site | Collection | null;
     withAsk: boolean;
 }
 
@@ -135,7 +136,7 @@ function SearchModalBody(
         onClose: (to?: string) => void;
     },
 ) {
-    const { spaceId, revisionId, spaceTitle, withAsk, parentId, state, onChangeQuery, onClose } =
+    const { spaceId, revisionId, spaceTitle, withAsk, parent, state, onChangeQuery, onClose } =
         props;
 
     const language = useLanguage();
@@ -236,7 +237,7 @@ function SearchModalBody(
                         ref={resultsRef}
                         spaceId={spaceId}
                         revisionId={revisionId}
-                        parentId={state.global ? parentId : null}
+                        parent={state.global ? parent : null}
                         query={state.query}
                         withAsk={withAsk}
                         onSwitchToAsk={() => {
@@ -248,7 +249,7 @@ function SearchModalBody(
                         }}
                         onClose={onClose}
                     >
-                        {parentId && state.query ? (
+                        {parent && state.query ? (
                             <SearchScopeToggle spaceTitle={spaceTitle} />
                         ) : null}
                     </SearchResults>

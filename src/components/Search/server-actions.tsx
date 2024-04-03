@@ -1,6 +1,14 @@
 'use server';
 
-import { RevisionPage, SearchAIAnswer, SearchPageResult, Space } from '@gitbook/api';
+import {
+    Collection,
+    RevisionPage,
+    SearchAIAnswer,
+    SearchPageResult,
+    Site,
+    Space,
+} from '@gitbook/api';
+import { headers } from 'next/headers';
 
 import { streamResponse } from '@/lib/actions';
 import * as api from '@/lib/api';
@@ -58,17 +66,39 @@ export async function searchSpaceContent(
  * Server action to search content in a parent (site or collection)
  */
 export async function searchParentContent(
-    parentId: string,
+    parent: Site | Collection,
     query: string,
 ): Promise<OrderedComputedResult[]> {
-    const [data, collectionSpaces] = await Promise.all([
-        api.searchCollectionContent(collectionId, query),
-        api.getCollectionSpaces(collectionId),
+    const headerSet = headers();
+    const organizationId = headerSet.get('x-gitbook-content-organization');
+
+    const [data, collectionSpaces, siteSpaces] = await Promise.all([
+        api.searchParentContent(parent.id, query),
+        parent.object === 'collection' ? api.getCollectionSpaces(parent.id) : null,
+        parent.object === 'site' && organizationId
+            ? api.getSiteSpaces(organizationId, parent.id)
+            : null,
     ]);
+
+    let spaces: Space[] = [];
+
+    if (collectionSpaces) {
+        spaces = collectionSpaces;
+    } else if (siteSpaces) {
+        spaces = Object.values(
+            siteSpaces.reduce(
+                (acc, siteSpace) => {
+                    acc[siteSpace.space.id] = siteSpace.space;
+                    return acc;
+                },
+                {} as Record<string, Space>,
+            ),
+        );
+    }
 
     return data.items
         .map((spaceItem) => {
-            const space = collectionSpaces.find((space) => space.id === spaceItem.id);
+            const space = spaces.find((space) => space.id === spaceItem.id);
             return spaceItem.pages.map((item) => transformPageResult(item, space));
         })
         .flat(2);

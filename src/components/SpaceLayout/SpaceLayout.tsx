@@ -116,7 +116,7 @@ export function SpaceLayout(props: {
                     revisionId={contentTarget.revisionId}
                     spaceTitle={customization.title ?? space.title}
                     withAsk={customization.aiSearch.enabled}
-                    parentId={parent && spaces.length > 1 ? parent.id : null}
+                    parent={parent && spaces.length > 1 ? parent : null}
                 />
             </React.Suspense>
         </>
