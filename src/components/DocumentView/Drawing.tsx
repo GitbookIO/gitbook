@@ -19,7 +19,7 @@ export async function Drawing(props: BlockProps<DocumentBlockDrawing>) {
                 sources={{
                     light: {
                         src: resolved.href,
-                        size: resolved.fileDimensions,
+                        size: resolved.file?.dimensions,
                     },
                 }}
                 alt="Drawing"

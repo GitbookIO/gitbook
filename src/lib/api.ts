@@ -163,8 +163,8 @@ export const getUserById = cache(
 /**
  * Get a synced block by its ref.
  */
-export const getSyncedBlock = cache(
-    'api.getSyncedBlock',
+export const getSyncedBlockContent = cache(
+    'api.getSyncedBlockContent',
     async (
         apiToken: string,
         organizationId: string,
@@ -172,7 +172,7 @@ export const getSyncedBlock = cache(
         options: CacheFunctionOptions,
     ) => {
         try {
-            const response = await apiWithToken(apiToken).orgs.getSyncedBlock(
+            const response = await apiWithToken(apiToken).orgs.getSyncedBlockContent(
                 organizationId,
                 syncedBlockId,
                 {
@@ -185,7 +185,6 @@ export const getSyncedBlock = cache(
                 tags: [
                     getAPICacheTag({
                         tag: 'synced-block',
-                        organization: organizationId,
                         syncedBlock: syncedBlockId,
                     }),
                 ],
@@ -992,7 +991,6 @@ export function getAPICacheTag(
         | {
               tag: 'synced-block';
               syncedBlock: string;
-              organization: string;
           }
         // All data related to a site
         | {
@@ -1015,7 +1013,7 @@ export function getAPICacheTag(
         case 'collection':
             return `collection:${spec.collection}`;
         case 'synced-block':
-            return `synced-block:${spec.organization}:${spec.syncedBlock}`;
+            return `synced-block:${spec.syncedBlock}`;
         case 'site':
             return `site:${spec.organization}:${spec.site}`;
         case 'site-space':

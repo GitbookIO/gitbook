@@ -1,6 +1,6 @@
 'use server';
 
-import { RevisionPage, SearchAIAnswer, SearchPageResult } from '@gitbook/api';
+import { RevisionPage, SearchAIAnswer, SearchPageResult, Space } from '@gitbook/api';
 
 import { streamResponse } from '@/lib/actions';
 import * as api from '@/lib/api';
@@ -61,11 +61,15 @@ export async function searchParentContent(
     parentId: string,
     query: string,
 ): Promise<OrderedComputedResult[]> {
-    const data = await api.searchParentContent(parentId, query);
+    const [data, collectionSpaces] = await Promise.all([
+        api.searchCollectionContent(collectionId, query),
+        api.getCollectionSpaces(collectionId),
+    ]);
 
     return data.items
         .map((spaceItem) => {
-            return spaceItem.pages.map((item) => transformPageResult(item, spaceItem.title));
+            const space = collectionSpaces.find((space) => space.id === spaceItem.id);
+            return spaceItem.pages.map((item) => transformPageResult(item, space));
         })
         .flat(2);
 }
@@ -125,6 +129,7 @@ function transformAnswer(
                 document={answer.answer.document}
                 context={{
                     mode: 'default',
+                    contentRefContext: null,
                     resolveContentRef: async () => null,
                 }}
                 style={['space-y-5']}
@@ -135,13 +140,30 @@ function transformAnswer(
     };
 }
 
-function transformPageResult(item: SearchPageResult, spaceTitle?: string) {
+function transformPageResult(item: SearchPageResult, space?: Space) {
+    // Resolve a relative path to an absolute URL
+    // if the search result is relative to another space, we use the space URL
+    const getURL = (path: string) => {
+        if (space) {
+            let url = space.urls.published ?? space.urls.app;
+            if (!url.endsWith('/')) {
+                url += '/';
+            }
+            if (path.startsWith('/')) {
+                path = path.slice(1);
+            }
+            return url + path;
+        } else {
+            return absoluteHref(path);
+        }
+    };
+
     const sections =
         item.sections?.map<ComputedSectionResult>((section) => ({
             type: 'section',
             id: item.id + '/' + section.id,
             title: section.title,
-            href: absoluteHref(section.path),
+            href: getURL(section.path),
             body: section.body,
         })) ?? [];
 
@@ -149,8 +171,8 @@ function transformPageResult(item: SearchPageResult, spaceTitle?: string) {
         type: 'page',
         id: item.id,
         title: item.title,
-        href: absoluteHref(item.path),
-        spaceTitle,
+        href: getURL(item.path),
+        spaceTitle: space?.title,
     };
 
     return [page, ...sections];

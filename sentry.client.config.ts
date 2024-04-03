@@ -6,6 +6,7 @@ if (dsn) {
         debug: false,
         dsn,
         integrations: [],
+        sampleRate: 0.1,
         enableTracing: false,
         beforeSendTransaction: () => {
             return null;

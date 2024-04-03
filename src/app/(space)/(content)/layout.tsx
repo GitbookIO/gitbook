@@ -1,5 +1,6 @@
 import { CustomizationThemeMode } from '@gitbook/api';
 import { Metadata, Viewport } from 'next';
+import { headers } from 'next/headers';
 import React from 'react';
 import * as ReactDOM from 'react-dom';
 
@@ -47,7 +48,10 @@ export default async function ContentLayout(props: { children: React.ReactNode }
     return (
         <ClientContexts
             nonce={nonce}
-            forcedTheme={customization.themes.toggeable ? undefined : customization.themes.default}
+            forcedTheme={
+                getQueryStringTheme() ??
+                (customization.themes.toggeable ? undefined : customization.themes.default)
+            }
         >
             <SpaceLayout
                 space={space}
@@ -123,4 +127,19 @@ export async function generateMetadata(): Promise<Metadata> {
         },
         robots: shouldIndexSpace({ space, parent }) ? 'index, follow' : 'noindex, nofollow',
     };
+}
+
+/**
+ * For preview, the theme can be set via query string (?theme=light).
+ */
+function getQueryStringTheme() {
+    const headersList = headers();
+    const queryStringTheme = headersList.get('x-gitbook-theme');
+    if (!queryStringTheme) {
+        return null;
+    }
+
+    return queryStringTheme === 'light'
+        ? CustomizationThemeMode.Light
+        : CustomizationThemeMode.Dark;
 }

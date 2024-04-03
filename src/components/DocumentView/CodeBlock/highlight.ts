@@ -9,7 +9,7 @@ import {
 // @ts-ignore - onigWasm is a Wasm module
 import onigWasm from 'shiki/onig.wasm?module';
 
-import { singleton, singletonMap } from '@/lib/async';
+import { asyncMutexFunction, singleton } from '@/lib/async';
 import { getNodeText } from '@/lib/document';
 import { trace } from '@/lib/tracing';
 
@@ -314,10 +314,13 @@ const loadHighlighter = singleton(async () => {
     });
 });
 
-const loadHighlighterLanguage = singletonMap(async (lang: keyof typeof bundledLanguages) => {
-    const highlighter = await loadHighlighter();
-    await trace(
-        `highlighting.loadLanguage(${lang})`,
-        async () => await highlighter.loadLanguage(lang),
-    );
-});
+const loadLanguagesMutex = asyncMutexFunction();
+async function loadHighlighterLanguage(lang: keyof typeof bundledLanguages) {
+    await loadLanguagesMutex.runBlocking(async () => {
+        const highlighter = await loadHighlighter();
+        await trace(
+            `highlighting.loadLanguage(${lang})`,
+            async () => await highlighter.loadLanguage(lang),
+        );
+    });
+}

@@ -33,10 +33,7 @@ export async function RecordCard(
                 'z-0',
                 'relative',
                 'grid',
-                'grid-cols-[40%,_1fr]',
                 'bg-light',
-                'min-[432px]:grid-cols-none',
-                'min-[432px]:grid-rows-[auto,1fr]',
                 'w-[calc(100%+2px)]',
                 'h-[calc(100%+2px)]',
                 'inset-[-1px]',
@@ -44,6 +41,14 @@ export async function RecordCard(
                 'straight-corners:rounded-none',
                 'overflow-hidden',
                 'dark:bg-dark',
+                cover
+                    ? [
+                          // On mobile, the cover is displayed on the left with 40% of the width
+                          'grid-cols-[40%,_1fr]',
+                          'min-[432px]:grid-cols-none',
+                          'min-[432px]:grid-rows-[auto,1fr]',
+                      ]
+                    : null,
             )}
         >
             {cover ? (
@@ -52,7 +57,7 @@ export async function RecordCard(
                     sources={{
                         light: {
                             src: cover.href,
-                            size: cover.fileDimensions,
+                            size: cover.file?.dimensions,
                         },
                     }}
                     sizes={[
@@ -61,6 +66,7 @@ export async function RecordCard(
                         },
                     ]}
                     className={tcls(
+                        'min-w-0',
                         'w-full',
                         'h-full',
                         'object-cover',
@@ -73,10 +79,12 @@ export async function RecordCard(
             ) : null}
             <div
                 className={tcls(
+                    'min-w-0',
                     'w-full',
                     'flex',
                     'flex-col',
                     'place-self-start',
+                    'gap-3',
                     'p-4',
                     'text-sm',
                     target

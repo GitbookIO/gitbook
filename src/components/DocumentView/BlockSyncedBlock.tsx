@@ -1,6 +1,7 @@
 import { DocumentBlockSyncedBlock } from '@gitbook/api';
 
-import { getSyncedBlock } from '@/lib/api';
+import { getSyncedBlockContent } from '@/lib/api';
+import { resolveContentRefWithFiles } from '@/lib/references';
 
 import { BlockProps } from './Block';
 import { Blocks } from './Blocks';
@@ -13,22 +14,39 @@ export async function BlockSyncedBlock(props: BlockProps<DocumentBlockSyncedBloc
         return null;
     }
 
-    const result = await getSyncedBlock(
+    // We can't resolve the synced block without an organization context.
+    if (!context.contentRefContext) {
+        return null;
+    }
+
+    const syncedBlock = await getSyncedBlockContent(
         apiToken,
-        block.data.ref.organization,
+        context.contentRefContext.space.organization,
         block.data.ref.syncedBlock,
     );
 
-    if (!result) {
+    if (!syncedBlock) {
         return null;
     }
 
     return (
         <Blocks
-            nodes={result.document.nodes}
-            document={result.document}
+            nodes={syncedBlock.document.nodes}
+            document={syncedBlock.document}
             ancestorBlocks={[...ancestorBlocks, block]}
-            context={context}
+            context={{
+                ...context,
+                resolveContentRef: async (ref, options) => {
+                    if (!syncedBlock?.files) {
+                        return context.resolveContentRef(ref, options);
+                    }
+                    const result = resolveContentRefWithFiles(syncedBlock.files, ref);
+                    if (result !== undefined) {
+                        return result;
+                    }
+                    return context.resolveContentRef(ref, options);
+                },
+            }}
             style={style}
         />
     );

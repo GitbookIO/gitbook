@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 
-import { race } from './async';
+import { asyncMutexFunction, race } from './async';
 import { flushWaitUntil } from './waitUntil';
 
 describe('race', () => {
@@ -377,6 +377,91 @@ describe('race', () => {
 
             const pendings = await flushWaitUntil();
             expect(pendings).toHaveLength(0);
+        });
+    });
+});
+
+describe('asyncMutexFunction', () => {
+    describe('self', () => {
+        it('should run only once', async () => {
+            let running = 0;
+
+            const fn = async () => {
+                running += 1;
+
+                await new Promise((resolve) => setTimeout(resolve, 10));
+            };
+
+            const mutexFn = asyncMutexFunction();
+
+            await Promise.all([
+                mutexFn(fn),
+                mutexFn(fn),
+                mutexFn(fn),
+                mutexFn(fn),
+                mutexFn(fn),
+                mutexFn(fn),
+            ]);
+
+            expect(running).toBe(1);
+        });
+    });
+
+    describe('runBlocking', () => {
+        it('should run only one function at a time', async () => {
+            let running = 0;
+            let maxRunning = 0;
+
+            const fn = async () => {
+                running += 1;
+                maxRunning = Math.max(running, maxRunning);
+
+                await new Promise((resolve) => setTimeout(resolve, 10));
+
+                running -= 1;
+            };
+
+            const mutexFn = asyncMutexFunction();
+
+            await Promise.all([
+                mutexFn.runBlocking(fn),
+                mutexFn.runBlocking(fn),
+                mutexFn.runBlocking(fn),
+                mutexFn.runBlocking(fn),
+                mutexFn.runBlocking(fn),
+                mutexFn.runBlocking(fn),
+            ]);
+
+            expect(maxRunning).toBe(1);
+        });
+    });
+
+    describe('runAfter', () => {
+        it('should run only one function at a time', async () => {
+            let running = 0;
+            let maxRunning = 0;
+
+            const fn = async () => {
+                running += 1;
+                maxRunning = Math.max(running, maxRunning);
+
+                await new Promise((resolve) => setTimeout(resolve, 10));
+
+                running -= 1;
+            };
+
+            const mutexFn = asyncMutexFunction();
+
+            await Promise.all([
+                mutexFn.runAfter(fn),
+                mutexFn.runAfter(fn),
+                mutexFn.runAfter(fn),
+                mutexFn.runAfter(fn),
+                mutexFn.runAfter(fn),
+                mutexFn.runAfter(fn),
+            ]);
+
+            expect(maxRunning).toBe(1);
         });
     });
 });

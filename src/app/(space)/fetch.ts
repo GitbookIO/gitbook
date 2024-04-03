@@ -141,13 +141,17 @@ async function resolvePage(
     // If page can't be found, we try with the API, in case we have a redirect
     // We use the raw pathname to handle special/malformed redirects setup by users in the GitSync.
     // The page rendering will take care of redirecting to a normalized pathname.
-    const resolved = await getRevisionPageByPath(
-        contentTarget.spaceId,
-        contentTarget.revisionId,
-        rawPathname,
-    );
-    if (resolved) {
-        return resolvePageId(pages, resolved.id);
+    //
+    // We don't test path that are too long as GitBook doesn't support them and will return a 404 anyway.
+    if (rawPathname.length <= 512) {
+        const resolved = await getRevisionPageByPath(
+            contentTarget.spaceId,
+            contentTarget.revisionId,
+            rawPathname,
+        );
+        if (resolved) {
+            return resolvePageId(pages, resolved.id);
+        }
     }
 
     return undefined;

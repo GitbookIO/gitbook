@@ -235,6 +235,7 @@ async function PDFPageDocument(props: {
                             spaceId: space.id,
                             revisionId: refContext.revisionId,
                         },
+                        contentRefContext: refContext,
                         resolveContentRef: (ref) => resolveContentRef(ref, refContext),
                         getId: (id) => pagePDFContainerId(page, id),
                     }}
