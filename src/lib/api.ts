@@ -434,7 +434,7 @@ export const getRevisionPageByPath = cache(
  * It should not be used directly, use `getRevisionFile` instead.
  */
 const getRevisionFileById = cache(
-    'api.getRevisionFile.v2',
+    'api.getRevisionFile.v3',
     async (spaceId: string, revisionId: string, fileId: string, options: CacheFunctionOptions) => {
         try {
             const response = await (async () => {
@@ -468,7 +468,7 @@ const getRevisionFileById = cache(
  * It should not be used directly, use `getRevisionFile` instead.
  */
 const getRevisionAllFiles = cache(
-    'api.getRevisionAllFiles',
+    'api.getRevisionAllFiles.v2',
     async (spaceId: string, revisionId: string, options: CacheFunctionOptions) => {
         const response = await getAll(
             (params) =>
