@@ -326,7 +326,7 @@ interface GetRevisionOptions {
  * Get a revision by its ID.
  */
 export const getRevision = cache(
-    'api.getRevision',
+    'api.getRevision.v2',
     async (
         spaceId: string,
         revisionId: string,
@@ -359,7 +359,7 @@ export const getRevision = cache(
  * Get all the pages in a revision of a space.
  */
 export const getRevisionPages = cache(
-    'api.getRevisionPages.v3',
+    'api.getRevisionPages.v4',
     async (
         spaceId: string,
         revisionId: string,
@@ -392,7 +392,7 @@ export const getRevisionPages = cache(
  * Get a revision page by its path
  */
 export const getRevisionPageByPath = cache(
-    'api.getRevisionPageByPath.v2',
+    'api.getRevisionPageByPath.v3',
     async (
         spaceId: string,
         revisionId: string,
@@ -434,7 +434,7 @@ export const getRevisionPageByPath = cache(
  * It should not be used directly, use `getRevisionFile` instead.
  */
 const getRevisionFileById = cache(
-    'api.getRevisionFile.v2',
+    'api.getRevisionFile.v3',
     async (spaceId: string, revisionId: string, fileId: string, options: CacheFunctionOptions) => {
         try {
             const response = await (async () => {
@@ -468,7 +468,7 @@ const getRevisionFileById = cache(
  * It should not be used directly, use `getRevisionFile` instead.
  */
 const getRevisionAllFiles = cache(
-    'api.getRevisionAllFiles',
+    'api.getRevisionAllFiles.v2',
     async (spaceId: string, revisionId: string, options: CacheFunctionOptions) => {
         const response = await getAll(
             (params) =>
