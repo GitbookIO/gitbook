@@ -44,12 +44,7 @@ export async function fetchOpenAPIBlock(
             return { error };
         }
 
-        return {
-            error: new OpenAPIFetchError(
-                `Failed to fetch OpenAPI block: ${error instanceof Error ? error.message : typeof error}`,
-                resolved.href,
-            ),
-        };
+        throw error;
     }
 }
 
@@ -64,9 +59,8 @@ const fetcher: OpenAPIFetcher = {
         });
 
         if (!response.ok) {
-            throw new OpenAPIFetchError(
+            throw new Error(
                 `Failed to fetch OpenAPI file: ${response.status} ${response.statusText}`,
-                url,
             );
         }
 
