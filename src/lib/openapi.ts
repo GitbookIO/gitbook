@@ -44,19 +44,28 @@ export async function fetchOpenAPIBlock(
             return { error };
         }
 
-        throw error;
+        return {
+            error: new OpenAPIFetchError(
+                `Failed to fetch OpenAPI block: ${error instanceof Error ? error.message : typeof error}`,
+                resolved.href,
+            ),
+        };
     }
 }
 
 const fetcher: OpenAPIFetcher = {
     fetch: cache('openapi.fetch', async (url: string, options: CacheFunctionOptions) => {
+        console.log('HERE fetch', url);
         const response = await fetch(url, {
             ...noCacheFetchOptions,
             signal: options.signal,
         });
 
         if (!response.ok) {
-            throw new Error(`Failed to fetch OpenAPI file: ${response.statusText}`);
+            throw new OpenAPIFetchError(
+                `Failed to fetch OpenAPI file: ${response.status} ${response.statusText}`,
+                url,
+            );
         }
 
         const text = await response.text();
