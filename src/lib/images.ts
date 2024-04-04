@@ -185,7 +185,7 @@ export async function resizeImage(
         return response;
     }
 
-    return fetch(input, {
+    return fetch(parsed, {
         // @ts-ignore
         cf: {
             image: resizeOptions,

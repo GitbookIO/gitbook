@@ -149,3 +149,37 @@ it('should parse Swagger 2.0', async () => {
         },
     });
 });
+
+it('should resolve a ref with whitespace', async () => {
+    const resolved = await fetchOpenAPIOperation(
+        {
+            url: ' https://petstore3.swagger.io/api/v3/openapi.json',
+            method: 'put',
+            path: '/pet',
+        },
+        fetcher,
+    );
+
+    expect(resolved).toMatchObject({
+        servers: [
+            {
+                url: '/api/v3',
+            },
+        ],
+        operation: {
+            tags: ['pet'],
+            summary: 'Update an existing pet',
+            description: 'Update an existing pet by Id',
+            requestBody: {
+                content: {
+                    'application/json': {
+                        schema: {
+                            type: 'object',
+                            required: ['name', 'photoUrls'],
+                        },
+                    },
+                },
+            },
+        },
+    });
+});
