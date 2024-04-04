@@ -69,7 +69,9 @@ async function fetchVisitorID(): Promise<string> {
  * Accept or reject cookies.
  */
 export function setCookiesTracking(enabled: boolean) {
-    cookies.set(GRANTED_COOKIE, enabled ? 'yes' : 'no');
+    cookies.set(GRANTED_COOKIE, enabled ? 'yes' : 'no', {
+        expires: 365,
+    });
 }
 
 /**
