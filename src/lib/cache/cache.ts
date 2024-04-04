@@ -126,6 +126,7 @@ export function cache<Args extends any[], Result>(
             // Try the memory backend, independently of the other backends as it doesn't have a network cost
             const memoryEntry = await memoryCache.get(key);
             if (memoryEntry) {
+                console.log(`${key} memcache ${Date.now()} setAt=${memoryEntry.meta.setAt} expiresAt=${memoryEntry.meta.expiresAt} revalidatesAt=${memoryEntry.meta.revalidatesAt}`)
                 span.setAttribute('memory', true);
                 result = [memoryEntry, 'memory'] as const;
             } else {
