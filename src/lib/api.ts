@@ -569,7 +569,7 @@ export const getRevisionFile = batch<[string, string, string], RevisionFile | nu
  * Get a document by its ID.
  */
 export const getDocument = cache(
-    'api.getDocument',
+    'api.getDocument.v2',
     async (spaceId: string, documentId: string, options: CacheFunctionOptions) => {
         const response = await api().spaces.getDocumentById(
             spaceId,
