@@ -180,7 +180,7 @@ async function getKVNamespace(): Promise<KVNamespace | null> {
 
     const cloudflare = getOptionalRequestContext();
     if (cloudflare) {
-        console.log('return cloudflare.env.CACHE_KV', !!cloudflare.env.CACHE_KV);
+        console.log(`return cloudflare.env.CACHE_KV: ${'CACHE_KV' in cloudflare.env ? !!cloudflare.env.CACHE_KV : null}`);
         // @ts-ignore
         return cloudflare.env.CACHE_KV ?? null;
     }
