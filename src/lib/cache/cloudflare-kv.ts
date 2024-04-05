@@ -108,12 +108,14 @@ export const cloudflareKVCache: CacheBackend = {
 
         const kv = await getKVNamespace();
         if (!kv) {
+            console.log('no kv');
             return result;
         }
 
         const pendingDeletions: Array<Promise<unknown>> = [];
 
         const iterateKVPage = async (prefix: string, cursor: string | null, max: number = 3) => {
+            console.log(`iterateKVPage prefix=${prefix} cursor=${cursor} max=${max}`)
             const entries = await kv.list<KVTagMetadata>({
                 prefix,
                 cursor,
@@ -125,15 +127,20 @@ export const cloudflareKVCache: CacheBackend = {
                     const metadata = entry.metadata;
                     const key = metadata.meta.key;
 
+                    console.log(`clear ${JSON.stringify(entry)}`)
+
                     result.metas.push(metadata.meta);
                     result.keys.push(key);
 
                     // Delete the tag key and the value key
                     pendingDeletions.push(kv.delete(getValueKey(key)));
                     pendingDeletions.push(kv.delete(entry.name));
+                } else {
+                    console.log(`entry ${JSON.stringify(entry)} has no metadata`)
                 }
             }
 
+            console.log(`cacheStatus = ${entries.cacheStatus} list_complete=${entries.list_complete}`);
             if (!entries.list_complete && max > 0) {
                 await iterateKVPage(prefix, entries.cursor, max - 1);
             }
@@ -173,9 +180,11 @@ async function getKVNamespace(): Promise<KVNamespace | null> {
 
     const cloudflare = getOptionalRequestContext();
     if (cloudflare) {
+        console.log('return cloudflare.env.CACHE_KV', !!cloudflare.env.CACHE_KV);
         // @ts-ignore
         return cloudflare.env.CACHE_KV ?? null;
     }
 
+    console.log(`no cloudflare :(`);
     return null;
 }
