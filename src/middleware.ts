@@ -176,6 +176,8 @@ export async function middleware(request: NextRequest) {
     // https://nextjs.org/docs/app/building-your-application/configuring/content-security-policy
     headers.set('x-nonce', nonce);
     headers.set('content-security-policy', csp);
+    // Basic security headers
+    headers.set('strict-transport-security', 'max-age=31536000');
     // Pass a x-forwarded-host and origin to ensure Next doesn't block server actions when proxied
     headers.set('x-forwarded-host', inputURL.host);
     headers.set('origin', inputURL.origin);
