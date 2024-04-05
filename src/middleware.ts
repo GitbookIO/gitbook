@@ -176,10 +176,6 @@ export async function middleware(request: NextRequest) {
     // https://nextjs.org/docs/app/building-your-application/configuring/content-security-policy
     headers.set('x-nonce', nonce);
     headers.set('content-security-policy', csp);
-    // Basic security headers
-    headers.set('strict-transport-security', 'max-age=31536000');
-    headers.set('referrer-policy', 'no-referrer-when-downgrade');
-    headers.set('x-content-type-options', 'nosniff');
     // Pass a x-forwarded-host and origin to ensure Next doesn't block server actions when proxied
     headers.set('x-forwarded-host', inputURL.host);
     headers.set('origin', inputURL.origin);
@@ -225,6 +221,10 @@ export async function middleware(request: NextRequest) {
 
     // Add Content Security Policy header
     response.headers.set('content-security-policy', csp);
+    // Basic security headers
+    response.headers.set('strict-transport-security', 'max-age=31536000');
+    response.headers.set('referrer-policy', 'no-referrer-when-downgrade');
+    response.headers.set('x-content-type-options', 'nosniff');
 
     const isPrefetch = request.headers.has('x-middleware-prefetch');
 
