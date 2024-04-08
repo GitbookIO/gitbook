@@ -6,6 +6,8 @@ if (dsn) {
         debug: false,
         dsn,
 
+        sampleRate: 0.1,
+
         // Disable tracing as it creates additional requests in an env where subrequests are limited.
         enableTracing: false,
 
