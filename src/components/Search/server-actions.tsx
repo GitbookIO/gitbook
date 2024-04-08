@@ -10,6 +10,7 @@ import {
 } from '@gitbook/api';
 import { headers } from 'next/headers';
 
+import { getContentPointer } from '@/app/(space)/fetch';
 import { streamResponse } from '@/lib/actions';
 import * as api from '@/lib/api';
 import { absoluteHref, pageHref } from '@/lib/links';
@@ -69,14 +70,13 @@ export async function searchParentContent(
     parent: Site | Collection,
     query: string,
 ): Promise<OrderedComputedResult[]> {
-    const headerSet = headers();
-    const organizationId = headerSet.get('x-gitbook-content-organization');
+    const pointer = getContentPointer();
 
     const [data, collectionSpaces, siteSpaces] = await Promise.all([
         api.searchParentContent(parent.id, query),
         parent.object === 'collection' ? api.getCollectionSpaces(parent.id) : null,
-        parent.object === 'site' && organizationId
-            ? api.getSiteSpaces(organizationId, parent.id)
+        parent.object === 'site' && 'organizationId' in pointer
+            ? api.getSiteSpaces(pointer.organizationId, parent.id)
             : null,
     ]);
 

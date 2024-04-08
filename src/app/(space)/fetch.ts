@@ -68,13 +68,14 @@ export function getContentPointer(): ContentPointer | SiteContentPointer {
  */
 export async function fetchSpaceData() {
     const content = getContentPointer();
-    const { space, contentTarget, pages, customization, scripts } = await ('siteId' in content
-        ? getSiteSpaceData(content)
-        : getSpaceData(content));
 
-    const parent = await ('siteId' in content
-        ? fetchParentSite(content.organizationId, content.siteId)
-        : fetchParentCollection(space));
+    const [{ space, contentTarget, pages, customization, scripts }, parentSite] = await Promise.all(
+        'siteId' in content
+            ? [getSiteSpaceData(content), fetchParentSite(content.organizationId, content.siteId)]
+            : [getSpaceData(content)],
+    );
+
+    const parent = await (parentSite ?? fetchParentCollection(space));
 
     return {
         content,
