@@ -35,7 +35,14 @@ export function Blocks<T extends DocumentBlock, Tag extends React.ElementType = 
                     key={node.key}
                     block={node}
                     style={[
-                        node.data && 'fullWidth' in node.data && node.data.fullWidth ? 'max-w-screen-xl' : 'max-w-3xl', 'w-full', 'mx-auto', 'decoration-primary/6', blockStyle]}
+                        node.data && 'fullWidth' in node.data && node.data.fullWidth
+                            ? 'max-w-screen-xl'
+                            : 'max-w-3xl',
+                        'w-full',
+                        'mx-auto',
+                        'decoration-primary/6',
+                        blockStyle,
+                    ]}
                     {...contextProps}
                 />
             ))}

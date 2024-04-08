@@ -22,11 +22,7 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
               'border-dark/3',
               'dark:border-light/2',
           ]
-        : [
-              'overflow-x-auto',
-              'overflow-y-hidden',
-              'mx-auto',
-          ];
+        : ['overflow-x-auto', 'overflow-y-hidden', 'mx-auto'];
 
     const tableTR = columnsOverThreshold
         ? ['[&>*+*]:border-l', '[&>*]:px-4']
