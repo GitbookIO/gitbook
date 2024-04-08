@@ -177,7 +177,13 @@ async function fetchParentSite(organizationId: string, siteId: string) {
 
     const spaces: Record<string, Space> = {};
     siteSpaces.forEach((siteSpace) => {
-        spaces[siteSpace.space.id] = siteSpace.space;
+        spaces[siteSpace.space.id] = {
+            ...siteSpace.space,
+            urls: {
+                ...siteSpace.space.urls,
+                published: siteSpace.urls.published,
+            },
+        };
     });
 
     return { parent: site, spaces: Object.values(spaces) };
