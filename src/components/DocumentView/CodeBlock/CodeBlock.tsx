@@ -9,6 +9,7 @@ import { DocumentContext } from '../DocumentView';
 import { Inline } from '../Inline';
 
 import './theme.css';
+import { MAX_WIDTH_FULL_WIDTH } from '@/components/layout';
 
 /**
  * Render an entire code-block. The syntax highlighting is done server-side.
@@ -24,7 +25,7 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
     const title = block.data.title;
     const fullWidth = block.data.fullWidth;
 
-    const fullWidthStyle = fullWidth ? 'max-w-4xl' : 'max-w-3xl';
+    const fullWidthStyle = fullWidth ? MAX_WIDTH_FULL_WIDTH : null;
     const titleRoundingStyle = [
         'rounded-md',
         'straight-corners:rounded-sm',
@@ -32,7 +33,7 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
     ];
 
     return (
-        <div className={tcls('group/codeblock', 'grid', 'grid-flow-col', fullWidthStyle, style)}>
+        <div className={tcls('group/codeblock', 'grid', 'grid-flow-col', style, fullWidthStyle)}>
             <div
                 className={tcls(
                     'flex',

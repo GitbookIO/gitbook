@@ -6,6 +6,7 @@ import { RecordRow } from './RecordRow';
 import { TableViewProps } from './Table';
 import styles from './table.module.css';
 import { getColumnAlignment } from './utils';
+import { MAX_WIDTH_FULL_WIDTH } from '@/components/layout';
 
 export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
     const { block, view, records, style } = props;
@@ -25,7 +26,7 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
               block.data.fullWidth
                   ? [
                         // has over X columns, and is full width
-                        'max-w-full',
+                        MAX_WIDTH_FULL_WIDTH,
                     ]
                   : [
                         // NOT full width, but has over X columns
@@ -41,7 +42,7 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
               block.data.fullWidth
                   ? [
                         // has under X columns, and is full width
-                        'max-w-full',
+                        MAX_WIDTH_FULL_WIDTH,
                     ]
                   : [
                         // NOT full width, but has under X columns
