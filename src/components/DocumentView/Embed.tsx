@@ -1,7 +1,6 @@
 import { DocumentBlockEmbed } from '@gitbook/api';
 import Script from 'next/script';
 
-
 import { Card } from '@/components/primitives';
 import { api } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
