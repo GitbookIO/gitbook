@@ -194,6 +194,7 @@ const testCases: TestsCase[] = [
             {
                 name: 'Embeds',
                 url: 'blocks/embeds',
+                fullPage: true,
             },
             {
                 name: 'Annotations',
@@ -481,7 +482,7 @@ for (const testCase of testCases) {
                 }
                 if (testEntry.screenshot !== false) {
                     await argosScreenshot(page, `${testCase.name} - ${testEntry.name}`, {
-                        viewports: ['macbook-13', 'iphone-x', 'ipad-2'],
+                        viewports: ['macbook-16', 'macbook-13', 'iphone-x', 'ipad-2'],
                         argosCSS: `
                         /* Hide Intercom */
                         .intercom-lightweight-app {
