@@ -616,10 +616,9 @@ export const getSiteSpaceCustomizationFromAPI = cache(
             revalidateBefore: 60 * 60,
             tags: [
                 getAPICacheTag({
-                    tag: 'site-space',
+                    tag: 'site',
                     organization: organizationId,
                     site: siteId,
-                    siteSpace: siteSpaceId,
                 }),
             ],
         });
@@ -997,12 +996,6 @@ export function getAPICacheTag(
               tag: 'site';
               site: string;
               organization: string;
-          }
-        | {
-              tag: 'site-space';
-              site: string;
-              siteSpace: string;
-              organization: string;
           },
 ): string {
     switch (spec.tag) {
@@ -1016,8 +1009,6 @@ export function getAPICacheTag(
             return `synced-block:${spec.syncedBlock}`;
         case 'site':
             return `site:${spec.organization}:${spec.site}`;
-        case 'site-space':
-            return `site-space:${spec.organization}:${spec.site}:${spec.siteSpace}`;
         default:
             assertNever(spec);
     }
