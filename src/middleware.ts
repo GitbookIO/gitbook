@@ -235,6 +235,10 @@ export async function middleware(request: NextRequest) {
 
     // Add Content Security Policy header
     response.headers.set('content-security-policy', csp);
+    // Basic security headers
+    response.headers.set('strict-transport-security', 'max-age=31536000');
+    response.headers.set('referrer-policy', 'no-referrer-when-downgrade');
+    response.headers.set('x-content-type-options', 'nosniff');
 
     const isPrefetch = request.headers.has('x-middleware-prefetch');
 
