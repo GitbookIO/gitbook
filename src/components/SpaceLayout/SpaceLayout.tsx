@@ -5,6 +5,8 @@ import {
     Revision,
     RevisionPageDocument,
     RevisionPageGroup,
+    Site,
+    SiteCustomizationSettings,
     Space,
 } from '@gitbook/api';
 import React from 'react';
@@ -26,9 +28,9 @@ export function SpaceLayout(props: {
     content: ContentPointer;
     contentTarget: ContentTarget;
     space: Space;
-    collection: Collection | null;
-    collectionSpaces: Space[];
-    customization: CustomizationSettings;
+    parent: Site | Collection | null;
+    spaces: Space[];
+    customization: CustomizationSettings | SiteCustomizationSettings;
     pages: Revision['pages'];
     ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
     children: React.ReactNode;
@@ -36,8 +38,8 @@ export function SpaceLayout(props: {
     const {
         space,
         contentTarget,
-        collection,
-        collectionSpaces,
+        parent,
+        spaces,
         content,
         pages,
         customization,
@@ -59,8 +61,8 @@ export function SpaceLayout(props: {
             <Header
                 withTopHeader={withTopHeader}
                 space={space}
-                collection={collection}
-                collectionSpaces={collectionSpaces}
+                parent={parent}
+                spaces={spaces}
                 context={contentRefContext}
                 customization={customization}
             />
@@ -89,8 +91,8 @@ export function SpaceLayout(props: {
                             withTopHeader ? null : (
                                 <CompactHeader
                                     space={space}
-                                    collection={collection}
-                                    collectionSpaces={collectionSpaces}
+                                    parent={parent}
+                                    spaces={spaces}
                                     customization={customization}
                                 />
                             )
@@ -114,7 +116,7 @@ export function SpaceLayout(props: {
                     revisionId={contentTarget.revisionId}
                     spaceTitle={customization.title ?? space.title}
                     withAsk={customization.aiSearch.enabled}
-                    collectionId={collection && collectionSpaces.length > 1 ? collection.id : null}
+                    parent={parent && spaces.length > 1 ? parent : null}
                 />
             </React.Suspense>
         </>

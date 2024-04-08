@@ -1,4 +1,11 @@
-import { Collection, CustomizationHeaderPreset, CustomizationSettings, Space } from '@gitbook/api';
+import {
+    Collection,
+    CustomizationHeaderPreset,
+    CustomizationSettings,
+    Site,
+    SiteCustomizationSettings,
+    Space,
+} from '@gitbook/api';
 
 import { HeaderMobileMenu } from '@/components/Header/HeaderMobileMenu';
 import { Image } from '@/components/utils';
@@ -8,9 +15,9 @@ import { tcls } from '@/lib/tailwind';
 import { Link } from '../primitives';
 
 interface HeaderLogoProps {
-    collection: Collection | null;
+    parent: Site | Collection | null;
     space: Space;
-    customization: CustomizationSettings;
+    customization: CustomizationSettings | SiteCustomizationSettings;
 }
 
 /**
@@ -86,7 +93,7 @@ export function HeaderLogo(props: HeaderLogoProps) {
 }
 
 function LogoFallback(props: HeaderLogoProps) {
-    const { collection, space, customization } = props;
+    const { parent, space, customization } = props;
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
 
     return (
@@ -138,7 +145,7 @@ function LogoFallback(props: HeaderLogoProps) {
                         : 'text-header-link',
                 )}
             >
-                {collection ? collection.title : customization.title ?? space.title}
+                {parent ? parent.title : customization.title ?? space.title}
             </h1>
         </>
     );

@@ -1,7 +1,7 @@
 import { ContentVisibility } from '@gitbook/api';
 import { NextRequest } from 'next/server';
 
-import { getCollection, getSpace } from '@/lib/api';
+import { getCollection, getSite, getSpace } from '@/lib/api';
 import { absoluteHref } from '@/lib/links';
 import { shouldIndexSpace } from '@/lib/seo';
 
@@ -13,16 +13,19 @@ export const runtime = 'edge';
  * Generate a robots.txt for the current space.
  */
 export async function GET(req: NextRequest) {
-    const space = await getSpace(getContentPointer().spaceId);
-    const collection =
-        space.visibility === ContentVisibility.InCollection && space.parent
-            ? await getCollection(space.parent)
-            : null;
+    const pointer = getContentPointer();
+    const space = await getSpace(pointer.spaceId);
+    const parent =
+        'siteId' in pointer
+            ? await getSite(pointer.organizationId, pointer.siteId)
+            : space.visibility === ContentVisibility.InCollection && space.parent
+              ? await getCollection(space.parent)
+              : null;
 
     const lines = [
         `User-agent: *`,
         'Disallow: /~gitbook/',
-        ...(shouldIndexSpace({ space, collection })
+        ...(shouldIndexSpace({ space, parent })
             ? [`Allow: /`, `Sitemap: ${absoluteHref(`/sitemap.xml`, true)}`]
             : [`Disallow: /`]),
     ];

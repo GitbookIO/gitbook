@@ -1,4 +1,10 @@
-import { Collection, CustomizationSettings, Space } from '@gitbook/api';
+import {
+    Collection,
+    CustomizationSettings,
+    Site,
+    SiteCustomizationSettings,
+    Space,
+} from '@gitbook/api';
 import React from 'react';
 
 import { t } from '@/intl/server';
@@ -13,11 +19,11 @@ import { SearchButton } from '../Search';
  */
 export function CompactHeader(props: {
     space: Space;
-    collection: Collection | null;
-    collectionSpaces: Space[];
-    customization: CustomizationSettings;
+    parent: Site | Collection | null;
+    spaces: Space[];
+    customization: CustomizationSettings | SiteCustomizationSettings;
 }) {
-    const { space, collection, customization } = props;
+    const { space, parent, customization } = props;
 
     return (
         <div
@@ -34,7 +40,7 @@ export function CompactHeader(props: {
             )}
         >
             <div className={tcls('flex-grow-0', 'mt-5')}>
-                <HeaderLogo collection={collection} space={space} customization={customization} />
+                <HeaderLogo parent={parent} space={space} customization={customization} />
             </div>
             <div
                 className={tcls(

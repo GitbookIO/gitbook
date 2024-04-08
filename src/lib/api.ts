@@ -9,8 +9,10 @@ import {
     HttpResponse,
     List,
     PublishedContentLookup,
+    PublishedSiteContentLookup,
     RequestRenderIntegrationUI,
     RevisionFile,
+    SiteCustomizationSettings,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 import { headers } from 'next/headers';
@@ -33,6 +35,15 @@ export interface ContentPointer {
     spaceId: string;
     changeRequestId?: string;
     revisionId?: string;
+}
+
+/**
+ * Pointer to a relative content, it might change overtime, the pointer is relative in the content history.
+ */
+export interface SiteContentPointer extends ContentPointer {
+    organizationId: string;
+    siteId: string;
+    siteSpaceId: string;
 }
 
 /**
@@ -109,7 +120,7 @@ export function withAPI<T>(client: GitBookAPI, fn: () => Promise<T>): Promise<T>
 }
 
 export type PublishedContentWithCache =
-    | (PublishedContentLookup & {
+    | ((PublishedContentLookup | PublishedSiteContentLookup) & {
           cacheMaxAge?: number;
           cacheTags?: string[];
       })
@@ -582,6 +593,152 @@ export const getDocument = cache(
 );
 
 /**
+ * Get the customization settings for a site-space from the API.
+ */
+export const getSiteSpaceCustomizationFromAPI = cache(
+    'api.getSiteSpaceCustomizationById',
+    async (
+        organizationId: string,
+        siteId: string,
+        siteSpaceId: string,
+        options: CacheFunctionOptions,
+    ) => {
+        const response = await api().orgs.getSiteSpaceCustomizationById(
+            organizationId,
+            siteId,
+            siteSpaceId,
+            {
+                signal: options.signal,
+                ...noCacheFetchOptions,
+            },
+        );
+        return cacheResponse(response, {
+            revalidateBefore: 60 * 60,
+            tags: [
+                getAPICacheTag({
+                    tag: 'site-space',
+                    organization: organizationId,
+                    site: siteId,
+                    siteSpace: siteSpaceId,
+                }),
+            ],
+        });
+    },
+);
+
+/**
+ * Get the customization settings for a site space from the API.
+ */
+export async function getSiteSpaceCustomization(args: {
+    organizationId: string;
+    siteId: string;
+    siteSpaceId: string;
+}): Promise<SiteCustomizationSettings> {
+    const headersList = headers();
+    const raw = await getSiteSpaceCustomizationFromAPI(
+        args.organizationId,
+        args.siteId,
+        args.siteSpaceId,
+    );
+
+    const extend = headersList.get('x-gitbook-customization');
+    if (extend) {
+        try {
+            const parsed = rison.decode_object<Partial<SiteCustomizationSettings>>(extend);
+            return { ...raw, ...parsed };
+        } catch (error) {
+            console.error(
+                `Failed to parse x-gitbook-customization header (ignored): ${
+                    (error as Error).stack ?? (error as Error).message ?? error
+                }`,
+            );
+        }
+    }
+
+    return raw;
+}
+
+/**
+ * Get the infos about a site by its ID.
+ */
+export const getSite = cache(
+    'api.getSite',
+    async (organizationId: string, siteId: string, options: CacheFunctionOptions) => {
+        const response = await api().orgs.getSiteById(organizationId, siteId, {
+            ...noCacheFetchOptions,
+            signal: options.signal,
+        });
+        return cacheResponse(response, {
+            revalidateBefore: 60 * 60,
+            tags: [getAPICacheTag({ tag: 'site', organization: organizationId, site: siteId })],
+        });
+    },
+);
+
+/**
+ * List all the site-spaces variants published in a site.
+ */
+export const getSiteSpaces = cache(
+    'api.getSiteSpaces',
+    async (organizationId: string, siteId: string, options: CacheFunctionOptions) => {
+        const response = await getAll((params) =>
+            api().orgs.listSiteSpaces(organizationId, siteId, params, {
+                ...noCacheFetchOptions,
+                signal: options.signal,
+            }),
+        );
+
+        return cacheResponse(response, {
+            revalidateBefore: 60 * 60,
+            data: response.data.items.map((siteSpace) => siteSpace),
+            tags: [getAPICacheTag({ tag: 'site', organization: organizationId, site: siteId })],
+        });
+    },
+);
+
+/**
+ * Fetch all the data to render a site-space at once.
+ */
+export async function getSiteSpaceData(pointer: SiteContentPointer) {
+    const [{ space, pages, contentTarget }, { customization, scripts }] = await Promise.all([
+        getSpaceData(pointer),
+        getSiteSpaceLayoutData(pointer),
+    ]);
+
+    return {
+        space,
+        pages,
+        contentTarget,
+        customization,
+        scripts,
+    };
+}
+
+/**
+ * Fetch all the layout data about a site-space at once.
+ */
+export async function getSiteSpaceLayoutData(args: {
+    organizationId: string;
+    siteId: string;
+    siteSpaceId: string;
+    spaceId: string;
+}) {
+    const [customization, scripts] = await Promise.all([
+        getSiteSpaceCustomization({
+            organizationId: args.organizationId,
+            siteId: args.siteId,
+            siteSpaceId: args.siteSpaceId,
+        }),
+        getSpaceIntegrationScripts(args.spaceId),
+    ]);
+
+    return {
+        customization,
+        scripts,
+    };
+}
+
+/**
  * Get the customization settings for a space from the API.
  */
 export const getSpaceCustomizationFromAPI = cache(
@@ -752,11 +909,11 @@ export const searchSpaceContent = cache(
 );
 
 /**
- * Search content accross all spaces in a collection.
+ * Search content accross all spaces in a parent (site or collection).
  */
-export const searchCollectionContent = cache(
-    'api.searchCollectionContent',
-    async (collectionId: string, query: string, options: CacheFunctionOptions) => {
+export const searchParentContent = cache(
+    'api.searchParentContent',
+    async (parentId: string, query: string, options: CacheFunctionOptions) => {
         const response = await api().search.searchContent(
             { query },
             {
@@ -834,6 +991,18 @@ export function getAPICacheTag(
         | {
               tag: 'synced-block';
               syncedBlock: string;
+          }
+        // All data related to a site
+        | {
+              tag: 'site';
+              site: string;
+              organization: string;
+          }
+        | {
+              tag: 'site-space';
+              site: string;
+              siteSpace: string;
+              organization: string;
           },
 ): string {
     switch (spec.tag) {
@@ -845,6 +1014,10 @@ export function getAPICacheTag(
             return `collection:${spec.collection}`;
         case 'synced-block':
             return `synced-block:${spec.syncedBlock}`;
+        case 'site':
+            return `site:${spec.organization}:${spec.site}`;
+        case 'site-space':
+            return `site-space:${spec.organization}:${spec.site}:${spec.siteSpace}`;
         default:
             assertNever(spec);
     }

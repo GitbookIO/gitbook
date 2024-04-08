@@ -41,6 +41,41 @@ async function waitForCookiesDialog(page: Page) {
 
 const testCases: TestsCase[] = [
     {
+        name: 'GitBook Site',
+        baseUrl: 'https://gitbook.gitbook.io/gitbook-site/',
+        tests: [
+            {
+                name: 'Home',
+                url: '',
+                run: waitForCookiesDialog,
+            },
+            {
+                name: 'Search',
+                url: '?q=',
+            },
+            {
+                name: 'Search Results',
+                url: '?q=gitbook',
+                run: async (page) => {
+                    await page.waitForSelector('[data-test="search-results"]');
+                },
+            },
+            {
+                name: 'AI Search',
+                url: '?q=What+is+GitBook%3F&ask=true',
+                run: async (page) => {
+                    await page.waitForSelector('[data-test="search-ask-answer"]');
+                },
+                screenshot: false,
+            },
+            {
+                name: 'Not found',
+                url: 'content-not-found',
+                run: waitForCookiesDialog,
+            },
+        ],
+    },
+    {
         name: 'GitBook',
         baseUrl: 'https://docs.gitbook.com',
         tests: [

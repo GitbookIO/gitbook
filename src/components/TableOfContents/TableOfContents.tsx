@@ -3,6 +3,7 @@ import {
     Revision,
     RevisionPageDocument,
     RevisionPageGroup,
+    SiteCustomizationSettings,
     Space,
 } from '@gitbook/api';
 import React from 'react';
@@ -16,7 +17,7 @@ import { Trademark } from './Trademark';
 
 export function TableOfContents(props: {
     space: Space;
-    customization: CustomizationSettings;
+    customization: CustomizationSettings | SiteCustomizationSettings;
     content: ContentPointer;
     context: ContentRefContext;
     pages: Revision['pages'];
