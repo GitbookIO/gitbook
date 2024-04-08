@@ -9,6 +9,10 @@ import {
     getDocument,
     getSpaceData,
     ContentTarget,
+    SiteContentPointer,
+    getSiteSpaceData,
+    getSite,
+    getSiteSpaces,
 } from '@/lib/api';
 import { resolvePagePath, resolvePageId } from '@/lib/pages';
 
@@ -23,7 +27,7 @@ export interface PageIdParams {
 /**
  * Get the current content pointer from the params.
  */
-export function getContentPointer() {
+export function getContentPointer(): ContentPointer | SiteContentPointer {
     const headerSet = headers();
     const spaceId = headerSet.get('x-gitbook-content-space');
     if (!spaceId) {
@@ -32,13 +36,31 @@ export function getContentPointer() {
         );
     }
 
-    const content: ContentPointer = {
-        spaceId,
-        revisionId: headerSet.get('x-gitbook-content-revision') ?? undefined,
-        changeRequestId: headerSet.get('x-gitbook-content-changerequest') ?? undefined,
-    };
+    const siteId = headerSet.get('x-gitbook-content-site');
+    if (siteId) {
+        const organizationId = headerSet.get('x-gitbook-content-organization');
+        const siteSpaceId = headerSet.get('x-gitbook-content-site-space');
+        if (!organizationId || !siteSpaceId) {
+            throw new Error('Missing site content headers');
+        }
 
-    return content;
+        const siteContent: SiteContentPointer = {
+            siteId,
+            spaceId,
+            siteSpaceId,
+            organizationId,
+            revisionId: headerSet.get('x-gitbook-content-revision') ?? undefined,
+            changeRequestId: headerSet.get('x-gitbook-content-changerequest') ?? undefined,
+        };
+        return siteContent;
+    } else {
+        const content: ContentPointer = {
+            spaceId,
+            revisionId: headerSet.get('x-gitbook-content-revision') ?? undefined,
+            changeRequestId: headerSet.get('x-gitbook-content-changerequest') ?? undefined,
+        };
+        return content;
+    }
 }
 
 /**
@@ -46,8 +68,14 @@ export function getContentPointer() {
  */
 export async function fetchSpaceData() {
     const content = getContentPointer();
-    const { space, contentTarget, pages, customization, scripts } = await getSpaceData(content);
-    const collection = await fetchParentCollection(space);
+
+    const [{ space, contentTarget, pages, customization, scripts }, parentSite] = await Promise.all(
+        'siteId' in content
+            ? [getSiteSpaceData(content), fetchParentSite(content.organizationId, content.siteId)]
+            : [getSpaceData(content)],
+    );
+
+    const parent = await (parentSite ?? fetchParentCollection(space));
 
     return {
         content,
@@ -57,7 +85,7 @@ export async function fetchSpaceData() {
         customization,
         scripts,
         ancestors: [],
-        ...collection,
+        ...parent,
     };
 }
 
@@ -133,12 +161,26 @@ async function resolvePage(
 async function fetchParentCollection(space: Space) {
     const parentCollectionId =
         space.visibility === ContentVisibility.InCollection ? space.parent : undefined;
-    const [collection, collectionSpaces] = await Promise.all([
+    const [collection, spaces] = await Promise.all([
         parentCollectionId ? getCollection(parentCollectionId) : null,
         parentCollectionId ? getCollectionSpaces(parentCollectionId) : ([] as Space[]),
     ]);
 
-    return { collection, collectionSpaces };
+    return { parent: collection, spaces };
+}
+
+async function fetchParentSite(organizationId: string, siteId: string) {
+    const [site, siteSpaces] = await Promise.all([
+        getSite(organizationId, siteId),
+        getSiteSpaces(organizationId, siteId),
+    ]);
+
+    const spaces: Record<string, Space> = {};
+    siteSpaces.forEach((siteSpace) => {
+        spaces[siteSpace.space.id] = siteSpace.space;
+    });
+
+    return { parent: site, spaces: Object.values(spaces) };
 }
 
 /**

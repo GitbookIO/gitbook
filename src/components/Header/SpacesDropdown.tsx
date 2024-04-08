@@ -4,12 +4,8 @@ import { tcls } from '@/lib/tailwind';
 
 import { Dropdown, DropdownChevron, DropdownMenu, DropdownMenuItem } from './Dropdown';
 
-export function CollectionSpacesDropdown(props: {
-    space: Space;
-    collection: Collection;
-    collectionSpaces: Space[];
-}) {
-    const { space, collectionSpaces } = props;
+export function SpacesDropdown(props: { space: Space; spaces: Space[] }) {
+    const { space, spaces } = props;
 
     return (
         <Dropdown
@@ -32,7 +28,7 @@ export function CollectionSpacesDropdown(props: {
             )}
         >
             <DropdownMenu>
-                {collectionSpaces.map((otherSpace) => (
+                {spaces.map((otherSpace) => (
                     <DropdownMenuItem
                         key={otherSpace.id}
                         href={otherSpace.urls.published ?? otherSpace.urls.app}

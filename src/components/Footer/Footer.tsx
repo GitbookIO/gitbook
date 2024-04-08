@@ -1,4 +1,4 @@
-import { CustomizationSettings, Space } from '@gitbook/api';
+import { CustomizationSettings, SiteCustomizationSettings, Space } from '@gitbook/api';
 import React from 'react';
 
 import { Image } from '@/components/utils';
@@ -12,7 +12,7 @@ import { ThemeToggler } from '../ThemeToggler';
 export function Footer(props: {
     space: Space;
     context: ContentRefContext;
-    customization: CustomizationSettings;
+    customization: CustomizationSettings | SiteCustomizationSettings;
 }) {
     const { context, customization } = props;
 

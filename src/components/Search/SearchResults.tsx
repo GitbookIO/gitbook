@@ -1,3 +1,4 @@
+import { Collection, Site } from '@gitbook/api';
 import assertNever from 'assert-never';
 import React from 'react';
 
@@ -11,7 +12,7 @@ import { SearchSectionResultItem } from './SearchSectionResultItem';
 import {
     getRecommendedQuestions,
     OrderedComputedResult,
-    searchCollectionContent,
+    searchParentContent,
     searchSpaceContent,
 } from './server-actions';
 import { Loading } from '../primitives';
@@ -39,15 +40,14 @@ export const SearchResults = React.forwardRef(function SearchResults(
         query: string;
         spaceId: string;
         revisionId: string;
-        collectionId: string | null;
+        parent: Site | Collection | null;
         withAsk: boolean;
         onSwitchToAsk: () => void;
         onClose: (to?: string) => void;
     },
     ref: React.Ref<SearchResultsRef>,
 ) {
-    const { children, query, spaceId, revisionId, collectionId, withAsk, onSwitchToAsk, onClose } =
-        props;
+    const { children, query, spaceId, revisionId, parent, withAsk, onSwitchToAsk, onClose } = props;
 
     const language = useLanguage();
     const debounceTimeout = React.useRef<NodeJS.Timeout | null>(null);
@@ -94,8 +94,8 @@ export const SearchResults = React.forwardRef(function SearchResults(
             debounceTimeout.current = setTimeout(async () => {
                 setCursor(null);
 
-                const fetchedResults = await (collectionId
-                    ? searchCollectionContent(collectionId, query)
+                const fetchedResults = await (parent
+                    ? searchParentContent(parent, query)
                     : searchSpaceContent(spaceId, revisionId, query));
                 setResults(withAsk ? withQuestionResult(fetchedResults, query) : fetchedResults);
             }, 250);
@@ -107,7 +107,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 }
             };
         }
-    }, [query, spaceId, revisionId, collectionId, withAsk]);
+    }, [query, spaceId, revisionId, parent, withAsk]);
 
     // Scroll to the active result.
     React.useEffect(() => {

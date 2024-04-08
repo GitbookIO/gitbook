@@ -1,4 +1,4 @@
-import { CustomizationSettings, Space } from '@gitbook/api';
+import { CustomizationSettings, SiteCustomizationSettings, Space } from '@gitbook/api';
 
 import { t, getSpaceLanguage } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
@@ -8,7 +8,10 @@ import { IconLogo } from '../icons/IconLogo';
 /**
  * Trademark link to the GitBook.
  */
-export function Trademark(props: { space: Space; customization: CustomizationSettings }) {
+export function Trademark(props: {
+    space: Space;
+    customization: CustomizationSettings | SiteCustomizationSettings;
+}) {
     return (
         <div
             className={tcls(
@@ -54,7 +57,10 @@ export function Trademark(props: { space: Space; customization: CustomizationSet
 /**
  * Trademark link to the GitBook.
  */
-export function TrademarkLink(props: { space: Space; customization: CustomizationSettings }) {
+export function TrademarkLink(props: {
+    space: Space;
+    customization: CustomizationSettings | SiteCustomizationSettings;
+}) {
     const { space, customization } = props;
     const language = getSpaceLanguage(customization);
 
