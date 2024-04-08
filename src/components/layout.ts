@@ -35,8 +35,3 @@ export const SIDE_COLUMN_WITHOUT_HEADER_AND_COVER: ClassValue = [
     'top-[240px]',
     'h-[calc(100vh-240px)]',
 ];
-
-/**
- * Maximum width for a full-width block.
- */
-export const MAX_WIDTH_FULL_WIDTH: ClassValue = 'max-w-screen-xl';

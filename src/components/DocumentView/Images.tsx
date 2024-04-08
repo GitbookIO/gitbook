@@ -31,7 +31,6 @@ export function Images(props: BlockProps<DocumentBlockImages>) {
                 align === 'right' && 'justify-end',
                 align === 'left' && 'justify-start',
                 isMultipleImages && ['grid', 'grid-flow-col', 'max-w-none'],
-                block.data.fullWidth ? 'max-w-screen-2xl' : null,
             )}
         >
             {block.nodes.map((node: any, i: number) => (

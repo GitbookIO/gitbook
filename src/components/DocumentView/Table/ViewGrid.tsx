@@ -1,6 +1,5 @@
 import { DocumentTableViewGrid } from '@gitbook/api';
 
-import { MAX_WIDTH_FULL_WIDTH } from '@/components/layout';
 import { tcls } from '@/lib/tailwind';
 
 import { RecordRow } from './RecordRow';
@@ -15,7 +14,6 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
     const tableWrapper = columnsOverThreshold
         ? [
               // has over X columns
-              'w-full',
               'overflow-x-auto',
               'overflow-y-hidden',
               'mx-auto',
@@ -23,31 +21,11 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
               'border',
               'border-dark/3',
               'dark:border-light/2',
-              block.data.fullWidth
-                  ? [
-                        // has over X columns, and is full width
-                        MAX_WIDTH_FULL_WIDTH,
-                    ]
-                  : [
-                        // NOT full width, but has over X columns
-                        'max-w-4xl',
-                    ],
           ]
         : [
-              'w-full',
               'overflow-x-auto',
               'overflow-y-hidden',
               'mx-auto',
-              // has under X columns
-              block.data.fullWidth
-                  ? [
-                        // has under X columns, and is full width
-                        MAX_WIDTH_FULL_WIDTH,
-                    ]
-                  : [
-                        // NOT full width, but has under X columns
-                        'max-w-3xl',
-                    ],
           ];
 
     const tableTR = columnsOverThreshold

@@ -2,12 +2,10 @@ import { DocumentBlockEmbed } from '@gitbook/api';
 
 import { Card } from '@/components/primitives';
 import { api } from '@/lib/api';
-import { getNodeFragmentByName, isNodeEmpty } from '@/lib/document';
-import { ClassValue, tcls } from '@/lib/tailwind';
+import { tcls } from '@/lib/tailwind';
 
 import { BlockProps } from './Block';
 import { Caption } from './Caption';
-import { Inlines } from './Inlines';
 
 export async function Embed(props: BlockProps<DocumentBlockEmbed>) {
     const { block } = props;
