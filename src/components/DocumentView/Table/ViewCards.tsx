@@ -1,10 +1,10 @@
 import { DocumentTableViewCards } from '@gitbook/api';
 
+import { MAX_WIDTH_FULL_WIDTH } from '@/components/layout';
 import { tcls } from '@/lib/tailwind';
 
 import { RecordCard } from './RecordCard';
 import { TableViewProps } from './Table';
-import { MAX_WIDTH_FULL_WIDTH } from '@/components/layout';
 
 export function ViewCards(props: TableViewProps<DocumentTableViewCards>) {
     const { block, view, records, style } = props;

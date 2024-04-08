@@ -1,12 +1,12 @@
 import { DocumentTableViewGrid } from '@gitbook/api';
 
+import { MAX_WIDTH_FULL_WIDTH } from '@/components/layout';
 import { tcls } from '@/lib/tailwind';
 
 import { RecordRow } from './RecordRow';
 import { TableViewProps } from './Table';
 import styles from './table.module.css';
 import { getColumnAlignment } from './utils';
-import { MAX_WIDTH_FULL_WIDTH } from '@/components/layout';
 
 export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
     const { block, view, records, style } = props;
