@@ -22,9 +22,6 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
     const withLineNumbers = !!block.data.lineNumbers && block.nodes.length > 1;
     const withWrap = block.data.overflow === 'wrap';
     const title = block.data.title;
-    const fullWidth = block.data.fullWidth;
-
-    const fullWidthStyle = fullWidth ? 'max-w-4xl' : 'max-w-3xl';
     const titleRoundingStyle = [
         'rounded-md',
         'straight-corners:rounded-sm',
@@ -32,7 +29,7 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
     ];
 
     return (
-        <div className={tcls('group/codeblock', 'grid', 'grid-flow-col', fullWidthStyle, style)}>
+        <div className={tcls('group/codeblock', 'grid', 'grid-flow-col', style)}>
             <div
                 className={tcls(
                     'flex',

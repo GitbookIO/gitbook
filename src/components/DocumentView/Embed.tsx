@@ -1,13 +1,13 @@
 import { DocumentBlockEmbed } from '@gitbook/api';
+import Script from 'next/script';
+
 
 import { Card } from '@/components/primitives';
 import { api } from '@/lib/api';
-import { getNodeFragmentByName, isNodeEmpty } from '@/lib/document';
-import { ClassValue, tcls } from '@/lib/tailwind';
+import { tcls } from '@/lib/tailwind';
 
 import { BlockProps } from './Block';
 import { Caption } from './Caption';
-import { Inlines } from './Inlines';
 
 export async function Embed(props: BlockProps<DocumentBlockEmbed>) {
     const { block } = props;
@@ -17,11 +17,15 @@ export async function Embed(props: BlockProps<DocumentBlockEmbed>) {
     return (
         <Caption {...props}>
             {embed.type === 'rich' ? (
-                <div
-                    dangerouslySetInnerHTML={{
-                        __html: embed.html,
-                    }}
-                />
+                <>
+                    <div
+                        dangerouslySetInnerHTML={{
+                            __html: embed.html,
+                        }}
+                    />
+                    {/* We load the iframely script to resize the embed iframes dynamically */}
+                    <Script src="https://cdn.iframe.ly/embed.js" defer async />
+                </>
             ) : (
                 <Card
                     leadingIcon={
