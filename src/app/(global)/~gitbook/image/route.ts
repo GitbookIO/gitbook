@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     // Verify the signature
     const verified = await verifyImageSignature(url, signature);
     if (!verified) {
-        return new Response(`Invalid signature "${signature ?? ''}" for "${url}"`, { status: 400 });
+        return new Response(`Invalid signature "${signature ?? ''}" for "${url}" (${request.url})`, { status: 400 });
     }
 
     // Cloudflare-specific options are in the cf object.
