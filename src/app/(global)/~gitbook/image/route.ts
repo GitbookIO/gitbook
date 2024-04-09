@@ -11,6 +11,8 @@ export const runtime = 'edge';
  */
 export async function GET(request: NextRequest) {
     const url = request.nextUrl.searchParams.get('url');
+    console.log(request.url);
+    console.log(url);
     const signature = request.nextUrl.searchParams.get('sign');
     if (!url || !signature) {
         return new Response('Missing url/sign parameters', { status: 400 });
