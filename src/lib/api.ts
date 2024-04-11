@@ -696,6 +696,23 @@ export const getSiteSpaces = cache(
 );
 
 /**
+ * List the scripts to load for the site.
+ */
+export const getSiteIntegrationScripts = cache(
+    'api.getSiteIntegrationScripts',
+    async (organizationId: string, siteId: string, options: CacheFunctionOptions) => {
+        const response = await api().orgs.listSiteIntegrationScripts(organizationId, siteId, {
+            ...noCacheFetchOptions,
+            signal: options.signal,
+        });
+        return cacheResponse(response, {
+            revalidateBefore: 60 * 60,
+            tags: [getAPICacheTag({ tag: 'site', organization: organizationId, site: siteId })],
+        });
+    },
+);
+
+/**
  * Fetch all the data to render a site-space at once.
  */
 export async function getSiteSpaceData(pointer: SiteContentPointer) {
@@ -728,7 +745,7 @@ export async function getSiteSpaceLayoutData(args: {
             siteId: args.siteId,
             siteSpaceId: args.siteSpaceId,
         }),
-        getSpaceIntegrationScripts(args.spaceId),
+        getSiteIntegrationScripts(args.organizationId, args.siteId),
     ]);
 
     return {
