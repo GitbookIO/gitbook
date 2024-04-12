@@ -5,7 +5,13 @@ import { NextRequest } from 'next/server';
 import React from 'react';
 
 import { getContentPointer } from '@/app/(space)/fetch';
-import { getCollection, getSpace, getSpaceCustomization } from '@/lib/api';
+import {
+    getCollection,
+    getSite,
+    getSiteSpaceCustomization,
+    getSpace,
+    getSpaceCustomization,
+} from '@/lib/api';
 import { getEmojiForCode } from '@/lib/emojis';
 import { tcls } from '@/lib/tailwind';
 
@@ -35,17 +41,20 @@ export async function GET(req: NextRequest) {
     const options = getOptions(req.url);
     const size = SIZES[options.size];
 
-    const spaceId = getContentPointer().spaceId;
+    const pointer = getContentPointer();
+    const spaceId = pointer.spaceId;
 
     const [space, customization] = await Promise.all([
         getSpace(spaceId),
-        getSpaceCustomization(spaceId),
+        'siteId' in pointer ? getSiteSpaceCustomization(pointer) : getSpaceCustomization(spaceId),
     ]);
-    const collection =
-        space.visibility === ContentVisibility.InCollection && space.parent
-            ? await getCollection(space.parent)
-            : null;
-    const contentTitle = collection?.title ?? customization.title ?? space.title;
+    const parent =
+        'siteId' in pointer
+            ? await getSite(pointer.organizationId, pointer.siteId)
+            : space.visibility === ContentVisibility.InCollection && space.parent
+              ? await getCollection(space.parent)
+              : null;
+    const contentTitle = parent?.title ?? customization.title ?? space.title;
 
     return new ImageResponse(
         (
