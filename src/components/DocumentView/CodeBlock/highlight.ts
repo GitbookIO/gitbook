@@ -29,8 +29,6 @@ type InlineIndexed = { inline: any; start: number; end: number };
 
 type PositionedToken = ThemedToken & { start: number; end: number };
 
-const renderer = asyncMutexFunction();
-let blockCount = 0;
 let lineCount = 0;
 
 const LINE_LIMIT = 1000;
@@ -46,13 +44,9 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
         return plainHighlighting(block);
     }
 
-    const overLimit = await renderer.runBlocking(async () => {
-        lineCount += block.nodes.length;
-        blockCount++;
-        return lineCount > LINE_LIMIT;
-    })
-
-    if (overLimit) {
+    lineCount += block.nodes.length;
+    console.log(`highlight, lineCount ${lineCount}`);
+    if (lineCount > LINE_LIMIT) {
         return plainHighlighting(block);
     }
 
@@ -72,7 +66,7 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
     });
 
     console.log(
-        `${block.key} ${JSON.stringify({ blockCount, lineCount })} block has ${
+        `${block.key} lines:${lineCount} block has ${
             block.nodes.length
         } lines, ${code.length} characters ${inlines.length} inlines`,
     );
