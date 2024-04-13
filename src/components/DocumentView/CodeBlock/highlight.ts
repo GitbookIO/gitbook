@@ -1,10 +1,12 @@
 import { DocumentBlockCode, DocumentBlockCodeLine, DocumentInlineAnnotation } from '@gitbook/api';
 import {
     loadWasm,
-    bundledLanguages,
     ThemedToken,
     getHighlighter,
     createCssVariablesTheme,
+    HighlighterGeneric,
+    bundledLanguages,
+    bundledThemes,
 } from 'shiki';
 // @ts-ignore - onigWasm is a Wasm module
 import onigWasm from 'shiki/onig.wasm?module';
@@ -40,18 +42,18 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
     
     const inlines: InlineIndexed[] = [];
     const code = getPlainCodeBlock(block, inlines);
-    console.log(`block has ${block.nodes.length} lines, ${code.length} characters ${inlines.length} inlines`);
-
+    
     inlines.sort((a, b) => {
         return a.start - b.start;
     });
-
+    
     const highlighter = await loadHighlighter();
-    await loadHighlighterLanguage(langName);
+    await loadHighlighterLanguage(highlighter, langName);
     const lines = highlighter.codeToTokensBase(code, {
         lang: langName,
         tokenizeMaxLineLength: 120,
     });
+    console.log(`block has ${block.nodes.length} lines, ${code.length} characters ${inlines.length} inlines ${JSON.stringify(process.memoryUsage())}`);
     let currentIndex = 0;
 
     return lines.map((tokens, index) => {
@@ -318,10 +320,8 @@ const loadHighlighter = singleton(async () => {
 });
 
 const loadLanguagesMutex = asyncMutexFunction();
-async function loadHighlighterLanguage(lang: keyof typeof bundledLanguages) {
+async function loadHighlighterLanguage(highlighter: HighlighterGeneric<keyof typeof bundledLanguages, keyof typeof bundledThemes>, lang: keyof typeof bundledLanguages) {
     await loadLanguagesMutex.runBlocking(async () => {
-        const highlighter = await loadHighlighter();
-
         if (highlighter.getLoadedLanguages().includes(lang)) {
             return;
         }
