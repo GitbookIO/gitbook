@@ -36,7 +36,10 @@ type PositionedToken = ThemedToken & { start: number; end: number };
  * This is done per invocation of the Cloudflare worker, so we can store it in-memory.
  */
 let lineCount = 0;
-const LINE_LIMIT = 750;
+let tokenCount = 0;
+const LINE_LIMIT = 10000;
+
+const runner = asyncMutexFunction();
 
 /**
  * Highlight a code block while preserving inline elements.
@@ -62,17 +65,20 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
         return a.start - b.start;
     });
 
+    const lineCountBefore = lineCount;
     const highlighter = await loadHighlighter();
     await loadHighlighterLanguage(highlighter, langName);
-
+    
     const lines = highlighter.codeToTokensBase(code, {
         lang: langName,
         tokenizeMaxLineLength: 120,
     });
-
+    
     let currentIndex = 0;
-
+    
+    console.log(`${block.key}${code.length} ${lineCountBefore} ${tokenCount}`);
     return lines.map((tokens, index) => {
+        tokenCount += tokens.length;
         const lineBlock = block.nodes[index];
         const result: HighlightToken[] = [];
 
