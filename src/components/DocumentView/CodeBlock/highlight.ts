@@ -31,7 +31,7 @@ type PositionedToken = ThemedToken & { start: number; end: number };
 
 let lineCount = 0;
 
-const LINE_LIMIT = 1000;
+const LINE_LIMIT = 500;
 
 /**
  * Highlight a code block while preserving inline elements.
@@ -45,7 +45,7 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
     }
 
     lineCount += block.nodes.length;
-    console.log(`highlight, lineCount ${lineCount}`);
+    console.log(`highlight, lineCount ${lineCount}, ${lineCount > LINE_LIMIT ? 'simple' : 'complex'}`);
     if (lineCount > LINE_LIMIT) {
         return plainHighlighting(block);
     }
