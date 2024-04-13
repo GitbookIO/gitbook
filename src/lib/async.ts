@@ -245,7 +245,6 @@ export function singleton<R>(execute: () => Promise<R>): () => Promise<R> {
         }
 
         const promise = execute();
-        console.log(`set state`);
         states.set(ctx, promise);
 
         const result = await promise;
