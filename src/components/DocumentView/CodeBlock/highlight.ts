@@ -79,32 +79,33 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
         const duration = Date.now() - start;
 
         let currentIndex = 0;
-        const result = lines.map((tokens, index) => {
-            tokenCount += tokens.length;
-            const lineBlock = block.nodes[index];
-            const result: HighlightToken[] = [];
+        const result = plainHighlighting(block);
+        // const result = lines.map((tokens, index) => {
+        //     tokenCount += tokens.length;
+        //     const lineBlock = block.nodes[index];
+        //     const result: HighlightToken[] = [];
 
-            const eatToken = (): PositionedToken | null => {
-                const token = tokens.shift();
-                if (token) {
-                    currentIndex += token.content.length;
-                }
-                return token
-                    ? { ...token, start: currentIndex - token.content.length, end: currentIndex }
-                    : null;
-            };
+        //     const eatToken = (): PositionedToken | null => {
+        //         const token = tokens.shift();
+        //         if (token) {
+        //             currentIndex += token.content.length;
+        //         }
+        //         return token
+        //             ? { ...token, start: currentIndex - token.content.length, end: currentIndex }
+        //             : null;
+        //     };
 
-            while (tokens.length > 0) {
-                result.push(...matchTokenAndInlines(eatToken, inlines));
-            }
+        //     while (tokens.length > 0) {
+        //         result.push(...matchTokenAndInlines(eatToken, inlines));
+        //     }
 
-            currentIndex += 1; // for the \n
+        //     currentIndex += 1; // for the \n
 
-            return {
-                highlighted: !!lineBlock.data.highlighted,
-                tokens: result,
-            };
-        });
+        //     return {
+        //         highlighted: !!lineBlock.data.highlighted,
+        //         tokens: result,
+        //     };
+        // });
 
         
         console.log(
