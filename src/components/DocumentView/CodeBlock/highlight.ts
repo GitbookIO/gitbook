@@ -32,7 +32,6 @@ type PositionedToken = ThemedToken & { start: number; end: number };
 const renderer = asyncMutexFunction();
 let blockCount = 0;
 let lineCount = 0;
-let charCount = 0;
 
 const LINE_LIMIT = 1000;
 
@@ -41,13 +40,16 @@ const LINE_LIMIT = 1000;
  */
 export async function highlight(block: DocumentBlockCode): Promise<HighlightLine[]> {
     const langName = block.data.syntax ? getLanguageForSyntax(block.data.syntax) : null;
-    
+
     if (!langName) {
         // Language not found, fallback to plain highlighting
         return plainHighlighting(block);
     }
 
-    if (lineCount + block.nodes.length > LINE_LIMIT) {
+    lineCount += block.nodes.length;
+    blockCount++;
+
+    if (lineCount > LINE_LIMIT) {
         return plainHighlighting(block);
     }
 
@@ -58,13 +60,9 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
         return a.start - b.start;
     });
 
-    const highlighter = await loadHighlighter();
-    await loadHighlighterLanguage(highlighter, langName);
-
     const lines = await renderer.runBlocking(async () => {
-        blockCount += 1;
-        lineCount += block.nodes.length;
-        charCount += code.length;
+        const highlighter = await loadHighlighter();
+        await loadHighlighterLanguage(highlighter, langName);
 
         return highlighter.codeToTokensBase(code, {
             lang: langName,
@@ -73,7 +71,7 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
     });
 
     console.log(
-        `${JSON.stringify({ blockCount, lineCount, charCount })} block has ${
+        `${JSON.stringify({ blockCount, lineCount })} block has ${
             block.nodes.length
         } lines, ${code.length} characters ${inlines.length} inlines`,
     );
