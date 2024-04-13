@@ -32,9 +32,11 @@ type PositionedToken = ThemedToken & { start: number; end: number };
 /**
  * Due to a combination of memory limitations of Cloudflare workers and the memory
  * cost of shiki, we need to set a limit on the number of lines we can highlight.
+ *
+ * This is done per invocation of the Cloudflare worker, so we can store it in-memory.
  */
 let lineCount = 0;
-const LINE_LIMIT = 2000;
+const LINE_LIMIT = 750;
 
 /**
  * Highlight a code block while preserving inline elements.
@@ -312,9 +314,11 @@ function cleanupLine(line: string): string {
     return line.replace(/\r/g, '');
 }
 
-let memoryHighlighter: HighlighterGeneric<any, any> | undefined = undefined;
-
-const loadHighlighterSingleton = singleton(async () => {
+/**
+ * Load the highlighter, only once, and reuse it.
+ * It makes sure to handle concurrent calls.
+ */
+const loadHighlighter = singleton(async () => {
     return await trace('highlighting.loadHighlighter', async () => {
         if (typeof onigWasm !== 'string') {
             // When running bun test, the import is a string, we ignore it and let the module
@@ -323,26 +327,13 @@ const loadHighlighterSingleton = singleton(async () => {
             // Otherwise for Vercel/Cloudflare, we need to load it ourselves.
             await loadWasm((obj) => WebAssembly.instantiate(onigWasm, obj));
         }
-        console.log('getHighlighter');
         const highlighter = await getHighlighter({
             themes: [createCssVariablesTheme()],
             langs: [],
         });
-        memoryHighlighter = highlighter;
         return highlighter;
     });
 });
-
-/**
- * Load the highlighter, only once, and reuse it.
- * It makes sure to handle concurrent calls.
- */
-const loadHighlighter = () => {
-    if (memoryHighlighter) {
-        return Promise.resolve(memoryHighlighter);
-    }
-    return loadHighlighterSingleton();
-};
 
 const loadLanguagesMutex = asyncMutexFunction();
 async function loadHighlighterLanguage(
