@@ -318,6 +318,11 @@ const loadLanguagesMutex = asyncMutexFunction();
 async function loadHighlighterLanguage(lang: keyof typeof bundledLanguages) {
     await loadLanguagesMutex.runBlocking(async () => {
         const highlighter = await loadHighlighter();
+
+        if (highlighter.getLoadedLanguages().includes(lang)) {
+            return;
+        }
+
         await trace(
             `highlighting.loadLanguage(${lang})`,
             async () => await highlighter.loadLanguage(lang),
