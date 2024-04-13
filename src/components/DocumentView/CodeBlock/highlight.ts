@@ -35,10 +35,8 @@ type PositionedToken = ThemedToken & { start: number; end: number };
  *
  * This is done per invocation of the Cloudflare worker, so we can store it in-memory.
  */
-let lineCount = 0;
-let tokenCount = 0;
 let blockCount = 0;
-const LINE_LIMIT = 10000;
+const BLOCK_LIMIT = 50;
 
 const runner = asyncMutexFunction();
 
@@ -53,74 +51,52 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
         return plainHighlighting(block);
     }
 
-    // lineCount += block.nodes.length;
-    // if (lineCount > LINE_LIMIT) {
-    //     // Too many lines and we risk crashing the worker, fallback to plain highlighting
-    //     return plainHighlighting(block);
-    // }
+    blockCount++;
+    if (blockCount > BLOCK_LIMIT) {
+        // Too many lines and we risk crashing the worker, fallback to plain highlighting
+        return plainHighlighting(block);
+    }
 
-    return runner.runBlocking(async () => {
-        const start = Date.now();
-        // console.log(`start ${block.key} ${tokenCount} tokens ${lineCount} lines`)
-        const inlines: InlineIndexed[] = [];
-        const code = getPlainCodeBlock(block, inlines);
+    const inlines: InlineIndexed[] = [];
+    const code = getPlainCodeBlock(block, inlines);
 
-        inlines.sort((a, b) => {
-            return a.start - b.start;
-        });
+    inlines.sort((a, b) => {
+        return a.start - b.start;
+    });
 
-        const highlighter = await loadHighlighter();
-        await loadHighlighterLanguage(highlighter, langName);
-        lineCount += block.nodes.length;
-        blockCount += 1;
+    const highlighter = await loadHighlighter();
+    await loadHighlighterLanguage(highlighter, langName);
 
-        if (blockCount >= 50) {
-            return plainHighlighting(block);
-        }
-        
-        const lines = highlighter.codeToTokensBase(code, {
-            lang: langName,
-            tokenizeMaxLineLength: 120,
-        });
+    const lines = highlighter.codeToTokensBase(code, {
+        lang: langName,
+        tokenizeMaxLineLength: 120,
+    });
 
-        let currentIndex = 0;
-        const result = lines.map((tokens, index) => {
-            tokenCount += tokens.length;
-            const lineBlock = block.nodes[index];
-            const result: HighlightToken[] = [];
+    let currentIndex = 0;
+    return lines.map((tokens, index) => {
+        const lineBlock = block.nodes[index];
+        const result: HighlightToken[] = [];
 
-            const eatToken = (): PositionedToken | null => {
-                const token = tokens.shift();
-                if (token) {
-                    currentIndex += token.content.length;
-                }
-                return token
-                    ? { ...token, start: currentIndex - token.content.length, end: currentIndex }
-                    : null;
-            };
-
-            while (tokens.length > 0) {
-                result.push(...matchTokenAndInlines(eatToken, inlines));
+        const eatToken = (): PositionedToken | null => {
+            const token = tokens.shift();
+            if (token) {
+                currentIndex += token.content.length;
             }
+            return token
+                ? { ...token, start: currentIndex - token.content.length, end: currentIndex }
+                : null;
+        };
 
-            currentIndex += 1; // for the \n
+        while (tokens.length > 0) {
+            result.push(...matchTokenAndInlines(eatToken, inlines));
+        }
 
-            return {
-                highlighted: !!lineBlock.data.highlighted,
-                tokens: result,
-            };
-        });
+        currentIndex += 1; // for the \n
 
-        const duration = Date.now() - start;
-        // if (duration > 150) {
-            // console.log(`--- start ---`)
-            // console.log(code);
-            // console.log(`--- end ---`)
-            console.log(
-                `end ${block.key} ${blockCount} ${duration}ms lines:${block.nodes.length} code len: ${code.length} lineCountBefore: ${lineCount} tokenCount: ${tokenCount} created lines: ${result.length} langs:${highlighter.getLoadedLanguages().join(',')}`,
-            );
-        // }
-        return result;
+        return {
+            highlighted: !!lineBlock.data.highlighted,
+            tokens: result,
+        };
     });
 }
 
