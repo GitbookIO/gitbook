@@ -34,13 +34,20 @@ let blockCount = 0;
 let lineCount = 0;
 let charCount = 0;
 
+const LINE_LIMIT = 1000;
+
 /**
  * Highlight a code block while preserving inline elements.
  */
 export async function highlight(block: DocumentBlockCode): Promise<HighlightLine[]> {
     const langName = block.data.syntax ? getLanguageForSyntax(block.data.syntax) : null;
+    
     if (!langName) {
         // Language not found, fallback to plain highlighting
+        return plainHighlighting(block);
+    }
+
+    if (lineCount + block.nodes.length > LINE_LIMIT) {
         return plainHighlighting(block);
     }
 
