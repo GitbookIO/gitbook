@@ -31,12 +31,11 @@ type PositionedToken = ThemedToken & { start: number; end: number };
 
 /**
  * Due to a combination of memory limitations of Cloudflare workers and the memory
- * cost of shiki, we need to set a limit on the number of lines we can highlight.
- *
- * This is done per invocation of the Cloudflare worker, so we can store it in-memory.
+ * cost of shiki, we need to set a limit on the number of blocks we can highlight
+ * in a single page.
  */
 let blockCount = 0;
-const BLOCK_LIMIT = 50;
+const BLOCK_LIMIT = 60;
 
 const runner = asyncMutexFunction();
 
@@ -53,7 +52,7 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
 
     blockCount++;
     if (blockCount > BLOCK_LIMIT) {
-        // Too many lines and we risk crashing the worker, fallback to plain highlighting
+        // Too many blocks and we risk crashing the worker, fallback to plain highlighting
         return plainHighlighting(block);
     }
 
