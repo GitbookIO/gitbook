@@ -325,7 +325,6 @@ const loadHighlighter = singleton(async () => {
             // loads it on its own.
             //
             // Otherwise for Vercel/Cloudflare, we need to load it ourselves.
-            console.log('load the wasm');
             await loadWasm((obj) => WebAssembly.instantiate(onigWasm, obj));
         }
         const highlighter = await getHighlighter({
