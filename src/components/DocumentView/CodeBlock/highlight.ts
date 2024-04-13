@@ -37,6 +37,7 @@ type PositionedToken = ThemedToken & { start: number; end: number };
  */
 let lineCount = 0;
 let tokenCount = 0;
+let blockCount = 0;
 const LINE_LIMIT = 10000;
 
 const runner = asyncMutexFunction();
@@ -60,7 +61,7 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
 
     return runner.runBlocking(async () => {
         const start = Date.now();
-        console.log(`start ${block.key} ${tokenCount} tokens ${lineCount} lines`)
+        // console.log(`start ${block.key} ${tokenCount} tokens ${lineCount} lines`)
         const inlines: InlineIndexed[] = [];
         const code = getPlainCodeBlock(block, inlines);
 
@@ -71,9 +72,13 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
         const highlighter = await loadHighlighter();
         await loadHighlighterLanguage(highlighter, langName);
         lineCount += block.nodes.length;
+        blockCount += 1;
 
+        if (blockCount >= 100) {
+            return plainHighlighting(block);
+        }
         
-        const lines = highlighter.codeToTokensBase(code.replace('\\', '').replaceAll(/[^\x00-\x7F]+/gi, ''), {
+        const lines = highlighter.codeToTokensBase(code, {
             lang: langName,
             tokenizeMaxLineLength: 120,
         });
@@ -107,9 +112,14 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
         });
 
         const duration = Date.now() - start;
-        console.log(
-            `end ${block.key} ${duration}ms code len: ${code.length} lineCountBefore: ${lineCount} tokenCount: ${tokenCount} created lines: ${result.length} langs:${highlighter.getLoadedLanguages().join(',')}`,
-        );
+        // if (duration > 150) {
+            // console.log(`--- start ---`)
+            // console.log(code);
+            // console.log(`--- end ---`)
+            console.log(
+                `end ${block.key} ${blockCount} ${duration}ms lines:${block.nodes.length} code len: ${code.length} lineCountBefore: ${lineCount} tokenCount: ${tokenCount} created lines: ${result.length} langs:${highlighter.getLoadedLanguages().join(',')}`,
+            );
+        // }
         return result;
     });
 }
@@ -340,6 +350,7 @@ const loadHighlighter = singleton(async () => {
             // loads it on its own.
             //
             // Otherwise for Vercel/Cloudflare, we need to load it ourselves.
+            console.log('load the wasm');
             await loadWasm((obj) => WebAssembly.instantiate(onigWasm, obj));
         }
         const highlighter = await getHighlighter({
