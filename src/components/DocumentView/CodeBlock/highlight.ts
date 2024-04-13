@@ -52,10 +52,6 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
         return plainHighlighting(block);
     }
 
-    if (block.key === 'dc6e6efdb1ed4981b71d5d3b02087996') {
-        return plainHighlighting(block);
-    }
-
     // lineCount += block.nodes.length;
     // if (lineCount > LINE_LIMIT) {
     //     // Too many lines and we risk crashing the worker, fallback to plain highlighting
@@ -71,7 +67,7 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
             return a.start - b.start;
         });
 
-        const highlighter = await loadHighlighter();
+        const highlighter = await loadHighlighter(tokenCount > 4000);
         await loadHighlighterLanguage(highlighter, langName);
         lineCount += block.nodes.length;
 

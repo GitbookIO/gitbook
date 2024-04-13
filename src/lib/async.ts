@@ -227,13 +227,13 @@ const UndefinedSymbol = Symbol('Undefined');
  * Wrap a singleton operation in a safe way for Cloudflare worker
  * where I/O cannot be performed on behalf of a different request.
  */
-export function singleton<R>(execute: () => Promise<R>): () => Promise<R> {
+export function singleton<R>(execute: () => Promise<R>): (force?: boolean) => Promise<R> {
     let cachedResult: Promise<R> | typeof UndefinedSymbol = UndefinedSymbol;
     const states = new WeakMap<object, Promise<R>>();
 
-    return async () => {
+    return async (force) => {
         // console.log('cachedResult', cachedResult === UndefinedSymbol);
-        if (cachedResult !== UndefinedSymbol) {
+        if (!force && cachedResult !== UndefinedSymbol) {
             // Result is actually shared between requests
             return cachedResult;
         }
