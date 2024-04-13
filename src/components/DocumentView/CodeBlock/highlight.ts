@@ -74,7 +74,7 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
         lineCount += block.nodes.length;
         blockCount += 1;
 
-        if (blockCount >= 100) {
+        if (blockCount >= 50) {
             return plainHighlighting(block);
         }
         
