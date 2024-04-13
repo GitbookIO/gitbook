@@ -15,6 +15,8 @@ import { asyncMutexFunction, singleton } from '@/lib/async';
 import { getNodeText } from '@/lib/document';
 import { trace } from '@/lib/tracing';
 
+import { DocumentContext } from '../DocumentView';
+
 export type HighlightLine = {
     highlighted: boolean;
     tokens: HighlightToken[];
@@ -30,14 +32,6 @@ type InlineIndexed = { inline: any; start: number; end: number };
 type PositionedToken = ThemedToken & { start: number; end: number };
 
 /**
- * Due to a combination of memory limitations of Cloudflare workers and the memory
- * cost of shiki, we need to set a limit on the number of blocks we can highlight
- * in a single page.
- */
-let blockCount = 0;
-const BLOCK_LIMIT = 50;
-
-/**
  * Highlight a code block while preserving inline elements.
  */
 export async function highlight(block: DocumentBlockCode): Promise<HighlightLine[]> {
@@ -47,12 +41,7 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
         // Language not found, fallback to plain highlighting
         return plainHighlighting(block);
     }
-
-    blockCount++;
-    if (blockCount > BLOCK_LIMIT) {
-        // Too many blocks and we risk crashing the worker, fallback to plain highlighting
-        return plainHighlighting(block);
-    }
+    debugger;
 
     const inlines: InlineIndexed[] = [];
     const code = getPlainCodeBlock(block, inlines);

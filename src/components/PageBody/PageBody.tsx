@@ -13,9 +13,16 @@ import { PageCover } from './PageCover';
 import { PageFooterNavigation } from './PageFooterNavigation';
 import { PageHeader } from './PageHeader';
 import { TrackPageView } from './TrackPageView';
-import { DocumentView } from '../DocumentView';
+import { DocumentView, createHighlightingContext } from '../DocumentView';
 import { PageFeedbackForm } from '../PageFeedback';
 import { DateRelative } from '../primitives';
+
+/**
+ * Due to a combination of memory limitations of Cloudflare workers and the memory
+ * cost of shiki, we need to set a limit on the number of blocks we can highlight
+ * in a single page.
+ */
+const CODE_HIGHLIGHT_BLOCK_LIMIT = 50;
 
 export function PageBody(props: {
     space: Space;
@@ -32,6 +39,7 @@ export function PageBody(props: {
     const asFullWidth = document ? hasFullWidthBlock(document) : false;
     const language = getSpaceLanguage(customization);
     const updatedAt = page.updatedAt ?? page.createdAt;
+    const shouldHighlightCode = createHighlightingContext();
 
     return (
         <>
@@ -73,6 +81,7 @@ export function PageBody(props: {
                             contentRefContext: context,
                             resolveContentRef: (ref, options) =>
                                 resolveContentRef(ref, context, options),
+                            shouldHighlightCode,
                         }}
                     />
                 ) : (
