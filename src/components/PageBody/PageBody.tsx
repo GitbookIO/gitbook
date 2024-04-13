@@ -17,13 +17,6 @@ import { DocumentView, createHighlightingContext } from '../DocumentView';
 import { PageFeedbackForm } from '../PageFeedback';
 import { DateRelative } from '../primitives';
 
-/**
- * Due to a combination of memory limitations of Cloudflare workers and the memory
- * cost of shiki, we need to set a limit on the number of blocks we can highlight
- * in a single page.
- */
-const CODE_HIGHLIGHT_BLOCK_LIMIT = 50;
-
 export function PageBody(props: {
     space: Space;
     contentTarget: ContentTarget;

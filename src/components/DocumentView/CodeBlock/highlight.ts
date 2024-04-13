@@ -36,12 +36,10 @@ type PositionedToken = ThemedToken & { start: number; end: number };
  */
 export async function highlight(block: DocumentBlockCode): Promise<HighlightLine[]> {
     const langName = block.data.syntax ? getLanguageForSyntax(block.data.syntax) : null;
-
     if (!langName) {
         // Language not found, fallback to plain highlighting
         return plainHighlighting(block);
     }
-    debugger;
 
     const inlines: InlineIndexed[] = [];
     const code = getPlainCodeBlock(block, inlines);
