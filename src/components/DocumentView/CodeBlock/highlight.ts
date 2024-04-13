@@ -52,13 +52,14 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
         return plainHighlighting(block);
     }
 
-    lineCount += block.nodes.length;
-    if (lineCount > LINE_LIMIT) {
-        // Too many lines and we risk crashing the worker, fallback to plain highlighting
-        return plainHighlighting(block);
-    }
+    // lineCount += block.nodes.length;
+    // if (lineCount > LINE_LIMIT) {
+    //     // Too many lines and we risk crashing the worker, fallback to plain highlighting
+    //     return plainHighlighting(block);
+    // }
 
     return runner.runBlocking(async () => {
+        console.log(`start ${block.key}`)
         const inlines: InlineIndexed[] = [];
         const code = getPlainCodeBlock(block, inlines);
 
@@ -94,7 +95,6 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
             };
 
             while (tokens.length > 0) {
-                console.log(`tokens.length: ${tokens.length}`)
                 result.push(...matchTokenAndInlines(eatToken, inlines));
             }
 
@@ -106,10 +106,10 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
             };
         });
 
+        
         console.log(
-            `${block.key} ${duration}ms code len: ${code.length} lineCountBefore: ${lineCount} tokenCount: ${tokenCount} created lines: ${result.length}`,
+            `end ${block.key} ${duration}ms code len: ${code.length} lineCountBefore: ${lineCount} tokenCount: ${tokenCount} created lines: ${result.length}`,
         );
-
         return result;
     });
 }
