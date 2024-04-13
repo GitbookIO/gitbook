@@ -54,7 +54,7 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
     const highlighter = await loadHighlighter();
     await loadHighlighterLanguage(highlighter, langName);
 
-    renderer.runBlocking(async () => {
+    const lines = await renderer.runBlocking(async () => {
         blockCount += 1;
         lineCount += block.nodes.length;
         charCount += code.length;
