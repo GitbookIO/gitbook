@@ -47,8 +47,8 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
     }
 
     const overLimit = await renderer.runBlocking(async () => {
-            lineCount += block.nodes.length;
-            blockCount++;
+        lineCount += block.nodes.length;
+        blockCount++;
         return lineCount > LINE_LIMIT;
     })
 
@@ -72,7 +72,7 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
     });
 
     console.log(
-        `${JSON.stringify({ blockCount, lineCount })} block has ${
+        `${block.key} ${JSON.stringify({ blockCount, lineCount })} block has ${
             block.nodes.length
         } lines, ${code.length} characters ${inlines.length} inlines`,
     );
