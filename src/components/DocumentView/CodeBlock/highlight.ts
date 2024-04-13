@@ -66,23 +66,19 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
             return a.start - b.start;
         });
 
-        const lineCountBefore = lineCount;
         const highlighter = await loadHighlighter();
         await loadHighlighterLanguage(highlighter, langName);
+        lineCount += block.nodes.length;
 
         const start = Date.now();
         const lines = highlighter.codeToTokensBase(code, {
             lang: langName,
             tokenizeMaxLineLength: 120,
         });
-        const end = Date.now() - start;
+        const duration = Date.now() - start;
 
         let currentIndex = 0;
-
-        console.log(
-            `${block.key} ${end - start}ms code len: ${code.length} lineCountBefore: ${lineCountBefore} tokenCount: ${tokenCount}`,
-        );
-        return lines.map((tokens, index) => {
+        const result = lines.map((tokens, index) => {
             tokenCount += tokens.length;
             const lineBlock = block.nodes[index];
             const result: HighlightToken[] = [];
@@ -98,6 +94,7 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
             };
 
             while (tokens.length > 0) {
+                console.log(`tokens.length: ${tokens.length}`)
                 result.push(...matchTokenAndInlines(eatToken, inlines));
             }
 
@@ -108,6 +105,12 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
                 tokens: result,
             };
         });
+
+        console.log(
+            `${block.key} ${duration}ms code len: ${code.length} lineCountBefore: ${lineCount} tokenCount: ${tokenCount} created lines: ${result.length}`,
+        );
+
+        return result;
     });
 }
 
