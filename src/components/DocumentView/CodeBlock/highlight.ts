@@ -30,6 +30,7 @@ type InlineIndexed = { inline: any; start: number; end: number };
 type PositionedToken = ThemedToken & { start: number; end: number };
 
 const tokenMutex = asyncMutexFunction();
+let running = 0;
 
 /**
  * Highlight a code block while preserving inline elements.
@@ -53,13 +54,17 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
     await loadHighlighterLanguage(highlighter, langName);
 
     const lines = await tokenMutex.runBlocking(async () => {
-        return highlighter.codeToTokensBase(code, {
+        console.log(`running... ${running}`)
+        running ++;
+        const lines = highlighter.codeToTokensBase(code, {
             lang: langName,
             tokenizeMaxLineLength: 120,
         });
+        running--;
+        return lines;
     })
     
-    console.log(`block has ${block.nodes.length} lines, ${code.length} characters ${inlines.length} inlines ${JSON.stringify(process.memoryUsage())}`);
+    console.log(`${running} block has ${block.nodes.length} lines, ${code.length} characters ${inlines.length} inlines`);
     let currentIndex = 0;
 
     return lines.map((tokens, index) => {

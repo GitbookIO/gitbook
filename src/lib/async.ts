@@ -233,7 +233,6 @@ export function singleton<R>(execute: () => Promise<R>): () => Promise<R> {
 
     return async () => {
         if (cachedResult !== UndefinedSymbol) {
-            console.log(`singleton: return early`);
             // Result is actually shared between requests
             return cachedResult;
         }
@@ -242,7 +241,6 @@ export function singleton<R>(execute: () => Promise<R>): () => Promise<R> {
         const ctx = await getGlobalContext();
         const current = states.get(ctx);
         if (current) {
-            console.log(`singleton: return from state`);
             return current;
         }
 
