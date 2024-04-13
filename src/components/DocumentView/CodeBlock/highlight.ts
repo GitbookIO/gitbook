@@ -37,8 +37,10 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
         return plainHighlighting(block);
     }
 
+    
     const inlines: InlineIndexed[] = [];
     const code = getPlainCodeBlock(block, inlines);
+    console.log(`block has ${block.nodes.length} lines, ${code.length} characters ${inlines.length} inlines`);
 
     inlines.sort((a, b) => {
         return a.start - b.start;
@@ -49,7 +51,6 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
     const lines = highlighter.codeToTokensBase(code, {
         lang: langName,
         tokenizeMaxLineLength: 120,
-        includeExplanation: false
     });
     let currentIndex = 0;
 
