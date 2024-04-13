@@ -46,10 +46,13 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
         return plainHighlighting(block);
     }
 
-    lineCount += block.nodes.length;
-    blockCount++;
+    const overLimit = await renderer.runBlocking(async () => {
+            lineCount += block.nodes.length;
+            blockCount++;
+        return lineCount > LINE_LIMIT;
+    })
 
-    if (lineCount > LINE_LIMIT) {
+    if (overLimit) {
         return plainHighlighting(block);
     }
 
@@ -60,14 +63,12 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
         return a.start - b.start;
     });
 
-    const lines = await renderer.runBlocking(async () => {
-        const highlighter = await loadHighlighter();
-        await loadHighlighterLanguage(highlighter, langName);
+    const highlighter = await loadHighlighter();
+    await loadHighlighterLanguage(highlighter, langName);
 
-        return highlighter.codeToTokensBase(code, {
-            lang: langName,
-            tokenizeMaxLineLength: 120,
-        });
+    const lines = highlighter.codeToTokensBase(code, {
+        lang: langName,
+        tokenizeMaxLineLength: 120,
     });
 
     console.log(
