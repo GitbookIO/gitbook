@@ -29,9 +29,12 @@ type InlineIndexed = { inline: any; start: number; end: number };
 
 type PositionedToken = ThemedToken & { start: number; end: number };
 
+/**
+ * Due to a combination of memory limitations of Cloudflare workers and the memory
+ * cost of shiki, we need to set a limit on the number of lines we can highlight.
+ */
 let lineCount = 0;
-const LINE_LIMIT = 750;
-const renderer = asyncMutexFunction();
+const LINE_LIMIT = 2000;
 
 /**
  * Highlight a code block while preserving inline elements.
@@ -45,8 +48,8 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
     }
 
     lineCount += block.nodes.length;
-    console.log(`highlight, lineCount ${lineCount}, ${lineCount > LINE_LIMIT ? 'simple' : 'complex'}`);
     if (lineCount > LINE_LIMIT) {
+        // Too many lines and we risk crashing the worker, fallback to plain highlighting
         return plainHighlighting(block);
     }
 
@@ -65,11 +68,6 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
         tokenizeMaxLineLength: 120,
     });
 
-    console.log(
-        `${block.key} lines:${lineCount} block has ${
-            block.nodes.length
-        } lines, ${code.length} characters ${inlines.length} inlines`,
-    );
     let currentIndex = 0;
 
     return lines.map((tokens, index) => {
@@ -314,11 +312,9 @@ function cleanupLine(line: string): string {
     return line.replace(/\r/g, '');
 }
 
-/**
- * Load the highlighter, only once, and reuse it.
- * It makes sure to handle concurrent calls.
- */
-const loadHighlighter = singleton(async () => {
+let memoryHighlighter = undefined;
+
+const loadHighlighterSingleton = singleton(async () => {
     return await trace('highlighting.loadHighlighter', async () => {
         if (typeof onigWasm !== 'string') {
             // When running bun test, the import is a string, we ignore it and let the module
@@ -327,13 +323,26 @@ const loadHighlighter = singleton(async () => {
             // Otherwise for Vercel/Cloudflare, we need to load it ourselves.
             await loadWasm((obj) => WebAssembly.instantiate(onigWasm, obj));
         }
+        console.log('getHighlighter');
         const highlighter = await getHighlighter({
             themes: [createCssVariablesTheme()],
             langs: [],
         });
+        memoryHighlighter = highlighter;
         return highlighter;
     });
 });
+
+/**
+ * Load the highlighter, only once, and reuse it.
+ * It makes sure to handle concurrent calls.
+ */
+const loadHighlighter = () => {
+    if (memoryHighlighter) {
+        return Promise.resolve(memoryHighlighter);
+    }
+    return loadHighlighterSingleton();
+};
 
 const loadLanguagesMutex = asyncMutexFunction();
 async function loadHighlighterLanguage(
