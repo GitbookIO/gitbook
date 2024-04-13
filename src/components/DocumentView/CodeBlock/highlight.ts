@@ -73,7 +73,7 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
         lineCount += block.nodes.length;
 
         
-        const lines = highlighter.codeToTokensBase(code, {
+        const lines = highlighter.codeToTokensBase(code.replace('\\', ''), {
             lang: langName,
             tokenizeMaxLineLength: 120,
         });
