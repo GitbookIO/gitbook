@@ -31,7 +31,52 @@ type PositionedToken = ThemedToken & { start: number; end: number };
  * Highlight a code block while preserving inline elements.
  */
 export async function highlight(block: DocumentBlockCode): Promise<HighlightLine[]> {
-    return plainHighlighting(block);
+    const langName = block.data.syntax ? getLanguageForSyntax(block.data.syntax) : null;
+    if (!langName) {
+        // Language not found, fallback to plain highlighting
+        return plainHighlighting(block);
+    }
+
+    const inlines: InlineIndexed[] = [];
+    const code = getPlainCodeBlock(block, inlines);
+
+    inlines.sort((a, b) => {
+        return a.start - b.start;
+    });
+
+    const highlighter = await loadHighlighter();
+    await loadHighlighterLanguage(langName);
+    const lines = highlighter.codeToTokensBase(code, {
+        lang: langName,
+        tokenizeMaxLineLength: 120,
+    });
+    let currentIndex = 0;
+
+    return lines.map((tokens, index) => {
+        const lineBlock = block.nodes[index];
+        const result: HighlightToken[] = [];
+
+        const eatToken = (): PositionedToken | null => {
+            const token = tokens.shift();
+            if (token) {
+                currentIndex += token.content.length;
+            }
+            return token
+                ? { ...token, start: currentIndex - token.content.length, end: currentIndex }
+                : null;
+        };
+
+        while (tokens.length > 0) {
+            result.push(...matchTokenAndInlines(eatToken, inlines));
+        }
+
+        currentIndex += 1; // for the \n
+
+        return {
+            highlighted: !!lineBlock.data.highlighted,
+            tokens: result,
+        };
+    });
 }
 
 /**
