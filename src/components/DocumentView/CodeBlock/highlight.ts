@@ -35,7 +35,7 @@ type PositionedToken = ThemedToken & { start: number; end: number };
  * in a single page.
  */
 let blockCount = 0;
-const BLOCK_LIMIT = 60;
+const BLOCK_LIMIT = 50;
 
 const runner = asyncMutexFunction();
 
