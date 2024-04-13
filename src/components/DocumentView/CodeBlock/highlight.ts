@@ -312,7 +312,7 @@ function cleanupLine(line: string): string {
     return line.replace(/\r/g, '');
 }
 
-let memoryHighlighter = undefined;
+let memoryHighlighter: HighlighterGeneric<any, any> | undefined = undefined;
 
 const loadHighlighterSingleton = singleton(async () => {
     return await trace('highlighting.loadHighlighter', async () => {
