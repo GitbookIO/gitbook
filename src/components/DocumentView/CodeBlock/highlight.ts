@@ -30,8 +30,8 @@ type InlineIndexed = { inline: any; start: number; end: number };
 type PositionedToken = ThemedToken & { start: number; end: number };
 
 let lineCount = 0;
-
-const LINE_LIMIT = 500;
+const LINE_LIMIT = 1000;
+const renderer = asyncMutexFunction();
 
 /**
  * Highlight a code block while preserving inline elements.
@@ -60,10 +60,10 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
     const highlighter = await loadHighlighter();
     await loadHighlighterLanguage(highlighter, langName);
 
-    const lines = highlighter.codeToTokensBase(code, {
+    const lines = await renderer.runBlocking(async () => highlighter.codeToTokensBase(code, {
         lang: langName,
         tokenizeMaxLineLength: 120,
-    });
+    }));
 
     console.log(
         `${block.key} lines:${lineCount} block has ${
