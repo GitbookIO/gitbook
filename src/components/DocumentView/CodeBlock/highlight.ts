@@ -59,7 +59,8 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
     // }
 
     return runner.runBlocking(async () => {
-        console.log(`start ${block.key}`)
+        const start = Date.now();
+        console.log(`start ${block.key} ${tokenCount} tokens ${lineCount} lines`)
         const inlines: InlineIndexed[] = [];
         const code = getPlainCodeBlock(block, inlines);
 
@@ -67,49 +68,47 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
             return a.start - b.start;
         });
 
-        const highlighter = await loadHighlighter(tokenCount > 4000);
+        const highlighter = await loadHighlighter();
         await loadHighlighterLanguage(highlighter, langName);
         lineCount += block.nodes.length;
 
-        const start = Date.now();
+        
         const lines = highlighter.codeToTokensBase(code, {
             lang: langName,
             tokenizeMaxLineLength: 120,
         });
-        const duration = Date.now() - start;
 
         let currentIndex = 0;
-        const result = plainHighlighting(block);
-        // const result = lines.map((tokens, index) => {
-        //     tokenCount += tokens.length;
-        //     const lineBlock = block.nodes[index];
-        //     const result: HighlightToken[] = [];
+        const result = lines.map((tokens, index) => {
+            tokenCount += tokens.length;
+            const lineBlock = block.nodes[index];
+            const result: HighlightToken[] = [];
 
-        //     const eatToken = (): PositionedToken | null => {
-        //         const token = tokens.shift();
-        //         if (token) {
-        //             currentIndex += token.content.length;
-        //         }
-        //         return token
-        //             ? { ...token, start: currentIndex - token.content.length, end: currentIndex }
-        //             : null;
-        //     };
+            const eatToken = (): PositionedToken | null => {
+                const token = tokens.shift();
+                if (token) {
+                    currentIndex += token.content.length;
+                }
+                return token
+                    ? { ...token, start: currentIndex - token.content.length, end: currentIndex }
+                    : null;
+            };
 
-        //     while (tokens.length > 0) {
-        //         result.push(...matchTokenAndInlines(eatToken, inlines));
-        //     }
+            while (tokens.length > 0) {
+                result.push(...matchTokenAndInlines(eatToken, inlines));
+            }
 
-        //     currentIndex += 1; // for the \n
+            currentIndex += 1; // for the \n
 
-        //     return {
-        //         highlighted: !!lineBlock.data.highlighted,
-        //         tokens: result,
-        //     };
-        // });
+            return {
+                highlighted: !!lineBlock.data.highlighted,
+                tokens: result,
+            };
+        });
 
-        
+        const duration = Date.now() - start;
         console.log(
-            `end ${block.key} ${duration}ms code len: ${code.length} lineCountBefore: ${lineCount} tokenCount: ${tokenCount} created lines: ${result.length}`,
+            `end ${block.key} ${duration}ms code len: ${code.length} lineCountBefore: ${lineCount} tokenCount: ${tokenCount} created lines: ${result.length} langs:${highlighter.getLoadedLanguages().join(',')}`,
         );
         return result;
     });
