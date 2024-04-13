@@ -29,6 +29,7 @@ type InlineIndexed = { inline: any; start: number; end: number };
 
 type PositionedToken = ThemedToken & { start: number; end: number };
 
+const renderer = asyncMutexFunction();
 let blockCount = 0;
 let lineCount = 0;
 let charCount = 0;
@@ -43,28 +44,32 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
         return plainHighlighting(block);
     }
 
-    
     const inlines: InlineIndexed[] = [];
     const code = getPlainCodeBlock(block, inlines);
-    
+
     inlines.sort((a, b) => {
         return a.start - b.start;
     });
 
-    blockCount += 1;
-    lineCount += block.nodes.length;
-    charCount += code.length;
-    
     const highlighter = await loadHighlighter();
     await loadHighlighterLanguage(highlighter, langName);
 
-    
-        const lines = highlighter.codeToTokensBase(code, {
+    renderer.runBlocking(async () => {
+        blockCount += 1;
+        lineCount += block.nodes.length;
+        charCount += code.length;
+
+        return highlighter.codeToTokensBase(code, {
             lang: langName,
             tokenizeMaxLineLength: 120,
         });
-    
-    console.log(`${JSON.stringify({ blockCount, lineCount, charCount })} block has ${block.nodes.length} lines, ${code.length} characters ${inlines.length} inlines`);
+    });
+
+    console.log(
+        `${JSON.stringify({ blockCount, lineCount, charCount })} block has ${
+            block.nodes.length
+        } lines, ${code.length} characters ${inlines.length} inlines`,
+    );
     let currentIndex = 0;
 
     return lines.map((tokens, index) => {
@@ -331,7 +336,10 @@ const loadHighlighter = singleton(async () => {
 });
 
 const loadLanguagesMutex = asyncMutexFunction();
-async function loadHighlighterLanguage(highlighter: HighlighterGeneric<keyof typeof bundledLanguages, keyof typeof bundledThemes>, lang: keyof typeof bundledLanguages) {
+async function loadHighlighterLanguage(
+    highlighter: HighlighterGeneric<keyof typeof bundledLanguages, keyof typeof bundledThemes>,
+    lang: keyof typeof bundledLanguages,
+) {
     await loadLanguagesMutex.runBlocking(async () => {
         if (highlighter.getLoadedLanguages().includes(lang)) {
             return;
