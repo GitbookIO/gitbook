@@ -49,6 +49,7 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
     const lines = highlighter.codeToTokensBase(code, {
         lang: langName,
         tokenizeMaxLineLength: 120,
+        includeExplanation: false
     });
     let currentIndex = 0;
 
