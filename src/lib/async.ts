@@ -232,7 +232,7 @@ export function singleton<R>(execute: () => Promise<R>): () => Promise<R> {
     const states = new WeakMap<object, Promise<R>>();
 
     return async () => {
-        console.log('cachedResult', cachedResult === UndefinedSymbol);
+        // console.log('cachedResult', cachedResult === UndefinedSymbol);
         if (cachedResult !== UndefinedSymbol) {
             // Result is actually shared between requests
             return cachedResult;

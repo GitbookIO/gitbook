@@ -58,50 +58,54 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
         return plainHighlighting(block);
     }
 
-    const inlines: InlineIndexed[] = [];
-    const code = getPlainCodeBlock(block, inlines);
+    return runner.runBlocking(async () => {
+        const inlines: InlineIndexed[] = [];
+        const code = getPlainCodeBlock(block, inlines);
 
-    inlines.sort((a, b) => {
-        return a.start - b.start;
-    });
+        inlines.sort((a, b) => {
+            return a.start - b.start;
+        });
 
-    const lineCountBefore = lineCount;
-    const highlighter = await loadHighlighter();
-    await loadHighlighterLanguage(highlighter, langName);
-    
-    const lines = highlighter.codeToTokensBase(code, {
-        lang: langName,
-        tokenizeMaxLineLength: 120,
-    });
-    
-    let currentIndex = 0;
-    
-    console.log(`${block.key}${code.length} ${lineCountBefore} ${tokenCount}`);
-    return lines.map((tokens, index) => {
-        tokenCount += tokens.length;
-        const lineBlock = block.nodes[index];
-        const result: HighlightToken[] = [];
+        const lineCountBefore = lineCount;
+        const highlighter = await loadHighlighter();
+        await loadHighlighterLanguage(highlighter, langName);
 
-        const eatToken = (): PositionedToken | null => {
-            const token = tokens.shift();
-            if (token) {
-                currentIndex += token.content.length;
+        const lines = highlighter.codeToTokensBase(code, {
+            lang: langName,
+            tokenizeMaxLineLength: 120,
+        });
+
+        let currentIndex = 0;
+
+        console.log(
+            `${block.key} code len: ${code.length} lineCountBefore: ${lineCountBefore} tokenCount: ${tokenCount}`,
+        );
+        return lines.map((tokens, index) => {
+            tokenCount += tokens.length;
+            const lineBlock = block.nodes[index];
+            const result: HighlightToken[] = [];
+
+            const eatToken = (): PositionedToken | null => {
+                const token = tokens.shift();
+                if (token) {
+                    currentIndex += token.content.length;
+                }
+                return token
+                    ? { ...token, start: currentIndex - token.content.length, end: currentIndex }
+                    : null;
+            };
+
+            while (tokens.length > 0) {
+                result.push(...matchTokenAndInlines(eatToken, inlines));
             }
-            return token
-                ? { ...token, start: currentIndex - token.content.length, end: currentIndex }
-                : null;
-        };
 
-        while (tokens.length > 0) {
-            result.push(...matchTokenAndInlines(eatToken, inlines));
-        }
+            currentIndex += 1; // for the \n
 
-        currentIndex += 1; // for the \n
-
-        return {
-            highlighted: !!lineBlock.data.highlighted,
-            tokens: result,
-        };
+            return {
+                highlighted: !!lineBlock.data.highlighted,
+                tokens: result,
+            };
+        });
     });
 }
 
