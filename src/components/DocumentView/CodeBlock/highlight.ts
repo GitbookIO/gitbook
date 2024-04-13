@@ -70,15 +70,17 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
         const highlighter = await loadHighlighter();
         await loadHighlighterLanguage(highlighter, langName);
 
+        const start = Date.now();
         const lines = highlighter.codeToTokensBase(code, {
             lang: langName,
             tokenizeMaxLineLength: 120,
         });
+        const end = Date.now() - start;
 
         let currentIndex = 0;
 
         console.log(
-            `${block.key} code len: ${code.length} lineCountBefore: ${lineCountBefore} tokenCount: ${tokenCount}`,
+            `${block.key} ${end - start}ms code len: ${code.length} lineCountBefore: ${lineCountBefore} tokenCount: ${tokenCount}`,
         );
         return lines.map((tokens, index) => {
             tokenCount += tokens.length;
