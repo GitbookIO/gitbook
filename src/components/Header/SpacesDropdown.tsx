@@ -12,6 +12,7 @@ export function SpacesDropdown(props: { space: Space; spaces: Space[] }) {
             button={(buttonProps) => (
                 <div
                     {...buttonProps}
+                    data-testid="space-dropdown-button"
                     className={tcls(
                         'justify-self-start',
                         'flex',
@@ -27,7 +28,7 @@ export function SpacesDropdown(props: { space: Space; spaces: Space[] }) {
                 </div>
             )}
         >
-            <DropdownMenu>
+            <DropdownMenu data-test="space-dropdown-menu">
                 {spaces.map((otherSpace) => (
                     <DropdownMenuItem
                         key={otherSpace.id}
