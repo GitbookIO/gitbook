@@ -42,7 +42,7 @@ async function waitForCookiesDialog(page: Page) {
 const testCases: TestsCase[] = [
     {
         name: 'GitBook Site',
-        baseUrl: 'https://gitbook.gitbook.io/gitbook-site/',
+        baseUrl: 'https://gitbook-sites.gitbook.io/gitbook-site/',
         tests: [
             {
                 name: 'Home',

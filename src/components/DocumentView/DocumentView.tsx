@@ -36,6 +36,16 @@ export interface DocumentContext {
      * Transform an ID to be added to the DOM.
      */
     getId?: (id: string) => string;
+
+    /**
+     * Returns true if the given code block should be highlighted.
+     * This function was added to protect against memory issues when highlighting
+     * a large number of code blocks.
+     * Once highlighting can scale up to a large number of code blocks, it can be removed.
+     *
+     * https://linear.app/gitbook-x/issue/RND-3588/gitbook-open-code-syntax-highlighting-runs-out-of-memory-after-a
+     */
+    shouldHighlightCode: () => boolean;
 }
 
 export interface DocumentContextProps {

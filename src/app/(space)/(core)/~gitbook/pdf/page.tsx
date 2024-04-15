@@ -11,7 +11,7 @@ import { notFound } from 'next/navigation';
 import * as React from 'react';
 
 import { getContentPointer } from '@/app/(space)/fetch';
-import { DocumentView } from '@/components/DocumentView';
+import { DocumentView, createHighlightingContext } from '@/components/DocumentView';
 import { TrademarkLink } from '@/components/TableOfContents/Trademark';
 import { PolymorphicComponentProp } from '@/components/utils/types';
 import { getSpaceLanguage } from '@/intl/server';
@@ -216,6 +216,7 @@ async function PDFPageDocument(props: {
     const { space, page, refContext } = props;
 
     const document = page.documentId ? await getDocument(space.id, page.documentId) : null;
+    const shouldHighlightCode = createHighlightingContext();
 
     return (
         <PrintPage id={pagePDFContainerId(page)}>
@@ -238,6 +239,7 @@ async function PDFPageDocument(props: {
                         contentRefContext: refContext,
                         resolveContentRef: (ref) => resolveContentRef(ref, refContext),
                         getId: (id) => pagePDFContainerId(page, id),
+                        shouldHighlightCode,
                     }}
                 />
             ) : null}
