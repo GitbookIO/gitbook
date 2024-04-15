@@ -76,6 +76,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
             </p>
             <button
                 onClick={() => setShow(false)}
+                aria-label={tString(language, 'cookies_close')}
                 className={tcls(
                     'absolute',
                     'top-3',
@@ -97,6 +98,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                 <Button
                     variant="primary"
                     size="small"
+                    aria-label={tString(language, 'cookies_accept')}
                     onClick={() => {
                         onUpdateState(true);
                     }}
@@ -106,6 +108,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                 <Button
                     variant="secondary"
                     size="small"
+                    aria-label={tString(language, 'cookies_reject')}
                     onClick={() => {
                         onUpdateState(false);
                     }}
