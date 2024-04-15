@@ -28,7 +28,7 @@ export function SpacesDropdown(props: { space: Space; spaces: Space[] }) {
                 </div>
             )}
         >
-            <DropdownMenu data-test="space-dropdown-menu">
+            <DropdownMenu>
                 {spaces.map((otherSpace) => (
                     <DropdownMenuItem
                         key={otherSpace.id}
