@@ -1,10 +1,12 @@
 import { DocumentBlockCode, DocumentBlockCodeLine, DocumentInlineAnnotation } from '@gitbook/api';
 import {
     loadWasm,
-    bundledLanguages,
     ThemedToken,
     getHighlighter,
     createCssVariablesTheme,
+    HighlighterGeneric,
+    bundledLanguages,
+    bundledThemes,
 } from 'shiki';
 // @ts-ignore - onigWasm is a Wasm module
 import onigWasm from 'shiki/onig.wasm?module';
@@ -12,6 +14,8 @@ import onigWasm from 'shiki/onig.wasm?module';
 import { asyncMutexFunction, singleton } from '@/lib/async';
 import { getNodeText } from '@/lib/document';
 import { trace } from '@/lib/tracing';
+
+import { DocumentContext } from '../DocumentView';
 
 export type HighlightLine = {
     highlighted: boolean;
@@ -45,12 +49,14 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
     });
 
     const highlighter = await loadHighlighter();
-    await loadHighlighterLanguage(langName);
+    await loadHighlighterLanguage(highlighter, langName);
+
     const lines = highlighter.codeToTokensBase(code, {
         lang: langName,
+        tokenizeMaxLineLength: 120,
     });
-    let currentIndex = 0;
 
+    let currentIndex = 0;
     return lines.map((tokens, index) => {
         const lineBlock = block.nodes[index];
         const result: HighlightToken[] = [];
@@ -315,9 +321,15 @@ const loadHighlighter = singleton(async () => {
 });
 
 const loadLanguagesMutex = asyncMutexFunction();
-async function loadHighlighterLanguage(lang: keyof typeof bundledLanguages) {
+async function loadHighlighterLanguage(
+    highlighter: HighlighterGeneric<keyof typeof bundledLanguages, keyof typeof bundledThemes>,
+    lang: keyof typeof bundledLanguages,
+) {
     await loadLanguagesMutex.runBlocking(async () => {
-        const highlighter = await loadHighlighter();
+        if (highlighter.getLoadedLanguages().includes(lang)) {
+            return;
+        }
+
         await trace(
             `highlighting.loadLanguage(${lang})`,
             async () => await highlighter.loadLanguage(lang),

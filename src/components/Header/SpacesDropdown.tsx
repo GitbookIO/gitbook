@@ -12,6 +12,7 @@ export function SpacesDropdown(props: { space: Space; spaces: Space[] }) {
             button={(buttonProps) => (
                 <div
                     {...buttonProps}
+                    data-testid="space-dropdown-button"
                     className={tcls(
                         'justify-self-start',
                         'flex',

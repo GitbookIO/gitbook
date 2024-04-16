@@ -3,7 +3,7 @@ import { DocumentBlockCode, JSONDocument } from '@gitbook/api';
 import { tcls } from '@/lib/tailwind';
 
 import { CopyCodeButton } from './CopyCodeButton';
-import { highlight, HighlightLine, HighlightToken } from './highlight';
+import { highlight, HighlightLine, HighlightToken, plainHighlighting } from './highlight';
 import { BlockProps } from '../Block';
 import { DocumentContext } from '../DocumentView';
 import { Inline } from '../Inline';
@@ -15,7 +15,8 @@ import './theme.css';
  */
 export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
     const { block, document, style, context } = props;
-    const lines = await highlight(block);
+    const withHighlighting = context.shouldHighlightCode();
+    const lines = withHighlighting ? await highlight(block) : plainHighlighting(block);
 
     const id = block.key!;
 

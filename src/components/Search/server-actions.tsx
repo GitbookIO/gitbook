@@ -161,6 +161,7 @@ function transformAnswer(
                     mode: 'default',
                     contentRefContext: null,
                     resolveContentRef: async () => null,
+                    shouldHighlightCode: () => false,
                 }}
                 style={['space-y-5']}
             />
