@@ -99,12 +99,10 @@ const testCases: TestsCase[] = [
             {
                 name: 'Default variant',
                 url: '',
-                run: waitForCookiesDialog,
             },
             {
                 name: 'RFC variant',
                 url: 'v/rfcs',
-                run: waitForCookiesDialog,
             },
         ],
     },
