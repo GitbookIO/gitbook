@@ -96,6 +96,16 @@ const testCases: TestsCase[] = [
                     await spaceDrowpdown.waitFor();
                 },
             },
+            {
+                name: 'Default variant',
+                url: '',
+                run: waitForCookiesDialog,
+            },
+            {
+                name: 'RFC variant',
+                url: 'v/rfcs',
+                run: waitForCookiesDialog,
+            },
         ],
     },
     {
