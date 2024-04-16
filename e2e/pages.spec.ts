@@ -96,6 +96,14 @@ const testCases: TestsCase[] = [
                     await spaceDrowpdown.waitFor();
                 },
             },
+            {
+                name: 'Default variant',
+                url: '',
+            },
+            {
+                name: 'RFC variant',
+                url: 'v/rfcs',
+            },
         ],
     },
     {
