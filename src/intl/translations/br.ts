@@ -13,7 +13,8 @@ export const br = {
     search_scope_all: 'Todo o conteúdo',
     search_ask: 'Perguntar "${1}"',
     search_ask_sources: 'Fontes',
-    search_ask_no_answer: 'Nenhuma resposta foi encontrada para sua pergunta, tente outra pergunta.',
+    search_ask_no_answer:
+        'Nenhuma resposta foi encontrada para sua pergunta, tente outra pergunta.',
     search_ask_error: 'Algo deu errado. Por favor tente novamente mais tarde.',
     on_this_page: 'Nesta página',
     next_page: 'Próximo',
@@ -37,9 +38,10 @@ export const br = {
     cookies_close: 'Fechar',
     edit_on_git: 'Editar no ${1}',
     notfound_title: 'Página não encontrada',
-    notfound: "A página que você está procurando não existe.",
+    notfound: 'A página que você está procurando não existe.',
     unexpected_error_title: 'Aconteceu um erro',
-    unexpected_error: 'Desculpe, aconteceu um erro inesperado. Por favor tente novamente mais tarde.',
+    unexpected_error:
+        'Desculpe, aconteceu um erro inesperado. Por favor tente novamente mais tarde.',
     unexpected_error_retry: ' Tentar novamente',
     pdf_download: 'Exportar como PDF',
     pdf_goback: 'Voltar ao conteúdo',
@@ -47,6 +49,7 @@ export const br = {
     pdf_page_of: '${1} de ${2}',
     pdf_mode_only_page: 'Somente esta página',
     pdf_mode_all: 'Todas as páginas',
-    pdf_limit_reached: "Não foi possível gerar o PDF para ${1} páginas, generation stopped at ${2}.",
+    pdf_limit_reached:
+        'Não foi possível gerar o PDF para ${1} páginas, generation stopped at ${2}.',
     pdf_limit_reached_continue: 'Extender com mais ${1} páginas.',
 };
