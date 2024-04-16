@@ -1,5 +1,6 @@
 import { CustomizationLocale } from '@gitbook/api';
 
+import { br } from './br';
 import { en } from './en';
 import { es } from './es';
 import { fr } from './fr';
@@ -17,4 +18,5 @@ export const languages: {
     es,
     zh,
     ja,
+    br,
 };
