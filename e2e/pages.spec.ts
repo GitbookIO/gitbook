@@ -41,13 +41,22 @@ async function waitForCookiesDialog(page: Page) {
 
 const testCases: TestsCase[] = [
     {
-        name: 'GitBook Site',
-        baseUrl: 'https://gitbook-sites.gitbook.io/gitbook-site/',
+        name: 'GitBook Site (Single Variant)',
+        baseUrl: 'https://gitbook-open-e2e-sites.gitbook.io/gitbook-doc/',
         tests: [
             {
                 name: 'Home',
                 url: '',
                 run: waitForCookiesDialog,
+            },
+            {
+                name: 'No variants dropdown',
+                url: '',
+                run: async (page) => {
+                    await expect(page.locator('[data-testid="space-dropdown-button"]')).toHaveCount(
+                        0,
+                    );
+                },
             },
             {
                 name: 'Search',
@@ -72,6 +81,20 @@ const testCases: TestsCase[] = [
                 name: 'Not found',
                 url: 'content-not-found',
                 run: waitForCookiesDialog,
+            },
+        ],
+    },
+    {
+        name: 'GitBook Site (Multi Variants)',
+        baseUrl: 'https://gitbook-open-e2e-sites.gitbook.io/multi-variants/',
+        tests: [
+            {
+                name: 'Variants dropdown',
+                url: '',
+                run: async (page) => {
+                    const spaceDrowpdown = page.locator('[data-testid="space-dropdown-button"]');
+                    await spaceDrowpdown.waitFor();
+                },
             },
         ],
     },
