@@ -6,7 +6,7 @@ import { redisCache } from './redis';
 export const cacheBackends = [
     // Cache local to the process
     // (can't be globally purged or shared between processes)
-    memoryCache,
+    // memoryCache,
     // Global cache shared between all processes
     // with proper replication and invalidation
     // redisCache, // Disabled as we investigate high amount of fetch requests
