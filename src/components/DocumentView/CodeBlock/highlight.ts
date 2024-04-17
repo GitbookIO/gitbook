@@ -329,7 +329,7 @@ const loadHighlighter = singleton(async () => {
 const loadLanguagesMutex = asyncMutexFunction();
 async function loadHighlighterLanguage(
     highlighter: HighlighterCore,
-    lang: keyof typeof bundledLanguages,
+    lang: string,
 ) {
     await loadLanguagesMutex.runBlocking(async () => {
         if (highlighter.getLoadedLanguages().includes(lang)) {
