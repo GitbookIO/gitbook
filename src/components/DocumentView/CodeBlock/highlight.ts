@@ -1,21 +1,17 @@
 import { DocumentBlockCode, DocumentBlockCodeLine, DocumentInlineAnnotation } from '@gitbook/api';
 import {
-    loadWasm,
     ThemedToken,
-    getHighlighter,
     createCssVariablesTheme,
-    HighlighterGeneric,
-    bundledLanguages,
-    bundledThemes,
+    HighlighterCore,
+    LanguageInput,
 } from 'shiki';
+import { getHighlighterCore } from 'shiki/core';
 // @ts-ignore - onigWasm is a Wasm module
 import onigWasm from 'shiki/onig.wasm?module';
 
 import { asyncMutexFunction, singleton } from '@/lib/async';
 import { getNodeText } from '@/lib/document';
 import { trace } from '@/lib/tracing';
-
-import { DocumentContext } from '../DocumentView';
 
 export type HighlightLine = {
     highlighted: boolean;
@@ -35,8 +31,8 @@ type PositionedToken = ThemedToken & { start: number; end: number };
  * Highlight a code block while preserving inline elements.
  */
 export async function highlight(block: DocumentBlockCode): Promise<HighlightLine[]> {
-    const langName = block.data.syntax ? getLanguageForSyntax(block.data.syntax) : null;
-    if (!langName) {
+    const langName = block.data.syntax; // ? getLanguageForSyntax(block.data.syntax) : null;
+    if (!langName || !loaders[langName]) {
         // Language not found, fallback to plain highlighting
         return plainHighlighting(block);
     }
@@ -87,16 +83,16 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
 /**
  * Validate a language name.
  */
-function getLanguageForSyntax(syntax: string): keyof typeof bundledLanguages | null {
-    // @ts-ignore
-    const lang = bundledLanguages[syntax];
-    if (!lang) {
-        return null;
-    }
+// function getLanguageForSyntax(syntax: string): keyof typeof bundledLanguages | null {
+//     // @ts-ignore
+//     const lang = bundledLanguages[syntax];
+//     if (!lang) {
+//         return null;
+//     }
 
-    // @ts-ignore
-    return syntax;
-}
+//     // @ts-ignore
+//     return syntax;
+// }
 
 /**
  * Parse a code block without highlighting it.
@@ -305,16 +301,26 @@ function cleanupLine(line: string): string {
  */
 const loadHighlighter = singleton(async () => {
     return await trace('highlighting.loadHighlighter', async () => {
-        if (typeof onigWasm !== 'string') {
-            // When running bun test, the import is a string, we ignore it and let the module
-            // loads it on its own.
-            //
-            // Otherwise for Vercel/Cloudflare, we need to load it ourselves.
-            await loadWasm((obj) => WebAssembly.instantiate(onigWasm, obj));
-        }
-        const highlighter = await getHighlighter({
+        // if (typeof onigWasm !== 'string') {
+        //     // When running bun test, the import is a string, we ignore it and let the module
+        //     // loads it on its own.
+        //     //
+        //     // Otherwise for Vercel/Cloudflare, we need to load it ourselves.
+        //     await loadWasm((obj) => WebAssembly.instantiate(onigWasm, obj));
+        // }
+        const highlighter = await getHighlighterCore({
             themes: [createCssVariablesTheme()],
             langs: [],
+            loadWasm:
+                typeof onigWasm !== 'string'
+                    ? async (obj) => {
+                          // When running bun test, the import is a string, we ignore it and let the module
+                          // loads it on its own.
+                          //
+                          // Otherwise for Vercel/Cloudflare, we need to load it ourselves.
+                          return WebAssembly.instantiate(onigWasm, obj);
+                      }
+                    : undefined,
         });
         return highlighter;
     });
@@ -322,7 +328,7 @@ const loadHighlighter = singleton(async () => {
 
 const loadLanguagesMutex = asyncMutexFunction();
 async function loadHighlighterLanguage(
-    highlighter: HighlighterGeneric<keyof typeof bundledLanguages, keyof typeof bundledThemes>,
+    highlighter: HighlighterCore,
     lang: keyof typeof bundledLanguages,
 ) {
     await loadLanguagesMutex.runBlocking(async () => {
@@ -332,7 +338,13 @@ async function loadHighlighterLanguage(
 
         await trace(
             `highlighting.loadLanguage(${lang})`,
-            async () => await highlighter.loadLanguage(lang),
+            async () => await highlighter.loadLanguage(loaders[lang]),
         );
     });
+}
+
+const loaders: { [key: string]: LanguageInput } = {
+    javascript: () => import('shiki/langs/javascript.mjs'),
+    typescript: () => import('shiki/langs/typescript.mjs'),
+    tsx: () => import('shiki/langs/tsx.mjs'),
 }

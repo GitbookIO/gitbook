@@ -33,7 +33,9 @@ export function Header(props: {
 
     const isCustomizationDefault =
         customization.header.preset === CustomizationHeaderPreset.Default;
-    const isMultiVariants = parent?.object === 'collection' || (parent && parent.object === 'site' && spaces.length > 1)
+    const isMultiVariants =
+        parent?.object === 'collection' ||
+        (parent && parent.object === 'site' && spaces.length > 1);
 
     return (
         <header
@@ -74,7 +76,9 @@ export function Header(props: {
                     )}
                 >
                     <HeaderLogo parent={parent} space={space} customization={customization} />
-                    <span>{isMultiVariants ? <SpacesDropdown space={space} spaces={spaces} /> : null}</span>
+                    <span>
+                        {isMultiVariants ? <SpacesDropdown space={space} spaces={spaces} /> : null}
+                    </span>
                     <HeaderLinks>
                         {customization.header.links.map((link, index) => {
                             return (
