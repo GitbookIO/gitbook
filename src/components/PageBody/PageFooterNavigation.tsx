@@ -1,6 +1,12 @@
 import ChevronLeft from '@geist-ui/icons/chevronLeft';
 import ChevronRight from '@geist-ui/icons/chevronRight';
-import { CustomizationSettings, Revision, RevisionPageDocument, Space } from '@gitbook/api';
+import {
+    CustomizationSettings,
+    Revision,
+    RevisionPageDocument,
+    SiteCustomizationSettings,
+    Space,
+} from '@gitbook/api';
 import React from 'react';
 
 import { t, getSpaceLanguage } from '@/intl/server';
@@ -15,7 +21,7 @@ import { Link } from '../primitives';
  */
 export function PageFooterNavigation(props: {
     space: Space;
-    customization: CustomizationSettings;
+    customization: CustomizationSettings | SiteCustomizationSettings;
     pages: Revision['pages'];
     page: RevisionPageDocument;
 }) {

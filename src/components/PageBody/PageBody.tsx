@@ -1,4 +1,10 @@
-import { CustomizationSettings, JSONDocument, RevisionPageDocument, Space } from '@gitbook/api';
+import {
+    CustomizationSettings,
+    JSONDocument,
+    RevisionPageDocument,
+    SiteCustomizationSettings,
+    Space,
+} from '@gitbook/api';
 import React from 'react';
 
 import { getSpaceLanguage } from '@/intl/server';
@@ -20,7 +26,7 @@ import { DateRelative } from '../primitives';
 export function PageBody(props: {
     space: Space;
     contentTarget: ContentTarget;
-    customization: CustomizationSettings;
+    customization: CustomizationSettings | SiteCustomizationSettings;
     page: RevisionPageDocument;
     document: JSONDocument | null;
     context: ContentRefContext;

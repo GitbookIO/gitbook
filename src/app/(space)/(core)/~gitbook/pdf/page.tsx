@@ -4,6 +4,7 @@ import {
     Revision,
     RevisionPageDocument,
     RevisionPageGroup,
+    SiteCustomizationSettings,
     Space,
 } from '@gitbook/api';
 import { Metadata } from 'next';
@@ -16,7 +17,13 @@ import { TrademarkLink } from '@/components/TableOfContents/Trademark';
 import { PolymorphicComponentProp } from '@/components/utils/types';
 import { getSpaceLanguage } from '@/intl/server';
 import { tString } from '@/intl/translate';
-import { getDocument, getSpace, getSpaceCustomization, getSpaceContentData } from '@/lib/api';
+import {
+    getDocument,
+    getSpace,
+    getSpaceCustomization,
+    getSpaceContentData,
+    getSiteSpaceCustomization,
+} from '@/lib/api';
 import { pagePDFContainerId, PageHrefContext, absoluteHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
@@ -35,7 +42,9 @@ export async function generateMetadata(): Promise<Metadata> {
     const contentPointer = getContentPointer();
     const [space, customization] = await Promise.all([
         getSpace(contentPointer.spaceId),
-        getSpaceCustomization(contentPointer.spaceId),
+        'siteId' in contentPointer
+            ? getSiteSpaceCustomization(contentPointer)
+            : getSpaceCustomization(contentPointer.spaceId),
     ]);
 
     return {
@@ -59,7 +68,9 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
 
     // Load the content,
     const [customization, { space, contentTarget, pages: rootPages }] = await Promise.all([
-        getSpaceCustomization(contentPointer.spaceId),
+        'siteId' in contentPointer
+            ? getSiteSpaceCustomization(contentPointer)
+            : getSpaceCustomization(contentPointer.spaceId),
         getSpaceContentData(contentPointer),
     ]);
     const language = getSpaceLanguage(customization);
@@ -172,7 +183,10 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
     );
 }
 
-async function PDFSpaceIntro(props: { space: Space; customization: CustomizationSettings }) {
+async function PDFSpaceIntro(props: {
+    space: Space;
+    customization: CustomizationSettings | SiteCustomizationSettings;
+}) {
     const { space, customization } = props;
 
     return (

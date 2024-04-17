@@ -95,11 +95,15 @@ export async function fetchSpaceData() {
  */
 export async function fetchPageData(params: PagePathParams | PageIdParams) {
     const content = getContentPointer();
-    const { space, contentTarget, pages, customization, scripts } = await getSpaceData(content);
+    const { space, contentTarget, pages, customization, scripts } = await ('siteId' in content
+        ? getSiteSpaceData(content)
+        : getSpaceData(content));
 
     const page = await resolvePage(contentTarget, pages, params);
-    const [collection, document] = await Promise.all([
-        fetchParentCollection(space),
+    const [parent, document] = await Promise.all([
+        'siteId' in content
+            ? fetchParentSite(content.organizationId, content.siteId)
+            : fetchParentCollection(space),
         page?.page.documentId ? getDocument(space.id, page.page.documentId) : null,
     ]);
 
@@ -112,7 +116,7 @@ export async function fetchPageData(params: PagePathParams | PageIdParams) {
         scripts,
         ancestors: [],
         ...page,
-        ...collection,
+        ...parent,
         document,
     };
 }

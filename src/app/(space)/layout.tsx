@@ -3,6 +3,7 @@ import {
     CustomizationCorners,
     CustomizationHeaderPreset,
     CustomizationSettings,
+    SiteCustomizationSettings,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 import colors from 'tailwindcss/colors';
@@ -10,7 +11,7 @@ import colors from 'tailwindcss/colors';
 import { emojiFontClassName } from '@/components/primitives';
 import { fonts, ibmPlexMono } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
-import { getSpaceLayoutData } from '@/lib/api';
+import { getSiteSpaceLayoutData, getSpaceLayoutData } from '@/lib/api';
 import { hexToRgb, shadesOfColor } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
 
@@ -25,7 +26,10 @@ import { getContentPointer } from './fetch';
 export default async function SpaceRootLayout(props: { children: React.ReactNode }) {
     const { children } = props;
 
-    const { customization } = await getSpaceLayoutData(getContentPointer().spaceId);
+    const pointer = getContentPointer();
+    const { customization } = await ('siteId' in pointer
+        ? getSiteSpaceLayoutData(pointer)
+        : getSpaceLayoutData(pointer.spaceId));
     const headerTheme = generateHeaderTheme(customization);
     const language = getSpaceLanguage(customization);
 
@@ -120,7 +124,7 @@ function generateColorVariable(name: string, color: ColorInput) {
         .join('\n');
 }
 
-function generateHeaderTheme(customization: CustomizationSettings): {
+function generateHeaderTheme(customization: CustomizationSettings | SiteCustomizationSettings): {
     backgroundColor: { light: ColorInput; dark: ColorInput };
     linkColor: { light: ColorInput; dark: ColorInput };
 } {

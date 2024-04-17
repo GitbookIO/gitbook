@@ -2,7 +2,13 @@ import { Menu } from '@geist-ui/icons';
 import DownloadCloud from '@geist-ui/icons/downloadCloud';
 import Github from '@geist-ui/icons/github';
 import Gitlab from '@geist-ui/icons/gitlab';
-import { CustomizationSettings, JSONDocument, RevisionPageDocument, Space } from '@gitbook/api';
+import {
+    CustomizationSettings,
+    JSONDocument,
+    RevisionPageDocument,
+    SiteCustomizationSettings,
+    Space,
+} from '@gitbook/api';
 import React from 'react';
 import urlJoin from 'url-join';
 
@@ -21,7 +27,7 @@ import { PageFeedbackForm } from '../PageFeedback';
  */
 export async function PageAside(props: {
     space: Space;
-    customization: CustomizationSettings;
+    customization: CustomizationSettings | SiteCustomizationSettings;
     page: RevisionPageDocument;
     document: JSONDocument | null;
     context: ContentRefContext;
