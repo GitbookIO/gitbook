@@ -344,7 +344,10 @@ async function loadHighlighterLanguage(
 }
 
 const loaders: { [key: string]: LanguageInput } = {
-    javascript: () => import('shiki/langs/javascript.mjs'),
+    javascript: () => {
+        console.log(`importing javascript`);
+        return import('shiki/langs/javascript.mjs')
+    },
     typescript: () => import('shiki/langs/typescript.mjs'),
     tsx: () => import('shiki/langs/tsx.mjs'),
 }
