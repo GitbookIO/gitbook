@@ -1,4 +1,3 @@
-import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
 import rehypeStringify from 'rehype-stringify';
 import remarkGfm from 'remark-gfm';
@@ -13,8 +12,7 @@ export async function parseMarkdown(markdown: string): Promise<string> {
     const file = await unified()
         .use(remarkParse)
         .use(remarkGfm)
-        .use(remarkRehype, { allowDangerousHtml: true })
-        .use(rehypeRaw)
+        .use(remarkRehype)
         .use(rehypeSanitize)
         .use(rehypeStringify)
         .process(markdown);
