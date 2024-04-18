@@ -7,8 +7,8 @@ import React from 'react';
 import { getContentPointer } from '@/app/(space)/fetch';
 import {
     getCollection,
+    getCurrentSiteCustomization,
     getSite,
-    getSiteSpaceCustomization,
     getSpace,
     getSpaceCustomization,
 } from '@/lib/api';
@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
 
     const [space, customization] = await Promise.all([
         getSpace(spaceId),
-        'siteId' in pointer ? getSiteSpaceCustomization(pointer) : getSpaceCustomization(spaceId),
+        'siteId' in pointer ? getCurrentSiteCustomization(pointer) : getSpaceCustomization(spaceId),
     ]);
     const parent =
         'siteId' in pointer
