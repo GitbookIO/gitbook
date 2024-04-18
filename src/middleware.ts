@@ -485,13 +485,19 @@ async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise
     }
 
     const decoded = jwt.decode(apiToken) as ContentAPITokenPayload;
+    const siteLookupResult =
+        typeof decoded.site === 'string' &&
+        decoded.site &&
+        typeof decoded.organization === 'string' &&
+        decoded.organization
+            ? { site: decoded.site, organization: decoded.organization }
+            : {};
 
     return {
         space: spaceId,
         changeRequest: changeRequestId,
         revision: revisionId,
-        site: decoded.site,
-        organization: decoded.organization,
+        ...siteLookupResult,
         basePath: normalizePathname(basePathParts.join('/')),
         pathname: normalizePathname(pathSegments.join('/')),
         apiToken,
