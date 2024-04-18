@@ -10,7 +10,7 @@ import {
     getSpaceData,
     ContentTarget,
     SiteContentPointer,
-    getSiteSpaceData,
+    getCurrentSiteData,
     getSite,
     getSiteSpaces,
 } from '@/lib/api';
@@ -40,14 +40,14 @@ export function getContentPointer(): ContentPointer | SiteContentPointer {
     if (siteId) {
         const organizationId = headerSet.get('x-gitbook-content-organization');
         const siteSpaceId = headerSet.get('x-gitbook-content-site-space');
-        if (!organizationId || !siteSpaceId) {
+        if (!organizationId) {
             throw new Error('Missing site content headers');
         }
 
         const siteContent: SiteContentPointer = {
             siteId,
             spaceId,
-            siteSpaceId,
+            siteSpaceId: siteSpaceId ?? undefined,
             organizationId,
             revisionId: headerSet.get('x-gitbook-content-revision') ?? undefined,
             changeRequestId: headerSet.get('x-gitbook-content-changerequest') ?? undefined,
@@ -71,7 +71,7 @@ export async function fetchSpaceData() {
 
     const [{ space, contentTarget, pages, customization, scripts }, parentSite] = await Promise.all(
         'siteId' in content
-            ? [getSiteSpaceData(content), fetchParentSite(content.organizationId, content.siteId)]
+            ? [getCurrentSiteData(content), fetchParentSite(content.organizationId, content.siteId)]
             : [getSpaceData(content)],
     );
 
@@ -96,7 +96,7 @@ export async function fetchSpaceData() {
 export async function fetchPageData(params: PagePathParams | PageIdParams) {
     const content = getContentPointer();
     const { space, contentTarget, pages, customization, scripts } = await ('siteId' in content
-        ? getSiteSpaceData(content)
+        ? getCurrentSiteData(content)
         : getSpaceData(content));
 
     const page = await resolvePage(contentTarget, pages, params);

@@ -22,7 +22,7 @@ import {
     getSpace,
     getSpaceCustomization,
     getSpaceContentData,
-    getSiteSpaceCustomization,
+    getCurrentSiteCustomization,
 } from '@/lib/api';
 import { pagePDFContainerId, PageHrefContext, absoluteHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
@@ -43,7 +43,7 @@ export async function generateMetadata(): Promise<Metadata> {
     const [space, customization] = await Promise.all([
         getSpace(contentPointer.spaceId),
         'siteId' in contentPointer
-            ? getSiteSpaceCustomization(contentPointer)
+            ? getCurrentSiteCustomization(contentPointer)
             : getSpaceCustomization(contentPointer.spaceId),
     ]);
 
@@ -69,7 +69,7 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
     // Load the content,
     const [customization, { space, contentTarget, pages: rootPages }] = await Promise.all([
         'siteId' in contentPointer
-            ? getSiteSpaceCustomization(contentPointer)
+            ? getCurrentSiteCustomization(contentPointer)
             : getSpaceCustomization(contentPointer.spaceId),
         getSpaceContentData(contentPointer),
     ]);

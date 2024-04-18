@@ -1,6 +1,7 @@
 import { GitBookAPI } from '@gitbook/api';
 import * as Sentry from '@sentry/nextjs';
 import assertNever from 'assert-never';
+import jwt from 'jsonwebtoken';
 import type { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 import { NextResponse, NextRequest } from 'next/server';
 
@@ -14,7 +15,7 @@ import {
     withAPI,
     getSpaceLayoutData,
     DEFAULT_API_ENDPOINT,
-    getSiteSpaceLayoutData,
+    getCurrentSiteLayoutData,
 } from '@/lib/api';
 import { race } from '@/lib/async';
 import { buildVersion } from '@/lib/build';
@@ -72,6 +73,13 @@ export type LookupResult = PublishedContentWithCache & {
     /** Cookies to store on the response */
     cookies?: LookupCookies;
 };
+
+interface ContentAPITokenPayload {
+    organization: string;
+    spaces: string[];
+    collection?: string;
+    site?: string;
+}
 
 /**
  * Middleware to lookup the space to render.
@@ -170,11 +178,10 @@ export async function middleware(request: NextRequest) {
             );
 
             const { scripts } = await ('site' in resolved
-                ? getSiteSpaceLayoutData({
+                ? getCurrentSiteLayoutData({
                       organizationId: resolved.organization,
                       siteId: resolved.site,
                       siteSpaceId: resolved.siteSpace,
-                      spaceId: resolved.space,
                   })
                 : getSpaceLayoutData(resolved.space));
             return getContentSecurityPolicy(scripts, nonce);
@@ -196,7 +203,9 @@ export async function middleware(request: NextRequest) {
     if ('site' in resolved) {
         headers.set('x-gitbook-content-organization', resolved.organization);
         headers.set('x-gitbook-content-site', resolved.site);
-        headers.set('x-gitbook-content-site-space', resolved.siteSpace);
+        if (resolved.siteSpace) {
+            headers.set('x-gitbook-content-site-space', resolved.siteSpace);
+        }
     }
     if (resolved.revision) {
         headers.set('x-gitbook-content-revision', resolved.revision);
@@ -475,10 +484,14 @@ async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise
         };
     }
 
+    const decoded = jwt.decode(apiToken) as ContentAPITokenPayload;
+
     return {
         space: spaceId,
         changeRequest: changeRequestId,
         revision: revisionId,
+        site: decoded.site,
+        organization: decoded.organization,
         basePath: normalizePathname(basePathParts.join('/')),
         pathname: normalizePathname(pathSegments.join('/')),
         apiToken,

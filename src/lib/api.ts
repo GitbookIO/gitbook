@@ -43,7 +43,10 @@ export interface ContentPointer {
 export interface SiteContentPointer extends ContentPointer {
     organizationId: string;
     siteId: string;
-    siteSpaceId: string;
+    /**
+     * ID of the siteSpace can be undefined when rendering in multi-id mode (for site previews)
+     */
+    siteSpaceId: string | undefined;
 }
 
 /**
@@ -595,7 +598,7 @@ export const getDocument = cache(
 /**
  * Get the customization settings for a site-space from the API.
  */
-export const getSiteSpaceCustomizationFromAPI = cache(
+const getSiteSpaceCustomizationFromAPI = cache(
     'api.getSiteSpaceCustomizationById',
     async (
         organizationId: string,
@@ -626,9 +629,32 @@ export const getSiteSpaceCustomizationFromAPI = cache(
 );
 
 /**
+ * Get the customization settings for a site from the API.
+ */
+const getSiteCustomizationFromAPI = cache(
+    'api.getSiteCustomizationById',
+    async (organizationId: string, siteId: string, options: CacheFunctionOptions) => {
+        const response = await api().orgs.getSiteCustomizationById(organizationId, siteId, {
+            signal: options.signal,
+            ...noCacheFetchOptions,
+        });
+        return cacheResponse(response, {
+            revalidateBefore: 60 * 60,
+            tags: [
+                getAPICacheTag({
+                    tag: 'site',
+                    organization: organizationId,
+                    site: siteId,
+                }),
+            ],
+        });
+    },
+);
+
+/**
  * Get the customization settings for a site space from the API.
  */
-export async function getSiteSpaceCustomization(args: {
+async function getSiteSpaceCustomization(args: {
     organizationId: string;
     siteId: string;
     siteSpaceId: string;
@@ -639,6 +665,33 @@ export async function getSiteSpaceCustomization(args: {
         args.siteId,
         args.siteSpaceId,
     );
+
+    const extend = headersList.get('x-gitbook-customization');
+    if (extend) {
+        try {
+            const parsed = rison.decode_object<Partial<SiteCustomizationSettings>>(extend);
+            return { ...raw, ...parsed };
+        } catch (error) {
+            console.error(
+                `Failed to parse x-gitbook-customization header (ignored): ${
+                    (error as Error).stack ?? (error as Error).message ?? error
+                }`,
+            );
+        }
+    }
+
+    return raw;
+}
+
+/**
+ * Get the customization settings for a site space from the API.
+ */
+async function getSiteCustomization(args: {
+    organizationId: string;
+    siteId: string;
+}): Promise<SiteCustomizationSettings> {
+    const headersList = headers();
+    const raw = await getSiteCustomizationFromAPI(args.organizationId, args.siteId);
 
     const extend = headersList.get('x-gitbook-customization');
     if (extend) {
@@ -713,12 +766,12 @@ export const getSiteIntegrationScripts = cache(
 );
 
 /**
- * Fetch all the data to render a site-space at once.
+ * Fetch all the data to render the current site at once.
  */
-export async function getSiteSpaceData(pointer: SiteContentPointer) {
+export async function getCurrentSiteData(pointer: SiteContentPointer) {
     const [{ space, pages, contentTarget }, { customization, scripts }] = await Promise.all([
         getSpaceData(pointer),
-        getSiteSpaceLayoutData(pointer),
+        getCurrentSiteLayoutData(pointer),
     ]);
 
     return {
@@ -731,20 +784,24 @@ export async function getSiteSpaceData(pointer: SiteContentPointer) {
 }
 
 /**
- * Fetch all the layout data about a site-space at once.
+ * Fetch all the layout data about the current site at once.
  */
-export async function getSiteSpaceLayoutData(args: {
+export async function getCurrentSiteLayoutData(args: {
     organizationId: string;
     siteId: string;
-    siteSpaceId: string;
-    spaceId: string;
+    siteSpaceId: string | undefined;
 }) {
     const [customization, scripts] = await Promise.all([
-        getSiteSpaceCustomization({
-            organizationId: args.organizationId,
-            siteId: args.siteId,
-            siteSpaceId: args.siteSpaceId,
-        }),
+        args.siteSpaceId
+            ? getSiteSpaceCustomization({
+                  organizationId: args.organizationId,
+                  siteId: args.siteId,
+                  siteSpaceId: args.siteSpaceId,
+              })
+            : getSiteCustomization({
+                  organizationId: args.organizationId,
+                  siteId: args.siteId,
+              }),
         getSiteIntegrationScripts(args.organizationId, args.siteId),
     ]);
 
@@ -752,6 +809,26 @@ export async function getSiteSpaceLayoutData(args: {
         customization,
         scripts,
     };
+}
+
+/**
+ * Get the customization settings for the current site from the API.
+ */
+export async function getCurrentSiteCustomization(args: {
+    organizationId: string;
+    siteId: string;
+    siteSpaceId: string | undefined;
+}): Promise<SiteCustomizationSettings> {
+    return args.siteSpaceId
+        ? getSiteSpaceCustomization({
+              organizationId: args.organizationId,
+              siteId: args.siteId,
+              siteSpaceId: args.siteSpaceId,
+          })
+        : getSiteCustomization({
+              organizationId: args.organizationId,
+              siteId: args.siteId,
+          });
 }
 
 /**
