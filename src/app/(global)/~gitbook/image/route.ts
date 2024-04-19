@@ -10,6 +10,8 @@ export const runtime = 'edge';
  * Fetch and resize an image.
  */
 export async function GET(request: NextRequest) {
+    console.log(`received GET: url=${request.url.toString()} nextUrl=${request.nextUrl.toString()}`)
+    console.log(`received GET: url.searchParams=${new URL(request.url).searchParams.get('url')} nextUrl.searchParams=${request.nextUrl.searchParams.get('url')}`)
     const url = request.nextUrl.searchParams.get('url');
     const signature = request.nextUrl.searchParams.get('sign');
     if (!url || !signature) {
