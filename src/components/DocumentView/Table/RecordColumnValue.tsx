@@ -129,6 +129,10 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             return (
                 <Tag className={tcls('text-base')}>
                     {files.filter(filterOutNullable).map((ref, index) => {
+                        const contentType = ref.file
+                            ? getSimplifiedContentType(ref.file.contentType)
+                            : null;
+
                         return (
                             <StyledLink
                                 key={index}
@@ -136,7 +140,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                 target="_blank"
                                 style={['flex', 'flex-row', 'items-center', 'gap-2']}
                             >
-                                {ref.file && isImageFile(ref.file.contentType) ? (
+                                {contentType === 'image' ? (
                                     <Image
                                         style={['max-h-[1lh]', 'h-[1lh]']}
                                         alt={ref.text}
@@ -153,13 +157,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                         priority="lazy"
                                     />
                                 ) : (
-                                    <FileIcon
-                                        contentType={
-                                            ref.file
-                                                ? getSimplifiedContentType(ref.file.contentType)
-                                                : null
-                                        }
-                                    />
+                                    <FileIcon contentType={contentType} />
                                 )}
                                 {ref.text}
                             </StyledLink>
