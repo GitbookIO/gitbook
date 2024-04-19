@@ -1,12 +1,10 @@
-import IconDownload from '@geist-ui/icons/download';
-import IconFileText from '@geist-ui/icons/fileText';
-import IconImage from '@geist-ui/icons/image';
-import IconPaperClip from '@geist-ui/icons/paperclip';
 import { DocumentBlockFile } from '@gitbook/api';
 
+import { getSimplifiedContentType } from '@/lib/files';
 import { tcls } from '@/lib/tailwind';
 
 import { BlockProps } from './Block';
+import { FileIcon } from './FileIcon';
 
 export async function File(props: BlockProps<DocumentBlockFile>) {
     const { block, context, style } = props;
@@ -18,42 +16,7 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
         return null;
     }
 
-    const contentType = (() => {
-        switch (file.contentType) {
-            case 'application/pdf':
-            case 'application/x-pdf':
-                return 'pdf';
-            case 'image/png':
-            case 'image/jpeg':
-            case 'image/gif':
-            case 'image/webp':
-            case 'image/tiff':
-            case 'image/svg+xml':
-                return 'image';
-            case 'application/zip':
-            case 'application/x-7z-compressed':
-            case 'application/x-zip-compressed':
-            case 'application/x-tar':
-            case 'application/x-rar-compressed':
-            case 'application/vnd.rar':
-                return 'archive';
-            default:
-                return null;
-        }
-    })();
-
-    const icon = (() => {
-        switch (contentType) {
-            case 'pdf':
-                return <IconFileText />;
-            case 'image':
-                return <IconImage />;
-            case 'archive':
-                return <IconPaperClip />;
-            default:
-                return <IconDownload />;
-        }
-    })();
+    const contentType = getSimplifiedContentType(file.contentType);
 
     return (
         <a
@@ -103,7 +66,9 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
                     'dark:border-light/2',
                 )}
             >
-                <div className={tcls('*:w-5', '*:h-5', '*:stroke-primary')}>{icon}</div>
+                <div className={tcls('*:w-5', '*:h-5', '*:stroke-primary')}>
+                    <FileIcon contentType={contentType} />
+                </div>
                 <div
                     className={tcls(
                         'text-xs',
