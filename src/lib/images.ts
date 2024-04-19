@@ -3,6 +3,7 @@ import 'server-only';
 import { noCacheFetchOptions } from '@/lib/cache/http';
 
 import { rootUrl } from './links';
+import { getImageAPIUrl } from './urls';
 
 export interface CloudflareImageJsonFormat {
     width: number;
@@ -76,7 +77,7 @@ export async function getResizedImageURL(
 
     return (options) => {
         const url = new URL('/~gitbook/image', rootUrl());
-        url.searchParams.set('url', input);
+        url.searchParams.set('url', getImageAPIUrl(input));
 
         if (options.width) {
             url.searchParams.set('width', options.width.toString());

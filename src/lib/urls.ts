@@ -65,3 +65,21 @@ export function getPDFUrlSearchParams(
 
     return searchParams;
 }
+
+/**
+ * Because of a bug in Cloudflare, 127.0.0.1 is replaced by localhost.
+ * We protect against it by converting to a special token, and then parsing
+ * the token in the image API.
+ */
+const GITBOOK_LOCALHOST_TOKEN = '$GITBOOK_LOCALHOST$';
+
+/**
+ * Prepare a URL for the GitBook Open Image API.
+ */
+export function getImageAPIUrl(url: string): string {
+    return url.replaceAll('127.0.0.1', GITBOOK_LOCALHOST_TOKEN);
+}
+
+export function parseImageAPIURL(url: string): string {
+    return url.replaceAll(GITBOOK_LOCALHOST_TOKEN, '127.0.0.1');
+}
