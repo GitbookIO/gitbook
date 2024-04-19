@@ -466,7 +466,10 @@ async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise
                 httpOnly: true,
                 maxAge: 60 * 30,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'none',
+                // When using multi-id mode in local env (localhost) we need to use sameSite = 'lax'
+                // otherwise cookies can't be set.
+                // Use sameSite = none in any other environment.
+                sameSite: process.env.NODE_ENV !== 'development' ? 'none' : 'lax',
             },
         },
     };
@@ -682,7 +685,10 @@ function getLookupResultForVisitorAuth(
                 value: getVisitorAuthCookieValue(basePath, visitorAuthToken),
                 options: {
                     httpOnly: true,
-                    sameSite: 'none',
+                    // When running E2E tests locally against local env we need to use sameSite = 'lax'
+                    // otherwise cookies can't be set and VA tests fails.
+                    // Use sameSite = none in any other environment.
+                    sameSite: process.env.NODE_ENV !== 'development' ? 'none' : 'lax',
                     secure: process.env.NODE_ENV === 'production',
                     maxAge: 7 * 24 * 60 * 60,
                 },
