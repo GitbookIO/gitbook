@@ -77,9 +77,9 @@ const GITBOOK_LOCALHOST_TOKEN = '$GITBOOK_LOCALHOST$';
  * Prepare a URL for the GitBook Open Image API.
  */
 export function getImageAPIUrl(url: string): string {
-    return url.replace('127.0.0.1', GITBOOK_LOCALHOST_TOKEN);
+    return url.replaceAll('127.0.0.1', GITBOOK_LOCALHOST_TOKEN);
 }
 
 export function parseImageAPIURL(url: string): string {
-    return url.replace(GITBOOK_LOCALHOST_TOKEN, '127.0.0.1');
+    return url.replaceAll(GITBOOK_LOCALHOST_TOKEN, '127.0.0.1');
 }
