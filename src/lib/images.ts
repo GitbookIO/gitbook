@@ -76,7 +76,7 @@ export async function getResizedImageURL(
 
     return (options) => {
         const url = new URL('/~gitbook/image', rootUrl());
-        url.searchParams.set('url', input);
+        url.searchParams.set('url', input.replace('127.0.0.1', '$GITBOOK_LOCALHOST$'));
 
         if (options.width) {
             url.searchParams.set('width', options.width.toString());

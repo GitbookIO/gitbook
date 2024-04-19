@@ -12,7 +12,7 @@ export const runtime = 'edge';
 export async function GET(request: NextRequest) {
     console.log(`received GET: url=${request.url.toString()} nextUrl=${request.nextUrl.toString()}`)
     console.log(`received GET: url.searchParams=${new URL(request.url).searchParams.get('url')} nextUrl.searchParams=${request.nextUrl.searchParams.get('url')}`)
-    const url = request.nextUrl.searchParams.get('url');
+    const url = request.nextUrl.searchParams.get('url')?.replace('$GITBOOK_LOCALHOST$', '127.0.0.1');
     const signature = request.nextUrl.searchParams.get('sign');
     if (!url || !signature) {
         return new Response('Missing url/sign parameters', { status: 400 });
