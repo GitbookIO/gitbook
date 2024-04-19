@@ -79,6 +79,7 @@ interface ContentAPITokenPayload {
     spaces: string[];
     collection?: string;
     site?: string;
+    siteSpace?: string;
 }
 
 /**
@@ -487,15 +488,15 @@ async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise
         };
     }
 
-    const decoded = jwt.decode(apiToken) as ContentAPITokenPayload;
+    const { organization, site, siteSpace } = jwt.decode(apiToken) as ContentAPITokenPayload;
     const siteLookupResult =
-        typeof decoded.site === 'string' &&
-        decoded.site &&
-        typeof decoded.organization === 'string' &&
-        decoded.organization
-            ? { site: decoded.site, organization: decoded.organization }
+        typeof organization === 'string' && organization && typeof site === 'string' && site
+            ? {
+                  organization,
+                  site,
+                  ...(typeof siteSpace === 'string' && siteSpace ? { siteSpace } : {}),
+              }
             : {};
-
     return {
         space: spaceId,
         changeRequest: changeRequestId,
