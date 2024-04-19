@@ -93,6 +93,7 @@ export async function getResizedImageURL(
 
         url.searchParams.set('sign', signature);
 
+        console.log(`getResizedImageURL`, input, 'to', url.toString());
         return url.toString();
     };
 }
