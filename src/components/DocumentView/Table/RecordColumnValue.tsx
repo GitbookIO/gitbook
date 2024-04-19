@@ -4,7 +4,9 @@ import assertNever from 'assert-never';
 
 import { Checkbox, Emoji } from '@/components/primitives';
 import { StyledLink } from '@/components/primitives';
+import { Image } from '@/components/utils';
 import { getNodeFragmentByName } from '@/lib/document';
+import { getSimplifiedContentType } from '@/lib/files';
 import { tcls } from '@/lib/tailwind';
 import { filterOutNullable } from '@/lib/typescript';
 
@@ -12,6 +14,7 @@ import { TableRecordKV } from './Table';
 import { getColumnAlignment } from './utils';
 import { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
+import { FileIcon } from '../FileIcon';
 
 /**
  * Render the value for a column in a record.
@@ -125,11 +128,43 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
 
             return (
                 <Tag className={tcls('text-base')}>
-                    {files.filter(filterOutNullable).map((file, index) => (
-                        <StyledLink key={index} href={file.href}>
-                            {file.text}
-                        </StyledLink>
-                    ))}
+                    {files.filter(filterOutNullable).map((ref, index) => {
+                        return (
+                            <StyledLink
+                                key={index}
+                                href={ref.href}
+                                target="_blank"
+                                style={['flex', 'flex-row', 'items-center', 'gap-2']}
+                            >
+                                {ref.file && isImageFile(ref.file.contentType) ? (
+                                    <Image
+                                        style={['max-h-[1lh]', 'h-[1lh]']}
+                                        alt={ref.text}
+                                        sizes={[{ width: 24 }]}
+                                        sources={{
+                                            light: {
+                                                src: ref.href,
+                                                size: {
+                                                    width: 24,
+                                                    height: 24,
+                                                },
+                                            },
+                                        }}
+                                        priority="lazy"
+                                    />
+                                ) : (
+                                    <FileIcon
+                                        contentType={
+                                            ref.file
+                                                ? getSimplifiedContentType(ref.file.contentType)
+                                                : null
+                                        }
+                                    />
+                                )}
+                                {ref.text}
+                            </StyledLink>
+                        );
+                    })}
                 </Tag>
             );
         case 'content-ref': {
@@ -208,4 +243,11 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
         default:
             assertNever(definition);
     }
+}
+
+/**
+ * Returns true if the given file is considered an image.
+ */
+export function isImageFile(mimeType: string) {
+    return mimeType.startsWith('image');
 }
