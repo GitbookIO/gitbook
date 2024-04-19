@@ -242,10 +242,3 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             assertNever(definition);
     }
 }
-
-/**
- * Returns true if the given file is considered an image.
- */
-export function isImageFile(mimeType: string) {
-    return mimeType.startsWith('image');
-}
