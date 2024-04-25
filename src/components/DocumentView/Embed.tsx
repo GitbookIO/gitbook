@@ -50,6 +50,9 @@ export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
     );
 }
 
+/**
+ * Create an integration block with an unfurl action from the GitBook Embed response.
+ */
 function createIntegrationBlock(
     url: string,
     integration: string,
