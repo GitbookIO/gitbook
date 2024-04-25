@@ -32,7 +32,7 @@ export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
                 <IntegrationBlock
                     {...otherProps}
                     context={context}
-                    block={createIntegrationBlock(block.data.url, embed.block)}
+                    block={createIntegrationBlock(block.data.url, embed.integration, embed.block)}
                 />
             ) : (
                 <Card
@@ -52,24 +52,22 @@ export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
 
 function createIntegrationBlock(
     url: string,
+    integration: string,
     block: gitbookAPI.IntegrationBlock,
 ): gitbookAPI.DocumentBlockIntegration {
-    const data: gitbookAPI.DocumentBlockIntegration['data'] = {
-        // TODO: wrong
-        integration: 'embedDoltHubSQL',
-        block: block.id,
-        props: {},
-        action: {
-            action: '@link.unfurl',
-            url,
-        },
-        url,
-    };
-
     return {
         object: 'block',
         type: 'integration',
         isVoid: true,
-        data,
+        data: {
+            integration,
+            block: block.id,
+            props: {},
+            action: {
+                action: '@link.unfurl',
+                url,
+            },
+            url,
+        },
     };
 }
