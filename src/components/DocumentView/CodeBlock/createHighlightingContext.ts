@@ -3,7 +3,11 @@ const CODE_HIGHLIGHT_BLOCK_LIMIT = 50;
 /**
  * Spaces where we'll always use plain highlighting.
  */
-const PLAIN_HIGHLIGHTING_SPACES: string[] = ['V9geAO9ITPi8WOYK5o0r', 'puRmcwVxGFtHph8IjXaf', 'e3jwbMOrr4RhKtZ9C0XL'];
+const PLAIN_HIGHLIGHTING_SPACES: string[] = [
+    'V9geAO9ITPi8WOYK5o0r',
+    'puRmcwVxGFtHph8IjXaf',
+    'e3jwbMOrr4RhKtZ9C0XL',
+];
 
 /**
  * Protect against memory issues when highlighting a large number of code blocks.
