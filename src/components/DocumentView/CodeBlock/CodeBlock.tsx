@@ -15,7 +15,7 @@ import './theme.css';
  */
 export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
     const { block, document, style, context } = props;
-    const withHighlighting = context.shouldHighlightCode();
+    const withHighlighting = context.shouldHighlightCode(context.content?.spaceId);
     const lines = withHighlighting ? await highlight(block) : plainHighlighting(block);
 
     const id = block.key!;
