@@ -88,6 +88,7 @@ export function ScalarApiClient(props: { children: React.ReactNode }) {
 
         const operation = {
             ...operationData,
+            information: operationData.operation,
             httpVerb: operationData.method,
             pathParameters: operationData.operation.parameters,
         } as TransformedOperation;
