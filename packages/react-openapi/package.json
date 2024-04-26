@@ -2,8 +2,8 @@
     "name": "@gitbook/react-openapi",
     "exports": "./src/index.ts",
     "dependencies": {
-        "@scalar/api-client-react": "^0.2.9",
-        "@scalar/oas-utils": "0.1.1",
+        "@scalar/api-client-react": "^0.3.7",
+        "@scalar/oas-utils": "0.1.6",
         "classnames": "^2.5.1",
         "flatted": "^3.2.9",
         "openapi-types": "^12.1.3",
