@@ -98,7 +98,10 @@ export function ScalarApiClient(props: { children: React.ReactNode }) {
             {
                 url: operationData.path,
             },
-            getRequestFromOperation(operation, { requiredOnly: false }),
+            getRequestFromOperation(
+                { ...operation, information: operationData.operation },
+                { requiredOnly: false },
+            ),
         );
 
         return {
