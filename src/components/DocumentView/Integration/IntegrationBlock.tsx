@@ -70,6 +70,7 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
     const initialInput = {
         componentId: block.data.block,
         props: block.data.props,
+        action: block.data.action,
         context: contentKitContext,
     };
 

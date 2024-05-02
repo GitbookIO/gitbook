@@ -1,4 +1,4 @@
-import { DocumentBlockEmbed } from '@gitbook/api';
+import * as gitbookAPI from '@gitbook/api';
 import Script from 'next/script';
 
 import { Card } from '@/components/primitives';
@@ -7,11 +7,14 @@ import { tcls } from '@/lib/tailwind';
 
 import { BlockProps } from './Block';
 import { Caption } from './Caption';
+import { IntegrationBlock } from './Integration';
 
-export async function Embed(props: BlockProps<DocumentBlockEmbed>) {
-    const { block } = props;
+export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
+    const { block, context, ...otherProps } = props;
 
-    const { data: embed } = await api().urls.getEmbedByUrl({ url: block.data.url });
+    const { data: embed } = await (context.content
+        ? api().spaces.getEmbedByUrlInSpace(context.content.spaceId, { url: block.data.url })
+        : api().urls.getEmbedByUrl({ url: block.data.url }));
 
     return (
         <Caption {...props}>
@@ -25,6 +28,12 @@ export async function Embed(props: BlockProps<DocumentBlockEmbed>) {
                     {/* We load the iframely script to resize the embed iframes dynamically */}
                     <Script src="https://cdn.iframe.ly/embed.js" defer async />
                 </>
+            ) : embed.type === 'integration' ? (
+                <IntegrationBlock
+                    {...otherProps}
+                    context={context}
+                    block={createIntegrationBlock(block.data.url, embed.integration, embed.block)}
+                />
             ) : (
                 <Card
                     leadingIcon={
@@ -39,4 +48,29 @@ export async function Embed(props: BlockProps<DocumentBlockEmbed>) {
             )}
         </Caption>
     );
+}
+
+/**
+ * Create an integration block with an unfurl action from the GitBook Embed response.
+ */
+function createIntegrationBlock(
+    url: string,
+    integration: string,
+    block: gitbookAPI.IntegrationBlock,
+): gitbookAPI.DocumentBlockIntegration {
+    return {
+        object: 'block',
+        type: 'integration',
+        isVoid: true,
+        data: {
+            integration,
+            block: block.id,
+            props: {},
+            action: {
+                action: '@link.unfurl',
+                url,
+            },
+            url,
+        },
+    };
 }
