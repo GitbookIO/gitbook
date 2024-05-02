@@ -84,6 +84,8 @@ export function TrademarkLink(props: {
                 'flex-row',
                 'items-center',
                 'hover:bg-dark/1',
+                'bg-light',
+                'dark:bg-dark',
                 'px-4',
                 'py-4',
                 'rounded-lg',
