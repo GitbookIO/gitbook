@@ -95,7 +95,6 @@ export function TrademarkLink(props: {
                 'tracking-[-0.016em]',
                 'dark:hover:bg-light/1',
                 'dark:ring-light/1',
-                'dark:font-semibold',
                 'border',
                 'border-dark/2',
                 'dark:border-light/2',
