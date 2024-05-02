@@ -86,7 +86,7 @@ export function TrademarkLink(props: {
                 'hover:bg-dark/1',
                 'px-4',
                 'py-4',
-                'rounded-md',
+                'rounded-lg',
                 'straight-corners:rounded-none',
                 'hover:backdrop-blur-sm',
                 'lg:ring-0',
@@ -95,6 +95,8 @@ export function TrademarkLink(props: {
                 'dark:ring-light/1',
                 'dark:font-normal',
                 'border',
+                'border-dark/2',
+                'dark:border-light/2',
             )}
         >
             <IconLogo className={tcls('w-5', 'h-5', 'mr-3')} />
