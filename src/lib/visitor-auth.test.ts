@@ -2,7 +2,6 @@ import { it, describe, expect } from 'bun:test';
 import { NextRequest } from 'next/server';
 
 import {
-    VisitorAuthCookieValue,
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
     getVisitorAuthToken,
@@ -18,18 +17,14 @@ describe('getVisitorAuthToken', () => {
         const request = nextRequest('https://example.com', {
             [getVisitorAuthCookieName('/')]: { value: getVisitorAuthCookieValue('/', '123') },
         });
-        const visitorAuth = getVisitorAuthToken(request, request.nextUrl);
-        assertVisitorAuthCookieValue(visitorAuth);
-        expect(visitorAuth.token).toEqual('123');
+        expect(getVisitorAuthToken(request, request.nextUrl)).toEqual('123');
     });
 
     it('should return the token from the cookie root basepath for a sub-path', () => {
         const request = nextRequest('https://example.com/hello/world', {
             [getVisitorAuthCookieName('/')]: { value: getVisitorAuthCookieValue('/', '123') },
         });
-        const visitorAuth = getVisitorAuthToken(request, request.nextUrl);
-        assertVisitorAuthCookieValue(visitorAuth);
-        expect(visitorAuth.token).toEqual('123');
+        expect(getVisitorAuthToken(request, request.nextUrl)).toEqual('123');
     });
 
     it('should return the closest token from the path', () => {
@@ -39,9 +34,7 @@ describe('getVisitorAuthToken', () => {
                 value: getVisitorAuthCookieValue('/hello/', '123'),
             },
         });
-        const visitorAuth = getVisitorAuthToken(request, request.nextUrl);
-        assertVisitorAuthCookieValue(visitorAuth);
-        expect(visitorAuth.token).toEqual('123');
+        expect(getVisitorAuthToken(request, request.nextUrl)).toEqual('123');
     });
 
     it('should return the token from the cookie in a collection type url', () => {
@@ -50,9 +43,7 @@ describe('getVisitorAuthToken', () => {
                 value: getVisitorAuthCookieValue('/hello/v/space1/', '123'),
             },
         });
-        const visitorAuth = getVisitorAuthToken(request, request.nextUrl);
-        assertVisitorAuthCookieValue(visitorAuth);
-        expect(visitorAuth.token).toEqual('123');
+        expect(getVisitorAuthToken(request, request.nextUrl)).toEqual('123');
     });
 
     it('should return undefined if no cookie and no query param', () => {
@@ -60,14 +51,6 @@ describe('getVisitorAuthToken', () => {
         expect(getVisitorAuthToken(request, request.nextUrl)).toBeUndefined();
     });
 });
-
-function assertVisitorAuthCookieValue(value: unknown): asserts value is VisitorAuthCookieValue {
-    if (value && typeof value === 'object' && 'token' in value) {
-        return;
-    }
-
-    throw new Error('Expected a VisitorAuthCookieValue');
-}
 
 function nextRequest(url: string, cookies: Record<string, { value: string }> = {}) {
     const nextUrl = new URL(url);

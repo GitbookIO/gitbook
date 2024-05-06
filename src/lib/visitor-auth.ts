@@ -16,10 +16,7 @@ export type VisitorAuthCookieValue = {
  * Get the visitor authentication token for the request. This token can either be in the
  * query parameters or stored as a cookie.
  */
-export function getVisitorAuthToken(
-    request: NextRequest,
-    url: URL,
-): string | VisitorAuthCookieValue | undefined {
+export function getVisitorAuthToken(request: NextRequest, url: URL): string | undefined {
     return url.searchParams.get(VISITOR_AUTH_PARAM) ?? getVisitorAuthTokenFromCookies(request, url);
 }
 
@@ -71,10 +68,7 @@ function getUrlBasePathCombinations(url: URL): string[] {
  * checking all cookies for a matching "visitor authentication cookie" and returning the
  * best possible match for the current URL.
  */
-function getVisitorAuthTokenFromCookies(
-    request: NextRequest,
-    url: URL,
-): VisitorAuthCookieValue | undefined {
+function getVisitorAuthTokenFromCookies(request: NextRequest, url: URL): string | undefined {
     const urlBasePaths = getUrlBasePathCombinations(url);
     // Try to find a visitor authentication token for the current URL. The request
     // for the content could be hosted on a base path like `/foo/v/bar` or `/foo` or just `/`
@@ -96,17 +90,14 @@ function getVisitorAuthTokenFromCookies(
 function findVisitorAuthCookieForBasePath(
     request: NextRequest,
     basePath: string,
-): VisitorAuthCookieValue | undefined {
-    return Array.from(request.cookies).reduce<VisitorAuthCookieValue | undefined>(
-        (acc, [name, cookie]) => {
-            if (name === getVisitorAuthCookieName(basePath)) {
-                const value = JSON.parse(cookie.value) as VisitorAuthCookieValue;
-                if (value.basePath === basePath) {
-                    acc = value;
-                }
+): string | undefined {
+    return Array.from(request.cookies).reduce<string | undefined>((acc, [name, cookie]) => {
+        if (name === getVisitorAuthCookieName(basePath)) {
+            const value = JSON.parse(cookie.value) as VisitorAuthCookieValue;
+            if (value.basePath === basePath) {
+                acc = value.token;
             }
-            return acc;
-        },
-        undefined,
-    );
+        }
+        return acc;
+    }, undefined);
 }

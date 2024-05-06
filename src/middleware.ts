@@ -22,7 +22,6 @@ import { buildVersion } from '@/lib/build';
 import { createContentSecurityPolicyNonce, getContentSecurityPolicy } from '@/lib/csp';
 import { getURLLookupAlternatives, normalizeURL } from '@/lib/middleware';
 import {
-    VisitorAuthCookieValue,
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
     getVisitorAuthToken,
@@ -589,7 +588,7 @@ async function lookupSpaceInMultiPathMode(request: NextRequest, url: URL): Promi
  */
 async function lookupSpaceByAPI(
     lookupURL: URL,
-    visitorAuthToken: ReturnType<typeof getVisitorAuthToken>,
+    visitorAuthToken: string | undefined,
 ): Promise<LookupResult> {
     const url = stripURLSearch(lookupURL);
     const lookup = getURLLookupAlternatives(url);
@@ -599,17 +598,9 @@ async function lookupSpaceByAPI(
     );
 
     const result = await race(lookup.urls, async (alternative, { signal }) => {
-        const data = await getPublishedContentByUrl(
-            alternative.url,
-            typeof visitorAuthToken === 'undefined'
-                ? undefined
-                : typeof visitorAuthToken === 'string'
-                  ? visitorAuthToken
-                  : visitorAuthToken.token,
-            {
-                signal,
-            },
-        );
+        const data = await getPublishedContentByUrl(alternative.url, visitorAuthToken, {
+            signal,
+        });
 
         if ('error' in data) {
             if (alternative.primary) {
@@ -681,36 +672,22 @@ async function lookupSpaceByAPI(
  */
 function getLookupResultForVisitorAuth(
     basePath: string,
-    visitorAuthToken: string | VisitorAuthCookieValue,
+    visitorAuthToken: string,
 ): Partial<LookupResult> {
     return {
         // No caching for content served with visitor auth
         cacheMaxAge: undefined,
         cacheTags: [],
         cookies: {
-            /**
-             * If the visitorAuthToken has been retrieved from a cookie, we set it back only
-             * if the basePath matches the current one. This is to avoid setting cookie for
-             * different base paths.
-             */
-            ...(typeof visitorAuthToken === 'string' || visitorAuthToken.basePath === basePath
-                ? {
-                      [getVisitorAuthCookieName(basePath)]: {
-                          value: getVisitorAuthCookieValue(
-                              basePath,
-                              typeof visitorAuthToken === 'string'
-                                  ? visitorAuthToken
-                                  : visitorAuthToken.token,
-                          ),
-                          options: {
-                              httpOnly: true,
-                              sameSite: 'none',
-                              secure: process.env.NODE_ENV === 'production',
-                              maxAge: 7 * 24 * 60 * 60,
-                          },
-                      },
-                  }
-                : {}),
+            [getVisitorAuthCookieName(basePath)]: {
+                value: getVisitorAuthCookieValue(basePath, visitorAuthToken),
+                options: {
+                    httpOnly: true,
+                    sameSite: 'none',
+                    secure: process.env.NODE_ENV === 'production',
+                    maxAge: 7 * 24 * 60 * 60,
+                },
+            },
         },
     };
 }
