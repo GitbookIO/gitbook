@@ -681,7 +681,7 @@ async function lookupSpaceByAPI(
  */
 function getLookupResultForVisitorAuth(
     basePath: string,
-    visitorAuthToken: Exclude<ReturnType<typeof getVisitorAuthToken>, undefined>,
+    visitorAuthToken: string | VisitorAuthCookieValue,
 ): Partial<LookupResult> {
     return {
         // No caching for content served with visitor auth
