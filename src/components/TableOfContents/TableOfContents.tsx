@@ -75,7 +75,7 @@ export function TableOfContents(props: {
                     'dark:group-hover:[&::-webkit-scrollbar-thumb]:bg-light/3',
                     'navigation-open:flex', // can be auto height animated as such https://stackoverflow.com/a/76944290
                     'lg:-ml-5',
-                    customization.trademark.enabled ? 'lg:pb-16' : 'lg:pb-4',
+                    customization.trademark.enabled ? 'lg:pb-20' : 'lg:pb-4',
                 )}
             >
                 <PagesList

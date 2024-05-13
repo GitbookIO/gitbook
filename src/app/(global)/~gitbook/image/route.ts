@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 
 import { verifyImageSignature, resizeImage, CloudflareImageOptions } from '@/lib/images';
+import { parseImageAPIURL } from '@/lib/urls';
 
 export const runtime = 'edge';
 
@@ -10,11 +11,13 @@ export const runtime = 'edge';
  * Fetch and resize an image.
  */
 export async function GET(request: NextRequest) {
-    const url = request.nextUrl.searchParams.get('url');
+    let urlParam = request.nextUrl.searchParams.get('url');
     const signature = request.nextUrl.searchParams.get('sign');
-    if (!url || !signature) {
+    if (!urlParam || !signature) {
         return new Response('Missing url/sign parameters', { status: 400 });
     }
+
+    const url = parseImageAPIURL(urlParam);
 
     // Prevent infinite loops
     if (url.includes('/~gitbook/image')) {

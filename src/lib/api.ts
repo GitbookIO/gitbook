@@ -620,7 +620,6 @@ const getSiteSpaceCustomizationFromAPI = cache(
             tags: [
                 getAPICacheTag({
                     tag: 'site',
-                    organization: organizationId,
                     site: siteId,
                 }),
             ],
@@ -643,7 +642,6 @@ const getSiteCustomizationFromAPI = cache(
             tags: [
                 getAPICacheTag({
                     tag: 'site',
-                    organization: organizationId,
                     site: siteId,
                 }),
             ],
@@ -722,7 +720,7 @@ export const getSite = cache(
         });
         return cacheResponse(response, {
             revalidateBefore: 60 * 60,
-            tags: [getAPICacheTag({ tag: 'site', organization: organizationId, site: siteId })],
+            tags: [getAPICacheTag({ tag: 'site', site: siteId })],
         });
     },
 );
@@ -743,7 +741,7 @@ export const getSiteSpaces = cache(
         return cacheResponse(response, {
             revalidateBefore: 60 * 60,
             data: response.data.items.map((siteSpace) => siteSpace),
-            tags: [getAPICacheTag({ tag: 'site', organization: organizationId, site: siteId })],
+            tags: [getAPICacheTag({ tag: 'site', site: siteId })],
         });
     },
 );
@@ -760,7 +758,7 @@ export const getSiteIntegrationScripts = cache(
         });
         return cacheResponse(response, {
             revalidateBefore: 60 * 60,
-            tags: [getAPICacheTag({ tag: 'site', organization: organizationId, site: siteId })],
+            tags: [getAPICacheTag({ tag: 'site', site: siteId })],
         });
     },
 );
@@ -1089,7 +1087,6 @@ export function getAPICacheTag(
         | {
               tag: 'site';
               site: string;
-              organization: string;
           },
 ): string {
     switch (spec.tag) {
@@ -1102,7 +1099,7 @@ export function getAPICacheTag(
         case 'synced-block':
             return `synced-block:${spec.syncedBlock}`;
         case 'site':
-            return `site:${spec.organization}:${spec.site}`;
+            return `site:${spec.site}`;
         default:
             assertNever(spec);
     }

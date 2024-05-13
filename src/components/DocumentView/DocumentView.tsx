@@ -45,7 +45,7 @@ export interface DocumentContext {
      *
      * https://linear.app/gitbook-x/issue/RND-3588/gitbook-open-code-syntax-highlighting-runs-out-of-memory-after-a
      */
-    shouldHighlightCode: () => boolean;
+    shouldHighlightCode: (spaceId: string | undefined) => boolean;
 }
 
 export interface DocumentContextProps {
