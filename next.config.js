@@ -43,7 +43,7 @@ module.exports = {
         remotePatterns: [
             {
                 protocol: 'https',
-                hostname: '*.gitbook.io',
+                hostname: '**.gitbook.io',
                 port: '',
             },
         ]
