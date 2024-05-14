@@ -14,6 +14,7 @@ interface OpenAPISchemaPropertyEntry {
     propertyName?: string;
     required?: boolean;
     schema: OpenAPIV3.SchemaObject;
+    example?: string;
 }
 
 /**
@@ -92,6 +93,10 @@ export function OpenAPISchemaProperty(
                             className="openapi-schema-description"
                         />
                     ) : null}
+                    {schema.example ? (<Markdown
+                            source={'Example: ' + schema.example}
+                            className="openapi-schema-description"
+                        />) : null}
                 </div>
             }
         >
