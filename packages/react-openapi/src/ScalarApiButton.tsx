@@ -7,6 +7,7 @@ import {
     getRequestFromOperation,
     Query,
     Header,
+    RequestBody,
 } from '@scalar/oas-utils';
 import React from 'react';
 
@@ -98,7 +99,15 @@ export function ScalarApiClient(props: { children: React.ReactNode }) {
             {
                 url: operationData.path,
             },
-            getRequestFromOperation(operation, { requiredOnly: false }),
+            getRequestFromOperation(
+                {
+                    ...operation,
+                    information: {
+                        requestBody: operationData.operation.requestBody as RequestBody,
+                    },
+                },
+                { requiredOnly: false },
+            ),
         );
 
         return {
