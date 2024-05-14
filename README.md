@@ -75,7 +75,7 @@ GitBook's rendering engine is fully open-source and built on top of [Next.js](ht
 
 ### Types of contributions
 
-We encourage you to contribute to GitBook to help us build the best tool for doucmenting techincal knowledge. If you're looking for some quick ways to contribute, continue reading to learn more about popular contributions.
+We encourage you to contribute to GitBook to help us build the best tool for documenting technical knowledge. If you're looking for some quick ways to contribute, continue reading to learn more about popular contributions.
 
 #### Translations
 
@@ -92,7 +92,7 @@ Encounter a bug or find an issue you'd like to fix? Helping us fix issues relate
 >
 > _Looking to add a specific feature in GitBook? Head to our [contributing guide](/.github/CONTRIBUTING.md) to get started._
 >
-> Self-hosting this project puts the responsibility of maintaining and merging future updates on **you**. We cannot guarantee support, maintainance, or updates to forked and self-hosted instances of this project.
+> Self-hosting this project puts the responsibility of maintaining and merging future updates on **you**. We cannot guarantee support, maintenance, or updates to forked and self-hosted instances of this project.
 >
 > We want to make it as easy as possible for our community to collaborate and push the future of GitBook, which is why we encourage you to contribute to our product directly instead of creating your own version.
 
