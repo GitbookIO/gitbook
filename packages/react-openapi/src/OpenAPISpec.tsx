@@ -76,7 +76,6 @@ function groupParameters(parameters: OpenAPIV3.ParameterObject[]): Array<{
     label: string;
     parameters: OpenAPIV3.ParameterObject[];
 }> {
-    console.log('parameters', parameters)
     const sorted = ['path', 'query', 'header'];
 
     const groups: Array<{
