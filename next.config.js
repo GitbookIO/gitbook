@@ -39,6 +39,15 @@ module.exports = withSentryConfig(
 
         assetPrefix: process.env.GITBOOK_ASSETS_PREFIX,
         poweredByHeader: false,
+
+        images: {
+            remotePatterns: [
+                {
+                    protocol: 'https',
+                    hostname: '*.gitbook.io',
+                }
+            ]
+        }
     },
     {
         silent: true,
