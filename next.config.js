@@ -36,7 +36,7 @@ module.exports = {
         ];
     },
 
-    assetPrefix: process.env.GITBOOK_ASSETS_PREFIX,
+    // assetPrefix: process.env.GITBOOK_ASSETS_PREFIX,
     poweredByHeader: false,
 
     images: {
