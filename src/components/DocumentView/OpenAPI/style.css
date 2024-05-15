@@ -172,6 +172,10 @@
     @apply prose-sm;
 }
 
+.openapi-schema-example.openapi-markdown {
+    @apply prose-sm;
+}
+
 /** Authentication */
 
 .openapi-securities {
