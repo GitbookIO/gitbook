@@ -23,7 +23,7 @@
         "@gitbook/api": "^0.46.0",
         "@radix-ui/react-checkbox": "^1.0.4",
         "@radix-ui/react-popover": "^1.0.7",
-        "@sentry/nextjs": "^7.94.1",
+        "@sentry/nextjs": "^8.0.0",
         "@tailwindcss/container-queries": "^0.1.1",
         "@tailwindcss/typography": "^0.5.10",
         "@upstash/redis": "^1.27.1",
