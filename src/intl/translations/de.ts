@@ -37,7 +37,7 @@ export const de = {
     cookies_close: 'Schließen',
     edit_on_git: 'Bearbeiten auf ${1}',
     notfound_title: 'Seite nicht gefunden',
-    notfound: 'Die Seite, die Sie suchen, existiert nicht.',
+    notfound: 'Die gesuchte Seite existiert nicht.',
     unexpected_error_title: 'Ein Fehler ist aufgetreten',
     unexpected_error: 'Entschuldigung, ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.',
     unexpected_error_retry: 'Erneut versuchen',
