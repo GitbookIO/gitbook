@@ -94,10 +94,7 @@ export function OpenAPISchemaProperty(
                         />
                     ) : null}
                     {schema.example ? (
-                        <Markdown
-                            source={'Example: ' + schema.example}
-                            className="openapi-schema-example"
-                        />
+                        <span className="openapi-schema-example">Example: {schema.example} </span>
                     ) : null}
                 </div>
             }
