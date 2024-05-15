@@ -173,7 +173,7 @@
 }
 
 .openapi-schema-example {
-    @apply py-2;
+    @apply mt-2;
 }
 
 /** Authentication */
