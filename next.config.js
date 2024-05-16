@@ -45,6 +45,7 @@ module.exports = withSentryConfig(
                 {
                     protocol: 'https',
                     hostname: '*.gitbook.io',
+                    port: ''
                 }
             ]
         }
