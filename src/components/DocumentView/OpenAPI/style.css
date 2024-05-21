@@ -173,7 +173,7 @@
 }
 
 .openapi-schema-example {
-    @apply mt-2;
+    @apply mt-2 text-base text-dark/10 dark:text-light/10;
 }
 
 /** Authentication */
