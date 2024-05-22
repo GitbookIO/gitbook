@@ -48,7 +48,6 @@ export function OpenAPISchemaProperty(
         : getSchemaAlternatives(schema, new Set(circularRefs.keys()));
 
     const shouldDisplayExample = (schema: OpenAPIV3.SchemaObject): boolean => {
-        schema.example;
         return (typeof schema.example === 'string' || typeof schema.example === 'number' || typeof schema.example === 'boolean')
     }
     return (
