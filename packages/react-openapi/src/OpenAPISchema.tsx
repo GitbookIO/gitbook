@@ -14,7 +14,6 @@ interface OpenAPISchemaPropertyEntry {
     propertyName?: string;
     required?: boolean;
     schema: OpenAPIV3.SchemaObject;
-    example?: string;
 }
 
 /**
@@ -48,6 +47,10 @@ export function OpenAPISchemaProperty(
         ? null
         : getSchemaAlternatives(schema, new Set(circularRefs.keys()));
 
+    const shouldDisplayExample = (schema: OpenAPIV3.SchemaObject): boolean => {
+        schema.example;
+        return (typeof schema.example === 'string' || typeof schema.example === 'number' || typeof schema.example === 'boolean')
+    }
     return (
         <InteractiveSection
             id={id}
@@ -93,8 +96,8 @@ export function OpenAPISchemaProperty(
                             className="openapi-schema-description"
                         />
                     ) : null}
-                    {schema.example ? (
-                        <span className="openapi-schema-example">Example: {schema.example} </span>
+                    {shouldDisplayExample(schema) ? (
+                        <span className="openapi-schema-example">Example: <code>{schema.example}</code></span>
                     ) : null}
                 </div>
             }

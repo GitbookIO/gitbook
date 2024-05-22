@@ -173,7 +173,7 @@
 }
 
 .openapi-schema-example {
-    @apply mt-2 text-base text-dark/10 dark:text-light/10;
+    @apply prose-sm mt-2 text-dark/10 dark:text-light/10;
 }
 
 /** Authentication */
