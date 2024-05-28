@@ -7,6 +7,7 @@ const PLAIN_HIGHLIGHTING_SPACES: string[] = [
     'V9geAO9ITPi8WOYK5o0r',
     'puRmcwVxGFtHph8IjXaf',
     'e3jwbMOrr4RhKtZ9C0XL',
+    'ryjzVNizLfd6pYogN3dm',
 ];
 
 /**
