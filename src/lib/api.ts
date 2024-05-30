@@ -610,6 +610,7 @@ const getSiteSpaceCustomizationFromAPI = cache(
             organizationId,
             siteId,
             siteSpaceId,
+            {},
             {
                 signal: options.signal,
                 ...noCacheFetchOptions,
@@ -633,10 +634,15 @@ const getSiteSpaceCustomizationFromAPI = cache(
 const getSiteCustomizationFromAPI = cache(
     'api.getSiteCustomizationById',
     async (organizationId: string, siteId: string, options: CacheFunctionOptions) => {
-        const response = await api().orgs.getSiteCustomizationById(organizationId, siteId, {
-            signal: options.signal,
-            ...noCacheFetchOptions,
-        });
+        const response = await api().orgs.getSiteCustomizationById(
+            organizationId,
+            siteId,
+            {},
+            {
+                signal: options.signal,
+                ...noCacheFetchOptions,
+            },
+        );
         return cacheResponse(response, {
             revalidateBefore: 60 * 60,
             tags: [
