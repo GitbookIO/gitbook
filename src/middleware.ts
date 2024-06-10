@@ -261,7 +261,7 @@ export async function middleware(request: NextRequest) {
         );
     } else {
         if (resolved.cacheMaxAge) {
-            const cacheControl = `public, max-age=0, s-maxage=${resolved.cacheMaxAge}, stale-while-revalidate=60, stale-if-error=0`;
+            const cacheControl = `public, max-age=0, s-maxage=${resolved.cacheMaxAge}, stale-if-error=0`;
 
             if (
                 process.env.GITBOOK_OUTPUT_CACHE === 'true' &&
