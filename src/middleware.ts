@@ -205,10 +205,12 @@ export async function middleware(request: NextRequest) {
     if ('site' in resolved) {
         headers.set('x-gitbook-content-organization', resolved.organization);
         headers.set('x-gitbook-content-site', resolved.site);
-        headers.set('x-gitbook-content-site-url', inputURL.toString());
         if (resolved.siteSpace) {
             headers.set('x-gitbook-content-site-space', resolved.siteSpace);
         }
+    }
+    if (resolved.contentUrl) {
+        headers.set('x-gitbook-content-url', resolved.contentUrl);
     }
     if (resolved.revision) {
         headers.set('x-gitbook-content-revision', resolved.revision);

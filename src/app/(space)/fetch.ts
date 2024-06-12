@@ -40,7 +40,7 @@ export function getContentPointer(): ContentPointer | SiteContentPointer {
     if (siteId) {
         const organizationId = headerSet.get('x-gitbook-content-organization');
         const siteSpaceId = headerSet.get('x-gitbook-content-site-space');
-        const siteUrl = headerSet.get('x-gitbook-content-site-url');
+        const siteUrl = headerSet.get('x-gitbook-content-url');
         if (!organizationId || !siteUrl) {
             throw new Error('Missing site content headers');
         }

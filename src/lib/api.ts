@@ -127,6 +127,8 @@ export type PublishedContentWithCache =
     | ((PublishedContentLookup | PublishedSiteContentLookup) & {
           cacheMaxAge?: number;
           cacheTags?: string[];
+          /** Published content URL that was used for lookup */
+          contentUrl?: string;
       })
     | {
           error: {
@@ -236,6 +238,7 @@ export const getPublishedContentByUrl = cache(
                 ...response.data,
                 cacheMaxAge: parsed.ttl,
                 cacheTags: parsed.tags,
+                contentUrl: url,
             };
             return {
                 tags: [
