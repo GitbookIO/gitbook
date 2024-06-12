@@ -10,7 +10,7 @@ import { zh } from './zh';
 export * from './types';
 
 export const languages: {
-    [locale in CustomizationLocale]: TranslationLanguage;
+    [locale in Exclude<CustomizationLocale, 'br' | 'de'>]: TranslationLanguage;
 } = {
     en,
     fr,
