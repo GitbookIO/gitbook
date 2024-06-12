@@ -47,6 +47,7 @@ export interface SiteContentPointer extends ContentPointer {
      * ID of the siteSpace can be undefined when rendering in multi-id mode (for site previews)
      */
     siteSpaceId: string | undefined;
+    siteUrl: string;
 }
 
 /**
@@ -736,12 +737,25 @@ export const getSite = cache(
  */
 export const getSiteSpaces = cache(
     'api.getSiteSpaces',
-    async (organizationId: string, siteId: string, options: CacheFunctionOptions) => {
+    async (
+        organizationId: string,
+        siteId: string,
+        siteUrlContext: string | null,
+        options: CacheFunctionOptions,
+    ) => {
         const response = await getAll((params) =>
-            api().orgs.listSiteSpaces(organizationId, siteId, params, {
-                ...noCacheFetchOptions,
-                signal: options.signal,
-            }),
+            api().orgs.listSiteSpaces(
+                organizationId,
+                siteId,
+                {
+                    ...params,
+                    context: siteUrlContext ?? undefined,
+                },
+                {
+                    ...noCacheFetchOptions,
+                    signal: options.signal,
+                },
+            ),
         );
 
         return cacheResponse(response, {
