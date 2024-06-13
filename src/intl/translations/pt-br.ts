@@ -1,4 +1,4 @@
-export const br = {
+export const pt_br = {
     locale: 'pt-br',
     powered_by_gitbook: 'Powered by GitBook',
     switch_to_dark_theme: 'Mudar para modo escuro',
