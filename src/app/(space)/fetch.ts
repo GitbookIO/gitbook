@@ -178,10 +178,14 @@ async function fetchParentCollection(space: Space) {
     return { parent: collection, spaces };
 }
 
-async function fetchParentSite(organizationId: string, siteId: string, siteUrl: string) {
+async function fetchParentSite(
+    organizationId: string,
+    siteId: string,
+    siteUrl: string | undefined,
+) {
     const [site, siteSpaces] = await Promise.all([
         getSite(organizationId, siteId),
-        getSiteSpaces(organizationId, siteId, siteUrl),
+        getSiteSpaces(organizationId, siteId, siteUrl ?? null),
     ]);
 
     const spaces: Record<string, Space> = {};
