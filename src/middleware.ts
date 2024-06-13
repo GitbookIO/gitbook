@@ -662,6 +662,7 @@ async function lookupSpaceByAPI(
             apiToken: data.apiToken,
             cacheMaxAge: data.cacheMaxAge,
             cacheTags: data.cacheTags,
+            contentUrl: data.contentUrl,
             ...('site' in data
                 ? { site: data.site, siteSpace: data.siteSpace, organization: data.organization }
                 : {}),
