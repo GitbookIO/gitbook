@@ -10,6 +10,7 @@ import { zh } from './zh';
 
 export * from './types';
 
+//@ts-ignore
 export const languages: {
     [locale in CustomizationLocale]: TranslationLanguage;
 } = {
