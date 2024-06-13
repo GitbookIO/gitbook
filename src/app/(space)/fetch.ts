@@ -41,15 +41,15 @@ export function getContentPointer(): ContentPointer | SiteContentPointer {
         const organizationId = headerSet.get('x-gitbook-content-organization');
         const siteSpaceId = headerSet.get('x-gitbook-content-site-space');
         const siteUrl = headerSet.get('x-gitbook-content-url');
-        if (!organizationId || !siteUrl) {
+        if (!organizationId) {
             throw new Error('Missing site content headers');
         }
 
         const siteContent: SiteContentPointer = {
-            siteUrl,
             siteId,
             spaceId,
             siteSpaceId: siteSpaceId ?? undefined,
+            siteUrl: siteUrl ?? undefined,
             organizationId,
             revisionId: headerSet.get('x-gitbook-content-revision') ?? undefined,
             changeRequestId: headerSet.get('x-gitbook-content-changerequest') ?? undefined,
