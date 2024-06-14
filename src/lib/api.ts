@@ -47,6 +47,11 @@ export interface SiteContentPointer extends ContentPointer {
      * ID of the siteSpace can be undefined when rendering in multi-id mode (for site previews)
      */
     siteSpaceId: string | undefined;
+    /**
+     * URL of the site content that was used for lookup. Only set for `multi` and `multi-path` modes
+     * where an URL is involved in the lookup/resolution
+     */
+    siteUrl: string | undefined;
 }
 
 /**
@@ -126,6 +131,8 @@ export type PublishedContentWithCache =
     | ((PublishedContentLookup | PublishedSiteContentLookup) & {
           cacheMaxAge?: number;
           cacheTags?: string[];
+          /** Published content URL that was used for lookup */
+          contentUrl?: string;
       })
     | {
           error: {
@@ -235,6 +242,7 @@ export const getPublishedContentByUrl = cache(
                 ...response.data,
                 cacheMaxAge: parsed.ttl,
                 cacheTags: parsed.tags,
+                contentUrl: url,
             };
             return {
                 tags: [
@@ -736,12 +744,28 @@ export const getSite = cache(
  */
 export const getSiteSpaces = cache(
     'api.getSiteSpaces',
-    async (organizationId: string, siteId: string, options: CacheFunctionOptions) => {
+    async (
+        organizationId: string,
+        siteId: string,
+        /**
+         * Additional site URL that can be used as context to resolve site space published urls
+         */
+        siteUrlContext: string | null,
+        options: CacheFunctionOptions,
+    ) => {
         const response = await getAll((params) =>
-            api().orgs.listSiteSpaces(organizationId, siteId, params, {
-                ...noCacheFetchOptions,
-                signal: options.signal,
-            }),
+            api().orgs.listSiteSpaces(
+                organizationId,
+                siteId,
+                {
+                    ...params,
+                    context: siteUrlContext ?? undefined,
+                },
+                {
+                    ...noCacheFetchOptions,
+                    signal: options.signal,
+                },
+            ),
         );
 
         return cacheResponse(response, {

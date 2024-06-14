@@ -40,6 +40,7 @@ export function getContentPointer(): ContentPointer | SiteContentPointer {
     if (siteId) {
         const organizationId = headerSet.get('x-gitbook-content-organization');
         const siteSpaceId = headerSet.get('x-gitbook-content-site-space');
+        const siteUrl = headerSet.get('x-gitbook-content-url');
         if (!organizationId) {
             throw new Error('Missing site content headers');
         }
@@ -48,6 +49,7 @@ export function getContentPointer(): ContentPointer | SiteContentPointer {
             siteId,
             spaceId,
             siteSpaceId: siteSpaceId ?? undefined,
+            siteUrl: siteUrl ?? undefined,
             organizationId,
             revisionId: headerSet.get('x-gitbook-content-revision') ?? undefined,
             changeRequestId: headerSet.get('x-gitbook-content-changerequest') ?? undefined,
@@ -71,7 +73,10 @@ export async function fetchSpaceData() {
 
     const [{ space, contentTarget, pages, customization, scripts }, parentSite] = await Promise.all(
         'siteId' in content
-            ? [getCurrentSiteData(content), fetchParentSite(content.organizationId, content.siteId)]
+            ? [
+                  getCurrentSiteData(content),
+                  fetchParentSite(content.organizationId, content.siteId, content.siteUrl),
+              ]
             : [getSpaceData(content)],
     );
 
@@ -102,7 +107,7 @@ export async function fetchPageData(params: PagePathParams | PageIdParams) {
     const page = await resolvePage(contentTarget, pages, params);
     const [parent, document] = await Promise.all([
         'siteId' in content
-            ? fetchParentSite(content.organizationId, content.siteId)
+            ? fetchParentSite(content.organizationId, content.siteId, content.siteUrl)
             : fetchParentCollection(space),
         page?.page.documentId ? getDocument(space.id, page.page.documentId) : null,
     ]);
@@ -173,10 +178,14 @@ async function fetchParentCollection(space: Space) {
     return { parent: collection, spaces };
 }
 
-async function fetchParentSite(organizationId: string, siteId: string) {
+async function fetchParentSite(
+    organizationId: string,
+    siteId: string,
+    siteUrl: string | undefined,
+) {
     const [site, siteSpaces] = await Promise.all([
         getSite(organizationId, siteId),
-        getSiteSpaces(organizationId, siteId),
+        getSiteSpaces(organizationId, siteId, siteUrl ?? null),
     ]);
 
     const spaces: Record<string, Space> = {};
