@@ -76,7 +76,11 @@ export async function searchParentContent(
         api.searchParentContent(parent.id, query),
         parent.object === 'collection' ? api.getCollectionSpaces(parent.id) : null,
         parent.object === 'site' && 'organizationId' in pointer
-            ? api.getSiteSpaces(pointer.organizationId, parent.id, pointer.siteUrl ?? null)
+            ? api.getSiteSpaces({
+                  organizationId: pointer.organizationId,
+                  siteId: parent.id,
+                  siteShareKey: pointer.siteShareKey,
+              })
             : null,
     ]);
 

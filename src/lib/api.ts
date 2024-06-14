@@ -48,10 +48,10 @@ export interface SiteContentPointer extends ContentPointer {
      */
     siteSpaceId: string | undefined;
     /**
-     * URL of the site content that was used for lookup. Only set for `multi` and `multi-path` modes
-     * where an URL is involved in the lookup/resolution
+     * Share key of the site that was used in lookup. Only set for `multi` and `multi-path` modes
+     * where an URL with the share-link key is involved in the lookup/resolution.
      */
-    siteUrl: string | undefined;
+    siteShareKey: string | undefined;
 }
 
 /**
@@ -131,8 +131,6 @@ export type PublishedContentWithCache =
     | ((PublishedContentLookup | PublishedSiteContentLookup) & {
           cacheMaxAge?: number;
           cacheTags?: string[];
-          /** Published content URL that was used for lookup */
-          contentUrl?: string;
       })
     | {
           error: {
@@ -242,7 +240,6 @@ export const getPublishedContentByUrl = cache(
                 ...response.data,
                 cacheMaxAge: parsed.ttl,
                 cacheTags: parsed.tags,
-                contentUrl: url,
             };
             return {
                 tags: [
@@ -745,21 +742,21 @@ export const getSite = cache(
 export const getSiteSpaces = cache(
     'api.getSiteSpaces',
     async (
-        organizationId: string,
-        siteId: string,
-        /**
-         * Additional site URL that can be used as context to resolve site space published urls
-         */
-        siteUrlContext: string | null,
+        args: {
+            organizationId: string;
+            siteId: string;
+            /** Site share key that can be used as context to resolve site space published urls */
+            siteShareKey: string | undefined;
+        },
         options: CacheFunctionOptions,
     ) => {
         const response = await getAll((params) =>
             api().orgs.listSiteSpaces(
-                organizationId,
-                siteId,
+                args.organizationId,
+                args.siteId,
                 {
                     ...params,
-                    context: siteUrlContext ?? undefined,
+                    ...(args.siteShareKey ? { shareKey: args.siteShareKey } : {}),
                 },
                 {
                     ...noCacheFetchOptions,
@@ -771,7 +768,7 @@ export const getSiteSpaces = cache(
         return cacheResponse(response, {
             revalidateBefore: 60 * 60,
             data: response.data.items.map((siteSpace) => siteSpace),
-            tags: [getAPICacheTag({ tag: 'site', site: siteId })],
+            tags: [getAPICacheTag({ tag: 'site', site: args.siteId })],
         });
     },
 );

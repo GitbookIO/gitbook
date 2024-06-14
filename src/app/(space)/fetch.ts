@@ -40,7 +40,7 @@ export function getContentPointer(): ContentPointer | SiteContentPointer {
     if (siteId) {
         const organizationId = headerSet.get('x-gitbook-content-organization');
         const siteSpaceId = headerSet.get('x-gitbook-content-site-space');
-        const siteUrl = headerSet.get('x-gitbook-content-url');
+        const siteShareKey = headerSet.get('x-gitbook-content-site-share-key');
         if (!organizationId) {
             throw new Error('Missing site content headers');
         }
@@ -49,7 +49,7 @@ export function getContentPointer(): ContentPointer | SiteContentPointer {
             siteId,
             spaceId,
             siteSpaceId: siteSpaceId ?? undefined,
-            siteUrl: siteUrl ?? undefined,
+            siteShareKey: siteShareKey ?? undefined,
             organizationId,
             revisionId: headerSet.get('x-gitbook-content-revision') ?? undefined,
             changeRequestId: headerSet.get('x-gitbook-content-changerequest') ?? undefined,
@@ -75,7 +75,11 @@ export async function fetchSpaceData() {
         'siteId' in content
             ? [
                   getCurrentSiteData(content),
-                  fetchParentSite(content.organizationId, content.siteId, content.siteUrl),
+                  fetchParentSite({
+                      organizationId: content.organizationId,
+                      siteId: content.siteId,
+                      siteShareKey: content.siteShareKey,
+                  }),
               ]
             : [getSpaceData(content)],
     );
@@ -107,7 +111,11 @@ export async function fetchPageData(params: PagePathParams | PageIdParams) {
     const page = await resolvePage(contentTarget, pages, params);
     const [parent, document] = await Promise.all([
         'siteId' in content
-            ? fetchParentSite(content.organizationId, content.siteId, content.siteUrl)
+            ? fetchParentSite({
+                  organizationId: content.organizationId,
+                  siteId: content.siteId,
+                  siteShareKey: content.siteShareKey,
+              })
             : fetchParentCollection(space),
         page?.page.documentId ? getDocument(space.id, page.page.documentId) : null,
     ]);
@@ -178,14 +186,15 @@ async function fetchParentCollection(space: Space) {
     return { parent: collection, spaces };
 }
 
-async function fetchParentSite(
-    organizationId: string,
-    siteId: string,
-    siteUrl: string | undefined,
-) {
+async function fetchParentSite(args: {
+    organizationId: string;
+    siteId: string;
+    siteShareKey: string | undefined;
+}) {
+    const { organizationId, siteId, siteShareKey } = args;
     const [site, siteSpaces] = await Promise.all([
         getSite(organizationId, siteId),
-        getSiteSpaces(organizationId, siteId, siteUrl ?? null),
+        getSiteSpaces({ organizationId, siteId, siteShareKey }),
     ]);
 
     const spaces: Record<string, Space> = {};
