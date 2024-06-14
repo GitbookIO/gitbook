@@ -47,6 +47,10 @@ export interface SiteContentPointer extends ContentPointer {
      * ID of the siteSpace can be undefined when rendering in multi-id mode (for site previews)
      */
     siteSpaceId: string | undefined;
+    /**
+     * URL of the site content that was used for lookup. Only set for `multi` and `multi-path` modes
+     * where an URL is involved in the lookup/resolution
+     */
     siteUrl: string | undefined;
 }
 
