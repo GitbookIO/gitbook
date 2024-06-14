@@ -208,10 +208,11 @@ export async function middleware(request: NextRequest) {
         if (resolved.siteSpace) {
             headers.set('x-gitbook-content-site-space', resolved.siteSpace);
         }
+        if (resolved.shareKey) {
+            headers.set('x-gitbook-content-site-share-key', resolved.shareKey);
+        }
     }
-    if (resolved.contentUrl) {
-        headers.set('x-gitbook-content-url', resolved.contentUrl);
-    }
+
     if (resolved.revision) {
         headers.set('x-gitbook-content-revision', resolved.revision);
     }
@@ -662,9 +663,13 @@ async function lookupSpaceByAPI(
             apiToken: data.apiToken,
             cacheMaxAge: data.cacheMaxAge,
             cacheTags: data.cacheTags,
-            contentUrl: data.contentUrl,
             ...('site' in data
-                ? { site: data.site, siteSpace: data.siteSpace, organization: data.organization }
+                ? {
+                      site: data.site,
+                      siteSpace: data.siteSpace,
+                      organization: data.organization,
+                      shareKey: data.shareKey,
+                  }
                 : {}),
         } as PublishedContentWithCache;
     });
