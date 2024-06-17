@@ -50,6 +50,7 @@ export function cacheResponse<Result, DefaultData = Result>(
     return {
         ttl: defaultEntry.ttl ?? parsed.ttl,
         tags: [...(defaultEntry.tags ?? []), ...parsed.tags],
+        revalidateBefore: defaultEntry.revalidateBefore,
         // @ts-ignore
         data: defaultEntry.data ?? response.data,
     };

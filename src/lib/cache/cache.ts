@@ -202,7 +202,7 @@ export function cache<Args extends any[], Result>(
 
             if (savedEntry.meta.revalidatesAt && savedEntry.meta.revalidatesAt < Date.now()) {
                 // Revalidate in the background
-                waitUntil(revalidate(key, undefined, ...args));
+                await waitUntil(revalidate(key, undefined, ...args));
             }
 
             return savedEntry.data;
