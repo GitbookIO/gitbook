@@ -3,6 +3,8 @@ import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 import React from 'react';
 
+import { getContentTitle } from '@/lib/utils';
+
 import { PageIdParams, fetchPageData } from '../../../../fetch';
 
 export const runtime = 'edge';
@@ -31,7 +33,7 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
                 }}
             >
                 <h2 tw="text-7xl font-bold tracking-tight text-left">
-                    {parent?.title ?? customization.title ?? space.title}
+                    {getContentTitle(space, customization, parent)}
                 </h2>
                 <div tw="flex flex-1">
                     <p tw="text-4xl">{page ? page.title : 'Not found'}</p>
