@@ -14,6 +14,7 @@ import {
 } from '@/lib/api';
 import { getEmojiForCode } from '@/lib/emojis';
 import { tcls } from '@/lib/tailwind';
+import { getContentTitle } from '@/lib/utils';
 
 export const runtime = 'edge';
 
@@ -54,7 +55,7 @@ export async function GET(req: NextRequest) {
             : space.visibility === ContentVisibility.InCollection && space.parent
               ? await getCollection(space.parent)
               : null;
-    const contentTitle = parent?.title ?? customization.title ?? space.title;
+    const contentTitle = getContentTitle(space, customization, parent);
 
     return new ImageResponse(
         (
