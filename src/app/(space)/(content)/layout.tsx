@@ -12,6 +12,7 @@ import { buildVersion } from '@/lib/build';
 import { getContentSecurityPolicyNonce } from '@/lib/csp';
 import { absoluteHref, baseUrl } from '@/lib/links';
 import { shouldIndexSpace } from '@/lib/seo';
+import { getContentTitle } from '@/lib/utils';
 
 import { ClientContexts } from './ClientContexts';
 import { RocketLoaderDetector } from './RocketLoaderDetector';
@@ -104,7 +105,7 @@ export async function generateMetadata(): Promise<Metadata> {
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
 
     return {
-        title: `${parent ? parent.title : customization.title ?? space.title}`,
+        title: getContentTitle(space, customization, parent),
         generator: `GitBook (${buildVersion()})`,
         metadataBase: new URL(baseUrl()),
         icons: {

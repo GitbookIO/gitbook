@@ -11,6 +11,7 @@ import { HeaderMobileMenu } from '@/components/Header/HeaderMobileMenu';
 import { Image } from '@/components/utils';
 import { absoluteHref } from '@/lib/links';
 import { tcls } from '@/lib/tailwind';
+import { getContentTitle } from '@/lib/utils';
 
 import { Link } from '../primitives';
 
@@ -145,7 +146,7 @@ function LogoFallback(props: HeaderLogoProps) {
                         : 'text-header-link',
                 )}
             >
-                {parent ? parent.title : customization.title ?? space.title}
+                {getContentTitle(space, customization, parent)}
             </h1>
         </>
     );
