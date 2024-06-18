@@ -10,11 +10,12 @@ import {
     getPublishedContentByUrl,
     api,
     getSpace,
+    getSpaceContentData,
     userAgent,
     withAPI,
+    getSpaceLayoutData,
     DEFAULT_API_ENDPOINT,
-    getSpaceIntegrationScripts,
-    getSiteIntegrationScripts,
+    getCurrentSiteLayoutData,
 } from '@/lib/api';
 import { race } from '@/lib/async';
 import { buildVersion } from '@/lib/build';
@@ -27,6 +28,8 @@ import {
     getVisitorAuthToken,
     normalizeVisitorAuthURL,
 } from '@/lib/visitor-auth';
+
+import { waitUntil } from './lib/waitUntil';
 
 export const config = {
     matcher:
@@ -166,9 +169,23 @@ export async function middleware(request: NextRequest) {
             userAgent: userAgent(),
         }),
         async () => {
-            const scripts = await ('site' in resolved
-                ? getSiteIntegrationScripts(resolved.organization, resolved.site)
-                : getSpaceIntegrationScripts(resolved.space));
+            // Start fetching everything as soon as possible, but do not block the middleware on it
+            // the cache will handle concurrent calls
+            await waitUntil(
+                getSpaceContentData({
+                    spaceId: resolved.space,
+                    changeRequestId: resolved.changeRequest,
+                    revisionId: resolved.revision,
+                }),
+            );
+
+            const { scripts } = await ('site' in resolved
+                ? getCurrentSiteLayoutData({
+                      organizationId: resolved.organization,
+                      siteId: resolved.site,
+                      siteSpaceId: resolved.siteSpace,
+                  })
+                : getSpaceLayoutData(resolved.space));
             return getContentSecurityPolicy(scripts, nonce);
         },
     );
