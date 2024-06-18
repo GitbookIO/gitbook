@@ -9,6 +9,7 @@ import { PageHrefContext, absoluteHref, pageHref } from '@/lib/links';
 import { getPagePath } from '@/lib/pages';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
+import { getContentTitle } from '@/lib/utils';
 
 import { PageClientLayout } from './PageClientLayout';
 import { PagePathParams, fetchPageData, getPathnameParam, normalizePathname } from '../../fetch';
@@ -110,7 +111,7 @@ export async function generateMetadata({ params }: { params: PagePathParams }): 
     }
 
     return {
-        title: [page.title, customization.title ?? space.title, parent?.title]
+        title: [page.title, getContentTitle(space, customization, parent)]
             .filter(Boolean)
             .join(' | '),
         description: page.description ?? '',
