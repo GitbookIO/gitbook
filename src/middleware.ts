@@ -10,6 +10,7 @@ import {
     getPublishedContentByUrl,
     api,
     getSpace,
+    getSpaceContentData,
     userAgent,
     withAPI,
     DEFAULT_API_ENDPOINT,
@@ -27,6 +28,8 @@ import {
     getVisitorAuthToken,
     normalizeVisitorAuthURL,
 } from '@/lib/visitor-auth';
+
+import { waitUntil } from './lib/waitUntil';
 
 export const config = {
     matcher:
@@ -166,6 +169,16 @@ export async function middleware(request: NextRequest) {
             userAgent: userAgent(),
         }),
         async () => {
+            // Start fetching everything as soon as possible, but do not block the middleware on it
+            // the cache will handle concurrent calls
+            await waitUntil(
+                getSpaceContentData({
+                    spaceId: resolved.space,
+                    changeRequestId: resolved.changeRequest,
+                    revisionId: resolved.revision,
+                }),
+            );
+
             const scripts = await ('site' in resolved
                 ? getSiteIntegrationScripts(resolved.organization, resolved.site)
                 : getSpaceIntegrationScripts(resolved.space));
