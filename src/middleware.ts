@@ -12,9 +12,9 @@ import {
     getSpace,
     userAgent,
     withAPI,
-    getSpaceLayoutData,
     DEFAULT_API_ENDPOINT,
-    getCurrentSiteLayoutData,
+    getSpaceIntegrationScripts,
+    getSiteIntegrationScripts,
 } from '@/lib/api';
 import { race } from '@/lib/async';
 import { buildVersion } from '@/lib/build';
@@ -166,13 +166,9 @@ export async function middleware(request: NextRequest) {
             userAgent: userAgent(),
         }),
         async () => {
-            const { scripts } = await ('site' in resolved
-                ? getCurrentSiteLayoutData({
-                      organizationId: resolved.organization,
-                      siteId: resolved.site,
-                      siteSpaceId: resolved.siteSpace,
-                  })
-                : getSpaceLayoutData(resolved.space));
+            const scripts = await ('site' in resolved
+                ? getSiteIntegrationScripts(resolved.organization, resolved.site)
+                : getSpaceIntegrationScripts(resolved.space));
             return getContentSecurityPolicy(scripts, nonce);
         },
     );
