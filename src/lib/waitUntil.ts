@@ -33,7 +33,6 @@ export async function waitUntil(promise: Promise<unknown>) {
     const { getOptionalRequestContext } = await import('@cloudflare/next-on-pages');
 
     const cloudflare = getOptionalRequestContext();
-    console.log('getOptionalRequestContext', cloudflare);
     if (cloudflare) {
         cloudflare.ctx.waitUntil(promise);
     } else {

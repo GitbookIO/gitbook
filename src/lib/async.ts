@@ -272,7 +272,6 @@ export function singletonMap<Key extends string, Args extends any[], Result>(
         const ctx = await getGlobalContext();
         let current = states.get(ctx);
         if (current) {
-            console.log('got current', key);
             const existing = current.get(key);
             if (existing) {
                 return existing;
@@ -280,7 +279,6 @@ export function singletonMap<Key extends string, Args extends any[], Result>(
         }
 
         if (!current) {
-            console.log('first current', key);
             current = new Map();
             states.set(ctx, current);
         }
