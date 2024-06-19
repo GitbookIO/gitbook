@@ -1,3 +1,5 @@
+import { getOptionalRequestContext } from '@cloudflare/next-on-pages';
+
 import { CacheBackend, CacheEntry } from './types';
 import { NON_IMMUTABLE_LOCAL_CACHE_MAX_AGE_SECONDS, isCacheEntryImmutable } from './utils';
 
@@ -67,12 +69,24 @@ export const memoryCache: CacheBackend = {
  * To share the cache between the two, we use a global variable.
  */
 function getMemoryCache(): Map<string, CacheEntry> {
+    // We lazy-load the next-on-pages package to avoid errors when running tests because of 'server-only'.
+    // const { getOptionalRequestContext } = await import('@cloudflare/next-on-pages');
+
+    let globalThisForMemoryCache: any = globalThis;
+    const cloudflare = getOptionalRequestContext();
+    if (cloudflare) {
+        globalThisForMemoryCache = cloudflare.ctx;
+    }
+    // console.log('getOptionalRequestContext', cloudflare);
     // @ts-ignore
-    if (!globalThis.gitbookMemoryCache) {
+    if (!globalThisForMemoryCache.gitbookMemoryCache) {
+        console.log('Creating memory cache')
         // @ts-ignore
-        globalThis.gitbookMemoryCache = new Map();
+        globalThisForMemoryCache.gitbookMemoryCache = new Map();
+    } else {
+        console.log('Memory cache exists');
     }
 
     // @ts-ignore
-    return globalThis.gitbookMemoryCache;
+    return globalThisForMemoryCache.gitbookMemoryCache;
 }
