@@ -11,7 +11,7 @@
         "format": "prettier ./ --ignore-unknown --write",
         "format:check": "prettier ./ --ignore-unknown --list-different",
         "typecheck": "tsc --noEmit",
-        "unit": "bun test {src,packages}/**/*.test.ts",
+        "unit": "bun test {src,packages}",
         "e2e": "playwright test",
         "postinstall": "rm -rf ./public/~gitbook/static/mathjax@3.2.2 && mkdir -p ./public/~gitbook/static/ && cp -R node_modules/mathjax/es5 ./public/~gitbook/static/mathjax@3.2.2"
     },
