@@ -172,6 +172,10 @@
     @apply prose-sm;
 }
 
+.openapi-schema-example {
+    @apply prose-sm mt-2 text-dark/10 dark:text-light/10;
+}
+
 /** Authentication */
 
 .openapi-securities {

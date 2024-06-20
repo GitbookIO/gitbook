@@ -47,6 +47,9 @@ export function OpenAPISchemaProperty(
         ? null
         : getSchemaAlternatives(schema, new Set(circularRefs.keys()));
 
+    const shouldDisplayExample = (schema: OpenAPIV3.SchemaObject): boolean => {
+        return (typeof schema.example === 'string' || typeof schema.example === 'number' || typeof schema.example === 'boolean')
+    }
     return (
         <InteractiveSection
             id={id}
@@ -91,6 +94,9 @@ export function OpenAPISchemaProperty(
                             source={schema.description}
                             className="openapi-schema-description"
                         />
+                    ) : null}
+                    {shouldDisplayExample(schema) ? (
+                        <span className="openapi-schema-example">Example: <code>{JSON.stringify(schema.example)}</code></span>
                     ) : null}
                 </div>
             }
