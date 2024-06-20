@@ -9,7 +9,7 @@ import React from 'react';
 
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
-import { ContentTarget, api } from '@/lib/api';
+import { ContentPointer, ContentTarget, SiteContentPointer, api } from '@/lib/api';
 import { hasFullWidthBlock, isNodeEmpty } from '@/lib/document';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -25,6 +25,7 @@ import { DateRelative } from '../primitives';
 
 export function PageBody(props: {
     space: Space;
+    contentPointer: ContentPointer | SiteContentPointer;
     contentTarget: ContentTarget;
     customization: CustomizationSettings | SiteCustomizationSettings;
     page: RevisionPageDocument;
@@ -32,13 +33,25 @@ export function PageBody(props: {
     context: ContentRefContext;
     withPageFeedback: boolean;
 }) {
-    const { space, contentTarget, customization, context, page, document, withPageFeedback } =
-        props;
+    const {
+        space,
+        contentPointer,
+        contentTarget,
+        customization,
+        context,
+        page,
+        document,
+        withPageFeedback,
+    } = props;
 
     const asFullWidth = document ? hasFullWidthBlock(document) : false;
     const language = getSpaceLanguage(customization);
     const updatedAt = page.updatedAt ?? page.createdAt;
     const shouldHighlightCode = createHighlightingContext();
+    const sitePointer =
+        'siteId' in contentPointer
+            ? { organizationId: contentPointer.organizationId, siteId: contentPointer.siteId }
+            : undefined;
 
     return (
         <>
@@ -129,7 +142,12 @@ export function PageBody(props: {
                 </div>
             </main>
             <React.Suspense fallback={null}>
-                <TrackPageView spaceId={space.id} pageId={page.id} apiHost={api().endpoint} />
+                <TrackPageView
+                    sitePointer={sitePointer}
+                    spaceId={space.id}
+                    pageId={page.id}
+                    apiHost={api().endpoint}
+                />
             </React.Suspense>
         </>
     );
