@@ -10,7 +10,7 @@ Invalidate cache can be done at two levels using tags:
 To invalidate and refetch the data cache, you can execute a POST request to `/~/gitbook/revalidate`:
 
 ```bash
-curl --location --request POST 'https://gitbook/mycompany.com/~gitbook/revalidate' \
+curl --location --request POST 'https://gitbook.mycompany.com/~gitbook/revalidate' \
 --header 'Content-Type: application/json' \
 --data-raw '{"tags": ["space.id"]}'
 ```
