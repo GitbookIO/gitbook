@@ -243,6 +243,7 @@ export const getPublishedContentByUrl = cache(
             };
             return {
                 tags: [
+                    ...parsed.tags,
                     getAPICacheTag({
                         tag: 'url',
                         hostname: parsedURL.hostname,
