@@ -1,5 +1,6 @@
 import { CacheBackend, CacheEntry } from './types';
 import { NON_IMMUTABLE_LOCAL_CACHE_MAX_AGE_SECONDS, isCacheEntryImmutable } from './utils';
+import { getGlobalContext } from '../waitUntil';
 
 export const memoryCache: CacheBackend = {
     name: 'memory',
@@ -67,16 +68,7 @@ export const memoryCache: CacheBackend = {
  * To share the cache between the two, we use a global variable.
  */
 async function getMemoryCache(): Promise<Map<string, CacheEntry>> {
-    let globalThisForMemoryCache: any = globalThis;
-
-    if (process.env.NODE_ENV !== 'test') {
-        // We lazy-load the next-on-pages package to avoid errors when running tests because of 'server-only'.
-        const { getOptionalRequestContext } = await import('@cloudflare/next-on-pages');
-        const cloudflare = getOptionalRequestContext();
-        if (cloudflare) {
-            globalThisForMemoryCache = cloudflare.ctx;
-        }
-    }
+    let globalThisForMemoryCache: any = await getGlobalContext();
 
     if (!globalThisForMemoryCache.gitbookMemoryCache) {
         globalThisForMemoryCache.gitbookMemoryCache = new Map();
