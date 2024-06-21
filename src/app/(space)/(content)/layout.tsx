@@ -9,6 +9,7 @@ import { CookiesToast } from '@/components/Cookies';
 import { LoadIntegrations } from '@/components/Integrations';
 import { SpaceLayout } from '@/components/SpaceLayout';
 import { api } from '@/lib/api';
+import { assetsDomain } from '@/lib/assets';
 import { buildVersion } from '@/lib/build';
 import { getContentSecurityPolicyNonce } from '@/lib/csp';
 import { absoluteHref, baseUrl } from '@/lib/links';
@@ -41,6 +42,10 @@ export default async function ContentLayout(props: { children: React.ReactNode }
     } = await fetchSpaceData();
 
     ReactDOM.preconnect(api().endpoint);
+    if (assetsDomain) {
+        ReactDOM.preconnect(assetsDomain);
+    }
+
     scripts.forEach(({ script }) => {
         ReactDOM.preload(script, {
             as: 'script',
