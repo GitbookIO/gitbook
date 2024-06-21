@@ -1,5 +1,7 @@
 import 'server-only';
 
+import fnv1a from '@sindresorhus/fnv1a';
+
 import { noCacheFetchOptions } from '@/lib/cache/http';
 
 import { rootUrl } from './links';
@@ -201,12 +203,10 @@ function stringifyOptions(options: CloudflareImageOptions): string {
     }, '');
 }
 
+// Reused buffer for FNV-1a hashing
+const fnv1aUtf8Buffer = new Uint8Array(100);
+
 async function generateSignature(input: string): Promise<string> {
     const all = [input, process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY].filter(Boolean).join(':');
-    const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(all));
-
-    // Convert ArrayBuffer to hex string
-    const hashArray = Array.from(new Uint8Array(hash));
-    const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
-    return hashHex;
+    return fnv1a(all, { utf8Buffer: fnv1aUtf8Buffer }).toString(16);
 }
