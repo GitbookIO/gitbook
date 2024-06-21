@@ -23,8 +23,15 @@ export default async function Page(props: { params: PagePathParams }) {
     const { params } = props;
 
     const rawPathname = getPathnameParam(params);
-    const { contentTarget, space, customization, pages, page, document } =
-        await fetchPageData(params);
+    const {
+        content: contentPointer,
+        contentTarget,
+        space,
+        customization,
+        pages,
+        page,
+        document,
+    } = await fetchPageData(params);
     const linksContext: PageHrefContext = {};
 
     if (!page) {
@@ -63,6 +70,7 @@ export default async function Page(props: { params: PagePathParams }) {
             <div className={tcls('flex', 'flex-row')}>
                 <PageBody
                     space={space}
+                    contentPointer={contentPointer}
                     contentTarget={contentTarget}
                     customization={customization}
                     context={contentRefContext}

@@ -48,6 +48,7 @@ export function OpenAPISpec(props: { rawData: any; context: OpenAPIClientContext
                                 // Description of the parameter is defined at the parameter level
                                 // we use display it if the schema doesn't override it
                                 description: parameter.description,
+                                example: parameter.example,
                                 ...(noReference(parameter.schema) ?? {}),
                             },
                             required: parameter.required,

@@ -26,9 +26,12 @@ export function parseCacheResponse(response: Response): {
     const cacheControlHeader = response.headers.get('cache-control');
     const cacheControl = cacheControlHeader ? parseCacheControl(cacheControlHeader) : null;
 
+    const cacheTagHeader = response.headers.get('x-gitbook-cache-tag');
+    const tags = !cacheTagHeader ? [] : cacheTagHeader.split(',');
+
     const entry = {
         ttl: 60 * 60 * 24,
-        tags: [],
+        tags,
     };
 
     if (cacheControl && cacheControl['max-age']) {
