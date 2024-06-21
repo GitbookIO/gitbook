@@ -1,11 +1,12 @@
 import { CacheBackend, CacheEntry } from './types';
 import { NON_IMMUTABLE_LOCAL_CACHE_MAX_AGE_SECONDS, isCacheEntryImmutable } from './utils';
+import { getGlobalContext } from '../waitUntil';
 
 export const memoryCache: CacheBackend = {
     name: 'memory',
     replication: 'local',
     async get(key) {
-        const memoryCache = getMemoryCache();
+        const memoryCache = await getMemoryCache();
         const memoryEntry = memoryCache.get(key);
 
         if (!memoryEntry) {
@@ -21,7 +22,7 @@ export const memoryCache: CacheBackend = {
         return null;
     },
     async set(key, entry) {
-        const memoryCache = getMemoryCache();
+        const memoryCache = await getMemoryCache();
         // When the entry is immutable, we can cache it for the entire duration.
         // Else we cache it for a very short time.
         const expiresAt =
@@ -41,11 +42,11 @@ export const memoryCache: CacheBackend = {
         memoryCache.set(key, { ...entry, meta });
     },
     async del(keys) {
-        const memoryCache = getMemoryCache();
+        const memoryCache = await getMemoryCache();
         keys.forEach((key) => memoryCache.delete(key));
     },
     async revalidateTags(tags) {
-        const memoryCache = getMemoryCache();
+        const memoryCache = await getMemoryCache();
         const keys: string[] = [];
 
         memoryCache.forEach((entry, key) => {
@@ -66,13 +67,12 @@ export const memoryCache: CacheBackend = {
  * With next-on-pages, the code seems to be isolated between the middleware and the handler.
  * To share the cache between the two, we use a global variable.
  */
-function getMemoryCache(): Map<string, CacheEntry> {
-    // @ts-ignore
-    if (!globalThis.gitbookMemoryCache) {
-        // @ts-ignore
-        globalThis.gitbookMemoryCache = new Map();
+async function getMemoryCache(): Promise<Map<string, CacheEntry>> {
+    let globalThisForMemoryCache: any = await getGlobalContext();
+
+    if (!globalThisForMemoryCache.gitbookMemoryCache) {
+        globalThisForMemoryCache.gitbookMemoryCache = new Map();
     }
 
-    // @ts-ignore
-    return globalThis.gitbookMemoryCache;
+    return globalThisForMemoryCache.gitbookMemoryCache;
 }
