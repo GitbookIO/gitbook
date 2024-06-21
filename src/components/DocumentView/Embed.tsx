@@ -1,5 +1,6 @@
 import * as gitbookAPI from '@gitbook/api';
 import Script from 'next/script';
+import ReactDOM from 'react-dom';
 
 import { Card } from '@/components/primitives';
 import { api } from '@/lib/api';
@@ -11,6 +12,8 @@ import { IntegrationBlock } from './Integration';
 
 export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
     const { block, context, ...otherProps } = props;
+    
+    ReactDOM.preconnect('https://cdn.iframe.ly');
 
     const { data: embed } = await (context.content
         ? api().spaces.getEmbedByUrlInSpace(context.content.spaceId, { url: block.data.url })
