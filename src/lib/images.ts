@@ -75,7 +75,7 @@ export async function getResizedImageURL(
         return null;
     }
 
-    const signature = await generateSignature(input);
+    const signature = await generateSignatureV1(input);
 
     return (options) => {
         const url = new URL('/~gitbook/image', rootUrl());
@@ -95,6 +95,7 @@ export async function getResizedImageURL(
         }
 
         url.searchParams.set('sign', signature);
+        url.searchParams.set('sv', '1');
 
         return url.toString();
     };
@@ -103,8 +104,12 @@ export async function getResizedImageURL(
 /**
  * Verify a signature of an image URL
  */
-export async function verifyImageSignature(input: string, signature: string): Promise<boolean> {
-    const expectedSignature = await generateSignature(input);
+export async function verifyImageSignature(
+    input: string,
+    { signature, version }: { signature: string; version: '1' | '0' },
+): Promise<boolean> {
+    const expectedSignature =
+        version === '1' ? await generateSignatureV1(input) : await generateSignature(input);
     return expectedSignature === signature;
 }
 
@@ -206,7 +211,27 @@ function stringifyOptions(options: CloudflareImageOptions): string {
 // Reused buffer for FNV-1a hashing
 const fnv1aUtf8Buffer = new Uint8Array(100);
 
-async function generateSignature(input: string): Promise<string> {
+/**
+ * New and faster algorithm to generate a signature for an image.
+ * When setting it in a URL, we use version '1' for the 'sv' querystring parameneter
+ * to know that it was the algorithm that was used.
+ */
+async function generateSignatureV1(input: string): Promise<string> {
     const all = [input, process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY].filter(Boolean).join(':');
     return fnv1a(all, { utf8Buffer: fnv1aUtf8Buffer }).toString(16);
+}
+
+/**
+ * Initial algorithm used to generate a signature for an image. It didn't use any versioning.
+ * We still need it to validate older signatures that were generated without versioning
+ * but still exist in previously generated and cached content.
+ */
+async function generateSignature(input: string): Promise<string> {
+    const all = [input, process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY].filter(Boolean).join(':');
+    const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(all));
+
+    // Convert ArrayBuffer to hex string
+    const hashArray = Array.from(new Uint8Array(hash));
+    const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
 }
