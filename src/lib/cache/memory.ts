@@ -1,6 +1,7 @@
 import { CacheBackend, CacheEntry } from './types';
 import { NON_IMMUTABLE_LOCAL_CACHE_MAX_AGE_SECONDS, isCacheEntryImmutable } from './utils';
 import { getGlobalContext } from '../waitUntil';
+import { singleton } from '../async';
 
 export const memoryCache: CacheBackend = {
     name: 'memory',
@@ -67,12 +68,4 @@ export const memoryCache: CacheBackend = {
  * With next-on-pages, the code seems to be isolated between the middleware and the handler.
  * To share the cache between the two, we use a global variable.
  */
-async function getMemoryCache(): Promise<Map<string, CacheEntry>> {
-    let globalThisForMemoryCache: any = await getGlobalContext();
-
-    if (!globalThisForMemoryCache.gitbookMemoryCache) {
-        globalThisForMemoryCache.gitbookMemoryCache = new Map();
-    }
-
-    return globalThisForMemoryCache.gitbookMemoryCache;
-}
+const getMemoryCache = singleton(async () => new Map());
