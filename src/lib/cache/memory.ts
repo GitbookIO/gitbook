@@ -1,6 +1,6 @@
-import { CacheBackend } from './types';
+import { CacheBackend, CacheEntry } from './types';
 import { NON_IMMUTABLE_LOCAL_CACHE_MAX_AGE_SECONDS, isCacheEntryImmutable } from './utils';
-import { singleton } from '../async';
+import { getGlobalContext } from '../waitUntil';
 
 export const memoryCache: CacheBackend = {
     name: 'memory',
@@ -9,6 +9,7 @@ export const memoryCache: CacheBackend = {
         const memoryCache = await getMemoryCache();
         const memoryEntry = memoryCache.get(key);
 
+        console.log(`${memoryEntry ? 'memory hit' : 'memory miss'} for key: ${key}`)
         if (!memoryEntry) {
             return null;
         }
@@ -64,9 +65,21 @@ export const memoryCache: CacheBackend = {
 };
 
 /**
- * With next-on-pages, the code seems to be isolated between the middleware and the handler.
- * To share the cache between the two, we use a global variable.
- * By using a singleton, we ensure that the cache is only created once and stored in the
- * current request context.
+ * In memory cache shared globally.
  */
-const getMemoryCache = singleton(async () => new Map());
+async function getMemoryCache(): Promise<Map<string, CacheEntry>> {
+    const ctx: Awaited<ReturnType<typeof getGlobalContext>> & {
+        gitbookMemoryCache?: Map<string, CacheEntry>;
+    } = await getGlobalContext();
+
+    if (ctx.gitbookMemoryCache) {
+        console.log('getMemoryCache - cache already exists');
+        return ctx.gitbookMemoryCache;
+    }
+
+    console.log('getMemoryCache - creating cache');
+    const gitbookMemoryCache = new Map<string, CacheEntry>();
+    ctx.gitbookMemoryCache = gitbookMemoryCache;
+
+    return gitbookMemoryCache;
+}
