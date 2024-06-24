@@ -1,6 +1,5 @@
-import { CacheBackend, CacheEntry } from './types';
+import { CacheBackend } from './types';
 import { NON_IMMUTABLE_LOCAL_CACHE_MAX_AGE_SECONDS, isCacheEntryImmutable } from './utils';
-import { getGlobalContext } from '../waitUntil';
 import { singleton } from '../async';
 
 export const memoryCache: CacheBackend = {
