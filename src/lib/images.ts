@@ -222,7 +222,7 @@ async function generateSignatureV1(input: string): Promise<string> {
 }
 
 /**
- * Initial algorithm used to generate a signature for an image. It didn't use any versioning.
+ * Initial algorithm used to generate a signature for an image. It didn't use any versioning in the URL.
  * We still need it to validate older signatures that were generated without versioning
  * but still exist in previously generated and cached content.
  */
