@@ -209,7 +209,7 @@ function stringifyOptions(options: CloudflareImageOptions): string {
 }
 
 // Reused buffer for FNV-1a hashing
-const fnv1aUtf8Buffer = new Uint8Array(100);
+const fnv1aUtf8Buffer = new Uint8Array(512);
 
 /**
  * New and faster algorithm to generate a signature for an image.
