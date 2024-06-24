@@ -66,5 +66,7 @@ export const memoryCache: CacheBackend = {
 /**
  * With next-on-pages, the code seems to be isolated between the middleware and the handler.
  * To share the cache between the two, we use a global variable.
+ * By using a singleton, we ensure that the cache is only created once and stored in the
+ * current request context.
  */
 const getMemoryCache = singleton(async () => new Map());
