@@ -6,7 +6,7 @@ export const memoryCache: CacheBackend = {
     name: 'memory',
     replication: 'local',
     async get(key) {
-        const memoryCache = getMemoryCache();
+        const memoryCache = await getMemoryCache();
         const memoryEntry = memoryCache.get(key);
 
         console.log(`${memoryEntry ? 'memory hit' : 'memory miss'} for key: ${key}`)
@@ -23,7 +23,7 @@ export const memoryCache: CacheBackend = {
         return null;
     },
     async set(key, entry) {
-        const memoryCache = getMemoryCache();
+        const memoryCache = await getMemoryCache();
         // When the entry is immutable, we can cache it for the entire duration.
         // Else we cache it for a very short time.
         const expiresAt =
@@ -43,11 +43,11 @@ export const memoryCache: CacheBackend = {
         memoryCache.set(key, { ...entry, meta });
     },
     async del(keys) {
-        const memoryCache = getMemoryCache();
+        const memoryCache = await getMemoryCache();
         keys.forEach((key) => memoryCache.delete(key));
     },
     async revalidateTags(tags) {
-        const memoryCache = getMemoryCache();
+        const memoryCache = await getMemoryCache();
         const keys: string[] = [];
 
         memoryCache.forEach((entry, key) => {
@@ -67,10 +67,10 @@ export const memoryCache: CacheBackend = {
 /**
  * In memory cache shared globally.
  */
-function getMemoryCache(): Map<string, CacheEntry> {
-    const ctx: ReturnType<typeof getGlobalContext> & {
+async function getMemoryCache(): Promise<Map<string, CacheEntry>> {
+    const ctx: Awaited<ReturnType<typeof getGlobalContext>> & {
         gitbookMemoryCache?: Map<string, CacheEntry>;
-    } = getGlobalContext();
+    } = await getGlobalContext();
 
     if (ctx.gitbookMemoryCache) {
         console.log('getMemoryCache - cache already exists');
