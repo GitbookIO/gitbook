@@ -9,7 +9,6 @@ export const memoryCache: CacheBackend = {
         const memoryCache = await getMemoryCache();
         const memoryEntry = memoryCache.get(key);
 
-        console.log(`${memoryEntry ? 'memory hit' : 'memory miss'} for key: ${key}`)
         if (!memoryEntry) {
             return null;
         }
@@ -73,11 +72,9 @@ async function getMemoryCache(): Promise<Map<string, CacheEntry>> {
     } = await getGlobalContext();
 
     if (ctx.gitbookMemoryCache) {
-        console.log('getMemoryCache - cache already exists');
         return ctx.gitbookMemoryCache;
     }
 
-    console.log('getMemoryCache - creating cache');
     const gitbookMemoryCache = new Map<string, CacheEntry>();
     ctx.gitbookMemoryCache = gitbookMemoryCache;
 
