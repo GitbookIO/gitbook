@@ -109,7 +109,7 @@ export async function verifyImageSignature(
     { signature, version }: { signature: string; version: '1' | '0' },
 ): Promise<boolean> {
     const expectedSignature =
-        version === '1' ? await generateSignatureV1(input) : await generateSignature(input);
+        version === '1' ? await generateSignatureV1(input) : await generateSignatureV0(input);
     return expectedSignature === signature;
 }
 
@@ -226,7 +226,7 @@ async function generateSignatureV1(input: string): Promise<string> {
  * We still need it to validate older signatures that were generated without versioning
  * but still exist in previously generated and cached content.
  */
-async function generateSignature(input: string): Promise<string> {
+async function generateSignatureV0(input: string): Promise<string> {
     const all = [input, process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY].filter(Boolean).join(':');
     const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(all));
 
