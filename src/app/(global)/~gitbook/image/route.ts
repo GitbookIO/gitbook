@@ -13,6 +13,9 @@ export const runtime = 'edge';
 export async function GET(request: NextRequest) {
     let urlParam = request.nextUrl.searchParams.get('url');
     const signature = request.nextUrl.searchParams.get('sign');
+    // The current signature algorithm sets version as 1, but we need to support the older version as well
+    // for previously generated content. In this case, we default to version 0.
+    const signatureVersion = (request.nextUrl.searchParams.get('sv') as '1') || '0';
     if (!urlParam || !signature) {
         return new Response('Missing url/sign parameters', { status: 400 });
     }
@@ -25,7 +28,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Verify the signature
-    const verified = await verifyImageSignature(url, signature);
+    const verified = await verifyImageSignature(url, { signature, version: signatureVersion });
     if (!verified) {
         return new Response(`Invalid signature "${signature ?? ''}" for "${url}"`, { status: 400 });
     }
