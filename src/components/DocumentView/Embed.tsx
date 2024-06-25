@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 
 import { Card } from '@/components/primitives';
 import { api } from '@/lib/api';
+import { getContentSecurityPolicyNonce } from '@/lib/csp';
 import { tcls } from '@/lib/tailwind';
 
 import { BlockProps } from './Block';
@@ -29,7 +30,12 @@ export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
                         }}
                     />
                     {/* We load the iframely script to resize the embed iframes dynamically */}
-                    <Script src="https://cdn.iframe.ly/embed.js" defer async />
+                    <Script
+                        src="https://cdn.iframe.ly/embed.js"
+                        defer
+                        async
+                        nonce={getContentSecurityPolicyNonce()}
+                    />
                 </>
             ) : embed.type === 'integration' ? (
                 <IntegrationBlock
