@@ -1,6 +1,6 @@
 import { MaybePromise } from 'p-map';
 
-import { waitUntil, getGlobalContext } from './waitUntil';
+import { waitUntil, getRequestContext } from './waitUntil';
 
 /**
  * Execute a function for each input in parallel and return the first result.
@@ -238,7 +238,7 @@ export function singleton<R>(execute: () => Promise<R>): () => Promise<R> {
         }
 
         // Promises are not shared between requests in Cloudflare Workers
-        const ctx = await getGlobalContext();
+        const ctx = await getRequestContext();
         const current = states.get(ctx);
         if (current) {
             return current;
@@ -269,7 +269,7 @@ export function singletonMap<Key extends string, Args extends any[], Result>(
     const states = new WeakMap<object, Map<string, Promise<Result>>>();
 
     const fn: SingletonFunction<Key, Args, Result> = async (key, ...args) => {
-        const ctx = await getGlobalContext();
+        const ctx = await getRequestContext();
         let current = states.get(ctx);
         if (current) {
             const existing = current.get(key);
@@ -292,7 +292,7 @@ export function singletonMap<Key extends string, Args extends any[], Result>(
     };
 
     fn.isRunning = async (key: string) => {
-        const ctx = await getGlobalContext();
+        const ctx = await getRequestContext();
         const current = states.get(ctx);
         return current?.has(key) ?? false;
     };
