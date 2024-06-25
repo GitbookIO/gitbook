@@ -25,6 +25,7 @@ module.exports = withSentryConfig(
                 config.plugins.push(
                     new webpack.DefinePlugin({
                         __SENTRY_DEBUG__: false,
+                        // We always init Sentry with enableTracing: false for now, so this is useless
                         __SENTRY_TRACING__: false,
                         __RRWEB_EXCLUDE_IFRAME__: true,
                         __RRWEB_EXCLUDE_SHADOW_DOM__: true,
