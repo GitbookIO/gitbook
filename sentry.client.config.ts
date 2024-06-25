@@ -1,8 +1,15 @@
-import * as Sentry from '@sentry/nextjs';
+import {
+    BrowserClient,
+    makeFetchTransport,
+    defaultStackParser,
+    getCurrentScope,
+} from '@sentry/nextjs';
 
 const dsn = process.env.SENTRY_DSN;
 if (dsn) {
-    Sentry.init({
+    // To tree shake default integrations that we don't use
+    // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/tree-shaking/#tree-shaking-default-integrations
+    const client = new BrowserClient({
         debug: false,
         dsn,
         integrations: [],
@@ -11,5 +18,10 @@ if (dsn) {
         beforeSendTransaction: () => {
             return null;
         },
+        transport: makeFetchTransport,
+        stackParser: defaultStackParser,
     });
+
+    getCurrentScope().setClient(client);
+    client.init();
 }
