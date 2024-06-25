@@ -1,5 +1,5 @@
 import { GitBookAPI } from '@gitbook/api';
-import * as Sentry from '@sentry/nextjs';
+import { setTag, setContext } from '@sentry/nextjs';
 import assertNever from 'assert-never';
 import jwt from 'jsonwebtoken';
 import type { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
@@ -94,8 +94,8 @@ interface ContentAPITokenPayload {
 export async function middleware(request: NextRequest) {
     const { url, mode } = getInputURL(request);
 
-    Sentry.setTag('url', url.toString());
-    Sentry.setContext('request', {
+    setTag('url', url.toString());
+    setContext('request', {
         method: request.method,
         url: url.toString(),
         rawRequestURL: request.url,
@@ -145,8 +145,8 @@ export async function middleware(request: NextRequest) {
         return writeCookies(NextResponse.redirect(normalizedVA.toString()), resolved.cookies);
     }
 
-    Sentry.setTag('space', resolved.space);
-    Sentry.setContext('content', {
+    setTag('space', resolved.space);
+    setContext('content', {
         space: resolved.space,
         changeRequest: resolved.changeRequest,
         revision: resolved.revision,
