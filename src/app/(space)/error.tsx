@@ -1,6 +1,6 @@
 'use client';
 
-import * as Sentry from '@sentry/nextjs';
+import { captureException } from '@sentry/nextjs';
 import React from 'react';
 
 import { Button } from '@/components/primitives/Button';
@@ -15,7 +15,7 @@ export default function ErrorPage(props: {
     const language = useLanguage();
 
     React.useEffect(() => {
-        Sentry.captureException(error);
+        captureException(error);
     }, [error]);
 
     return (

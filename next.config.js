@@ -9,7 +9,7 @@ module.exports = withSentryConfig(
             GITBOOK_ASSETS_PREFIX: process.env.GITBOOK_ASSETS_PREFIX,
         },
 
-        webpack(config) {
+        webpack(config, { dev, webpack }) {
             config.resolve.fallback = {
                 ...config.resolve.fallback,
 
@@ -18,6 +18,21 @@ module.exports = withSentryConfig(
                 path: false,
                 http: false,
             };
+
+            // Tree shake debug code for Sentry
+            // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/tree-shaking/#tree-shaking-with-nextjs
+            if (!dev) {
+                config.plugins.push(
+                    new webpack.DefinePlugin({
+                        __SENTRY_DEBUG__: false,
+                        // We always init Sentry with enableTracing: false for now, so this is useless
+                        __SENTRY_TRACING__: false,
+                        __RRWEB_EXCLUDE_IFRAME__: true,
+                        __RRWEB_EXCLUDE_SHADOW_DOM__: true,
+                        __SENTRY_EXCLUDE_REPLAY_WORKER__: true,
+                    }),
+                );
+            }
 
             return config;
         },
@@ -45,9 +60,9 @@ module.exports = withSentryConfig(
                 {
                     protocol: 'https',
                     hostname: '*.gitbook.io',
-                }
-            ]
-        }
+                },
+            ],
+        },
     },
     {
         silent: true,
