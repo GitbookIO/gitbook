@@ -30,8 +30,7 @@ export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
                             __html: embed.html,
                         }}
                     />
-                    {/* We load the iframely script to resize the embed iframes dynamically */}
-                    <Script src="https://cdn.iframe.ly/embed.js" nonce={nonce} defer async />
+                    <Script src="https://cdn.iframe.ly/embed.js" nonce={nonce} />
                 </>
             ) : embed.type === 'integration' ? (
                 <IntegrationBlock
