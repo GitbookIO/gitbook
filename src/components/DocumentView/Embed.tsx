@@ -1,4 +1,5 @@
 import * as gitbookAPI from '@gitbook/api';
+import { headers } from 'next/headers';
 import Script from 'next/script';
 import ReactDOM from 'react-dom';
 
@@ -12,6 +13,7 @@ import { IntegrationBlock } from './Integration';
 
 export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
     const { block, context, ...otherProps } = props;
+    const nonce = headers().get('x-nonce') || undefined;
     
     ReactDOM.preconnect('https://cdn.iframe.ly');
 
@@ -29,7 +31,7 @@ export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
                         }}
                     />
                     {/* We load the iframely script to resize the embed iframes dynamically */}
-                    <Script src="https://cdn.iframe.ly/embed.js" defer async />
+                    <Script src="https://cdn.iframe.ly/embed.js" nonce={nonce} defer async />
                 </>
             ) : embed.type === 'integration' ? (
                 <IntegrationBlock
