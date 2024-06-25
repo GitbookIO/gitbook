@@ -9,7 +9,7 @@ module.exports = withSentryConfig(
             GITBOOK_ASSETS_PREFIX: process.env.GITBOOK_ASSETS_PREFIX,
         },
 
-        webpack(config, { dev }) {
+        webpack(config, { dev, webpack }) {
             config.resolve.fallback = {
                 ...config.resolve.fallback,
 
