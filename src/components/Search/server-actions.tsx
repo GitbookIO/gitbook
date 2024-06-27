@@ -46,7 +46,7 @@ export interface AskAnswerSource {
 }
 
 export interface AskAnswerResult {
-    body: React.ReactNode;
+    body?: React.ReactNode;
     followupQuestions: string[];
     sources: AskAnswerSource[];
 }
@@ -112,12 +112,15 @@ export async function searchParentContent(
  * Server action to ask a question in a space.
  */
 export const streamAskQuestion = streamResponse(async function* (spaceId: string, query: string) {
-    const stream = api.api().spaces.streamAskInSpace(spaceId, { query, format: 'document' });
+    const stream = api
+        .api()
+        .spaces.streamAskInSpace(spaceId, { query, format: 'document', details: true });
     const pagesPromise = api.getSpaceContentData({ spaceId });
 
     for await (const chunk of stream) {
         // We run the AI search and fetch the pages in parallel
         const { pages } = await pagesPromise;
+
         yield transformAnswer(chunk.answer, pages);
     }
 });
@@ -134,9 +137,11 @@ function transformAnswer(
     answer: SearchAIAnswer | undefined,
     pages: RevisionPage[],
 ): AskAnswerResult | null {
-    if (!answer || !('document' in answer.answer)) {
+    if (!answer) {
         return null;
     }
+
+    const hasAnswer = 'document' in answer.answer;
 
     const sources = answer.sources
         .map((source) => {
@@ -158,7 +163,7 @@ function transformAnswer(
         .filter(filterOutNullable);
 
     return {
-        body: (
+        body: hasAnswer ? (
             <DocumentView
                 document={answer.answer.document}
                 context={{
@@ -169,7 +174,7 @@ function transformAnswer(
                 }}
                 style={['space-y-5']}
             />
-        ),
+        ) : null,
         followupQuestions: answer.followupQuestions,
         sources,
     };

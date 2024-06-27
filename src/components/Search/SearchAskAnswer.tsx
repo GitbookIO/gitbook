@@ -9,9 +9,10 @@ import { t } from '@/intl/translate';
 import { iterateStreamResponse } from '@/lib/actions';
 import { tcls } from '@/lib/tailwind';
 
-import { AskAnswerResult, streamAskQuestion } from './server-actions';
+import { AskAnswerResult, AskAnswerSource, streamAskQuestion } from './server-actions';
 import { useSearch, useSearchLink } from './useSearch';
 import { Link } from '../primitives';
+import { TranslationLanguage } from '@/intl/translations';
 
 /**
  * Store the state of the answer in a global state so that it can be
@@ -94,6 +95,11 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
         };
     }, [setState]);
 
+    let hasAnswer = false;
+    if (state && 'answer' in state) {
+        hasAnswer = !!state?.answer?.body;
+    }
+
     return (
         <div
             className={tcls(
@@ -106,7 +112,7 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
         >
             {state?.type === 'answer' ? (
                 <>
-                    {state.answer ? (
+                    {state.answer?.body ? (
                         <div className={tcls('w-full')}>
                             <AnswerBody answer={state.answer} />
                         </div>
@@ -129,7 +135,6 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
 
 function AnswerBody(props: { answer: AskAnswerResult }) {
     const { answer } = props;
-    const getSearchLinkProps = useSearchLink();
     const language = useLanguage();
 
     const [, setSearchState] = useSearch();
@@ -146,91 +151,112 @@ function AnswerBody(props: { answer: AskAnswerResult }) {
                 {answer.body}
             </div>
             {answer.followupQuestions.length > 0 ? (
-                <div className={tcls('mt-7', 'flex', 'flex-col', 'flex-wrap', 'gap-1')}>
-                    {answer.followupQuestions.map((question) => (
-                        <Link
-                            key={question}
-                            className={tcls(
-                                'text-sm',
-                                'font-medium',
-                                'inline-flex',
-                                'items-start',
-                                'gap-2',
-                                'px-4',
-                                'py-1',
-                                'text-primary-500',
-                                'focus-within:text-primary-700',
-                                'hover:bg-primary/2',
-                                'dark:text-primary-400',
-                                'dark:hover:bg-primary-500/3',
-                            )}
-                            {...getSearchLinkProps({
-                                query: question,
-                                ask: true,
-                            })}
-                        >
-                            <IconSearch
-                                className={tcls(
-                                    'w-[15px]',
-                                    'h-[15px]',
-                                    'shrink-0',
-                                    'mt-0.5',
-                                    '[&>path]:[stroke-opacity:0.64]',
-                                )}
-                            />
-                            <span>{question}</span>
-                        </Link>
-                    ))}
-                </div>
+                <AnswerFollowupQuestions followupQuestions={answer.followupQuestions} />
             ) : null}
             {answer.sources.length > 0 ? (
-                <div
-                    className={tcls(
-                        'flex',
-                        'flex-wrap',
-                        'gap-2',
-                        'mt-7',
-                        'py-4',
-                        'px-4',
-                        'border-t',
-                        'border-dark/2',
-                        'dark:border-light/1',
-                    )}
-                >
-                    <span className={tcls('text-sm')}>{t(language, 'search_ask_sources')}</span>
-
-                    {answer.sources.map((source) => (
-                        <span key={source.id} className={tcls()}>
-                            <Link
-                                onClick={onClose}
-                                className={tcls(
-                                    'flex',
-                                    'text-sm',
-                                    'text-dark/7',
-                                    'hover:underline',
-                                    'focus-within:text-primary-700',
-                                    'dark:text-light/8',
-                                )}
-                                href={source.href}
-                                prefetch={false}
-                            >
-                                <IconBox
-                                    className={tcls(
-                                        'stroke-dark/6',
-                                        'w-[15px]',
-                                        'h-[15px]',
-                                        'shrink-0',
-                                        'mt-0.5',
-                                        'mr-0.5',
-                                        'dark:stroke-light/6',
-                                    )}
-                                />
-                                {source.title}
-                            </Link>
-                        </span>
-                    ))}
-                </div>
+                <AnswerSources sources={answer.sources} language={language} onClose={onClose} />
             ) : null}
         </>
+    );
+}
+
+function AnswerFollowupQuestions(props: { followupQuestions: string[] }) {
+    const { followupQuestions } = props;
+    const getSearchLinkProps = useSearchLink();
+
+    return (
+        <div className={tcls('mt-7', 'flex', 'flex-col', 'flex-wrap', 'gap-1')}>
+            {followupQuestions.map((question) => (
+                <Link
+                    key={question}
+                    className={tcls(
+                        'text-sm',
+                        'font-medium',
+                        'inline-flex',
+                        'items-start',
+                        'gap-2',
+                        'px-4',
+                        'py-1',
+                        'text-primary-500',
+                        'focus-within:text-primary-700',
+                        'hover:bg-primary/2',
+                        'dark:text-primary-400',
+                        'dark:hover:bg-primary-500/3',
+                    )}
+                    {...getSearchLinkProps({
+                        query: question,
+                        ask: true,
+                    })}
+                >
+                    <IconSearch
+                        className={tcls(
+                            'w-[15px]',
+                            'h-[15px]',
+                            'shrink-0',
+                            'mt-0.5',
+                            '[&>path]:[stroke-opacity:0.64]',
+                        )}
+                    />
+                    <span>{question}</span>
+                </Link>
+            ))}
+        </div>
+    );
+}
+
+function AnswerSources(props: {
+    sources: AskAnswerSource[];
+    language: TranslationLanguage;
+    onClose: () => void;
+}) {
+    const { sources, onClose, language } = props;
+
+    return (
+        <div
+            className={tcls(
+                'flex',
+                'flex-wrap',
+                'gap-2',
+                'mt-7',
+                'py-4',
+                'px-4',
+                'border-t',
+                'border-dark/2',
+                'dark:border-light/1',
+            )}
+        >
+            <span className={tcls('text-sm')}>{t(language, 'search_ask_sources')}</span>
+
+            {sources.map((source) => (
+                <span key={source.id} className={tcls()}>
+                    <Link
+                        onClick={onClose}
+                        className={tcls(
+                            'flex',
+                            'text-sm',
+                            'text-dark/7',
+                            'hover:underline',
+                            'focus-within:text-primary-700',
+                            'dark:text-light/8',
+                        )}
+                        href={source.href}
+                        prefetch={false}
+                    >
+                        <IconBox
+                            className={tcls(
+                                'stroke-dark/6',
+                                'w-[15px]',
+                                'h-[15px]',
+                                'shrink-0',
+                                'mt-0.5',
+                                'mr-0.5',
+                                'dark:stroke-light/6',
+                            )}
+                        />
+                        {source.title}
+                    </Link>
+                </span>
+            ))}
+        </div>
     );
 }
