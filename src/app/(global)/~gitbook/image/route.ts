@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 
-import { verifyImageSignature, resizeImage, CloudflareImageOptions } from '@/lib/images';
+import { verifyImageSignature, resizeImage, CloudflareImageOptions, checkIsSizableImageURL } from '@/lib/images';
 import { parseImageAPIURL } from '@/lib/urls';
 
 export const runtime = 'edge';
@@ -24,6 +24,12 @@ export async function GET(request: NextRequest) {
 
     // Prevent infinite loops
     if (url.includes('/~gitbook/image')) {
+        return new Response('Invalid url parameter', { status: 400 });
+    }
+
+    // Check again if the image can be sized, even though we checked when rendering the Image component
+    // Otherwise, it's possible to pass just any link to this endpoint and trigger HTML injection on the domain
+    if (!checkIsSizableImageURL(url)) {
         return new Response('Invalid url parameter', { status: 400 });
     }
 
