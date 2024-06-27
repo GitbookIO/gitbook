@@ -41,7 +41,7 @@ export function isImageResizingEnabled(): boolean {
 /**
  * Check if a URL is an HTTP URL.
  */
-export function checkIsHttpURL(input: string): boolean {
+export function checkIsHttpURL(input: string | URL): boolean {
     if (!URL.canParse(input)) {
         return false;
     }
@@ -54,11 +54,16 @@ export function checkIsHttpURL(input: string): boolean {
  * Skip it for non-http(s) URLs (data, etc).
  * Skip it for SVGs.
  */
-function checkIsSizableImageURL(input: string): boolean {
-    if (input.endsWith('.svg')) {
+export function checkIsSizableImageURL(input: string): boolean {
+    if (!URL.canParse(input)) {
         return false;
     }
-    return checkIsHttpURL(input);
+
+    const parsed = new URL(input);
+    if (parsed.pathname.endsWith('.svg')) {
+        return false;
+    }
+    return checkIsHttpURL(parsed);
 }
 
 /**
