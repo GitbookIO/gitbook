@@ -15,7 +15,7 @@ export const en = {
     search_ask_sources: 'Sources',
     search_ask_sources_no_answer: 'Related pages',
     search_ask_no_answer:
-        'No answer could be found for your question. You could try rephrasing it, or be more specific.',
+        'An answer could not be found for your question. You could try rephrasing it, or be more specific.',
     search_ask_error: 'Something went wrong. Please try again later.',
     on_this_page: 'On this page',
     next_page: 'Next',
