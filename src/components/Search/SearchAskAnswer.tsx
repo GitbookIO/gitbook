@@ -113,7 +113,7 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
             {state?.type === 'answer' ? (
                 <>
                     {state.answer ? (
-                        <div className={tcls('w-full pb-4')}>
+                        <div className={tcls('w-full')}>
                             <AnswerBody answer={state.answer} />
                         </div>
                     ) : (
@@ -170,7 +170,7 @@ function AnswerFollowupQuestions(props: { followupQuestions: string[] }) {
     const getSearchLinkProps = useSearchLink();
 
     return (
-        <div className={tcls('mt-7', 'flex', 'flex-col', 'flex-wrap', 'gap-1')}>
+        <div className={tcls('mt-7 mb-4', 'flex', 'flex-col', 'flex-wrap', 'gap-1')}>
             {followupQuestions.map((question) => (
                 <Link
                     key={question}
