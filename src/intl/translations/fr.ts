@@ -15,7 +15,9 @@ export const fr: TranslationLanguage = {
     search_scope_all: 'Tout le contenu',
     search_ask: 'Demander "${1}"',
     search_ask_sources: 'Sources',
-    search_ask_no_answer: 'Aucune réponse trouvée à votre question, essayez-en une autre.',
+    search_ask_sources_no_answer: 'Pages connexes',
+    search_ask_no_answer:
+        "Aucune réponse n'a pu être trouvée pour votre question. Essayez de la reformuler ou d'être plus précis",
     search_ask_error: 'Quelque chose a mal fonctionné. Veuillez réessayer plus tard.',
     on_this_page: 'Sur cette page',
     next_page: 'Suivant',

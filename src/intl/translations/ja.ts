@@ -15,8 +15,9 @@ export const ja: TranslationLanguage = {
     search_scope_all: '全てのコンテンツ',
     search_ask: '"${1}" を質問する',
     search_ask_sources: '情報源',
+    search_ask_sources_no_answer: '関連ページ',
     search_ask_no_answer:
-        'ご質問に答えられる答えが見つかりませんでした、他の質問を試してください。',
+        'ご質問への回答が見つかりませんでした。質問を言い換えるか、もう少し具体的にしてください。',
     search_ask_error: '何らかのエラーが発生しました。後ほど再度お試しください。',
     on_this_page: 'このページ内',
     next_page: '次へ',

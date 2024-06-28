@@ -13,8 +13,9 @@ export const pt_br = {
     search_scope_all: 'Todo o conteúdo',
     search_ask: 'Perguntar "${1}"',
     search_ask_sources: 'Fontes',
+    search_ask_sources_no_answer: 'Páginas relacionadas',
     search_ask_no_answer:
-        'Nenhuma resposta foi encontrada para sua pergunta, tente outra pergunta.',
+        'Não foi possível encontrar uma resposta para sua pergunta. Você pode tentar reformulá-la ou ser mais específico.',
     search_ask_error: 'Algo deu errado. Por favor tente novamente mais tarde.',
     on_this_page: 'Nesta página',
     next_page: 'Próximo',

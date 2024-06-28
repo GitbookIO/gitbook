@@ -13,7 +13,9 @@ export const en = {
     search_scope_all: 'All the content',
     search_ask: 'Ask "${1}"',
     search_ask_sources: 'Sources',
-    search_ask_no_answer: 'No answer could be found for your question, try with another one.',
+    search_ask_sources_no_answer: 'Related pages',
+    search_ask_no_answer:
+        'An answer could not be found for your question. You could try rephrasing it, or be more specific.',
     search_ask_error: 'Something went wrong. Please try again later.',
     on_this_page: 'On this page',
     next_page: 'Next',

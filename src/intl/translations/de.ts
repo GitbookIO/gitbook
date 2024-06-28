@@ -13,7 +13,9 @@ export const de = {
     search_scope_all: 'Alle Inhalte',
     search_ask: 'Fragen "${1}"',
     search_ask_sources: 'Quellen',
-    search_ask_no_answer: 'Es konnte keine Antwort auf Ihre Frage gefunden werden, versuchen Sie es mit einer anderen Frage.',
+    search_ask_sources_no_answer: 'Verwandte Seiten',
+    search_ask_no_answer:
+        'Es konnte keine Antwort auf Ihre Frage gefunden werden. Versuchen Sie, sie umzuformulieren oder genauer zu sein.',
     search_ask_error: 'Etwas ist schief gelaufen. Bitte versuchen Sie es später noch einmal.',
     on_this_page: 'Auf dieser Seite',
     next_page: 'Nächste',
@@ -39,7 +41,8 @@ export const de = {
     notfound_title: 'Seite nicht gefunden',
     notfound: 'Die gesuchte Seite existiert nicht.',
     unexpected_error_title: 'Ein Fehler ist aufgetreten',
-    unexpected_error: 'Entschuldigung, ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.',
+    unexpected_error:
+        'Entschuldigung, ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.',
     unexpected_error_retry: 'Erneut versuchen',
     pdf_download: 'Als PDF exportieren',
     pdf_goback: 'Zurück zum Inhalt',
@@ -47,6 +50,7 @@ export const de = {
     pdf_page_of: '${1} von ${2}',
     pdf_mode_only_page: 'Nur diese Seite',
     pdf_mode_all: 'Alle Seiten',
-    pdf_limit_reached: 'Das PDF konnte für ${1} Seiten nicht generiert werden, Generierung wurde bei ${2} gestoppt.',
+    pdf_limit_reached:
+        'Das PDF konnte für ${1} Seiten nicht generiert werden, Generierung wurde bei ${2} gestoppt.',
     pdf_limit_reached_continue: 'Mit ${1} weiteren Seiten erweitern.',
 };
