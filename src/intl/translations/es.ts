@@ -15,7 +15,9 @@ export const es: TranslationLanguage = {
     search_scope_all: 'Todo el contenido',
     search_ask: 'Preguntar "${1}"',
     search_ask_sources: 'Fuentes',
-    search_ask_no_answer: 'No se pudo encontrar una respuesta a tu pregunta, intenta con otra.',
+    search_ask_sources_no_answer: 'Páginas relacionadas',
+    search_ask_no_answer:
+        'No se pudo encontrar una respuesta para su pregunta. Puede intentar reformularla o ser más específico.',
     search_ask_error: 'Algo salió mal. Por favor, inténtalo de nuevo más tarde.',
     on_this_page: 'En esta página',
     next_page: 'Siguiente',

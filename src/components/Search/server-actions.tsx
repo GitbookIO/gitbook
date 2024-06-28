@@ -49,6 +49,7 @@ export interface AskAnswerResult {
     body?: React.ReactNode;
     followupQuestions: string[];
     sources: AskAnswerSource[];
+    hasAnswer: boolean;
 }
 
 /**
@@ -141,7 +142,7 @@ function transformAnswer(
         return null;
     }
 
-    const hasAnswer = 'document' in answer.answer;
+    const hasAnswer = answer.answer && 'document' in answer.answer;
 
     const sources = answer.sources
         .map((source) => {
@@ -177,6 +178,7 @@ function transformAnswer(
         ) : null,
         followupQuestions: answer.followupQuestions,
         sources,
+        hasAnswer,
     };
 }
 

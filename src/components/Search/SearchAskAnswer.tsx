@@ -6,13 +6,13 @@ import { atom, useRecoilState } from 'recoil';
 import { Loading } from '@/components/primitives';
 import { useLanguage } from '@/intl/client';
 import { t } from '@/intl/translate';
+import { TranslationLanguage } from '@/intl/translations';
 import { iterateStreamResponse } from '@/lib/actions';
 import { tcls } from '@/lib/tailwind';
 
 import { AskAnswerResult, AskAnswerSource, streamAskQuestion } from './server-actions';
 import { useSearch, useSearchLink } from './useSearch';
 import { Link } from '../primitives';
-import { TranslationLanguage } from '@/intl/translations';
 
 /**
  * Store the state of the answer in a global state so that it can be
@@ -112,8 +112,8 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
         >
             {state?.type === 'answer' ? (
                 <>
-                    {state.answer?.body ? (
-                        <div className={tcls('w-full')}>
+                    {state.answer ? (
+                        <div className={tcls('w-full pb-4')}>
                             <AnswerBody answer={state.answer} />
                         </div>
                     ) : (
@@ -148,13 +148,18 @@ function AnswerBody(props: { answer: AskAnswerResult }) {
                 data-test="search-ask-answer"
                 className={tcls('mt-4', 'px-4', 'text-dark/9', 'dark:text-light/8')}
             >
-                {answer.body}
+                {answer.hasAnswer ? answer.body : t(language, 'search_ask_no_answer')}
             </div>
             {answer.followupQuestions.length > 0 ? (
                 <AnswerFollowupQuestions followupQuestions={answer.followupQuestions} />
             ) : null}
             {answer.sources.length > 0 ? (
-                <AnswerSources sources={answer.sources} language={language} onClose={onClose} />
+                <AnswerSources
+                    hasAnswer={answer.hasAnswer}
+                    sources={answer.sources}
+                    language={language}
+                    onClose={onClose}
+                />
             ) : null}
         </>
     );
@@ -208,8 +213,9 @@ function AnswerSources(props: {
     sources: AskAnswerSource[];
     language: TranslationLanguage;
     onClose: () => void;
+    hasAnswer?: boolean;
 }) {
-    const { sources, onClose, language } = props;
+    const { sources, onClose, language, hasAnswer } = props;
 
     return (
         <div
@@ -225,7 +231,9 @@ function AnswerSources(props: {
                 'dark:border-light/1',
             )}
         >
-            <span className={tcls('text-sm')}>{t(language, 'search_ask_sources')}</span>
+            <span className={tcls('text-sm')}>
+                {t(language, hasAnswer ? 'search_ask_sources' : 'search_ask_sources_no_answer')}
+            </span>
 
             {sources.map((source) => (
                 <span key={source.id} className={tcls()}>
