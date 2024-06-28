@@ -142,8 +142,6 @@ function transformAnswer(
         return null;
     }
 
-    const hasAnswer = answer.answer && 'document' in answer.answer;
-
     const sources = answer.sources
         .map((source) => {
             if (source.type !== 'page') {
@@ -164,21 +162,22 @@ function transformAnswer(
         .filter(filterOutNullable);
 
     return {
-        body: hasAnswer ? (
-            <DocumentView
-                document={answer.answer.document}
-                context={{
-                    mode: 'default',
-                    contentRefContext: null,
-                    resolveContentRef: async () => null,
-                    shouldHighlightCode: () => false,
-                }}
-                style={['space-y-5']}
-            />
-        ) : null,
+        body:
+            answer.answer && 'document' in answer.answer ? (
+                <DocumentView
+                    document={answer.answer.document}
+                    context={{
+                        mode: 'default',
+                        contentRefContext: null,
+                        resolveContentRef: async () => null,
+                        shouldHighlightCode: () => false,
+                    }}
+                    style={['space-y-5']}
+                />
+            ) : null,
         followupQuestions: answer.followupQuestions,
         sources,
-        hasAnswer,
+        hasAnswer: !!answer.answer && 'document' in answer.answer,
     };
 }
 
