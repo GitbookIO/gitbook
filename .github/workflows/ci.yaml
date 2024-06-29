@@ -20,7 +20,7 @@ jobs:
             - name: Setup bun
               uses: oven-sh/setup-bun@v1
               with:
-                  bun-version: 1.0.33
+                  bun-version: 1.1.17
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:
@@ -82,7 +82,7 @@ jobs:
             - name: Setup bun
               uses: oven-sh/setup-bun@v1
               with:
-                  bun-version: 1.0.33
+                  bun-version: 1.1.17
             - name: Install dependencies
               run: bun install --frozen-lockfile
             - name: Setup Playwright
@@ -102,7 +102,7 @@ jobs:
             - name: Setup bun
               uses: oven-sh/setup-bun@v1
               with:
-                  bun-version: 1.0.33
+                  bun-version: 1.1.17
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:
@@ -121,7 +121,7 @@ jobs:
             - name: Setup bun
               uses: oven-sh/setup-bun@v1
               with:
-                  bun-version: 1.0.33
+                  bun-version: 1.1.17
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:
@@ -136,7 +136,7 @@ jobs:
             - name: Setup bun
               uses: oven-sh/setup-bun@v1
               with:
-                  bun-version: 1.0.33
+                  bun-version: 1.1.17
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:
@@ -151,7 +151,7 @@ jobs:
             - name: Setup bun
               uses: oven-sh/setup-bun@v1
               with:
-                  bun-version: 1.0.33
+                  bun-version: 1.1.17
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:
@@ -166,7 +166,7 @@ jobs:
             - name: Setup bun
               uses: oven-sh/setup-bun@v1
               with:
-                  bun-version: 1.0.33
+                  bun-version: 1.1.17
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:

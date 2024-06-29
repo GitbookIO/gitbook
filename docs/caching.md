@@ -4,8 +4,8 @@
 
 Invalidate cache can be done at two levels using tags:
 
--   Data fetching cache
--   Rendering cache
+- Data fetching cache
+- Rendering cache
 
 To invalidate and refetch the data cache, you can execute a POST request to `/~/gitbook/revalidate`:
 
