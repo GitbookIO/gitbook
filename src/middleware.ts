@@ -140,8 +140,10 @@ export async function middleware(request: NextRequest) {
     // Make sure the URL is clean of any va token after a successful lookup
     // The token is stored in a cookie that is set on the redirect response
     const normalizedVA = normalizeVisitorAuthURL(normalized);
-    if (normalizedVA.toString() !== normalized.toString()) {
-        console.log(`redirecting to ${normalizedVA.toString()}`);
+
+    // We don't do this redirect when working locally as we can't write cookies reliably on localhost.
+    // On localhost we just keep the jwt_token in the URL.
+    if (url.hostname !== 'localhost' && normalizedVA.toString() !== normalized.toString()) {
         return writeCookies(NextResponse.redirect(normalizedVA.toString()), resolved.cookies);
     }
 
@@ -155,8 +157,6 @@ export async function middleware(request: NextRequest) {
 
     // Because of how Next will encode, we need to encode ourselves the pathname before rewriting to it.
     const rewritePathname = normalizePathname(encodePathname(resolved.pathname));
-
-    console.log(`${request.method} (${resolved.space}) ${rewritePathname}`);
 
     // Resolution might have changed the API endpoint
     apiEndpoint = resolved.apiEndpoint ?? apiEndpoint;
