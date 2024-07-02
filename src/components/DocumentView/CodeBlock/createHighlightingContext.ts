@@ -25,6 +25,7 @@ export function createHighlightingContext() {
         }
 
         count += 1;
+        console.log(`Block #${count} / ${CODE_HIGHLIGHT_BLOCK_LIMIT}`)
         return count < CODE_HIGHLIGHT_BLOCK_LIMIT;
     };
 }
