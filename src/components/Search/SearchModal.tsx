@@ -232,28 +232,23 @@ function SearchModalBody(
                 </div>
             </div>
             {!state.ask || !withAsk ? (
-                <>
-                    <SearchResults
-                        ref={resultsRef}
-                        spaceId={spaceId}
-                        revisionId={revisionId}
-                        parent={state.global ? parent : null}
-                        query={state.query}
-                        withAsk={withAsk}
-                        onSwitchToAsk={() => {
-                            onChangeQuery({
-                                ask: true,
-                                query: state.query,
-                                global: state.global,
-                            });
-                        }}
-                        onClose={onClose}
-                    >
-                        {parent && state.query ? (
-                            <SearchScopeToggle spaceTitle={spaceTitle} />
-                        ) : null}
-                    </SearchResults>
-                </>
+                <SearchResults
+                    ref={resultsRef}
+                    spaceId={spaceId}
+                    revisionId={revisionId}
+                    parent={state.global ? parent : null}
+                    query={state.query}
+                    withAsk={withAsk}
+                    onSwitchToAsk={() => {
+                        onChangeQuery({
+                            ask: true,
+                            query: state.query,
+                            global: state.global,
+                        });
+                    }}
+                >
+                    {parent && state.query ? <SearchScopeToggle spaceTitle={spaceTitle} /> : null}
+                </SearchResults>
             ) : null}
             {state.query && state.ask && withAsk ? (
                 <SearchAskAnswer spaceId={spaceId} query={state.query} />
