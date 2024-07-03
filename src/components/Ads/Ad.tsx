@@ -62,10 +62,43 @@ export function Ad({
     style?: ClassValue;
     vertical?: boolean;
 }) {
+    const containerRef = React.useRef<HTMLDivElement>(null);
+    const [visible, setVisible] = React.useState(false);
     const [ad, setAd] = React.useState<AdItem | undefined>(undefined);
 
-    // Track an impression on the ad and fetch it
+    // Observe the container visibility
     React.useEffect(() => {
+        if (!containerRef.current) {
+            return;
+        }
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setVisible(true);
+                }
+            },
+            {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1,
+            },
+        );
+
+        observer.observe(containerRef.current);
+
+        return () => {
+            observer.disconnect();
+        };
+    }, []);
+
+    // When the container is visible,
+    // track an impression on the ad and fetch it
+    React.useEffect(() => {
+        if (!visible) {
+            return;
+        }
+
         let cancelled = false;
 
         (async () => {
@@ -93,11 +126,7 @@ export function Ad({
         return () => {
             cancelled = true;
         };
-    }, [zoneId, ignore, vertical]);
-
-    if (!ad) {
-        return null;
-    }
+    }, [visible, zoneId, ignore, vertical]);
 
     const viaUrl = new URL('https://www.gitbook.com');
     viaUrl.searchParams.set('utm_source', 'content');
@@ -105,44 +134,48 @@ export function Ad({
     viaUrl.searchParams.set('utm_campaign', spaceId);
 
     return (
-        <div className={tcls(style)}>
-            <a
-                className={tcls(
-                    'flex',
-                    'flex-col',
-                    'bg-light-2',
-                    'text-dark/7',
-                    'dark:bg-dark-2',
-                    'dark:text-light/7',
-                    'hover:text-dark/9',
-                    'dark:hover:text-light/9',
-                    'rounded-lg',
-                    'p-3',
-                )}
-                href={ad.statlink}
-                rel="sponsored noopener"
-                target="_blank"
-                title={`${ad.company} — ${ad.companyTagline}`}
-            >
-                <div className={tcls('mb-3', 'px-6', 'py-4', 'rounded-md')} style={{ backgroundColor: ad.backgroundColor }}>
-                    <img alt="Ads logo" src={ad.logo} />
-                </div>
-                <div className={tcls('flex', 'flex-col', 'mb-4')}>
-                    <div className={tcls('text-sm', 'font-semibold', 'mb-2')}>
-                        {ad.company} — {ad.companyTagline}
-                    </div>
-                    <div className={tcls('text-xs')}>{ad.description}</div>
-                </div>
-                <div>
-                    <span className={tcls('text-sm', 'rounded-md', 'bg-light-3', 'dark:bg-dark-3', 'py-2', 'px-4')} style={{ backgroundColor: ad.ctaBackgroundColor, color: ad.ctaTextColor }}>
-                        {ad.callToAction}
-                    </span>
-                </div>
-                {ad.pixel ? <AdPixels rawPixel={ad.pixel} /> : null}
-            </a>
-            <p className={tcls('mt-2', 'mr-2', 'text-xs', 'text-right', 'text-dark/5', 'dark:text-light/5')}>
-                <a href={viaUrl.toString()}>Ads via GitBook</a>
-            </p>
+        <div ref={containerRef} className={tcls(style)}>
+            {ad ? (
+                <>
+                    <a
+                        className={tcls(
+                            'flex',
+                            'flex-col',
+                            'bg-light-2',
+                            'text-dark/7',
+                            'dark:bg-dark-2',
+                            'dark:text-light/7',
+                            'hover:text-dark/9',
+                            'dark:hover:text-light/9',
+                            'rounded-lg',
+                            'p-3',
+                        )}
+                        href={ad.statlink}
+                        rel="sponsored noopener"
+                        target="_blank"
+                        title={`${ad.company} — ${ad.companyTagline}`}
+                    >
+                        <div className={tcls('mb-3', 'px-6', 'py-4', 'rounded-md')} style={{ backgroundColor: ad.backgroundColor }}>
+                            <img alt="Ads logo" src={ad.logo} />
+                        </div>
+                        <div className={tcls('flex', 'flex-col', 'mb-4')}>
+                            <div className={tcls('text-sm', 'font-semibold', 'mb-2')}>
+                                {ad.company} — {ad.companyTagline}
+                            </div>
+                            <div className={tcls('text-xs')}>{ad.description}</div>
+                        </div>
+                        <div>
+                            <span className={tcls('text-sm', 'rounded-md', 'bg-light-3', 'dark:bg-dark-3', 'py-2', 'px-4')} style={{ backgroundColor: ad.ctaBackgroundColor, color: ad.ctaTextColor }}>
+                                {ad.callToAction}
+                            </span>
+                        </div>
+                        {ad.pixel ? <AdPixels rawPixel={ad.pixel} /> : null}
+                    </a>
+                    <p className={tcls('mt-2', 'mr-2', 'text-xs', 'text-right', 'text-dark/5', 'dark:text-light/5')}>
+                        <a target="_blank" href={viaUrl.toString()} className={tcls('hover:underline')}>Ads via GitBook</a>
+                    </p>
+                </>
+            ) : null}
         </div>
     );
 }
