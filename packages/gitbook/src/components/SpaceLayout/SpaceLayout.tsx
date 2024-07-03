@@ -114,7 +114,7 @@ export function SpaceLayout(props: {
                 <SearchModal
                     spaceId={contentTarget.spaceId}
                     revisionId={contentTarget.revisionId}
-                    spaceTitle={customization.title ?? space.title}
+                    spaceTitle={space.title}
                     withAsk={customization.aiSearch.enabled}
                     parent={parent && spaces.length > 1 ? parent : null}
                 />
