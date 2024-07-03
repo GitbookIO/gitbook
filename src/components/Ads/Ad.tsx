@@ -127,7 +127,7 @@ export function Ad({
         return () => {
             cancelled = true;
         };
-    }, [visible, zoneId, ignore, vertical]);
+    }, [visible, zoneId, ignore, vertical, placement]);
 
     const viaUrl = new URL('https://www.gitbook.com');
     viaUrl.searchParams.set('utm_source', 'content');
