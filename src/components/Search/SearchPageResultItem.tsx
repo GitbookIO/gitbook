@@ -21,10 +21,6 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
         <Link
             ref={ref}
             href={item.href}
-            onClick={(event) => {
-                event.preventDefault();
-                onClick(item.href);
-            }}
             className={tcls(
                 'flex',
                 'flex-row',
