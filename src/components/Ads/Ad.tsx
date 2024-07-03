@@ -1,6 +1,7 @@
 'use client';
-import { ClassValue, tcls } from '@/lib/tailwind';
 import * as React from 'react';
+
+import { ClassValue, tcls } from '@/lib/tailwind';
 
 interface AdItem {
     active: string;
@@ -190,9 +191,10 @@ function AdPixels({ rawPixel }: { rawPixel: string }) {
 
     return (
         <div className={tcls('hidden')}>
-            {pixels.map(pixel => {
+            {pixels.map((pixel, index) => {
                 return (
                     <img
+                        key={index}
                         src={pixel.replace("[timestamp]", time)}
                         width="1"
                         height="1"

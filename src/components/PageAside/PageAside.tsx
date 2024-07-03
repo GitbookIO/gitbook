@@ -13,6 +13,7 @@ import React from 'react';
 import urlJoin from 'url-join';
 
 import { t, getSpaceLanguage } from '@/intl/server';
+import { getContentSecurityPolicyNonce } from '@/lib/csp';
 import { getDocumentSections } from '@/lib/document';
 import { absoluteHref } from '@/lib/links';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
@@ -20,9 +21,8 @@ import { tcls } from '@/lib/tailwind';
 import { getPDFUrlSearchParams } from '@/lib/urls';
 
 import { ScrollSectionsList } from './ScrollSectionsList';
-import { PageFeedbackForm } from '../PageFeedback';
-import { getContentSecurityPolicyNonce } from '@/lib/csp';
 import { Ad } from '../Ads';
+import { PageFeedbackForm } from '../PageFeedback';
 
 /**
  * Aside listing the headings in the document.
