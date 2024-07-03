@@ -13,7 +13,6 @@ import React from 'react';
 import urlJoin from 'url-join';
 
 import { t, getSpaceLanguage } from '@/intl/server';
-import { getContentSecurityPolicyNonce } from '@/lib/csp';
 import { getDocumentSections } from '@/lib/document';
 import { absoluteHref } from '@/lib/links';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
@@ -40,7 +39,6 @@ export async function PageAside(props: {
     const { space, page, document, customization, withHeaderOffset, withPageFeedback, context } =
         props;
     const language = getSpaceLanguage(customization);
-    const nonce = getContentSecurityPolicyNonce();
 
     return (
         <aside

@@ -65,6 +65,7 @@ export function Ad({
 }) {
     const containerRef = React.useRef<HTMLDivElement>(null);
     const [visible, setVisible] = React.useState(false);
+    const [failed, setFailed] = React.useState(false);
     const [ad, setAd] = React.useState<AdItem | undefined>(undefined);
 
     // Observe the container visibility
@@ -112,15 +113,20 @@ export function Ad({
                 url.searchParams.set('v', 'true');
             }
 
-            const res = await fetch(url);
-            const json: AdsResponse = await res.json();
+            try {
+                const res = await fetch(url);
+                const json: AdsResponse = await res.json();
 
-            if (cancelled) {
-                return;
-            }
+                if (cancelled) {
+                    return;
+                }
 
-            if (json.ads.length > 0) {
-                setAd(json.ads[0] as AdItem);
+                if (json.ads.length > 0) {
+                    setAd(json.ads[0] as AdItem);
+                }
+            } catch (error) {
+                console.error('Failed to fetch ad, it might have been blocked by a ad-blocker', error);
+                setFailed(true);
             }
         })();
 
@@ -133,6 +139,10 @@ export function Ad({
     viaUrl.searchParams.set('utm_source', 'content');
     viaUrl.searchParams.set('utm_medium', 'ads');
     viaUrl.searchParams.set('utm_campaign', spaceId);
+
+    if (failed) {
+        return null;
+    }
 
     return (
         <div ref={containerRef} className={tcls(style)}>
