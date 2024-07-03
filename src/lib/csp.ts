@@ -38,7 +38,7 @@ export function getContentSecurityPolicy(scripts: SpaceIntegrationScript[], nonc
         script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline' 'unsafe-eval' ${assetsDomain} https://integrations.gitbook.com https://cdn.iframe.ly;
         style-src 'self' ${assetsDomain} fonts.googleapis.com 'unsafe-inline';
         img-src * 'self' blob: data: files.gitbook.com ${assetsDomain};
-        connect-src * 'self' integrations.gitbook.com app.gitbook.com api.gitbook.com ${assetsDomain};
+        connect-src * 'self' integrations.gitbook.com app.gitbook.com api.gitbook.com srv.buysellads.com ${assetsDomain};
         font-src 'self' fonts.gstatic.com ${assetsDomain};
         frame-src *;
         object-src 'none';

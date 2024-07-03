@@ -17,10 +17,12 @@ import { getDocumentSections } from '@/lib/document';
 import { absoluteHref } from '@/lib/links';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
-import { getPDFUrl, getPDFUrlSearchParams } from '@/lib/urls';
+import { getPDFUrlSearchParams } from '@/lib/urls';
 
 import { ScrollSectionsList } from './ScrollSectionsList';
 import { PageFeedbackForm } from '../PageFeedback';
+import { getContentSecurityPolicyNonce } from '@/lib/csp';
+import { Ad } from '../Ads';
 
 /**
  * Aside listing the headings in the document.
@@ -38,6 +40,7 @@ export async function PageAside(props: {
     const { space, page, document, customization, withHeaderOffset, withPageFeedback, context } =
         props;
     const language = getSpaceLanguage(customization);
+    const nonce = getContentSecurityPolicyNonce();
 
     return (
         <aside
@@ -172,6 +175,13 @@ export async function PageAside(props: {
                     ) : null}
                 </div>
             </div>
+            <Ad
+                zoneId="CW7DCK3J"
+                placement="page.aside"
+                spaceId={space.id}
+                ignore={process.env.NODE_ENV !== 'production'}
+                style={tcls('mt-4')}
+            />
         </aside>
     );
 }
