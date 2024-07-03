@@ -211,7 +211,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                         query={query}
                                         item={item}
                                         active={index === cursor}
-                                        onClick={onClose}
                                     />
                                 );
                             }
