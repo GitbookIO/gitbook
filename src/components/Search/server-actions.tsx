@@ -94,6 +94,8 @@ export async function searchParentContent(
             siteSpaces.reduce(
                 (acc, siteSpace) => {
                     acc[siteSpace.space.id] = siteSpace.space;
+                    // replace the published url for the "space" with the site's published url
+                    acc[siteSpace.space.id].urls.published = siteSpace.urls.published;
                     return acc;
                 },
                 {} as Record<string, Space>,

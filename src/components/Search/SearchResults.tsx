@@ -43,11 +43,10 @@ export const SearchResults = React.forwardRef(function SearchResults(
         parent: Site | Collection | null;
         withAsk: boolean;
         onSwitchToAsk: () => void;
-        onClose: (to?: string) => void;
     },
     ref: React.Ref<SearchResultsRef>,
 ) {
-    const { children, query, spaceId, revisionId, parent, withAsk, onSwitchToAsk, onClose } = props;
+    const { children, query, spaceId, revisionId, parent, withAsk, onSwitchToAsk } = props;
 
     const language = useLanguage();
     const debounceTimeout = React.useRef<NodeJS.Timeout | null>(null);
@@ -211,7 +210,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                         query={query}
                                         item={item}
                                         active={index === cursor}
-                                        onClick={onClose}
                                     />
                                 );
                             }
@@ -252,7 +250,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                         query={query}
                                         item={item}
                                         active={index === cursor}
-                                        onClick={onClose}
                                     />
                                 );
                             }
