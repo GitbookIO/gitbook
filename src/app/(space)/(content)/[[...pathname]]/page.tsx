@@ -27,6 +27,7 @@ export default async function Page(props: { params: PagePathParams }) {
         content: contentPointer,
         contentTarget,
         space,
+        parent,
         customization,
         pages,
         page,
@@ -84,6 +85,7 @@ export default async function Page(props: { params: PagePathParams }) {
                 {page.layout.outline ? (
                     <PageAside
                         space={space}
+                        site={parent?.object === 'site' ? parent : undefined}
                         customization={customization}
                         page={page}
                         document={document}

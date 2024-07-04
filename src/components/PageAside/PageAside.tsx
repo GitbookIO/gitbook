@@ -6,6 +6,7 @@ import {
     CustomizationSettings,
     JSONDocument,
     RevisionPageDocument,
+    Site,
     SiteCustomizationSettings,
     Space,
 } from '@gitbook/api';
@@ -28,6 +29,7 @@ import { PageFeedbackForm } from '../PageFeedback';
  */
 export async function PageAside(props: {
     space: Space;
+    site: Site | undefined;
     customization: CustomizationSettings | SiteCustomizationSettings;
     page: RevisionPageDocument;
     document: JSONDocument | null;
@@ -36,8 +38,16 @@ export async function PageAside(props: {
     withFullPageCover: boolean;
     withPageFeedback: boolean;
 }) {
-    const { space, page, document, customization, withHeaderOffset, withPageFeedback, context } =
-        props;
+    const {
+        space,
+        site,
+        page,
+        document,
+        customization,
+        withHeaderOffset,
+        withPageFeedback,
+        context,
+    } = props;
     const language = getSpaceLanguage(customization);
 
     return (
@@ -173,13 +183,15 @@ export async function PageAside(props: {
                     ) : null}
                 </div>
             </div>
-            <Ad
-                zoneId="CW7DCK3J"
-                placement="page.aside"
-                spaceId={space.id}
-                ignore={process.env.NODE_ENV !== 'production'}
-                style={tcls('mt-4')}
-            />
+            {site?.ads ? (
+                <Ad
+                    zoneId={site.ads.zone}
+                    placement="page.aside"
+                    spaceId={space.id}
+                    ignore={process.env.NODE_ENV !== 'production'}
+                    style={tcls('mt-4')}
+                />
+            ) : null}
         </aside>
     );
 }
