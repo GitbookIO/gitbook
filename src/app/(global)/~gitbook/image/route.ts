@@ -1,6 +1,11 @@
 import { NextRequest } from 'next/server';
 
-import { verifyImageSignature, resizeImage, CloudflareImageOptions, checkIsSizableImageURL } from '@/lib/images';
+import {
+    verifyImageSignature,
+    resizeImage,
+    CloudflareImageOptions,
+    checkIsSizableImageURL,
+} from '@/lib/images';
 import { parseImageAPIURL } from '@/lib/urls';
 
 export const runtime = 'edge';
