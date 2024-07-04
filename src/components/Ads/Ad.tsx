@@ -196,8 +196,8 @@ function AdBlockerPlaceholder() {
                 <p className={tcls('text-xs', 'font-semibold')}>Ad disabled</p>
             </div>
             <p className={tcls('text-xs')}>
-                It seems you have an ad-blocker enabled. Consider disabling it to support the
-                creator.
+                It looks like you're using an adblocker. Whitelist this site to help support this
+                project.
             </p>
         </div>
     );
