@@ -40,9 +40,6 @@ export function AdClassicRendering({ ad }: { ad: AdItem }) {
                 </div>
             )}
             <div className={tcls('flex', 'flex-col')}>
-                {/* <div className={tcls('text-sm', 'font-semibold', 'mb-2')}>
-                    {ad.company} — {ad.companyTagline}
-                </div> */}
                 <div className={tcls('text-xs')}>{ad.description}</div>
             </div>
         </a>

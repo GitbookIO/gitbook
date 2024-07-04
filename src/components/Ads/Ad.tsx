@@ -10,8 +10,8 @@ import { AdCoverRendering } from './AdCoverRendering';
 import { AdItem, AdsResponse } from './types';
 
 /**
- * Load and render an ad placement.
- * https://docs.buysellads.com/custom-templates
+ * Fetch and render the Ad placement.
+ * https://docs.buysellads.com/ad-serving-api
  */
 export function Ad({
     zoneId,
