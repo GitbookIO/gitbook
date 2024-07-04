@@ -6,6 +6,7 @@ import {
     CustomizationSettings,
     JSONDocument,
     RevisionPageDocument,
+    Site,
     SiteCustomizationSettings,
     Space,
 } from '@gitbook/api';
@@ -17,9 +18,10 @@ import { getDocumentSections } from '@/lib/document';
 import { absoluteHref } from '@/lib/links';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
-import { getPDFUrl, getPDFUrlSearchParams } from '@/lib/urls';
+import { getPDFUrlSearchParams } from '@/lib/urls';
 
 import { ScrollSectionsList } from './ScrollSectionsList';
+import { Ad } from '../Ads';
 import { PageFeedbackForm } from '../PageFeedback';
 
 /**
@@ -27,6 +29,7 @@ import { PageFeedbackForm } from '../PageFeedback';
  */
 export async function PageAside(props: {
     space: Space;
+    site: Site | undefined;
     customization: CustomizationSettings | SiteCustomizationSettings;
     page: RevisionPageDocument;
     document: JSONDocument | null;
@@ -35,8 +38,16 @@ export async function PageAside(props: {
     withFullPageCover: boolean;
     withPageFeedback: boolean;
 }) {
-    const { space, page, document, customization, withHeaderOffset, withPageFeedback, context } =
-        props;
+    const {
+        space,
+        site,
+        page,
+        document,
+        customization,
+        withHeaderOffset,
+        withPageFeedback,
+        context,
+    } = props;
     const language = getSpaceLanguage(customization);
 
     return (
@@ -172,6 +183,15 @@ export async function PageAside(props: {
                     ) : null}
                 </div>
             </div>
+            {site?.ads ? (
+                <Ad
+                    zoneId={site.ads.zone}
+                    placement="page.aside"
+                    spaceId={space.id}
+                    ignore={process.env.NODE_ENV !== 'production'}
+                    style={tcls('mt-4')}
+                />
+            ) : null}
         </aside>
     );
 }

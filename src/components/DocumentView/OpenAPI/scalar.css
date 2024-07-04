@@ -5,8 +5,16 @@
         rgb(var(--primary-base-300, 180 180 180)),
         rgb(var(--dark-base, 23 23 23)) 96%
     );
-    --scalar-color-2: color-mix(in srgb, var(--scalar-color-1), transparent calc(100% - 100% * 0.72));
-    --scalar-color-3: color-mix(in srgb, var(--scalar-color-1), transparent calc(100% - 100% * 0.4));
+    --scalar-color-2: color-mix(
+        in srgb,
+        var(--scalar-color-1),
+        transparent calc(100% - 100% * 0.72)
+    );
+    --scalar-color-3: color-mix(
+        in srgb,
+        var(--scalar-color-1),
+        transparent calc(100% - 100% * 0.4)
+    );
     --scalar-color-accent: #007d9c;
 
     --scalar-background-1: rgb(var(--light-base, 255 255 255));
@@ -50,8 +58,16 @@
         rgb(var(--primary-base-700, 70 70 70)),
         rgb(var(--light-base, 255 255 255)) 100%
     );
-    --scalar-color-2: color-mix(in srgb, var(--scalar-color-1), transparent calc(100% - 100% * 0.64));
-    --scalar-color-3: color-mix(in srgb, var(--scalar-color-1), transparent calc(100% - 100% * 0.4));
+    --scalar-color-2: color-mix(
+        in srgb,
+        var(--scalar-color-1),
+        transparent calc(100% - 100% * 0.64)
+    );
+    --scalar-color-3: color-mix(
+        in srgb,
+        var(--scalar-color-1),
+        transparent calc(100% - 100% * 0.4)
+    );
     --scalar-color-accent: #50b7e0;
 
     --scalar-background-1: rgb(var(--dark-base, 22 22 22));

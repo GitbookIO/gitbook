@@ -17,6 +17,15 @@ export function hexToRgb(hex: string): string {
 }
 
 /**
+ * Convert a hex color to a RGBA color.
+ */
+export function hexToRgba(hex: string, alpha: number): string {
+    const [r, g, b] = hexToRgbArray(hex);
+    // Return the RGBA values separated by spaces
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+/**
  * Generate Tailwind-compatible shades from a single color
  * @param {string} hex The hex code to generate shades from
  * @param {boolean} halfShades Generate additional shades, e.g. at 150

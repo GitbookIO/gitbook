@@ -14,7 +14,7 @@ import { IntegrationBlock } from './Integration';
 export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
     const { block, context, ...otherProps } = props;
     const nonce = headers().get('x-nonce') || undefined;
-    
+
     ReactDOM.preload('https://cdn.iframe.ly/embed.js', { as: 'script', nonce });
 
     const { data: embed } = await (context.content
