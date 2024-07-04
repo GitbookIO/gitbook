@@ -1,48 +1,13 @@
 'use client';
+
+import IconHeart from '@geist-ui/icons/heart';
 import * as React from 'react';
 
 import { ClassValue, tcls } from '@/lib/tailwind';
 
-interface AdItem {
-    active: string;
-    ad_via_link: string;
-    backgroundColor: string;
-    backgroundHoverColor: string;
-    bannerid: string;
-    callToAction: string;
-    company: string;
-    companyTagline: string;
-    creativeid: string;
-    ctaBackgroundColor: string;
-    ctaBackgroundHoverColor: string;
-    ctaTextColor: string;
-    ctaTextColorHover: string;
-    description: string;
-    evenodd: string;
-    external_id: string;
-    height: string;
-    i: string;
-    identifier: string;
-    image: string;
-    logo: string;
-    longimp: string;
-    longlink: string;
-    num_slots: string;
-    rendering: string;
-    statimp: string;
-    statlink: string;
-    textColor: string;
-    textColorHover: string;
-    timestamp: string;
-    width: string;
-    zoneid: string;
-    zonekey: string;
-    pixel?: string;
-}
-
-interface AdsResponse {
-    ads: Array<AdItem | {}>;
-}
+import { AdClassicRendering } from './AdClassicRendering';
+import { AdCoverRendering } from './AdCoverRendering';
+import { AdItem, AdsResponse } from './types';
 
 /**
  * Load and render an ad placement.
@@ -54,14 +19,14 @@ export function Ad({
     placement,
     ignore,
     style,
-    vertical = true,
+    mode = 'auto',
 }: {
     zoneId: string;
     spaceId: string;
     placement: string;
     ignore: boolean;
     style?: ClassValue;
-    vertical?: boolean;
+    mode?: 'classic' | 'auto' | 'cover';
 }) {
     const containerRef = React.useRef<HTMLDivElement>(null);
     const [visible, setVisible] = React.useState(false);
@@ -106,11 +71,9 @@ export function Ad({
         (async () => {
             const url = new URL(`https://srv.buysellads.com/ads/${zoneId}.json`);
             url.searchParams.set('segment', `placement:${placement}`);
+            url.searchParams.set('v', 'true');
             if (ignore) {
                 url.searchParams.set('ignore', 'true');
-            }
-            if (vertical) {
-                url.searchParams.set('v', 'true');
             }
 
             try {
@@ -121,11 +84,15 @@ export function Ad({
                     return;
                 }
 
-                if (json.ads.length > 0) {
-                    setAd(json.ads[0] as AdItem);
+                const first = json.ads[0];
+                if (first && 'active' in first) {
+                    setAd(first);
                 }
             } catch (error) {
-                console.error('Failed to fetch ad, it might have been blocked by a ad-blocker', error);
+                console.error(
+                    'Failed to fetch ad, it might have been blocked by a ad-blocker',
+                    error,
+                );
                 setFailed(true);
             }
         })();
@@ -133,59 +100,48 @@ export function Ad({
         return () => {
             cancelled = true;
         };
-    }, [visible, zoneId, ignore, vertical, placement]);
+    }, [visible, zoneId, ignore, placement]);
 
     const viaUrl = new URL('https://www.gitbook.com');
     viaUrl.searchParams.set('utm_source', 'content');
     viaUrl.searchParams.set('utm_medium', 'ads');
     viaUrl.searchParams.set('utm_campaign', spaceId);
 
-    if (failed) {
-        return null;
+    if (ad) {
+        console.log('ad', ad);
     }
 
     return (
         <div ref={containerRef} className={tcls(style)}>
             {ad ? (
                 <>
-                    <a
+                    {mode === 'classic' || !('callToAction' in ad) ? (
+                        <AdClassicRendering ad={ad} />
+                    ) : (
+                        <AdCoverRendering ad={ad} />
+                    )}
+                    {ad.pixel ? <AdPixels rawPixel={ad.pixel} /> : null}
+                    <p
                         className={tcls(
-                            'flex',
-                            'flex-col',
-                            'bg-light-2',
-                            'text-dark/7',
-                            'dark:bg-dark-2',
-                            'dark:text-light/7',
-                            'hover:text-dark/9',
-                            'dark:hover:text-light/9',
-                            'rounded-lg',
-                            'p-3',
+                            'mt-2',
+                            'mr-2',
+                            'text-xs',
+                            'text-right',
+                            'text-dark/5',
+                            'dark:text-light/5',
                         )}
-                        href={ad.statlink}
-                        rel="sponsored noopener"
-                        target="_blank"
-                        title={`${ad.company} — ${ad.companyTagline}`}
                     >
-                        <div className={tcls('mb-3', 'px-6', 'py-4', 'rounded-md')} style={{ backgroundColor: ad.backgroundColor }}>
-                            <img alt="Ads logo" src={ad.logo} />
-                        </div>
-                        <div className={tcls('flex', 'flex-col', 'mb-4')}>
-                            <div className={tcls('text-sm', 'font-semibold', 'mb-2')}>
-                                {ad.company} — {ad.companyTagline}
-                            </div>
-                            <div className={tcls('text-xs')}>{ad.description}</div>
-                        </div>
-                        <div>
-                            <span className={tcls('text-sm', 'rounded-md', 'bg-light-3', 'dark:bg-dark-3', 'py-2', 'px-4')} style={{ backgroundColor: ad.ctaBackgroundColor, color: ad.ctaTextColor }}>
-                                {ad.callToAction}
-                            </span>
-                        </div>
-                        {ad.pixel ? <AdPixels rawPixel={ad.pixel} /> : null}
-                    </a>
-                    <p className={tcls('mt-2', 'mr-2', 'text-xs', 'text-right', 'text-dark/5', 'dark:text-light/5')}>
-                        <a target="_blank" href={viaUrl.toString()} className={tcls('hover:underline')}>Ads via GitBook</a>
+                        <a
+                            target="_blank"
+                            href={viaUrl.toString()}
+                            className={tcls('hover:underline')}
+                        >
+                            Ads via GitBook
+                        </a>
                     </p>
                 </>
+            ) : failed ? (
+                <AdBlockerPlaceholder />
             ) : null}
         </div>
     );
@@ -196,7 +152,7 @@ export function Ad({
  * https://docs.buysellads.com/ad-serving-api#pixels
  */
 function AdPixels({ rawPixel }: { rawPixel: string }) {
-    const pixels = rawPixel.split("||");
+    const pixels = rawPixel.split('||');
     const time = String(Math.round(Date.now() / 1e4) | 0);
 
     return (
@@ -205,14 +161,44 @@ function AdPixels({ rawPixel }: { rawPixel: string }) {
                 return (
                     <img
                         key={index}
-                        src={pixel.replace("[timestamp]", time)}
+                        src={pixel.replace('[timestamp]', time)}
                         width="1"
                         height="1"
                         style={{ display: 'none' }}
                         alt="Ads tracking pixel"
                     />
-                )
+                );
             })}
         </div>
-    )
+    );
+}
+
+/**
+ * Placeholder when visitor has an ad-blocker.
+ */
+function AdBlockerPlaceholder() {
+    return (
+        <div
+            className={tcls(
+                'flex',
+                'flex-col',
+                'gap-3',
+                'bg-light-2',
+                'text-dark/7',
+                'dark:bg-dark-2',
+                'dark:text-light/7',
+                'rounded-lg',
+                'p-4',
+            )}
+        >
+            <div className={tcls('flex', 'flex-row', 'gap-2', 'items-center')}>
+                <IconHeart className={tcls('w-4', 'h-4', 'text-primary-500')} />
+                <p className={tcls('text-xs', 'font-semibold')}>Ad disabled</p>
+            </div>
+            <p className={tcls('text-xs')}>
+                It seems you have an ad-blocker enabled. Consider disabling it to support the
+                creator.
+            </p>
+        </div>
+    );
 }
