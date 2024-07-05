@@ -107,13 +107,9 @@ export function Ad({
     viaUrl.searchParams.set('utm_medium', 'ads');
     viaUrl.searchParams.set('utm_campaign', spaceId);
 
-    if (ad) {
-        console.log('ad', ad);
-    }
-
     return (
         <div ref={containerRef} className={tcls(style)}>
-            {ad ? (
+            {ad && ad.description && ad.statlink ? (
                 <>
                     {mode === 'classic' || !('callToAction' in ad) ? (
                         <AdClassicRendering ad={ad} />
