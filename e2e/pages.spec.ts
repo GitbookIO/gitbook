@@ -107,6 +107,56 @@ const testCases: TestsCase[] = [
         ],
     },
     {
+        name: 'GitBook Site (Navigation when switching variant)',
+        baseUrl: 'https://gitbook-open-e2e-sites.gitbook.io/',
+        tests: [
+            {
+                name: 'Keep navigation path/route when switching variant (Public)',
+                url: 'api-multi-versions/reference/api-reference/pets',
+                run: async (page) => {
+                    const spaceDrowpdown = await page.waitForSelector(
+                        '[data-testid="space-dropdown-button"]',
+                    );
+                    await spaceDrowpdown.click();
+
+                    // Click the second variant in the dropdown
+                    await page
+                        .getByRole('link', {
+                            name: '2.0',
+                        })
+                        .click();
+
+                    // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
+                    await page.waitForURL(
+                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions/v/2.0/reference/api-reference/pets',
+                    );
+                },
+            },
+            {
+                name: 'Keep navigation path/route when switching variant (Share link)',
+                url: 'api-multi-versions-share-links/bRfQbzwsK8rbN1GRxx7K/reference/api-reference/pets',
+                run: async (page) => {
+                    const spaceDrowpdown = await page.waitForSelector(
+                        '[data-testid="space-dropdown-button"]',
+                    );
+                    await spaceDrowpdown.click();
+
+                    // Click the second variant in the dropdown
+                    await page
+                        .getByRole('link', {
+                            name: '2.0',
+                        })
+                        .click();
+
+                    // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
+                    await page.waitForURL(
+                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/bRfQbzwsK8rbN1GRxx7K/v/2.0/reference/api-reference/pets',
+                    );
+                },
+            },
+        ],
+    },
+    {
         name: 'GitBook',
         baseUrl: 'https://docs.gitbook.com',
         tests: [
