@@ -20,6 +20,8 @@ export interface ResolvedContentRef {
     text: string;
     /** Emoji associated with the reference */
     emoji?: string;
+    /** Icon associated with the reference */
+    icon?: string;
     /** URL to open for the content ref */
     href: string;
     /** True if the content ref is active */
@@ -176,6 +178,8 @@ export async function resolveContentRef(
                 href: targetSpace.urls.published ?? targetSpace.urls.app,
                 text: targetSpace.title,
                 active: true,
+                emoji:  targetSpace.emoji,
+                icon: targetSpace.urls.icon
             };
         }
 
