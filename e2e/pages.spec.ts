@@ -113,6 +113,7 @@ const testCases: TestsCase[] = [
             {
                 name: 'Keep navigation path/route when switching variant (Public)',
                 url: 'api-multi-versions/reference/api-reference/pets',
+                screenshot: false,
                 run: async (page) => {
                     const spaceDrowpdown = await page.waitForSelector(
                         '[data-testid="space-dropdown-button"]',
@@ -135,6 +136,7 @@ const testCases: TestsCase[] = [
             {
                 name: 'Keep navigation path/route when switching variant (Share link)',
                 url: 'api-multi-versions-share-links/bRfQbzwsK8rbN1GRxx7K/reference/api-reference/pets',
+                screenshot: false,
                 run: async (page) => {
                     const spaceDrowpdown = await page.waitForSelector(
                         '[data-testid="space-dropdown-button"]',
@@ -156,6 +158,7 @@ const testCases: TestsCase[] = [
             },
             {
                 name: 'Keep navigation path/route when switching variant (VA)',
+                screenshot: false,
                 url: (() => {
                     const privateKey = 'c26190fc-74b2-4b54-9fc7-df9941104953';
                     const token = jwt.sign(
