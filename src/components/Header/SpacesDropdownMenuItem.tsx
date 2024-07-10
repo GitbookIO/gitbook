@@ -15,7 +15,7 @@ function useVariantSpaceHref(variantSpace: Space) {
 }
 
 export function SpacesDropdownMenuItem(props: { variantSpace: Space; currentSpace: Space }) {
-    const { variantSpace, currentSpace } = props
+    const { variantSpace, currentSpace } = props;
     const variantHref = useVariantSpaceHref(variantSpace);
 
     return (

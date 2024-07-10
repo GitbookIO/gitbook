@@ -30,9 +30,13 @@ export function SpacesDropdown(props: { space: Space; spaces: Space[] }) {
             )}
         >
             <DropdownMenu>
-                {spaces.map((otherSpace, index) => 
-                    <SpacesDropdownMenuItem key={`${otherSpace.id}-${index}`} currentSpace={space} variantSpace={otherSpace} />
-                )}
+                {spaces.map((otherSpace, index) => (
+                    <SpacesDropdownMenuItem
+                        key={`${otherSpace.id}-${index}`}
+                        currentSpace={space}
+                        variantSpace={otherSpace}
+                    />
+                ))}
             </DropdownMenu>
         </Dropdown>
     );
