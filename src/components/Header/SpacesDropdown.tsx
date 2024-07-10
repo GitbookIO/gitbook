@@ -1,11 +1,16 @@
-import { Collection, Space } from '@gitbook/api';
+'use client';
+
+import { Space } from '@gitbook/api';
+import { useSelectedLayoutSegment } from 'next/navigation';
 
 import { tcls } from '@/lib/tailwind';
 
 import { Dropdown, DropdownChevron, DropdownMenu, DropdownMenuItem } from './Dropdown';
 
+
 export function SpacesDropdown(props: { space: Space; spaces: Space[] }) {
     const { space, spaces } = props;
+    const currentPathname = useSelectedLayoutSegment() ?? '';
 
     return (
         <Dropdown
@@ -29,15 +34,19 @@ export function SpacesDropdown(props: { space: Space; spaces: Space[] }) {
             )}
         >
             <DropdownMenu>
-                {spaces.map((otherSpace) => (
-                    <DropdownMenuItem
-                        key={otherSpace.id}
-                        href={otherSpace.urls.published ?? otherSpace.urls.app}
-                        active={otherSpace.id === space.id}
-                    >
-                        {otherSpace.title}
-                    </DropdownMenuItem>
-                ))}
+                {spaces.map((otherSpace) => {
+                    const targetUrl = new URL(otherSpace.urls.published ?? otherSpace.urls.app);
+                    targetUrl.pathname += `/${currentPathname}`;
+                    return (
+                        <DropdownMenuItem
+                            key={otherSpace.id}
+                            href={targetUrl.toString()}
+                            active={otherSpace.id === space.id}
+                        >
+                            {otherSpace.title}
+                        </DropdownMenuItem>
+                    );
+                })}
             </DropdownMenu>
         </Dropdown>
     );
