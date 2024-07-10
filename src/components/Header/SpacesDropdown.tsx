@@ -1,8 +1,9 @@
-import { Collection, Space } from '@gitbook/api';
+import { Space } from '@gitbook/api';
 
 import { tcls } from '@/lib/tailwind';
 
-import { Dropdown, DropdownChevron, DropdownMenu, DropdownMenuItem } from './Dropdown';
+import { Dropdown, DropdownChevron, DropdownMenu } from './Dropdown';
+import { SpacesDropdownMenuItem } from './SpacesDropdownMenuItem';
 
 export function SpacesDropdown(props: { space: Space; spaces: Space[] }) {
     const { space, spaces } = props;
@@ -29,14 +30,12 @@ export function SpacesDropdown(props: { space: Space; spaces: Space[] }) {
             )}
         >
             <DropdownMenu>
-                {spaces.map((otherSpace) => (
-                    <DropdownMenuItem
-                        key={otherSpace.id}
-                        href={otherSpace.urls.published ?? otherSpace.urls.app}
-                        active={otherSpace.id === space.id}
-                    >
-                        {otherSpace.title}
-                    </DropdownMenuItem>
+                {spaces.map((otherSpace, index) => (
+                    <SpacesDropdownMenuItem
+                        key={`${otherSpace.id}-${index}`}
+                        currentSpace={space}
+                        variantSpace={otherSpace}
+                    />
                 ))}
             </DropdownMenu>
         </Dropdown>

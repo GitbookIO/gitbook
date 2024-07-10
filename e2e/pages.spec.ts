@@ -107,6 +107,93 @@ const testCases: TestsCase[] = [
         ],
     },
     {
+        name: 'GitBook Site (Navigation when switching variant)',
+        baseUrl: 'https://gitbook-open-e2e-sites.gitbook.io/',
+        tests: [
+            {
+                name: 'Keep navigation path/route when switching variant (Public)',
+                url: 'api-multi-versions/reference/api-reference/pets',
+                screenshot: false,
+                run: async (page) => {
+                    const spaceDrowpdown = await page.waitForSelector(
+                        '[data-testid="space-dropdown-button"]',
+                    );
+                    await spaceDrowpdown.click();
+
+                    // Click the second variant in the dropdown
+                    await page
+                        .getByRole('link', {
+                            name: '2.0',
+                        })
+                        .click();
+
+                    // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
+                    await page.waitForURL(
+                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions/v/2.0/reference/api-reference/pets',
+                    );
+                },
+            },
+            {
+                name: 'Keep navigation path/route when switching variant (Share link)',
+                url: 'api-multi-versions-share-links/bRfQbzwsK8rbN1GRxx7K/reference/api-reference/pets',
+                screenshot: false,
+                run: async (page) => {
+                    const spaceDrowpdown = await page.waitForSelector(
+                        '[data-testid="space-dropdown-button"]',
+                    );
+                    await spaceDrowpdown.click();
+
+                    // Click the second variant in the dropdown
+                    await page
+                        .getByRole('link', {
+                            name: '2.0',
+                        })
+                        .click();
+
+                    // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
+                    await page.waitForURL(
+                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/bRfQbzwsK8rbN1GRxx7K/v/2.0/reference/api-reference/pets',
+                    );
+                },
+            },
+            {
+                name: 'Keep navigation path/route when switching variant (VA)',
+                screenshot: false,
+                url: (() => {
+                    const privateKey = 'c26190fc-74b2-4b54-9fc7-df9941104953';
+                    const token = jwt.sign(
+                        {
+                            name: 'gitbook-open-tests',
+                        },
+                        privateKey,
+                        {
+                            expiresIn: '24h',
+                        },
+                    );
+                    return `api-multi-versions-va/reference/api-reference/pets?jwt_token=${token}`;
+                })(),
+                run: async (page) => {
+                    const spaceDrowpdown = await page.waitForSelector(
+                        '[data-testid="space-dropdown-button"]',
+                    );
+                    await spaceDrowpdown.click();
+
+                    // Click the second variant in the dropdown
+                    await page
+                        .getByRole('link', {
+                            name: '2.0',
+                        })
+                        .click();
+
+                    // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
+                    await page.waitForURL(
+                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-va/v/2.0/reference/api-reference/pets',
+                    );
+                },
+            },
+        ],
+    },
+    {
         name: 'GitBook',
         baseUrl: 'https://docs.gitbook.com',
         tests: [
