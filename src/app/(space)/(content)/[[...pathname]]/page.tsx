@@ -21,8 +21,9 @@ export const runtime = 'edge';
  */
 export default async function Page(props: {
     params: PagePathParams;
+    searchParams: { fallback?: string };
 }) {
-    const { params } = props;
+    const { params, searchParams } = props;
 
     const rawPathname = getPathnameParam(params);
     const {
@@ -32,10 +33,17 @@ export default async function Page(props: {
         parent,
         customization,
         pages,
-        page,
+        page: resolvedPage,
         document,
     } = await fetchPageData(params);
     const linksContext: PageHrefContext = {};
+    
+    const canFallback = searchParams.fallback?.toLocaleLowerCase() === 'true';
+    let page = resolvedPage;
+    if (!resolvedPage && canFallback) {
+        const rootPage = resolveFirstDocument(pages, []);
+        page = rootPage?.page;
+    }
 
     if (!page) {
         const pathname = normalizePathname(rawPathname);
@@ -124,27 +132,30 @@ export async function generateMetadata({
     searchParams: { fallback?: string };
 }): Promise<Metadata> {
     const { space, pages, page, customization, parent } = await fetchPageData(params);
-    if (!page) {
-        const canFallback = searchParams.fallback?.toLocaleLowerCase() === 'true';
-        if (canFallback) {
-            const rootPage = resolveFirstDocument(pages, []);
-            rootPage?.page ? redirect(pageHref(pages, rootPage.page)) : notFound();
-        }
+    const canFallback = searchParams.fallback?.toLocaleLowerCase() === 'true';
+
+    let targetPage = page;
+    if (!page && canFallback) {
+        const rootPage = resolveFirstDocument(pages, []);
+        targetPage = rootPage?.page;
+    }
+
+    if (!targetPage) {
         notFound();
     }
 
     return {
-        title: [page.title, getContentTitle(space, customization, parent)]
+        title: [targetPage.title, getContentTitle(space, customization, parent)]
             .filter(Boolean)
             .join(' | '),
-        description: page.description ?? '',
+        description: targetPage.description ?? '',
         alternates: {
-            canonical: absoluteHref(getPagePath(pages, page), true),
+            canonical: absoluteHref(getPagePath(pages, targetPage), true),
         },
         openGraph: {
             images: [
                 customization.socialPreview.url ??
-                    absoluteHref(`~gitbook/ogimage/${page.id}`, true),
+                    absoluteHref(`~gitbook/ogimage/${targetPage.id}`, true),
             ],
         },
     };
