@@ -6,7 +6,7 @@ import React from 'react';
 import { PageAside } from '@/components/PageAside';
 import { PageBody, PageCover } from '@/components/PageBody';
 import { PageHrefContext, absoluteHref, pageHref } from '@/lib/links';
-import { getPagePath } from '@/lib/pages';
+import { getPagePath, resolveFirstDocument } from '@/lib/pages';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { getContentTitle } from '@/lib/utils';
@@ -19,7 +19,9 @@ export const runtime = 'edge';
 /**
  * Fetch and render a page.
  */
-export default async function Page(props: { params: PagePathParams }) {
+export default async function Page(props: {
+    params: PagePathParams;
+}) {
     const { params } = props;
 
     const rawPathname = getPathnameParam(params);
@@ -114,9 +116,20 @@ export async function generateViewport({ params }: { params: PagePathParams }): 
     };
 }
 
-export async function generateMetadata({ params }: { params: PagePathParams }): Promise<Metadata> {
+export async function generateMetadata({
+    params,
+    searchParams,
+}: {
+    params: PagePathParams;
+    searchParams: { fallback?: string };
+}): Promise<Metadata> {
     const { space, pages, page, customization, parent } = await fetchPageData(params);
     if (!page) {
+        const canFallback = searchParams.fallback?.toLocaleLowerCase() === 'true';
+        if (canFallback) {
+            const rootPage = resolveFirstDocument(pages, []);
+            rootPage?.page ? redirect(pageHref(pages, rootPage.page)) : notFound();
+        }
         notFound();
     }
 

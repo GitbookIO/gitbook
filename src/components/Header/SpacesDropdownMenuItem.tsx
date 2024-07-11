@@ -10,6 +10,7 @@ function useVariantSpaceHref(variantSpaceUrl: string) {
     const targetUrl = new URL(variantSpaceUrl);
     targetUrl.pathname += `/${currentPathname}`;
     targetUrl.pathname = targetUrl.pathname.replace(/\/{2,}/g, '/').replace(/\/$/, '');
+    targetUrl.search = '?fallback=true';
 
     return targetUrl.toString();
 }
