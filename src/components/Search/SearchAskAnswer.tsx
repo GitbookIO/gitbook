@@ -137,11 +137,6 @@ function AnswerBody(props: { answer: AskAnswerResult }) {
     const { answer } = props;
     const language = useLanguage();
 
-    const [, setSearchState] = useSearch();
-    const onClose = () => {
-        setSearchState(null);
-    };
-
     return (
         <>
             <div
@@ -158,7 +153,6 @@ function AnswerBody(props: { answer: AskAnswerResult }) {
                     hasAnswer={answer.hasAnswer}
                     sources={answer.sources}
                     language={language}
-                    onClose={onClose}
                 />
             ) : null}
         </>
@@ -212,10 +206,9 @@ function AnswerFollowupQuestions(props: { followupQuestions: string[] }) {
 function AnswerSources(props: {
     sources: AskAnswerSource[];
     language: TranslationLanguage;
-    onClose: () => void;
     hasAnswer?: boolean;
 }) {
-    const { sources, onClose, language, hasAnswer } = props;
+    const { sources, language, hasAnswer } = props;
 
     return (
         <div
@@ -238,7 +231,6 @@ function AnswerSources(props: {
             {sources.map((source) => (
                 <span key={source.id} className={tcls()}>
                     <Link
-                        onClick={onClose}
                         className={tcls(
                             'flex',
                             'text-sm',
