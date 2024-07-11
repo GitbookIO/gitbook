@@ -33,8 +33,12 @@ export function SpacesDropdown(props: { space: Space; spaces: Space[] }) {
                 {spaces.map((otherSpace, index) => (
                     <SpacesDropdownMenuItem
                         key={`${otherSpace.id}-${index}`}
-                        currentSpace={space}
-                        variantSpace={otherSpace}
+                        variantSpace={{
+                            id: otherSpace.id,
+                            title: otherSpace.title,
+                            url: otherSpace.urls.published ?? otherSpace.urls.app,
+                        }}
+                        active={otherSpace.id === space.id}
                     />
                 ))}
             </DropdownMenu>
