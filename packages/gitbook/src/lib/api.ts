@@ -695,7 +695,7 @@ async function getSiteSpaceCustomization(args: {
 /**
  * Get the customization settings for a site space from the API.
  */
-export async function getSiteCustomization(args: {
+async function getSiteCustomization(args: {
     organizationId: string;
     siteId: string;
 }): Promise<SiteCustomizationSettings> {
@@ -842,7 +842,7 @@ export async function getCurrentSiteLayoutData(args: {
 export async function getCurrentSiteCustomization(args: {
     organizationId: string;
     siteId: string;
-    siteSpaceId: string | undefined;
+    siteSpaceId?: string | undefined;
 }): Promise<SiteCustomizationSettings> {
     return args.siteSpaceId
         ? getSiteSpaceCustomization({

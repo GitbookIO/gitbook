@@ -11,7 +11,7 @@ import { getContentPointer } from '@/app/(space)/fetch';
 import { HeaderMobileMenu } from '@/components/Header/HeaderMobileMenu';
 import { LogoIcon } from '@/components/icons';
 import { Image } from '@/components/utils';
-import { getSiteCustomization } from '@/lib/api';
+import { getCurrentSiteCustomization } from '@/lib/api';
 import { absoluteHref } from '@/lib/links';
 import { tcls } from '@/lib/tailwind';
 import { getContentTitle } from '@/lib/utils';
@@ -104,7 +104,7 @@ async function LogoFallback(props: HeaderLogoProps) {
 
     const siteCustomization =
         'siteId' in content
-            ? await getSiteCustomization({
+            ? await getCurrentSiteCustomization({
                   organizationId: content.organizationId,
                   siteId: content.siteId,
               })
