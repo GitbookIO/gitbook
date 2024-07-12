@@ -1,6 +1,6 @@
 import { Space } from '@gitbook/api';
 
-import { getSpaceLayoutData } from '@/lib/api';
+import { getSpaceCustomization, getSpaceLayoutData } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 import { getSpaceTitle } from '@/lib/utils';
 
@@ -11,12 +11,12 @@ export async function SpacesDropdown(props: { space: Space; spaces: Space[] }) {
     const { space, spaces } = props;
 
     // fetch space layout data such as customizations
-    const spacesLayoutData = await Promise.all(
-        spaces.map(async (space) => [space.id, await getSpaceLayoutData(space.id)]),
+    const spaceCustomizations = await Promise.all(
+        spaces.map(async (space) => [space.id, await getSpaceCustomization(space.id)]),
     );
 
     // Map using space IDs as keys for convenience
-    const spacesLayoutMap = spacesLayoutData.reduce((accum, layoutKeyVal) => {
+    const spaceCustomizationsMap = spaceCustomizations.reduce((accum, layoutKeyVal) => {
         accum.set(layoutKeyVal[0], layoutKeyVal[1]);
         return accum;
     }, new Map());
@@ -39,7 +39,7 @@ export async function SpacesDropdown(props: { space: Space; spaces: Space[] }) {
                 >
                     {getSpaceTitle({
                         space,
-                        customization: spacesLayoutMap.get(space.id)?.customization ?? {},
+                        customization: spaceCustomizationsMap.get(space.id) ?? {},
                     })}
                     <DropdownChevron />
                 </div>
@@ -53,8 +53,7 @@ export async function SpacesDropdown(props: { space: Space; spaces: Space[] }) {
                             id: otherSpace.id,
                             title: getSpaceTitle({
                                 space: otherSpace,
-                                customization:
-                                    spacesLayoutMap.get(otherSpace.id)?.customization ?? {},
+                                customization: spaceCustomizationsMap.get(otherSpace.id) ?? {},
                             }),
                             url: otherSpace.urls.published ?? otherSpace.urls.app,
                         }}
