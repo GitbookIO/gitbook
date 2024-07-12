@@ -3,7 +3,7 @@ import { Collection, Site, Space } from '@gitbook/api';
 import { getContentPointer } from '@/app/(space)/fetch';
 import { getCurrentSiteCustomization, getSiteSpaces, getSpaceCustomization } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
-import { getSpaceTitle } from '@/lib/utils';
+import { getContentTitle } from '@/lib/utils';
 
 import { Dropdown, DropdownChevron, DropdownMenu } from './Dropdown';
 import { SpacesDropdownMenuItem } from './SpacesDropdownMenuItem';
@@ -13,6 +13,7 @@ export async function SpacesDropdown(props: {
     spaces: Space[];
     parent?: Site | Collection | null;
 }) {
+    props.parent?.object;
     const { space, spaces } = props;
     const contentPointer = getContentPointer();
 
@@ -62,10 +63,7 @@ export async function SpacesDropdown(props: {
                         'text-header-link-500',
                     )}
                 >
-                    {getSpaceTitle({
-                        space,
-                        customization: spaceCustomizationsMap.get(space.id) ?? {},
-                    })}
+                    {getContentTitle(space, spaceCustomizationsMap.get(space.id) ?? {})}
                     <DropdownChevron />
                 </div>
             )}
@@ -76,10 +74,10 @@ export async function SpacesDropdown(props: {
                         key={`${otherSpace.id}-${index}`}
                         variantSpace={{
                             id: otherSpace.id,
-                            title: getSpaceTitle({
-                                space: otherSpace,
-                                customization: spaceCustomizationsMap.get(otherSpace.id) ?? {},
-                            }),
+                            title: getContentTitle(
+                                otherSpace,
+                                spaceCustomizationsMap.get(otherSpace.id) ?? {},
+                            ),
                             url: otherSpace.urls.published ?? otherSpace.urls.app,
                         }}
                         active={otherSpace.id === space.id}
