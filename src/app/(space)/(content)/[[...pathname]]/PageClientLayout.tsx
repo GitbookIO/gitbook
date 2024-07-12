@@ -5,22 +5,6 @@ import React from 'react';
 
 import { useScrollToHash } from '@/components/hooks';
 
-function useStripFallbackQueryParam() {
-    const router = useRouter();
-    const pathname = usePathname();
-    const searchParams = useSearchParams();
-
-    const stripFallbackParam = React.useCallback(() => {
-        const params = new URLSearchParams(searchParams.toString());
-        params.delete('fallback');
-        router.push(`${pathname}?${params.toString()}${window.location.hash ?? ''}`);
-    }, [router, pathname, searchParams]);
-
-    React.useEffect(() => {
-        stripFallbackParam();
-    }, []);
-}
-
 /**
  * Client component to initialize interactivity for a page.
  */
@@ -29,6 +13,24 @@ export function PageClientLayout(props: {}) {
     // are rendered before we scroll to the hash.
     useScrollToHash();
 
+    // When the user switches variants using the space dropdown, we pass a fallback=true parameter.
+    // This parameter indicates that we should redirect to the root page if the path from the
+    // previous variant doesn't exist in the new variant. If the path does exist, no redirect occurs,
+    // so we need to remove the fallback parameter.
     useStripFallbackQueryParam();
     return null;
+}
+
+function useStripFallbackQueryParam() {
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
+    React.useEffect(() => {
+        if (searchParams.has('fallback')) {
+            const params = new URLSearchParams(searchParams.toString());
+            params.delete('fallback');
+            router.push(`${pathname}?${params.toString()}${window.location.hash ?? ''}`);
+        }
+    }, [router, pathname, searchParams]);
 }

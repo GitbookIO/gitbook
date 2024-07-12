@@ -33,14 +33,13 @@ export default async function Page(props: {
         parent,
         customization,
         pages,
-        page: resolvedPage,
+        page,
         document,
     } = await fetchPageData(params);
     const linksContext: PageHrefContext = {};
 
-    const canFallback = searchParams.fallback?.toLocaleLowerCase() === 'true';
-    let page = resolvedPage;
-    if (!resolvedPage && canFallback) {
+    const canFallback = !!searchParams.fallback;
+    if (!page && canFallback) {
         const rootPage = resolveFirstDocument(pages, []);
         rootPage?.page ? redirect(pageHref(pages, rootPage?.page, linksContext)) : notFound();
     }
@@ -132,7 +131,7 @@ export async function generateMetadata({
     searchParams: { fallback?: string };
 }): Promise<Metadata> {
     const { space, pages, page, customization, parent } = await fetchPageData(params);
-    const canFallback = searchParams.fallback?.toLocaleLowerCase() === 'true';
+    const canFallback = !!searchParams.fallback;
 
     let targetPage = page;
     if (!page && canFallback) {
