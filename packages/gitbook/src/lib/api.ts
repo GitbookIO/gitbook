@@ -746,7 +746,7 @@ export const getSiteSpaces = cache(
             organizationId: string;
             siteId: string;
             /** Site share key that can be used as context to resolve site space published urls */
-            siteShareKey: string | undefined;
+            siteShareKey?: string;
         },
         options: CacheFunctionOptions,
     ) => {
