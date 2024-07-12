@@ -62,7 +62,10 @@ export function OpenAPIResponseExample(props: {
 
     return (
         <InteractiveSection header="Response" className="openapi-response-example">
-            <context.CodeBlock code={JSON.stringify(example, null, 2)} syntax="json" />
+            <context.CodeBlock
+                code={typeof example === 'string' ? example : JSON.stringify(example, null, 2)}
+                syntax="json"
+            />
         </InteractiveSection>
     );
 }
