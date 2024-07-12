@@ -1,10 +1,11 @@
 import { CustomizationThemedURL, DocumentBlockContentRef } from '@gitbook/api';
 
 import { Card, Emoji } from '@/components/primitives';
+import { getSpaceCustomization, ignoreAPIError } from '@/lib/api';
+import { ResolvedContentRef } from '@/lib/references';
 
 import { BlockProps } from './Block';
 import { Image } from '../utils';
-
 
 
 export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>) {
@@ -17,10 +18,15 @@ export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>
     if (!resolved) {
         return null;
     }
-    
+
+    const kind = block?.data?.ref?.kind;
+    if (resolved.active && kind === 'space') {
+        return <SpaceRefCard {...props} resolved={resolved} />;
+    }
+
     return (
         <Card
-            leadingIcon={resolved.icon ? <BlockContentRefIcon icon={resolved.icon} /> : resolved.emoji ? <Emoji code={resolved.emoji} style="text-xl" /> : null}
+            leadingIcon={resolved.emoji ? <Emoji code={resolved.emoji} style="text-xl" /> : null}
             href={resolved.href}
             title={resolved.text}
             style={style}
@@ -28,7 +34,28 @@ export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>
     );
 }
 
-function BlockContentRefIcon(props: { icon: string | CustomizationThemedURL }) {
+async function SpaceRefCard(props: { resolved: ResolvedContentRef } & BlockProps<DocumentBlockContentRef>) {
+    const { context, style, resolved } = props;
+    const spaceId = context.contentRefContext?.space.id;
+
+    if (!spaceId) { return null; }
+
+    const spaceCustomization = await ignoreAPIError(getSpaceCustomization(spaceId));
+    const customFavicon = spaceCustomization?.favicon;
+    const customEmoji = customFavicon && 'emoji' in customFavicon ? customFavicon.emoji : null;
+    const customIcon = customFavicon && 'icon' in customFavicon ? customFavicon.icon : null;
+
+    return (
+        <Card
+            leadingIcon={customIcon ? <BlockContentRefIcon icon={customIcon} /> : customEmoji ? <Emoji code={customEmoji} style="text-xl" /> : null}
+            href={resolved.href}
+            title={resolved.text}
+            style={style}
+        />
+    );
+}
+
+function BlockContentRefIcon(props: { icon: CustomizationThemedURL }) {
     const { icon } = props;
             
     return icon ? <Image 

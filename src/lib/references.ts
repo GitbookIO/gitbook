@@ -1,4 +1,4 @@
-import { ContentRef, CustomizationThemedURL, Revision, RevisionFile, RevisionPageDocument, Space } from '@gitbook/api';
+import { ContentRef, Revision, RevisionFile, RevisionPageDocument, Space } from '@gitbook/api';
 import assertNever from 'assert-never';
 
 import {
@@ -8,7 +8,6 @@ import {
     getRevisionFile,
     getSpace,
     getSpaceContentData,
-    getSpaceCustomization,
     getUserById,
     ignoreAPIError,
 } from './api';
@@ -22,8 +21,6 @@ export interface ResolvedContentRef {
     text: string;
     /** Emoji associated with the reference */
     emoji?: string;
-    /** Icon associated with the reference */
-    icon?: CustomizationThemedURL | string;
     /** URL to open for the content ref */
     href: string;
     /** True if the content ref is active */
@@ -177,17 +174,11 @@ export async function resolveContentRef(
                 };
             }
 
-            const spaceCustomization = await ignoreAPIError(getSpaceCustomization(targetSpace.id));
-            const customFavicon = spaceCustomization?.favicon;
-            const customEmoji = customFavicon && 'emoji' in customFavicon ? customFavicon.emoji : null;
-            const customIcon = customFavicon && 'icon' in customFavicon ? customFavicon.icon : null;
-
             return {
                 href: targetSpace.urls.published ?? targetSpace.urls.app,
                 text: targetSpace.title,
                 active: true,
-                emoji: customEmoji ?? targetSpace.emoji,
-                icon: customIcon ?? targetSpace.urls.icon
+                emoji: targetSpace.emoji,
             };
         }
 
