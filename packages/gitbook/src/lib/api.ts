@@ -842,7 +842,7 @@ export async function getCurrentSiteLayoutData(args: {
 export async function getCurrentSiteCustomization(args: {
     organizationId: string;
     siteId: string;
-    siteSpaceId?: string | undefined;
+    siteSpaceId?: string;
 }): Promise<SiteCustomizationSettings> {
     return args.siteSpaceId
         ? getSiteSpaceCustomization({
