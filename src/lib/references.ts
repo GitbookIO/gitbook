@@ -1,4 +1,4 @@
-import { ContentRef, Revision, RevisionFile, RevisionPageDocument, Space } from '@gitbook/api';
+import { ContentRef, CustomizationThemedURL, Revision, RevisionFile, RevisionPageDocument, Space } from '@gitbook/api';
 import assertNever from 'assert-never';
 
 import {
@@ -8,6 +8,7 @@ import {
     getRevisionFile,
     getSpace,
     getSpaceContentData,
+    getSpaceCustomization,
     getUserById,
     ignoreAPIError,
 } from './api';
@@ -15,13 +16,14 @@ import { getBlockById, getBlockTitle } from './document';
 import { gitbookAppHref, pageHref, PageHrefContext } from './links';
 import { getPagePath, resolvePageId } from './pages';
 
+
 export interface ResolvedContentRef {
     /** Text to render in the content ref */
     text: string;
     /** Emoji associated with the reference */
     emoji?: string;
     /** Icon associated with the reference */
-    icon?: string;
+    icon?: CustomizationThemedURL | string;
     /** URL to open for the content ref */
     href: string;
     /** True if the content ref is active */
@@ -166,6 +168,7 @@ export async function resolveContentRef(
                 contentRef.space === space.id
                     ? space
                     : await ignoreAPIError(getSpace(contentRef.space));
+                    
             if (!targetSpace) {
                 return {
                     href: gitbookAppHref(`/s/${contentRef.space}`),
@@ -174,12 +177,16 @@ export async function resolveContentRef(
                 };
             }
 
+            const spaceCustomization = await getSpaceCustomization(targetSpace.id);
+            const customEmoji = 'emoji' in spaceCustomization.favicon ? spaceCustomization.favicon.emoji : null;
+            const customIcon = 'icon' in spaceCustomization.favicon ? spaceCustomization.favicon.icon : null;
+
             return {
                 href: targetSpace.urls.published ?? targetSpace.urls.app,
                 text: targetSpace.title,
                 active: true,
-                emoji:  targetSpace.emoji,
-                icon: targetSpace.urls.icon
+                emoji: customEmoji ?? targetSpace.emoji,
+                icon: customIcon ?? targetSpace.urls.icon
             };
         }
 
