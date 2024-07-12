@@ -15,6 +15,7 @@ import { getBlockById, getBlockTitle } from './document';
 import { gitbookAppHref, pageHref, PageHrefContext } from './links';
 import { getPagePath, resolvePageId } from './pages';
 
+
 export interface ResolvedContentRef {
     /** Text to render in the content ref */
     text: string;
@@ -164,6 +165,7 @@ export async function resolveContentRef(
                 contentRef.space === space.id
                     ? space
                     : await ignoreAPIError(getSpace(contentRef.space));
+                    
             if (!targetSpace) {
                 return {
                     href: gitbookAppHref(`/s/${contentRef.space}`),
@@ -175,7 +177,7 @@ export async function resolveContentRef(
             return {
                 href: targetSpace.urls.published ?? targetSpace.urls.app,
                 text: targetSpace.title,
-                active: true,
+                active: true
             };
         }
 
