@@ -177,8 +177,7 @@ export async function resolveContentRef(
             return {
                 href: targetSpace.urls.published ?? targetSpace.urls.app,
                 text: targetSpace.title,
-                active: true,
-                emoji: targetSpace.emoji,
+                active: true
             };
         }
 
