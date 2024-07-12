@@ -40,7 +40,6 @@ export async function SpacesDropdown(props: { space: Space; spaces: Space[] }) {
                     {getSpaceTitle({
                         space,
                         customization: spacesLayoutMap.get(space.id)?.customization ?? {},
-                        parent: null,
                     })}
                     <DropdownChevron />
                 </div>
@@ -56,7 +55,6 @@ export async function SpacesDropdown(props: { space: Space; spaces: Space[] }) {
                                 space: otherSpace,
                                 customization:
                                     spacesLayoutMap.get(otherSpace.id)?.customization ?? {},
-                                parent: null,
                             }),
                             url: otherSpace.urls.published ?? otherSpace.urls.app,
                         }}

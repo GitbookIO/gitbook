@@ -30,13 +30,7 @@ export function getContentTitle(
 export function getSpaceTitle(args: {
     space: Space;
     customization: CustomizationSettings | SiteCustomizationSettings;
-    parent: Site | Collection | null;
 }) {
-    const { space, customization, parent } = args;
-    if (parent?.object === 'site') {
-        return customization.title ?? space.title;
-    }
-
-    // Otherwise the legacy behavior is not changed to avoid regressions
+    const { space, customization } = args;
     return customization.title ?? space.title;
 }
