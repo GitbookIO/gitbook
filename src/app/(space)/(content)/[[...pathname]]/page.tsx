@@ -37,12 +37,12 @@ export default async function Page(props: {
         document,
     } = await fetchPageData(params);
     const linksContext: PageHrefContext = {};
-    
+
     const canFallback = searchParams.fallback?.toLocaleLowerCase() === 'true';
     let page = resolvedPage;
     if (!resolvedPage && canFallback) {
         const rootPage = resolveFirstDocument(pages, []);
-        page = rootPage?.page;
+        rootPage?.page ? redirect(pageHref(pages, rootPage?.page, linksContext)) : notFound();
     }
 
     if (!page) {

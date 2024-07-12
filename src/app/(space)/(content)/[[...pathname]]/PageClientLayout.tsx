@@ -14,11 +14,11 @@ function useStripFallbackQueryParam() {
         const params = new URLSearchParams(searchParams.toString());
         params.delete('fallback');
         router.push(`${pathname}?${params.toString()}${window.location.hash ?? ''}`);
-    }, []);
+    }, [router, pathname, searchParams]);
 
     React.useEffect(() => {
         stripFallbackParam();
-    }, [stripFallbackParam]);
+    }, []);
 }
 
 /**
