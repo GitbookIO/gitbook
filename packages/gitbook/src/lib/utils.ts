@@ -23,3 +23,20 @@ export function getContentTitle(
     // Otherwise the legacy behavior is not changed to avoid regressions
     return parent ? parent.title : customization.title ?? space.title;
 }
+
+/**
+ * Get the title to display for a Space.
+ */
+export function getSpaceTitle(args: {
+    space: Space;
+    customization: CustomizationSettings | SiteCustomizationSettings;
+    parent: Site | Collection | null;
+}) {
+    const { space, customization, parent } = args;
+    if (parent?.object === 'site') {
+        return customization.title ?? space.title;
+    }
+
+    // Otherwise the legacy behavior is not changed to avoid regressions
+    return customization.title ?? space.title;
+}
