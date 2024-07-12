@@ -177,9 +177,10 @@ export async function resolveContentRef(
                 };
             }
 
-            const spaceCustomization = await getSpaceCustomization(targetSpace.id);
-            const customEmoji = 'emoji' in spaceCustomization.favicon ? spaceCustomization.favicon.emoji : null;
-            const customIcon = 'icon' in spaceCustomization.favicon ? spaceCustomization.favicon.icon : null;
+            const spaceCustomization = await ignoreAPIError(getSpaceCustomization(targetSpace.id));
+            const customFavicon = spaceCustomization?.favicon;
+            const customEmoji = customFavicon && 'emoji' in customFavicon ? customFavicon.emoji : null;
+            const customIcon = customFavicon && 'icon' in customFavicon ? customFavicon.icon : null;
 
             return {
                 href: targetSpace.urls.published ?? targetSpace.urls.app,
