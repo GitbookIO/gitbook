@@ -15,6 +15,8 @@ import { tcls } from '@/lib/tailwind';
 import { getContentTitle } from '@/lib/utils';
 
 import { Link } from '../primitives';
+import { getSiteCustomization } from '@/lib/api';
+import { getContentPointer } from '@/app/(space)/fetch';
 
 interface HeaderLogoProps {
     parent: Site | Collection | null;
@@ -94,10 +96,20 @@ export function HeaderLogo(props: HeaderLogoProps) {
     );
 }
 
-function LogoFallback(props: HeaderLogoProps) {
+async function LogoFallback(props: HeaderLogoProps) {
     const { parent, space, customization } = props;
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : undefined;
     const customEmoji = 'emoji' in customization.favicon ? customization.favicon.emoji : undefined;
+    const content = getContentPointer();
+
+    const siteCustomization =
+        'siteId' in content
+            ? await getSiteCustomization({
+                  organizationId: content.organizationId,
+                  siteId: content.siteId,
+              })
+            : null;
+
     return (
         <>
             <LogoIcon
@@ -125,7 +137,7 @@ function LogoFallback(props: HeaderLogoProps) {
                         : 'text-header-link',
                 )}
             >
-                {getContentTitle(space, customization, parent)}
+                {getContentTitle(space, siteCustomization ?? customization, parent)}
             </h1>
         </>
     );

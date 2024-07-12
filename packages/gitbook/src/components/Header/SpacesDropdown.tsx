@@ -1,12 +1,7 @@
 import { Collection, Site, Space } from '@gitbook/api';
 
 import { getContentPointer } from '@/app/(space)/fetch';
-import {
-    getCurrentSiteCustomization,
-    getSiteSpaces,
-    getSpaceCustomization,
-    getSpaceLayoutData,
-} from '@/lib/api';
+import { getCurrentSiteCustomization, getSiteSpaces, getSpaceCustomization } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 import { getSpaceTitle } from '@/lib/utils';
 
@@ -18,7 +13,7 @@ export async function SpacesDropdown(props: {
     spaces: Space[];
     parent?: Site | Collection | null;
 }) {
-    const { space, spaces, parent } = props;
+    const { space, spaces } = props;
     const contentPointer = getContentPointer();
 
     // fetch customizations based on site vs a legacy space

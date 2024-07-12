@@ -695,7 +695,7 @@ async function getSiteSpaceCustomization(args: {
 /**
  * Get the customization settings for a site space from the API.
  */
-async function getSiteCustomization(args: {
+export async function getSiteCustomization(args: {
     organizationId: string;
     siteId: string;
 }): Promise<SiteCustomizationSettings> {
