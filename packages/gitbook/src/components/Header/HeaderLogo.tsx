@@ -7,16 +7,16 @@ import {
     Space,
 } from '@gitbook/api';
 
+import { getContentPointer } from '@/app/(space)/fetch';
 import { HeaderMobileMenu } from '@/components/Header/HeaderMobileMenu';
 import { LogoIcon } from '@/components/icons';
 import { Image } from '@/components/utils';
+import { getSiteCustomization } from '@/lib/api';
 import { absoluteHref } from '@/lib/links';
 import { tcls } from '@/lib/tailwind';
 import { getContentTitle } from '@/lib/utils';
 
 import { Link } from '../primitives';
-import { getSiteCustomization } from '@/lib/api';
-import { getContentPointer } from '@/app/(space)/fetch';
 
 interface HeaderLogoProps {
     parent: Site | Collection | null;
