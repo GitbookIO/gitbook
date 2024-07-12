@@ -8,7 +8,7 @@ import { AdminToolbar } from '@/components/AdminToolbar';
 import { CookiesToast } from '@/components/Cookies';
 import { LoadIntegrations } from '@/components/Integrations';
 import { SpaceLayout } from '@/components/SpaceLayout';
-import { api, getSiteCustomization } from '@/lib/api';
+import { api } from '@/lib/api';
 import { assetsDomain } from '@/lib/assets';
 import { buildVersion } from '@/lib/build';
 import { getContentSecurityPolicyNonce } from '@/lib/csp';
