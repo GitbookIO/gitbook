@@ -8,6 +8,7 @@ import {
 } from '@gitbook/api';
 
 import { HeaderMobileMenu } from '@/components/Header/HeaderMobileMenu';
+import { LogoIcon } from '@/components/icons';
 import { Image } from '@/components/utils';
 import { absoluteHref } from '@/lib/links';
 import { tcls } from '@/lib/tailwind';
@@ -95,40 +96,11 @@ export function HeaderLogo(props: HeaderLogoProps) {
 
 function LogoFallback(props: HeaderLogoProps) {
     const { parent, space, customization } = props;
-    const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
-
+    const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : undefined;
+    const customEmoji = 'emoji' in customization.favicon ? customization.favicon.emoji : undefined;
     return (
         <>
-            <Image
-                alt="Logo"
-                sources={
-                    customIcon
-                        ? {
-                              light: { src: customIcon.light, aspectRatio: '1' },
-                              dark: customIcon.dark
-                                  ? { src: customIcon.dark, aspectRatio: '1' }
-                                  : null,
-                          }
-                        : {
-                              light: {
-                                  src: absoluteHref('~gitbook/icon?size=medium&theme=light', true),
-                                  size: { width: 256, height: 256 },
-                              },
-                              dark: {
-                                  src: absoluteHref('~gitbook/icon?size=medium&theme=dark', true),
-                                  size: { width: 256, height: 256 },
-                              },
-                          }
-                }
-                sizes={[
-                    {
-                        width: 32,
-                    },
-                ]}
-                fetchPriority="high"
-                style={['w-8', 'h-8', 'object-contain']}
-            />
-
+            <LogoIcon icon={customIcon} emoji={customEmoji} alt='' sizes={[{ width: 32 }]} style={['object-contain', 'size-8']} fetchPriority='high'/> 
             <h1
                 className={tcls(
                     'text-pretty',

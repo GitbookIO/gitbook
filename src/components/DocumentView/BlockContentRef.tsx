@@ -1,12 +1,11 @@
-import { CustomizationThemedURL, DocumentBlockContentRef } from '@gitbook/api';
+import { DocumentBlockContentRef } from '@gitbook/api';
 
+import { LogoIcon } from '@/components/icons';
 import { Card, Emoji } from '@/components/primitives';
 import { getSpaceCustomization, ignoreAPIError } from '@/lib/api';
 import { ResolvedContentRef } from '@/lib/references';
 
 import { BlockProps } from './Block';
-import { Image } from '../utils';
-
 
 export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>) {
     const { block, context, style } = props;
@@ -42,36 +41,15 @@ async function SpaceRefCard(props: { resolved: ResolvedContentRef } & BlockProps
 
     const spaceCustomization = await ignoreAPIError(getSpaceCustomization(spaceId));
     const customFavicon = spaceCustomization?.favicon;
-    const customEmoji = customFavicon && 'emoji' in customFavicon ? customFavicon.emoji : null;
-    const customIcon = customFavicon && 'icon' in customFavicon ? customFavicon.icon : null;
+    const customEmoji = customFavicon && 'emoji' in customFavicon ? customFavicon.emoji : undefined;
+    const customIcon = customFavicon && 'icon' in customFavicon ? customFavicon.icon : undefined;
 
     return (
         <Card
-            leadingIcon={customIcon ? <BlockContentRefIcon icon={customIcon} /> : customEmoji ? <Emoji code={customEmoji} style="text-xl" /> : null}
+            leadingIcon={<LogoIcon icon={customIcon} emoji={customEmoji} alt='' sizes={[{ width: 24 }]} style={['object-contain', 'size-6']} />}
             href={resolved.href}
             title={resolved.text}
             style={style}
         />
     );
-}
-
-function BlockContentRefIcon(props: { icon: CustomizationThemedURL }) {
-    const { icon } = props;
-            
-    return icon ? <Image 
-        priority='lazy' 
-        alt=""
-        sources={{
-            light: {
-                src: typeof icon ==='string' ? icon : icon.light,
-                size: { width: 256, height: 256 },
-            },
-            dark: {
-                src:  typeof icon ==='string' ? icon : icon.dark,
-                size: { width: 256, height: 256 },
-            },
-        }}
-        sizes={[{ width: 24 }]}
-        className="size-6 flex-1 object-contain"
-    /> : null;
 }
