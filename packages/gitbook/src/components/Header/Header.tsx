@@ -77,14 +77,7 @@ export function Header(props: {
                 >
                     <HeaderLogo parent={parent} space={space} customization={customization} />
                     <span>
-                        {isMultiVariants ? (
-                            <SpacesDropdown
-                                space={space}
-                                customization={customization}
-                                parent={parent}
-                                spaces={spaces}
-                            />
-                        ) : null}
+                        {isMultiVariants ? <SpacesDropdown space={space} spaces={spaces} /> : null}
                     </span>
                     <HeaderLinks>
                         {customization.header.links.map((link, index) => {
