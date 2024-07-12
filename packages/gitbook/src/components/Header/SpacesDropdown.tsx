@@ -1,19 +1,49 @@
-import { Space } from '@gitbook/api';
+import { Collection, Site, Space } from '@gitbook/api';
 
-import { getSpaceCustomization, getSpaceLayoutData } from '@/lib/api';
+import { getContentPointer } from '@/app/(space)/fetch';
+import {
+    getCurrentSiteCustomization,
+    getSiteSpaces,
+    getSpaceCustomization,
+    getSpaceLayoutData,
+} from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 import { getSpaceTitle } from '@/lib/utils';
 
 import { Dropdown, DropdownChevron, DropdownMenu } from './Dropdown';
 import { SpacesDropdownMenuItem } from './SpacesDropdownMenuItem';
 
-export async function SpacesDropdown(props: { space: Space; spaces: Space[] }) {
-    const { space, spaces } = props;
+export async function SpacesDropdown(props: {
+    space: Space;
+    spaces: Space[];
+    parent?: Site | Collection | null;
+}) {
+    const { space, spaces, parent } = props;
+    const contentPointer = getContentPointer();
 
-    // fetch space layout data such as customizations
-    const spaceCustomizations = await Promise.all(
-        spaces.map(async (space) => [space.id, await getSpaceCustomization(space.id)]),
-    );
+    // fetch customizations based on site vs a legacy space
+    let spaceCustomizations = [];
+    if ('siteId' in contentPointer) {
+        const siteSpaces = await getSiteSpaces({
+            organizationId: contentPointer.organizationId,
+            siteId: contentPointer.siteId,
+        });
+
+        spaceCustomizations = await Promise.all(
+            siteSpaces.map(async ({ id, space }) => [
+                space.id,
+                await getCurrentSiteCustomization({
+                    organizationId: contentPointer.organizationId,
+                    siteId: contentPointer.siteId,
+                    siteSpaceId: id,
+                }),
+            ]),
+        );
+    } else {
+        spaceCustomizations = await Promise.all(
+            spaces.map(async (space) => [space.id, await getSpaceCustomization(space.id)]),
+        );
+    }
 
     // Map using space IDs as keys for convenience
     const spaceCustomizationsMap = spaceCustomizations.reduce((accum, layoutKeyVal) => {
