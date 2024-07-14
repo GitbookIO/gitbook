@@ -100,7 +100,14 @@ function LogoFallback(props: HeaderLogoProps) {
     const customEmoji = 'emoji' in customization.favicon ? customization.favicon.emoji : undefined;
     return (
         <>
-            <LogoIcon icon={customIcon} emoji={customEmoji} alt='' sizes={[{ width: 32 }]} style={['object-contain', 'size-8']} fetchPriority='high'/> 
+            <LogoIcon
+                icon={customIcon}
+                emoji={customEmoji}
+                alt=""
+                sizes={[{ width: 32 }]}
+                style={['object-contain', 'size-8']}
+                fetchPriority="high"
+            />
             <h1
                 className={tcls(
                     'text-pretty',

@@ -7,10 +7,5 @@
         ["style \\=([^;]*);", "\"([^\"]*)\""],
         ["style \\=([^;]*);", "\\`([^\\`]*)\\`"]
     ],
-    "tailwindCSS.classAttributes": [
-        "class",
-        "className",
-        "style",
-        ".*Style"
-    ]
+    "tailwindCSS.classAttributes": ["class", "className", "style", ".*Style"]
 }
