@@ -33,11 +33,15 @@ export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>
     );
 }
 
-async function SpaceRefCard(props: { resolved: ResolvedContentRef } & BlockProps<DocumentBlockContentRef>) {
+async function SpaceRefCard(
+    props: { resolved: ResolvedContentRef } & BlockProps<DocumentBlockContentRef>,
+) {
     const { context, style, resolved } = props;
     const spaceId = context.contentRefContext?.space.id;
 
-    if (!spaceId) { return null; }
+    if (!spaceId) {
+        return null;
+    }
 
     const spaceCustomization = await ignoreAPIError(getSpaceCustomization(spaceId));
     const customFavicon = spaceCustomization?.favicon;
@@ -46,7 +50,15 @@ async function SpaceRefCard(props: { resolved: ResolvedContentRef } & BlockProps
 
     return (
         <Card
-            leadingIcon={<LogoIcon icon={customIcon} emoji={customEmoji} alt='' sizes={[{ width: 24 }]} style={['object-contain', 'size-6']} />}
+            leadingIcon={
+                <LogoIcon
+                    icon={customIcon}
+                    emoji={customEmoji}
+                    alt=""
+                    sizes={[{ width: 24 }]}
+                    style={['object-contain', 'size-6']}
+                />
+            }
             href={resolved.href}
             title={resolved.text}
             style={style}

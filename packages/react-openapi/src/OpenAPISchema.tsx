@@ -182,6 +182,8 @@ export function OpenAPIRootSchema(props: {
 
 /**
  * Render a tab for an alternative schema.
+ * It renders directly the properties if relevant;
+ * for primitives, it renders the schema itself.
  */
 function OpenAPISchemaAlternative(props: {
     schema: OpenAPIV3.SchemaObject;
@@ -190,12 +192,13 @@ function OpenAPISchemaAlternative(props: {
 }) {
     const { schema, circularRefs, context } = props;
     const id = useId();
+    const subProperties = getSchemaProperties(schema);
 
     return (
         <OpenAPISchemaProperties
             id={id}
-            properties={getSchemaProperties(schema) ?? []}
-            circularRefs={new Map(circularRefs).set(schema, id)}
+            properties={subProperties ?? [{ schema }]}
+            circularRefs={subProperties ? new Map(circularRefs).set(schema, id) : circularRefs}
             context={context}
         />
     );

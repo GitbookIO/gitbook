@@ -126,7 +126,7 @@ jobs:
               run: bun install --frozen-lockfile
               env:
                   PUPPETEER_SKIP_DOWNLOAD: 1
-            - run: bun format --check .
+            - run: bun format:check
     lint:
         runs-on: ubuntu-latest
         name: Lint
