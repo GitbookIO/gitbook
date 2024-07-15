@@ -64,6 +64,17 @@ async function sendSiteTrackPageViewRequest(args: {
 let latestPageId: string | undefined | null = null;
 
 /**
+ * Check if the current page is in an iframe.
+ * This is used to avoid tracking page views in iframes.
+ */
+function isInIframe(): boolean {
+    try {
+        return window.self !== window.top || window.frameElement !== null;
+    } catch (e) {
+        return true;
+    }
+}
+/**
  * Track the page view for the current page to GitBook.
  * We don't use the API client to avoid shipping 80kb of JS to the client.
  * And instead use a simple fetch.
@@ -75,6 +86,11 @@ async function trackPageView(args: {
     pageId: string | undefined;
 }) {
     const { apiHost, sitePointer, pageId, spaceId } = args;
+
+    if (isInIframe()) {
+        return;
+    }
+
     if (pageId === latestPageId) {
         // The hook can be called multiple times, we only want to track once.
         return;
