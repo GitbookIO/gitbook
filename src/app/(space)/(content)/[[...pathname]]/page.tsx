@@ -25,7 +25,6 @@ export default async function Page(props: {
 }) {
     const { params, searchParams } = props;
 
-    const rawPathname = getPathnameParam(params);
     const {
         content: contentPointer,
         contentTarget,
@@ -35,15 +34,14 @@ export default async function Page(props: {
         pages,
         page,
         document,
-    } = await fetchPageData(params);
+    } = await getPageDataWithFallback({
+        pagePathParams: params,
+        searchParams,
+        redirectOnFallback: true,
+    });
+
     const linksContext: PageHrefContext = {};
-
-    const canFallback = !!searchParams.fallback;
-    if (!page && canFallback) {
-        const rootPage = resolveFirstDocument(pages, []);
-        rootPage?.page ? redirect(pageHref(pages, rootPage?.page, linksContext)) : notFound();
-    }
-
+    const rawPathname = getPathnameParam(params);
     if (!page) {
         const pathname = normalizePathname(rawPathname);
         if (pathname !== rawPathname) {
@@ -130,32 +128,59 @@ export async function generateMetadata({
     params: PagePathParams;
     searchParams: { fallback?: string };
 }): Promise<Metadata> {
-    const { space, pages, page, customization, parent } = await fetchPageData(params);
-    const canFallback = !!searchParams.fallback;
+    const { space, pages, page, customization, parent } = await getPageDataWithFallback({
+        pagePathParams: params,
+        searchParams,
+    });
 
-    let targetPage = page;
-    if (!page && canFallback) {
-        const rootPage = resolveFirstDocument(pages, []);
-        targetPage = rootPage?.page;
-    }
-
-    if (!targetPage) {
+    if (!page) {
         notFound();
     }
 
     return {
-        title: [targetPage.title, getContentTitle(space, customization, parent)]
+        title: [page.title, getContentTitle(space, customization, parent)]
             .filter(Boolean)
             .join(' | '),
-        description: targetPage.description ?? '',
+        description: page.description ?? '',
         alternates: {
-            canonical: absoluteHref(getPagePath(pages, targetPage), true),
+            canonical: absoluteHref(getPagePath(pages, page), true),
         },
         openGraph: {
             images: [
                 customization.socialPreview.url ??
-                    absoluteHref(`~gitbook/ogimage/${targetPage.id}`, true),
+                    absoluteHref(`~gitbook/ogimage/${page.id}`, true),
             ],
         },
+    };
+}
+
+/**
+ * Fetches the page data matching the requested pathname and fallback to root page when page is not found.
+ */
+async function getPageDataWithFallback(args: {
+    pagePathParams: PagePathParams;
+    searchParams: { fallback?: string };
+    redirectOnFallback?: boolean;
+}) {
+    const { pagePathParams, searchParams, redirectOnFallback = false } = args;
+
+    const { pages, page: targetPage, ...otherPageData } = await fetchPageData(pagePathParams);
+
+    let page = targetPage;
+    const canFallback = !!searchParams.fallback;
+    if (!page && canFallback) {
+        const rootPage = resolveFirstDocument(pages, []);
+
+        if (redirectOnFallback && rootPage?.page) {
+            redirect(pageHref(pages, rootPage?.page));
+        }
+
+        page = rootPage?.page;
+    }
+
+    return {
+        ...otherPageData,
+        pages,
+        page,
     };
 }
