@@ -19,7 +19,7 @@ export function PageClientLayout(props: {}) {
 
 /**
  * Strip the fallback query parameter from current URL.
- * 
+ *
  * When the user switches variants using the space dropdown, we pass a fallback=true parameter.
  * This parameter indicates that we should redirect to the root page if the path from the
  * previous variant doesn't exist in the new variant. If the path does exist, no redirect occurs,
