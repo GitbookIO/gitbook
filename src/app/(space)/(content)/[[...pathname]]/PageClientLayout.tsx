@@ -13,14 +13,18 @@ export function PageClientLayout(props: {}) {
     // are rendered before we scroll to the hash.
     useScrollToHash();
 
-    // When the user switches variants using the space dropdown, we pass a fallback=true parameter.
-    // This parameter indicates that we should redirect to the root page if the path from the
-    // previous variant doesn't exist in the new variant. If the path does exist, no redirect occurs,
-    // so we need to remove the fallback parameter.
     useStripFallbackQueryParam();
     return null;
 }
 
+/**
+ * Strip the fallback query parameter from current URL.
+ * 
+ * When the user switches variants using the space dropdown, we pass a fallback=true parameter.
+ * This parameter indicates that we should redirect to the root page if the path from the
+ * previous variant doesn't exist in the new variant. If the path does exist, no redirect occurs,
+ * so we need to remove the fallback parameter.
+ */
 function useStripFallbackQueryParam() {
     const router = useRouter();
     const pathname = usePathname();
