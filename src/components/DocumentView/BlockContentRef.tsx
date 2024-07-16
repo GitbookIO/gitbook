@@ -18,9 +18,12 @@ export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>
         return null;
     }
 
-    const isContentInOtherSpace = context.contentRefContext?.space && 'space' in block.data.ref && context.contentRefContext.space.id !== block.data.ref.space;
+    const isContentInOtherSpace =
+        context.contentRefContext?.space &&
+        'space' in block.data.ref &&
+        context.contentRefContext.space.id !== block.data.ref.space;
     const kind = block?.data?.ref?.kind;
-    if (resolved.active && kind === 'space' || isContentInOtherSpace) {
+    if ((resolved.active && kind === 'space') || isContentInOtherSpace) {
         return <SpaceRefCard {...props} resolved={resolved} />;
     }
 

@@ -14,7 +14,6 @@ import {
 import { getBlockById, getBlockTitle } from './document';
 import { gitbookAppHref, pageHref, PageHrefContext } from './links';
 import { getPagePath, resolvePageId } from './pages';
-import { text } from 'stream/consumers';
 
 export interface ResolvedContentRef {
     /** Text to render in the content ref */
