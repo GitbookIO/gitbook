@@ -129,7 +129,7 @@ const testCases: TestsCase[] = [
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
                     await page.waitForURL(
-                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions/v/2.0/reference/api-reference/pets',
+                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions/v/2.0/reference/api-reference/pets?fallback=true',
                     );
                 },
             },
@@ -152,7 +152,7 @@ const testCases: TestsCase[] = [
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
                     await page.waitForURL(
-                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/bRfQbzwsK8rbN1GRxx7K/v/2.0/reference/api-reference/pets',
+                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/bRfQbzwsK8rbN1GRxx7K/v/2.0/reference/api-reference/pets?fallback=true',
                     );
                 },
             },
@@ -187,7 +187,7 @@ const testCases: TestsCase[] = [
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
                     await page.waitForURL(
-                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-va/v/2.0/reference/api-reference/pets',
+                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-va/v/2.0/reference/api-reference/pets?fallback=true',
                     );
                 },
             },

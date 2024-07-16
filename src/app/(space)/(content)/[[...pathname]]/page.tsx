@@ -6,7 +6,7 @@ import React from 'react';
 import { PageAside } from '@/components/PageAside';
 import { PageBody, PageCover } from '@/components/PageBody';
 import { PageHrefContext, absoluteHref, pageHref } from '@/lib/links';
-import { getPagePath } from '@/lib/pages';
+import { getPagePath, resolveFirstDocument } from '@/lib/pages';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { getContentTitle } from '@/lib/utils';
@@ -19,10 +19,12 @@ export const runtime = 'edge';
 /**
  * Fetch and render a page.
  */
-export default async function Page(props: { params: PagePathParams }) {
-    const { params } = props;
+export default async function Page(props: {
+    params: PagePathParams;
+    searchParams: { fallback?: string };
+}) {
+    const { params, searchParams } = props;
 
-    const rawPathname = getPathnameParam(params);
     const {
         content: contentPointer,
         contentTarget,
@@ -32,9 +34,14 @@ export default async function Page(props: { params: PagePathParams }) {
         pages,
         page,
         document,
-    } = await fetchPageData(params);
-    const linksContext: PageHrefContext = {};
+    } = await getPageDataWithFallback({
+        pagePathParams: params,
+        searchParams,
+        redirectOnFallback: true,
+    });
 
+    const linksContext: PageHrefContext = {};
+    const rawPathname = getPathnameParam(params);
     if (!page) {
         const pathname = normalizePathname(rawPathname);
         if (pathname !== rawPathname) {
@@ -114,8 +121,18 @@ export async function generateViewport({ params }: { params: PagePathParams }): 
     };
 }
 
-export async function generateMetadata({ params }: { params: PagePathParams }): Promise<Metadata> {
-    const { space, pages, page, customization, parent } = await fetchPageData(params);
+export async function generateMetadata({
+    params,
+    searchParams,
+}: {
+    params: PagePathParams;
+    searchParams: { fallback?: string };
+}): Promise<Metadata> {
+    const { space, pages, page, customization, parent } = await getPageDataWithFallback({
+        pagePathParams: params,
+        searchParams,
+    });
+
     if (!page) {
         notFound();
     }
@@ -134,5 +151,36 @@ export async function generateMetadata({ params }: { params: PagePathParams }): 
                     absoluteHref(`~gitbook/ogimage/${page.id}`, true),
             ],
         },
+    };
+}
+
+/**
+ * Fetches the page data matching the requested pathname and fallback to root page when page is not found.
+ */
+async function getPageDataWithFallback(args: {
+    pagePathParams: PagePathParams;
+    searchParams: { fallback?: string };
+    redirectOnFallback?: boolean;
+}) {
+    const { pagePathParams, searchParams, redirectOnFallback = false } = args;
+
+    const { pages, page: targetPage, ...otherPageData } = await fetchPageData(pagePathParams);
+
+    let page = targetPage;
+    const canFallback = !!searchParams.fallback;
+    if (!page && canFallback) {
+        const rootPage = resolveFirstDocument(pages, []);
+
+        if (redirectOnFallback && rootPage?.page) {
+            redirect(pageHref(pages, rootPage?.page));
+        }
+
+        page = rootPage?.page;
+    }
+
+    return {
+        ...otherPageData,
+        pages,
+        page,
     };
 }
