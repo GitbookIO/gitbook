@@ -60,6 +60,30 @@ export async function searchSpaceContent(
     revisionId: string,
     query: string,
 ): Promise<OrderedComputedResult[]> {
+    const pointer = getContentPointer();
+
+    if ('siteId' in pointer && 'organizationId' in pointer && pointer.siteSpaceId) {
+        const searchResults = await api.searchSiteContent(
+            pointer.organizationId,
+            pointer.siteId,
+            query,
+            [pointer.siteSpaceId],
+        );
+
+        const allSiteSpaces = await api.getSiteSpaces({
+            organizationId: pointer.organizationId,
+            siteId: pointer.siteId,
+            siteShareKey: pointer.siteShareKey,
+        });
+
+        return searchResults.items
+            .map((spaceItem) => {
+                const space = allSiteSpaces.find((space) => space.id === spaceItem.id);
+                return spaceItem.pages.map((item) => transformPageResult(item, space?.space));
+            })
+            .flat(2);
+    }
+
     const data = await api.searchSpaceContent(spaceId, revisionId, query);
     return data.items.map((item) => transformPageResult(item, undefined)).flat();
 }
@@ -74,7 +98,9 @@ export async function searchParentContent(
     const pointer = getContentPointer();
 
     const [data, collectionSpaces, siteSpaces] = await Promise.all([
-        api.searchParentContent(parent.id, query),
+        'siteId' in pointer
+            ? api.searchSiteContent(pointer.organizationId, pointer.siteId, query, [])
+            : api.searchParentContent(parent.id, query),
         parent.object === 'collection' ? api.getCollectionSpaces(parent.id) : null,
         parent.object === 'site' && 'organizationId' in pointer
             ? api.getSiteSpaces({

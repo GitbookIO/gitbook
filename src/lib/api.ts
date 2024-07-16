@@ -1047,6 +1047,29 @@ export const searchParentContent = cache(
 );
 
 /**
+ * Search content accross all spaces in a parent (site or collection).
+ */
+export const searchSiteContent = cache(
+    'api.searchSiteContent',
+    async (
+        organizationId: string,
+        siteId: string,
+        query: string,
+        siteSpaceIds: string[] = [],
+        options: CacheFunctionOptions,
+    ) => {
+        const response = await api().orgs.searchSiteContent(organizationId, siteId, {
+            query,
+            siteSpaceIds,
+        });
+        return cacheResponse(response, {
+            ttl: 60 * 60,
+            tags: [],
+        });
+    },
+);
+
+/**
  * Get a list of recommended questions in a space.
  */
 export const getRecommendedQuestionsInSpace = cache(

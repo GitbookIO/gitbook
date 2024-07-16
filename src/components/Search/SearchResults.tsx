@@ -36,6 +36,7 @@ type ResultType =
  */
 export const SearchResults = React.forwardRef(function SearchResults(
     props: {
+        organizationId?: string;
         children?: React.ReactNode;
         query: string;
         spaceId: string;
@@ -96,6 +97,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 const fetchedResults = await (parent
                     ? searchParentContent(parent, query)
                     : searchSpaceContent(spaceId, revisionId, query));
+
                 setResults(withAsk ? withQuestionResult(fetchedResults, query) : fetchedResults);
             }, 250);
 
