@@ -14,10 +14,13 @@ import {
 import { getBlockById, getBlockTitle } from './document';
 import { gitbookAppHref, pageHref, PageHrefContext } from './links';
 import { getPagePath, resolvePageId } from './pages';
+import { text } from 'stream/consumers';
 
 export interface ResolvedContentRef {
     /** Text to render in the content ref */
     text: string;
+    /** Additional sub text to render in the content ref */
+    subText?: string;
     /** Emoji associated with the reference */
     emoji?: string;
     /** URL to open for the content ref */
@@ -245,12 +248,22 @@ async function resolveContentRefInSpace(spaceId: string, contentRef: ContentRef)
         baseUrl += '/';
     }
 
-    return resolveContentRef(contentRef, {
+    const resolved = await resolveContentRef(contentRef, {
         space,
         revisionId: space.revision,
         pages,
         baseUrl,
     });
+
+    if (!resolved) {
+        return null;
+    }
+
+    return {
+        ...resolved,
+        text: space.title,
+        subText: resolved.text,
+    };
 }
 
 export function resolveContentRefWithFiles(
