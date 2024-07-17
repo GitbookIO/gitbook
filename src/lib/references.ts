@@ -270,8 +270,7 @@ async function resolveContentRefInSpace(spaceId: string, contentRef: ContentRef)
 
     return {
         ...resolved,
-        text: space.title,
-        subText: resolved.text,
+        subText: space.title,
     };
 }
 
