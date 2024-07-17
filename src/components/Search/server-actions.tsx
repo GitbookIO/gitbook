@@ -6,6 +6,7 @@ import {
     SearchAIAnswer,
     SearchPageResult,
     Site,
+    SiteSpace,
     Space,
 } from '@gitbook/api';
 
@@ -82,23 +83,13 @@ export async function searchSiteContent(args: {
 
         if (!siteSpaceIds) {
             // We are searching all of this Site's content
-
-            const processedSiteSpaces = allSiteSpaces.map((siteSpace) => {
-                // replace the published url for the "space" with the site's published url
-                siteSpace.space.urls.published = siteSpace.urls.published;
-                return siteSpace;
-            });
-
-            // We pass a space to the transform since this search is relative to the Site
             return searchResults.items
                 .map((spaceItem) => {
-                    const siteSpace = processedSiteSpaces.find(
+                    const siteSpace = allSiteSpaces.find(
                         (siteSpace) => siteSpace.space.id === spaceItem.id,
                     );
 
-                    return spaceItem.pages.map((item) =>
-                        transformPageResult(item, siteSpace?.space),
-                    );
+                    return spaceItem.pages.map((item) => transformSitePageResult(item, siteSpace));
                 })
                 .flat(2);
         }
@@ -237,19 +228,24 @@ function transformAnswer(
     };
 }
 
-function transformPageResult(item: SearchPageResult, space?: Space) {
+function transformSectionsAndPage(args: {
+    item: SearchPageResult;
+    space?: Space;
+    spaceURL?: string;
+}): [ComputedPageResult, ComputedSectionResult[]] {
+    const { item, space, spaceURL } = args;
+
     // Resolve a relative path to an absolute URL
     // if the search result is relative to another space, we use the space URL
-    const getURL = (path: string) => {
-        if (space) {
-            let url = space.urls.published ?? space.urls.app;
-            if (!url.endsWith('/')) {
-                url += '/';
+    const getURL = (path: string, spaceURL?: string) => {
+        if (spaceURL) {
+            if (!spaceURL.endsWith('/')) {
+                spaceURL += '/';
             }
             if (path.startsWith('/')) {
                 path = path.slice(1);
             }
-            return url + path;
+            return spaceURL + path;
         } else {
             return absoluteHref(path);
         }
@@ -260,7 +256,7 @@ function transformPageResult(item: SearchPageResult, space?: Space) {
             type: 'section',
             id: item.id + '/' + section.id,
             title: section.title,
-            href: getURL(section.path),
+            href: getURL(section.path, spaceURL),
             body: section.body,
         })) ?? [];
 
@@ -271,6 +267,26 @@ function transformPageResult(item: SearchPageResult, space?: Space) {
         href: getURL(item.path),
         spaceTitle: space?.title,
     };
+
+    return [page, sections];
+}
+
+export function transformSitePageResult(item: SearchPageResult, siteSpace?: SiteSpace) {
+    const [page, sections] = transformSectionsAndPage({
+        item,
+        space: siteSpace?.space,
+        spaceURL: siteSpace?.urls.published,
+    });
+
+    return [page, ...sections];
+}
+
+function transformPageResult(item: SearchPageResult, space?: Space) {
+    const [page, sections] = transformSectionsAndPage({
+        item,
+        space,
+        spaceURL: space?.urls.published ?? space?.urls.app,
+    });
 
     return [page, ...sections];
 }
