@@ -56,8 +56,13 @@ export async function searchSiteContent(args: {
     siteSpaceIds?: string[];
     cacheBust?: string;
 }): Promise<OrderedComputedResult[]> {
-    const { siteSpaceIds = [], query, cacheBust } = args;
+    const { siteSpaceIds, query, cacheBust } = args;
     const pointer = getContentPointer();
+
+    if (siteSpaceIds?.length === 0) {
+        // if we have no siteSpaces to search in then we won't find anything. skip the call.
+        return [];
+    }
 
     if ('siteId' in pointer && 'organizationId' in pointer) {
         const [searchResults, allSiteSpaces] = await Promise.all([
@@ -75,7 +80,7 @@ export async function searchSiteContent(args: {
             }),
         ]);
 
-        if (siteSpaceIds.length === 0) {
+        if (!siteSpaceIds) {
             // We are searching all of this Site's content
 
             const processedSiteSpaces = allSiteSpaces.map((siteSpace) => {

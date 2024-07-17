@@ -1055,7 +1055,7 @@ export const searchSiteContent = cache(
         organizationId: string,
         siteId: string,
         query: string,
-        siteSpaceIds: string[] = [],
+        siteSpaceIds?: string[],
         /** A cache bust param to avoid revalidating lot of cache entries by tags */
         cacheBust?: string,
         options?: CacheFunctionOptions,
