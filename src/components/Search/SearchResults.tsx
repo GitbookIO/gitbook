@@ -36,7 +36,6 @@ type ResultType =
  */
 export const SearchResults = React.forwardRef(function SearchResults(
     props: {
-        organizationId?: string;
         children?: React.ReactNode;
         query: string;
         spaceId: string;

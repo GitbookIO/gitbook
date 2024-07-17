@@ -96,9 +96,10 @@ export async function searchParentContent(
     query: string,
 ): Promise<OrderedComputedResult[]> {
     const pointer = getContentPointer();
+    const isSite = 'siteId' in pointer;
 
     const [data, collectionSpaces, siteSpaces] = await Promise.all([
-        'siteId' in pointer
+        isSite
             ? api.searchSiteContent(pointer.organizationId, pointer.siteId, query, [])
             : api.searchParentContent(parent.id, query),
         parent.object === 'collection' ? api.getCollectionSpaces(parent.id) : null,

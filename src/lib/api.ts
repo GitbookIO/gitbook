@@ -1047,7 +1047,7 @@ export const searchParentContent = cache(
 );
 
 /**
- * Search content accross all spaces in a parent (site or collection).
+ * Search content in a Site or specific SiteSpaces.
  */
 export const searchSiteContent = cache(
     'api.searchSiteContent',
