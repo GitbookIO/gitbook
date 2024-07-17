@@ -60,20 +60,20 @@ export async function searchSiteContent(args: {
     const pointer = getContentPointer();
 
     if ('siteId' in pointer && 'organizationId' in pointer) {
-        const searchResults = await api.searchSiteContent(
-            pointer.organizationId,
-            pointer.siteId,
-            query,
-            siteSpaceIds,
-            cacheBust,
-        );
-
-        // resolve all SiteSpaces so we can match up with the spaceId
-        const allSiteSpaces = await api.getSiteSpaces({
-            organizationId: pointer.organizationId,
-            siteId: pointer.siteId,
-            siteShareKey: pointer.siteShareKey,
-        });
+        const [searchResults, allSiteSpaces] = await Promise.all([
+            api.searchSiteContent(
+                pointer.organizationId,
+                pointer.siteId,
+                query,
+                siteSpaceIds,
+                cacheBust,
+            ),
+            api.getSiteSpaces({
+                organizationId: pointer.organizationId,
+                siteId: pointer.siteId,
+                siteShareKey: pointer.siteShareKey,
+            }),
+        ]);
 
         if (siteSpaceIds.length === 0) {
             // We are searching all of this Site's content
