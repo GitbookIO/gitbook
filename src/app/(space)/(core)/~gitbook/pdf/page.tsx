@@ -4,6 +4,7 @@ import {
     Revision,
     RevisionPageDocument,
     RevisionPageGroup,
+    RevisionPageLink,
     SiteCustomizationSettings,
     Space,
 } from '@gitbook/api';
@@ -313,9 +314,17 @@ function selectPages(
     ): FlatPageEntry[] => {
         return [
             { page, depth },
-            ...page.pages.flatMap((child) =>
-                child.type === 'link' ? [] : flattenPage(child, depth + 1),
-            ),
+            ...page.pages.flatMap((child) => {
+                if (child.type === 'link') {
+                    return [];
+                }
+
+                if (child.hidden) {
+                    return [];
+                }
+
+                return flattenPage(child, depth + 1);
+            }),
         ];
     };
 
@@ -340,8 +349,16 @@ function selectPages(
         return limitTo(flattenPage(found.page, 0));
     }
 
-    const allPages = rootPages.flatMap((page) =>
-        page.type === 'link' ? [] : flattenPage(page, 0),
-    );
+    const allPages = rootPages.flatMap((page) => {
+        if (page.type === 'link') {
+            return [];
+        }
+
+        if (page.hidden) {
+            return [];
+        }
+
+        return flattenPage(page, 0);
+    });
     return limitTo(allPages);
 }
