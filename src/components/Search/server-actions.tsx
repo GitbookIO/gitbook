@@ -8,7 +8,6 @@ import {
     Site,
     Space,
 } from '@gitbook/api';
-import { headers } from 'next/headers';
 
 import { getContentPointer } from '@/app/(space)/fetch';
 import { streamResponse } from '@/lib/actions';
@@ -52,11 +51,12 @@ export interface AskAnswerResult {
     hasAnswer: boolean;
 }
 
-export async function searchSiteContent(
-    siteSpaceIds: string[],
-    query: string,
-    cacheKey: string,
-): Promise<OrderedComputedResult[]> {
+export async function searchSiteContent(args: {
+    query: string;
+    siteSpaceIds?: string[];
+    cacheKey?: string;
+}): Promise<OrderedComputedResult[]> {
+    const { siteSpaceIds = [], query, cacheKey } = args;
     const pointer = getContentPointer();
 
     if ('siteId' in pointer && 'organizationId' in pointer) {
@@ -70,15 +70,35 @@ export async function searchSiteContent(
         );
 
         // resolve all SiteSpaces so we can match up with the spaceId
-        const allSiteSpaces = await api.getSiteSpaces({
+        let allSiteSpaces = await api.getSiteSpaces({
             organizationId: pointer.organizationId,
             siteId: pointer.siteId,
             siteShareKey: pointer.siteShareKey,
         });
 
+        if (siteSpaceIds.length === 0) {
+            // replace the published url for the "space" with the site's published url
+            // if we are searching the whole site
+            allSiteSpaces = Object.values(
+                allSiteSpaces.map((siteSpace) => {
+                    siteSpace.space.urls.published = siteSpace.urls.published;
+                    return siteSpace;
+                }, []),
+            );
+
+            return searchResults.items
+                .map((spaceItem) => {
+                    const space = allSiteSpaces.find(
+                        (siteSpace) => siteSpace.space.id === spaceItem.id,
+                    );
+                    return spaceItem.pages.map((item) => transformPageResult(item, space?.space));
+                })
+                .flat(2);
+        }
+
         return searchResults.items
             .map((spaceItem) => {
-                const space = allSiteSpaces.find((space) => space.id === spaceItem.id);
+                const space = allSiteSpaces.find((siteSpace) => siteSpace.id === spaceItem.id);
                 return spaceItem.pages.map((item) => transformPageResult(item, space?.space));
             })
             .flat(2);
@@ -100,9 +120,9 @@ export async function searchSpaceContent(
     if ('siteId' in pointer && 'organizationId' in pointer) {
         const siteSpaceIds = pointer.siteSpaceId ? [pointer.siteSpaceId] : []; // if we don't have a siteSpaceID search all content
 
-        // This is a site so use a different endpoint
-        // We also want to break cache for this specific space if the revisionId is different so use it as a cache key
-        return await searchSiteContent(siteSpaceIds, query, revisionId);
+        // This is a site so use a different function which we can eventually call directly
+        // We also want to break cache for this specific space if the revisionId is different so use it as a cache busting key
+        return await searchSiteContent({ siteSpaceIds, query, cacheKey: revisionId });
     }
 
     const data = await api.searchSpaceContent(spaceId, revisionId, query);
@@ -119,37 +139,16 @@ export async function searchParentContent(
     const pointer = getContentPointer();
     const isSite = 'siteId' in pointer;
 
-    const [data, collectionSpaces, siteSpaces] = await Promise.all([
-        isSite
-            ? api.searchSiteContent(pointer.organizationId, pointer.siteId, query, [])
-            : api.searchParentContent(parent.id, query),
+    if (isSite) {
+        return searchSiteContent({ query });
+    }
+
+    const [data, collectionSpaces] = await Promise.all([
+        api.searchParentContent(parent.id, query),
         parent.object === 'collection' ? api.getCollectionSpaces(parent.id) : null,
-        parent.object === 'site' && 'organizationId' in pointer
-            ? api.getSiteSpaces({
-                  organizationId: pointer.organizationId,
-                  siteId: parent.id,
-                  siteShareKey: pointer.siteShareKey,
-              })
-            : null,
     ]);
 
-    let spaces: Space[] = [];
-
-    if (collectionSpaces) {
-        spaces = collectionSpaces;
-    } else if (siteSpaces) {
-        spaces = Object.values(
-            siteSpaces.reduce(
-                (acc, siteSpace) => {
-                    acc[siteSpace.space.id] = siteSpace.space;
-                    // replace the published url for the "space" with the site's published url
-                    acc[siteSpace.space.id].urls.published = siteSpace.urls.published;
-                    return acc;
-                },
-                {} as Record<string, Space>,
-            ),
-        );
-    }
+    let spaces: Space[] = collectionSpaces ? collectionSpaces : [];
 
     return data.items
         .map((spaceItem) => {
