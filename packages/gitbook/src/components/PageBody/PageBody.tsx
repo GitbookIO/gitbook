@@ -18,7 +18,7 @@ import { PageBodyBlankslate } from './PageBodyBlankslate';
 import { PageCover } from './PageCover';
 import { PageFooterNavigation } from './PageFooterNavigation';
 import { PageHeader } from './PageHeader';
-import { TrackPageView } from './TrackPageView';
+import { TrackPageViewConditional } from './TrackPageViewConditional';
 import { DocumentView, createHighlightingContext } from '../DocumentView';
 import { PageFeedbackForm } from '../PageFeedback';
 import { DateRelative } from '../primitives';
@@ -141,14 +141,12 @@ export function PageBody(props: {
                     ) : null}
                 </div>
             </main>
-            <React.Suspense fallback={null}>
-                <TrackPageView
-                    sitePointer={sitePointer}
-                    spaceId={space.id}
-                    pageId={page.id}
-                    apiHost={api().endpoint}
-                />
-            </React.Suspense>
+            <TrackPageViewConditional
+                sitePointer={sitePointer}
+                spaceId={space.id}
+                pageId={page.id}
+                apiHost={api().endpoint}
+            />
         </>
     );
 }
