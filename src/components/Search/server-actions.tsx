@@ -70,36 +70,38 @@ export async function searchSiteContent(args: {
         );
 
         // resolve all SiteSpaces so we can match up with the spaceId
-        let allSiteSpaces = await api.getSiteSpaces({
+        const allSiteSpaces = await api.getSiteSpaces({
             organizationId: pointer.organizationId,
             siteId: pointer.siteId,
             siteShareKey: pointer.siteShareKey,
         });
 
         if (siteSpaceIds.length === 0) {
-            // replace the published url for the "space" with the site's published url
-            // if we are searching the whole site
-            allSiteSpaces = Object.values(
-                allSiteSpaces.map((siteSpace) => {
-                    siteSpace.space.urls.published = siteSpace.urls.published;
-                    return siteSpace;
-                }, []),
-            );
+            // We are searching all of this Site's content
 
+            const processedSiteSpaces = allSiteSpaces.map((siteSpace) => {
+                // replace the published url for the "space" with the site's published url
+                siteSpace.space.urls.published = siteSpace.urls.published;
+                return siteSpace;
+            });
+
+            // We pass a space to the transform since this search is relative to the Site
             return searchResults.items
                 .map((spaceItem) => {
-                    const space = allSiteSpaces.find(
+                    const siteSpace = processedSiteSpaces.find(
                         (siteSpace) => siteSpace.space.id === spaceItem.id,
                     );
-                    return spaceItem.pages.map((item) => transformPageResult(item, space?.space));
+
+                    return spaceItem.pages.map((item) =>
+                        transformPageResult(item, siteSpace?.space),
+                    );
                 })
                 .flat(2);
         }
 
         return searchResults.items
             .map((spaceItem) => {
-                const space = allSiteSpaces.find((siteSpace) => siteSpace.id === spaceItem.id);
-                return spaceItem.pages.map((item) => transformPageResult(item, space?.space));
+                return spaceItem.pages.map((item) => transformPageResult(item));
             })
             .flat(2);
     }
