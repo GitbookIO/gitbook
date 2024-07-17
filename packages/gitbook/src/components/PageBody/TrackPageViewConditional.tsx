@@ -4,6 +4,9 @@ import { SiteContentPointer } from '@/lib/api';
 
 import { TrackPageView } from './TrackPageView';
 
+/**
+ * Track page view in GitBook analytics if not disabled
+ */
 export function TrackPageViewConditional(props: {
     apiHost: string;
     sitePointer?: Pick<SiteContentPointer, 'siteId' | 'organizationId'>;
