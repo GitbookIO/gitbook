@@ -1056,6 +1056,7 @@ export const searchSiteContent = cache(
         siteId: string,
         query: string,
         siteSpaceIds: string[] = [],
+        /** A cache bust key to avoid revalidating lot of cache entries by tags */
         cacheKey?: string,
         options?: CacheFunctionOptions,
     ) => {
