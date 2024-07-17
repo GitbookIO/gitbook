@@ -141,15 +141,7 @@ function resolvePageDocument(
     if (page.type === 'group') {
         const firstDocument = resolveFirstDocument(page.pages, [...ancestors, page]);
         if (firstDocument) {
-            const { page: firstPageInGroup, ancestors } = firstDocument;
-            return {
-                // Keep the page group title but use the first page in the group for the rest.
-                page: {
-                    ...firstPageInGroup,
-                    title: page.title,
-                },
-                ancestors,
-            };
+            return firstDocument;
         }
 
         return;
