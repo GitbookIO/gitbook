@@ -55,6 +55,7 @@ export interface AskAnswerResult {
 export async function searchSiteContent(
     siteSpaceIds: string[],
     query: string,
+    cacheKey: string,
 ): Promise<OrderedComputedResult[]> {
     const pointer = getContentPointer();
 
@@ -65,6 +66,7 @@ export async function searchSiteContent(
             pointer.siteId,
             query,
             siteSpaceIds,
+            cacheKey,
         );
 
         // resolve all SiteSpaces so we can match up with the spaceId
@@ -99,7 +101,8 @@ export async function searchSpaceContent(
         const siteSpaceIds = pointer.siteSpaceId ? [pointer.siteSpaceId] : []; // if we don't have a siteSpaceID search all content
 
         // This is a site so use a different endpoint
-        return await searchSiteContent(siteSpaceIds, query);
+        // We also want to break cache for this specific space if the revisionId is different so use it as a cache key
+        return await searchSiteContent(siteSpaceIds, query, revisionId);
     }
 
     const data = await api.searchSpaceContent(spaceId, revisionId, query);

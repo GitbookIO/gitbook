@@ -1056,12 +1056,22 @@ export const searchSiteContent = cache(
         siteId: string,
         query: string,
         siteSpaceIds: string[] = [],
-        options: CacheFunctionOptions,
+        cacheKey?: string,
+        options?: CacheFunctionOptions,
     ) => {
-        const response = await api().orgs.searchSiteContent(organizationId, siteId, {
-            query,
-            siteSpaceIds,
-        });
+        const response = await api().orgs.searchSiteContent(
+            organizationId,
+            siteId,
+            {
+                query,
+                siteSpaceIds,
+            },
+            undefined,
+            {
+                ...noCacheFetchOptions,
+                signal: options?.signal,
+            },
+        );
 
         return cacheResponse(response, {
             ttl: 60 * 60,
