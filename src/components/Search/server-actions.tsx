@@ -52,26 +52,19 @@ export interface AskAnswerResult {
     hasAnswer: boolean;
 }
 
-/**
- * Server action to search content in a space
- */
-export async function searchSpaceContent(
-    spaceId: string,
-    revisionId: string,
+export async function searchSiteContent(
+    siteSpaceIds: string[],
     query: string,
 ): Promise<OrderedComputedResult[]> {
     const pointer = getContentPointer();
 
     if ('siteId' in pointer && 'organizationId' in pointer) {
-        const siteSpaceIds = pointer.siteSpaceId ? [pointer.siteSpaceId] : []; // if we don't have a siteSpaceID search all content
-
         // This is a site so use a different endpoint
         const searchResults = await api.searchSiteContent(
             pointer.organizationId,
             pointer.siteId,
             query,
             siteSpaceIds,
-            revisionId,
         );
 
         // resolve all SiteSpaces so we can match up with the spaceId
@@ -87,6 +80,26 @@ export async function searchSpaceContent(
                 return spaceItem.pages.map((item) => transformPageResult(item, space?.space));
             })
             .flat(2);
+    }
+
+    return [];
+}
+
+/**
+ * Server action to search content in a space
+ */
+export async function searchSpaceContent(
+    spaceId: string,
+    revisionId: string,
+    query: string,
+): Promise<OrderedComputedResult[]> {
+    const pointer = getContentPointer();
+
+    if ('siteId' in pointer && 'organizationId' in pointer) {
+        const siteSpaceIds = pointer.siteSpaceId ? [pointer.siteSpaceId] : []; // if we don't have a siteSpaceID search all content
+
+        // This is a site so use a different endpoint
+        return await searchSiteContent(siteSpaceIds, query);
     }
 
     const data = await api.searchSpaceContent(spaceId, revisionId, query);

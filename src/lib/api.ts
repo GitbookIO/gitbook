@@ -1047,7 +1047,7 @@ export const searchParentContent = cache(
 );
 
 /**
- * Search content accross all spaces in a parent (site or collection).
+ * Search content in a Site or specific SiteSpaces.
  */
 export const searchSiteContent = cache(
     'api.searchSiteContent',
@@ -1056,14 +1056,13 @@ export const searchSiteContent = cache(
         siteId: string,
         query: string,
         siteSpaceIds: string[] = [],
-        /** The revision ID is used as a cache bust key, to avoid revalidating lot of cache entries by tags */
-        revisionId: string,
         options: CacheFunctionOptions,
     ) => {
         const response = await api().orgs.searchSiteContent(organizationId, siteId, {
             query,
             siteSpaceIds,
         });
+
         return cacheResponse(response, {
             ttl: 60 * 60,
             tags: [],
