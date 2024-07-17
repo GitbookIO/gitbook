@@ -64,8 +64,8 @@ async function SpaceRefCard(
                 />
             }
             href={resolved.href}
-            title={resolved.subText ?? resolved.text}
-            postTitle={resolved.subText ? resolved.text : undefined}
+            title={resolved.text}
+            postTitle={resolved.subText}
             style={style}
         />
     );
