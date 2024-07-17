@@ -1056,8 +1056,8 @@ export const searchSiteContent = cache(
         siteId: string,
         query: string,
         siteSpaceIds: string[] = [],
-        /** A cache bust key to avoid revalidating lot of cache entries by tags */
-        cacheKey?: string,
+        /** A cache bust param to avoid revalidating lot of cache entries by tags */
+        cacheBust?: string,
         options?: CacheFunctionOptions,
     ) => {
         const response = await api().orgs.searchSiteContent(
