@@ -62,14 +62,19 @@ export async function searchSpaceContent(
 ): Promise<OrderedComputedResult[]> {
     const pointer = getContentPointer();
 
-    if ('siteId' in pointer && 'organizationId' in pointer && pointer.siteSpaceId) {
+    if ('siteId' in pointer && 'organizationId' in pointer) {
+        const siteSpaceIds = pointer.siteSpaceId ? [pointer.siteSpaceId] : []; // if we don't have a siteSpaceID search all content
+
+        // This is a site so use a different endpoint
         const searchResults = await api.searchSiteContent(
             pointer.organizationId,
             pointer.siteId,
             query,
-            [pointer.siteSpaceId],
+            siteSpaceIds,
+            revisionId,
         );
 
+        // resolve all SiteSpaces so we can match up with the spaceId
         const allSiteSpaces = await api.getSiteSpaces({
             organizationId: pointer.organizationId,
             siteId: pointer.siteId,
