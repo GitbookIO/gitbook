@@ -60,7 +60,6 @@ export async function searchSiteContent(args: {
     const pointer = getContentPointer();
 
     if ('siteId' in pointer && 'organizationId' in pointer) {
-        // This is a site so use a different endpoint
         const searchResults = await api.searchSiteContent(
             pointer.organizationId,
             pointer.siteId,
@@ -106,6 +105,7 @@ export async function searchSiteContent(args: {
             .flat(2);
     }
 
+    // This should never happen
     return [];
 }
 
