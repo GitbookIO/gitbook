@@ -75,7 +75,7 @@ export function resolvePageId(
 
 /**
  * Resolve the next/previous page before another one.
- * It ignores hidden pages as this used for navigation purpose.
+ * It ignores hidden pages as this is used for navigation purpose.
  */
 export function resolvePrevNextPages(
     rootPages: Revision['pages'],
