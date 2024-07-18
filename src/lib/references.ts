@@ -18,6 +18,8 @@ import { getPagePath, resolvePageId } from './pages';
 export interface ResolvedContentRef {
     /** Text to render in the content ref */
     text: string;
+    /** Additional sub text to render in the content ref */
+    subText?: string;
     /** Emoji associated with the reference */
     emoji?: string;
     /** URL to open for the content ref */
@@ -103,10 +105,14 @@ export async function resolveContentRef(
                 return resolveContentRefInSpace(contentRef.space, contentRef);
             }
 
-            const page =
+            const resolvePageResult =
                 !contentRef.page || contentRef.page === activePage?.id
                     ? activePage
-                    : resolvePageId(pages, contentRef.page)?.page;
+                        ? { page: activePage, ancestors: [] }
+                        : undefined
+                    : resolvePageId(pages, contentRef.page);
+
+            const page = resolvePageResult?.page;
             if (!page) {
                 return null;
             }
@@ -134,7 +140,13 @@ export async function resolveContentRef(
                     }
                 }
             } else {
-                text = page.title;
+                const parentPage = (resolvePageResult?.ancestors || []).slice(-1).pop();
+                // When the looked up ref was a page group we use the page group title as resolved ref text.
+                // Otherwise use the resolved page title.
+                text =
+                    parentPage && contentRef.page === parentPage.id && parentPage.type === 'group'
+                        ? parentPage.title
+                        : page.title;
                 emoji = isCurrentPage ? undefined : page.emoji;
             }
 
@@ -245,12 +257,21 @@ async function resolveContentRefInSpace(spaceId: string, contentRef: ContentRef)
         baseUrl += '/';
     }
 
-    return resolveContentRef(contentRef, {
+    const resolved = await resolveContentRef(contentRef, {
         space,
         revisionId: space.revision,
         pages,
         baseUrl,
     });
+
+    if (!resolved) {
+        return null;
+    }
+
+    return {
+        ...resolved,
+        subText: space.title,
+    };
 }
 
 export function resolveContentRefWithFiles(
