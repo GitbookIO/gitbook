@@ -1,5 +1,6 @@
 {
     "name": "@gitbook/react-contentkit",
+    "version": "0.0.0",
     "exports": "./src/index.ts",
     "dependencies": {
         "classnames": "^2.5.1",

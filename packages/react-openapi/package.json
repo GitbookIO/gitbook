@@ -1,6 +1,7 @@
 {
     "name": "@gitbook/react-openapi",
     "exports": "./src/index.ts",
+    "version": "0.0.0",
     "dependencies": {
         "@scalar/api-client-react": "^0.3.7",
         "@scalar/oas-utils": "0.1.6",

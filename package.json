@@ -13,6 +13,7 @@
         "typecheck": "tsc --noEmit",
         "unit": "bun test {src,packages}",
         "e2e": "playwright test",
+        "changeset": "changeset",
         "postinstall": "rm -rf ./public/~gitbook/static/mathjax@3.2.2 && mkdir -p ./public/~gitbook/static/ && cp -R node_modules/mathjax/es5 ./public/~gitbook/static/mathjax@3.2.2"
     },
     "workspaces": [
