@@ -74,7 +74,7 @@ export async function searchSiteContent(args: {
                 siteSpaceIds,
                 cacheBust,
             ),
-            api.getSiteSpaces({
+            siteSpaceIds ? null : api.getSiteSpaces({
                 organizationId: pointer.organizationId,
                 siteId: pointer.siteId,
                 siteShareKey: pointer.siteShareKey,
