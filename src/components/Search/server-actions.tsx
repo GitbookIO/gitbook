@@ -74,18 +74,20 @@ export async function searchSiteContent(args: {
                 siteSpaceIds,
                 cacheBust,
             ),
-            siteSpaceIds ? null : api.getSiteSpaces({
-                organizationId: pointer.organizationId,
-                siteId: pointer.siteId,
-                siteShareKey: pointer.siteShareKey,
-            }),
+            siteSpaceIds
+                ? null
+                : api.getSiteSpaces({
+                      organizationId: pointer.organizationId,
+                      siteId: pointer.siteId,
+                      siteShareKey: pointer.siteShareKey,
+                  }),
         ]);
 
         if (!siteSpaceIds) {
             // We are searching all of this Site's content
             return searchResults.items
                 .map((spaceItem) => {
-                    const siteSpace = allSiteSpaces.find(
+                    const siteSpace = allSiteSpaces?.find(
                         (siteSpace) => siteSpace.space.id === spaceItem.id,
                     );
 
