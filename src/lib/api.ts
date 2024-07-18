@@ -1047,6 +1047,41 @@ export const searchParentContent = cache(
 );
 
 /**
+ * Search content in a Site or specific SiteSpaces.
+ */
+export const searchSiteContent = cache(
+    'api.searchSiteContent',
+    async (
+        organizationId: string,
+        siteId: string,
+        query: string,
+        siteSpaceIds?: string[],
+        /** A cache bust param to avoid revalidating lot of cache entries by tags */
+        cacheBust?: string,
+        options?: CacheFunctionOptions,
+    ) => {
+        const response = await api().orgs.searchSiteContent(
+            organizationId,
+            siteId,
+            {
+                query,
+                siteSpaceIds,
+            },
+            undefined,
+            {
+                ...noCacheFetchOptions,
+                signal: options?.signal,
+            },
+        );
+
+        return cacheResponse(response, {
+            ttl: 60 * 60,
+            tags: [],
+        });
+    },
+);
+
+/**
  * Get a list of recommended questions in a space.
  */
 export const getRecommendedQuestionsInSpace = cache(

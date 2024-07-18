@@ -6,9 +6,9 @@ import {
     SearchAIAnswer,
     SearchPageResult,
     Site,
+    SiteSpace,
     Space,
 } from '@gitbook/api';
-import { headers } from 'next/headers';
 
 import { getContentPointer } from '@/app/(space)/fetch';
 import { streamResponse } from '@/lib/actions';
@@ -52,6 +52,61 @@ export interface AskAnswerResult {
     hasAnswer: boolean;
 }
 
+export async function searchSiteContent(args: {
+    query: string;
+    siteSpaceIds?: string[];
+    cacheBust?: string;
+}): Promise<OrderedComputedResult[]> {
+    const { siteSpaceIds, query, cacheBust } = args;
+    const pointer = getContentPointer();
+
+    if (siteSpaceIds?.length === 0) {
+        // if we have no siteSpaces to search in then we won't find anything. skip the call.
+        return [];
+    }
+
+    if ('siteId' in pointer && 'organizationId' in pointer) {
+        const [searchResults, allSiteSpaces] = await Promise.all([
+            api.searchSiteContent(
+                pointer.organizationId,
+                pointer.siteId,
+                query,
+                siteSpaceIds,
+                cacheBust,
+            ),
+            siteSpaceIds
+                ? null
+                : api.getSiteSpaces({
+                      organizationId: pointer.organizationId,
+                      siteId: pointer.siteId,
+                      siteShareKey: pointer.siteShareKey,
+                  }),
+        ]);
+
+        if (!siteSpaceIds) {
+            // We are searching all of this Site's content
+            return searchResults.items
+                .map((spaceItem) => {
+                    const siteSpace = allSiteSpaces?.find(
+                        (siteSpace) => siteSpace.space.id === spaceItem.id,
+                    );
+
+                    return spaceItem.pages.map((item) => transformSitePageResult(item, siteSpace));
+                })
+                .flat(2);
+        }
+
+        return searchResults.items
+            .map((spaceItem) => {
+                return spaceItem.pages.map((item) => transformPageResult(item));
+            })
+            .flat(2);
+    }
+
+    // This should never happen
+    return [];
+}
+
 /**
  * Server action to search content in a space
  */
@@ -60,6 +115,16 @@ export async function searchSpaceContent(
     revisionId: string,
     query: string,
 ): Promise<OrderedComputedResult[]> {
+    const pointer = getContentPointer();
+
+    if ('siteId' in pointer && 'organizationId' in pointer) {
+        const siteSpaceIds = pointer.siteSpaceId ? [pointer.siteSpaceId] : []; // if we don't have a siteSpaceID search all content
+
+        // This is a site so use a different function which we can eventually call directly
+        // We also want to break cache for this specific space if the revisionId is different so use it as a cache busting key
+        return await searchSiteContent({ siteSpaceIds, query, cacheBust: revisionId });
+    }
+
     const data = await api.searchSpaceContent(spaceId, revisionId, query);
     return data.items.map((item) => transformPageResult(item, undefined)).flat();
 }
@@ -72,36 +137,18 @@ export async function searchParentContent(
     query: string,
 ): Promise<OrderedComputedResult[]> {
     const pointer = getContentPointer();
+    const isSite = 'siteId' in pointer;
 
-    const [data, collectionSpaces, siteSpaces] = await Promise.all([
+    if (isSite) {
+        return searchSiteContent({ query });
+    }
+
+    const [data, collectionSpaces] = await Promise.all([
         api.searchParentContent(parent.id, query),
         parent.object === 'collection' ? api.getCollectionSpaces(parent.id) : null,
-        parent.object === 'site' && 'organizationId' in pointer
-            ? api.getSiteSpaces({
-                  organizationId: pointer.organizationId,
-                  siteId: parent.id,
-                  siteShareKey: pointer.siteShareKey,
-              })
-            : null,
     ]);
 
-    let spaces: Space[] = [];
-
-    if (collectionSpaces) {
-        spaces = collectionSpaces;
-    } else if (siteSpaces) {
-        spaces = Object.values(
-            siteSpaces.reduce(
-                (acc, siteSpace) => {
-                    acc[siteSpace.space.id] = siteSpace.space;
-                    // replace the published url for the "space" with the site's published url
-                    acc[siteSpace.space.id].urls.published = siteSpace.urls.published;
-                    return acc;
-                },
-                {} as Record<string, Space>,
-            ),
-        );
-    }
+    let spaces: Space[] = collectionSpaces ? collectionSpaces : [];
 
     return data.items
         .map((spaceItem) => {
@@ -183,19 +230,24 @@ function transformAnswer(
     };
 }
 
-function transformPageResult(item: SearchPageResult, space?: Space) {
+function transformSectionsAndPage(args: {
+    item: SearchPageResult;
+    space?: Space;
+    spaceURL?: string;
+}): [ComputedPageResult, ComputedSectionResult[]] {
+    const { item, space, spaceURL } = args;
+
     // Resolve a relative path to an absolute URL
     // if the search result is relative to another space, we use the space URL
-    const getURL = (path: string) => {
-        if (space) {
-            let url = space.urls.published ?? space.urls.app;
-            if (!url.endsWith('/')) {
-                url += '/';
+    const getURL = (path: string, spaceURL?: string) => {
+        if (spaceURL) {
+            if (!spaceURL.endsWith('/')) {
+                spaceURL += '/';
             }
             if (path.startsWith('/')) {
                 path = path.slice(1);
             }
-            return url + path;
+            return spaceURL + path;
         } else {
             return absoluteHref(path);
         }
@@ -206,7 +258,7 @@ function transformPageResult(item: SearchPageResult, space?: Space) {
             type: 'section',
             id: item.id + '/' + section.id,
             title: section.title,
-            href: getURL(section.path),
+            href: getURL(section.path, spaceURL),
             body: section.body,
         })) ?? [];
 
@@ -217,6 +269,26 @@ function transformPageResult(item: SearchPageResult, space?: Space) {
         href: getURL(item.path),
         spaceTitle: space?.title,
     };
+
+    return [page, sections];
+}
+
+function transformSitePageResult(item: SearchPageResult, siteSpace?: SiteSpace) {
+    const [page, sections] = transformSectionsAndPage({
+        item,
+        space: siteSpace?.space,
+        spaceURL: siteSpace?.urls.published,
+    });
+
+    return [page, ...sections];
+}
+
+function transformPageResult(item: SearchPageResult, space?: Space) {
+    const [page, sections] = transformSectionsAndPage({
+        item,
+        space,
+        spaceURL: space?.urls.published ?? space?.urls.app,
+    });
 
     return [page, ...sections];
 }

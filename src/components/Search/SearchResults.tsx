@@ -96,6 +96,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 const fetchedResults = await (parent
                     ? searchParentContent(parent, query)
                     : searchSpaceContent(spaceId, revisionId, query));
+
                 setResults(withAsk ? withQuestionResult(fetchedResults, query) : fetchedResults);
             }, 250);
 
