@@ -271,7 +271,7 @@ function transformSectionsAndPage(args: {
     return [page, sections];
 }
 
-export function transformSitePageResult(item: SearchPageResult, siteSpace?: SiteSpace) {
+function transformSitePageResult(item: SearchPageResult, siteSpace?: SiteSpace) {
     const [page, sections] = transformSectionsAndPage({
         item,
         space: siteSpace?.space,
