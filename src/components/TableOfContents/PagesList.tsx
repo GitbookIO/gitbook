@@ -19,6 +19,14 @@ export function PagesList(props: {
     return (
         <ul className={tcls('flex', 'flex-1', 'flex-col', 'gap-y-0.5', style)}>
             {pages.map((page) => {
+                if (page.type === 'link') {
+                    return <PageLinkItem key={page.id} page={page} context={context} />;
+                }
+
+                if (page.hidden) {
+                    return null;
+                }
+
                 if (page.type === 'group') {
                     return (
                         <PageGroupItem
@@ -29,8 +37,6 @@ export function PagesList(props: {
                             context={context}
                         />
                     );
-                } else if (page.type === 'link') {
-                    return <PageLinkItem key={page.id} page={page} context={context} />;
                 }
 
                 return (

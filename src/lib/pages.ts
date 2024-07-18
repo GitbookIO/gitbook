@@ -75,12 +75,13 @@ export function resolvePageId(
 
 /**
  * Resolve the next/previous page before another one.
+ * It ignores hidden pages as this is used for navigation purpose.
  */
 export function resolvePrevNextPages(
     rootPages: Revision['pages'],
     page: RevisionPageDocument,
 ): { previous?: RevisionPageDocument; next?: RevisionPageDocument } {
-    const flat = flattenPages(rootPages);
+    const flat = flattenPages(rootPages, (page) => !page.hidden);
 
     const currentIndex = flat.findIndex((p) => p.id === page.id);
     if (currentIndex === -1) {
@@ -152,17 +153,27 @@ function resolvePageDocument(
     return { page, ancestors };
 }
 
-function flattenPages(pages: RevisionPage[]): RevisionPageDocument[] {
+/**
+ * Flatten a list of pages into a list of page documents.
+ */
+function flattenPages(
+    pages: RevisionPage[],
+    filter?: (page: RevisionPageDocument | RevisionPageGroup) => boolean,
+): RevisionPageDocument[] {
     const result: RevisionPageDocument[] = [];
     for (const page of pages) {
         if (page.type === 'link') {
             continue;
         }
 
+        if (filter && !filter(page)) {
+            continue;
+        }
+
         if (page.type === 'document') {
             result.push(page);
         }
-        result.push(...flattenPages(page.pages));
+        result.push(...flattenPages(page.pages, filter));
     }
 
     return result;

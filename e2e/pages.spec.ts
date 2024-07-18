@@ -364,6 +364,11 @@ const testCases: TestsCase[] = [
         baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
         tests: [
             {
+                name: 'Hidden',
+                url: 'page-options/page-hidden',
+                run: waitForCookiesDialog,
+            },
+            {
                 name: 'With cover',
                 url: 'page-options/page-with-cover',
                 run: waitForCookiesDialog,
