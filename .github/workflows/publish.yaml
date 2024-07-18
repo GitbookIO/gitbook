@@ -1,0 +1,98 @@
+name: Publish
+
+on:
+    push:
+        branches:
+            - main
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+    publish:
+        name: Publish
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Repo
+              uses: actions/checkout@v3
+              with:
+                  # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
+                  fetch-depth: 0
+            - name: Setup bun
+              uses: oven-sh/setup-bun@v1
+              with:
+                  bun-version: 1.1.18
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+              env:
+                  PUPPETEER_SKIP_DOWNLOAD: 1
+            - name: Create Release Pull Request or Publish to npm
+              id: changesets
+              uses: changesets/action@v1
+              with:
+                  publish: npm run release
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+        name: Publish Integrations to Staging
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Repo
+              uses: actions/checkout@v3
+            - name: Setup Node.js 20.x
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 20.x
+            - name: Install Dependencies
+              # We need to build and then re-install so that the "bin" can be correctly linked
+              run: |
+                  npm ci
+                  npm run build
+                  npm ci
+            - name: Publish all integrations assets to staging
+              run: npm run publish-assets
+              env:
+                  CLOUDFLARE_PAGES_PROJECT: ${{ secrets.INTEGRATIONS_ASSETS_STAGING_PROJECT }}
+                  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+                  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_API_TOKEN }}
+            - name: Publish all integrations to staging
+              run: npm run publish-integrations-staging
+              env:
+                  GITBOOK_TOKEN: ${{ secrets.GITBOOK_STAGING_API_TOKEN }}
+                  GITBOOK_ENDPOINT: https://api.gitbook-staging.com
+                  GITBOOK_ORGANIZATION: gitbookio
+                  UNFURL_GITHUB_CLIENT_ID: ${{ secrets.UNFURL_GITHUB_CLIENT_ID }}
+                  UNFURL_GITHUB_CLIENT_SECRET: ${{ secrets.UNFURL_GITHUB_CLIENT_SECRET }}
+                  GITLAB_CLIENT_ID: ${{ secrets.GITLAB_CLIENT_ID }}
+                  GITLAB_CLIENT_SECRET: ${{ secrets.GITLAB_CLIENT_SECRET }}
+                  DISCORD_CLIENT_ID: $ {{ secrets.DISCORD_CLIENT_ID }}
+                  DISCORD_CLIENT_SECRET: $ {{ secrets.DISCORD_CLIENT_SECRET }}
+                  DISCORD_BOT_TOKEN: $ {{ secrets.DISCORD_BOT_TOKEN }}
+                  SLACK_CLIENT_ID: ${{ secrets.SLACK_STAGING_CLIENT_ID }}
+                  SLACK_CLIENT_SECRET: ${{ secrets.SLACK_STAGING_CLIENT_SECRET }}
+                  SLACK_SIGNING_SECRET: ${{ secrets.SLACK_STAGING_SIGNING_SECRET }}
+                  FIGMA_CLIENT_ID: ${{ secrets.FIGMA_STAGING_CLIENT_ID }}
+                  FIGMA_CLIENT_SECRET: ${{ secrets.FIGMA_STAGING_CLIENT_SECRET }}
+                  MAILCHIMP_CLIENT_ID: ${{ secrets.MAILCHIMP_STAGING_CLIENT_ID }}
+                  MAILCHIMP_CLIENT_SECRET: ${{ secrets.MAILCHIMP_STAGING_CLIENT_SECRET }}
+                  JIRA_CLIENT_ID: ${{ secrets.JIRA_STAGING_CLIENT_ID }}
+                  JIRA_CLIENT_SECRET: ${{ secrets.JIRA_STAGING_CLIENT_SECRET }}
+                  LINEAR_CLIENT_ID: ${{ secrets.LINEAR_STAGING_CLIENT_ID }}
+                  LINEAR_CLIENT_SECRET: ${{ secrets.LINEAR_STAGING_CLIENT_SECRET }}
+                  SENTRY_CLIENT_ID: ${{ secrets.SENTRY_STAGING_CLIENT_ID }}
+                  SENTRY_CLIENT_SECRET: ${{ secrets.SENTRY_STAGING_CLIENT_SECRET }}
+                  SENTRY_GITBOOK_INTEGRATION: ${{ secrets.SENTRY_STAGING_GITBOOK_INTEGRATION }}
+                  GITHUB_APP_INSTALL_URL: ${{ secrets.GITBOOK_GITHUB_STAGING_APP_INSTALL_URL }}
+                  GITHUB_APP_ID: ${{ secrets.GITBOOK_GITHUB_STAGING_APP_ID }}
+                  GITHUB_CLIENT_ID: ${{ secrets.GITBOOK_GITHUB_STAGING_CLIENT_ID }}
+                  GITHUB_CLIENT_SECRET: ${{ secrets.GITBOOK_GITHUB_STAGING_CLIENT_SECRET }}
+                  GITHUB_WEBHOOK_SECRET: ${{ secrets.GITBOOK_GITHUB_STAGING_WEBHOOK_SECRET }}
+                  GITHUB_PRIVATE_KEY: ${{ secrets.GITBOOK_GITHUB_STAGING_PRIVATE_KEY }}
+                  GITHUB_ENTITIES_APP_INSTALL_URL: ${{ secrets.ENTITIES_GITHUB_STAGING_APP_INSTALL_URL }}
+                  GITHUB_ENTITIES_APP_ID: ${{ secrets.ENTITIES_GITHUB_STAGING_APP_ID }}
+                  GITHUB_ENTITIES_CLIENT_ID: ${{ secrets.ENTITIES_GITHUB_STAGING_CLIENT_ID }}
+                  GITHUB_ENTITIES_CLIENT_SECRET: ${{ secrets.ENTITIES_GITHUB_STAGING_CLIENT_SECRET }}
+                  GITHUB_ENTITIES_WEBHOOK_SECRET: ${{ secrets.ENTITIES_GITHUB_STAGING_WEBHOOK_SECRET }}
+                  GITHUB_ENTITIES_PRIVATE_KEY: ${{ secrets.ENTITIES_GITHUB_STAGING_PRIVATE_KEY }}
+                  LUCID_CLIENT_ID: ${{ secrets.LUCID_CLIENT_ID }}
+                  LUCID_CLIENT_SECRET: ${{ secrets.LUCID_CLIENT_SECRET }}

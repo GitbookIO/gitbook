@@ -65,6 +65,7 @@
     },
     "devDependencies": {
         "@argos-ci/playwright": "^2.0.0",
+        "@changesets/cli": "^2.27.7",
         "@cloudflare/next-on-pages": "^1.11.3",
         "@cloudflare/workers-types": "^4.20231218.0",
         "@playwright/test": "^1.42.1",
