@@ -5,7 +5,7 @@ import { tcls } from '@/lib/tailwind';
 import { Dropdown, DropdownChevron, DropdownMenu } from './Dropdown';
 import { SpacesDropdownMenuItem } from './SpacesDropdownMenuItem';
 
-export async function SpacesDropdown(props: { space: Space; spaces: Space[] }) {
+export function SpacesDropdown(props: { space: Space; spaces: Space[] }) {
     const { space, spaces } = props;
 
     return (
