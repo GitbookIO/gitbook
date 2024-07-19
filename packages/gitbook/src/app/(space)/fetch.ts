@@ -201,6 +201,7 @@ async function fetchParentSite(args: {
     siteSpaces.forEach((siteSpace) => {
         spaces[siteSpace.space.id] = {
             ...siteSpace.space,
+            title: siteSpace.title ?? siteSpace.space.title,
             urls: {
                 ...siteSpace.space.urls,
                 published: siteSpace.urls.published,
