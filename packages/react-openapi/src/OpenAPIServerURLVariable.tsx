@@ -1,8 +1,8 @@
 'use client';
 
+import * as React from 'react';
 import classNames from 'classnames';
 import { OpenAPIV3 } from 'openapi-types';
-import React from 'react';
 
 /**
  * Interactive component to show the value of a server variable and let the user change it.
