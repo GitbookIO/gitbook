@@ -7,11 +7,9 @@ import {
     Space,
 } from '@gitbook/api';
 
-import { getContentPointer } from '@/app/(space)/fetch';
 import { HeaderMobileMenu } from '@/components/Header/HeaderMobileMenu';
 import { LogoIcon } from '@/components/icons';
 import { Image } from '@/components/utils';
-import { getCurrentSiteCustomization } from '@/lib/api';
 import { absoluteHref } from '@/lib/links';
 import { tcls } from '@/lib/tailwind';
 import { getContentTitle } from '@/lib/utils';
@@ -96,19 +94,10 @@ export function HeaderLogo(props: HeaderLogoProps) {
     );
 }
 
-async function LogoFallback(props: HeaderLogoProps) {
+function LogoFallback(props: HeaderLogoProps) {
     const { parent, space, customization } = props;
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : undefined;
     const customEmoji = 'emoji' in customization.favicon ? customization.favicon.emoji : undefined;
-    const content = getContentPointer();
-
-    const siteCustomization =
-        'siteId' in content
-            ? await getCurrentSiteCustomization({
-                  organizationId: content.organizationId,
-                  siteId: content.siteId,
-              })
-            : null;
 
     return (
         <>
@@ -137,7 +126,7 @@ async function LogoFallback(props: HeaderLogoProps) {
                         : 'text-header-link',
                 )}
             >
-                {getContentTitle(space, siteCustomization ?? customization, parent)}
+                {getContentTitle(space, customization, parent)}
             </h1>
         </>
     );
