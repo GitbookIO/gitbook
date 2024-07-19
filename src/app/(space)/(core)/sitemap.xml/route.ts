@@ -15,7 +15,7 @@ export const runtime = 'edge';
  */
 export async function GET(req: NextRequest) {
     const { pages: rootPages } = await getSpaceContentData(getContentPointer());
-    const pages = flattenPages(rootPages);
+    const pages = flattenPages(rootPages, (page) => !page.hidden);
     const urls = pages.map(({ page, depth }) => {
         // Decay priority with depth
         const priority = Math.pow(2, -0.25 * depth);
@@ -66,13 +66,16 @@ export async function GET(req: NextRequest) {
 
 type FlatPageEntry = { page: RevisionPageDocument; depth: number };
 
-function flattenPages(rootPags: RevisionPage[]): FlatPageEntry[] {
+function flattenPages(
+    rootPags: RevisionPage[],
+    filter: (page: RevisionPageDocument) => boolean,
+): FlatPageEntry[] {
     const flattenPage = (
         page: RevisionPageDocument | RevisionPageGroup,
         depth: number,
     ): FlatPageEntry[] => {
         return [
-            ...(page.type === 'document' ? [{ page, depth }] : []),
+            ...(page.type === 'document' && filter(page) ? [{ page, depth }] : []),
             ...page.pages.flatMap((child) =>
                 child.type === 'link' ? [] : flattenPage(child, depth + 1),
             ),
