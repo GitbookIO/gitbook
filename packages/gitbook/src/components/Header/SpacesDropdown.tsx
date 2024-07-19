@@ -1,16 +1,11 @@
-import { Collection, Site, Space } from '@gitbook/api';
+import { Space } from '@gitbook/api';
 
 import { tcls } from '@/lib/tailwind';
 
 import { Dropdown, DropdownChevron, DropdownMenu } from './Dropdown';
 import { SpacesDropdownMenuItem } from './SpacesDropdownMenuItem';
 
-export async function SpacesDropdown(props: {
-    space: Space;
-    spaces: Space[];
-    parent?: Site | Collection | null;
-}) {
-    props.parent?.object;
+export async function SpacesDropdown(props: { space: Space; spaces: Space[] }) {
     const { space, spaces } = props;
 
     return (
