@@ -1,12 +1,5 @@
 # `@gitbook/react-openapi`
 
-React components to render OpenAPI operations.
+Style-less React components to render OpenAPI operation blocks.
 
-## Features
-
--   Generate code samples for the request
--   Support custom cde samples with `x-codeSamples` (Redocly syntax)
-
-## TODO
-
--   Support for trying out the request
+Note: The package is a TypeScript package and do not expose JS built files.

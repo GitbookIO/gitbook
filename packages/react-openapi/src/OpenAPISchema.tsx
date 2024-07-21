@@ -1,4 +1,3 @@
-import * as React from 'react';
 import classNames from 'classnames';
 import { OpenAPIV3 } from 'openapi-types';
 import React, { useId } from 'react';
