@@ -1,5 +1,11 @@
 # @gitbook/react-openapi
 
+## 0.3.0
+
+### Minor Changes
+
+-   bd0ca5b: Fix missing react imports
+
 ## 0.2.0
 
 ### Minor Changes
