@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { OpenAPIV3 } from 'openapi-types';
 import { OpenAPIServerURLVariable } from './OpenAPIServerURLVariable';
 

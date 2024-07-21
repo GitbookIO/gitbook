@@ -1,4 +1,4 @@
-import { OpenAPIV3 } from 'openapi-types';
+import * as React from 'react';
 
 import { CodeSampleInput, codeSampleGenerators } from './code-samples';
 import { OpenAPIOperationData, toJSON } from './fetchOpenAPIOperation';

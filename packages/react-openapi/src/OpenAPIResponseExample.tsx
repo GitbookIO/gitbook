@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { InteractiveSection } from './InteractiveSection';
 import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { generateSchemaExample } from './generateSchemaExample';
