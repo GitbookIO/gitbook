@@ -2,6 +2,7 @@
     "name": "gitbook",
     "version": "0.1.0",
     "private": true,
+    "packageManager": "bun@1.1.18",
     "scripts": {
         "dev": "next dev",
         "build": "next build",
@@ -14,7 +15,7 @@
         "unit": "bun test {src,packages}",
         "e2e": "playwright test",
         "changeset": "changeset",
-        "release": "changeset publish",
+        "release": "turbo run build && changeset publish",
         "postinstall": "rm -rf ./public/~gitbook/static/mathjax@3.2.2 && mkdir -p ./public/~gitbook/static/ && cp -R node_modules/mathjax/es5 ./public/~gitbook/static/mathjax@3.2.2"
     },
     "workspaces": [
@@ -32,7 +33,7 @@
         "@upstash/redis": "^1.27.1",
         "ajv": "^8.12.0",
         "assert-never": "^1.2.1",
-        "bun-types": "^1.0.7",
+        "bun-types": "^1.1.20",
         "classnames": "^2.5.1",
         "content-security-policy-merger": "^1.0.0",
         "framer-motion": "^10.16.14",
@@ -91,6 +92,7 @@
         "prettier": "^3.0.3",
         "psi": "^4.1.0",
         "tailwindcss": "^3.4.0",
-        "typescript": "^5"
+        "typescript": "^5.5.3",
+        "turbo": "^2.0.9"
     }
 }

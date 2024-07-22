@@ -46,3 +46,7 @@ screenshots/
 
 # Generated public files
 /public/~gitbook/static/
+
+# Turbo
+.turbo
+

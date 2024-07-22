@@ -1,7 +1,13 @@
 {
     "name": "@gitbook/react-openapi",
-    "exports": "./src/index.ts",
-    "version": "0.3.0",
+    "exports": {
+        ".": {
+            "default": "./dist/index.js",
+            "types": "./dist/index.d.ts",
+            "development": "./src/index.ts"
+        }
+    },
+    "version": "0.2.0",
     "dependencies": {
         "@scalar/api-client-react": "^0.3.7",
         "@scalar/oas-utils": "0.1.6",
@@ -12,9 +18,14 @@
         "swagger2openapi": "^7.0.8"
     },
     "devDependencies": {
-        "@types/swagger2openapi": "^7.0.4"
+        "@types/swagger2openapi": "^7.0.4",
+        "bun-types": "^1.1.20",
+        "typescript": "^5.5.3"
     },
     "peerDependencies": {
         "react": "*"
+    },
+    "scripts": {
+        "build": "tsc"
     }
 }
