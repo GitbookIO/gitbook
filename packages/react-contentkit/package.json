@@ -1,7 +1,13 @@
 {
     "name": "@gitbook/react-contentkit",
     "version": "0.2.0",
-    "exports": "./src/index.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "development": "./src/index.ts",
+            "default": "./dist/index.js"
+        }
+    },
     "dependencies": {
         "classnames": "^2.5.1",
         "@gitbook/api": "^0.51.0",
@@ -9,5 +15,12 @@
     },
     "peerDependencies": {
         "react": "*"
+    },
+    "devDependencies": {
+        "typescript": "^5.5.3"
+    },
+    "scripts": {
+        "build": "tsc",
+        "typecheck": "tsc --noEmit"
     }
 }

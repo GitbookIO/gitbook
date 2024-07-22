@@ -1,4 +1,5 @@
 import { type ContentKitRenderOutput } from '@gitbook/api';
+import React from 'react';
 
 import { Element } from './Element';
 import { ContentKitServerContext } from './types';

@@ -1,4 +1,5 @@
 import { ContentKitMarkdown } from '@gitbook/api';
+import React from 'react';
 
 import { ContentKitServerElementProps } from './types';
 import { ElementMarkdownClient } from './ElementMarkdownClient';
