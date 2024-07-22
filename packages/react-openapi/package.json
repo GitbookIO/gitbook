@@ -28,6 +28,7 @@
     "scripts": {
         "build": "tsc",
         "typecheck": "tsc --noEmit",
-        "unit": "bun test"
+        "unit": "bun test",
+        "dev": "tsc -w"
     }
 }
