@@ -1,5 +1,11 @@
 # @gitbook/react-math
 
+## 0.5.0
+
+### Minor Changes
+
+-   3445db4: Fix files published in the NPM packages by defining "files" in "package.json"
+
 ## 0.4.0
 
 ### Minor Changes
