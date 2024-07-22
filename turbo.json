@@ -9,13 +9,13 @@
             "dependsOn": ["^build"]
         },
         "typecheck": {
-            "dependsOn": ["^typecheck"]
+            "dependsOn": ["^typecheck", "^build"]
         },
         "lint": {
             "dependsOn": ["^lint"]
         },
         "unit": {
-            "dependsOn": ["^unit"]
+            "dependsOn": ["^unit", "^build"]
         },
         "e2e": {
             "dependsOn": ["^e2e"]
