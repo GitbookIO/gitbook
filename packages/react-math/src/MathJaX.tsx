@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import React from 'react';
 
 declare var MathJax: {
     startup: {
@@ -24,6 +24,7 @@ export interface MathJaXFormulaProps {
 export default function MathJaXFormula(props: MathJaXFormulaProps) {
     const { formula, inline, className, mathJaxUrl } = props;
 
+    // @ts-ignore - React.use doesn't seem define in typing
     React.use(loadMathJaxScript(mathJaxUrl));
     const [html, setHTML] = React.useState('');
 

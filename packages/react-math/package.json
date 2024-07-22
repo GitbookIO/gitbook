@@ -1,11 +1,23 @@
 {
     "name": "@gitbook/react-math",
-    "exports": "./src/index.ts",
+    "exports": {
+        ".": {
+            "default": "./dist/index.js",
+            "types": "./dist/index.d.ts",
+            "development": "./src/index.ts"
+        }
+    },
     "version": "0.2.0",
     "dependencies": {
         "object-hash": "^3.0.0"
     },
     "peerDependencies": {
         "react": "*"
+    },
+    "devDependencies": {
+        "typescript": "^5.5.3"
+    },
+    "scripts": {
+        "build": "tsc"
     }
 }
