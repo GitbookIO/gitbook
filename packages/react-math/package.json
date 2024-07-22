@@ -19,6 +19,7 @@
         "@types/katex": "^0.16.5"
     },
     "scripts": {
-        "build": "tsc"
+        "build": "tsc",
+        "typecheck": "tsc --noEmit"
     }
 }
