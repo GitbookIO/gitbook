@@ -1,0 +1,32 @@
+{
+    "name": "@gitbook/icons",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "development": "./src/index.ts",
+            "default": "./dist/index.js"
+        }
+    },
+    "version": "0.0.0",
+    "dependencies": {
+        "@heroicons/react": "^2.1.5",
+        "ts-case-convert": "^2.0.7"
+    },
+    "devDependencies": {
+        "typescript": "^5.5.3"
+    },
+    "peerDependencies": {
+        "react": "*"
+    },
+    "scripts": {
+        "build": "tsc",
+        "typecheck": "tsc --noEmit",
+        "dev": "tsc -w"
+    },
+    "files": [
+        "dist",
+        "src",
+        "README.md",
+        "CHANGELOG.md"
+    ]
+}
