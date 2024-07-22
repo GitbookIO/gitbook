@@ -22,5 +22,12 @@
         "build": "tsc",
         "typecheck": "tsc --noEmit",
         "dev": "tsc -w"
-    }
+    },
+    "files": [
+        "dist",
+        "src",
+        "css",
+        "README.md",
+        "CHANGELOG.md"
+    ]
 }
