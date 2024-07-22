@@ -2,7 +2,7 @@ import React from 'react';
 import { KaTeX } from './KaTeX';
 import { MathJaXLazy } from './MathJaXLazy';
 
-import './default.css';
+import '../css/default.css';
 
 export interface MathFormulaProps {
     /**
