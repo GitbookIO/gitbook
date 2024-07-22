@@ -108,7 +108,7 @@ jobs:
               env:
                   PUPPETEER_SKIP_DOWNLOAD: 1
             - name: Run pagespeed tests
-              run: bun ./tests/pagespeed-testing.ts $DEPLOYMENT_URL
+              run: bun ./packages/gitbook/tests/pagespeed-testing.ts $DEPLOYMENT_URL
               env:
                   DEPLOYMENT_URL: ${{needs.deploy.outputs.deployment_url}}
                   PAGESPEED_API_KEY: ${{ secrets.PAGESPEED_API_KEY }}
