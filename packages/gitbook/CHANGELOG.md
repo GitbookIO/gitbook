@@ -1,5 +1,14 @@
 # gitbook
 
+## 0.2.2
+
+### Patch Changes
+
+-   Updated dependencies [3445db4]
+    -   @gitbook/react-contentkit@0.5.0
+    -   @gitbook/react-openapi@0.5.0
+    -   @gitbook/react-math@0.5.0
+
 ## 0.2.1
 
 ### Patch Changes
