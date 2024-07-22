@@ -18,8 +18,6 @@ import assertNever from 'assert-never';
 import { headers } from 'next/headers';
 import rison from 'rison';
 
-import { fetchParentSite } from '@/app/(space)/fetch';
-
 import { batch } from './async';
 import { buildVersion } from './build';
 import {
