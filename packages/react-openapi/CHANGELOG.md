@@ -1,5 +1,11 @@
 # @gitbook/react-openapi
 
+## 0.4.0
+
+### Minor Changes
+
+-   24cd72e: Fix changeset CI workflow
+
 ## 0.3.0
 
 ### Minor Changes
