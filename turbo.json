@@ -1,6 +1,6 @@
 {
     "$schema": "https://turbo.build/schema.json",
-    "globalEnv": ["NODE_ENV", "CI", "GITHUB_SHA", "ARGOS_TOKEN", "GITHUB_TOKEN"],
+    "globalEnv": ["NODE_ENV", "CI", "ARGOS_*", "GITHUB_*"],
     "tasks": {
         "build": {
             "dependsOn": ["^build"],
