@@ -7,7 +7,6 @@ import { LoadingPane } from '@/components/primitives';
 import { fetchOpenAPIBlock } from '@/lib/openapi';
 import { tcls } from '@/lib/tailwind';
 
-
 import { BlockProps } from '../Block';
 import { PlainCodeBlock } from '../CodeBlock';
 

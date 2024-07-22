@@ -21,7 +21,6 @@ import { ignoreAPIError, renderIntegrationUi } from '@/lib/api';
 import { parseMarkdown } from '@/lib/markdown';
 import { tcls } from '@/lib/tailwind';
 
-
 import type { BlockProps } from '../Block';
 import './contentkit.css';
 import { PlainCodeBlock } from '../CodeBlock';

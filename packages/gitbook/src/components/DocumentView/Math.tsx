@@ -4,7 +4,6 @@ import { MathFormula } from '@gitbook/react-math';
 import { getStaticFileURL } from '@/lib/assets';
 import { tcls } from '@/lib/tailwind';
 
-
 import { BlockProps } from './Block';
 import { InlineProps } from './Inline';
 
