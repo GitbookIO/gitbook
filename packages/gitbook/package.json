@@ -18,6 +18,7 @@
         "@gitbook/api": "^0.56.0",
         "@gitbook/react-math": "workspace:*",
         "@gitbook/react-openapi": "workspace:*",
+        "@gitbook/react-contentkit": "workspace:*",
         "@radix-ui/react-checkbox": "^1.0.4",
         "@radix-ui/react-popover": "^1.0.7",
         "@sentry/nextjs": "^7.94.1",
