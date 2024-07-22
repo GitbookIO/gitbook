@@ -7,7 +7,7 @@
             "default": "./dist/index.js"
         }
     },
-    "version": "0.2.0",
+    "version": "0.3.0",
     "dependencies": {
         "@scalar/api-client-react": "^0.3.7",
         "@scalar/oas-utils": "0.1.6",

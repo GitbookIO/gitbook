@@ -1,5 +1,11 @@
 # @gitbook/react-contentkit
 
+## 0.3.0
+
+### Minor Changes
+
+-   de747b7: Publish to NPM with JS files and TypeScript declaration files
+
 ## 0.2.0
 
 ### Minor Changes

@@ -4,6 +4,12 @@
 
 ### Minor Changes
 
+-   de747b7: Refactor the repository to be a proper monorepo and publish JS files on NPM instead of TypeScript files.
+
+## 0.3.0
+
+### Minor Changes
+
 -   bd0ca5b: Fix missing react imports
 
 ## 0.2.0
