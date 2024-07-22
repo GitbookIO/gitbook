@@ -2,9 +2,9 @@
     "name": "@gitbook/react-openapi",
     "exports": {
         ".": {
-            "default": "./dist/index.js",
             "types": "./dist/index.d.ts",
-            "development": "./src/index.ts"
+            "development": "./src/index.ts",
+            "default": "./dist/index.js"
         }
     },
     "version": "0.2.0",
