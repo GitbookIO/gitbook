@@ -15,7 +15,8 @@
         "react": "*"
     },
     "devDependencies": {
-        "typescript": "^5.5.3"
+        "typescript": "^5.5.3",
+        "@types/katex": "^0.16.5"
     },
     "scripts": {
         "build": "tsc"

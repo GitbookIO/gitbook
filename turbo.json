@@ -3,10 +3,22 @@
     "tasks": {
         "build": {
             "dependsOn": ["^build"],
-            "outputs": [".next/**", "!.next/cache/**"]
+            "outputs": [".next/**", "!.next/cache/**", "dist"]
         },
-        "check-types": {
-            "dependsOn": ["^check-types"]
+        "build:cloudflare": {
+            "dependsOn": ["^build"]
+        },
+        "typecheck": {
+            "dependsOn": ["^typecheck"]
+        },
+        "lint": {
+            "dependsOn": ["^lint"]
+        },
+        "unit": {
+            "dependsOn": ["^unit"]
+        },
+        "e2e": {
+            "dependsOn": ["^e2e"]
         },
         "dev": {
             "persistent": true,
