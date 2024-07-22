@@ -13,6 +13,7 @@ import {
     getCurrentSiteData,
     getSite,
     getSiteSpaces,
+    getCurrentSiteCustomization,
 } from '@/lib/api';
 import { resolvePagePath, resolvePageId } from '@/lib/pages';
 
@@ -71,20 +72,35 @@ export function getContentPointer(): ContentPointer | SiteContentPointer {
 export async function fetchSpaceData() {
     const content = getContentPointer();
 
-    const [{ space, contentTarget, pages, customization, scripts }, parentSite] = await Promise.all(
-        'siteId' in content
-            ? [
-                  getCurrentSiteData(content),
-                  fetchParentSite({
-                      organizationId: content.organizationId,
-                      siteId: content.siteId,
-                      siteShareKey: content.siteShareKey,
-                  }),
-              ]
-            : [getSpaceData(content)],
-    );
+    if ('siteId' in content) {
+        const [{ space, contentTarget, pages, customization, scripts }, parentSite] =
+            await Promise.all([
+                getCurrentSiteData(content),
+                fetchParentSite({
+                    organizationId: content.organizationId,
+                    siteId: content.siteId,
+                    siteShareKey: content.siteShareKey,
+                }),
+            ]);
 
-    const parent = await (parentSite ?? fetchParentCollection(space));
+        const spaceRelativeToParent = parentSite.spaces.find(
+            (space) => space.id === content.spaceId,
+        );
+
+        return {
+            content,
+            contentTarget,
+            space: spaceRelativeToParent ?? space,
+            pages,
+            customization,
+            scripts,
+            ancestors: [],
+            ...parentSite,
+        };
+    }
+
+    const { space, contentTarget, pages, customization, scripts } = await getSpaceData(content);
+    const parent = await fetchParentCollection(space);
 
     return {
         content,
@@ -192,9 +208,10 @@ async function fetchParentSite(args: {
     siteShareKey: string | undefined;
 }) {
     const { organizationId, siteId, siteShareKey } = args;
-    const [site, siteSpaces] = await Promise.all([
+    const [site, siteSpaces, siteParentCustomizations] = await Promise.all([
         getSite(organizationId, siteId),
         getSiteSpaces({ organizationId, siteId, siteShareKey }),
+        siteId ? getCurrentSiteCustomization({ organizationId, siteId }) : null,
     ]);
 
     const spaces: Record<string, Space> = {};
@@ -209,7 +226,9 @@ async function fetchParentSite(args: {
         };
     });
 
-    return { parent: site, spaces: Object.values(spaces) };
+    const parent = siteParentCustomizations ? { ...site, ...siteParentCustomizations } : site;
+
+    return { parent, spaces: Object.values(spaces) };
 }
 
 /**

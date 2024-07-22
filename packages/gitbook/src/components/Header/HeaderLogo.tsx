@@ -85,9 +85,7 @@ export function HeaderLogo(props: HeaderLogoProps) {
                         )}
                     />
                 ) : (
-                    <>
-                        <LogoFallback {...props} />
-                    </>
+                    <LogoFallback {...props} />
                 )}
             </Link>
         </div>
