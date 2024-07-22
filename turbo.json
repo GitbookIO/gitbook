@@ -18,7 +18,8 @@
             "dependsOn": ["^unit", "^build"]
         },
         "e2e": {
-            "dependsOn": ["^e2e"]
+            "dependsOn": ["^e2e"],
+            "env": ["BASE_URL", "ARGOS_TOKEN"]
         },
         "dev": {
             "persistent": true,
