@@ -3,6 +3,7 @@ import {
     ContentKitInlineElement,
     ContentKitRootElement,
 } from '@gitbook/api';
+import React from 'react';
 
 import { ElementBlock } from './ElementBlock';
 import { ElementWebframe } from './ElementWebframe';
@@ -13,7 +14,6 @@ import { ElementCodeBlock } from './ElementCodeBlock';
 import { ElementImage } from './ElementImage';
 import { ElementStack } from './ElementStack';
 import { ElementText } from './ElementText';
-import React from 'react';
 import { ElementButton } from './ElementButton';
 import { ElementModal } from './ElementModal';
 import { ElementBox } from './ElementBox';

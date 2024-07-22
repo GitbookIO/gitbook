@@ -18,7 +18,7 @@ export type VisitorAuthCookieValue = {
  */
 export function getVisitorAuthToken(
     request: NextRequest,
-    url: URL,
+    url: URL | NextRequest['nextUrl'],
 ): string | VisitorAuthCookieValue | undefined {
     return url.searchParams.get(VISITOR_AUTH_PARAM) ?? getVisitorAuthTokenFromCookies(request, url);
 }
@@ -55,7 +55,7 @@ export function normalizeVisitorAuthURL(url: URL): URL {
  * authentication cookie token.
  * It returns the longest one first, and the shortest one last.
  */
-function getUrlBasePathCombinations(url: URL): string[] {
+function getUrlBasePathCombinations(url: URL | NextRequest['nextUrl']): string[] {
     const parts = url.pathname.split('/').filter(Boolean);
     const baseNames = ['/'];
 
@@ -73,7 +73,7 @@ function getUrlBasePathCombinations(url: URL): string[] {
  */
 function getVisitorAuthTokenFromCookies(
     request: NextRequest,
-    url: URL,
+    url: URL | NextRequest['nextUrl'],
 ): VisitorAuthCookieValue | undefined {
     const urlBasePaths = getUrlBasePathCombinations(url);
     // Try to find a visitor authentication token for the current URL. The request

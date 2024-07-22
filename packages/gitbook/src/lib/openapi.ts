@@ -1,7 +1,4 @@
 import { ContentRef, DocumentBlockSwagger } from '@gitbook/api';
-
-import { cache, parseCacheResponse, noCacheFetchOptions, CacheFunctionOptions } from '@/lib/cache';
-
 import {
     OpenAPIOperationData,
     fetchOpenAPIOperation,
@@ -9,6 +6,8 @@ import {
     parseOpenAPIV3,
     OpenAPIFetchError,
 } from '@gitbook/react-openapi';
+
+import { cache, parseCacheResponse, noCacheFetchOptions, CacheFunctionOptions } from '@/lib/cache';
 
 import { parseMarkdown } from './markdown';
 import { ResolvedContentRef } from './references';

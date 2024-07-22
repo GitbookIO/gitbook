@@ -58,7 +58,7 @@ jobs:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   projectName: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
-                  directory: ./.vercel/output/static
+                  directory: ./packages/gitbook/.vercel/output/static
                   gitHubToken: ${{ secrets.GITHUB_TOKEN }}
                   workingDirectory: ./
             - name: Outputs
@@ -108,7 +108,7 @@ jobs:
               env:
                   PUPPETEER_SKIP_DOWNLOAD: 1
             - name: Run pagespeed tests
-              run: bun ./tests/pagespeed-testing.ts $DEPLOYMENT_URL
+              run: bun ./packages/gitbook/tests/pagespeed-testing.ts $DEPLOYMENT_URL
               env:
                   DEPLOYMENT_URL: ${{needs.deploy.outputs.deployment_url}}
                   PAGESPEED_API_KEY: ${{ secrets.PAGESPEED_API_KEY }}

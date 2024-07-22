@@ -69,7 +69,7 @@ function reactToString(el: React.ReactNode): string {
         return el.map(reactToString).join('');
     }
 
-    if ('props' in el) {
+    if (typeof el === 'object' && 'props' in el) {
         return el.props.children.map(reactToString).join('');
     }
 

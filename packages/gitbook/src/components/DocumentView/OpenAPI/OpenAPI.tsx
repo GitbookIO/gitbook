@@ -1,12 +1,11 @@
 import { ChevronDown, ChevronRight } from '@geist-ui/icons';
 import { DocumentBlockSwagger } from '@gitbook/api';
+import { OpenAPIOperation } from '@gitbook/react-openapi';
 import React from 'react';
 
 import { LoadingPane } from '@/components/primitives';
 import { fetchOpenAPIBlock } from '@/lib/openapi';
 import { tcls } from '@/lib/tailwind';
-
-import { OpenAPIOperation } from '@gitbook/react-openapi';
 
 import { BlockProps } from '../Block';
 import { PlainCodeBlock } from '../CodeBlock';
