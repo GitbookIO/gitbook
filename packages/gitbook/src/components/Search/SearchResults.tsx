@@ -49,7 +49,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     const { children, query, spaceId, revisionId, parent, withAsk, onSwitchToAsk } = props;
 
     const language = useLanguage();
-    const debounceTimeout = React.useRef<NodeJS.Timeout | null>(null);
+    const debounceTimeout = React.useRef<Timer | null>(null);
     const [results, setResults] = React.useState<ResultType[] | null>(null);
     const [cursor, setCursor] = React.useState<number | null>(null);
     const refs = React.useRef<(null | HTMLAnchorElement)[]>([]);

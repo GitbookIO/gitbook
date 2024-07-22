@@ -75,11 +75,11 @@ export async function race<I, R>(
     const result = await new Promise<R | null>((resolve, reject) => {
         let resolved = false;
         let pending = inputs.length;
-        let timeoutId: NodeJS.Timeout | null = null;
+        let timeoutId: Timer | null = null;
         let blockFallbackStarted = false;
         let blockFallbackRunning = false;
         let blockFallbackError: Error | null = null;
-        let blockTimeoutId: NodeJS.Timeout | null = null;
+        let blockTimeoutId: Timer | null = null;
         const abort = new AbortController();
 
         const done = () => {
@@ -326,7 +326,7 @@ export function batch<Args extends any[], R>(
     const { delay, groupBy = () => 'default', skip = () => false } = options;
 
     const groups = new Map<string, Array<[Args, (r: R) => void, (error: Error) => void]>>();
-    let timeoutId: NodeJS.Timeout | null = null;
+    let timeoutId: Timer | null = null;
 
     return async (...args) => {
         if (await skip(...args)) {
