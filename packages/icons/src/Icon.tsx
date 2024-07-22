@@ -71,6 +71,7 @@ const iconComponents: Record<IconStyle, { [name in IconName]?: IconComponent }> 
 function getIconComponent(icon: IconName, iconStyle: IconStyle) {
     if (!iconComponents[iconStyle][icon]) {
         iconComponents[iconStyle][icon] = React.lazy(() =>
+            // @ts-ignore
             iconStyles[iconStyle]().then((style) => style[getIconComponentName(icon)]),
         );
     }
