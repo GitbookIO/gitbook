@@ -1,5 +1,11 @@
 # @gitbook/react-math
 
+## 0.3.0
+
+### Minor Changes
+
+-   de747b7: Refactor the repository to be a proper monorepo and publish JS files on NPM instead of TypeScript files.
+
 ## 0.2.0
 
 ### Minor Changes
