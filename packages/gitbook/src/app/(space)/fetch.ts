@@ -226,9 +226,16 @@ async function fetchParentSite(args: {
         };
     });
 
-    const parent = siteParentCustomizations ? { ...site, ...siteParentCustomizations } : site;
+    // override the title with the customization title
+    const parent = {
+        ...site,
+        ...(siteParentCustomizations?.title ? { title: siteParentCustomizations.title } : {}),
+    };
 
-    return { parent, spaces: Object.values(spaces) };
+    return {
+        parent,
+        spaces: Object.values(spaces),
+    };
 }
 
 /**
