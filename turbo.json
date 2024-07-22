@@ -1,5 +1,6 @@
 {
     "$schema": "https://turbo.build/schema.json",
+    "globalEnv": ["NODE_ENV", "CI", "GITHUB_SHA", "ARGOS_TOKEN", "GITHUB_TOKEN"],
     "tasks": {
         "build": {
             "dependsOn": ["^build"],
@@ -19,7 +20,7 @@
         },
         "e2e": {
             "dependsOn": ["^e2e"],
-            "env": ["BASE_URL", "ARGOS_TOKEN"]
+            "env": ["BASE_URL"]
         },
         "dev": {
             "persistent": true,
