@@ -21,6 +21,10 @@ jobs:
               uses: oven-sh/setup-bun@v1
               with:
                   bun-version: 1.1.18
+            - name: Generate .npmrc
+              run: bunx npmrc-replace-env
+              env:
+                  NPMRC_FONT_AWESOME_TOKEN: ${{ secrets.NPMRC_FONT_AWESOME_TOKEN }}
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:

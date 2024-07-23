@@ -17,6 +17,7 @@ import { tcls } from '@/lib/tailwind';
 
 import { ClientContexts } from './ClientContexts';
 import './globals.css';
+import '@gitbook/icons/style.css';
 import { getContentPointer } from './fetch';
 
 /**

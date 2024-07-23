@@ -1,6 +1,6 @@
 'use client';
 
-import IconSearch from '@geist-ui/icons/search';
+import { Icon } from '@gitbook/icons';
 import { useEffect, useState } from 'react';
 
 import { useLanguage, tString } from '@/intl/client';
@@ -65,7 +65,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
             )}
         >
             <div className={tcls('text-dark/7', 'pt-1.5', 'pb-2', 'dark:text-light/7')}>
-                <IconSearch className={tcls('shrink-0', 'w-5', 'h-5')} />
+                <Icon icon="magnifying-glass" className={tcls('shrink-0', 'size-5')} />
             </div>
             {children}
             <Shortcut />

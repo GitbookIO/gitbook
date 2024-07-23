@@ -1,5 +1,5 @@
-import IconHash from '@geist-ui/icons/hash';
 import { DocumentBlockHeading } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
 
 import { tcls } from '@/lib/tailwind';
 
@@ -48,7 +48,8 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                         textStyle.lineHeight,
                     )}
                 >
-                    <IconHash
+                    <Icon
+                        icon="hashtag"
                         className={tcls(
                             'w-3.5',
                             'h-[1lh]',

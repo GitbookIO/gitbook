@@ -14,7 +14,8 @@
         "unit": "turbo run unit",
         "e2e": "turbo run e2e",
         "changeset": "changeset",
-        "release": "turbo run build && changeset publish"
+        "release": "turbo run build && changeset publish",
+        "generate-npmrc": "npmrc-replace-env"
     },
     "workspaces": [
         "packages/*"
@@ -22,6 +23,7 @@
     "devDependencies": {
         "@changesets/cli": "^2.27.7",
         "prettier": "^3.0.3",
-        "turbo": "^2.0.9"
+        "turbo": "^2.0.9",
+        "npmrc-replace-env": "^1.1.4" 
     }
 }

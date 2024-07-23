@@ -1,28 +1,27 @@
 import * as React from 'react';
-import type * as allSolid from '@heroicons/react/24/solid';
-import { toCamel, ToSnake } from 'ts-case-convert/lib/caseConvert';
+import { IconName, library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// import { far } from '@fortawesome/free-regular-svg-icons';
+// import { fas } from '@fortawesome/free-solid-svg-icons';
 
-/**
- * Extracts the icon name from the component name.
- * For example 'AdjustmentsVerticalIcon' becomes 'adjustments-vertical'
- */
-type IconNameFromComponentName<ComponentName extends string> =
-    ComponentName extends `${infer Prefix}Icon` ? ToSnake<Prefix> : never;
+import { far } from '@awesome.me/kit-a463935e93/icons';
 
-type IconComponentName = keyof typeof allSolid;
-
-type IconComponent = (typeof allSolid)[keyof typeof allSolid];
+// TODO: lazy load
+library.add(far);
 
 /**
  * Name of the icon component.
  */
-export type IconName = IconNameFromComponentName<IconComponentName>;
+export type { IconName };
 
 /**
  * Style for the icon component.
  */
 export type IconStyle = 'solid' | 'outline';
 
+/**
+ * Props for the icon component.
+ */
 export interface IconProps {
     /**
      * Name of the icon to render.
@@ -46,38 +45,6 @@ export interface IconProps {
  */
 export function Icon(props: IconProps) {
     const { icon, iconStyle = 'solid', className } = props;
-    const IconComponent = getIconComponent(icon, iconStyle);
 
-    return (
-        <React.Suspense fallback={<span className={className} />}>
-            <IconComponent className={className} />
-        </React.Suspense>
-    );
-}
-
-/**
- * Lazy-loads the icon component from the specified style.
- */
-const iconStyles: Record<IconStyle, () => Promise<typeof allSolid>> = {
-    solid: () => import('@heroicons/react/24/solid'),
-    outline: () => import('@heroicons/react/24/outline'),
-};
-
-const iconComponents: Record<IconStyle, { [name in IconName]?: IconComponent }> = {
-    solid: {},
-    outline: {},
-};
-
-function getIconComponent(icon: IconName, iconStyle: IconStyle) {
-    if (!iconComponents[iconStyle][icon]) {
-        iconComponents[iconStyle][icon] = React.lazy(() =>
-            // @ts-ignore
-            iconStyles[iconStyle]().then((style) => style[getIconComponentName(icon)]),
-        );
-    }
-    return iconComponents[iconStyle][icon];
-}
-
-function getIconComponentName(icon: IconName): IconComponentName {
-    return `${toCamel(icon)}Icon` as IconComponentName;
+    return <FontAwesomeIcon icon={["far", icon]} fixedWidth className={'gb-icon ' + className} />
 }

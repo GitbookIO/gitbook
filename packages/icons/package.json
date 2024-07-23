@@ -5,12 +5,27 @@
             "types": "./dist/index.d.ts",
             "development": "./src/index.ts",
             "default": "./dist/index.js"
+        },
+        "./icons": {
+            "types": "./dist/icons.d.ts",
+            "development": "./src/icons.ts",
+            "default": "./dist/icons.js"
+        },
+        "./style.css": {
+            "default": "./src/style.css"
         }
     },
     "version": "0.0.0",
     "dependencies": {
         "@heroicons/react": "^2.1.5",
-        "ts-case-convert": "^2.0.7"
+        "ts-case-convert": "^2.0.7",
+        "@fortawesome/fontawesome-svg-core": "^6.6.0",
+        "@fortawesome/free-solid-svg-icons": "^6.6.0",
+        "@fortawesome/free-regular-svg-icons": "^6.6.0",
+        "@fortawesome/react-fontawesome": "^0.2.2"
+    },
+    "optionalDependencies": {
+        "@awesome.me/kit-a463935e93": "latest"
     },
     "devDependencies": {
         "typescript": "^5.5.3"
