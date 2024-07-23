@@ -266,7 +266,7 @@ function transformSectionsAndPage(args: {
         type: 'page',
         id: item.id,
         title: item.title,
-        href: getURL(item.path),
+        href: getURL(item.path, spaceURL),
         spaceTitle: space?.title,
     };
 
