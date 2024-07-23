@@ -34,7 +34,7 @@ export async function OpenAPI(props: BlockProps<DocumentBlockSwagger>) {
 
 async function OpenAPIBody(props: BlockProps<DocumentBlockSwagger>) {
     const { block, context } = props;
-    const { data, error } = await fetchOpenAPIBlock(block, context.resolveContentRef);
+    const { data, specUrl, error } = await fetchOpenAPIBlock(block, context.resolveContentRef);
 
     if (error) {
         return (
@@ -46,7 +46,7 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockSwagger>) {
         );
     }
 
-    if (!data) {
+    if (!data || !specUrl) {
         return null;
     }
 
@@ -60,6 +60,7 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockSwagger>) {
                 },
                 CodeBlock: PlainCodeBlock,
                 defaultInteractiveOpened: context.mode === 'print',
+                specUrl,
             }}
             className="openapi-block"
         />
