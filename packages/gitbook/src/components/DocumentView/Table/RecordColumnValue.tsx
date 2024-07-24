@@ -157,7 +157,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                         priority="lazy"
                                     />
                                 ) : (
-                                    <FileIcon contentType={contentType} />
+                                    <FileIcon contentType={contentType} className={tcls('size-4')} />
                                 )}
                                 {ref.text}
                             </StyledLink>

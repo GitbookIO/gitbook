@@ -1,10 +1,10 @@
 'use client';
 
-import Check from '@geist-ui/icons/check';
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
+import { Icon } from '@gitbook/icons';
 
 export const Checkbox = React.forwardRef<
     React.ElementRef<typeof CheckboxPrimitive.Root>,
@@ -46,7 +46,7 @@ export const Checkbox = React.forwardRef<
                 'dark:text-primary-200',
             )}
         >
-            <Check size={12} />
+            <Icon icon="check" className={"size-3"} />
         </CheckboxPrimitive.Indicator>
         <div
             className={tcls(
@@ -60,7 +60,7 @@ export const Checkbox = React.forwardRef<
                 'dark:text-light/2',
             )}
         >
-            <Check size={12} />
+            <Icon icon="check" className={"size-3"} />
         </div>
     </CheckboxPrimitive.Root>
 ));

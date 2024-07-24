@@ -1,6 +1,5 @@
 'use client';
 
-import IconX from '@geist-ui/icons/x';
 import * as React from 'react';
 
 import { Button } from '@/components/primitives';
@@ -8,6 +7,7 @@ import { useLanguage } from '@/intl/client';
 import { t, tString } from '@/intl/translate';
 import { isCookiesTrackingDisabled, setCookiesTracking } from '@/lib/analytics';
 import { tcls } from '@/lib/tailwind';
+import { Icon } from '@gitbook/icons';
 
 /**
  * Toast to accept or reject the use of cookies.
@@ -92,7 +92,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                 )}
                 title={tString(language, 'cookies_close')}
             >
-                <IconX className={tcls('w-4')} />
+                <Icon icon="xmark" className={tcls('size-4')} />
             </button>
             <div className={tcls('mt-3', 'flex', 'flex-row', 'gap-2')}>
                 <Button
