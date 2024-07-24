@@ -1,5 +1,5 @@
 import { IconStyle } from "./types";
-import rawIcons from '../icons.json';
+import rawIcons from '../data/icons.json';
 
 export interface IconStyleDefinition {
     title: string;
@@ -17,13 +17,25 @@ export interface IconDefinition {
  */
 export const iconStyles: IconStyleDefinition[] = [
     {
+        title: 'Regular',
+        style: IconStyle.Regular
+    },
+    {
+        title: 'Duotone',
+        style: IconStyle.Duotone
+    },
+    {
+        title: 'Light',
+        style: IconStyle.Light
+    },
+    {
+        title: 'Thin',
+        style: IconStyle.Thin
+    },
+    {
         title: 'Solid',
         style: IconStyle.Solid
     },
-    {
-        title: 'Outline',
-        style: IconStyle.Outline
-    }
 ];
 
 /**

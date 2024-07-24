@@ -47,7 +47,7 @@ export function ThemeToggler(props: {}) {
             />
             <ThemeButton
                 active={mounted && theme === 'system'}
-                icon="deskpro"
+                icon="desktop"
                 onClick={() => onSwitchMode('system')}
                 title={tString(language, 'switch_to_system_theme')}
             />

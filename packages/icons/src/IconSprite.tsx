@@ -5,6 +5,7 @@ import * as React from 'react';
 import { IconStyle } from './types';
 import { IconProps } from './Icon';
 import { getAssetURL } from './assets';
+import { getIconStyle } from './getIconStyle';
 
 export interface IconSpriteProps extends IconProps {}
 
@@ -15,13 +16,15 @@ const loadedStyles = new Set<IconStyle>();
  * This method is more efficient when rendering a large set of icons.
  */
 export function IconSprite(props: IconSpriteProps) {
-    const { icon, iconStyle = IconStyle.Solid, className = '' } = props;
+    const { icon, iconStyle = IconStyle.Regular, className = '' } = props;
+
+    const parsed = getIconStyle(iconStyle, icon);
 
     if (typeof window !== 'undefined') {
-        loadSprite(iconStyle);
+        loadSprite(parsed[0]);
     }
 
-    const id = getIDPrefix(iconStyle) + icon;
+    const id = getIDPrefix(parsed[0]) + parsed[1];
 
     return (
         <svg className={'gb-icon ' + className}>

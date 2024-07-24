@@ -28,7 +28,7 @@ export interface IconProps {
  * Renders an icon component from the library.
  */
 export function Icon(props: IconProps) {
-    const { icon, iconStyle = 'solid', className } = props;
+    const { icon, iconStyle = IconStyle.Regular, className } = props;
 
     return (
         <IconSprite {...props} />

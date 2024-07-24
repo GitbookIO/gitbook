@@ -43,7 +43,7 @@
         "dist",
         "src",
         "bin",
-        "icons.json",
+        "data",
         "README.md",
         "CHANGELOG.md"
     ]

@@ -1,7 +1,5 @@
 import { Menu } from '@geist-ui/icons';
 import DownloadCloud from '@geist-ui/icons/downloadCloud';
-import Github from '@geist-ui/icons/github';
-import Gitlab from '@geist-ui/icons/gitlab';
 import {
     CustomizationSettings,
     JSONDocument,
@@ -23,6 +21,7 @@ import { getPDFUrlSearchParams } from '@/lib/urls';
 import { ScrollSectionsList } from './ScrollSectionsList';
 import { Ad } from '../Ads';
 import { PageFeedbackForm } from '../PageFeedback';
+import { Icon } from '@gitbook/icons';
 
 /**
  * Aside listing the headings in the document.
@@ -147,11 +146,7 @@ export async function PageAside(props: {
                                     'dark:text-light/5',
                                 )}
                             >
-                                {space.gitSync.installationProvider === 'gitlab' ? (
-                                    <Gitlab className={tcls('size-4', 'mr-1.5')} />
-                                ) : (
-                                    <Github className={tcls('size-4', 'mr-1.5')} />
-                                )}
+                                <Icon icon={space.gitSync.installationProvider === 'gitlab' ? 'gitlab' : 'github'} className={tcls('size-4', 'mr-1.5')} />
                                 {t(language, 'edit_on_git', getGitSyncName(space))}
                             </a>
                         </div>
@@ -176,7 +171,7 @@ export async function PageAside(props: {
                                     'dark:text-light/5',
                                 )}
                             >
-                                <DownloadCloud className={tcls('size-4', 'mr-1.5')} />
+                                <Icon icon="file-pdf" className={tcls('size-4', 'mr-1.5')} />
                                 {t(language, 'pdf_download')}
                             </a>
                         </div>
