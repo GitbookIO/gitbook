@@ -19,10 +19,7 @@
     "dependencies": {
         "@heroicons/react": "^2.1.5",
         "ts-case-convert": "^2.0.7",
-        "@fortawesome/fontawesome-svg-core": "^6.6.0",
-        "@fortawesome/free-solid-svg-icons": "^6.6.0",
-        "@fortawesome/free-regular-svg-icons": "^6.6.0",
-        "@fortawesome/react-fontawesome": "^0.2.2"
+        "@fortawesome/fontawesome-free": "^6.6.0"
     },
     "optionalDependencies": {
         "@awesome.me/kit-a463935e93": "latest"
@@ -36,11 +33,17 @@
     "scripts": {
         "build": "tsc",
         "typecheck": "tsc --noEmit",
-        "dev": "tsc -w"
+        "dev": "tsc -w",
+        "postinstall": "node ./bin/gen-list.js"
+    },
+    "bin": {
+        "gitbook-icons": "./bin/gitbook-icons.js"
     },
     "files": [
         "dist",
         "src",
+        "bin",
+        "icons.json",
         "README.md",
         "CHANGELOG.md"
     ]
