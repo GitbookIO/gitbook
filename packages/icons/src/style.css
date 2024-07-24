@@ -1,3 +1,7 @@
-svg.svg-inline--fa.gb-icon {
+svg.gb-icon {
     display: block;
+}
+svg.gb-icon path, svg.gb-icon use {
+    fill: currentColor;
+    stroke: currentColor;
 }
