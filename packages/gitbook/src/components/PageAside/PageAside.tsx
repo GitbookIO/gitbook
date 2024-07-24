@@ -146,7 +146,14 @@ export async function PageAside(props: {
                                     'dark:text-light/5',
                                 )}
                             >
-                                <Icon icon={space.gitSync.installationProvider === 'gitlab' ? 'gitlab' : 'github'} className={tcls('size-4', 'mr-1.5')} />
+                                <Icon
+                                    icon={
+                                        space.gitSync.installationProvider === 'gitlab'
+                                            ? 'gitlab'
+                                            : 'github'
+                                    }
+                                    className={tcls('size-4', 'mr-1.5')}
+                                />
                                 {t(language, 'edit_on_git', getGitSyncName(space))}
                             </a>
                         </div>

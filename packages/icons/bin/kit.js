@@ -7,9 +7,9 @@ module.exports.getKitPath = function getKitPath() {
     let source = path.dirname(require.resolve('@fortawesome/fontawesome-free/package.json'));
     try {
         source = path.dirname(require.resolve('@awesome.me/kit-a463935e93/package.json'));
-    } catch(error) {
+    } catch (error) {
         console.warn('⚠️ Could not find the Pro kit, using the free kit instead');
     }
 
     return source;
-}
+};

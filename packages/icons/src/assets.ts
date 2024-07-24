@@ -1,4 +1,3 @@
-
 let version = 1;
 let assetsURL = '/public/icons/';
 
@@ -15,4 +14,3 @@ export function setAssetsURL(url: string) {
 export function getAssetURL(path: string) {
     return assetsURL + (assetsURL.endsWith('/') ? '' : '/') + path + '?v=' + version;
 }
-

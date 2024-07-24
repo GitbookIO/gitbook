@@ -35,7 +35,7 @@ export function Icon(props: IconProps) {
     const url = getAssetURL(`svgs/${iconStyle}/${icon}.svg`);
 
     return (
-        <svg 
+        <svg
             style={{
                 maskImage: `url(${url})`,
                 maskRepeat: 'no-repeat',

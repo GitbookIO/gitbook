@@ -41,24 +41,23 @@ function loadSprite(style: IconStyle) {
     const url = getAssetURL(`sprites/${style}.svg`);
 
     fetch(url)
-    .then(response => response.text())
-    .then(svg => {
-        // To ensure the sprite IDs don't conflict with the page's IDs, we prefix them
-        const idPrefix = getIDPrefix(style);
-        const idRegex = new RegExp(`id="([^"]+)"`, 'g');
-        svg = svg.replace(idRegex, (_, id) => `id="${idPrefix}${id}"`);
+        .then((response) => response.text())
+        .then((svg) => {
+            // To ensure the sprite IDs don't conflict with the page's IDs, we prefix them
+            const idPrefix = getIDPrefix(style);
+            const idRegex = new RegExp(`id="([^"]+)"`, 'g');
+            svg = svg.replace(idRegex, (_, id) => `id="${idPrefix}${id}"`);
 
-        // Then we insert in the DOM
-        const div = document.createElement('div');
-        div.style.display = 'none';
-        div.innerHTML = svg;
-        document.body.appendChild(div);
-    })
-    .catch((error) => {
-        console.error(`Failed to load icon sprite: ${url}`, error);
-    })
+            // Then we insert in the DOM
+            const div = document.createElement('div');
+            div.style.display = 'none';
+            div.innerHTML = svg;
+            document.body.appendChild(div);
+        })
+        .catch((error) => {
+            console.error(`Failed to load icon sprite: ${url}`, error);
+        });
 }
-
 
 function getIDPrefix(style: IconStyle) {
     return `gbi-${style}-`;

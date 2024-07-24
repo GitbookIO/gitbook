@@ -7,7 +7,9 @@ const { getKitPath } = require('./kit');
  */
 async function main() {
     const source = getKitPath();
-    const icons = JSON.parse(await fs.readFile(path.join(source, 'icons/metadata/icon-families.json'), 'utf8'));
+    const icons = JSON.parse(
+        await fs.readFile(path.join(source, 'icons/metadata/icon-families.json'), 'utf8'),
+    );
     const potentialOnly = ['brands'];
 
     const onlyStyles = {};
@@ -17,30 +19,35 @@ async function main() {
         const stylesCovered = [];
 
         Object.entries(iconSpec.svgs).forEach(([family, familyEntries]) => {
-            Object.keys(familyEntries).forEach(style => {
+            Object.keys(familyEntries).forEach((style) => {
                 const key = family !== 'classic' ? `${family}-${style}` : style;
                 stylesCovered.push(key);
             });
         });
 
-        potentialOnly.forEach(style => {
+        potentialOnly.forEach((style) => {
             if (stylesCovered.includes(style)) {
                 onlyStyles[style] = onlyStyles[style] || [];
                 onlyStyles[style].push(icon);
             }
-        })
+        });
 
         result.push({
             icon,
             label: iconSpec.label,
             search: iconSpec.search?.terms,
-        })
+        });
     });
-   
-    await fs.writeFile(path.resolve(__dirname, '../data/styles-map.json'), JSON.stringify(onlyStyles, null, 2));
-    await fs.writeFile(path.resolve(__dirname, '../data/icons.json'), JSON.stringify(result, null, 2));
+
+    await fs.writeFile(
+        path.resolve(__dirname, '../data/styles-map.json'),
+        JSON.stringify(onlyStyles, null, 2),
+    );
+    await fs.writeFile(
+        path.resolve(__dirname, '../data/icons.json'),
+        JSON.stringify(result, null, 2),
+    );
     console.log(`🎉 ${result.length} icons found`);
 }
 
 main().catch(console.error);
-

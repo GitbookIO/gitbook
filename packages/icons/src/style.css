@@ -1,4 +1,5 @@
-svg.gb-icon, svg.gb-icon-s {
+svg.gb-icon,
+svg.gb-icon-s {
     display: block;
 }
 
@@ -8,7 +9,8 @@ svg.gb-icon {
 }
 
 /* Sprite */
-svg.gb-icon-s path, svg.gb-icon-s use {
+svg.gb-icon-s path,
+svg.gb-icon-s use {
     fill: currentColor;
     stroke: currentColor;
 }

@@ -17,12 +17,15 @@ async function main() {
     // source/sprites to outputFolder/sprites
     // source/svgs to outputFolder/svgs
     await Promise.all([
-        fs.cp(path.join(source, 'icons/sprites'), path.join(outputFolder, 'sprites'), { recursive: true }),
-        fs.cp(path.join(source, 'icons/svgs'), path.join(outputFolder, 'svgs'), { recursive: true })
+        fs.cp(path.join(source, 'icons/sprites'), path.join(outputFolder, 'sprites'), {
+            recursive: true,
+        }),
+        fs.cp(path.join(source, 'icons/svgs'), path.join(outputFolder, 'svgs'), {
+            recursive: true,
+        }),
     ]);
 
     console.log(`🎉 Icons copied to ${outputFolder}`);
 }
 
 main().catch(console.error);
-

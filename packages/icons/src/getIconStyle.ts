@@ -7,10 +7,7 @@ const cache = new Map<IconName, Map<IconStyle, [IconStyle, IconName]>>();
  * Return the style to load an icon from by its name.
  * Some icons are only available for certain styles.
  */
-export function getIconStyle(
-    style: IconStyle,
-    icon: IconName
-): [IconStyle, IconName] {
+export function getIconStyle(style: IconStyle, icon: IconName): [IconStyle, IconName] {
     const cached = cache.get(icon)?.get(style);
 
     if (cached) {
@@ -35,4 +32,3 @@ export function getIconStyle(
 
     return result;
 }
-

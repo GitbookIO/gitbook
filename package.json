@@ -24,6 +24,6 @@
         "@changesets/cli": "^2.27.7",
         "prettier": "^3.0.3",
         "turbo": "^2.0.9",
-        "npmrc-replace-env": "^1.1.4" 
+        "npmrc-replace-env": "^1.1.4"
     }
 }

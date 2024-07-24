@@ -112,7 +112,7 @@ export default async function SpaceRootLayout(props: { children: React.ReactNode
                 )}
             >
                 <IconsProvider assetsURL={iconsAssetsURL}>
-                <ClientContexts language={language}>{children}</ClientContexts>
+                    <ClientContexts language={language}>{children}</ClientContexts>
                 </IconsProvider>
             </body>
         </html>
