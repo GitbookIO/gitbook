@@ -46,5 +46,5 @@ export interface IconProps {
 export function Icon(props: IconProps) {
     const { icon, iconStyle = 'solid', className } = props;
 
-    return <FontAwesomeIcon icon={["far", icon]} fixedWidth className={'gb-icon ' + className} />
+    return <FontAwesomeIcon icon={["far", icon]} className={'gb-icon ' + className} />
 }

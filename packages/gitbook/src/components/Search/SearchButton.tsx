@@ -65,7 +65,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
             )}
         >
             <div className={tcls('text-dark/7', 'pt-1.5', 'pb-2', 'dark:text-light/7')}>
-                <Icon icon="magnifying-glass" className={tcls('shrink-0', 'size-5')} />
+                <Icon icon="magnifying-glass" className={tcls('shrink-0', 'size-4')} />
             </div>
             {children}
             <Shortcut />

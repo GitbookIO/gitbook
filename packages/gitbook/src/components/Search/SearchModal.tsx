@@ -1,6 +1,5 @@
 'use client';
 
-import IconSearch from '@geist-ui/icons/search';
 import { Collection, Site } from '@gitbook/api';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -16,6 +15,7 @@ import { SearchResults, SearchResultsRef } from './SearchResults';
 import { SearchScopeToggle } from './SearchScopeToggle';
 import { SearchState, useSearch } from './useSearch';
 import { LoadingPane } from '../primitives/LoadingPane';
+import { Icon } from '@gitbook/icons';
 
 interface SearchModalProps {
     spaceId: string;
@@ -199,7 +199,7 @@ function SearchModalBody(
         >
             <div className={tcls('flex', 'flex-row', 'items-center')}>
                 <div className={tcls('text-dark/4', 'p-3', 'dark:text-light/5')}>
-                    <IconSearch className={tcls('w-6', 'h-6')} />
+                    <Icon icon="magnifying-glass" className={tcls('size-4')} />
                 </div>
                 <div className={tcls('flex-1')}>
                     <input

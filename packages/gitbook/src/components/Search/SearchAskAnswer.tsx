@@ -1,5 +1,4 @@
 import IconBox from '@geist-ui/icons/box';
-import IconSearch from '@geist-ui/icons/search';
 import React from 'react';
 import { atom, useRecoilState } from 'recoil';
 
@@ -13,6 +12,7 @@ import { tcls } from '@/lib/tailwind';
 import { AskAnswerResult, AskAnswerSource, streamAskQuestion } from './server-actions';
 import { useSearch, useSearchLink } from './useSearch';
 import { Link } from '../primitives';
+import { Icon } from '@gitbook/icons';
 
 /**
  * Store the state of the answer in a global state so that it can be
@@ -187,10 +187,10 @@ function AnswerFollowupQuestions(props: { followupQuestions: string[] }) {
                         ask: true,
                     })}
                 >
-                    <IconSearch
+                    <Icon
+                        icon="magnifying-glass"
                         className={tcls(
-                            'w-[15px]',
-                            'h-[15px]',
+                            'size-[15px]',
                             'shrink-0',
                             'mt-0.5',
                             '[&>path]:[stroke-opacity:0.64]',
