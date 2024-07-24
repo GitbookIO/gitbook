@@ -16,18 +16,17 @@ const loadedStyles = new Set<IconStyle>();
  * This method is more efficient when rendering a large set of icons.
  */
 export function IconSprite(props: IconSpriteProps) {
-    const { icon, iconStyle = IconStyle.Regular, className = '' } = props;
-
-    const parsed = getIconStyle(iconStyle, icon);
+    const { className = '' } = props;
+    const [iconStyle, icon] = getIconStyle(props.iconStyle ?? IconStyle.Regular, props.icon);
 
     if (typeof window !== 'undefined') {
-        loadSprite(parsed[0]);
+        loadSprite(iconStyle);
     }
 
-    const id = getIDPrefix(parsed[0]) + parsed[1];
+    const id = getIDPrefix(iconStyle) + icon;
 
     return (
-        <svg className={'gb-icon ' + className}>
+        <svg className={'gb-icon-s ' + className}>
             <use xlinkHref={`#${id}`} />
         </svg>
     );

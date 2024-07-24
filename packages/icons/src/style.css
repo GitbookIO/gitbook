@@ -1,7 +1,14 @@
-svg.gb-icon {
+svg.gb-icon, svg.gb-icon-s {
     display: block;
 }
-svg.gb-icon path, svg.gb-icon use {
+
+/* Normal */
+svg.gb-icon {
+    background: currentColor;
+}
+
+/* Sprite */
+svg.gb-icon-s path, svg.gb-icon-s use {
     fill: currentColor;
     stroke: currentColor;
 }

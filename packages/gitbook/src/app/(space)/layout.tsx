@@ -7,7 +7,7 @@ import {
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 import colors from 'tailwindcss/colors';
-import { IconsProvider } from '@gitbook/icons';
+import { IconsProvider, setAssetsURL as setIconsAssetsURL } from '@gitbook/icons';
 
 import { emojiFontClassName } from '@/components/primitives';
 import { fonts, ibmPlexMono } from '@/fonts';
@@ -22,6 +22,8 @@ import '@gitbook/icons/style.css';
 import { getContentPointer } from './fetch';
 import { getStaticFileURL } from '@/lib/assets';
 
+const iconsAssetsURL = getStaticFileURL('icons');
+setIconsAssetsURL(iconsAssetsURL);
 
 /**
  * Layout shared between the content and the PDF renderer.
@@ -109,7 +111,7 @@ export default async function SpaceRootLayout(props: { children: React.ReactNode
                     'dark:bg-dark',
                 )}
             >
-                <IconsProvider assetsURL={getStaticFileURL('icons')}>
+                <IconsProvider assetsURL={iconsAssetsURL}>
                 <ClientContexts language={language}>{children}</ClientContexts>
                 </IconsProvider>
             </body>

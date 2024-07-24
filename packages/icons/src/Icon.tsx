@@ -1,7 +1,8 @@
 import * as React from 'react';
 
 import { IconName, IconStyle } from './types';
-import { IconSprite } from './IconSprite';
+import { getAssetURL } from './assets';
+import { getIconStyle } from './getIconStyle';
 
 /**
  * Props for the icon component.
@@ -28,9 +29,19 @@ export interface IconProps {
  * Renders an icon component from the library.
  */
 export function Icon(props: IconProps) {
-    const { icon, iconStyle = IconStyle.Regular, className } = props;
+    const { className } = props;
+
+    const [iconStyle, icon] = getIconStyle(props.iconStyle ?? IconStyle.Regular, props.icon);
+    const url = getAssetURL(`svgs/${iconStyle}/${icon}.svg`);
 
     return (
-        <IconSprite {...props} />
+        <svg 
+            style={{
+                maskImage: `url(${url})`,
+                maskRepeat: 'no-repeat',
+                maskPosition: 'center',
+            }}
+            className={'gb-icon ' + className}
+        ></svg>
     );
 }
