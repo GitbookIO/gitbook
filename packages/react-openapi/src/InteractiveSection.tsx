@@ -3,6 +3,12 @@
 import classNames from 'classnames';
 import React from 'react';
 
+interface InteractiveSectionTab {
+    key: string;
+    label: string;
+    body: React.ReactNode;
+}
+
 /**
  * To optimize rendering, most of the components are server-components,
  * and the interactiveness is mainly handled by a few key components like this one.
@@ -19,11 +25,7 @@ export function InteractiveSection(props: {
     toggleOpenIcon?: React.ReactNode;
     toggleCloseIcon?: React.ReactNode;
     /** Tabs of content to display */
-    tabs?: Array<{
-        key: string;
-        label: string;
-        body: React.ReactNode;
-    }>;
+    tabs?: Array<InteractiveSectionTab>;
     /** Default tab to have opened */
     defaultTab?: string;
     /** Content of the header */
@@ -49,7 +51,8 @@ export function InteractiveSection(props: {
 
     const [opened, setOpened] = React.useState(defaultOpened);
     const [selectedTabKey, setSelectedTab] = React.useState(defaultTab);
-    const selectedTab = tabs.find((tab) => tab.key === selectedTabKey) ?? tabs[0];
+    const selectedTab: InteractiveSectionTab | undefined =
+        tabs.find((tab) => tab.key === selectedTabKey) ?? tabs[0];
 
     return (
         <div
@@ -119,7 +122,7 @@ export function InteractiveSection(props: {
             {(!toggeable || opened) && (children || selectedTab?.body) ? (
                 <div className={classNames('openapi-section-body', `${className}-body`)}>
                     {children}
-                    {selectedTab.body}
+                    {selectedTab?.body}
                 </div>
             ) : null}
             {overlay}
