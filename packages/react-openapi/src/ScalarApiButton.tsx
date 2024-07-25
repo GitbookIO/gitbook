@@ -2,20 +2,16 @@
 
 import { useApiClientModal } from '@scalar/api-client-react';
 import React from 'react';
-import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 
 /**
  * Button which launches the Scalar API Client
  */
-export function ScalarApiButton(props: { data: OpenAPIOperationData }) {
+export function ScalarApiButton() {
     const client = useApiClientModal();
 
     return (
         <div className="scalar scalar-activate">
-            <button
-                className="scalar-activate-button"
-                onClick={() => client?.open({ path: props.data.path, method: props.data.method })}
-            >
+            <button className="scalar-activate-button" onClick={() => client?.open()}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="10" height="12" fill="none">
                     <path
                         stroke="currentColor"

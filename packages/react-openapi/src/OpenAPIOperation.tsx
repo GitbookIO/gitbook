@@ -28,7 +28,10 @@ export function OpenAPIOperation(props: {
     };
 
     return (
-        <ApiClientModalProvider configuration={{ spec: { url: context.specUrl } }}>
+        <ApiClientModalProvider
+            configuration={{ spec: { url: context.specUrl } }}
+            initialRequest={{ path: data.path, method: data.method }}
+        >
             <div className={classNames('openapi-operation', className)}>
                 <div className="openapi-intro">
                     <h2 className="openapi-summary">{operation.summary}</h2>
