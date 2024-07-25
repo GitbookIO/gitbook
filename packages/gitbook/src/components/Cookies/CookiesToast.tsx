@@ -1,5 +1,6 @@
 'use client';
 
+import { Icon } from '@gitbook/icons';
 import * as React from 'react';
 
 import { Button } from '@/components/primitives';
@@ -7,7 +8,6 @@ import { useLanguage } from '@/intl/client';
 import { t, tString } from '@/intl/translate';
 import { isCookiesTrackingDisabled, setCookiesTracking } from '@/lib/analytics';
 import { tcls } from '@/lib/tailwind';
-import { Icon } from '@gitbook/icons';
 
 /**
  * Toast to accept or reject the use of cookies.

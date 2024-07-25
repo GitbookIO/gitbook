@@ -8,6 +8,7 @@ import {
     SiteCustomizationSettings,
     Space,
 } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
 import React from 'react';
 import urlJoin from 'url-join';
 
@@ -21,7 +22,6 @@ import { getPDFUrlSearchParams } from '@/lib/urls';
 import { ScrollSectionsList } from './ScrollSectionsList';
 import { Ad } from '../Ads';
 import { PageFeedbackForm } from '../PageFeedback';
-import { Icon } from '@gitbook/icons';
 
 /**
  * Aside listing the headings in the document.

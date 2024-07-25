@@ -1,5 +1,6 @@
 'use client';
 
+import { Icon } from '@gitbook/icons';
 import * as React from 'react';
 
 import { ClassValue, tcls } from '@/lib/tailwind';
@@ -7,7 +8,6 @@ import { ClassValue, tcls } from '@/lib/tailwind';
 import { AdClassicRendering } from './AdClassicRendering';
 import { AdCoverRendering } from './AdCoverRendering';
 import { AdItem, AdsResponse } from './types';
-import { Icon } from '@gitbook/icons';
 
 /**
  * Fetch and render the Ad placement.

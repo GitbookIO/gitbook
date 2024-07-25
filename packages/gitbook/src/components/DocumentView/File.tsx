@@ -67,7 +67,10 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
                 )}
             >
                 <div>
-                    <FileIcon contentType={contentType} className={tcls('size-5', 'text-primary')} />
+                    <FileIcon
+                        contentType={contentType}
+                        className={tcls('size-5', 'text-primary')}
+                    />
                 </div>
                 <div
                     className={tcls(

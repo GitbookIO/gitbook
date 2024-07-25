@@ -1,5 +1,6 @@
 'use client';
 
+import { Icon } from '@gitbook/icons';
 import classNames from 'classnames';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -7,7 +8,6 @@ import ReactDOM from 'react-dom';
 import { tcls } from '@/lib/tailwind';
 
 import styles from './ZoomImage.module.css';
-import { Icon } from '@gitbook/icons';
 
 /**
  * Replacement for an <img> tag that allows zooming.

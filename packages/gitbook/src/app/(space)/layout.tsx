@@ -5,14 +5,15 @@ import {
     CustomizationSettings,
     SiteCustomizationSettings,
 } from '@gitbook/api';
+import { IconsProvider, setAssetsURL as setIconsAssetsURL } from '@gitbook/icons';
 import assertNever from 'assert-never';
 import colors from 'tailwindcss/colors';
-import { IconsProvider, setAssetsURL as setIconsAssetsURL } from '@gitbook/icons';
 
 import { emojiFontClassName } from '@/components/primitives';
 import { fonts, ibmPlexMono } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
 import { getCurrentSiteLayoutData, getSpaceLayoutData } from '@/lib/api';
+import { getStaticFileURL } from '@/lib/assets';
 import { hexToRgb, shadesOfColor } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
 
@@ -20,7 +21,6 @@ import { ClientContexts } from './ClientContexts';
 import './globals.css';
 import '@gitbook/icons/style.css';
 import { getContentPointer } from './fetch';
-import { getStaticFileURL } from '@/lib/assets';
 
 const iconsAssetsURL = getStaticFileURL('icons');
 setIconsAssetsURL(iconsAssetsURL);
