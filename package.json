@@ -25,5 +25,8 @@
         "prettier": "^3.0.3",
         "turbo": "^2.0.9",
         "npmrc-replace-env": "^1.1.4"
+    },
+    "patchedDependencies": {
+        "@vercel/next@4.0.15": "patches/@vercel%2Fnext@4.0.15.patch"
     }
 }
