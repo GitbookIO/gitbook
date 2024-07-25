@@ -55,8 +55,8 @@
     --scalar-button-1-hover: rgb(28 31 33);
 
     --scalar-shadow-1: 0 1px 3px 0 rgba(0, 0, 0, 0.11);
-    --scalar-shadow-2: rgba(0, 0, 0, 0.08) 0px 13px 20px 0px,
-    rgba(0, 0, 0, 0.08) 0px 3px 8px 0px, #eeeeed 0px 0 0 1px;
+    --scalar-shadow-2: rgba(0, 0, 0, 0.08) 0px 13px 20px 0px, rgba(0, 0, 0, 0.08) 0px 3px 8px 0px,
+        #eeeeed 0px 0 0 1px;
 }
 .dark .scalar-modal-layout,
 .dark .scalar-app,
@@ -112,8 +112,8 @@
     --scalar-button-1-hover: #e7e7e7;
 
     --scalar-shadow-1: 0 1px 3px 0 rgb(0, 0, 0, 0.1);
-    --scalar-shadow-2: rgba(15, 15, 15, 0.2) 0px 3px 6px,
-    rgba(15, 15, 15, 0.4) 0px 9px 24px, 0 0 0 1px rgba(255, 255, 255, 0.1);
+    --scalar-shadow-2: rgba(15, 15, 15, 0.2) 0px 3px 6px, rgba(15, 15, 15, 0.4) 0px 9px 24px,
+        0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 .scalar-modal-layout,
 .scalar-app,
@@ -339,17 +339,17 @@
     }
 }
 .dark .scalar .client-wrapper-bg-color {
-  background: linear-gradient(
-    color-mix(in srgb, var(--tw-bg-base) 6%, transparent) 1%,
-    color-mix(in srgb, var(--scalar-background-1) 30%, black) 9%
-  );
+    background: linear-gradient(
+        color-mix(in srgb, var(--tw-bg-base) 6%, transparent) 1%,
+        color-mix(in srgb, var(--scalar-background-1) 30%, black) 9%
+    );
 }
 .light .scalar .client-wrapper-bg-color {
-  background-color: var(--scalar-background-2) !important;
+    background-color: var(--scalar-background-2) !important;
 }
 .scalar .gitbook-show {
-  display: block !important;
+    display: block !important;
 }
 .scalar .gitbook-hidden {
-  display: none !important;
+    display: none !important;
 }
