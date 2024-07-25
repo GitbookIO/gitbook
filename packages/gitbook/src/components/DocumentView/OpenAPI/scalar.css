@@ -1,6 +1,7 @@
 @import '@scalar/api-client-react/style.css';
 
 .light .scalar-modal-layout,
+.light .scalar-app,
 .light .scalar {
     --scalar-color-1: color-mix(
         in srgb,
@@ -52,8 +53,13 @@
     --scalar-button-1: rgb(49 53 56);
     --scalar-button-1-color: #fff;
     --scalar-button-1-hover: rgb(28 31 33);
+
+    --scalar-shadow-1: 0 1px 3px 0 rgba(0, 0, 0, 0.11);
+    --scalar-shadow-2: rgba(0, 0, 0, 0.08) 0px 13px 20px 0px,
+    rgba(0, 0, 0, 0.08) 0px 3px 8px 0px, #eeeeed 0px 0 0 1px;
 }
 .dark .scalar-modal-layout,
+.dark .scalar-app,
 .dark .scalar {
     --scalar-color-1: color-mix(
         in srgb,
@@ -104,8 +110,13 @@
     --scalar-button-1: #f6f6f6;
     --scalar-button-1-color: #000;
     --scalar-button-1-hover: #e7e7e7;
+
+    --scalar-shadow-1: 0 1px 3px 0 rgb(0, 0, 0, 0.1);
+    --scalar-shadow-2: rgba(15, 15, 15, 0.2) 0px 3px 6px,
+    rgba(15, 15, 15, 0.4) 0px 9px 24px, 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 .scalar-modal-layout,
+.scalar-app,
 .scalar {
     --scalar-font: initial;
     --scalar-font-code: var(--font-mono);
@@ -167,7 +178,7 @@
 .scalar-api-client__close:hover {
     cursor: pointer;
 }
-.scalar .scalar-app {
+.scalar .scalar-app-layout {
     background: var(--scalar-background-3);
     height: calc(100dvh - 100px);
     max-width: 1280px;
