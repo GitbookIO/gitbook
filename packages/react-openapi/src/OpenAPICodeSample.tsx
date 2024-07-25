@@ -63,7 +63,8 @@ export function OpenAPICodeSample(props: {
 
     // Code samples can be disabled at the top-level or at the operation level
     // If code samples are defined at the operation level, it will override the top-level setting
-    const codeSamplesDisabled = data['x-codeSamples'] === false || data.operation['x-codeSamples'] === false;
+    const codeSamplesDisabled =
+        data['x-codeSamples'] === false || data.operation['x-codeSamples'] === false;
     const samples = customCodeSamples ?? (!codeSamplesDisabled ? autoCodeSamples : []);
     if (samples.length === 0) {
         return null;
