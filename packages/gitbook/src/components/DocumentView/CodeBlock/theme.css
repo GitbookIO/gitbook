@@ -9,8 +9,8 @@
     --shiki-token-string-expression: #6a4906;
     --shiki-token-punctuation: theme('colors.pomegranate.700/.92');
     --shiki-token-link: theme('colors.dark.DEFAULT');
-    --shiki-token-inserted: #22863A;
-    --shiki-token-deleted: #B31D28;
+    --shiki-token-inserted: #22863a;
+    --shiki-token-deleted: #b31d28;
     --shiki-token-changed: #8250df;
 }
 
@@ -25,7 +25,7 @@ html.dark {
     --shiki-token-string-expression: theme('colors.light.4');
     --shiki-token-punctuation: #acc6ee;
     --shiki-token-link: theme('colors.pomegranate.400');
-    --shiki-token-inserted: #85E89D;
-    --shiki-token-deleted: #FDAEB7;
+    --shiki-token-inserted: #85e89d;
+    --shiki-token-deleted: #fdaeb7;
     --shiki-token-changed: #56b6c2;
 }
