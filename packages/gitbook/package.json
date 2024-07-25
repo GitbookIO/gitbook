@@ -55,7 +55,7 @@
         "remark-rehype": "^11.1.0",
         "rison": "^0.1.1",
         "server-only": "^0.0.1",
-        "shiki": "^1.2.0",
+        "shiki": "^1.11.1",
         "tailwind-merge": "^2.2.0",
         "tailwind-shades": "^1.1.2",
         "unified": "^11.0.4",

@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
             // no-cors, *cors, same-origin
             // mode: 'cors', // Not supported on Cloudflare Workers
             // *default, no-cache, reload, force-cache, only-if-cached
-            cache: 'no-cache',
+            // cache: 'no-cache', // Not supported on Cloudflare Workers
             // include, *same-origin, omit
             // credentials: 'include', // Not supported on Cloudflare Workers
             headers: requestBody.headers,
