@@ -1,10 +1,33 @@
 {
     "name": "@gitbook/react-math",
-    "exports": "./src/index.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "development": "./src/index.ts",
+            "default": "./dist/index.js"
+        }
+    },
+    "version": "0.5.0",
     "dependencies": {
         "object-hash": "^3.0.0"
     },
     "peerDependencies": {
         "react": "*"
-    }
+    },
+    "devDependencies": {
+        "typescript": "^5.5.3",
+        "@types/katex": "^0.16.5"
+    },
+    "scripts": {
+        "build": "tsc",
+        "typecheck": "tsc --noEmit",
+        "dev": "tsc -w"
+    },
+    "files": [
+        "dist",
+        "src",
+        "css",
+        "README.md",
+        "CHANGELOG.md"
+    ]
 }

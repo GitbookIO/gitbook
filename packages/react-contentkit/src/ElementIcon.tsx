@@ -1,4 +1,5 @@
 import { ContentKitIcon } from '@gitbook/api';
+import React from 'react';
 import { ContentKitServerContext } from './types';
 
 export function ElementIcon(props: { icon: ContentKitIcon; context: ContentKitServerContext }) {

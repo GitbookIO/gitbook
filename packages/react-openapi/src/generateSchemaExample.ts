@@ -19,7 +19,7 @@ export function generateSchemaExample(
         return undefined;
     }
 
-    if (schema.example) {
+    if (typeof schema.example !== 'undefined') {
         return schema.example;
     }
 

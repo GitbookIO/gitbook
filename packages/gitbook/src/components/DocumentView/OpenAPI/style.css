@@ -1,0 +1,363 @@
+.openapi-operation {
+    @apply flex-1 flex flex-col gap-6;
+}
+
+.openapi-columns {
+    @apply flex flex-col md:flex-row gap-6 print-mode:flex-col;
+}
+
+/** Intro */
+
+.openapi-intro {
+    @apply flex flex-col gap-3 max-w-3xl;
+}
+
+.openapi-summary {
+    @apply font-semibold text-xl;
+}
+
+.openapi-description.openapi-markdown {
+    @apply prose-base;
+}
+
+/** Method tag */
+
+.openapi-method {
+    @apply rounded font-mono font-bold text-[11.5px] px-1 py-0.5 mr-2 text-dark-1/8 leading-tight align-middle inline-flex ring-1 ring-inset ring-dark-1/1 dark:ring-light-1/1 whitespace-nowrap;
+}
+
+.openapi-method-get {
+    @apply bg-[hsl(215,54%,86%)] dark:bg-[hsla(215,54%,45%,0.24)] dark:text-[hsl(215,54%,86%)];
+}
+
+.openapi-method-post {
+    @apply bg-[hsl(120,25%,80%)] dark:bg-[hsla(120,54%,32%,0.24)] dark:text-[hsl(120,25%,80%)];
+}
+
+.openapi-method-put {
+    @apply bg-yellow dark:bg-yellow-600/5 dark:text-yellow;
+}
+
+.openapi-method-patch {
+    @apply bg-teal-300 dark:bg-teal-600/5 dark:text-teal-300;
+}
+
+.openapi-method-delete {
+    @apply bg-pomegranate-200 dark:bg-pomegranate-500/5 dark:text-pomegranate-200;
+}
+
+.openapi-method-head,
+.openapi-method-options,
+.openapi-method-trace {
+    @apply bg-dark-3/4 dark:bg-light-3/5 dark:text-light-3;
+}
+
+/** URL */
+
+.openapi-url {
+    @apply font-mono text-sm text-dark/8 dark:text-light/8;
+}
+
+.openapi-url-var {
+    @apply text-dark/7 underline underline-offset-2 decoration-dark/5 dark:decoration-light/5 dark:text-light/6;
+}
+
+/** Columns */
+
+.openapi-column-spec {
+    @apply flex flex-col flex-1 gap-4 max-w-3xl;
+}
+
+.openapi-column-preview {
+    @apply flex flex-col flex-1 max-w-3xl;
+}
+
+.openapi-column-preview-body {
+    @apply flex flex-col gap-4 sticky top-4 space-header:top-20 page-api-block:xl:max-2xl:top-32 print-mode:static;
+}
+
+.openapi-column-preview pre {
+    @apply max-h-60 print-mode:max-h-none;
+}
+
+/** Schemas */
+
+.openapi-schema-root {
+    @apply mx-3 mb-3 mt-2;
+}
+
+.openapi-schema .openapi-schema-properties {
+    @apply border rounded border-dark/2 dark:border-light/2;
+}
+
+.openapi-schema-properties .openapi-schema {
+    @apply border-b px-3 py-2 border-dark/1 dark:border-light/1;
+}
+
+.openapi-schema-properties .openapi-schema:last-child {
+    @apply border-b-0;
+}
+
+.openapi-schema-properties .openapi-schema-opened {
+    @apply pb-3;
+}
+
+.openapi-schema > .openapi-schema-properties {
+    @apply mt-3;
+}
+
+.openapi-schema-name {
+    /* To make double click on the property name select only the name,
+    we disable selection on the parent and re-enable it on the children. */
+    @apply select-none;
+}
+
+.openapi-schema-propertyname {
+    @apply select-all font-medium text-base text-dark/10 dark:text-light/10;
+}
+
+.openapi-schema-required {
+    @apply font-normal text-yellow-600;
+}
+
+.openapi-schema-type {
+    @apply font-mono ml-3 text-base text-dark-4/8 dark:text-light-4 select-text;
+}
+
+.openapi-schema-type:only-child {
+    @apply ml-0;
+}
+
+.openapi-schema-header {
+    @apply flex flex-row items-center;
+}
+
+.openapi-schema-intro {
+    @apply flex-1;
+}
+
+.openapi-schema-body {
+    @apply mt-2;
+}
+
+.openapi-schema-circular {
+    @apply text-xs text-dark/6 dark:text-light/6;
+}
+
+.openapi-schema-circular a {
+    @apply underline;
+}
+
+.openapi-schema-circular-glyph {
+    @apply text-base;
+}
+
+.openapi-schema-enum {
+    @apply flex flex-row flex-wrap mt-1;
+}
+
+.openapi-schema-enum-value {
+    @apply font-mono text-xs px-1.5 py-1 border border-light-4 ml-[-1px] mt-[-1px] text-dark/8 dark:text-light/8 dark:border-dark-4;
+}
+
+.openapi-schema-enum-value:first-child {
+    @apply rounded-l ml-0;
+}
+
+.openapi-schema-enum-value:last-child {
+    @apply rounded-r;
+}
+
+.openapi-schema-description.openapi-markdown {
+    @apply prose-sm;
+}
+
+.openapi-schema-example {
+    @apply prose-sm mt-2 text-dark/10 dark:text-light/10;
+}
+
+/** Authentication */
+
+.openapi-securities {
+    @apply border rounded border-dark/2 dark:border-light/2;
+}
+
+.openapi-securities-header {
+    @apply px-3 py-2;
+}
+
+.openapi-securities.openapi-securities-closed:hover {
+    @apply border-dark/3 dark:border-light/3 cursor-pointer;
+}
+
+.openapi-securities-header-content {
+    @apply font-semibold text-base text-dark-2 dark:text-light-4;
+}
+
+.openapi-securities-body {
+    @apply mx-3 mb-2 flex flex-col gap-2;
+}
+
+.openapi-securities-description.openapi-markdown {
+    @apply prose-sm;
+}
+
+.openapi-securities-label {
+    @apply font-medium text-sm text-dark-2 dark:text-light-4;
+}
+
+/** Parameters */
+
+.openapi-parameters {
+    @apply border rounded border-dark/2 dark:border-light/2;
+}
+
+.openapi-parameters.openapi-parameters-closed:hover {
+    @apply border-dark/3 dark:border-light/3 cursor-pointer;
+}
+
+.openapi-parameters-header {
+    @apply px-3 py-2;
+}
+
+.openapi-parameters-header-content {
+    @apply font-semibold text-base text-dark-2 dark:text-light-4;
+}
+
+/** Request body */
+.openapi-requestbody {
+    @apply border rounded border-dark/2 dark:border-light/2;
+}
+
+.openapi-requestbody-header {
+    @apply px-3 py-2;
+}
+
+.openapi-requestbody-header-content {
+    @apply font-semibold text-base text-dark-2 dark:text-light-4;
+}
+
+.openapi-requestbody-description.openapi-markdown {
+    @apply px-3 prose-sm;
+}
+
+.openapi-requestbody-description.openapi-markdown {
+    @apply px-3 prose-sm;
+}
+
+.openapi-requestbody-description.openapi-markdown {
+    @apply px-3 prose-sm;
+}
+
+/** Responses */
+.openapi-responses {
+    @apply border rounded border-dark/2 dark:border-light/2;
+}
+
+.openapi-responses-header {
+    @apply px-3 py-2;
+}
+
+.openapi-responses-body {
+    @apply flex flex-col gap-3;
+}
+
+.openapi-responses-header-content {
+    @apply font-semibold text-dark-2 dark:text-light-4;
+}
+
+/** Response */
+.openapi-response-description.openapi-markdown {
+    @apply px-3 prose-sm;
+}
+
+.openapi-response-description:last-child {
+    @apply mb-3;
+}
+
+.openapi-responsebody-header,
+.openapi-responseheaders-header {
+    @apply px-3 py-1;
+}
+
+.openapi-responsebody-header-content,
+.openapi-responseheaders-header-content {
+    @apply text-base text-dark/8 dark:text-light/8;
+}
+
+/** Code sample */
+
+.openapi-codesample {
+    @apply border rounded bg-light-2 border-dark/1 dark:bg-dark-2 dark:border-light/2;
+}
+
+.openapi-codesample-header {
+    @apply flex flex-row items-center px-3 py-2;
+}
+
+.openapi-codesample-title {
+    @apply flex-1 font-semibold text-base;
+}
+
+/** Response example */
+
+.openapi-response-example {
+    @apply border rounded bg-light-2 border-dark/1 dark:bg-dark-2 dark:border-light/2;
+}
+
+.openapi-response-example-header {
+    @apply flex flex-row items-center px-3 py-2;
+}
+
+.openapi-response-example-title {
+    @apply flex-1 font-semibold text-base;
+}
+
+/** Common */
+
+.openapi-select {
+    @apply max-w-48 rounded font-mono text-xs leading-6 px-1 py-0.5 border border-dark-2/2 bg-light-2 dark:bg-dark-2 dark:border-light/1;
+}
+
+/** Section */
+
+.openapi-section {
+}
+
+.openapi-section-header {
+    @apply flex flex-row items-start;
+}
+
+.openapi-section-header-content {
+    @apply flex-1;
+}
+
+.openapi-section-header-controls {
+    @apply flex flex-row items-center gap-2;
+}
+
+.openapi-section-toggle {
+    @apply flex items-center justify-end size-6 text-dark/6 dark:text-light/6;
+}
+
+.openapi-section-toggle:focus-visible,
+.openapi-section-toggle:focus-visible {
+    @apply text-primary-500;
+}
+
+.openapi-section-toggle svg {
+    @apply size-4;
+}
+
+/** Markdown */
+.openapi-markdown {
+    @apply prose dark:prose-invert max-w-none whitespace-normal;
+}
+
+.openapi-markdown > *:first-child {
+    @apply mt-0;
+}
+
+.openapi-markdown > *:last-child {
+    @apply mb-0;
+}

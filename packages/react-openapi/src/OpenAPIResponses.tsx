@@ -1,3 +1,4 @@
+import * as React from 'react';
 import classNames from 'classnames';
 import { OpenAPIV3 } from 'openapi-types';
 import { noReference } from './utils';

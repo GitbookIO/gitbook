@@ -1,11 +1,11 @@
 'use client';
 
 import { ContentKitModal } from '@gitbook/api';
+import React from 'react';
 
 import { ContentKitClientElementProps } from './types';
 import classNames from 'classnames';
 import { useContentKitClientContext } from './context';
-import React from 'react';
 
 export function ElementModal(
     props: ContentKitClientElementProps<ContentKitModal> & {

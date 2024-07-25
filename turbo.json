@@ -1,0 +1,30 @@
+{
+    "$schema": "https://turbo.build/schema.json",
+    "globalEnv": ["NODE_ENV", "CI", "ARGOS_*", "GITHUB_*"],
+    "tasks": {
+        "build": {
+            "dependsOn": ["^build"],
+            "outputs": [".next/**", "!.next/cache/**", "dist"]
+        },
+        "build:cloudflare": {
+            "dependsOn": ["^build"]
+        },
+        "typecheck": {
+            "dependsOn": ["^typecheck", "^build"]
+        },
+        "lint": {
+            "dependsOn": ["^lint"]
+        },
+        "unit": {
+            "dependsOn": ["^unit", "^build"]
+        },
+        "e2e": {
+            "dependsOn": ["^e2e"],
+            "env": ["BASE_URL"]
+        },
+        "dev": {
+            "persistent": true,
+            "cache": false
+        }
+    }
+}
