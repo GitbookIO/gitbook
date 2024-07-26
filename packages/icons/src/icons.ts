@@ -1,5 +1,5 @@
 import { IconStyle } from './types';
-import rawIcons from '../data/icons.json';
+import rawIcons from './data/icons.json';
 
 export interface IconStyleDefinition {
     title: string;

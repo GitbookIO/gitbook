@@ -1,2 +1,2 @@
 dist/
-data/*.json
+src/data/*.json

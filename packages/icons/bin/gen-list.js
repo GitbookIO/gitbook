@@ -1,4 +1,5 @@
 const fs = require('fs/promises');
+const { existsSync } = require('fs');
 const path = require('path');
 const { getKitPath } = require('./kit');
 
@@ -39,15 +40,25 @@ async function main() {
         });
     });
 
-    await fs.writeFile(
-        path.resolve(__dirname, '../data/styles-map.json'),
-        JSON.stringify(onlyStyles, null, 2),
-    );
-    await fs.writeFile(
-        path.resolve(__dirname, '../data/icons.json'),
-        JSON.stringify(result, null, 2),
-    );
+    await Promise.all([
+        writeDataFile('styles-map', JSON.stringify(onlyStyles, null, 2)),
+        writeDataFile('icons', JSON.stringify(result, null, 2)),
+    ]);
     console.log(`🎉 ${result.length} icons found`);
+}
+
+async function writeDataFile(name, content) {
+    await Promise.all([
+        fs.writeFile(
+            path.resolve(__dirname, `../src/data/${name}.json`),
+            content,
+        ),
+        // Write to dist folder if it exists
+        existsSync(path.resolve(__dirname, '../dist/')) ? fs.writeFile(
+            path.resolve(__dirname, `../dist/data/${name}.json`),
+            content,
+        ) : null
+    ])
 }
 
 main().catch(console.error);

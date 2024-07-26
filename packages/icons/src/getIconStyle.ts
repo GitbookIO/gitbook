@@ -1,4 +1,4 @@
-import stylesMap from '../data/styles-map.json';
+import stylesMap from './data/styles-map.json';
 import { IconName, IconStyle } from './types';
 
 const cache = new Map<IconName, Map<IconStyle, [IconStyle, IconName]>>();
