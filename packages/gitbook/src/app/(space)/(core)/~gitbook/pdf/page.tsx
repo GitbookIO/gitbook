@@ -42,7 +42,10 @@ export const runtime = 'edge';
 export async function generateMetadata(): Promise<Metadata> {
     const contentPointer = getContentPointer();
     const [space, customization] = await Promise.all([
-        getSpace(contentPointer.spaceId),
+        getSpace(
+            contentPointer.spaceId,
+            'siteId' in contentPointer ? contentPointer.siteShareKey : undefined,
+        ),
         'siteId' in contentPointer
             ? getCurrentSiteCustomization(contentPointer)
             : getSpaceCustomization(contentPointer.spaceId),
@@ -72,7 +75,10 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
         'siteId' in contentPointer
             ? getCurrentSiteCustomization(contentPointer)
             : getSpaceCustomization(contentPointer.spaceId),
-        getSpaceContentData(contentPointer),
+        getSpaceContentData(
+            contentPointer,
+            'siteId' in contentPointer ? contentPointer.siteShareKey : undefined,
+        ),
     ]);
     const language = getSpaceLanguage(customization);
 
@@ -170,6 +176,7 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
                             space={space}
                             page={page}
                             refContext={{
+                                siteContext: 'siteId' in contentPointer ? contentPointer : null,
                                 space,
                                 revisionId: contentTarget.revisionId,
                                 pages: rootPages,
