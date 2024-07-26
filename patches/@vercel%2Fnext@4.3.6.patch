@@ -1,13 +1,13 @@
 diff --git a/dist/index.js b/dist/index.js
-index 7f9eaa2526e5fad42420f590bb733e5670766e63..302274144d28dde2b9ba8f9018281d2867f79299 100644
+index c5ea5e053c4e6be202914bdd2e0228bc7be8b976..31c24e146fdf50a806f8c1da7eedc1d941270fa9 100644
 --- a/dist/index.js
 +++ b/dist/index.js
-@@ -9484,7 +9484,7 @@ var import_path = require("path");
+@@ -10474,7 +10474,7 @@ var import_path = require("path");
  // src/constants.ts
  var KIB = 1024;
  var MIB = 1024 * KIB;
 -var EDGE_FUNCTION_SIZE_LIMIT = 4 * MIB;
 +var EDGE_FUNCTION_SIZE_LIMIT = 10 * MIB;
- var MAX_UNCOMPRESSED_LAMBDA_SIZE = 250 * MIB;
- var LAMBDA_RESERVED_UNCOMPRESSED_SIZE = 2.5 * MIB;
- var LAMBDA_RESERVED_COMPRESSED_SIZE = 250 * KIB;
+ var DEFAULT_MAX_UNCOMPRESSED_LAMBDA_SIZE = 250 * MIB;
+ var LAMBDA_RESERVED_UNCOMPRESSED_SIZE = 25 * MIB;
+ 
