@@ -15,7 +15,7 @@
     },
     "dependencies": {
         "@geist-ui/icons": "^1.0.2",
-        "@gitbook/api": "^0.56.0",
+        "@gitbook/api": "^0.58.0",
         "@gitbook/icons": "workspace:*",
         "@gitbook/react-math": "workspace:*",
         "@gitbook/react-openapi": "workspace:*",
