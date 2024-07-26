@@ -3,6 +3,7 @@ import assertNever from 'assert-never';
 
 import {
     ContentPointer,
+    SiteContentPointer,
     getCollection,
     getDocument,
     getRevisionFile,
@@ -36,6 +37,11 @@ export interface ContentRefContext extends PageHrefContext {
      */
     baseUrl?: string;
 
+    /**
+     * Site in which we are resolving the content reference.
+     * If null, the site is not known (legacy published content mode)
+     */
+    siteContext: SiteContentPointer | null;
     /**
      * Space in which we are resolving the content reference.
      */
@@ -74,7 +80,7 @@ export async function resolveContentRef(
     options: ResolveContentRefOptions = {},
 ): Promise<ResolvedContentRef | null> {
     const { resolveAnchorText = false } = options;
-    const { space, revisionId, pages, page: activePage, ...linksContext } = context;
+    const { siteContext, space, revisionId, pages, page: activePage, ...linksContext } = context;
 
     switch (contentRef.kind) {
         case 'url': {
@@ -102,7 +108,7 @@ export async function resolveContentRef(
         case 'anchor':
         case 'page': {
             if (contentRef.space && contentRef.space !== space.id) {
-                return resolveContentRefInSpace(contentRef.space, contentRef);
+                return resolveContentRefInSpace(contentRef.space, siteContext, contentRef);
             }
 
             const resolvePageResult =
@@ -175,7 +181,12 @@ export async function resolveContentRef(
             const targetSpace =
                 contentRef.space === space.id
                     ? space
-                    : await ignoreAPIError(getSpace(contentRef.space));
+                    : await ignoreAPIError(
+                          getSpace(
+                              contentRef.space,
+                              siteContext?.siteShareKey ? siteContext.siteShareKey : undefined,
+                          ),
+                      );
 
             if (!targetSpace) {
                 return {
@@ -239,12 +250,16 @@ export async function resolveContentRef(
     }
 }
 
-async function resolveContentRefInSpace(spaceId: string, contentRef: ContentRef) {
+async function resolveContentRefInSpace(
+    spaceId: string,
+    siteContext: SiteContentPointer | null,
+    contentRef: ContentRef,
+) {
     const pointer: ContentPointer = {
         spaceId,
     };
 
-    const result = await ignoreAPIError(getSpaceContentData(pointer));
+    const result = await ignoreAPIError(getSpaceContentData(pointer, siteContext?.siteShareKey));
     if (!result) {
         return null;
     }
@@ -258,6 +273,7 @@ async function resolveContentRefInSpace(spaceId: string, contentRef: ContentRef)
     }
 
     const resolved = await resolveContentRef(contentRef, {
+        siteContext,
         space,
         revisionId: space.revision,
         pages,

@@ -14,7 +14,10 @@ export const runtime = 'edge';
  */
 export async function GET(req: NextRequest) {
     const pointer = getContentPointer();
-    const space = await getSpace(pointer.spaceId);
+    const space = await getSpace(
+        pointer.spaceId,
+        'siteId' in pointer ? pointer.siteShareKey : undefined,
+    );
     const parent =
         'siteId' in pointer
             ? await getSite(pointer.organizationId, pointer.siteId)

@@ -165,7 +165,7 @@ export const streamAskQuestion = streamResponse(async function* (spaceId: string
     const stream = api
         .api()
         .spaces.streamAskInSpace(spaceId, { query, format: 'document', details: true });
-    const pagesPromise = api.getSpaceContentData({ spaceId });
+    const pagesPromise = api.getSpaceContentData({ spaceId }, undefined);
 
     for await (const chunk of stream) {
         // We run the AI search and fetch the pages in parallel

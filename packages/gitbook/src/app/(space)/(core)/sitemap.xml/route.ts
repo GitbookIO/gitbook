@@ -14,7 +14,11 @@ export const runtime = 'edge';
  * Generate a sitemap.xml for the current space.
  */
 export async function GET(req: NextRequest) {
-    const { pages: rootPages } = await getSpaceContentData(getContentPointer());
+    const pointer = getContentPointer();
+    const { pages: rootPages } = await getSpaceContentData(
+        pointer,
+        'siteId' in pointer ? pointer.siteShareKey : undefined,
+    );
     const pages = flattenPages(rootPages, (page) => !page.hidden);
     const urls = pages.map(({ page, depth }) => {
         // Decay priority with depth

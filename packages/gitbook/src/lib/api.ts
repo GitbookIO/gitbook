@@ -282,11 +282,17 @@ export const getPublishedContentByUrl = cache(
  */
 export const getSpace = cache(
     'api.getSpace',
-    async (spaceId: string, options: CacheFunctionOptions) => {
-        const response = await api().spaces.getSpaceById(spaceId, {
-            ...noCacheFetchOptions,
-            signal: options.signal,
-        });
+    async (spaceId: string, shareKey: string | undefined, options: CacheFunctionOptions) => {
+        const response = await api().spaces.getSpaceById(
+            spaceId,
+            {
+                shareKey,
+            },
+            {
+                ...noCacheFetchOptions,
+                signal: options.signal,
+            },
+        );
         return cacheResponse(response, {
             revalidateBefore: 60 * 60,
             tags: [getAPICacheTag({ tag: 'space', space: spaceId })],
@@ -795,7 +801,7 @@ export const getSiteIntegrationScripts = cache(
  */
 export async function getCurrentSiteData(pointer: SiteContentPointer) {
     const [{ space, pages, contentTarget }, { customization, scripts }] = await Promise.all([
-        getSpaceData(pointer),
+        getSpaceData(pointer, pointer.siteShareKey),
         getCurrentSiteLayoutData(pointer),
     ]);
 
@@ -940,9 +946,9 @@ export const getCollectionSpaces = cache(
 /**
  * Fetch all the data to render a space at once.
  */
-export async function getSpaceData(pointer: ContentPointer) {
+export async function getSpaceData(pointer: ContentPointer, shareKey: string | undefined) {
     const [{ space, pages, contentTarget }, { customization, scripts }] = await Promise.all([
-        getSpaceContentData(pointer),
+        getSpaceContentData(pointer, shareKey),
         getSpaceLayoutData(pointer.spaceId),
     ]);
 
@@ -960,9 +966,9 @@ export async function getSpaceData(pointer: ContentPointer) {
  * This function executes the requests in parallel and should be used as early as possible
  * instead of calling the individual functions.
  */
-export async function getSpaceContentData(pointer: ContentPointer) {
+export async function getSpaceContentData(pointer: ContentPointer, shareKey: string | undefined) {
     const [space, changeRequest] = await Promise.all([
-        getSpace(pointer.spaceId),
+        getSpace(pointer.spaceId, shareKey),
         pointer.changeRequestId ? getChangeRequest(pointer.spaceId, pointer.changeRequestId) : null,
     ]);
 
