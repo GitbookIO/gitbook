@@ -35,7 +35,7 @@
         "build": "tsc",
         "typecheck": "tsc --noEmit",
         "dev": "tsc -w",
-        "postinstall": "node ./bin/gen-list.js"
+        "prepare": "node ./bin/gen-list.js"
     },
     "bin": {
         "gitbook-icons": "./bin/gitbook-icons.js"
