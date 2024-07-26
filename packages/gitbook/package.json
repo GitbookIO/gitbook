@@ -11,7 +11,7 @@
         "typecheck": "tsc --noEmit",
         "e2e": "playwright test",
         "unit": "bun test {src,packages}",
-        "postinstall": "gitbook-icons ./public/~gitbook/static/icons && rm -rf ./public/~gitbook/static/mathjax@3.2.2 && mkdir -p ./public/~gitbook/static/ && cp -R ../../node_modules/mathjax/es5 ./public/~gitbook/static/mathjax@3.2.2"
+        "prepare": "gitbook-icons ./public/~gitbook/static/icons && gitbook-math ./public/~gitbook/static/math"
     },
     "dependencies": {
         "@geist-ui/icons": "^1.0.2",

@@ -7,7 +7,7 @@ import { tcls } from '@/lib/tailwind';
 import { BlockProps } from './Block';
 import { InlineProps } from './Inline';
 
-const mathJaxUrl = getStaticFileURL('mathjax@3.2.2/tex-chtml.js');
+const assetsUrl = getStaticFileURL('math');
 
 export async function BlockMath(props: BlockProps<DocumentBlockMath>) {
     const { block, style } = props;
@@ -17,7 +17,7 @@ export async function BlockMath(props: BlockProps<DocumentBlockMath>) {
             formula={block.data.formula}
             inline={false}
             className={tcls(style, 'overflow-x-auto')}
-            mathJaxUrl={mathJaxUrl}
+            assetsUrl={assetsUrl}
         />
     );
 }
@@ -25,5 +25,5 @@ export async function BlockMath(props: BlockProps<DocumentBlockMath>) {
 export async function InlineMath(props: InlineProps<DocumentInlineMath>) {
     const { inline } = props;
 
-    return <MathFormula formula={inline.data.formula} inline={true} mathJaxUrl={mathJaxUrl} />;
+    return <MathFormula formula={inline.data.formula} inline={true} assetsUrl={assetsUrl} />;
 }

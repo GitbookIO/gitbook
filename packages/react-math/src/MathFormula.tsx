@@ -26,9 +26,9 @@ export interface MathFormulaProps {
     fallback?: React.ReactNode;
 
     /**
-     * URL to load MathJax from.
+     * URL to load assets from.
      */
-    mathJaxUrl: string;
+    assetsUrl: string;
 }
 
 /**
@@ -43,8 +43,10 @@ export function MathFormula(props: MathFormulaProps) {
             className: props.className,
             children: props.formula,
         }),
-        mathJaxUrl,
+        assetsUrl,
     } = props;
+
+    const mathJaxUrl = `${assetsUrl}/mathjax@3.2.2/tex-chtml.js`;
 
     return (
         <KaTeX

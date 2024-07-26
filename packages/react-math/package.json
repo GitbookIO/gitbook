@@ -23,6 +23,9 @@
         "typecheck": "tsc --noEmit",
         "dev": "tsc -w"
     },
+    "bin": {
+        "gitbook-math": "./bin/gitbook-math.js"
+    },
     "files": [
         "dist",
         "src",
