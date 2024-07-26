@@ -3,6 +3,8 @@ const fs = require('fs/promises');
 const path = require('path');
 const { getKitPath } = require('./kit');
 
+const stylesToCopy = ['brands', 'duotone', 'solid', 'regular', 'light'];
+
 /**
  * Scripts to copy the assets to a public folder.
  */
@@ -17,12 +19,21 @@ async function main() {
     // source/sprites to outputFolder/sprites
     // source/svgs to outputFolder/svgs
     await Promise.all([
-        fs.cp(path.join(source, 'icons/sprites'), path.join(outputFolder, 'sprites'), {
-            recursive: true,
-        }),
-        fs.cp(path.join(source, 'icons/svgs'), path.join(outputFolder, 'svgs'), {
-            recursive: true,
-        }),
+        ...stylesToCopy.map((style) =>
+            fs.cp(
+                path.join(source, `icons/svgs/${style}`),
+                path.join(outputFolder, 'svgs', style),
+                {
+                    recursive: true,
+                },
+            ),
+        ),
+        ...stylesToCopy.map((style) =>
+            fs.cp(
+                path.join(source, `icons/sprites/${style}.svg`),
+                path.join(outputFolder, 'sprites', style + '.svg'),
+            ),
+        ),
     ]);
 
     console.log(`🎉 Icons copied to ${outputFolder}`);
