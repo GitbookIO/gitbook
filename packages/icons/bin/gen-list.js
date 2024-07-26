@@ -49,16 +49,12 @@ async function main() {
 
 async function writeDataFile(name, content) {
     await Promise.all([
-        fs.writeFile(
-            path.resolve(__dirname, `../src/data/${name}.json`),
-            content,
-        ),
+        fs.writeFile(path.resolve(__dirname, `../src/data/${name}.json`), content),
         // Write to dist folder if it exists
-        existsSync(path.resolve(__dirname, '../dist/')) ? fs.writeFile(
-            path.resolve(__dirname, `../dist/data/${name}.json`),
-            content,
-        ) : null
-    ])
+        existsSync(path.resolve(__dirname, '../dist/'))
+            ? fs.writeFile(path.resolve(__dirname, `../dist/data/${name}.json`), content)
+            : null,
+    ]);
 }
 
 main().catch(console.error);

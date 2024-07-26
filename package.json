@@ -8,6 +8,7 @@
         "build": "turbo run build",
         "build:cloudflare": "turbo run build:cloudflare",
         "lint": "turbo run lint",
+        "lint:fix": "turbo run lint -- --fix",
         "typecheck": "turbo run typecheck",
         "format": "prettier ./ --ignore-unknown --write",
         "format:check": "prettier ./ --ignore-unknown --list-different",
