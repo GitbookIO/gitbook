@@ -26,6 +26,6 @@
         "turbo": "^2.0.9"
     },
     "patchedDependencies": {
-        "@vercel/next@4.0.15": "patches/@vercel%2Fnext@4.0.15.patch"
+        "@vercel/next@4.3.6": "patches/@vercel%2Fnext@4.3.6.patch"
     }
 }
