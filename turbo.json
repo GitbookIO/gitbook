@@ -40,6 +40,10 @@
         "dev": {
             "persistent": true,
             "cache": false
+        },
+        // Script run when the package is deployed
+        "release": {
+            "dependsOn": ["^release", "build"]
         }
     }
 }

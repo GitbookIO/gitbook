@@ -14,7 +14,7 @@
         "unit": "turbo run unit",
         "e2e": "turbo run e2e",
         "changeset": "changeset",
-        "release": "turbo run build && changeset publish",
+        "release": "turbo run release && changeset publish",
         "generate-npmrc": "npmrc-replace-env"
     },
     "workspaces": [
