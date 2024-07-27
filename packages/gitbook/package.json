@@ -11,7 +11,8 @@
         "typecheck": "tsc --noEmit",
         "e2e": "playwright test",
         "unit": "bun test {src,packages}",
-        "prepare": "gitbook-math ./public/~gitbook/static/math"
+        "prepare": "gitbook-math ./public/~gitbook/static/math",
+        "copy:icons": "gitbook-icons ./public/~gitbook/static/icons"
     },
     "dependencies": {
         "@gitbook/api": "^0.58.0",

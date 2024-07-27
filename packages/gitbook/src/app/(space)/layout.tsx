@@ -13,6 +13,7 @@ import { emojiFontClassName } from '@/components/primitives';
 import { fonts, ibmPlexMono } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
 import { getCurrentSiteLayoutData, getSpaceLayoutData } from '@/lib/api';
+import { getStaticFileURL } from '@/lib/assets';
 import { hexToRgb, shadesOfColor } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
 
@@ -108,8 +109,8 @@ export default async function SpaceRootLayout(props: { children: React.ReactNode
                 )}
             >
                 <IconsProvider
-                    assetsURL="https://ka-p.fontawesome.com/releases/v6.6.0/"
-                    assetsURLToken="a463935e93"
+                    assetsURL={process.env.GITBOOK_ICONS_URL ?? getStaticFileURL('icons')}
+                    assetsURLToken={process.env.GITBOOK_ICONS_TOKEN}
                     iconStyle={IconStyle.Light}
                 >
                     <ClientContexts language={language}>{children}</ClientContexts>
