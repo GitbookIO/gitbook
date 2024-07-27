@@ -1,4 +1,5 @@
 import { ContentRef, DocumentBlockTable } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
 import assertNever from 'assert-never';
 
 import { Checkbox, Emoji } from '@/components/primitives';
@@ -14,7 +15,6 @@ import { getColumnAlignment } from './utils';
 import { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { FileIcon } from '../FileIcon';
-import { Icon } from '@gitbook/icons';
 
 /**
  * Render the value for a column in a record.

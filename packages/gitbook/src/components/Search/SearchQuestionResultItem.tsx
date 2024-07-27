@@ -1,3 +1,4 @@
+import { Icon } from '@gitbook/icons';
 import React from 'react';
 
 import { t, useLanguage } from '@/intl/client';
@@ -5,7 +6,6 @@ import { tcls } from '@/lib/tailwind';
 
 import { useSearchLink } from './useSearch';
 import { Link } from '../primitives';
-import { Icon } from '@gitbook/icons';
 
 export const SearchQuestionResultItem = React.forwardRef(function SearchQuestionResultItem(
     props: {

@@ -1,4 +1,5 @@
 import { DocumentBlockExpandable } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
 
 import { getNodeFragmentByType } from '@/lib/document';
 import { tcls } from '@/lib/tailwind';
@@ -6,7 +7,6 @@ import { tcls } from '@/lib/tailwind';
 import { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { Inlines } from '../Inlines';
-import { Icon } from '@gitbook/icons';
 
 export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
     const { block, style, ancestorBlocks, document, context } = props;

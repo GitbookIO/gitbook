@@ -32,6 +32,7 @@ import { PDFSearchParams, getPDFSearchParams } from '@/lib/urls';
 import './pdf.css';
 import { PageControlButtons } from './PageControlButtons';
 import { PrintButton } from './PrintButton';
+
 import { Icon } from '@gitbook/icons';
 
 const DEFAULT_LIMIT = 100;

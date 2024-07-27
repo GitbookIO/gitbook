@@ -5,6 +5,7 @@ import {
     SiteCustomizationSettings,
     Space,
 } from '@gitbook/api';
+import { Icon, IconName } from '@gitbook/icons';
 import React from 'react';
 
 import { t, getSpaceLanguage } from '@/intl/server';
@@ -13,7 +14,6 @@ import { resolvePrevNextPages } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 
 import { Link } from '../primitives';
-import { Icon, IconName } from '@gitbook/icons';
 
 /**
  * Show cards to go to previous/next pages at the bottom.

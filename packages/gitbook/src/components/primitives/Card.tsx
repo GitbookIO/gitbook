@@ -1,7 +1,8 @@
+import { Icon } from '@gitbook/icons';
+
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { Link } from './Link';
-import { Icon } from '@gitbook/icons';
 
 export async function Card(props: {
     href: string;

@@ -1,9 +1,9 @@
 import { RevisionPageLink } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
 
 import { Emoji, Link } from '@/components/primitives';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
-import { Icon } from '@gitbook/icons';
 
 export async function PageLinkItem(props: { page: RevisionPageLink; context: ContentRefContext }) {
     const { page, context } = props;

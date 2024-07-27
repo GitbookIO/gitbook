@@ -1,5 +1,6 @@
 'use client';
 
+import { Icon } from '@gitbook/icons';
 import { motion, stagger, useAnimate } from 'framer-motion';
 import { useSelectedLayoutSegment } from 'next/navigation';
 import React from 'react';
@@ -7,7 +8,6 @@ import React from 'react';
 import { tcls } from '@/lib/tailwind';
 
 import { Link } from '../primitives';
-import { Icon } from '@gitbook/icons';
 
 const show = {
     opacity: 1,

@@ -1,9 +1,9 @@
+import { Icon } from '@gitbook/icons';
 import { DetailedHTMLProps, HTMLAttributes, useId } from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
 import { Link } from '../primitives';
-import { Icon } from '@gitbook/icons';
 
 export type DropdownButtonProps<E extends HTMLElement = HTMLElement> = Omit<
     Partial<DetailedHTMLProps<HTMLAttributes<E>, E>>,
