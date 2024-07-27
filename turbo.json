@@ -12,7 +12,7 @@
         },
         // Build the package for publishing
         "build": {
-            "dependsOn": ["^build", "generate"],
+            "dependsOn": ["^build", "^generate", "generate"],
             "outputs": [".next/**", "!.next/cache/**", "dist"]
         },
         // Build the package for Cloudflare Pages
