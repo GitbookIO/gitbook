@@ -5,7 +5,7 @@ import {
     CustomizationSettings,
     SiteCustomizationSettings,
 } from '@gitbook/api';
-import { IconsProvider } from '@gitbook/icons';
+import { IconsProvider, IconStyle } from '@gitbook/icons';
 import assertNever from 'assert-never';
 import colors from 'tailwindcss/colors';
 
@@ -110,6 +110,7 @@ export default async function SpaceRootLayout(props: { children: React.ReactNode
                 <IconsProvider
                     assetsURL="https://ka-p.fontawesome.com/releases/v6.6.0/"
                     assetsURLToken="a463935e93"
+                    iconStyle={IconStyle.Light}
                 >
                     <ClientContexts language={language}>{children}</ClientContexts>
                 </IconsProvider>

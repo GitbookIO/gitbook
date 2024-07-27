@@ -1,5 +1,3 @@
-import { Menu } from '@geist-ui/icons';
-import DownloadCloud from '@geist-ui/icons/downloadCloud';
 import {
     CustomizationSettings,
     JSONDocument,
@@ -96,7 +94,7 @@ export async function PageAside(props: {
                     'py-2',
                 )}
             >
-                <Menu className={tcls('size-4')} />
+                <Icon icon="bars" className={tcls('size-3')} />
                 {t(language, 'on_this_page')}
             </div>
             <div
