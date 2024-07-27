@@ -1,10 +1,8 @@
-import { ArrowLeft, Printer } from '@geist-ui/icons';
 import {
     CustomizationSettings,
     Revision,
     RevisionPageDocument,
     RevisionPageGroup,
-    RevisionPageLink,
     SiteCustomizationSettings,
     Space,
 } from '@gitbook/api';
@@ -34,6 +32,7 @@ import { PDFSearchParams, getPDFSearchParams } from '@/lib/urls';
 import './pdf.css';
 import { PageControlButtons } from './PageControlButtons';
 import { PrintButton } from './PrintButton';
+import { Icon } from '@gitbook/icons';
 
 const DEFAULT_LIMIT = 100;
 
@@ -116,7 +115,7 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
                             'border',
                         )}
                     >
-                        <ArrowLeft className={tcls('size-6')} />
+                        <Icon icon="arrow-left" className={tcls('size-6')} />
                     </a>
                 </div>
             ) : null}
@@ -142,7 +141,7 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
                         'border',
                     )}
                 >
-                    <Printer className={tcls('size-6')} />
+                    <Icon icon="print" className={tcls('size-6')} />
                 </PrintButton>
             </div>
 
