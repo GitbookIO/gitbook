@@ -11,7 +11,7 @@
         "typecheck": "tsc --noEmit",
         "e2e": "playwright test",
         "unit": "bun test {src,packages}",
-        "prepare": "gitbook-icons ./public/~gitbook/static/icons && gitbook-math ./public/~gitbook/static/math"
+        "prepare": "gitbook-math ./public/~gitbook/static/math"
     },
     "dependencies": {
         "@geist-ui/icons": "^1.0.2",

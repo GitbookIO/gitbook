@@ -4,8 +4,8 @@ import * as React from 'react';
 
 import { IconStyle } from './types';
 import { IconProps } from './Icon';
-import { getAssetURL } from './assets';
 import { getIconStyle } from './getIconStyle';
+import { getAssetURL, IconsContextType, useIcons } from './IconsProvider';
 
 export interface IconSpriteProps extends IconProps {}
 
@@ -17,10 +17,12 @@ const loadedStyles = new Set<IconStyle>();
  */
 export function IconSprite(props: IconSpriteProps) {
     const { className = '' } = props;
-    const [iconStyle, icon] = getIconStyle(props.iconStyle ?? IconStyle.Regular, props.icon);
+
+    const context = useIcons();
+    const [iconStyle, icon] = getIconStyle(props.iconStyle ?? context.iconStyle, props.icon);
 
     if (typeof window !== 'undefined') {
-        loadSprite(iconStyle);
+        loadSprite(context, iconStyle);
     }
 
     const id = getIDPrefix(iconStyle) + icon;
@@ -32,13 +34,13 @@ export function IconSprite(props: IconSpriteProps) {
     );
 }
 
-function loadSprite(style: IconStyle) {
+function loadSprite(context: IconsContextType, style: IconStyle) {
     if (loadedStyles.has(style)) {
         return;
     }
     loadedStyles.add(style);
 
-    const url = getAssetURL(`sprites/${style}.svg`);
+    const url = getAssetURL(context, `sprites/${style}.svg`);
 
     fetch(url)
         .then((response) => response.text())

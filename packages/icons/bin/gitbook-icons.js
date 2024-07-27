@@ -34,6 +34,11 @@ async function main() {
                 path.join(outputFolder, 'sprites', style + '.svg'),
             ),
         ),
+        // Write a version file
+        fs.writeFile(
+            path.join(outputFolder, 'version.txt'),
+            require(path.join(source, 'package.json')).version,
+        ),
     ]);
 
     console.log(`🎉 Icons copied to ${outputFolder}`);

@@ -1,8 +1,10 @@
+'use client';
+
 import * as React from 'react';
 
 import { IconName, IconStyle } from './types';
-import { getAssetURL } from './assets';
 import { getIconStyle } from './getIconStyle';
+import { getAssetURL, useIcons } from './IconsProvider';
 
 /**
  * Props for the icon component.
@@ -31,8 +33,9 @@ export interface IconProps {
 export function Icon(props: IconProps) {
     const { className } = props;
 
-    const [iconStyle, icon] = getIconStyle(props.iconStyle ?? IconStyle.Regular, props.icon);
-    const url = getAssetURL(`svgs/${iconStyle}/${icon}.svg`);
+    const context = useIcons();
+    const [iconStyle, icon] = getIconStyle(props.iconStyle ?? context.iconStyle, props.icon);
+    const url = getAssetURL(context, `svgs/${iconStyle}/${icon}.svg`);
 
     return (
         <svg

@@ -5,7 +5,7 @@ import {
     CustomizationSettings,
     SiteCustomizationSettings,
 } from '@gitbook/api';
-import { IconsProvider, setAssetsURL as setIconsAssetsURL } from '@gitbook/icons';
+import { IconsProvider } from '@gitbook/icons';
 import assertNever from 'assert-never';
 import colors from 'tailwindcss/colors';
 
@@ -13,7 +13,6 @@ import { emojiFontClassName } from '@/components/primitives';
 import { fonts, ibmPlexMono } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
 import { getCurrentSiteLayoutData, getSpaceLayoutData } from '@/lib/api';
-import { getStaticFileURL } from '@/lib/assets';
 import { hexToRgb, shadesOfColor } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
 
@@ -21,9 +20,6 @@ import { ClientContexts } from './ClientContexts';
 import './globals.css';
 import '@gitbook/icons/style.css';
 import { getContentPointer } from './fetch';
-
-const iconsAssetsURL = getStaticFileURL('icons');
-setIconsAssetsURL(iconsAssetsURL);
 
 /**
  * Layout shared between the content and the PDF renderer.
@@ -111,7 +107,10 @@ export default async function SpaceRootLayout(props: { children: React.ReactNode
                     'dark:bg-dark',
                 )}
             >
-                <IconsProvider assetsURL={iconsAssetsURL}>
+                <IconsProvider
+                    assetsURL="https://ka-p.fontawesome.com/releases/v6.6.0/"
+                    assetsURLToken="a463935e93"
+                >
                     <ClientContexts language={language}>{children}</ClientContexts>
                 </IconsProvider>
             </body>
