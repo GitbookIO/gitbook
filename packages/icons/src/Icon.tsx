@@ -31,7 +31,7 @@ export interface IconProps {
  * Renders an icon component from the library.
  */
 export function Icon(props: IconProps) {
-    const { className } = props;
+    const { className = '' } = props;
 
     const context = useIcons();
     const [iconStyle, icon] = getIconStyle(props.iconStyle ?? context.iconStyle, props.icon);

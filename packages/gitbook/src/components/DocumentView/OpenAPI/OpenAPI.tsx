@@ -1,4 +1,3 @@
-import { ChevronDown, ChevronRight } from '@geist-ui/icons';
 import { DocumentBlockSwagger } from '@gitbook/api';
 import { OpenAPIOperation } from '@gitbook/react-openapi';
 import React from 'react';
@@ -12,6 +11,7 @@ import { PlainCodeBlock } from '../CodeBlock';
 
 import './style.css';
 import './scalar.css';
+import { Icon } from '@gitbook/icons';
 
 /**
  * Render an OpenAPI block.
@@ -55,8 +55,8 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockSwagger>) {
             data={data}
             context={{
                 icons: {
-                    chevronDown: <ChevronDown />,
-                    chevronRight: <ChevronRight />,
+                    chevronDown: <Icon icon="chevron-down" />,
+                    chevronRight: <Icon icon="chevron-right" />,
                 },
                 CodeBlock: PlainCodeBlock,
                 defaultInteractiveOpened: context.mode === 'print',
