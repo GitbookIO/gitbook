@@ -110,11 +110,11 @@ export function Header(props: {
                                               'text-header-link/8',
                                               'ring-header-background-200/5',
                                               '[&>span]:text-header-link/7',
-                                              '[&_svg]:stroke-header-link',
+                                              '[&_svg]:text-header-link',
                                               'dark:bg-header-link-600/3',
                                               'dark:ring-header-link-600/2',
                                               'dark:text-header-link/7',
-                                              'dark:[&_svg]:stroke-header-link/7',
+                                              'dark:[&_svg]:text-header-link/7',
                                           ]
                                         : null
                                 }

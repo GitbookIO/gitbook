@@ -54,9 +54,9 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                             'w-3.5',
                             'h-[1lh]',
                             'transition-colors',
-                            'stroke-transparent',
-                            'group-hover:stroke-dark/6',
-                            'dark:group-hover:stroke-light/5',
+                            'text-transparent',
+                            'group-hover:text-dark/6',
+                            'dark:group-hover:text-light/5',
                             'lg:w-4',
                         )}
                     />

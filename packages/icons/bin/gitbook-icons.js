@@ -3,7 +3,7 @@ const fs = require('fs/promises');
 const path = require('path');
 const { getKitPath } = require('./kit');
 
-const stylesToCopy = ['brands', 'duotone', 'solid', 'regular', 'light'];
+const stylesToCopy = ['brands', 'duotone', 'solid', 'regular', 'light', 'thin'];
 
 /**
  * Scripts to copy the assets to a public folder.

@@ -29,6 +29,7 @@ export interface IconProps {
 
 /**
  * Renders an icon component from the library.
+ * The icon is loaded as a standalone image.
  */
 export function Icon(props: IconProps) {
     const { className = '' } = props;

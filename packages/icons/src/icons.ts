@@ -28,10 +28,10 @@ export const iconStyles: IconStyleDefinition[] = [
         title: 'Light',
         style: IconStyle.Light,
     },
-    // {
-    //     title: 'Thin',
-    //     style: IconStyle.Thin,
-    // },
+    {
+        title: 'Thin',
+        style: IconStyle.Thin,
+    },
     {
         title: 'Solid',
         style: IconStyle.Solid,

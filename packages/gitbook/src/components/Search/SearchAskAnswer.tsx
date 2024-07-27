@@ -188,12 +188,7 @@ function AnswerFollowupQuestions(props: { followupQuestions: string[] }) {
                 >
                     <Icon
                         icon="magnifying-glass"
-                        className={tcls(
-                            'size-[15px]',
-                            'shrink-0',
-                            'mt-0.5',
-                            '[&>path]:[stroke-opacity:0.64]',
-                        )}
+                        className={tcls('size-[15px]', 'shrink-0', 'mt-0.5', '[opacity:0.64]')}
                     />
                     <span>{question}</span>
                 </Link>

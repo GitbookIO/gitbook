@@ -47,9 +47,13 @@ export function getAssetURL(context: IconsContextType, path: string): string {
     if (!context.assetsURL) {
         throw new Error('You first need to pass a assetsURL to <IconsProvider>');
     }
-    const url = new URL(context.assetsURL + (context.assetsURL.endsWith('/') ? '' : '/') + path);
+    const rawUrl = context.assetsURL + (context.assetsURL.endsWith('/') ? '' : '/') + path;
+
     if (context.assetsURLToken) {
+        const url = new URL(rawUrl);
         url.searchParams.set('token', context.assetsURLToken);
+        return url.toString();
+    } else {
+        return rawUrl;
     }
-    return url.toString();
 }
