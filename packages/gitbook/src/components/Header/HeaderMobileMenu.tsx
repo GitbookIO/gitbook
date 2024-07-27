@@ -3,9 +3,9 @@
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { IconMenu } from '@/components/icons/IconMenu';
 import { useLanguage, tString } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
+import { Icon } from '@gitbook/icons';
 
 const globalClassName = 'navigation-open';
 
@@ -54,18 +54,22 @@ export function HeaderMobileMenu(props: Partial<React.ButtonHTMLAttributes<HTMLB
             aria-label={tString(language, 'table_of_contents_button_label')}
             onClick={toggleNavigation}
         >
-            <IconMenu
+            <span className={tcls(
+                'hover:bg-dark/3',
+                'p-[0.25rem]',
+                'dark:hover:bg-light/2',
+                'rounded',
+                'straight-corners:rounded-sm',
+            )}>
+            <Icon
+                icon="bars"
                 className={tcls(
-                    'w-7',
-                    'h-7',
-                    'rounded',
-                    'straight-corners:rounded-sm',
+                    'size-7',
                     'text-inherit',
-                    'hover:bg-dark/3',
-                    'p-[0.25rem]',
-                    'dark:hover:bg-light/2',
                 )}
             />
+            </span>
+            
         </button>
     );
 }
