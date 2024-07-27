@@ -3,16 +3,16 @@
     "globalEnv": ["NODE_ENV", "CI", "ARGOS_*", "GITHUB_*"],
     "tasks": {
         // Prepare the package for all other tasks
-        "prepare": {
-            "dependsOn": ["^prepare"]
+        "generate": {
+            "dependsOn": ["^generate"]
         },
-        "@gitbook/icons#prepare": {
-            "dependsOn": ["^prepare"],
+        "@gitbook/icons#generate": {
+            "dependsOn": ["^generate"],
             "outputs": ["data/*.json"]
         },
         // Build the package for publishing
         "build": {
-            "dependsOn": ["^build", "prepare"],
+            "dependsOn": ["^build", "generate"],
             "outputs": [".next/**", "!.next/cache/**", "dist"]
         },
         // Build the package for Cloudflare Pages
@@ -21,15 +21,15 @@
         },
         // Check the package for type errors
         "typecheck": {
-            "dependsOn": ["^typecheck", "^build", "prepare"]
+            "dependsOn": ["^typecheck", "^build", "generate"]
         },
         // Lint the package for style errors
         "lint": {
-            "dependsOn": ["^lint", "prepare"]
+            "dependsOn": ["^lint", "generate"]
         },
         // Run unit tests
         "unit": {
-            "dependsOn": ["^unit", "^build", "prepare"]
+            "dependsOn": ["^unit", "^build", "generate"]
         },
         // Run end-to-end tests
         "e2e": {

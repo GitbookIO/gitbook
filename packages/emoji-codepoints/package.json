@@ -9,6 +9,6 @@
         "emoji-assets": "^8.0.0"
     },
     "scripts": {
-        "prepare": "bun ./build.ts"
+        "generate": "bun ./build.ts"
     }
 }

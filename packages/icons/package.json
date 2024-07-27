@@ -32,7 +32,8 @@
         "react": "*"
     },
     "scripts": {
-        "build": "node ./bin/gen-list.js && tsc",
+        "generate": "node ./bin/gen-list.js",
+        "build": "tsc",
         "typecheck": "tsc --noEmit",
         "dev": "tsc -w"
     },
