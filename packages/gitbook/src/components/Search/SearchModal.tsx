@@ -198,8 +198,8 @@ function SearchModalBody(
             }}
         >
             <div className={tcls('flex', 'flex-row', 'items-center')}>
-                <div className={tcls('text-dark/4', 'p-3', 'dark:text-light/5')}>
-                    <Icon icon="magnifying-glass" className={tcls('size-4')} />
+                <div className={tcls('p-2', 'pl-4')}>
+                    <Icon icon="magnifying-glass" className={tcls('size-4', 'text-dark/4', 'dark:text-light/5')} />
                 </div>
                 <div className={tcls('flex-1')}>
                     <input

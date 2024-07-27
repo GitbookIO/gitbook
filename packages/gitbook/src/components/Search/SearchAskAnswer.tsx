@@ -1,4 +1,3 @@
-import IconBox from '@geist-ui/icons/box';
 import { Icon } from '@gitbook/icons';
 import React from 'react';
 import { atom, useRecoilState } from 'recoil';
@@ -242,15 +241,16 @@ function AnswerSources(props: {
                         href={source.href}
                         prefetch={false}
                     >
-                        <IconBox
+                        <Icon
+                            icon="arrow-up-right"
                             className={tcls(
-                                'stroke-dark/6',
+                                'text-dark/6',
                                 'w-[15px]',
                                 'h-[15px]',
                                 'shrink-0',
                                 'mt-0.5',
                                 'mr-0.5',
-                                'dark:stroke-light/6',
+                                'dark:text-light/6',
                             )}
                         />
                         {source.title}
