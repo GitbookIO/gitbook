@@ -1,5 +1,3 @@
-import ChevronLeft from '@geist-ui/icons/chevronLeft';
-import ChevronRight from '@geist-ui/icons/chevronRight';
 import {
     CustomizationSettings,
     Revision,
@@ -15,6 +13,7 @@ import { resolvePrevNextPages } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 
 import { Link } from '../primitives';
+import { Icon, IconName } from '@gitbook/icons';
 
 /**
  * Show cards to go to previous/next pages at the bottom.
@@ -44,7 +43,7 @@ export function PageFooterNavigation(props: {
         >
             {previous ? (
                 <NavigationCard
-                    icon={ChevronLeft}
+                    icon="chevron-left"
                     label={t(language, 'previous_page')}
                     title={previous.title}
                     href={pageHref(pages, previous)}
@@ -53,7 +52,7 @@ export function PageFooterNavigation(props: {
             ) : null}
             {next ? (
                 <NavigationCard
-                    icon={ChevronRight}
+                    icon="chevron-right"
                     label={t(language, 'next_page')}
                     title={next.title}
                     href={pageHref(pages, next)}
@@ -64,13 +63,13 @@ export function PageFooterNavigation(props: {
 }
 
 function NavigationCard(props: {
-    icon: React.FunctionComponent<{ className?: string }>;
+    icon: IconName;
     label: React.ReactNode;
     title: string;
     href: string;
     reversed?: boolean;
 }) {
-    const { icon: IconCo, label, title, href, reversed } = props;
+    const { icon, label, title, href, reversed } = props;
 
     return (
         <Link
@@ -111,14 +110,14 @@ function NavigationCard(props: {
                     {title}
                 </span>
             </span>
-            <IconCo
+            <Icon
+                icon={icon}
                 className={tcls(
                     'hidden',
-                    'w-5',
-                    'h-5',
-                    'stroke-dark/5',
-                    'group-hover:stroke-primary',
-                    'dark:stroke-light/4',
+                    'size-4',
+                    'text-dark/5',
+                    'group-hover:text-primary',
+                    'dark:text-light/4',
                     'md:block',
                 )}
             />
