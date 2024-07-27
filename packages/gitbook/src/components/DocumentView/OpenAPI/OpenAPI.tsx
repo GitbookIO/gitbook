@@ -1,4 +1,5 @@
 import { DocumentBlockSwagger } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
 import { OpenAPIOperation } from '@gitbook/react-openapi';
 import React from 'react';
 
@@ -11,7 +12,6 @@ import { PlainCodeBlock } from '../CodeBlock';
 
 import './style.css';
 import './scalar.css';
-import { Icon } from '@gitbook/icons';
 
 /**
  * Render an OpenAPI block.

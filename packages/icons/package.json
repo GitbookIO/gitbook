@@ -32,10 +32,9 @@
         "react": "*"
     },
     "scripts": {
-        "build": "tsc",
+        "build": "node ./bin/gen-list.js && tsc",
         "typecheck": "tsc --noEmit",
-        "dev": "tsc -w",
-        "prepare": "node ./bin/gen-list.js"
+        "dev": "tsc -w"
     },
     "bin": {
         "gitbook-icons": "./bin/gitbook-icons.js"

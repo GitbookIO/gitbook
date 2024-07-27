@@ -6,6 +6,7 @@ import {
     SiteCustomizationSettings,
     Space,
 } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import * as React from 'react';
@@ -32,8 +33,6 @@ import { PDFSearchParams, getPDFSearchParams } from '@/lib/urls';
 import './pdf.css';
 import { PageControlButtons } from './PageControlButtons';
 import { PrintButton } from './PrintButton';
-
-import { Icon } from '@gitbook/icons';
 
 const DEFAULT_LIMIT = 100;
 

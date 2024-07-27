@@ -1,4 +1,5 @@
 import { ContentKitContext, DocumentBlockIntegration } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
 import { ContentKit, ContentKitOutput, ContentKitServerContext } from '@gitbook/react-contentkit';
 
 import { ignoreAPIError, renderIntegrationUi } from '@/lib/api';
@@ -8,8 +9,6 @@ import { tcls } from '@/lib/tailwind';
 import type { BlockProps } from '../Block';
 import './contentkit.css';
 import { PlainCodeBlock } from '../CodeBlock';
-
-import { Icon } from '@gitbook/icons';
 
 const outputContext: ContentKitServerContext = {
     icons: {
