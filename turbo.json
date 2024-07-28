@@ -4,7 +4,8 @@
     "tasks": {
         // Prepare the package for all other tasks
         "generate": {
-            "dependsOn": ["^generate"]
+            "dependsOn": ["^generate"],
+            "outputs": ["dist"]
         },
         "@gitbook/icons#generate": {
             "dependsOn": ["^generate"],

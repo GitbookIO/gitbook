@@ -1,4 +1,5 @@
-import fs from 'fs';
+import fs from 'node:fs';
+import path from 'node:path';
 import emojisRaws from 'emoji-assets/emoji.json';
 
 interface EmojiData {
@@ -20,7 +21,8 @@ Object.entries(emojis).forEach(([key, value]) => {
     }
 });
 
+fs.mkdirSync(path.resolve(__dirname, 'dist'), { recursive: true });
 fs.writeFileSync(
-    'index.ts',
+    path.resolve(__dirname, 'dist/index.ts'),
     `export const emojiCodepoints: Record<string, string> = ${JSON.stringify(output, null, 4)};`,
 );
