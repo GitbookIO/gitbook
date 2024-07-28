@@ -9,7 +9,7 @@ import { getAssetURL, IconsContextType, useIcons } from './IconsProvider';
 
 export interface IconSpriteProps extends IconProps {}
 
-const loadedStyles = new Set<IconStyle>();
+const loadedStyles = new Set<string>();
 
 /**
  * Renders an icon using a common sprite.
@@ -34,7 +34,7 @@ export function IconSprite(props: IconSpriteProps) {
     );
 }
 
-function loadSprite(context: IconsContextType, style: IconStyle) {
+function loadSprite(context: IconsContextType, style: string) {
     if (loadedStyles.has(style)) {
         return;
     }
@@ -61,6 +61,6 @@ function loadSprite(context: IconsContextType, style: IconStyle) {
         });
 }
 
-function getIDPrefix(style: IconStyle) {
+function getIDPrefix(style: string) {
     return `gbi-${style}-`;
 }

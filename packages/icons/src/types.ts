@@ -1,4 +1,4 @@
-import type { IconName } from '@fortawesome/fontawesome-svg-core';
+import type { IconName as BasicIconName } from '@fortawesome/fontawesome-svg-core';
 
 export enum IconStyle {
     // Regular
@@ -18,4 +18,6 @@ export enum IconStyle {
     SharpThin = 'sharp-thin',
 }
 
-export type { IconName };
+type CustomIconName = 'gitbook';
+
+export type IconName = BasicIconName | CustomIconName;

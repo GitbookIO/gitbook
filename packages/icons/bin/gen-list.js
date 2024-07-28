@@ -11,7 +11,15 @@ async function main() {
     const icons = JSON.parse(
         await fs.readFile(path.join(source, 'icons/metadata/icon-families.json'), 'utf8'),
     );
-    const potentialOnly = ['brands'];
+
+    // Only these families have exceptions
+    const potentialOnly = ['brands', 'custom-icons'];
+
+    const keyRename = {
+        // Font Awesome stores custom icons under "custom-icons"
+        // but indicates them as svg.kit.custom in the JSON data
+        'kit-custom': 'custom-icons',
+    };
 
     const onlyStyles = {};
 
@@ -21,7 +29,8 @@ async function main() {
 
         Object.entries(iconSpec.svgs).forEach(([family, familyEntries]) => {
             Object.keys(familyEntries).forEach((style) => {
-                const key = family !== 'classic' ? `${family}-${style}` : style;
+                let key = family !== 'classic' ? `${family}-${style}` : style;
+                key = keyRename[key] ?? key;
                 stylesCovered.push(key);
             });
         });

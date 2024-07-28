@@ -111,6 +111,11 @@ export default async function SpaceRootLayout(props: { children: React.ReactNode
                 <IconsProvider
                     assetsURL={process.env.GITBOOK_ICONS_URL ?? getStaticFileURL('icons')}
                     assetsURLToken={process.env.GITBOOK_ICONS_TOKEN}
+                    assetsByStyles={{
+                        'custom-icons': {
+                            assetsURL: getStaticFileURL('icons'),
+                        },
+                    }}
                     iconStyle={IconStyle.Light}
                 >
                     <ClientContexts language={language}>{children}</ClientContexts>

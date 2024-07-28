@@ -8,13 +8,13 @@ import {
 } from '@gitbook/api';
 
 import { HeaderMobileMenu } from '@/components/Header/HeaderMobileMenu';
-import { LogoIcon } from '@/components/icons';
 import { Image } from '@/components/utils';
 import { absoluteHref } from '@/lib/links';
 import { tcls } from '@/lib/tailwind';
 import { getContentTitle } from '@/lib/utils';
 
 import { Link } from '../primitives';
+import { SpaceIcon } from '../Space/SpaceIcon';
 
 interface HeaderLogoProps {
     parent: Site | Collection | null;
@@ -100,7 +100,7 @@ function LogoFallback(props: HeaderLogoProps) {
     const customEmoji = 'emoji' in customization.favicon ? customization.favicon.emoji : undefined;
     return (
         <>
-            <LogoIcon
+            <SpaceIcon
                 icon={customIcon}
                 emoji={customEmoji}
                 alt=""

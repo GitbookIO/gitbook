@@ -1,13 +1,13 @@
 import stylesMap from './data/styles-map.json';
 import { IconName, IconStyle } from './types';
 
-const cache = new Map<IconName, Map<IconStyle, [IconStyle, IconName]>>();
+const cache = new Map<IconName, Map<IconStyle, [string, IconName]>>();
 
 /**
  * Return the style to load an icon from by its name.
  * Some icons are only available for certain styles.
  */
-export function getIconStyle(style: IconStyle, icon: IconName): [IconStyle, IconName] {
+export function getIconStyle(style: IconStyle, icon: IconName): [string, IconName] {
     const cached = cache.get(icon)?.get(style);
 
     if (cached) {
@@ -15,12 +15,11 @@ export function getIconStyle(style: IconStyle, icon: IconName): [IconStyle, Icon
     }
 
     // Check for exceptions
-    let result = [style, icon] as [IconStyle, IconName];
+    let result = [style, icon] as [string, IconName];
 
     for (const [onlyStyle, icons] of Object.entries(stylesMap)) {
         if (icons.includes(icon)) {
-            const styleEnum = onlyStyle as IconStyle;
-            result = [styleEnum, icon];
+            result = [onlyStyle, icon];
             break;
         }
     }
