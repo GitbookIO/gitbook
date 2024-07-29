@@ -7,7 +7,7 @@ runs:
         - name: 🏗 Prepare Playwright env
           shell: bash
           run: |
-              PLAYWRIGHT_VERSION=$(npm ls --json @playwright/test | jq --raw-output '.dependencies["@playwright/test"].version')
+              PLAYWRIGHT_VERSION=$(npm ls --json @playwright/test | jq --raw-output '.dependencies["gitbook"].dependencies["@playwright/test"].version')
               echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
 
         # Cache browser binaries, cache key is based on Playwright version and OS
@@ -24,6 +24,7 @@ runs:
         - name: 🏗 Install Playwright browser binaries & OS dependencies
           if: steps.playwright-cache.outputs.cache-hit != 'true'
           shell: bash
+          working-directory: packages/gitbook
           run: |
               bun x playwright install --with-deps chromium
 
@@ -31,5 +32,6 @@ runs:
         - name: 🏗 Install Playwright OS dependencies
           if: steps.playwright-cache.outputs.cache-hit == 'true'
           shell: bash
+          working-directory: packages/gitbook
           run: |
               bun x playwright install-deps
