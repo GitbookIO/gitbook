@@ -30,7 +30,7 @@ export function HeaderLogo(props: HeaderLogoProps) {
     const { customization } = props;
 
     return (
-        <div className={tcls('flex', 'flex-row', 'gap-3')}>
+        <div className={tcls('flex', 'flex-row', 'gap-2')}>
             <HeaderMobileMenu
                 className={tcls(
                     'lg:hidden',
