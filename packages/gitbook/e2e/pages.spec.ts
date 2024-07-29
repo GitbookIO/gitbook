@@ -350,6 +350,11 @@ const testCases: TestsCase[] = [
                 fullPage: true,
             },
             {
+                name: 'Page links',
+                url: 'blocks/page-links',
+                fullPage: true,
+            },
+            {
                 name: 'Annotations',
                 url: 'blocks/annotations',
                 run: async (page) => {
