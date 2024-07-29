@@ -218,7 +218,7 @@ export const getSyncedBlockContent = cache(
  * Resolve a URL to the content to render.
  */
 export const getPublishedContentByUrl = cache(
-    'api.getPublishedContentByUrl',
+    'api.getPublishedContentByUrl.v2',
     async (url: string, visitorAuthToken: string | undefined, options: CacheFunctionOptions) => {
         const parsedURL = new URL(url);
 
