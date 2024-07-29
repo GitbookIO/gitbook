@@ -19,7 +19,7 @@ export const Checkbox = React.forwardRef<
             'shrink-0',
             'rounded-sm',
             'ring-1',
-            'bg-primary-300/3',
+            'bg-primary-300/1',
             'ring-dark/3',
             'ring-inset',
             'grid',
@@ -46,7 +46,7 @@ export const Checkbox = React.forwardRef<
                 'dark:text-primary-200',
             )}
         >
-            <Icon icon="check" className={'size-3'} />
+            {props.checked ? <Icon icon="check" className={'size-3'} /> : null}
         </CheckboxPrimitive.Indicator>
         <div
             className={tcls(
@@ -60,7 +60,7 @@ export const Checkbox = React.forwardRef<
                 'dark:text-light/2',
             )}
         >
-            <Icon icon="check" className={'size-3'} />
+            {props.checked ? <Icon icon="check" className={'size-3'} /> : null}
         </div>
     </CheckboxPrimitive.Root>
 ));
