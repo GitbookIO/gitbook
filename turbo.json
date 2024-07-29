@@ -18,7 +18,7 @@
         },
         // Build the package for Cloudflare Pages
         "build:cloudflare": {
-            "dependsOn": ["^build"]
+            "dependsOn": ["^build", "generate"]
         },
         // Check the package for type errors
         "typecheck": {
