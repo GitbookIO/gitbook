@@ -1,3 +1,4 @@
+#sudo su 
 <h1 align="center">GitBook</h1>
 
 <p align="center">
