@@ -1,4 +1,4 @@
-import { IconStyle } from './types';
+import { IconName, IconStyle } from './types';
 import rawIcons from './data/icons.json';
 
 export interface IconStyleDefinition {
@@ -7,7 +7,7 @@ export interface IconStyleDefinition {
 }
 
 export interface IconDefinition {
-    icon: string;
+    icon: IconName;
     label: string;
     search?: string[];
 }
@@ -41,4 +41,5 @@ export const iconStyles: IconStyleDefinition[] = [
 /**
  * List of all icons available in the library.
  */
+// @ts-ignore
 export const icons: IconDefinition[] = rawIcons;
