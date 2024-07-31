@@ -43,3 +43,16 @@ export const iconStyles: IconStyleDefinition[] = [
  */
 // @ts-ignore
 export const icons: IconDefinition[] = rawIcons;
+
+let iconNamesSet: Set<IconName> | null = null;
+
+/**
+ * Validate that the icon name is valid.
+ */
+export function validateIconName(icon: IconName): boolean {
+    if (!iconNamesSet) {
+        iconNamesSet = new Set(icons.map((icon) => icon.icon));
+    }
+
+    return iconNamesSet.has(icon);
+}
