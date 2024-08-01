@@ -16,7 +16,7 @@
             "default": "./src/style.css"
         }
     },
-    "version": "0.0.2",
+    "version": "0.0.3",
     "dependencies": {
         "@fortawesome/fontawesome-svg-core": "^6.6.0",
         "@fortawesome/fontawesome-free": "^6.6.0"
