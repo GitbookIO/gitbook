@@ -3,6 +3,8 @@
 import * as React from 'react';
 import { IconStyle } from './types';
 
+const version = 1;
+
 export interface IconsAssetsLocation {
     /** Rroot url where the icon assets are served */
     assetsURL: string;
@@ -54,7 +56,8 @@ export function getAssetURL(location: Partial<IconsAssetsLocation>, path: string
     if (!location.assetsURL) {
         throw new Error('You first need to pass a assetsURL to <IconsProvider>');
     }
-    const rawUrl = location.assetsURL + (location.assetsURL.endsWith('/') ? '' : '/') + path;
+    const rawUrl =
+        location.assetsURL + (location.assetsURL.endsWith('/') ? '' : '/') + path + `?v=${version}`;
 
     if (location.assetsURLToken) {
         const url = new URL(rawUrl);

@@ -39,7 +39,7 @@ async function main() {
                 path.join(source, `icons/sprites/${style}.svg`),
                 path.join(outputFolder, 'sprites', style + '.svg'),
             ),
-        )
+        ),
     ]);
 
     console.log(`🎉 Icons copied to ${printOutputFolder}`);
