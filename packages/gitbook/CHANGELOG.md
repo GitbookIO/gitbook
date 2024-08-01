@@ -1,5 +1,19 @@
 # gitbook
 
+## 0.3.0
+
+### Minor Changes
+
+-   24b785c: Update shiki for code block syntax highlighting, with support for more languages and fixes for diffs. It also patches the deployment on Cloudflare to support edge functions larger than 4MB.
+
+### Patch Changes
+
+-   acc3f2f: Fix error with the "Try it" of OpenAPI block because of the Scalar proxy failing on Cloudflare with the `cache` option
+-   Updated dependencies [709f1a1]
+-   Updated dependencies [ede2335]
+-   Updated dependencies [0426312]
+    -   @gitbook/react-openapi@0.6.0
+
 ## 0.2.2
 
 ### Patch Changes

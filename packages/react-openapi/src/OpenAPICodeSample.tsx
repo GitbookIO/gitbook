@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { CodeSampleInput, codeSampleGenerators } from './code-samples';
-import { OpenAPIOperationData, toJSON } from './fetchOpenAPIOperation';
+import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { generateMediaTypeExample } from './generateSchemaExample';
 import { InteractiveSection } from './InteractiveSection';
 import { getServersURL } from './OpenAPIServerURL';
@@ -52,7 +52,7 @@ export function OpenAPICodeSample(props: {
     }> = null;
     (['x-custom-examples', 'x-code-samples', 'x-codeSamples'] as const).forEach((key) => {
         const customSamples = data.operation[key];
-        if (customSamples) {
+        if (customSamples && Array.isArray(customSamples)) {
             customCodeSamples = customSamples.map((sample) => ({
                 key: `redocly-${sample.lang}`,
                 label: sample.label,
@@ -61,14 +61,13 @@ export function OpenAPICodeSample(props: {
         }
     });
 
-    const samples = customCodeSamples ?? (data['x-codeSamples'] !== false ? autoCodeSamples : []);
+    // Code samples can be disabled at the top-level or at the operation level
+    // If code samples are defined at the operation level, it will override the top-level setting
+    const codeSamplesDisabled =
+        data['x-codeSamples'] === false || data.operation['x-codeSamples'] === false;
+    const samples = customCodeSamples ?? (!codeSamplesDisabled ? autoCodeSamples : []);
     if (samples.length === 0) {
         return null;
-    }
-
-    async function fetchOperationData() {
-        'use server';
-        return toJSON(data);
     }
 
     return (
@@ -78,7 +77,7 @@ export function OpenAPICodeSample(props: {
             tabs={samples}
             overlay={
                 data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'] ? null : (
-                    <ScalarApiButton fetchOperationData={fetchOperationData} />
+                    <ScalarApiButton />
                 )
             }
         />

@@ -64,6 +64,7 @@ export default async function Page(props: {
     const withPageFeedback = customization.feedback.enabled;
 
     const contentRefContext: ContentRefContext = {
+        siteContext: 'siteId' in contentPointer ? contentPointer : null,
         space,
         revisionId: contentTarget.revisionId,
         pages,

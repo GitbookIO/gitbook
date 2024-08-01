@@ -1,6 +1,6 @@
 {
     "name": "gitbook",
-    "version": "0.2.2",
+    "version": "0.3.0",
     "private": true,
     "scripts": {
         "dev": "next dev",
@@ -15,7 +15,7 @@
     },
     "dependencies": {
         "@geist-ui/icons": "^1.0.2",
-        "@gitbook/api": "^0.56.0",
+        "@gitbook/api": "^0.58.0",
         "@gitbook/react-math": "workspace:*",
         "@gitbook/react-openapi": "workspace:*",
         "@gitbook/react-contentkit": "workspace:*",
@@ -55,7 +55,7 @@
         "remark-rehype": "^11.1.0",
         "rison": "^0.1.1",
         "server-only": "^0.0.1",
-        "shiki": "^1.2.0",
+        "shiki": "^1.11.1",
         "tailwind-merge": "^2.2.0",
         "tailwind-shades": "^1.1.2",
         "unified": "^11.0.4",

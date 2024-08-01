@@ -172,11 +172,14 @@ export async function middleware(request: NextRequest) {
             // Start fetching everything as soon as possible, but do not block the middleware on it
             // the cache will handle concurrent calls
             await waitUntil(
-                getSpaceContentData({
-                    spaceId: resolved.space,
-                    changeRequestId: resolved.changeRequest,
-                    revisionId: resolved.revision,
-                }),
+                getSpaceContentData(
+                    {
+                        spaceId: resolved.space,
+                        changeRequestId: resolved.changeRequest,
+                        revisionId: resolved.revision,
+                    },
+                    'site' in resolved ? resolved.shareKey : undefined,
+                ),
             );
 
             const { scripts } = await ('site' in resolved
@@ -462,7 +465,7 @@ async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise
             authToken: apiToken,
             userAgent: userAgent(),
         }),
-        () => getSpace.revalidate(spaceId),
+        () => getSpace.revalidate(spaceId, undefined),
     );
 
     const cookies: LookupCookies = {

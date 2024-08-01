@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
     const spaceId = pointer.spaceId;
 
     const [space, customization] = await Promise.all([
-        getSpace(spaceId),
+        getSpace(spaceId, 'siteId' in pointer ? pointer.siteShareKey : undefined),
         'siteId' in pointer ? getCurrentSiteCustomization(pointer) : getSpaceCustomization(spaceId),
     ]);
     const parent =

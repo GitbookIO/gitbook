@@ -1,5 +1,16 @@
 # @gitbook/react-openapi
 
+## 0.6.0
+
+### Minor Changes
+
+-   709f1a1: Update Scalar to the latest version, with faster performances and an improved experience
+
+### Patch Changes
+
+-   ede2335: Fix x-codeSamples: false not working at the single operation level
+-   0426312: Fix tabs being empty for code samples when they are updated dynamically
+
 ## 0.5.0
 
 ### Minor Changes
