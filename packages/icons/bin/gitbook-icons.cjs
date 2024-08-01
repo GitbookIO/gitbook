@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const fs = require('fs/promises');
 const path = require('path');
-const { getKitPath } = require('./kit');
+const { getKitPath } = require('./kit.cjs');
 
 const allStyles = ['brands', 'duotone', 'solid', 'regular', 'light', 'thin', 'custom-icons'];
 
