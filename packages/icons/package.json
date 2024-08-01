@@ -31,13 +31,13 @@
         "react": "*"
     },
     "scripts": {
-        "generate": "node ./bin/gen-list.cjs",
+        "generate": "node ./bin/gen-list.js",
         "build": "tsc",
         "typecheck": "tsc --noEmit",
         "dev": "tsc -w"
     },
     "bin": {
-        "gitbook-icons": "./bin/gitbook-icons.cjs"
+        "gitbook-icons": "./bin/gitbook-icons.js"
     },
     "files": [
         "dist",

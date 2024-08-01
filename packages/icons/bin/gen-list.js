@@ -1,7 +1,8 @@
-const fs = require('fs/promises');
-const { existsSync } = require('fs');
-const path = require('path');
-const { getKitPath } = require('./kit.cjs');
+import fs from 'fs/promises';
+import { existsSync } from 'fs';
+import path from 'path';
+
+import { getKitPath } from './kit.js';
 
 /**
  * Scripts to generate the list of all icons.

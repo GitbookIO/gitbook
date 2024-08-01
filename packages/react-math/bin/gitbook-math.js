@@ -1,14 +1,16 @@
 #!/usr/bin/env node
-const fs = require('fs/promises');
-const path = require('path');
+import fs from 'fs/promises';
+import path from 'path';
+import url from 'url';
 
 /**
  * Scripts to copy the assets to a public folder.
  */
 async function main() {
     const outputFolder = path.resolve(process.cwd(), process.argv[2] ?? 'public/math');
-    const packageJson = require('mathjax/package.json');
-    const source = path.dirname(require.resolve('mathjax/package.json'));
+    const source = path.dirname(url.fileURLToPath(import.meta.resolve('mathjax/package.json')));
+
+    const packageJson = JSON.parse(await fs.readFile(path.join(source, 'package.json'), 'utf8'));
 
     // Create the output folder if it doesn't exist
     await fs.mkdir(outputFolder, { recursive: true });
