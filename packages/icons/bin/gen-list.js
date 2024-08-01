@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
+import url from 'url';
 
 import { getKitPath } from './kit.js';
 
@@ -58,11 +59,12 @@ async function main() {
 }
 
 async function writeDataFile(name, content) {
+    const dirname = path.dirname(url.fileURLToPath(import.meta.url));
     await Promise.all([
-        fs.writeFile(path.resolve(__dirname, `../src/data/${name}.json`), content),
+        fs.writeFile(path.resolve(dirname, `../src/data/${name}.json`), content),
         // Write to dist folder if it exists
-        existsSync(path.resolve(__dirname, '../dist/'))
-            ? fs.writeFile(path.resolve(__dirname, `../dist/data/${name}.json`), content)
+        existsSync(path.resolve(dirname, '../dist/'))
+            ? fs.writeFile(path.resolve(dirname, `../dist/data/${name}.json`), content)
             : null,
     ]);
 }
