@@ -1,5 +1,6 @@
 {
     "name": "@gitbook/react-math",
+    "type": "module",
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
