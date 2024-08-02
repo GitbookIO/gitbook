@@ -28,7 +28,7 @@ async function main() {
     // source/svgs to outputFolder/svgs
     await Promise.all([
         ...stylesToCopy.map((style) => {
-            const stylePath = path.join(outputFolder, 'svgs', style);
+            const stylePath = path.join(source, 'svgs', style);
             if (!existsSync(stylePath)) {
                 console.warn(`❌ Style ${style} does not exist`);
             } else {
@@ -38,7 +38,7 @@ async function main() {
             }
         }),
         ...stylesToCopy.map((style) => {
-            const spritePath = path.join(outputFolder, `sprites/${style}.svg`);
+            const spritePath = path.join(source, `sprites/${style}.svg`);
             if (existsSync(spritePath)) {
                 return fs.cp(
                     path.join(source, `sprites/${style}.svg`),
