@@ -22,6 +22,8 @@ import { TrackPageViewConditional } from './TrackPageViewConditional';
 import { DocumentView, createHighlightingContext } from '../DocumentView';
 import { PageFeedbackForm } from '../PageFeedback';
 import { DateRelative } from '../primitives';
+import { shouldTrackPageViews } from '@/lib/tracking';
+import { TrackPageView } from './TrackPageView';
 
 export function PageBody(props: {
     space: Space;
@@ -141,12 +143,14 @@ export function PageBody(props: {
                     ) : null}
                 </div>
             </main>
-            <TrackPageViewConditional
-                sitePointer={sitePointer}
-                spaceId={space.id}
-                pageId={page.id}
-                apiHost={api().endpoint}
-            />
+            {shouldTrackPageViews() ? (
+                <TrackPageView
+                    sitePointer={sitePointer}
+                    spaceId={space.id}
+                    pageId={page.id}
+                    apiHost={api().endpoint}
+                />
+            ) : null}
         </>
     );
 }
