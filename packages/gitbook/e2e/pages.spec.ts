@@ -1,8 +1,9 @@
 import { argosScreenshot } from '@argos-ci/playwright';
 import {
     CustomizationHeaderPreset,
+    CustomizationIconsStyle,
     CustomizationLocale,
-    CustomizationSettings,
+    SiteCustomizationSettings,
 } from '@gitbook/api';
 import { test, expect, Page } from '@playwright/test';
 import jwt from 'jsonwebtoken';
@@ -388,6 +389,11 @@ const testCases: TestsCase[] = [
                 url: 'page-options/page-with-cover-and-no-toc',
                 run: waitForCookiesDialog,
             },
+            {
+                name: 'With icon',
+                url: 'page-options/page-with-icon',
+                run: waitForCookiesDialog,
+            },
         ],
     },
     {
@@ -401,6 +407,15 @@ const testCases: TestsCase[] = [
                         preset: CustomizationHeaderPreset.None,
                         links: [],
                     },
+                }),
+                run: waitForCookiesDialog,
+            },
+            {
+                name: 'Without duotone icons',
+                url: 'page-options/page-with-icon' + getCustomizationURL({
+                    styling: {
+                        icons: CustomizationIconsStyle.Duotone,
+                    }
                 }),
                 run: waitForCookiesDialog,
             },
@@ -662,7 +677,7 @@ for (const testCase of testCases) {
 /**
  * Create a URL with customization settings.
  */
-function getCustomizationURL(partial: Partial<CustomizationSettings>): string {
+function getCustomizationURL(partial: Partial<SiteCustomizationSettings>): string {
     const encoded = rison.encode_object(partial);
 
     const searchParams = new URLSearchParams();
