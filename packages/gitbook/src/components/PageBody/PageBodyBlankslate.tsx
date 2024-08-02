@@ -4,6 +4,7 @@ import { Card } from '@/components/primitives';
 import { pageHref } from '@/lib/links';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
+import { PageIcon } from '../PageIcon';
 
 /**
  * Blankslate when the page has no document or the document is empty.
@@ -33,18 +34,26 @@ export async function PageBodyBlankslate(props: {
         >
             {await Promise.all(
                 page.pages.map(async (child) => {
+                    const icon = <PageIcon page={child} style={[
+                        'text-base', 'text-dark/6',
+                        'dark:text-light/6',
+                    ]} />;
+
                     if (child.type === RevisionPageType.Link) {
                         const resolved = await resolveContentRef(child.target, context);
                         if (!resolved) {
                             return null;
                         }
 
-                        return <Card key={child.id} title={child.title} href={resolved.href} />;
+                        return <Card key={child.id}
+                            leadingIcon={icon}
+                            title={child.title} href={resolved.href} />;
                     } else {
                         return (
                             <Card
                                 key={child.id}
                                 title={child.title}
+                                leadingIcon={icon}
                                 href={pageHref(rootPages, child)}
                             />
                         );
