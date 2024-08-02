@@ -413,7 +413,6 @@ const testCases: TestsCase[] = [
             {
                 name: 'Valid link',
                 url: 'TGs8PkF4GWVtbmPnWhYL/',
-                run: waitForCookiesDialog,
             },
             {
                 name: 'Invalid link',
