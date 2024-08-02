@@ -5,6 +5,7 @@ import {
     SiteCustomizationSettings,
     Space,
 } from '@gitbook/api';
+import React from 'react';
 
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
