@@ -639,7 +639,6 @@ const testCases: TestsCase[] = [
             url: getCustomizationURL({
                 internationalization: {
                     locale,
-                    inherit: false,
                 },
             }),
             run: async (page) => {
