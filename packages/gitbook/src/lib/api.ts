@@ -17,6 +17,7 @@ import {
 import assertNever from 'assert-never';
 import { headers } from 'next/headers';
 import rison from 'rison';
+import { DeepPartial } from 'ts-essentials';
 
 import { batch } from './async';
 import { buildVersion } from './build';
@@ -674,28 +675,13 @@ async function getSiteSpaceCustomization(args: {
     siteId: string;
     siteSpaceId: string;
 }): Promise<SiteCustomizationSettings> {
-    const headersList = headers();
     const raw = await getSiteSpaceCustomizationFromAPI(
         args.organizationId,
         args.siteId,
         args.siteSpaceId,
     );
 
-    const extend = headersList.get('x-gitbook-customization');
-    if (extend) {
-        try {
-            const parsed = rison.decode_object<Partial<SiteCustomizationSettings>>(extend);
-            return { ...raw, ...parsed };
-        } catch (error) {
-            console.error(
-                `Failed to parse x-gitbook-customization header (ignored): ${
-                    (error as Error).stack ?? (error as Error).message ?? error
-                }`,
-            );
-        }
-    }
-
-    return raw;
+    return mergeCustomizationWithExtend(raw);
 }
 
 /**
@@ -705,24 +691,8 @@ async function getSiteCustomization(args: {
     organizationId: string;
     siteId: string;
 }): Promise<SiteCustomizationSettings> {
-    const headersList = headers();
     const raw = await getSiteCustomizationFromAPI(args.organizationId, args.siteId);
-
-    const extend = headersList.get('x-gitbook-customization');
-    if (extend) {
-        try {
-            const parsed = rison.decode_object<Partial<SiteCustomizationSettings>>(extend);
-            return { ...raw, ...parsed };
-        } catch (error) {
-            console.error(
-                `Failed to parse x-gitbook-customization header (ignored): ${
-                    (error as Error).stack ?? (error as Error).message ?? error
-                }`,
-            );
-        }
-    }
-
-    return raw;
+    return mergeCustomizationWithExtend(raw);
 }
 
 /**
@@ -1249,4 +1219,60 @@ async function getAll<T, E>(
     }
 
     throw new Error('Unreachable');
+}
+
+/**
+ * Merge the customization settings with the ones passed in the x-gitbook-customization header if present.
+ */
+function mergeCustomizationWithExtend<T extends SiteCustomizationSettings | CustomizationSettings>(
+    raw: T,
+) {
+    const headersList = headers();
+    const extend = headersList.get('x-gitbook-customization');
+    if (extend) {
+        try {
+            const parsed = rison.decode_object<DeepPartial<T>>(extend);
+
+            // Merge objects and some properties deep
+            return mergeDeepPlainObject(raw, parsed, ['styling', 'themes']);
+        } catch (error) {
+            console.error(
+                `Failed to parse x-gitbook-customization header (ignored): ${
+                    (error as Error).stack ?? (error as Error).message ?? error
+                }`,
+            );
+        }
+    }
+
+    return raw;
+}
+
+function mergeDeepPlainObject<T>(target: T, source: DeepPartial<T>, keys: Array<keyof T>): T {
+    if (typeof target !== 'object' || target === null) {
+        return target;
+    }
+
+    const result = { ...target };
+
+    for (const key in source) {
+        const value = source[key];
+        if (value === undefined) {
+            continue;
+        }
+
+        if (
+            typeof value === 'object' &&
+            !Array.isArray(value) &&
+            value !== null &&
+            keys.includes(key as keyof T)
+        ) {
+            // @ts-ignore
+            result[key] = mergeDeepPlainObject(target[key] ?? {}, value);
+        } else {
+            // @ts-ignore
+            result[key] = value;
+        }
+    }
+
+    return result;
 }

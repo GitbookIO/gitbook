@@ -23,7 +23,7 @@ export async function Card(props: {
                 'flex-row',
                 'justify-between',
                 'items-center',
-                'gap-0.5',
+                'gap-4',
                 'ring-1',
                 'ring-dark/3',
                 'rounded',
@@ -39,7 +39,7 @@ export async function Card(props: {
                 style,
             )}
         >
-            {leadingIcon ? <span className={tcls('mr-4')}>{leadingIcon}</span> : null}
+            {leadingIcon}
             <span className={tcls('flex', 'flex-col', 'flex-1')}>
                 {preTitle ? (
                     <span

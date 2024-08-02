@@ -1,6 +1,7 @@
 import {
     CustomizationBackground,
     CustomizationCorners,
+    CustomizationIconsStyle,
     CustomizationHeaderPreset,
     CustomizationSettings,
     SiteCustomizationSettings,
@@ -116,7 +117,11 @@ export default async function SpaceRootLayout(props: { children: React.ReactNode
                             assetsURL: getStaticFileURL('icons'),
                         },
                     }}
-                    iconStyle={IconStyle.Light}
+                    iconStyle={
+                        ('icons' in customization.styling
+                            ? apiToIconsStyles[customization.styling.icons]
+                            : null) || IconStyle.Regular
+                    }
                 >
                     <ClientContexts language={language}>{children}</ClientContexts>
                 </IconsProvider>
@@ -202,3 +207,13 @@ function generateHeaderTheme(customization: CustomizationSettings | SiteCustomiz
         }
     }
 }
+
+const apiToIconsStyles: {
+    [key in CustomizationIconsStyle]: IconStyle;
+} = {
+    [CustomizationIconsStyle.Regular]: IconStyle.Regular,
+    [CustomizationIconsStyle.Solid]: IconStyle.Solid,
+    [CustomizationIconsStyle.Duotone]: IconStyle.Duotone,
+    [CustomizationIconsStyle.Thin]: IconStyle.Thin,
+    [CustomizationIconsStyle.Light]: IconStyle.Light,
+};
