@@ -412,7 +412,7 @@ const testCases: TestsCase[] = [
                 run: waitForCookiesDialog,
             },
             {
-                name: 'Without duotone icons',
+                name: 'With duotone icons',
                 url:
                     'page-options/page-with-icon' +
                     getCustomizationURL({
