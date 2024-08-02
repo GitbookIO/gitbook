@@ -1,3 +1,4 @@
+import { DeepPartial } from 'ts-essentials';
 import { argosScreenshot } from '@argos-ci/playwright';
 import {
     CustomizationHeaderPreset,
@@ -679,7 +680,7 @@ for (const testCase of testCases) {
 /**
  * Create a URL with customization settings.
  */
-function getCustomizationURL(partial: Partial<SiteCustomizationSettings>): string {
+function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettings>): string {
     const encoded = rison.encode_object(partial);
 
     const searchParams = new URLSearchParams();
