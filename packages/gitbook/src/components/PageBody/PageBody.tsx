@@ -5,7 +5,6 @@ import {
     SiteCustomizationSettings,
     Space,
 } from '@gitbook/api';
-import React from 'react';
 
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
@@ -13,17 +12,16 @@ import { ContentPointer, ContentTarget, SiteContentPointer, api } from '@/lib/ap
 import { hasFullWidthBlock, isNodeEmpty } from '@/lib/document';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
+import { shouldTrackPageViews } from '@/lib/tracking';
 
 import { PageBodyBlankslate } from './PageBodyBlankslate';
 import { PageCover } from './PageCover';
 import { PageFooterNavigation } from './PageFooterNavigation';
 import { PageHeader } from './PageHeader';
-import { TrackPageViewConditional } from './TrackPageViewConditional';
+import { TrackPageView } from './TrackPageView';
 import { DocumentView, createHighlightingContext } from '../DocumentView';
 import { PageFeedbackForm } from '../PageFeedback';
 import { DateRelative } from '../primitives';
-import { shouldTrackPageViews } from '@/lib/tracking';
-import { TrackPageView } from './TrackPageView';
 
 export function PageBody(props: {
     space: Space;
