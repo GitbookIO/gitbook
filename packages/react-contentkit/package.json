@@ -24,10 +24,5 @@
         "typecheck": "tsc --noEmit",
         "dev": "tsc -w"
     },
-    "files": [
-        "dist",
-        "src",
-        "README.md",
-        "CHANGELOG.md"
-    ]
+    "files": ["dist", "src", "README.md", "CHANGELOG.md"]
 }

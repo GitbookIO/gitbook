@@ -15,11 +15,13 @@
         "unit": "turbo run unit",
         "e2e": "turbo run e2e",
         "changeset": "changeset",
-        "release": "turbo run release && changeset publish"
+        "release": "turbo run release && changeset publish",
+
+        // For the GitBook team, we have the special command `bun run download:env` to download the .env file
+        // Run it before running the `bun install` command.
+        "download:env": "op read op://gitbook-x-dev/gitbook-open/.env.local > .env.local"
     },
-    "workspaces": [
-        "packages/*"
-    ],
+    "workspaces": ["packages/*"],
     "devDependencies": {
         "@changesets/cli": "^2.27.7",
         "prettier": "^3.0.3",

@@ -27,11 +27,5 @@
     "bin": {
         "gitbook-math": "./bin/gitbook-math.js"
     },
-    "files": [
-        "dist",
-        "src",
-        "css",
-        "README.md",
-        "CHANGELOG.md"
-    ]
+    "files": ["dist", "src", "css", "README.md", "CHANGELOG.md"]
 }

@@ -39,12 +39,5 @@
     "bin": {
         "gitbook-icons": "./bin/gitbook-icons.js"
     },
-    "files": [
-        "dist",
-        "src",
-        "bin",
-        "data",
-        "README.md",
-        "CHANGELOG.md"
-    ]
+    "files": ["dist", "src", "bin", "data", "README.md", "CHANGELOG.md"]
 }
