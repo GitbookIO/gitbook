@@ -11,7 +11,7 @@ import { getKitPath } from './kit.js';
 async function main() {
     const source = getKitPath();
     const icons = JSON.parse(
-        await fs.readFile(path.join(source, 'icons/metadata/icon-families.json'), 'utf8'),
+        await fs.readFile(path.join(source, 'metadata/icon-families.json'), 'utf8'),
     );
 
     // Only these families have exceptions
@@ -69,4 +69,7 @@ async function writeDataFile(name, content) {
     ]);
 }
 
-main().catch(console.error);
+main().catch((error) => {
+    console.error(error);
+    process.exit(1);
+});

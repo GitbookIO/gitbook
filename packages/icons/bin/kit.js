@@ -9,8 +9,11 @@ export function getKitPath() {
         url.fileURLToPath(import.meta.resolve('@fortawesome/fontawesome-free/package.json')),
     );
     try {
-        source = path.dirname(
-            url.fileURLToPath(import.meta.resolve('@awesome.me/kit-a463935e93/package.json')),
+        source = path.resolve(
+            path.dirname(
+                url.fileURLToPath(import.meta.resolve('@awesome.me/kit-a463935e93/package.json')),
+            ),
+            'icons',
         );
     } catch (error) {
         console.warn('⚠️ Could not find the Pro kit, using the free kit instead');

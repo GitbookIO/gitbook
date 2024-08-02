@@ -15,7 +15,8 @@
         "unit": "turbo run unit",
         "e2e": "turbo run e2e",
         "changeset": "changeset",
-        "release": "turbo run release && changeset publish"
+        "release": "turbo run release && changeset publish",
+        "download:env": "op read op://gitbook-x-dev/gitbook-open/.env.local >> .env.local"
     },
     "workspaces": [
         "packages/*"

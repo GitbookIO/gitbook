@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import fs from 'fs/promises';
+import { existsSync } from 'fs';
 import path from 'path';
 
 import { getKitPath } from './kit.js';
@@ -26,24 +27,31 @@ async function main() {
     // source/sprites to outputFolder/sprites
     // source/svgs to outputFolder/svgs
     await Promise.all([
-        ...stylesToCopy.map((style) =>
-            fs.cp(
-                path.join(source, `icons/svgs/${style}`),
-                path.join(outputFolder, 'svgs', style),
-                {
+        ...stylesToCopy.map((style) => {
+            const stylePath = path.join(source, 'svgs', style);
+            if (!existsSync(stylePath)) {
+                console.warn(`❌ Style ${style} does not exist`);
+            } else {
+                return fs.cp(stylePath, path.join(outputFolder, 'svgs', style), {
                     recursive: true,
-                },
-            ),
-        ),
-        ...stylesToCopy.map((style) =>
-            fs.cp(
-                path.join(source, `icons/sprites/${style}.svg`),
-                path.join(outputFolder, 'sprites', style + '.svg'),
-            ),
-        ),
+                });
+            }
+        }),
+        ...stylesToCopy.map((style) => {
+            const spritePath = path.join(source, `sprites/${style}.svg`);
+            if (existsSync(spritePath)) {
+                return fs.cp(
+                    path.join(source, `sprites/${style}.svg`),
+                    path.join(outputFolder, 'sprites', style + '.svg'),
+                );
+            }
+        }),
     ]);
 
     console.log(`🎉 Icons copied to ${printOutputFolder}`);
 }
 
-main().catch(console.error);
+main().catch((error) => {
+    console.error(error);
+    process.exit(1);
+});
