@@ -1,5 +1,8 @@
 import { ContentRef, Revision, RevisionFile, RevisionPageDocument, Space } from '@gitbook/api';
 import assertNever from 'assert-never';
+import React from 'react';
+
+import { PageIcon } from '@/components/PageIcon';
 
 import {
     ContentPointer,
@@ -15,8 +18,6 @@ import {
 import { getBlockById, getBlockTitle } from './document';
 import { gitbookAppHref, pageHref, PageHrefContext } from './links';
 import { getPagePath, resolvePageId } from './pages';
-import React from 'react';
-import { PageIcon } from '@/components/PageIcon';
 import { ClassValue } from './tailwind';
 
 export interface ResolvedContentRef {

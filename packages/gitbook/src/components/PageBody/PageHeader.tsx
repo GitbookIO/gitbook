@@ -1,6 +1,7 @@
 import { RevisionPageDocument } from '@gitbook/api';
 
 import { tcls } from '@/lib/tailwind';
+
 import { PageIcon } from '../PageIcon';
 
 export function PageHeader(props: { page: RevisionPageDocument }) {

@@ -4,6 +4,7 @@ import { Icon } from '@gitbook/icons';
 import { Link } from '@/components/primitives';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
+
 import { TOCPageIcon } from './TOCPageIcon';
 
 export async function PageLinkItem(props: { page: RevisionPageLink; context: ContentRefContext }) {

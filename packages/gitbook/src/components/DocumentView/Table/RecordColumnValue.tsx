@@ -179,9 +179,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                 : null;
             return (
                 <Tag className={tcls('text-base', 'text-balance', 'flex', 'items-center')}>
-                    {resolved && resolved.icon ? (
-                        resolved.icon
-                    ) : null}
+                    {resolved && resolved.icon ? resolved.icon : null}
                     {resolved ? (
                         <StyledLink href={resolved.href}>{resolved.text}</StyledLink>
                     ) : null}

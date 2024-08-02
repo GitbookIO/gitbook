@@ -1,8 +1,8 @@
 import { RevisionPage } from '@gitbook/api';
+import { Icon, IconName } from '@gitbook/icons';
 
 import { Emoji } from '@/components/primitives';
 import { ClassValue, tcls } from '@/lib/tailwind';
-import { Icon, IconName } from '@gitbook/icons';
 
 export function PageIcon(props: { page: RevisionPage; style?: ClassValue }) {
     const { page, style } = props;

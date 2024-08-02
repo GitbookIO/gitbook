@@ -6,8 +6,8 @@ import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { PagesList } from './PagesList';
-import { ToggleableLinkItem } from './ToggleableLinkItem';
 import { TOCPageIcon } from './TOCPageIcon';
+import { ToggleableLinkItem } from './ToggleableLinkItem';
 
 export function PageDocumentItem(props: {
     rootPages: RevisionPage[];
