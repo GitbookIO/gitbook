@@ -1267,7 +1267,7 @@ function mergeDeepPlainObject<T>(target: T, source: DeepPartial<T>, keys: Array<
             keys.includes(key as keyof T)
         ) {
             // @ts-ignore
-            result[key] = mergeDeepPlainObject(target[key] ?? {}, value);
+            result[key] = mergeDeepPlainObject(target[key] ?? {}, value, []);
         } else {
             // @ts-ignore
             result[key] = value;
