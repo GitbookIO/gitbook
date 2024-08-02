@@ -1,0 +1,11 @@
+/* Normal */
+svg.gb-icon {
+    background: currentColor;
+}
+
+/* Sprite */
+svg.gb-icon-s path,
+svg.gb-icon-s use {
+    fill: currentColor;
+    stroke: currentColor;
+}

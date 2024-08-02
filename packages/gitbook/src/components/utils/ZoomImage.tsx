@@ -1,6 +1,6 @@
 'use client';
 
-import IconMinimize from '@geist-ui/icons/minimize';
+import { Icon } from '@gitbook/icons';
 import classNames from 'classnames';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -257,7 +257,7 @@ function ZoomImageModal(props: {
                 )}
                 onClick={onClose}
             >
-                <IconMinimize />
+                <Icon icon="compress-wide" className={tcls('size-5')} />
             </button>
         </div>
     );

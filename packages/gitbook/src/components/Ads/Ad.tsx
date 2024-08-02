@@ -1,6 +1,6 @@
 'use client';
 
-import IconHeart from '@geist-ui/icons/heart';
+import { Icon } from '@gitbook/icons';
 import * as React from 'react';
 
 import { ClassValue, tcls } from '@/lib/tailwind';
@@ -188,7 +188,7 @@ function AdBlockerPlaceholder() {
             )}
         >
             <div className={tcls('flex', 'flex-row', 'gap-2', 'items-center')}>
-                <IconHeart className={tcls('w-4', 'h-4', 'text-primary-500')} />
+                <Icon icon="heart" className={tcls('size-4', 'text-primary-500')} />
                 <p className={tcls('text-xs', 'font-semibold')}>Ad disabled</p>
             </div>
             <p className={tcls('text-xs')}>

@@ -1,24 +1,21 @@
-import IconDownload from '@geist-ui/icons/download';
-import IconFileText from '@geist-ui/icons/fileText';
-import IconImage from '@geist-ui/icons/image';
-import IconPaperClip from '@geist-ui/icons/paperclip';
+import { Icon } from '@gitbook/icons';
 
 import { SimplifiedFileType } from '@/lib/files';
 
 /**
  * Render an appropriate icon for a file.
  */
-export function FileIcon(props: { contentType: SimplifiedFileType | null }) {
-    const { contentType } = props;
+export function FileIcon(props: { contentType: SimplifiedFileType | null; className: string }) {
+    const { contentType, className } = props;
 
     switch (contentType) {
         case 'pdf':
-            return <IconFileText />;
+            return <Icon icon="file-pdf" className={className} />;
         case 'image':
-            return <IconImage />;
+            return <Icon icon="file-image" className={className} />;
         case 'archive':
-            return <IconPaperClip />;
+            return <Icon icon="file-archive" className={className} />;
         default:
-            return <IconDownload />;
+            return <Icon icon="file-download" className={className} />;
     }
 }

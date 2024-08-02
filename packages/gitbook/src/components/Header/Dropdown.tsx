@@ -1,4 +1,4 @@
-import IconChevronDown from '@geist-ui/icons/chevronDown';
+import { Icon } from '@gitbook/icons';
 import { DetailedHTMLProps, HTMLAttributes, useId } from 'react';
 
 import { tcls } from '@/lib/tailwind';
@@ -80,11 +80,11 @@ export function Dropdown<E extends HTMLElement>(props: {
  */
 export function DropdownChevron(props: {}) {
     return (
-        <IconChevronDown
+        <Icon
+            icon="chevron-down"
             className={tcls(
                 'opacity-6',
-                'w-4',
-                'h-4',
+                'size-3',
                 'ms-1',
                 'transition-transform',
                 'group-hover/dropdown:rotate-180',

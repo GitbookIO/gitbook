@@ -443,10 +443,10 @@ async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise
               apiToken: url.searchParams.get(AUTH_TOKEN_QUERY) ?? '',
               apiEndpoint: url.searchParams.get(API_ENDPOINT_QUERY) ?? undefined,
           }
-        : decodeGitBookTokenCookie(spaceId, request.cookies.get(cookieName)?.value) ?? {
+        : (decodeGitBookTokenCookie(spaceId, request.cookies.get(cookieName)?.value) ?? {
               apiToken: undefined,
               apiEndpoint: undefined,
-          };
+          });
 
     if (!apiToken) {
         return {
