@@ -1,9 +1,11 @@
 import { RevisionPageLink } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 
-import { Emoji, Link } from '@/components/primitives';
+import { Link } from '@/components/primitives';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
+
+import { TOCPageIcon } from './TOCPageIcon';
 
 export async function PageLinkItem(props: { page: RevisionPageLink; context: ContentRefContext }) {
     const { page, context } = props;
@@ -16,7 +18,6 @@ export async function PageLinkItem(props: { page: RevisionPageLink; context: Con
                 href={resolved?.href ?? '#'}
                 className={tcls(
                     'flex',
-                    'flex-row',
                     'justify-start',
                     'items-center',
                     'gap-3',
@@ -35,7 +36,7 @@ export async function PageLinkItem(props: { page: RevisionPageLink; context: Con
                     'dark:hover:bg-light/2',
                 )}
             >
-                {page.emoji ? <Emoji code={page.emoji} /> : null}
+                <TOCPageIcon page={page} />
                 {page.title}
                 <Icon
                     icon="arrow-up-right-from-square"

@@ -96,7 +96,9 @@ export function ToggleableLinkItem(props: {
         <div>
             <Link
                 href={href}
+                aria-selected={isActive}
                 className={tcls(
+                    'group/toclink',
                     'flex',
                     'flex-row',
                     'justify-between',
