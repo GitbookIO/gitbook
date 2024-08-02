@@ -23,7 +23,7 @@ export async function Card(props: {
                 'flex-row',
                 'justify-between',
                 'items-center',
-                'gap-3',
+                'gap-4',
                 'ring-1',
                 'ring-dark/3',
                 'rounded',
