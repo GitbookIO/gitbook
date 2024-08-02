@@ -1,10 +1,10 @@
 import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 
-import { Emoji } from '@/components/primitives';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { PagesList } from './PagesList';
+import { TOCPageIcon } from './TOCPageIcon';
 
 export function PageGroupItem(props: {
     rootPages: RevisionPage[];
@@ -18,6 +18,9 @@ export function PageGroupItem(props: {
         <li className={tcls('flex', 'flex-col')}>
             <div
                 className={tcls(
+                    'flex',
+                    'items-center',
+                    'gap-3',
                     'px-5',
                     'pt-6',
                     'pb-1.5',
@@ -37,7 +40,7 @@ export function PageGroupItem(props: {
                     'dark:to-transparent',
                 )}
             >
-                {page.emoji ? <Emoji code={page.emoji} style={['mr-3']} /> : null}
+                <TOCPageIcon page={page} />
                 {page.title}
             </div>
             {page.pages && page.pages.length ? (
