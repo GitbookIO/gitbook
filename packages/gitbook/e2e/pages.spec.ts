@@ -408,11 +408,11 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Share links',
-        baseUrl: 'https://gitbook.gitbook.io/test-share-links/',
+        baseUrl: 'https://gitbook.gitbook.io/gbo-tests-share-links/',
         tests: [
             {
                 name: 'Valid link',
-                url: 'Fc6mMII9FKgnwm7qqynx/',
+                url: 'TGs8PkF4GWVtbmPnWhYL/',
                 run: waitForCookiesDialog,
             },
             {
