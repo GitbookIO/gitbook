@@ -29,6 +29,10 @@ export function createContentSecurityPolicyNonce(): string {
  * Generate a Content Security Policy header for a space.
  */
 export function getContentSecurityPolicy(scripts: SpaceIntegrationScript[], nonce: string): string {
+    const iconsAssetsSrc = process.env.GITBOOK_ICONS_URL
+        ? new URL(process.env.GITBOOK_ICONS_URL).origin
+        : '';
+
     // We need to allow loading any image or download any file
     // to support image and OpenAPI blocks where the content reference could be external.
     //
@@ -37,8 +41,8 @@ export function getContentSecurityPolicy(scripts: SpaceIntegrationScript[], nonc
         default-src 'self' ${assetsDomain};
         script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline' 'unsafe-eval' ${assetsDomain} https://integrations.gitbook.com https://cdn.iframe.ly;
         style-src 'self' ${assetsDomain} fonts.googleapis.com 'unsafe-inline';
-        img-src * 'self' blob: data: files.gitbook.com ${assetsDomain};
-        connect-src * 'self' integrations.gitbook.com app.gitbook.com api.gitbook.com srv.buysellads.com ${assetsDomain};
+        img-src * 'self' blob: data: files.gitbook.com ${assetsDomain} ${iconsAssetsSrc};
+        connect-src * 'self' integrations.gitbook.com app.gitbook.com api.gitbook.com srv.buysellads.com ${assetsDomain} ${iconsAssetsSrc};
         font-src 'self' fonts.gstatic.com ${assetsDomain};
         frame-src *;
         object-src 'none';

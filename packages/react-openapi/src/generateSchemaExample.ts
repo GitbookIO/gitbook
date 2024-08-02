@@ -104,7 +104,7 @@ export function generateSchemaExample(
 
     if (schema.properties) {
         const example: { [key: string]: JSONValue } = {};
-        const props = onlyRequired ? schema.required ?? [] : Object.keys(schema.properties);
+        const props = onlyRequired ? (schema.required ?? []) : Object.keys(schema.properties);
 
         for (const key of props) {
             const property = noReference(schema.properties[key]);

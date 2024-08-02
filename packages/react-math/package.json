@@ -1,5 +1,6 @@
 {
     "name": "@gitbook/react-math",
+    "type": "module",
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
@@ -22,6 +23,9 @@
         "build": "tsc",
         "typecheck": "tsc --noEmit",
         "dev": "tsc -w"
+    },
+    "bin": {
+        "gitbook-math": "./bin/gitbook-math.js"
     },
     "files": [
         "dist",

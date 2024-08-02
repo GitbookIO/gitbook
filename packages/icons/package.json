@@ -1,0 +1,50 @@
+{
+    "name": "@gitbook/icons",
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "development": "./src/index.ts",
+            "default": "./dist/index.js"
+        },
+        "./icons": {
+            "types": "./dist/icons.d.ts",
+            "development": "./src/icons.ts",
+            "default": "./dist/icons.js"
+        },
+        "./style.css": {
+            "default": "./src/style.css"
+        }
+    },
+    "version": "0.0.3",
+    "dependencies": {
+        "@fortawesome/fontawesome-svg-core": "^6.6.0",
+        "@fortawesome/fontawesome-free": "^6.6.0"
+    },
+    "optionalDependencies": {
+        "@awesome.me/kit-a463935e93": "1.0.8"
+    },
+    "devDependencies": {
+        "typescript": "^5.5.3"
+    },
+    "peerDependencies": {
+        "react": "*"
+    },
+    "scripts": {
+        "generate": "node ./bin/gen-list.js",
+        "build": "tsc",
+        "typecheck": "tsc --noEmit",
+        "dev": "tsc -w"
+    },
+    "bin": {
+        "gitbook-icons": "./bin/gitbook-icons.js"
+    },
+    "files": [
+        "dist",
+        "src",
+        "bin",
+        "data",
+        "README.md",
+        "CHANGELOG.md"
+    ]
+}

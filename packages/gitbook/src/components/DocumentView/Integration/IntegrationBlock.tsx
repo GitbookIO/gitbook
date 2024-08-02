@@ -1,20 +1,5 @@
-import {
-    Edit,
-    Github,
-    Gitlab,
-    Maximize,
-    X,
-    Mail,
-    Settings,
-    Search,
-    Delete,
-    Star,
-    AlertTriangle,
-    Link,
-    Eye,
-    Lock,
-} from '@geist-ui/icons';
 import { ContentKitContext, DocumentBlockIntegration } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
 import { ContentKit, ContentKitOutput, ContentKitServerContext } from '@gitbook/react-contentkit';
 
 import { ignoreAPIError, renderIntegrationUi } from '@/lib/api';
@@ -27,21 +12,21 @@ import { PlainCodeBlock } from '../CodeBlock';
 
 const outputContext: ContentKitServerContext = {
     icons: {
-        maximize: Maximize,
-        edit: Edit,
-        github: Github,
-        gitlab: Gitlab,
-        close: X,
-        email: Mail,
-        settings: Settings,
-        search: Search,
-        delete: Delete,
-        star: Star,
-        warning: AlertTriangle,
-        link: Link,
-        'link-external': Link,
-        eye: Eye,
-        lock: Lock,
+        maximize: (props) => <Icon icon="maximize" {...props} />,
+        edit: (props) => <Icon icon="edit" {...props} />,
+        github: (props) => <Icon icon="github" {...props} />,
+        gitlab: (props) => <Icon icon="gitlab" {...props} />,
+        close: (props) => <Icon icon="x" {...props} />,
+        email: (props) => <Icon icon="envelope" {...props} />,
+        settings: (props) => <Icon icon="gear" {...props} />,
+        search: (props) => <Icon icon="magnifying-glass" {...props} />,
+        delete: (props) => <Icon icon="trash" {...props} />,
+        star: (props) => <Icon icon="star" {...props} />,
+        warning: (props) => <Icon icon="triangle-exclamation" {...props} />,
+        link: (props) => <Icon icon="link" {...props} />,
+        'link-external': (props) => <Icon icon="arrow-up-right-from-square" {...props} />,
+        eye: (props) => <Icon icon="eye" {...props} />,
+        lock: (props) => <Icon icon="lock" {...props} />,
     },
     codeBlock: (props) => {
         return <PlainCodeBlock code={props.code} syntax={props.syntax} />;

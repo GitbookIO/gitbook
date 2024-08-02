@@ -2,29 +2,49 @@
     "$schema": "https://turbo.build/schema.json",
     "globalEnv": ["NODE_ENV", "CI", "ARGOS_*", "GITHUB_*"],
     "tasks": {
+        // Prepare the package for all other tasks
+        "generate": {
+            "dependsOn": ["^generate"],
+            "outputs": ["dist"]
+        },
+        "@gitbook/icons#generate": {
+            "dependsOn": ["^generate"],
+            "outputs": ["data/*.json"]
+        },
+        // Build the package for publishing
         "build": {
-            "dependsOn": ["^build"],
+            "dependsOn": ["^build", "generate"],
             "outputs": [".next/**", "!.next/cache/**", "dist"]
         },
+        // Build the package for Cloudflare Pages
         "build:cloudflare": {
-            "dependsOn": ["^build"]
+            "dependsOn": ["^build", "generate"]
         },
+        // Check the package for type errors
         "typecheck": {
-            "dependsOn": ["^typecheck", "^build"]
+            "dependsOn": ["^typecheck", "^build", "generate"]
         },
+        // Lint the package for style errors
         "lint": {
-            "dependsOn": ["^lint"]
+            "dependsOn": ["^lint", "generate"]
         },
+        // Run unit tests
         "unit": {
-            "dependsOn": ["^unit", "^build"]
+            "dependsOn": ["^unit", "^build", "generate"]
         },
+        // Run end-to-end tests
         "e2e": {
             "dependsOn": ["^e2e"],
             "env": ["BASE_URL"]
         },
+        // Start the package in development mode
         "dev": {
             "persistent": true,
             "cache": false
+        },
+        // Script run when the package is deployed
+        "release": {
+            "dependsOn": ["^release", "build"]
         }
     }
 }

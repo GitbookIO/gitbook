@@ -5,6 +5,7 @@ import {
     CustomizationSettings,
     SiteCustomizationSettings,
 } from '@gitbook/api';
+import { IconsProvider, IconStyle } from '@gitbook/icons';
 import assertNever from 'assert-never';
 import colors from 'tailwindcss/colors';
 
@@ -12,11 +13,13 @@ import { emojiFontClassName } from '@/components/primitives';
 import { fonts, ibmPlexMono } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
 import { getCurrentSiteLayoutData, getSpaceLayoutData } from '@/lib/api';
+import { getStaticFileURL } from '@/lib/assets';
 import { hexToRgb, shadesOfColor } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
 
 import { ClientContexts } from './ClientContexts';
 import './globals.css';
+import '@gitbook/icons/style.css';
 import { getContentPointer } from './fetch';
 
 /**
@@ -105,7 +108,18 @@ export default async function SpaceRootLayout(props: { children: React.ReactNode
                     'dark:bg-dark',
                 )}
             >
-                <ClientContexts language={language}>{children}</ClientContexts>
+                <IconsProvider
+                    assetsURL={process.env.GITBOOK_ICONS_URL ?? getStaticFileURL('icons')}
+                    assetsURLToken={process.env.GITBOOK_ICONS_TOKEN}
+                    assetsByStyles={{
+                        'custom-icons': {
+                            assetsURL: getStaticFileURL('icons'),
+                        },
+                    }}
+                    iconStyle={IconStyle.Light}
+                >
+                    <ClientContexts language={language}>{children}</ClientContexts>
+                </IconsProvider>
             </body>
         </html>
     );

@@ -8,13 +8,14 @@
         "build": "turbo run build",
         "build:cloudflare": "turbo run build:cloudflare",
         "lint": "turbo run lint",
+        "lint:fix": "turbo run lint -- --fix",
         "typecheck": "turbo run typecheck",
         "format": "prettier ./ --ignore-unknown --write",
         "format:check": "prettier ./ --ignore-unknown --list-different",
         "unit": "turbo run unit",
         "e2e": "turbo run e2e",
         "changeset": "changeset",
-        "release": "turbo run build && changeset publish"
+        "release": "turbo run release && changeset publish"
     },
     "workspaces": [
         "packages/*"
@@ -25,6 +26,6 @@
         "turbo": "^2.0.9"
     },
     "patchedDependencies": {
-        "@vercel/next@4.0.15": "patches/@vercel%2Fnext@4.0.15.patch"
+        "@vercel/next@4.3.6": "patches/@vercel%2Fnext@4.3.6.patch"
     }
 }

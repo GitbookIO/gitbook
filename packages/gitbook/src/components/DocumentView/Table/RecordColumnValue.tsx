@@ -1,5 +1,5 @@
-import IconStar from '@geist-ui/icons/star';
 import { ContentRef, DocumentBlockTable } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
 import assertNever from 'assert-never';
 
 import { Checkbox, Emoji } from '@/components/primitives';
@@ -54,12 +54,13 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                         <>
                             <span className={tcls('inline-flex', 'grid-area-1-1', 'gap-0.5')}>
                                 {Array.from({ length: max }).map((_, i) => (
-                                    <IconStar
+                                    <Icon
                                         key={i}
+                                        icon="star"
                                         className={tcls(
                                             'size-[15px]',
-                                            'stroke-primary-700/5',
-                                            'dark:stroke-primary-300/5',
+                                            'text-primary-700/5',
+                                            'dark:text-primary-300/5',
                                         )}
                                     />
                                 ))}
@@ -73,9 +74,10 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                 className={tcls('inline-flex', 'grid-area-1-1', 'gap-0.5')}
                             >
                                 {Array.from({ length: rating }).map((_, i) => (
-                                    <IconStar
+                                    <Icon
                                         key={i}
-                                        className={tcls('size-[15px]', 'stroke-primary')}
+                                        icon="star"
+                                        className={tcls('size-[15px]', 'text-primary')}
                                     />
                                 ))}
                             </span>
@@ -157,7 +159,10 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                         priority="lazy"
                                     />
                                 ) : (
-                                    <FileIcon contentType={contentType} />
+                                    <FileIcon
+                                        contentType={contentType}
+                                        className={tcls('size-4')}
+                                    />
                                 )}
                                 {ref.text}
                             </StyledLink>
