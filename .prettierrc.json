@@ -1,14 +1,5 @@
 {
     "printWidth": 100,
     "singleQuote": true,
-    "tabWidth": 4,
-    "overrides": [
-        {
-            "files": ["package.json"],
-            "options": {
-                "parser": "jsonc",
-                "trailingComma": "none"
-            }
-        }
-    ]
+    "tabWidth": 4
 }

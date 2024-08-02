@@ -31,5 +31,10 @@
         "unit": "bun test",
         "dev": "tsc -w"
     },
-    "files": ["dist", "src", "README.md", "CHANGELOG.md"]
+    "files": [
+        "dist",
+        "src",
+        "README.md",
+        "CHANGELOG.md"
+    ]
 }
