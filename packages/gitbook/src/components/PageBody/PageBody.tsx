@@ -13,6 +13,7 @@ import { ContentPointer, ContentTarget, SiteContentPointer, api } from '@/lib/ap
 import { hasFullWidthBlock, isNodeEmpty } from '@/lib/document';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
+import { shouldTrackPageViews } from '@/lib/tracking';
 
 import { PageBodyBlankslate } from './PageBodyBlankslate';
 import { PageCover } from './PageCover';
@@ -141,14 +142,14 @@ export function PageBody(props: {
                     ) : null}
                 </div>
             </main>
-            <React.Suspense fallback={null}>
+            {shouldTrackPageViews() ? (
                 <TrackPageView
                     sitePointer={sitePointer}
                     spaceId={space.id}
                     pageId={page.id}
                     apiHost={api().endpoint}
                 />
-            </React.Suspense>
+            ) : null}
         </>
     );
 }
