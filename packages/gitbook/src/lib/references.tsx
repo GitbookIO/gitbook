@@ -15,12 +15,17 @@ import {
 import { getBlockById, getBlockTitle } from './document';
 import { gitbookAppHref, pageHref, PageHrefContext } from './links';
 import { getPagePath, resolvePageId } from './pages';
+import React from 'react';
+import { PageIcon } from '@/components/PageIcon';
+import { ClassValue } from './tailwind';
 
 export interface ResolvedContentRef {
     /** Text to render in the content ref */
     text: string;
     /** Additional sub text to render in the content ref */
     subText?: string;
+    /** Icon associated with it */
+    icon?: React.ReactNode;
     /** Emoji associated with the reference */
     emoji?: string;
     /** URL to open for the content ref */
@@ -69,6 +74,11 @@ export interface ResolveContentRefOptions {
      * @default false
      */
     resolveAnchorText?: boolean;
+
+    /**
+     * Styles to apply to the icon.
+     */
+    iconStyle?: ClassValue;
 }
 
 /**
@@ -79,7 +89,7 @@ export async function resolveContentRef(
     context: ContentRefContext,
     options: ResolveContentRefOptions = {},
 ): Promise<ResolvedContentRef | null> {
-    const { resolveAnchorText = false } = options;
+    const { resolveAnchorText = false, iconStyle } = options;
     const { siteContext, space, revisionId, pages, page: activePage, ...linksContext } = context;
 
     switch (contentRef.kind) {
@@ -128,6 +138,7 @@ export async function resolveContentRef(
 
             let href = '';
             let text = '';
+            let icon: React.ReactNode | undefined = undefined;
             let emoji: string | undefined = undefined;
 
             // Compute the text to display for the link
@@ -154,6 +165,7 @@ export async function resolveContentRef(
                         ? parentPage.title
                         : page.title;
                 emoji = isCurrentPage ? undefined : page.emoji;
+                icon = <PageIcon page={page} style={iconStyle} />;
             }
 
             // Compute the href for the link
@@ -173,6 +185,7 @@ export async function resolveContentRef(
                 href,
                 text,
                 emoji,
+                icon,
                 active: !anchor && page.id === activePage?.id,
             };
         }
