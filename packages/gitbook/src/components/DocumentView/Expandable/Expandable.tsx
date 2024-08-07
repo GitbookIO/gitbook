@@ -1,6 +1,5 @@
-import ChevronRight from '@geist-ui/icons/chevronRight';
-import IconHash from '@geist-ui/icons/hash';
 import { DocumentBlockExpandable } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
 
 import { getNodeFragmentByType } from '@/lib/document';
 import { tcls } from '@/lib/tailwind';
@@ -78,11 +77,11 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                     '[&::-webkit-details-marker]:hidden',
                 )}
             >
-                <ChevronRight
+                <Icon
+                    icon="chevron-right"
                     className={tcls(
                         'inline-block',
-                        'w-4',
-                        'h-4',
+                        'size-3',
                         'mr-2',
                         'mb-1',
                         'transition-transform',
@@ -111,15 +110,15 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                         'dark:ring-0',
                     )}
                 >
-                    <IconHash
+                    <Icon
+                        icon="hashtag"
                         className={tcls(
                             'inline-block',
-                            'w-4',
-                            'h-4',
+                            'size-3',
                             'transition-colors',
-                            'stroke-transparent',
-                            'group-hover:stroke-dark/6',
-                            'dark:group-hover:stroke-light/5',
+                            'text-transparent',
+                            'group-hover:text-dark/6',
+                            'dark:group-hover:text-light/5',
                         )}
                     />
                 </a>

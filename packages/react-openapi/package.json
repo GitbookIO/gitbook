@@ -1,5 +1,6 @@
 {
     "name": "@gitbook/react-openapi",
+    "type": "module",
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
@@ -9,7 +10,7 @@
     },
     "version": "0.6.0",
     "dependencies": {
-        "@scalar/api-client-react": "1.0.5",
+        "@scalar/api-client-react": "1.0.7",
         "classnames": "^2.5.1",
         "flatted": "^3.2.9",
         "openapi-types": "^12.1.3",

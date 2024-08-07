@@ -346,7 +346,7 @@
 }
 
 .openapi-section-toggle svg {
-    @apply size-4;
+    @apply size-3;
 }
 
 /** Markdown */

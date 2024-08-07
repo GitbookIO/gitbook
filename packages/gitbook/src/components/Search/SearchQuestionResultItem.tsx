@@ -1,4 +1,4 @@
-import IconSearch from '@geist-ui/icons/search';
+import { Icon } from '@gitbook/icons';
 import React from 'react';
 
 import { t, useLanguage } from '@/intl/client';
@@ -44,15 +44,16 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                 query: question,
             })}
         >
-            <IconSearch
+            <Icon
+                icon="magnifying-glass"
                 className={tcls(
                     'w-[15px]',
                     'h-[15px]',
                     'shrink-0',
                     'mt-0.5',
-                    'mr-2',
-                    'stroke-dark/5',
-                    'dark:stroke-light/5',
+                    'mr-4',
+                    'text-dark/5',
+                    'dark:text-light/5',
                 )}
             />
             {recommended ? question : t(language, 'search_ask', [question])}

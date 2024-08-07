@@ -1,6 +1,6 @@
 'use client';
 
-import { AlertTriangle } from '@geist-ui/icons';
+import { Icon } from '@gitbook/icons';
 import React from 'react';
 
 import { useScrollActiveId } from '@/components/hooks';
@@ -105,7 +105,10 @@ export function PageControlButtons(props: {
                             'max-w-sm',
                         )}
                     >
-                        <AlertTriangle className={tcls('size-6', 'mr-3', 'mt-1')} />{' '}
+                        <Icon
+                            icon="triangle-exclamation"
+                            className={tcls('size-6', 'mr-3', 'mt-1')}
+                        />{' '}
                         <div>
                             <div>{t(language, 'pdf_limit_reached', total, pageIds.length)}</div>
                             <div>

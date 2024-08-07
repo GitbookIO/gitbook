@@ -1,8 +1,10 @@
+import { DeepPartial } from 'ts-essentials';
 import { argosScreenshot } from '@argos-ci/playwright';
 import {
     CustomizationHeaderPreset,
+    CustomizationIconsStyle,
     CustomizationLocale,
-    CustomizationSettings,
+    SiteCustomizationSettings,
 } from '@gitbook/api';
 import { test, expect, Page } from '@playwright/test';
 import jwt from 'jsonwebtoken';
@@ -350,6 +352,11 @@ const testCases: TestsCase[] = [
                 fullPage: true,
             },
             {
+                name: 'Page links',
+                url: 'blocks/page-links',
+                fullPage: true,
+            },
+            {
                 name: 'Annotations',
                 url: 'blocks/annotations',
                 run: async (page) => {
@@ -383,6 +390,11 @@ const testCases: TestsCase[] = [
                 url: 'page-options/page-with-cover-and-no-toc',
                 run: waitForCookiesDialog,
             },
+            {
+                name: 'With icon',
+                url: 'page-options/page-with-icon',
+                run: waitForCookiesDialog,
+            },
         ],
     },
     {
@@ -399,6 +411,17 @@ const testCases: TestsCase[] = [
                 }),
                 run: waitForCookiesDialog,
             },
+            {
+                name: 'With duotone icons',
+                url:
+                    'page-options/page-with-icon' +
+                    getCustomizationURL({
+                        styling: {
+                            icons: CustomizationIconsStyle.Duotone,
+                        },
+                    }),
+                run: waitForCookiesDialog,
+            },
         ],
     },
     {
@@ -408,7 +431,6 @@ const testCases: TestsCase[] = [
             {
                 name: 'Valid link',
                 url: 'TGs8PkF4GWVtbmPnWhYL/',
-                run: waitForCookiesDialog,
             },
             {
                 name: 'Invalid link',
@@ -617,7 +639,6 @@ const testCases: TestsCase[] = [
             url: getCustomizationURL({
                 internationalization: {
                     locale,
-                    inherit: false,
                 },
             }),
             run: async (page) => {
@@ -658,7 +679,7 @@ for (const testCase of testCases) {
 /**
  * Create a URL with customization settings.
  */
-function getCustomizationURL(partial: Partial<CustomizationSettings>): string {
+function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettings>): string {
     const encoded = rison.encode_object(partial);
 
     const searchParams = new URLSearchParams();

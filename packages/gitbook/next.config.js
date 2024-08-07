@@ -7,6 +7,8 @@ module.exports = withSentryConfig(
             SENTRY_DSN: process.env.SENTRY_DSN ?? '',
             SENTRY_ENVIRONMENT: process.env.SENTRY_ENVIRONMENT ?? 'development',
             GITBOOK_ASSETS_PREFIX: process.env.GITBOOK_ASSETS_PREFIX,
+            GITBOOK_ICONS_URL: process.env.GITBOOK_ICONS_URL,
+            GITBOOK_ICONS_TOKEN: process.env.GITBOOK_ICONS_TOKEN,
         },
 
         webpack(config, { dev, webpack }) {

@@ -5,7 +5,10 @@ import { absoluteHref } from '@/lib/links';
 
 import { Emoji } from '../primitives';
 
-export function LogoIcon(
+/**
+ * Icon for a space.
+ */
+export function SpaceIcon(
     props: { icon?: CustomizationThemedURL; emoji?: string } & Omit<
         React.ComponentProps<typeof Image>,
         'sources'
