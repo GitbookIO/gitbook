@@ -27,6 +27,7 @@ export async function Annotation(props: InlineProps<DocumentInlineAnnotation>) {
                     ancestorBlocks={[]}
                     context={context}
                     nodes={fragment.nodes}
+                    style={['[&>:not(h1,h2,h3,h4)]:mt-5']}
                 />
             }
         >
