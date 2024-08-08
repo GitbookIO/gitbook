@@ -3,6 +3,7 @@ import {
     JSONDocument,
     RevisionPageDocument,
     Site,
+    SiteAdsStatus,
     SiteCustomizationSettings,
     Space,
 } from '@gitbook/api';
@@ -183,9 +184,9 @@ export async function PageAside(props: {
                     ) : null}
                 </div>
             </div>
-            {site?.ads ? (
+            {site?.ads && site.ads.status === SiteAdsStatus.Live ? (
                 <Ad
-                    zoneId={site.ads.zone}
+                    zoneId={site.ads.zoneId}
                     placement="page.aside"
                     spaceId={space.id}
                     ignore={process.env.NODE_ENV !== 'production'}
