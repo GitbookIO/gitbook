@@ -21,6 +21,7 @@ export function Quote(props: BlockProps<DocumentBlockQuote>) {
                 'border-dark/2',
                 'dark:text-light/7',
                 'dark:border-light/2',
+                '[&>*+*]:mt-5'
             ]}
         />
     );
