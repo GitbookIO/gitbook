@@ -21,7 +21,7 @@ export function Quote(props: BlockProps<DocumentBlockQuote>) {
                 'border-dark/2',
                 'dark:text-light/7',
                 'dark:border-light/2',
-                '[&>:not(h1,h2,h3,h4)]:mt-5',
+                'space-y-4',
             ]}
         />
     );
