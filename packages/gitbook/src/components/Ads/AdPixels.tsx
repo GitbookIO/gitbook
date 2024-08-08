@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { tcls } from "@/lib/tailwind";
+import { tcls } from '@/lib/tailwind';
 
 /**
  * Render attribution or verification pixels.

@@ -18,7 +18,7 @@ export function Ad({
     style,
     mode = 'auto',
 }: {
-    zoneId: string;
+    zoneId: string | null;
     spaceId: string;
     placement: string;
     ignore: boolean;
@@ -64,8 +64,20 @@ export function Ad({
 
         let cancelled = false;
 
+        const preview = new URL(window.location.href).searchParams.has('adpreview');
+        if (!preview && !zoneId) {
+            return;
+        }
+
         (async () => {
-            const result = await renderAd({ spaceId, placement, ignore, zoneId, mode });
+            const result = await renderAd({
+                spaceId,
+                placement,
+                ignore,
+                zoneId: zoneId || 'FAKE_ID',
+                mode,
+                fake: preview,
+            });
 
             if (cancelled) {
                 return;
@@ -88,9 +100,7 @@ export function Ad({
 
     return (
         <div ref={containerRef} className={tcls(style)}>
-            {ad ? (
-                ad
-            ) : null}
+            {ad ? ad : null}
         </div>
     );
 }
