@@ -10,7 +10,7 @@ import { AdCover } from './types';
  * Cover rendering for an ad.
  */
 export async function AdCoverRendering({ ad }: { ad: AdCover }) {
-    const largeImage = await getResizedImageURL(ad.largeImage, { width: 128 });
+    const largeImage = await getResizedImageURL(ad.largeImage, { width: 128, dpr: 2 });
 
     return (
         <a
