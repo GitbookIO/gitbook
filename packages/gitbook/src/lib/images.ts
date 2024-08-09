@@ -66,16 +66,19 @@ export function checkIsSizableImageURL(input: string): boolean {
     return checkIsHttpURL(parsed);
 }
 
+interface ResizeImageOptions {
+    width?: number;
+    height?: number;
+    dpr?: number;
+    quality?: number;
+}
+
 /**
- * Create a new URL for an image with resized parameters.
- * The URL is signed and verified by the server.
+ * Create a function to get resized image URLs for a given image URL.
  */
-export async function getResizedImageURL(
+export async function getResizedImageURLFactory(
     input: string,
-): Promise<
-    | ((options: { width?: number; height?: number; dpr?: number; quality?: number }) => string)
-    | null
-> {
+): Promise<((options: ResizeImageOptions) => string) | null> {
     if (!checkIsSizableImageURL(input)) {
         return null;
     }
@@ -104,6 +107,18 @@ export async function getResizedImageURL(
 
         return url.toString();
     };
+}
+
+/**
+ * Create a new URL for an image with resized parameters.
+ * The URL is signed and verified by the server.
+ */
+export async function getResizedImageURL(
+    input: string,
+    options: ResizeImageOptions,
+): Promise<string> {
+    const factory = await getResizedImageURLFactory(input);
+    return factory?.(options) ?? input;
 }
 
 /**
