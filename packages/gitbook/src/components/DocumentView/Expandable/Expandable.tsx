@@ -128,7 +128,7 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                 document={document}
                 ancestorBlocks={[...ancestorBlocks, block]}
                 context={context}
-                style={['px-10', 'pb-5', 'space-y-3']}
+                style={['px-10', 'pb-5', 'space-y-4']}
             />
         </details>
     );
