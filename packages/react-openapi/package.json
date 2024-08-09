@@ -8,7 +8,7 @@
             "default": "./dist/index.js"
         }
     },
-    "version": "0.6.0",
+    "version": "0.6.1",
     "dependencies": {
         "@scalar/api-client-react": "1.0.7",
         "classnames": "^2.5.1",
