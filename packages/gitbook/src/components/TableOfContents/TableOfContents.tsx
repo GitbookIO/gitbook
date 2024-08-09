@@ -26,7 +26,6 @@ export function TableOfContents(props: {
     withHeaderOffset: boolean;
 }) {
     const { space, customization, pages, ancestors, header, context, withHeaderOffset } = props;
-    const scrollContainerId = React.useId();
 
     return (
         <aside
@@ -57,7 +56,6 @@ export function TableOfContents(props: {
         >
             {header ? header : null}
             <div
-                id={scrollContainerId}
                 className={tcls(
                     withHeaderOffset ? 'pt-4' : ['pt-4', 'lg:pt-0'],
                     'hidden',
