@@ -7,6 +7,7 @@ import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
+import { useScrollToActiveTOCItem } from './useScrollToActiveTOCItem';
 import { Link } from '../primitives';
 
 const show = {
@@ -46,6 +47,7 @@ export function ToggleableLinkItem(props: {
 
     const [scope, animate] = useAnimate();
     const [isVisible, setIsVisible] = React.useState(hasActiveDescendant);
+    const linkRef = React.createRef<HTMLAnchorElement>();
 
     // Update the visibility of the children, if we are navigating to a descendant.
     React.useEffect(() => {
@@ -90,12 +92,15 @@ export function ToggleableLinkItem(props: {
     const mountedRef = React.useRef(false);
     React.useEffect(() => {
         mountedRef.current = true;
-    }, []);
+    });
+
+    useScrollToActiveTOCItem({ linkRef, isActive });
 
     return (
         <div>
             <Link
                 href={href}
+                ref={linkRef}
                 aria-selected={isActive}
                 className={tcls(
                     'group/toclink',
