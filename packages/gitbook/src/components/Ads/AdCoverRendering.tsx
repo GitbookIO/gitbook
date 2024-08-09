@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { hexToRgba } from '@/lib/colors';
+import { getResizedImageURL } from '@/lib/images';
 import { tcls } from '@/lib/tailwind';
 
 import { AdCover } from './types';
@@ -8,7 +9,9 @@ import { AdCover } from './types';
 /**
  * Cover rendering for an ad.
  */
-export function AdCoverRendering({ ad }: { ad: AdCover }) {
+export async function AdCoverRendering({ ad }: { ad: AdCover }) {
+    const largeImage = await getResizedImageURL(ad.largeImage, { width: 128 });
+
     return (
         <a
             className={tcls(
@@ -43,14 +46,14 @@ export function AdCoverRendering({ ad }: { ad: AdCover }) {
                     'z-0',
                 )}
                 style={{
-                    backgroundImage: `url(${ad.largeImage})`,
+                    backgroundImage: `url(${largeImage})`,
                 }}
             />
 
             <div className={tcls('z-[2]')}>
                 <img
                     alt="Large image"
-                    src={ad.largeImage}
+                    src={largeImage}
                     className={tcls(
                         'rounded-md',
                         'shadow-md',
