@@ -7,6 +7,11 @@ import { ClassValue, tcls } from '@/lib/tailwind';
 import { renderAd } from './renderAd';
 
 /**
+ * Zone ID provided by BuySellAds for the preview.
+ */
+const PREVIEW_ZONE_ID = 'CVAIKKQM';
+
+/**
  * Fetch and render the Ad placement.
  * https://docs.buysellads.com/ad-serving-api
  */
@@ -64,8 +69,10 @@ export function Ad({
 
         let cancelled = false;
 
-        const preview = new URL(window.location.href).searchParams.has('adpreview');
-        if (!preview && !zoneId) {
+        const preview = new URL(window.location.href).searchParams.has('ads_preview');
+        const realZoneId = preview ? PREVIEW_ZONE_ID : zoneId;
+
+        if (!realZoneId) {
             return;
         }
 
@@ -73,10 +80,9 @@ export function Ad({
             const result = await renderAd({
                 spaceId,
                 placement,
-                ignore,
-                zoneId: zoneId || 'FAKE_ID',
+                ignore: ignore || preview,
+                zoneId: realZoneId,
                 mode,
-                fake: preview,
             });
 
             if (cancelled) {

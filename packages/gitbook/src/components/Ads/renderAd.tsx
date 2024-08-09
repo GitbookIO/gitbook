@@ -1,11 +1,13 @@
 'use server';
 
 import { headers } from 'next/headers';
-import { AdItem, AdsResponse } from './types';
+
+import { tcls } from '@/lib/tailwind';
+
 import { AdClassicRendering } from './AdClassicRendering';
 import { AdCoverRendering } from './AdCoverRendering';
 import { AdPixels } from './AdPixels';
-import { tcls } from '@/lib/tailwind';
+import { AdItem, AdsResponse } from './types';
 
 interface FetchAdOptions {
     /** ID of the zone to fetch Ads for */
@@ -18,8 +20,6 @@ interface FetchAdOptions {
     placement: string;
     /** If true, we'll not track it as an impression */
     ignore: boolean;
-    /** If true, we'll render a fake Ad instead. This is used for preview */
-    fake?: boolean;
 }
 
 /**
@@ -65,44 +65,7 @@ export async function renderAd(options: FetchAdOptions) {
     );
 }
 
-async function fetchAd({
-    zoneId,
-    placement,
-    ignore,
-    fake,
-}: FetchAdOptions): Promise<AdItem | null> {
-    if (fake) {
-        return {
-            description: 'Text of the Ad.',
-            statlink:
-                'https://www.gitbook.com',
-            smallImage:
-                'https://srv.buysellads.com/static/30242/4f7f59796c5dda8f5dfc63a40583dfde7cebb050',
-            // Not really used
-            active: '1',
-            ad_via_link: '',
-            bannerid: '',
-            creativeid: '',
-            evenodd: '0',
-            external_id: '',
-            height: '0',
-            i: '0',
-            identifier: '',
-            longimp: '',
-            longlink:
-                '',
-            num_slots: '1',
-            rendering: 'carbon',
-            statimp:
-                '',
-            
-            timestamp: '1723109225',
-            width: '0',
-            zoneid: 'FAKE_ID',
-            zonekey: zoneId,
-        };
-    }
-
+async function fetchAd({ zoneId, placement, ignore }: FetchAdOptions): Promise<AdItem | null> {
     const headersSet = headers();
     const ip = headersSet.get('x-forwarded-for') ?? '';
     const userAgent = headersSet.get('user-agent') ?? '';
