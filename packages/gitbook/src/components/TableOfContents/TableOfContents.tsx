@@ -80,15 +80,15 @@ export function TableOfContents(props: {
                     customization.trademark.enabled ? 'lg:pb-20' : 'lg:pb-4',
                 )}
             >
-                    <PagesList
-                        rootPages={pages}
-                        pages={pages}
-                        ancestors={ancestors}
-                        context={context}
-                    />
-                    {customization.trademark.enabled ? (
-                        <Trademark space={space} customization={customization} />
-                    ) : null}
+                <PagesList
+                    rootPages={pages}
+                    pages={pages}
+                    ancestors={ancestors}
+                    context={context}
+                />
+                {customization.trademark.enabled ? (
+                    <Trademark space={space} customization={customization} />
+                ) : null}
             </div>
         </aside>
     );

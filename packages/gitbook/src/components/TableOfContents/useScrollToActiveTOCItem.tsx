@@ -13,7 +13,7 @@ export function useScrollToActiveTOCItem(tocItem: {
 
     React.useEffect(() => {
         if (isActive && linkRef.current) {
-            linkRef.current.scrollIntoView({behavior: 'smooth', block: 'center'})
+            linkRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     }, [isActive, linkRef]);
 }
