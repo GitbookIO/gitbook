@@ -3,13 +3,13 @@ import { Icon } from '@gitbook/icons';
 import { ContentKit, ContentKitOutput, ContentKitServerContext } from '@gitbook/react-contentkit';
 
 import { ignoreAPIError, renderIntegrationUi } from '@/lib/api';
+import { INTEGRATIONS_HOST } from '@/lib/csp';
 import { parseMarkdown } from '@/lib/markdown';
 import { tcls } from '@/lib/tailwind';
 
 import type { BlockProps } from '../Block';
 import './contentkit.css';
 import { PlainCodeBlock } from '../CodeBlock';
-import { INTEGRATIONS_HOST } from '@/lib/csp';
 
 const outputContext: ContentKitServerContext = {
     icons: {
