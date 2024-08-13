@@ -9,6 +9,7 @@ import { tcls } from '@/lib/tailwind';
 import type { BlockProps } from '../Block';
 import './contentkit.css';
 import { PlainCodeBlock } from '../CodeBlock';
+import { INTEGRATIONS_HOST } from '@/lib/csp';
 
 const outputContext: ContentKitServerContext = {
     icons: {
@@ -69,7 +70,7 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
     return (
         <div className={tcls(style)}>
             <ContentKit
-                security={{ firstPartyDomains: ['integrations.gitbook.com'] }}
+                security={{ firstPartyDomains: [INTEGRATIONS_HOST] }}
                 initialInput={initialInput}
                 initialOutput={initialOutput}
                 render={async (request) => {
