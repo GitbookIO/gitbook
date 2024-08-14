@@ -10,6 +10,7 @@ import { resolveDynamicBinding } from './dynamic';
 export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWebFrame>) {
     const { element } = props;
 
+    const [mounted, setMounted] = React.useState(false);
     const renderer = useContentKitClientContext();
     const iframeRef = React.useRef<HTMLIFrameElement>(null);
     const [size, setSize] = React.useState<{
@@ -23,10 +24,6 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
 
     const sendMessage = React.useCallback(
         (message: object) => {
-            if (!iframeRef.current) {
-                return;
-            }
-
             const target = new URL(element.source.url);
 
             // For security reasons, only iframe from our integrations domains are allowed
@@ -36,6 +33,10 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
             }
 
             if (readyRef.current) {
+                if (!iframeRef.current) {
+                    return;
+                }
+
                 iframeRef.current.contentWindow!.postMessage(
                     message,
                     `${target.protocol}//${target.host}`,
@@ -61,7 +62,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
 
             // For security reasons, only iframe from our integrations domains are allowed
             // to send and receive messages
-            if (!renderer.security.firstPartyDomains.includes(origin.host) && 0) {
+            if (!renderer.security.firstPartyDomains.includes(origin.host)) {
                 return;
             }
 
@@ -117,6 +118,11 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
         };
 
         window.addEventListener('message', callback);
+
+        // We only render the iframe once we have added the event listener
+        // otherwise during SSR, we'll miss messages
+        setMounted(true);
+
         return () => {
             window.removeEventListener('message', callback);
         };
@@ -142,26 +148,29 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
         <div
             className={`contentkit-webframe`}
             style={{
-                aspectRatio: element.aspectRatio,
-                ...size,
+                aspectRatio: size.aspectRatio || element.aspectRatio || undefined,
+                maxWidth: size.maxWidth || undefined,
+                maxHeight: size.maxHeight || undefined,
             }}
         >
-            <iframe
-                ref={iframeRef}
-                src={element.source.url}
-                allowFullScreen
-                allow="clipboard-write"
-                style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    bottom: 0,
-                    right: 0,
-                    width: '100%',
-                    height: '100%',
-                    border: 'none',
-                }}
-            />
+            {mounted ? (
+                <iframe
+                    ref={iframeRef}
+                    src={element.source.url}
+                    allowFullScreen
+                    allow="clipboard-write"
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        bottom: 0,
+                        right: 0,
+                        width: '100%',
+                        height: '100%',
+                        border: 'none',
+                    }}
+                />
+            ) : null}
         </div>
     );
 }
