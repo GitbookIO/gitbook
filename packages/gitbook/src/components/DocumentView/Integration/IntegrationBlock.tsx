@@ -3,6 +3,7 @@ import { Icon } from '@gitbook/icons';
 import { ContentKit, ContentKitOutput, ContentKitServerContext } from '@gitbook/react-contentkit';
 
 import { ignoreAPIError, renderIntegrationUi } from '@/lib/api';
+import { INTEGRATIONS_HOST } from '@/lib/csp';
 import { parseMarkdown } from '@/lib/markdown';
 import { tcls } from '@/lib/tailwind';
 
@@ -69,7 +70,7 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
     return (
         <div className={tcls(style)}>
             <ContentKit
-                security={{ firstPartyDomains: ['integrations.gitbook.com'] }}
+                security={{ firstPartyDomains: [INTEGRATIONS_HOST] }}
                 initialInput={initialInput}
                 initialOutput={initialOutput}
                 render={async (request) => {
