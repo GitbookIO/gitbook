@@ -2,8 +2,6 @@
 
 import React from 'react';
 
-import { tcls } from '@/lib/tailwind';
-
 const TOCScrollContainerContext = React.createContext<React.RefObject<HTMLDivElement> | null>(null);
 
 export function TOCScrollContainerProvider(
