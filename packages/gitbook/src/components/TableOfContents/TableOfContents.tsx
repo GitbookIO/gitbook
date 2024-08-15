@@ -14,6 +14,7 @@ import { tcls } from '@/lib/tailwind';
 
 import { PagesList } from './PagesList';
 import { Trademark } from './Trademark';
+import { TOCScrollContainerProvider } from './useScrollToActiveTOCItem';
 
 export function TableOfContents(props: {
     space: Space;
@@ -55,7 +56,7 @@ export function TableOfContents(props: {
             )}
         >
             {header ? header : null}
-            <div
+            <TOCScrollContainerProvider
                 className={tcls(
                     withHeaderOffset ? 'pt-4' : ['pt-4', 'lg:pt-0'],
                     'hidden',
@@ -87,7 +88,7 @@ export function TableOfContents(props: {
                 {customization.trademark.enabled ? (
                     <Trademark space={space} customization={customization} />
                 ) : null}
-            </div>
+            </TOCScrollContainerProvider>
         </aside>
     );
 }
