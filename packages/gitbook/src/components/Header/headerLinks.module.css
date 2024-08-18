@@ -3,37 +3,73 @@
     container-name: headerlinks;
 }
 
-.containerHeaderlinks > * {
+.containerHeaderlinks > a {
+    display: flex;
+}
+.linkEllipsis {
     display: none;
+    & div > a {
+        display: none;
+    }
 }
 
-@container headerlinks ( width > 150px ) {
-    .containerHeaderlinks > *:nth-child(1) {
+@container headerlinks ( width < 150px ) {
+    .containerHeaderlinks > a:nth-of-type(n+2) {
+        display: none;
+    }
+    .containerHeaderlinks > a:nth-of-type(n+2)  ~ .linkEllipsis {
         display: flex;
+        & div > a:nth-of-type(n+2) {
+            display: flex;
+        }
     }
 }
-@container headerlinks ( width > 300px ) {
-    .containerHeaderlinks > *:nth-child(2) {
-        display: flex;
+@container headerlinks ( width < 300px ) {
+    .containerHeaderlinks > a:nth-of-type(n+3) {
+        display: none;
     }
+    .containerHeaderlinks > a:nth-of-type(n+3)  ~ .linkEllipsis {
+        display: flex;
+        & div > a:nth-of-type(n+3) {
+            display: flex;
+        }
+     }
 }
-@container headerlinks ( width > 450px ) {
-    .containerHeaderlinks > *:nth-child(3) {
-        display: flex;
+@container headerlinks ( width < 450px ) {
+    .containerHeaderlinks > a:nth-of-type(n+4) {
+        display: none;
     }
+    .containerHeaderlinks > a:nth-of-type(n+4)  ~ .linkEllipsis {
+        display: flex;
+        & div > a:nth-of-type(n+4) {
+            display: flex;
+        }
+     }
 }
-@container headerlinks ( width > 600px ) {
-    .containerHeaderlinks > *:nth-child(4) {
-        display: flex;
+@container headerlinks ( width < 600px ) {
+    .containerHeaderlinks > a:nth-of-type(n+5) {
+        display: none;
     }
+    .containerHeaderlinks > a:nth-of-type(n+5) ~ .linkEllipsis {
+        display: flex;
+        & div > a:nth-of-type(n+5) {
+            display: flex;
+        }
+     }
+}
+@container headerlinks ( width < 750px ) {
+    .containerHeaderlinks > a:nth-of-type(n+6) {
+        display: none;
+    }
+    .containerHeaderlinks > a:nth-of-type(n+6) ~ .linkEllipsis {
+        display: flex;
+        & div > a:nth-of-type(n+6) {
+            display: flex;
+        }
+     }
 }
 @container headerlinks ( width > 750px ) {
-    .containerHeaderlinks > *:nth-child(5) {
-        display: flex;
-    }
-}
-@container headerlinks ( width > 900px ) {
-    .containerHeaderlinks > *:nth-child(n + 5) {
+    .containerHeaderlinks > a {
         display: flex;
     }
 }
