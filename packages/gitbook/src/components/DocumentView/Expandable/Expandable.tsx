@@ -1,12 +1,27 @@
-import { DocumentBlockExpandable } from '@gitbook/api';
+import { DocumentBlockExpandable, DocumentBlocksEssentials } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 
 import { getNodeFragmentByType } from '@/lib/document';
 import { tcls } from '@/lib/tailwind';
 
+import { Details } from './Details';
 import { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { Inlines } from '../Inlines';
+
+/**
+ * Find nodes with ids within Expandable section's content.
+ */
+function getIdsInNodes(nodes: DocumentBlocksEssentials[]): string[] {
+    const ids = []
+    for (const node of nodes) {
+        if ('meta' in node && typeof node.meta?.id === 'string') { ids.push(node.meta?.id); }
+        if ('nodes' in node && node.nodes.length > 0) {
+            ids.push(...getIdsInNodes(node.nodes as any[]))
+        }
+    }
+    return ids.filter(Boolean);
+}
 
 export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
     const { block, style, ancestorBlocks, document, context } = props;
@@ -19,46 +34,16 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
     if (!title || !body || titleParagraph?.type !== 'paragraph') {
         return null;
     }
-
+    
     let id = block.meta?.id ?? '';
     id = context.getId ? context.getId(id) : id;
-
+    
     return (
-        <details
+        <Details
             id={id}
+            contentIds={getIdsInNodes(body.nodes)}
             open={context.mode === 'print'}
-            className={tcls(
-                style,
-                'group/expandable',
-                'shadow-dark/1',
-                'bg-gradient-to-t',
-                'from-light-1',
-                'to-light-1',
-                'border',
-                'border-b-0',
-                'border-dark-3/3',
-                //all
-                '[&]:mt-[0px]',
-                //select first child
-                '[&:first-child]:mt-5',
-                '[&:first-child]:rounded-t-lg',
-                //select first in group
-                '[:not(&)_+&]:mt-5',
-                '[:not(&)_+&]:rounded-t-lg',
-                //select last in group
-                '[&:not(:has(+_&))]:mb-5',
-                '[&:not(:has(+_&))]:rounded-b-lg',
-                '[&:not(:has(+_&))]:border-b',
-                /* '[&:not(:has(+_&))]:shadow-1xs', */
-
-                'dark:border-light-2/[0.06]',
-                'dark:from-dark-2',
-                'dark:to-dark-2',
-                'dark:shadow-none',
-
-                'group open:dark:to-dark-2/8',
-                'group open:to-light-1/6',
-            )}
+            className={style}
         >
             <summary
                 className={tcls(
@@ -130,6 +115,6 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                 context={context}
                 style={['px-10', 'pb-5', 'space-y-4']}
             />
-        </details>
+        </Details>
     );
 }
