@@ -14,6 +14,7 @@ import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { HeaderLink } from './HeaderLink';
+import { HeaderLinkMore } from './HeaderLinkMore';
 import { HeaderLinks } from './HeaderLinks';
 import { HeaderLogo } from './HeaderLogo';
 import { SpacesDropdown } from './SpacesDropdown';
@@ -90,6 +91,11 @@ export function Header(props: {
                                 />
                             );
                         })}
+                        <HeaderLinkMore
+                            label={t(getSpaceLanguage(customization), 'more')}
+                            links={customization.header.links}
+                            context={context}
+                        />
                     </HeaderLinks>
                     <div
                         className={tcls(
