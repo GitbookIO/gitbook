@@ -9,20 +9,6 @@ import { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { Inlines } from '../Inlines';
 
-/**
- * Find nodes with ids within Expandable section's content.
- */
-function getIdsInNodes(nodes: DocumentBlocksEssentials[]): string[] {
-    const ids = []
-    for (const node of nodes) {
-        if ('meta' in node && typeof node.meta?.id === 'string') { ids.push(node.meta?.id); }
-        if ('nodes' in node && node.nodes.length > 0) {
-            ids.push(...getIdsInNodes(node.nodes as any[]))
-        }
-    }
-    return ids.filter(Boolean);
-}
-
 export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
     const { block, style, ancestorBlocks, document, context } = props;
 
@@ -41,7 +27,6 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
     return (
         <Details
             id={id}
-            contentIds={getIdsInNodes(body.nodes)}
             open={context.mode === 'print'}
             className={style}
         >

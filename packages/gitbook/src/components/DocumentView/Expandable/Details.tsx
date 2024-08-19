@@ -1,44 +1,55 @@
 'use client'
 
-import { useParams } from 'next/navigation';
 import React from 'react';
 
 import { ClassValue, tcls } from '@/lib/tailwind';
+import { useParams } from 'next/navigation';
 
-
+function useHash() {
+    const params = useParams();
+    const [hash, setHash] = React.useState<string>(global.location?.hash?.slice(1));
+    React.useEffect(() => {
+        function updateHash() {
+            setHash( global.location?.hash?.slice(1));
+        }
+        global.addEventListener('hashchange', updateHash);
+        updateHash();
+        return () => global.removeEventListener('hashchange', updateHash); 
+    }, [params]);
+    return hash;
+}
 /**
  * Details component rendered on client so it can expand dependent on url hash changes.
  */
 export function Details(props: { children : React.ReactNode; id: string; contentIds?: string[]; open?: boolean; className?: ClassValue; }) {
-    const { children, id, contentIds = [], open, className } = props;
-    const params = useParams();
-    const [hash, setHash] = React.useState<string | null>(null);
+    const { children, id, open, className } = props;
     
+    const detailsRef = React.useRef<HTMLDetailsElement>(null);
+
+    const [anchorElement, setAnchorElement] = React.useState<Element | null | undefined>();
+
+    const hash = useHash();
     React.useEffect(() => {
-        function updateHash() {
-            const urlHash = global?.location?.hash;
-            if (urlHash !== hash) {
-                setHash(urlHash.slice(1));
-                const element = document.getElementById(urlHash.slice(1));
-                if (element) {
-                    element.scrollIntoView({
-                        block: 'start',
-                        behavior: 'smooth',
-                    });
-                }
-            }
+        if (!hash) { return; }
+        const descendant = hash === id ? detailsRef.current : detailsRef.current?.querySelector(`#${hash}`);
+        setAnchorElement(descendant);
+    }, [hash, id]);
+
+
+    React.useLayoutEffect(() => {
+        if (anchorElement) {
+            anchorElement.scrollIntoView({
+                block: 'start',
+                behavior: 'smooth',
+            });
         }
-        addEventListener('hashchange', updateHash);
-        updateHash();
-        return () => removeEventListener('hashchange', updateHash); 
-    }, [params, hash, open])
-    
-    const isOpen = open || [id, ...contentIds].some(id => hash === id);
+    }, [anchorElement]);
 
     return (
         <details
+            ref={detailsRef}
             id={id}
-            open={isOpen}
+            open={open || Boolean(anchorElement)}
             className={tcls(
                 className,
                 'group/expandable',
