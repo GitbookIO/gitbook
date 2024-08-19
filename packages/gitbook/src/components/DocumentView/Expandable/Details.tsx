@@ -1,9 +1,9 @@
 'use client';
 
+import { useParams } from 'next/navigation';
 import React from 'react';
 
 import { ClassValue, tcls } from '@/lib/tailwind';
-import { useParams } from 'next/navigation';
 
 function useHash() {
     const params = useParams();

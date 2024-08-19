@@ -1,4 +1,4 @@
-import { DocumentBlockExpandable, DocumentBlocksEssentials } from '@gitbook/api';
+import { DocumentBlockExpandable } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 
 import { getNodeFragmentByType } from '@/lib/document';
