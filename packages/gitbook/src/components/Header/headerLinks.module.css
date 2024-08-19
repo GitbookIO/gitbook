@@ -14,70 +14,70 @@
 }
 
 @container headerlinks ( width < 150px ) {
-    .containerHeaderlinks > a:nth-of-type(n+1) {
+    .containerHeaderlinks > a:nth-of-type(n + 1) {
         display: none;
     }
-    .containerHeaderlinks > a:nth-of-type(n+1)  ~ .linkEllipsis {
+    .containerHeaderlinks > a:nth-of-type(n + 1) ~ .linkEllipsis {
         display: flex;
-        & div > a:nth-of-type(n+1) {
+        & div > a:nth-of-type(n + 1) {
             display: flex;
         }
     }
 }
 @container headerlinks ( width < 300px ) {
-    .containerHeaderlinks > a:nth-of-type(n+2) {
+    .containerHeaderlinks > a:nth-of-type(n + 2) {
         display: none;
     }
-    .containerHeaderlinks > a:nth-of-type(n+2)  ~ .linkEllipsis {
+    .containerHeaderlinks > a:nth-of-type(n + 2) ~ .linkEllipsis {
         display: flex;
-        & div > a:nth-of-type(n+2) {
+        & div > a:nth-of-type(n + 2) {
             display: flex;
         }
-     }
+    }
 }
 @container headerlinks ( width < 450px ) {
-    .containerHeaderlinks > a:nth-of-type(n+3) {
+    .containerHeaderlinks > a:nth-of-type(n + 3) {
         display: none;
     }
-    .containerHeaderlinks > a:nth-of-type(n+3)  ~ .linkEllipsis {
+    .containerHeaderlinks > a:nth-of-type(n + 3) ~ .linkEllipsis {
         display: flex;
-        & div > a:nth-of-type(n+3) {
+        & div > a:nth-of-type(n + 3) {
             display: flex;
         }
-     }
+    }
 }
 @container headerlinks ( width < 600px ) {
-    .containerHeaderlinks > a:nth-of-type(n+4) {
+    .containerHeaderlinks > a:nth-of-type(n + 4) {
         display: none;
     }
-    .containerHeaderlinks > a:nth-of-type(n+4) ~ .linkEllipsis {
+    .containerHeaderlinks > a:nth-of-type(n + 4) ~ .linkEllipsis {
         display: flex;
-        & div > a:nth-of-type(n+4) {
+        & div > a:nth-of-type(n + 4) {
             display: flex;
         }
-     }
+    }
 }
 @container headerlinks ( width < 750px ) {
-    .containerHeaderlinks > a:nth-of-type(n+5) {
+    .containerHeaderlinks > a:nth-of-type(n + 5) {
         display: none;
     }
-    .containerHeaderlinks > a:nth-of-type(n+5) ~ .linkEllipsis {
+    .containerHeaderlinks > a:nth-of-type(n + 5) ~ .linkEllipsis {
         display: flex;
-        & div > a:nth-of-type(n+5) {
+        & div > a:nth-of-type(n + 5) {
             display: flex;
         }
-     }
+    }
 }
 @container headerlinks ( width < 900px ) {
-    .containerHeaderlinks > a:nth-of-type(n+6) {
+    .containerHeaderlinks > a:nth-of-type(n + 6) {
         display: none;
     }
-    .containerHeaderlinks > a:nth-of-type(n+6) ~ .linkEllipsis {
+    .containerHeaderlinks > a:nth-of-type(n + 6) ~ .linkEllipsis {
         display: flex;
-        & div > a:nth-of-type(n+6) {
+        & div > a:nth-of-type(n + 6) {
             display: flex;
         }
-     }
+    }
 }
 @container headerlinks ( width > 900px ) {
     .containerHeaderlinks > a {

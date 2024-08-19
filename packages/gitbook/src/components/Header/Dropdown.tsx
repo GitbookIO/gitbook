@@ -49,7 +49,7 @@ export function Dropdown<E extends HTMLElement>(props: {
                     'duration-1000',
                     'group-hover/dropdown:visible',
                     'group-focus-within/dropdown:visible',
-                    className
+                    className,
                 )}
             >
                 <div

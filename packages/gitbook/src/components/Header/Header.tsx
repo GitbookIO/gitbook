@@ -91,10 +91,11 @@ export function Header(props: {
                                 />
                             );
                         })}
-                        <HeaderLinkMore label={t(
-                            getSpaceLanguage(customization),
-                            'more'
-                        )} links={customization.header.links} context={context} />
+                        <HeaderLinkMore
+                            label={t(getSpaceLanguage(customization), 'more')}
+                            links={customization.header.links}
+                            context={context}
+                        />
                     </HeaderLinks>
                     <div
                         className={tcls(
