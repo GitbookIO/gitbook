@@ -1,7 +1,7 @@
 import { Icon } from '@gitbook/icons';
 import { DetailedHTMLProps, HTMLAttributes, useId } from 'react';
 
-import { tcls } from '@/lib/tailwind';
+import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { Link } from '../primitives';
 
@@ -19,7 +19,7 @@ export function Dropdown<E extends HTMLElement>(props: {
     /** Content of the dropdown */
     children: React.ReactNode;
     /** Custom styles */
-    className?: string;
+    className?: ClassValue;
 }) {
     const { button, children, className } = props;
     const dropdownId = useId();

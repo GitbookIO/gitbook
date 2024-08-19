@@ -6,6 +6,9 @@ import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { Dropdown, DropdownChevron, DropdownMenu, DropdownMenuItem } from './Dropdown';
 import styles from './headerLinks.module.css';
 
+/**
+ * Dropdown menu for header links hidden at small screen size.
+ */
 export function HeaderLinkMore(props: {
     label: React.ReactNode;
     links: CustomizationHeaderLink[];
