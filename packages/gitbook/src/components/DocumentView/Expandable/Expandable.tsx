@@ -20,16 +20,12 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
     if (!title || !body || titleParagraph?.type !== 'paragraph') {
         return null;
     }
-    
+
     let id = block.meta?.id ?? '';
     id = context.getId ? context.getId(id) : id;
-    
+
     return (
-        <Details
-            id={id}
-            open={context.mode === 'print'}
-            className={style}
-        >
+        <Details id={id} open={context.mode === 'print'} className={style}>
             <summary
                 className={tcls(
                     'cursor-pointer',

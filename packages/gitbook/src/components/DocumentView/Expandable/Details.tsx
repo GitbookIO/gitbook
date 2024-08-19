@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import React from 'react';
 
@@ -10,31 +10,40 @@ function useHash() {
     const [hash, setHash] = React.useState<string>(global.location?.hash?.slice(1));
     React.useEffect(() => {
         function updateHash() {
-            setHash( global.location?.hash?.slice(1));
+            setHash(global.location?.hash?.slice(1));
         }
         global.addEventListener('hashchange', updateHash);
         updateHash();
-        return () => global.removeEventListener('hashchange', updateHash); 
+        return () => global.removeEventListener('hashchange', updateHash);
     }, [params]);
     return hash;
 }
+
 /**
  * Details component rendered on client so it can expand dependent on url hash changes.
  */
-export function Details(props: { children : React.ReactNode; id: string; contentIds?: string[]; open?: boolean; className?: ClassValue; }) {
+export function Details(props: {
+    children: React.ReactNode;
+    id: string;
+    contentIds?: string[];
+    open?: boolean;
+    className?: ClassValue;
+}) {
     const { children, id, open, className } = props;
-    
+
     const detailsRef = React.useRef<HTMLDetailsElement>(null);
 
     const [anchorElement, setAnchorElement] = React.useState<Element | null | undefined>();
 
     const hash = useHash();
     React.useEffect(() => {
-        if (!hash) { return; }
-        const descendant = hash === id ? detailsRef.current : detailsRef.current?.querySelector(`#${hash}`);
+        if (!hash) {
+            return;
+        }
+        const descendant =
+            hash === id ? detailsRef.current : detailsRef.current?.querySelector(`#${hash}`);
         setAnchorElement(descendant);
     }, [hash, id]);
-
 
     React.useLayoutEffect(() => {
         if (anchorElement) {
