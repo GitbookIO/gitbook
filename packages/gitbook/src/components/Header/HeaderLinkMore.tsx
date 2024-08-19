@@ -17,7 +17,7 @@ export function HeaderLinkMore(props: {
     const { label, links, context } = props;
 
     const renderButton = () => (
-        <button>
+        <button className="px-1">
             <span className="sr-only">{label}</span>
             <DropdownChevron />
         </button>
