@@ -14,6 +14,17 @@
 }
 
 @container headerlinks ( width < 150px ) {
+    .containerHeaderlinks > a:nth-of-type(n+1) {
+        display: none;
+    }
+    .containerHeaderlinks > a:nth-of-type(n+1)  ~ .linkEllipsis {
+        display: flex;
+        & div > a:nth-of-type(n+1) {
+            display: flex;
+        }
+    }
+}
+@container headerlinks ( width < 300px ) {
     .containerHeaderlinks > a:nth-of-type(n+2) {
         display: none;
     }
@@ -22,9 +33,9 @@
         & div > a:nth-of-type(n+2) {
             display: flex;
         }
-    }
+     }
 }
-@container headerlinks ( width < 300px ) {
+@container headerlinks ( width < 450px ) {
     .containerHeaderlinks > a:nth-of-type(n+3) {
         display: none;
     }
@@ -35,18 +46,18 @@
         }
      }
 }
-@container headerlinks ( width < 450px ) {
+@container headerlinks ( width < 600px ) {
     .containerHeaderlinks > a:nth-of-type(n+4) {
         display: none;
     }
-    .containerHeaderlinks > a:nth-of-type(n+4)  ~ .linkEllipsis {
+    .containerHeaderlinks > a:nth-of-type(n+4) ~ .linkEllipsis {
         display: flex;
         & div > a:nth-of-type(n+4) {
             display: flex;
         }
      }
 }
-@container headerlinks ( width < 600px ) {
+@container headerlinks ( width < 750px ) {
     .containerHeaderlinks > a:nth-of-type(n+5) {
         display: none;
     }
@@ -57,7 +68,7 @@
         }
      }
 }
-@container headerlinks ( width < 750px ) {
+@container headerlinks ( width < 900px ) {
     .containerHeaderlinks > a:nth-of-type(n+6) {
         display: none;
     }
@@ -68,7 +79,7 @@
         }
      }
 }
-@container headerlinks ( width > 750px ) {
+@container headerlinks ( width > 900px ) {
     .containerHeaderlinks > a {
         display: flex;
     }

@@ -53,4 +53,5 @@ export const pt_br = {
     pdf_limit_reached:
         'Não foi possível gerar o PDF para ${1} páginas, generation stopped at ${2}.',
     pdf_limit_reached_continue: 'Extender com mais ${1} páginas.',
+    more: 'Mais',
 };

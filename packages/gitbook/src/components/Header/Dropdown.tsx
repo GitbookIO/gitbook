@@ -18,8 +18,10 @@ export function Dropdown<E extends HTMLElement>(props: {
     button: (buttonProps: DropdownButtonProps<E>) => React.ReactNode;
     /** Content of the dropdown */
     children: React.ReactNode;
+    /** Custom styles */
+    className?: string;
 }) {
-    const { button, children } = props;
+    const { button, children, className } = props;
     const dropdownId = useId();
 
     return (
@@ -47,6 +49,7 @@ export function Dropdown<E extends HTMLElement>(props: {
                     'duration-1000',
                     'group-hover/dropdown:visible',
                     'group-focus-within/dropdown:visible',
+                    className
                 )}
             >
                 <div

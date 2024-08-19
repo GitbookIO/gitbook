@@ -1,7 +1,6 @@
 import { CustomizationHeaderLink } from '@gitbook/api';
 import React from 'react';
 
-//import { useLanguage, tString } from '@/intl/client';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 
 
@@ -14,18 +13,19 @@ import {
 import styles from './headerLinks.module.css';
 
 
-export function HeaderLinkMore({ links, context }: { links: CustomizationHeaderLink[]; context: ContentRefContext; }) {
+export function HeaderLinkMore(props: { label: React.ReactNode; links: CustomizationHeaderLink[]; context: ContentRefContext; }) {
+    const { label, links, context } = props;
 
-    //const language = useLanguage();
     const renderButton = () => (
-        <button 
-            aria-label='More' /* TODO: translation */
-        ><DropdownChevron /></button>
+        <button>
+            <span className="sr-only">{label}</span>
+            <DropdownChevron />
+        </button>
     );
    
     return (
         <div className={`${styles.linkEllipsis} items-center`}>
-            <Dropdown button={renderButton}
+            <Dropdown button={renderButton} className='-translate-x-48 md:translate-x-0'
             >
                 <DropdownMenu>
                     {links.map((link, index) => (

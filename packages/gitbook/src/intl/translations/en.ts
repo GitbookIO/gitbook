@@ -51,4 +51,5 @@ export const en = {
     pdf_mode_all: 'All pages',
     pdf_limit_reached: "Couldn't generate the PDF for ${1} pages, generation stopped at ${2}.",
     pdf_limit_reached_continue: 'Extend with ${1} more pages.',
+    more: 'More',
 };
