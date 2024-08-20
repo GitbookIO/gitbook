@@ -15,11 +15,11 @@ export function Details(props: {
     open?: boolean;
     className?: ClassValue;
 }) {
-    const { children, id, open, className } = props;
+    const { children, id, className } = props;
 
     const detailsRef = React.useRef<HTMLDetailsElement>(null);
 
-    const [anchorElement, setAnchorElement] = React.useState<Element | null | undefined>();
+    const [openFromHash, setOpenFromHash] = React.useState(false);
 
     const hash = useHash();
     /**
@@ -31,20 +31,17 @@ export function Details(props: {
             return;
         }
         if (hash === id) {
-            setAnchorElement(detailsRef.current);
-        } else {
-            const activeElement = document.getElementById(hash);
-            if (activeElement && detailsRef.current?.contains(activeElement)) {
-                setAnchorElement(activeElement);
-            }
+            setOpenFromHash(true);
         }
+        const activeElement = document.getElementById(hash);
+        setOpenFromHash(Boolean(activeElement && detailsRef.current?.contains(activeElement)));
     }, [hash, id]);
 
     return (
         <details
             ref={detailsRef}
             id={id}
-            open={open || Boolean(anchorElement)}
+            open={props.open || openFromHash}
             className={tcls(
                 className,
                 'group/expandable',
