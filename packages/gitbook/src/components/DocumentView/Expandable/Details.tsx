@@ -1,23 +1,9 @@
 'use client';
 
-import { useParams } from 'next/navigation';
 import React from 'react';
 
 import { ClassValue, tcls } from '@/lib/tailwind';
-
-function useHash() {
-    const params = useParams();
-    const [hash, setHash] = React.useState<string>(global.location?.hash?.slice(1));
-    React.useEffect(() => {
-        function updateHash() {
-            setHash(global.location?.hash?.slice(1));
-        }
-        global.addEventListener('hashchange', updateHash);
-        updateHash();
-        return () => global.removeEventListener('hashchange', updateHash);
-    }, [params]);
-    return hash;
-}
+import { useHash } from '@/components/hooks';
 
 /**
  * Details component rendered on client so it can expand dependent on url hash changes.
@@ -36,23 +22,24 @@ export function Details(props: {
     const [anchorElement, setAnchorElement] = React.useState<Element | null | undefined>();
 
     const hash = useHash();
+    /**
+     * Open the details element if the url hash refers to the id of the details element
+     * or the id of some element contained within the details element.
+     */
     React.useEffect(() => {
-        if (!hash) {
+        if (!hash || !detailsRef.current) {
             return;
         }
-        const descendant =
-            hash === id ? detailsRef.current : detailsRef.current?.querySelector(`#${hash}`);
-        setAnchorElement(descendant);
-    }, [hash, id]);
-
-    React.useLayoutEffect(() => {
-        if (anchorElement) {
-            anchorElement.scrollIntoView({
-                block: 'start',
-                behavior: 'smooth',
-            });
+        if (hash === id) {
+            setAnchorElement(detailsRef.current)
         }
-    }, [anchorElement]);
+        else {
+            const activeElement = document.getElementById(hash);
+            if (activeElement && detailsRef.current?.contains(activeElement)) {
+                setAnchorElement(activeElement);
+            }
+        }
+    }, [hash, id]);
 
     return (
         <details
