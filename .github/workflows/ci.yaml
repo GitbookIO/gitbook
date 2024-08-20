@@ -159,6 +159,7 @@ jobs:
                   PUPPETEER_SKIP_DOWNLOAD: 1
             - run: bun unit
     build-oss:
+        # CI to check that the repository builds correctly on a machine without the credentials
         runs-on: ubuntu-latest
         name: Build (Open Source)
         env:
