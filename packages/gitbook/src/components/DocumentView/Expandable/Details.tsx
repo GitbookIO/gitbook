@@ -2,8 +2,8 @@
 
 import React from 'react';
 
-import { ClassValue, tcls } from '@/lib/tailwind';
 import { useHash } from '@/components/hooks';
+import { ClassValue, tcls } from '@/lib/tailwind';
 
 /**
  * Details component rendered on client so it can expand dependent on url hash changes.
@@ -31,9 +31,8 @@ export function Details(props: {
             return;
         }
         if (hash === id) {
-            setAnchorElement(detailsRef.current)
-        }
-        else {
+            setAnchorElement(detailsRef.current);
+        } else {
             const activeElement = document.getElementById(hash);
             if (activeElement && detailsRef.current?.contains(activeElement)) {
                 setAnchorElement(activeElement);
