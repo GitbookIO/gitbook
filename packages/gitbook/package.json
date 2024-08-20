@@ -3,7 +3,7 @@
     "version": "0.3.0",
     "private": true,
     "scripts": {
-        "dev": "env-cmd -f ../../.env.local next dev",
+        "dev": "env-cmd --silent -f ../../.env.local next dev",
         "build": "next build",
         "build:cloudflare": "next-on-pages",
         "start": "next start",
