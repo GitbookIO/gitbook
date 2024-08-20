@@ -67,7 +67,7 @@ export async function renderAd(options: FetchAdOptions) {
 
 async function fetchAd({ zoneId, placement, ignore }: FetchAdOptions): Promise<AdItem | null> {
     const headersSet = headers();
-    const ip = headersSet.get('x-forwarded-for') ?? '';
+    const ip = headersSet.get('cf-connecting-ip') ?? headersSet.get('x-forwarded-for') ?? '';
     const userAgent = headersSet.get('user-agent') ?? '';
 
     const url = new URL(`https://srv.buysellads.com/ads/${zoneId}.json`);
