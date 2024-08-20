@@ -70,8 +70,6 @@ async function fetchAd({ zoneId, placement, ignore }: FetchAdOptions): Promise<A
     const ip = headersSet.get('cf-connecting-ip') ?? headersSet.get('x-forwarded-for') ?? '';
     const userAgent = headersSet.get('user-agent') ?? '';
 
-    console.log('fetching ad', { zoneId, placement, ignore, ip, userAgent });
-
     const url = new URL(`https://srv.buysellads.com/ads/${zoneId}.json`);
     url.searchParams.set('segment', `placement:${placement}`);
     url.searchParams.set('v', 'true');
