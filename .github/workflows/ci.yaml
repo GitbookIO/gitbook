@@ -158,6 +158,24 @@ jobs:
               env:
                   PUPPETEER_SKIP_DOWNLOAD: 1
             - run: bun unit
+    build-oss:
+        # CI to check that the repository builds correctly on a machine without the credentials
+        runs-on: ubuntu-latest
+        name: Build (Open Source)
+        env:
+            NPMRC_FONT_AWESOME_TOKEN: ''
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Setup bun
+              uses: oven-sh/setup-bun@v1
+              with:
+                  bun-version: 1.1.18
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+              env:
+                  PUPPETEER_SKIP_DOWNLOAD: 1
+            - run: bun run build
     typecheck:
         runs-on: ubuntu-latest
         name: Typecheck

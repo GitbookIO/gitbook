@@ -55,4 +55,5 @@ export const es: TranslationLanguage = {
     pdf_limit_reached:
         'No se pudo generar el PDF para ${1} páginas, la generación se detuvo en ${2}.',
     pdf_limit_reached_continue: 'Extender con ${1} páginas más.',
+    more: 'Más',
 };

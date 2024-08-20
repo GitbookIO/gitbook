@@ -106,7 +106,7 @@ On the con side, you become responsible for the reliability of your published si
 
 Distributed under the [GNU GPLv3 License](https://github.com/GitBookIO/gitbook/blob/main/LICENSE).
 
-If you plan to distribute the code, you must the source code public to comply with GNU GPLv3. To clone in a private repository, acquire a [commercial license](https://www.gitbook.com/pricing).
+If you plan to distribute the code, you must make the source code public to comply with the GNU GPLv3. To clone in a private repository, acquire a [commercial license](https://www.gitbook.com/pricing).
 
 See `LICENSE` for more information.
 

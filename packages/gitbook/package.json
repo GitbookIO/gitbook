@@ -3,7 +3,7 @@
     "version": "0.3.0",
     "private": true,
     "scripts": {
-        "dev": "env-cmd -f ../../.env.local next dev",
+        "dev": "env-cmd --silent -f ../../.env.local next dev",
         "build": "next build",
         "build:cloudflare": "next-on-pages",
         "start": "next start",
@@ -15,7 +15,7 @@
         "copy:icons": "gitbook-icons ./public/~gitbook/static/icons"
     },
     "dependencies": {
-        "@gitbook/api": "^0.59.0",
+        "@gitbook/api": "^0.60.0",
         "@gitbook/icons": "workspace:*",
         "@gitbook/react-math": "workspace:*",
         "@gitbook/react-openapi": "workspace:*",
