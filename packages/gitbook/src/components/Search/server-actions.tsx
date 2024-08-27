@@ -60,6 +60,10 @@ export async function searchSiteContent(args: {
     const { siteSpaceIds, query, cacheBust } = args;
     const pointer = getContentPointer();
 
+    if (query.length < 3) {
+        return [];
+    }
+
     if (siteSpaceIds?.length === 0) {
         // if we have no siteSpaces to search in then we won't find anything. skip the call.
         return [];
