@@ -98,7 +98,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                     : searchSpaceContent(spaceId, revisionId, query));
 
                 setResults(withAsk ? withQuestionResult(fetchedResults, query) : fetchedResults);
-            }, 250);
+            }, 400);
 
             return () => {
                 if (debounceTimeout.current) {
