@@ -12,6 +12,7 @@ import { getSpaceLanguage } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
 
 import { HeaderLogo } from './HeaderLogo';
+import { SpacesDropdown } from './SpacesDropdown';
 import { SearchButton } from '../Search';
 
 /**
@@ -23,7 +24,7 @@ export function CompactHeader(props: {
     spaces: Space[];
     customization: CustomizationSettings | SiteCustomizationSettings;
 }) {
-    const { space, parent, customization } = props;
+    const { space, spaces, parent, customization } = props;
 
     return (
         <div
@@ -53,6 +54,9 @@ export function CompactHeader(props: {
                     'justify-self-end',
                 )}
             >
+                <div className={tcls('mb-2')}>
+                    <SpacesDropdown space={space} spaces={spaces} buttonKind="bordered" />
+                </div>
                 <React.Suspense fallback={null}>
                     <SearchButton>
                         <span className={tcls('flex-1')}>
