@@ -200,18 +200,18 @@ async function fetchParentSite(args: {
         getSiteSpaces({ organizationId, siteId, siteShareKey }),
     ]);
 
-    const spaces: Record<string, Space> = {};
+    const spaces: Array<Space> = [];
     siteSpaces.forEach((siteSpace) => {
-        spaces[siteSpace.space.id] = {
+        spaces.push({
             ...siteSpace.space,
             urls: {
                 ...siteSpace.space.urls,
                 published: siteSpace.urls.published,
             },
-        };
+        });
     });
 
-    return { parent: site, spaces: Object.values(spaces) };
+    return { parent: site, spaces };
 }
 
 /**
