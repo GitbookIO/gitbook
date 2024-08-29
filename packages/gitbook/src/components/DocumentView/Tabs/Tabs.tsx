@@ -19,7 +19,7 @@ export function Tabs(props: BlockProps<DocumentBlockTabs>) {
                 ancestorBlocks={[...ancestorBlocks, block, tab]}
                 context={context}
                 blockStyle={tcls('flip-heading-hash')}
-                style={tcls('w-full', 'space-y-6')}
+                style={tcls('w-full', 'space-y-4')}
             />
         ),
     }));

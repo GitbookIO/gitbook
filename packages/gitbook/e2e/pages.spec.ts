@@ -425,6 +425,17 @@ const testCases: TestsCase[] = [
         ],
     },
     {
+        name: 'Ads',
+        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        tests: [
+            {
+                name: 'Without previewed ads',
+                url: 'text-page?ads_preview=1',
+                run: waitForCookiesDialog,
+            },
+        ],
+    },
+    {
         name: 'Share links',
         baseUrl: 'https://gitbook.gitbook.io/gbo-tests-share-links/',
         tests: [

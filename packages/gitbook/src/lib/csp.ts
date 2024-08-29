@@ -26,6 +26,12 @@ export function createContentSecurityPolicyNonce(): string {
 }
 
 /**
+ * Hostname serving the integrations.
+ */
+export const INTEGRATIONS_HOST =
+    process.env.GITBOOK_INTEGRATIONS_HOST ?? 'integrations.gitbook.com';
+
+/**
  * Generate a Content Security Policy header for a space.
  */
 export function getContentSecurityPolicy(scripts: SpaceIntegrationScript[], nonce: string): string {
@@ -39,10 +45,10 @@ export function getContentSecurityPolicy(scripts: SpaceIntegrationScript[], nonc
     // Since I can't get the nonce to work for inline styles, we need to allow unsafe-inline
     const defaultCSP = `
         default-src 'self' ${assetsDomain};
-        script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline' 'unsafe-eval' ${assetsDomain} https://integrations.gitbook.com https://cdn.iframe.ly;
+        script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline' 'unsafe-eval' ${assetsDomain} https://${INTEGRATIONS_HOST} https://cdn.iframe.ly;
         style-src 'self' ${assetsDomain} fonts.googleapis.com 'unsafe-inline';
         img-src * 'self' blob: data: files.gitbook.com ${assetsDomain} ${iconsAssetsSrc};
-        connect-src * 'self' integrations.gitbook.com app.gitbook.com api.gitbook.com srv.buysellads.com ${assetsDomain} ${iconsAssetsSrc};
+        connect-src * 'self' ${INTEGRATIONS_HOST} app.gitbook.com api.gitbook.com srv.buysellads.com ${assetsDomain} ${iconsAssetsSrc};
         font-src 'self' fonts.gstatic.com ${assetsDomain};
         frame-src *;
         object-src 'none';

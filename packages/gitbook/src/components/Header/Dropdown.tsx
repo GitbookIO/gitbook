@@ -1,7 +1,7 @@
 import { Icon } from '@gitbook/icons';
 import { DetailedHTMLProps, HTMLAttributes, useId } from 'react';
 
-import { tcls } from '@/lib/tailwind';
+import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { Link } from '../primitives';
 
@@ -18,8 +18,10 @@ export function Dropdown<E extends HTMLElement>(props: {
     button: (buttonProps: DropdownButtonProps<E>) => React.ReactNode;
     /** Content of the dropdown */
     children: React.ReactNode;
+    /** Custom styles */
+    className?: ClassValue;
 }) {
-    const { button, children } = props;
+    const { button, children, className } = props;
     const dropdownId = useId();
 
     return (
@@ -36,6 +38,8 @@ export function Dropdown<E extends HTMLElement>(props: {
                 aria-orientation="vertical"
                 aria-labelledby={dropdownId}
                 className={tcls(
+                    'w-52',
+                    'max-h-56',
                     'flex',
                     'absolute',
                     'top-full',
@@ -47,13 +51,13 @@ export function Dropdown<E extends HTMLElement>(props: {
                     'duration-1000',
                     'group-hover/dropdown:visible',
                     'group-focus-within/dropdown:visible',
+                    className,
                 )}
             >
                 <div
                     className={tcls(
                         'mt-2',
-                        'w-52',
-                        'max-h-56',
+                        'w-full',
                         'bg-light',
                         'rounded-lg',
                         'straight-corners:rounded-sm',

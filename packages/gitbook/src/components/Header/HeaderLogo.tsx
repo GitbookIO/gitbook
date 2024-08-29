@@ -108,7 +108,7 @@ function LogoFallback(props: HeaderLogoProps) {
                 style={['object-contain', 'size-8']}
                 fetchPriority="high"
             />
-            <h1
+            <div
                 className={tcls(
                     'text-pretty',
                     'line-clamp-3',
@@ -126,7 +126,7 @@ function LogoFallback(props: HeaderLogoProps) {
                 )}
             >
                 {getContentTitle(space, customization, parent)}
-            </h1>
+            </div>
         </>
     );
 }
