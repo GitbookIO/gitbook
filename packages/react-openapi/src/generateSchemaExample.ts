@@ -138,9 +138,9 @@ export function generateSchemaExample(
             new Set(ancestors).add(schema),
         );
     }
-
-    if (schema.allOf && schema.allOf.length > 0) {
-        return schema.allOf.reduce(
+    const filteredAllOf = schema.allOf && schema.allOf.filter(item => item !== undefined)
+    if (filteredAllOf && filteredAllOf.length > 0) {
+        return filteredAllOf.reduce(
             (acc, curr) => {
                 const example = generateSchemaExample(
                     noReference(curr),
