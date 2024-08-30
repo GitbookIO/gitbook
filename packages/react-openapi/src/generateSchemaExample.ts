@@ -138,6 +138,7 @@ export function generateSchemaExample(
             new Set(ancestors).add(schema),
         );
     }
+    
     const filteredAllOf = schema.allOf && schema.allOf.filter(item => item !== undefined)
     if (filteredAllOf && filteredAllOf.length > 0) {
         return filteredAllOf.reduce(
