@@ -60,7 +60,7 @@ export async function searchSiteContent(args: {
     const { siteSpaceIds, query, cacheBust } = args;
     const pointer = getContentPointer();
 
-    if (query.length < 3) {
+    if (query.length <= 1) {
         return [];
     }
 
