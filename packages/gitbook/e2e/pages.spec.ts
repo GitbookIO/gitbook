@@ -232,7 +232,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Versioning',
-        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
             {
                 name: 'Revision',
@@ -243,7 +243,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'PDF',
-        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
             {
                 name: 'PDF',
@@ -253,7 +253,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Content tests',
-        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
             {
                 name: 'Text',
@@ -368,7 +368,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Page options',
-        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
             {
                 name: 'Hidden',
@@ -399,7 +399,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Customization',
-        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
             {
                 name: 'Without header',
@@ -426,7 +426,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Ads',
-        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
             {
                 name: 'Without previewed ads',
@@ -644,7 +644,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Languages',
-        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: allLocales.map((locale) => ({
             name: locale,
             url: getCustomizationURL({

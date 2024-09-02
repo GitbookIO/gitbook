@@ -51,6 +51,7 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                     'z-[1]',
                     'sticky',
                     'left-[calc(100%-5rem)]',
+                    'pointer-events-none',
                 )}`}
             >
                 <svg
