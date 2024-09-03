@@ -5,7 +5,7 @@ import { OpenAPIOperationData, toJSON } from './fetchOpenAPIOperation';
 import { Markdown } from './Markdown';
 import { OpenAPICodeSample } from './OpenAPICodeSample';
 import { OpenAPIResponseExample } from './OpenAPIResponseExample';
-import { OpenAPIServerURL } from './OpenAPIServerURL';
+import { getServersURL, OpenAPIServerURL } from './OpenAPIServerURL';
 import { OpenAPISpec } from './OpenAPISpec';
 import { OpenAPIClientContext, OpenAPIContextProps } from './types';
 import { ScalarApiClient } from './ScalarApiButton';
@@ -13,7 +13,7 @@ import { ScalarApiClient } from './ScalarApiButton';
 /**
  * Display an interactive OpenAPI operation.
  */
-export function OpenAPIOperation(props: {
+export async function OpenAPIOperation(props: {
     className?: string;
     data: OpenAPIOperationData;
     context: OpenAPIContextProps;
@@ -25,8 +25,10 @@ export function OpenAPIOperation(props: {
         defaultInteractiveOpened: context.defaultInteractiveOpened,
         icons: context.icons,
         blockKey: context.blockKey,
+        enumSelectors: context.enumSelectors,
     };
 
+    const config = await getConfiguration(context);
     return (
         <ScalarApiClient>
             <div className={classNames('openapi-operation', className)}>
@@ -47,7 +49,7 @@ export function OpenAPIOperation(props: {
                             {method.toUpperCase()}
                         </span>
                         <span className="openapi-url">
-                            <OpenAPIServerURL servers={servers} />
+                            <OpenAPIServerURL servers={servers} context={clientContext} />
                             {path}
                         </span>
                     </div>
@@ -66,4 +68,18 @@ export function OpenAPIOperation(props: {
             </div>
         </ScalarApiClient>
     );
+}
+
+async function getConfiguration(context: OpenAPIContextProps) {
+    const response = await fetch(context.specUrl);
+    const doc = await response.json();
+
+    return {
+        spec: {
+            content: {
+                ...doc,
+                servers: [{ url: getServersURL(doc.servers, context.enumSelectors) }],
+            },
+        },
+    };
 }

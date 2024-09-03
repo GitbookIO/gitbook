@@ -21,6 +21,10 @@ export interface OpenAPIClientContext {
     blockKey?: string;
     /** Optional id attached to the OpenAPI Operation heading and used as an anchor */
     id?: string;
+
+    blockKey?: string;
+
+    enumSelectors?: Record<string, number>;
 }
 
 export interface OpenAPIFetcher {
