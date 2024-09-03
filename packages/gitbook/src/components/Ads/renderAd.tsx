@@ -75,6 +75,8 @@ async function fetchAd({
 }: FetchAdOptions): Promise<{ ad: AdItem; ip: string } | null> {
     const headersSet = headers();
     const ip =
+        headersSet.get('x-gitbook-ipv4') ??
+        headersSet.get('x-gitbook-ip') ??
         headersSet.get('cf-pseudo-ipv4') ??
         headersSet.get('cf-connecting-ip') ??
         headersSet.get('x-forwarded-for') ??
