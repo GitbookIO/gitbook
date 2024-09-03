@@ -54,7 +54,7 @@ export function OpenAPICodeSample(props: {
 
     const input: CodeSampleInput = {
         url:
-            getServersURL(data.servers) +
+            getServersURL(data.servers, context.enumSelectors) +
             data.path +
             (searchParams.size ? `?${searchParams.toString()}` : ''),
         method: data.method,

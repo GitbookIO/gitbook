@@ -1,18 +1,23 @@
 import * as React from 'react';
 import { OpenAPIV3 } from 'openapi-types';
 import { OpenAPIServerURLVariable } from './OpenAPIServerURLVariable';
+import { OpenAPIClientContext } from './types';
+import { ServerURLForm } from './OpenAPIServerURLForm';
 
 /**
  * Show the url of the server with variables replaced by their default values.
  */
-export function OpenAPIServerURL(props: { servers: OpenAPIV3.ServerObject[] }) {
-    const { servers } = props;
-    const server = servers[0];
-
+export function OpenAPIServerURL(props: {
+    servers: OpenAPIV3.ServerObject[];
+    context: OpenAPIClientContext;
+}) {
+    const { servers, context } = props;
+    const serverIndex = context.enumSelectors?.servers ?? 0;
+    const server = servers[serverIndex];
     const parts = parseServerURL(server?.url ?? '');
 
     return (
-        <span>
+        <ServerURLForm context={context} server={server}>
             {parts.map((part, i) => {
                 if (part.kind === 'text') {
                     return <span key={i}>{part.text}</span>;
@@ -26,18 +31,22 @@ export function OpenAPIServerURL(props: { servers: OpenAPIV3.ServerObject[] }) {
                             key={i}
                             name={part.name}
                             variable={server.variables[part.name]}
+                            enumIndex={context.enumSelectors?.[part.name]}
                         />
                     );
                 }
             })}
-        </span>
+        </ServerURLForm>
     );
 }
 
 /**
  * Get the default URL for the server.
  */
-export function getServersURL(servers: OpenAPIV3.ServerObject[]): string {
+export function getServersURL(
+    servers: OpenAPIV3.ServerObject[],
+    selectors?: Record<string, number>,
+): string {
     const server = servers[0];
     const parts = parseServerURL(server?.url ?? '');
 
@@ -46,7 +55,9 @@ export function getServersURL(servers: OpenAPIV3.ServerObject[]): string {
             if (part.kind === 'text') {
                 return part.text;
             } else {
-                return server.variables?.[part.name]?.default ?? `{${part.name}}`;
+                return selectors && !isNaN(selectors[part.name])
+                    ? server.variables?.[part.name]?.enum?.[selectors[part.name]]
+                    : (server.variables?.[part.name]?.default ?? `{${part.name}}`);
             }
         })
         .join('');
