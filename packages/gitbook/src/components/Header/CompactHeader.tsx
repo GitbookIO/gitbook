@@ -26,6 +26,10 @@ export function CompactHeader(props: {
 }) {
     const { space, spaces, parent, customization } = props;
 
+    const isMultiVariants =
+        parent?.object === 'collection' ||
+        (parent && parent.object === 'site' && spaces.length > 1);
+
     return (
         <div
             className={tcls(
@@ -54,9 +58,11 @@ export function CompactHeader(props: {
                     'justify-self-end',
                 )}
             >
-                <div className={tcls('mb-2')}>
-                    <SpacesDropdown space={space} spaces={spaces} buttonKind="bordered" />
-                </div>
+                {isMultiVariants ? (
+                    <div className={tcls('mb-2')}>
+                        <SpacesDropdown space={space} spaces={spaces} buttonKind="bordered" />
+                    </div>
+                ) : null}
                 <React.Suspense fallback={null}>
                     <SearchButton>
                         <span className={tcls('flex-1')}>
