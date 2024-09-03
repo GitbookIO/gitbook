@@ -19,13 +19,16 @@ export function OpenAPICodeSample(props: {
 }) {
     const { data, context } = props;
 
-    const requiredHeaders = data.operation.parameters?.map(noReference).filter(param => param.in === 'header' && param.required);
+    const requiredHeaders = data.operation.parameters
+        ?.map(noReference)
+        .filter((param) => param.in === 'header' && param.required);
 
-    const headersObject: {[k: string]: string} = {}
-    requiredHeaders?.forEach(header => {
+    const headersObject: { [k: string]: string } = {};
+    requiredHeaders?.forEach((header) => {
         let example = header.schema && generateSchemaExample(noReference(header.schema));
         if (example) {
-            headersObject[header.name] = typeof example !== 'string' ? JSON.stringify(example) : example
+            headersObject[header.name] =
+                typeof example !== 'string' ? JSON.stringify(example) : example;
         }
     });
 
@@ -40,7 +43,7 @@ export function OpenAPICodeSample(props: {
             : undefined,
         headers: {
             ...getSecurityHeaders(data.securities),
-            ...(headersObject),
+            ...headersObject,
             ...(requestBodyContent
                 ? {
                       'Content-Type': requestBodyContent[0],
