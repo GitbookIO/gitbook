@@ -1,6 +1,6 @@
 import { DocumentBlockSwagger } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import { OpenAPIOperation } from '@gitbook/react-openapi';
+import { OpenAPIOperation, OpenAPIOperationData } from '@gitbook/react-openapi';
 import React from 'react';
 
 import { LoadingPane } from '@/components/primitives';
@@ -45,6 +45,10 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockSwagger>) {
         return null;
     }
 
+    const enumSelectors =
+        context.searchParams && context.searchParams.block === block.key
+            ? parseModifiers(data, context.searchParams)
+            : undefined;
     return (
         <OpenAPIOperation
             data={data}
@@ -56,6 +60,7 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockSwagger>) {
                 CodeBlock: PlainCodeBlock,
                 defaultInteractiveOpened: context.mode === 'print',
                 id: block.meta?.id,
+                enumSelectors,
                 blockKey: block.key,
             }}
             className="openapi-block"
@@ -90,4 +95,28 @@ function OpenAPIFallback() {
             </div>
         </div>
     );
+}
+
+function parseModifiers(data: OpenAPIOperationData, params: Record<string, string>) {
+    if (!data) {
+        return;
+    }
+    const { servers } = params;
+    const serverIndex =
+        servers && !isNaN(Number(servers))
+            ? Math.min(0, Math.max(Number(servers), servers.length - 1))
+            : 0;
+    const server = data.servers[serverIndex];
+    if (server && server.variables) {
+        return Object.keys(server.variables).reduce<Record<string, number>>(
+            (result, key) => {
+                const selection = Number(params[key]);
+                if (!isNaN(selection)) {
+                    result[key] = selection;
+                }
+                return result;
+            },
+            { servers: serverIndex },
+        );
+    }
 }
