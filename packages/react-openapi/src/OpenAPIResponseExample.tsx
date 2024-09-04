@@ -37,35 +37,46 @@ export function OpenAPIResponseExample(props: {
         return Number(a) - Number(b);
     });
 
-    const examples = responses.map(response => {
-        const responseObject = noReference(response[1]);
+    const examples = responses
+        .map((response) => {
+            const responseObject = noReference(response[1]);
 
-        const schema = noReference(
-            (
-                responseObject.content?.['application/json'] ??
-                responseObject.content?.[Object.keys(responseObject.content)[0]]
-            )?.schema,
-        );
+            const schema = noReference(
+                (
+                    responseObject.content?.['application/json'] ??
+                    responseObject.content?.[Object.keys(responseObject.content)[0]]
+                )?.schema,
+            );
 
-        if (!schema) { return null; }
-        
-        const example = generateSchemaExample(schema);
-        return ({
-            key: `${response[0]}`,
-            label: `${response[0]}`,
-            body: <context.CodeBlock
-                code={typeof example === 'string' ? example : JSON.stringify(example, null, 2)}
-                syntax="json"
-        />
+            if (!schema) {
+                return null;
+            }
+
+            const example = generateSchemaExample(schema);
+            return {
+                key: `${response[0]}`,
+                label: `${response[0]}`,
+                body: (
+                    <context.CodeBlock
+                        code={
+                            typeof example === 'string' ? example : JSON.stringify(example, null, 2)
+                        }
+                        syntax="json"
+                    />
+                ),
+            };
         })
-    })
-    .filter((val): val is { key: string, label: string, body: any } => Boolean(val));
+        .filter((val): val is { key: string; label: string; body: any } => Boolean(val));
 
     if (examples.length === 0) {
         return null;
     }
 
     return (
-        <InteractiveSection header="Response" className="openapi-response-example" tabs={examples} />
+        <InteractiveSection
+            header="Response"
+            className="openapi-response-example"
+            tabs={examples}
+        />
     );
 }
