@@ -65,6 +65,24 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
             return lines.map((line, index) => (index > 0 ? indent(line, 2) : line)).join(separator);
         },
     },
+    {
+        id: 'python',
+        label: 'Python',
+        syntax: 'python',
+        generate: ({ method, url, headers, body }) => {
+            let code = 'import requests\n';
+            code += `response = requests.${method.toLowerCase()}("${url}",\n`;
+            if (headers) {
+                code += indent(`headers = ${JSON.stringify(headers, null, 2)},\n`, 11);
+            }
+            if (body) {
+                code += indent(`json = ${JSON.stringify(body, null, 2)}\n`, 11);
+            }
+            code += ')\n';
+            code += `data = response.json()`;
+            return code;
+        },
+    },
 ];
 
 function indent(code: string, spaces: number) {
