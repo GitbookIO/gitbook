@@ -34,7 +34,9 @@ export function OpenAPIOperation(props: {
         >
             <div className={classNames('openapi-operation', className)}>
                 <div className="openapi-intro">
-                    <h2 className="openapi-summary">{operation.summary}</h2>
+                    <h2 className="openapi-summary" id={context.id}>
+                        {operation.summary}
+                    </h2>
                     {operation.description ? (
                         <Markdown className="openapi-description" source={operation.description} />
                     ) : null}
