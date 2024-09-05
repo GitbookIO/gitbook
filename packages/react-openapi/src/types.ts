@@ -18,6 +18,8 @@ export interface OpenAPIClientContext {
      * @default false
      */
     defaultInteractiveOpened?: boolean;
+
+    id?: string;
 }
 
 export interface OpenAPIFetcher {
