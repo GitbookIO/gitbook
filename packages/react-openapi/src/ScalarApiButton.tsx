@@ -129,7 +129,6 @@ export function ScalarApiClient(props: { children: React.ReactNode }) {
             body: request.postData?.text,
         };
 
-        console.log(data);
         return data;
     }, [active]);
 
