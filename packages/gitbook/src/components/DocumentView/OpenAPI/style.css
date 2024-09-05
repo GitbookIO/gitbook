@@ -1,6 +1,6 @@
 .openapi-operation {
     content-visibility: auto;
-    contain-intrinsic-size: 600px;
+    contain-intrinsic-height: 600px;
     @apply flex-1 flex flex-col gap-6;
 }
 
