@@ -1,32 +1,35 @@
 {
-    "name": "gitbook",
-    "version": "0.1.0",
-    "private": true,
-    "packageManager": "bun@1.1.18",
-    "scripts": {
-        "dev": "turbo run dev",
-        "build": "turbo run build",
-        "build:cloudflare": "turbo run build:cloudflare",
-        "lint": "turbo run lint",
-        "lint:fix": "turbo run lint -- --fix",
-        "typecheck": "turbo run typecheck",
-        "format": "prettier ./ --ignore-unknown --write",
-        "format:check": "prettier ./ --ignore-unknown --list-different",
-        "unit": "turbo run unit",
-        "e2e": "turbo run e2e",
-        "changeset": "changeset",
-        "release": "turbo run release && changeset publish",
-        "download:env": "op read op://gitbook-x-dev/gitbook-open/.env.local >> .env.local"
-    },
-    "workspaces": [
-        "packages/*"
-    ],
-    "devDependencies": {
-        "@changesets/cli": "^2.27.7",
-        "prettier": "^3.0.3",
-        "turbo": "^2.0.9"
-    },
-    "patchedDependencies": {
-        "@vercel/next@4.3.6": "patches/@vercel%2Fnext@4.3.6.patch"
-    }
+  "name": "gitbook",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "bun@1.1.18",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "build:cloudflare": "turbo run build:cloudflare",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint -- --fix",
+    "typecheck": "turbo run typecheck",
+    "format": "prettier ./ --ignore-unknown --write",
+    "format:check": "prettier ./ --ignore-unknown --list-different",
+    "unit": "turbo run unit",
+    "e2e": "turbo run e2e",
+    "changeset": "changeset",
+    "release": "turbo run release && changeset publish",
+    "download:env": "op read op://gitbook-x-dev/gitbook-open/.env.local >> .env.local"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@changesets/cli": "^2.27.7",
+    "prettier": "^3.0.3",
+    "turbo": "^2.0.9"
+  },
+  "patchedDependencies": {
+    "@vercel/next@4.3.6": "patches/@vercel%2Fnext@4.3.6.patch"
+  },
+  "dependencies": {
+    "@scalar/api-client-react": "0.3.7"
+  }
 }
