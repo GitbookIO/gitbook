@@ -1,7 +1,7 @@
 import * as React from 'react';
 import classNames from 'classnames';
 import { OpenAPIV3 } from 'openapi-types';
-import { noReference } from './utils';
+import { createStateKey, noReference } from './utils';
 import { OpenAPIResponse } from './OpenAPIResponse';
 import { OpenAPIClientContext } from './types';
 import { InteractiveSection } from './InteractiveSection';
@@ -17,7 +17,7 @@ export function OpenAPIResponses(props: {
 
     return (
         <InteractiveSection
-            stateKey={`${context.blockKey}_response`}
+            stateKey={createStateKey('response', context.blockKey)}
             header="Response"
             className={classNames('openapi-responses')}
             tabs={Object.entries(responses).map(([statusCode, response]) => {
