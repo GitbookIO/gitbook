@@ -12,9 +12,8 @@ interface InteractiveSectionTab {
 
 const syncedTabsAtom = atom<Record<string, string>>({
     key: 'syncedTabState',
-    default: {}
+    default: {},
 });
-
 
 /**
  * To optimize rendering, most of the components are server-components,
@@ -59,8 +58,10 @@ export function InteractiveSection(props: {
         stateKey,
     } = props;
     const [syncedTabs, setSyncedTabs] = useRecoilState(syncedTabsAtom);
-    const tabFromState = stateKey && stateKey in syncedTabs ? 
-        tabs.find((tab) => tab.key === syncedTabs[stateKey]) : undefined;
+    const tabFromState =
+        stateKey && stateKey in syncedTabs
+            ? tabs.find((tab) => tab.key === syncedTabs[stateKey])
+            : undefined;
 
     const [opened, setOpened] = React.useState(defaultOpened);
     const [selectedTabKey, setSelectedTab] = React.useState(tabFromState?.key ?? defaultTab);
@@ -113,7 +114,10 @@ export function InteractiveSection(props: {
                             onChange={(event) => {
                                 setSelectedTab(event.target.value);
                                 if (stateKey) {
-                                    setSyncedTabs((state) => ({...state, [stateKey]: event.target.value}))
+                                    setSyncedTabs((state) => ({
+                                        ...state,
+                                        [stateKey]: event.target.value,
+                                    }));
                                 }
                                 setOpened(true);
                             }}

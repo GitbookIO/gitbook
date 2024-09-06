@@ -24,7 +24,7 @@ export function OpenAPIOperation(props: {
     const clientContext: OpenAPIClientContext = {
         defaultInteractiveOpened: context.defaultInteractiveOpened,
         icons: context.icons,
-        blockKey: context.blockKey
+        blockKey: context.blockKey,
     };
 
     return (
