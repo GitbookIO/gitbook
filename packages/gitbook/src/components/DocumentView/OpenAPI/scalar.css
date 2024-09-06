@@ -1,7 +1,4 @@
-@import '@scalar/api-client-react/style.css';
-
 .light .scalar-modal-layout,
-.light .scalar-app,
 .light .scalar {
     --scalar-color-1: color-mix(
         in srgb,
@@ -53,13 +50,8 @@
     --scalar-button-1: rgb(49 53 56);
     --scalar-button-1-color: #fff;
     --scalar-button-1-hover: rgb(28 31 33);
-
-    --scalar-shadow-1: 0 1px 3px 0 rgba(0, 0, 0, 0.11);
-    --scalar-shadow-2: rgba(0, 0, 0, 0.08) 0px 13px 20px 0px, rgba(0, 0, 0, 0.08) 0px 3px 8px 0px,
-        #eeeeed 0px 0 0 1px;
 }
 .dark .scalar-modal-layout,
-.dark .scalar-app,
 .dark .scalar {
     --scalar-color-1: color-mix(
         in srgb,
@@ -110,13 +102,8 @@
     --scalar-button-1: #f6f6f6;
     --scalar-button-1-color: #000;
     --scalar-button-1-hover: #e7e7e7;
-
-    --scalar-shadow-1: 0 1px 3px 0 rgb(0, 0, 0, 0.1);
-    --scalar-shadow-2: rgba(15, 15, 15, 0.2) 0px 3px 6px, rgba(15, 15, 15, 0.4) 0px 9px 24px,
-        0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 .scalar-modal-layout,
-.scalar-app,
 .scalar {
     --scalar-font: initial;
     --scalar-font-code: var(--font-mono);
@@ -178,7 +165,7 @@
 .scalar-api-client__close:hover {
     cursor: pointer;
 }
-.scalar .scalar-app-layout {
+.scalar .scalar-app {
     background: var(--scalar-background-3);
     height: calc(100dvh - 100px);
     max-width: 1280px;
@@ -214,6 +201,23 @@
     z-index: 1000;
     cursor: pointer;
     animation: scalardrawerexitfadein 0.35s forwards;
+}
+.scalar .scalar-app-exit:before {
+    content: '\00d7';
+    font-family: sans-serif;
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 30px;
+    font-weight: 100;
+    line-height: 50px;
+    right: 12px;
+    text-align: center;
+    color: white;
+    opacity: 0.6;
+}
+.scalar .scalar-app-exit:hover:before {
+    opacity: 1;
 }
 @keyframes scalardrawerexitfadein {
     from {
@@ -301,6 +305,11 @@
     scrollbar-width: thin;
     -webkit-overflow-scrolling: touch;
 }
+@supports (-moz-appearance: none) {
+    .scalar .custom-scroll {
+        padding-right: 12px;
+    }
+}
 .scalar .custom-scroll:hover {
     scrollbar-color: rgba(0, 0, 0, 0.24) transparent;
 }
@@ -337,19 +346,4 @@
     .scalar .custom-scroll {
         padding-right: 12px;
     }
-}
-.dark .scalar .client-wrapper-bg-color {
-    background: linear-gradient(
-        color-mix(in srgb, var(--tw-bg-base) 6%, transparent) 1%,
-        color-mix(in srgb, var(--scalar-background-1) 30%, black) 9%
-    );
-}
-.light .scalar .client-wrapper-bg-color {
-    background-color: var(--scalar-background-2) !important;
-}
-.scalar .gitbook-show {
-    display: block !important;
-}
-.scalar .gitbook-hidden {
-    display: none !important;
 }

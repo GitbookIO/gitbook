@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { CodeSampleInput, codeSampleGenerators } from './code-samples';
-import { OpenAPIOperationData } from './fetchOpenAPIOperation';
+import { OpenAPIOperationData, toJSON } from './fetchOpenAPIOperation';
 import { generateMediaTypeExample } from './generateSchemaExample';
 import { InteractiveSection } from './InteractiveSection';
 import { getServersURL } from './OpenAPIServerURL';
@@ -70,6 +70,11 @@ export function OpenAPICodeSample(props: {
         return null;
     }
 
+    async function fetchOperationData() {
+        'use server';
+        return toJSON(data);
+    }
+
     return (
         <InteractiveSection
             header="Request"
@@ -77,7 +82,7 @@ export function OpenAPICodeSample(props: {
             tabs={samples}
             overlay={
                 data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'] ? null : (
-                    <ScalarApiButton />
+                    <ScalarApiButton fetchOperationData={fetchOperationData} />
                 )
             }
         />
