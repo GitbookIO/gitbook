@@ -1,0 +1,5 @@
+---
+'gitbook': patch
+---
+
+Update lockfile
