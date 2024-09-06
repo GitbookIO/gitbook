@@ -53,6 +53,10 @@ export function OpenAPIResponseExample(props: {
             }
 
             const example = generateSchemaExample(schema);
+            if (example === undefined) {
+                return null;
+            }
+
             return {
                 key: `${response[0]}`,
                 label: `${response[0]}`,

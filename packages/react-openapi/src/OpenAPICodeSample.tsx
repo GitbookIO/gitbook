@@ -69,11 +69,19 @@ export function OpenAPICodeSample(props: {
     (['x-custom-examples', 'x-code-samples', 'x-codeSamples'] as const).forEach((key) => {
         const customSamples = data.operation[key];
         if (customSamples && Array.isArray(customSamples)) {
-            customCodeSamples = customSamples.map((sample) => ({
-                key: `redocly-${sample.lang}`,
-                label: sample.label,
-                body: <context.CodeBlock code={sample.source} syntax={sample.lang} />,
-            }));
+            customCodeSamples = customSamples
+                .filter((sample) => {
+                    return (
+                        typeof sample.label === 'string' &&
+                        typeof sample.source === 'string' &&
+                        typeof sample.lang === 'string'
+                    );
+                })
+                .map((sample) => ({
+                    key: `redocly-${sample.lang}`,
+                    label: sample.label,
+                    body: <context.CodeBlock code={sample.source} syntax={sample.lang} />,
+                }));
         }
     });
 
