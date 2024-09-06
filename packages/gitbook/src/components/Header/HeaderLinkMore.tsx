@@ -4,14 +4,14 @@ import {
     CustomizationSettings,
     SiteCustomizationSettings,
 } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
 import React from 'react';
 
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
+import { tcls } from '@/lib/tailwind';
 
 import { Dropdown, DropdownMenu, DropdownMenuItem } from './Dropdown';
 import styles from './headerLinks.module.css';
-import { tcls } from '@/lib/tailwind';
-import { Icon } from '@gitbook/icons';
 
 /**
  * Dropdown menu for header links hidden at small screen size.
