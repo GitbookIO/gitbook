@@ -29,10 +29,12 @@ interface FetchAdOptions {
  */
 export async function renderAd(options: FetchAdOptions) {
     const { spaceId, mode } = options;
-    const ad = await fetchAd(options);
-    if (!ad || !ad.description || !ad.statlink) {
+    const result = await fetchAd(options);
+    if (!result || !result.ad.description || !result.ad.statlink) {
         return null;
     }
+
+    const { ad, ip } = result;
 
     const viaUrl = new URL('https://www.gitbook.com');
     viaUrl.searchParams.set('utm_source', 'content');
@@ -56,6 +58,7 @@ export async function renderAd(options: FetchAdOptions) {
                     'text-dark/5',
                     'dark:text-light/5',
                 )}
+                data-debug-ip={ip}
             >
                 <a target="_blank" href={viaUrl.toString()} className={tcls('hover:underline')}>
                     Sponsored via GitBook
@@ -65,9 +68,19 @@ export async function renderAd(options: FetchAdOptions) {
     );
 }
 
-async function fetchAd({ zoneId, placement, ignore }: FetchAdOptions): Promise<AdItem | null> {
+async function fetchAd({
+    zoneId,
+    placement,
+    ignore,
+}: FetchAdOptions): Promise<{ ad: AdItem; ip: string } | null> {
     const headersSet = headers();
-    const ip = headersSet.get('cf-connecting-ip') ?? headersSet.get('x-forwarded-for') ?? '';
+    const ip =
+        headersSet.get('x-gitbook-ipv4') ??
+        headersSet.get('x-gitbook-ip') ??
+        headersSet.get('cf-pseudo-ipv4') ??
+        headersSet.get('cf-connecting-ip') ??
+        headersSet.get('x-forwarded-for') ??
+        '';
     const userAgent = headersSet.get('user-agent') ?? '';
 
     const url = new URL(`https://srv.buysellads.com/ads/${zoneId}.json`);
@@ -84,7 +97,7 @@ async function fetchAd({ zoneId, placement, ignore }: FetchAdOptions): Promise<A
 
     const first = json.ads[0];
     if (first && 'active' in first) {
-        return first;
+        return { ad: first, ip };
     }
 
     return null;

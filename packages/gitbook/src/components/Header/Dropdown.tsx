@@ -38,6 +38,8 @@ export function Dropdown<E extends HTMLElement>(props: {
                 aria-orientation="vertical"
                 aria-labelledby={dropdownId}
                 className={tcls(
+                    'w-52',
+                    'max-h-56',
                     'flex',
                     'absolute',
                     'top-full',
@@ -55,8 +57,7 @@ export function Dropdown<E extends HTMLElement>(props: {
                 <div
                     className={tcls(
                         'mt-2',
-                        'w-52',
-                        'max-h-56',
+                        'w-full',
                         'bg-light',
                         'rounded-lg',
                         'straight-corners:rounded-sm',
