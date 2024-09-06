@@ -78,6 +78,7 @@ export function OpenAPIResponseExample(props: {
 
     return (
         <InteractiveSection
+            stateKey={`${context.blockKey}_response`}
             header="Response"
             className="openapi-response-example"
             tabs={examples}

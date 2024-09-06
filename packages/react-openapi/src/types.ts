@@ -15,7 +15,10 @@ export interface OpenAPIClientContext {
      * @default false
      */
     defaultInteractiveOpened?: boolean;
-
+    /**
+     * The key of the block 
+     */
+    blockKey?: string;
     /** Optional id attached to the OpenAPI Operation heading and used as an anchor */
     id?: string;
 }
