@@ -28,21 +28,17 @@ export function HeaderLinkMore(props: {
         customization.header.preset === CustomizationHeaderPreset.Default;
 
     const renderButton = () => (
-        <button className="px-1">
+        <button
+            className={tcls(
+                'px-1',
+                !isCustomizationDefault
+                    ? ['text-header-link-500']
+                    : ['text-dark/8', 'dark:text-light/8', 'dark:hover:text-light'],
+                'hover:text-header-link-400',
+            )}
+        >
             <span className="sr-only">{label}</span>
-            <Icon
-                icon="ellipsis"
-                className={tcls(
-                    'opacity-6',
-                    'size-3',
-                    'ms-1',
-                    'transition-transform',
-                    'group-hover/dropdown:rotate-180',
-                    !isCustomizationDefault
-                        ? ['text-header-link-500']
-                        : ['text-dark/8', 'dark:text-light/8', 'dark:hover:text-light'],
-                )}
-            />
+            <Icon icon="ellipsis" className={tcls('opacity-6', 'size-3', 'ms-1')} />
         </button>
     );
 
