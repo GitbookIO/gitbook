@@ -28,8 +28,5 @@
     },
     "patchedDependencies": {
         "@vercel/next@4.3.6": "patches/@vercel%2Fnext@4.3.6.patch"
-    },
-    "dependencies": {
-        "@scalar/api-client-react": "0.3.7"
     }
 }
