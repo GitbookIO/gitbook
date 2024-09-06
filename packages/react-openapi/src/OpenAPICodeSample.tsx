@@ -25,8 +25,10 @@ export function OpenAPICodeSample(props: {
 
     const headersObject: { [k: string]: string } = {};
     requiredHeaders?.forEach((header) => {
-        const example = header.schema && generateSchemaExample(noReference(header.schema));
-        if (example) {
+        const example = header.schema
+            ? generateSchemaExample(noReference(header.schema))
+            : undefined;
+        if (example !== undefined) {
             headersObject[header.name] =
                 typeof example !== 'string' ? JSON.stringify(example) : example;
         }
