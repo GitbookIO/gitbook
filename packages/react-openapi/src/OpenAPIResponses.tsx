@@ -17,6 +17,7 @@ export function OpenAPIResponses(props: {
 
     return (
         <InteractiveSection
+            stateKey={`${context.blockKey}_response`}
             header="Response"
             className={classNames('openapi-responses')}
             tabs={Object.entries(responses).map(([statusCode, response]) => {
