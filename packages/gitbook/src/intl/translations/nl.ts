@@ -1,4 +1,5 @@
 import { TranslationLanguage } from './types';
+
 export const nl: TranslationLanguage = {
     locale: 'nl',
     powered_by_gitbook: 'Powered by GitBook',
