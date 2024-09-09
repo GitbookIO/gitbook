@@ -10,7 +10,8 @@
     },
     "version": "0.6.0",
     "dependencies": {
-        "@scalar/api-client-react": "1.0.20",
+        "@scalar/api-client-react": "0.3.7",
+        "@scalar/oas-utils": "0.1.6",
         "classnames": "^2.5.1",
         "flatted": "^3.2.9",
         "openapi-types": "^12.1.3",

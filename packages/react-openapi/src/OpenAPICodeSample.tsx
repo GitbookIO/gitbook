@@ -1,8 +1,8 @@
 import * as React from 'react';
 
 import { CodeSampleInput, codeSampleGenerators } from './code-samples';
-import { OpenAPIOperationData } from './fetchOpenAPIOperation';
-import { generateMediaTypeExample } from './generateSchemaExample';
+import { OpenAPIOperationData, toJSON } from './fetchOpenAPIOperation';
+import { generateMediaTypeExample, generateSchemaExample } from './generateSchemaExample';
 import { InteractiveSection } from './InteractiveSection';
 import { getServersURL } from './OpenAPIServerURL';
 import { ScalarApiButton } from './ScalarApiButton';
@@ -19,6 +19,21 @@ export function OpenAPICodeSample(props: {
 }) {
     const { data, context } = props;
 
+    const requiredHeaders = data.operation.parameters
+        ?.map(noReference)
+        .filter((param) => param.in === 'header' && param.required);
+
+    const headersObject: { [k: string]: string } = {};
+    requiredHeaders?.forEach((header) => {
+        const example = header.schema
+            ? generateSchemaExample(noReference(header.schema))
+            : undefined;
+        if (example !== undefined) {
+            headersObject[header.name] =
+                typeof example !== 'string' ? JSON.stringify(example) : example;
+        }
+    });
+
     const requestBody = noReference(data.operation.requestBody);
     const requestBodyContent = requestBody ? Object.entries(requestBody.content)[0] : undefined;
 
@@ -30,6 +45,7 @@ export function OpenAPICodeSample(props: {
             : undefined,
         headers: {
             ...getSecurityHeaders(data.securities),
+            ...headersObject,
             ...(requestBodyContent
                 ? {
                       'Content-Type': requestBodyContent[0],
@@ -53,11 +69,19 @@ export function OpenAPICodeSample(props: {
     (['x-custom-examples', 'x-code-samples', 'x-codeSamples'] as const).forEach((key) => {
         const customSamples = data.operation[key];
         if (customSamples && Array.isArray(customSamples)) {
-            customCodeSamples = customSamples.map((sample) => ({
-                key: `redocly-${sample.lang}`,
-                label: sample.label,
-                body: <context.CodeBlock code={sample.source} syntax={sample.lang} />,
-            }));
+            customCodeSamples = customSamples
+                .filter((sample) => {
+                    return (
+                        typeof sample.label === 'string' &&
+                        typeof sample.source === 'string' &&
+                        typeof sample.lang === 'string'
+                    );
+                })
+                .map((sample) => ({
+                    key: `redocly-${sample.lang}`,
+                    label: sample.label,
+                    body: <context.CodeBlock code={sample.source} syntax={sample.lang} />,
+                }));
         }
     });
 
@@ -70,6 +94,11 @@ export function OpenAPICodeSample(props: {
         return null;
     }
 
+    async function fetchOperationData() {
+        'use server';
+        return toJSON(data);
+    }
+
     return (
         <InteractiveSection
             header="Request"
@@ -77,7 +106,7 @@ export function OpenAPICodeSample(props: {
             tabs={samples}
             overlay={
                 data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'] ? null : (
-                    <ScalarApiButton />
+                    <ScalarApiButton fetchOperationData={fetchOperationData} />
                 )
             }
         />

@@ -1,9 +1,16 @@
-import { CustomizationHeaderLink } from '@gitbook/api';
+import {
+    CustomizationHeaderLink,
+    CustomizationHeaderPreset,
+    CustomizationSettings,
+    SiteCustomizationSettings,
+} from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
 import React from 'react';
 
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
+import { tcls } from '@/lib/tailwind';
 
-import { Dropdown, DropdownChevron, DropdownMenu, DropdownMenuItem } from './Dropdown';
+import { Dropdown, DropdownMenu, DropdownMenuItem } from './Dropdown';
 import styles from './headerLinks.module.css';
 
 /**
@@ -13,13 +20,25 @@ export function HeaderLinkMore(props: {
     label: React.ReactNode;
     links: CustomizationHeaderLink[];
     context: ContentRefContext;
+    customization: CustomizationSettings | SiteCustomizationSettings;
 }) {
-    const { label, links, context } = props;
+    const { label, links, context, customization } = props;
+
+    const isCustomizationDefault =
+        customization.header.preset === CustomizationHeaderPreset.Default;
 
     const renderButton = () => (
-        <button className="px-1">
+        <button
+            className={tcls(
+                'px-1',
+                !isCustomizationDefault
+                    ? ['text-header-link-500']
+                    : ['text-dark/8', 'dark:text-light/8', 'dark:hover:text-light'],
+                'hover:text-header-link-400',
+            )}
+        >
             <span className="sr-only">{label}</span>
-            <DropdownChevron />
+            <Icon icon="ellipsis" className={tcls('opacity-6', 'size-3', 'ms-1')} />
         </button>
     );
 

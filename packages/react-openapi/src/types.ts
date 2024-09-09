@@ -10,14 +10,14 @@ export interface OpenAPIClientContext {
         chevronRight: React.ReactNode;
     };
 
-    /** Spec url foor the Scalar Api Client */
-    specUrl: string;
-
     /**
      * Force all sections to be opened by default.
      * @default false
      */
     defaultInteractiveOpened?: boolean;
+
+    /** Optional id attached to the OpenAPI Operation heading and used as an anchor */
+    id?: string;
 }
 
 export interface OpenAPIFetcher {

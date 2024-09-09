@@ -95,6 +95,7 @@ export function Header(props: {
                             label={t(getSpaceLanguage(customization), 'more')}
                             links={customization.header.links}
                             context={context}
+                            customization={customization}
                         />
                     </HeaderLinks>
                     <div
