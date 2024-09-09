@@ -1,6 +1,8 @@
 # Welcome to GitBook's contributing guide!
 
-Thank you for investing your time in contributing to GitBook. Any contribution you make will be reviewed by our team.In this guide, you'll learn the different ways you can contribute.
+> _For help, support, feature requests, and product questions - head to our [GitHub Community](https://github.com/orgs/GitbookIO/discussions) 🤖_
+
+Thank you for investing your time in contributing to GitBook. Any contribution you make will be reviewed by our team. In this guide, you'll learn the different ways you can contribute.
 
 ## Types of Contributions
 
@@ -45,13 +47,25 @@ Any contribution you make can be made to the code located in this repository. In
 
 -   [Fork the repo](https://docs.github.com/en/github/getting-started-with-github/fork-a-repo#fork-an-example-repository) so that you can make your changes without affecting the original project until you're ready to merge them.
 
-##### GitHub Codespaces:
-
--   [Fork, edit, and preview](https://docs.github.com/en/free-pro-team@latest/github/developing-online-with-codespaces/creating-a-codespace) using [GitHub Codespaces](https://github.com/features/codespaces) without having to install and run the project locally.
-
 #### 2. Create a working branch and start with your changes
 
-After forking this repository, you'll want to [create a branch](https://docs.github.com/en/issues/tracking-your-work-with-issues/creating-a-branch-for-an-issue) to work off of. After creating the branch, you can start making changes!
+After forking this repository, you'll want to [create a branch](https://docs.github.com/en/issues/tracking-your-work-with-issues/creating-a-branch-for-an-issue) to work off of.
+
+#### 3. Install dependencies and run the project locally
+
+GitBook uses [Bun](https://bun.sh/) to run the project. Make sure you're using the specified version of `node` before running any of the development commands to ensure a smooth development experience.
+
+You can easily do this by running the command `nvm use`.
+
+To start your local version of GitBook, run the command `bun dev`.
+
+#### 4. Preview your changes
+
+When running the development server, published GitBook sites can be rendered through your local version at `http://localhost:3000/`.
+
+For example, our published docs can be viewed using the local version by visiting `http://localhost:3000/docs.gitbook.com` after running the development server.
+
+You can visit any published GitBook site behind your development server. Please make sure your site is [published publicly](https://docs.gitbook.com/published-documentation/publish-your-content-as-a-docs-site) to ensure you can view the site correctly in your development version.
 
 ### Commit your update
 
@@ -71,4 +85,4 @@ When you're finished with the changes, [create a pull request](https://docs.gith
 
 ### Your PR is merged
 
-Congratulations 🎉Thank you for your contribution! Once your PR is merged, your contributions will be publicly visible on the relevant repository.
+Congratulations 🎉 Thank you for your contribution! Once your PR is merged, your contributions will be publicly visible on the relevant repository.
