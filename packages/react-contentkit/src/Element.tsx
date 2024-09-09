@@ -97,9 +97,6 @@ export function Element(props: {
         case 'textinput': {
             return <ElementTextInput element={element} />;
         }
-        case 'input': {
-            return <ElementTextInput element={element} state={state} />;
-        }
         case 'hstack':
         case 'vstack':
             return (
