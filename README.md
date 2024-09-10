@@ -14,7 +14,7 @@
 
 <p align="center">Welcome to GitBook, the platform for managing technical knowledge for teams.</p>
 
-<p align="center">This repository contains the open-source code used to render GitBook's published content.</p>
+<p align="center">This repository contains the open source code used to render GitBook's published content.</p>
 
 <p align="center">
   <img alt="GitBook Open Published Site" src="./assets/published-site.png">
@@ -46,19 +46,28 @@ To run a local version of this project, please follow these simple steps.
 git clone https://github.com/gitbookIO/gitbook.git
 ```
 
-2. Install the project's dependencies through Bun.
+2. Ensure you are using the project's version of `node`. Running `nvm use` will change your local version to the correct one.
+
+3. Install the project's dependencies through Bun.
 
 ```
 bun install
 ```
 
-3. Start your local development server.
+4. Start your local development server.
 
 ```
 bun dev
 ```
 
-Then open the space in your web browser, using http://localhost:3000/<host>/<path> (example: http://localhost:3000/docs.gitbook.com).
+5. Open a published GitBook space in your web browser, prefixing it with `http://localhost:3000/`.
+
+examples:
+
+-   http://localhost:3000/docs.gitbook.com
+-   http://localhost:3000/open-source.gitbook.io/midjourney
+
+Any published GitBook site can be accessed through your local development instance, and any updates you make to the codebase will be reflected in your browser.
 
 ### Other development commands
 
@@ -71,15 +80,15 @@ All pull-requests will be tested against both visual and performances testing to
 
 ## Contributing
 
-GitBook's rendering engine is fully open-source and built on top of [Next.js](https://nextjs.org/). Head to our [contributing guide](https://github.com/GitbookIO/gitbook/.github/CONTRIBUTING.md) to learn more about the workflow on adding your first Pull Request.
+GitBook's rendering engine is fully open source and built on top of [Next.js](https://nextjs.org/). Head to our [contributing guide](https://github.com/GitbookIO/gitbook/blob/main/.github/CONTRIBUTING.md) to learn more about the workflow on adding your first Pull Request.
 
 ### Types of contributions
 
-We encourage you to contribute to GitBook to help us build the best tool for doucmenting techincal knowledge. If you're looking for some quick ways to contribute, continue reading to learn more about popular contributions.
+We encourage you to contribute to GitBook to help us build the best tool for documenting technical knowledge. If you're looking for some quick ways to contribute, continue reading to learn more about popular contributions.
 
 #### Translations
 
-The GitBook UI is rendered using a set of translation files found in [`src/intl/translations`](/src/intl/translations/). We welcome all additional translations for the UI.
+The GitBook UI is rendered using a set of translation files found in [`packages/gitbook/src/intl/translations`](/packages/gitbook/src/intl/translations/). We welcome all additional translations for the UI.
 
 #### Bugs
 
@@ -90,9 +99,9 @@ Encounter a bug or find an issue you'd like to fix? Helping us fix issues relate
 > [!WARNING]  
 > While it is possible to self-host this project, we do not recommend this unless you are certain this option fits your need.
 >
-> _Looking to add a specific feature in GitBook? Head to our [contributing guide](/.github/CONTRIBUTING.md) to get started._
+> _Looking to add a specific feature in GitBook? Head to our [contributing guide](https://github.com/GitbookIO/gitbook/blob/main/.github/CONTRIBUTING.md) to get started._
 >
-> Self-hosting this project puts the responsibility of maintaining and merging future updates on **you**. We cannot guarantee support, maintainance, or updates to forked and self-hosted instances of this project.
+> Self-hosting this project puts the responsibility of maintaining and merging future updates on **you**. We cannot guarantee support, maintenance, or updates to forked and self-hosted instances of this project.
 >
 > We want to make it as easy as possible for our community to collaborate and push the future of GitBook, which is why we encourage you to contribute to our product directly instead of creating your own version.
 
@@ -106,7 +115,7 @@ On the con side, you become responsible for the reliability of your published si
 
 Distributed under the [GNU GPLv3 License](https://github.com/GitBookIO/gitbook/blob/main/LICENSE).
 
-If you plan to distribute the code, you must the source code public to comply with GNU GPLv3. To clone in a private repository, acquire a [commercial license](https://www.gitbook.com/pricing).
+If you plan to distribute the code, you must make the source code public to comply with the GNU GPLv3. To clone in a private repository, acquire a [commercial license](https://www.gitbook.com/pricing).
 
 See `LICENSE` for more information.
 
@@ -118,6 +127,12 @@ GitBook wouldn't be possible without these projects:
 -   [Bun](https://bun.sh/)
 -   [Tailwind CSS](https://tailwindcss.com/)
 -   [Framer Motion](https://www.npmjs.com/package/framer-motion)
+
+## Contributors
+
+<a href="https://github.com/gitbookIO/gitbook/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=gitbookIO/gitbook" />
+</a>
 
 ## Legacy GitBook (Deprecated)
 

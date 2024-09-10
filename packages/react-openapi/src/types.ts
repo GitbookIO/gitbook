@@ -15,6 +15,9 @@ export interface OpenAPIClientContext {
      * @default false
      */
     defaultInteractiveOpened?: boolean;
+
+    /** Optional id attached to the OpenAPI Operation heading and used as an anchor */
+    id?: string;
 }
 
 export interface OpenAPIFetcher {

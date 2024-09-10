@@ -3,6 +3,12 @@
 import classNames from 'classnames';
 import React from 'react';
 
+interface InteractiveSectionTab {
+    key: string;
+    label: string;
+    body: React.ReactNode;
+}
+
 /**
  * To optimize rendering, most of the components are server-components,
  * and the interactiveness is mainly handled by a few key components like this one.
@@ -19,11 +25,7 @@ export function InteractiveSection(props: {
     toggleOpenIcon?: React.ReactNode;
     toggleCloseIcon?: React.ReactNode;
     /** Tabs of content to display */
-    tabs?: Array<{
-        key: string;
-        label: string;
-        body: React.ReactNode;
-    }>;
+    tabs?: Array<InteractiveSectionTab>;
     /** Default tab to have opened */
     defaultTab?: string;
     /** Content of the header */
@@ -48,9 +50,9 @@ export function InteractiveSection(props: {
     } = props;
 
     const [opened, setOpened] = React.useState(defaultOpened);
-    const [selectedTab, setSelectedTab] = React.useState(defaultTab);
-
-    const tabBody = tabs.find((tab) => tab.key === selectedTab)?.body;
+    const [selectedTabKey, setSelectedTab] = React.useState(defaultTab);
+    const selectedTab: InteractiveSectionTab | undefined =
+        tabs.find((tab) => tab.key === selectedTabKey) ?? tabs[0];
 
     return (
         <div
@@ -94,7 +96,7 @@ export function InteractiveSection(props: {
                                 'openapi-select',
                                 `${className}-tabs-select`,
                             )}
-                            value={selectedTab}
+                            value={selectedTab.key}
                             onChange={(event) => {
                                 setSelectedTab(event.target.value);
                                 setOpened(true);
@@ -107,7 +109,7 @@ export function InteractiveSection(props: {
                             ))}
                         </select>
                     ) : null}
-                    {(children || tabBody) && toggeable ? (
+                    {(children || selectedTab?.body) && toggeable ? (
                         <button
                             className={classNames('openapi-section-toggle', `${className}-toggle`)}
                             onClick={() => setOpened(!opened)}
@@ -117,10 +119,10 @@ export function InteractiveSection(props: {
                     ) : null}
                 </div>
             </div>
-            {(!toggeable || opened) && (children || tabBody) ? (
+            {(!toggeable || opened) && (children || selectedTab?.body) ? (
                 <div className={classNames('openapi-section-body', `${className}-body`)}>
                     {children}
-                    {tabBody}
+                    {selectedTab?.body}
                 </div>
             ) : null}
             {overlay}

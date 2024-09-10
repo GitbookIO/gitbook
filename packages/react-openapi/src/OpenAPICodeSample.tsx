@@ -1,8 +1,8 @@
-import { OpenAPIV3 } from 'openapi-types';
+import * as React from 'react';
 
 import { CodeSampleInput, codeSampleGenerators } from './code-samples';
 import { OpenAPIOperationData, toJSON } from './fetchOpenAPIOperation';
-import { generateMediaTypeExample } from './generateSchemaExample';
+import { generateMediaTypeExample, generateSchemaExample } from './generateSchemaExample';
 import { InteractiveSection } from './InteractiveSection';
 import { getServersURL } from './OpenAPIServerURL';
 import { ScalarApiButton } from './ScalarApiButton';
@@ -19,6 +19,21 @@ export function OpenAPICodeSample(props: {
 }) {
     const { data, context } = props;
 
+    const requiredHeaders = data.operation.parameters
+        ?.map(noReference)
+        .filter((param) => param.in === 'header' && param.required);
+
+    const headersObject: { [k: string]: string } = {};
+    requiredHeaders?.forEach((header) => {
+        const example = header.schema
+            ? generateSchemaExample(noReference(header.schema))
+            : undefined;
+        if (example !== undefined) {
+            headersObject[header.name] =
+                typeof example !== 'string' ? JSON.stringify(example) : example;
+        }
+    });
+
     const requestBody = noReference(data.operation.requestBody);
     const requestBodyContent = requestBody ? Object.entries(requestBody.content)[0] : undefined;
 
@@ -30,6 +45,7 @@ export function OpenAPICodeSample(props: {
             : undefined,
         headers: {
             ...getSecurityHeaders(data.securities),
+            ...headersObject,
             ...(requestBodyContent
                 ? {
                       'Content-Type': requestBodyContent[0],
@@ -52,16 +68,28 @@ export function OpenAPICodeSample(props: {
     }> = null;
     (['x-custom-examples', 'x-code-samples', 'x-codeSamples'] as const).forEach((key) => {
         const customSamples = data.operation[key];
-        if (customSamples) {
-            customCodeSamples = customSamples.map((sample) => ({
-                key: `redocly-${sample.lang}`,
-                label: sample.label,
-                body: <context.CodeBlock code={sample.source} syntax={sample.lang} />,
-            }));
+        if (customSamples && Array.isArray(customSamples)) {
+            customCodeSamples = customSamples
+                .filter((sample) => {
+                    return (
+                        typeof sample.label === 'string' &&
+                        typeof sample.source === 'string' &&
+                        typeof sample.lang === 'string'
+                    );
+                })
+                .map((sample) => ({
+                    key: `redocly-${sample.lang}`,
+                    label: sample.label,
+                    body: <context.CodeBlock code={sample.source} syntax={sample.lang} />,
+                }));
         }
     });
 
-    const samples = customCodeSamples ?? (data['x-codeSamples'] !== false ? autoCodeSamples : []);
+    // Code samples can be disabled at the top-level or at the operation level
+    // If code samples are defined at the operation level, it will override the top-level setting
+    const codeSamplesDisabled =
+        data['x-codeSamples'] === false || data.operation['x-codeSamples'] === false;
+    const samples = customCodeSamples ?? (!codeSamplesDisabled ? autoCodeSamples : []);
     if (samples.length === 0) {
         return null;
     }

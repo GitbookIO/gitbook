@@ -1,0 +1,86 @@
+.containerHeaderlinks {
+    container-type: inline-size;
+    container-name: headerlinks;
+}
+
+.containerHeaderlinks > * {
+    display: flex;
+}
+.linkEllipsis {
+    display: none;
+    & div > a {
+        display: none;
+    }
+}
+
+@container headerlinks ( width < 150px ) {
+    .containerHeaderlinks > :nth-child(n + 1) {
+        display: none;
+    }
+    .containerHeaderlinks > :nth-child(n + 1) ~ .linkEllipsis {
+        display: flex;
+        & div > a:nth-of-type(n + 1) {
+            display: flex;
+        }
+    }
+}
+@container headerlinks ( width < 300px ) {
+    .containerHeaderlinks > :nth-child(n + 2) {
+        display: none;
+    }
+    .containerHeaderlinks > :nth-child(n + 2) ~ .linkEllipsis {
+        display: flex;
+        & div > a:nth-of-type(n + 2) {
+            display: flex;
+        }
+    }
+}
+@container headerlinks ( width < 450px ) {
+    .containerHeaderlinks > :nth-child(n + 3) {
+        display: none;
+    }
+    .containerHeaderlinks > :nth-child(n + 3) ~ .linkEllipsis {
+        display: flex;
+        & div > a:nth-of-type(n + 3) {
+            display: flex;
+        }
+    }
+}
+@container headerlinks ( width < 600px ) {
+    .containerHeaderlinks > :nth-child(n + 4) {
+        display: none;
+    }
+    .containerHeaderlinks > :nth-child(n + 4) ~ .linkEllipsis {
+        display: flex;
+        & div > a:nth-of-type(n + 4) {
+            display: flex;
+        }
+    }
+}
+@container headerlinks ( width < 750px ) {
+    .containerHeaderlinks > :nth-child(n + 5) {
+        display: none;
+    }
+    .containerHeaderlinks > :nth-child(n + 5) ~ .linkEllipsis {
+        display: flex;
+        & div > :nth-child(n + 5) {
+            display: flex;
+        }
+    }
+}
+@container headerlinks ( width < 900px ) {
+    .containerHeaderlinks > :nth-child(n + 6) {
+        display: none;
+    }
+    .containerHeaderlinks > :nth-child(n + 6) ~ .linkEllipsis {
+        display: flex;
+        & div > a:nth-of-type(n + 6) {
+            display: flex;
+        }
+    }
+}
+@container headerlinks ( width > 900px ) {
+    .containerHeaderlinks > *:not(.linkEllipsis) {
+        display: flex;
+    }
+}

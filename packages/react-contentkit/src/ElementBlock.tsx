@@ -1,4 +1,5 @@
 import { ContentKitBlock } from '@gitbook/api';
+import React from 'react';
 
 import { ContentKitServerElementProps } from './types';
 

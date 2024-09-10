@@ -1,1 +1,10 @@
 .next
+.vercel
+
+# Generated
+packages/emoji-codepoints/index.ts
+packages/gitbook/public/~gitbook/static/
+packages/icons/src/data/*.json
+
+# Build files
+dist/
