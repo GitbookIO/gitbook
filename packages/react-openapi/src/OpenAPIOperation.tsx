@@ -48,7 +48,11 @@ export async function OpenAPIOperation(props: {
                             {method.toUpperCase()}
                         </span>
                         <span className="openapi-url">
-                            <OpenAPIServerURL servers={servers} context={clientContext} path={path} />
+                            <OpenAPIServerURL
+                                servers={servers}
+                                context={clientContext}
+                                path={path}
+                            />
                         </span>
                     </div>
                 </div>
