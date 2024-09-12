@@ -5,7 +5,6 @@ import React from 'react';
 import { PageIcon } from '@/components/PageIcon';
 
 import {
-    ContentPointer,
     SiteContentPointer,
     getCollection,
     getDocument,
@@ -45,9 +44,8 @@ export interface ContentRefContext extends PageHrefContext {
 
     /**
      * Site in which we are resolving the content reference.
-     * If null, the site is not known (legacy published content mode)
      */
-    siteContext: SiteContentPointer | null;
+    siteContext: SiteContentPointer;
     /**
      * Space in which we are resolving the content reference.
      */
@@ -119,7 +117,7 @@ export async function resolveContentRef(
         case 'anchor':
         case 'page': {
             if (contentRef.space && contentRef.space !== space.id) {
-                return resolveContentRefInSpace(contentRef.space, siteContext, contentRef);
+                return resolveContentRefInSpace(siteContext, contentRef);
             }
 
             const resolvePageResult =
@@ -265,15 +263,10 @@ export async function resolveContentRef(
 }
 
 async function resolveContentRefInSpace(
-    spaceId: string,
-    siteContext: SiteContentPointer | null,
+    siteContextPointer: SiteContentPointer,
     contentRef: ContentRef,
 ) {
-    const pointer: ContentPointer = {
-        spaceId,
-    };
-
-    const result = await ignoreAPIError(getSpaceContentData(pointer, siteContext?.siteShareKey));
+    const result = await ignoreAPIError(getSpaceContentData(siteContextPointer));
     if (!result) {
         return null;
     }
@@ -287,7 +280,7 @@ async function resolveContentRefInSpace(
     }
 
     const resolved = await resolveContentRef(contentRef, {
-        siteContext,
+        siteContext: siteContextPointer,
         space,
         revisionId: space.revision,
         pages,

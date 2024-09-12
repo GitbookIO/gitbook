@@ -10,7 +10,7 @@ import {
     Space,
 } from '@gitbook/api';
 
-import { getContentPointer } from '@/app/(space)/fetch';
+import { getSiteContentPointer } from '@/app/(space)/fetch';
 import { streamResponse } from '@/lib/actions';
 import * as api from '@/lib/api';
 import { absoluteHref, pageHref } from '@/lib/links';
@@ -58,7 +58,7 @@ export async function searchSiteContent(args: {
     cacheBust?: string;
 }): Promise<OrderedComputedResult[]> {
     const { siteSpaceIds, query, cacheBust } = args;
-    const pointer = getContentPointer();
+    const pointer = getSiteContentPointer();
 
     if (query.length <= 1) {
         return [];
@@ -69,46 +69,41 @@ export async function searchSiteContent(args: {
         return [];
     }
 
-    if ('siteId' in pointer && 'organizationId' in pointer) {
-        const [searchResults, allSiteSpaces] = await Promise.all([
-            api.searchSiteContent(
-                pointer.organizationId,
-                pointer.siteId,
-                query,
-                siteSpaceIds,
-                cacheBust,
-            ),
-            siteSpaceIds
-                ? null
-                : api.getSiteSpaces({
-                      organizationId: pointer.organizationId,
-                      siteId: pointer.siteId,
-                      siteShareKey: pointer.siteShareKey,
-                  }),
-        ]);
+    const [searchResults, allSiteSpaces] = await Promise.all([
+        api.searchSiteContent(
+            pointer.organizationId,
+            pointer.siteId,
+            query,
+            siteSpaceIds,
+            cacheBust,
+        ),
+        siteSpaceIds
+            ? null
+            : api.getSiteSpaces({
+                  organizationId: pointer.organizationId,
+                  siteId: pointer.siteId,
+                  siteShareKey: pointer.siteShareKey,
+              }),
+    ]);
 
-        if (!siteSpaceIds) {
-            // We are searching all of this Site's content
-            return searchResults.items
-                .map((spaceItem) => {
-                    const siteSpace = allSiteSpaces?.find(
-                        (siteSpace) => siteSpace.space.id === spaceItem.id,
-                    );
-
-                    return spaceItem.pages.map((item) => transformSitePageResult(item, siteSpace));
-                })
-                .flat(2);
-        }
-
+    if (!siteSpaceIds) {
+        // We are searching all of this Site's content
         return searchResults.items
             .map((spaceItem) => {
-                return spaceItem.pages.map((item) => transformPageResult(item));
+                const siteSpace = allSiteSpaces?.find(
+                    (siteSpace) => siteSpace.space.id === spaceItem.id,
+                );
+
+                return spaceItem.pages.map((item) => transformSitePageResult(item, siteSpace));
             })
             .flat(2);
     }
 
-    // This should never happen
-    return [];
+    return searchResults.items
+        .map((spaceItem) => {
+            return spaceItem.pages.map((item) => transformPageResult(item));
+        })
+        .flat(2);
 }
 
 /**
@@ -119,47 +114,13 @@ export async function searchSpaceContent(
     revisionId: string,
     query: string,
 ): Promise<OrderedComputedResult[]> {
-    const pointer = getContentPointer();
+    const pointer = getSiteContentPointer();
 
-    if ('siteId' in pointer && 'organizationId' in pointer) {
-        const siteSpaceIds = pointer.siteSpaceId ? [pointer.siteSpaceId] : []; // if we don't have a siteSpaceID search all content
+    const siteSpaceIds = pointer.siteSpaceId ? [pointer.siteSpaceId] : []; // if we don't have a siteSpaceID search all content
 
-        // This is a site so use a different function which we can eventually call directly
-        // We also want to break cache for this specific space if the revisionId is different so use it as a cache busting key
-        return await searchSiteContent({ siteSpaceIds, query, cacheBust: revisionId });
-    }
-
-    const data = await api.searchSpaceContent(spaceId, revisionId, query);
-    return data.items.map((item) => transformPageResult(item, undefined)).flat();
-}
-
-/**
- * Server action to search content in a parent (site or collection)
- */
-export async function searchParentContent(
-    parent: Site | Collection,
-    query: string,
-): Promise<OrderedComputedResult[]> {
-    const pointer = getContentPointer();
-    const isSite = 'siteId' in pointer;
-
-    if (isSite) {
-        return searchSiteContent({ query });
-    }
-
-    const [data, collectionSpaces] = await Promise.all([
-        api.searchParentContent(parent.id, query),
-        parent.object === 'collection' ? api.getCollectionSpaces(parent.id) : null,
-    ]);
-
-    let spaces: Space[] = collectionSpaces ? collectionSpaces : [];
-
-    return data.items
-        .map((spaceItem) => {
-            const space = spaces.find((space) => space.id === spaceItem.id);
-            return spaceItem.pages.map((item) => transformPageResult(item, space));
-        })
-        .flat(2);
+    // This is a site so use a different function which we can eventually call directly
+    // We also want to break cache for this specific space if the revisionId is different so use it as a cache busting key
+    return await searchSiteContent({ siteSpaceIds, query, cacheBust: revisionId });
 }
 
 /**
@@ -169,7 +130,7 @@ export const streamAskQuestion = streamResponse(async function* (spaceId: string
     const stream = api
         .api()
         .spaces.streamAskInSpace(spaceId, { query, format: 'document', details: true });
-    const pagesPromise = api.getSpaceContentData({ spaceId }, undefined);
+    const pagesPromise = api.getSpaceContentData({ spaceId, siteShareKey: undefined });
 
     for await (const chunk of stream) {
         // We run the AI search and fetch the pages in parallel

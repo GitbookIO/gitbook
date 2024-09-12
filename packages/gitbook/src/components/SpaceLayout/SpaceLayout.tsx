@@ -17,7 +17,7 @@ import { CONTAINER_STYLE } from '@/components/layout';
 import { ColorDebugger } from '@/components/primitives/ColorDebugger';
 import { SearchModal } from '@/components/Search';
 import { TableOfContents } from '@/components/TableOfContents';
-import { ContentPointer, ContentTarget, SiteContentPointer } from '@/lib/api';
+import { ContentTarget, SiteContentPointer } from '@/lib/api';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
@@ -25,10 +25,10 @@ import { tcls } from '@/lib/tailwind';
  * Render the entire content of the space (header, table of contents, footer, and page content).
  */
 export function SpaceLayout(props: {
-    content: ContentPointer | SiteContentPointer;
+    content: SiteContentPointer;
     contentTarget: ContentTarget;
     space: Space;
-    parent: Site | Collection | null;
+    parent: Site;
     spaces: Space[];
     customization: CustomizationSettings | SiteCustomizationSettings;
     pages: Revision['pages'];
@@ -50,7 +50,7 @@ export function SpaceLayout(props: {
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
     const contentRefContext: ContentRefContext = {
-        siteContext: 'siteId' in content ? content : null,
+        siteContext: content,
         space,
         revisionId: contentTarget.revisionId,
         pages,
@@ -113,11 +113,12 @@ export function SpaceLayout(props: {
 
             <React.Suspense fallback={null}>
                 <SearchModal
+                    parent={parent}
                     spaceId={contentTarget.spaceId}
                     revisionId={contentTarget.revisionId}
                     spaceTitle={customization.title ?? space.title}
                     withAsk={customization.aiSearch.enabled}
-                    parent={parent && spaces.length > 1 ? parent : null}
+                    withParent={parent && spaces.length > 1 ? true : false}
                 />
             </React.Suspense>
         </>

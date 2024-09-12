@@ -13,7 +13,6 @@ import {
     getSpaceContentData,
     userAgent,
     withAPI,
-    getSpaceLayoutData,
     DEFAULT_API_ENDPOINT,
     getCurrentSiteLayoutData,
 } from '@/lib/api';
@@ -78,9 +77,8 @@ export type LookupResult = PublishedContentWithCache & {
 interface ContentAPITokenPayload {
     organization: string;
     spaces: string[];
-    collection?: string;
-    site?: string;
-    siteSpace?: string;
+    site: string;
+    siteSpace: string;
 }
 
 /**
@@ -172,23 +170,20 @@ export async function middleware(request: NextRequest) {
             // Start fetching everything as soon as possible, but do not block the middleware on it
             // the cache will handle concurrent calls
             await waitUntil(
-                getSpaceContentData(
-                    {
-                        spaceId: resolved.space,
-                        changeRequestId: resolved.changeRequest,
-                        revisionId: resolved.revision,
-                    },
-                    'site' in resolved ? resolved.shareKey : undefined,
-                ),
+                getSpaceContentData({
+                    spaceId: resolved.space,
+                    changeRequestId: resolved.changeRequest,
+                    revisionId: resolved.revision,
+                    siteShareKey: resolved.shareKey,
+                }),
             );
 
-            const { scripts } = await ('site' in resolved
-                ? getCurrentSiteLayoutData({
-                      organizationId: resolved.organization,
-                      siteId: resolved.site,
-                      siteSpaceId: resolved.siteSpace,
-                  })
-                : getSpaceLayoutData(resolved.space));
+            const { scripts } = await getCurrentSiteLayoutData({
+                organizationId: resolved.organization,
+                siteId: resolved.site,
+                siteSpaceId: resolved.siteSpace,
+            });
+
             return getContentSecurityPolicy(scripts, nonce);
         },
     );
@@ -494,19 +489,14 @@ async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise
     }
 
     const { organization, site, siteSpace } = jwt.decode(apiToken) as ContentAPITokenPayload;
-    const siteLookupResult =
-        typeof organization === 'string' && organization && typeof site === 'string' && site
-            ? {
-                  organization,
-                  site,
-                  ...(typeof siteSpace === 'string' && siteSpace ? { siteSpace } : {}),
-              }
-            : {};
+
     return {
         space: spaceId,
         changeRequest: changeRequestId,
         revision: revisionId,
-        ...siteLookupResult,
+        organization,
+        site,
+        siteSpace,
         basePath: normalizePathname(basePathParts.join('/')),
         pathname: normalizePathname(pathSegments.join('/')),
         apiToken,

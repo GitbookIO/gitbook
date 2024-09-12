@@ -21,7 +21,8 @@ interface SearchModalProps {
     spaceId: string;
     revisionId: string;
     spaceTitle: string;
-    parent: Site | Collection | null;
+    parent: Site;
+    withParent: boolean;
     withAsk: boolean;
 }
 
@@ -136,7 +137,7 @@ function SearchModalBody(
         onClose: (to?: string) => void;
     },
 ) {
-    const { spaceId, revisionId, spaceTitle, withAsk, parent, state, onChangeQuery, onClose } =
+    const { spaceId, revisionId, spaceTitle, withAsk, withParent, state, onChangeQuery, onClose } =
         props;
 
     const language = useLanguage();
@@ -239,7 +240,7 @@ function SearchModalBody(
                     ref={resultsRef}
                     spaceId={spaceId}
                     revisionId={revisionId}
-                    parent={state.global ? parent : null}
+                    withParentSearch={withParent && state.global ? true : false}
                     query={state.query}
                     withAsk={withAsk}
                     onSwitchToAsk={() => {
@@ -250,7 +251,9 @@ function SearchModalBody(
                         });
                     }}
                 >
-                    {parent && state.query ? <SearchScopeToggle spaceTitle={spaceTitle} /> : null}
+                    {withParent && state.query ? (
+                        <SearchScopeToggle spaceTitle={spaceTitle} />
+                    ) : null}
                 </SearchResults>
             ) : null}
             {state.query && state.ask && withAsk ? (

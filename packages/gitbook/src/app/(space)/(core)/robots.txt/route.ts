@@ -5,7 +5,7 @@ import { getCollection, getSite, getSpace } from '@/lib/api';
 import { absoluteHref } from '@/lib/links';
 import { shouldIndexSpace } from '@/lib/seo';
 
-import { getContentPointer } from '../../fetch';
+import { getSiteContentPointer } from '../../fetch';
 
 export const runtime = 'edge';
 
@@ -13,17 +13,9 @@ export const runtime = 'edge';
  * Generate a robots.txt for the current space.
  */
 export async function GET(req: NextRequest) {
-    const pointer = getContentPointer();
-    const space = await getSpace(
-        pointer.spaceId,
-        'siteId' in pointer ? pointer.siteShareKey : undefined,
-    );
-    const parent =
-        'siteId' in pointer
-            ? await getSite(pointer.organizationId, pointer.siteId)
-            : space.visibility === ContentVisibility.InCollection && space.parent
-              ? await getCollection(space.parent)
-              : null;
+    const pointer = getSiteContentPointer();
+    const space = await getSpace(pointer.spaceId, pointer.siteShareKey);
+    const parent = await getSite(pointer.organizationId, pointer.siteId);
 
     const lines = [
         `User-agent: *`,

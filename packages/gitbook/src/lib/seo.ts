@@ -4,13 +4,7 @@ import { headers } from 'next/headers';
 /**
  * Return true if a space should be indexed by search engines.
  */
-export function shouldIndexSpace({
-    space,
-    parent,
-}: {
-    space: Space;
-    parent: Site | Collection | null;
-}) {
+export function shouldIndexSpace({ space, parent }: { space: Space; parent: Site }) {
     const headerSet = headers();
 
     if (
@@ -28,18 +22,9 @@ export function shouldIndexSpace({
         return false;
     }
 
-    if (parent && parent.object === 'site') {
-        return shouldIndexVisibility(parent.visibility);
-    }
-
-    if (space.visibility === ContentVisibility.InCollection) {
-        return parent && parent.object === 'collection'
-            ? shouldIndexVisibility(parent.visibility)
-            : false;
-    }
-    return shouldIndexVisibility(space.visibility);
+    return shouldIndexVisibility(parent.visibility);
 }
 
-function shouldIndexVisibility(visibility: ContentVisibility | SiteVisibility) {
-    return visibility === ContentVisibility.Public;
+function shouldIndexVisibility(visibility: SiteVisibility) {
+    return visibility === SiteVisibility.Public;
 }

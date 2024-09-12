@@ -1,11 +1,11 @@
 import { Space } from '@gitbook/api';
 import React from 'react';
 
-import { ContentPointer, getChangeRequest, getRevision } from '@/lib/api';
+import { SiteContentPointer, getChangeRequest, getRevision } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
 interface AdminToolbarProps {
-    content: ContentPointer;
+    content: SiteContentPointer;
     space: Space;
 }
 

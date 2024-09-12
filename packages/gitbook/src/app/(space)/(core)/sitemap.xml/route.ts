@@ -6,7 +6,7 @@ import { getSpaceContentData } from '@/lib/api';
 import { absoluteHref } from '@/lib/links';
 import { getPagePath } from '@/lib/pages';
 
-import { getContentPointer } from '../../fetch';
+import { getSiteContentPointer } from '../../fetch';
 
 export const runtime = 'edge';
 
@@ -14,11 +14,8 @@ export const runtime = 'edge';
  * Generate a sitemap.xml for the current space.
  */
 export async function GET(req: NextRequest) {
-    const pointer = getContentPointer();
-    const { pages: rootPages } = await getSpaceContentData(
-        pointer,
-        'siteId' in pointer ? pointer.siteShareKey : undefined,
-    );
+    const pointer = getSiteContentPointer();
+    const { pages: rootPages } = await getSpaceContentData(pointer);
     const pages = flattenPages(rootPages, (page) => !page.hidden);
     const urls = pages.map(({ page, depth }) => {
         // Decay priority with depth

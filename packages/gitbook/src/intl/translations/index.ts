@@ -21,4 +21,5 @@ export const languages: {
     zh,
     ja,
     'pt-br': pt_br,
+    nl: en,
 };

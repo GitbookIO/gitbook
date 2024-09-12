@@ -4,7 +4,7 @@ import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 import React from 'react';
 
-import { getContentPointer } from '@/app/(space)/fetch';
+import { getSiteContentPointer } from '@/app/(space)/fetch';
 import {
     getCollection,
     getCurrentSiteCustomization,
@@ -42,19 +42,15 @@ export async function GET(req: NextRequest) {
     const options = getOptions(req.url);
     const size = SIZES[options.size];
 
-    const pointer = getContentPointer();
+    const pointer = getSiteContentPointer();
     const spaceId = pointer.spaceId;
 
     const [space, customization] = await Promise.all([
-        getSpace(spaceId, 'siteId' in pointer ? pointer.siteShareKey : undefined),
-        'siteId' in pointer ? getCurrentSiteCustomization(pointer) : getSpaceCustomization(spaceId),
+        getSpace(spaceId, pointer.siteShareKey),
+        getCurrentSiteCustomization(pointer),
     ]);
-    const parent =
-        'siteId' in pointer
-            ? await getSite(pointer.organizationId, pointer.siteId)
-            : space.visibility === ContentVisibility.InCollection && space.parent
-              ? await getCollection(space.parent)
-              : null;
+    const parent = await getSite(pointer.organizationId, pointer.siteId);
+
     const contentTitle = getContentTitle(space, customization, parent);
 
     return new ImageResponse(

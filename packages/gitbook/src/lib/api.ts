@@ -8,7 +8,6 @@ import {
     GitBookAPIError,
     HttpResponse,
     List,
-    PublishedContentLookup,
     PublishedSiteContentLookup,
     RequestRenderIntegrationUI,
     RevisionFile,
@@ -32,16 +31,10 @@ import {
 /**
  * Pointer to a relative content, it might change overtime, the pointer is relative in the content history.
  */
-export interface ContentPointer {
-    spaceId: string;
+export interface SiteContentPointer {
     changeRequestId?: string;
     revisionId?: string;
-}
-
-/**
- * Pointer to a relative content, it might change overtime, the pointer is relative in the content history.
- */
-export interface SiteContentPointer extends ContentPointer {
+    spaceId: string;
     organizationId: string;
     siteId: string;
     /**
@@ -129,7 +122,7 @@ export function withAPI<T>(client: GitBookAPI, fn: () => Promise<T>): Promise<T>
 }
 
 export type PublishedContentWithCache =
-    | ((PublishedContentLookup | PublishedSiteContentLookup) & {
+    | (PublishedSiteContentLookup & {
           cacheMaxAge?: number;
           cacheTags?: string[];
       })
@@ -771,7 +764,7 @@ export const getSiteIntegrationScripts = cache(
  */
 export async function getCurrentSiteData(pointer: SiteContentPointer) {
     const [{ space, pages, contentTarget }, { customization, scripts }] = await Promise.all([
-        getSpaceData(pointer, pointer.siteShareKey),
+        getSpaceContentData(pointer),
         getCurrentSiteLayoutData(pointer),
     ]);
 
@@ -914,37 +907,26 @@ export const getCollectionSpaces = cache(
 );
 
 /**
- * Fetch all the data to render a space at once.
- */
-export async function getSpaceData(pointer: ContentPointer, shareKey: string | undefined) {
-    const [{ space, pages, contentTarget }, { customization, scripts }] = await Promise.all([
-        getSpaceContentData(pointer, shareKey),
-        getSpaceLayoutData(pointer.spaceId),
-    ]);
-
-    return {
-        space,
-        pages,
-        contentTarget,
-        customization,
-        scripts,
-    };
-}
-
-/**
  * Fetch all the content data about a space at once.
  * This function executes the requests in parallel and should be used as early as possible
  * instead of calling the individual functions.
  */
-export async function getSpaceContentData(pointer: ContentPointer, shareKey: string | undefined) {
+export async function getSpaceContentData(
+    contentPointer: Pick<
+        SiteContentPointer,
+        'spaceId' | 'revisionId' | 'changeRequestId' | 'siteShareKey'
+    >,
+) {
     const [space, changeRequest] = await Promise.all([
-        getSpace(pointer.spaceId, shareKey),
-        pointer.changeRequestId ? getChangeRequest(pointer.spaceId, pointer.changeRequestId) : null,
+        getSpace(contentPointer.spaceId, contentPointer.siteShareKey),
+        contentPointer.changeRequestId
+            ? getChangeRequest(contentPointer.spaceId, contentPointer.changeRequestId)
+            : null,
     ]);
 
     const contentTarget: ContentTarget = {
-        spaceId: pointer.spaceId,
-        revisionId: changeRequest?.revision ?? pointer.revisionId ?? space.revision,
+        spaceId: contentPointer.spaceId,
+        revisionId: changeRequest?.revision ?? contentPointer.revisionId ?? space.revision,
     };
     const [pages] = await Promise.all([
         getRevisionPages(space.id, contentTarget.revisionId, {
@@ -958,21 +940,6 @@ export async function getSpaceContentData(pointer: ContentPointer, shareKey: str
         space,
         pages,
         contentTarget,
-    };
-}
-
-/**
- * Fetch all the layout data about a space at once.
- */
-export async function getSpaceLayoutData(spaceId: string) {
-    const [customization, scripts] = await Promise.all([
-        getSpaceCustomization(spaceId),
-        getSpaceIntegrationScripts(spaceId),
-    ]);
-
-    return {
-        customization,
-        scripts,
     };
 }
 

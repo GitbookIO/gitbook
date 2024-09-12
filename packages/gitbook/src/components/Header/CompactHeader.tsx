@@ -20,15 +20,13 @@ import { SearchButton } from '../Search';
  */
 export function CompactHeader(props: {
     space: Space;
-    parent: Site | Collection | null;
+    parent: Site;
     spaces: Space[];
     customization: CustomizationSettings | SiteCustomizationSettings;
 }) {
     const { space, spaces, parent, customization } = props;
 
-    const isMultiVariants =
-        parent?.object === 'collection' ||
-        (parent && parent.object === 'site' && spaces.length > 1);
+    const isMultiVariants = parent.object === 'site' && spaces.length > 1;
 
     return (
         <div

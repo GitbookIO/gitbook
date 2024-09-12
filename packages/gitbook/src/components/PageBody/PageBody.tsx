@@ -9,7 +9,7 @@ import React from 'react';
 
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
-import { ContentPointer, ContentTarget, SiteContentPointer, api } from '@/lib/api';
+import { ContentTarget, SiteContentPointer, api } from '@/lib/api';
 import { hasFullWidthBlock, isNodeEmpty } from '@/lib/document';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -26,7 +26,7 @@ import { DateRelative } from '../primitives';
 
 export function PageBody(props: {
     space: Space;
-    contentPointer: ContentPointer | SiteContentPointer;
+    contentPointer: SiteContentPointer;
     contentTarget: ContentTarget;
     customization: CustomizationSettings | SiteCustomizationSettings;
     page: RevisionPageDocument;
@@ -49,10 +49,6 @@ export function PageBody(props: {
     const language = getSpaceLanguage(customization);
     const updatedAt = page.updatedAt ?? page.createdAt;
     const shouldHighlightCode = createHighlightingContext();
-    const sitePointer =
-        'siteId' in contentPointer
-            ? { organizationId: contentPointer.organizationId, siteId: contentPointer.siteId }
-            : undefined;
 
     return (
         <>
@@ -144,7 +140,7 @@ export function PageBody(props: {
             </main>
             {shouldTrackPageViews() ? (
                 <TrackPageView
-                    sitePointer={sitePointer}
+                    sitePointer={contentPointer}
                     spaceId={space.id}
                     pageId={page.id}
                     apiHost={api().endpoint}
