@@ -51,7 +51,6 @@ export function OpenAPICodeSample(props: {
 
     const requestBody = noReference(data.operation.requestBody);
     const requestBodyContent = requestBody ? Object.entries(requestBody.content)[0] : undefined;
-
     const input: CodeSampleInput = {
         url:
             getServersURL(data.servers, context.enumSelectors) +
