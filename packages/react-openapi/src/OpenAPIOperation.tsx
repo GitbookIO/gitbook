@@ -28,9 +28,8 @@ export async function OpenAPIOperation(props: {
         enumSelectors: context.enumSelectors,
     };
 
-    const config = await getConfiguration(context);
     return (
-        <ScalarApiClient>
+        <ScalarApiClient serverUrl={getServersURL(data.servers, context.enumSelectors)}>
             <div className={classNames('openapi-operation', className)}>
                 <div className="openapi-intro">
                     <h2 className="openapi-summary" id={context.id}>
@@ -71,18 +70,4 @@ export async function OpenAPIOperation(props: {
             </div>
         </ScalarApiClient>
     );
-}
-
-async function getConfiguration(context: OpenAPIContextProps) {
-    const response = await fetch(context.specUrl);
-    const doc = await response.json();
-
-    return {
-        spec: {
-            content: {
-                ...doc,
-                servers: [{ url: getServersURL(doc.servers, context.enumSelectors) }],
-            },
-        },
-    };
 }

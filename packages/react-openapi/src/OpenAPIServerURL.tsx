@@ -26,7 +26,7 @@ export function OpenAPIServerURL(props: {
     return (
         <ServerURLForm context={context} servers={servers} serverIndex={serverIndex}>
             {parts.map((part, i) => {
-                if (part.kind === 'text') {
+                if (part.kind === 'text') { 
                     return <span key={i}>{part.text}</span>;
                 } else {
                     if (!server.variables?.[part.name]) {

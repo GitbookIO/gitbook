@@ -105,14 +105,14 @@ function parseModifiers(data: OpenAPIOperationData, params: Record<string, strin
     if (!data) {
         return;
     }
-    const { servers } = params;
+    const { server: serverQueryParam } = params;
     const serverIndex =
-        servers && !isNaN(Number(servers))
-            ? Math.min(0, Math.max(Number(servers), servers.length - 1))
+        serverQueryParam && !isNaN(Number(serverQueryParam))
+            ? Math.max(0, Math.min(Number(serverQueryParam), data.servers.length - 1))
             : 0;
     const server = data.servers[serverIndex];
-    if (server && server.variables) {
-        return Object.keys(server.variables).reduce<Record<string, number>>(
+    if (server) {
+        return Object.keys(server.variables ?? {}).reduce<Record<string, number>>(
             (result, key) => {
                 const selection = Number(params[key]);
                 if (!isNaN(selection)) {
@@ -120,7 +120,7 @@ function parseModifiers(data: OpenAPIOperationData, params: Record<string, strin
                 }
                 return result;
             },
-            { servers: serverIndex },
+            { server: serverIndex },
         );
     }
 }
