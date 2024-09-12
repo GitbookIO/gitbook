@@ -15,7 +15,7 @@
         "copy:icons": "gitbook-icons ./public/~gitbook/static/icons"
     },
     "dependencies": {
-        "@gitbook/api": "^0.60.0",
+        "@gitbook/api": "^0.61.0",
         "@gitbook/icons": "workspace:*",
         "@gitbook/react-math": "workspace:*",
         "@gitbook/react-openapi": "workspace:*",
