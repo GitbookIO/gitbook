@@ -364,3 +364,7 @@
 .openapi-markdown > *:last-child {
     @apply mb-0;
 }
+
+.openapi-server-button {
+    @apply disabled:opacity-5;
+}
