@@ -3,6 +3,7 @@ import { OpenAPIV3 } from 'openapi-types';
 import { OpenAPIServerURLVariable } from './OpenAPIServerURLVariable';
 import { OpenAPIClientContext } from './types';
 import { ServerURLForm } from './OpenAPIServerURLForm';
+import { ServerSelector } from './ServerSelector';
 
 /**
  * Show the url of the server with variables replaced by their default values.
@@ -10,16 +11,17 @@ import { ServerURLForm } from './OpenAPIServerURLForm';
 export function OpenAPIServerURL(props: {
     servers: OpenAPIV3.ServerObject[];
     context: OpenAPIClientContext;
+    path?: string;
 }) {
-    const { servers, context } = props;
-    const serverIndex = context.enumSelectors?.servers ?? 0;
+    const { path, servers, context } = props;
+    const serverIndex = context.enumSelectors?.server ?? 0;
     const server = servers[serverIndex];
     const parts = parseServerURL(server?.url ?? '');
 
     return (
-        <ServerURLForm context={context} server={server}>
+        <ServerURLForm context={context} servers={servers} serverIndex={serverIndex}>
             {parts.map((part, i) => {
-                if (part.kind === 'text') {
+                if (part.kind === 'text') { 
                     return <span key={i}>{part.text}</span>;
                 } else {
                     if (!server.variables?.[part.name]) {
@@ -35,7 +37,7 @@ export function OpenAPIServerURL(props: {
                         />
                     );
                 }
-            })}
+            })}{path}
         </ServerURLForm>
     );
 }
@@ -47,7 +49,8 @@ export function getServersURL(
     servers: OpenAPIV3.ServerObject[],
     selectors?: Record<string, number>,
 ): string {
-    const server = servers[0];
+    const serverIndex = selectors && !isNaN(selectors.server) ? Number(selectors.server) : 0;
+    const server = servers[serverIndex];
     const parts = parseServerURL(server?.url ?? '');
 
     return parts

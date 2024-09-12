@@ -55,8 +55,8 @@ export function ScalarApiButton(props: {
 /**
  * Wrap the rendering with a context to open the scalar modal.
  */
-export function ScalarApiClient(props: { children: React.ReactNode }) {
-    const { children } = props;
+export function ScalarApiClient(props: { children: React.ReactNode; serverUrl?: string }) {
+    const { children, serverUrl } = props;
 
     const [active, setActive] = React.useState<null | {
         operationData: OpenAPIOperationData | null;
@@ -125,12 +125,12 @@ export function ScalarApiClient(props: { children: React.ReactNode }) {
             headers: request.headers.map((header: Header) => {
                 return { ...header, enabled: true };
             }),
-            url: operationData.servers[0]?.url,
+            url: serverUrl ?? operationData.servers[0]?.url,
             body: request.postData?.text,
         };
 
         return data;
-    }, [active]);
+    }, [active, serverUrl]);
 
     return (
         <ScalarContext.Provider value={open}>
