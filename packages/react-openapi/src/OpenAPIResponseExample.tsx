@@ -3,7 +3,7 @@ import { InteractiveSection } from './InteractiveSection';
 import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { generateSchemaExample } from './generateSchemaExample';
 import { OpenAPIContextProps } from './types';
-import { noReference } from './utils';
+import { createStateKey, noReference } from './utils';
 
 /**
  * Display an example of the response content.
@@ -78,6 +78,7 @@ export function OpenAPIResponseExample(props: {
 
     return (
         <InteractiveSection
+            stateKey={createStateKey('response', context.blockKey)}
             header="Response"
             className="openapi-response-example"
             tabs={examples}
