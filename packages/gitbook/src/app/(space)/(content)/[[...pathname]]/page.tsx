@@ -154,7 +154,7 @@ export async function generateMetadata({
                     absoluteHref(`~gitbook/ogimage/${page.id}`, true),
             ],
         },
-        robots: isIndexable ? undefined : 'noindex',
+        robots: isIndexable ? undefined : 'noindex, nofollow',
     };
 }
 

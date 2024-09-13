@@ -139,6 +139,8 @@ export function resolveFirstDocument(
  * Return true if a page is indexable in search.
  */
 export function isPageIndexable(page: RevisionPageDocument | RevisionPageGroup): boolean {
+    // @ts-ignore - noIndex and noRobotsIndex are not in the type
+    // until we fix the deprecated APIs
     return !page.noIndex && !page.noRobotsIndex;
 }
 
