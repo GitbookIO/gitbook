@@ -19,10 +19,7 @@ export async function GET(req: NextRequest) {
         pointer,
         'siteId' in pointer ? pointer.siteShareKey : undefined,
     );
-    const pages = flattenPages(
-        rootPages,
-        (page) => !page.hidden && isPageIndexable(page)
-    );
+    const pages = flattenPages(rootPages, (page) => !page.hidden && isPageIndexable(page));
     const urls = pages.map(({ page, depth }) => {
         // Decay priority with depth
         const priority = Math.pow(2, -0.25 * depth);
