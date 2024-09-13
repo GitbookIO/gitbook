@@ -695,7 +695,7 @@ const testCases: TestsCase[] = [
                 },
             },
             {
-                name: `Don't index descendant of noIndex`,
+                name: `Don't index descendant of noRobotsIndex`,
                 url: 'page-options/page-no-robots-index/descendant-of-page-no-robots-index',
                 run: async (page) => {
                     const metaRobots = page.locator('meta[name="robots"]');
