@@ -96,12 +96,6 @@ jobs:
             - uses: actions/upload-artifact@v4
               if: ${{ !cancelled() }}
               with:
-                  name: playwright-report
-                  path: packages/gitbook/playwright-report/
-                  retention-days: 3
-            - uses: actions/upload-artifact@v4
-              if: ${{ !cancelled() }}
-              with:
                   name: playwright-test-results
                   path: packages/gitbook/test-results/
                   retention-days: 3

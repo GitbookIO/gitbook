@@ -664,7 +664,7 @@ const testCases: TestsCase[] = [
         tests: [
             {
                 name: `Index by default`,
-                url: '',
+                url: '?x-gitbook-search-indexation=true',
                 screenshot: false,
                 run: async (page) => {
                     const metaRobots = page.locator('meta[name="robots"]');
@@ -673,7 +673,7 @@ const testCases: TestsCase[] = [
             },
             {
                 name: `Don't index noIndex`,
-                url: 'page-options/page-no-index',
+                url: 'page-options/page-no-index?x-gitbook-search-indexation=true',
                 screenshot: false,
                 run: async (page) => {
                     const metaRobots = page.locator('meta[name="robots"]');
@@ -682,7 +682,7 @@ const testCases: TestsCase[] = [
             },
             {
                 name: `Don't index descendant of noIndex`,
-                url: 'page-options/page-no-index/descendant-of-page-no-index',
+                url: 'page-options/page-no-index/descendant-of-page-no-index?x-gitbook-search-indexation=true',
                 screenshot: false,
                 run: async (page) => {
                     const metaRobots = page.locator('meta[name="robots"]');
@@ -691,7 +691,7 @@ const testCases: TestsCase[] = [
             },
             {
                 name: `Don't index noRobotsIndex`,
-                url: 'page-options/page-no-robots-index',
+                url: 'page-options/page-no-robots-index?x-gitbook-search-indexation=true',
                 screenshot: false,
                 run: async (page) => {
                     const metaRobots = page.locator('meta[name="robots"]');
@@ -700,7 +700,7 @@ const testCases: TestsCase[] = [
             },
             {
                 name: `Don't index descendant of noRobotsIndex`,
-                url: 'page-options/page-no-robots-index/descendant-of-page-no-robots-index',
+                url: 'page-options/page-no-robots-index/descendant-of-page-no-robots-index?x-gitbook-search-indexation=true',
                 screenshot: false,
                 run: async (page) => {
                     const metaRobots = page.locator('meta[name="robots"]');
