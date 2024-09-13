@@ -13,6 +13,8 @@ import { zh } from './zh';
 export * from './types';
 
 export const languages: {
+    [key: string]: TranslationLanguage;
+} & {
     [locale in CustomizationLocale]: TranslationLanguage;
 } = {
     de,
