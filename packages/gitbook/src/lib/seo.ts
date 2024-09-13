@@ -19,8 +19,11 @@ export function isPageIndexable(
     // @ts-ignore - noIndex and noRobotsIndex are not in the type
     // until we fix the deprecated APIs
     return (
+        // @ts-ignore
         !page.noIndex &&
+        // @ts-ignore
         !page.noRobotsIndex &&
+        // @ts-ignore
         ancestors.every((ancestor) => !ancestor.noIndex && !ancestor.noRobotsIndex)
     );
 }
