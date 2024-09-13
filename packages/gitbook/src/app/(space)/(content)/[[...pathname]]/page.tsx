@@ -6,8 +6,9 @@ import React from 'react';
 import { PageAside } from '@/components/PageAside';
 import { PageBody, PageCover } from '@/components/PageBody';
 import { PageHrefContext, absoluteHref, pageHref } from '@/lib/links';
-import { getPagePath, isPageIndexable, resolveFirstDocument } from '@/lib/pages';
+import { getPagePath, resolveFirstDocument } from '@/lib/pages';
 import { ContentRefContext } from '@/lib/references';
+import { isSpaceIndexable, isPageIndexable } from '@/lib/seo';
 import { tcls } from '@/lib/tailwind';
 import { getContentTitle } from '@/lib/utils';
 
@@ -138,8 +139,6 @@ export async function generateMetadata({
         notFound();
     }
 
-    const isIndexable = isPageIndexable(page) && ancestors.every(isPageIndexable);
-
     return {
         title: [page.title, getContentTitle(space, customization, parent)]
             .filter(Boolean)
@@ -154,7 +153,10 @@ export async function generateMetadata({
                     absoluteHref(`~gitbook/ogimage/${page.id}`, true),
             ],
         },
-        robots: isIndexable ? undefined : 'noindex, nofollow',
+        robots:
+            isSpaceIndexable({ space, parent }) && isPageIndexable(ancestors, page)
+                ? 'index, follow'
+                : 'noindex, nofollow',
     };
 }
 

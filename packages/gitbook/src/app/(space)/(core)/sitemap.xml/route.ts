@@ -4,7 +4,8 @@ import { NextRequest } from 'next/server';
 
 import { getSpaceContentData } from '@/lib/api';
 import { absoluteHref } from '@/lib/links';
-import { getPagePath, isPageIndexable } from '@/lib/pages';
+import { getPagePath } from '@/lib/pages';
+import { isPageIndexable } from '@/lib/seo';
 
 import { getContentPointer } from '../../fetch';
 
@@ -19,7 +20,8 @@ export async function GET(req: NextRequest) {
         pointer,
         'siteId' in pointer ? pointer.siteShareKey : undefined,
     );
-    const pages = flattenPages(rootPages, (page) => !page.hidden && isPageIndexable(page));
+
+    const pages = flattenPages(rootPages, (page) => !page.hidden && isPageIndexable([], page));
     const urls = pages.map(({ page, depth }) => {
         // Decay priority with depth
         const priority = Math.pow(2, -0.25 * depth);
