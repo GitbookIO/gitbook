@@ -135,6 +135,13 @@ export function resolveFirstDocument(
     return;
 }
 
+/**
+ * Return true if a page is indexable in search.
+ */
+export function isPageIndexable(page: RevisionPageDocument | RevisionPageGroup): boolean {
+    return !page.noIndex && !page.noRobotsIndex;
+}
+
 function resolvePageDocument(
     page: RevisionPage,
     ancestors: AncestorRevisionPage[],

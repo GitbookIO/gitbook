@@ -6,7 +6,7 @@ import React from 'react';
 import { PageAside } from '@/components/PageAside';
 import { PageBody, PageCover } from '@/components/PageBody';
 import { PageHrefContext, absoluteHref, pageHref } from '@/lib/links';
-import { getPagePath, resolveFirstDocument } from '@/lib/pages';
+import { getPagePath, isPageIndexable, resolveFirstDocument } from '@/lib/pages';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { getContentTitle } from '@/lib/utils';
@@ -129,7 +129,7 @@ export async function generateMetadata({
     params: PagePathParams;
     searchParams: { fallback?: string };
 }): Promise<Metadata> {
-    const { space, pages, page, customization, parent } = await getPageDataWithFallback({
+    const { space, pages, page, customization, parent, ancestors } = await getPageDataWithFallback({
         pagePathParams: params,
         searchParams,
     });
@@ -137,6 +137,8 @@ export async function generateMetadata({
     if (!page) {
         notFound();
     }
+
+    const isIndexable = isPageIndexable(page) && ancestors.every(isPageIndexable);
 
     return {
         title: [page.title, getContentTitle(space, customization, parent)]
@@ -152,6 +154,7 @@ export async function generateMetadata({
                     absoluteHref(`~gitbook/ogimage/${page.id}`, true),
             ],
         },
+        robots: isIndexable ? undefined : 'noindex',
     };
 }
 

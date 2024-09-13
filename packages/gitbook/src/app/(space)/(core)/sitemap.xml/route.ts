@@ -4,7 +4,7 @@ import { NextRequest } from 'next/server';
 
 import { getSpaceContentData } from '@/lib/api';
 import { absoluteHref } from '@/lib/links';
-import { getPagePath } from '@/lib/pages';
+import { getPagePath, isPageIndexable } from '@/lib/pages';
 
 import { getContentPointer } from '../../fetch';
 
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     );
     const pages = flattenPages(
         rootPages,
-        (page) => !page.hidden && !page.noIndex && !page.noRobotsIndex
+        (page) => !page.hidden && isPageIndexable(page)
     );
     const urls = pages.map(({ page, depth }) => {
         // Decay priority with depth
