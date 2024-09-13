@@ -93,6 +93,12 @@ jobs:
               env:
                   BASE_URL: ${{needs.deploy.outputs.deployment_url}}
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
+            - uses: actions/upload-artifact@v4
+              if: ${{ !cancelled() }}
+              with:
+                  name: playwright-report
+                  path: packages/gitbook/playwright-report/
+                  retention-days: 3
     pagespeed-testing:
         runs-on: ubuntu-latest
         name: PageSpeed Testing

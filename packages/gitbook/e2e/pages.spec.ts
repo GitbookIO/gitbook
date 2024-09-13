@@ -665,6 +665,7 @@ const testCases: TestsCase[] = [
             {
                 name: `Index by default`,
                 url: '',
+                screenshot: false,
                 run: async (page) => {
                     const metaRobots = page.locator('meta[name="robots"]');
                     await expect(metaRobots).toHaveAttribute('content', 'index, follow');
@@ -673,6 +674,7 @@ const testCases: TestsCase[] = [
             {
                 name: `Don't index noIndex`,
                 url: 'page-options/page-no-index',
+                screenshot: false,
                 run: async (page) => {
                     const metaRobots = page.locator('meta[name="robots"]');
                     await expect(metaRobots).toHaveAttribute('content', 'noindex, nofollow');
@@ -681,6 +683,7 @@ const testCases: TestsCase[] = [
             {
                 name: `Don't index descendant of noIndex`,
                 url: 'page-options/page-no-index/descendant-of-page-no-index',
+                screenshot: false,
                 run: async (page) => {
                     const metaRobots = page.locator('meta[name="robots"]');
                     await expect(metaRobots).toHaveAttribute('content', 'noindex, nofollow');
@@ -689,6 +692,7 @@ const testCases: TestsCase[] = [
             {
                 name: `Don't index noRobotsIndex`,
                 url: 'page-options/page-no-robots-index',
+                screenshot: false,
                 run: async (page) => {
                     const metaRobots = page.locator('meta[name="robots"]');
                     await expect(metaRobots).toHaveAttribute('content', 'noindex, nofollow');
@@ -697,6 +701,7 @@ const testCases: TestsCase[] = [
             {
                 name: `Don't index descendant of noRobotsIndex`,
                 url: 'page-options/page-no-robots-index/descendant-of-page-no-robots-index',
+                screenshot: false,
                 run: async (page) => {
                     const metaRobots = page.locator('meta[name="robots"]');
                     await expect(metaRobots).toHaveAttribute('content', 'noindex, nofollow');
