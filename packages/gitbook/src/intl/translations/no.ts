@@ -1,4 +1,6 @@
-export const no = {
+import { TranslationLanguage } from './types';
+
+export const no: TranslationLanguage = {
     locale: 'no',
     powered_by_gitbook: 'Drevet av GitBook',
     switch_to_dark_theme: 'Bytt til mørkt tema',
