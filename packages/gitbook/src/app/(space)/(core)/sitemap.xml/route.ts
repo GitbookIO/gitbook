@@ -19,7 +19,10 @@ export async function GET(req: NextRequest) {
         pointer,
         'siteId' in pointer ? pointer.siteShareKey : undefined,
     );
-    const pages = flattenPages(rootPages, (page) => !page.hidden);
+    const pages = flattenPages(
+        rootPages,
+        (page) => !page.hidden && !page.noIndex && !page.noRobotsIndex
+    );
     const urls = pages.map(({ page, depth }) => {
         // Decay priority with depth
         const priority = Math.pow(2, -0.25 * depth);
@@ -72,14 +75,19 @@ type FlatPageEntry = { page: RevisionPageDocument; depth: number };
 
 function flattenPages(
     rootPags: RevisionPage[],
-    filter: (page: RevisionPageDocument) => boolean,
+    filter: (page: RevisionPageDocument | RevisionPageGroup) => boolean,
 ): FlatPageEntry[] {
     const flattenPage = (
         page: RevisionPageDocument | RevisionPageGroup,
         depth: number,
     ): FlatPageEntry[] => {
+        const allowed = filter(page);
+        if (!allowed) {
+            return [];
+        }
+
         return [
-            ...(page.type === 'document' && filter(page) ? [{ page, depth }] : []),
+            ...(page.type === 'document' ? [{ page, depth }] : []),
             ...page.pages.flatMap((child) =>
                 child.type === 'link' ? [] : flattenPage(child, depth + 1),
             ),
