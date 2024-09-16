@@ -5,6 +5,7 @@ import { NextRequest } from 'next/server';
 import { getSpaceContentData } from '@/lib/api';
 import { absoluteHref } from '@/lib/links';
 import { getPagePath } from '@/lib/pages';
+import { isPageIndexable } from '@/lib/seo';
 
 import { getContentPointer } from '../../fetch';
 
@@ -14,8 +15,13 @@ export const runtime = 'edge';
  * Generate a sitemap.xml for the current space.
  */
 export async function GET(req: NextRequest) {
-    const { pages: rootPages } = await getSpaceContentData(getContentPointer());
-    const pages = flattenPages(rootPages, (page) => !page.hidden);
+    const pointer = getContentPointer();
+    const { pages: rootPages } = await getSpaceContentData(
+        pointer,
+        'siteId' in pointer ? pointer.siteShareKey : undefined,
+    );
+
+    const pages = flattenPages(rootPages, (page) => !page.hidden && isPageIndexable([], page));
     const urls = pages.map(({ page, depth }) => {
         // Decay priority with depth
         const priority = Math.pow(2, -0.25 * depth);
@@ -68,14 +74,19 @@ type FlatPageEntry = { page: RevisionPageDocument; depth: number };
 
 function flattenPages(
     rootPags: RevisionPage[],
-    filter: (page: RevisionPageDocument) => boolean,
+    filter: (page: RevisionPageDocument | RevisionPageGroup) => boolean,
 ): FlatPageEntry[] {
     const flattenPage = (
         page: RevisionPageDocument | RevisionPageGroup,
         depth: number,
     ): FlatPageEntry[] => {
+        const allowed = filter(page);
+        if (!allowed) {
+            return [];
+        }
+
         return [
-            ...(page.type === 'document' && filter(page) ? [{ page, depth }] : []),
+            ...(page.type === 'document' ? [{ page, depth }] : []),
             ...page.pages.flatMap((child) =>
                 child.type === 'link' ? [] : flattenPage(child, depth + 1),
             ),

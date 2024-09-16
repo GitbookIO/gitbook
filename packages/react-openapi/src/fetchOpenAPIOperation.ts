@@ -43,7 +43,7 @@ export interface OpenAPICustomSpecProperties {
  */
 export interface OpenAPICustomOperationProperties {
     'x-code-samples'?: OpenAPICustomCodeSample[];
-    'x-codeSamples'?: OpenAPICustomCodeSample[];
+    'x-codeSamples'?: OpenAPICustomCodeSample[] | false;
     'x-custom-examples'?: OpenAPICustomCodeSample[];
 
     /**

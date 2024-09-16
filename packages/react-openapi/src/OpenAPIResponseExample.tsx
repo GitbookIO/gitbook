@@ -3,7 +3,7 @@ import { InteractiveSection } from './InteractiveSection';
 import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { generateSchemaExample } from './generateSchemaExample';
 import { OpenAPIContextProps } from './types';
-import { noReference } from './utils';
+import { createStateKey, noReference } from './utils';
 
 /**
  * Display an example of the response content.
@@ -36,37 +36,52 @@ export function OpenAPIResponseExample(props: {
         }
         return Number(a) - Number(b);
     });
-    // Take the first one
-    const response = responses[0];
 
-    if (!response) {
-        return null;
-    }
+    const examples = responses
+        .map((response) => {
+            const responseObject = noReference(response[1]);
 
-    const responseObject = noReference(response[1]);
+            const schema = noReference(
+                (
+                    responseObject.content?.['application/json'] ??
+                    responseObject.content?.[Object.keys(responseObject.content)[0]]
+                )?.schema,
+            );
 
-    const schema = noReference(
-        (
-            responseObject.content?.['application/json'] ??
-            responseObject.content?.[Object.keys(responseObject.content)[0]]
-        )?.schema,
-    );
+            if (!schema) {
+                return null;
+            }
 
-    if (!schema) {
-        return null;
-    }
+            const example = generateSchemaExample(schema);
+            if (example === undefined) {
+                return null;
+            }
 
-    const example = generateSchemaExample(schema);
-    if (example === undefined) {
+            return {
+                key: `${response[0]}`,
+                label: `${response[0]}`,
+                body: (
+                    <context.CodeBlock
+                        code={
+                            typeof example === 'string' ? example : JSON.stringify(example, null, 2)
+                        }
+                        syntax="json"
+                    />
+                ),
+            };
+        })
+        .filter((val): val is { key: string; label: string; body: any } => Boolean(val));
+
+    if (examples.length === 0) {
         return null;
     }
 
     return (
-        <InteractiveSection header="Response" className="openapi-response-example">
-            <context.CodeBlock
-                code={typeof example === 'string' ? example : JSON.stringify(example, null, 2)}
-                syntax="json"
-            />
-        </InteractiveSection>
+        <InteractiveSection
+            stateKey={createStateKey('response', context.blockKey)}
+            header="Response"
+            className="openapi-response-example"
+            tabs={examples}
+        />
     );
 }

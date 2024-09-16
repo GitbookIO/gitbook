@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { getResizedImageURL } from '@/lib/images';
 import { tcls } from '@/lib/tailwind';
 
 import { AdItem } from './types';
@@ -7,7 +8,7 @@ import { AdItem } from './types';
 /**
  * Classic rendering for an ad.
  */
-export function AdClassicRendering({ ad }: { ad: AdItem }) {
+export async function AdClassicRendering({ ad }: { ad: AdItem }) {
     return (
         <a
             className={tcls(
@@ -29,14 +30,21 @@ export function AdClassicRendering({ ad }: { ad: AdItem }) {
         >
             {'smallImage' in ad ? (
                 <div>
-                    <img alt="Ads logo" className={tcls('rounded-md')} src={ad.smallImage} />
+                    <img
+                        alt="Ads logo"
+                        className={tcls('rounded-md')}
+                        src={await getResizedImageURL(ad.smallImage, { width: 192, dpr: 2 })}
+                    />
                 </div>
             ) : (
                 <div
                     className={tcls('px-6', 'py-4', 'rounded-md')}
                     style={{ backgroundColor: ad.backgroundColor }}
                 >
-                    <img alt="Ads logo" src={ad.logo} />
+                    <img
+                        alt="Ads logo"
+                        src={await getResizedImageURL(ad.logo, { width: 192 - 48, dpr: 2 })}
+                    />
                 </div>
             )}
             <div className={tcls('flex', 'flex-col')}>

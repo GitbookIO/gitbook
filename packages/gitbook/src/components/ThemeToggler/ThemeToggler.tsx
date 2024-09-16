@@ -1,12 +1,9 @@
 'use client';
 
-import Monitor from '@geist-ui/icons/monitor';
-import Moon from '@geist-ui/icons/moon';
-import Sun from '@geist-ui/icons/sun';
+import { Icon, IconName } from '@gitbook/icons';
 import { useTheme } from 'next-themes';
 import React from 'react';
 
-import { IconComponent } from '@/components/icons';
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
@@ -44,19 +41,19 @@ export function ThemeToggler(props: {}) {
         >
             <ThemeButton
                 active={mounted && theme === 'light'}
-                icon={Sun}
+                icon="sun-bright"
                 onClick={() => onSwitchMode('light')}
                 title={tString(language, 'switch_to_light_theme')}
             />
             <ThemeButton
                 active={mounted && theme === 'system'}
-                icon={Monitor}
+                icon="desktop"
                 onClick={() => onSwitchMode('system')}
                 title={tString(language, 'switch_to_system_theme')}
             />
             <ThemeButton
                 active={mounted && theme === 'dark'}
-                icon={Moon}
+                icon="moon"
                 onClick={() => onSwitchMode('dark')}
                 title={tString(language, 'switch_to_dark_theme')}
             />
@@ -65,12 +62,12 @@ export function ThemeToggler(props: {}) {
 }
 
 function ThemeButton(props: {
-    icon: IconComponent;
+    icon: IconName;
     onClick: () => void;
     title: string;
     active: boolean;
 }) {
-    const { icon: Icon, onClick, title, active } = props;
+    const { icon, onClick, title, active } = props;
     return (
         <button
             type="button"
@@ -90,10 +87,10 @@ function ThemeButton(props: {
             )}
         >
             <Icon
+                icon={icon}
                 className={tcls(
-                    'w-4',
-                    'h-4',
-                    active ? ['stroke-primary-600', 'dark:stroke-primary-400'] : null,
+                    'size-4',
+                    active ? ['text-primary-600', 'dark:text-primary-400'] : null,
                 )}
             />
         </button>

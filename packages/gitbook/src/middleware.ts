@@ -172,11 +172,14 @@ export async function middleware(request: NextRequest) {
             // Start fetching everything as soon as possible, but do not block the middleware on it
             // the cache will handle concurrent calls
             await waitUntil(
-                getSpaceContentData({
-                    spaceId: resolved.space,
-                    changeRequestId: resolved.changeRequest,
-                    revisionId: resolved.revision,
-                }),
+                getSpaceContentData(
+                    {
+                        spaceId: resolved.space,
+                        changeRequestId: resolved.changeRequest,
+                        revisionId: resolved.revision,
+                    },
+                    'site' in resolved ? resolved.shareKey : undefined,
+                ),
             );
 
             const { scripts } = await ('site' in resolved
@@ -211,6 +214,15 @@ export async function middleware(request: NextRequest) {
         if (resolved.shareKey) {
             headers.set('x-gitbook-content-site-share-key', resolved.shareKey);
         }
+    }
+
+    // For tests, we make it possible to enable search indexation
+    // using a query parameter.
+    const xGitBookSearchIndexation =
+        headers.get('x-gitbook-search-indexation') ??
+        url.searchParams.has('x-gitbook-search-indexation');
+    if (xGitBookSearchIndexation) {
+        headers.set('x-gitbook-search-indexation', 'true');
     }
 
     if (resolved.revision) {
@@ -440,10 +452,10 @@ async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise
               apiToken: url.searchParams.get(AUTH_TOKEN_QUERY) ?? '',
               apiEndpoint: url.searchParams.get(API_ENDPOINT_QUERY) ?? undefined,
           }
-        : decodeGitBookTokenCookie(spaceId, request.cookies.get(cookieName)?.value) ?? {
+        : (decodeGitBookTokenCookie(spaceId, request.cookies.get(cookieName)?.value) ?? {
               apiToken: undefined,
               apiEndpoint: undefined,
-          };
+          });
 
     if (!apiToken) {
         return {
@@ -462,7 +474,7 @@ async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise
             authToken: apiToken,
             userAgent: userAgent(),
         }),
-        () => getSpace.revalidate(spaceId),
+        () => getSpace.revalidate(spaceId, undefined),
     );
 
     const cookies: LookupCookies = {

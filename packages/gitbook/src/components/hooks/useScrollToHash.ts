@@ -1,16 +1,15 @@
-import { useParams } from 'next/navigation';
 import React from 'react';
+
+import { useHash } from './useHash';
 
 /**
  * Scroll to the current URL hash everytime the URL changes.
  */
 export function useScrollToHash() {
-    const params = useParams();
-
-    const scrollToHash = React.useCallback(() => {
-        const hash = window.location.hash;
+    const hash = useHash();
+    React.useLayoutEffect(() => {
         if (hash) {
-            const element = document.getElementById(hash.slice(1));
+            const element = document.getElementById(hash);
             if (element) {
                 element.scrollIntoView({
                     block: 'start',
@@ -18,12 +17,5 @@ export function useScrollToHash() {
                 });
             }
         }
-    }, []);
-
-    // With next.js, the hashchange event is not triggered when the hash changes
-    // Instead a hack is to use the `useParams` hook to listen to changes in the hash
-    // https://github.com/vercel/next.js/discussions/49465#discussioncomment-5845312
-    React.useEffect(() => {
-        scrollToHash();
-    }, [params, scrollToHash]);
+    }, [hash]);
 }

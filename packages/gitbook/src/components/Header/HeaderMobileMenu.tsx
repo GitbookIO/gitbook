@@ -1,9 +1,9 @@
 'use client';
 
+import { Icon } from '@gitbook/icons';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { IconMenu } from '@/components/icons/IconMenu';
 import { useLanguage, tString } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
@@ -53,19 +53,20 @@ export function HeaderMobileMenu(props: Partial<React.ButtonHTMLAttributes<HTMLB
             {...props}
             aria-label={tString(language, 'table_of_contents_button_label')}
             onClick={toggleNavigation}
+            className={tcls(
+                'flex',
+                'flex-row',
+                'items-center',
+                'hover:bg-dark/3',
+                'py-1',
+                'px-2',
+                'dark:hover:bg-light/2',
+                'rounded',
+                'straight-corners:rounded-sm',
+                props.className,
+            )}
         >
-            <IconMenu
-                className={tcls(
-                    'w-7',
-                    'h-7',
-                    'rounded',
-                    'straight-corners:rounded-sm',
-                    'text-inherit',
-                    'hover:bg-dark/3',
-                    'p-[0.25rem]',
-                    'dark:hover:bg-light/2',
-                )}
-            />
+            <Icon icon="bars" className={tcls('size-4', 'text-inherit')} />
         </button>
     );
 }

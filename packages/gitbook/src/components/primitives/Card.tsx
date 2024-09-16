@@ -1,4 +1,4 @@
-import ChevronRight from '@geist-ui/icons/chevronRight';
+import { Icon } from '@gitbook/icons';
 
 import { ClassValue, tcls } from '@/lib/tailwind';
 
@@ -23,7 +23,7 @@ export async function Card(props: {
                 'flex-row',
                 'justify-between',
                 'items-center',
-                'gap-0.5',
+                'gap-4',
                 'ring-1',
                 'ring-dark/3',
                 'rounded',
@@ -39,7 +39,7 @@ export async function Card(props: {
                 style,
             )}
         >
-            {leadingIcon ? <span className={tcls('mr-4')}>{leadingIcon}</span> : null}
+            {leadingIcon}
             <span className={tcls('flex', 'flex-col', 'flex-1')}>
                 {preTitle ? (
                     <span
@@ -61,15 +61,15 @@ export async function Card(props: {
                     </span>
                 ) : null}
             </span>
-            <ChevronRight
+            <Icon
+                icon="chevron-right"
                 className={tcls(
-                    'w-4',
-                    'h-4',
-                    'stroke-dark/7',
+                    'size-3',
+                    'text-dark/7',
                     'transition-all',
                     'group-hover:translate-x-0.5',
-                    'group-hover:stroke-primary/8',
-                    'dark:stroke-light/6',
+                    'group-hover:text-primary/8',
+                    'dark:text-light/6',
                 )}
             />
         </Link>

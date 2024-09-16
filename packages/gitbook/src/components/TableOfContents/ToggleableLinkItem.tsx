@@ -1,6 +1,6 @@
 'use client';
 
-import IconChevronRight from '@geist-ui/icons/chevronRight';
+import { Icon } from '@gitbook/icons';
 import { motion, stagger, useAnimate } from 'framer-motion';
 import { useSelectedLayoutSegment } from 'next/navigation';
 import React from 'react';
@@ -96,7 +96,9 @@ export function ToggleableLinkItem(props: {
         <div>
             <Link
                 href={href}
+                aria-selected={isActive}
                 className={tcls(
+                    'group/toclink',
                     'flex',
                     'flex-row',
                     'justify-between',
@@ -170,18 +172,18 @@ export function ToggleableLinkItem(props: {
                             setIsVisible((prev) => !prev);
                         }}
                     >
-                        <IconChevronRight
+                        <Icon
+                            icon="chevron-right"
                             className={tcls(
                                 'grid',
                                 'flex-shrink-0',
-                                'w-5',
-                                'h-5',
-                                'p-0.5',
-                                '[&>path]:transition-[stroke-opacity]',
+                                'size-3',
+                                'm-1',
+                                'transition-[opacity]',
                                 'text-current',
                                 'transition-transform',
-                                '[&>path]:[stroke-opacity:0.40]',
-                                'group-hover:[&>path]:[stroke-opacity:1]',
+                                '[opacity:0.40]',
+                                'group-hover:[opacity:1]',
 
                                 isVisible ? ['rotate-90'] : ['rotate-0'],
                             )}

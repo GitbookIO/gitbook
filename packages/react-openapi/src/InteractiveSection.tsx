@@ -2,6 +2,18 @@
 
 import classNames from 'classnames';
 import React from 'react';
+import { atom, useRecoilState } from 'recoil';
+
+interface InteractiveSectionTab {
+    key: string;
+    label: string;
+    body: React.ReactNode;
+}
+
+const syncedTabsAtom = atom<Record<string, string>>({
+    key: 'syncedTabState',
+    default: {},
+});
 
 /**
  * To optimize rendering, most of the components are server-components,
@@ -19,11 +31,7 @@ export function InteractiveSection(props: {
     toggleOpenIcon?: React.ReactNode;
     toggleCloseIcon?: React.ReactNode;
     /** Tabs of content to display */
-    tabs?: Array<{
-        key: string;
-        label: string;
-        body: React.ReactNode;
-    }>;
+    tabs?: Array<InteractiveSectionTab>;
     /** Default tab to have opened */
     defaultTab?: string;
     /** Content of the header */
@@ -32,6 +40,8 @@ export function InteractiveSection(props: {
     children?: React.ReactNode;
     /** Children to display within the container */
     overlay?: React.ReactNode;
+    /** An optional key referencing a value in global state */
+    stateKey?: string;
 }) {
     const {
         id,
@@ -45,12 +55,18 @@ export function InteractiveSection(props: {
         overlay,
         toggleOpenIcon = '▶',
         toggleCloseIcon = '▼',
+        stateKey,
     } = props;
+    const [syncedTabs, setSyncedTabs] = useRecoilState(syncedTabsAtom);
+    const tabFromState =
+        stateKey && stateKey in syncedTabs
+            ? tabs.find((tab) => tab.key === syncedTabs[stateKey])
+            : undefined;
 
     const [opened, setOpened] = React.useState(defaultOpened);
-    const [selectedTab, setSelectedTab] = React.useState(defaultTab);
-
-    const tabBody = tabs.find((tab) => tab.key === selectedTab)?.body;
+    const [selectedTabKey, setSelectedTab] = React.useState(tabFromState?.key ?? defaultTab);
+    const selectedTab: InteractiveSectionTab | undefined =
+        tabFromState ?? tabs.find((tab) => tab.key === selectedTabKey) ?? tabs[0];
 
     return (
         <div
@@ -94,9 +110,15 @@ export function InteractiveSection(props: {
                                 'openapi-select',
                                 `${className}-tabs-select`,
                             )}
-                            value={selectedTab}
+                            value={selectedTab.key}
                             onChange={(event) => {
                                 setSelectedTab(event.target.value);
+                                if (stateKey) {
+                                    setSyncedTabs((state) => ({
+                                        ...state,
+                                        [stateKey]: event.target.value,
+                                    }));
+                                }
                                 setOpened(true);
                             }}
                         >
@@ -107,7 +129,7 @@ export function InteractiveSection(props: {
                             ))}
                         </select>
                     ) : null}
-                    {(children || tabBody) && toggeable ? (
+                    {(children || selectedTab?.body) && toggeable ? (
                         <button
                             className={classNames('openapi-section-toggle', `${className}-toggle`)}
                             onClick={() => setOpened(!opened)}
@@ -117,10 +139,10 @@ export function InteractiveSection(props: {
                     ) : null}
                 </div>
             </div>
-            {(!toggeable || opened) && (children || tabBody) ? (
+            {(!toggeable || opened) && (children || selectedTab?.body) ? (
                 <div className={classNames('openapi-section-body', `${className}-body`)}>
                     {children}
-                    {tabBody}
+                    {selectedTab?.body}
                 </div>
             ) : null}
             {overlay}

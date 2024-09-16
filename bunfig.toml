@@ -1,0 +1,2 @@
+[install.scopes]
+"awesome.me" = { token = "$NPMRC_FONT_AWESOME_TOKEN", url = "https://npm.fontawesome.com/" }

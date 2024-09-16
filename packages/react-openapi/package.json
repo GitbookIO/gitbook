@@ -1,5 +1,6 @@
 {
     "name": "@gitbook/react-openapi",
+    "type": "module",
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
@@ -7,15 +8,15 @@
             "default": "./dist/index.js"
         }
     },
-    "version": "0.5.0",
+    "version": "0.6.0",
     "dependencies": {
-        "@scalar/api-client-react": "^0.3.7",
+        "@scalar/api-client-react": "0.3.7",
         "@scalar/oas-utils": "0.1.6",
         "classnames": "^2.5.1",
         "flatted": "^3.2.9",
         "openapi-types": "^12.1.3",
-        "yaml": "1.10.2",
-        "swagger2openapi": "^7.0.8"
+        "swagger2openapi": "^7.0.8",
+        "yaml": "1.10.2"
     },
     "devDependencies": {
         "@types/swagger2openapi": "^7.0.4",
@@ -23,7 +24,8 @@
         "typescript": "^5.5.3"
     },
     "peerDependencies": {
-        "react": "*"
+        "react": "*",
+        "recoil": "^0.7.7"
     },
     "scripts": {
         "build": "tsc",

@@ -1,17 +1,18 @@
 import { DocumentBlockContentRef } from '@gitbook/api';
 
-import { LogoIcon } from '@/components/icons';
 import { Card, Emoji } from '@/components/primitives';
 import { getSpaceCustomization, ignoreAPIError } from '@/lib/api';
 import { ResolvedContentRef } from '@/lib/references';
 
 import { BlockProps } from './Block';
+import { SpaceIcon } from '../Space/SpaceIcon';
 
 export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>) {
     const { block, context, style } = props;
 
     const resolved = await context.resolveContentRef(block.data.ref, {
         resolveAnchorText: true,
+        iconStyle: ['text-xl', 'text-dark/6', 'dark:text-light/6'],
     });
 
     if (!resolved) {
@@ -29,7 +30,7 @@ export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>
 
     return (
         <Card
-            leadingIcon={resolved.emoji ? <Emoji code={resolved.emoji} style="text-xl" /> : null}
+            leadingIcon={resolved.icon ? resolved.icon : null}
             href={resolved.href}
             title={resolved.text}
             style={style}
@@ -55,7 +56,7 @@ async function SpaceRefCard(
     return (
         <Card
             leadingIcon={
-                <LogoIcon
+                <SpaceIcon
                     icon={customIcon}
                     emoji={customEmoji}
                     alt=""

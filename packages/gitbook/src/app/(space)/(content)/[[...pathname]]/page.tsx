@@ -8,6 +8,7 @@ import { PageBody, PageCover } from '@/components/PageBody';
 import { PageHrefContext, absoluteHref, pageHref } from '@/lib/links';
 import { getPagePath, resolveFirstDocument } from '@/lib/pages';
 import { ContentRefContext } from '@/lib/references';
+import { isSpaceIndexable, isPageIndexable } from '@/lib/seo';
 import { tcls } from '@/lib/tailwind';
 import { getContentTitle } from '@/lib/utils';
 
@@ -64,6 +65,7 @@ export default async function Page(props: {
     const withPageFeedback = customization.feedback.enabled;
 
     const contentRefContext: ContentRefContext = {
+        siteContext: 'siteId' in contentPointer ? contentPointer : null,
         space,
         revisionId: contentTarget.revisionId,
         pages,
@@ -128,7 +130,7 @@ export async function generateMetadata({
     params: PagePathParams;
     searchParams: { fallback?: string };
 }): Promise<Metadata> {
-    const { space, pages, page, customization, parent } = await getPageDataWithFallback({
+    const { space, pages, page, customization, parent, ancestors } = await getPageDataWithFallback({
         pagePathParams: params,
         searchParams,
     });
@@ -151,6 +153,10 @@ export async function generateMetadata({
                     absoluteHref(`~gitbook/ogimage/${page.id}`, true),
             ],
         },
+        robots:
+            isSpaceIndexable({ space, parent }) && isPageIndexable(ancestors, page)
+                ? 'index, follow'
+                : 'noindex, nofollow',
     };
 }
 

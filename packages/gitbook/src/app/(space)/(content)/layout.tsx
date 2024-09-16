@@ -13,7 +13,7 @@ import { assetsDomain } from '@/lib/assets';
 import { buildVersion } from '@/lib/build';
 import { getContentSecurityPolicyNonce } from '@/lib/csp';
 import { absoluteHref, baseUrl } from '@/lib/links';
-import { shouldIndexSpace } from '@/lib/seo';
+import { isSpaceIndexable } from '@/lib/seo';
 import { getContentTitle } from '@/lib/utils';
 
 import { ClientContexts } from './ClientContexts';
@@ -133,7 +133,7 @@ export async function generateMetadata(): Promise<Metadata> {
                 },
             ],
         },
-        robots: shouldIndexSpace({ space, parent }) ? 'index, follow' : 'noindex, nofollow',
+        robots: isSpaceIndexable({ space, parent }) ? 'index, follow' : 'noindex, nofollow',
     };
 }
 

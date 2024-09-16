@@ -1,13 +1,12 @@
-import { ArrowLeft, Printer } from '@geist-ui/icons';
 import {
     CustomizationSettings,
     Revision,
     RevisionPageDocument,
     RevisionPageGroup,
-    RevisionPageLink,
     SiteCustomizationSettings,
     Space,
 } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import * as React from 'react';
@@ -42,7 +41,10 @@ export const runtime = 'edge';
 export async function generateMetadata(): Promise<Metadata> {
     const contentPointer = getContentPointer();
     const [space, customization] = await Promise.all([
-        getSpace(contentPointer.spaceId),
+        getSpace(
+            contentPointer.spaceId,
+            'siteId' in contentPointer ? contentPointer.siteShareKey : undefined,
+        ),
         'siteId' in contentPointer
             ? getCurrentSiteCustomization(contentPointer)
             : getSpaceCustomization(contentPointer.spaceId),
@@ -72,7 +74,10 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
         'siteId' in contentPointer
             ? getCurrentSiteCustomization(contentPointer)
             : getSpaceCustomization(contentPointer.spaceId),
-        getSpaceContentData(contentPointer),
+        getSpaceContentData(
+            contentPointer,
+            'siteId' in contentPointer ? contentPointer.siteShareKey : undefined,
+        ),
     ]);
     const language = getSpaceLanguage(customization);
 
@@ -110,7 +115,7 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
                             'border',
                         )}
                     >
-                        <ArrowLeft className={tcls('size-6')} />
+                        <Icon icon="arrow-left" className={tcls('size-6')} />
                     </a>
                 </div>
             ) : null}
@@ -136,7 +141,7 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
                         'border',
                     )}
                 >
-                    <Printer className={tcls('size-6')} />
+                    <Icon icon="print" className={tcls('size-6')} />
                 </PrintButton>
             </div>
 
@@ -170,6 +175,7 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
                             space={space}
                             page={page}
                             refContext={{
+                                siteContext: 'siteId' in contentPointer ? contentPointer : null,
                                 space,
                                 revisionId: contentTarget.revisionId,
                                 pages: rootPages,

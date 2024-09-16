@@ -60,6 +60,10 @@ export async function searchSiteContent(args: {
     const { siteSpaceIds, query, cacheBust } = args;
     const pointer = getContentPointer();
 
+    if (query.length <= 1) {
+        return [];
+    }
+
     if (siteSpaceIds?.length === 0) {
         // if we have no siteSpaces to search in then we won't find anything. skip the call.
         return [];
@@ -165,7 +169,7 @@ export const streamAskQuestion = streamResponse(async function* (spaceId: string
     const stream = api
         .api()
         .spaces.streamAskInSpace(spaceId, { query, format: 'document', details: true });
-    const pagesPromise = api.getSpaceContentData({ spaceId });
+    const pagesPromise = api.getSpaceContentData({ spaceId }, undefined);
 
     for await (const chunk of stream) {
         // We run the AI search and fetch the pages in parallel

@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server';
 
 import { getCollection, getSite, getSpace } from '@/lib/api';
 import { absoluteHref } from '@/lib/links';
-import { shouldIndexSpace } from '@/lib/seo';
+import { isSpaceIndexable } from '@/lib/seo';
 
 import { getContentPointer } from '../../fetch';
 
@@ -14,7 +14,10 @@ export const runtime = 'edge';
  */
 export async function GET(req: NextRequest) {
     const pointer = getContentPointer();
-    const space = await getSpace(pointer.spaceId);
+    const space = await getSpace(
+        pointer.spaceId,
+        'siteId' in pointer ? pointer.siteShareKey : undefined,
+    );
     const parent =
         'siteId' in pointer
             ? await getSite(pointer.organizationId, pointer.siteId)
@@ -25,7 +28,7 @@ export async function GET(req: NextRequest) {
     const lines = [
         `User-agent: *`,
         'Disallow: /~gitbook/',
-        ...(shouldIndexSpace({ space, parent })
+        ...(isSpaceIndexable({ space, parent })
             ? [`Allow: /`, `Sitemap: ${absoluteHref(`/sitemap.xml`, true)}`]
             : [`Disallow: /`]),
     ];

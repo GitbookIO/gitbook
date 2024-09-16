@@ -1,5 +1,5 @@
-import { ChevronDown, ChevronRight } from '@geist-ui/icons';
 import { DocumentBlockSwagger } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
 import { OpenAPIOperation } from '@gitbook/react-openapi';
 import React from 'react';
 
@@ -20,11 +20,6 @@ export async function OpenAPI(props: BlockProps<DocumentBlockSwagger>) {
     const { block, style } = props;
     return (
         <div className={tcls('w-full', 'flex', 'flex-row', style, 'max-w-full')}>
-            {/*
-                Invisible span with the ID to correctly identify the active section in the aside navigation.
-                We don't use the full <div> because it can be longer than the viewport and will not work well with IntersectionObserver.
-            */}
-            <span id={block.meta?.id} />
             <React.Suspense fallback={<OpenAPIFallback />}>
                 <OpenAPIBody {...props} />
             </React.Suspense>
@@ -55,11 +50,13 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockSwagger>) {
             data={data}
             context={{
                 icons: {
-                    chevronDown: <ChevronDown />,
-                    chevronRight: <ChevronRight />,
+                    chevronDown: <Icon icon="chevron-down" />,
+                    chevronRight: <Icon icon="chevron-right" />,
                 },
                 CodeBlock: PlainCodeBlock,
                 defaultInteractiveOpened: context.mode === 'print',
+                id: block.meta?.id,
+                blockKey: block.key,
             }}
             className="openapi-block"
         />

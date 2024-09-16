@@ -7,7 +7,7 @@ export const ja: TranslationLanguage = {
     switch_to_light_theme: 'ライトテーマに切り替え',
     switch_to_system_theme: 'システムのテーマに切り替え',
     search: '検索',
-    search_or_ask: '質問するか検索する',
+    search_or_ask: '質問または検索',
     search_input_placeholder: 'コンテンツを検索',
     search_ask_input_placeholder: 'コンテンツを検索するか質問をする',
     search_no_results: '"${1}" の結果はありません。',
@@ -53,4 +53,5 @@ export const ja: TranslationLanguage = {
     pdf_mode_all: '全てのページ',
     pdf_limit_reached: '${1}ページのPDFを生成できませんでした、${2}で生成が停止しました。',
     pdf_limit_reached_continue: 'さらに${1}ページで拡張',
+    more: '詳細',
 };

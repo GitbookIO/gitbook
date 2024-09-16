@@ -1,15 +1,13 @@
-import { Menu } from '@geist-ui/icons';
-import DownloadCloud from '@geist-ui/icons/downloadCloud';
-import Github from '@geist-ui/icons/github';
-import Gitlab from '@geist-ui/icons/gitlab';
 import {
     CustomizationSettings,
     JSONDocument,
     RevisionPageDocument,
     Site,
+    SiteAdsStatus,
     SiteCustomizationSettings,
     Space,
 } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
 import React from 'react';
 import urlJoin from 'url-join';
 
@@ -97,7 +95,7 @@ export async function PageAside(props: {
                     'py-2',
                 )}
             >
-                <Menu className={tcls('size-4')} />
+                <Icon icon="bars" className={tcls('size-3')} />
                 {t(language, 'on_this_page')}
             </div>
             <div
@@ -147,11 +145,14 @@ export async function PageAside(props: {
                                     'dark:text-light/5',
                                 )}
                             >
-                                {space.gitSync.installationProvider === 'gitlab' ? (
-                                    <Gitlab className={tcls('size-4', 'mr-1.5')} />
-                                ) : (
-                                    <Github className={tcls('size-4', 'mr-1.5')} />
-                                )}
+                                <Icon
+                                    icon={
+                                        space.gitSync.installationProvider === 'gitlab'
+                                            ? 'gitlab'
+                                            : 'github'
+                                    }
+                                    className={tcls('size-4', 'mr-1.5')}
+                                />
                                 {t(language, 'edit_on_git', getGitSyncName(space))}
                             </a>
                         </div>
@@ -176,22 +177,22 @@ export async function PageAside(props: {
                                     'dark:text-light/5',
                                 )}
                             >
-                                <DownloadCloud className={tcls('size-4', 'mr-1.5')} />
+                                <Icon icon="file-pdf" className={tcls('size-4', 'mr-1.5')} />
                                 {t(language, 'pdf_download')}
                             </a>
                         </div>
                     ) : null}
                 </div>
             </div>
-            {site?.ads ? (
-                <Ad
-                    zoneId={site.ads.zone}
-                    placement="page.aside"
-                    spaceId={space.id}
-                    ignore={process.env.NODE_ENV !== 'production'}
-                    style={tcls('mt-4')}
-                />
-            ) : null}
+            <Ad
+                zoneId={
+                    site?.ads && site.ads.status === SiteAdsStatus.Live ? site.ads.zoneId : null
+                }
+                placement="page.aside"
+                spaceId={space.id}
+                ignore={process.env.NODE_ENV !== 'production'}
+                style={tcls('mt-4')}
+            />
         </aside>
     );
 }

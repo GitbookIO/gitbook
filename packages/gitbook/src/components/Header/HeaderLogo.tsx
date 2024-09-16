@@ -8,13 +8,13 @@ import {
 } from '@gitbook/api';
 
 import { HeaderMobileMenu } from '@/components/Header/HeaderMobileMenu';
-import { LogoIcon } from '@/components/icons';
 import { Image } from '@/components/utils';
 import { absoluteHref } from '@/lib/links';
 import { tcls } from '@/lib/tailwind';
 import { getContentTitle } from '@/lib/utils';
 
 import { Link } from '../primitives';
+import { SpaceIcon } from '../Space/SpaceIcon';
 
 interface HeaderLogoProps {
     parent: Site | Collection | null;
@@ -30,7 +30,7 @@ export function HeaderLogo(props: HeaderLogoProps) {
     const { customization } = props;
 
     return (
-        <div className={tcls('flex', 'flex-row', 'gap-3')}>
+        <div className={tcls('flex', 'flex-row', 'gap-2')}>
             <HeaderMobileMenu
                 className={tcls(
                     'lg:hidden',
@@ -99,7 +99,7 @@ function LogoFallback(props: HeaderLogoProps) {
 
     return (
         <>
-            <LogoIcon
+            <SpaceIcon
                 icon={customIcon}
                 emoji={customEmoji}
                 alt=""
@@ -107,7 +107,7 @@ function LogoFallback(props: HeaderLogoProps) {
                 style={['object-contain', 'size-8']}
                 fetchPriority="high"
             />
-            <h1
+            <div
                 className={tcls(
                     'text-pretty',
                     'line-clamp-3',
@@ -125,7 +125,7 @@ function LogoFallback(props: HeaderLogoProps) {
                 )}
             >
                 {getContentTitle(space, customization, parent)}
-            </h1>
+            </div>
         </>
     );
 }

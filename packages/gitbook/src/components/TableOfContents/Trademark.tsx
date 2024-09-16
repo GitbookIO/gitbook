@@ -1,9 +1,8 @@
 import { CustomizationSettings, SiteCustomizationSettings, Space } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
 
 import { t, getSpaceLanguage } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
-
-import { IconLogo } from '../icons/IconLogo';
 
 /**
  * Trademark link to the GitBook.
@@ -100,7 +99,7 @@ export function TrademarkLink(props: {
                 'dark:border-light/2',
             )}
         >
-            <IconLogo className={tcls('w-5', 'h-5', 'mr-3')} />
+            <Icon icon="gitbook" className={tcls('size-5', 'mr-3')} />
             {t(language, 'powered_by_gitbook')}
         </a>
     );

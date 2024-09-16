@@ -17,7 +17,7 @@ import { CONTAINER_STYLE } from '@/components/layout';
 import { ColorDebugger } from '@/components/primitives/ColorDebugger';
 import { SearchModal } from '@/components/Search';
 import { TableOfContents } from '@/components/TableOfContents';
-import { ContentPointer, ContentTarget } from '@/lib/api';
+import { ContentPointer, ContentTarget, SiteContentPointer } from '@/lib/api';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
@@ -25,7 +25,7 @@ import { tcls } from '@/lib/tailwind';
  * Render the entire content of the space (header, table of contents, footer, and page content).
  */
 export function SpaceLayout(props: {
-    content: ContentPointer;
+    content: ContentPointer | SiteContentPointer;
     contentTarget: ContentTarget;
     space: Space;
     parent: Site | Collection | null;
@@ -50,6 +50,7 @@ export function SpaceLayout(props: {
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
     const contentRefContext: ContentRefContext = {
+        siteContext: 'siteId' in content ? content : null,
         space,
         revisionId: contentTarget.revisionId,
         pages,

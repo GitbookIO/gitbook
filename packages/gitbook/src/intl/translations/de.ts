@@ -53,4 +53,5 @@ export const de = {
     pdf_limit_reached:
         'Das PDF konnte für ${1} Seiten nicht generiert werden, Generierung wurde bei ${2} gestoppt.',
     pdf_limit_reached_continue: 'Mit ${1} weiteren Seiten erweitern.',
+    more: 'Mehr',
 };

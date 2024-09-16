@@ -1,8 +1,10 @@
+import { DeepPartial } from 'ts-essentials';
 import { argosScreenshot } from '@argos-ci/playwright';
 import {
     CustomizationHeaderPreset,
+    CustomizationIconsStyle,
     CustomizationLocale,
-    CustomizationSettings,
+    SiteCustomizationSettings,
 } from '@gitbook/api';
 import { test, expect, Page } from '@playwright/test';
 import jwt from 'jsonwebtoken';
@@ -230,7 +232,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Versioning',
-        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
             {
                 name: 'Revision',
@@ -241,7 +243,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'PDF',
-        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
             {
                 name: 'PDF',
@@ -251,7 +253,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Content tests',
-        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
             {
                 name: 'Text',
@@ -350,6 +352,11 @@ const testCases: TestsCase[] = [
                 fullPage: true,
             },
             {
+                name: 'Page links',
+                url: 'blocks/page-links',
+                fullPage: true,
+            },
+            {
                 name: 'Annotations',
                 url: 'blocks/annotations',
                 run: async (page) => {
@@ -361,7 +368,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Page options',
-        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
             {
                 name: 'Hidden',
@@ -383,11 +390,16 @@ const testCases: TestsCase[] = [
                 url: 'page-options/page-with-cover-and-no-toc',
                 run: waitForCookiesDialog,
             },
+            {
+                name: 'With icon',
+                url: 'page-options/page-with-icon',
+                run: waitForCookiesDialog,
+            },
         ],
     },
     {
         name: 'Customization',
-        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
             {
                 name: 'Without header',
@@ -399,16 +411,37 @@ const testCases: TestsCase[] = [
                 }),
                 run: waitForCookiesDialog,
             },
+            {
+                name: 'With duotone icons',
+                url:
+                    'page-options/page-with-icon' +
+                    getCustomizationURL({
+                        styling: {
+                            icons: CustomizationIconsStyle.Duotone,
+                        },
+                    }),
+                run: waitForCookiesDialog,
+            },
+        ],
+    },
+    {
+        name: 'Ads',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        tests: [
+            {
+                name: 'Without previewed ads',
+                url: 'text-page?ads_preview=1',
+                run: waitForCookiesDialog,
+            },
         ],
     },
     {
         name: 'Share links',
-        baseUrl: 'https://gitbook.gitbook.io/test-share-links/',
+        baseUrl: 'https://gitbook.gitbook.io/gbo-tests-share-links/',
         tests: [
             {
                 name: 'Valid link',
-                url: 'Fc6mMII9FKgnwm7qqynx/',
-                run: waitForCookiesDialog,
+                url: 'TGs8PkF4GWVtbmPnWhYL/',
             },
             {
                 name: 'Invalid link',
@@ -611,13 +644,12 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Languages',
-        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: allLocales.map((locale) => ({
             name: locale,
             url: getCustomizationURL({
                 internationalization: {
                     locale,
-                    inherit: false,
                 },
             }),
             run: async (page) => {
@@ -625,6 +657,57 @@ const testCases: TestsCase[] = [
                 await expect(dialog).toBeVisible();
             },
         })),
+    },
+    {
+        name: 'SEO',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        tests: [
+            {
+                name: `Index by default`,
+                url: '?x-gitbook-search-indexation=true',
+                screenshot: false,
+                run: async (page) => {
+                    const metaRobots = page.locator('meta[name="robots"]');
+                    await expect(metaRobots).toHaveAttribute('content', 'index, follow');
+                },
+            },
+            {
+                name: `Don't index noIndex`,
+                url: 'page-options/page-no-index?x-gitbook-search-indexation=true',
+                screenshot: false,
+                run: async (page) => {
+                    const metaRobots = page.locator('meta[name="robots"]');
+                    await expect(metaRobots).toHaveAttribute('content', 'noindex, nofollow');
+                },
+            },
+            {
+                name: `Don't index descendant of noIndex`,
+                url: 'page-options/page-no-index/descendant-of-page-no-index?x-gitbook-search-indexation=true',
+                screenshot: false,
+                run: async (page) => {
+                    const metaRobots = page.locator('meta[name="robots"]');
+                    await expect(metaRobots).toHaveAttribute('content', 'noindex, nofollow');
+                },
+            },
+            {
+                name: `Don't index noRobotsIndex`,
+                url: 'page-options/page-no-robots-index?x-gitbook-search-indexation=true',
+                screenshot: false,
+                run: async (page) => {
+                    const metaRobots = page.locator('meta[name="robots"]');
+                    await expect(metaRobots).toHaveAttribute('content', 'noindex, nofollow');
+                },
+            },
+            {
+                name: `Don't index descendant of noRobotsIndex`,
+                url: 'page-options/page-no-robots-index/descendant-of-page-no-robots-index?x-gitbook-search-indexation=true',
+                screenshot: false,
+                run: async (page) => {
+                    const metaRobots = page.locator('meta[name="robots"]');
+                    await expect(metaRobots).toHaveAttribute('content', 'noindex, nofollow');
+                },
+            },
+        ],
     },
 ];
 
@@ -658,7 +741,7 @@ for (const testCase of testCases) {
 /**
  * Create a URL with customization settings.
  */
-function getCustomizationURL(partial: Partial<CustomizationSettings>): string {
+function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettings>): string {
     const encoded = rison.encode_object(partial);
 
     const searchParams = new URLSearchParams();

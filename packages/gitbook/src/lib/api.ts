@@ -17,6 +17,7 @@ import {
 import assertNever from 'assert-never';
 import { headers } from 'next/headers';
 import rison from 'rison';
+import { DeepPartial } from 'ts-essentials';
 
 import { batch } from './async';
 import { buildVersion } from './build';
@@ -218,7 +219,7 @@ export const getSyncedBlockContent = cache(
  * Resolve a URL to the content to render.
  */
 export const getPublishedContentByUrl = cache(
-    'api.getPublishedContentByUrl',
+    'api.getPublishedContentByUrl.v3',
     async (url: string, visitorAuthToken: string | undefined, options: CacheFunctionOptions) => {
         const parsedURL = new URL(url);
 
@@ -282,11 +283,17 @@ export const getPublishedContentByUrl = cache(
  */
 export const getSpace = cache(
     'api.getSpace',
-    async (spaceId: string, options: CacheFunctionOptions) => {
-        const response = await api().spaces.getSpaceById(spaceId, {
-            ...noCacheFetchOptions,
-            signal: options.signal,
-        });
+    async (spaceId: string, shareKey: string | undefined, options: CacheFunctionOptions) => {
+        const response = await api().spaces.getSpaceById(
+            spaceId,
+            {
+                shareKey,
+            },
+            {
+                ...noCacheFetchOptions,
+                signal: options.signal,
+            },
+        );
         return cacheResponse(response, {
             revalidateBefore: 60 * 60,
             tags: [getAPICacheTag({ tag: 'space', space: spaceId })],
@@ -668,28 +675,13 @@ async function getSiteSpaceCustomization(args: {
     siteId: string;
     siteSpaceId: string;
 }): Promise<SiteCustomizationSettings> {
-    const headersList = headers();
     const raw = await getSiteSpaceCustomizationFromAPI(
         args.organizationId,
         args.siteId,
         args.siteSpaceId,
     );
 
-    const extend = headersList.get('x-gitbook-customization');
-    if (extend) {
-        try {
-            const parsed = rison.decode_object<Partial<SiteCustomizationSettings>>(extend);
-            return { ...raw, ...parsed };
-        } catch (error) {
-            console.error(
-                `Failed to parse x-gitbook-customization header (ignored): ${
-                    (error as Error).stack ?? (error as Error).message ?? error
-                }`,
-            );
-        }
-    }
-
-    return raw;
+    return mergeCustomizationWithExtend(raw);
 }
 
 /**
@@ -699,24 +691,8 @@ async function getSiteCustomization(args: {
     organizationId: string;
     siteId: string;
 }): Promise<SiteCustomizationSettings> {
-    const headersList = headers();
     const raw = await getSiteCustomizationFromAPI(args.organizationId, args.siteId);
-
-    const extend = headersList.get('x-gitbook-customization');
-    if (extend) {
-        try {
-            const parsed = rison.decode_object<Partial<SiteCustomizationSettings>>(extend);
-            return { ...raw, ...parsed };
-        } catch (error) {
-            console.error(
-                `Failed to parse x-gitbook-customization header (ignored): ${
-                    (error as Error).stack ?? (error as Error).message ?? error
-                }`,
-            );
-        }
-    }
-
-    return raw;
+    return mergeCustomizationWithExtend(raw);
 }
 
 /**
@@ -795,7 +771,7 @@ export const getSiteIntegrationScripts = cache(
  */
 export async function getCurrentSiteData(pointer: SiteContentPointer) {
     const [{ space, pages, contentTarget }, { customization, scripts }] = await Promise.all([
-        getSpaceData(pointer),
+        getSpaceData(pointer, pointer.siteShareKey),
         getCurrentSiteLayoutData(pointer),
     ]);
 
@@ -940,9 +916,9 @@ export const getCollectionSpaces = cache(
 /**
  * Fetch all the data to render a space at once.
  */
-export async function getSpaceData(pointer: ContentPointer) {
+export async function getSpaceData(pointer: ContentPointer, shareKey: string | undefined) {
     const [{ space, pages, contentTarget }, { customization, scripts }] = await Promise.all([
-        getSpaceContentData(pointer),
+        getSpaceContentData(pointer, shareKey),
         getSpaceLayoutData(pointer.spaceId),
     ]);
 
@@ -960,9 +936,9 @@ export async function getSpaceData(pointer: ContentPointer) {
  * This function executes the requests in parallel and should be used as early as possible
  * instead of calling the individual functions.
  */
-export async function getSpaceContentData(pointer: ContentPointer) {
+export async function getSpaceContentData(pointer: ContentPointer, shareKey: string | undefined) {
     const [space, changeRequest] = await Promise.all([
-        getSpace(pointer.spaceId),
+        getSpace(pointer.spaceId, shareKey),
         pointer.changeRequestId ? getChangeRequest(pointer.spaceId, pointer.changeRequestId) : null,
     ]);
 
@@ -1243,4 +1219,60 @@ async function getAll<T, E>(
     }
 
     throw new Error('Unreachable');
+}
+
+/**
+ * Merge the customization settings with the ones passed in the x-gitbook-customization header if present.
+ */
+function mergeCustomizationWithExtend<T extends SiteCustomizationSettings | CustomizationSettings>(
+    raw: T,
+) {
+    const headersList = headers();
+    const extend = headersList.get('x-gitbook-customization');
+    if (extend) {
+        try {
+            const parsed = rison.decode_object<DeepPartial<T>>(extend);
+
+            // Merge objects and some properties deep
+            return mergeDeepPlainObject(raw, parsed, ['styling', 'themes']);
+        } catch (error) {
+            console.error(
+                `Failed to parse x-gitbook-customization header (ignored): ${
+                    (error as Error).stack ?? (error as Error).message ?? error
+                }`,
+            );
+        }
+    }
+
+    return raw;
+}
+
+function mergeDeepPlainObject<T>(target: T, source: DeepPartial<T>, keys: Array<keyof T>): T {
+    if (typeof target !== 'object' || target === null) {
+        return target;
+    }
+
+    const result = { ...target };
+
+    for (const key in source) {
+        const value = source[key];
+        if (value === undefined) {
+            continue;
+        }
+
+        if (
+            typeof value === 'object' &&
+            !Array.isArray(value) &&
+            value !== null &&
+            keys.includes(key as keyof T)
+        ) {
+            // @ts-ignore
+            result[key] = mergeDeepPlainObject(target[key] ?? {}, value, []);
+        } else {
+            // @ts-ignore
+            result[key] = value;
+        }
+    }
+
+    return result;
 }

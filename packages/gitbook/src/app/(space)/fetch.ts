@@ -72,45 +72,32 @@ export function getContentPointer(): ContentPointer | SiteContentPointer {
 export async function fetchSpaceData() {
     const content = getContentPointer();
 
-    if ('siteId' in content) {
-        const [{ space, contentTarget, pages, customization, scripts }, parentSite] =
-            await Promise.all([
-                getCurrentSiteData(content),
-                fetchParentSite({
-                    organizationId: content.organizationId,
-                    siteId: content.siteId,
-                    siteShareKey: content.siteShareKey,
-                }),
-            ]);
+    const siteShareKey = 'siteId' in content ? content.siteShareKey : undefined;
 
-        const spaceRelativeToParent = parentSite.spaces.find(
-            (space) => space.id === content.spaceId,
-        );
+    const [{ space, contentTarget, pages, customization, scripts }, parentSite] = await Promise.all(
+        'siteId' in content
+            ? [
+                  getCurrentSiteData(content),
+                  fetchParentSite({
+                      organizationId: content.organizationId,
+                      siteId: content.siteId,
+                      siteShareKey,
+                  }),
+              ]
+            : [getSpaceData(content, siteShareKey)],
+    );
 
-        return {
-            content,
-            contentTarget,
-            space: spaceRelativeToParent ?? space,
-            pages,
-            customization,
-            scripts,
-            ancestors: [],
-            ...parentSite,
-        };
-    }
-
-    const { space, contentTarget, pages, customization, scripts } = await getSpaceData(content);
-    const parent = await fetchParentCollection(space);
+    const spaceRelativeToParent = parentSite?.spaces.find((space) => space.id === content.spaceId);
 
     return {
         content,
         contentTarget,
-        space,
+        space: spaceRelativeToParent ?? space,
         pages,
         customization,
         scripts,
         ancestors: [],
-        ...parent,
+        ...parentSite,
     };
 }
 
@@ -120,9 +107,10 @@ export async function fetchSpaceData() {
  */
 export async function fetchPageData(params: PagePathParams | PageIdParams) {
     const content = getContentPointer();
+    const siteShareKey = 'siteId' in content ? content.siteShareKey : undefined;
     const { space, contentTarget, pages, customization, scripts } = await ('siteId' in content
         ? getCurrentSiteData(content)
-        : getSpaceData(content));
+        : getSpaceData(content, siteShareKey));
 
     const page = await resolvePage(contentTarget, pages, params);
     const [parent, document] = await Promise.all([

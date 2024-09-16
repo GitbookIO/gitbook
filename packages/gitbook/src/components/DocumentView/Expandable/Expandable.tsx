@@ -1,10 +1,10 @@
-import ChevronRight from '@geist-ui/icons/chevronRight';
-import IconHash from '@geist-ui/icons/hash';
 import { DocumentBlockExpandable } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
 
 import { getNodeFragmentByType } from '@/lib/document';
 import { tcls } from '@/lib/tailwind';
 
+import { Details } from './Details';
 import { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { Inlines } from '../Inlines';
@@ -25,42 +25,7 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
     id = context.getId ? context.getId(id) : id;
 
     return (
-        <details
-            id={id}
-            open={context.mode === 'print'}
-            className={tcls(
-                style,
-                'group/expandable',
-                'shadow-dark/1',
-                'bg-gradient-to-t',
-                'from-light-1',
-                'to-light-1',
-                'border',
-                'border-b-0',
-                'border-dark-3/3',
-                //all
-                '[&]:mt-[0px]',
-                //select first child
-                '[&:first-child]:mt-5',
-                '[&:first-child]:rounded-t-lg',
-                //select first in group
-                '[:not(&)_+&]:mt-5',
-                '[:not(&)_+&]:rounded-t-lg',
-                //select last in group
-                '[&:not(:has(+_&))]:mb-5',
-                '[&:not(:has(+_&))]:rounded-b-lg',
-                '[&:not(:has(+_&))]:border-b',
-                /* '[&:not(:has(+_&))]:shadow-1xs', */
-
-                'dark:border-light-2/[0.06]',
-                'dark:from-dark-2',
-                'dark:to-dark-2',
-                'dark:shadow-none',
-
-                'group open:dark:to-dark-2/8',
-                'group open:to-light-1/6',
-            )}
-        >
+        <Details id={id} open={context.mode === 'print'} className={style}>
             <summary
                 className={tcls(
                     'cursor-pointer',
@@ -78,11 +43,11 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                     '[&::-webkit-details-marker]:hidden',
                 )}
             >
-                <ChevronRight
+                <Icon
+                    icon="chevron-right"
                     className={tcls(
                         'inline-block',
-                        'w-4',
-                        'h-4',
+                        'size-3',
                         'mr-2',
                         'mb-1',
                         'transition-transform',
@@ -111,15 +76,15 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                         'dark:ring-0',
                     )}
                 >
-                    <IconHash
+                    <Icon
+                        icon="hashtag"
                         className={tcls(
                             'inline-block',
-                            'w-4',
-                            'h-4',
+                            'size-3',
                             'transition-colors',
-                            'stroke-transparent',
-                            'group-hover:stroke-dark/6',
-                            'dark:group-hover:stroke-light/5',
+                            'text-transparent',
+                            'group-hover:text-dark/6',
+                            'dark:group-hover:text-light/5',
                         )}
                     />
                 </a>
@@ -129,8 +94,8 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                 document={document}
                 ancestorBlocks={[...ancestorBlocks, block]}
                 context={context}
-                style={['px-10', 'pb-5', 'space-y-3']}
+                style={['px-10', 'pb-5', 'space-y-4']}
             />
-        </details>
+        </Details>
     );
 }

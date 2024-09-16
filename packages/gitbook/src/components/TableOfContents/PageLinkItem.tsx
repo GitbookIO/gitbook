@@ -1,9 +1,11 @@
-import IconExternal from '@geist-ui/icons/externalLink';
 import { RevisionPageLink } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
 
-import { Emoji, Link } from '@/components/primitives';
+import { Link } from '@/components/primitives';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
+
+import { TOCPageIcon } from './TOCPageIcon';
 
 export async function PageLinkItem(props: { page: RevisionPageLink; context: ContentRefContext }) {
     const { page, context } = props;
@@ -16,7 +18,6 @@ export async function PageLinkItem(props: { page: RevisionPageLink; context: Con
                 href={resolved?.href ?? '#'}
                 className={tcls(
                     'flex',
-                    'flex-row',
                     'justify-start',
                     'items-center',
                     'gap-3',
@@ -35,21 +36,21 @@ export async function PageLinkItem(props: { page: RevisionPageLink; context: Con
                     'dark:hover:bg-light/2',
                 )}
             >
-                {page.emoji ? <Emoji code={page.emoji} /> : null}
+                <TOCPageIcon page={page} />
                 {page.title}
-                <IconExternal
+                <Icon
+                    icon="arrow-up-right-from-square"
                     className={tcls(
-                        'w-3',
-                        'h-3',
+                        'size-3',
                         'mr-1',
                         'mt-1',
                         'place-self-start',
                         'shrink-0',
-                        'stroke-current',
+                        'text-current',
                         'transition-colors',
-                        '[&>path]:transition-[stroke-opacity]',
-                        '[&>path]:[stroke-opacity:0.40]',
-                        'group-hover:[&>path]:[stroke-opacity:1]',
+                        '[&>path]:transition-[opacity]',
+                        '[&>path]:[opacity:0.40]',
+                        'group-hover:[&>path]:[opacity:1]',
                     )}
                 />
             </Link>

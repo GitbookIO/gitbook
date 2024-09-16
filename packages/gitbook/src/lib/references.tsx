@@ -1,8 +1,12 @@
 import { ContentRef, Revision, RevisionFile, RevisionPageDocument, Space } from '@gitbook/api';
 import assertNever from 'assert-never';
+import React from 'react';
+
+import { PageIcon } from '@/components/PageIcon';
 
 import {
     ContentPointer,
+    SiteContentPointer,
     getCollection,
     getDocument,
     getRevisionFile,
@@ -14,12 +18,15 @@ import {
 import { getBlockById, getBlockTitle } from './document';
 import { gitbookAppHref, pageHref, PageHrefContext } from './links';
 import { getPagePath, resolvePageId } from './pages';
+import { ClassValue } from './tailwind';
 
 export interface ResolvedContentRef {
     /** Text to render in the content ref */
     text: string;
     /** Additional sub text to render in the content ref */
     subText?: string;
+    /** Icon associated with it */
+    icon?: React.ReactNode;
     /** Emoji associated with the reference */
     emoji?: string;
     /** URL to open for the content ref */
@@ -36,6 +43,11 @@ export interface ContentRefContext extends PageHrefContext {
      */
     baseUrl?: string;
 
+    /**
+     * Site in which we are resolving the content reference.
+     * If null, the site is not known (legacy published content mode)
+     */
+    siteContext: SiteContentPointer | null;
     /**
      * Space in which we are resolving the content reference.
      */
@@ -63,6 +75,11 @@ export interface ResolveContentRefOptions {
      * @default false
      */
     resolveAnchorText?: boolean;
+
+    /**
+     * Styles to apply to the icon.
+     */
+    iconStyle?: ClassValue;
 }
 
 /**
@@ -73,8 +90,8 @@ export async function resolveContentRef(
     context: ContentRefContext,
     options: ResolveContentRefOptions = {},
 ): Promise<ResolvedContentRef | null> {
-    const { resolveAnchorText = false } = options;
-    const { space, revisionId, pages, page: activePage, ...linksContext } = context;
+    const { resolveAnchorText = false, iconStyle } = options;
+    const { siteContext, space, revisionId, pages, page: activePage, ...linksContext } = context;
 
     switch (contentRef.kind) {
         case 'url': {
@@ -102,7 +119,7 @@ export async function resolveContentRef(
         case 'anchor':
         case 'page': {
             if (contentRef.space && contentRef.space !== space.id) {
-                return resolveContentRefInSpace(contentRef.space, contentRef);
+                return resolveContentRefInSpace(contentRef.space, siteContext, contentRef);
             }
 
             const resolvePageResult =
@@ -122,6 +139,7 @@ export async function resolveContentRef(
 
             let href = '';
             let text = '';
+            let icon: React.ReactNode | undefined = undefined;
             let emoji: string | undefined = undefined;
 
             // Compute the text to display for the link
@@ -148,6 +166,7 @@ export async function resolveContentRef(
                         ? parentPage.title
                         : page.title;
                 emoji = isCurrentPage ? undefined : page.emoji;
+                icon = <PageIcon page={page} style={iconStyle} />;
             }
 
             // Compute the href for the link
@@ -167,6 +186,7 @@ export async function resolveContentRef(
                 href,
                 text,
                 emoji,
+                icon,
                 active: !anchor && page.id === activePage?.id,
             };
         }
@@ -175,7 +195,12 @@ export async function resolveContentRef(
             const targetSpace =
                 contentRef.space === space.id
                     ? space
-                    : await ignoreAPIError(getSpace(contentRef.space));
+                    : await ignoreAPIError(
+                          getSpace(
+                              contentRef.space,
+                              siteContext?.siteShareKey ? siteContext.siteShareKey : undefined,
+                          ),
+                      );
 
             if (!targetSpace) {
                 return {
@@ -239,12 +264,16 @@ export async function resolveContentRef(
     }
 }
 
-async function resolveContentRefInSpace(spaceId: string, contentRef: ContentRef) {
+async function resolveContentRefInSpace(
+    spaceId: string,
+    siteContext: SiteContentPointer | null,
+    contentRef: ContentRef,
+) {
     const pointer: ContentPointer = {
         spaceId,
     };
 
-    const result = await ignoreAPIError(getSpaceContentData(pointer));
+    const result = await ignoreAPIError(getSpaceContentData(pointer, siteContext?.siteShareKey));
     if (!result) {
         return null;
     }
@@ -258,6 +287,7 @@ async function resolveContentRefInSpace(spaceId: string, contentRef: ContentRef)
     }
 
     const resolved = await resolveContentRef(contentRef, {
+        siteContext,
         space,
         revisionId: space.revision,
         pages,

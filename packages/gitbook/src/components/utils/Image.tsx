@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import ReactDOM from 'react-dom';
 
-import { checkIsHttpURL, getImageSize, getResizedImageURL } from '@/lib/images';
+import { checkIsHttpURL, getImageSize, getResizedImageURLFactory } from '@/lib/images';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { PolymorphicComponentProp } from './types';
@@ -164,7 +164,7 @@ async function getImageAttributes(params: {
     const { sizes, source, quality, resize } = params;
     let src = source.src;
 
-    const getURL = resize ? await getResizedImageURL(source.src) : null;
+    const getURL = resize ? await getResizedImageURLFactory(source.src) : null;
 
     if (!getURL) {
         return {

@@ -110,7 +110,7 @@ export function ScalarApiClient(props: { children: React.ReactNode }) {
             ),
         );
 
-        return {
+        const data = {
             id: operationId,
             type: operationData.method,
             path: operationData.path,
@@ -128,6 +128,8 @@ export function ScalarApiClient(props: { children: React.ReactNode }) {
             url: operationData.servers[0]?.url,
             body: request.postData?.text,
         };
+
+        return data;
     }, [active]);
 
     return (

@@ -7,8 +7,8 @@ import { OpenAPICodeSample } from './OpenAPICodeSample';
 import { OpenAPIResponseExample } from './OpenAPIResponseExample';
 import { OpenAPIServerURL } from './OpenAPIServerURL';
 import { OpenAPISpec } from './OpenAPISpec';
-import { ScalarApiClient } from './ScalarApiButton';
 import { OpenAPIClientContext, OpenAPIContextProps } from './types';
+import { ScalarApiClient } from './ScalarApiButton';
 
 /**
  * Display an interactive OpenAPI operation.
@@ -24,13 +24,16 @@ export function OpenAPIOperation(props: {
     const clientContext: OpenAPIClientContext = {
         defaultInteractiveOpened: context.defaultInteractiveOpened,
         icons: context.icons,
+        blockKey: context.blockKey,
     };
 
     return (
         <ScalarApiClient>
             <div className={classNames('openapi-operation', className)}>
                 <div className="openapi-intro">
-                    <h2 className="openapi-summary">{operation.summary}</h2>
+                    <h2 className="openapi-summary" id={context.id}>
+                        {operation.summary}
+                    </h2>
                     {operation.description ? (
                         <Markdown className="openapi-description" source={operation.description} />
                     ) : null}
