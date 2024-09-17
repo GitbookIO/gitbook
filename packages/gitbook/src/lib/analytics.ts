@@ -71,6 +71,8 @@ async function fetchVisitorID(): Promise<string> {
 export function setCookiesTracking(enabled: boolean) {
     cookies.set(GRANTED_COOKIE, enabled ? 'yes' : 'no', {
         expires: 365,
+        sameSite: 'none',
+        secure: true,
     });
 }
 
