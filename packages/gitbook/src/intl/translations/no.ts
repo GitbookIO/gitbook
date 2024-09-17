@@ -3,6 +3,7 @@ import { TranslationLanguage } from './types';
 export const no: TranslationLanguage = {
     locale: 'no',
     powered_by_gitbook: 'Drevet av GitBook',
+    sponsored_via_gitbook: 'Sponset av GitBook',
     switch_to_dark_theme: 'Bytt til mørkt tema',
     switch_to_light_theme: 'Bytt til lyst tema',
     switch_to_system_theme: 'Bytt til systemtema',
