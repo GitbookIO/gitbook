@@ -2,8 +2,6 @@
 
 import { headers } from 'next/headers';
 
-import { tcls } from '@/lib/tailwind';
-
 import { AdClassicRendering } from './AdClassicRendering';
 import { AdCoverRendering } from './AdCoverRendering';
 import { AdPixels } from './AdPixels';
@@ -12,8 +10,6 @@ import { AdItem, AdsResponse } from './types';
 interface FetchAdOptions {
     /** ID of the zone to fetch Ads for */
     zoneId: string;
-    /** ID of the space */
-    spaceId: string;
     /** Mode to render the Ad */
     mode: 'classic' | 'auto' | 'cover';
     /** Name of the placement for the ad */
@@ -28,18 +24,13 @@ interface FetchAdOptions {
  * and properly access user-agent and IP.
  */
 export async function renderAd(options: FetchAdOptions) {
-    const { spaceId, mode } = options;
+    const { mode } = options;
     const result = await fetchAd(options);
     if (!result || !result.ad.description || !result.ad.statlink) {
         return null;
     }
 
-    const { ad, ip } = result;
-
-    const viaUrl = new URL('https://www.gitbook.com');
-    viaUrl.searchParams.set('utm_source', 'content');
-    viaUrl.searchParams.set('utm_medium', 'ads');
-    viaUrl.searchParams.set('utm_campaign', spaceId);
+    const { ad } = result;
 
     return (
         <>
@@ -49,21 +40,6 @@ export async function renderAd(options: FetchAdOptions) {
                 <AdCoverRendering ad={ad} />
             )}
             {ad.pixel ? <AdPixels rawPixel={ad.pixel} /> : null}
-            <p
-                className={tcls(
-                    'mt-2',
-                    'mr-2',
-                    'text-xs',
-                    'text-right',
-                    'text-dark/5',
-                    'dark:text-light/5',
-                )}
-                data-debug-ip={ip}
-            >
-                <a target="_blank" href={viaUrl.toString()} className={tcls('hover:underline')}>
-                    Sponsored via GitBook
-                </a>
-            </p>
         </>
     );
 }

@@ -3,6 +3,7 @@ import { TranslationLanguage } from './types';
 export const nl: TranslationLanguage = {
     locale: 'nl',
     powered_by_gitbook: 'Powered by GitBook',
+    sponsored_via_gitbook: 'Gesponsord door GitBook',
     switch_to_dark_theme: 'Schakel over naar donkere modus',
     switch_to_light_theme: 'Schakel over naar lichte modus',
     switch_to_system_theme: 'Schakel over naar systeemmodus',
