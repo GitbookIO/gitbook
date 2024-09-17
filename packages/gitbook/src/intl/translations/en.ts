@@ -1,6 +1,7 @@
 export const en = {
     locale: 'en',
     powered_by_gitbook: 'Powered by GitBook',
+    sponsored_via_gitbook: 'Sponsored via GitBook',
     switch_to_dark_theme: 'Switch to dark theme',
     switch_to_light_theme: 'Switch to light theme',
     switch_to_system_theme: 'Switch to system theme',
