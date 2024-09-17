@@ -87,7 +87,8 @@ export async function fetchSpaceData() {
             : [getSpaceData(content, siteShareKey)],
     );
 
-    const spaceRelativeToParent = parentSite?.spaces.find((space) => space.id === content.spaceId);
+    const parent = await (parentSite ?? fetchParentCollection(space));
+    const spaceRelativeToParent = parent?.spaces.find((space) => space.id === content.spaceId);
 
     return {
         content,
@@ -97,7 +98,7 @@ export async function fetchSpaceData() {
         customization,
         scripts,
         ancestors: [],
-        ...parentSite,
+        ...parent,
     };
 }
 
