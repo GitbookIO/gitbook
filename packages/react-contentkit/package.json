@@ -22,7 +22,8 @@
     "scripts": {
         "build": "tsc",
         "typecheck": "tsc --noEmit",
-        "dev": "tsc -w"
+        "dev": "tsc -w",
+        "clean": "rm -rf ./dist"
     },
     "files": [
         "dist",
