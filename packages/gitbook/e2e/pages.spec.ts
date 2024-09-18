@@ -14,10 +14,10 @@ import { getContentTestURL } from '../tests/utils';
 
 interface Test {
     name: string;
-    url: string;
-    run?: (page: Page) => Promise<unknown>;
-    fullPage?: boolean;
-    screenshot?: false;
+    url: string; // URL to visit for testing
+    run?: (page: Page) => Promise<unknown>; // The test to run
+    fullPage?: boolean; // Whether the test should be fullscreened during testing
+    screenshot?: false; // Should a screenshot be stored
 }
 
 interface TestsCase {
@@ -105,6 +105,28 @@ const testCases: TestsCase[] = [
             {
                 name: 'RFC variant',
                 url: 'v/rfcs',
+            },
+            {
+                name: 'Check that the customized variant title it displayed',
+                url: '',
+                run: async (page) => {
+                    const spaceDrowpdown = page.locator('[data-testid="space-dropdown-button"]');
+                    await spaceDrowpdown.click();
+
+                    // the customized space title
+                    await expect(
+                        page.getByRole('link', {
+                            name: 'Multi-Variants',
+                        }),
+                    ).toBeVisible();
+
+                    // the NON-customized space title
+                    await expect(
+                        page.getByRole('link', {
+                            name: 'RFCs',
+                        }),
+                    ).toBeVisible();
+                },
             },
         ],
     },
