@@ -200,7 +200,7 @@ async function fetchParentSite(args: {
     const [site, siteSpaces, siteParentCustomizations] = await Promise.all([
         getSite(organizationId, siteId),
         getSiteSpaces({ organizationId, siteId, siteShareKey }),
-        siteId ? getCurrentSiteCustomization({ organizationId, siteId }) : null,
+        getCurrentSiteCustomization({ organizationId, siteId }),
     ]);
 
     const spaces: Record<string, Space> = {};

@@ -107,22 +107,25 @@ const testCases: TestsCase[] = [
                 url: 'v/rfcs',
             },
             {
-                name: 'Check that the customized variant title it displayed',
+                name: 'Customized variant titles are displayed',
                 url: '',
                 run: async (page) => {
                     const spaceDrowpdown = page.locator('[data-testid="space-dropdown-button"]');
                     await spaceDrowpdown.click();
 
+                    const variantSelectionDropdown = page.locator(
+                        'css=[data-testid="space-dropdown-button"] + div',
+                    );
                     // the customized space title
                     await expect(
-                        page.getByRole('link', {
+                        variantSelectionDropdown.getByRole('link', {
                             name: 'Multi-Variants',
                         }),
                     ).toBeVisible();
 
                     // the NON-customized space title
                     await expect(
-                        page.getByRole('link', {
+                        variantSelectionDropdown.getByRole('link', {
                             name: 'RFCs',
                         }),
                     ).toBeVisible();
