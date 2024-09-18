@@ -88,6 +88,7 @@ export async function fetchSpaceData() {
     );
 
     const parent = await (parentSite ?? fetchParentCollection(space));
+    // we grab the space attached to the parent as it contains overriden customizations
     const spaceRelativeToParent = parent?.spaces.find((space) => space.id === content.spaceId);
 
     return {
