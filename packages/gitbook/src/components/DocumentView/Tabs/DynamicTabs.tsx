@@ -267,9 +267,10 @@ function getTabButtonId(tabId: string) {
 
 /**
  * Get the ID for a tab panel.
+ * We use the ID of the tab itself as links can be pointing to this ID.
  */
 function getTabPanelId(tabId: string) {
-    return `tabpanel-${tabId}`;
+    return tabId;
 }
 
 /**
