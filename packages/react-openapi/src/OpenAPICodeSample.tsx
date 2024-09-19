@@ -19,18 +19,33 @@ export function OpenAPICodeSample(props: {
 }) {
     const { data, context } = props;
 
-    const requiredHeaders = data.operation.parameters
-        ?.map(noReference)
-        .filter((param) => param.in === 'header' && param.required);
-
+    const searchParams = new URLSearchParams();
     const headersObject: { [k: string]: string } = {};
-    requiredHeaders?.forEach((header) => {
-        const example = header.schema
-            ? generateSchemaExample(noReference(header.schema))
-            : undefined;
-        if (example !== undefined) {
-            headersObject[header.name] =
-                typeof example !== 'string' ? JSON.stringify(example) : example;
+
+    data.operation.parameters?.forEach((rawParam) => {
+        const param = noReference(rawParam);
+        if (!param) {
+            return;
+        }
+
+        if (param.in === 'header' && param.required) {
+            const example = param.schema
+                ? generateSchemaExample(noReference(param.schema))
+                : undefined;
+            if (example !== undefined) {
+                headersObject[param.name] =
+                    typeof example !== 'string' ? JSON.stringify(example) : example;
+            }
+        } else if (param.in === 'query' && param.required) {
+            const example = param.schema
+                ? generateSchemaExample(noReference(param.schema))
+                : undefined;
+            if (example !== undefined) {
+                searchParams.append(
+                    param.name,
+                    String(Array.isArray(example) ? example[0] : example),
+                );
+            }
         }
     });
 
@@ -38,7 +53,10 @@ export function OpenAPICodeSample(props: {
     const requestBodyContent = requestBody ? Object.entries(requestBody.content)[0] : undefined;
 
     const input: CodeSampleInput = {
-        url: getServersURL(data.servers) + data.path,
+        url:
+            getServersURL(data.servers) +
+            data.path +
+            (searchParams.size ? `?${searchParams.toString()}` : ''),
         method: data.method,
         body: requestBodyContent
             ? generateMediaTypeExample(requestBodyContent[1], { onlyRequired: true })
