@@ -104,6 +104,11 @@ export function OpenAPISchemaProperty(
                             Example: <code>{JSON.stringify(schema.example)}</code>
                         </span>
                     ) : null}
+                    {schema.pattern ? (
+                        <div className="openapi-schema-pattern">
+                            Pattern: <code>{schema.pattern}</code>
+                        </div>
+                    ) : null}
                 </div>
             }
         >
