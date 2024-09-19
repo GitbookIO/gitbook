@@ -16,7 +16,8 @@
         "e2e": "turbo run e2e",
         "changeset": "changeset",
         "release": "turbo run release && changeset publish",
-        "download:env": "op read op://gitbook-x-dev/gitbook-open/.env.local >> .env.local"
+        "download:env": "op read op://gitbook-x-dev/gitbook-open/.env.local >> .env.local",
+        "clean": "turbo run clean"
     },
     "workspaces": [
         "packages/*"
@@ -24,7 +25,7 @@
     "devDependencies": {
         "@changesets/cli": "^2.27.7",
         "prettier": "^3.0.3",
-        "turbo": "^2.0.9"
+        "turbo": "^2.1.2"
     },
     "patchedDependencies": {
         "@vercel/next@4.3.6": "patches/@vercel%2Fnext@4.3.6.patch"

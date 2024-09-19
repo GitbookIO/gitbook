@@ -658,6 +658,57 @@ const testCases: TestsCase[] = [
             },
         })),
     },
+    {
+        name: 'SEO',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        tests: [
+            {
+                name: `Index by default`,
+                url: '?x-gitbook-search-indexation=true',
+                screenshot: false,
+                run: async (page) => {
+                    const metaRobots = page.locator('meta[name="robots"]');
+                    await expect(metaRobots).toHaveAttribute('content', 'index, follow');
+                },
+            },
+            {
+                name: `Don't index noIndex`,
+                url: 'page-options/page-no-index?x-gitbook-search-indexation=true',
+                screenshot: false,
+                run: async (page) => {
+                    const metaRobots = page.locator('meta[name="robots"]');
+                    await expect(metaRobots).toHaveAttribute('content', 'noindex, nofollow');
+                },
+            },
+            {
+                name: `Don't index descendant of noIndex`,
+                url: 'page-options/page-no-index/descendant-of-page-no-index?x-gitbook-search-indexation=true',
+                screenshot: false,
+                run: async (page) => {
+                    const metaRobots = page.locator('meta[name="robots"]');
+                    await expect(metaRobots).toHaveAttribute('content', 'noindex, nofollow');
+                },
+            },
+            {
+                name: `Don't index noRobotsIndex`,
+                url: 'page-options/page-no-robots-index?x-gitbook-search-indexation=true',
+                screenshot: false,
+                run: async (page) => {
+                    const metaRobots = page.locator('meta[name="robots"]');
+                    await expect(metaRobots).toHaveAttribute('content', 'noindex, nofollow');
+                },
+            },
+            {
+                name: `Don't index descendant of noRobotsIndex`,
+                url: 'page-options/page-no-robots-index/descendant-of-page-no-robots-index?x-gitbook-search-indexation=true',
+                screenshot: false,
+                run: async (page) => {
+                    const metaRobots = page.locator('meta[name="robots"]');
+                    await expect(metaRobots).toHaveAttribute('content', 'noindex, nofollow');
+                },
+            },
+        ],
+    },
 ];
 
 for (const testCase of testCases) {

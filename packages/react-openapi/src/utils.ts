@@ -7,3 +7,7 @@ export function noReference<T>(input: T | OpenAPIV3.ReferenceObject): T {
 
     return input;
 }
+
+export function createStateKey(key: string, scope?: string) {
+    return scope ? `${scope}_${key}` : key;
+}

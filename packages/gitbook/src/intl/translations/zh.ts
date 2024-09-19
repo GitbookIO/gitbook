@@ -3,6 +3,7 @@ import { TranslationLanguage } from './types';
 export const zh: TranslationLanguage = {
     locale: 'zh',
     powered_by_gitbook: '由 GitBook 提供支持',
+    sponsored_via_gitbook: '通过 GitBook 赞助',
     switch_to_dark_theme: '切换到深色主题',
     switch_to_light_theme: '切换到浅色主题',
     switch_to_system_theme: '切换到系统主题',

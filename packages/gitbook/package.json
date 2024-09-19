@@ -12,10 +12,11 @@
         "e2e": "playwright test",
         "unit": "bun test {src,packages}",
         "generate": "gitbook-icons ./public/~gitbook/static/icons custom-icons && gitbook-math ./public/~gitbook/static/math",
-        "copy:icons": "gitbook-icons ./public/~gitbook/static/icons"
+        "copy:icons": "gitbook-icons ./public/~gitbook/static/icons",
+        "clean": "rm -rf ./.next && rm -rf ./public/~gitbook/static"
     },
     "dependencies": {
-        "@gitbook/api": "^0.60.0",
+        "@gitbook/api": "0.60.0",
         "@gitbook/icons": "workspace:*",
         "@gitbook/react-math": "workspace:*",
         "@gitbook/react-openapi": "workspace:*",

@@ -56,6 +56,7 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockSwagger>) {
                 CodeBlock: PlainCodeBlock,
                 defaultInteractiveOpened: context.mode === 'print',
                 id: block.meta?.id,
+                blockKey: block.key,
             }}
             className="openapi-block"
         />
