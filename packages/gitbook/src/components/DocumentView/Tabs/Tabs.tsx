@@ -14,7 +14,7 @@ export function Tabs(props: BlockProps<DocumentBlockTabs>) {
 
     block.nodes.forEach((tab, index) => {
         tabs.push({
-            id: tab.key!,
+            id: tab.meta?.id ?? tab.key!,
             title: tab.data.title ?? '',
         });
 
