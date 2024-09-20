@@ -16,7 +16,13 @@ export function OpenAPIServerURLVariable(props: {
 
     if (variable.enum && variable.enum.length > 0) {
         if (!selectable) {
-            return  <span className={classNames('openapi-url-var')}>{!isNaN(Number(selectionIndex)) ? variable.enum[Number(selectionIndex)] : variable.default}</span>;
+            return (
+                <span className={classNames('openapi-url-var')}>
+                    {!isNaN(Number(selectionIndex))
+                        ? variable.enum[Number(selectionIndex)]
+                        : variable.default}
+                </span>
+            );
         }
 
         return (
