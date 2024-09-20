@@ -49,6 +49,7 @@ export function ServerURLForm(props: {
         });
     }
 
+    const isEditable = servers.length > 1 || server.variables;
     return (
         <form ref={formRef} onSubmit={e => { e.preventDefault(); updateServerVariables(new FormData(e.currentTarget)); }} className="contents">
             <fieldset disabled={ctx?.isPending} className="contents">
@@ -61,11 +62,11 @@ export function ServerURLForm(props: {
                     onChange={switchServer}
                     />
                 ) : null}
-                <button className='inline-flex pl-4' onClick={() => { 
+                 { isEditable ? <button className='openapi-edit-button ml-2' onClick={() => { 
                     const state = { ...ctx?.state };
                     delete state.edit;
                     update({ server: `${serverIndex}`, ...state, ...(ctx?.state?.edit ? undefined : { edit: 'true' }) });
-                }} aria-label={ctx?.state?.edit ? "Clear" : "Edit"}>{ctx?.state?.edit ? 'X' : 'Edit'}</button>
+                }} title={ctx?.state?.edit ? undefined : "Try different server options"} aria-label={ctx?.state?.edit ? "Clear" : "Edit"}>{ctx?.state?.edit ? context.icons.clear : context.icons.edit}</button> : null}
             </fieldset>
         </form>
     );
