@@ -12,7 +12,6 @@ export function createStateKey(key: string, scope?: string) {
     return scope ? `${scope}_${key}` : key;
 }
 
-
 /**
  * Get the default URL for the server.
  */
@@ -20,7 +19,8 @@ export function getServersURL(
     servers: OpenAPIV3.ServerObject[],
     selectors?: Record<string, string>,
 ): string {
-    const serverIndex = selectors && !isNaN(Number(selectors.server)) ? Number(selectors.server) : 0;
+    const serverIndex =
+        selectors && !isNaN(Number(selectors.server)) ? Number(selectors.server) : 0;
     const server = servers[serverIndex];
     const parts = parseServerURL(server?.url ?? '');
 
