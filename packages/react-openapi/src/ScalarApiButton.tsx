@@ -57,7 +57,7 @@ export function ScalarApiButton(props: {
 /**
  * Wrap the rendering with a context to open the scalar modal.
  */
-export function ScalarApiClient(props: { children: React.ReactNode; }) {
+export function ScalarApiClient(props: { children: React.ReactNode }) {
     const { children } = props;
 
     const ctx = useOpenAPIContext();

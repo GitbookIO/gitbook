@@ -18,11 +18,11 @@ export function OpenAPIServerURL(props: {
 }) {
     const { path, servers, context } = props;
     const ctx = useOpenAPIContext();
-    
+
     const serverIndex = !isNaN(Number(ctx?.state?.server)) ? Number(ctx?.state?.server) : 0;
     const server = servers[serverIndex];
     const parts = parseServerURL(server?.url ?? '');
-    console.log({ ctxState: ctx?.state })
+    console.log({ ctxState: ctx?.state });
 
     return (
         <ServerURLForm context={context} servers={servers} serverIndex={serverIndex}>

@@ -21,7 +21,7 @@ export function ServerURLForm(props: {
         if (index !== serverIndex) {
             update({
                 server: `${index}` ?? '0',
-            ...(ctx?.state?.edit ? { edit: 'true' } : undefined) 
+                ...(ctx?.state?.edit ? { edit: 'true' } : undefined),
             });
         }
     }
@@ -37,12 +37,14 @@ export function ServerURLForm(props: {
         update({
             server: `${formData.get('server')}` ?? '0',
             ...variables,
-            ...(ctx?.state?.edit ? { edit: 'true' } : undefined) 
+            ...(ctx?.state?.edit ? { edit: 'true' } : undefined),
         });
     }
 
     function update(variables?: Record<string, string>) {
-        if (!context.blockKey) { return; }  
+        if (!context.blockKey) {
+            return;
+        }
         ctx?.onUpdate({
             block: context.blockKey,
             ...variables,
@@ -51,22 +53,42 @@ export function ServerURLForm(props: {
 
     const isEditable = servers.length > 1 || server.variables;
     return (
-        <form ref={formRef} onSubmit={e => { e.preventDefault(); updateServerVariables(new FormData(e.currentTarget)); }} className="contents">
+        <form
+            ref={formRef}
+            onSubmit={(e) => {
+                e.preventDefault();
+                updateServerVariables(new FormData(e.currentTarget));
+            }}
+            className="contents"
+        >
             <fieldset disabled={ctx?.isPending} className="contents">
                 <input type="hidden" name="block" value={context.blockKey} />
                 {children}
                 {ctx?.state?.edit && servers.length > 1 ? (
                     <ServerSelector
-                    servers={servers}
-                    currentIndex={serverIndex}
-                    onChange={switchServer}
+                        servers={servers}
+                        currentIndex={serverIndex}
+                        onChange={switchServer}
                     />
                 ) : null}
-                 { isEditable ? <button className='openapi-edit-button ml-2' onClick={() => { 
-                    const state = { ...ctx?.state };
-                    delete state.edit;
-                    update({ server: `${serverIndex}`, ...state, ...(ctx?.state?.edit ? undefined : { edit: 'true' }) });
-                }} title={ctx?.state?.edit ? undefined : "Try different server options"} aria-label={ctx?.state?.edit ? "Clear" : "Edit"}>{ctx?.state?.edit ? context.icons.clear : context.icons.edit}</button> : null}
+                {isEditable ? (
+                    <button
+                        className="openapi-edit-button ml-2"
+                        onClick={() => {
+                            const state = { ...ctx?.state };
+                            delete state.edit;
+                            update({
+                                server: `${serverIndex}`,
+                                ...state,
+                                ...(ctx?.state?.edit ? undefined : { edit: 'true' }),
+                            });
+                        }}
+                        title={ctx?.state?.edit ? undefined : 'Try different server options'}
+                        aria-label={ctx?.state?.edit ? 'Clear' : 'Edit'}
+                    >
+                        {ctx?.state?.edit ? context.icons.clear : context.icons.edit}
+                    </button>
+                ) : null}
             </fieldset>
         </form>
     );

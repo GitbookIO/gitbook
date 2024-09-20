@@ -55,16 +55,16 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockSwagger>) {
                         chevronDown: <Icon icon="chevron-down" />,
                         chevronRight: <Icon icon="chevron-right" />,
                         edit: <Icon icon="edit" />,
-                        clear: <Icon icon="x" />
+                        clear: <Icon icon="x" />,
                     },
                     CodeBlock: PlainCodeBlock,
                     defaultInteractiveOpened: context.mode === 'print',
                     id: block.meta?.id,
-                    blockKey: block.key
+                    blockKey: block.key,
                 }}
                 className="openapi-block"
             />
-         </OpenAPIContext>
+        </OpenAPIContext>
     );
 }
 

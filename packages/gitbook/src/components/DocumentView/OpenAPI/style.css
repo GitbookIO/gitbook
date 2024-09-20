@@ -370,7 +370,9 @@
     @apply p-0.5 inline-flex text-dark/6 dark:text-light/6 hover:opacity-8;
 }
 
-.openapi-edit-button { @apply p-0.5 ml-4 size-4; }
+.openapi-edit-button {
+    @apply p-0.5 ml-4 size-4;
+}
 
 .openapi-edit-button > * {
     @apply size-full;
