@@ -31,7 +31,7 @@ export interface OpenAPIClientContext {
     /**
      * Selectors to update openapi enums, e.g. for server url variables
      */
-    enumSelectors?: Record<string, number>;
+    enumSelectors?: Record<string, string>;
 }
 
 export interface OpenAPIFetcher {
