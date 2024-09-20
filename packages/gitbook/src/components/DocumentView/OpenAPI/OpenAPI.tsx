@@ -1,12 +1,13 @@
 import { DocumentBlockSwagger } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import { OpenAPIOperation, OpenAPIOperationData } from '@gitbook/react-openapi';
+import { OpenAPIOperation } from '@gitbook/react-openapi';
 import React from 'react';
 
 import { LoadingPane } from '@/components/primitives';
 import { fetchOpenAPIBlock } from '@/lib/openapi';
 import { tcls } from '@/lib/tailwind';
 
+import OpenAPIContext from './OpenAPIContext';
 import { BlockProps } from '../Block';
 import { PlainCodeBlock } from '../CodeBlock';
 
@@ -45,27 +46,23 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockSwagger>) {
         return null;
     }
 
-    const enumSelectors =
-        context.searchParams && context.searchParams.block === block.key
-            ? parseModifiers(data, context.searchParams)
-            : undefined;
-
     return (
-        <OpenAPIOperation
-            data={data}
-            context={{
-                icons: {
-                    chevronDown: <Icon icon="chevron-down" />,
-                    chevronRight: <Icon icon="chevron-right" />,
-                },
-                CodeBlock: PlainCodeBlock,
-                defaultInteractiveOpened: context.mode === 'print',
-                id: block.meta?.id,
-                enumSelectors,
-                blockKey: block.key,
-            }}
-            className="openapi-block"
-        />
+        <OpenAPIContext block={block} data={data}>
+            <OpenAPIOperation
+                data={data}
+                context={{
+                    icons: {
+                        chevronDown: <Icon icon="chevron-down" />,
+                        chevronRight: <Icon icon="chevron-right" />,
+                    },
+                    CodeBlock: PlainCodeBlock,
+                    defaultInteractiveOpened: context.mode === 'print',
+                    id: block.meta?.id,
+                    blockKey: block.key
+                }}
+                className="openapi-block"
+            />
+         </OpenAPIContext>
     );
 }
 
@@ -96,28 +93,4 @@ function OpenAPIFallback() {
             </div>
         </div>
     );
-}
-
-function parseModifiers(data: OpenAPIOperationData, params: Record<string, string>) {
-    if (!data) {
-        return;
-    }
-    const { server: serverQueryParam } = params;
-    const serverIndex =
-        serverQueryParam && !isNaN(Number(serverQueryParam))
-            ? Math.max(0, Math.min(Number(serverQueryParam), data.servers.length - 1))
-            : 0;
-    const server = data.servers[serverIndex];
-    if (server) {
-        return Object.keys(server.variables ?? {}).reduce<Record<string, number>>(
-            (result, key) => {
-                const selection = Number(params[key]);
-                if (!isNaN(selection)) {
-                    result[key] = selection;
-                }
-                return result;
-            },
-            { server: serverIndex },
-        );
-    }
 }

@@ -1,10 +1,10 @@
 'use client';
 
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
 import { OpenAPIClientContext } from './types';
 import { OpenAPIV3 } from 'openapi-types';
 import { ServerSelector } from './ServerSelector';
+import { useOpenAPIContext } from './OpenAPIContextProvider';
 
 export function ServerURLForm(props: {
     children: React.ReactNode;
@@ -13,50 +13,59 @@ export function ServerURLForm(props: {
     serverIndex: number;
 }) {
     const { children, context, servers, serverIndex } = props;
-    const router = useRouter();
-    const [isPending, startTransition] = React.useTransition();
-
+    const ctx = useOpenAPIContext();
     const server = servers[serverIndex];
     const formRef = React.useRef<HTMLFormElement>(null);
 
     function switchServer(index: number) {
-        startTransition(() => {
-            if (index !== serverIndex) {
-                let params = new URLSearchParams(
-                    `block=${context.blockKey}&server=${index ?? '0'}`,
-                );
-                router.push(`?${params}`, { scroll: false });
-            }
-        });
+        if (index !== serverIndex) {
+            update({
+                server: `${index}` ?? '0',
+            ...(ctx?.state?.edit ? { edit: 'true' } : undefined) 
+            });
+        }
     }
 
     function updateServerVariables(formData: FormData) {
-        startTransition(() => {
-            let params = new URLSearchParams(
-                `block=${context.blockKey}&server=${formData.get('server') ?? '0'}`,
-            );
-            const variableKeys = Object.keys(server.variables ?? {});
-            for (const pair of formData.entries()) {
-                if (variableKeys.includes(pair[0]) && !isNaN(Number(pair[1]))) {
-                    params.set(pair[0], `${pair[1]}`);
-                }
+        const variableKeys = Object.keys(server.variables ?? {});
+        const variables: Record<string, string> = {};
+        for (const pair of formData) {
+            if (variableKeys.includes(pair[0]) && !isNaN(Number(pair[1]))) {
+                variables[pair[0]] = `${pair[1]}`;
             }
-            router.push(`?${params}`, { scroll: false });
+        }
+        update({
+            server: `${formData.get('server')}` ?? '0',
+            ...variables,
+            ...(ctx?.state?.edit ? { edit: 'true' } : undefined) 
+        });
+    }
+
+    function update(variables?: Record<string, string>) {
+        if (!context.blockKey) { return; }  
+        ctx?.onUpdate({
+            block: context.blockKey,
+            ...variables,
         });
     }
 
     return (
-        <form ref={formRef} action={updateServerVariables} className="contents">
-            <fieldset disabled={isPending} className="contents">
+        <form ref={formRef} onSubmit={e => { e.preventDefault(); updateServerVariables(new FormData(e.currentTarget)); }} className="contents">
+            <fieldset disabled={ctx?.isPending} className="contents">
                 <input type="hidden" name="block" value={context.blockKey} />
                 {children}
-                {servers.length > 1 ? (
+                {ctx?.state?.edit && servers.length > 1 ? (
                     <ServerSelector
-                        servers={servers}
-                        currentIndex={serverIndex}
-                        onChange={switchServer}
+                    servers={servers}
+                    currentIndex={serverIndex}
+                    onChange={switchServer}
                     />
                 ) : null}
+                <button className='inline-flex pl-4' onClick={() => { 
+                    const state = { ...ctx?.state };
+                    delete state.edit;
+                    update({ server: `${serverIndex}`, ...state, ...(ctx?.state?.edit ? undefined : { edit: 'true' }) });
+                }} aria-label={ctx?.state?.edit ? "Clear" : "Edit"}>{ctx?.state?.edit ? 'X' : 'Edit'}</button>
             </fieldset>
         </form>
     );

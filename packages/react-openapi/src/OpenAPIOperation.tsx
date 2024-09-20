@@ -5,7 +5,7 @@ import { OpenAPIOperationData, toJSON } from './fetchOpenAPIOperation';
 import { Markdown } from './Markdown';
 import { OpenAPICodeSample } from './OpenAPICodeSample';
 import { OpenAPIResponseExample } from './OpenAPIResponseExample';
-import { getServersURL, OpenAPIServerURL } from './OpenAPIServerURL';
+import { OpenAPIServerURL } from './OpenAPIServerURL';
 import { OpenAPISpec } from './OpenAPISpec';
 import { OpenAPIClientContext, OpenAPIContextProps } from './types';
 import { ScalarApiClient } from './ScalarApiButton';
@@ -25,11 +25,10 @@ export async function OpenAPIOperation(props: {
         defaultInteractiveOpened: context.defaultInteractiveOpened,
         icons: context.icons,
         blockKey: context.blockKey,
-        enumSelectors: context.enumSelectors,
     };
 
     return (
-        <ScalarApiClient serverUrl={getServersURL(data.servers, context.enumSelectors)}>
+        <ScalarApiClient>
             <div className={classNames('openapi-operation', className)}>
                 <div className="openapi-intro">
                     <h2 className="openapi-summary" id={context.id}>

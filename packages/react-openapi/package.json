@@ -6,7 +6,8 @@
             "types": "./dist/index.d.ts",
             "development": "./src/index.ts",
             "default": "./dist/index.js"
-        }
+        },
+        "./client": "./src/client.ts"
     },
     "version": "0.6.0",
     "dependencies": {

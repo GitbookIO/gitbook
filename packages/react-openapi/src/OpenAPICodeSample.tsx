@@ -4,10 +4,9 @@ import { CodeSampleInput, codeSampleGenerators } from './code-samples';
 import { OpenAPIOperationData, toJSON } from './fetchOpenAPIOperation';
 import { generateMediaTypeExample, generateSchemaExample } from './generateSchemaExample';
 import { InteractiveSection } from './InteractiveSection';
-import { getServersURL } from './OpenAPIServerURL';
 import { ScalarApiButton } from './ScalarApiButton';
 import { OpenAPIContextProps } from './types';
-import { noReference } from './utils';
+import { getServersURL, noReference } from './utils';
 
 /**
  * Display code samples to execute the operation.
