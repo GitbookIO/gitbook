@@ -67,9 +67,9 @@ export function ServerURLForm(props: {
                 {children}
                 {stateContext?.state?.edit && servers.length > 1 ? (
                     <ServerSelector
-                    servers={servers}
-                    currentIndex={serverIndex}
-                    onChange={switchServer}
+                        servers={servers}
+                        currentIndex={serverIndex}
+                        onChange={switchServer}
                     />
                 ) : null}
                 {isEditable ? (
