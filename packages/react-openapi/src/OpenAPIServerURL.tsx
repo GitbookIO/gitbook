@@ -18,7 +18,6 @@ export function OpenAPIServerURL(props: {
 }) {
     const { path, servers, context } = props;
     const ctx = useOpenAPIContext();
-
     const serverIndex = !isNaN(Number(ctx?.state?.server)) ? Number(ctx?.state?.server) : 0;
     const server = servers[serverIndex];
     const parts = parseServerURL(server?.url ?? '');

@@ -1,9 +1,7 @@
 'use client';
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
 import classNames from 'classnames';
 import { OpenAPIV3 } from 'openapi-types';
-import { OpenAPIClientContext } from './types';
 
 /**
  * Interactive component to show the value of a server variable and let the user change it.

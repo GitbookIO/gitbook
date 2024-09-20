@@ -1,6 +1,6 @@
 import { DocumentBlockSwagger } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import { OpenAPIOperation, OpenAPIOperationData } from '@gitbook/react-openapi';
+import { OpenAPIOperation } from '@gitbook/react-openapi';
 import React from 'react';
 
 import { LoadingPane } from '@/components/primitives';
@@ -99,28 +99,4 @@ function OpenAPIFallback() {
             </div>
         </div>
     );
-}
-
-function parseModifiers(data: OpenAPIOperationData, params: Record<string, string>) {
-    if (!data) {
-        return;
-    }
-    const { server: serverQueryParam } = params;
-    const serverIndex =
-        serverQueryParam && !isNaN(Number(serverQueryParam))
-            ? Math.max(0, Math.min(Number(serverQueryParam), data.servers.length - 1))
-            : 0;
-    const server = data.servers[serverIndex];
-    if (server) {
-        return Object.keys(server.variables ?? {}).reduce<Record<string, number>>(
-            (result, key) => {
-                const selection = Number(params[key]);
-                if (!isNaN(selection)) {
-                    result[key] = selection;
-                }
-                return result;
-            },
-            { server: serverIndex },
-        );
-    }
 }
