@@ -34,7 +34,6 @@ export function PageBody(props: {
     document: JSONDocument | null;
     context: ContentRefContext;
     withPageFeedback: boolean;
-    searchParams: Record<string, string>;
 }) {
     const {
         space,
@@ -45,7 +44,6 @@ export function PageBody(props: {
         page,
         document,
         withPageFeedback,
-        searchParams,
     } = props;
 
     const asFullWidth = document ? hasFullWidthBlock(document) : false;
@@ -98,7 +96,6 @@ export function PageBody(props: {
                             resolveContentRef: (ref, options) =>
                                 resolveContentRef(ref, context, options),
                             shouldHighlightCode,
-                            searchParams,
                         }}
                     />
                 ) : (
