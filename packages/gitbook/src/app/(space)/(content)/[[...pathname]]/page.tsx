@@ -90,7 +90,6 @@ export default async function Page(props: {
                         // Display the page feedback in the page footer if the aside is not visible
                         withPageFeedback && !page.layout.outline
                     }
-                    searchParams={searchParams}
                 />
                 {page.layout.outline ? (
                     <PageAside

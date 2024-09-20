@@ -1,9 +1,7 @@
 'use client';
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
 import classNames from 'classnames';
 import { OpenAPIV3 } from 'openapi-types';
-import { OpenAPIClientContext } from './types';
 
 /**
  * Interactive component to show the value of a server variable and let the user change it.
@@ -11,18 +9,23 @@ import { OpenAPIClientContext } from './types';
 export function OpenAPIServerURLVariable(props: {
     name: string;
     variable: OpenAPIV3.ServerVariableObject;
-    enumIndex?: number;
+    selectionIndex?: number;
+    selectable: boolean;
 }) {
-    const { enumIndex, name, variable } = props;
+    const { selectable, selectionIndex, name, variable } = props;
 
     if (variable.enum && variable.enum.length > 0) {
+        if (!selectable) {
+            return  <span className={classNames('openapi-url-var')}>{!isNaN(Number(selectionIndex)) ? variable.enum[Number(selectionIndex)] : variable.default}</span>;
+        }
+
         return (
-            <EnumSelect
+            <VariableSelector
                 name={name}
                 variable={variable}
                 value={
-                    !isNaN(Number(enumIndex))
-                        ? enumIndex
+                    !isNaN(Number(selectionIndex))
+                        ? selectionIndex
                         : variable.enum.findIndex((v) => v === variable.default)
                 }
             />
@@ -35,7 +38,7 @@ export function OpenAPIServerURLVariable(props: {
 /**
  * Render a select if there is an enum for a Server URL variable
  */
-function EnumSelect(props: {
+function VariableSelector(props: {
     value?: number;
     name: string;
     variable: OpenAPIV3.ServerVariableObject;
