@@ -8,6 +8,8 @@ export interface OpenAPIClientContext {
     icons: {
         chevronDown: React.ReactNode;
         chevronRight: React.ReactNode;
+        edit: React.ReactNode;
+        clear: React.ReactNode;
     };
 
     /**

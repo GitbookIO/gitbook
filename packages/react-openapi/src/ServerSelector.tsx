@@ -18,7 +18,7 @@ export function ServerSelector(props: {
         <span className="inline-flex pl-4 gap-2">
             <input type="hidden" value={`${index}`} name="server" />
             <button
-                className="openapi-server-button"
+                className="openapi-select-button"
                 disabled={index === 0}
                 onClick={(e) => {
                     e.preventDefault();
@@ -31,7 +31,7 @@ export function ServerSelector(props: {
                 ◀
             </button>
             <button
-                className="openapi-server-button"
+                className="openapi-select-button"
                 disabled={index >= servers.length - 1}
                 onClick={(e) => {
                     e.preventDefault();

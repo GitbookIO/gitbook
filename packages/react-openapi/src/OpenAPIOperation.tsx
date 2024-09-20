@@ -37,7 +37,7 @@ export async function OpenAPIOperation(props: {
                     {operation.description ? (
                         <Markdown className="openapi-description" source={operation.description} />
                     ) : null}
-                    <div className="openapi-target">
+                    <div className="openapi-target flex items-center">
                         <span
                             className={classNames(
                                 'openapi-method',
