@@ -22,7 +22,6 @@ export class CacheObjectStub {
     async open() {
         if (!this.opened) {
             const groupId = getCacheGroupIdName(this.locationId, this.objectId);
-            console.log('opening cache group', groupId);
             const cacheGroup = this.doNamespace.get(this.doNamespace.idFromName(groupId));
             this.opened = await cacheGroup.open();
         }
@@ -42,6 +41,7 @@ export class CacheObjectStub {
      * Set a value in the cache.
      */
     async set<Value = unknown>(key: string, value: Value, expiresAt: number) {
+        // TODO: Should we write on all locations instead of just the current one?
         const desc = await this.open();
         return await desc.set<Value>(key, value, expiresAt);
     }
@@ -50,13 +50,17 @@ export class CacheObjectStub {
      * Purge all keys in the cache tag.
      */
     async purge() {
+        const keys = new Set<string>();
         await Promise.all(
-            allLocations.map((locationId) => {
+            allLocations.map(async (locationId) => {
                 const groupId = getCacheGroupIdName(locationId, this.objectId);
                 const cacheGroup = this.doNamespace.get(this.doNamespace.idFromName(groupId));
-                return cacheGroup.purge();
+                const locationkeys = await cacheGroup.purge();
+                locationkeys.forEach((key) => keys.add(key));
             }),
         );
+
+        return keys;
     }
 }
 

@@ -1,6 +1,6 @@
 import { CacheObjectStub, CacheLocationId } from '@gitbook/cache-do/api';
 
-import { CacheBackend, CacheEntry } from './types';
+import { CacheBackend, CacheEntry, CacheEntryLookup } from './types';
 import { trace } from '../tracing';
 
 /**
@@ -52,10 +52,24 @@ export const cloudflareDOCache: CacheBackend = {
         );
     },
     async del(entries) {
-        //
+        // We don't need to directly delete entries from the Cloudflare DO cache.
     },
     async revalidateTags(tags) {
-        //
+        const entries: CacheEntryLookup[] = [];
+
+        await Promise.all(
+            tags.map(async (tag) => {
+                const stub = await getStub(tag);
+                if (!stub) {
+                    return;
+                }
+
+                const keys = await stub.purge();
+                keys.forEach((key) => {
+                    entries.push({ key, tag });
+                });
+            }),
+        );
 
         return { entries: [] };
     },

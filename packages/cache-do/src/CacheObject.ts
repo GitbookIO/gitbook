@@ -12,6 +12,13 @@ interface CacheObjectProp<Value = unknown> {
     expiresAt: number;
 }
 
+interface CacheObjectExp {
+    /** Key of the property */
+    k: string;
+    /** Number of chunks */
+    c: number;
+}
+
 export class CacheObject extends DurableObject {
     private lru = new LRUMap<string, { match: CacheObjectProp | undefined }>(500);
 
@@ -81,9 +88,14 @@ export class CacheObject extends DurableObject {
 
             this.lru.set(key, { match: prop });
             await this.ctx.storage.transaction(async (tx) => {
-                await tx.put(getGCClockKey(key, expiresAt), key);
-
                 const entries = encodeChunks(key, prop);
+
+                const clockValue: CacheObjectExp = {
+                    k: key,
+                    c: Object.keys(entries).length,
+                };
+
+                await tx.put(getGCClockKey(key, expiresAt), clockValue);
                 await tx.put(entries);
 
                 const currentAlarm = await tx.getAlarm();
@@ -99,37 +111,72 @@ export class CacheObject extends DurableObject {
      * Purge all keys in the cache object.
      */
     public async purge() {
-        this.lru.clear();
-        await this.ctx.storage.deleteAll();
+        let result = new Set<string>();
+
+        try {
+            // List all the keys in the cache object.
+            const entries = await this.ctx.storage.list<CacheObjectExp>({
+                prefix: 'exp.',
+                noCache: true,
+            });
+            entries.forEach((exp) => {
+                result.add(exp.k);
+            });
+        } catch (error) {
+            // If an error occurs, reset the cache object.
+            // This is a safety mechanism to prevent the cache object from being stuck in a bad state.
+            console.error('Error during purge, reset the cache object', error);
+        }
+
+        await this.reset();
+        return Array.from(result);
     }
 
     /**
      * Alarm to garbage collect all entries that have expired.
      */
     async alarm() {
-        const entries = await this.ctx.storage.list<string>({
-            prefix: 'exp.',
-            noCache: true,
-        });
-        const toDelete: string[] = [];
+        try {
+            const entries = await this.ctx.storage.list<CacheObjectExp>({
+                prefix: 'exp.',
+                noCache: true,
+            });
+            const toDeleteSet = new Set<string>();
 
-        for (const [key, targetKey] of entries) {
-            const timestamp = parseInt(key.split('.')[1]);
-            if (timestamp < Date.now()) {
-                toDelete.push(key);
-                toDelete.push(targetKey);
+            for (const [key, exp] of entries) {
+                const timestamp = parseInt(key.split('.')[1]);
+                if (timestamp < Date.now()) {
+                    toDeleteSet.add(key);
+                    for (let i = 0; i < exp.c; i++) {
+                        toDeleteSet.add(getStoragePropChunkKey(exp.k, i));
+                    }
+                }
             }
-        }
 
-        // Delete the keys by batch of 128.
-        for (let i = 0; i < toDelete.length; i += 128) {
-            await this.ctx.storage.delete(toDelete.slice(i, i + 128));
-        }
+            // Delete the keys by batch of 128.
+            const toDelete = Array.from(toDeleteSet);
+            for (let i = 0; i < toDelete.length; i += 128) {
+                await this.ctx.storage.delete(toDelete.slice(i, i + 128));
+            }
 
-        // If there are still keys to delete, set an alarm to continue the deletion in 12h.
-        if (toDelete.length) {
-            await this.ctx.storage.setAlarm(Date.now() + 12 * 60 * 60 * 1000);
+            // If there are still keys to delete, set an alarm to continue the deletion in 12h.
+            if (toDelete.length) {
+                await this.ctx.storage.setAlarm(Date.now() + 12 * 60 * 60 * 1000);
+            }
+        } catch (error) {
+            // If an error occurs, reset the cache object.
+            // This is a safety mechanism to prevent the cache object from being stuck in a bad state.
+            console.error('Error during alarm, reset the cache object', error);
+            await this.reset();
         }
+    }
+
+    /**
+     * Reset the cache object.
+     */
+    async reset() {
+        this.lru.clear();
+        await this.ctx.storage.deleteAll();
     }
 }
 

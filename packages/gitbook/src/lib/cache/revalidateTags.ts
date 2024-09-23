@@ -1,4 +1,5 @@
 import { cacheBackends } from './backends';
+import { CacheEntryLookup } from './types';
 
 interface RevalidateTagsStats {
     [key: string]: {
@@ -15,8 +16,8 @@ interface RevalidateTagsStats {
 }
 
 /**
- * Revalidate all values associated with tags.
- * It clears the values from the caches, but also start a background task to revalidate them.
+ * Purge all cache entries associated with the given tags.
+ * TODO: Implement background revalidation.
  */
 export async function revalidateTags(tags: string[]): Promise<{
     stats: RevalidateTagsStats;
@@ -28,13 +29,11 @@ export async function revalidateTags(tags: string[]): Promise<{
     const stats: RevalidateTagsStats = {};
 
     const keysByBackend = new Map<number, string[]>();
-    const keys = new Set<string>();
+    const entries = new Map<string, CacheEntryLookup>();
 
     await Promise.all(
         cacheBackends.map(async (backend, backendIndex) => {
             const { entries: addedEntries } = await backend.revalidateTags(tags);
-
-            console.log('revalidateTags', backend.name, addedEntries.length);
 
             addedEntries.forEach(({ key, tag }) => {
                 stats[key] = stats[key] ?? {
@@ -43,28 +42,28 @@ export async function revalidateTags(tags: string[]): Promise<{
                 };
                 stats[key].backends[backend.name] = { set: true };
 
-                keys.add(key);
+                entries.set(key, { tag, key });
                 keysByBackend.set(backendIndex, [...(keysByBackend.get(backendIndex) ?? []), key]);
             });
         }),
     );
 
     // Clear the keys on the backends that didn't return them
-    // await Promise.all(
-    //     cacheBackends.map(async (backend, backendIndex) => {
-    //         const unclearedKeys = Array.from(keys).filter(
-    //             (key) => !keysByBackend.get(backendIndex)?.includes(key),
-    //         );
+    await Promise.all(
+        cacheBackends.map(async (backend, backendIndex) => {
+            const unclearedEntries = Array.from(entries.values()).filter(
+                (entry) => !keysByBackend.get(backendIndex)?.includes(entry.key),
+            );
 
-    //         if (unclearedKeys.length > 0) {
-    //             unclearedKeys.forEach((key) => {
-    //                 stats[key][backend.name] = { set: false };
-    //             });
+            if (unclearedEntries.length > 0) {
+                unclearedEntries.forEach((entry) => {
+                    stats[entry.key].backends[backend.name] = { set: false };
+                });
 
-    //             await backend.del(unclearedKeys);
-    //         }
-    //     }),
-    // );
+                await backend.del(unclearedEntries);
+            }
+        }),
+    );
 
     return {
         stats,
