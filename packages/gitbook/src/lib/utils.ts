@@ -17,6 +17,7 @@ export function getContentTitle(
     // When we are rendering a site, always give priority to the customization title first
     // and then fallback to the site title
     if (parent?.object === 'site') {
+        // the parent title for a site is already overridden by the customized title in the fetch call
         return parent.title ?? space.title;
     }
 
