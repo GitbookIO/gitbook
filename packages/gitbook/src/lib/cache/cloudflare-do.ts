@@ -51,7 +51,6 @@ export const cloudflareDOCache: CacheBackend = {
     },
 };
 
-
 const globalStubs = new WeakMap<object, Map<string, CacheObjectStub>>();
 
 async function getStub(tag: string): Promise<CacheObjectStub | null> {
@@ -70,7 +69,8 @@ async function getStub(tag: string): Promise<CacheObjectStub | null> {
     globalStubs.set(cloudflare.cf, requestStubs);
 
     const locationId: CacheLocationId = cloudflare.cf.continent ?? 'NA';
-    const stub = requestStubs.get(tag) ?? new CacheObjectStub(cloudflare.env.CACHE, locationId, tag);
+    const stub =
+        requestStubs.get(tag) ?? new CacheObjectStub(cloudflare.env.CACHE, locationId, tag);
     requestStubs.set(tag, stub);
 
     return stub;

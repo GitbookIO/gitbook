@@ -1,5 +1,5 @@
 import { encode, decode } from '@msgpack/msgpack';
-import { DurableObject } from "cloudflare:workers";
+import { DurableObject } from 'cloudflare:workers';
 
 export interface CacheObjectDescriptor {
     get: <Value = unknown>(key: string) => Promise<Value | undefined>;
@@ -19,7 +19,7 @@ export class CacheObject extends DurableObject {
             },
             set: async <Value = unknown>(key: string, value: Value, expiresAt: number) => {
                 await this.set(key, value, expiresAt);
-            }
+            },
         };
     }
 
@@ -51,12 +51,11 @@ export class CacheObject extends DurableObject {
             expiresAt,
         };
 
-        await this.ctx.storage.transaction(async tx => {
+        await this.ctx.storage.transaction(async (tx) => {
             await tx.put(getGCClockKey(key, expiresAt), key);
 
             const entries = encodeChunks(key, prop);
             await tx.put(entries);
-
 
             const currentAlarm = await tx.getAlarm();
             if (!currentAlarm) {
@@ -146,7 +145,6 @@ function decodeChunks<T>(entries: Map<string, Uint8Array>): T | undefined {
     const buf = mergeUint8Array(chunks);
     return decode(buf) as T;
 }
-
 
 function chunkUint8Array(input: Uint8Array, chunkSize: number): Uint8Array[] {
     const chunks: Uint8Array[] = [];

@@ -1,10 +1,8 @@
-import type { CacheObject, CacheObjectDescriptor } from "./CacheObject";
+import type { CacheObject, CacheObjectDescriptor } from './CacheObject';
 
 export type CacheLocationId = ContinentCode;
 
-const allLocations: CacheLocationId[] = [
-    "AF", "AS", "NA", "SA", "AN", "EU", "OC"
-];
+const allLocations: CacheLocationId[] = ['AF', 'AS', 'NA', 'SA', 'AN', 'EU', 'OC'];
 
 /**
  * Client to access a tag in the cache.
@@ -15,10 +13,8 @@ export class CacheObjectStub {
     constructor(
         private doNamespace: DurableObjectNamespace<CacheObject>,
         private locationId: CacheLocationId,
-        private objectId: string
-    ) {
-
-    }
+        private objectId: string,
+    ) {}
 
     /**
      * Open the cache object.
@@ -54,18 +50,15 @@ export class CacheObjectStub {
      */
     async purge() {
         await Promise.all(
-            allLocations.map(locationId => {
+            allLocations.map((locationId) => {
                 const groupId = getCacheGroupIdName(locationId, this.objectId);
                 const cacheGroup = this.doNamespace.get(this.doNamespace.idFromName(groupId));
                 return cacheGroup.purge();
-            })
+            }),
         );
     }
 }
 
-function getCacheGroupIdName(
-    locationId: CacheLocationId,
-    objectId: string
-): string {
+function getCacheGroupIdName(locationId: CacheLocationId, objectId: string): string {
     return `${locationId}:${objectId}`;
 }

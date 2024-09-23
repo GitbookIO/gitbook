@@ -145,10 +145,11 @@ export type PublishedContentWithCache =
  */
 export const getUserById = cache({
     name: 'api.getUserById',
-    tag: (userId) => getAPICacheTag({
-        tag: 'user',
-        user: userId
-    }),
+    tag: (userId) =>
+        getAPICacheTag({
+            tag: 'user',
+            user: userId,
+        }),
     get: async (userId: string, options: CacheFunctionOptions) => {
         try {
             const response = await api().users.getUserById(userId, {
@@ -174,56 +175,60 @@ export const getUserById = cache({
 /**
  * Get a synced block by its ref.
  */
-export const getSyncedBlockContent = cache(
-    {
-        name: 'api.getSyncedBlockContent',
-        tag: (apiToken, organizationId, syncedBlockId) => getAPICacheTag({
+export const getSyncedBlockContent = cache({
+    name: 'api.getSyncedBlockContent',
+    tag: (apiToken, organizationId, syncedBlockId) =>
+        getAPICacheTag({
             tag: 'synced-block',
             syncedBlock: syncedBlockId,
         }),
-        get: async (
-            apiToken: string,
-            organizationId: string,
-            syncedBlockId: string,
-            options: CacheFunctionOptions,
-        ) => {
-            try {
-                const response = await apiWithToken(apiToken).orgs.getSyncedBlockContent(
-                    organizationId,
-                    syncedBlockId,
-                    {
-                        ...noCacheFetchOptions,
-                        signal: options.signal,
-                    },
-                );
-                return cacheResponse(response, {
+    get: async (
+        apiToken: string,
+        organizationId: string,
+        syncedBlockId: string,
+        options: CacheFunctionOptions,
+    ) => {
+        try {
+            const response = await apiWithToken(apiToken).orgs.getSyncedBlockContent(
+                organizationId,
+                syncedBlockId,
+                {
+                    ...noCacheFetchOptions,
+                    signal: options.signal,
+                },
+            );
+            return cacheResponse(response, {
+                revalidateBefore: 60 * 60,
+            });
+        } catch (error) {
+            if ((error as GitBookAPIError).code === 404) {
+                return {
                     revalidateBefore: 60 * 60,
-                });
-            } catch (error) {
-                if ((error as GitBookAPIError).code === 404) {
-                    return {
-                        revalidateBefore: 60 * 60,
-                        data: null,
-                    };
-                }
-
-                throw error;
+                    data: null,
+                };
             }
-        },
-        // We don't cache apiToken as it's not a stable key
-        getKeyArgs: (args) => [args[1], args[2]],
+
+            throw error;
+        }
     },
-);
+    // We don't cache apiToken as it's not a stable key
+    getKeyArgs: (args) => [args[1], args[2]],
+});
 /**
  * Resolve a URL to the content to render.
  */
 export const getPublishedContentByUrl = cache({
     name: 'api.getPublishedContentByUrl.v3',
-    tag: (url) => getAPICacheTag({
-        tag: 'url',
-        hostname: new URL(url).hostname,
-    }),
-    get: async (url: string, visitorAuthToken: string | undefined, options: CacheFunctionOptions) => {
+    tag: (url) =>
+        getAPICacheTag({
+            tag: 'url',
+            hostname: new URL(url).hostname,
+        }),
+    get: async (
+        url: string,
+        visitorAuthToken: string | undefined,
+        options: CacheFunctionOptions,
+    ) => {
         try {
             const response = await api().urls.getPublishedContentByUrl(
                 {
@@ -295,7 +300,8 @@ export const getSpace = cache({
  */
 export const getChangeRequest = cache({
     name: 'api.getChangeRequest',
-    tag: (spaceId, changeRequestId) => getAPICacheTag({ tag: 'change-request', space: spaceId, changeRequest: changeRequestId }),
+    tag: (spaceId, changeRequestId) =>
+        getAPICacheTag({ tag: 'change-request', space: spaceId, changeRequest: changeRequestId }),
     get: async (spaceId: string, changeRequestId: string, options: CacheFunctionOptions) => {
         const response = await api().spaces.getChangeRequestById(spaceId, changeRequestId, {
             ...noCacheFetchOptions,
@@ -342,7 +348,8 @@ interface GetRevisionOptions {
  */
 export const getRevision = cache({
     name: 'api.getRevision.v2',
-    tag: (spaceId, revisionId) => getAPICacheTag({ tag: 'revision', space: spaceId, revision: revisionId, }),
+    tag: (spaceId, revisionId) =>
+        getAPICacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
     get: async (
         spaceId: string,
         revisionId: string,
@@ -374,7 +381,8 @@ export const getRevision = cache({
  */
 export const getRevisionPages = cache({
     name: 'api.getRevisionPages.v4',
-    tag: (spaceId, revisionId) => getAPICacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
+    tag: (spaceId, revisionId) =>
+        getAPICacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
     get: async (
         spaceId: string,
         revisionId: string,
@@ -399,15 +407,15 @@ export const getRevisionPages = cache({
         });
     },
     getKeyArgs: (args) => [args[0], args[1]],
-    },
-);
+});
 
 /**
  * Get a revision page by its path
  */
 export const getRevisionPageByPath = cache({
     name: 'api.getRevisionPageByPath.v3',
-    tag: (spaceId, revisionId) => getAPICacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
+    tag: (spaceId, revisionId) =>
+        getAPICacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
     get: async (
         spaceId: string,
         revisionId: string,
@@ -450,8 +458,14 @@ export const getRevisionPageByPath = cache({
  */
 const getRevisionFileById = cache({
     name: 'api.getRevisionFile.v3',
-    tag: (spaceId, revisionId) => getAPICacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
-    get: async (spaceId: string, revisionId: string, fileId: string, options: CacheFunctionOptions) => {
+    tag: (spaceId, revisionId) =>
+        getAPICacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
+    get: async (
+        spaceId: string,
+        revisionId: string,
+        fileId: string,
+        options: CacheFunctionOptions,
+    ) => {
         try {
             const response = await (async () => {
                 return api().spaces.getFileInRevisionById(
@@ -485,7 +499,8 @@ const getRevisionFileById = cache({
  */
 const getRevisionAllFiles = cache({
     name: 'api.getRevisionAllFiles.v2',
-    tag: (spaceId, revisionId) => getAPICacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
+    tag: (spaceId, revisionId) =>
+        getAPICacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
     get: async (spaceId: string, revisionId: string, options: CacheFunctionOptions) => {
         const response = await getAll(
             (params) =>
@@ -514,8 +529,7 @@ const getRevisionAllFiles = cache({
         return cacheResponse(response, { ...immutableCacheTtl_7days, data: files });
     },
     timeout: 60 * 1000,
-},
-);
+});
 
 /**
  * Resolve a file by its ID.
@@ -575,7 +589,8 @@ export const getRevisionFile = batch<[string, string, string], RevisionFile | nu
  */
 export const getDocument = cache({
     name: 'api.getDocument.v2',
-    tag: (spaceId, documentId) => getAPICacheTag({ tag: 'document', space: spaceId, document: documentId }),
+    tag: (spaceId, documentId) =>
+        getAPICacheTag({ tag: 'document', space: spaceId, document: documentId }),
     get: async (spaceId: string, documentId: string, options: CacheFunctionOptions) => {
         const response = await api().spaces.getDocumentById(
             spaceId,
@@ -590,12 +605,11 @@ export const getDocument = cache({
         );
         return cacheResponse(response, immutableCacheTtl_7days);
     },
-        // Temporarily allow for a longer timeout than the default 10s
-        // because GitBook's API currently re-normalizes all documents
-        // and it can take more than 10s...
-        timeout: 20 * 1000,
-    },
-);
+    // Temporarily allow for a longer timeout than the default 10s
+    // because GitBook's API currently re-normalizes all documents
+    // and it can take more than 10s...
+    timeout: 20 * 1000,
+});
 
 /**
  * Get the customization settings for a site-space from the API.
@@ -1090,34 +1104,34 @@ export function getAPICacheTag(
               tag: 'user';
               user: string;
           }
-          // All data related to a space
-    | {
+        // All data related to a space
+        | {
               tag: 'space';
               space: string;
           }
-          // All data related to an integration
-    | {
-        tag: 'integration';
-        integration: string;
-    }
+        // All data related to an integration
+        | {
+              tag: 'integration';
+              integration: string;
+          }
         // All data related to a change request
-            | {
-                tag: 'change-request';
-                space: string;
-                changeRequest: string;
-            }
+        | {
+              tag: 'change-request';
+              space: string;
+              changeRequest: string;
+          }
         // Immutable data related to a revision
         | {
-            tag: 'revision';
-            space: string;
-            revision: string;
-        }
+              tag: 'revision';
+              space: string;
+              revision: string;
+          }
         // Immutable data related to a document
         | {
-            tag: 'document';
-            space: string;
-            document: string;
-        }
+              tag: 'document';
+              space: string;
+              document: string;
+          }
         // All data related to the URL of a content
         | {
               tag: 'url';

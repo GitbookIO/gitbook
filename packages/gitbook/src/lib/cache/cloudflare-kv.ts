@@ -42,7 +42,7 @@ export const cloudflareKVCache: CacheBackend = {
             },
         );
     },
-    async set( entry) {
+    async set(entry) {
         const kv = await getKVNamespace();
         if (!kv) {
             return;

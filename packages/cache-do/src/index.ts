@@ -7,4 +7,4 @@ export default class Worker extends WorkerEntrypoint {
     fetch() {
         return new Response('Hello, world!');
     }
-};
+}

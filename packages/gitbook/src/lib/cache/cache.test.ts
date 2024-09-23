@@ -24,7 +24,7 @@ describe('cache', () => {
                     data: impl(arg),
                     ttl: getTtl(),
                 };
-            }
+            },
         });
     });
 

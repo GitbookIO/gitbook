@@ -89,8 +89,7 @@ export function cache<Args extends any[], Result>(
                     signal?.throwIfAborted();
 
                     const setAt = Date.now();
-                    const expiresAt =
-                        setAt + (result.ttl ?? defaultTtl) * 1000;
+                    const expiresAt = setAt + (result.ttl ?? defaultTtl) * 1000;
 
                     const cacheEntry: CacheEntry = {
                         data: result.data,
