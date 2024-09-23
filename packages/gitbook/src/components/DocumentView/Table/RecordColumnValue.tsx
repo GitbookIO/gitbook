@@ -22,11 +22,12 @@ import { FileIcon } from '../FileIcon';
 export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
     props: BlockProps<DocumentBlockTable> & {
         tag?: Tag;
+        ariaLabelledBy?: string;
         record: TableRecordKV;
         column: string;
     },
 ) {
-    const { tag: Tag = 'div', block, document, record, column, context } = props;
+    const { tag: Tag = 'div', ariaLabelledBy, block, document, record, column, context } = props;
 
     const definition = block.data.definition[column];
     const value = record[1].values[column];
@@ -42,6 +43,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                     className={tcls('w-5', 'h-5')}
                     checked={value as boolean}
                     disabled={true}
+                    aria-labelledby={ariaLabelledBy}
                 />
             );
         case 'rating':
@@ -67,7 +69,8 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                             </span>
                             <span
                                 role="meter"
-                                aria-label={definition.title ?? ''}
+                                aria-label={ariaLabelledBy ? undefined : (definition.title ?? '')}
+                                aria-labelledby={ariaLabelledBy}
                                 aria-valuenow={rating}
                                 aria-valuemin={1}
                                 aria-valuemax={definition.max}
@@ -89,6 +92,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             return (
                 <Tag
                     className={tcls('text-base', 'tabular-nums', 'tracking-tighter')}
+                    aria-labelledby={ariaLabelledBy}
                 >{`${value}`}</Tag>
             );
         case 'text':
@@ -116,6 +120,9 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                     ]}
                     context={context}
                     blockStyle={['w-full', 'max-w-[unset]']}
+                    wrapperProps={{
+                        'aria-labelledby': ariaLabelledBy,
+                    }}
                 />
             );
         case 'files':
@@ -129,7 +136,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             );
 
             return (
-                <Tag className={tcls('text-base')}>
+                <Tag className={tcls('text-base')} aria-labelledby={ariaLabelledBy}>
                     {files.filter(filterOutNullable).map((ref, index) => {
                         const contentType = ref.file
                             ? getSimplifiedContentType(ref.file.contentType)
@@ -178,7 +185,10 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                   })
                 : null;
             return (
-                <Tag className={tcls('text-base', 'text-balance', 'flex', 'items-center')}>
+                <Tag
+                    className={tcls('text-base', 'text-balance', 'flex', 'items-center')}
+                    aria-labelledby={ariaLabelledBy}
+                >
                     {resolved?.icon ?? null}
                     {resolved ? (
                         <StyledLink href={resolved.href}>{resolved.text}</StyledLink>
@@ -197,7 +207,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             );
 
             return (
-                <Tag className={tcls('text-base')}>
+                <Tag className={tcls('text-base')} aria-labelledby={ariaLabelledBy}>
                     {resolved.filter(filterOutNullable).map((file, index) => (
                         <StyledLink key={index} href={file.href}>
                             {file.text}
@@ -208,7 +218,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
         }
         case 'select': {
             return (
-                <Tag className={tcls()}>
+                <Tag aria-labelledby={ariaLabelledBy}>
                     <span className={tcls('inline-flex', 'gap-2', 'flex-wrap')}>
                         {(value as string[]).map((selectId) => {
                             const option = definition.options.find(

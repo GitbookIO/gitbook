@@ -63,6 +63,7 @@ export function HeaderMobileMenu(props: Partial<React.ButtonHTMLAttributes<HTMLB
                 'dark:hover:bg-light/2',
                 'rounded',
                 'straight-corners:rounded-sm',
+                'page-no-toc:hidden',
                 props.className,
             )}
         >

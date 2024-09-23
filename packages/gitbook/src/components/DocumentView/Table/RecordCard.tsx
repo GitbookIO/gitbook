@@ -1,4 +1,5 @@
 import { ContentRef, DocumentTableViewCards } from '@gitbook/api';
+import React from 'react';
 
 import { Image } from '@/components/utils';
 import { ClassValue, tcls } from '@/lib/tailwind';
@@ -12,7 +13,7 @@ export async function RecordCard(
         record: TableRecordKV;
     },
 ) {
-    const { view, record, context, isOffscreen } = props;
+    const { view, record, context, block, isOffscreen } = props;
 
     const coverFile = view.coverDefinition
         ? getRecordValue<string[]>(record[1], view.coverDefinition)?.[0]
@@ -99,6 +100,31 @@ export async function RecordCard(
                 )}
             >
                 {view.columns.map((column) => {
+                    const definition = block.data.definition[column];
+
+                    if (!definition) {
+                        return null;
+                    }
+
+                    if (!view.hideColumnTitle && definition.title) {
+                        const ariaLabelledBy = `${block.key}-${column}-title`;
+                        return (
+                            <div key={column} className="flex flex-col gap-1">
+                                <div
+                                    id={ariaLabelledBy}
+                                    className="text-sm text-dark/8 dark:text-light/8"
+                                >
+                                    {definition.title}
+                                </div>
+                                <RecordColumnValue
+                                    {...props}
+                                    column={column}
+                                    ariaLabelledBy={ariaLabelledBy}
+                                />
+                            </div>
+                        );
+                    }
+
                     return <RecordColumnValue key={column} {...props} column={column} />;
                 })}
             </div>

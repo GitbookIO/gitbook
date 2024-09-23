@@ -60,12 +60,19 @@ async function main() {
 
 async function writeDataFile(name, content) {
     const dirname = path.dirname(url.fileURLToPath(import.meta.url));
+
+    const srcData = path.resolve(dirname, '../src/data');
+    const distData = path.resolve(dirname, '../dist/data');
+
+    // Ensure the directories exists
     await Promise.all([
-        fs.writeFile(path.resolve(dirname, `../src/data/${name}.json`), content),
-        // Write to dist folder if it exists
-        existsSync(path.resolve(dirname, '../dist/'))
-            ? fs.writeFile(path.resolve(dirname, `../dist/data/${name}.json`), content)
-            : null,
+        fs.mkdir(srcData, { recursive: true }),
+        fs.mkdir(distData, { recursive: true }),
+    ]);
+
+    await Promise.all([
+        fs.writeFile(path.resolve(srcData, `${name}.json`), content),
+        fs.writeFile(path.resolve(distData, `${name}.json`), content),
     ]);
 }
 

@@ -1,5 +1,6 @@
 {
     "$schema": "https://turbo.build/schema.json",
+    "ui": "tui",
     "globalEnv": ["NODE_ENV", "CI", "ARGOS_*", "GITHUB_*"],
     "tasks": {
         // Prepare the package for all other tasks
@@ -40,11 +41,16 @@
         // Start the package in development mode
         "dev": {
             "persistent": true,
-            "cache": false
+            "cache": false,
+            "dependsOn": ["generate"]
         },
         // Script run when the package is deployed
         "release": {
             "dependsOn": ["^release", "build"]
+        },
+        // Clean up the package
+        "clean": {
+            "cache": false
         }
     }
 }
