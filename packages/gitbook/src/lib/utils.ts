@@ -22,5 +22,5 @@ export function getContentTitle(
     }
 
     // Otherwise the legacy behavior is not changed to avoid regressions
-    return parent ? parent.title : customization.title ?? space.title;
+    return parent ? parent.title : (customization.title ?? space.title);
 }
