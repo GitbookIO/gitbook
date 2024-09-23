@@ -22,6 +22,11 @@ interface CacheObjectExp {
 export class CacheObject extends DurableObject {
     private lru = new LRUMap<string, { match: CacheObjectProp | undefined }>(500);
 
+    /**
+     * Open a descriptor to access the cache object.
+     * The goal is to minimize the amount of RPC sessions between the client and the cache object.
+     * One session is opened per request on the client side and used to perform multiple operations.
+     */
     public open(): CacheObjectDescriptor {
         return {
             get: async <Value = unknown>(key: string) => {
