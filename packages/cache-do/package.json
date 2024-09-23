@@ -1,0 +1,31 @@
+{
+    "name": "@gitbook/cache-do",
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "development": "./src/index.ts",
+            "default": "./dist/index.js"
+        }
+    },
+    "version": "0.0.0",
+    "dependencies": {},
+    "devDependencies": {
+        "typescript": "^5.5.3",
+        "wrangler": "^3.78.7"
+    },
+    "scripts": {
+        "generate": "wrangler types --experimental-include-runtime",
+        "build": "tsc",
+        "typecheck": "tsc --noEmit",
+        "dev": "tsc -w"
+    },
+    "files": [
+        "dist",
+        "src",
+        "bin",
+        "data",
+        "README.md",
+        "CHANGELOG.md"
+    ]
+}

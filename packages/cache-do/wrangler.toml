@@ -1,0 +1,12 @@
+main = "./src/index.ts"
+name = "gitbook-open-cache"
+compatibility_date = "2024-09-02"
+
+[durable_objects]
+[[bindings]]
+name = "CACHE"
+class_name = "CacheObject"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["CacheObject"]
