@@ -15,7 +15,8 @@
     },
     "version": "0.0.0",
     "dependencies": {
-        "@msgpack/msgpack": "^3.0.0-beta2"
+        "@msgpack/msgpack": "^3.0.0-beta2",
+        "lru_map": "^0.4.1"
     },
     "devDependencies": {
         "typescript": "^5.5.3",

@@ -1,5 +1,6 @@
 import { encode, decode } from '@msgpack/msgpack';
 import { DurableObject } from 'cloudflare:workers';
+import { LRUMap } from 'lru_map';
 
 export interface CacheObjectDescriptor {
     get: <Value = unknown>(key: string) => Promise<Value | undefined>;
@@ -12,6 +13,8 @@ interface CacheObjectProp<Value = unknown> {
 }
 
 export class CacheObject extends DurableObject {
+    private lru = new LRUMap<string, { match: CacheObjectProp | undefined }>(500);
+
     public open(): CacheObjectDescriptor {
         return {
             get: async <Value = unknown>(key: string) => {
@@ -24,22 +27,45 @@ export class CacheObject extends DurableObject {
     }
 
     /**
-     * Get the value of a property from the cache object.
+     * Get the value of a property.
      */
     public async get<Value = unknown>(key: string) {
+        console.log('get', key);
+        // Try the memory state first.
+        const memoryEntry = this.lru.get(key);
+        if (memoryEntry) {
+            console.log('memory hit for', key, !!memoryEntry.match);
+            if (!memoryEntry.match) {
+                return;
+            }
+
+            if (memoryEntry.match.expiresAt > Date.now()) {
+                return memoryEntry.match.value as Value;
+            }
+        }
+
+        return await this.getFromStorage<Value>(key);
+    }
+
+    /**
+     * Get the value of a property from the DO storage.
+     */
+    public async getFromStorage<Value = unknown>(key: string) {
         const entries = await this.ctx.storage.list<Uint8Array>({
             prefix: getStoragePropKey(key),
+            noCache: true,
         });
-        if (!entries.size) {
-            return;
+        if (entries.size) {
+            const entry = decodeChunks<CacheObjectProp<Value>>(entries);
+            if (entry && entry.expiresAt > Date.now()) {
+                // Found
+                this.lru.set(key, { match: entry });
+                return entry.value;
+            }
         }
 
-        const entry = decodeChunks<CacheObjectProp<Value>>(entries);
-        if (!entry || entry.expiresAt < Date.now()) {
-            return;
-        }
-
-        return entry.value;
+        // Not found
+        this.lru.set(key, { match: undefined });
     }
 
     /**
@@ -51,6 +77,9 @@ export class CacheObject extends DurableObject {
             expiresAt,
         };
 
+        console.log('set', key, 'expiresAt', prop.expiresAt);
+
+        this.lru.set(key, { match: prop });
         await this.ctx.storage.transaction(async (tx) => {
             await tx.put(getGCClockKey(key, expiresAt), key);
 
@@ -69,6 +98,7 @@ export class CacheObject extends DurableObject {
      * Purge all keys in the cache object.
      */
     public async purge() {
+        this.lru.clear();
         await this.ctx.storage.deleteAll();
     }
 
@@ -78,6 +108,7 @@ export class CacheObject extends DurableObject {
     async alarm() {
         const entries = await this.ctx.storage.list<string>({
             prefix: 'exp.',
+            noCache: true,
         });
         const toDelete: string[] = [];
 
