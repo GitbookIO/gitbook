@@ -19,7 +19,7 @@ const cacheVersion = 2;
 export const cloudflareCache: CacheBackend = {
     name: 'cloudflare',
     replication: 'local',
-    async get(key, options) {
+    async get(entry, options) {
         const cache = getCache();
         if (!cache) {
             return null;
@@ -27,10 +27,10 @@ export const cloudflareCache: CacheBackend = {
         return trace(
             {
                 operation: `cloudflareCache.get`,
-                name: key,
+                name: entry.key,
             },
             async (span) => {
-                const cacheKey = await serializeKey(key);
+                const cacheKey = await serializeKey(entry.key);
                 const response = await cache.match(cacheKey);
                 span.setAttribute('hit', !!response);
 
@@ -39,32 +39,32 @@ export const cloudflareCache: CacheBackend = {
                     return null;
                 }
 
-                const entry = await deserializeEntry(response);
-                return entry;
+                const cacheEntry = await deserializeEntry(response);
+                return cacheEntry;
             },
         );
     },
-    async set(key, entry) {
+    async set(entry) {
         const cache = getCache();
         if (cache) {
             await trace(
                 {
                     operation: `cloudflareCache.set`,
-                    name: key,
+                    name: entry.meta.key,
                 },
                 async () => {
-                    const cacheKey = await serializeKey(key);
+                    const cacheKey = await serializeKey(entry.meta.key);
                     await cache.put(cacheKey, serializeEntry(entry));
                 },
             );
         }
     },
-    async del(keys) {
+    async del(entries) {
         const cache = getCache();
         if (cache) {
             await Promise.all(
-                keys.map(async (key) => {
-                    const cacheKey = await serializeKey(key);
+                entries.map(async (entry) => {
+                    const cacheKey = await serializeKey(entry.key);
                     await cache.delete(cacheKey);
                 }),
             );
@@ -72,8 +72,7 @@ export const cloudflareCache: CacheBackend = {
     },
     async revalidateTags(tags) {
         return {
-            keys: [],
-            metas: [],
+            entries: [],
         };
     },
 };
@@ -103,7 +102,7 @@ async function serializeKey(key: string): Promise<string> {
 function serializeEntry(entry: CacheEntry): WorkerResponse {
     const headers = new Headers();
     headers.set('Content-Type', 'application/json');
-    const cacheTags = ['gitbook-open', ...entry.meta.tags];
+    const cacheTags = ['gitbook-open', entry.meta.tag];
 
     const maxAge = getCacheMaxAge(
         entry.meta,

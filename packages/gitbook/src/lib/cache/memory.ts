@@ -1,13 +1,13 @@
-import { CacheBackend, CacheEntry } from './types';
+import { CacheBackend, CacheEntry, CacheEntryLookup } from './types';
 import { NON_IMMUTABLE_LOCAL_CACHE_MAX_AGE_SECONDS, isCacheEntryImmutable } from './utils';
 import { getGlobalContext } from '../waitUntil';
 
 export const memoryCache: CacheBackend = {
     name: 'memory',
     replication: 'local',
-    async get(key) {
+    async get(entry) {
         const memoryCache = await getMemoryCache();
-        const memoryEntry = memoryCache.get(key);
+        const memoryEntry = memoryCache.get(entry.key);
 
         if (!memoryEntry) {
             return null;
@@ -16,12 +16,12 @@ export const memoryCache: CacheBackend = {
         if (memoryEntry.meta.expiresAt > Date.now()) {
             return memoryEntry;
         } else {
-            memoryCache.delete(key);
+            memoryCache.delete(entry.key);
         }
 
         return null;
     },
-    async set(key, entry) {
+    async set(entry) {
         const memoryCache = await getMemoryCache();
         // When the entry is immutable, we can cache it for the entire duration.
         // Else we cache it for a very short time.
@@ -39,26 +39,25 @@ export const memoryCache: CacheBackend = {
             meta.expiresAt = expiresAt;
         }
 
-        memoryCache.set(key, { ...entry, meta });
+        memoryCache.set(entry.meta.key, { ...entry, meta });
     },
-    async del(keys) {
+    async del(entries) {
         const memoryCache = await getMemoryCache();
-        keys.forEach((key) => memoryCache.delete(key));
+        entries.forEach((entry) => memoryCache.delete(entry.key));
     },
     async revalidateTags(tags) {
         const memoryCache = await getMemoryCache();
-        const keys: string[] = [];
+        const entries: CacheEntryLookup[] = [];
 
         memoryCache.forEach((entry, key) => {
-            if (tags.some((tag) => entry.meta.tags.includes(tag))) {
-                keys.push(key);
+            if (tags.includes(entry.meta.tag)) {
+                entries.push({ key, tag: entry.meta.tag });
                 memoryCache.delete(key);
             }
         });
 
         return {
-            keys,
-            metas: [],
+            entries,
         };
     },
 };

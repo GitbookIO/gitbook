@@ -43,11 +43,26 @@ export interface CacheResult<Result> {
      * Time before ttl where the cache should be revalidated (in seconds).
      */
     revalidateBefore?: number;
+}
 
-    /**
-     * Tags to associate with the cache entry.
-     */
-    tags?: string[];
+export interface CacheDefinition<Args extends any[], Result> {
+    /** Unique name for the cache */
+    name: string;
+
+    /** Tag to associate to the entry */
+    tag: (...args: Args) => string;
+
+    /** Filter the arguments that should be taken into consideration for the cache key */
+    getKeyArgs?: (args: Args) => any[];
+
+    /** Default ttl (in seconds) */
+    defaultTtl?: number;
+
+    /** When a request to the underlying resource will timeout. */
+    timeout?: number;
+
+    /** Function to get the value */
+    get: (...args: [...Args, CacheFunctionOptions]) => Promise<CacheResult<Result>>;
 }
 
 /**
@@ -55,21 +70,11 @@ export interface CacheResult<Result> {
  * We don't use the next.js cache because it has a 2MB limit.
  */
 export function cache<Args extends any[], Result>(
-    cacheName: string,
-    fn: (...args: [...Args, CacheFunctionOptions]) => Promise<CacheResult<Result>>,
-    options: {
-        /** Filter the arguments that should be taken into consideration for caching */
-        extractArgs?: (args: Args) => any[];
-
-        /** Default ttl (in seconds) */
-        defaultTtl?: number;
-
-        /** When a request to the underlying resource will timeout. */
-        timeout?: number;
-    } = {},
+    cacheDef: CacheDefinition<Args, Result>,
 ): CacheFunction<Args, Result> {
     // We stop everything after 10s to avoid pending requests
-    const timeout = options.timeout ?? 1000 * 10;
+    const timeout = cacheDef.timeout ?? 1000 * 10;
+    const defaultTtl = cacheDef.defaultTtl ?? 60 * 60 * 24;
 
     const revalidate = singletonMap(
         async (key: string, signal: AbortSignal | undefined, ...args: Args) => {
@@ -80,19 +85,19 @@ export function cache<Args extends any[], Result>(
                 },
                 async (span) => {
                     // Fetch upstream
-                    const result = await fn(...args, { signal });
+                    const result = await cacheDef.get(...args, { signal });
                     signal?.throwIfAborted();
 
                     const setAt = Date.now();
                     const expiresAt =
-                        setAt + (result.ttl ?? options.defaultTtl ?? 60 * 60 * 24) * 1000;
+                        setAt + (result.ttl ?? defaultTtl) * 1000;
 
                     const cacheEntry: CacheEntry = {
                         data: result.data,
                         meta: {
                             key,
-                            cache: cacheName,
-                            tags: result.tags ?? [],
+                            cache: cacheDef.name,
+                            tag: cacheDef.tag(...args),
                             setAt,
                             expiresAt,
                             revalidatesAt: result.revalidateBefore
@@ -106,7 +111,7 @@ export function cache<Args extends any[], Result>(
 
                     // Write it to the cache
                     if (result.ttl && result.ttl > 0) {
-                        await waitUntil(setCacheEntry(key, cacheEntry));
+                        await waitUntil(setCacheEntry(cacheEntry));
                     }
 
                     return cacheEntry;
@@ -122,9 +127,10 @@ export function cache<Args extends any[], Result>(
             let fetchDuration = 0;
 
             let result: readonly [CacheEntry, string] | null = null;
+            const tag = cacheDef.tag(...args);
 
             // Try the memory backend, independently of the other backends as it doesn't have a network cost
-            const memoryEntry = await memoryCache.get(key);
+            const memoryEntry = await memoryCache.get({ key, tag });
             if (memoryEntry) {
                 span.setAttribute('memory', true);
                 result = [memoryEntry, 'memory'] as const;
@@ -132,7 +138,7 @@ export function cache<Args extends any[], Result>(
                 result = await race(
                     cacheBackends,
                     async (backend, { signal }) => {
-                        const entry = await backend.get(key, { signal });
+                        const entry = await backend.get({ key, tag }, { signal });
                         return entry ? ([entry, backend.name] as const) : null;
                     },
                     {
@@ -184,7 +190,7 @@ export function cache<Args extends any[], Result>(
                                 (backend) =>
                                     backend.name !== backendName && backend.replication === 'local',
                             )
-                            .map((backend) => backend.set(key, savedEntry)),
+                            .map((backend) => backend.set(savedEntry)),
                     ),
                 );
             }
@@ -214,8 +220,8 @@ export function cache<Args extends any[], Result>(
     const cacheFn = async (...rawArgs: Args | [...Args, CacheFunctionOptions]) => {
         const [args, { signal }] = extractCacheFunctionOptions<Args>(rawArgs);
 
-        const cacheArgs = options.extractArgs ? options.extractArgs(args) : args;
-        const key = getCacheKey(cacheName, cacheArgs);
+        const cacheArgs = cacheDef.getKeyArgs ? cacheDef.getKeyArgs(args) : args;
+        const key = getCacheKey(cacheDef.name, cacheArgs);
 
         return await trace(
             {
@@ -231,17 +237,18 @@ export function cache<Args extends any[], Result>(
 
     cacheFn.revalidate = async (...rawArgs: Args | [...Args, CacheFunctionOptions]) => {
         const [args, { signal }] = extractCacheFunctionOptions<Args>(rawArgs);
-        const cacheArgs = options.extractArgs ? options.extractArgs(args) : args;
-        const key = getCacheKey(cacheName, cacheArgs);
+        const cacheArgs = cacheDef.getKeyArgs ? cacheDef.getKeyArgs(args) : args;
+        const key = getCacheKey(cacheDef.name, cacheArgs);
 
         await revalidate(key, signal, ...args);
     };
 
     cacheFn.hasInMemory = async (...args: Args) => {
-        const cacheArgs = options.extractArgs ? options.extractArgs(args) : args;
-        const key = getCacheKey(cacheName, cacheArgs);
+        const cacheArgs = cacheDef.getKeyArgs ? cacheDef.getKeyArgs(args) : args;
+        const key = getCacheKey(cacheDef.name, cacheArgs);
+        const tag = cacheDef.tag(...args);
 
-        const memoryEntry = await memoryCache.get(key);
+        const memoryEntry = await memoryCache.get({ key, tag });
         if (memoryEntry) {
             return true;
         }
@@ -250,7 +257,7 @@ export function cache<Args extends any[], Result>(
     };
 
     // @ts-ignore
-    registeredCaches.set(cacheName, cacheFn);
+    registeredCaches.set(cacheDef.name, cacheFn);
 
     return cacheFn;
 }
@@ -289,14 +296,14 @@ function hashValue(arg: any): string {
     return JSON.stringify(arg);
 }
 
-async function setCacheEntry(key: string, entry: CacheEntry) {
+async function setCacheEntry(entry: CacheEntry) {
     return await trace(
         {
             operation: `cache.setCacheEntry`,
-            name: key,
+            name: entry.meta.key,
         },
         async () => {
-            await Promise.all(cacheBackends.map((backend) => backend.set(key, entry)));
+            await Promise.all(cacheBackends.map((backend) => backend.set(entry)));
         },
     );
 }
