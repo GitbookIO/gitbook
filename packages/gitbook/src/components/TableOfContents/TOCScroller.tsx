@@ -39,7 +39,9 @@ export function useScrollToActiveTOCItem(tocItem: {
     const scrollContainerRef = React.useContext(TOCScrollContainerContext);
 
     React.useLayoutEffect(() => {
-        if (isActive && linkRef.current && scrollContainerRef?.current) {
+        if (!isActive) { return; }
+
+        if (linkRef.current && scrollContainerRef?.current) {
             const tocItem = linkRef.current;
             const tocContainer = scrollContainerRef.current;
 
