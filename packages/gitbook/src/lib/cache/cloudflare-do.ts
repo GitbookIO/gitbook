@@ -1,4 +1,4 @@
-import { CacheObjectStub, CacheLocationId } from '@gitbook/cache-do';
+import { CacheObjectStub, CacheLocationId } from '@gitbook/cache-do/api';
 
 import { CacheBackend, CacheEntry } from './types';
 import { trace } from '../tracing';

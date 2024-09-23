@@ -6,6 +6,11 @@
             "types": "./dist/index.d.ts",
             "development": "./src/index.ts",
             "default": "./dist/index.js"
+        },
+        "./api": {
+            "types": "./dist/api.d.ts",
+            "development": "./src/api.ts",
+            "default": "./dist/api.js"
         }
     },
     "version": "0.0.0",
@@ -21,7 +26,8 @@
         "build": "tsc",
         "typecheck": "tsc --noEmit",
         "dev": "tsc -w",
-        "deploy": "wrangler deploy"
+        "release": "wrangler deploy",
+        "release:preview": "wrangler deploy --env preview"
     },
     "files": [
         "dist",
