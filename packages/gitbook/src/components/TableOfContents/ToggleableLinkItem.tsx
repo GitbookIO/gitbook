@@ -7,6 +7,7 @@ import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
+import { useScrollToActiveTOCItem } from './TOCScroller';
 import { Link } from '../primitives';
 
 const show = {
@@ -92,9 +93,13 @@ export function ToggleableLinkItem(props: {
         mountedRef.current = true;
     }, []);
 
+    const linkRef = React.createRef<HTMLAnchorElement>();
+    useScrollToActiveTOCItem({ linkRef, isActive });
+
     return (
         <div>
             <Link
+                ref={linkRef}
                 href={href}
                 aria-selected={isActive}
                 className={tcls(
