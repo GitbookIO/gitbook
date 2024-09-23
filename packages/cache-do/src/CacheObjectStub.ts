@@ -22,6 +22,7 @@ export class CacheObjectStub {
     async open() {
         if (!this.opened) {
             const groupId = getCacheGroupIdName(this.locationId, this.objectId);
+            console.log('opening cache group', groupId);
             const cacheGroup = this.doNamespace.get(this.doNamespace.idFromName(groupId));
             this.opened = await cacheGroup.open();
         }
