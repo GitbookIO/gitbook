@@ -30,21 +30,22 @@ export class CacheObject extends DurableObject {
      * Get the value of a property.
      */
     public async get<Value = unknown>(key: string) {
-        console.log('get', key);
-        // Try the memory state first.
-        const memoryEntry = this.lru.get(key);
-        if (memoryEntry) {
-            console.log('memory hit for', key, !!memoryEntry.match);
-            if (!memoryEntry.match) {
-                return;
+        return timeFn(`get: ${key}`, async () => {
+            // Try the memory state first.
+            const memoryEntry = this.lru.get(key);
+            if (memoryEntry) {
+                console.log(`get: (memory, ${!!memoryEntry.match}) ${key}`);
+                if (!memoryEntry.match) {
+                    return;
+                }
+
+                if (memoryEntry.match.expiresAt > Date.now()) {
+                    return memoryEntry.match.value as Value;
+                }
             }
 
-            if (memoryEntry.match.expiresAt > Date.now()) {
-                return memoryEntry.match.value as Value;
-            }
-        }
-
-        return await this.getFromStorage<Value>(key);
+            return await this.getFromStorage<Value>(key);
+        });
     }
 
     /**
@@ -72,25 +73,25 @@ export class CacheObject extends DurableObject {
      * Set a value in the cache object.
      */
     public async set<Value = unknown>(key: string, value: Value, expiresAt: number) {
-        const prop: CacheObjectProp<Value> = {
-            value,
-            expiresAt,
-        };
+        return timeFn(`set: ${key}`, async () => {
+            const prop: CacheObjectProp<Value> = {
+                value,
+                expiresAt,
+            };
 
-        console.log('set', key, 'expiresAt', prop.expiresAt);
+            this.lru.set(key, { match: prop });
+            await this.ctx.storage.transaction(async (tx) => {
+                await tx.put(getGCClockKey(key, expiresAt), key);
 
-        this.lru.set(key, { match: prop });
-        await this.ctx.storage.transaction(async (tx) => {
-            await tx.put(getGCClockKey(key, expiresAt), key);
+                const entries = encodeChunks(key, prop);
+                await tx.put(entries);
 
-            const entries = encodeChunks(key, prop);
-            await tx.put(entries);
-
-            const currentAlarm = await tx.getAlarm();
-            if (!currentAlarm) {
-                // Set an alarm to garbage collect all entries that have expired in 12h.
-                await tx.setAlarm(Date.now() + 12 * 60 * 60 * 1000);
-            }
+                const currentAlarm = await tx.getAlarm();
+                if (!currentAlarm) {
+                    // Set an alarm to garbage collect all entries that have expired in 12h.
+                    await tx.setAlarm(Date.now() + 12 * 60 * 60 * 1000);
+                }
+            });
         });
     }
 
@@ -194,4 +195,13 @@ function mergeUint8Array(chunks: Uint8Array[]): Uint8Array {
         offset += chunk.length;
     }
     return result;
+}
+
+async function timeFn<T>(message: string, fn: () => Promise<T>): Promise<T> {
+    const start = performance.now();
+    try {
+        return await fn();
+    } finally {
+        console.log(`${message} (${performance.now() - start}ms)`);
+    }
 }
