@@ -1,6 +1,6 @@
 export interface CacheEntryLookup {
     key: string;
-    tag: string;
+    tag?: string;
 }
 
 export interface CacheEntryMeta extends CacheEntryLookup {

@@ -102,7 +102,10 @@ async function serializeKey(key: string): Promise<string> {
 function serializeEntry(entry: CacheEntry): WorkerResponse {
     const headers = new Headers();
     headers.set('Content-Type', 'application/json');
-    const cacheTags = ['gitbook-open', entry.meta.tag];
+    const cacheTags = ['gitbook-open'];
+    if (entry.meta.tag) {
+        cacheTags.push(entry.meta.tag);
+    }
 
     const maxAge = getCacheMaxAge(
         entry.meta,

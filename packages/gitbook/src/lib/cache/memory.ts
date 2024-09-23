@@ -50,7 +50,7 @@ export const memoryCache: CacheBackend = {
         const entries: CacheEntryLookup[] = [];
 
         memoryCache.forEach((entry, key) => {
-            if (tags.includes(entry.meta.tag)) {
+            if (entry.meta.tag && tags.includes(entry.meta.tag)) {
                 entries.push({ key, tag: entry.meta.tag });
                 memoryCache.delete(key);
             }

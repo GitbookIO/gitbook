@@ -66,16 +66,18 @@ export const cloudflareKVCache: CacheBackend = {
                     expirationTtl: secondsFromNow,
                 });
 
-                const metadata: KVTagMetadata = {
-                    meta: entry.meta,
-                };
-                const jsonMetadata = JSON.stringify(metadata);
-                const tagKey = getTagKey(entry.meta.tag, entry.meta.key);
+                if (entry.meta.tag) {
+                    const metadata: KVTagMetadata = {
+                        meta: entry.meta,
+                    };
+                    const jsonMetadata = JSON.stringify(metadata);
+                    const tagKey = getTagKey(entry.meta.tag, entry.meta.key);
 
-                await kv.put(tagKey, jsonMetadata, {
-                    metadata,
-                    expirationTtl: secondsFromNow,
-                });
+                    await kv.put(tagKey, jsonMetadata, {
+                        metadata,
+                        expirationTtl: secondsFromNow,
+                    });
+                }
             },
         );
     },

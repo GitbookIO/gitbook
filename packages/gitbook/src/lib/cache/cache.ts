@@ -50,7 +50,7 @@ export interface CacheDefinition<Args extends any[], Result> {
     name: string;
 
     /** Tag to associate to the entry */
-    tag: (...args: Args) => string;
+    tag?: (...args: Args) => string;
 
     /** Filter the arguments that should be taken into consideration for the cache key */
     getKeyArgs?: (args: Args) => any[];
@@ -96,7 +96,7 @@ export function cache<Args extends any[], Result>(
                         meta: {
                             key,
                             cache: cacheDef.name,
-                            tag: cacheDef.tag(...args),
+                            tag: cacheDef.tag?.(...args),
                             setAt,
                             expiresAt,
                             revalidatesAt: result.revalidateBefore
@@ -126,7 +126,7 @@ export function cache<Args extends any[], Result>(
             let fetchDuration = 0;
 
             let result: readonly [CacheEntry, string] | null = null;
-            const tag = cacheDef.tag(...args);
+            const tag = cacheDef.tag?.(...args);
 
             // Try the memory backend, independently of the other backends as it doesn't have a network cost
             const memoryEntry = await memoryCache.get({ key, tag });
@@ -245,7 +245,7 @@ export function cache<Args extends any[], Result>(
     cacheFn.hasInMemory = async (...args: Args) => {
         const cacheArgs = cacheDef.getKeyArgs ? cacheDef.getKeyArgs(args) : args;
         const key = getCacheKey(cacheDef.name, cacheArgs);
-        const tag = cacheDef.tag(...args);
+        const tag = cacheDef.tag?.(...args);
 
         const memoryEntry = await memoryCache.get({ key, tag });
         if (memoryEntry) {

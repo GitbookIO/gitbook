@@ -48,27 +48,30 @@ export async function fetchOpenAPIBlock(
 }
 
 const fetcher: OpenAPIFetcher = {
-    fetch: cache('openapi.fetch', async (url: string, options: CacheFunctionOptions) => {
-        // Wrap the raw string to prevent invalid URLs from being passed to fetch.
-        // This can happen if the URL has whitespace, which is currently handled differently by Cloudflare's implementation of fetch:
-        // https://github.com/cloudflare/workerd/issues/1957
-        const response = await fetch(new URL(url), {
-            ...noCacheFetchOptions,
-            signal: options.signal,
-        });
+    fetch: cache({
+        name: 'openapi.fetch',
+        get: async (url: string, options: CacheFunctionOptions) => {
+            // Wrap the raw string to prevent invalid URLs from being passed to fetch.
+            // This can happen if the URL has whitespace, which is currently handled differently by Cloudflare's implementation of fetch:
+            // https://github.com/cloudflare/workerd/issues/1957
+            const response = await fetch(new URL(url), {
+                ...noCacheFetchOptions,
+                signal: options.signal,
+            });
 
-        if (!response.ok) {
-            throw new Error(
-                `Failed to fetch OpenAPI file: ${response.status} ${response.statusText}`,
-            );
-        }
+            if (!response.ok) {
+                throw new Error(
+                    `Failed to fetch OpenAPI file: ${response.status} ${response.statusText}`,
+                );
+            }
 
-        const text = await response.text();
-        const data = await parseOpenAPIV3(url, text);
-        return {
-            ...parseCacheResponse(response),
-            data,
-        };
+            const text = await response.text();
+            const data = await parseOpenAPIV3(url, text);
+            return {
+                ...parseCacheResponse(response),
+                data,
+            };
+        },
     }),
     parseMarkdown,
 };

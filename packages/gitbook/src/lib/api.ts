@@ -72,12 +72,10 @@ export interface ContentTarget {
 const immutableCacheTtl_7days = {
     revalidateBefore: 24 * 60 * 60,
     ttl: 7 * 24 * 60 * 60,
-    tags: [],
 };
 const immutableCacheTtl_1day = {
     revalidateBefore: 60 * 60,
     ttl: 24 * 60 * 60,
-    tags: [],
 };
 
 const apiSyncStorage = new AsyncLocalStorage<GitBookAPI>();
@@ -657,12 +655,6 @@ const getSiteCustomizationFromAPI = cache({
         );
         return cacheResponse(response, {
             revalidateBefore: 60 * 60,
-            tags: [
-                getAPICacheTag({
-                    tag: 'site',
-                    site: siteId,
-                }),
-            ],
         });
     },
 });
@@ -1017,7 +1009,6 @@ export const searchParentContent = cache({
         );
         return cacheResponse(response, {
             ttl: 60 * 60,
-            tags: [],
         });
     },
 });
