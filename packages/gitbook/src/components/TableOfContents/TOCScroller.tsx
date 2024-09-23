@@ -37,10 +37,9 @@ export function useScrollToActiveTOCItem(tocItem: {
 
     const hash = useHash();
     const scrollContainerRef = React.useContext(TOCScrollContainerContext);
+    const isScrolled = React.useRef(false);
 
-    React.useLayoutEffect(() => {
-        if (!isActive) { return; }
-
+    const isOutOfView = React.useCallback(() => {
         if (linkRef.current && scrollContainerRef?.current) {
             const tocItem = linkRef.current;
             const tocContainer = scrollContainerRef.current;
@@ -49,17 +48,31 @@ export function useScrollToActiveTOCItem(tocItem: {
             const containerTop = tocContainer.scrollTop;
             const containerBottom = containerTop + tocContainer.clientHeight;
 
-            // Only scroll if the TOC item is outside the viewable area of the container
-            if (
+            return (
                 tocItemTop < containerTop + TOC_ITEM_OFFSET ||
                 tocItemTop > containerBottom - TOC_ITEM_OFFSET
-            ) {
-                tocItem.scrollIntoView({
-                    behavior: 'instant', // using instant as smooth can interrupt or get interrupted by other `scrollIntoView` changes
-                    block: 'center',
-                });
-            }
+            );
         }
+        return false;
+    }, [linkRef, scrollContainerRef]);
+
+    React.useLayoutEffect(() => {
+        if (!isActive) { 
+            isScrolled.current = false;
+            return; 
+        }
+
+        if (!isOutOfView() || isScrolled.current) {
+            return;
+        }
+
+        const tocItem = linkRef.current;
+        console.log({ isActive, scrollToView: tocItem?.textContent });
+        tocItem?.scrollIntoView({
+            behavior: 'instant', // using instant as smooth can interrupt or get interrupted by other `scrollIntoView` changes
+            block: 'center',
+        });
+        isScrolled.current = true;
         // We've included `hash` from `useHash` hook as a dependency so we trigger the effect in response to changes to the url hash
-    }, [isActive, hash, linkRef, scrollContainerRef]);
+    }, [hash, isActive, isOutOfView, linkRef]);
 }

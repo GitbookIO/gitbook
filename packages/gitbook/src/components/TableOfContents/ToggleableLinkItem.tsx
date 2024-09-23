@@ -49,6 +49,7 @@ export function ToggleableLinkItem(props: {
     const [scope, animate] = useAnimate();
     const [isVisible, setIsVisible] = React.useState(hasActiveDescendant);
     const isMounted = useIsMounted();
+
     // Update the visibility of the children, if we are navigating to a descendant.
     React.useEffect(() => {
         if (!hasDescendants) {
@@ -64,7 +65,6 @@ export function ToggleableLinkItem(props: {
         if (!isMounted || !hasDescendants) {
             return;
         }
-
         try {
             animate(scope.current, isVisible ? show : hide, {
                 duration: 0.1,
@@ -89,7 +89,7 @@ export function ToggleableLinkItem(props: {
     }, [isVisible, isMounted, hasDescendants, animate, scope]);
 
     const linkRef = React.createRef<HTMLAnchorElement>();
-    useScrollToActiveTOCItem({ linkRef, isActive: isMounted && isActive });
+    useScrollToActiveTOCItem({ linkRef, isActive });
 
     return (
         <div>
