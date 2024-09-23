@@ -1,9 +1,10 @@
 'use client';
 
-import { useParams } from 'next/navigation';
 import React from 'react';
 
 import { ClassValue, tcls } from '@/lib/tailwind';
+
+import { useHash } from '../hooks';
 
 const TOCScrollContainerContext = React.createContext<React.RefObject<HTMLDivElement> | null>(null);
 
@@ -34,7 +35,7 @@ export function useScrollToActiveTOCItem(tocItem: {
 }) {
     const { isActive, linkRef } = tocItem;
 
-    const params = useParams();
+    const hash = useHash();
     const scrollContainerRef = React.useContext(TOCScrollContainerContext);
 
     React.useLayoutEffect(() => {
@@ -57,8 +58,6 @@ export function useScrollToActiveTOCItem(tocItem: {
                 });
             }
         }
-        // We've included `param` from `useParams` hook to listen to respond to changes to hash or
-        // for updates to route from next and previous browser buttons.
-        // See https://github.com/vercel/next.js/discussions/49465#discussioncomment-5845312
-    }, [isActive, linkRef, scrollContainerRef, params]);
+        // We've included `hash` from `useHash` hook as a dependency so we trigger the effect in response to changes to the url hash
+    }, [isActive, hash, linkRef, scrollContainerRef]);
 }
