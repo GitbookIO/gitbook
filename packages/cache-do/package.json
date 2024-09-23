@@ -9,7 +9,9 @@
         }
     },
     "version": "0.0.0",
-    "dependencies": {},
+    "dependencies": {
+        "@msgpack/msgpack": "^3.0.0-beta2"
+    },
     "devDependencies": {
         "typescript": "^5.5.3",
         "wrangler": "^3.78.7"
@@ -18,7 +20,8 @@
         "generate": "wrangler types --experimental-include-runtime",
         "build": "tsc",
         "typecheck": "tsc --noEmit",
-        "dev": "tsc -w"
+        "dev": "tsc -w",
+        "deploy": "wrangler deploy"
     },
     "files": [
         "dist",

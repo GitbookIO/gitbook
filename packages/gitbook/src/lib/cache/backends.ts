@@ -1,4 +1,5 @@
 import { cloudflareCache } from './cloudflare-cache';
+import { cloudflareDOCache } from './cloudflare-do';
 import { cloudflareKVCache } from './cloudflare-kv';
 import { memoryCache } from './memory';
 
@@ -11,4 +12,5 @@ export const cacheBackends = [
     cloudflareCache,
     // Cache global, but with slow replication
     cloudflareKVCache,
+    cloudflareDOCache,
 ];

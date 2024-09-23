@@ -1,6 +1,6 @@
 import type { CacheObject, CacheObjectDescriptor } from "./CacheObject";
 
-type CacheLocationId = ContinentCode;
+export type CacheLocationId = ContinentCode;
 
 const allLocations: CacheLocationId[] = [
     "AF", "AS", "NA", "SA", "AN", "EU", "OC"
@@ -36,17 +36,17 @@ export class CacheObjectStub {
     /**
      * Get a value from the cache.
      */
-    async get(key: string) {
+    async get<Value = unknown>(key: string) {
         const desc = await this.open();
-        return await desc.get(key);
+        return await desc.get<Value>(key);
     }
 
     /**
      * Set a value in the cache.
      */
-    async set(key: string, value: any) {
+    async set<Value = unknown>(key: string, value: Value, expiresAt: number) {
         const desc = await this.open();
-        return await desc.set(key, value);
+        return await desc.set<Value>(key, value, expiresAt);
     }
 
     /**
