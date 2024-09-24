@@ -5,7 +5,7 @@
     "scripts": {
         "dev": "env-cmd --silent -f ../../.env.local next dev",
         "build": "next build",
-        "build:cloudflare": "next-on-pages && bun run ./scripts/post-cf-build.ts",
+        "build:cloudflare": "next-on-pages",
         "start": "next start",
         "lint": "next lint",
         "typecheck": "tsc --noEmit",
