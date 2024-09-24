@@ -8,7 +8,7 @@ export interface CacheObjectDescriptor {
 }
 
 /**
- * Value stored in a cuncked binary msgpack format.
+ * Value stored in a chunked binary msgpack format.
  * Stored under the key `prop.${key}.${index}`.
  */
 interface CacheObjectProp<Value = unknown> {
@@ -142,7 +142,7 @@ export class CacheObject extends DurableObject {
         } catch (error) {
             // If an error occurs, reset the cache object.
             // This is a safety mechanism to prevent the cache object from being stuck in a bad state.
-            console.error('Error during purge, reset the cache object', error);
+            console.error('Error during purge, resetting the cache object', error);
         }
 
         await this.reset();
