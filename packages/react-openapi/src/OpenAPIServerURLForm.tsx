@@ -14,7 +14,7 @@ export function ServerURLForm(props: {
     serverIndex: number;
 }) {
     const { children, context, servers, serverIndex } = props;
-    const ctx = useOpenAPIContext();
+    const stateContext = useOpenAPIContext();
     const server = servers[serverIndex];
     const formRef = React.useRef<HTMLFormElement>(null);
 
@@ -22,7 +22,7 @@ export function ServerURLForm(props: {
         if (index !== serverIndex) {
             update({
                 server: `${index}` ?? '0',
-                ...(ctx?.state?.edit ? { edit: 'true' } : undefined),
+                ...(stateContext?.state?.edit ? { edit: 'true' } : undefined),
             });
         }
     }
@@ -38,7 +38,7 @@ export function ServerURLForm(props: {
         update({
             server: `${formData.get('server')}` ?? '0',
             ...variables,
-            ...(ctx?.state?.edit ? { edit: 'true' } : undefined),
+            ...(stateContext?.state?.edit ? { edit: 'true' } : undefined),
         });
     }
 
@@ -46,7 +46,7 @@ export function ServerURLForm(props: {
         if (!context.blockKey) {
             return;
         }
-        ctx?.onUpdate({
+        stateContext?.onUpdate({
             block: context.blockKey,
             ...variables,
         });
@@ -62,10 +62,10 @@ export function ServerURLForm(props: {
             }}
             className="contents"
         >
-            <fieldset disabled={ctx?.isPending} className="contents">
+            <fieldset disabled={stateContext?.isPending} className="contents">
                 <input type="hidden" name="block" value={context.blockKey} />
                 {children}
-                {ctx?.state?.edit && servers.length > 1 ? (
+                {stateContext?.state?.edit && servers.length > 1 ? (
                     <ServerSelector
                         servers={servers}
                         currentIndex={serverIndex}
@@ -76,18 +76,22 @@ export function ServerURLForm(props: {
                     <button
                         className="openapi-edit-button ml-2"
                         onClick={() => {
-                            const state = { ...ctx?.state };
+                            const state = { ...stateContext?.state };
                             delete state.edit;
                             update({
                                 server: `${serverIndex}`,
                                 ...state,
-                                ...(ctx?.state?.edit ? { serverUrl: getServersURL(servers, state) } : { edit: 'true' }),
+                                ...(stateContext?.state?.edit
+                                    ? { serverUrl: getServersURL(servers, state) }
+                                    : { edit: 'true' }),
                             });
                         }}
-                        title={ctx?.state?.edit ? undefined : 'Try different server options'}
-                        aria-label={ctx?.state?.edit ? 'Clear' : 'Edit'}
+                        title={
+                            stateContext?.state?.edit ? undefined : 'Try different server options'
+                        }
+                        aria-label={stateContext?.state?.edit ? 'Clear' : 'Edit'}
                     >
-                        {ctx?.state?.edit ? context.icons.clear : context.icons.edit}
+                        {stateContext?.state?.edit ? context.icons.clear : context.icons.edit}
                     </button>
                 ) : null}
             </fieldset>
