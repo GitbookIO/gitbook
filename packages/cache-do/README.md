@@ -10,7 +10,7 @@ The cache backend is optimized for performances by being distributed and accessi
 
 To achieve a good balance between **performances** and **consistency**, cache objects are distributed over 7 locations, representing continents.
 
-It makes it possible to pirge all 7 locations in one go and achieve fast consistency.
+It makes it possible to purge all 7 locations in one go and achieve fast consistency.
 
 ### Concepts
 
