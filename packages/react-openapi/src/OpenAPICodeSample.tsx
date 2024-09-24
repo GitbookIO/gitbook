@@ -52,10 +52,7 @@ export function OpenAPICodeSample(props: {
     const requestBody = noReference(data.operation.requestBody);
     const requestBodyContent = requestBody ? Object.entries(requestBody.content)[0] : undefined;
     const input: CodeSampleInput = {
-        url:
-            serverUrl +
-            data.path +
-            (searchParams.size ? `?${searchParams.toString()}` : ''),
+        url: serverUrl + data.path + (searchParams.size ? `?${searchParams.toString()}` : ''),
         method: data.method,
         body: requestBodyContent
             ? generateMediaTypeExample(requestBodyContent[1], { onlyRequired: true })
