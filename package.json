@@ -16,6 +16,7 @@
         "e2e": "turbo run e2e",
         "changeset": "changeset",
         "release": "turbo run release && changeset publish",
+        "release:preview": "turbo run release:preview",
         "download:env": "op read op://gitbook-x-dev/gitbook-open/.env.local >> .env.local",
         "clean": "turbo run clean"
     },
