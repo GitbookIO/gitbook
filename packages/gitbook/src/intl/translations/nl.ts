@@ -8,7 +8,7 @@ export const nl: TranslationLanguage = {
     switch_to_light_theme: 'Schakel over naar lichte modus',
     switch_to_system_theme: 'Schakel over naar systeemmodus',
     search: 'Zoeken',
-    search_or_ask: 'Stel een vraag of zoek',
+    search_or_ask: 'Zoek of vraag',
     search_input_placeholder: 'Zoek inhoud',
     search_ask_input_placeholder: 'Zoek inhoud of stel een vraag',
     search_no_results: 'Geen resultaten voor "${1}".',
