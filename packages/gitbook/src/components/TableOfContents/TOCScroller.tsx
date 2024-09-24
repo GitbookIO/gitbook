@@ -57,9 +57,9 @@ export function useScrollToActiveTOCItem(tocItem: {
     }, [linkRef, scrollContainerRef]);
 
     React.useLayoutEffect(() => {
-        if (!isActive) { 
+        if (!isActive) {
             isScrolled.current = false;
-            return; 
+            return;
         }
 
         if (!isOutOfView() || isScrolled.current) {
