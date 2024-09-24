@@ -37,3 +37,24 @@ jobs:
                   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
                   CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    release-preview:
+        # For now it releases the cache-do to both preview and production
+        # Once we changed to deploy the app only on release, we should change `release:preview` in `cache-do`
+        name: Release Preview
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Repo
+              uses: actions/checkout@v3
+            - name: Setup bun
+              uses: oven-sh/setup-bun@v1
+              with:
+                  bun-version: 1.1.18
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+              env:
+                  PUPPETEER_SKIP_DOWNLOAD: 1
+            - name: Release preview packages
+              run: bun run release:preview
+              env:
+                  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+                  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

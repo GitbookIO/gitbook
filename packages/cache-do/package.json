@@ -29,7 +29,7 @@
         "typecheck": "tsc --noEmit",
         "dev": "tsc -w",
         "release": "wrangler deploy",
-        "release:preview": "wrangler deploy --env preview"
+        "release:preview": "wrangler deploy && wrangler deploy --env preview"
     },
     "files": [
         "dist",
