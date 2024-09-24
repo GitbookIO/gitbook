@@ -66,5 +66,8 @@ function isOutOfView(tocItem: HTMLElement, tocContainer: HTMLElement) {
     const tocItemTop = tocItem.offsetTop;
     const containerTop = tocContainer.scrollTop;
     const containerBottom = containerTop + tocContainer.clientHeight;
-    return tocItemTop < containerTop + TOC_ITEM_OFFSET || tocItemTop > containerBottom - TOC_ITEM_OFFSET;
+    return (
+        tocItemTop < containerTop + TOC_ITEM_OFFSET ||
+        tocItemTop > containerBottom - TOC_ITEM_OFFSET
+    );
 }
