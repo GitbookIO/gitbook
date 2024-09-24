@@ -9,8 +9,8 @@ export const cacheBackends = [
     memoryCache,
     // Cache local to the datacenter
     // It can't be purged globally but it's faster
-    // cloudflareCache,
+    cloudflareCache,
     // Cache global, but with slow replication
-    // cloudflareKVCache,
+    cloudflareKVCache,
     cloudflareDOCache,
 ];
