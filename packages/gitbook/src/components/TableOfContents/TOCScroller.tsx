@@ -4,20 +4,19 @@ import React from 'react';
 
 import { ClassValue, tcls } from '@/lib/tailwind';
 
-const TOCScrollContainerRefContext = React.createContext<React.RefObject<HTMLDivElement> | null>(null);
+const TOCScrollContainerRefContext = React.createContext<React.RefObject<HTMLDivElement> | null>(
+    null,
+);
 
 function useTOCScrollContainerRefContext() {
     const ctx = React.useContext(TOCScrollContainerRefContext);
     if (!ctx) {
-        throw new Error("Context `TOCScrollContainerRefContext` must be used within Provider");
+        throw new Error('Context `TOCScrollContainerRefContext` must be used within Provider');
     }
     return ctx;
 }
 
-export function TOCScrollContainer(props: {
-    children: React.ReactNode;
-    className?: ClassValue;
-}) {
+export function TOCScrollContainer(props: { children: React.ReactNode; className?: ClassValue }) {
     const { children, className } = props;
     const scrollContainerRef = React.createRef<HTMLDivElement>();
 
@@ -67,8 +66,5 @@ function isOutOfView(tocItem: HTMLElement, tocContainer: HTMLElement) {
     const tocItemTop = tocItem.offsetTop;
     const containerTop = tocContainer.scrollTop;
     const containerBottom = containerTop + tocContainer.clientHeight;
-    return (
-        tocItemTop < containerTop ||
-        tocItemTop > containerBottom 
-    );
+    return tocItemTop < containerTop || tocItemTop > containerBottom;
 }
