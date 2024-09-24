@@ -1,6 +1,7 @@
 {
     "name": "@gitbook/cache-do",
     "type": "module",
+    "private": true,
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
