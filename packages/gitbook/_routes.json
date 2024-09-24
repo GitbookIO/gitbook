@@ -1,4 +1,4 @@
 {
-	"version": 1,
-	"exclude": ["/~gitbook/static/*"]
+    "version": 1,
+    "exclude": ["/~gitbook/static/*"]
 }
