@@ -65,11 +65,14 @@ export function useScrollToActiveTOCItem(props: {
             return;
         }
         const tocItem = linkRef.current;
-        tocItem?.scrollIntoView({
-            behavior: 'instant', // using instant as smooth can interrupt or get interrupted by other `scrollIntoView` changes
-            block: 'center',
+        const tocContainer = scrollContainerRef?.current;
+        if (!tocItem || !tocContainer) {
+            return;
+        }
+        tocContainer?.scrollTo({
+            top: tocItem.offsetTop - TOC_ITEM_OFFSET,
         });
         isScrolled.current = true;
         // We've included `hash` from `useHash` hook as a dependency so we trigger the effect in response to changes to the url hash
-    }, [hash, isActive, isOutOfView, linkRef]);
+    }, [hash, isActive, isOutOfView, linkRef, scrollContainerRef]);
 }
