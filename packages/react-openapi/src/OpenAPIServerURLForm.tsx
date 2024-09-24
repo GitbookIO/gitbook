@@ -5,6 +5,7 @@ import { OpenAPIClientContext } from './types';
 import { OpenAPIV3 } from 'openapi-types';
 import { ServerSelector } from './ServerSelector';
 import { useOpenAPIContext } from './OpenAPIContextProvider';
+import { getServersURL } from './utils';
 
 export function ServerURLForm(props: {
     children: React.ReactNode;
@@ -80,7 +81,7 @@ export function ServerURLForm(props: {
                             update({
                                 server: `${serverIndex}`,
                                 ...state,
-                                ...(ctx?.state?.edit ? undefined : { edit: 'true' }),
+                                ...(ctx?.state?.edit ? { serverUrl: getServersURL(servers, state) } : { edit: 'true' }),
                             });
                         }}
                         title={ctx?.state?.edit ? undefined : 'Try different server options'}
