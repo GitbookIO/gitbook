@@ -20,5 +20,3 @@ Cache tags should not contain a large set of unique keys. Exceeding thousands co
 **Cache key**: unique key in the cache environment. Each key should be assigned to a `tag`.
 
 **Location**: cache is distributed over 7 unique locations, one for each continent.
-
-

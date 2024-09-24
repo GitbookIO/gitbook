@@ -4,6 +4,21 @@ export type CacheLocationId = ContinentCode;
 const allLocations: CacheLocationId[] = ['AF', 'AS', 'NA', 'SA', 'AN', 'EU', 'OC'];
 
 /**
+ * Location hint for the CacheObject durable object.
+ */
+const doLocationHints: {
+    [key in CacheLocationId]: DurableObjectLocationHint;
+} = {
+    AF: 'afr',
+    AS: 'apac',
+    NA: 'wnam',
+    SA: 'sam',
+    AN: 'oc',
+    EU: 'weur',
+    OC: 'oc',
+};
+
+/**
  * Client to access a cache tag.
  */
 export class CacheObjectStub {
@@ -24,7 +39,12 @@ export class CacheObjectStub {
     async open() {
         if (!this.opened) {
             const groupId = getCacheObjectIdName(this.locationId, this.tag);
-            const cacheGroup = this.doNamespace.get(this.doNamespace.idFromName(groupId));
+            const cacheGroup = this.doNamespace.get(this.doNamespace.idFromName(groupId), {
+                // Initialize the object with a locaiton hint,
+                // as we might want to purge all locations before the object is created.
+                // https://developers.cloudflare.com/durable-objects/reference/data-location/
+                locationHint: doLocationHints[this.locationId],
+            });
             this.opened = await cacheGroup.open();
         }
 
