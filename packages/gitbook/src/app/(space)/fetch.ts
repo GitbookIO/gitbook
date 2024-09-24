@@ -224,7 +224,7 @@ async function fetchParentSite(args: {
 
     return {
         parent,
-        spaces: Object.values(spaces),
+        spaces,
     };
 }
 
