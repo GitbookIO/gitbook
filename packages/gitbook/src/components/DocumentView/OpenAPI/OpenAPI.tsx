@@ -8,6 +8,7 @@ import { fetchOpenAPIBlock } from '@/lib/openapi';
 import { tcls } from '@/lib/tailwind';
 
 import OpenAPIContext from './OpenAPIContext';
+import { serverUrlCache } from './ServerUrlCache';
 import { BlockProps } from '../Block';
 import { PlainCodeBlock } from '../CodeBlock';
 
@@ -46,6 +47,8 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockSwagger>) {
         return null;
     }
 
+    const serverUrl = serverUrlCache.get('serverUrl');
+
     return (
         <OpenAPIContext block={block} data={data}>
             <OpenAPIOperation
@@ -61,6 +64,7 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockSwagger>) {
                     defaultInteractiveOpened: context.mode === 'print',
                     id: block.meta?.id,
                     blockKey: block.key,
+                    serverUrl
                 }}
                 className="openapi-block"
             />

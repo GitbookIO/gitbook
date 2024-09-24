@@ -48,11 +48,12 @@ export function OpenAPICodeSample(props: {
         }
     });
 
+    const serverUrl = context.serverUrl ?? getServersURL(data.servers);
     const requestBody = noReference(data.operation.requestBody);
     const requestBodyContent = requestBody ? Object.entries(requestBody.content)[0] : undefined;
     const input: CodeSampleInput = {
         url:
-            getServersURL(data.servers, context.enumSelectors) +
+            serverUrl +
             data.path +
             (searchParams.size ? `?${searchParams.toString()}` : ''),
         method: data.method,

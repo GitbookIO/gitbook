@@ -27,11 +27,10 @@ export interface OpenAPIClientContext {
      * Optional id attached to the OpenAPI Operation heading and used as an anchor
      */
     id?: string;
-
     /**
-     * Selectors to update openapi enums, e.g. for server url variables
+     * Optional serverUrl to use with OpenAPI operations
      */
-    enumSelectors?: Record<string, string>;
+    serverUrl?: string | null;
 }
 
 export interface OpenAPIFetcher {
