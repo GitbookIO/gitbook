@@ -17,7 +17,7 @@ interface KVTagMetadata {
 export const cloudflareKVCache: CacheBackend = {
     name: 'cloudflare-kv',
     replication: 'global',
-    async get(key, options) {
+    async get({ key }, options) {
         const kv = await getKVNamespace();
         if (!kv) {
             return null;
@@ -42,7 +42,7 @@ export const cloudflareKVCache: CacheBackend = {
             },
         );
     },
-    async set(key, entry) {
+    async set(entry) {
         const kv = await getKVNamespace();
         if (!kv) {
             return;
@@ -51,7 +51,7 @@ export const cloudflareKVCache: CacheBackend = {
         return trace(
             {
                 operation: `cloudflareKV.set`,
-                name: key,
+                name: entry.meta.key,
             },
             async () => {
                 const secondsFromNow = getCacheMaxAge(entry.meta, 0, 60 * 60 * 24);
@@ -61,54 +61,45 @@ export const cloudflareKVCache: CacheBackend = {
                     return;
                 }
 
-                const kvKey = getValueKey(key);
+                const kvKey = getValueKey(entry.meta.key);
                 await kv.put(kvKey, JSON.stringify(entry), {
                     expirationTtl: secondsFromNow,
                 });
 
-                if (entry.meta.tags.length > 0) {
+                if (entry.meta.tag) {
                     const metadata: KVTagMetadata = {
                         meta: entry.meta,
                     };
                     const jsonMetadata = JSON.stringify(metadata);
+                    const tagKey = getTagKey(entry.meta.tag, entry.meta.key);
 
-                    // Write a key for each tag
-                    await Promise.all(
-                        entry.meta.tags.map(async (tag) => {
-                            const tagKey = getTagKey(tag, key);
-
-                            await kv.put(tagKey, jsonMetadata, {
-                                metadata,
-                                expirationTtl: secondsFromNow,
-                            });
-                        }),
-                    );
+                    await kv.put(tagKey, jsonMetadata, {
+                        metadata,
+                        expirationTtl: secondsFromNow,
+                    });
                 }
             },
         );
     },
-    async del(keys) {
+    async del(entries) {
         const kv = await getKVNamespace();
         if (!kv) {
             return;
         }
 
         await Promise.all(
-            keys.map(async (key) => {
+            entries.map(async ({ key }) => {
                 const kvKey = getValueKey(key);
                 await kv.delete(kvKey);
             }),
         );
     },
     async revalidateTags(tags) {
-        const result: { keys: string[]; metas: CacheEntryMeta[] } = {
-            keys: [],
-            metas: [],
-        };
+        const result: CacheEntryMeta[] = [];
 
         const kv = await getKVNamespace();
         if (!kv) {
-            return result;
+            return { entries: result };
         }
 
         const pendingDeletions: Array<Promise<unknown>> = [];
@@ -125,8 +116,7 @@ export const cloudflareKVCache: CacheBackend = {
                     const metadata = entry.metadata;
                     const key = metadata.meta.key;
 
-                    result.metas.push(metadata.meta);
-                    result.keys.push(key);
+                    result.push(metadata.meta);
 
                     // Delete the tag key and the value key
                     pendingDeletions.push(kv.delete(getValueKey(key)));
@@ -147,7 +137,7 @@ export const cloudflareKVCache: CacheBackend = {
 
         await Promise.all(pendingDeletions);
 
-        return result;
+        return { entries: result };
     },
 };
 

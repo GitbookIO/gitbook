@@ -46,7 +46,13 @@
         },
         // Script run when the package is deployed
         "release": {
-            "dependsOn": ["^release", "build"]
+            "dependsOn": ["^release", "build"],
+            "env": ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN"]
+        },
+        // Script to run when deploying on main to preview/staging
+        "release:preview": {
+            "dependsOn": ["^release:preview", "build"],
+            "env": ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN"]
         },
         // Clean up the package
         "clean": {

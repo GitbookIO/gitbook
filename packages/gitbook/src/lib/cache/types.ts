@@ -1,6 +1,9 @@
-export interface CacheEntryMeta {
+export interface CacheEntryLookup {
     key: string;
+    tag?: string;
+}
 
+export interface CacheEntryMeta extends CacheEntryLookup {
     /**
      * Timestamp when the entry was created.
      */
@@ -20,12 +23,6 @@ export interface CacheEntryMeta {
      * Timestamp after which the entry should be revalidated.
      */
     revalidatesAt?: number;
-
-    /**
-     * Tags associated with the entry, used for revalidation.
-     * If no tags is present, the entry is considered immutable.
-     */
-    tags: string[];
 
     /**
      * Arguments that were passed to the function.
@@ -51,21 +48,21 @@ export interface CacheBackend {
     /**
      * Get a value from the cache.
      */
-    get(key: string, options?: { signal?: AbortSignal }): Promise<CacheEntry | null>;
+    get(entry: CacheEntryLookup, options?: { signal?: AbortSignal }): Promise<CacheEntry | null>;
 
     /**
      * Set a value in the cache.
      */
-    set(key: string, entry: CacheEntry): Promise<void>;
+    set(entry: CacheEntry): Promise<void>;
 
     /**
      * Delete a value from the cache.
      */
-    del(keys: string[]): Promise<void>;
+    del(keys: CacheEntryLookup[]): Promise<void>;
 
     /**
      * Revalidate all keys associated with tags.
      * It should return the meta of all entries that were revalidated.
      */
-    revalidateTags(tags: string[]): Promise<{ keys: string[]; metas: CacheEntryMeta[] }>;
+    revalidateTags(tags: string[]): Promise<{ entries: Array<CacheEntryLookup | CacheEntryMeta> }>;
 }
