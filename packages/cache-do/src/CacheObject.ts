@@ -7,11 +7,18 @@ export interface CacheObjectDescriptor {
     set: <Value = unknown>(key: string, value: Value, expiresAt: number) => Promise<void>;
 }
 
+/**
+ * Value stored in a cuncked binary msgpack format.
+ * Stored under the key `prop.${key}.${index}`. 
+ */
 interface CacheObjectProp<Value = unknown> {
     value: Value;
     expiresAt: number;
 }
 
+/**
+ * Expiration clock stored under the key `exp.${expiresAt}.${key}`.
+ */
 interface CacheObjectExp {
     /** Key of the property */
     k: string;
@@ -19,6 +26,9 @@ interface CacheObjectExp {
     c: number;
 }
 
+/**
+ * Durable Object class being deployed as a distributed cache.
+ */
 export class CacheObject extends DurableObject {
     private lru = new LRUMap<string, { match: CacheObjectProp | undefined }>(500);
 
