@@ -3,6 +3,7 @@ import { Metadata, Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import React from 'react';
 
+import { serverUrlCache } from '@/components/DocumentView/OpenAPI/ServerUrlCache';
 import { PageAside } from '@/components/PageAside';
 import { PageBody, PageCover } from '@/components/PageBody';
 import { PageHrefContext, absoluteHref, pageHref } from '@/lib/links';
@@ -25,6 +26,8 @@ export default async function Page(props: {
     searchParams: { fallback?: string };
 }) {
     const { params, searchParams } = props;
+
+    serverUrlCache.parse(searchParams);
 
     const {
         content: contentPointer,
