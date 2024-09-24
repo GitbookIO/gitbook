@@ -9,7 +9,7 @@ export interface OpenAPIClientContext {
         chevronDown: React.ReactNode;
         chevronRight: React.ReactNode;
         edit: React.ReactNode;
-        clear: React.ReactNode;
+        editDone: React.ReactNode;
     };
 
     /**

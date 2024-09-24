@@ -91,7 +91,7 @@ export function ServerURLForm(props: {
                         }
                         aria-label={stateContext?.state?.edit ? 'Clear' : 'Edit'}
                     >
-                        {stateContext?.state?.edit ? context.icons.clear : context.icons.edit}
+                        {stateContext?.state?.edit ? context.icons.editDone : context.icons.edit}
                     </button>
                 ) : null}
             </fieldset>
