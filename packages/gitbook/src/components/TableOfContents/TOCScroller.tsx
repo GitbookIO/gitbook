@@ -29,11 +29,11 @@ const TOC_ITEM_OFFSET = 200;
 /**
  * Scrolls the table of contents container to the page item when it becomes active
  */
-export function useScrollToActiveTOCItem(tocItem: {
+export function useScrollToActiveTOCItem(props: {
     isActive: boolean;
     linkRef: React.RefObject<HTMLAnchorElement>;
 }) {
-    const { isActive, linkRef } = tocItem;
+    const { isActive, linkRef } = props;
 
     const hash = useHash();
     const scrollContainerRef = React.useContext(TOCScrollContainerContext);
@@ -61,13 +61,10 @@ export function useScrollToActiveTOCItem(tocItem: {
             isScrolled.current = false;
             return;
         }
-
         if (!isOutOfView() || isScrolled.current) {
             return;
         }
-
         const tocItem = linkRef.current;
-        console.log({ isActive, scrollToView: tocItem?.textContent });
         tocItem?.scrollIntoView({
             behavior: 'instant', // using instant as smooth can interrupt or get interrupted by other `scrollIntoView` changes
             block: 'center',
