@@ -1,19 +1,21 @@
 import type { CacheObject, CacheObjectDescriptor } from './CacheObject';
 
 export type CacheLocationId = ContinentCode;
-
 const allLocations: CacheLocationId[] = ['AF', 'AS', 'NA', 'SA', 'AN', 'EU', 'OC'];
 
 /**
- * Client to access a tag in the cache.
+ * Client to access a cache tag.
  */
 export class CacheObjectStub {
     private opened: CacheObjectDescriptor | null = null;
 
     constructor(
+        /** Binding to the CacheObject durable object */
         private doNamespace: DurableObjectNamespace<CacheObject>,
+        /** ID of the location to target */
         private locationId: CacheLocationId,
-        private objectId: string,
+        /** Name of the tag */
+        private tag: string,
     ) {}
 
     /**
@@ -21,7 +23,7 @@ export class CacheObjectStub {
      */
     async open() {
         if (!this.opened) {
-            const groupId = getCacheGroupIdName(this.locationId, this.objectId);
+            const groupId = getCacheObjectIdName(this.locationId, this.tag);
             const cacheGroup = this.doNamespace.get(this.doNamespace.idFromName(groupId));
             this.opened = await cacheGroup.open();
         }
@@ -53,7 +55,7 @@ export class CacheObjectStub {
         const keys = new Set<string>();
         await Promise.all(
             allLocations.map(async (locationId) => {
-                const groupId = getCacheGroupIdName(locationId, this.objectId);
+                const groupId = getCacheObjectIdName(locationId, this.tag);
                 const cacheGroup = this.doNamespace.get(this.doNamespace.idFromName(groupId));
                 const locationkeys = await cacheGroup.purge();
                 locationkeys.forEach((key) => keys.add(key));
@@ -64,6 +66,6 @@ export class CacheObjectStub {
     }
 }
 
-function getCacheGroupIdName(locationId: CacheLocationId, objectId: string): string {
-    return `${locationId}:${objectId}`;
+function getCacheObjectIdName(locationId: CacheLocationId, tag: string): string {
+    return `${locationId}:${tag}`;
 }
