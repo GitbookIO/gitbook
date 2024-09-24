@@ -13,7 +13,7 @@ import { ScalarApiClient } from './ScalarApiButton';
 /**
  * Display an interactive OpenAPI operation.
  */
-export async function OpenAPIOperation(props: {
+export function OpenAPIOperation(props: {
     className?: string;
     data: OpenAPIOperationData;
     context: OpenAPIContextProps;
