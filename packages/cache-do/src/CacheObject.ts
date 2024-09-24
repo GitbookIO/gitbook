@@ -36,6 +36,7 @@ export class CacheObject extends DurableObject {
      * Open a descriptor to access the cache object.
      * The goal is to minimize the amount of RPC sessions between the client and the cache object.
      * One session is opened per request on the client side and used to perform multiple operations.
+     * https://developers.cloudflare.com/workers/runtime-apis/rpc/#return-functions-from-rpc-methods
      */
     public open(): CacheObjectDescriptor {
         return {
