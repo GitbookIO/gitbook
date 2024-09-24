@@ -4,11 +4,17 @@ import React from 'react';
 
 import { ClassValue, tcls } from '@/lib/tailwind';
 
-import { useHash } from '../hooks';
+const TOCScrollContainerRefContext = React.createContext<React.RefObject<HTMLDivElement> | null>(null);
 
-const TOCScrollContainerContext = React.createContext<React.RefObject<HTMLDivElement> | null>(null);
+function useTOCScrollContainerRefContext() {
+    const ctx = React.useContext(TOCScrollContainerRefContext);
+    if (!ctx) {
+        throw new Error("Context `TOCScrollContainerRefContext` must be used within Provider");
+    }
+    return ctx;
+}
 
-export function TOCScrollContainerProvider(props: {
+export function TOCScrollContainer(props: {
     children: React.ReactNode;
     className?: ClassValue;
 }) {
@@ -16,16 +22,17 @@ export function TOCScrollContainerProvider(props: {
     const scrollContainerRef = React.createRef<HTMLDivElement>();
 
     return (
-        <TOCScrollContainerContext.Provider value={scrollContainerRef}>
+        <TOCScrollContainerRefContext.Provider value={scrollContainerRef}>
             <div ref={scrollContainerRef} className={tcls(className)}>
                 {children}
             </div>
-        </TOCScrollContainerContext.Provider>
+        </TOCScrollContainerRefContext.Provider>
     );
 }
 
 // Offset to scroll the table of contents item by.
 const TOC_ITEM_OFFSET = 200;
+
 /**
  * Scrolls the table of contents container to the page item when it becomes active
  */
@@ -34,45 +41,34 @@ export function useScrollToActiveTOCItem(props: {
     linkRef: React.RefObject<HTMLAnchorElement>;
 }) {
     const { isActive, linkRef } = props;
-
-    const hash = useHash();
-    const scrollContainerRef = React.useContext(TOCScrollContainerContext);
+    const scrollContainerRef = useTOCScrollContainerRefContext();
     const isScrolled = React.useRef(false);
-
-    const isOutOfView = React.useCallback(() => {
-        if (linkRef.current && scrollContainerRef?.current) {
-            const tocItem = linkRef.current;
-            const tocContainer = scrollContainerRef.current;
-
-            const tocItemTop = tocItem.offsetTop;
-            const containerTop = tocContainer.scrollTop;
-            const containerBottom = containerTop + tocContainer.clientHeight;
-
-            return (
-                tocItemTop < containerTop + TOC_ITEM_OFFSET ||
-                tocItemTop > containerBottom - TOC_ITEM_OFFSET
-            );
-        }
-        return false;
-    }, [linkRef, scrollContainerRef]);
-
     React.useLayoutEffect(() => {
         if (!isActive) {
             isScrolled.current = false;
             return;
         }
-        if (!isOutOfView() || isScrolled.current) {
+        if (isScrolled.current) {
             return;
         }
         const tocItem = linkRef.current;
-        const tocContainer = scrollContainerRef?.current;
-        if (!tocItem || !tocContainer) {
+        const tocContainer = scrollContainerRef.current;
+        if (!tocItem || !tocContainer || !isOutOfView(tocItem, tocContainer)) {
             return;
         }
         tocContainer?.scrollTo({
             top: tocItem.offsetTop - TOC_ITEM_OFFSET,
         });
         isScrolled.current = true;
-        // We've included `hash` from `useHash` hook as a dependency so we trigger the effect in response to changes to the url hash
-    }, [hash, isActive, isOutOfView, linkRef, scrollContainerRef]);
+    }, [isActive, linkRef, scrollContainerRef]);
+}
+
+function isOutOfView(tocItem: HTMLElement, tocContainer: HTMLElement) {
+    const tocItemTop = tocItem.offsetTop;
+    const containerTop = tocContainer.scrollTop;
+    const containerBottom = containerTop + tocContainer.clientHeight;
+    return (
+        tocItemTop < containerTop ||
+        tocItemTop > containerBottom 
+    );
 }
