@@ -3,11 +3,12 @@ import { TranslationLanguage } from './types';
 export const ja: TranslationLanguage = {
     locale: 'ja',
     powered_by_gitbook: 'GitBook提供',
+    sponsored_via_gitbook: 'GitBookスポンサー',
     switch_to_dark_theme: 'ダークテーマに切り替え',
     switch_to_light_theme: 'ライトテーマに切り替え',
     switch_to_system_theme: 'システムのテーマに切り替え',
     search: '検索',
-    search_or_ask: '質問するか検索する',
+    search_or_ask: '質問または検索',
     search_input_placeholder: 'コンテンツを検索',
     search_ask_input_placeholder: 'コンテンツを検索するか質問をする',
     search_no_results: '"${1}" の結果はありません。',

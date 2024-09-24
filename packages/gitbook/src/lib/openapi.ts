@@ -19,12 +19,12 @@ export async function fetchOpenAPIBlock(
     block: DocumentBlockSwagger,
     resolveContentRef: (ref: ContentRef) => Promise<ResolvedContentRef | null>,
 ): Promise<
-    | { data: OpenAPIOperationData | null; specUrl: string | null; error?: undefined }
-    | { error: OpenAPIFetchError; data?: undefined; specUrl?: undefined }
+    | { data: OpenAPIOperationData | null; error?: undefined }
+    | { error: OpenAPIFetchError; data?: undefined }
 > {
     const resolved = block.data.ref ? await resolveContentRef(block.data.ref) : null;
     if (!resolved || !block.data.path || !block.data.method) {
-        return { data: null, specUrl: null };
+        return { data: null };
     }
 
     try {
@@ -37,7 +37,7 @@ export async function fetchOpenAPIBlock(
             fetcher,
         );
 
-        return { data, specUrl: resolved.href };
+        return { data };
     } catch (error) {
         if (error instanceof OpenAPIFetchError) {
             return { error };
@@ -48,27 +48,30 @@ export async function fetchOpenAPIBlock(
 }
 
 const fetcher: OpenAPIFetcher = {
-    fetch: cache('openapi.fetch', async (url: string, options: CacheFunctionOptions) => {
-        // Wrap the raw string to prevent invalid URLs from being passed to fetch.
-        // This can happen if the URL has whitespace, which is currently handled differently by Cloudflare's implementation of fetch:
-        // https://github.com/cloudflare/workerd/issues/1957
-        const response = await fetch(new URL(url), {
-            ...noCacheFetchOptions,
-            signal: options.signal,
-        });
+    fetch: cache({
+        name: 'openapi.fetch',
+        get: async (url: string, options: CacheFunctionOptions) => {
+            // Wrap the raw string to prevent invalid URLs from being passed to fetch.
+            // This can happen if the URL has whitespace, which is currently handled differently by Cloudflare's implementation of fetch:
+            // https://github.com/cloudflare/workerd/issues/1957
+            const response = await fetch(new URL(url), {
+                ...noCacheFetchOptions,
+                signal: options.signal,
+            });
 
-        if (!response.ok) {
-            throw new Error(
-                `Failed to fetch OpenAPI file: ${response.status} ${response.statusText}`,
-            );
-        }
+            if (!response.ok) {
+                throw new Error(
+                    `Failed to fetch OpenAPI file: ${response.status} ${response.statusText}`,
+                );
+            }
 
-        const text = await response.text();
-        const data = await parseOpenAPIV3(url, text);
-        return {
-            ...parseCacheResponse(response),
-            data,
-        };
+            const text = await response.text();
+            const data = await parseOpenAPIV3(url, text);
+            return {
+                ...parseCacheResponse(response),
+                data,
+            };
+        },
     }),
     parseMarkdown,
 };

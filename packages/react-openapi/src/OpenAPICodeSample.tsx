@@ -1,8 +1,8 @@
 import * as React from 'react';
 
 import { CodeSampleInput, codeSampleGenerators } from './code-samples';
-import { OpenAPIOperationData } from './fetchOpenAPIOperation';
-import { generateMediaTypeExample } from './generateSchemaExample';
+import { OpenAPIOperationData, toJSON } from './fetchOpenAPIOperation';
+import { generateMediaTypeExample, generateSchemaExample } from './generateSchemaExample';
 import { InteractiveSection } from './InteractiveSection';
 import { getServersURL } from './OpenAPIServerURL';
 import { ScalarApiButton } from './ScalarApiButton';
@@ -19,17 +19,51 @@ export function OpenAPICodeSample(props: {
 }) {
     const { data, context } = props;
 
+    const searchParams = new URLSearchParams();
+    const headersObject: { [k: string]: string } = {};
+
+    data.operation.parameters?.forEach((rawParam) => {
+        const param = noReference(rawParam);
+        if (!param) {
+            return;
+        }
+
+        if (param.in === 'header' && param.required) {
+            const example = param.schema
+                ? generateSchemaExample(noReference(param.schema))
+                : undefined;
+            if (example !== undefined) {
+                headersObject[param.name] =
+                    typeof example !== 'string' ? JSON.stringify(example) : example;
+            }
+        } else if (param.in === 'query' && param.required) {
+            const example = param.schema
+                ? generateSchemaExample(noReference(param.schema))
+                : undefined;
+            if (example !== undefined) {
+                searchParams.append(
+                    param.name,
+                    String(Array.isArray(example) ? example[0] : example),
+                );
+            }
+        }
+    });
+
     const requestBody = noReference(data.operation.requestBody);
     const requestBodyContent = requestBody ? Object.entries(requestBody.content)[0] : undefined;
 
     const input: CodeSampleInput = {
-        url: getServersURL(data.servers) + data.path,
+        url:
+            getServersURL(data.servers) +
+            data.path +
+            (searchParams.size ? `?${searchParams.toString()}` : ''),
         method: data.method,
         body: requestBodyContent
             ? generateMediaTypeExample(requestBodyContent[1], { onlyRequired: true })
             : undefined,
         headers: {
             ...getSecurityHeaders(data.securities),
+            ...headersObject,
             ...(requestBodyContent
                 ? {
                       'Content-Type': requestBodyContent[0],
@@ -53,11 +87,19 @@ export function OpenAPICodeSample(props: {
     (['x-custom-examples', 'x-code-samples', 'x-codeSamples'] as const).forEach((key) => {
         const customSamples = data.operation[key];
         if (customSamples && Array.isArray(customSamples)) {
-            customCodeSamples = customSamples.map((sample) => ({
-                key: `redocly-${sample.lang}`,
-                label: sample.label,
-                body: <context.CodeBlock code={sample.source} syntax={sample.lang} />,
-            }));
+            customCodeSamples = customSamples
+                .filter((sample) => {
+                    return (
+                        typeof sample.label === 'string' &&
+                        typeof sample.source === 'string' &&
+                        typeof sample.lang === 'string'
+                    );
+                })
+                .map((sample) => ({
+                    key: `redocly-${sample.lang}`,
+                    label: sample.label,
+                    body: <context.CodeBlock code={sample.source} syntax={sample.lang} />,
+                }));
         }
     });
 
@@ -70,6 +112,11 @@ export function OpenAPICodeSample(props: {
         return null;
     }
 
+    async function fetchOperationData() {
+        'use server';
+        return toJSON(data);
+    }
+
     return (
         <InteractiveSection
             header="Request"
@@ -77,7 +124,7 @@ export function OpenAPICodeSample(props: {
             tabs={samples}
             overlay={
                 data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'] ? null : (
-                    <ScalarApiButton />
+                    <ScalarApiButton fetchOperationData={fetchOperationData} />
                 )
             }
         />

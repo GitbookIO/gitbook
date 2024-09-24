@@ -216,6 +216,15 @@ export async function middleware(request: NextRequest) {
         }
     }
 
+    // For tests, we make it possible to enable search indexation
+    // using a query parameter.
+    const xGitBookSearchIndexation =
+        headers.get('x-gitbook-search-indexation') ??
+        url.searchParams.has('x-gitbook-search-indexation');
+    if (xGitBookSearchIndexation) {
+        headers.set('x-gitbook-search-indexation', 'true');
+    }
+
     if (resolved.revision) {
         headers.set('x-gitbook-content-revision', resolved.revision);
     }

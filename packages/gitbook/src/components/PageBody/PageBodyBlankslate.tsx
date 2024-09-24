@@ -17,7 +17,8 @@ export async function PageBodyBlankslate(props: {
 }) {
     const { page, rootPages, context } = props;
 
-    if (!page.pages.length) {
+    const pages = page.pages.filter((child) => (child.type === 'document' ? !child.hidden : true));
+    if (!pages.length) {
         return null;
     }
 
@@ -34,7 +35,7 @@ export async function PageBodyBlankslate(props: {
             )}
         >
             {await Promise.all(
-                page.pages.map(async (child) => {
+                pages.map(async (child) => {
                     const icon = (
                         <PageIcon
                             page={child}

@@ -1,4 +1,6 @@
 .openapi-operation {
+    content-visibility: auto;
+    contain-intrinsic-height: 600px;
     @apply flex-1 flex flex-col gap-6;
 }
 
@@ -172,7 +174,8 @@
     @apply prose-sm;
 }
 
-.openapi-schema-example {
+.openapi-schema-example,
+.openapi-schema-pattern {
     @apply prose-sm mt-2 text-dark/10 dark:text-light/10;
 }
 

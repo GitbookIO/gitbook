@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 
+import { t, useLanguage } from '@/intl/client';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { renderAd } from './renderAd';
@@ -78,7 +79,6 @@ export function Ad({
 
         (async () => {
             const result = await renderAd({
-                spaceId,
                 placement,
                 ignore: ignore || preview,
                 zoneId: realZoneId,
@@ -97,7 +97,7 @@ export function Ad({
         return () => {
             cancelled = true;
         };
-    }, [visible, spaceId, zoneId, ignore, placement, mode]);
+    }, [visible, zoneId, ignore, placement, mode]);
 
     const viaUrl = new URL('https://www.gitbook.com');
     viaUrl.searchParams.set('utm_source', 'content');
@@ -106,7 +106,39 @@ export function Ad({
 
     return (
         <div ref={containerRef} className={tcls(style)}>
-            {ad ? ad : null}
+            {ad ? (
+                <>
+                    {ad}
+                    <AdSponsoredLink spaceId={spaceId} />
+                </>
+            ) : null}
         </div>
+    );
+}
+
+function AdSponsoredLink(props: { spaceId: string }) {
+    const { spaceId } = props;
+    const language = useLanguage();
+
+    const viaUrl = new URL('https://www.gitbook.com');
+    viaUrl.searchParams.set('utm_source', 'content');
+    viaUrl.searchParams.set('utm_medium', 'sponsoring');
+    viaUrl.searchParams.set('utm_campaign', spaceId);
+
+    return (
+        <p
+            className={tcls(
+                'mt-2',
+                'mr-2',
+                'text-xs',
+                'text-right',
+                'text-dark/5',
+                'dark:text-light/5',
+            )}
+        >
+            <a target="_blank" href={viaUrl.toString()} className={tcls('hover:underline')}>
+                {t(language, 'sponsored_via_gitbook')}
+            </a>
+        </p>
     );
 }

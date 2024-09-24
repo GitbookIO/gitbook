@@ -20,11 +20,6 @@ export async function OpenAPI(props: BlockProps<DocumentBlockSwagger>) {
     const { block, style } = props;
     return (
         <div className={tcls('w-full', 'flex', 'flex-row', style, 'max-w-full')}>
-            {/*
-                Invisible span with the ID to correctly identify the active section in the aside navigation.
-                We don't use the full <div> because it can be longer than the viewport and will not work well with IntersectionObserver.
-            */}
-            <span id={block.meta?.id} />
             <React.Suspense fallback={<OpenAPIFallback />}>
                 <OpenAPIBody {...props} />
             </React.Suspense>
@@ -34,7 +29,7 @@ export async function OpenAPI(props: BlockProps<DocumentBlockSwagger>) {
 
 async function OpenAPIBody(props: BlockProps<DocumentBlockSwagger>) {
     const { block, context } = props;
-    const { data, specUrl, error } = await fetchOpenAPIBlock(block, context.resolveContentRef);
+    const { data, error } = await fetchOpenAPIBlock(block, context.resolveContentRef);
 
     if (error) {
         return (
@@ -46,7 +41,7 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockSwagger>) {
         );
     }
 
-    if (!data || !specUrl) {
+    if (!data) {
         return null;
     }
 
@@ -60,7 +55,8 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockSwagger>) {
                 },
                 CodeBlock: PlainCodeBlock,
                 defaultInteractiveOpened: context.mode === 'print',
-                specUrl,
+                id: block.meta?.id,
+                blockKey: block.key,
             }}
             className="openapi-block"
         />

@@ -51,7 +51,7 @@ export function TableOfContents(props: {
                 'dark:navigation-open:shadow-light/2',
                 withHeaderOffset ? 'lg:h-[calc(100vh_-_4rem)]' : 'lg:h-[100vh]',
                 withHeaderOffset ? 'lg:top-16' : 'lg:top-0',
-                'page-no-toc:lg:hidden',
+                'page-no-toc:hidden',
             )}
         >
             {header ? header : null}

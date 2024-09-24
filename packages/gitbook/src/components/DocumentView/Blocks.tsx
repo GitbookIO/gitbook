@@ -16,7 +16,7 @@ export function Blocks<T extends DocumentBlock, Tag extends React.ElementType = 
         /** Ancestors of the blocks */
         ancestorBlocks: DocumentBlock[];
 
-        /** HTML tag to use */
+        /** HTML tag to use for the wrapper */
         tag?: Tag;
 
         /** Style passed to the wrapper */
@@ -24,12 +24,15 @@ export function Blocks<T extends DocumentBlock, Tag extends React.ElementType = 
 
         /** Style passed to all blocks */
         blockStyle?: ClassValue;
+
+        /** Props to pass to the wrapper element */
+        wrapperProps?: React.ComponentProps<Tag>;
     },
 ) {
-    const { nodes, tag: Tag = 'div', style, blockStyle, ...contextProps } = props;
+    const { nodes, tag: Tag = 'div', style, blockStyle, wrapperProps, ...contextProps } = props;
 
     return (
-        <Tag className={tcls(style)}>
+        <Tag {...wrapperProps} className={tcls(style)}>
             {nodes.map((node, index) => (
                 <Block
                     key={node.key}

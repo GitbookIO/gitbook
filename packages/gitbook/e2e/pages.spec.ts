@@ -14,10 +14,10 @@ import { getContentTestURL } from '../tests/utils';
 
 interface Test {
     name: string;
-    url: string;
-    run?: (page: Page) => Promise<unknown>;
-    fullPage?: boolean;
-    screenshot?: false;
+    url: string; // URL to visit for testing
+    run?: (page: Page) => Promise<unknown>; // The test to run
+    fullPage?: boolean; // Whether the test should be fullscreened during testing
+    screenshot?: false; // Should a screenshot be stored
 }
 
 interface TestsCase {
@@ -105,6 +105,31 @@ const testCases: TestsCase[] = [
             {
                 name: 'RFC variant',
                 url: 'v/rfcs',
+            },
+            {
+                name: 'Customized variant titles are displayed',
+                url: '',
+                run: async (page) => {
+                    const spaceDrowpdown = page.locator('[data-testid="space-dropdown-button"]');
+                    await spaceDrowpdown.click();
+
+                    const variantSelectionDropdown = page.locator(
+                        'css=[data-testid="space-dropdown-button"] + div',
+                    );
+                    // the customized space title
+                    await expect(
+                        variantSelectionDropdown.getByRole('link', {
+                            name: 'Multi-Variants',
+                        }),
+                    ).toBeVisible();
+
+                    // the NON-customized space title
+                    await expect(
+                        variantSelectionDropdown.getByRole('link', {
+                            name: 'RFCs',
+                        }),
+                    ).toBeVisible();
+                },
             },
         ],
     },
@@ -232,7 +257,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Versioning',
-        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
             {
                 name: 'Revision',
@@ -243,7 +268,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'PDF',
-        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
             {
                 name: 'PDF',
@@ -253,7 +278,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Content tests',
-        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
             {
                 name: 'Text',
@@ -368,7 +393,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Page options',
-        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
             {
                 name: 'Hidden',
@@ -399,7 +424,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Customization',
-        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
             {
                 name: 'Without header',
@@ -426,7 +451,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Ads',
-        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
             {
                 name: 'Without previewed ads',
@@ -644,7 +669,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Languages',
-        baseUrl: 'https://gitbook.gitbook.io/test-1-1/',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: allLocales.map((locale) => ({
             name: locale,
             url: getCustomizationURL({
@@ -657,6 +682,57 @@ const testCases: TestsCase[] = [
                 await expect(dialog).toBeVisible();
             },
         })),
+    },
+    {
+        name: 'SEO',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        tests: [
+            {
+                name: `Index by default`,
+                url: '?x-gitbook-search-indexation=true',
+                screenshot: false,
+                run: async (page) => {
+                    const metaRobots = page.locator('meta[name="robots"]');
+                    await expect(metaRobots).toHaveAttribute('content', 'index, follow');
+                },
+            },
+            {
+                name: `Don't index noIndex`,
+                url: 'page-options/page-no-index?x-gitbook-search-indexation=true',
+                screenshot: false,
+                run: async (page) => {
+                    const metaRobots = page.locator('meta[name="robots"]');
+                    await expect(metaRobots).toHaveAttribute('content', 'noindex, nofollow');
+                },
+            },
+            {
+                name: `Don't index descendant of noIndex`,
+                url: 'page-options/page-no-index/descendant-of-page-no-index?x-gitbook-search-indexation=true',
+                screenshot: false,
+                run: async (page) => {
+                    const metaRobots = page.locator('meta[name="robots"]');
+                    await expect(metaRobots).toHaveAttribute('content', 'noindex, nofollow');
+                },
+            },
+            {
+                name: `Don't index noRobotsIndex`,
+                url: 'page-options/page-no-robots-index?x-gitbook-search-indexation=true',
+                screenshot: false,
+                run: async (page) => {
+                    const metaRobots = page.locator('meta[name="robots"]');
+                    await expect(metaRobots).toHaveAttribute('content', 'noindex, nofollow');
+                },
+            },
+            {
+                name: `Don't index descendant of noRobotsIndex`,
+                url: 'page-options/page-no-robots-index/descendant-of-page-no-robots-index?x-gitbook-search-indexation=true',
+                screenshot: false,
+                run: async (page) => {
+                    const metaRobots = page.locator('meta[name="robots"]');
+                    await expect(metaRobots).toHaveAttribute('content', 'noindex, nofollow');
+                },
+            },
+        ],
     },
 ];
 
