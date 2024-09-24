@@ -71,7 +71,7 @@ export const cloudflareDOCache: CacheBackend = {
             }),
         );
 
-        return { entries: [] };
+        return { entries };
     },
 };
 

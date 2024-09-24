@@ -124,6 +124,7 @@ export class CacheObject extends DurableObject {
                 prefix: 'exp.',
                 noCache: true,
             });
+            console.log(`purge: ${entries.size} entries`);
             entries.forEach((exp) => {
                 result.add(exp.k);
             });
@@ -134,6 +135,8 @@ export class CacheObject extends DurableObject {
         }
 
         await this.reset();
+
+        console.log(`purge returns`, Array.from(result));
         return Array.from(result);
     }
 
@@ -180,6 +183,7 @@ export class CacheObject extends DurableObject {
      * Reset the cache object.
      */
     async reset() {
+        console.log('reset: clear all entries');
         this.lru.clear();
         await this.ctx.storage.deleteAll();
     }
