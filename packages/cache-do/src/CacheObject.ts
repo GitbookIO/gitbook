@@ -9,7 +9,7 @@ export interface CacheObjectDescriptor {
 
 /**
  * Value stored in a cuncked binary msgpack format.
- * Stored under the key `prop.${key}.${index}`. 
+ * Stored under the key `prop.${key}.${index}`.
  */
 interface CacheObjectProp<Value = unknown> {
     value: Value;
