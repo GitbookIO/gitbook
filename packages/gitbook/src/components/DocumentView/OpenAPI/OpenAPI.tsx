@@ -58,7 +58,7 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockSwagger>) {
                         chevronDown: <Icon icon="chevron-down" />,
                         chevronRight: <Icon icon="chevron-right" />,
                         edit: <Icon icon="edit" />,
-                        clear: <Icon icon="x" />,
+                        editDone: <Icon icon="check" />,
                     },
                     CodeBlock: PlainCodeBlock,
                     defaultInteractiveOpened: context.mode === 'print',
