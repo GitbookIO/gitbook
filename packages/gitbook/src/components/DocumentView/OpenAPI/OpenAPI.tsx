@@ -64,7 +64,7 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockSwagger>) {
                     defaultInteractiveOpened: context.mode === 'print',
                     id: block.meta?.id,
                     blockKey: block.key,
-                    serverUrl
+                    serverUrl,
                 }}
                 className="openapi-block"
             />
