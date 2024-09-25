@@ -5,7 +5,7 @@ import { getChangeRequest } from '@/lib/api';
 /**
  * Return true if a change-request has been updated.
  */
-export async function checkHasContentBeenUpdated(props: {
+export async function hasContentBeenUpdated(props: {
     spaceId: string;
     changeRequestId: string;
     revisionId: string;

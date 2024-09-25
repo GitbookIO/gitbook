@@ -2,10 +2,10 @@
 
 import React from 'react';
 
-import { checkHasContentBeenUpdated } from './server-actions';
+import { hasContentBeenUpdated } from './server-actions';
 
 /**
- * Return a callback to check if the content has been updated and to refresh the page if it has.
+ * Return a callback to check if a change request has been updated and to refresh the page if it has.
  */
 export function useCheckForContentUpdate(props: {
     spaceId: string;
@@ -15,9 +15,7 @@ export function useCheckForContentUpdate(props: {
     const { spaceId, changeRequestId, revisionId } = props;
 
     return React.useCallback(async () => {
-        const updated = await checkHasContentBeenUpdated({ spaceId, changeRequestId, revisionId });
-
-        console.log('Content updated:', updated);
+        const updated = await hasContentBeenUpdated({ spaceId, changeRequestId, revisionId });
 
         if (updated) {
             window.location.reload();
