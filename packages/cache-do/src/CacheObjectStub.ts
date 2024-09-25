@@ -22,6 +22,7 @@ const doLocationHints: {
  * Client to access a cache tag.
  */
 export class CacheObjectStub {
+    private stub: DurableObjectStub<CacheObject>;
     private opened: CacheObjectDescriptor | null = null;
 
     constructor(
@@ -31,41 +32,39 @@ export class CacheObjectStub {
         private locationId: CacheLocationId,
         /** Name of the tag */
         private tag: string,
-    ) {}
+    ) {
+        const groupId = getCacheObjectIdName(this.locationId, this.tag);
+        this.stub = this.doNamespace.get(this.doNamespace.idFromName(groupId), {
+            // Initialize the object with a locaiton hint,
+            // as we might want to purge all locations before the object is created.
+            // https://developers.cloudflare.com/durable-objects/reference/data-location/
+            locationHint: doLocationHints[this.locationId],
+        });
+    }
 
     /**
      * Open the cache object.
      */
-    async open() {
-        if (!this.opened) {
-            const groupId = getCacheObjectIdName(this.locationId, this.tag);
-            const cacheGroup = this.doNamespace.get(this.doNamespace.idFromName(groupId), {
-                // Initialize the object with a locaiton hint,
-                // as we might want to purge all locations before the object is created.
-                // https://developers.cloudflare.com/durable-objects/reference/data-location/
-                locationHint: doLocationHints[this.locationId],
-            });
-            this.opened = await cacheGroup.open();
-        }
+    // async open() {
+    //     if (!this.opened) {
+    //         this.opened = await this.stub.open();
+    //     }
 
-        return this.opened;
-    }
+    //     return this.opened;
+    // }
 
     /**
      * Get a value from the cache.
      */
     async get<Value = unknown>(key: string) {
-        const desc = await this.open();
-        return await desc.get<Value>(key);
+        return (await this.stub.get(key)) as Value | undefined;
     }
 
     /**
      * Set a value in the cache.
      */
     async set<Value = unknown>(key: string, value: Value, expiresAt: number) {
-        // TODO: Should we write on all locations instead of just the current one?
-        const desc = await this.open();
-        return await desc.set<Value>(key, value, expiresAt);
+        return await this.stub.set(key, value, expiresAt);
     }
 
     /**
