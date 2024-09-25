@@ -30,10 +30,13 @@ export function RefreshChangeRequestButton(props: {
     React.useEffect(() => {}, [refresh]);
 
     return (
-        <ToolbarButton title="Refresh" onClick={event => {
-            event.preventDefault();
-            refresh();
-        }}>
+        <ToolbarButton
+            title="Refresh"
+            onClick={(event) => {
+                event.preventDefault();
+                refresh();
+            }}
+        >
             <Icon icon="rotate-right" className={tcls('size-4', loading ? 'animate-spin' : null)} />
         </ToolbarButton>
     );

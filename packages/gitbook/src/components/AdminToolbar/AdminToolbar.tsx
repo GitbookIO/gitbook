@@ -5,9 +5,9 @@ import React from 'react';
 import { ContentPointer, getChangeRequest, getRevision } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
+import { RefreshChangeRequestButton } from './RefreshChangeRequestButton';
 import { Toolbar, ToolbarBody, ToolbarButton, ToolbarButtonGroups } from './Toolbar';
 import { DateRelative } from '../primitives';
-import { RefreshChangeRequestButton } from './RefreshChangeRequestButton';
 
 interface AdminToolbarProps {
     content: ContentPointer;
@@ -88,7 +88,11 @@ async function ChangeRequestToolbar(props: { spaceId: string; changeRequestId: s
                 <ToolbarButton title="Open in application" href={changeRequest.urls.app}>
                     <Icon icon="arrow-up-right-from-square" className="size-4" />
                 </ToolbarButton>
-                <RefreshChangeRequestButton spaceId={spaceId} changeRequestId={changeRequestId} revisionId={changeRequest.revision} />
+                <RefreshChangeRequestButton
+                    spaceId={spaceId}
+                    changeRequestId={changeRequestId}
+                    revisionId={changeRequest.revision}
+                />
             </ToolbarButtonGroups>
         </Toolbar>
     );
