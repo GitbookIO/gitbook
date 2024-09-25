@@ -10,6 +10,6 @@ export async function checkHasContentBeenUpdated(props: {
     changeRequestId: string;
     revisionId: string;
 }) {
-    const changeRequest = await getChangeRequest(props.spaceId, props.changeRequestId);
+    const changeRequest = await getChangeRequest.revalidate(props.spaceId, props.changeRequestId);
     return changeRequest.revision !== props.revisionId;
 }
