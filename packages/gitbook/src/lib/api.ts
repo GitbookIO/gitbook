@@ -306,8 +306,6 @@ export const getChangeRequest = cache({
             signal: options.signal,
         });
         return cacheResponse(response, {
-            // We don't cache for long as we currently don't invalidate change-request cache
-            // and it's only used for preview where perfs are not critical
             ttl: 60 * 60,
             revalidateBefore: 10 * 60,
         });
