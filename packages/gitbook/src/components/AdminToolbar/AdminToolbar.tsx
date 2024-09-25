@@ -1,10 +1,11 @@
 import { Space } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
 import React from 'react';
 
 import { ContentPointer, getChangeRequest, getRevision } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
+
 import { DateRelative } from '../primitives';
-import { Icon } from '@gitbook/icons';
 
 interface AdminToolbarProps {
     content: ContentPointer;
@@ -71,20 +72,22 @@ async function ChangeRequestToolbar(props: { spaceId: string; changeRequestId: s
     return (
         <Toolbar>
             <ToolbarButton title="Open in application" href={changeRequest.urls.app}>
-                <Icon icon="code-branch" className='size-4' />
+                <Icon icon="code-branch" className="size-4" />
             </ToolbarButton>
             <ToolbarBody>
-                <p>#{changeRequest.number}: {changeRequest.subject ?? 'No subject'}</p>
+                <p>
+                    #{changeRequest.number}: {changeRequest.subject ?? 'No subject'}
+                </p>
                 <p className="text-xs text-light/8 dark:text-light/8">
                     Change request updated <DateRelative value={changeRequest.updatedAt} />
                 </p>
             </ToolbarBody>
             <ToolbarButtonGroups>
                 <ToolbarButton title="Open in application" href={changeRequest.urls.app}>
-                    <Icon icon="arrow-up-right-from-square" className='size-4' />
+                    <Icon icon="arrow-up-right-from-square" className="size-4" />
                 </ToolbarButton>
-                <ToolbarButton title="Refresh" href={"?"}>
-                    <Icon icon="rotate-right" className='size-4' />
+                <ToolbarButton title="Refresh" href={'?'}>
+                    <Icon icon="rotate-right" className="size-4" />
                 </ToolbarButton>
             </ToolbarButtonGroups>
         </Toolbar>
@@ -101,25 +104,26 @@ async function RevisionToolbar(props: { spaceId: string; revisionId: string }) {
     return (
         <Toolbar>
             <ToolbarButton title="Open in application" href={revision.urls.app}>
-                <Icon icon="code-commit" className='size-4' />
+                <Icon icon="code-commit" className="size-4" />
             </ToolbarButton>
             <ToolbarBody>
                 <p>
                     Revision created <DateRelative value={revision.createdAt} />
                 </p>
                 {revision.git ? (
-                    <p className="text-xs text-light/8 dark:text-light/8">
-                        {revision.git.message}
-                    </p>
+                    <p className="text-xs text-light/8 dark:text-light/8">{revision.git.message}</p>
                 ) : null}
             </ToolbarBody>
             <ToolbarButtonGroups>
                 <ToolbarButton title="Open in application" href={revision.urls.app}>
-                    <Icon icon="arrow-up-right-from-square" className='size-4' />
+                    <Icon icon="arrow-up-right-from-square" className="size-4" />
                 </ToolbarButton>
                 {revision.git?.url ? (
                     <ToolbarButton title="Open git commit" href={revision.git.url}>
-                        <Icon icon={revision.git.url.includes('github.com') ? 'github' : 'gitlab'} className='size-4' />
+                        <Icon
+                            icon={revision.git.url.includes('github.com') ? 'github' : 'gitlab'}
+                            className="size-4"
+                        />
                     </ToolbarButton>
                 ) : null}
             </ToolbarButtonGroups>
@@ -152,19 +156,11 @@ function Toolbar(props: { children: React.ReactNode }) {
 }
 
 function ToolbarBody(props: { children: React.ReactNode }) {
-    return (
-        <div className='flex flex-col gap-1'>
-            {props.children}
-        </div>
-    )
+    return <div className="flex flex-col gap-1">{props.children}</div>;
 }
 
 function ToolbarButtonGroups(props: { children: React.ReactNode }) {
-    return (
-        <div className='flex flex-row gap-2'>
-            {props.children}
-        </div>
-    )
+    return <div className="flex flex-row gap-2">{props.children}</div>;
 }
 
 function ToolbarButton(props: { title: string; href: string; children: React.ReactNode }) {
