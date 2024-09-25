@@ -52,7 +52,7 @@ export function ServerURLForm(props: {
         });
     }
 
-    const isEditable = servers.length > 1 || server.variables;
+    const isEditable = stateContext?.onUpdate && (servers.length > 1 || server.variables);
     return (
         <form
             ref={formRef}
