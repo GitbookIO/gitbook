@@ -37,7 +37,7 @@ export function RefreshChangeRequestButton(props: {
                 refresh();
             }}
         >
-            <Icon icon="rotate-right" className={tcls('size-4', loading ? 'animate-spin' : null)} />
+            <Icon icon="rotate" className={tcls('size-4', loading ? 'animate-spin' : null)} />
         </ToolbarButton>
     );
 }
