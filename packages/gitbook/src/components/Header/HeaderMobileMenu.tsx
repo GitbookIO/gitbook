@@ -39,6 +39,7 @@ export function HeaderMobileMenu(props: Partial<React.ButtonHTMLAttributes<HTMLB
     // Close the navigation when navigating to a page
     useEffect(() => {
         document.body.classList.remove(globalClassName);
+        window.scrollTo(0, 0);
     }, [pathname]);
 
     useEffect(() => {
