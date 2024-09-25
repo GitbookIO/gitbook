@@ -364,10 +364,7 @@ export const getRevision = cache({
             },
         );
 
-        return cacheResponse(
-            response,
-            fetchOptions.metadata ? cacheTtl_7days : cacheTtl_1day,
-        );
+        return cacheResponse(response, fetchOptions.metadata ? cacheTtl_7days : cacheTtl_1day);
     },
     getKeyArgs: (args) => [args[0], args[1]],
 });
