@@ -75,7 +75,7 @@ export const cloudflareKVCache: CacheBackend = {
         );
     },
     async set(entry) {
-        if (entry.meta.tag && !shouldUseItForTag(entry.meta.tag)) {
+        if (entry.meta.tag && !shouldUseKVForTag(entry.meta.tag)) {
             return;
         }
 
