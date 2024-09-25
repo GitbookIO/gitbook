@@ -57,6 +57,7 @@ export function ToolbarButton(props: React.HTMLProps<HTMLAnchorElement>) {
                 'dark:text-light',
                 'dark:hover:bg-dark-2',
                 'hover:shadow-lg',
+                'cursor-pointer',
             )}
         >
             {children}

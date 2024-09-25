@@ -92,6 +92,7 @@ async function ChangeRequestToolbar(props: { spaceId: string; changeRequestId: s
                     spaceId={spaceId}
                     changeRequestId={changeRequestId}
                     revisionId={changeRequest.revision}
+                    updatedAt={new Date(changeRequest.updatedAt).getTime()}
                 />
             </ToolbarButtonGroups>
         </Toolbar>
