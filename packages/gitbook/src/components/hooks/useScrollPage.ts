@@ -1,7 +1,7 @@
+import { usePathname } from 'next/navigation';
 import React from 'react';
 
 import { useHash } from './useHash';
-import { usePathname } from 'next/navigation';
 
 /**
  * Scroll the page to an anchor point or
