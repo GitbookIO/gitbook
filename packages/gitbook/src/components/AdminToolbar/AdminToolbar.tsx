@@ -83,7 +83,7 @@ async function ChangeRequestToolbar(props: { spaceId: string; changeRequestId: s
                 <ToolbarButton title="Open in application" href={changeRequest.urls.app}>
                     <Icon icon="arrow-up-right-from-square" className='size-4' />
                 </ToolbarButton>
-                <ToolbarButton title="Refresh" href={changeRequest.urls.app}>
+                <ToolbarButton title="Refresh" href={"?"}>
                     <Icon icon="rotate-right" className='size-4' />
                 </ToolbarButton>
             </ToolbarButtonGroups>
