@@ -5,6 +5,8 @@ import React from 'react';
 import { ContentPointer, getChangeRequest, getRevision } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
+import { RefreshChangeRequestButton } from './RefreshChangeRequestButton';
+import { Toolbar, ToolbarBody, ToolbarButton, ToolbarButtonGroups } from './Toolbar';
 import { DateRelative } from '../primitives';
 
 interface AdminToolbarProps {
@@ -86,9 +88,12 @@ async function ChangeRequestToolbar(props: { spaceId: string; changeRequestId: s
                 <ToolbarButton title="Open in application" href={changeRequest.urls.app}>
                     <Icon icon="arrow-up-right-from-square" className="size-4" />
                 </ToolbarButton>
-                <ToolbarButton title="Refresh" href={'?'}>
-                    <Icon icon="rotate-right" className="size-4" />
-                </ToolbarButton>
+                <RefreshChangeRequestButton
+                    spaceId={spaceId}
+                    changeRequestId={changeRequestId}
+                    revisionId={changeRequest.revision}
+                    updatedAt={new Date(changeRequest.updatedAt).getTime()}
+                />
             </ToolbarButtonGroups>
         </Toolbar>
     );
@@ -128,66 +133,5 @@ async function RevisionToolbar(props: { spaceId: string; revisionId: string }) {
                 ) : null}
             </ToolbarButtonGroups>
         </Toolbar>
-    );
-}
-
-function Toolbar(props: { children: React.ReactNode }) {
-    const { children } = props;
-
-    return (
-        <div
-            className={tcls(
-                'flex',
-                'flex-row',
-                'items-center',
-                'gap-4',
-                'text-sm',
-                'px-4',
-                'py-1',
-                'rounded-full',
-                'truncate',
-                'text-light',
-                'dark:text-light',
-            )}
-        >
-            {children}
-        </div>
-    );
-}
-
-function ToolbarBody(props: { children: React.ReactNode }) {
-    return <div className="flex flex-col gap-1">{props.children}</div>;
-}
-
-function ToolbarButtonGroups(props: { children: React.ReactNode }) {
-    return <div className="flex flex-row gap-2">{props.children}</div>;
-}
-
-function ToolbarButton(props: { title: string; href: string; children: React.ReactNode }) {
-    const { title, href, children } = props;
-    return (
-        <a
-            title={title}
-            href={href}
-            className={tcls(
-                'flex',
-                'flex-col',
-                'items-center',
-                'justify-center',
-                'size-11',
-                'gap-1',
-                'text-sm',
-                'rounded-full',
-                'hover:bg-dark-1',
-                'hover:text-white',
-                'truncate',
-                'text-light',
-                'dark:text-light',
-                'dark:hover:bg-dark-2',
-                'hover:shadow-lg',
-            )}
-        >
-            {children}
-        </a>
     );
 }
