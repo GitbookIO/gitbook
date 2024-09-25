@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { IconStyle } from './types';
 
-const version = 1;
+const version = 2;
 
 export interface IconsAssetsLocation {
     /** Rroot url where the icon assets are served */
