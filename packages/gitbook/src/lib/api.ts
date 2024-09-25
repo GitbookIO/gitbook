@@ -64,16 +64,16 @@ export interface ContentTarget {
 }
 
 /**
- * Parameter to cache an entry as an immutable one (ex: revisions, documents).
+ * Parameter to cache an entry for a certain period of time.
  * It'll cache it for 1 week and revalidate it 24h before expiration.
  *
  * We don't cache for more than this to ensure we don't use too much storage and keep the cache small.
  */
-const immutableCacheTtl_7days = {
+const cacheTtl_7days = {
     revalidateBefore: 24 * 60 * 60,
     ttl: 7 * 24 * 60 * 60,
 };
-const immutableCacheTtl_1day = {
+const cacheTtl_1day = {
     revalidateBefore: 60 * 60,
     ttl: 24 * 60 * 60,
 };
@@ -366,7 +366,7 @@ export const getRevision = cache({
 
         return cacheResponse(
             response,
-            fetchOptions.metadata ? immutableCacheTtl_7days : immutableCacheTtl_1day,
+            fetchOptions.metadata ? cacheTtl_7days : cacheTtl_1day,
         );
     },
     getKeyArgs: (args) => [args[0], args[1]],
@@ -398,7 +398,7 @@ export const getRevisionPages = cache({
         );
 
         return cacheResponse(response, {
-            ...(fetchOptions.metadata ? immutableCacheTtl_7days : immutableCacheTtl_1day),
+            ...(fetchOptions.metadata ? cacheTtl_7days : cacheTtl_1day),
             data: response.data.pages,
         });
     },
@@ -434,12 +434,12 @@ export const getRevisionPageByPath = cache({
                 },
             );
 
-            return cacheResponse(response, immutableCacheTtl_7days);
+            return cacheResponse(response, cacheTtl_7days);
         } catch (error) {
             if ((error as GitBookAPIError).code === 404) {
                 return {
                     data: null,
-                    ...immutableCacheTtl_7days,
+                    ...cacheTtl_7days,
                 };
             }
 
@@ -478,10 +478,10 @@ const getRevisionFileById = cache({
                 );
             })();
 
-            return cacheResponse(response, immutableCacheTtl_7days);
+            return cacheResponse(response, cacheTtl_7days);
         } catch (error: any) {
             if (error instanceof GitBookAPIError && error.code === 404) {
-                return { data: null, ...immutableCacheTtl_7days };
+                return { data: null, ...cacheTtl_7days };
             }
 
             throw error;
@@ -522,7 +522,7 @@ const getRevisionAllFiles = cache({
             files[file.id] = file;
         });
 
-        return cacheResponse(response, { ...immutableCacheTtl_7days, data: files });
+        return cacheResponse(response, { ...cacheTtl_7days, data: files });
     },
     timeout: 60 * 1000,
 });
@@ -599,7 +599,7 @@ export const getDocument = cache({
                 ...noCacheFetchOptions,
             },
         );
-        return cacheResponse(response, immutableCacheTtl_7days);
+        return cacheResponse(response, cacheTtl_7days);
     },
     // Temporarily allow for a longer timeout than the default 10s
     // because GitBook's API currently re-normalizes all documents
@@ -1090,16 +1090,16 @@ export const renderIntegrationUi = cache({
  */
 export const getEmbedByUrl = cache({
     name: 'api.getEmbedByUrl',
-    get: async (
-        url: string,
-        options: CacheFunctionOptions,
-    ) => {
-        const response = await api().urls.getEmbedByUrl({ url }, {
-            ...noCacheFetchOptions,
-            signal: options.signal,
-        });
+    get: async (url: string, options: CacheFunctionOptions) => {
+        const response = await api().urls.getEmbedByUrl(
+            { url },
+            {
+                ...noCacheFetchOptions,
+                signal: options.signal,
+            },
+        );
         return cacheResponse(response);
-    }
+    },
 });
 
 /**
@@ -1108,17 +1108,17 @@ export const getEmbedByUrl = cache({
 export const getEmbedByUrlInSpace = cache({
     name: 'api.getEmbedByUrlInSpace',
     tag: (spaceId) => getAPICacheTag({ tag: 'space', space: spaceId }),
-    get: async (
-        spaceId: string,
-        url: string,
-        options: CacheFunctionOptions,
-    ) => {
-        const response = await api().spaces.getEmbedByUrlInSpace(spaceId, { url }, {
-            ...noCacheFetchOptions,
-            signal: options.signal,
-        });
-        return cacheResponse(response, immutableCacheTtl_7days);
-    }
+    get: async (spaceId: string, url: string, options: CacheFunctionOptions) => {
+        const response = await api().spaces.getEmbedByUrlInSpace(
+            spaceId,
+            { url },
+            {
+                ...noCacheFetchOptions,
+                signal: options.signal,
+            },
+        );
+        return cacheResponse(response, cacheTtl_7days);
+    },
 });
 
 /**
