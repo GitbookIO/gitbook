@@ -23,7 +23,6 @@ const doLocationHints: {
  */
 export class CacheObjectStub {
     private stub: DurableObjectStub<CacheObject>;
-    private opened: CacheObjectDescriptor | null = null;
 
     constructor(
         /** Binding to the CacheObject durable object */
@@ -43,15 +42,18 @@ export class CacheObjectStub {
     }
 
     /**
-     * Open the cache object.
+     * Open a descriptor to the cache object.
+     * It can be used to perform multiple operations in a single RPC session.
+     * Ex:
+     * ```ts
+     * using desc = cache.open();
+     * await desc.set('key', 'value', Date.now() + 1000);
+     * await desc.get('key');
+     * ```
      */
-    // async open() {
-    //     if (!this.opened) {
-    //         this.opened = await this.stub.open();
-    //     }
-
-    //     return this.opened;
-    // }
+    async open() {
+        return await this.stub.open();
+    }
 
     /**
      * Get a value from the cache.
