@@ -3,15 +3,15 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React from 'react';
 
-import { useScrollToHash } from '@/components/hooks';
+import { useScrollPage } from '@/components/hooks';
 
 /**
  * Client component to initialize interactivity for a page.
  */
 export function PageClientLayout(props: {}) {
     // We use this hook in the page layout to ensure the elements for the blocks
-    // are rendered before we scroll to the hash.
-    useScrollToHash();
+    // are rendered before we scroll to a hash or to the top of the page 
+    useScrollPage();
 
     useStripFallbackQueryParam();
     return null;
