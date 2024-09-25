@@ -10,7 +10,7 @@ import { useScrollPage } from '@/components/hooks';
  */
 export function PageClientLayout(props: {}) {
     // We use this hook in the page layout to ensure the elements for the blocks
-    // are rendered before we scroll to a hash or to the top of the page 
+    // are rendered before we scroll to a hash or to the top of the page
     useScrollPage();
 
     useStripFallbackQueryParam();
