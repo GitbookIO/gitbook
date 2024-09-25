@@ -276,7 +276,7 @@ export async function middleware(request: NextRequest) {
             'private, no-cache, no-store, max-age=0, must-revalidate',
         );
     } else {
-        if (resolved.cacheMaxAge) {
+        if (typeof resolved.cacheMaxAge === 'number') {
             const cacheControl = `public, max-age=0, s-maxage=${resolved.cacheMaxAge}, stale-if-error=0`;
 
             if (
@@ -666,14 +666,17 @@ async function lookupSpaceByAPI(
             return null;
         }
 
+        const changeRequest = data.changeRequest ?? lookup.changeRequest;
         return {
             space: data.space,
-            changeRequest: data.changeRequest ?? lookup.changeRequest,
+            changeRequest,
             revision: data.revision ?? lookup.revision,
             basePath: joinPath(data.basePath, lookup.basePath ?? ''),
             pathname: joinPath(data.pathname, alternative.extraPath),
             apiToken: data.apiToken,
-            cacheMaxAge: data.cacheMaxAge,
+            // We don't cache change requests as they often change and we want to have consistent previews
+            // Purging the CDN cache will not be efficient enough.
+            cacheMaxAge: changeRequest ? 0 : data.cacheMaxAge,
             cacheTags: data.cacheTags,
             ...('site' in data
                 ? {
