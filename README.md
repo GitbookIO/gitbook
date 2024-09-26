@@ -1,10 +1,10 @@
 ---
 description: Cultivating a Flourishing Symbiosis Between Business and Sustainability
-cover: broken-reference
+cover: .gitbook/assets/image (19).png
 coverY: 0
 ---
 
-# 🔔 Getting Started: Your Sustainable Journey with myHerb
+# 🍀 Getting Started: Your Sustainable Journey with myHerb
 
 **Imagine a world where vibrant ecosystems of commerce and responsibility thrive in harmony.** This is the future myHerb aspires to cultivate, where sustainability isn't an afterthought but a fundamental pillar of thriving businesses. We believe sustainable practices aren't just an ethical imperative and a potent catalyst for innovation, resilience, and long-term prosperity.
 
@@ -17,13 +17,6 @@ To empower businesses of all sizes to integrate sustainability into their DNA se
 * **Expert-driven blog:** Delve into insightful articles, reports, and case studies from sustainability luminaries.
 * **Educational workshops:** Hone your expertise through targeted workshops covering diverse sustainability themes.
 * **Resource hub:** Uncover a treasure trove of practical tools, templates, and best practices at your fingertips.
-
-| Articles & Blog                     | Educational Materials | Resource Hub |
-| ----------------------------------- | --------------------- | ------------ |
-| [Medium](https://medium.com/myherb) | Google Classroom      | YouTrack     |
-| Patreon                             |                       | GitBook      |
-| Reddit                              |                       | Confluence   |
-| LinkedIn Newsletter                 |                       | Monday.com   |
 
 ### **2. The Sprout of Strategy:**
 
