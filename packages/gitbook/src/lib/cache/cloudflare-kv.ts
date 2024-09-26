@@ -32,7 +32,7 @@ function shouldUseKVForTag(tag: string): boolean {
     const hash = tag.split('').reduce((acc, char) => {
         return acc + char.charCodeAt(0);
     }, 0);
-    if (hash % 100 <= 95) {
+    if (hash % 100 <= 80) {
         return true;
     }
 
@@ -76,10 +76,6 @@ export const cloudflareKVCache: CacheBackend = {
         );
     },
     async set(entry) {
-        if (entry.meta.tag && !shouldUseKVForTag(entry.meta.tag)) {
-            return;
-        }
-
         const kv = await getKVNamespace();
         if (!kv) {
             return;
