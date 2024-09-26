@@ -4,9 +4,7 @@ import { getURLLookupAlternatives, normalizeURL } from './middleware';
 
 describe('getURLLookupAlternatives', () => {
     it('should return all URLs up to the root', () => {
-        const res = getURLLookupAlternatives(new URL('https://docs.mycompany.com/a/b/c'));
-        console.log(res);
-        expect(res).toEqual({
+        expect(getURLLookupAlternatives(new URL('https://docs.mycompany.com/a/b/c'))).toEqual({
             revision: undefined,
             changeRequest: undefined,
             basePath: undefined,
