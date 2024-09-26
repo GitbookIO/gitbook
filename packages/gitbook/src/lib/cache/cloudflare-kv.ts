@@ -76,10 +76,6 @@ export const cloudflareKVCache: CacheBackend = {
         );
     },
     async set(entry) {
-        if (entry.meta.tag && !shouldUseKVForTag(entry.meta.tag)) {
-            return;
-        }
-
         const kv = await getKVNamespace();
         if (!kv) {
             return;
