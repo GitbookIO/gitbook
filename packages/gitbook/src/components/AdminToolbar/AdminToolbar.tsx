@@ -1,8 +1,13 @@
 import { Space } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
 import React from 'react';
 
 import { ContentPointer, getChangeRequest, getRevision } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
+
+import { RefreshChangeRequestButton } from './RefreshChangeRequestButton';
+import { Toolbar, ToolbarBody, ToolbarButton, ToolbarButtonGroups } from './Toolbar';
+import { DateRelative } from '../primitives';
 
 interface AdminToolbarProps {
     content: ContentPointer;
@@ -67,9 +72,30 @@ async function ChangeRequestToolbar(props: { spaceId: string; changeRequestId: s
     const changeRequest = await getChangeRequest(spaceId, changeRequestId);
 
     return (
-        <ToolbarButton href={changeRequest.urls.app}>
-            Change request #{changeRequest.number}: {changeRequest.subject ?? 'No subject'}
-        </ToolbarButton>
+        <Toolbar>
+            <ToolbarButton title="Open in application" href={changeRequest.urls.app}>
+                <Icon icon="code-branch" className="size-4" />
+            </ToolbarButton>
+            <ToolbarBody>
+                <p>
+                    #{changeRequest.number}: {changeRequest.subject ?? 'No subject'}
+                </p>
+                <p className="text-xs text-light/8 dark:text-light/8">
+                    Change request updated <DateRelative value={changeRequest.updatedAt} />
+                </p>
+            </ToolbarBody>
+            <ToolbarButtonGroups>
+                <ToolbarButton title="Open in application" href={changeRequest.urls.app}>
+                    <Icon icon="arrow-up-right-from-square" className="size-4" />
+                </ToolbarButton>
+                <RefreshChangeRequestButton
+                    spaceId={spaceId}
+                    changeRequestId={changeRequestId}
+                    revisionId={changeRequest.revision}
+                    updatedAt={new Date(changeRequest.updatedAt).getTime()}
+                />
+            </ToolbarButtonGroups>
+        </Toolbar>
     );
 }
 
@@ -77,37 +103,35 @@ async function RevisionToolbar(props: { spaceId: string; revisionId: string }) {
     const { spaceId, revisionId } = props;
 
     const revision = await getRevision(spaceId, revisionId, {
-        metadata: false,
+        metadata: true,
     });
 
     return (
-        <ToolbarButton href={revision.urls.app}>
-            Revision created on {new Date(revision.createdAt).toLocaleDateString()}
-        </ToolbarButton>
-    );
-}
-
-function ToolbarButton(props: { href: string; children: React.ReactNode }) {
-    const { href, children } = props;
-
-    return (
-        <a
-            href={href}
-            className={tcls(
-                'block',
-                'text-sm',
-                'px-4',
-                'py-1',
-                'rounded-full',
-                'hover:bg-dark-1',
-                'hover:text-white',
-                'truncate',
-                'text-light',
-                'dark:text-light',
-                'dark:hover:bg-dark-2',
-            )}
-        >
-            {children}
-        </a>
+        <Toolbar>
+            <ToolbarButton title="Open in application" href={revision.urls.app}>
+                <Icon icon="code-commit" className="size-4" />
+            </ToolbarButton>
+            <ToolbarBody>
+                <p>
+                    Revision created <DateRelative value={revision.createdAt} />
+                </p>
+                {revision.git ? (
+                    <p className="text-xs text-light/8 dark:text-light/8">{revision.git.message}</p>
+                ) : null}
+            </ToolbarBody>
+            <ToolbarButtonGroups>
+                <ToolbarButton title="Open in application" href={revision.urls.app}>
+                    <Icon icon="arrow-up-right-from-square" className="size-4" />
+                </ToolbarButton>
+                {revision.git?.url ? (
+                    <ToolbarButton title="Open git commit" href={revision.git.url}>
+                        <Icon
+                            icon={revision.git.url.includes('github.com') ? 'github' : 'gitlab'}
+                            className="size-4"
+                        />
+                    </ToolbarButton>
+                ) : null}
+            </ToolbarButtonGroups>
+        </Toolbar>
     );
 }
