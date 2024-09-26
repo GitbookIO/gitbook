@@ -15,12 +15,28 @@ interface KVTagMetadata {
  */
 const noKVTags = new Set([
     // docs.gitbook.com
+    'url:docs.gitbook.com',
     'site:site_p4Xo4',
     'space:NkEGS7hzeqa35sMXQZ4X',
 ]);
 
-function shouldUseItForTag(tag: string): boolean {
-    return !noKVTags.has(tag) && !tag.startsWith('change-request:');
+function shouldUseKVForTag(tag: string): boolean {
+    if (noKVTags.has(tag)) {
+        return false;
+    }
+    if (tag.startsWith('change-request:')) {
+        return false;
+    }
+
+    // Hash the tag and return true for 95% of the tags
+    const hash = tag.split('').reduce((acc, char) => {
+        return acc + char.charCodeAt(0);
+    }, 0);
+    if (hash % 100 <= 95) {
+        return true;
+    }
+
+    return false;
 }
 
 /**
@@ -31,7 +47,7 @@ export const cloudflareKVCache: CacheBackend = {
     name: 'cloudflare-kv',
     replication: 'global',
     async get({ key, tag }, options) {
-        if (tag && !shouldUseItForTag(tag)) {
+        if (tag && !shouldUseKVForTag(tag)) {
             return null;
         }
 
@@ -60,7 +76,7 @@ export const cloudflareKVCache: CacheBackend = {
         );
     },
     async set(entry) {
-        if (entry.meta.tag && !shouldUseItForTag(entry.meta.tag)) {
+        if (entry.meta.tag && !shouldUseKVForTag(entry.meta.tag)) {
             return;
         }
 
