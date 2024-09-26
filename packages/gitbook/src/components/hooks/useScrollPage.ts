@@ -1,12 +1,16 @@
+import { usePathname } from 'next/navigation';
 import React from 'react';
 
 import { useHash } from './useHash';
 
 /**
- * Scroll to the current URL hash everytime the URL changes.
+ * Scroll the page to an anchor point or
+ * to the top of the page when navigating between pages (pathname)
+ * or sections of a page (hash).
  */
-export function useScrollToHash() {
+export function useScrollPage() {
     const hash = useHash();
+    const pathname = usePathname();
     React.useLayoutEffect(() => {
         if (hash) {
             const element = document.getElementById(hash);
@@ -16,6 +20,8 @@ export function useScrollToHash() {
                     behavior: 'smooth',
                 });
             }
+        } else {
+            window.scrollTo(0, 0);
         }
-    }, [hash]);
+    }, [hash, pathname]);
 }
