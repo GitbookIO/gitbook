@@ -4,7 +4,9 @@ import { getURLLookupAlternatives, normalizeURL } from './middleware';
 
 describe('getURLLookupAlternatives', () => {
     it('should return all URLs up to the root', () => {
-        expect(getURLLookupAlternatives(new URL('https://docs.mycompany.com/a/b/c'))).toEqual({
+        const res = getURLLookupAlternatives(new URL('https://docs.mycompany.com/a/b/c'));
+        console.log(res);
+        expect(res).toEqual({
             revision: undefined,
             changeRequest: undefined,
             basePath: undefined,
@@ -22,6 +24,11 @@ describe('getURLLookupAlternatives', () => {
                 {
                     extraPath: 'c',
                     url: 'https://docs.mycompany.com/a/b',
+                    primary: false,
+                },
+                {
+                    extraPath: '',
+                    url: 'https://docs.mycompany.com/a/b/c',
                     primary: true,
                 },
             ],
@@ -229,6 +236,11 @@ describe('getURLLookupAlternatives', () => {
                 {
                     extraPath: 'c/d',
                     url: 'https://docs.mycompany.com/a/b',
+                    primary: false,
+                },
+                {
+                    extraPath: 'd',
+                    url: 'https://docs.mycompany.com/a/b/c',
                     primary: true,
                 },
             ],
@@ -254,6 +266,11 @@ describe('getURLLookupAlternatives', () => {
                 {
                     extraPath: 'b/c/d',
                     url: 'https://docs.mycompany.com/a/~',
+                    primary: false,
+                },
+                {
+                    extraPath: 'c/d',
+                    url: 'https://docs.mycompany.com/a/~/b',
                     primary: true,
                 },
             ],

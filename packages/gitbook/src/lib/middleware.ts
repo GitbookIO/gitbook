@@ -91,7 +91,7 @@ export function getURLLookupAlternatives(input: URL) {
         }
 
         // Otherwise match with the first two segments of the path
-        for (let i = 1; i <= 2; i++) {
+        for (let i = 1; i <= 3; i++) {
             if (pathSegments.length >= i) {
                 const shortURL = new URL(url);
                 shortURL.pathname = pathSegments.slice(0, i).join('/');
