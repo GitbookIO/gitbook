@@ -1,6 +1,7 @@
 # Table of contents
 
-* [GitBook](README.md)
+* [🔔 Getting Started: Your Sustainable Journey with myHerb](README.md)
+* [GitBook](<README (1).md>)
 * [Changesets](.changeset/README.md)
   * [beige-crabs-attack](.changeset/beige-crabs-attack.md)
   * [beige-snails-count](.changeset/beige-snails-count.md)
