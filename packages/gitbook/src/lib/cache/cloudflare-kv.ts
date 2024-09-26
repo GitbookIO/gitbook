@@ -15,6 +15,7 @@ interface KVTagMetadata {
  */
 const noKVTags = new Set([
     // docs.gitbook.com
+    'url:docs.gitbook.com',
     'site:site_p4Xo4',
     'space:NkEGS7hzeqa35sMXQZ4X',
 ]);
