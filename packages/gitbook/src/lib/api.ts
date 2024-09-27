@@ -130,6 +130,7 @@ export type PublishedContentWithCache =
     | ((
           | PublishedContentLookup
           | (PublishedSiteContentLookup & {
+                //TODO: Remove this once the @gitbook/api is bumped
                 /**
                  * ID of the default site space variant in the URL lookup.
                  */
