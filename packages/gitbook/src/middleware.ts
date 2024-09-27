@@ -672,7 +672,7 @@ async function lookupSpaceByAPI(
          * - the resolution resolves to a site space variant which is different from the default variant
          *   (in this case, we are looking at the deepest path using the variant path explicitly)
          */
-        if (alternative.primary || ('site' in data && data.defaultVariant !== data.siteSpace)) {
+        if (alternative.primary || ('site' in data && data.defaultSiteSpace !== data.siteSpace)) {
             const changeRequest = data.changeRequest ?? lookup.changeRequest;
             return {
                 space: data.space,

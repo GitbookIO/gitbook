@@ -133,7 +133,7 @@ export type PublishedContentWithCache =
                 /**
                  * ID of the default site space variant in the URL lookup.
                  */
-                defaultVariant: string;
+                defaultSiteSpace: string;
             })
       ) & {
           cacheMaxAge?: number;

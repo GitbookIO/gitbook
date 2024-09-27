@@ -22,6 +22,11 @@ describe('getURLLookupAlternatives', () => {
                 {
                     extraPath: 'c',
                     url: 'https://docs.mycompany.com/a/b',
+                    primary: false,
+                },
+                {
+                    extraPath: '',
+                    url: 'https://docs.mycompany.com/a/b/c',
                     primary: true,
                 },
             ],
@@ -229,6 +234,11 @@ describe('getURLLookupAlternatives', () => {
                 {
                     extraPath: 'c/d',
                     url: 'https://docs.mycompany.com/a/b',
+                    primary: false,
+                },
+                {
+                    extraPath: 'd',
+                    url: 'https://docs.mycompany.com/a/b/c',
                     primary: true,
                 },
             ],
@@ -254,6 +264,11 @@ describe('getURLLookupAlternatives', () => {
                 {
                     extraPath: 'b/c/d',
                     url: 'https://docs.mycompany.com/a/~',
+                    primary: false,
+                },
+                {
+                    extraPath: 'c/d',
+                    url: 'https://docs.mycompany.com/a/~/b',
                     primary: true,
                 },
             ],
