@@ -666,27 +666,37 @@ async function lookupSpaceByAPI(
             return null;
         }
 
-        const changeRequest = data.changeRequest ?? lookup.changeRequest;
-        return {
-            space: data.space,
-            changeRequest,
-            revision: data.revision ?? lookup.revision,
-            basePath: joinPath(data.basePath, lookup.basePath ?? ''),
-            pathname: joinPath(data.pathname, alternative.extraPath),
-            apiToken: data.apiToken,
-            // We don't cache change requests as they often change and we want to have consistent previews
-            // Purging the CDN cache will not be efficient enough.
-            cacheMaxAge: changeRequest ? 0 : data.cacheMaxAge,
-            cacheTags: data.cacheTags,
-            ...('site' in data
-                ? {
-                      site: data.site,
-                      siteSpace: data.siteSpace,
-                      organization: data.organization,
-                      shareKey: data.shareKey,
-                  }
-                : {}),
-        } as PublishedContentWithCache;
+        /**
+         * We use the following criteria to determine if the lookup result is the right one:
+         * - the primary alternative was resolved (because that's the longest or most inclusive path)
+         * - the resolution resolves to a site space variant which is different from the default variant
+         *   (in this case, we are looking at the deepest path using the variant path explicitly)
+         */
+        if (alternative.primary || ('site' in data && data.defaultVariant !== data.siteSpace)) {
+            const changeRequest = data.changeRequest ?? lookup.changeRequest;
+            return {
+                space: data.space,
+                changeRequest,
+                revision: data.revision ?? lookup.revision,
+                basePath: joinPath(data.basePath, lookup.basePath ?? ''),
+                pathname: joinPath(data.pathname, alternative.extraPath),
+                apiToken: data.apiToken,
+                // We don't cache change requests as they often change and we want to have consistent previews
+                // Purging the CDN cache will not be efficient enough.
+                cacheMaxAge: changeRequest ? 0 : data.cacheMaxAge,
+                cacheTags: data.cacheTags,
+                ...('site' in data
+                    ? {
+                          site: data.site,
+                          siteSpace: data.siteSpace,
+                          organization: data.organization,
+                          shareKey: data.shareKey,
+                      }
+                    : {}),
+            } as PublishedContentWithCache;
+        }
+
+        return null;
     });
 
     return (

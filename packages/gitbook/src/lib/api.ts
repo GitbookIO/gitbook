@@ -127,7 +127,15 @@ export function withAPI<T>(client: GitBookAPI, fn: () => Promise<T>): Promise<T>
 }
 
 export type PublishedContentWithCache =
-    | ((PublishedContentLookup | PublishedSiteContentLookup) & {
+    | ((
+          | PublishedContentLookup
+          | (PublishedSiteContentLookup & {
+                /**
+                 * ID of the default site space variant in the URL lookup.
+                 */
+                defaultVariant: string;
+            })
+      ) & {
           cacheMaxAge?: number;
           cacheTags?: string[];
       })
