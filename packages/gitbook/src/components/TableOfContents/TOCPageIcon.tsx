@@ -15,8 +15,8 @@ export function TOCPageIcon({ page }: { page: RevisionPage }) {
                 'text-base',
                 'text-dark/6',
                 'dark:text-light/6',
-                'group-aria-selected/toclink:text-primary',
-                'group-aria-selected/toclink:dark:text-primary-400',
+                'group-aria-current-page/toclink:text-primary',
+                'group-aria-current-page/toclink:dark:text-primary-400',
             )}
         />
     );
