@@ -53,16 +53,20 @@ export class CacheObject extends DurableObject {
      * Get the value of a property.
      */
     public async get<Value = unknown>(key: string) {
-        return timeFn(`get: ${key}`, async () => {
+        return this.logOperation({ operation: 'get', key }, async (setLog) => {
             // Try the memory state first.
             const memoryEntry = this.lru.get(key);
             if (memoryEntry) {
-                console.log(`get: (memory, ${!!memoryEntry.match}) ${key}`);
+                setLog({ memory: true });
+                setLog({ memoryMatch: !!memoryEntry.match });
                 if (!memoryEntry.match) {
                     return;
                 }
 
-                if (memoryEntry.match.expiresAt > Date.now()) {
+                const isExpired = memoryEntry.match.expiresAt < Date.now();
+                setLog({ memoryExpired: isExpired });
+
+                if (!isExpired) {
                     return memoryEntry.match.value as Value;
                 }
             }
@@ -75,28 +79,31 @@ export class CacheObject extends DurableObject {
      * Get the value of a property from the DO storage.
      */
     public async getFromStorage<Value = unknown>(key: string) {
-        const entries = await this.ctx.storage.list<Uint8Array>({
-            prefix: getStoragePropKey(key),
-            noCache: true,
-        });
-        if (entries.size) {
-            const entry = decodeChunks<CacheObjectProp<Value>>(entries);
-            if (entry && entry.expiresAt > Date.now()) {
-                // Found
-                this.lru.set(key, { match: entry });
-                return entry.value;
+        return this.logOperation({ operation: 'getFromStorage', key }, async (setLog) => {
+            const entries = await this.ctx.storage.list<Uint8Array>({
+                prefix: getStoragePropKey(key),
+                noCache: true,
+            });
+            if (entries.size) {
+                const entry = decodeChunks<CacheObjectProp<Value>>(entries);
+                setLog({ chunks: entries.size, chunksSize: entry?.size ?? 0 });
+                if (entry && entry.value.expiresAt > Date.now()) {
+                    // Found
+                    this.lru.set(key, { match: entry.value });
+                    return entry.value.value;
+                }
             }
-        }
 
-        // Not found
-        this.lru.set(key, { match: undefined });
+            // Not found
+            this.lru.set(key, { match: undefined });
+        });
     }
 
     /**
      * Set a value in the cache object.
      */
     public async set<Value = unknown>(key: string, value: Value, expiresAt: number) {
-        return timeFn(`set: ${key}`, async () => {
+        return this.logOperation({ operation: 'set', key }, async (setLog) => {
             const prop: CacheObjectProp<Value> = {
                 value,
                 expiresAt,
@@ -105,10 +112,12 @@ export class CacheObject extends DurableObject {
             this.lru.set(key, { match: prop });
             await this.ctx.storage.transaction(async (tx) => {
                 const entries = encodeChunks(key, prop);
+                const chunks = Object.keys(entries).length;
+                setLog({ chunks });
 
                 const clockValue: CacheObjectExp = {
                     k: key,
-                    c: Object.keys(entries).length,
+                    c: chunks,
                 };
 
                 await tx.put(getGCClockKey(key, expiresAt), clockValue);
@@ -127,76 +136,101 @@ export class CacheObject extends DurableObject {
      * Purge all keys in the cache object.
      */
     public async purge() {
-        let result = new Set<string>();
+        return this.logOperation({ operation: 'purge' }, async (setLog) => {
+            let result = new Set<string>();
 
-        try {
-            // List all the keys in the cache object.
-            const entries = await this.ctx.storage.list<CacheObjectExp>({
-                prefix: 'exp.',
-                noCache: true,
-            });
-            console.log(`purge: ${entries.size} entries`);
-            entries.forEach((exp) => {
-                result.add(exp.k);
-            });
-        } catch (error) {
-            // If an error occurs, reset the cache object.
-            // This is a safety mechanism to prevent the cache object from being stuck in a bad state.
-            console.error('Error during purge, resetting the cache object', error);
-        }
+            try {
+                // List all the keys in the cache object.
+                const entries = await this.ctx.storage.list<CacheObjectExp>({
+                    prefix: 'exp.',
+                    noCache: true,
+                });
+                setLog({ entries: entries.size });
+                entries.forEach((exp) => {
+                    result.add(exp.k);
+                });
+            } catch (error) {
+                // If an error occurs, reset the cache object.
+                // This is a safety mechanism to prevent the cache object from being stuck in a bad state.
+                console.error('Error during purge, resetting the cache object', error);
+            }
 
-        await this.reset();
-
-        console.log(`purge returns`, Array.from(result));
-        return Array.from(result);
+            await this.reset();
+            return Array.from(result);
+        });
     }
 
     /**
      * Alarm to garbage collect all entries that have expired.
      */
     async alarm() {
-        try {
-            const entries = await this.ctx.storage.list<CacheObjectExp>({
-                prefix: 'exp.',
-                noCache: true,
-            });
-            const toDeleteSet = new Set<string>();
+        return this.logOperation({ operation: 'alarm' }, async (setLog) => {
+            try {
+                const entries = await this.ctx.storage.list<CacheObjectExp>({
+                    prefix: 'exp.',
+                    noCache: true,
+                });
+                setLog({ entries: entries.size });
+                const toDeleteSet = new Set<string>();
 
-            for (const [key, exp] of entries) {
-                const timestamp = parseInt(key.split('.')[1]);
-                if (timestamp < Date.now()) {
-                    toDeleteSet.add(key);
-                    for (let i = 0; i < exp.c; i++) {
-                        toDeleteSet.add(getStoragePropChunkKey(exp.k, i));
+                for (const [key, exp] of entries) {
+                    const timestamp = parseInt(key.split('.')[1]);
+                    if (timestamp < Date.now()) {
+                        toDeleteSet.add(key);
+                        for (let i = 0; i < exp.c; i++) {
+                            toDeleteSet.add(getStoragePropChunkKey(exp.k, i));
+                        }
                     }
                 }
-            }
 
-            // Delete the keys by batch of 128.
-            const toDelete = Array.from(toDeleteSet);
-            for (let i = 0; i < toDelete.length; i += 128) {
-                await this.ctx.storage.delete(toDelete.slice(i, i + 128));
-            }
+                // Delete the keys by batch of 128.
+                const toDelete = Array.from(toDeleteSet);
+                setLog({ toDelete: toDelete.length });
+                for (let i = 0; i < toDelete.length; i += 128) {
+                    await this.ctx.storage.delete(toDelete.slice(i, i + 128));
+                }
 
-            // If there are still keys to delete, set an alarm to continue the deletion in 12h.
-            if (toDelete.length) {
-                await this.ctx.storage.setAlarm(Date.now() + 12 * 60 * 60 * 1000);
+                // If there are still keys to delete, set an alarm to continue the deletion in 12h.
+                if (toDelete.length) {
+                    await this.ctx.storage.setAlarm(Date.now() + 12 * 60 * 60 * 1000);
+                }
+            } catch (error) {
+                // If an error occurs, reset the cache object.
+                // This is a safety mechanism to prevent the cache object from being stuck in a bad state.
+                console.error('Error during alarm, reset the cache object', error);
+                await this.reset();
             }
-        } catch (error) {
-            // If an error occurs, reset the cache object.
-            // This is a safety mechanism to prevent the cache object from being stuck in a bad state.
-            console.error('Error during alarm, reset the cache object', error);
-            await this.reset();
-        }
+        });
     }
 
     /**
      * Reset the cache object.
      */
     async reset() {
-        console.log('reset: clear all entries');
-        this.lru.clear();
-        await this.ctx.storage.deleteAll();
+        return this.logOperation({ operation: 'reset' }, async () => {
+            this.lru.clear();
+            await this.ctx.storage.deleteAll();
+        });
+    }
+
+    /**
+     * Time and log an operation.
+     */
+    async logOperation<T>(
+        log: Record<string, unknown>,
+        fn: (update: (log: Record<string, unknown>) => void) => Promise<T>,
+    ): Promise<T> {
+        const objectId = this.ctx.id.name ?? this.ctx.id.toString();
+        let update: Record<string, unknown> = {};
+        const start = performance.now();
+        try {
+            return await fn((arg) => {
+                Object.assign(update, arg);
+            });
+        } finally {
+            const duration = performance.now() - start;
+            console.log({ ...log, ...update, objectId, duration });
+        }
     }
 }
 
@@ -228,7 +262,7 @@ function encodeChunks<T>(key: string, value: T): Record<string, Uint8Array> {
     return entries;
 }
 
-function decodeChunks<T>(entries: Map<string, Uint8Array>): T | undefined {
+function decodeChunks<T>(entries: Map<string, Uint8Array>): { value: T; size: number } | undefined {
     const chunks = Array.from(entries.entries())
         .map(([key, value]) => {
             const index = parseInt(key.split('.').pop()!);
@@ -242,7 +276,7 @@ function decodeChunks<T>(entries: Map<string, Uint8Array>): T | undefined {
     }
 
     const buf = mergeUint8Array(chunks);
-    return decode(buf) as T;
+    return { value: decode(buf) as T, size: buf.length };
 }
 
 function chunkUint8Array(input: Uint8Array, chunkSize: number): Uint8Array[] {
@@ -262,13 +296,4 @@ function mergeUint8Array(chunks: Uint8Array[]): Uint8Array {
         offset += chunk.length;
     }
     return result;
-}
-
-async function timeFn<T>(message: string, fn: () => Promise<T>): Promise<T> {
-    const start = performance.now();
-    try {
-        return await fn();
-    } finally {
-        console.log(`${message} (${performance.now() - start}ms)`);
-    }
 }
