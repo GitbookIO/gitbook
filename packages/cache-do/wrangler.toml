@@ -4,7 +4,7 @@ compatibility_date = "2024-09-02"
 
 [observability]
 enabled = true
-head_sampling_rate = 0.1
+head_sampling_rate = 0.01
 
 durable_objects.bindings = [
   {name = "CACHE", class_name = "CacheObject"}
