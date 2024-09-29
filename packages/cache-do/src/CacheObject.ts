@@ -79,21 +79,24 @@ export class CacheObject extends DurableObject {
      * Get the value of a property from the DO storage.
      */
     public async getFromStorage<Value = unknown>(key: string) {
-        const entries = await this.ctx.storage.list<Uint8Array>({
-            prefix: getStoragePropKey(key),
-            noCache: true,
-        });
-        if (entries.size) {
-            const entry = decodeChunks<CacheObjectProp<Value>>(entries);
-            if (entry && entry.expiresAt > Date.now()) {
-                // Found
-                this.lru.set(key, { match: entry });
-                return entry.value;
+        return this.logOperation({ operation: 'getFromStorage', key }, async (setLog) => {
+            const entries = await this.ctx.storage.list<Uint8Array>({
+                prefix: getStoragePropKey(key),
+                noCache: true,
+            });
+            if (entries.size) {
+                const entry = decodeChunks<CacheObjectProp<Value>>(entries);
+                setLog({ chunks: entries.size, chunksSize: entry?.size ?? 0 });
+                if (entry && entry.value.expiresAt > Date.now()) {
+                    // Found
+                    this.lru.set(key, { match: entry.value });
+                    return entry.value.value;
+                }
             }
-        }
 
-        // Not found
-        this.lru.set(key, { match: undefined });
+            // Not found
+            this.lru.set(key, { match: undefined });
+        });
     }
 
     /**
@@ -259,7 +262,7 @@ function encodeChunks<T>(key: string, value: T): Record<string, Uint8Array> {
     return entries;
 }
 
-function decodeChunks<T>(entries: Map<string, Uint8Array>): T | undefined {
+function decodeChunks<T>(entries: Map<string, Uint8Array>): { value: T; size: number } | undefined {
     const chunks = Array.from(entries.entries())
         .map(([key, value]) => {
             const index = parseInt(key.split('.').pop()!);
@@ -273,7 +276,7 @@ function decodeChunks<T>(entries: Map<string, Uint8Array>): T | undefined {
     }
 
     const buf = mergeUint8Array(chunks);
-    return decode(buf) as T;
+    return { value: decode(buf) as T, size: buf.length };
 }
 
 function chunkUint8Array(input: Uint8Array, chunkSize: number): Uint8Array[] {
