@@ -669,12 +669,11 @@ async function lookupSpaceByAPI(
         /**
          * We use the following criteria to determine if the lookup result is the right one:
          * - the primary alternative was resolved (because that's the longest or most inclusive path)
-         * - the resolution resolves to a site space variant which is different from the default variant
-         *   (in this case, we are looking at the deepest path that uses the variant path explicitly)
+         * - the resolution of the site URL is complete (because we want to resolve the deepest path possible)
          *
          * In both cases, the idea is to use the deepest/longest/most inclusive path to resolve the content.
          */
-        if (alternative.primary || ('site' in data && data.defaultSiteSpace !== data.siteSpace)) {
+        if (alternative.primary || ('site' in data && data.complete)) {
             const changeRequest = data.changeRequest ?? lookup.changeRequest;
             return {
                 space: data.space,

@@ -132,9 +132,10 @@ export type PublishedContentWithCache =
           | (PublishedSiteContentLookup & {
                 //TODO: Remove this once the @gitbook/api is bumped
                 /**
-                 * ID of the default site space variant in the URL lookup.
+                 * Whether the resolved site URL is complete and at it's terminal point, meaning no more site path segments
+                 * can be further expected before any page path segments.
                  */
-                defaultSiteSpace: string;
+                complete: boolean;
             })
       ) & {
           cacheMaxAge?: number;
