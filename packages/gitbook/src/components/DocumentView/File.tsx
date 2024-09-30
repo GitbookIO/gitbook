@@ -4,10 +4,11 @@ import { getSimplifiedContentType } from '@/lib/files';
 import { tcls } from '@/lib/tailwind';
 
 import { BlockProps } from './Block';
+import { Caption } from './Caption';
 import { FileIcon } from './FileIcon';
 
 export async function File(props: BlockProps<DocumentBlockFile>) {
-    const { block, context, style } = props;
+    const { block, context } = props;
 
     const contentRef = await context.resolveContentRef(block.data.ref);
     const file = contentRef?.file;
@@ -19,76 +20,65 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
     const contentType = getSimplifiedContentType(file.contentType);
 
     return (
-        <a
-            href={file.downloadURL}
-            download={file.name}
-            className={tcls(
-                'group/file',
-                'flex',
-                'flex-row',
-                'items-center',
-                'border',
-                'border-b-0',
-                'px-5',
-                'py-3',
-                'border-dark/3',
-
-                //all
-                '[&]:mt-[0px]',
-                //select first child
-                '[&:first-child]:mt-5',
-                '[&:first-child]:rounded-t-lg',
-                //select first in group
-                '[:not(&)_+&]:mt-5',
-                '[:not(&)_+&]:rounded-t-lg',
-                //select last in group
-                '[&:not(:has(+_&))]:mb-5',
-                '[&:not(:has(+_&))]:rounded-b-lg',
-                '[&:not(:has(+_&))]:border-b',
-
-                'hover:text-primary-600',
-                'dark:border-light/3',
-                'dark:hover:text-primary-300',
-                style,
-            )}
-        >
-            <div
+        <Caption {...props} wrapperStyle={[]}>
+            <a
+                href={file.downloadURL}
+                download={file.name}
                 className={tcls(
-                    'min-w-14',
-                    'mr-5',
-                    'pr-5',
+                    'group/file',
                     'flex',
-                    'flex-col',
+                    'flex-row',
                     'items-center',
-                    'gap-1',
-                    'border-r',
-                    'border-dark/2',
-                    'dark:border-light/2',
+                    'border',
+                    'px-5',
+                    'py-3',
+                    'border-dark/3',
+                    'rounded-lg',
+                    'hover:text-primary-600',
+                    'dark:border-light/3',
+                    'dark:hover:text-primary-300',
                 )}
             >
-                <div>
-                    <FileIcon
-                        contentType={contentType}
-                        className={tcls('size-5', 'text-primary')}
-                    />
-                </div>
                 <div
                     className={tcls(
-                        'text-xs',
-                        'text-dark-4/8',
-                        'group-hover/file:text-dark',
-                        'dark:text-light-4/7',
-                        'dark:group-hover/file:text-light',
+                        'min-w-14',
+                        'mr-5',
+                        'pr-5',
+                        'flex',
+                        'flex-col',
+                        'items-center',
+                        'gap-1',
+                        'border-r',
+                        'border-dark/2',
+                        'dark:border-light/2',
                     )}
                 >
-                    {getHumanFileSize(file.size)}
+                    <div>
+                        <FileIcon
+                            contentType={contentType}
+                            className={tcls('size-5', 'text-primary')}
+                        />
+                    </div>
+                    <div
+                        className={tcls(
+                            'text-xs',
+                            'text-dark-4/8',
+                            'group-hover/file:text-dark',
+                            'dark:text-light-4/7',
+                            'dark:group-hover/file:text-light',
+                        )}
+                    >
+                        {getHumanFileSize(file.size)}
+                    </div>
                 </div>
-            </div>
-            <div>
-                <div className={tcls('text-base')}>{file.name}</div>
-                <div className={tcls('text-sm', 'opacity-9', 'dark:opacity-8')}>{contentType}</div>
-            </div>
-        </a>
+                <div>
+                    <div className={tcls('text-base')}>{file.name}</div>
+                    <div className={tcls('text-sm', 'opacity-9', 'dark:opacity-8')}>
+                        {contentType}
+                    </div>
+                </div>
+            </a>
+        </Caption>
     );
 }
 
