@@ -127,7 +127,17 @@ export function withAPI<T>(client: GitBookAPI, fn: () => Promise<T>): Promise<T>
 }
 
 export type PublishedContentWithCache =
-    | ((PublishedContentLookup | PublishedSiteContentLookup) & {
+    | ((
+          | PublishedContentLookup
+          | (PublishedSiteContentLookup & {
+                //TODO: Remove this once the @gitbook/api is bumped
+                /**
+                 * Whether the resolved site URL is complete and at it's terminal point, meaning no more site path segments
+                 * can be further expected before any page path segments.
+                 */
+                complete: boolean;
+            })
+      ) & {
           cacheMaxAge?: number;
           cacheTags?: string[];
       })
