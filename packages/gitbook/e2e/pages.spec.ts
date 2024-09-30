@@ -104,7 +104,7 @@ const testCases: TestsCase[] = [
             },
             {
                 name: 'RFC variant',
-                url: 'v/rfcs',
+                url: 'rfcs',
             },
             {
                 name: 'Customized variant titles are displayed',
@@ -553,7 +553,7 @@ const testCases: TestsCase[] = [
                             expiresIn: '24h',
                         },
                     );
-                    return `v/spacea?jwt_token=${token}`;
+                    return `spacea?jwt_token=${token}`;
                 })(),
                 run: waitForCookiesDialog,
             },
@@ -570,7 +570,7 @@ const testCases: TestsCase[] = [
                             expiresIn: '24h',
                         },
                     );
-                    return `v/spaceb?jwt_token=${token}`;
+                    return `spaceb?jwt_token=${token}`;
                 })(),
                 run: waitForCookiesDialog,
             },
@@ -587,7 +587,7 @@ const testCases: TestsCase[] = [
                             expiresIn: '24h',
                         },
                     );
-                    return `v/spacec?jwt_token=${token}`;
+                    return `spacec?jwt_token=${token}`;
                 })(),
                 run: waitForCookiesDialog,
             },
