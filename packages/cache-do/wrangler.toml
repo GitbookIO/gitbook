@@ -10,8 +10,19 @@ migrations = [
   {tag = "v1", new_classes = ["CacheObject"]}
 ]
 
+[observability]
+enabled = true
+head_sampling_rate = 0.01
+
 [env.preview]
 name = "gitbook-open-cache-preview"
 durable_objects.bindings = [
   {name = "CACHE", class_name = "CacheObject"}
 ]
+migrations = [
+  {tag = "v1", new_classes = ["CacheObject"]}
+]
+
+[env.preview.observability]
+enabled = true
+head_sampling_rate = 1

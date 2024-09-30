@@ -32,7 +32,7 @@ function shouldUseKVForTag(tag: string): boolean {
     const hash = tag.split('').reduce((acc, char) => {
         return acc + char.charCodeAt(0);
     }, 0);
-    if (hash % 100 <= 60) {
+    if (hash % 100 <= 30) {
         return true;
     }
 
