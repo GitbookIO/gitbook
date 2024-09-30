@@ -77,7 +77,12 @@ export class CacheObjectStub {
         await Promise.all(
             allLocations.map(async (locationId) => {
                 const groupId = getCacheObjectIdName(locationId, this.tag);
-                const cacheGroup = this.doNamespace.get(this.doNamespace.idFromName(groupId));
+                const cacheGroup = this.doNamespace.get(this.doNamespace.idFromName(groupId), {
+                    // Initialize the object with a locaiton hint,
+                    // as we might want to purge all locations before the object is created.
+                    // https://developers.cloudflare.com/durable-objects/reference/data-location/
+                    locationHint: doLocationHints[this.locationId],
+                });
                 const locationkeys = await cacheGroup.purge();
                 locationkeys.forEach((key) => keys.add(key));
             }),
