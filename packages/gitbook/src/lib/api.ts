@@ -226,7 +226,7 @@ export const getSyncedBlockContent = cache({
  * Resolve a URL to the content to render.
  */
 export const getPublishedContentByUrl = cache({
-    name: 'api.getPublishedContentByUrl.v3',
+    name: 'api.getPublishedContentByUrl.v4',
     tag: (url) =>
         getAPICacheTag({
             tag: 'url',
