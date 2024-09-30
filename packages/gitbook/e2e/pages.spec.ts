@@ -1,4 +1,3 @@
-import { DeepPartial } from 'ts-essentials';
 import { argosScreenshot } from '@argos-ci/playwright';
 import {
     CustomizationHeaderPreset,
@@ -9,6 +8,7 @@ import {
 import { test, expect, Page } from '@playwright/test';
 import jwt from 'jsonwebtoken';
 import rison from 'rison';
+import { DeepPartial } from 'ts-essentials';
 
 import { getContentTestURL } from '../tests/utils';
 
@@ -156,7 +156,7 @@ const testCases: TestsCase[] = [
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
                     await page.waitForURL(
-                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions/v/2.0/reference/api-reference/pets?fallback=true',
+                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions/2.0/reference/api-reference/pets?fallback=true',
                     );
                 },
             },
@@ -179,7 +179,7 @@ const testCases: TestsCase[] = [
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
                     await page.waitForURL(
-                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/bRfQbzwsK8rbN1GRxx7K/v/2.0/reference/api-reference/pets?fallback=true',
+                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/bRfQbzwsK8rbN1GRxx7K/2.0/reference/api-reference/pets?fallback=true',
                     );
                 },
             },
@@ -214,7 +214,7 @@ const testCases: TestsCase[] = [
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
                     await page.waitForURL(
-                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-va/v/2.0/reference/api-reference/pets?fallback=true',
+                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-va/2.0/reference/api-reference/pets?fallback=true',
                     );
                 },
             },
