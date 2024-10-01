@@ -372,6 +372,11 @@ const testCases: TestsCase[] = [
                 url: 'blocks/math',
             },
             {
+                name: 'Files',
+                url: 'blocks/files',
+                fullPage: true,
+            },
+            {
                 name: 'Embeds',
                 url: 'blocks/embeds',
                 fullPage: true,
