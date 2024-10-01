@@ -17,7 +17,7 @@ export type CacheFunction<Args extends any[], Result> = ((
     /**
      * Refetch the data and update the cache.
      */
-    revalidate: (...args: Args | [...Args, CacheFunctionOptions]) => Promise<void>;
+    revalidate: (...args: Args | [...Args, CacheFunctionOptions]) => Promise<Result>;
 
     /**
      * Check if a value is in the memory cache.
@@ -239,7 +239,8 @@ export function cache<Args extends any[], Result>(
         const cacheArgs = cacheDef.getKeyArgs ? cacheDef.getKeyArgs(args) : args;
         const key = getCacheKey(cacheDef.name, cacheArgs);
 
-        await revalidate(key, signal, ...args);
+        const result = await revalidate(key, signal, ...args);
+        return result.data;
     };
 
     cacheFn.hasInMemory = async (...args: Args) => {

@@ -22,7 +22,7 @@ const doLocationHints: {
  * Client to access a cache tag.
  */
 export class CacheObjectStub {
-    private opened: CacheObjectDescriptor | null = null;
+    private stub: DurableObjectStub<CacheObject>;
 
     constructor(
         /** Binding to the CacheObject durable object */
@@ -31,41 +31,42 @@ export class CacheObjectStub {
         private locationId: CacheLocationId,
         /** Name of the tag */
         private tag: string,
-    ) {}
+    ) {
+        const groupId = getCacheObjectIdName(this.locationId, this.tag);
+        this.stub = this.doNamespace.get(this.doNamespace.idFromName(groupId), {
+            // Initialize the object with a locaiton hint,
+            // as we might want to purge all locations before the object is created.
+            // https://developers.cloudflare.com/durable-objects/reference/data-location/
+            locationHint: doLocationHints[this.locationId],
+        });
+    }
 
     /**
-     * Open the cache object.
+     * Open a descriptor to the cache object.
+     * It can be used to perform multiple operations in a single RPC session.
+     * Ex:
+     * ```ts
+     * using desc = cache.open();
+     * await desc.set('key', 'value', Date.now() + 1000);
+     * await desc.get('key');
+     * ```
      */
     async open() {
-        if (!this.opened) {
-            const groupId = getCacheObjectIdName(this.locationId, this.tag);
-            const cacheGroup = this.doNamespace.get(this.doNamespace.idFromName(groupId), {
-                // Initialize the object with a locaiton hint,
-                // as we might want to purge all locations before the object is created.
-                // https://developers.cloudflare.com/durable-objects/reference/data-location/
-                locationHint: doLocationHints[this.locationId],
-            });
-            this.opened = await cacheGroup.open();
-        }
-
-        return this.opened;
+        return await this.stub.open();
     }
 
     /**
      * Get a value from the cache.
      */
     async get<Value = unknown>(key: string) {
-        const desc = await this.open();
-        return await desc.get<Value>(key);
+        return (await this.stub.get(key)) as Value | undefined;
     }
 
     /**
      * Set a value in the cache.
      */
     async set<Value = unknown>(key: string, value: Value, expiresAt: number) {
-        // TODO: Should we write on all locations instead of just the current one?
-        const desc = await this.open();
-        return await desc.set<Value>(key, value, expiresAt);
+        return await this.stub.set(key, value, expiresAt);
     }
 
     /**
@@ -76,7 +77,12 @@ export class CacheObjectStub {
         await Promise.all(
             allLocations.map(async (locationId) => {
                 const groupId = getCacheObjectIdName(locationId, this.tag);
-                const cacheGroup = this.doNamespace.get(this.doNamespace.idFromName(groupId));
+                const cacheGroup = this.doNamespace.get(this.doNamespace.idFromName(groupId), {
+                    // Initialize the object with a locaiton hint,
+                    // as we might want to purge all locations before the object is created.
+                    // https://developers.cloudflare.com/durable-objects/reference/data-location/
+                    locationHint: doLocationHints[this.locationId],
+                });
                 const locationkeys = await cacheGroup.purge();
                 locationkeys.forEach((key) => keys.add(key));
             }),

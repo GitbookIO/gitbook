@@ -64,16 +64,16 @@ export interface ContentTarget {
 }
 
 /**
- * Parameter to cache an entry as an immutable one (ex: revisions, documents).
+ * Parameter to cache an entry for a certain period of time.
  * It'll cache it for 1 week and revalidate it 24h before expiration.
  *
  * We don't cache for more than this to ensure we don't use too much storage and keep the cache small.
  */
-const immutableCacheTtl_7days = {
+const cacheTtl_7days = {
     revalidateBefore: 24 * 60 * 60,
     ttl: 7 * 24 * 60 * 60,
 };
-const immutableCacheTtl_1day = {
+const cacheTtl_1day = {
     revalidateBefore: 60 * 60,
     ttl: 24 * 60 * 60,
 };
@@ -127,7 +127,17 @@ export function withAPI<T>(client: GitBookAPI, fn: () => Promise<T>): Promise<T>
 }
 
 export type PublishedContentWithCache =
-    | ((PublishedContentLookup | PublishedSiteContentLookup) & {
+    | ((
+          | PublishedContentLookup
+          | (PublishedSiteContentLookup & {
+                //TODO: Remove this once the @gitbook/api is bumped
+                /**
+                 * Whether the resolved site URL is complete and at it's terminal point, meaning no more site path segments
+                 * can be further expected before any page path segments.
+                 */
+                complete: boolean;
+            })
+      ) & {
           cacheMaxAge?: number;
           cacheTags?: string[];
       })
@@ -216,7 +226,7 @@ export const getSyncedBlockContent = cache({
  * Resolve a URL to the content to render.
  */
 export const getPublishedContentByUrl = cache({
-    name: 'api.getPublishedContentByUrl.v3',
+    name: 'api.getPublishedContentByUrl.v4',
     tag: (url) =>
         getAPICacheTag({
             tag: 'url',
@@ -306,8 +316,6 @@ export const getChangeRequest = cache({
             signal: options.signal,
         });
         return cacheResponse(response, {
-            // We don't cache for long as we currently don't invalidate change-request cache
-            // and it's only used for preview where perfs are not critical
             ttl: 60 * 60,
             revalidateBefore: 10 * 60,
         });
@@ -366,10 +374,7 @@ export const getRevision = cache({
             },
         );
 
-        return cacheResponse(
-            response,
-            fetchOptions.metadata ? immutableCacheTtl_7days : immutableCacheTtl_1day,
-        );
+        return cacheResponse(response, fetchOptions.metadata ? cacheTtl_7days : cacheTtl_1day);
     },
     getKeyArgs: (args) => [args[0], args[1]],
 });
@@ -400,7 +405,7 @@ export const getRevisionPages = cache({
         );
 
         return cacheResponse(response, {
-            ...(fetchOptions.metadata ? immutableCacheTtl_7days : immutableCacheTtl_1day),
+            ...(fetchOptions.metadata ? cacheTtl_7days : cacheTtl_1day),
             data: response.data.pages,
         });
     },
@@ -436,12 +441,12 @@ export const getRevisionPageByPath = cache({
                 },
             );
 
-            return cacheResponse(response, immutableCacheTtl_7days);
+            return cacheResponse(response, cacheTtl_7days);
         } catch (error) {
             if ((error as GitBookAPIError).code === 404) {
                 return {
                     data: null,
-                    ...immutableCacheTtl_7days,
+                    ...cacheTtl_7days,
                 };
             }
 
@@ -480,10 +485,10 @@ const getRevisionFileById = cache({
                 );
             })();
 
-            return cacheResponse(response, immutableCacheTtl_7days);
+            return cacheResponse(response, cacheTtl_7days);
         } catch (error: any) {
             if (error instanceof GitBookAPIError && error.code === 404) {
-                return { data: null, ...immutableCacheTtl_7days };
+                return { data: null, ...cacheTtl_7days };
             }
 
             throw error;
@@ -524,7 +529,7 @@ const getRevisionAllFiles = cache({
             files[file.id] = file;
         });
 
-        return cacheResponse(response, { ...immutableCacheTtl_7days, data: files });
+        return cacheResponse(response, { ...cacheTtl_7days, data: files });
     },
     timeout: 60 * 1000,
 });
@@ -601,7 +606,7 @@ export const getDocument = cache({
                 ...noCacheFetchOptions,
             },
         );
-        return cacheResponse(response, immutableCacheTtl_7days);
+        return cacheResponse(response, cacheTtl_7days);
     },
     // Temporarily allow for a longer timeout than the default 10s
     // because GitBook's API currently re-normalizes all documents
@@ -1083,6 +1088,43 @@ export const renderIntegrationUi = cache({
             },
         );
         return cacheResponse(response);
+    },
+});
+
+/**
+ * Fetch an embed.
+ * We don't cache them by cache tag, as we never purge them (they expire after 7 days).
+ */
+export const getEmbedByUrl = cache({
+    name: 'api.getEmbedByUrl',
+    get: async (url: string, options: CacheFunctionOptions) => {
+        const response = await api().urls.getEmbedByUrl(
+            { url },
+            {
+                ...noCacheFetchOptions,
+                signal: options.signal,
+            },
+        );
+        return cacheResponse(response);
+    },
+});
+
+/**
+ * Fetch an embed in a space.
+ */
+export const getEmbedByUrlInSpace = cache({
+    name: 'api.getEmbedByUrlInSpace',
+    tag: (spaceId) => getAPICacheTag({ tag: 'space', space: spaceId }),
+    get: async (spaceId: string, url: string, options: CacheFunctionOptions) => {
+        const response = await api().spaces.getEmbedByUrlInSpace(
+            spaceId,
+            { url },
+            {
+                ...noCacheFetchOptions,
+                signal: options.signal,
+            },
+        );
+        return cacheResponse(response, cacheTtl_7days);
     },
 });
 

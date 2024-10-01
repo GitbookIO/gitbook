@@ -11,13 +11,46 @@ interface KVTagMetadata {
 }
 
 /**
+ * As we migrate off KV, we start disabling it for some tests content.
+ */
+const noKVTags = new Set([
+    // docs.gitbook.com
+    'url:docs.gitbook.com',
+    'site:site_p4Xo4',
+    'space:NkEGS7hzeqa35sMXQZ4X',
+]);
+
+function shouldUseKVForTag(tag: string): boolean {
+    if (noKVTags.has(tag)) {
+        return false;
+    }
+    if (tag.startsWith('change-request:')) {
+        return false;
+    }
+
+    // Hash the tag and return true for 95% of the tags
+    const hash = tag.split('').reduce((acc, char) => {
+        return acc + char.charCodeAt(0);
+    }, 0);
+    if (hash % 100 <= 30) {
+        return true;
+    }
+
+    return false;
+}
+
+/**
  * Cache implementation using the Cloudflare KV API.
  * https://developers.cloudflare.com/kv/
  */
 export const cloudflareKVCache: CacheBackend = {
     name: 'cloudflare-kv',
     replication: 'global',
-    async get({ key }, options) {
+    async get({ key, tag }, options) {
+        if (tag && !shouldUseKVForTag(tag)) {
+            return null;
+        }
+
         const kv = await getKVNamespace();
         if (!kv) {
             return null;

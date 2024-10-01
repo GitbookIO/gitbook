@@ -276,7 +276,7 @@ export async function middleware(request: NextRequest) {
             'private, no-cache, no-store, max-age=0, must-revalidate',
         );
     } else {
-        if (resolved.cacheMaxAge) {
+        if (typeof resolved.cacheMaxAge === 'number') {
             const cacheControl = `public, max-age=0, s-maxage=${resolved.cacheMaxAge}, stale-if-error=0`;
 
             if (
@@ -666,24 +666,38 @@ async function lookupSpaceByAPI(
             return null;
         }
 
-        return {
-            space: data.space,
-            changeRequest: data.changeRequest ?? lookup.changeRequest,
-            revision: data.revision ?? lookup.revision,
-            basePath: joinPath(data.basePath, lookup.basePath ?? ''),
-            pathname: joinPath(data.pathname, alternative.extraPath),
-            apiToken: data.apiToken,
-            cacheMaxAge: data.cacheMaxAge,
-            cacheTags: data.cacheTags,
-            ...('site' in data
-                ? {
-                      site: data.site,
-                      siteSpace: data.siteSpace,
-                      organization: data.organization,
-                      shareKey: data.shareKey,
-                  }
-                : {}),
-        } as PublishedContentWithCache;
+        /**
+         * We use the following criteria to determine if the lookup result is the right one:
+         * - the primary alternative was resolved (because that's the longest or most inclusive path)
+         * - the resolution of the site URL is complete (because we want to resolve the deepest path possible)
+         *
+         * In both cases, the idea is to use the deepest/longest/most inclusive path to resolve the content.
+         */
+        if (alternative.primary || ('site' in data && data.complete)) {
+            const changeRequest = data.changeRequest ?? lookup.changeRequest;
+            return {
+                space: data.space,
+                changeRequest,
+                revision: data.revision ?? lookup.revision,
+                basePath: joinPath(data.basePath, lookup.basePath ?? ''),
+                pathname: joinPath(data.pathname, alternative.extraPath),
+                apiToken: data.apiToken,
+                // We don't cache change requests as they often change and we want to have consistent previews
+                // Purging the CDN cache will not be efficient enough.
+                cacheMaxAge: changeRequest ? 0 : data.cacheMaxAge,
+                cacheTags: data.cacheTags,
+                ...('site' in data
+                    ? {
+                          site: data.site,
+                          siteSpace: data.siteSpace,
+                          organization: data.organization,
+                          shareKey: data.shareKey,
+                      }
+                    : {}),
+            } as PublishedContentWithCache;
+        }
+
+        return null;
     });
 
     return (

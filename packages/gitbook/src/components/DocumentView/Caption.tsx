@@ -1,6 +1,7 @@
 import {
     DocumentBlockDrawing,
     DocumentBlockEmbed,
+    DocumentBlockFile,
     DocumentBlockImage,
     JSONDocument,
 } from '@gitbook/api';
@@ -21,7 +22,7 @@ export function Caption(
         style?: ClassValue;
         fit?: boolean;
         wrapperStyle?: ClassValue;
-        block: DocumentBlockImage | DocumentBlockDrawing | DocumentBlockEmbed;
+        block: DocumentBlockImage | DocumentBlockDrawing | DocumentBlockEmbed | DocumentBlockFile;
     } & DocumentContextProps,
 ) {
     const {

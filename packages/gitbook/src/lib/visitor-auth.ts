@@ -61,6 +61,12 @@ function getUrlBasePathCombinations(url: URL | NextRequest['nextUrl']): string[]
 
     for (let index = 0; index < parts.length; index++) {
         baseNames.push('/' + parts.slice(0, index + 1).join('/') + '/');
+        // For backwards compatibility, we also add the base path with the `/v/` prefix if it's not already there
+        if (parts.length > 1 && index >= 1 && ![parts[0], parts[1]].includes('v')) {
+            baseNames.push(
+                '/' + parts.slice(0, 1) + '/v/' + parts.slice(1, index + 1).join('/') + '/',
+            );
+        }
     }
 
     return baseNames.reverse();
