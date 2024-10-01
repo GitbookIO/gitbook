@@ -162,7 +162,7 @@ const testCases: TestsCase[] = [
             },
             {
                 name: 'Keep navigation path/route when switching variant (Share link)',
-                url: 'api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/reference/api-reference/pets',
+                url: 'api-multi-versions-share-links/bRfQbzwsK8rbN1GRxx7K/reference/api-reference/pets',
                 screenshot: false,
                 run: async (page) => {
                     const spaceDrowpdown = await page.waitForSelector(
@@ -179,7 +179,7 @@ const testCases: TestsCase[] = [
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
                     await page.waitForURL(
-                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/2.0/reference/api-reference/pets?fallback=true',
+                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/bRfQbzwsK8rbN1GRxx7K/2.0/reference/api-reference/pets?fallback=true',
                     );
                 },
             },
