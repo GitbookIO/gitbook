@@ -1,7 +1,6 @@
 'use client';
 
 import { DocumentBlock } from '@gitbook/api';
-import { OpenAPIOperationData } from '@gitbook/react-openapi';
 import { OpenAPIClientState } from '@gitbook/react-openapi/client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { OpenAPIV3 } from 'openapi-types';
