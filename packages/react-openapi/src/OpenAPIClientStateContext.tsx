@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { getServersURL } from './utils';
 import { OpenAPIV3 } from 'openapi-types';
 
