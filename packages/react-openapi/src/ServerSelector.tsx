@@ -4,10 +4,10 @@ import * as React from 'react';
 
 export function ServerSelector(props: {
     currentIndex: number;
+    lastIndex: number;
     onChange: (value: number) => void;
-    servers: any[];
 }) {
-    const { currentIndex, onChange, servers } = props;
+    const { currentIndex, onChange, lastIndex } = props;
     const [index, setIndex] = React.useState(currentIndex);
 
     React.useEffect(() => {
@@ -32,7 +32,7 @@ export function ServerSelector(props: {
             </button>
             <button
                 className="openapi-select-button"
-                disabled={index >= servers.length - 1}
+                disabled={index >= lastIndex}
                 onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();

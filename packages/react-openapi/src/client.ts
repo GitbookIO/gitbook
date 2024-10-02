@@ -1,2 +1,2 @@
 'use client';
-export { OpenAPIContextProvider } from './OpenAPIContextProvider';
+export { OpenAPIClientState } from './OpenAPIClientStateContext';

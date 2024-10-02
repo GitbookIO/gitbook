@@ -4,7 +4,7 @@ import * as React from 'react';
 import { OpenAPIClientContext } from './types';
 import { OpenAPIV3 } from 'openapi-types';
 import { ServerSelector } from './ServerSelector';
-import { useOpenAPIContext } from './OpenAPIContextProvider';
+import { useOpenAPIClientState } from './OpenAPIClientStateContext';
 import { getServersURL } from './utils';
 
 export function ServerURLForm(props: {
@@ -14,7 +14,7 @@ export function ServerURLForm(props: {
     serverIndex: number;
 }) {
     const { children, context, servers, serverIndex } = props;
-    const stateContext = useOpenAPIContext();
+    const stateContext = useOpenAPIClientState();
     const server = servers[serverIndex];
     const formRef = React.useRef<HTMLFormElement>(null);
 
@@ -52,7 +52,10 @@ export function ServerURLForm(props: {
         });
     }
 
-    const isEditable = stateContext?.onUpdate && (servers.length > 1 || server.variables);
+    // Only make the server url editable if there is some onUpdate callback 
+    // and if there are variations on the server url (e.g. an array of servers or url variables).
+    const isEditable = stateContext?.onUpdate && (servers.length > 1 || server.variables); 
+    const isEditing = isEditable && stateContext?.state?.edit;
     return (
         <form
             ref={formRef}
@@ -65,9 +68,9 @@ export function ServerURLForm(props: {
             <fieldset disabled={stateContext?.isPending} className="contents">
                 <input type="hidden" name="block" value={context.blockKey} />
                 {children}
-                {stateContext?.state?.edit && servers.length > 1 ? (
+                {isEditing && servers.length > 1 ? (
                     <ServerSelector
-                        servers={servers}
+                        lastIndex={servers.length - 1}
                         currentIndex={serverIndex}
                         onChange={switchServer}
                     />
@@ -81,17 +84,17 @@ export function ServerURLForm(props: {
                             update({
                                 server: `${serverIndex}`,
                                 ...state,
-                                ...(stateContext?.state?.edit
+                                ...(isEditing
                                     ? { serverUrl: getServersURL(servers, state) }
                                     : { edit: 'true' }),
                             });
                         }}
                         title={
-                            stateContext?.state?.edit ? undefined : 'Try different server options'
+                            isEditing ? undefined : 'Try different server options'
                         }
-                        aria-label={stateContext?.state?.edit ? 'Clear' : 'Edit'}
+                        aria-label={isEditing ? 'Clear' : 'Edit'}
                     >
-                        {stateContext?.state?.edit ? context.icons.editDone : context.icons.edit}
+                        {isEditing ? context.icons.editDone : context.icons.edit}
                     </button>
                 ) : null}
             </fieldset>

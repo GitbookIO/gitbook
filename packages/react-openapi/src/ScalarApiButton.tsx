@@ -12,8 +12,7 @@ import {
 import React from 'react';
 
 import { OpenAPIOperationData, fromJSON } from './fetchOpenAPIOperation';
-import { useOpenAPIContext } from './OpenAPIContextProvider';
-import { getServersURL } from './utils';
+import { useOpenAPIClientState } from './OpenAPIClientStateContext';
 
 const ApiClientReact = React.lazy(async () => {
     const mod = await import('@scalar/api-client-react');
@@ -60,7 +59,7 @@ export function ScalarApiButton(props: {
 export function ScalarApiClient(props: { children: React.ReactNode }) {
     const { children } = props;
 
-    const ctx = useOpenAPIContext();
+    const stateCtx = useOpenAPIClientState();
 
     const [active, setActive] = React.useState<null | {
         operationData: OpenAPIOperationData | null;
@@ -129,12 +128,12 @@ export function ScalarApiClient(props: { children: React.ReactNode }) {
             headers: request.headers.map((header: Header) => {
                 return { ...header, enabled: true };
             }),
-            url: ctx?.serverUrl ?? operationData.servers[0]?.url,
+            url: stateCtx?.serverUrl ?? operationData.servers[0]?.url,
             body: request.postData?.text,
         };
 
         return data;
-    }, [active, ctx?.state?.serverUrl]);
+    }, [active, stateCtx?.serverUrl]);
 
     return (
         <ScalarContext.Provider value={open}>
