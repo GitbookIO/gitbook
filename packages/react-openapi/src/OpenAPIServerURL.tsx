@@ -11,7 +11,9 @@ import { useOpenAPIClientState } from './OpenAPIClientStateContext';
 import { parseServerURL } from './utils';
 
 /**
- * Show the url of the server with variables replaced by their default values.
+ * Show the url of the server, where there are variables they are replaced by their default values.
+ * If a stateContext is provided with an `onUpdate` callback then the variables can be edited and 
+ * if there are multiple servers available they can be selected.
  */
 export function OpenAPIServerURL(props: {
     servers: OpenAPIV3.ServerObject[];
