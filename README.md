@@ -120,12 +120,12 @@ If you plan to distribute the code, you must make the source code public to comp
 See `LICENSE` for more information.
 
 ## Badges
+
 <p align="left">
   <a href="https://gitbook.com"><img src="https://img.shields.io/static/v1?message=Documented%20on%20GitBook&logo=gitbook&logoColor=ffffff&label=%20&labelColor=5c5c5c&color=3F89A1"></a>
   <a href="https://gitbook.com"><img src="https://img.shields.io/static/v1?message=Documented%20on%20GitBook&logo=gitbook&logoColor=ffffff&label=%20&labelColor=5c5c5c&color=F4E28D"></a>
   <a href="https://gitbook.com"><img src="https://img.shields.io/static/v1?message=Documented%20on%20GitBook&logo=gitbook&logoColor=ffffff&label=%20&labelColor=5c5c5c&color=FDA599"></a>
 </p>
-
 
 ```md
 [![GitBook](https://img.shields.io/static/v1?message=Documented%20on%20GitBook&logo=gitbook&logoColor=ffffff&label=%20&labelColor=5c5c5c&color=3F89A1)](https://gitbook.com/)
@@ -133,10 +133,11 @@ See `LICENSE` for more information.
 
 ```html
 <a href="https://gitbook.com">
-  <img src="https://img.shields.io/static/v1?message=Documented%20on%20GitBook&logo=gitbook&logoColor=ffffff&label=%20&labelColor=5c5c5c&color=3F89A1">
+    <img
+        src="https://img.shields.io/static/v1?message=Documented%20on%20GitBook&logo=gitbook&logoColor=ffffff&label=%20&labelColor=5c5c5c&color=3F89A1"
+    />
 </a>
 ```
-
 
 ## Acknowledgements
 
