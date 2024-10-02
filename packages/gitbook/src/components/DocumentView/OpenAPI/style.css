@@ -381,3 +381,7 @@
 .openapi-select-button {
     @apply leading-[1cap] disabled:opacity-5;
 }
+
+.openapi-pending {
+    @apply opacity-5;
+}

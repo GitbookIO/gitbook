@@ -7,7 +7,7 @@ import { LoadingPane } from '@/components/primitives';
 import { fetchOpenAPIBlock } from '@/lib/openapi';
 import { tcls } from '@/lib/tailwind';
 
-import OpenAPIContext from './OpenAPIContext';
+import OpenAPIClientStateContainer from './OpenAPIClientStateContainer';
 import { serverUrlCache } from './ServerUrlCache';
 import { BlockProps } from '../Block';
 import { PlainCodeBlock } from '../CodeBlock';
@@ -19,7 +19,7 @@ import './scalar.css';
  * Render an OpenAPI block.
  */
 export async function OpenAPI(props: BlockProps<DocumentBlockSwagger>) {
-    const { block, style } = props;
+    const { style } = props;
     return (
         <div className={tcls('w-full', 'flex', 'flex-row', style, 'max-w-full')}>
             <React.Suspense fallback={<OpenAPIFallback />}>
@@ -47,10 +47,12 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockSwagger>) {
         return null;
     }
 
-    const serverUrl = serverUrlCache.get('serverUrl');
+    // To update the code sample we need to re-render the server component
+    // so reading the cached value from search params
+    const serverUrl = serverUrlCache.get('serverUrl'); 
 
     return (
-        <OpenAPIContext block={block} data={data}>
+        <OpenAPIClientStateContainer block={block} servers={data.servers}>
             <OpenAPIOperation
                 data={data}
                 context={{
@@ -68,7 +70,7 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockSwagger>) {
                 }}
                 className="openapi-block"
             />
-        </OpenAPIContext>
+        </OpenAPIClientStateContainer>
     );
 }
 

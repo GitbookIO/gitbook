@@ -2,24 +2,29 @@
 
 import { DocumentBlock } from '@gitbook/api';
 import { OpenAPIOperationData } from '@gitbook/react-openapi';
-import { OpenAPIContextProvider } from '@gitbook/react-openapi/client';
+import { OpenAPIClientState } from '@gitbook/react-openapi/client';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { OpenAPIV3 } from 'openapi-types';
 import * as React from 'react';
 
-export default function OpenAPIContext(props: {
+/**
+ * Client component that wraps `OpenAPIClientState` so we can 
+ * use some hooks (e.g. useRouter) in the `onUpdate` callback.
+ */
+export default function OpenAPIClientStateContainer(props: {
     children: React.ReactNode;
     block: DocumentBlock;
-    data: OpenAPIOperationData;
+    servers: OpenAPIV3.ServerObject[];
 }) {
-    const { block, children, data } = props;
+    const { block, children, servers } = props;
     const [isPending, startTransition] = React.useTransition();
     const router = useRouter();
     const searchParams = useSearchParams();
 
     return (
-        <OpenAPIContextProvider
+        <OpenAPIClientState
             isPending={isPending}
-            data={data}
+            servers={servers}
             params={
                 searchParams.get('block') === block.key
                     ? Object.fromEntries(searchParams.entries())
@@ -33,6 +38,6 @@ export default function OpenAPIContext(props: {
             }}
         >
             {children}
-        </OpenAPIContextProvider>
+        </OpenAPIClientState>
     );
 }
