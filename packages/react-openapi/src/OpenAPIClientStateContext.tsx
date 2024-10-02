@@ -65,7 +65,10 @@ export function OpenAPIClientState(props: {
     );
 }
 
-function parseClientStateModifiers(servers: OpenAPIV3.ServerObject[], params: Record<string, string>) {
+function parseClientStateModifiers(
+    servers: OpenAPIV3.ServerObject[],
+    params: Record<string, string>,
+) {
     if (!servers) {
         return null;
     }

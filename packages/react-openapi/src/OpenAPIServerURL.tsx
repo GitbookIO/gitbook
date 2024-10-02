@@ -21,15 +21,19 @@ export function OpenAPIServerURL(props: {
     const { path, servers, context } = props;
     const stateContext = useOpenAPIClientState();
 
-    const serverIndex = !isNaN(Number(stateContext?.state?.server)) ? Number(stateContext?.state?.server) : 0;
+    const serverIndex = !isNaN(Number(stateContext?.state?.server))
+        ? Number(stateContext?.state?.server)
+        : 0;
     const server = servers[serverIndex];
     const parts = parseServerURL(server?.url ?? '');
 
-    if (!server) { return null; }
+    if (!server) {
+        return null;
+    }
 
     return (
         <ServerURLForm context={context} servers={servers} serverIndex={serverIndex}>
-            <span className={classNames(stateContext?.isPending && "openapi-pending")}>
+            <span className={classNames(stateContext?.isPending && 'openapi-pending')}>
                 {parts.map((part, i) => {
                     if (part.kind === 'text') {
                         return <span key={i}>{part.text}</span>;

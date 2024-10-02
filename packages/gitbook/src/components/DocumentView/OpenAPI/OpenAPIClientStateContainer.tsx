@@ -8,7 +8,7 @@ import { OpenAPIV3 } from 'openapi-types';
 import * as React from 'react';
 
 /**
- * Client component that wraps `OpenAPIClientState` so we can 
+ * Client component that wraps `OpenAPIClientState` so we can
  * use some hooks (e.g. useRouter) in the `onUpdate` callback.
  */
 export default function OpenAPIClientStateContainer(props: {

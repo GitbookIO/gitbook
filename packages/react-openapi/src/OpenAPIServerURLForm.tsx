@@ -52,9 +52,9 @@ export function ServerURLForm(props: {
         });
     }
 
-    // Only make the server url editable if there is some onUpdate callback 
+    // Only make the server url editable if there is some onUpdate callback
     // and if there are variations on the server url (e.g. an array of servers or url variables).
-    const isEditable = stateContext?.onUpdate && (servers.length > 1 || server.variables); 
+    const isEditable = stateContext?.onUpdate && (servers.length > 1 || server.variables);
     const isEditing = isEditable && stateContext?.state?.edit;
     return (
         <form
@@ -89,9 +89,7 @@ export function ServerURLForm(props: {
                                     : { edit: 'true' }),
                             });
                         }}
-                        title={
-                            isEditing ? undefined : 'Try different server options'
-                        }
+                        title={isEditing ? undefined : 'Try different server options'}
                         aria-label={isEditing ? 'Clear' : 'Edit'}
                     >
                         {isEditing ? context.icons.editDone : context.icons.edit}

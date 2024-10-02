@@ -49,7 +49,7 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockSwagger>) {
 
     // To update the code sample we need to re-render the server component
     // so reading the cached value from search params
-    const serverUrl = serverUrlCache.get('serverUrl'); 
+    const serverUrl = serverUrlCache.get('serverUrl');
 
     return (
         <OpenAPIClientStateContainer block={block} servers={data.servers}>
