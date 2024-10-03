@@ -19,7 +19,7 @@ export function resolvePagePath(
             }
 
             if (page.path !== pagePath) {
-                if (page.path.split('/').join('/') === pagePath) {
+                if (page.path.split('/').slice(1).join('/') === pagePath) {
                     return resolvePageDocument(page, ancestors);
                 }
 
