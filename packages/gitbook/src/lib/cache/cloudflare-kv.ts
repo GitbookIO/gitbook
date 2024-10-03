@@ -1,42 +1,13 @@
 import type { KVNamespace } from '@cloudflare/workers-types';
 
-import { CacheBackend, CacheEntry, CacheEntryMeta } from './types';
+import { CacheBackend, CacheEntry, CacheEntryLookup, CacheEntryMeta } from './types';
 import { getCacheMaxAge } from './utils';
 import { trace } from '../tracing';
 
-const cacheVersion = 1;
+const cacheVersion = 2;
 
 interface KVTagMetadata {
     meta: CacheEntryMeta;
-}
-
-/**
- * As we migrate off KV, we start disabling it for some tests content.
- */
-const noKVTags = new Set([
-    // docs.gitbook.com
-    'url:docs.gitbook.com',
-    'site:site_p4Xo4',
-    'space:NkEGS7hzeqa35sMXQZ4X',
-]);
-
-function shouldUseKVForTag(tag: string): boolean {
-    if (noKVTags.has(tag)) {
-        return false;
-    }
-    if (tag.startsWith('change-request:')) {
-        return false;
-    }
-
-    // Hash the tag and return true for 95% of the tags
-    const hash = tag.split('').reduce((acc, char) => {
-        return acc + char.charCodeAt(0);
-    }, 0);
-    if (hash % 100 <= 30) {
-        return true;
-    }
-
-    return false;
 }
 
 /**
@@ -46,11 +17,7 @@ function shouldUseKVForTag(tag: string): boolean {
 export const cloudflareKVCache: CacheBackend = {
     name: 'cloudflare-kv',
     replication: 'global',
-    async get({ key, tag }, options) {
-        if (tag && !shouldUseKVForTag(tag)) {
-            return null;
-        }
-
+    async get(entry, options) {
         const kv = await getKVNamespace();
         if (!kv) {
             return null;
@@ -59,19 +26,19 @@ export const cloudflareKVCache: CacheBackend = {
         return trace(
             {
                 operation: `cloudflareKV.get`,
-                name: key,
+                name: entry.key,
             },
             async (span) => {
-                const kvKey = getValueKey(key);
+                const kvKey = getKey(entry);
 
-                const entry = await kv.get<CacheEntry>(kvKey, {
+                const kvEntry = await kv.get<CacheEntry>(kvKey, {
                     type: 'json',
                     cacheTtl: 60,
                 });
 
-                span.setAttribute('hit', !!entry);
+                span.setAttribute('hit', !!kvEntry);
 
-                return entry;
+                return kvEntry;
             },
         );
     },
@@ -94,23 +61,10 @@ export const cloudflareKVCache: CacheBackend = {
                     return;
                 }
 
-                const kvKey = getValueKey(entry.meta.key);
+                const kvKey = getKey(entry.meta);
                 await kv.put(kvKey, JSON.stringify(entry), {
                     expirationTtl: secondsFromNow,
                 });
-
-                if (entry.meta.tag) {
-                    const metadata: KVTagMetadata = {
-                        meta: entry.meta,
-                    };
-                    const jsonMetadata = JSON.stringify(metadata);
-                    const tagKey = getTagKey(entry.meta.tag, entry.meta.key);
-
-                    await kv.put(tagKey, jsonMetadata, {
-                        metadata,
-                        expirationTtl: secondsFromNow,
-                    });
-                }
             },
         );
     },
@@ -121,8 +75,8 @@ export const cloudflareKVCache: CacheBackend = {
         }
 
         await Promise.all(
-            entries.map(async ({ key }) => {
-                const kvKey = getValueKey(key);
+            entries.map(async (entry) => {
+                const kvKey = getKey(entry);
                 await kv.delete(kvKey);
             }),
         );
@@ -147,12 +101,7 @@ export const cloudflareKVCache: CacheBackend = {
             for (const entry of entries.keys) {
                 if (entry.metadata) {
                     const metadata = entry.metadata;
-                    const key = metadata.meta.key;
-
                     result.push(metadata.meta);
-
-                    // Delete the tag key and the value key
-                    pendingDeletions.push(kv.delete(getValueKey(key)));
                     pendingDeletions.push(kv.delete(entry.name));
                 }
             }
@@ -174,16 +123,12 @@ export const cloudflareKVCache: CacheBackend = {
     },
 };
 
-function getValueKey(key: string): string {
-    return `${cacheVersion}.v.${key}`;
+function getKey(entry: CacheEntryLookup) {
+    return `${getTagPrefix(entry.tag || 'default')}.${entry.key}`;
 }
 
 function getTagPrefix(tag: string) {
-    return `${cacheVersion}.tag.${tag}.`;
-}
-
-function getTagKey(tag: string, key: string) {
-    return `${getTagPrefix(tag)}${key}`;
+    return `${cacheVersion}.${tag}.`;
 }
 
 async function getKVNamespace(): Promise<KVNamespace | null> {
