@@ -74,18 +74,20 @@ export default async function SpaceRootLayout(props: { children: React.ReactNode
                             'primary-color',
                             customization.styling.primaryColor.light,
                         )}
-                        ${ // Generate the right contrast color for each shade of primary-color
+                        ${
+                            // Generate the right contrast color for each shade of primary-color
                             generateColorVariable(
-                            'contrast-primary',
-                            Object.fromEntries(
-                                Object.entries(
-                                    shadesOfColor(customization.styling.primaryColor.light),
-                                ).map(([index, color]) => [
-                                    index,
-                                    colorContrast(color, ['#000', '#fff']),
-                                ]),
-                            ),
-                        )}
+                                'contrast-primary',
+                                Object.fromEntries(
+                                    Object.entries(
+                                        shadesOfColor(customization.styling.primaryColor.light),
+                                    ).map(([index, color]) => [
+                                        index,
+                                        colorContrast(color, ['#000', '#fff']),
+                                    ]),
+                                ),
+                            )
+                        }
                         
                         ${generateColorVariable(
                             'primary-base',
@@ -106,18 +108,20 @@ export default async function SpaceRootLayout(props: { children: React.ReactNode
                             'primary-base',
                             customization.styling.primaryColor.dark,
                         )}
-                        ${ // Generate the right contrast color for each shade of primary-color
+                        ${
+                            // Generate the right contrast color for each shade of primary-color
                             generateColorVariable(
-                            'contrast-primary',
-                            Object.fromEntries(
-                                Object.entries(
-                                    shadesOfColor(customization.styling.primaryColor.dark),
-                                ).map(([index, color]) => [
-                                    index,
-                                    colorContrast(color, ['#000', '#fff']),
-                                ]),
-                            ),
-                        )}
+                                'contrast-primary',
+                                Object.fromEntries(
+                                    Object.entries(
+                                        shadesOfColor(customization.styling.primaryColor.dark),
+                                    ).map(([index, color]) => [
+                                        index,
+                                        colorContrast(color, ['#000', '#fff']),
+                                    ]),
+                                ),
+                            )
+                        }
                         ${generateColorVariable(
                             'header-background',
                             headerTheme.backgroundColor.dark,
