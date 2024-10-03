@@ -19,6 +19,10 @@ export function resolvePagePath(
             }
 
             if (page.path !== pagePath) {
+                if (page.path.split('/').join('/') === pagePath) {
+                    return resolvePageDocument(page, ancestors);
+                }
+
                 // TODO: can be optimized to count the number of slashes and skip the entire subtree
                 const result = iteratePages(page.pages, [...ancestors, page]);
                 if (result) {
