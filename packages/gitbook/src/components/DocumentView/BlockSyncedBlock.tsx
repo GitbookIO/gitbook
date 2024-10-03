@@ -4,7 +4,7 @@ import { getSyncedBlockContent } from '@/lib/api';
 import { resolveContentRefWithFiles } from '@/lib/references';
 
 import { BlockProps } from './Block';
-import { Blocks } from './Blocks';
+import { Blocks, UnwrappedBlocks } from './Blocks';
 
 export async function BlockSyncedBlock(props: BlockProps<DocumentBlockSyncedBlock>) {
     const { block, ancestorBlocks, context, style } = props;
@@ -30,7 +30,7 @@ export async function BlockSyncedBlock(props: BlockProps<DocumentBlockSyncedBloc
     }
 
     return (
-        <Blocks
+        <UnwrappedBlocks
             nodes={syncedBlock.document.nodes}
             document={syncedBlock.document}
             ancestorBlocks={[...ancestorBlocks, block]}
@@ -47,7 +47,6 @@ export async function BlockSyncedBlock(props: BlockProps<DocumentBlockSyncedBloc
                     return context.resolveContentRef(ref, options);
                 },
             }}
-            style={style}
         />
     );
 }
