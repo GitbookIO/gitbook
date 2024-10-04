@@ -1,8 +1,16 @@
 {
     "name": "gitbook",
     "version": "0.1.0",
-    "private": true,
+    "devDependencies": {
+        "@changesets/cli": "^2.27.7",
+        "prettier": "^3.0.3",
+        "turbo": "^2.1.2"
+    },
     "packageManager": "bun@1.1.18",
+    "patchedDependencies": {
+        "@vercel/next@4.3.6": "patches/@vercel%2Fnext@4.3.6.patch"
+    },
+    "private": true,
     "scripts": {
         "dev": "turbo run dev",
         "build": "turbo run build",
@@ -22,14 +30,5 @@
     },
     "workspaces": [
         "packages/*"
-    ],
-    "devDependencies": {
-        "@changesets/cli": "^2.27.7",
-        "postcss-color-contrast": "^1.1.0",
-        "prettier": "^3.0.3",
-        "turbo": "^2.1.2"
-    },
-    "patchedDependencies": {
-        "@vercel/next@4.3.6": "patches/@vercel%2Fnext@4.3.6.patch"
-    }
+    ]
 }
