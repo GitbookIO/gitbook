@@ -7,7 +7,7 @@ import { absoluteHref } from '@/lib/links';
 import { getPagePath } from '@/lib/pages';
 import { isPageIndexable } from '@/lib/seo';
 
-import { getContentPointer } from '../../fetch';
+import { getSiteContentPointer } from '../../fetch';
 
 export const runtime = 'edge';
 

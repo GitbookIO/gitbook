@@ -24,7 +24,7 @@ import { SearchButton } from '../Search';
  */
 export function Header(props: {
     space: Space;
-    parent: Site | Collection | null;
+    parent: Site;
     spaces: Space[];
     context: ContentRefContext;
     customization: CustomizationSettings | SiteCustomizationSettings;
@@ -34,9 +34,7 @@ export function Header(props: {
 
     const isCustomizationDefault =
         customization.header.preset === CustomizationHeaderPreset.Default;
-    const isMultiVariants =
-        parent?.object === 'collection' ||
-        (parent && parent.object === 'site' && spaces.length > 1);
+    const isMultiVariants = parent.object === 'site' && spaces.length > 1;
 
     return (
         <header

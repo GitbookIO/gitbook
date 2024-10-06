@@ -8,7 +8,7 @@ import {
 } from '@gitbook/api';
 import React from 'react';
 
-import { ContentPointer } from '@/lib/api';
+import { SiteContentPointer } from '@/lib/api';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
@@ -19,7 +19,7 @@ import { Trademark } from './Trademark';
 export function TableOfContents(props: {
     space: Space;
     customization: CustomizationSettings | SiteCustomizationSettings;
-    content: ContentPointer;
+    content: SiteContentPointer;
     context: ContentRefContext;
     pages: Revision['pages'];
     ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
