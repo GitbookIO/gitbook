@@ -15,12 +15,16 @@ describe('cache', () => {
         testId += 1;
         getTtl = () => 1000;
 
-        fn = cache(`cache-${testId}`, async (arg: string, options: CacheFunctionOptions) => {
-            await new Promise((resolve) => setTimeout(resolve, 20));
-            return {
-                data: impl(arg),
-                ttl: getTtl(),
-            };
+        fn = cache({
+            name: `cache-${testId}`,
+            tag: (arg) => 'test',
+            get: async (arg: string, options: CacheFunctionOptions) => {
+                await new Promise((resolve) => setTimeout(resolve, 20));
+                return {
+                    data: impl(arg),
+                    ttl: getTtl(),
+                };
+            },
         });
     });
 

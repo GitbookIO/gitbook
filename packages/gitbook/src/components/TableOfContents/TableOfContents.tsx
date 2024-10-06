@@ -13,6 +13,7 @@ import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { PagesList } from './PagesList';
+import { TOCScrollContainer } from './TOCScroller';
 import { Trademark } from './Trademark';
 
 export function TableOfContents(props: {
@@ -51,11 +52,11 @@ export function TableOfContents(props: {
                 'dark:navigation-open:shadow-light/2',
                 withHeaderOffset ? 'lg:h-[calc(100vh_-_4rem)]' : 'lg:h-[100vh]',
                 withHeaderOffset ? 'lg:top-16' : 'lg:top-0',
-                'page-no-toc:lg:hidden',
+                'page-no-toc:hidden',
             )}
         >
             {header ? header : null}
-            <div
+            <TOCScrollContainer
                 className={tcls(
                     withHeaderOffset ? 'pt-4' : ['pt-4', 'lg:pt-0'],
                     'hidden',
@@ -87,7 +88,7 @@ export function TableOfContents(props: {
                 {customization.trademark.enabled ? (
                     <Trademark space={space} customization={customization} />
                 ) : null}
-            </div>
+            </TOCScrollContainer>
         </aside>
     );
 }

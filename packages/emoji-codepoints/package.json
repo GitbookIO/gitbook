@@ -9,6 +9,7 @@
         "emoji-assets": "^8.0.0"
     },
     "scripts": {
-        "generate": "bun ./build.ts"
+        "generate": "bun ./build.ts",
+        "clean": "rm -rf ./dist"
     }
 }

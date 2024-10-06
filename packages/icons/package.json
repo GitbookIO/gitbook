@@ -34,7 +34,8 @@
         "generate": "node ./bin/gen-list.js",
         "build": "tsc",
         "typecheck": "tsc --noEmit",
-        "dev": "tsc -w"
+        "dev": "tsc -w",
+        "clean": "rm -rf ./dist && rm -rf ./src/data"
     },
     "bin": {
         "gitbook-icons": "./bin/gitbook-icons.js"

@@ -1,3 +1,4 @@
 export * from './useScrollActiveId';
-export * from './useScrollToHash';
+export * from './useScrollPage';
 export * from './useHash';
+export * from './useIsMounted';

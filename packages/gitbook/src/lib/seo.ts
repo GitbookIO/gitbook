@@ -1,10 +1,43 @@
-import { Collection, ContentVisibility, Site, SiteVisibility, Space } from '@gitbook/api';
+import {
+    Collection,
+    ContentVisibility,
+    RevisionPageDocument,
+    RevisionPageGroup,
+    Site,
+    SiteVisibility,
+    Space,
+} from '@gitbook/api';
 import { headers } from 'next/headers';
+
+/**
+ * Return true if a page is indexable in search.
+ */
+export function isPageIndexable(
+    ancestors: Array<RevisionPageDocument | RevisionPageGroup>,
+    page: RevisionPageDocument | RevisionPageGroup,
+): boolean {
+    // @ts-ignore - noIndex and noRobotsIndex are not in the type
+    // until we fix the deprecated APIs
+    return (
+        // @ts-ignore
+        !page.noIndex &&
+        // @ts-ignore
+        !page.noRobotsIndex &&
+        // @ts-ignore
+        ancestors.every((ancestor) => !ancestor.noIndex && !ancestor.noRobotsIndex)
+    );
+}
 
 /**
  * Return true if a space should be indexed by search engines.
  */
-export function shouldIndexSpace({ space, parent }: { space: Space; parent: Site }) {
+export function isSpaceIndexable({
+    space,
+    parent,
+}: {
+    space: Space;
+    parent: Site | Collection | null;
+}) {
     const headerSet = headers();
 
     if (

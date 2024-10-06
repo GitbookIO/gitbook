@@ -1,4 +1,3 @@
-import { DeepPartial } from 'ts-essentials';
 import { argosScreenshot } from '@argos-ci/playwright';
 import {
     CustomizationHeaderPreset,
@@ -9,15 +8,16 @@ import {
 import { test, expect, Page } from '@playwright/test';
 import jwt from 'jsonwebtoken';
 import rison from 'rison';
+import { DeepPartial } from 'ts-essentials';
 
 import { getContentTestURL } from '../tests/utils';
 
 interface Test {
     name: string;
-    url: string;
-    run?: (page: Page) => Promise<unknown>;
-    fullPage?: boolean;
-    screenshot?: false;
+    url: string; // URL to visit for testing
+    run?: (page: Page) => Promise<unknown>; // The test to run
+    fullPage?: boolean; // Whether the test should be fullscreened during testing
+    screenshot?: false; // Should a screenshot be stored
 }
 
 interface TestsCase {
@@ -104,7 +104,32 @@ const testCases: TestsCase[] = [
             },
             {
                 name: 'RFC variant',
-                url: 'v/rfcs',
+                url: 'rfcs',
+            },
+            {
+                name: 'Customized variant titles are displayed',
+                url: '',
+                run: async (page) => {
+                    const spaceDrowpdown = page.locator('[data-testid="space-dropdown-button"]');
+                    await spaceDrowpdown.click();
+
+                    const variantSelectionDropdown = page.locator(
+                        'css=[data-testid="space-dropdown-button"] + div',
+                    );
+                    // the customized space title
+                    await expect(
+                        variantSelectionDropdown.getByRole('link', {
+                            name: 'Multi-Variants',
+                        }),
+                    ).toBeVisible();
+
+                    // the NON-customized space title
+                    await expect(
+                        variantSelectionDropdown.getByRole('link', {
+                            name: 'RFCs',
+                        }),
+                    ).toBeVisible();
+                },
             },
         ],
     },
@@ -131,13 +156,13 @@ const testCases: TestsCase[] = [
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
                     await page.waitForURL(
-                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions/v/2.0/reference/api-reference/pets?fallback=true',
+                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions/2.0/reference/api-reference/pets?fallback=true',
                     );
                 },
             },
             {
                 name: 'Keep navigation path/route when switching variant (Share link)',
-                url: 'api-multi-versions-share-links/bRfQbzwsK8rbN1GRxx7K/reference/api-reference/pets',
+                url: 'api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/reference/api-reference/pets',
                 screenshot: false,
                 run: async (page) => {
                     const spaceDrowpdown = await page.waitForSelector(
@@ -154,7 +179,7 @@ const testCases: TestsCase[] = [
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
                     await page.waitForURL(
-                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/bRfQbzwsK8rbN1GRxx7K/v/2.0/reference/api-reference/pets?fallback=true',
+                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/2.0/reference/api-reference/pets?fallback=true',
                     );
                 },
             },
@@ -189,7 +214,7 @@ const testCases: TestsCase[] = [
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
                     await page.waitForURL(
-                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-va/v/2.0/reference/api-reference/pets?fallback=true',
+                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-va/2.0/reference/api-reference/pets?fallback=true',
                     );
                 },
             },
@@ -345,6 +370,11 @@ const testCases: TestsCase[] = [
             {
                 name: 'Math',
                 url: 'blocks/math',
+            },
+            {
+                name: 'Files',
+                url: 'blocks/files',
+                fullPage: true,
             },
             {
                 name: 'Embeds',
@@ -528,7 +558,7 @@ const testCases: TestsCase[] = [
                             expiresIn: '24h',
                         },
                     );
-                    return `v/spacea?jwt_token=${token}`;
+                    return `spacea?jwt_token=${token}`;
                 })(),
                 run: waitForCookiesDialog,
             },
@@ -545,7 +575,7 @@ const testCases: TestsCase[] = [
                             expiresIn: '24h',
                         },
                     );
-                    return `v/spaceb?jwt_token=${token}`;
+                    return `spaceb?jwt_token=${token}`;
                 })(),
                 run: waitForCookiesDialog,
             },
@@ -562,7 +592,7 @@ const testCases: TestsCase[] = [
                             expiresIn: '24h',
                         },
                     );
-                    return `v/spacec?jwt_token=${token}`;
+                    return `spacec?jwt_token=${token}`;
                 })(),
                 run: waitForCookiesDialog,
             },
@@ -657,6 +687,57 @@ const testCases: TestsCase[] = [
                 await expect(dialog).toBeVisible();
             },
         })),
+    },
+    {
+        name: 'SEO',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        tests: [
+            {
+                name: `Index by default`,
+                url: '?x-gitbook-search-indexation=true',
+                screenshot: false,
+                run: async (page) => {
+                    const metaRobots = page.locator('meta[name="robots"]');
+                    await expect(metaRobots).toHaveAttribute('content', 'index, follow');
+                },
+            },
+            {
+                name: `Don't index noIndex`,
+                url: 'page-options/page-no-index?x-gitbook-search-indexation=true',
+                screenshot: false,
+                run: async (page) => {
+                    const metaRobots = page.locator('meta[name="robots"]');
+                    await expect(metaRobots).toHaveAttribute('content', 'noindex, nofollow');
+                },
+            },
+            {
+                name: `Don't index descendant of noIndex`,
+                url: 'page-options/page-no-index/descendant-of-page-no-index?x-gitbook-search-indexation=true',
+                screenshot: false,
+                run: async (page) => {
+                    const metaRobots = page.locator('meta[name="robots"]');
+                    await expect(metaRobots).toHaveAttribute('content', 'noindex, nofollow');
+                },
+            },
+            {
+                name: `Don't index noRobotsIndex`,
+                url: 'page-options/page-no-robots-index?x-gitbook-search-indexation=true',
+                screenshot: false,
+                run: async (page) => {
+                    const metaRobots = page.locator('meta[name="robots"]');
+                    await expect(metaRobots).toHaveAttribute('content', 'noindex, nofollow');
+                },
+            },
+            {
+                name: `Don't index descendant of noRobotsIndex`,
+                url: 'page-options/page-no-robots-index/descendant-of-page-no-robots-index?x-gitbook-search-indexation=true',
+                screenshot: false,
+                run: async (page) => {
+                    const metaRobots = page.locator('meta[name="robots"]');
+                    await expect(metaRobots).toHaveAttribute('content', 'noindex, nofollow');
+                },
+            },
+        ],
     },
 ];
 

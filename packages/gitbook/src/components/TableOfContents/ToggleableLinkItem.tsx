@@ -7,6 +7,8 @@ import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
+import { useScrollToActiveTOCItem } from './TOCScroller';
+import { useIsMounted } from '../hooks';
 import { Link } from '../primitives';
 
 const show = {
@@ -46,6 +48,7 @@ export function ToggleableLinkItem(props: {
 
     const [scope, animate] = useAnimate();
     const [isVisible, setIsVisible] = React.useState(hasActiveDescendant);
+    const isMounted = useIsMounted();
 
     // Update the visibility of the children, if we are navigating to a descendant.
     React.useEffect(() => {
@@ -59,10 +62,9 @@ export function ToggleableLinkItem(props: {
     // Animate the visibility of the children
     // only after the initial state.
     React.useEffect(() => {
-        if (!mountedRef.current || !hasDescendants) {
+        if (!isMounted || !hasDescendants) {
             return;
         }
-
         try {
             animate(scope.current, isVisible ? show : hide, {
                 duration: 0.1,
@@ -84,19 +86,17 @@ export function ToggleableLinkItem(props: {
             // The selector can crash in some browsers, we ignore it as the animation is not critical.
             console.error(error);
         }
-    }, [isVisible, hasDescendants, animate, scope]);
+    }, [isVisible, isMounted, hasDescendants, animate, scope]);
 
-    // Track if the component is mounted.
-    const mountedRef = React.useRef(false);
-    React.useEffect(() => {
-        mountedRef.current = true;
-    }, []);
+    const linkRef = React.createRef<HTMLAnchorElement>();
+    useScrollToActiveTOCItem({ linkRef, isActive });
 
     return (
         <div>
             <Link
+                ref={linkRef}
                 href={href}
-                aria-selected={isActive}
+                {...(isActive ? { 'aria-current': 'page' } : {})}
                 className={tcls(
                     'group/toclink',
                     'flex',

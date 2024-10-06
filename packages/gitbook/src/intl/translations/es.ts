@@ -3,6 +3,7 @@ import { TranslationLanguage } from './types';
 export const es: TranslationLanguage = {
     locale: 'es',
     powered_by_gitbook: 'Con tecnología de GitBook',
+    sponsored_via_gitbook: 'Patrocinado por GitBook',
     switch_to_dark_theme: 'Cambiar a tema oscuro',
     switch_to_light_theme: 'Cambiar a tema claro',
     switch_to_system_theme: 'Cambiar a tema del sistema',

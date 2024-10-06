@@ -1,5 +1,6 @@
 {
     "$schema": "https://turbo.build/schema.json",
+    "ui": "tui",
     "globalEnv": ["NODE_ENV", "CI", "ARGOS_*", "GITHUB_*"],
     "tasks": {
         // Prepare the package for all other tasks
@@ -40,11 +41,22 @@
         // Start the package in development mode
         "dev": {
             "persistent": true,
-            "cache": false
+            "cache": false,
+            "dependsOn": ["generate"]
         },
         // Script run when the package is deployed
         "release": {
-            "dependsOn": ["^release", "build"]
+            "dependsOn": ["^release", "build"],
+            "env": ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN"]
+        },
+        // Script to run when deploying on main to preview/staging
+        "release:preview": {
+            "dependsOn": ["^release:preview", "build"],
+            "env": ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN"]
+        },
+        // Clean up the package
+        "clean": {
+            "cache": false
         }
     }
 }

@@ -85,9 +85,7 @@ export function HeaderLogo(props: HeaderLogoProps) {
                         )}
                     />
                 ) : (
-                    <>
-                        <LogoFallback {...props} />
-                    </>
+                    <LogoFallback {...props} />
                 )}
             </Link>
         </div>
@@ -98,6 +96,7 @@ function LogoFallback(props: HeaderLogoProps) {
     const { parent, space, customization } = props;
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : undefined;
     const customEmoji = 'emoji' in customization.favicon ? customization.favicon.emoji : undefined;
+
     return (
         <>
             <SpaceIcon

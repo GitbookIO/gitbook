@@ -31,7 +31,8 @@
         "build": "tsc",
         "typecheck": "tsc --noEmit",
         "unit": "bun test",
-        "dev": "tsc -w"
+        "dev": "tsc -w",
+        "clean": "rm -rf ./dist"
     },
     "files": [
         "dist",

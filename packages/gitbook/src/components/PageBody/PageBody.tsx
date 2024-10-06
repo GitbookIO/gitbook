@@ -19,6 +19,7 @@ import { PageBodyBlankslate } from './PageBodyBlankslate';
 import { PageCover } from './PageCover';
 import { PageFooterNavigation } from './PageFooterNavigation';
 import { PageHeader } from './PageHeader';
+import { PreservePageLayout } from './PreservePageLayout';
 import { TrackPageView } from './TrackPageView';
 import { DocumentView, createHighlightingContext } from '../DocumentView';
 import { PageFeedbackForm } from '../PageFeedback';
@@ -74,6 +75,7 @@ export function PageBody(props: {
                     (!page.layout.tableOfContents ? ' page-no-toc' : '')
                 }
             >
+                <PreservePageLayout asFullWidth={asFullWidth} />
                 {page.cover && page.layout.cover && page.layout.coverSize === 'hero' ? (
                     <PageCover as="hero" page={page} cover={page.cover} context={context} />
                 ) : null}

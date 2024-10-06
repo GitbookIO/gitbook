@@ -59,6 +59,20 @@ describe('getVisitorAuthToken', () => {
         const request = nextRequest('https://example.com');
         expect(getVisitorAuthToken(request, request.nextUrl)).toBeUndefined();
     });
+
+    // For backwards compatibility
+    it('should return the token from the cookie of a /v/ path when the url does not have /v/', () => {
+        const request = nextRequest('https://example.com/hello/space1/cool', {
+            [getVisitorAuthCookieName('/')]: { value: getVisitorAuthCookieValue('/', 'no') },
+            [getVisitorAuthCookieName('/hello/v/space1/')]: {
+                value: getVisitorAuthCookieValue('/hello/v/space1/', 'gotcha'),
+            },
+        });
+
+        const visitorAuth = getVisitorAuthToken(request, request.nextUrl);
+        assertVisitorAuthCookieValue(visitorAuth);
+        expect(visitorAuth.token).toEqual('gotcha');
+    });
 });
 
 function assertVisitorAuthCookieValue(value: unknown): asserts value is VisitorAuthCookieValue {

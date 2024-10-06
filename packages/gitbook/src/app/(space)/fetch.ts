@@ -11,6 +11,7 @@ import {
     getCurrentSiteData,
     getSite,
     getSiteSpaces,
+    getCurrentSiteCustomization,
 } from '@/lib/api';
 import { resolvePagePath, resolvePageId } from '@/lib/pages';
 
@@ -66,19 +67,27 @@ export async function fetchSpaceData() {
 
     const siteShareKey = content.siteShareKey;
 
-    const [{ space, contentTarget, pages, customization, scripts }, parent] = await Promise.all([
-        getCurrentSiteData(content),
-        fetchParentSite({
-            organizationId: content.organizationId,
-            siteId: content.siteId,
-            siteShareKey,
-        }),
-    ]);
+    const [{ space, contentTarget, pages, customization, scripts }, parentSite] = await Promise.all(
+        'siteId' in content
+            ? [
+                  getCurrentSiteData(content),
+                  fetchParentSite({
+                      organizationId: content.organizationId,
+                      siteId: content.siteId,
+                      siteShareKey,
+                  }),
+              ]
+            : [getSpaceData(content, siteShareKey)],
+    );
+
+    const parent = await (parentSite ?? fetchParentCollection(space));
+    // we grab the space attached to the parent as it contains overriden customizations
+    const spaceRelativeToParent = parent?.spaces.find((space) => space.id === content.spaceId);
 
     return {
         content,
         contentTarget,
-        space,
+        space: spaceRelativeToParent ?? space,
         pages,
         customization,
         scripts,
@@ -167,15 +176,17 @@ async function fetchParentSite(args: {
     siteShareKey: string | undefined;
 }) {
     const { organizationId, siteId, siteShareKey } = args;
-    const [site, siteSpaces] = await Promise.all([
+    const [site, siteSpaces, siteParentCustomizations] = await Promise.all([
         getSite(organizationId, siteId),
         getSiteSpaces({ organizationId, siteId, siteShareKey }),
+        getCurrentSiteCustomization({ organizationId, siteId, siteSpaceId: undefined }),
     ]);
 
     const spaces: Record<string, Space> = {};
     siteSpaces.forEach((siteSpace) => {
         spaces[siteSpace.space.id] = {
             ...siteSpace.space,
+            title: siteSpace.title ?? siteSpace.space.title,
             urls: {
                 ...siteSpace.space.urls,
                 published: siteSpace.urls.published,
@@ -183,7 +194,16 @@ async function fetchParentSite(args: {
         };
     });
 
-    return { parent: site, spaces: Object.values(spaces) };
+    // override the title with the customization title
+    const parent = {
+        ...site,
+        ...(siteParentCustomizations?.title ? { title: siteParentCustomizations.title } : {}),
+    };
+
+    return {
+        parent,
+        spaces: Object.values(spaces),
+    };
 }
 
 /**

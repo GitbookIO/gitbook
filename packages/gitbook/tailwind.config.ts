@@ -58,6 +58,9 @@ const config: Config = {
     ],
     theme: {
         extend: {
+            aria: {
+                'current-page': 'current="page"',
+            },
             fontFamily: {
                 sans: ['var(--font-content)'],
                 mono: ['var(--font-mono)'],

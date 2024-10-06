@@ -1,0 +1,42 @@
+{
+    "name": "@gitbook/cache-do",
+    "type": "module",
+    "private": true,
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "development": "./src/index.ts",
+            "default": "./dist/index.js"
+        },
+        "./api": {
+            "types": "./dist/api.d.ts",
+            "development": "./src/api.ts",
+            "default": "./dist/api.js"
+        }
+    },
+    "version": "0.0.0",
+    "dependencies": {
+        "@msgpack/msgpack": "^3.0.0-beta2",
+        "lru_map": "^0.4.1"
+    },
+    "devDependencies": {
+        "typescript": "^5.5.3",
+        "wrangler": "^3.78.7"
+    },
+    "scripts": {
+        "generate": "wrangler types --experimental-include-runtime",
+        "build": "tsc",
+        "typecheck": "tsc --noEmit",
+        "dev": "tsc -w",
+        "release": "wrangler deploy",
+        "release:preview": "wrangler deploy && wrangler deploy --env preview"
+    },
+    "files": [
+        "dist",
+        "src",
+        "bin",
+        "data",
+        "README.md",
+        "CHANGELOG.md"
+    ]
+}

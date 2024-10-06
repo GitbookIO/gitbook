@@ -3,7 +3,7 @@ import React from 'react';
 
 export function useHash() {
     const params = useParams();
-    const [hash, setHash] = React.useState<string>(global.location?.hash?.slice(1));
+    const [hash, setHash] = React.useState<string | null>(global.location?.hash?.slice(1) ?? null);
     React.useEffect(() => {
         function updateHash() {
             setHash(global.location?.hash?.slice(1));

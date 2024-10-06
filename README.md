@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://gitbook.com"><img src="https://img.shields.io/static/v1?message=Documented%20on%20GitBook&logo=data:image/svg%2bxml;base64,PHN2ZyB3aWR0aD0iNjUiIGhlaWdodD0iNjUiIHZpZXdCb3g9IjAgMCA2NSA2NSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTI3LjM5NjQgMzMuNjc2NEMzMC41MjU1IDM1LjQ4MjQgMzIuMDkgMzYuMzg1NCAzMy44MDgzIDM2LjM4NjlDMzUuNTI2NSAzNi4zODg0IDM3LjA5MjYgMzUuNDg4MiA0MC4yMjQ5IDMzLjY4NzdMNjAuMTkxNCAyMi4yMTA0QzYxLjA5MjcgMjEuNjkyMiA2MS42NDg0IDIwLjczMTggNjEuNjQ4NCAxOS42OTIxQzYxLjY0ODQgMTguNjUyNCA2MS4wOTI3IDE3LjY5MiA2MC4xOTE0IDE3LjE3MzlMNDAuMjE3NyA1LjY5MjQ1QzM3LjA4ODggMy44OTM4NiAzNS41MjQzIDIuOTk0NTcgMzMuODA3OCAyLjk5NTI0QzMyLjA5MTIgMi45OTU5MSAzMC41Mjc1IDMuODk2NDIgMjcuNCA1LjY5NzQ0TDEwLjIyOTMgMTUuNTg1NUMxMC4xMDIgMTUuNjU4OCAxMC4wMzg0IDE1LjY5NTQgOS45NzkwOCAxNS43MzAxQzQuMTEzNzEgMTkuMTYzNyAwLjQ4OTg5MiAyNS40MzIzIDAuNDQxNDM4IDMyLjIyODZDMC40NDA5NDggMzIuMjk3MyAwLjQ0MDk0OCAzMi4zNzA4IDAuNDQwOTQ4IDMyLjUxNzZDMC40NDA5NDggMzIuNjY0MyAwLjQ0MDk0OCAzMi43Mzc2IDAuNDQxNDM3IDMyLjgwNjNDMC40ODk3ODUgMzkuNTk0OSA0LjEwNTUyIDQ1Ljg1NzcgOS45NjA0NCA0OS4yOTRDMTAuMDE5NiA0OS4zMjg3IDEwLjA4MzIgNDkuMzY1NCAxMC4yMTAyIDQ5LjQzODdMMjAuOTY1OSA1NS42NDg3QzI3LjIzMzIgNTkuMjY3MyAzMC4zNjY4IDYxLjA3NjYgMzMuODA4MSA2MS4wNzc3QzM3LjI0OTMgNjEuMDc4OSA0MC4zODQyIDU5LjI3MTcgNDYuNjUzOSA1NS42NTc0TDU4LjAwOCA0OS4xMTIxQzYxLjE0NzQgNDcuMzAyMyA2Mi43MTcxIDQ2LjM5NzQgNjMuNTc5IDQ0LjkwNTZDNjQuNDQwOSA0My40MTM5IDY0LjQ0MDkgNDEuNjAyIDY0LjQ0MDkgMzcuOTc4NFYzMC45NzgxQzY0LjQ0MDkgMjkuOTcyOCA2My44OTY1IDI5LjA0NjQgNjMuMDE4MiAyOC41NTczQzYyLjE2ODQgMjguMDgzOSA2MS4xMzI1IDI4LjA5MSA2MC4yODkxIDI4LjU3NThMMzcuMDA3NCA0MS45NTg4QzM1LjQ0NTQgNDIuODU2NyAzNC42NjQzIDQzLjMwNTYgMzMuODA3MyA0My4zMDU5QzMyLjk1MDIgNDMuMzA2MiAzMi4xNjg5IDQyLjg1NzcgMzAuNjA2MyA0MS45NjA3TDE0Ljg0ODcgMzIuOTE1NUMxNC4wNTk0IDMyLjQ2MjQgMTMuNjY0NyAzMi4yMzU5IDEzLjM0NzcgMzIuMTk1QzEyLjYyNSAzMi4xMDE3IDExLjkzMDEgMzIuNTA2NiAxMS42NTQ4IDMzLjE4MTNDMTEuNTM0MSAzMy40NzcyIDExLjUzNjUgMzMuOTMyMiAxMS41NDE0IDM0Ljg0MjRDMTEuNTQ1IDM1LjUxMjQgMTEuNTQ2OCAzNS44NDc0IDExLjYwOTQgMzYuMTU1NkMxMS43NDk3IDM2Ljg0NTYgMTIuMTEyNyAzNy40NzA1IDEyLjY0MjggMzcuOTM0MUMxMi44Nzk1IDM4LjE0MTEgMTMuMTY5NiAzOC4zMDg1IDEzLjc1IDM4LjY0MzVMMzAuNTk3NCA0OC4zNjcyQzMyLjE2NDEgNDkuMjcxNCAzMi45NDc0IDQ5LjcyMzUgMzMuODA3NSA0OS43MjM3QzM0LjY2NzcgNDkuNzIzOSAzNS40NTEzIDQ5LjI3MjMgMzcuMDE4NCA0OC4zNjg5TDU3LjY2ODQgMzYuNDY1NEM1OC4yMDM3IDM2LjE1NjkgNTguNDcxNCAzNi4wMDI2IDU4LjY3MjEgMzYuMTE4NUM1OC44NzI3IDM2LjIzNDUgNTguODcyNyAzNi41NDM0IDU4Ljg3MjcgMzcuMTYxM1Y0MC4zMzY1QzU4Ljg3MjcgNDEuMjQyNCA1OC44NzI3IDQxLjY5NTQgNTguNjU3MiA0Mi4wNjgzQzU4LjQ0MTggNDIuNDQxMyA1OC4wNDkzIDQyLjY2NzUgNTcuMjY0NCA0My4xMTk5TDQwLjIzMjIgNTIuOTM4QzM3LjA5NjYgNTQuNzQ1NCAzNS41Mjg4IDU1LjY0OTIgMzMuODA3OSA1NS42NDg0QzMyLjA4NjkgNTUuNjQ3NiAzMC41MTk5IDU0Ljc0MjQgMjcuMzg2IDUyLjkzMjFMMTEuNDUwOSA0My43MjdDMTEuNDAwMyA0My42OTc4IDExLjM3NSA0My42ODMyIDExLjM1MTQgNDMuNjY5NEM4LjAxMDIzIDQxLjcxNyA1Ljk0ODU5IDM4LjE0NTEgNS45MjkyNSAzNC4yNzU0QzUuOTI5MTIgMzQuMjQ4IDUuOTI5MTIgMzQuMjE4OCA1LjkyOTEyIDM0LjE2MDRWMzEuMjQ1OEM1LjkyOTEyIDI5LjEwOTUgNy4wNjY4OSAyNy4xMzQ5IDguOTE1MTMgMjYuMDYzNkMxMC41NDgzIDI1LjExNjkgMTIuNTYyOCAyNS4xMTUxIDE0LjE5NzcgMjYuMDU4N0wyNy4zOTY0IDMzLjY3NjRaIiBmaWxsPSIjRjJGN0Y3Ii8+Cjwvc3ZnPgo=&labelColor=5c5c5c&color=3F89A1&label=%20" alt="Documented on GitBook"></a>
+  <a href="https://gitbook.com"><img src="https://img.shields.io/static/v1?message=Documented%20on%20GitBook&logo=gitbook&logoColor=ffffff&label=%20&labelColor=5c5c5c&color=3F89A1"></a>
   <a href="#"><img src="https://img.shields.io/badge/Open_Source-❤️-FDA599?"/></a>
   <a href="/LICENSE"><img src="https://img.shields.io/badge/License-GNU_GPLv3-F4E28D"/></a>
   <a href="/.github/CONTRIBUTING.md"><img src="https://img.shields.io/github/contributors/gitbookIO/gitbook"/></a>
@@ -118,6 +118,26 @@ Distributed under the [GNU GPLv3 License](https://github.com/GitBookIO/gitbook/b
 If you plan to distribute the code, you must make the source code public to comply with the GNU GPLv3. To clone in a private repository, acquire a [commercial license](https://www.gitbook.com/pricing).
 
 See `LICENSE` for more information.
+
+## Badges
+
+<p align="left">
+  <a href="https://gitbook.com"><img src="https://img.shields.io/static/v1?message=Documented%20on%20GitBook&logo=gitbook&logoColor=ffffff&label=%20&labelColor=5c5c5c&color=3F89A1"></a>
+  <a href="https://gitbook.com"><img src="https://img.shields.io/static/v1?message=Documented%20on%20GitBook&logo=gitbook&logoColor=ffffff&label=%20&labelColor=5c5c5c&color=F4E28D"></a>
+  <a href="https://gitbook.com"><img src="https://img.shields.io/static/v1?message=Documented%20on%20GitBook&logo=gitbook&logoColor=ffffff&label=%20&labelColor=5c5c5c&color=FDA599"></a>
+</p>
+
+```md
+[![GitBook](https://img.shields.io/static/v1?message=Documented%20on%20GitBook&logo=gitbook&logoColor=ffffff&label=%20&labelColor=5c5c5c&color=3F89A1)](https://gitbook.com/)
+```
+
+```html
+<a href="https://gitbook.com">
+    <img
+        src="https://img.shields.io/static/v1?message=Documented%20on%20GitBook&logo=gitbook&logoColor=ffffff&label=%20&labelColor=5c5c5c&color=3F89A1"
+    />
+</a>
+```
 
 ## Acknowledgements
 
