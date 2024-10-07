@@ -101,7 +101,7 @@ const Shortcut = () => {
                 `[font-feature-settings:"calt",_"case"]`,
             )}
         >
-            {operatingSystem === 'mac' ? '⌘' : 'Ctrl'} + K
+            {operatingSystem === 'mac' ? '⌘' : 'Ctrl +'} K
         </span>
     );
 };
