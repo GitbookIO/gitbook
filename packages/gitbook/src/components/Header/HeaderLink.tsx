@@ -16,19 +16,20 @@ import {
     DropdownMenu,
     DropdownMenuItem,
 } from './Dropdown';
-import { Link } from '../primitives';
+import { Button, Link } from '../primitives';
+import assertNever from 'assert-never';
+
+// @TODO Remove it once we have the proper types in API
+type CustomizationHeaderLinkWithStyle = CustomizationHeaderLink & {
+    style?: 'link' | 'button-primary' | 'button-secondary';
+};
 
 export async function HeaderLink(props: {
     context: ContentRefContext;
-    link: CustomizationHeaderLink;
+    link: CustomizationHeaderLinkWithStyle;
     customization: CustomizationSettings | SiteCustomizationSettings;
 }) {
     const { context, link, customization } = props;
-
-    const isCustomizationCustom = customization.header.preset === CustomizationHeaderPreset.Custom;
-
-    const isCustomizationDefault =
-        customization.header.preset === CustomizationHeaderPreset.Default;
 
     const target = await resolveContentRef(link.to, context);
 
@@ -36,36 +37,75 @@ export async function HeaderLink(props: {
         return null;
     }
 
-    const renderLink = (linkProps: DropdownButtonProps<HTMLAnchorElement>) => (
-        <Link
-            {...linkProps}
-            href={target.href}
-            className={tcls(
-                'overflow-hidden',
-                'text-sm',
-                'flex',
-                'flex-row',
-                'items-center',
-                'whitespace-nowrap',
-                'lg:text-base',
+    const headerPreset = customization.header.preset;
 
-                !isCustomizationDefault
-                    ? ['text-header-link-500']
-                    : ['text-dark/8', 'dark:text-light/8', 'dark:hover:text-light'],
-                target.active
-                    ? [
-                          isCustomizationCustom
-                              ? ['shadow-header-link-500/7']
-                              : ['shadow-dark/6', 'dark:shadow-light/7'],
-                      ]
-                    : ['hover:text-header-link-400'],
-            )}
-        >
-            <span className={tcls('truncate')}> {link.title}</span>
+    const renderLink = (linkProps: DropdownButtonProps<HTMLAnchorElement>) => {
+        const linkStyle = link.style ?? 'link';
 
-            {link.links && link.links.length > 0 ? <DropdownChevron /> : null}
-        </Link>
-    );
+        switch (linkStyle) {
+            case 'button-secondary':
+            case 'button-primary': {
+                const variant = (() => {
+                    switch (linkStyle) {
+                        case 'button-secondary':
+                            return 'secondary';
+                        case 'button-primary':
+                            return 'primary';
+                        default:
+                            assertNever(linkStyle);
+                    }
+                })();
+                return (
+                    <Button
+                        href={target.href}
+                        variant={variant}
+                        className={tcls(
+                            {
+                                'button-primary':
+                                    headerPreset === CustomizationHeaderPreset.Custom ||
+                                    headerPreset === CustomizationHeaderPreset.Bold
+                                        ? tcls(
+                                              'bg-header-link-500 hover:bg-text-header-link-300 text-header-button-text',
+                                              'dark:bg-header-link-500 dark:hover:bg-text-header-link-300 dark:text-header-button-text',
+                                          )
+                                        : null,
+                                'button-secondary': tcls(
+                                    'dark:bg-transparent dark:hover:bg-transparent',
+                                    'ring-header-link-500 hover:ring-header-link-300 dark:ring-header-link-500 dark:hover:ring-header-link-300 text-header-link-500 dark:text-header-link-500',
+                                ),
+                            }[linkStyle],
+                        )}
+                    >
+                        {link.title}
+                    </Button>
+                );
+            }
+            case 'link': {
+                return (
+                    <Link
+                        {...linkProps}
+                        href={target.href}
+                        className={tcls(
+                            'overflow-hidden',
+                            'text-sm lg:text-base',
+                            'flex flex-row items-center',
+                            'whitespace-nowrap',
+                            'hover:text-header-link-400 dark:hover:text-light',
+
+                            headerPreset === CustomizationHeaderPreset.Default
+                                ? ['text-dark/8', 'dark:text-light/8']
+                                : ['text-header-link-500 hover:text-header-link-400'],
+                        )}
+                    >
+                        <span className={tcls('truncate')}>{link.title}</span>
+                        {link.links && link.links.length > 0 ? <DropdownChevron /> : null}
+                    </Link>
+                );
+            }
+            default:
+                assertNever(linkStyle);
+        }
+    };
 
     if (link.links && link.links.length > 0) {
         return (
