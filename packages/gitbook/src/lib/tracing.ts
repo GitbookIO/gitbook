@@ -43,8 +43,10 @@ export async function trace<T>(
                 span.setAttribute('error', true);
                 throw error;
             } finally {
-                let end = now();
-                console.log(`trace ${completeName} ${end - start}ms`, attributes);
+                if (process.env.SILENT !== 'true') {
+                    let end = now();
+                    console.log(`trace ${completeName} ${end - start}ms`, attributes);
+                }
             }
         },
     );
