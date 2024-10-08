@@ -18,6 +18,7 @@ export const Checkbox = React.forwardRef<
             'w-5',
             'shrink-0',
             'rounded-sm',
+            'straight-corners:rounded-none',
             'ring-1',
             'ring-dark/3',
             'ring-inset',
