@@ -198,8 +198,16 @@ function generateHeaderTheme(customization: CustomizationSettings | SiteCustomiz
                     dark: customization.styling.primaryColor.dark,
                 },
                 linkColor: {
-                    light: colorContrast(customization.styling.primaryColor.light, [colors.white, colors.black], 'aaa'),
-                    dark: colorContrast(customization.styling.primaryColor.dark, [colors.white, colors.black], 'aaa'),
+                    light: colorContrast(
+                        customization.styling.primaryColor.light,
+                        [colors.white, colors.black],
+                        'aaa',
+                    ),
+                    dark: colorContrast(
+                        customization.styling.primaryColor.dark,
+                        [colors.white, colors.black],
+                        'aaa',
+                    ),
                 },
             };
         }
