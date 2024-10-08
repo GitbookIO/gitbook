@@ -70,6 +70,7 @@ const config: Config = {
 
                 /** primary-color used to accent elements, these colors remain unchanged when toggling between the CustomizationBackground options**/
                 primary: generateVarShades('primary-color'),
+                'contrast-primary': generateVarShades('contrast-primary'),
 
                 /** primary-base is an internal color that generates the same colors as primary-color. But it's shades will change into a grayscale if CustomizationBackground.Plain is selected. (globals.css) **/
                 primarybase: generateVarShades('primary-base'),
