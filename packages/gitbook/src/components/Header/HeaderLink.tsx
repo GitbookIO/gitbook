@@ -5,6 +5,7 @@ import {
     CustomizationHeaderPreset,
     SiteCustomizationSettings,
 } from '@gitbook/api';
+import assertNever from 'assert-never';
 
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -17,7 +18,6 @@ import {
     DropdownMenuItem,
 } from './Dropdown';
 import { Button, Link } from '../primitives';
-import assertNever from 'assert-never';
 
 // @TODO Remove it once we have the proper types in API
 type CustomizationHeaderLinkWithStyle = CustomizationHeaderLink & {

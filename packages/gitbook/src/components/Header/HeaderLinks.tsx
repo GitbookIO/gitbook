@@ -1,5 +1,7 @@
-import { tcls } from '@/lib/tailwind';
 import React from 'react';
+
+import { tcls } from '@/lib/tailwind';
+
 import styles from './headerLinks.module.css';
 
 interface HeaderLinksProps {
