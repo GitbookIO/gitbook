@@ -462,11 +462,13 @@ const testCases: TestsCase[] = [
                                 {
                                     title: 'Secondary button',
                                     to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                    // @ts-ignore Remove once we upgrade to the latest version of the API
                                     style: 'button-secondary',
                                 },
                                 {
                                     title: 'Primary button',
                                     to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                    // @ts-ignore Remove once we upgrade to the latest version of the API
                                     style: 'button-primary',
                                 },
                             ],
