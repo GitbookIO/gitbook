@@ -98,6 +98,7 @@ export default async function SpaceRootLayout(props: { children: React.ReactNode
                             headerTheme.backgroundColor.light,
                         )}
                         ${generateColorVariable('header-link', headerTheme.linkColor.light)}
+                        ${generateColorVariable('header-button-text', colorContrast(headerTheme.linkColor.light as string, ['#000', '#fff']))}
                     }
                     .dark {
                         ${generateColorVariable(
@@ -127,6 +128,7 @@ export default async function SpaceRootLayout(props: { children: React.ReactNode
                             headerTheme.backgroundColor.dark,
                         )}
                         ${generateColorVariable('header-link', headerTheme.linkColor.dark)}
+                        ${generateColorVariable('header-button-text', colorContrast(headerTheme.linkColor.dark as string, ['#000', '#fff']))}
                     }
                 `}</style>
             </head>
