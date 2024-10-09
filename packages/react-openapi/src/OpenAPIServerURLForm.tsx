@@ -21,7 +21,7 @@ export function ServerURLForm(props: {
     function switchServer(index: number) {
         if (index !== serverIndex) {
             update({
-                server: `${index}` ?? '0',
+                server: index ? `${index}` : '0',
                 ...(stateContext?.state?.edit ? { edit: 'true' } : undefined),
             });
         }
@@ -36,7 +36,7 @@ export function ServerURLForm(props: {
             }
         }
         update({
-            server: `${formData.get('server')}` ?? '0',
+            server: formData.has('server') ? `${formData.get('server')}` : '0',
             ...variables,
             ...(stateContext?.state?.edit ? { edit: 'true' } : undefined),
         });
