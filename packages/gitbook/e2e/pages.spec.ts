@@ -452,6 +452,28 @@ const testCases: TestsCase[] = [
                     }),
                 run: waitForCookiesDialog,
             },
+            {
+                name: 'With header buttons',
+                url:
+                    'page-options/page-with-header-buttons' +
+                    getCustomizationURL({
+                        header: {
+                            links: [
+                                {
+                                    title: 'Secondary button',
+                                    to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                    style: 'button-secondary',
+                                },
+                                {
+                                    title: 'Primary button',
+                                    to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                    style: 'button-primary',
+                                },
+                            ],
+                        },
+                    }),
+                run: waitForCookiesDialog,
+            },
         ],
     },
     {
