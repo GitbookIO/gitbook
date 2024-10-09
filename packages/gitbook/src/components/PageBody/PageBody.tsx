@@ -54,7 +54,6 @@ export function PageBody(props: {
         'siteId' in contentPointer
             ? { organizationId: contentPointer.organizationId, siteId: contentPointer.siteId }
             : undefined;
-
     return (
         <>
             <main
