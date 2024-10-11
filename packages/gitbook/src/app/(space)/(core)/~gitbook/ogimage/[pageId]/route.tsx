@@ -194,7 +194,7 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
                             : 'Not found'}
                     </h1>
                     {page?.description && page?.title.length <= 65 ? (
-                        <h2 tw={tcls('text-4xl', 'mb-0', 'mt-8', 'w-[60%]', 'font-normal')}>
+                        <h2 tw={tcls('text-4xl', 'mb-0', 'mt-8', 'w-[75%]', 'font-normal')}>
                             {page.description.length > 140
                                 ? page.description.slice(0, 140) + '...'
                                 : page.description}
