@@ -348,7 +348,7 @@ function getInputURL(request: NextRequest): { url: URL; mode: URLLookupMode } {
     }
 
     // When request started with ~space/:id, we force the mode as 'multi-id'.
-    if (url.pathname.startsWith('/~space/')) {
+    if (url.pathname.startsWith('/~space/') || url.pathname.startsWith('/~site/')) {
         mode = 'multi-id';
     }
 
