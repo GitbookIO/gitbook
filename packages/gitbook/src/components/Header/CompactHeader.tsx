@@ -20,15 +20,12 @@ import { SearchButton } from '../Search';
  */
 export function CompactHeader(props: {
     space: Space;
-    parent: Site | Collection | null;
+    site: Site | null;
     spaces: Space[];
     customization: CustomizationSettings | SiteCustomizationSettings;
 }) {
-    const { space, spaces, parent, customization } = props;
-
-    const isMultiVariants =
-        parent?.object === 'collection' ||
-        (parent && parent.object === 'site' && spaces.length > 1);
+    const { space, spaces, site, customization } = props;
+    const isMultiVariants = site && site.object === 'site' && spaces.length > 1;
 
     return (
         <div
@@ -45,7 +42,7 @@ export function CompactHeader(props: {
             )}
         >
             <div className={tcls('flex-grow-0', 'mt-5')}>
-                <HeaderLogo parent={parent} space={space} customization={customization} />
+                <HeaderLogo site={site} space={space} customization={customization} />
             </div>
             <div
                 className={tcls(

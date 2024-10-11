@@ -766,10 +766,10 @@ export const getSiteIntegrationScripts = cache({
 /**
  * Fetch all the data to render the current site at once.
  */
-export async function getCurrentSiteData(pointer: SiteContentPointer) {
+export async function getSiteData(pointer: SiteContentPointer) {
     const [{ space, pages, contentTarget }, { customization, scripts }] = await Promise.all([
-        getSpaceData(pointer, pointer.siteShareKey),
-        getCurrentSiteLayoutData(pointer),
+        getSpaceContentData(pointer, pointer.siteShareKey),
+        getSiteLayoutData(pointer),
     ]);
 
     return {
@@ -784,22 +784,13 @@ export async function getCurrentSiteData(pointer: SiteContentPointer) {
 /**
  * Fetch all the layout data about the current site at once.
  */
-export async function getCurrentSiteLayoutData(args: {
+export async function getSiteLayoutData(args: {
     organizationId: string;
     siteId: string;
     siteSpaceId: string | undefined;
 }) {
     const [customization, scripts] = await Promise.all([
-        args.siteSpaceId
-            ? getSiteSpaceCustomization({
-                  organizationId: args.organizationId,
-                  siteId: args.siteId,
-                  siteSpaceId: args.siteSpaceId,
-              })
-            : getSiteCustomization({
-                  organizationId: args.organizationId,
-                  siteId: args.siteId,
-              }),
+        getCurrentSiteCustomization(args),
         getSiteIntegrationScripts(args.organizationId, args.siteId),
     ]);
 

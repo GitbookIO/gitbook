@@ -12,7 +12,7 @@ import { SearchSectionResultItem } from './SearchSectionResultItem';
 import {
     getRecommendedQuestions,
     OrderedComputedResult,
-    searchParentContent,
+    searchSiteContent,
     searchSpaceContent,
 } from './server-actions';
 import { Loading } from '../primitives';
@@ -40,13 +40,13 @@ export const SearchResults = React.forwardRef(function SearchResults(
         query: string;
         spaceId: string;
         revisionId: string;
-        parent: Site | Collection | null;
+        site: Site | null;
         withAsk: boolean;
         onSwitchToAsk: () => void;
     },
     ref: React.Ref<SearchResultsRef>,
 ) {
-    const { children, query, spaceId, revisionId, parent, withAsk, onSwitchToAsk } = props;
+    const { children, query, spaceId, revisionId, site, withAsk, onSwitchToAsk } = props;
 
     const language = useLanguage();
     const debounceTimeout = React.useRef<Timer | null>(null);
@@ -93,8 +93,8 @@ export const SearchResults = React.forwardRef(function SearchResults(
             debounceTimeout.current = setTimeout(async () => {
                 setCursor(null);
 
-                const fetchedResults = await (parent
-                    ? searchParentContent(parent, query)
+                const fetchedResults = await (site
+                    ? searchSiteContent({ siteId: site.id, query })
                     : searchSpaceContent(spaceId, revisionId, query));
 
                 setResults(withAsk ? withQuestionResult(fetchedResults, query) : fetchedResults);

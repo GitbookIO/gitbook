@@ -31,13 +31,7 @@ export function isPageIndexable(
 /**
  * Return true if a space should be indexed by search engines.
  */
-export function isSpaceIndexable({
-    space,
-    parent,
-}: {
-    space: Space;
-    parent: Site | Collection | null;
-}) {
+export function isSpaceIndexable({ space, site }: { space: Space; site: Site | null }) {
     const headerSet = headers();
 
     if (
@@ -55,16 +49,12 @@ export function isSpaceIndexable({
         return false;
     }
 
-    if (parent && parent.object === 'site') {
-        return shouldIndexVisibility(parent.visibility);
+    if (site && site.object === 'site') {
+        return shouldIndexVisibility(site.visibility);
     }
 
-    if (space.visibility === ContentVisibility.InCollection) {
-        return parent && parent.object === 'collection'
-            ? shouldIndexVisibility(parent.visibility)
-            : false;
-    }
-    return shouldIndexVisibility(space.visibility);
+    // space with no site should not be indexed
+    return false;
 }
 
 function shouldIndexVisibility(visibility: ContentVisibility | SiteVisibility) {

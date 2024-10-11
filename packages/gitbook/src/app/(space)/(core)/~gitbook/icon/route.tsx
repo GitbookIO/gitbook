@@ -49,13 +49,8 @@ export async function GET(req: NextRequest) {
         getSpace(spaceId, 'siteId' in pointer ? pointer.siteShareKey : undefined),
         'siteId' in pointer ? getCurrentSiteCustomization(pointer) : getSpaceCustomization(spaceId),
     ]);
-    const parent =
-        'siteId' in pointer
-            ? await getSite(pointer.organizationId, pointer.siteId)
-            : space.visibility === ContentVisibility.InCollection && space.parent
-              ? await getCollection(space.parent)
-              : null;
-    const contentTitle = getContentTitle(space, customization, parent);
+    const site = 'siteId' in pointer ? await getSite(pointer.organizationId, pointer.siteId) : null;
+    const contentTitle = getContentTitle(space, customization, site);
 
     return new ImageResponse(
         (

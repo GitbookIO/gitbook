@@ -28,7 +28,7 @@ export function SpaceLayout(props: {
     content: ContentPointer | SiteContentPointer;
     contentTarget: ContentTarget;
     space: Space;
-    parent: Site | Collection | null;
+    site: Site | null;
     spaces: Space[];
     customization: CustomizationSettings | SiteCustomizationSettings;
     pages: Revision['pages'];
@@ -38,7 +38,7 @@ export function SpaceLayout(props: {
     const {
         space,
         contentTarget,
-        parent,
+        site,
         spaces,
         content,
         pages,
@@ -62,7 +62,7 @@ export function SpaceLayout(props: {
             <Header
                 withTopHeader={withTopHeader}
                 space={space}
-                parent={parent}
+                site={site}
                 spaces={spaces}
                 context={contentRefContext}
                 customization={customization}
@@ -92,7 +92,7 @@ export function SpaceLayout(props: {
                             withTopHeader ? null : (
                                 <CompactHeader
                                     space={space}
-                                    parent={parent}
+                                    site={site}
                                     spaces={spaces}
                                     customization={customization}
                                 />
@@ -117,7 +117,7 @@ export function SpaceLayout(props: {
                     revisionId={contentTarget.revisionId}
                     spaceTitle={customization.title ?? space.title}
                     withAsk={customization.aiSearch.enabled}
-                    parent={parent && spaces.length > 1 ? parent : null}
+                    site={site && spaces.length > 1 ? site : null}
                 />
             </React.Suspense>
         </>

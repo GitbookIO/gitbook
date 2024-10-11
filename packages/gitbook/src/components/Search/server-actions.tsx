@@ -54,6 +54,7 @@ export interface AskAnswerResult {
 
 export async function searchSiteContent(args: {
     query: string;
+    siteId: string;
     siteSpaceIds?: string[];
     cacheBust?: string;
 }): Promise<OrderedComputedResult[]> {
@@ -126,40 +127,16 @@ export async function searchSpaceContent(
 
         // This is a site so use a different function which we can eventually call directly
         // We also want to break cache for this specific space if the revisionId is different so use it as a cache busting key
-        return await searchSiteContent({ siteSpaceIds, query, cacheBust: revisionId });
+        return await searchSiteContent({
+            siteId: pointer.siteId,
+            siteSpaceIds,
+            query,
+            cacheBust: revisionId,
+        });
     }
 
     const data = await api.searchSpaceContent(spaceId, revisionId, query);
     return data.items.map((item) => transformPageResult(item, undefined)).flat();
-}
-
-/**
- * Server action to search content in a parent (site or collection)
- */
-export async function searchParentContent(
-    parent: Site | Collection,
-    query: string,
-): Promise<OrderedComputedResult[]> {
-    const pointer = getContentPointer();
-    const isSite = 'siteId' in pointer;
-
-    if (isSite) {
-        return searchSiteContent({ query });
-    }
-
-    const [data, collectionSpaces] = await Promise.all([
-        api.searchParentContent(parent.id, query),
-        parent.object === 'collection' ? api.getCollectionSpaces(parent.id) : null,
-    ]);
-
-    let spaces: Space[] = collectionSpaces ? collectionSpaces : [];
-
-    return data.items
-        .map((spaceItem) => {
-            const space = spaces.find((space) => space.id === spaceItem.id);
-            return spaceItem.pages.map((item) => transformPageResult(item, space));
-        })
-        .flat(2);
 }
 
 /**
