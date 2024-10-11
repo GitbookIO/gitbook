@@ -1,15 +1,15 @@
+import { CustomizationHeaderPreset } from '@gitbook/api';
 import { redirect } from 'next/navigation';
 import { ImageResponse } from 'next/og';
 import { ImageResponseOptions, NextRequest } from 'next/server';
+import colorContrast from 'postcss-color-contrast/js';
 import React from 'react';
 
+import { absoluteHref } from '@/lib/links';
+import { tcls } from '@/lib/tailwind';
 import { getContentTitle } from '@/lib/utils';
 
 import { PageIdParams, fetchPageData } from '../../../../fetch';
-import { absoluteHref } from '@/lib/links';
-import { tcls } from '@/lib/tailwind';
-import { CustomizationHeaderPreset } from '@gitbook/api';
-import colorContrast from 'postcss-color-contrast/js';
 
 export const runtime = 'edge';
 
@@ -100,6 +100,7 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
                     width={40}
                     height={40}
                     tw={tcls('mr-4')}
+                    alt="Icon"
                 />
             );
         if ('emoji' in customization.favicon)
@@ -114,6 +115,7 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
                     `~gitbook/icon?size=medium&theme=${customization.themes.default}`,
                     true,
                 )}
+                alt="Icon"
                 width={40}
                 height={40}
                 tw={tcls('mr-4')}
