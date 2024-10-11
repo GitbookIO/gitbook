@@ -162,7 +162,7 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
                 {customization.header.logo ? (
                     <img
                         alt="Logo"
-                        height={90}
+                        height={60}
                         src={
                             light ? customization.header.logo.light : customization.header.logo.dark
                         }
