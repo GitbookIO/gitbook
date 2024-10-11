@@ -3,6 +3,7 @@ import {
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
     CustomizationLocale,
+    PublishedSiteContentLookup,
     SiteCustomizationSettings,
 } from '@gitbook/api';
 import { test, expect, Page } from '@playwright/test';
@@ -760,6 +761,32 @@ const testCases: TestsCase[] = [
                     const metaRobots = page.locator('meta[name="robots"]');
                     await expect(metaRobots).toHaveAttribute('content', 'noindex, nofollow');
                 },
+            },
+        ],
+    },
+    {
+        name: 'open.gitbook.com',
+        baseUrl: 'https://open.gitbook.com/',
+        tests: [
+            {
+                name: 'GitBook Docs',
+                url: await (async () => {
+                    const res = await fetch(
+                        `https://api.gitbook.com/v1/urls/published?url=https://docs.gitbook.com`,
+                    );
+
+                    if (!res.ok) {
+                        throw new Error('Failed to get published URL');
+                    }
+
+                    const published = await res.json<PublishedSiteContentLookup>();
+                    if (!('site' in published)) {
+                        throw new Error('Expected site for published URL');
+                    }
+
+                    return `~site/${published.site}?token=${published.apiToken}`;
+                })(),
+                run: waitForCookiesDialog,
             },
         ],
     },
