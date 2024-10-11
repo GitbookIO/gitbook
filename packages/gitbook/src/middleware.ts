@@ -88,6 +88,11 @@ type SpaceAPIToken = ContentAPIBaseToken & {
     space: string;
 };
 
+type CollectionAPIToken = ContentAPIBaseToken & {
+    kind: 'collection';
+    collection: string;
+};
+
 type SiteAPIToken = ContentAPIBaseToken & {
     kind: 'site';
     site: string;
@@ -95,7 +100,7 @@ type SiteAPIToken = ContentAPIBaseToken & {
     space: string;
 };
 
-type ContentAPITokenPayload = SpaceAPIToken | SiteAPIToken;
+type ContentAPITokenPayload = SpaceAPIToken | CollectionAPIToken | SiteAPIToken;
 
 /**
  * Middleware to lookup the space to render.
@@ -490,13 +495,16 @@ async function lookupSiteOrSpaceInMultiIdMode(
         };
     }
 
+    const decoded = jwt.decode(apiToken) as ContentAPITokenPayload;
+    if (decoded.kind === 'collection') {
+        throw new Error('Collection is not supported in multi-id mode');
+    }
+
     const gitbookAPI = new GitBookAPI({
         endpoint: apiEndpoint ?? api().endpoint,
         authToken: apiToken,
         userAgent: userAgent(),
     });
-
-    const decoded = jwt.decode(apiToken) as ContentAPITokenPayload;
 
     // Verify access to the space to avoid leaking cached data in this mode
     // (the cache is not dependend on the auth token, so it could leak data)
