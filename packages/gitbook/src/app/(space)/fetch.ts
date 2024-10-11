@@ -184,17 +184,6 @@ async function resolvePage(
     return undefined;
 }
 
-// async function fetchParentCollection(space: Space) {
-//     const parentCollectionId =
-//         space.visibility === ContentVisibility.InCollection ? space.parent : undefined;
-//     const [collection, spaces] = await Promise.all([
-//         parentCollectionId ? getCollection(parentCollectionId) : null,
-//         parentCollectionId ? getCollectionSpaces(parentCollectionId) : ([] as Space[]),
-//     ]);
-
-//     return { parent: collection, spaces };
-// }
-
 /**
  * Fetch the structure of an organization site.
  * This includes the site and its spaces.
