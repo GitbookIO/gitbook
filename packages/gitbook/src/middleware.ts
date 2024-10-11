@@ -16,6 +16,7 @@ import {
     getSpaceLayoutData,
     DEFAULT_API_ENDPOINT,
     getCurrentSiteLayoutData,
+    getSite,
 } from '@/lib/api';
 import { race } from '@/lib/async';
 import { buildVersion } from '@/lib/build';
@@ -54,7 +55,7 @@ type URLLookupMode =
      */
     | 'multi-path'
     /**
-     * Spaces are located using an ID stored in the first segments of the URL (open.gitbook.com/~space/:id/).
+     * Sites or Spaces are located using an ID stored in the first segments of the URL (open.gitbook.com/~site|~space/:id/)
      * This mode is automatically detected and doesn't need to be configured.
      * When this mode is used, an authentication token should be passed as a query parameter (`token`).
      */
@@ -75,13 +76,31 @@ export type LookupResult = PublishedContentWithCache & {
     cookies?: LookupCookies;
 };
 
-interface ContentAPITokenPayload {
+// FIXME: This is a temporary type for now. Use @gitbook/api types when available.
+interface ContentAPIBaseToken {
     organization: string;
     spaces: string[];
-    collection?: string;
-    site?: string;
-    siteSpace?: string;
+    rateLimitMultiplier?: number;
 }
+
+type SpaceAPIToken = ContentAPIBaseToken & {
+    kind: 'space';
+    space: string;
+};
+
+type CollectionAPIToken = ContentAPIBaseToken & {
+    kind: 'collection';
+    collection: string;
+};
+
+type SiteAPIToken = ContentAPIBaseToken & {
+    kind: 'site';
+    site: string;
+    siteSpace: string;
+    space: string;
+};
+
+type ContentAPITokenPayload = SpaceAPIToken | CollectionAPIToken | SiteAPIToken;
 
 /**
  * Middleware to lookup the space to render.
@@ -328,8 +347,8 @@ function getInputURL(request: NextRequest): { url: URL; mode: URLLookupMode } {
         url.host = xGitbookHost;
     }
 
-    // When request started with ~space/:id, we force the mode as 'multi-id'.
-    if (url.pathname.startsWith('/~space/')) {
+    // When request started with ~space/:id or ~site/:id, we force the mode as 'multi-id'.
+    if (url.pathname.startsWith('/~space/') || url.pathname.startsWith('/~site/')) {
         mode = 'multi-id';
     }
 
@@ -352,7 +371,7 @@ async function lookupSpaceForURL(
             return await lookupSpaceInMultiPathMode(request, url);
         }
         case 'multi-id': {
-            return await lookupSpaceInMultiIdMode(request, url);
+            return await lookupSiteOrSpaceInMultiIdMode(request, url);
         }
         default:
             assertNever(mode);
@@ -406,11 +425,14 @@ async function lookupSpaceInMultiMode(request: NextRequest, url: URL): Promise<L
  * When serving multi spaces with the ID passed in the path.
  *
  * The format of the path is:
- *   - /~space/:id/:path
- *   - /~space/:id/~changes/:changeId/:path
- *   - /~space/:id/~revisions/:revisionId/:path
+ *   - /~space|~site/:id/:path
+ *   - /~space|~site/:id/~changes/:changeId/:path
+ *   - /~space|~site/:id/~revisions/:revisionId/:path
  */
-async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise<LookupResult> {
+async function lookupSiteOrSpaceInMultiIdMode(
+    request: NextRequest,
+    url: URL,
+): Promise<LookupResult> {
     const basePathParts: string[] = [];
     const pathSegments = url.pathname.slice(1).split('/');
 
@@ -429,11 +451,18 @@ async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise
     };
 
     const spaceId = eatPathId('~space');
-    if (!spaceId) {
+    const siteId = eatPathId('~site');
+    const source: { kind: 'space' | 'site'; id: string } | undefined = spaceId
+        ? { kind: 'space', id: spaceId }
+        : siteId
+          ? { kind: 'site', id: siteId }
+          : undefined;
+
+    if (!source) {
         return {
             error: {
                 code: 400,
-                message: `Missing space ID in the path`,
+                message: `Missing site or space ID in the path`,
             },
         };
     }
@@ -445,14 +474,14 @@ async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise
     // Get the auth token from the URL query
     const AUTH_TOKEN_QUERY = 'token';
     const API_ENDPOINT_QUERY = 'api';
-    const cookieName = `gitbook-token-${spaceId}`;
+    const cookieName = `gitbook-token-${source.id}`;
 
     const { apiToken, apiEndpoint } = url.searchParams.has(AUTH_TOKEN_QUERY)
         ? {
               apiToken: url.searchParams.get(AUTH_TOKEN_QUERY) ?? '',
               apiEndpoint: url.searchParams.get(API_ENDPOINT_QUERY) ?? undefined,
           }
-        : (decodeGitBookTokenCookie(spaceId, request.cookies.get(cookieName)?.value) ?? {
+        : (decodeGitBookTokenCookie(source.id, request.cookies.get(cookieName)?.value) ?? {
               apiToken: undefined,
               apiEndpoint: undefined,
           });
@@ -466,20 +495,32 @@ async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise
         };
     }
 
+    const decoded = jwt.decode(apiToken) as ContentAPITokenPayload;
+    if (decoded.kind === 'collection') {
+        throw new Error('Collection is not supported in multi-id mode');
+    }
+
+    const gitbookAPI = new GitBookAPI({
+        endpoint: apiEndpoint ?? api().endpoint,
+        authToken: apiToken,
+        userAgent: userAgent(),
+    });
+
     // Verify access to the space to avoid leaking cached data in this mode
     // (the cache is not dependend on the auth token, so it could leak data)
-    await withAPI(
-        new GitBookAPI({
-            endpoint: apiEndpoint ?? api().endpoint,
-            authToken: apiToken,
-            userAgent: userAgent(),
-        }),
-        () => getSpace.revalidate(spaceId, undefined),
-    );
+    if (source.kind === 'space') {
+        await withAPI(gitbookAPI, () => getSpace.revalidate(source.id, undefined));
+    }
+
+    // Verify access to the site to avoid leaking cached data in this mode
+    // (the cache is not dependend on the auth token, so it could leak data)
+    if (source.kind === 'site') {
+        await withAPI(gitbookAPI, () => getSite.revalidate(decoded.organization, source.id));
+    }
 
     const cookies: LookupCookies = {
         [cookieName]: {
-            value: encodeGitBookTokenCookie(spaceId, apiToken, apiEndpoint),
+            value: encodeGitBookTokenCookie(source.id, apiToken, apiEndpoint),
             options: {
                 httpOnly: true,
                 maxAge: 60 * 30,
@@ -502,20 +543,10 @@ async function lookupSpaceInMultiIdMode(request: NextRequest, url: URL): Promise
         };
     }
 
-    const { organization, site, siteSpace } = jwt.decode(apiToken) as ContentAPITokenPayload;
-    const siteLookupResult =
-        typeof organization === 'string' && organization && typeof site === 'string' && site
-            ? {
-                  organization,
-                  site,
-                  ...(typeof siteSpace === 'string' && siteSpace ? { siteSpace } : {}),
-              }
-            : {};
     return {
-        space: spaceId,
+        ...decoded,
         changeRequest: changeRequestId,
         revision: revisionId,
-        ...siteLookupResult,
         basePath: normalizePathname(basePathParts.join('/')),
         pathname: normalizePathname(pathSegments.join('/')),
         apiToken,
@@ -816,7 +847,7 @@ function encodePathname(pathname: string): string {
 }
 
 function decodeGitBookTokenCookie(
-    spaceId: string,
+    sourceId: string,
     cookie: string | undefined,
 ): { apiToken: string; apiEndpoint: string | undefined } | undefined {
     if (!cookie) {
@@ -825,7 +856,7 @@ function decodeGitBookTokenCookie(
 
     try {
         const parsed = JSON.parse(cookie);
-        if (typeof parsed.t === 'string' && parsed.s === spaceId) {
+        if (typeof parsed.t === 'string' && parsed.s === sourceId) {
             return {
                 apiToken: parsed.t,
                 apiEndpoint: typeof parsed.e === 'string' ? parsed.e : undefined,
