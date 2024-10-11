@@ -1,8 +1,8 @@
-import { Collection, Site } from '@gitbook/api';
 import assertNever from 'assert-never';
 import React from 'react';
 
 import { t, useLanguage } from '@/intl/client';
+import { ContentPointer, SiteContentPointer } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
 import { isQuestion } from './isQuestion';
@@ -12,8 +12,8 @@ import { SearchSectionResultItem } from './SearchSectionResultItem';
 import {
     getRecommendedQuestions,
     OrderedComputedResult,
+    searchCurrentSpaceContent,
     searchSiteContent,
-    searchSpaceContent,
 } from './server-actions';
 import { Loading } from '../primitives';
 
@@ -40,13 +40,14 @@ export const SearchResults = React.forwardRef(function SearchResults(
         query: string;
         spaceId: string;
         revisionId: string;
-        site: Site | null;
+        global: boolean;
         withAsk: boolean;
+        pointer: ContentPointer | SiteContentPointer;
         onSwitchToAsk: () => void;
     },
     ref: React.Ref<SearchResultsRef>,
 ) {
-    const { children, query, spaceId, revisionId, site, withAsk, onSwitchToAsk } = props;
+    const { children, query, pointer, spaceId, revisionId, global, withAsk, onSwitchToAsk } = props;
 
     const language = useLanguage();
     const debounceTimeout = React.useRef<Timer | null>(null);
@@ -93,9 +94,9 @@ export const SearchResults = React.forwardRef(function SearchResults(
             debounceTimeout.current = setTimeout(async () => {
                 setCursor(null);
 
-                const fetchedResults = await (site
-                    ? searchSiteContent({ siteId: site.id, query })
-                    : searchSpaceContent(spaceId, revisionId, query));
+                const fetchedResults = await (global
+                    ? searchSiteContent({ query, pointer })
+                    : searchCurrentSpaceContent(query, pointer, revisionId));
 
                 setResults(withAsk ? withQuestionResult(fetchedResults, query) : fetchedResults);
             }, 350);
@@ -107,7 +108,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 }
             };
         }
-    }, [query, spaceId, revisionId, parent, withAsk]);
+    }, [query, global, pointer, spaceId, revisionId, withAsk]);
 
     // Scroll to the active result.
     React.useEffect(() => {

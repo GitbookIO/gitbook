@@ -117,7 +117,8 @@ export function SpaceLayout(props: {
                     revisionId={contentTarget.revisionId}
                     spaceTitle={customization.title ?? space.title}
                     withAsk={customization.aiSearch.enabled}
-                    site={site && spaces.length > 1 ? site : null}
+                    isMultiVariants={Boolean(site && spaces.length > 1)}
+                    pointer={content}
                 />
             </React.Suspense>
         </>

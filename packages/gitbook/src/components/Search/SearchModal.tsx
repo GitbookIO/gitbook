@@ -9,6 +9,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { useRecoilValue } from 'recoil';
 
 import { tString, useLanguage } from '@/intl/client';
+import { ContentPointer, SiteContentPointer } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
 import { SearchAskAnswer, searchAskState } from './SearchAskAnswer';
@@ -21,8 +22,9 @@ interface SearchModalProps {
     spaceId: string;
     revisionId: string;
     spaceTitle: string;
-    site: Site | null;
+    isMultiVariants: boolean;
     withAsk: boolean;
+    pointer: ContentPointer | SiteContentPointer;
 }
 
 /**
@@ -136,7 +138,17 @@ function SearchModalBody(
         onClose: (to?: string) => void;
     },
 ) {
-    const { spaceId, revisionId, spaceTitle, withAsk, site, state, onChangeQuery, onClose } = props;
+    const {
+        pointer,
+        spaceId,
+        revisionId,
+        spaceTitle,
+        withAsk,
+        isMultiVariants,
+        state,
+        onChangeQuery,
+        onClose,
+    } = props;
 
     const language = useLanguage();
     const resultsRef = React.useRef<SearchResultsRef>(null);
@@ -236,9 +248,10 @@ function SearchModalBody(
             {!state.ask || !withAsk ? (
                 <SearchResults
                     ref={resultsRef}
+                    pointer={pointer}
                     spaceId={spaceId}
                     revisionId={revisionId}
-                    site={state.global ? site : null}
+                    global={isMultiVariants && state.global}
                     query={state.query}
                     withAsk={withAsk}
                     onSwitchToAsk={() => {
@@ -249,7 +262,9 @@ function SearchModalBody(
                         });
                     }}
                 >
-                    {site && state.query ? <SearchScopeToggle spaceTitle={spaceTitle} /> : null}
+                    {isMultiVariants && state.query ? (
+                        <SearchScopeToggle spaceTitle={spaceTitle} />
+                    ) : null}
                 </SearchResults>
             ) : null}
             {state.query && state.ask && withAsk ? (
