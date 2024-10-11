@@ -15,7 +15,7 @@ import { getContentTestURL } from '../tests/utils';
 
 interface Test {
     name: string;
-    url: string; // URL to visit for testing
+    url: string | (() => Promise<string>); // URL to visit for testing
     run?: (page: Page) => Promise<unknown>; // The test to run
     fullPage?: boolean; // Whether the test should be fullscreened during testing
     screenshot?: false; // Should a screenshot be stored
@@ -770,7 +770,7 @@ const testCases: TestsCase[] = [
         tests: [
             {
                 name: 'GitBook Docs',
-                url: await (async () => {
+                url: async () => {
                     const res = await fetch(
                         `https://api.gitbook.com/v1/urls/published?url=https://docs.gitbook.com`,
                     );
@@ -785,7 +785,7 @@ const testCases: TestsCase[] = [
                     }
 
                     return `~site/${published.site}?token=${published.apiToken}`;
-                })(),
+                },
                 run: waitForCookiesDialog,
             },
         ],
@@ -797,7 +797,9 @@ for (const testCase of testCases) {
         for (const testEntry of testCase.tests) {
             const testFn = testEntry.only ? test.only : test;
             testFn(testEntry.name, async ({ page, baseURL }) => {
-                const contentUrl = new URL(testEntry.url, testCase.baseUrl);
+                const testEntryUrl =
+                    typeof testEntry.url === 'string' ? testEntry.url : await testEntry.url();
+                const contentUrl = new URL(testEntryUrl, testCase.baseUrl);
                 const url = getContentTestURL(contentUrl.toString(), baseURL);
                 await page.goto(url);
                 if (testEntry.run) {
