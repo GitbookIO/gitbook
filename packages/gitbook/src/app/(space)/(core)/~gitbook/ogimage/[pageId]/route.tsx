@@ -8,6 +8,8 @@ import { getContentTitle } from '@/lib/utils';
 import { PageIdParams, fetchPageData } from '../../../../fetch';
 import { absoluteHref } from '@/lib/links';
 import { tcls } from '@/lib/tailwind';
+import { CustomizationHeaderPreset } from '@gitbook/api';
+import colorContrast from 'postcss-color-contrast/js';
 
 export const runtime = 'edge';
 
@@ -54,20 +56,47 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
         redirect(customization.socialPreview.url);
     }
 
-    const light = customization.themes.default === 'light';
+    const theme = customization.themes.default;
+    const light = theme === 'light';
 
-    // We have no access to CSS variables, so we'll have to hardcode some values and
-    const colorLight = 'rgb(251 252 252)';
-    const colorDark = 'rgb(20 20 20)';
-    const colorPrimary = light
-        ? customization.styling.primaryColor.light
-        : customization.styling.primaryColor.dark;
+    const bold = customization.header.preset == CustomizationHeaderPreset.Bold;
+    const custom = customization.header.preset == CustomizationHeaderPreset.Custom;
+
+    // We have no access to CSS variables, so we'll have to hardcode some values
+    const baseColors = {
+        light: '#fff',
+        dark: '#111827',
+    };
+
+    const colors = {
+        primary: custom
+            ? customization.header.linkColor?.[theme]
+            : bold
+              ? colorContrast(customization.styling.primaryColor[theme], [
+                    baseColors.light,
+                    baseColors.dark,
+                ])
+              : customization.styling.primaryColor[theme],
+        background: custom
+            ? customization.header.backgroundColor?.[theme]
+            : bold
+              ? customization.styling.primaryColor[theme]
+              : baseColors[theme],
+        foreground: custom
+            ? customization.header.linkColor?.[theme]
+            : bold
+              ? colorContrast(customization.styling.primaryColor[theme], [
+                    baseColors.light,
+                    baseColors.dark,
+                ])
+              : baseColors[light ? 'dark' : 'light'],
+    };
 
     const favicon = function () {
         if ('icon' in customization.favicon)
             return (
                 <img
-                    src={light ? customization.favicon.icon.light : customization.favicon.icon.dark}
+                    src={customization.favicon.icon[theme]}
                     width={40}
                     height={40}
                     tw={tcls('mr-4')}
@@ -103,15 +132,15 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
                     'h-full',
                     'flex',
                     'flex-col',
-                    'fontFamily-sans',
-                    light ? ['bg-white', 'text-gray-900'] : ['bg-gray-900', 'text-white'],
+                    `bg-[${colors.background}]`,
+                    `text-[${colors.foreground}]`,
                 )}
             >
                 {/* Gradient */}
                 <div
                     tw={tcls('absolute', 'inset-0')}
                     style={{
-                        backgroundImage: `radial-gradient(ellipse 100% 100% at top right , ${colorPrimary}, ${colorPrimary}00)`,
+                        backgroundImage: `radial-gradient(ellipse 100% 100% at top right , ${bold ? colors.foreground : colors.primary}, ${bold ? colors.foreground : colors.primary}00)`,
                         opacity: 0.5,
                     }}
                 ></div>
@@ -131,7 +160,7 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
                 {customization.header.logo ? (
                     <img
                         alt="Logo"
-                        height="90"
+                        height={90}
                         src={
                             light ? customization.header.logo.light : customization.header.logo.dark
                         }
@@ -154,13 +183,17 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
                             'tracking-tight',
                             'leading-none',
                             'text-left',
-                            `text-[${colorPrimary}]`,
+                            `text-[${colors.primary}]`,
                             'font-bold',
                         )}
                     >
-                        {page ? page.title : 'Not found'}
+                        {page
+                            ? page.title.length > 65
+                                ? page.title.slice(0, 65) + '...'
+                                : page.title
+                            : 'Not found'}
                     </h1>
-                    {page?.description ? (
+                    {page?.description && page?.title.length <= 65 ? (
                         <h2 tw={tcls('text-4xl', 'mb-0', 'mt-8', 'w-[60%]', 'font-normal')}>
                             {page.description.length > 140
                                 ? page.description.slice(0, 140) + '...'
