@@ -18,6 +18,7 @@ interface Test {
     run?: (page: Page) => Promise<unknown>; // The test to run
     fullPage?: boolean; // Whether the test should be fullscreened during testing
     screenshot?: false; // Should a screenshot be stored
+    only?: boolean; // Only run this test
 }
 
 interface TestsCase {
@@ -452,6 +453,29 @@ const testCases: TestsCase[] = [
                     }),
                 run: waitForCookiesDialog,
             },
+            {
+                name: 'With header buttons',
+                url: getCustomizationURL({
+                    header: {
+                        preset: CustomizationHeaderPreset.Default,
+                        links: [
+                            {
+                                title: 'Secondary button',
+                                to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                // @ts-ignore Remove once we upgrade to the latest version of the API
+                                style: 'button-secondary',
+                            },
+                            {
+                                title: 'Primary button',
+                                to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                // @ts-ignore Remove once we upgrade to the latest version of the API
+                                style: 'button-primary',
+                            },
+                        ],
+                    },
+                }),
+                run: waitForCookiesDialog,
+            },
         ],
     },
     {
@@ -744,7 +768,8 @@ const testCases: TestsCase[] = [
 for (const testCase of testCases) {
     test.describe(testCase.name, () => {
         for (const testEntry of testCase.tests) {
-            test(testEntry.name, async ({ page, baseURL }) => {
+            const testFn = testEntry.only ? test.only : test;
+            testFn(testEntry.name, async ({ page, baseURL }) => {
                 const contentUrl = new URL(testEntry.url, testCase.baseUrl);
                 const url = getContentTestURL(contentUrl.toString(), baseURL);
                 await page.goto(url);

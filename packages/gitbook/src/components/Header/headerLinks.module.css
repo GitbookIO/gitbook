@@ -3,9 +3,6 @@
     container-name: headerlinks;
 }
 
-.containerHeaderlinks > * {
-    display: flex;
-}
 .linkEllipsis {
     display: none;
     & div > a {
@@ -77,10 +74,5 @@
         & div > a:nth-of-type(n + 6) {
             display: flex;
         }
-    }
-}
-@container headerlinks ( width > 900px ) {
-    .containerHeaderlinks > *:not(.linkEllipsis) {
-        display: flex;
     }
 }

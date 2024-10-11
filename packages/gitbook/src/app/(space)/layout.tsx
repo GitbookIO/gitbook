@@ -8,6 +8,7 @@ import {
 } from '@gitbook/api';
 import { IconsProvider, IconStyle } from '@gitbook/icons';
 import assertNever from 'assert-never';
+import colorContrast from 'postcss-color-contrast/js';
 import colors from 'tailwindcss/colors';
 
 import { emojiFontClassName } from '@/components/primitives';
@@ -72,6 +73,21 @@ export default async function SpaceRootLayout(props: { children: React.ReactNode
                             'primary-color',
                             customization.styling.primaryColor.light,
                         )}
+                        ${
+                            // Generate the right contrast color for each shade of primary-color
+                            generateColorVariable(
+                                'contrast-primary',
+                                Object.fromEntries(
+                                    Object.entries(
+                                        shadesOfColor(customization.styling.primaryColor.light),
+                                    ).map(([index, color]) => [
+                                        index,
+                                        colorContrast(color, ['#000', '#fff']),
+                                    ]),
+                                ),
+                            )
+                        }
+                        
                         ${generateColorVariable(
                             'primary-base',
                             customization.styling.primaryColor.light,
@@ -81,6 +97,7 @@ export default async function SpaceRootLayout(props: { children: React.ReactNode
                             headerTheme.backgroundColor.light,
                         )}
                         ${generateColorVariable('header-link', headerTheme.linkColor.light)}
+                        ${generateColorVariable('header-button-text', colorContrast(headerTheme.linkColor.light as string, ['#000', '#fff']))}
                     }
                     .dark {
                         ${generateColorVariable(
@@ -91,11 +108,26 @@ export default async function SpaceRootLayout(props: { children: React.ReactNode
                             'primary-base',
                             customization.styling.primaryColor.dark,
                         )}
+                        ${
+                            // Generate the right contrast color for each shade of primary-color
+                            generateColorVariable(
+                                'contrast-primary',
+                                Object.fromEntries(
+                                    Object.entries(
+                                        shadesOfColor(customization.styling.primaryColor.dark),
+                                    ).map(([index, color]) => [
+                                        index,
+                                        colorContrast(color, ['#000', '#fff']),
+                                    ]),
+                                ),
+                            )
+                        }
                         ${generateColorVariable(
                             'header-background',
                             headerTheme.backgroundColor.dark,
                         )}
                         ${generateColorVariable('header-link', headerTheme.linkColor.dark)}
+                        ${generateColorVariable('header-button-text', colorContrast(headerTheme.linkColor.dark as string, ['#000', '#fff']))}
                     }
                 `}</style>
             </head>

@@ -70,12 +70,14 @@ const config: Config = {
 
                 /** primary-color used to accent elements, these colors remain unchanged when toggling between the CustomizationBackground options**/
                 primary: generateVarShades('primary-color'),
+                'contrast-primary': generateVarShades('contrast-primary'),
 
                 /** primary-base is an internal color that generates the same colors as primary-color. But it's shades will change into a grayscale if CustomizationBackground.Plain is selected. (globals.css) **/
                 primarybase: generateVarShades('primary-base'),
 
                 'header-background': generateVarShades('header-background'),
                 'header-link': generateVarShades('header-link'),
+                'header-button-text': generateVarShades('header-button-text'),
 
                 light: {
                     1: `color-mix(in srgb, var(--light-1), transparent calc(100% - 100% * <alpha-value>))`, //1 99%

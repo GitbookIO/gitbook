@@ -211,7 +211,7 @@ export async function resolveContentRef(
             return {
                 href: targetSpace.urls.published ?? targetSpace.urls.app,
                 text: targetSpace.title,
-                active: true,
+                active: contentRef.space === space.id,
             };
         }
 
