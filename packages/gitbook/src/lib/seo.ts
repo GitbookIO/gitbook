@@ -55,18 +55,9 @@ export function isSpaceIndexable({
         return false;
     }
 
-    if (parent && parent.object === 'site') {
-        return shouldIndexVisibility(parent.visibility);
-    }
-
-    if (space.visibility === ContentVisibility.InCollection) {
-        return parent && parent.object === 'collection'
-            ? shouldIndexVisibility(parent.visibility)
-            : false;
-    }
-    return shouldIndexVisibility(space.visibility);
+    return shouldIndexVisibility(parent.visibility);
 }
 
-function shouldIndexVisibility(visibility: ContentVisibility | SiteVisibility) {
-    return visibility === ContentVisibility.Public;
+function shouldIndexVisibility(visibility: SiteVisibility) {
+    return visibility === SiteVisibility.Public;
 }

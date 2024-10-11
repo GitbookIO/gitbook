@@ -10,7 +10,7 @@
     },
     "dependencies": {
         "classnames": "^2.5.1",
-        "@gitbook/api": "0.60.0",
+        "@gitbook/api": "0.64.1",
         "assert-never": "^1.2.1"
     },
     "peerDependencies": {

@@ -17,7 +17,7 @@ import { Link } from '../primitives';
 import { SpaceIcon } from '../Space/SpaceIcon';
 
 interface HeaderLogoProps {
-    parent: Site | Collection | null;
+    parent: Site;
     space: Space;
     customization: CustomizationSettings | SiteCustomizationSettings;
 }

@@ -14,7 +14,7 @@ import colors from 'tailwindcss/colors';
 import { emojiFontClassName } from '@/components/primitives';
 import { fonts, ibmPlexMono } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
-import { getCurrentSiteLayoutData, getSpaceLayoutData } from '@/lib/api';
+import { getCurrentSiteLayoutData } from '@/lib/api';
 import { getStaticFileURL } from '@/lib/assets';
 import { hexToRgb, shadesOfColor } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
@@ -22,7 +22,7 @@ import { tcls } from '@/lib/tailwind';
 import { ClientContexts } from './ClientContexts';
 import './globals.css';
 import '@gitbook/icons/style.css';
-import { getContentPointer } from './fetch';
+import { getSiteContentPointer } from './fetch';
 
 /**
  * Layout shared between the content and the PDF renderer.
@@ -31,10 +31,9 @@ import { getContentPointer } from './fetch';
 export default async function SpaceRootLayout(props: { children: React.ReactNode }) {
     const { children } = props;
 
-    const pointer = getContentPointer();
-    const { customization } = await ('siteId' in pointer
-        ? getCurrentSiteLayoutData(pointer)
-        : getSpaceLayoutData(pointer.spaceId));
+    const pointer = getSiteContentPointer();
+    const { customization } = await getCurrentSiteLayoutData(pointer);
+
     const headerTheme = generateHeaderTheme(customization);
     const language = getSpaceLanguage(customization);
 
