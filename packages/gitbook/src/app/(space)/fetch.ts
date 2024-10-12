@@ -204,16 +204,16 @@ async function fetchParentSite(args: {
         getCurrentSiteCustomization({ organizationId, siteId, siteSpaceId: undefined }),
     ]);
 
-    const spaces: Record<string, Space> = {};
+    const spaces: Array<Space> = [];
     siteSpaces.forEach((siteSpace) => {
-        spaces[siteSpace.space.id] = {
+        spaces.push({
             ...siteSpace.space,
             title: siteSpace.title ?? siteSpace.space.title,
             urls: {
                 ...siteSpace.space.urls,
                 published: siteSpace.urls.published,
             },
-        };
+        });
     });
 
     // override the title with the customization title
@@ -224,7 +224,7 @@ async function fetchParentSite(args: {
 
     return {
         parent,
-        spaces: Object.values(spaces),
+        spaces,
     };
 }
 
