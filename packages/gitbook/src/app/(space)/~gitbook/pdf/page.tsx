@@ -11,7 +11,6 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import * as React from 'react';
 
-import { getContentPointer } from '@/app/(site)/fetch';
 import { DocumentView, createHighlightingContext } from '@/components/DocumentView';
 import { TrademarkLink } from '@/components/TableOfContents/Trademark';
 import { PolymorphicComponentProp } from '@/components/utils/types';
@@ -23,9 +22,12 @@ import {
     getSpaceCustomization,
     getSpaceContentData,
     getCurrentSiteCustomization,
+    SpaceContentPointer,
+    SiteContentPointer,
 } from '@/lib/api';
 import { pagePDFContainerId, PageHrefContext, absoluteHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
+import { getSpacePointer, getSiteContentPointer } from '@/lib/pointer';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { PDFSearchParams, getPDFSearchParams } from '@/lib/urls';
@@ -36,18 +38,41 @@ import { PrintButton } from './PrintButton';
 
 const DEFAULT_LIMIT = 100;
 
+function getSpaceOrSitePointer():
+    | {
+          kind: 'space';
+          content: SpaceContentPointer;
+      }
+    | {
+          kind: 'site';
+          content: SiteContentPointer;
+      } {
+    try {
+        const sitePointer = getSiteContentPointer();
+        return {
+            kind: 'site',
+            content: sitePointer,
+        };
+    } catch (error) {
+        return {
+            kind: 'space',
+            content: getSpacePointer(),
+        };
+    }
+}
+
 export const runtime = 'edge';
 
 export async function generateMetadata(): Promise<Metadata> {
-    const contentPointer = getContentPointer();
+    const pointer = getSpaceOrSitePointer();
     const [space, customization] = await Promise.all([
         getSpace(
-            contentPointer.spaceId,
-            'siteId' in contentPointer ? contentPointer.siteShareKey : undefined,
+            pointer.content.spaceId,
+            pointer.kind === 'site' ? pointer.content.siteShareKey : undefined,
         ),
-        'siteId' in contentPointer
-            ? getCurrentSiteCustomization(contentPointer)
-            : getSpaceCustomization(contentPointer.spaceId),
+        pointer.kind === 'site'
+            ? getCurrentSiteCustomization(pointer.content)
+            : getSpaceCustomization(pointer.content.spaceId),
     ]);
 
     return {
@@ -60,7 +85,7 @@ export async function generateMetadata(): Promise<Metadata> {
  * Render a space as a standalone HTML page that can be printed as a PDF.
  */
 export default async function PDFHTMLOutput(props: { searchParams: { [key: string]: string } }) {
-    const contentPointer = getContentPointer();
+    const pointer = getSpaceOrSitePointer();
 
     const searchParams = new URLSearchParams(props.searchParams);
     const pdfParams = getPDFSearchParams(new URLSearchParams(searchParams));
@@ -71,12 +96,12 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
 
     // Load the content,
     const [customization, { space, contentTarget, pages: rootPages }] = await Promise.all([
-        'siteId' in contentPointer
-            ? getCurrentSiteCustomization(contentPointer)
-            : getSpaceCustomization(contentPointer.spaceId),
+        pointer.kind === 'site'
+            ? getCurrentSiteCustomization(pointer.content)
+            : getSpaceCustomization(pointer.content.spaceId),
         getSpaceContentData(
-            contentPointer,
-            'siteId' in contentPointer ? contentPointer.siteShareKey : undefined,
+            pointer.content,
+            pointer.kind === 'site' ? pointer.content.siteShareKey : undefined,
         ),
     ]);
     const language = getSpaceLanguage(customization);
@@ -175,7 +200,7 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
                             space={space}
                             page={page}
                             refContext={{
-                                siteContext: 'siteId' in contentPointer ? contentPointer : null,
+                                siteContext: pointer.kind === 'site' ? pointer.content : null,
                                 space,
                                 revisionId: contentTarget.revisionId,
                                 pages: rootPages,

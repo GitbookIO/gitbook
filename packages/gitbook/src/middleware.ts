@@ -372,6 +372,7 @@ async function lookupSpaceInSingleMode(url: URL): Promise<LookupResult> {
     }
 
     return {
+        kind: 'space',
         space: spaceId,
         basePath: '',
         pathname: url.pathname,
@@ -518,7 +519,8 @@ async function lookupSiteOrSpaceInMultiIdMode(
     }
 
     return {
-        ...decoded,
+        // In multi-id mode, complete is always considered true because there is no URL to resolve
+        ...(decoded.kind === 'site' ? { ...decoded, complete: true } : decoded),
         changeRequest: changeRequestId,
         revision: revisionId,
         basePath: normalizePathname(basePathParts.join('/')),

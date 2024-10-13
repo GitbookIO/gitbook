@@ -1,9 +1,9 @@
 import { headers } from 'next/headers';
 
-import { SiteContentPointer } from './api';
+import { SiteContentPointer, SpaceContentPointer } from './api';
 
 /**
- * Get the current site content pointer from the params.
+ * Get the current site content pointer from the headers
  */
 export function getSiteContentPointer(): SiteContentPointer {
     const headerSet = headers();
@@ -34,13 +34,26 @@ export function getSiteContentPointer(): SiteContentPointer {
     };
 
     return pointer;
+}
 
-    // else {
-    //     const content: ContentPointer = {
-    //         spaceId,
-    //         revisionId: headerSet.get('x-gitbook-content-revision') ?? undefined,
-    //         changeRequestId: headerSet.get('x-gitbook-content-changerequest') ?? undefined,
-    //     };
-    //     return content;
-    // }
+/**
+ * Get the current space pointer from the headers. This should be used when rendering
+ * the space in an isolated context (e.g. PDF generation).
+ */
+export function getSpacePointer(): SpaceContentPointer {
+    const headerSet = headers();
+    const spaceId = headerSet.get('x-gitbook-content-space');
+    if (!spaceId) {
+        throw new Error(
+            'getSpacePointer is called outside the scope of a request processed by the middleware',
+        );
+    }
+
+    const pointer: SpaceContentPointer = {
+        spaceId,
+        revisionId: headerSet.get('x-gitbook-content-revision') ?? undefined,
+        changeRequestId: headerSet.get('x-gitbook-content-changerequest') ?? undefined,
+    };
+
+    return pointer;
 }

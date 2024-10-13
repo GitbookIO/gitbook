@@ -31,16 +31,16 @@ import {
 /**
  * Pointer to a relative content, it might change overtime, the pointer is relative in the content history.
  */
-interface ContentPointer {
+export interface SpaceContentPointer {
     spaceId: string;
     changeRequestId?: string;
     revisionId?: string;
 }
 
 /**
- * Pointer to a relative content, it might change overtime, the pointer is relative in the content history.
+ * Pointer to a specific site content.
  */
-export interface SiteContentPointer extends ContentPointer {
+export interface SiteContentPointer extends SpaceContentPointer {
     organizationId: string;
     siteId: string;
     /**
@@ -125,8 +125,25 @@ export function withAPI<T>(client: GitBookAPI, fn: () => Promise<T>): Promise<T>
     return apiSyncStorage.run(client, fn);
 }
 
+// FIXME: Fix @gitbook/api types for PublishedSiteContentLookup
+type SpaceContentLookup = {
+    kind: 'space';
+    /** ID of the space matching. */
+    space: string;
+    /** Identifier of the change request being previewed in this URL. */
+    changeRequest?: string;
+    /** Identifier of the revision being previewed in this URL. */
+    revision?: string;
+    /** Path of the content relative to the space */
+    pathname: string;
+    /** Prefix of the path in the URL dedicated to the space */
+    basePath: string;
+    /** Short-lived API token to fetch content related to the space in the context of the URL. */
+    apiToken: string;
+};
+
 export type PublishedContentWithCache =
-    | (PublishedSiteContentLookup & {
+    | ((SpaceContentLookup | PublishedSiteContentLookup) & {
           cacheMaxAge?: number;
           cacheTags?: string[];
       })
@@ -893,7 +910,7 @@ export const getCollectionSpaces = cache({
 /**
  * Fetch all the data to render a space at once.
  */
-export async function getSpaceData(pointer: ContentPointer, shareKey: string | undefined) {
+export async function getSpaceData(pointer: SpaceContentPointer, shareKey: string | undefined) {
     const [{ space, pages, contentTarget }, { customization, scripts }] = await Promise.all([
         getSpaceContentData(pointer, shareKey),
         getSpaceLayoutData(pointer.spaceId),
@@ -913,7 +930,10 @@ export async function getSpaceData(pointer: ContentPointer, shareKey: string | u
  * This function executes the requests in parallel and should be used as early as possible
  * instead of calling the individual functions.
  */
-export async function getSpaceContentData(pointer: ContentPointer, shareKey: string | undefined) {
+export async function getSpaceContentData(
+    pointer: SpaceContentPointer,
+    shareKey: string | undefined,
+) {
     const [space, changeRequest] = await Promise.all([
         getSpace(pointer.spaceId, shareKey),
         pointer.changeRequestId ? getChangeRequest(pointer.spaceId, pointer.changeRequestId) : null,
