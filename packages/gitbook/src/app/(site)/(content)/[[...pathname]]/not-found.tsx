@@ -1,14 +1,11 @@
 import { getSpaceLanguage, t } from '@/intl/server';
 import { getSiteLayoutData, getSpaceLayoutData } from '@/lib/api';
+import { getSiteContentPointer } from '@/lib/pointer';
 import { tcls } from '@/lib/tailwind';
 
-import { getContentPointer } from '../../fetch';
-
 export default async function NotFound() {
-    const pointer = getContentPointer();
-    const { customization } = await ('siteId' in pointer
-        ? getSiteLayoutData(pointer)
-        : getSpaceLayoutData(pointer.spaceId));
+    const pointer = getSiteContentPointer();
+    const { customization } = await getSiteLayoutData(pointer);
 
     const language = getSpaceLanguage(customization);
 

@@ -45,9 +45,8 @@ export interface ContentRefContext extends PageHrefContext {
 
     /**
      * Site in which we are resolving the content reference.
-     * If null, the site is not known (legacy published content mode)
      */
-    siteContext: SiteContentPointer | null;
+    siteContext: SiteContentPointer;
     /**
      * Space in which we are resolving the content reference.
      */

@@ -8,7 +8,6 @@ import {
     GitBookAPIError,
     HttpResponse,
     List,
-    PublishedContentLookup,
     PublishedSiteContentLookup,
     RequestRenderIntegrationUI,
     RevisionFile,
@@ -32,7 +31,7 @@ import {
 /**
  * Pointer to a relative content, it might change overtime, the pointer is relative in the content history.
  */
-export interface ContentPointer {
+interface ContentPointer {
     spaceId: string;
     changeRequestId?: string;
     revisionId?: string;
@@ -127,17 +126,7 @@ export function withAPI<T>(client: GitBookAPI, fn: () => Promise<T>): Promise<T>
 }
 
 export type PublishedContentWithCache =
-    | ((
-          | PublishedContentLookup
-          | (PublishedSiteContentLookup & {
-                //TODO: Remove this once the @gitbook/api is bumped
-                /**
-                 * Whether the resolved site URL is complete and at it's terminal point, meaning no more site path segments
-                 * can be further expected before any page path segments.
-                 */
-                complete: boolean;
-            })
-      ) & {
+    | (PublishedSiteContentLookup & {
           cacheMaxAge?: number;
           cacheTags?: string[];
       })

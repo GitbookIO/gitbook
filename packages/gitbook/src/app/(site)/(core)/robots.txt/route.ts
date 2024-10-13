@@ -3,9 +3,8 @@ import { NextRequest } from 'next/server';
 
 import { getCollection, getSite, getSpace } from '@/lib/api';
 import { absoluteHref } from '@/lib/links';
+import { getSiteContentPointer } from '@/lib/pointer';
 import { isSpaceIndexable } from '@/lib/seo';
-
-import { getContentPointer } from '../../fetch';
 
 export const runtime = 'edge';
 
@@ -13,12 +12,9 @@ export const runtime = 'edge';
  * Generate a robots.txt for the current space.
  */
 export async function GET(req: NextRequest) {
-    const pointer = getContentPointer();
-    const space = await getSpace(
-        pointer.spaceId,
-        'siteId' in pointer ? pointer.siteShareKey : undefined,
-    );
-    const site = 'siteId' in pointer ? await getSite(pointer.organizationId, pointer.siteId) : null;
+    const pointer = getSiteContentPointer();
+    const space = await getSpace(pointer.spaceId, pointer.siteShareKey);
+    const site = await getSite(pointer.organizationId, pointer.siteId);
 
     const lines = [
         `User-agent: *`,

@@ -1,7 +1,6 @@
 import { SpaceRootLayout } from '@/components/SpaceRootLayout';
 import { getSiteLayoutData, getSpaceLayoutData } from '@/lib/api';
-
-import { getContentPointer } from './fetch';
+import { getSiteContentPointer } from '@/lib/pointer';
 
 /**
  * Layout shared between the content and the PDF renderer.
@@ -10,10 +9,8 @@ import { getContentPointer } from './fetch';
 export default async function SiteRootLayout(props: { children: React.ReactNode }) {
     const { children } = props;
 
-    const pointer = getContentPointer();
-    const { customization } = await ('siteId' in pointer
-        ? getSiteLayoutData(pointer)
-        : getSpaceLayoutData(pointer.spaceId));
+    const pointer = getSiteContentPointer();
+    const { customization } = await getSiteLayoutData(pointer);
 
     return <SpaceRootLayout customization={customization}>{children}</SpaceRootLayout>;
 }

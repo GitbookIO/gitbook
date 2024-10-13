@@ -12,7 +12,7 @@ import { SiteContentPointer } from '@/lib/api';
  */
 export function TrackPageView(props: {
     apiHost: string;
-    sitePointer?: Pick<SiteContentPointer, 'siteId' | 'organizationId'>;
+    sitePointer: SiteContentPointer;
     spaceId: string;
     pageId: string | undefined;
 }) {
