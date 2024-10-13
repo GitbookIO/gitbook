@@ -49,7 +49,7 @@ export function isSpaceIndexable({ space, site }: { space: Space; site: Site | n
         return false;
     }
 
-    if (site && site.object === 'site') {
+    if (site) {
         return shouldIndexVisibility(site.visibility);
     }
 

@@ -25,7 +25,7 @@ export function CompactHeader(props: {
     customization: CustomizationSettings | SiteCustomizationSettings;
 }) {
     const { space, spaces, site, customization } = props;
-    const isMultiVariants = site && site.object === 'site' && spaces.length > 1;
+    const isMultiVariants = site && spaces.length > 1;
 
     return (
         <div

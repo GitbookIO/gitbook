@@ -33,7 +33,7 @@ export function Header(props: {
     const { context, space, site, spaces, customization, withTopHeader } = props;
     const isCustomizationDefault =
         customization.header.preset === CustomizationHeaderPreset.Default;
-    const isMultiVariants = site && site.object === 'site' && spaces.length > 1;
+    const isMultiVariants = site && spaces.length > 1;
 
     return (
         <header

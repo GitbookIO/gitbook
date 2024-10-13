@@ -94,7 +94,7 @@ export default async function Page(props: {
                 {page.layout.outline ? (
                     <PageAside
                         space={space}
-                        site={site?.object === 'site' ? site : undefined}
+                        site={site}
                         customization={customization}
                         page={page}
                         document={document}
