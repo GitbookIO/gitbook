@@ -3,8 +3,8 @@ import { getSpaceLayoutData } from '@/lib/api';
 import { getSpacePointer } from '@/lib/pointer';
 
 /**
- * Layout shared between the content and the PDF renderer.
- * It takes care of setting the theme and the language.
+ * Layout to be used for the site root. It fetches the customization data for the site
+ * and initializes the SpaceRootLayout with it.
  */
 export default async function PDFRootLayout(props: { children: React.ReactNode }) {
     const { children } = props;

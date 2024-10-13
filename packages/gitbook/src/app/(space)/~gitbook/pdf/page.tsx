@@ -38,41 +38,15 @@ import { PrintButton } from './PrintButton';
 
 const DEFAULT_LIMIT = 100;
 
-function getSpaceOrSitePointer():
-    | {
-          kind: 'space';
-          content: SpaceContentPointer;
-      }
-    | {
-          kind: 'site';
-          content: SiteContentPointer;
-      } {
-    try {
-        const sitePointer = getSiteContentPointer();
-        return {
-            kind: 'site',
-            content: sitePointer,
-        };
-    } catch (error) {
-        return {
-            kind: 'space',
-            content: getSpacePointer(),
-        };
-    }
-}
-
 export const runtime = 'edge';
 
 export async function generateMetadata(): Promise<Metadata> {
     const pointer = getSpaceOrSitePointer();
     const [space, customization] = await Promise.all([
-        getSpace(
-            pointer.content.spaceId,
-            pointer.kind === 'site' ? pointer.content.siteShareKey : undefined,
-        ),
-        pointer.kind === 'site'
-            ? getCurrentSiteCustomization(pointer.content)
-            : getSpaceCustomization(pointer.content.spaceId),
+        getSpace(pointer.spaceId, 'siteId' in pointer ? pointer.siteShareKey : undefined),
+        'siteId' in pointer
+            ? getCurrentSiteCustomization(pointer)
+            : getSpaceCustomization(pointer.spaceId),
     ]);
 
     return {
@@ -96,13 +70,10 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
 
     // Load the content,
     const [customization, { space, contentTarget, pages: rootPages }] = await Promise.all([
-        pointer.kind === 'site'
-            ? getCurrentSiteCustomization(pointer.content)
-            : getSpaceCustomization(pointer.content.spaceId),
-        getSpaceContentData(
-            pointer.content,
-            pointer.kind === 'site' ? pointer.content.siteShareKey : undefined,
-        ),
+        'siteId' in pointer
+            ? getCurrentSiteCustomization(pointer)
+            : getSpaceCustomization(pointer.spaceId),
+        getSpaceContentData(pointer, 'siteId' in pointer ? pointer.siteShareKey : undefined),
     ]);
     const language = getSpaceLanguage(customization);
 
@@ -200,7 +171,7 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
                             space={space}
                             page={page}
                             refContext={{
-                                siteContext: pointer.kind === 'site' ? pointer.content : null,
+                                siteContext: 'siteId' in pointer ? pointer : null,
                                 space,
                                 revisionId: contentTarget.revisionId,
                                 pages: rootPages,
@@ -392,4 +363,17 @@ function selectPages(
         return flattenPage(page, 0);
     });
     return limitTo(allPages);
+}
+
+/**
+ * PDF generation can be done at the site level (e.g. docs.foo.com/~gitbook/pdf) or
+ * at the space level (e.g. open.gitbook.com/~space/:spaceId/~gitbook/pdf). This function
+ * returns the pointer depending on the context.
+ */
+function getSpaceOrSitePointer(): SiteContentPointer | SpaceContentPointer {
+    try {
+        return getSiteContentPointer();
+    } catch (error) {
+        return getSpacePointer();
+    }
 }
