@@ -17,7 +17,7 @@ import { Link } from '../primitives';
 import { SpaceIcon } from '../Space/SpaceIcon';
 
 interface HeaderLogoProps {
-    parent: Site | Collection | null;
+    site: Site | null;
     space: Space;
     customization: CustomizationSettings | SiteCustomizationSettings;
 }
@@ -93,7 +93,7 @@ export function HeaderLogo(props: HeaderLogoProps) {
 }
 
 function LogoFallback(props: HeaderLogoProps) {
-    const { parent, space, customization } = props;
+    const { site, space, customization } = props;
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : undefined;
     const customEmoji = 'emoji' in customization.favicon ? customization.favicon.emoji : undefined;
 
@@ -124,7 +124,7 @@ function LogoFallback(props: HeaderLogoProps) {
                         : 'text-header-link',
                 )}
             >
-                {getContentTitle(space, customization, parent)}
+                {getContentTitle(space, customization, site)}
             </div>
         </>
     );

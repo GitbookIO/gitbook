@@ -3,6 +3,7 @@
 import type {
     ContentKitAction,
     ContentKitRenderOutput,
+    ContentKitRenderOutputElement,
     RequestRenderIntegrationUI,
 } from '@gitbook/api';
 import React from 'react';
@@ -15,7 +16,7 @@ import {
 } from './context';
 import { resolveDynamicBinding } from './dynamic';
 
-type ContentKitLifecycleMode = ContentKitRenderOutput['element']['type'];
+type ContentKitLifecycleMode = ContentKitRenderOutputElement['element']['type'];
 
 /**
  * Render a ContentKit component.
@@ -27,7 +28,7 @@ export function ContentKit(props: {
     /** Initial input being displayed */
     initialInput: RequestRenderIntegrationUI;
     /** Initial output being displayed */
-    initialOutput: ContentKitRenderOutput;
+    initialOutput: ContentKitRenderOutputElement;
     /** Initial state to display */
     children?: React.ReactNode;
     /** Render a new state */
@@ -37,6 +38,8 @@ export function ContentKit(props: {
     }>;
     /** Callback when an action is triggered */
     onAction?: (action: ContentKitAction) => void;
+    /** Callback when the flow is completed */
+    onComplete?: (returnValue: any) => void;
 }) {
     const {
         security,
@@ -45,6 +48,7 @@ export function ContentKit(props: {
         children: initialChildren,
         render,
         onAction,
+        onComplete,
     } = props;
 
     const [current, setCurrent] = React.useState({
@@ -61,7 +65,7 @@ export function ContentKit(props: {
     const [subView, setSubView] = React.useState<null | {
         mode: ContentKitLifecycleMode;
         initialInput: RequestRenderIntegrationUI;
-        initialOutput: ContentKitRenderOutput;
+        initialOutput: ContentKitRenderOutputElement;
         initialChildren: React.ReactNode;
     }>(null);
 
@@ -85,17 +89,22 @@ export function ContentKit(props: {
 
             console.log('transition to input', newInput);
             const result = await render(newInput);
+            const output = result.output;
 
-            console.log('and got output', result.output, 'for', newInput);
+            if (output.type === 'complete') {
+                return onComplete?.(output.returnValue);
+            }
+
+            console.log('and got output', output, 'for', newInput);
 
             setCurrent((prev) => ({
                 input: newInput,
                 children: result.children,
-                output: result.output,
+                output: output,
                 state: prev.state,
             }));
         },
-        [setCurrent, current, render],
+        [setCurrent, current, render, onComplete],
     );
 
     const renderer = React.useMemo<ContentKitClientContextType>(() => {
@@ -131,12 +140,15 @@ export function ContentKit(props: {
 
                         // Prefetch the modal content to show a loading in the button opening the button
                         const result = await render(modalInput);
-                        setSubView({
-                            mode: 'modal',
-                            initialInput: modalInput,
-                            initialOutput: result.output,
-                            initialChildren: result.children,
-                        });
+
+                        if (result.output.type === 'element' || !result.output.type) {
+                            setSubView({
+                                mode: 'modal',
+                                initialInput: modalInput,
+                                initialOutput: result.output,
+                                initialChildren: result.children,
+                            });
+                        }
                         break;
                     }
 

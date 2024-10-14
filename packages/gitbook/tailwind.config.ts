@@ -77,6 +77,7 @@ const config: Config = {
 
                 'header-background': generateVarShades('header-background'),
                 'header-link': generateVarShades('header-link'),
+                'header-button-text': generateVarShades('header-button-text'),
 
                 light: {
                     1: `color-mix(in srgb, var(--light-1), transparent calc(100% - 100% * <alpha-value>))`, //1 99%
