@@ -6,7 +6,7 @@ import { getSiteContentPointer, getSpacePointer } from '@/lib/pointer';
  * at the space level (e.g. open.gitbook.com/~space/:spaceId/~gitbook/pdf). This function
  * returns the pointer depending on the context.
  */
-export function getSiteOrSpacePointer(): SiteContentPointer | SpaceContentPointer {
+export function getSiteOrSpacePointerForPDF(): SiteContentPointer | SpaceContentPointer {
     try {
         return getSiteContentPointer();
     } catch (error) {

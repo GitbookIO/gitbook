@@ -34,7 +34,7 @@ import { PDFSearchParams, getPDFSearchParams } from '@/lib/urls';
 
 import './pdf.css';
 import { PageControlButtons } from './PageControlButtons';
-import { getSiteOrSpacePointer } from './pointer';
+import { getSiteOrSpacePointerForPDF } from './pointer';
 import { PrintButton } from './PrintButton';
 
 const DEFAULT_LIMIT = 100;
@@ -42,7 +42,7 @@ const DEFAULT_LIMIT = 100;
 export const runtime = 'edge';
 
 export async function generateMetadata(): Promise<Metadata> {
-    const pointer = getSiteOrSpacePointer();
+    const pointer = getSiteOrSpacePointerForPDF();
     const [space, customization] = await Promise.all([
         getSpace(pointer.spaceId, 'siteId' in pointer ? pointer.siteShareKey : undefined),
         'siteId' in pointer
@@ -60,7 +60,7 @@ export async function generateMetadata(): Promise<Metadata> {
  * Render a space as a standalone HTML page that can be printed as a PDF.
  */
 export default async function PDFHTMLOutput(props: { searchParams: { [key: string]: string } }) {
-    const pointer = getSiteOrSpacePointer();
+    const pointer = getSiteOrSpacePointerForPDF();
 
     const searchParams = new URLSearchParams(props.searchParams);
     const pdfParams = getPDFSearchParams(new URLSearchParams(searchParams));
