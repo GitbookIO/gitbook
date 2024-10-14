@@ -1,8 +1,8 @@
 import {
     CustomizationBackground,
     CustomizationCorners,
-    CustomizationIconsStyle,
     CustomizationHeaderPreset,
+    CustomizationIconsStyle,
     CustomizationSettings,
     SiteCustomizationSettings,
 } from '@gitbook/api';
@@ -11,30 +11,28 @@ import assertNever from 'assert-never';
 import colorContrast from 'postcss-color-contrast/js';
 import colors from 'tailwindcss/colors';
 
-import { emojiFontClassName } from '@/components/primitives';
 import { fonts, ibmPlexMono } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
-import { getCurrentSiteLayoutData, getSpaceLayoutData } from '@/lib/api';
 import { getStaticFileURL } from '@/lib/assets';
 import { hexToRgb, shadesOfColor } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
 
 import { ClientContexts } from './ClientContexts';
+import { emojiFontClassName } from '../primitives';
+
 import './globals.css';
 import '@gitbook/icons/style.css';
-import { getContentPointer } from './fetch';
 
 /**
  * Layout shared between the content and the PDF renderer.
  * It takes care of setting the theme and the language.
  */
-export default async function SpaceRootLayout(props: { children: React.ReactNode }) {
-    const { children } = props;
+export async function CustomizationRootLayout(props: {
+    customization: SiteCustomizationSettings | CustomizationSettings;
+    children: React.ReactNode;
+}) {
+    const { customization, children } = props;
 
-    const pointer = getContentPointer();
-    const { customization } = await ('siteId' in pointer
-        ? getCurrentSiteLayoutData(pointer)
-        : getSpaceLayoutData(pointer.spaceId));
     const headerTheme = generateHeaderTheme(customization);
     const language = getSpaceLanguage(customization);
 
@@ -88,7 +86,7 @@ export default async function SpaceRootLayout(props: { children: React.ReactNode
                                 ),
                             )
                         }
-                        
+
                         ${generateColorVariable(
                             'primary-base',
                             customization.styling.primaryColor.light,
@@ -98,6 +96,7 @@ export default async function SpaceRootLayout(props: { children: React.ReactNode
                             headerTheme.backgroundColor.light,
                         )}
                         ${generateColorVariable('header-link', headerTheme.linkColor.light)}
+                        ${generateColorVariable('header-button-text', colorContrast(headerTheme.linkColor.light as string, ['#000', '#fff']))}
                     }
                     .dark {
                         ${generateColorVariable(
@@ -127,6 +126,7 @@ export default async function SpaceRootLayout(props: { children: React.ReactNode
                             headerTheme.backgroundColor.dark,
                         )}
                         ${generateColorVariable('header-link', headerTheme.linkColor.dark)}
+                        ${generateColorVariable('header-button-text', colorContrast(headerTheme.linkColor.dark as string, ['#000', '#fff']))}
                     }
                 `}</style>
             </head>

@@ -12,7 +12,7 @@ import { parseServerURL } from './utils';
 
 /**
  * Show the url of the server, where there are variables they are replaced by their default values.
- * If a stateContext is provided with an `onUpdate` callback then the variables can be edited and 
+ * If a stateContext is provided with an `onUpdate` callback then the variables can be edited and
  * if there are multiple servers available they can be selected.
  */
 export function OpenAPIServerURL(props: {

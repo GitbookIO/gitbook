@@ -24,19 +24,16 @@ import { SearchButton } from '../Search';
  */
 export function Header(props: {
     space: Space;
-    parent: Site | Collection | null;
+    site: Site | null;
     spaces: Space[];
     context: ContentRefContext;
     customization: CustomizationSettings | SiteCustomizationSettings;
     withTopHeader?: boolean;
 }) {
-    const { context, space, parent, spaces, customization, withTopHeader } = props;
-
+    const { context, space, site, spaces, customization, withTopHeader } = props;
     const isCustomizationDefault =
         customization.header.preset === CustomizationHeaderPreset.Default;
-    const isMultiVariants =
-        parent?.object === 'collection' ||
-        (parent && parent.object === 'site' && spaces.length > 1);
+    const isMultiVariants = site && spaces.length > 1;
 
     return (
         <header
@@ -76,7 +73,7 @@ export function Header(props: {
                         CONTAINER_STYLE,
                     )}
                 >
-                    <HeaderLogo parent={parent} space={space} customization={customization} />
+                    <HeaderLogo site={site} space={space} customization={customization} />
                     <span>
                         {isMultiVariants ? <SpacesDropdown space={space} spaces={spaces} /> : null}
                     </span>

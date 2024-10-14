@@ -5,8 +5,8 @@ import React from 'react';
 import { PageIcon } from '@/components/PageIcon';
 
 import {
-    ContentPointer,
     SiteContentPointer,
+    SpaceContentPointer,
     getCollection,
     getDocument,
     getRevisionFile,
@@ -45,7 +45,7 @@ export interface ContentRefContext extends PageHrefContext {
 
     /**
      * Site in which we are resolving the content reference.
-     * If null, the site is not known (legacy published content mode)
+     * If `null`, the site is not known (e.g. PDF generation in a private space).
      */
     siteContext: SiteContentPointer | null;
     /**
@@ -213,7 +213,7 @@ export async function resolveContentRef(
             return {
                 href: targetSpace.urls.published ?? targetSpace.urls.app,
                 text: targetSpace.title,
-                active: true,
+                active: contentRef.space === space.id,
             };
         }
 
@@ -269,7 +269,7 @@ async function resolveContentRefInSpace(
     siteContext: SiteContentPointer | null,
     contentRef: ContentRef,
 ) {
-    const pointer: ContentPointer = {
+    const pointer: SpaceContentPointer = {
         spaceId,
     };
 

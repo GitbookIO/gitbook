@@ -51,6 +51,7 @@ export function Button({
               ['text-xs', 'px-3 py-2'];
 
     const domClassName = tcls(
+        'inline-block',
         'rounded-md',
         'straight-corners:rounded-none',
         'place-self-start',
@@ -58,6 +59,7 @@ export function Button({
         'ring-inset',
         'grow-0',
         'shrink-0',
+        'truncate',
         variantClasses,
         sizeClasses,
         className,

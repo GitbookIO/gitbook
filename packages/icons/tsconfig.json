@@ -14,7 +14,10 @@
         "resolveJsonModule": true,
         "isolatedModules": true,
         "jsx": "react",
-        "incremental": true
+        "incremental": true,
+        "types": [
+            "bun-types" // add Bun global
+        ]
     },
     "include": ["src/**/*.ts", "src/**/*.tsx"],
     "exclude": ["node_modules"]

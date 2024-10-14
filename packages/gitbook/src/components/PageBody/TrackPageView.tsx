@@ -12,7 +12,7 @@ import { SiteContentPointer } from '@/lib/api';
  */
 export function TrackPageView(props: {
     apiHost: string;
-    sitePointer?: Pick<SiteContentPointer, 'siteId' | 'organizationId'>;
+    sitePointer: SiteContentPointer;
     spaceId: string;
     pageId: string | undefined;
 }) {
@@ -45,7 +45,7 @@ async function sendSpaceTrackPageViewRequest(args: {
 
 async function sendSiteTrackPageViewRequest(args: {
     apiHost: string;
-    sitePointer: Pick<SiteContentPointer, 'siteId' | 'organizationId'>;
+    sitePointer: SiteContentPointer;
     body: RequestSiteTrackPageView;
 }) {
     const { apiHost, sitePointer, body } = args;
@@ -70,7 +70,7 @@ let latestPageId: string | undefined | null = null;
  */
 async function trackPageView(args: {
     apiHost: string;
-    sitePointer?: Pick<SiteContentPointer, 'siteId' | 'organizationId'>;
+    sitePointer: SiteContentPointer;
     spaceId: string;
     pageId: string | undefined;
 }) {

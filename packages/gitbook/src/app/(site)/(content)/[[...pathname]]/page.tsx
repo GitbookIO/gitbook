@@ -33,7 +33,7 @@ export default async function Page(props: {
         content: contentPointer,
         contentTarget,
         space,
-        parent,
+        site,
         customization,
         pages,
         page,
@@ -68,7 +68,7 @@ export default async function Page(props: {
     const withPageFeedback = customization.feedback.enabled;
 
     const contentRefContext: ContentRefContext = {
-        siteContext: 'siteId' in contentPointer ? contentPointer : null,
+        siteContext: contentPointer,
         space,
         revisionId: contentTarget.revisionId,
         pages,
@@ -83,7 +83,7 @@ export default async function Page(props: {
             <div className={tcls('flex', 'flex-row')}>
                 <PageBody
                     space={space}
-                    contentPointer={contentPointer}
+                    pointer={contentPointer}
                     contentTarget={contentTarget}
                     customization={customization}
                     context={contentRefContext}
@@ -97,7 +97,7 @@ export default async function Page(props: {
                 {page.layout.outline ? (
                     <PageAside
                         space={space}
-                        site={parent?.object === 'site' ? parent : undefined}
+                        site={site}
                         customization={customization}
                         page={page}
                         document={document}
@@ -133,7 +133,7 @@ export async function generateMetadata({
     params: PagePathParams;
     searchParams: { fallback?: string };
 }): Promise<Metadata> {
-    const { space, pages, page, customization, parent, ancestors } = await getPageDataWithFallback({
+    const { space, pages, page, customization, site, ancestors } = await getPageDataWithFallback({
         pagePathParams: params,
         searchParams,
     });
@@ -143,7 +143,7 @@ export async function generateMetadata({
     }
 
     return {
-        title: [page.title, getContentTitle(space, customization, parent)]
+        title: [page.title, getContentTitle(space, customization, site ?? null)]
             .filter(Boolean)
             .join(' | '),
         description: page.description ?? '',
@@ -157,7 +157,7 @@ export async function generateMetadata({
             ],
         },
         robots:
-            isSpaceIndexable({ space, parent }) && isPageIndexable(ancestors, page)
+            isSpaceIndexable({ space, site: site ?? null }) && isPageIndexable(ancestors, page)
                 ? 'index, follow'
                 : 'noindex, nofollow',
     };

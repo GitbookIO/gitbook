@@ -63,7 +63,7 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
         renderIntegrationUi(block.data.integration, initialInput),
         true,
     );
-    if (!initialOutput) {
+    if (!initialOutput || initialOutput.type === 'complete') {
         return null;
     }
 
