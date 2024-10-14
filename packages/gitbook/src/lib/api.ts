@@ -814,23 +814,6 @@ export async function getCurrentSiteCustomization(args: {
 /**
  * Get the customization settings for a space from the API.
  */
-export const getSpaceCustomizationFromAPI = cache({
-    name: 'api.getSpaceCustomization',
-    tag: (spaceId) => getAPICacheTag({ tag: 'space', space: spaceId }),
-    get: async (spaceId: string, options: CacheFunctionOptions) => {
-        const response = await api().spaces.getSpacePublishingCustomizationById(spaceId, {
-            signal: options.signal,
-            ...noCacheFetchOptions,
-        });
-        return cacheResponse(response, {
-            revalidateBefore: 60 * 60,
-        });
-    },
-});
-
-/**
- * Get the customization settings for a space from the API.
- */
 export async function getSpaceCustomization(spaceId: string): Promise<CustomizationSettings> {
     const headersList = headers();
     const raw = defaultCustomizationForSpace();
