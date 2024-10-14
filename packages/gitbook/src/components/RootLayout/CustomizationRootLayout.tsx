@@ -17,7 +17,7 @@ import { getStaticFileURL } from '@/lib/assets';
 import { hexToRgb, shadesOfColor } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
 
-import { ClientContexts } from '../Contexts';
+import { ClientContexts } from './ClientContexts';
 import { emojiFontClassName } from '../primitives';
 
 import './globals.css';
@@ -27,7 +27,7 @@ import '@gitbook/icons/style.css';
  * Layout shared between the content and the PDF renderer.
  * It takes care of setting the theme and the language.
  */
-export async function SpaceRootLayout(props: {
+export async function CustomizationRootLayout(props: {
     customization: SiteCustomizationSettings | CustomizationSettings;
     children: React.ReactNode;
 }) {

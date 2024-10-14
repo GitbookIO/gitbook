@@ -13,8 +13,10 @@ export const runtime = 'edge';
  */
 export async function GET(req: NextRequest) {
     const pointer = getSiteContentPointer();
-    const space = await getSpace(pointer.spaceId, pointer.siteShareKey);
-    const site = await getSite(pointer.organizationId, pointer.siteId);
+    const [site, space] = await Promise.all([
+        getSite(pointer.organizationId, pointer.siteId),
+        getSpace(pointer.spaceId, pointer.siteShareKey),
+    ]);
 
     const lines = [
         `User-agent: *`,

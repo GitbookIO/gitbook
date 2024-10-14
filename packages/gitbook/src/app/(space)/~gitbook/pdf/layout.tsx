@@ -1,11 +1,11 @@
-import { SpaceRootLayout } from '@/components/SpaceRootLayout';
+import { CustomizationRootLayout } from '@/components/RootLayout';
 import { getSiteLayoutData, getSpaceLayoutData } from '@/lib/api';
 
 import { getSiteOrSpacePointerForPDF } from './pointer';
 
 /**
- * Layout to be used for the site root. It fetches the customization data for the site
- * and initializes the SpaceRootLayout with it.
+ * Layout to be used for the site root. It fetches the customization data for the
+ * site or space and initializes the CustomizationRootLayout with it.
  */
 export default async function PDFRootLayout(props: { children: React.ReactNode }) {
     const { children } = props;
@@ -15,5 +15,7 @@ export default async function PDFRootLayout(props: { children: React.ReactNode }
         ? getSiteLayoutData(pointer)
         : getSpaceLayoutData(pointer.spaceId));
 
-    return <SpaceRootLayout customization={customization}>{children}</SpaceRootLayout>;
+    return (
+        <CustomizationRootLayout customization={customization}>{children}</CustomizationRootLayout>
+    );
 }
