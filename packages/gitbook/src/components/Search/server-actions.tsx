@@ -71,10 +71,6 @@ export async function searchSiteContent(args: {
         return [];
     }
 
-    if (!('siteId' in pointer)) {
-        throw new Error(`Expected a site pointer for searching site content`);
-    }
-
     const [searchResults, allSiteSpaces] = await Promise.all([
         api.searchSiteContent(
             pointer.organizationId,
@@ -130,10 +126,6 @@ export async function searchCurrentSpaceContent(
         query,
         cacheBust: revisionId,
     });
-
-    // This is for legacy space content pointer and it should not be used anymore
-    const data = await api.searchSpaceContent(pointer.spaceId, revisionId, query);
-    return data.items.map((item) => transformPageResult(item, undefined)).flat();
 }
 
 /**
