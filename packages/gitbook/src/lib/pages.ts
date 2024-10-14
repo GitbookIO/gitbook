@@ -1,4 +1,4 @@
-import { Revision, RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
+import { Revision, RevisionPage, RevisionPageDocument, RevisionPageGroup, RevisionPageType } from '@gitbook/api';
 
 export type AncestorRevisionPage = RevisionPageDocument | RevisionPageGroup;
 
@@ -162,7 +162,7 @@ function flattenPages(
 ): RevisionPageDocument[] {
     const result: RevisionPageDocument[] = [];
     for (const page of pages) {
-        if (page.type === 'link') {
+        if (page.type === RevisionPageType.Link || page.type === RevisionPageType.Computed) {
             continue;
         }
 
@@ -170,7 +170,7 @@ function flattenPages(
             continue;
         }
 
-        if (page.type === 'document') {
+        if (page.type === RevisionPageType.Document) {
             result.push(page);
         }
         result.push(...flattenPages(page.pages, filter));
