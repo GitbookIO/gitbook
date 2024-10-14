@@ -1,21 +1,16 @@
-import { ContentVisibility, RevisionPage, Space } from '@gitbook/api';
-import { headers } from 'next/headers';
+import { RevisionPage, Space } from '@gitbook/api';
 
 import {
-    getCollectionSpaces,
-    getCollection,
-    ContentPointer,
     getRevisionPageByPath,
     getDocument,
-    getSpaceData,
     ContentTarget,
-    SiteContentPointer,
     getSiteData,
     getSite,
     getSiteSpaces,
     getCurrentSiteCustomization,
 } from '@/lib/api';
 import { resolvePagePath, resolvePageId } from '@/lib/pages';
+import { getSiteContentPointer } from '@/lib/pointer';
 
 export interface PagePathParams {
     pathname?: string[];
@@ -26,70 +21,23 @@ export interface PageIdParams {
 }
 
 /**
- * Get the current content pointer from the params.
- */
-export function getContentPointer(): ContentPointer | SiteContentPointer {
-    const headerSet = headers();
-    const spaceId = headerSet.get('x-gitbook-content-space');
-    if (!spaceId) {
-        throw new Error(
-            'getContentPointer is called outside the scope of a request processed by the middleware',
-        );
-    }
-
-    const siteId = headerSet.get('x-gitbook-content-site');
-    if (siteId) {
-        const organizationId = headerSet.get('x-gitbook-content-organization');
-        const siteSpaceId = headerSet.get('x-gitbook-content-site-space');
-        const siteShareKey = headerSet.get('x-gitbook-content-site-share-key');
-        if (!organizationId) {
-            throw new Error('Missing site content headers');
-        }
-
-        const siteContent: SiteContentPointer = {
-            siteId,
-            spaceId,
-            siteSpaceId: siteSpaceId ?? undefined,
-            siteShareKey: siteShareKey ?? undefined,
-            organizationId,
-            revisionId: headerSet.get('x-gitbook-content-revision') ?? undefined,
-            changeRequestId: headerSet.get('x-gitbook-content-changerequest') ?? undefined,
-        };
-        return siteContent;
-    } else {
-        const content: ContentPointer = {
-            spaceId,
-            revisionId: headerSet.get('x-gitbook-content-revision') ?? undefined,
-            changeRequestId: headerSet.get('x-gitbook-content-changerequest') ?? undefined,
-        };
-        return content;
-    }
-}
-
-/**
  * Fetch all the data needed to render the content layout.
  */
 export async function fetchContentData() {
-    const content = getContentPointer();
-
-    const siteShareKey = 'siteId' in content ? content.siteShareKey : undefined;
+    const content = getSiteContentPointer();
 
     const [{ space, contentTarget, pages, customization, scripts }, siteStructure] =
-        await Promise.all(
-            'siteId' in content
-                ? [
-                      getSiteData(content),
-                      fetchSiteStructure({
-                          organizationId: content.organizationId,
-                          siteId: content.siteId,
-                          siteShareKey,
-                      }),
-                  ]
-                : [getSpaceData(content, siteShareKey)],
-        );
+        await Promise.all([
+            getSiteData(content),
+            fetchSiteStructure({
+                organizationId: content.organizationId,
+                siteId: content.siteId,
+                siteShareKey: content.siteShareKey,
+            }),
+        ]);
 
-    const site = siteStructure ? siteStructure.site : null;
-    const spaces = siteStructure ? siteStructure.spaces : [];
+    const site = siteStructure.site;
+    const spaces = siteStructure.spaces;
     // we grab the space attached to the parent as it contains overriden customizations
     const spaceRelativeToParent = spaces.find((space) => space.id === content.spaceId);
 
@@ -111,21 +59,16 @@ export async function fetchContentData() {
  * Optimized to fetch in parallel as much as possible.
  */
 export async function fetchPageData(params: PagePathParams | PageIdParams) {
-    const content = getContentPointer();
-    const siteShareKey = 'siteId' in content ? content.siteShareKey : undefined;
-    const { space, contentTarget, pages, customization, scripts } = await ('siteId' in content
-        ? getSiteData(content)
-        : getSpaceData(content, siteShareKey));
+    const content = getSiteContentPointer();
 
+    const { space, contentTarget, pages, customization, scripts } = await getSiteData(content);
     const page = await resolvePage(contentTarget, pages, params);
     const [siteStructure, document] = await Promise.all([
-        'siteId' in content
-            ? fetchSiteStructure({
-                  organizationId: content.organizationId,
-                  siteId: content.siteId,
-                  siteShareKey: content.siteShareKey,
-              })
-            : null,
+        fetchSiteStructure({
+            organizationId: content.organizationId,
+            siteId: content.siteId,
+            siteShareKey: content.siteShareKey,
+        }),
         page?.page.documentId ? getDocument(space.id, page.page.documentId) : null,
     ]);
 

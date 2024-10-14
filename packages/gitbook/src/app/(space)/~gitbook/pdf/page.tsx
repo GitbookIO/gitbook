@@ -11,7 +11,6 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import * as React from 'react';
 
-import { getContentPointer } from '@/app/(space)/fetch';
 import { DocumentView, createHighlightingContext } from '@/components/DocumentView';
 import { TrademarkLink } from '@/components/TableOfContents/Trademark';
 import { PolymorphicComponentProp } from '@/components/utils/types';
@@ -32,6 +31,7 @@ import { PDFSearchParams, getPDFSearchParams } from '@/lib/urls';
 
 import './pdf.css';
 import { PageControlButtons } from './PageControlButtons';
+import { getSiteOrSpacePointerForPDF } from './pointer';
 import { PrintButton } from './PrintButton';
 
 const DEFAULT_LIMIT = 100;
@@ -39,15 +39,12 @@ const DEFAULT_LIMIT = 100;
 export const runtime = 'edge';
 
 export async function generateMetadata(): Promise<Metadata> {
-    const contentPointer = getContentPointer();
+    const pointer = getSiteOrSpacePointerForPDF();
     const [space, customization] = await Promise.all([
-        getSpace(
-            contentPointer.spaceId,
-            'siteId' in contentPointer ? contentPointer.siteShareKey : undefined,
-        ),
-        'siteId' in contentPointer
-            ? getCurrentSiteCustomization(contentPointer)
-            : getSpaceCustomization(contentPointer.spaceId),
+        getSpace(pointer.spaceId, 'siteId' in pointer ? pointer.siteShareKey : undefined),
+        'siteId' in pointer
+            ? getCurrentSiteCustomization(pointer)
+            : getSpaceCustomization(pointer.spaceId),
     ]);
 
     return {
@@ -60,7 +57,7 @@ export async function generateMetadata(): Promise<Metadata> {
  * Render a space as a standalone HTML page that can be printed as a PDF.
  */
 export default async function PDFHTMLOutput(props: { searchParams: { [key: string]: string } }) {
-    const contentPointer = getContentPointer();
+    const pointer = getSiteOrSpacePointerForPDF();
 
     const searchParams = new URLSearchParams(props.searchParams);
     const pdfParams = getPDFSearchParams(new URLSearchParams(searchParams));
@@ -71,13 +68,10 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
 
     // Load the content,
     const [customization, { space, contentTarget, pages: rootPages }] = await Promise.all([
-        'siteId' in contentPointer
-            ? getCurrentSiteCustomization(contentPointer)
-            : getSpaceCustomization(contentPointer.spaceId),
-        getSpaceContentData(
-            contentPointer,
-            'siteId' in contentPointer ? contentPointer.siteShareKey : undefined,
-        ),
+        'siteId' in pointer
+            ? getCurrentSiteCustomization(pointer)
+            : getSpaceCustomization(pointer.spaceId),
+        getSpaceContentData(pointer, 'siteId' in pointer ? pointer.siteShareKey : undefined),
     ]);
     const language = getSpaceLanguage(customization);
 
@@ -175,7 +169,7 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
                             space={space}
                             page={page}
                             refContext={{
-                                siteContext: 'siteId' in contentPointer ? contentPointer : null,
+                                siteContext: 'siteId' in pointer ? pointer : null,
                                 space,
                                 revisionId: contentTarget.revisionId,
                                 pages: rootPages,

@@ -65,7 +65,7 @@ export default async function Page(props: {
     const withPageFeedback = customization.feedback.enabled;
 
     const contentRefContext: ContentRefContext = {
-        siteContext: 'siteId' in contentPointer ? contentPointer : null,
+        siteContext: contentPointer,
         space,
         revisionId: contentTarget.revisionId,
         pages,
@@ -80,7 +80,7 @@ export default async function Page(props: {
             <div className={tcls('flex', 'flex-row')}>
                 <PageBody
                     space={space}
-                    contentPointer={contentPointer}
+                    pointer={contentPointer}
                     contentTarget={contentTarget}
                     customization={customization}
                     context={contentRefContext}

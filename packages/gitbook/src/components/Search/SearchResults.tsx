@@ -2,7 +2,7 @@ import assertNever from 'assert-never';
 import React from 'react';
 
 import { t, useLanguage } from '@/intl/client';
-import { ContentPointer, SiteContentPointer } from '@/lib/api';
+import { SiteContentPointer } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
 import { isQuestion } from './isQuestion';
@@ -42,7 +42,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
         revisionId: string;
         global: boolean;
         withAsk: boolean;
-        pointer: ContentPointer | SiteContentPointer;
+        pointer: SiteContentPointer;
         onSwitchToAsk: () => void;
     },
     ref: React.Ref<SearchResultsRef>,

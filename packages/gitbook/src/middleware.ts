@@ -1,4 +1,4 @@
-import { GitBookAPI } from '@gitbook/api';
+import { GitBookAPI, ContentAPITokenPayload } from '@gitbook/api';
 import { setTag, setContext } from '@sentry/nextjs';
 import assertNever from 'assert-never';
 import jwt from 'jsonwebtoken';
@@ -75,32 +75,6 @@ export type LookupResult = PublishedContentWithCache & {
     /** Cookies to store on the response */
     cookies?: LookupCookies;
 };
-
-// FIXME: This is a temporary type for now. Use @gitbook/api types when available.
-interface ContentAPIBaseToken {
-    organization: string;
-    spaces: string[];
-    rateLimitMultiplier?: number;
-}
-
-type SpaceAPIToken = ContentAPIBaseToken & {
-    kind: 'space';
-    space: string;
-};
-
-type CollectionAPIToken = ContentAPIBaseToken & {
-    kind: 'collection';
-    collection: string;
-};
-
-type SiteAPIToken = ContentAPIBaseToken & {
-    kind: 'site';
-    site: string;
-    siteSpace: string;
-    space: string;
-};
-
-type ContentAPITokenPayload = SpaceAPIToken | CollectionAPIToken | SiteAPIToken;
 
 /**
  * Middleware to lookup the space to render.
@@ -398,6 +372,7 @@ async function lookupSpaceInSingleMode(url: URL): Promise<LookupResult> {
     }
 
     return {
+        kind: 'space',
         space: spaceId,
         basePath: '',
         pathname: url.pathname,
@@ -544,7 +519,8 @@ async function lookupSiteOrSpaceInMultiIdMode(
     }
 
     return {
-        ...decoded,
+        // In multi-id mode, complete is always considered true because there is no URL to resolve
+        ...(decoded.kind === 'site' ? { ...decoded, complete: true } : decoded),
         changeRequest: changeRequestId,
         revision: revisionId,
         basePath: normalizePathname(basePathParts.join('/')),

@@ -10,7 +10,6 @@ import {
     Space,
 } from '@gitbook/api';
 
-import { getContentPointer } from '@/app/(space)/fetch';
 import { streamResponse } from '@/lib/actions';
 import * as api from '@/lib/api';
 import { absoluteHref, pageHref } from '@/lib/links';
@@ -56,7 +55,7 @@ export interface AskAnswerResult {
  * Search for content in the entire site.
  */
 export async function searchSiteContent(args: {
-    pointer: api.ContentPointer | api.SiteContentPointer;
+    pointer: api.SiteContentPointer;
     query: string;
     siteSpaceIds?: string[];
     cacheBust?: string;
@@ -70,10 +69,6 @@ export async function searchSiteContent(args: {
     if (siteSpaceIds?.length === 0) {
         // if we have no siteSpaces to search in then we won't find anything. skip the call.
         return [];
-    }
-
-    if (!('siteId' in pointer)) {
-        throw new Error(`Expected a site pointer for searching site content`);
     }
 
     const [searchResults, allSiteSpaces] = await Promise.all([
@@ -118,25 +113,19 @@ export async function searchSiteContent(args: {
  */
 export async function searchCurrentSpaceContent(
     query: string,
-    pointer: api.ContentPointer | api.SiteContentPointer,
+    pointer: api.SiteContentPointer,
     revisionId: string,
 ): Promise<OrderedComputedResult[]> {
-    if ('siteId' in pointer) {
-        const siteSpaceIds = pointer.siteSpaceId ? [pointer.siteSpaceId] : []; // if we don't have a siteSpaceID search all content
+    const siteSpaceIds = pointer.siteSpaceId ? [pointer.siteSpaceId] : []; // if we don't have a siteSpaceID search all content
 
-        // This is a site so use a different function which we can eventually call directly
-        // We also want to break cache for this specific space if the revisionId is different so use it as a cache busting key
-        return await searchSiteContent({
-            pointer,
-            siteSpaceIds,
-            query,
-            cacheBust: revisionId,
-        });
-    }
-
-    // This is for legacy space content pointer and it should not be used anymore
-    const data = await api.searchSpaceContent(pointer.spaceId, revisionId, query);
-    return data.items.map((item) => transformPageResult(item, undefined)).flat();
+    // This is a site so use a different function which we can eventually call directly
+    // We also want to break cache for this specific space if the revisionId is different so use it as a cache busting key
+    return await searchSiteContent({
+        pointer,
+        siteSpaceIds,
+        query,
+        cacheBust: revisionId,
+    });
 }
 
 /**

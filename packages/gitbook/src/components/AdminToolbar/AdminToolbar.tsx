@@ -2,7 +2,7 @@ import { Space } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import React from 'react';
 
-import { ContentPointer, getChangeRequest, getRevision } from '@/lib/api';
+import { getChangeRequest, getRevision, SiteContentPointer } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
 import { RefreshChangeRequestButton } from './RefreshChangeRequestButton';
@@ -10,7 +10,7 @@ import { Toolbar, ToolbarBody, ToolbarButton, ToolbarButtonGroups } from './Tool
 import { DateRelative } from '../primitives';
 
 interface AdminToolbarProps {
-    content: ContentPointer;
+    content: SiteContentPointer;
     space: Space;
 }
 

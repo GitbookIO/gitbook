@@ -9,7 +9,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { useRecoilValue } from 'recoil';
 
 import { tString, useLanguage } from '@/intl/client';
-import { ContentPointer, SiteContentPointer } from '@/lib/api';
+import { SiteContentPointer } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
 import { SearchAskAnswer, searchAskState } from './SearchAskAnswer';
@@ -24,7 +24,7 @@ interface SearchModalProps {
     spaceTitle: string;
     isMultiVariants: boolean;
     withAsk: boolean;
-    pointer: ContentPointer | SiteContentPointer;
+    pointer: SiteContentPointer;
 }
 
 /**
