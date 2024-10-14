@@ -1,4 +1,9 @@
-import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
+import {
+    RevisionPage,
+    RevisionPageDocument,
+    RevisionPageGroup,
+    RevisionPageType,
+} from '@gitbook/api';
 
 import { ContentRefContext } from '@/lib/references';
 import { ClassValue, tcls } from '@/lib/tailwind';
@@ -19,7 +24,13 @@ export function PagesList(props: {
     return (
         <ul className={tcls('flex', 'flex-1', 'flex-col', 'gap-y-0.5', style)}>
             {pages.map((page) => {
-                if (page.type === 'link') {
+                if (page.type === RevisionPageType.Computed) {
+                    throw new Error(
+                        'Unexpected computed page, it should have been computed in the API',
+                    );
+                }
+
+                if (page.type === RevisionPageType.Link) {
                     return <PageLinkItem key={page.id} page={page} context={context} />;
                 }
 
@@ -27,7 +38,7 @@ export function PagesList(props: {
                     return null;
                 }
 
-                if (page.type === 'group') {
+                if (page.type === RevisionPageType.Group) {
                     return (
                         <PageGroupItem
                             key={page.id}

@@ -52,7 +52,7 @@ const imageOptions: ImageResponseOptions = {
  * Render the OpenGraph image for a space.
  */
 export async function GET(req: NextRequest, { params }: { params: PageIdParams }) {
-    const { space, page, customization, parent } = await fetchPageData(params);
+    const { space, page, customization, site } = await fetchPageData(params);
 
     if (customization.socialPreview.url) {
         // If user configured a custom social preview, we redirect to it.
@@ -187,7 +187,7 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
                     <div tw={tcls('flex')}>
                         {favicon()}
                         <h3 tw={tcls('text-4xl', 'my-0')}>
-                            {getContentTitle(space, customization, parent)}
+                            {getContentTitle(space, customization, site ?? null)}
                         </h3>
                     </div>
                 )}
