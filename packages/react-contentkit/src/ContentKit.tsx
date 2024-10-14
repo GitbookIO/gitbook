@@ -104,7 +104,7 @@ export function ContentKit(props: {
                 state: prev.state,
             }));
         },
-        [setCurrent, current, render,onComplete],
+        [setCurrent, current, render, onComplete],
     );
 
     const renderer = React.useMemo<ContentKitClientContextType>(() => {
