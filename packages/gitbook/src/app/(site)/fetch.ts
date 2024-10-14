@@ -1,14 +1,9 @@
-import { ContentVisibility, RevisionPage, Space } from '@gitbook/api';
-import { headers } from 'next/headers';
+import { RevisionPage, Space } from '@gitbook/api';
 
 import {
-    getCollectionSpaces,
-    getCollection,
     getRevisionPageByPath,
     getDocument,
-    getSpaceData,
     ContentTarget,
-    SiteContentPointer,
     getSiteData,
     getSite,
     getSiteSpaces,

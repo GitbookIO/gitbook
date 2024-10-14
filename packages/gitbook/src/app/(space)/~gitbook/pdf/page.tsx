@@ -22,12 +22,9 @@ import {
     getSpaceCustomization,
     getSpaceContentData,
     getCurrentSiteCustomization,
-    SpaceContentPointer,
-    SiteContentPointer,
 } from '@/lib/api';
 import { pagePDFContainerId, PageHrefContext, absoluteHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
-import { getSpacePointer, getSiteContentPointer } from '@/lib/pointer';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { PDFSearchParams, getPDFSearchParams } from '@/lib/urls';

@@ -1,16 +1,9 @@
-import { ContentVisibility } from '@gitbook/api';
 import { notFound } from 'next/navigation';
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 import React from 'react';
 
-import {
-    getCollection,
-    getCurrentSiteCustomization,
-    getSite,
-    getSpace,
-    getSpaceCustomization,
-} from '@/lib/api';
+import { getCurrentSiteCustomization, getSite, getSpace } from '@/lib/api';
 import { getEmojiForCode } from '@/lib/emojis';
 import { getSiteContentPointer } from '@/lib/pointer';
 import { tcls } from '@/lib/tailwind';

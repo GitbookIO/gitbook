@@ -8,19 +8,15 @@ import { SiteContentPointer, SpaceContentPointer } from './api';
 export function getSiteContentPointer(): SiteContentPointer {
     const headerSet = headers();
     const spaceId = headerSet.get('x-gitbook-content-space');
-    if (!spaceId) {
-        throw new Error(
-            'getSiteContentPointer is called outside the scope of a request processed by the middleware',
-        );
-    }
-
     const siteId = headerSet.get('x-gitbook-content-site');
     const organizationId = headerSet.get('x-gitbook-content-organization');
     const siteSpaceId = headerSet.get('x-gitbook-content-site-space');
     const siteShareKey = headerSet.get('x-gitbook-content-site-share-key');
 
-    if (!siteId || !organizationId) {
-        throw new Error('Missing site content headers');
+    if (!spaceId || !siteId || !organizationId) {
+        throw new Error(
+            'getSiteContentPointer is called outside the scope of a request processed by the middleware',
+        );
     }
 
     const pointer: SiteContentPointer = {
