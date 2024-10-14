@@ -9,10 +9,9 @@ import { absoluteHref } from '@/lib/links';
 import { tcls } from '@/lib/tailwind';
 import { getContentTitle } from '@/lib/utils';
 
-import { PageIdParams, fetchPageData } from '../../../../fetch';
-
-import gridWhite from '../../../../../../images/ogimage-grid-white.png';
 import gridBlack from '../../../../../../images/ogimage-grid-black.png';
+import gridWhite from '../../../../../../images/ogimage-grid-white.png';
+import { PageIdParams, fetchPageData } from '../../../../fetch';
 
 export const runtime = 'edge';
 
