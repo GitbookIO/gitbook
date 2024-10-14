@@ -19,14 +19,9 @@ import {
 } from './Dropdown';
 import { Button, Link } from '../primitives';
 
-// @TODO Remove it once we have the proper types in API
-type CustomizationHeaderLinkWithStyle = CustomizationHeaderLink & {
-    style?: 'link' | 'button-primary' | 'button-secondary';
-};
-
 export async function HeaderLink(props: {
     context: ContentRefContext;
-    link: CustomizationHeaderLinkWithStyle;
+    link: CustomizationHeaderLink;
     customization: CustomizationSettings | SiteCustomizationSettings;
 }) {
     const { context, link, customization } = props;
