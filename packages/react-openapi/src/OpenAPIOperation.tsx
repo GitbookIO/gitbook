@@ -37,7 +37,7 @@ export function OpenAPIOperation(props: {
                     {operation.description ? (
                         <Markdown className="openapi-description" source={operation.description} />
                     ) : null}
-                    <div className="openapi-target">
+                    <div className="openapi-target flex items-center">
                         <span
                             className={classNames(
                                 'openapi-method',
@@ -47,8 +47,11 @@ export function OpenAPIOperation(props: {
                             {method.toUpperCase()}
                         </span>
                         <span className="openapi-url">
-                            <OpenAPIServerURL servers={servers} />
-                            {path}
+                            <OpenAPIServerURL
+                                servers={servers}
+                                context={clientContext}
+                                path={path}
+                            />
                         </span>
                     </div>
                 </div>

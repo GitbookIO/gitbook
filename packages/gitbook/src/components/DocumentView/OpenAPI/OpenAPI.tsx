@@ -7,6 +7,8 @@ import { LoadingPane } from '@/components/primitives';
 import { fetchOpenAPIBlock } from '@/lib/openapi';
 import { tcls } from '@/lib/tailwind';
 
+import OpenAPIClientStateContainer from './OpenAPIClientStateContainer';
+import { serverUrlCache } from './ServerUrlCache';
 import { BlockProps } from '../Block';
 import { PlainCodeBlock } from '../CodeBlock';
 
@@ -17,7 +19,7 @@ import './scalar.css';
  * Render an OpenAPI block.
  */
 export async function OpenAPI(props: BlockProps<DocumentBlockSwagger>) {
-    const { block, style } = props;
+    const { style } = props;
     return (
         <div className={tcls('w-full', 'flex', 'flex-row', style, 'max-w-full')}>
             <React.Suspense fallback={<OpenAPIFallback />}>
@@ -45,21 +47,30 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockSwagger>) {
         return null;
     }
 
+    // To update the code sample we need to re-render the server component
+    // so reading the cached value from search params
+    const serverUrl = serverUrlCache.get('serverUrl');
+
     return (
-        <OpenAPIOperation
-            data={data}
-            context={{
-                icons: {
-                    chevronDown: <Icon icon="chevron-down" />,
-                    chevronRight: <Icon icon="chevron-right" />,
-                },
-                CodeBlock: PlainCodeBlock,
-                defaultInteractiveOpened: context.mode === 'print',
-                id: block.meta?.id,
-                blockKey: block.key,
-            }}
-            className="openapi-block"
-        />
+        <OpenAPIClientStateContainer block={block} servers={data.servers}>
+            <OpenAPIOperation
+                data={data}
+                context={{
+                    icons: {
+                        chevronDown: <Icon icon="chevron-down" />,
+                        chevronRight: <Icon icon="chevron-right" />,
+                        edit: <Icon icon="edit" />,
+                        editDone: <Icon icon="check" />,
+                    },
+                    CodeBlock: PlainCodeBlock,
+                    defaultInteractiveOpened: context.mode === 'print',
+                    id: block.meta?.id,
+                    blockKey: block.key,
+                    serverUrl,
+                }}
+                className="openapi-block"
+            />
+        </OpenAPIClientStateContainer>
     );
 }
 

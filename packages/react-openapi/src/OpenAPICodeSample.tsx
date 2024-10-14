@@ -4,10 +4,9 @@ import { CodeSampleInput, codeSampleGenerators } from './code-samples';
 import { OpenAPIOperationData, toJSON } from './fetchOpenAPIOperation';
 import { generateMediaTypeExample, generateSchemaExample } from './generateSchemaExample';
 import { InteractiveSection } from './InteractiveSection';
-import { getServersURL } from './OpenAPIServerURL';
 import { ScalarApiButton } from './ScalarApiButton';
 import { OpenAPIContextProps } from './types';
-import { noReference } from './utils';
+import { getServersURL, noReference } from './utils';
 
 /**
  * Display code samples to execute the operation.
@@ -49,14 +48,11 @@ export function OpenAPICodeSample(props: {
         }
     });
 
+    const serverUrl = context.serverUrl ?? getServersURL(data.servers);
     const requestBody = noReference(data.operation.requestBody);
     const requestBodyContent = requestBody ? Object.entries(requestBody.content)[0] : undefined;
-
     const input: CodeSampleInput = {
-        url:
-            getServersURL(data.servers) +
-            data.path +
-            (searchParams.size ? `?${searchParams.toString()}` : ''),
+        url: serverUrl + data.path + (searchParams.size ? `?${searchParams.toString()}` : ''),
         method: data.method,
         body: requestBodyContent
             ? generateMediaTypeExample(requestBodyContent[1], { onlyRequired: true })
