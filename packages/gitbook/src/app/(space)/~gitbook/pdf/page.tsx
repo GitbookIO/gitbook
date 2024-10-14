@@ -315,7 +315,7 @@ function selectPages(
         return [
             { page, depth },
             ...page.pages.flatMap((child) => {
-                if (child.type === 'link') {
+                if (child.type !== 'document') {
                     return [];
                 }
 
@@ -350,7 +350,7 @@ function selectPages(
     }
 
     const allPages = rootPages.flatMap((page) => {
-        if (page.type === 'link') {
+        if (page.type !== 'document' && page.type !== 'group') {
             return [];
         }
 

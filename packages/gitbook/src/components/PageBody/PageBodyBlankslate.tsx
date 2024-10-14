@@ -17,7 +17,9 @@ export async function PageBodyBlankslate(props: {
 }) {
     const { page, rootPages, context } = props;
 
-    const pages = page.pages.filter((child) => (child.type === 'document' ? !child.hidden : true));
+    const pages = page.pages.filter((child) =>
+        child.type === RevisionPageType.Document ? !child.hidden : true,
+    );
     if (!pages.length) {
         return null;
     }
@@ -43,7 +45,11 @@ export async function PageBodyBlankslate(props: {
                         />
                     );
 
-                    if (child.type === RevisionPageType.Link) {
+                    if (child.type === RevisionPageType.Computed) {
+                        throw new Error(
+                            'Unexpected computed page, it should have been computed in the API',
+                        );
+                    } else if (child.type === RevisionPageType.Link) {
                         const resolved = await resolveContentRef(child.target, context);
                         if (!resolved) {
                             return null;

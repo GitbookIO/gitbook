@@ -13,6 +13,11 @@ export function ContentKitOutput(props: {
     output: ContentKitRenderOutput;
 }) {
     const { output, context } = props;
+
+    if (output.type === 'complete') {
+        return null;
+    }
+
     return (
         <>
             {process.env.NODE_ENV === 'development' ? (

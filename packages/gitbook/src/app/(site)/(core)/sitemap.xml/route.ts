@@ -84,10 +84,12 @@ function flattenPages(
         return [
             ...(page.type === 'document' ? [{ page, depth }] : []),
             ...page.pages.flatMap((child) =>
-                child.type === 'link' ? [] : flattenPage(child, depth + 1),
+                child.type === 'document' ? flattenPage(child, depth + 1) : [],
             ),
         ];
     };
 
-    return rootPags.flatMap((page) => (page.type === 'link' ? [] : flattenPage(page, 0)));
+    return rootPags.flatMap((page) =>
+        page.type === 'group' || page.type === 'document' ? flattenPage(page, 0) : [],
+    );
 }
