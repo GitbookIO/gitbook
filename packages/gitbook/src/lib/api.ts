@@ -12,7 +12,6 @@ import {
     RequestRenderIntegrationUI,
     RevisionFile,
     SiteCustomizationSettings,
-    Space,
     SpaceIntegrationScript,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
