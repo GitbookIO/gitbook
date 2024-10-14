@@ -13,7 +13,7 @@ export const runtime = 'edge';
  * Render the OpenGraph image for a space.
  */
 export async function GET(req: NextRequest, { params }: { params: PageIdParams }) {
-    const { space, page, customization, parent } = await fetchPageData(params);
+    const { space, page, customization, site } = await fetchPageData(params);
     const url = new URL(space.urls.published ?? space.urls.app);
 
     if (customization.socialPreview.url) {
@@ -33,7 +33,7 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
                 }}
             >
                 <h2 tw="text-7xl font-bold tracking-tight text-left">
-                    {getContentTitle(space, customization, parent)}
+                    {getContentTitle(space, customization, site ?? null)}
                 </h2>
                 <div tw="flex flex-1">
                     <p tw="text-4xl">{page ? page.title : 'Not found'}</p>

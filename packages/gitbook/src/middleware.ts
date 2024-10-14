@@ -15,7 +15,7 @@ import {
     withAPI,
     getSpaceLayoutData,
     DEFAULT_API_ENDPOINT,
-    getCurrentSiteLayoutData,
+    getSiteLayoutData,
     getSite,
 } from '@/lib/api';
 import { race } from '@/lib/async';
@@ -202,7 +202,7 @@ export async function middleware(request: NextRequest) {
             );
 
             const { scripts } = await ('site' in resolved
-                ? getCurrentSiteLayoutData({
+                ? getSiteLayoutData({
                       organizationId: resolved.organization,
                       siteId: resolved.site,
                       siteSpaceId: resolved.siteSpace,

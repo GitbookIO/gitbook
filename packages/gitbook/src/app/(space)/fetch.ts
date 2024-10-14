@@ -10,7 +10,7 @@ import {
     getSpaceData,
     ContentTarget,
     SiteContentPointer,
-    getCurrentSiteData,
+    getSiteData,
     getSite,
     getSiteSpaces,
     getCurrentSiteCustomization,
@@ -67,39 +67,42 @@ export function getContentPointer(): ContentPointer | SiteContentPointer {
 }
 
 /**
- * Fetch all the data needed to render the space layout.
+ * Fetch all the data needed to render the content layout.
  */
-export async function fetchSpaceData() {
+export async function fetchContentData() {
     const content = getContentPointer();
 
     const siteShareKey = 'siteId' in content ? content.siteShareKey : undefined;
 
-    const [{ space, contentTarget, pages, customization, scripts }, parentSite] = await Promise.all(
-        'siteId' in content
-            ? [
-                  getCurrentSiteData(content),
-                  fetchParentSite({
-                      organizationId: content.organizationId,
-                      siteId: content.siteId,
-                      siteShareKey,
-                  }),
-              ]
-            : [getSpaceData(content, siteShareKey)],
-    );
+    const [{ space, contentTarget, pages, customization, scripts }, siteStructure] =
+        await Promise.all(
+            'siteId' in content
+                ? [
+                      getSiteData(content),
+                      fetchSiteStructure({
+                          organizationId: content.organizationId,
+                          siteId: content.siteId,
+                          siteShareKey,
+                      }),
+                  ]
+                : [getSpaceData(content, siteShareKey)],
+        );
 
-    const parent = await (parentSite ?? fetchParentCollection(space));
+    const site = siteStructure ? siteStructure.site : null;
+    const spaces = siteStructure ? siteStructure.spaces : [];
     // we grab the space attached to the parent as it contains overriden customizations
-    const spaceRelativeToParent = parent?.spaces.find((space) => space.id === content.spaceId);
+    const spaceRelativeToParent = spaces.find((space) => space.id === content.spaceId);
 
     return {
         content,
         contentTarget,
         space: spaceRelativeToParent ?? space,
         pages,
+        site,
+        spaces,
         customization,
         scripts,
         ancestors: [],
-        ...parent,
     };
 }
 
@@ -111,18 +114,18 @@ export async function fetchPageData(params: PagePathParams | PageIdParams) {
     const content = getContentPointer();
     const siteShareKey = 'siteId' in content ? content.siteShareKey : undefined;
     const { space, contentTarget, pages, customization, scripts } = await ('siteId' in content
-        ? getCurrentSiteData(content)
+        ? getSiteData(content)
         : getSpaceData(content, siteShareKey));
 
     const page = await resolvePage(contentTarget, pages, params);
-    const [parent, document] = await Promise.all([
+    const [siteStructure, document] = await Promise.all([
         'siteId' in content
-            ? fetchParentSite({
+            ? fetchSiteStructure({
                   organizationId: content.organizationId,
                   siteId: content.siteId,
                   siteShareKey: content.siteShareKey,
               })
-            : fetchParentCollection(space),
+            : null,
         page?.page.documentId ? getDocument(space.id, page.page.documentId) : null,
     ]);
 
@@ -135,7 +138,7 @@ export async function fetchPageData(params: PagePathParams | PageIdParams) {
         scripts,
         ancestors: [],
         ...page,
-        ...parent,
+        ...siteStructure,
         document,
     };
 }
@@ -181,24 +184,17 @@ async function resolvePage(
     return undefined;
 }
 
-async function fetchParentCollection(space: Space) {
-    const parentCollectionId =
-        space.visibility === ContentVisibility.InCollection ? space.parent : undefined;
-    const [collection, spaces] = await Promise.all([
-        parentCollectionId ? getCollection(parentCollectionId) : null,
-        parentCollectionId ? getCollectionSpaces(parentCollectionId) : ([] as Space[]),
-    ]);
-
-    return { parent: collection, spaces };
-}
-
-async function fetchParentSite(args: {
+/**
+ * Fetch the structure of an organization site.
+ * This includes the site and its spaces.
+ */
+async function fetchSiteStructure(args: {
     organizationId: string;
     siteId: string;
     siteShareKey: string | undefined;
 }) {
     const { organizationId, siteId, siteShareKey } = args;
-    const [site, siteSpaces, siteParentCustomizations] = await Promise.all([
+    const [orgSite, siteSpaces, siteParentCustomizations] = await Promise.all([
         getSite(organizationId, siteId),
         getSiteSpaces({ organizationId, siteId, siteShareKey }),
         getCurrentSiteCustomization({ organizationId, siteId, siteSpaceId: undefined }),
@@ -217,13 +213,13 @@ async function fetchParentSite(args: {
     });
 
     // override the title with the customization title
-    const parent = {
-        ...site,
+    const site = {
+        ...orgSite,
         ...(siteParentCustomizations?.title ? { title: siteParentCustomizations.title } : {}),
     };
 
     return {
-        parent,
+        site,
         spaces: Object.values(spaces),
     };
 }

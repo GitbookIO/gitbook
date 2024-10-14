@@ -18,7 +18,7 @@ import { getContentTitle } from '@/lib/utils';
 
 import { ClientContexts } from './ClientContexts';
 import { RocketLoaderDetector } from './RocketLoaderDetector';
-import { fetchSpaceData } from '../fetch';
+import { fetchContentData } from '../fetch';
 
 export const runtime = 'edge';
 
@@ -35,11 +35,11 @@ export default async function ContentLayout(props: { children: React.ReactNode }
         contentTarget,
         customization,
         pages,
-        parent,
+        site,
         spaces,
         ancestors,
         scripts,
-    } = await fetchSpaceData();
+    } = await fetchContentData();
 
     ReactDOM.preconnect(api().endpoint);
     if (assetsDomain) {
@@ -64,7 +64,7 @@ export default async function ContentLayout(props: { children: React.ReactNode }
             <SpaceLayout
                 space={space}
                 contentTarget={contentTarget}
-                parent={parent}
+                site={site}
                 spaces={spaces}
                 customization={customization}
                 pages={pages}
@@ -97,7 +97,7 @@ export default async function ContentLayout(props: { children: React.ReactNode }
 }
 
 export async function generateViewport(): Promise<Viewport> {
-    const { customization } = await fetchSpaceData();
+    const { customization } = await fetchContentData();
     return {
         colorScheme: customization.themes.toggeable
             ? customization.themes.default === CustomizationThemeMode.Dark
@@ -108,11 +108,11 @@ export async function generateViewport(): Promise<Viewport> {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-    const { space, parent, customization } = await fetchSpaceData();
+    const { space, site, customization } = await fetchContentData();
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
 
     return {
-        title: getContentTitle(space, customization, parent),
+        title: getContentTitle(space, customization, site),
         generator: `GitBook (${buildVersion()})`,
         metadataBase: new URL(baseUrl()),
         icons: {
@@ -133,7 +133,7 @@ export async function generateMetadata(): Promise<Metadata> {
                 },
             ],
         },
-        robots: isSpaceIndexable({ space, parent }) ? 'index, follow' : 'noindex, nofollow',
+        robots: isSpaceIndexable({ space, site }) ? 'index, follow' : 'noindex, nofollow',
     };
 }
 

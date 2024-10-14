@@ -18,17 +18,12 @@ export async function GET(req: NextRequest) {
         pointer.spaceId,
         'siteId' in pointer ? pointer.siteShareKey : undefined,
     );
-    const parent =
-        'siteId' in pointer
-            ? await getSite(pointer.organizationId, pointer.siteId)
-            : space.visibility === ContentVisibility.InCollection && space.parent
-              ? await getCollection(space.parent)
-              : null;
+    const site = 'siteId' in pointer ? await getSite(pointer.organizationId, pointer.siteId) : null;
 
     const lines = [
         `User-agent: *`,
         'Disallow: /~gitbook/',
-        ...(isSpaceIndexable({ space, parent })
+        ...(isSpaceIndexable({ space, site })
             ? [`Allow: /`, `Sitemap: ${absoluteHref(`/sitemap.xml`, true)}`]
             : [`Disallow: /`]),
     ];

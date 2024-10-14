@@ -14,7 +14,7 @@ import colors from 'tailwindcss/colors';
 import { emojiFontClassName } from '@/components/primitives';
 import { fonts, ibmPlexMono } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
-import { getCurrentSiteLayoutData, getSpaceLayoutData } from '@/lib/api';
+import { getSiteLayoutData, getSpaceLayoutData } from '@/lib/api';
 import { getStaticFileURL } from '@/lib/assets';
 import { hexToRgb, shadesOfColor } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
@@ -33,7 +33,7 @@ export default async function SpaceRootLayout(props: { children: React.ReactNode
 
     const pointer = getContentPointer();
     const { customization } = await ('siteId' in pointer
-        ? getCurrentSiteLayoutData(pointer)
+        ? getSiteLayoutData(pointer)
         : getSpaceLayoutData(pointer.spaceId));
     const headerTheme = generateHeaderTheme(customization);
     const language = getSpaceLanguage(customization);
@@ -88,7 +88,7 @@ export default async function SpaceRootLayout(props: { children: React.ReactNode
                                 ),
                             )
                         }
-                        
+
                         ${generateColorVariable(
                             'primary-base',
                             customization.styling.primaryColor.light,

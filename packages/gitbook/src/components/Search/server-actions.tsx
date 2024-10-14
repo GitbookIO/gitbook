@@ -52,13 +52,16 @@ export interface AskAnswerResult {
     hasAnswer: boolean;
 }
 
+/**
+ * Search for content in the entire site.
+ */
 export async function searchSiteContent(args: {
+    pointer: api.ContentPointer | api.SiteContentPointer;
     query: string;
     siteSpaceIds?: string[];
     cacheBust?: string;
 }): Promise<OrderedComputedResult[]> {
-    const { siteSpaceIds, query, cacheBust } = args;
-    const pointer = getContentPointer();
+    const { pointer, siteSpaceIds, query, cacheBust } = args;
 
     if (query.length <= 1) {
         return [];
@@ -69,97 +72,71 @@ export async function searchSiteContent(args: {
         return [];
     }
 
-    if ('siteId' in pointer && 'organizationId' in pointer) {
-        const [searchResults, allSiteSpaces] = await Promise.all([
-            api.searchSiteContent(
-                pointer.organizationId,
-                pointer.siteId,
-                query,
-                siteSpaceIds,
-                cacheBust,
-            ),
-            siteSpaceIds
-                ? null
-                : api.getSiteSpaces({
-                      organizationId: pointer.organizationId,
-                      siteId: pointer.siteId,
-                      siteShareKey: pointer.siteShareKey,
-                  }),
-        ]);
+    if (!('siteId' in pointer)) {
+        throw new Error(`Expected a site pointer for searching site content`);
+    }
 
-        if (!siteSpaceIds) {
-            // We are searching all of this Site's content
-            return searchResults.items
-                .map((spaceItem) => {
-                    const siteSpace = allSiteSpaces?.find(
-                        (siteSpace) => siteSpace.space.id === spaceItem.id,
-                    );
+    const [searchResults, allSiteSpaces] = await Promise.all([
+        api.searchSiteContent(
+            pointer.organizationId,
+            pointer.siteId,
+            query,
+            siteSpaceIds,
+            cacheBust,
+        ),
+        siteSpaceIds
+            ? null
+            : api.getSiteSpaces({
+                  organizationId: pointer.organizationId,
+                  siteId: pointer.siteId,
+                  siteShareKey: pointer.siteShareKey,
+              }),
+    ]);
 
-                    return spaceItem.pages.map((item) => transformSitePageResult(item, siteSpace));
-                })
-                .flat(2);
-        }
-
+    if (!siteSpaceIds) {
+        // We are searching all of this Site's content
         return searchResults.items
             .map((spaceItem) => {
-                return spaceItem.pages.map((item) => transformPageResult(item));
+                const siteSpace = allSiteSpaces?.find(
+                    (siteSpace) => siteSpace.space.id === spaceItem.id,
+                );
+
+                return spaceItem.pages.map((item) => transformSitePageResult(item, siteSpace));
             })
             .flat(2);
     }
 
-    // This should never happen
-    return [];
+    return searchResults.items
+        .map((spaceItem) => {
+            return spaceItem.pages.map((item) => transformPageResult(item));
+        })
+        .flat(2);
 }
 
 /**
- * Server action to search content in a space
+ * Server action to search content in the current space
  */
-export async function searchSpaceContent(
-    spaceId: string,
-    revisionId: string,
+export async function searchCurrentSpaceContent(
     query: string,
+    pointer: api.ContentPointer | api.SiteContentPointer,
+    revisionId: string,
 ): Promise<OrderedComputedResult[]> {
-    const pointer = getContentPointer();
-
-    if ('siteId' in pointer && 'organizationId' in pointer) {
+    if ('siteId' in pointer) {
         const siteSpaceIds = pointer.siteSpaceId ? [pointer.siteSpaceId] : []; // if we don't have a siteSpaceID search all content
 
         // This is a site so use a different function which we can eventually call directly
         // We also want to break cache for this specific space if the revisionId is different so use it as a cache busting key
-        return await searchSiteContent({ siteSpaceIds, query, cacheBust: revisionId });
+        return await searchSiteContent({
+            pointer,
+            siteSpaceIds,
+            query,
+            cacheBust: revisionId,
+        });
     }
 
-    const data = await api.searchSpaceContent(spaceId, revisionId, query);
+    // This is for legacy space content pointer and it should not be used anymore
+    const data = await api.searchSpaceContent(pointer.spaceId, revisionId, query);
     return data.items.map((item) => transformPageResult(item, undefined)).flat();
-}
-
-/**
- * Server action to search content in a parent (site or collection)
- */
-export async function searchParentContent(
-    parent: Site | Collection,
-    query: string,
-): Promise<OrderedComputedResult[]> {
-    const pointer = getContentPointer();
-    const isSite = 'siteId' in pointer;
-
-    if (isSite) {
-        return searchSiteContent({ query });
-    }
-
-    const [data, collectionSpaces] = await Promise.all([
-        api.searchParentContent(parent.id, query),
-        parent.object === 'collection' ? api.getCollectionSpaces(parent.id) : null,
-    ]);
-
-    let spaces: Space[] = collectionSpaces ? collectionSpaces : [];
-
-    return data.items
-        .map((spaceItem) => {
-            const space = spaces.find((space) => space.id === spaceItem.id);
-            return spaceItem.pages.map((item) => transformPageResult(item, space));
-        })
-        .flat(2);
 }
 
 /**
