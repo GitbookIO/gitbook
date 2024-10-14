@@ -35,7 +35,8 @@
         "build": "tsc",
         "typecheck": "tsc --noEmit",
         "dev": "tsc -w",
-        "clean": "rm -rf ./dist && rm -rf ./src/data"
+        "clean": "rm -rf ./dist && rm -rf ./src/data",
+        "unit": "bun test"
     },
     "bin": {
         "gitbook-icons": "./bin/gitbook-icons.js"
