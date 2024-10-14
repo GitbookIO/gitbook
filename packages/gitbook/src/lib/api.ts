@@ -12,6 +12,8 @@ import {
     RequestRenderIntegrationUI,
     RevisionFile,
     SiteCustomizationSettings,
+    Space,
+    SpaceIntegrationScript,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 import { headers } from 'next/headers';
@@ -27,6 +29,7 @@ import {
     noCacheFetchOptions,
     parseCacheResponse,
 } from './cache';
+import { defaultCustomizationForSpace } from './utils';
 
 /**
  * Pointer to a relative content, it might change overtime, the pointer is relative in the content history.
@@ -324,23 +327,6 @@ export const getChangeRequest = cache({
         return cacheResponse(response, {
             ttl: 60 * 60,
             revalidateBefore: 10 * 60,
-        });
-    },
-});
-
-/**
- * List the scripts to load for the space.
- */
-export const getSpaceIntegrationScripts = cache({
-    name: 'api.getSpaceIntegrationScripts',
-    tag: (spaceId) => getAPICacheTag({ tag: 'space', space: spaceId }),
-    get: async (spaceId: string, options: CacheFunctionOptions) => {
-        const response = await api().spaces.listSpaceIntegrationScripts(spaceId, {
-            ...noCacheFetchOptions,
-            signal: options.signal,
-        });
-        return cacheResponse(response, {
-            revalidateBefore: 60 * 60,
         });
     },
 });
@@ -848,7 +834,7 @@ export const getSpaceCustomizationFromAPI = cache({
  */
 export async function getSpaceCustomization(spaceId: string): Promise<CustomizationSettings> {
     const headersList = headers();
-    const raw = await getSpaceCustomizationFromAPI(spaceId);
+    const raw = defaultCustomizationForSpace();
 
     const extend = headersList.get('x-gitbook-customization');
     if (extend) {
@@ -964,7 +950,7 @@ export async function getSpaceContentData(
 export async function getSpaceLayoutData(spaceId: string) {
     const [customization, scripts] = await Promise.all([
         getSpaceCustomization(spaceId),
-        getSpaceIntegrationScripts(spaceId),
+        [] as SpaceIntegrationScript[],
     ]);
 
     return {
