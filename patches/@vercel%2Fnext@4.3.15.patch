@@ -1,5 +1,5 @@
 diff --git a/dist/index.js b/dist/index.js
-index c5ea5e053c4e6be202914bdd2e0228bc7be8b976..31c24e146fdf50a806f8c1da7eedc1d941270fa9 100644
+index 1a8c68c0713d41b0239dc8e3895d31437d3bb2e8..f6fec64252c8f1c6225eb37776f6c0d0e2a42c35 100644
 --- a/dist/index.js
 +++ b/dist/index.js
 @@ -10474,7 +10474,7 @@ var import_path = require("path");
