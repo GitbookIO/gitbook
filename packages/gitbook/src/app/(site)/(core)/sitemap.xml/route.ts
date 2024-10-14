@@ -89,5 +89,7 @@ function flattenPages(
         ];
     };
 
-    return rootPags.flatMap((page) => (page.type === 'group' || page.type === 'document' ? flattenPage(page, 0) : []));
+    return rootPags.flatMap((page) =>
+        page.type === 'group' || page.type === 'document' ? flattenPage(page, 0) : [],
+    );
 }
