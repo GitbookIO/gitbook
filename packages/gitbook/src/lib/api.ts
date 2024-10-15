@@ -876,24 +876,6 @@ export const getCollectionSpaces = cache({
 });
 
 /**
- * Fetch all the data to render a space at once.
- */
-export async function getSpaceData(pointer: SpaceContentPointer, shareKey: string | undefined) {
-    const [{ space, pages, contentTarget }, { customization, scripts }] = await Promise.all([
-        getSpaceContentData(pointer, shareKey),
-        getSpaceLayoutData(pointer.spaceId),
-    ]);
-
-    return {
-        space,
-        pages,
-        contentTarget,
-        customization,
-        scripts,
-    };
-}
-
-/**
  * Fetch all the content data about a space at once.
  * This function executes the requests in parallel and should be used as early as possible
  * instead of calling the individual functions.
@@ -923,21 +905,6 @@ export async function getSpaceContentData(
         space,
         pages,
         contentTarget,
-    };
-}
-
-/**
- * Fetch all the layout data about a space at once.
- */
-export async function getSpaceLayoutData(spaceId: string) {
-    const [customization, scripts] = await Promise.all([
-        getSpaceCustomization(spaceId),
-        [] as SpaceIntegrationScript[],
-    ]);
-
-    return {
-        customization,
-        scripts,
     };
 }
 
