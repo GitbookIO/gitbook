@@ -9,8 +9,8 @@ import { absoluteHref } from '@/lib/links';
 import { tcls } from '@/lib/tailwind';
 import { getContentTitle } from '@/lib/utils';
 
-import gridBlack from '../../../../../../images/ogimage-grid-black.png';
-import gridWhite from '../../../../../../images/ogimage-grid-white.png';
+// import gridBlack from '../../../../../../images/ogimage-grid-black.png';
+// import gridWhite from '../../../../../../images/ogimage-grid-white.png';
 import { PageIdParams, fetchPageData } from '../../../../fetch';
 
 export const runtime = 'edge';
@@ -73,7 +73,7 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
         title: customization.styling.primaryColor[theme],
         body: baseColors[useLightTheme ? 'dark' : 'light'], // Invert text on background
     };
-    let gridAsset = useLightTheme ? gridBlack : gridWhite;
+    // let gridAsset = useLightTheme ? gridBlack : gridWhite;
 
     switch (customization.header.preset) {
         case CustomizationHeaderPreset.Custom:
@@ -86,7 +86,7 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
                     [baseColors.light, baseColors.dark],
                 ),
             };
-            gridAsset = colors.body == baseColors.light ? gridWhite : gridBlack;
+            // gridAsset = colors.body == baseColors.light ? gridWhite : gridBlack;
             break;
 
         case CustomizationHeaderPreset.Bold:
@@ -105,7 +105,7 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
                     baseColors.dark,
                 ]),
             };
-            gridAsset = colors.body == baseColors.light ? gridWhite : gridBlack;
+            // gridAsset = colors.body == baseColors.light ? gridWhite : gridBlack;
             break;
     }
 
@@ -165,11 +165,11 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
                 ></div>
 
                 {/* Grid */}
-                <img
+                {/* <img
                     tw={tcls('absolute', 'inset-0', 'w-[100vw]', 'h-[100vh]')}
                     src={absoluteHref(gridAsset.src, true)}
                     alt="Grid"
-                />
+                /> */}
 
                 {/* Logo */}
                 {customization.header.logo ? (
