@@ -1,5 +1,5 @@
 import { CustomizationRootLayout } from '@/components/RootLayout';
-import { getSiteLayoutData, getSpaceLayoutData } from '@/lib/api';
+import { getSiteLayoutData } from '@/lib/api';
 import { getSiteContentPointer } from '@/lib/pointer';
 
 /**
