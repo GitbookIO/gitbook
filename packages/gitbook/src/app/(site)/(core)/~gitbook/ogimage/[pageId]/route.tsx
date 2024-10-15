@@ -1,7 +1,7 @@
 import { CustomizationHeaderPreset } from '@gitbook/api';
 import { redirect } from 'next/navigation';
 import { ImageResponse } from 'next/og';
-import { NextRequest } from 'next/server';
+import { ImageResponseOptions, NextRequest } from 'next/server';
 import colorContrast from 'postcss-color-contrast/js';
 import React from 'react';
 
@@ -13,6 +13,38 @@ import { PageIdParams, fetchPageData } from '../../../../fetch';
 
 export const runtime = 'edge';
 
+// TODO: Support all fonts available in GitBook
+// Right now this is impossible since next/font/google does not expose the cached font file
+// Another option would be to use the Satori prop `loadAdditionalAsset` [example](https://github.com/vercel/satori/blob/main/playground/pages/index.tsx),
+// but this prop isn't (yet) exposed through `ImageResponse`.
+const interRegular = await fetch(
+    new URL('../../../../../../fonts/Inter/Inter-Regular.ttf', import.meta.url),
+).then((res) => res.arrayBuffer());
+const interBold = await fetch(
+    new URL('../../../../../../fonts/Inter/Inter-Bold.ttf', import.meta.url),
+).then((res) => res.arrayBuffer());
+
+// By passing ImageResponse (Satori) a global object we make it cacheable.
+// This also caches the font data, which should speed up rendering.
+const imageOptions: ImageResponseOptions = {
+    width: 1200,
+    height: 630,
+    fonts: [
+        {
+            name: 'Inter',
+            data: interRegular,
+            weight: 400,
+            style: 'normal',
+        },
+        {
+            name: 'Inter',
+            data: interBold,
+            weight: 700,
+            style: 'normal',
+        },
+    ],
+};
+
 /**
  * Render the OpenGraph image for a space.
  */
@@ -23,17 +55,6 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
         // If user configured a custom social preview, we redirect to it.
         redirect(customization.socialPreview.url);
     }
-
-    // TODO: Support all fonts available in GitBook
-    // Right now this is impossible since next/font/google does not expose the cached font file
-    // Another option would be to use the Satori prop `loadAdditionalAsset` [example](https://github.com/vercel/satori/blob/main/playground/pages/index.tsx),
-    // but this prop isn't (yet) exposed through `ImageResponse`.
-    const interRegular = await fetch(
-        new URL('../../../../../../fonts/Inter/Inter-Regular.ttf', import.meta.url),
-    ).then((res) => res.arrayBuffer());
-    const interBold = await fetch(
-        new URL('../../../../../../fonts/Inter/Inter-Bold.ttf', import.meta.url),
-    ).then((res) => res.arrayBuffer());
 
     const theme = customization.themes.default;
     const useLightTheme = theme === 'light';
@@ -201,23 +222,6 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
                 </div>
             </div>
         ),
-        {
-            width: 1200,
-            height: 630,
-            fonts: [
-                {
-                    name: 'Inter',
-                    data: interRegular,
-                    weight: 400,
-                    style: 'normal',
-                },
-                {
-                    name: 'Inter',
-                    data: interBold,
-                    weight: 700,
-                    style: 'normal',
-                },
-            ],
-        },
+        imageOptions,
     );
 }
