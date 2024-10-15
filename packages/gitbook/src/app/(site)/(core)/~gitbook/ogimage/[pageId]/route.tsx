@@ -186,15 +186,15 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
                         )}
                     >
                         {page
-                            ? page.title.length > 65
-                                ? page.title.slice(0, 65) + '...'
+                            ? page.title.length > 64
+                                ? page.title.slice(0, 64) + '...'
                                 : page.title
                             : 'Not found'}
                     </h1>
-                    {page?.description && page?.title.length <= 65 ? (
+                    {page?.description && page?.title.length <= 64 ? (
                         <h2 tw={tcls('text-4xl', 'mb-0', 'mt-8', 'w-[75%]', 'font-normal')}>
-                            {page.description.length > 140
-                                ? page.description.slice(0, 140) + '...'
+                            {page.description.length > 164
+                                ? page.description.slice(0, 164) + '...'
                                 : page.description}
                         </h2>
                     ) : null}
