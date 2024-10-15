@@ -32,4 +32,5 @@ screenshots/
 /playwright/.cache/
 
 # Generated public files
-/public/~gitbook/static/
+/public/~gitbook/static/*
+!/public/~gitbook/static/images
