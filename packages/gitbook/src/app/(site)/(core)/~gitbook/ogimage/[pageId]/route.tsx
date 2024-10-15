@@ -9,43 +9,9 @@ import { absoluteHref } from '@/lib/links';
 import { tcls } from '@/lib/tailwind';
 import { getContentTitle } from '@/lib/utils';
 
-// import gridBlack from '../../../../../../images/ogimage-grid-black.png';
-// import gridWhite from '../../../../../../images/ogimage-grid-white.png';
 import { PageIdParams, fetchPageData } from '../../../../fetch';
 
 export const runtime = 'edge';
-
-// TODO: Support all fonts available in GitBook
-// Right now this is impossible since next/font/google does not expose the cached font file
-// Another option would be to use the Satori prop `loadAdditionalAsset` [example](https://github.com/vercel/satori/blob/main/playground/pages/index.tsx),
-// but this prop isn't (yet) exposed through `ImageResponse`.
-// const interRegular = fetch(
-//     new URL('../../../../../../fonts/Inter/Inter-Regular.ttf', import.meta.url),
-// ).then((res) => res.arrayBuffer());
-// const interBold = fetch(
-//     new URL('../../../../../../fonts/Inter/Inter-Bold.ttf', import.meta.url),
-// ).then((res) => res.arrayBuffer());
-
-// By passing ImageResponse (Satori) a global object we make it cachable.
-// This also caches the font data, speeding up rendering.
-const imageOptions: ImageResponseOptions = {
-    width: 1200,
-    height: 630,
-    // fonts: [
-    //     {
-    //         name: 'Inter',
-    //         data: await interRegular,
-    //         weight: 400,
-    //         style: 'normal',
-    //     },
-    //     {
-    //         name: 'Inter',
-    //         data: await interBold,
-    //         weight: 700,
-    //         style: 'normal',
-    //     },
-    // ],
-};
 
 /**
  * Render the OpenGraph image for a space.
@@ -57,6 +23,17 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
         // If user configured a custom social preview, we redirect to it.
         redirect(customization.socialPreview.url);
     }
+
+    // TODO: Support all fonts available in GitBook
+    // Right now this is impossible since next/font/google does not expose the cached font file
+    // Another option would be to use the Satori prop `loadAdditionalAsset` [example](https://github.com/vercel/satori/blob/main/playground/pages/index.tsx),
+    // but this prop isn't (yet) exposed through `ImageResponse`.
+    const interRegular = fetch(
+        new URL('../../../../../../fonts/Inter/Inter-Regular.ttf', import.meta.url),
+    ).then((res) => res.arrayBuffer());
+    const interBold = fetch(
+        new URL('../../../../../../fonts/Inter/Inter-Bold.ttf', import.meta.url),
+    ).then((res) => res.arrayBuffer());
 
     const theme = customization.themes.default;
     const useLightTheme = theme === 'light';
@@ -73,7 +50,11 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
         title: customization.styling.primaryColor[theme],
         body: baseColors[useLightTheme ? 'dark' : 'light'], // Invert text on background
     };
-    // let gridAsset = useLightTheme ? gridBlack : gridWhite;
+
+    const gridWhite = absoluteHref('~gitbook/static/images/ogimage-grid-white.png', true);
+    const gridBlack = absoluteHref('~gitbook/static/images/ogimage-grid-black.png', true);
+
+    let gridAsset = useLightTheme ? gridBlack : gridWhite;
 
     switch (customization.header.preset) {
         case CustomizationHeaderPreset.Custom:
@@ -86,7 +67,7 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
                     [baseColors.light, baseColors.dark],
                 ),
             };
-            // gridAsset = colors.body == baseColors.light ? gridWhite : gridBlack;
+            gridAsset = colors.body == baseColors.light ? gridWhite : gridBlack;
             break;
 
         case CustomizationHeaderPreset.Bold:
@@ -105,7 +86,7 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
                     baseColors.dark,
                 ]),
             };
-            // gridAsset = colors.body == baseColors.light ? gridWhite : gridBlack;
+            gridAsset = colors.body == baseColors.light ? gridWhite : gridBlack;
             break;
     }
 
@@ -165,11 +146,11 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
                 ></div>
 
                 {/* Grid */}
-                {/* <img
+                <img
                     tw={tcls('absolute', 'inset-0', 'w-[100vw]', 'h-[100vh]')}
-                    src={absoluteHref(gridAsset.src, true)}
+                    src={gridAsset}
                     alt="Grid"
-                /> */}
+                />
 
                 {/* Logo */}
                 {customization.header.logo ? (
@@ -220,6 +201,23 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
                 </div>
             </div>
         ),
-        imageOptions,
+        {
+            width: 1200,
+            height: 630,
+            fonts: [
+                {
+                    name: 'Inter',
+                    data: await interRegular,
+                    weight: 400,
+                    style: 'normal',
+                },
+                {
+                    name: 'Inter',
+                    data: await interBold,
+                    weight: 700,
+                    style: 'normal',
+                },
+            ],
+        },
     );
 }
