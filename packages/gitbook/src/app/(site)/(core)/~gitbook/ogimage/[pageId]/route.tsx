@@ -28,12 +28,12 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
     // Right now this is impossible since next/font/google does not expose the cached font file
     // Another option would be to use the Satori prop `loadAdditionalAsset` [example](https://github.com/vercel/satori/blob/main/playground/pages/index.tsx),
     // but this prop isn't (yet) exposed through `ImageResponse`.
-    const interRegular = await fetch(
-        new URL('../../../../../../fonts/Inter/Inter-Regular.ttf', import.meta.url),
-    ).then((res) => res.arrayBuffer());
-    const interBold = await fetch(
-        new URL('../../../../../../fonts/Inter/Inter-Bold.ttf', import.meta.url),
-    ).then((res) => res.arrayBuffer());
+    // const interRegular = await fetch(
+    //     new URL('../../../../../../fonts/Inter/Inter-Regular.ttf', import.meta.url),
+    // ).then((res) => res.arrayBuffer());
+    // const interBold = await fetch(
+    //     new URL('../../../../../../fonts/Inter/Inter-Bold.ttf', import.meta.url),
+    // ).then((res) => res.arrayBuffer());
 
     const theme = customization.themes.default;
     const useLightTheme = theme === 'light';
@@ -204,20 +204,20 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
         {
             width: 1200,
             height: 630,
-            fonts: [
-                {
-                    name: 'Inter',
-                    data: interRegular,
-                    weight: 400,
-                    style: 'normal',
-                },
-                {
-                    name: 'Inter',
-                    data: interBold,
-                    weight: 700,
-                    style: 'normal',
-                },
-            ],
+            // fonts: [
+            //     {
+            //         name: 'Inter',
+            //         data: interRegular,
+            //         weight: 400,
+            //         style: 'normal',
+            //     },
+            //     {
+            //         name: 'Inter',
+            //         data: interBold,
+            //         weight: 700,
+            //         style: 'normal',
+            //     },
+            // ],
         },
     );
 }
