@@ -12,6 +12,7 @@ import {
     RequestRenderIntegrationUI,
     RevisionFile,
     SiteCustomizationSettings,
+    SpaceIntegrationScript,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 import { headers } from 'next/headers';
@@ -27,6 +28,7 @@ import {
     noCacheFetchOptions,
     parseCacheResponse,
 } from './cache';
+import { defaultCustomizationForSpace } from './utils';
 
 /**
  * Pointer to a relative content, it might change overtime, the pointer is relative in the content history.
@@ -324,23 +326,6 @@ export const getChangeRequest = cache({
         return cacheResponse(response, {
             ttl: 60 * 60,
             revalidateBefore: 10 * 60,
-        });
-    },
-});
-
-/**
- * List the scripts to load for the space.
- */
-export const getSpaceIntegrationScripts = cache({
-    name: 'api.getSpaceIntegrationScripts',
-    tag: (spaceId) => getAPICacheTag({ tag: 'space', space: spaceId }),
-    get: async (spaceId: string, options: CacheFunctionOptions) => {
-        const response = await api().spaces.listSpaceIntegrationScripts(spaceId, {
-            ...noCacheFetchOptions,
-            signal: options.signal,
-        });
-        return cacheResponse(response, {
-            revalidateBefore: 60 * 60,
         });
     },
 });
@@ -829,26 +814,9 @@ export async function getCurrentSiteCustomization(args: {
 /**
  * Get the customization settings for a space from the API.
  */
-export const getSpaceCustomizationFromAPI = cache({
-    name: 'api.getSpaceCustomization',
-    tag: (spaceId) => getAPICacheTag({ tag: 'space', space: spaceId }),
-    get: async (spaceId: string, options: CacheFunctionOptions) => {
-        const response = await api().spaces.getSpacePublishingCustomizationById(spaceId, {
-            signal: options.signal,
-            ...noCacheFetchOptions,
-        });
-        return cacheResponse(response, {
-            revalidateBefore: 60 * 60,
-        });
-    },
-});
-
-/**
- * Get the customization settings for a space from the API.
- */
 export async function getSpaceCustomization(spaceId: string): Promise<CustomizationSettings> {
     const headersList = headers();
-    const raw = await getSpaceCustomizationFromAPI(spaceId);
+    const raw = defaultCustomizationForSpace();
 
     const extend = headersList.get('x-gitbook-customization');
     if (extend) {
@@ -908,24 +876,6 @@ export const getCollectionSpaces = cache({
 });
 
 /**
- * Fetch all the data to render a space at once.
- */
-export async function getSpaceData(pointer: SpaceContentPointer, shareKey: string | undefined) {
-    const [{ space, pages, contentTarget }, { customization, scripts }] = await Promise.all([
-        getSpaceContentData(pointer, shareKey),
-        getSpaceLayoutData(pointer.spaceId),
-    ]);
-
-    return {
-        space,
-        pages,
-        contentTarget,
-        customization,
-        scripts,
-    };
-}
-
-/**
  * Fetch all the content data about a space at once.
  * This function executes the requests in parallel and should be used as early as possible
  * instead of calling the individual functions.
@@ -955,21 +905,6 @@ export async function getSpaceContentData(
         space,
         pages,
         contentTarget,
-    };
-}
-
-/**
- * Fetch all the layout data about a space at once.
- */
-export async function getSpaceLayoutData(spaceId: string) {
-    const [customization, scripts] = await Promise.all([
-        getSpaceCustomization(spaceId),
-        getSpaceIntegrationScripts(spaceId),
-    ]);
-
-    return {
-        customization,
-        scripts,
     };
 }
 
