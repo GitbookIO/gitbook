@@ -19,32 +19,32 @@ export const runtime = 'edge';
 // Right now this is impossible since next/font/google does not expose the cached font file
 // Another option would be to use the Satori prop `loadAdditionalAsset` [example](https://github.com/vercel/satori/blob/main/playground/pages/index.tsx),
 // but this prop isn't (yet) exposed through `ImageResponse`.
-const interRegular = fetch(
-    new URL('../../../../../../fonts/Inter/Inter-Regular.ttf', import.meta.url),
-).then((res) => res.arrayBuffer());
-const interBold = fetch(
-    new URL('../../../../../../fonts/Inter/Inter-Bold.ttf', import.meta.url),
-).then((res) => res.arrayBuffer());
+// const interRegular = fetch(
+//     new URL('../../../../../../fonts/Inter/Inter-Regular.ttf', import.meta.url),
+// ).then((res) => res.arrayBuffer());
+// const interBold = fetch(
+//     new URL('../../../../../../fonts/Inter/Inter-Bold.ttf', import.meta.url),
+// ).then((res) => res.arrayBuffer());
 
 // By passing ImageResponse (Satori) a global object we make it cachable.
 // This also caches the font data, speeding up rendering.
 const imageOptions: ImageResponseOptions = {
     width: 1200,
     height: 630,
-    fonts: [
-        {
-            name: 'Inter',
-            data: await interRegular,
-            weight: 400,
-            style: 'normal',
-        },
-        {
-            name: 'Inter',
-            data: await interBold,
-            weight: 700,
-            style: 'normal',
-        },
-    ],
+    // fonts: [
+    //     {
+    //         name: 'Inter',
+    //         data: await interRegular,
+    //         weight: 400,
+    //         style: 'normal',
+    //     },
+    //     {
+    //         name: 'Inter',
+    //         data: await interBold,
+    //         weight: 700,
+    //         style: 'normal',
+    //     },
+    // ],
 };
 
 /**
