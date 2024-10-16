@@ -6,6 +6,7 @@ import { t, useLanguage } from '@/intl/client';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { renderAd } from './renderAd';
+import { SiteAds, SiteAdsStatus } from '@gitbook/api';
 
 /**
  * Zone ID provided by BuySellAds for the preview.
@@ -21,6 +22,7 @@ export function Ad({
     spaceId,
     placement,
     ignore,
+    siteAdsStatus,
     style,
     mode = 'auto',
 }: {
@@ -29,6 +31,7 @@ export function Ad({
     placement: string;
     ignore: boolean;
     style?: ClassValue;
+    siteAdsStatus?: SiteAds['status'];
     mode?: 'classic' | 'auto' | 'cover';
 }) {
     const containerRef = React.useRef<HTMLDivElement>(null);
@@ -72,6 +75,12 @@ export function Ad({
 
         const preview = new URL(window.location.href).searchParams.has('ads_preview');
         const realZoneId = preview ? PREVIEW_ZONE_ID : zoneId;
+        const adRenderMode =
+            preview &&
+            siteAdsStatus &&
+            (siteAdsStatus === SiteAdsStatus.Pending || siteAdsStatus === SiteAdsStatus.InReview)
+                ? 'placeholder'
+                : mode;
 
         if (!realZoneId) {
             return;
@@ -82,7 +91,7 @@ export function Ad({
                 placement,
                 ignore: ignore || preview,
                 zoneId: realZoneId,
-                mode,
+                mode: adRenderMode,
             });
 
             if (cancelled) {
