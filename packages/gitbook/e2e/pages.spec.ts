@@ -395,6 +395,10 @@ const testCases: TestsCase[] = [
                     await page.click('[data-testid="annotation-button"]');
                 },
             },
+            {
+                name: 'Stepper',
+                url: 'blocks/stepper',
+            },
         ],
     },
     {
