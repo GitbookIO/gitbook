@@ -42,6 +42,13 @@ export interface BlockProps<Block extends DocumentBlock> extends DocumentContext
     style?: ClassValue;
 }
 
+/**
+ * Alternative to `assertNever` that returns `null` instead of throwing an error.
+ */
+function nullIfNever(value: never): null {
+    return null;
+}
+
 export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
     const { block, style, ...contextProps } = props;
 
@@ -98,7 +105,7 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
             case 'synced-block':
                 return <BlockSyncedBlock {...props} {...contextProps} block={block} />;
             default:
-                assertNever(block);
+                return nullIfNever(block);
         }
     })();
 
@@ -148,6 +155,6 @@ function BlockPlaceholder(props: { block: DocumentBlock; style: ClassValue }) {
         case 'tabs-item':
             throw new Error('Blocks should be directly rendered by parent');
         default:
-            assertNever(block);
+            return nullIfNever(block);
     }
 }
