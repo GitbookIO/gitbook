@@ -1,12 +1,12 @@
 'use client';
 
+import { SiteAds, SiteAdsStatus } from '@gitbook/api';
 import * as React from 'react';
 
 import { t, useLanguage } from '@/intl/client';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { renderAd } from './renderAd';
-import { SiteAds, SiteAdsStatus } from '@gitbook/api';
 
 /**
  * Zone ID provided by BuySellAds for the preview.
@@ -106,7 +106,7 @@ export function Ad({
         return () => {
             cancelled = true;
         };
-    }, [visible, zoneId, ignore, placement, mode]);
+    }, [visible, zoneId, ignore, placement, mode, siteAdsStatus]);
 
     const viaUrl = new URL('https://www.gitbook.com');
     viaUrl.searchParams.set('utm_source', 'content');

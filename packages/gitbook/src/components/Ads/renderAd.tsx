@@ -2,11 +2,12 @@
 
 import { headers } from 'next/headers';
 
+import { absoluteHref } from '@/lib/links';
+
 import { AdClassicRendering } from './AdClassicRendering';
 import { AdCoverRendering } from './AdCoverRendering';
 import { AdPixels } from './AdPixels';
 import { AdItem, AdsResponse } from './types';
-import { absoluteHref } from '@/lib/links';
 
 interface FetchAdOptions {
     /** ID of the zone to fetch Ads for */
