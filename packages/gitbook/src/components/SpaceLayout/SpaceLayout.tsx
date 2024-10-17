@@ -6,6 +6,7 @@ import {
     RevisionPageGroup,
     Site,
     SiteCustomizationSettings,
+    SiteSection,
     Space,
 } from '@gitbook/api';
 import React from 'react';
@@ -20,6 +21,8 @@ import { ContentTarget, SiteContentPointer } from '@/lib/api';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
+import { SiteSectionTabs } from '../SiteSectionTabs';
+
 /**
  * Render the entire content of the space (header, table of contents, footer, and page content).
  */
@@ -28,6 +31,7 @@ export function SpaceLayout(props: {
     contentTarget: ContentTarget;
     space: Space;
     site: Site | null;
+    sections: { list: SiteSection[]; section: SiteSection } | null;
     spaces: Space[];
     customization: CustomizationSettings | SiteCustomizationSettings;
     pages: Revision['pages'];
@@ -38,6 +42,7 @@ export function SpaceLayout(props: {
         space,
         contentTarget,
         site,
+        sections,
         spaces,
         content,
         pages,
@@ -66,8 +71,12 @@ export function SpaceLayout(props: {
                 context={contentRefContext}
                 customization={customization}
             />
-
             <div className={tcls('scroll-nojump')}>
+                {sections ? (
+                    <div className={tcls(CONTAINER_STYLE)}>
+                        <SiteSectionTabs sections={sections.list} section={sections.section} />
+                    </div>
+                ) : null}
                 <div
                     className={tcls(
                         'flex',

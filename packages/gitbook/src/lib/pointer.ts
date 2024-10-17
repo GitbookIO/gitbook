@@ -11,6 +11,7 @@ export function getSiteContentPointer(): SiteContentPointer {
     const siteId = headerSet.get('x-gitbook-content-site');
     const organizationId = headerSet.get('x-gitbook-content-organization');
     const siteSpaceId = headerSet.get('x-gitbook-content-site-space');
+    const siteSectionId = headerSet.get('x-gitbook-content-site-section');
     const siteShareKey = headerSet.get('x-gitbook-content-site-share-key');
 
     if (!spaceId || !siteId || !organizationId) {
@@ -22,6 +23,7 @@ export function getSiteContentPointer(): SiteContentPointer {
     const pointer: SiteContentPointer = {
         siteId,
         spaceId,
+        siteSectionId: siteSectionId ?? undefined,
         siteSpaceId: siteSpaceId ?? undefined,
         siteShareKey: siteShareKey ?? undefined,
         organizationId,
