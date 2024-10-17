@@ -1,5 +1,6 @@
 'use client';
 
+import { SiteAds, SiteAdsStatus } from '@gitbook/api';
 import * as React from 'react';
 
 import { t, useLanguage } from '@/intl/client';
@@ -21,6 +22,7 @@ export function Ad({
     spaceId,
     placement,
     ignore,
+    siteAdsStatus,
     style,
     mode = 'auto',
 }: {
@@ -29,6 +31,7 @@ export function Ad({
     placement: string;
     ignore: boolean;
     style?: ClassValue;
+    siteAdsStatus?: SiteAds['status'];
     mode?: 'classic' | 'auto' | 'cover';
 }) {
     const containerRef = React.useRef<HTMLDivElement>(null);
@@ -70,8 +73,14 @@ export function Ad({
 
         let cancelled = false;
 
-        const preview = new URL(window.location.href).searchParams.has('ads_preview');
+        const previewParam = new URL(window.location.href).searchParams.get('ads_preview');
+        const preview = !!previewParam;
         const realZoneId = preview ? PREVIEW_ZONE_ID : zoneId;
+        const showPlaceholderAd =
+            previewParam === 'placeholder' ||
+            (siteAdsStatus &&
+                (siteAdsStatus === SiteAdsStatus.Pending ||
+                    siteAdsStatus === SiteAdsStatus.InReview));
 
         if (!realZoneId) {
             return;
@@ -83,6 +92,7 @@ export function Ad({
                 ignore: ignore || preview,
                 zoneId: realZoneId,
                 mode,
+                source: showPlaceholderAd ? 'placeholder' : 'live',
             });
 
             if (cancelled) {
@@ -97,7 +107,7 @@ export function Ad({
         return () => {
             cancelled = true;
         };
-    }, [visible, zoneId, ignore, placement, mode]);
+    }, [visible, zoneId, ignore, placement, mode, siteAdsStatus]);
 
     const viaUrl = new URL('https://www.gitbook.com');
     viaUrl.searchParams.set('utm_source', 'content');
