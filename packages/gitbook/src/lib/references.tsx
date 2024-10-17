@@ -259,7 +259,11 @@ export async function resolveContentRef(
         }
 
         case 'reusable-content': {
-            const reusableContent = await getReusableContent(space.id, revisionId, contentRef.reusableContent);
+            const reusableContent = await getReusableContent(
+                space.id,
+                revisionId,
+                contentRef.reusableContent,
+            );
             if (!reusableContent) {
                 return null;
             }
@@ -268,7 +272,7 @@ export async function resolveContentRef(
                 text: reusableContent.title,
                 active: false,
                 documentId: reusableContent.document,
-            }
+            };
         }
         case 'synced-block':
             return null;

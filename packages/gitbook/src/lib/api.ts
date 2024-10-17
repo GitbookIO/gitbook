@@ -629,13 +629,13 @@ export const getReusableContent = async (
 
     if (hasRevisionInMemory) {
         const revision = await getRevision(spaceId, revisionId, { metadata: false });
-        return revision.reusableContents.find((reusableContent) => reusableContent.id === reusableContentId) ?? null;
-    } else {
-        return getRevisionReusableContentById(
-            spaceId,
-            revisionId,
-            reusableContentId,
+        return (
+            revision.reusableContents.find(
+                (reusableContent) => reusableContent.id === reusableContentId,
+            ) ?? null
         );
+    } else {
+        return getRevisionReusableContentById(spaceId, revisionId, reusableContentId);
     }
 };
 
