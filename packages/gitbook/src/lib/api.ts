@@ -504,6 +504,9 @@ const getRevisionReusableContentById = cache({
                     revisionId,
                     reusableContentId,
                     {
+                        metadata: false,
+                    },
+                    {
                         ...noCacheFetchOptions,
                         signal: options.signal,
                     },
@@ -626,7 +629,7 @@ export const getReusableContent = async (
 
     if (hasRevisionInMemory) {
         const revision = await getRevision(spaceId, revisionId, { metadata: false });
-        return revision.reusableContents[reusableContentId] ?? null;
+        return revision.reusableContents.find((reusableContent) => reusableContent.id === reusableContentId) ?? null;
     } else {
         return getRevisionReusableContentById(
             spaceId,
