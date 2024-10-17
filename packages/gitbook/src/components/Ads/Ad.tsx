@@ -74,13 +74,12 @@ export function Ad({
         let cancelled = false;
 
         const previewParam = new URL(window.location.href).searchParams.get('ads_preview');
-        const preview = !!previewParam && previewParam !== 'placeholder';
+        const preview = !!previewParam;
         const realZoneId = preview ? PREVIEW_ZONE_ID : zoneId;
         const showPlaceholderAd =
             previewParam === 'placeholder' ||
             (siteAdsStatus &&
-                (siteAdsStatus === SiteAdsStatus.Pending ||
-                    siteAdsStatus === SiteAdsStatus.InReview));
+            (siteAdsStatus === SiteAdsStatus.Pending || siteAdsStatus === SiteAdsStatus.InReview))
 
         if (!realZoneId) {
             return;
@@ -92,7 +91,7 @@ export function Ad({
                 ignore: ignore || preview,
                 zoneId: realZoneId,
                 mode,
-                source: showPlaceholderAd ? 'placeholder' : 'live',
+                source: showPlaceholderAd ? 'placeholder' : 'live'
             });
 
             if (cancelled) {
