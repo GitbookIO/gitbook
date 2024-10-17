@@ -1,4 +1,4 @@
-import { RevisionPage, Space } from '@gitbook/api';
+import { RevisionPage, SiteSpace, Space } from '@gitbook/api';
 
 import {
     getRevisionPageByPath,
@@ -6,8 +6,8 @@ import {
     ContentTarget,
     getSiteData,
     getSite,
-    getSiteSpaces,
     getCurrentSiteCustomization,
+    getSiteStructure,
 } from '@/lib/api';
 import { resolvePagePath, resolvePageId } from '@/lib/pages';
 import { getSiteContentPointer } from '@/lib/pointer';
@@ -33,11 +33,14 @@ export async function fetchContentData() {
                 organizationId: content.organizationId,
                 siteId: content.siteId,
                 siteShareKey: content.siteShareKey,
+                siteSpaceId: content.siteSpaceId,
             }),
         ]);
 
     const site = siteStructure.site;
     const spaces = siteStructure.spaces;
+    const sections = siteStructure.sections;
+
     // we grab the space attached to the parent as it contains overriden customizations
     const spaceRelativeToParent = spaces.find((space) => space.id === content.spaceId);
 
@@ -46,6 +49,8 @@ export async function fetchContentData() {
         contentTarget,
         space: spaceRelativeToParent ?? space,
         pages,
+        sections,
+        section: siteStructure.section,
         site,
         spaces,
         customization,
@@ -68,6 +73,7 @@ export async function fetchPageData(params: PagePathParams | PageIdParams) {
             organizationId: content.organizationId,
             siteId: content.siteId,
             siteShareKey: content.siteShareKey,
+            siteSpaceId: content.siteSpaceId,
         }),
         page?.page.documentId ? getDocument(space.id, page.page.documentId) : null,
     ]);
@@ -129,20 +135,27 @@ async function resolvePage(
 
 /**
  * Fetch the structure of an organization site.
- * This includes the site and its spaces.
+ * This includes the site and its sections and spaces.
  */
 async function fetchSiteStructure(args: {
     organizationId: string;
     siteId: string;
     siteShareKey: string | undefined;
+    siteSpaceId: string | undefined;
 }) {
-    const { organizationId, siteId, siteShareKey } = args;
-    const [orgSite, siteSpaces, siteParentCustomizations] = await Promise.all([
+    const { organizationId, siteId, siteSpaceId} = args;
+    const [orgSite, siteStructure, siteParentCustomizations] = await Promise.all([
         getSite(organizationId, siteId),
-        getSiteSpaces({ organizationId, siteId, siteShareKey }),
+        getSiteStructure({ organizationId, siteId }),
         getCurrentSiteCustomization({ organizationId, siteId, siteSpaceId: undefined }),
     ]);
 
+    const siteSections = siteStructure.type === 'sections' && siteStructure.structure ? siteStructure.structure : [];
+
+    const section = siteSections.find(section => section.id === siteSpaceId || section.siteSpaces.find(siteSpace => siteSpace.id === siteSpaceId));
+
+    const siteSpaces: SiteSpace[] = siteStructure.type === 'siteSpaces' && siteStructure.structure ? siteStructure.structure : section?.siteSpaces ?? [];
+   
     const spaces: Record<string, Space> = {};
     siteSpaces.forEach((siteSpace) => {
         spaces[siteSpace.space.id] = {
@@ -164,6 +177,8 @@ async function fetchSiteStructure(args: {
     return {
         site,
         spaces: Object.values(spaces),
+        sections: siteSections,
+        section
     };
 }
 

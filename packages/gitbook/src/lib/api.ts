@@ -752,6 +752,29 @@ export const getSiteSpaces = cache({
     },
 });
 
+export const getSiteStructure = cache({
+    name: 'api.getSiteStructure',
+    tag: ({ organizationId, siteId }) => getAPICacheTag({ tag: 'site', site: siteId }),
+    get: async (
+        args: { organizationId: string; siteId: string },
+        options: CacheFunctionOptions,
+    ) => {
+        const response = await api().orgs.getSiteStructure(
+            args.organizationId,
+            args.siteId,
+            {},
+            {
+                signal: options.signal,
+                ...noCacheFetchOptions,
+            },
+        );
+        return cacheResponse(response, {
+            revalidateBefore: 60 * 60,
+            data: response.data,
+        });
+    },
+});
+
 /**
  * List the scripts to load for the site.
  */
