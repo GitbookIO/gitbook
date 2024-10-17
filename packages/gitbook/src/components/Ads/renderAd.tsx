@@ -90,7 +90,7 @@ function getPlaceholderAd(): { ad: AdItem; ip: string } {
             bannerid: '',
             creativeid: '',
             description:
-                'Your docs could be this good\nPublish incredible open source docs for free with GitBook',
+                'Your docs could be this good.\nPublish incredible open source docs for free with GitBook',
             evenodd: '0',
             external_id: '',
             height: '0',
