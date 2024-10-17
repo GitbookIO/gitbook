@@ -10,7 +10,7 @@ import { Button, Link } from '../primitives';
 /**
  * A set of tabs representing site sections for multi-section sites
  */
-export function SiteSectionTabs(props: { sections: SiteSection[], section: SiteSection }) {
+export function SiteSectionTabs(props: { sections: SiteSection[]; section: SiteSection }) {
     const { sections, section: currentSection } = props;
 
     const tabs = sections.map((section) => ({

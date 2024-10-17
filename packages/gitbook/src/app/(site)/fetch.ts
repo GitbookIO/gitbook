@@ -21,7 +21,7 @@ export interface PageIdParams {
     pageId: string;
 }
 
-type SectionsList = { list: SiteSection[]; section: SiteSection; };
+type SectionsList = { list: SiteSection[]; section: SiteSection };
 
 /**
  * Fetch all the data needed to render the content layout.
@@ -42,9 +42,10 @@ export async function fetchContentData() {
     const site = siteStructure.site;
 
     const siteSections = getSiteSectionsList(content.siteSectionId, siteStructure.sections);
-    
+
     const spaces =
-        siteStructure.spaces ?? (siteSections ? parseSpacesFromSiteSpaces(siteSections.section.siteSpaces) : []);
+        siteStructure.spaces ??
+        (siteSections ? parseSpacesFromSiteSpaces(siteSections.section.siteSpaces) : []);
 
     // we grab the space attached to the parent as it contains overriden customizations
     const spaceRelativeToParent = spaces?.find((space) => space.id === content.spaceId);
@@ -68,11 +69,11 @@ function getSiteSectionsList(siteSectionId?: string, sections?: SiteSection[] | 
         return null;
     }
     const section = sections?.find((section) => section.id === siteSectionId);
-    assert(sectionIsDefined(section), "A section must be defined when there are multiple sections");
+    assert(sectionIsDefined(section), 'A section must be defined when there are multiple sections');
     return { list: sections, section } satisfies SectionsList;
 }
 
-function sectionIsDefined(section?: SiteSection): section is NonNullable<SiteSection>  {
+function sectionIsDefined(section?: SiteSection): section is NonNullable<SiteSection> {
     return typeof section !== 'undefined' && section !== null;
 }
 

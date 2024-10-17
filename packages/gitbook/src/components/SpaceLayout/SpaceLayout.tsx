@@ -31,7 +31,7 @@ export function SpaceLayout(props: {
     contentTarget: ContentTarget;
     space: Space;
     site: Site | null;
-    sections: { list: SiteSection[], section: SiteSection } | null;
+    sections: { list: SiteSection[]; section: SiteSection } | null;
     spaces: Space[];
     customization: CustomizationSettings | SiteCustomizationSettings;
     pages: Revision['pages'];
