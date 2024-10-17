@@ -2,12 +2,12 @@
 
 import { headers } from 'next/headers';
 
-import { absoluteHref } from '@/lib/links';
-
 import { AdClassicRendering } from './AdClassicRendering';
 import { AdCoverRendering } from './AdCoverRendering';
 import { AdPixels } from './AdPixels';
+import adRainbow from './assets/ad-rainbow.svg'
 import { AdItem, AdsResponse } from './types';
+
 
 interface FetchAdOptions {
     /** ID of the zone to fetch Ads for */
@@ -76,7 +76,6 @@ async function fetchAd({
 
 function getPlaceholderAd(): { ad: AdItem; ip: string } {
     const { ip } = getUserAgentAndIp();
-    const imageHref = absoluteHref('~gitbook/static/images/ad-rainbow.svg', true);
 
     return {
         ad: {
@@ -95,7 +94,7 @@ function getPlaceholderAd(): { ad: AdItem; ip: string } {
             longlink: '',
             num_slots: '1',
             rendering: 'carbon',
-            smallImage: imageHref,
+            smallImage: adRainbow.src,
             statimp: '',
             statlink: 'https://www.gitbook.com/solutions/open-source',
             timestamp: Date.now().toString(),
