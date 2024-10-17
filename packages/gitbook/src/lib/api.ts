@@ -7,13 +7,12 @@ import {
     GitBookAPI,
     GitBookAPIError,
     HttpResponse,
-    JSONDocument,
     List,
     PublishedSiteContentLookup,
     RequestRenderIntegrationUI,
     RevisionFile,
     SiteCustomizationSettings,
-    SpaceIntegrationScript,
+    RevisionReusableContent,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 import { headers } from 'next/headers';
@@ -489,7 +488,7 @@ const getRevisionFileById = cache({
 });
 
 const getRevisionReusableContentById = cache({
-    name: 'api.getRevisionReusableContentById',
+    name: 'api.getRevisionReusableContentById.v1',
     tag: (spaceId, revisionId) =>
         getAPICacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
     get: async (
