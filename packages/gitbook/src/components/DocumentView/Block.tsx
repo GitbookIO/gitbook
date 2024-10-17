@@ -32,6 +32,7 @@ import { BlockMath } from './Math';
 import { OpenAPI } from './OpenAPI';
 import { Paragraph } from './Paragraph';
 import { Quote } from './Quote';
+import { ReusableContent } from './ReusableContent';
 import { Stepper } from './Stepper';
 import { StepperStep } from './StepperStep';
 import { Table } from './Table';
@@ -107,7 +108,7 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
             case 'synced-block':
                 return <BlockSyncedBlock {...props} {...contextProps} block={block} />;
             case 'reusable-content':
-                return null;
+                return <ReusableContent {...props} {...contextProps} block={block} />;
             case 'stepper':
                 return <Stepper {...props} {...contextProps} block={block} />;
             case 'stepper-step':
