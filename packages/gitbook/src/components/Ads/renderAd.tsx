@@ -13,11 +13,17 @@ interface FetchAdOptions {
     /** ID of the zone to fetch Ads for */
     zoneId: string;
     /** Mode to render the Ad */
-    mode: 'classic' | 'auto' | 'cover' | 'placeholder';
+    mode: 'classic' | 'auto' | 'cover';
     /** Name of the placement for the ad */
     placement: string;
     /** If true, we'll not track it as an impression */
     ignore: boolean;
+    /**
+     * Source of the ad (live: from the platform, placeholder: static placeholder)
+     * 
+     * Defaults to live.
+     * */
+    source?: 'live' | 'placeholder';
 }
 
 /**
@@ -26,9 +32,9 @@ interface FetchAdOptions {
  * and properly access user-agent and IP.
  */
 export async function renderAd(options: FetchAdOptions) {
-    const { mode } = options;
+    const { mode, source = 'live' } = options;
 
-    const result = mode !== 'placeholder' ? await fetchAd(options) : getPlaceholderAd();
+    const result = source === 'live' ? await fetchAd(options) : getPlaceholderAd();
     if (!result || !result.ad.description || !result.ad.statlink) {
         return null;
     }
