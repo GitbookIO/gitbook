@@ -1,4 +1,5 @@
-import { RevisionPage, SiteSpace, Space } from '@gitbook/api';
+import { RevisionPage, SiteSection, SiteSpace, Space } from '@gitbook/api';
+import { assert } from 'ts-essentials';
 
 import {
     getRevisionPageByPath,
@@ -20,6 +21,8 @@ export interface PageIdParams {
     pageId: string;
 }
 
+type SectionsList = { list: SiteSection[]; section: SiteSection; };
+
 /**
  * Fetch all the data needed to render the content layout.
  */
@@ -33,17 +36,15 @@ export async function fetchContentData() {
                 organizationId: content.organizationId,
                 siteId: content.siteId,
                 siteShareKey: content.siteShareKey,
-                siteSpaceId: content.siteSpaceId,
             }),
         ]);
 
     const site = siteStructure.site;
 
-    const sections = siteStructure.sections;
-    const section = siteStructure.sections?.find((section) => section.id === content.siteSectionId);
-
+    const siteSections = getSiteSectionsList(content.siteSectionId, siteStructure.sections);
+    
     const spaces =
-        siteStructure.spaces ?? (section ? parseSpacesFromSiteSpaces(section.siteSpaces) : []);
+        siteStructure.spaces ?? (siteSections ? parseSpacesFromSiteSpaces(siteSections.section.siteSpaces) : []);
 
     // we grab the space attached to the parent as it contains overriden customizations
     const spaceRelativeToParent = spaces?.find((space) => space.id === content.spaceId);
@@ -53,14 +54,26 @@ export async function fetchContentData() {
         contentTarget,
         space: spaceRelativeToParent ?? space,
         pages,
-        sections,
-        section,
+        sections: siteSections,
         site,
         spaces,
         customization,
         scripts,
         ancestors: [],
     };
+}
+
+function getSiteSectionsList(siteSectionId?: string, sections?: SiteSection[] | null) {
+    if (!sections) {
+        return null;
+    }
+    const section = sections?.find((section) => section.id === siteSectionId);
+    assert(sectionIsDefined(section), "A section must be defined when there are multiple sections");
+    return { list: sections, section } satisfies SectionsList;
+}
+
+function sectionIsDefined(section?: SiteSection): section is NonNullable<SiteSection>  {
+    return typeof section !== 'undefined' && section !== null;
 }
 
 /**
@@ -77,7 +90,6 @@ export async function fetchPageData(params: PagePathParams | PageIdParams) {
             organizationId: content.organizationId,
             siteId: content.siteId,
             siteShareKey: content.siteShareKey,
-            siteSpaceId: content.siteSpaceId,
         }),
         page?.page.documentId ? getDocument(space.id, page.page.documentId) : null,
     ]);
@@ -139,13 +151,12 @@ async function resolvePage(
 
 /**
  * Fetch the structure of an organization site.
- * This includes the site and its sections and spaces.
+ * This includes the site and its sections or spaces.
  */
 async function fetchSiteStructure(args: {
     organizationId: string;
     siteId: string;
     siteShareKey: string | undefined;
-    siteSpaceId: string | undefined;
 }) {
     const { organizationId, siteId, siteShareKey } = args;
     const [orgSite, siteStructure, siteParentCustomizations] = await Promise.all([

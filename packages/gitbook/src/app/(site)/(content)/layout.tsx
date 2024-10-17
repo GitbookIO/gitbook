@@ -40,7 +40,6 @@ export default async function ContentLayout(props: { children: React.ReactNode }
         ancestors,
         scripts,
         sections,
-        section,
     } = await fetchContentData();
 
     ReactDOM.preconnect(api().endpoint);
@@ -69,7 +68,6 @@ export default async function ContentLayout(props: { children: React.ReactNode }
                 site={site}
                 spaces={spaces}
                 sections={sections}
-                section={section}
                 customization={customization}
                 pages={pages}
                 ancestors={ancestors}

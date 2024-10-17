@@ -7,7 +7,10 @@ import { tcls } from '@/lib/tailwind';
 
 import { Button, Link } from '../primitives';
 
-export function SiteSectionTabs(props: { sections: SiteSection[]; section: SiteSection }) {
+/**
+ * A set of tabs representing site sections for multi-section sites
+ */
+export function SiteSectionTabs(props: { sections: SiteSection[], section: SiteSection }) {
     const { sections, section: currentSection } = props;
 
     const tabs = sections.map((section) => ({
@@ -89,6 +92,9 @@ export function SiteSectionTabs(props: { sections: SiteSection[]; section: SiteS
     ) : null;
 }
 
+/**
+ * The tab item - a link to a site section
+ */
 const Tab = React.forwardRef<
     HTMLAnchorElement,
     { active: boolean; href: string; label: string; onClick: any }
@@ -114,6 +120,9 @@ const Tab = React.forwardRef<
     );
 });
 
+/**
+ * Dropdown trigger for when there are too many sections to show them all
+ */
 function MoreSectionsButton() {
     return (
         <div>
