@@ -76,7 +76,7 @@ async function fetchAd({
 
 function getPlaceholderAd(): { ad: AdItem; ip: string } {
     const { ip } = getUserAgentAndIp();
-    const imageHref = absoluteHref('~gitbook/static/images/ad-rainbow.svg');
+    const imageHref = absoluteHref('~gitbook/static/images/ad-rainbow.svg', true);
 
     return {
         ad: {
