@@ -13,7 +13,6 @@ import {
     getSpaceContentData,
     userAgent,
     withAPI,
-    getSpaceLayoutData,
     DEFAULT_API_ENDPOINT,
     getSiteLayoutData,
     getSite,
@@ -181,7 +180,7 @@ export async function middleware(request: NextRequest) {
                       siteId: resolved.site,
                       siteSpaceId: resolved.siteSpace,
                   })
-                : getSpaceLayoutData(resolved.space));
+                : { scripts: [] });
             return getContentSecurityPolicy(scripts, nonce);
         },
     );

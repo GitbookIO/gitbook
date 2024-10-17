@@ -103,16 +103,21 @@ export function Header(props: {
                                 style={
                                     !isCustomizationDefault && withTopHeader
                                         ? [
-                                              'bg-header-background-400/8',
+                                              'bg-header-link/3',
                                               'shadow-sm',
-                                              'text-header-link/8',
-                                              'ring-header-background-200/5',
-                                              '[&>span]:text-header-link/7',
+                                              'ring-header-link/3',
+                                              '[&>span]:!text-header-link/7',
                                               '[&_svg]:text-header-link',
-                                              'dark:bg-header-link-600/3',
-                                              'dark:ring-header-link-600/2',
-                                              'dark:text-header-link/7',
-                                              'dark:[&_svg]:text-header-link/7',
+                                              'contrast-more:bg-transparent',
+                                              'contrast-more:ring-header-link',
+                                              'contrast-more:[&>span]:!text-header-link',
+                                              'dark:bg-header-link/3',
+                                              'dark:ring-header-link/3',
+                                              '[&>span]:!text-header-link/7',
+                                              'dark:[&_svg]:text-header-link',
+                                              'dark:contrast-more:bg-transparent',
+                                              'dark:contrast-more:ring-header-link',
+                                              'dark:contrast-more:[&>span]:!text-header-link',
                                           ]
                                         : null
                                 }

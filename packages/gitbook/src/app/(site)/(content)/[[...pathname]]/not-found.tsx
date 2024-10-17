@@ -1,5 +1,5 @@
 import { getSpaceLanguage, t } from '@/intl/server';
-import { getSiteLayoutData, getSpaceLayoutData } from '@/lib/api';
+import { getSiteLayoutData } from '@/lib/api';
 import { getSiteContentPointer } from '@/lib/pointer';
 import { tcls } from '@/lib/tailwind';
 
