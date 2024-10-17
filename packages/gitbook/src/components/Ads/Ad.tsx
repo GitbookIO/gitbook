@@ -79,7 +79,8 @@ export function Ad({
         const showPlaceholderAd =
             previewParam === 'placeholder' ||
             (siteAdsStatus &&
-            (siteAdsStatus === SiteAdsStatus.Pending || siteAdsStatus === SiteAdsStatus.InReview))
+                (siteAdsStatus === SiteAdsStatus.Pending ||
+                    siteAdsStatus === SiteAdsStatus.InReview));
 
         if (!realZoneId) {
             return;
@@ -91,7 +92,7 @@ export function Ad({
                 ignore: ignore || preview,
                 zoneId: realZoneId,
                 mode,
-                source: showPlaceholderAd ? 'placeholder' : 'live'
+                source: showPlaceholderAd ? 'placeholder' : 'live',
             });
 
             if (cancelled) {

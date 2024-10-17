@@ -5,9 +5,8 @@ import { headers } from 'next/headers';
 import { AdClassicRendering } from './AdClassicRendering';
 import { AdCoverRendering } from './AdCoverRendering';
 import { AdPixels } from './AdPixels';
-import adRainbow from './assets/ad-rainbow.svg'
+import adRainbow from './assets/ad-rainbow.svg';
 import { AdItem, AdsResponse } from './types';
-
 
 interface FetchAdOptions {
     /** ID of the zone to fetch Ads for */
@@ -20,7 +19,7 @@ interface FetchAdOptions {
     ignore: boolean;
     /**
      * Source of the ad (live: from the platform, placeholder: static placeholder)
-     * 
+     *
      * Defaults to live.
      * */
     source?: 'live' | 'placeholder';
