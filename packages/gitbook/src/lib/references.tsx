@@ -255,9 +255,9 @@ export async function resolveContentRef(
             };
         }
 
-        case 'synced-block': {
+        case 'reusable-content':
+        case 'synced-block':
             return null;
-        }
 
         default:
             assertNever(contentRef);
