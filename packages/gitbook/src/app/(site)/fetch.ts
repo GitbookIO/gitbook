@@ -38,11 +38,14 @@ export async function fetchContentData() {
         ]);
 
     const site = siteStructure.site;
-    const spaces = siteStructure.spaces;
-    const sections = siteStructure.sections;
 
+    const sections = siteStructure.sections;
+    const section = siteStructure.sections?.find(section => section.id === content.siteSectionId);
+    
+    const spaces = siteStructure.spaces ?? (section ? parseSpacesFromSiteSpaces(section.siteSpaces) : []);
+    
     // we grab the space attached to the parent as it contains overriden customizations
-    const spaceRelativeToParent = spaces.find((space) => space.id === content.spaceId);
+    const spaceRelativeToParent = spaces?.find((space) => space.id === content.spaceId);
 
     return {
         content,
@@ -50,7 +53,7 @@ export async function fetchContentData() {
         space: spaceRelativeToParent ?? space,
         pages,
         sections,
-        section: siteStructure.section,
+        section,
         site,
         spaces,
         customization,
@@ -143,19 +146,30 @@ async function fetchSiteStructure(args: {
     siteShareKey: string | undefined;
     siteSpaceId: string | undefined;
 }) {
-    const { organizationId, siteId, siteSpaceId} = args;
+    const { organizationId, siteId, siteShareKey } = args;
     const [orgSite, siteStructure, siteParentCustomizations] = await Promise.all([
         getSite(organizationId, siteId),
-        getSiteStructure({ organizationId, siteId }),
+        getSiteStructure({ organizationId, siteId, siteShareKey }),
         getCurrentSiteCustomization({ organizationId, siteId, siteSpaceId: undefined }),
     ]);
 
-    const siteSections = siteStructure.type === 'sections' && siteStructure.structure ? siteStructure.structure : [];
+    const siteSections = siteStructure.type === 'sections' && siteStructure.structure ? siteStructure.structure : null;
+    const siteSpaces = siteStructure.type === 'siteSpaces' && siteStructure.structure ? parseSpacesFromSiteSpaces(siteStructure.structure) : null;
 
-    const section = siteSections.find(section => section.id === siteSpaceId || section.siteSpaces.find(siteSpace => siteSpace.id === siteSpaceId));
+    // override the title with the customization title
+    const site = {
+        ...orgSite,
+        ...(siteParentCustomizations?.title ? { title: siteParentCustomizations.title } : {}),
+    };
 
-    const siteSpaces: SiteSpace[] = siteStructure.type === 'siteSpaces' && siteStructure.structure ? siteStructure.structure : section?.siteSpaces ?? [];
-   
+    return {
+        site,
+        spaces: siteSpaces,
+        sections: siteSections,
+    };
+}
+
+function parseSpacesFromSiteSpaces(siteSpaces: SiteSpace[]) {
     const spaces: Record<string, Space> = {};
     siteSpaces.forEach((siteSpace) => {
         spaces[siteSpace.space.id] = {
@@ -167,19 +181,7 @@ async function fetchSiteStructure(args: {
             },
         };
     });
-
-    // override the title with the customization title
-    const site = {
-        ...orgSite,
-        ...(siteParentCustomizations?.title ? { title: siteParentCustomizations.title } : {}),
-    };
-
-    return {
-        site,
-        spaces: Object.values(spaces),
-        sections: siteSections,
-        section
-    };
+    return Object.values(spaces);
 }
 
 /**

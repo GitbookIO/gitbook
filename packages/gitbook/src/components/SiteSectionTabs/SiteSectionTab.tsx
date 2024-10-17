@@ -7,7 +7,7 @@ import { tcls } from '@/lib/tailwind';
 
 import { Button, Link } from '../primitives';
 
-export function SiteSectionTabs(props: { sections: SiteSection[]; section?: SiteSection; }) {
+export function SiteSectionTabs(props: { sections: SiteSection[]; section: SiteSection; }) {
     const { sections, section: currentSection } = props;
 
     const tabs = sections.map((section) => ({ id: section.id, label: section.title, path: section.urls.published ?? '' }));
