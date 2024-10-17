@@ -7,6 +7,7 @@ import {
     GitBookAPI,
     GitBookAPIError,
     HttpResponse,
+    JSONDocument,
     List,
     PublishedSiteContentLookup,
     RequestRenderIntegrationUI,
@@ -487,6 +488,40 @@ const getRevisionFileById = cache({
     },
 });
 
+const getRevisionReusableContentById = cache({
+    name: 'api.getRevisionReusableContentById',
+    tag: (spaceId, revisionId) =>
+        getAPICacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
+    get: async (
+        spaceId: string,
+        revisionId: string,
+        reusableContentId: string,
+        options: CacheFunctionOptions,
+    ) => {
+        try {
+            const response = await (async () => {
+                return api().spaces.getReusableContentInRevisionById(
+                    spaceId,
+                    revisionId,
+                    reusableContentId,
+                    {
+                        ...noCacheFetchOptions,
+                        signal: options.signal,
+                    },
+                );
+            })();
+
+            return cacheResponse(response, cacheTtl_7days);
+        } catch (error: any) {
+            if (error instanceof GitBookAPIError && error.code === 404) {
+                return { data: null, ...cacheTtl_7days };
+            }
+
+            throw error;
+        }
+    },
+});
+
 /**
  * Get all the files in a revision of a space.
  * It should not be used directly, use `getRevisionFile` instead.
@@ -577,6 +612,35 @@ export const getRevisionFile = batch<[string, string, string], RevisionFile | nu
         },
     },
 );
+
+/**
+ * Get reusable content in a revision. Also returns the document.
+ */
+export const getReusableContentDocument = async (
+    spaceId: string,
+    revisionId: string,
+    reusableContentId: string,
+): Promise<JSONDocument | null> => {
+    const hasRevisionInMemory = await getRevision.hasInMemory(spaceId, revisionId, {
+        metadata: false,
+    });
+
+    if (hasRevisionInMemory) {
+        const revision = await getRevision(spaceId, revisionId, { metadata: false });
+        const reusableContent = revision.reusableContents[reusableContentId];
+        if (!reusableContent) {
+            return null;
+        }
+        return getDocument(reusableContent.documentId);
+    } else {
+        const response = await getRevisionReusableContentById(
+            spaceId,
+            revisionId,
+            reusableContentId,
+        );
+        return response?.document ?? null;
+    }
+};
 
 /**
  * Get a document by its ID.
