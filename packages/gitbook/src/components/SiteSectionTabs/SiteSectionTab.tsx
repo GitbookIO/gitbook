@@ -7,15 +7,21 @@ import { tcls } from '@/lib/tailwind';
 
 import { Button, Link } from '../primitives';
 
-export function SiteSectionTabs(props: { sections: SiteSection[]; section: SiteSection; }) {
+export function SiteSectionTabs(props: { sections: SiteSection[]; section: SiteSection }) {
     const { sections, section: currentSection } = props;
 
-    const tabs = sections.map((section) => ({ id: section.id, label: section.title, path: section.urls.published ?? '' }));
+    const tabs = sections.map((section) => ({
+        id: section.id,
+        label: section.title,
+        path: section.urls.published ?? '',
+    }));
 
     const currentTabRef = React.useRef<HTMLAnchorElement>(null);
     const navRef = React.useRef<HTMLDivElement>(null);
 
-    const [currentIndex, setCurrentIndex] = React.useState(sections.findIndex(section => section.id === currentSection?.id) || 0);
+    const [currentIndex, setCurrentIndex] = React.useState(
+        sections.findIndex((section) => section.id === currentSection?.id) || 0,
+    );
     const [tabDimensions, setTabDimensions] = React.useState<{
         left: number;
         width: number;
@@ -34,7 +40,7 @@ export function SiteSectionTabs(props: { sections: SiteSection[]; section: SiteS
             if (currentTabRef.current && navRef.current) {
                 const rect = currentTabRef.current.getBoundingClientRect();
                 const navRect = navRef.current.getBoundingClientRect();
-                setTabDimensions({ left: rect.left - navRect.left, width: rect.width  });
+                setTabDimensions({ left: rect.left - navRect.left, width: rect.width });
             }
         }
         window.addEventListener('resize', onResize);
@@ -43,7 +49,7 @@ export function SiteSectionTabs(props: { sections: SiteSection[]; section: SiteS
 
     const scale = (tabDimensions?.width ?? 0) * 0.01;
     const startPos = `${tabDimensions?.left ?? 0}px`;
-    
+
     const hasMoreSections = false; /** TODO: determine whether we need to show the more button */
 
     return tabs.length > 0 ? (
@@ -57,7 +63,7 @@ export function SiteSectionTabs(props: { sections: SiteSection[]; section: SiteS
                 } as React.CSSProperties
             }
         >
-            <div  
+            <div
                 className={tcls(
                     'relative flex gap-2',
                     /* add a pseudo element for active tab indicator */
@@ -78,7 +84,7 @@ export function SiteSectionTabs(props: { sections: SiteSection[]; section: SiteS
                     />
                 ))}
             </div>
-            { hasMoreSections ? <MoreSectionsButton /> : null }
+            {hasMoreSections ? <MoreSectionsButton /> : null}
         </nav>
     ) : null;
 }
@@ -95,7 +101,13 @@ const Tab = React.forwardRef<
                 !active && 'hover:bg-dark/1 dark:hover:bg-light/2 transition-colors',
             )}
         >
-            <Link ref={ref} onClick={onClick} className={tcls('inline-flex w-full truncate')} role="tab" href={href}>
+            <Link
+                ref={ref}
+                onClick={onClick}
+                className={tcls('inline-flex w-full truncate')}
+                role="tab"
+                href={href}
+            >
                 {label}
             </Link>
         </div>

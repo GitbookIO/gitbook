@@ -74,9 +74,11 @@ export function SpaceLayout(props: {
                 customization={customization}
             />
             <div className={tcls('scroll-nojump')}>
-                { sections && section ? <div className={tcls(CONTAINER_STYLE)}>
-                    <SiteSectionTabs sections={sections} section={section} />
-                </div> : null }
+                {sections && section ? (
+                    <div className={tcls(CONTAINER_STYLE)}>
+                        <SiteSectionTabs sections={sections} section={section} />
+                    </div>
+                ) : null}
                 <div
                     className={tcls(
                         'flex',

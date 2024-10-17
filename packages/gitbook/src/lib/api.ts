@@ -745,12 +745,12 @@ export const getSiteStructure = cache({
     name: 'api.getSiteStructure',
     tag: ({ siteId }) => getAPICacheTag({ tag: 'site', site: siteId }),
     get: async (
-        args: { 
+        args: {
             organizationId: string;
-            siteId: string,
+            siteId: string;
             /** Site share key that can be used as context to resolve site space published urls */
             siteShareKey: string | undefined;
-         },
+        },
         options: CacheFunctionOptions,
     ) => {
         const response = await api().orgs.getSiteStructure(

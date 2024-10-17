@@ -40,10 +40,11 @@ export async function fetchContentData() {
     const site = siteStructure.site;
 
     const sections = siteStructure.sections;
-    const section = siteStructure.sections?.find(section => section.id === content.siteSectionId);
-    
-    const spaces = siteStructure.spaces ?? (section ? parseSpacesFromSiteSpaces(section.siteSpaces) : []);
-    
+    const section = siteStructure.sections?.find((section) => section.id === content.siteSectionId);
+
+    const spaces =
+        siteStructure.spaces ?? (section ? parseSpacesFromSiteSpaces(section.siteSpaces) : []);
+
     // we grab the space attached to the parent as it contains overriden customizations
     const spaceRelativeToParent = spaces?.find((space) => space.id === content.spaceId);
 
@@ -153,8 +154,14 @@ async function fetchSiteStructure(args: {
         getCurrentSiteCustomization({ organizationId, siteId, siteSpaceId: undefined }),
     ]);
 
-    const siteSections = siteStructure.type === 'sections' && siteStructure.structure ? siteStructure.structure : null;
-    const siteSpaces = siteStructure.type === 'siteSpaces' && siteStructure.structure ? parseSpacesFromSiteSpaces(siteStructure.structure) : null;
+    const siteSections =
+        siteStructure.type === 'sections' && siteStructure.structure
+            ? siteStructure.structure
+            : null;
+    const siteSpaces =
+        siteStructure.type === 'siteSpaces' && siteStructure.structure
+            ? parseSpacesFromSiteSpaces(siteStructure.structure)
+            : null;
 
     // override the title with the customization title
     const site = {

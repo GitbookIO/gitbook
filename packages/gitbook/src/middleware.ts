@@ -211,7 +211,6 @@ export async function middleware(request: NextRequest) {
         }
     }
 
-
     // For tests, we make it possible to enable search indexation
     // using a query parameter.
     const xGitBookSearchIndexation =
