@@ -9,6 +9,7 @@ import {
     SpaceContentPointer,
     getCollection,
     getDocument,
+    getReusableContent,
     getRevisionFile,
     getSpace,
     getSpaceContentData,
@@ -35,6 +36,8 @@ export interface ResolvedContentRef {
     active: boolean;
     /** File, if the reference is a file */
     file?: RevisionFile;
+    /** ID of an attached document. */
+    documentId?: string;
 }
 
 export interface ContentRefContext extends PageHrefContext {
@@ -255,7 +258,18 @@ export async function resolveContentRef(
             };
         }
 
-        case 'reusable-content':
+        case 'reusable-content': {
+            const reusableContent = await getReusableContent(space.id, revisionId, contentRef.reusableContent);
+            if (!reusableContent) {
+                return null;
+            }
+            return {
+                href: gitbookAppHref(`/s/${space.id}`),
+                text: reusableContent.title,
+                active: false,
+                documentId: reusableContent.document,
+            }
+        }
         case 'synced-block':
             return null;
 

@@ -92,7 +92,7 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
             case 'math':
                 return <BlockMath {...props} {...contextProps} block={block} />;
             case 'file':
-                return <File {...props} {...contextProps} block={block} />
+                return <File {...props} {...contextProps} block={block} />;
             case 'divider':
                 return <Divider {...props} {...contextProps} block={block} />;
             case 'drawing':

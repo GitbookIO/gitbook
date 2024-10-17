@@ -614,31 +614,26 @@ export const getRevisionFile = batch<[string, string, string], RevisionFile | nu
 );
 
 /**
- * Get reusable content in a revision. Also returns the document.
+ * Get reusable content in a revision.
  */
-export const getReusableContentDocument = async (
+export const getReusableContent = async (
     spaceId: string,
     revisionId: string,
     reusableContentId: string,
-): Promise<JSONDocument | null> => {
+): Promise<RevisionReusableContent | null> => {
     const hasRevisionInMemory = await getRevision.hasInMemory(spaceId, revisionId, {
         metadata: false,
     });
 
     if (hasRevisionInMemory) {
         const revision = await getRevision(spaceId, revisionId, { metadata: false });
-        const reusableContent = revision.reusableContents[reusableContentId];
-        if (!reusableContent) {
-            return null;
-        }
-        return getDocument(reusableContent.documentId);
+        return revision.reusableContents[reusableContentId] ?? null;
     } else {
-        const response = await getRevisionReusableContentById(
+        return getRevisionReusableContentById(
             spaceId,
             revisionId,
             reusableContentId,
         );
-        return response?.document ?? null;
     }
 };
 

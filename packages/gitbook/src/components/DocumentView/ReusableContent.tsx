@@ -1,6 +1,6 @@
 import { DocumentBlockReusableContent } from '@gitbook/api';
 
-import { getReusableContentDocument } from '@/lib/api';
+import { getDocument, getReusableContent } from '@/lib/api';
 
 import { BlockProps } from './Block';
 import { UnwrappedBlocks } from './Blocks';
@@ -9,14 +9,15 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
     const { block, context, ancestorBlocks } = props;
 
     if (!context.content) {
+        throw new Error(`Expected a content context to render a reusable content block`);
+    }
+
+    const resolved = await context.resolveContentRef(block.data.ref);
+    if (!resolved?.documentId) {
         return null;
     }
 
-    const document = await getReusableContentDocument(
-        context.content.spaceId,
-        context.content.revisionId,
-        block.data.ref.reusableContent,
-    );
+    const document = await getDocument(context.content.spaceId, resolved.documentId);
 
     if (!document) {
         return null;
