@@ -8,7 +8,7 @@ import { AdItem } from './types';
 /**
  * Classic rendering for an ad.
  */
-export async function AdClassicRendering({ ad }: { ad: AdItem }) {
+export function AdClassicRendering({ ad }: { ad: AdItem }) {
     return (
         <a
             className={tcls(
