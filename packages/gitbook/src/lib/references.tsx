@@ -1,4 +1,11 @@
-import { ContentRef, Revision, RevisionFile, RevisionPageDocument, Space } from '@gitbook/api';
+import {
+    ContentRef,
+    Revision,
+    RevisionFile,
+    RevisionPageDocument,
+    RevisionReusableContent,
+    Space,
+} from '@gitbook/api';
 import assertNever from 'assert-never';
 import React from 'react';
 
@@ -9,6 +16,7 @@ import {
     SpaceContentPointer,
     getCollection,
     getDocument,
+    getReusableContent,
     getRevisionFile,
     getSpace,
     getSpaceContentData,
@@ -35,6 +43,8 @@ export interface ResolvedContentRef {
     active: boolean;
     /** File, if the reference is a file */
     file?: RevisionFile;
+    /** Resolved reusable content, if the ref points to reusable content on a revision. */
+    reusableContent?: RevisionReusableContent;
 }
 
 export interface ContentRefContext extends PageHrefContext {
@@ -255,7 +265,22 @@ export async function resolveContentRef(
             };
         }
 
-        case 'reusable-content':
+        case 'reusable-content': {
+            const reusableContent = await getReusableContent(
+                space.id,
+                revisionId,
+                contentRef.reusableContent,
+            );
+            if (!reusableContent) {
+                return null;
+            }
+            return {
+                href: gitbookAppHref(`/s/${space.id}`),
+                text: reusableContent.title,
+                active: false,
+                reusableContent,
+            };
+        }
         case 'synced-block':
             return null;
 
