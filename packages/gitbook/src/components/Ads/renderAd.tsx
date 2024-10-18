@@ -8,7 +8,13 @@ import { AdPixels } from './AdPixels';
 import adRainbow from './assets/ad-rainbow.svg';
 import { AdItem, AdsResponse } from './types';
 
-interface FetchAdOptions {
+type FetchAdOptions = FetchLiveAdOptions | FetchPlaceholderAdOptions;
+
+interface FetchLiveAdOptions {
+    /**
+     * Source of the ad (live: from the platform)
+     */
+    source: 'live';
     /** ID of the zone to fetch Ads for */
     zoneId: string;
     /** Mode to render the Ad */
@@ -17,12 +23,13 @@ interface FetchAdOptions {
     placement: string;
     /** If true, we'll not track it as an impression */
     ignore: boolean;
+}
+
+interface FetchPlaceholderAdOptions {
     /**
-     * Source of the ad (live: from the platform, placeholder: static placeholder)
-     *
-     * Defaults to live.
-     * */
-    source?: 'live' | 'placeholder';
+     * Source of the ad (placeholder: static placeholder ad)
+     */
+    source: 'placeholder';
 }
 
 /**
@@ -31,9 +38,9 @@ interface FetchAdOptions {
  * and properly access user-agent and IP.
  */
 export async function renderAd(options: FetchAdOptions) {
-    const { mode, source = 'live' } = options;
+    const mode = options.source === 'live' ? options.mode : 'classic';
 
-    const result = source === 'live' ? await fetchAd(options) : getPlaceholderAd();
+    const result = options.source === 'live' ? await fetchAd(options) : getPlaceholderAd();
     if (!result || !result.ad.description || !result.ad.statlink) {
         return null;
     }
@@ -56,7 +63,7 @@ async function fetchAd({
     zoneId,
     placement,
     ignore,
-}: FetchAdOptions): Promise<{ ad: AdItem; ip: string } | null> {
+}: FetchLiveAdOptions): Promise<{ ad: AdItem; ip: string } | null> {
     const { ip, userAgent } = getUserAgentAndIp();
 
     const url = new URL(`https://srv.buysellads.com/ads/${zoneId}.json`);
