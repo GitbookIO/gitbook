@@ -190,6 +190,7 @@ export async function PageAside(props: {
                 }
                 placement="page.aside"
                 spaceId={space.id}
+                siteAdsStatus={site?.ads && site.ads.status ? site.ads.status : undefined}
                 ignore={process.env.NODE_ENV !== 'production'}
                 style={tcls('mt-4')}
             />

@@ -32,6 +32,8 @@ import { BlockMath } from './Math';
 import { OpenAPI } from './OpenAPI';
 import { Paragraph } from './Paragraph';
 import { Quote } from './Quote';
+import { Stepper } from './Stepper';
+import { StepperStep } from './StepperStep';
 import { Table } from './Table';
 import { Tabs } from './Tabs';
 
@@ -40,6 +42,13 @@ export interface BlockProps<Block extends DocumentBlock> extends DocumentContext
     document: JSONDocument;
     ancestorBlocks: DocumentBlock[];
     style?: ClassValue;
+}
+
+/**
+ * Alternative to `assertNever` that returns `null` instead of throwing an error.
+ */
+function nullIfNever(value: never): null {
+    return null;
 }
 
 export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
@@ -97,8 +106,14 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
                 return <IntegrationBlock {...props} {...contextProps} block={block} />;
             case 'synced-block':
                 return <BlockSyncedBlock {...props} {...contextProps} block={block} />;
+            case 'reusable-content':
+                return null;
+            case 'stepper':
+                return <Stepper {...props} {...contextProps} block={block} />;
+            case 'stepper-step':
+                return <StepperStep {...props} {...contextProps} block={block} />;
             default:
-                assertNever(block);
+                return nullIfNever(block);
         }
     })();
 
@@ -129,7 +144,6 @@ function BlockPlaceholder(props: { block: DocumentBlock; style: ClassValue }) {
         case 'code':
         case 'hint':
         case 'tabs':
-        case 'synced-block':
             return <SkeletonParagraph id={id} style={style} />;
         case 'expandable':
         case 'table':
@@ -138,6 +152,9 @@ function BlockPlaceholder(props: { block: DocumentBlock; style: ClassValue }) {
         case 'divider':
         case 'content-ref':
         case 'integration':
+        case 'stepper':
+        case 'synced-block':
+        case 'reusable-content':
             return <SkeletonCard id={id} style={style} />;
         case 'embed':
         case 'images':
@@ -146,8 +163,9 @@ function BlockPlaceholder(props: { block: DocumentBlock; style: ClassValue }) {
         case 'image':
         case 'code-line':
         case 'tabs-item':
+        case 'stepper-step':
             throw new Error('Blocks should be directly rendered by parent');
         default:
-            assertNever(block);
+            return nullIfNever(block);
     }
 }

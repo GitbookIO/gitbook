@@ -13,7 +13,6 @@ import {
     getSpaceContentData,
     userAgent,
     withAPI,
-    getSpaceLayoutData,
     DEFAULT_API_ENDPOINT,
     getSiteLayoutData,
     getSite,
@@ -181,7 +180,7 @@ export async function middleware(request: NextRequest) {
                       siteId: resolved.site,
                       siteSpaceId: resolved.siteSpace,
                   })
-                : getSpaceLayoutData(resolved.space));
+                : { scripts: [] });
             return getContentSecurityPolicy(scripts, nonce);
         },
     );
@@ -201,6 +200,9 @@ export async function middleware(request: NextRequest) {
     if ('site' in resolved) {
         headers.set('x-gitbook-content-organization', resolved.organization);
         headers.set('x-gitbook-content-site', resolved.site);
+        if (resolved.siteSection) {
+            headers.set('x-gitbook-content-site-section', resolved.siteSection);
+        }
         if (resolved.siteSpace) {
             headers.set('x-gitbook-content-site-space', resolved.siteSpace);
         }
