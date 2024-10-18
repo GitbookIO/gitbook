@@ -85,7 +85,11 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
         });
 
         return () => {
-            cancelled = true;
+            // During development, the useEffect is called twice and the second call doesn't process the stream,
+            // causing the component to get stuck in the loading state.
+            if (process.env.NODE_ENV !== 'development') {
+                cancelled = true;
+            }
         };
     }, [spaceId, query, setSearchState, setState]);
 
