@@ -108,10 +108,7 @@ const Tab = React.forwardRef<
             href={href}
             onClick={onClick}
         >
-            <span
-                ref={ref}
-                className={tcls('inline-flex w-full truncate')}
-            >
+            <span ref={ref} className={tcls('inline-flex w-full truncate')}>
                 {label}
             </span>
         </Link>
