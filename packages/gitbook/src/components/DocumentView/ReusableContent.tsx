@@ -1,6 +1,6 @@
 import { DocumentBlockReusableContent } from '@gitbook/api';
 
-import { getDocument, getReusableContent } from '@/lib/api';
+import { getDocument } from '@/lib/api';
 
 import { BlockProps } from './Block';
 import { UnwrappedBlocks } from './Blocks';
