@@ -25,7 +25,7 @@ import { PageFeedbackForm } from '../PageFeedback';
 /**
  * Aside listing the headings in the document.
  */
-export async function PageAside(props: {
+export function PageAside(props: {
     space: Space;
     site: Site | undefined;
     customization: CustomizationSettings | SiteCustomizationSettings;
