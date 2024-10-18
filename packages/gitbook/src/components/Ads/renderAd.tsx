@@ -108,7 +108,8 @@ function getPlaceholderAd(): { ad: AdItem; ip: string } {
             rendering: 'carbon',
             smallImage: adRainbow.src,
             statimp: '',
-            statlink: 'https://www.gitbook.com/solutions/open-source?utm_campaign=sponsored-content&utm_medium=ad&utm_source=content',
+            statlink:
+                'https://www.gitbook.com/solutions/open-source?utm_campaign=sponsored-content&utm_medium=ad&utm_source=content',
             timestamp: Date.now().toString(),
             width: '0',
             zoneid: '',
