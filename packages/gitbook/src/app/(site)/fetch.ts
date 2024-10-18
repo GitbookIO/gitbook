@@ -41,7 +41,10 @@ export async function fetchContentData() {
 
     const site = siteStructure.site;
 
-    const siteSections = content.siteSectionId && siteStructure.sections ? parseSiteSectionsList(content.siteSectionId, siteStructure.sections) : null;
+    const siteSections =
+        content.siteSectionId && siteStructure.sections
+            ? parseSiteSectionsList(content.siteSectionId, siteStructure.sections)
+            : null;
 
     const spaces =
         siteStructure.spaces ??
@@ -65,7 +68,7 @@ export async function fetchContentData() {
 }
 
 function parseSiteSectionsList(siteSectionId: string, sections: SiteSection[]) {
-    const section = sections?.find((section) => section.id === siteSectionId);
+    const section = sections.find((section) => section.id === siteSectionId);
     assert(sectionIsDefined(section), 'A section must be defined when there are multiple sections');
     return { list: sections, section } satisfies SectionsList;
 }
