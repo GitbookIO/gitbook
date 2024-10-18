@@ -13,11 +13,11 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
     }
 
     const resolved = await context.resolveContentRef(block.data.ref);
-    if (!resolved?.documentId) {
+    if (!resolved?.reusableContent?.document) {
         return null;
     }
 
-    const document = await getDocument(context.content.spaceId, resolved.documentId);
+    const document = await getDocument(context.content.spaceId, resolved.reusableContent.document);
 
     if (!document) {
         return null;
