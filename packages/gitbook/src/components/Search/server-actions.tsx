@@ -190,6 +190,7 @@ function transformAnswer(
                         contentRefContext: null,
                         resolveContentRef: async () => null,
                         shouldHighlightCode: () => false,
+                        wrapBlocksInSuspense: false,
                     }}
                     style={['space-y-5']}
                 />

@@ -5,6 +5,7 @@ import { ContentRefContext, ResolveContentRefOptions, ResolvedContentRef } from 
 import { ClassValue } from '@/lib/tailwind';
 
 import { Blocks } from './Blocks';
+import { BlockSkeleton } from './Block';
 
 export interface DocumentContext {
     /**
@@ -46,6 +47,12 @@ export interface DocumentContext {
      * https://linear.app/gitbook-x/issue/RND-3588/gitbook-open-code-syntax-highlighting-runs-out-of-memory-after-a
      */
     shouldHighlightCode: (spaceId: string | undefined) => boolean;
+
+    /**
+     * True if the blocks should be wrapped in suspense boundary for isolated loading skeletons.
+     * @default true
+     */
+    wrapBlocksInSuspense?: boolean;
 }
 
 export interface DocumentContextProps {
@@ -82,4 +89,28 @@ export function DocumentView(
             context={context}
         />
     );
+}
+
+/**
+ * Placeholder for the entire document layout.
+ */
+export function DocumentViewSkeleton(props: {
+    document: JSONDocument;
+    blockStyle: ClassValue;
+}) {
+    const { document, blockStyle } = props;
+
+    return (
+        <div className='flex flex-col gap-4'>
+            {document.nodes.map((block, index) => (
+                <BlockSkeleton key={block.key!} block={block} style={[
+                    'w-full mx-auto decoration-primary/6',
+                    block.data && 'fullWidth' in block.data && block.data.fullWidth
+                            ? 'max-w-screen-xl'
+                            : 'max-w-3xl',
+                    blockStyle,
+                ]} />   
+            ))}
+        </div>
+    )
 }

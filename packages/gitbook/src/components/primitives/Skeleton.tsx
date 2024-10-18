@@ -28,10 +28,10 @@ export function SkeletonParagraph(props: { id?: string; style?: ClassValue }) {
 export function SkeletonHeading(props: { id?: string; style?: ClassValue }) {
     const { id, style } = props;
     return (
-        <div id={id} role="status" aria-busy className="skeleton-heading">
+        <div id={id} role="status" aria-busy className={tcls(style)}>
             <LoadingPane
                 tile={12}
-                style={['rounded-md', 'h-[47px]', '[max-width:calc(48rem-1px)]', style]}
+                style={['rounded-md', 'h-[47px]', '[max-width:calc(48rem-1px)]']}
             />
         </div>
     );
@@ -43,7 +43,7 @@ export function SkeletonHeading(props: { id?: string; style?: ClassValue }) {
 export function SkeletonImage(props: { id?: string; style?: ClassValue }) {
     const { id, style } = props;
     return (
-        <div id={id} role="status" aria-busy className="skeleton-image">
+        <div id={id} role="status" aria-busy className={tcls(style)}>
             <LoadingPane
                 tile={96}
                 style={[
@@ -51,7 +51,6 @@ export function SkeletonImage(props: { id?: string; style?: ClassValue }) {
                     'h-full',
                     'aspect-video',
                     '[max-width:calc(48rem-1px)]',
-                    style,
                 ]}
             />
         </div>
@@ -68,7 +67,7 @@ export function SkeletonCard(props: { id?: string; style?: ClassValue }) {
             id={id}
             role="status"
             aria-busy
-            className={tcls('skeleton-card', 'flex', 'gap-[25px]', style)}
+            className={tcls('flex', 'gap-[25px]', style)}
         >
             <LoadingPane tile={24} delay={0} style={['rounded-md', 'aspect-[1/1.2]', 'w-full']} />
             <LoadingPane tile={24} delay={1} style={['rounded-md', 'aspect-[1/1.2]', 'w-full']} />
@@ -83,10 +82,10 @@ export function SkeletonCard(props: { id?: string; style?: ClassValue }) {
 export function SkeletonSmall(props: { id?: string; style?: ClassValue }) {
     const { id, style } = props;
     return (
-        <div id={id} role="status" aria-busy className="skeleton-small">
+        <div id={id} role="status" aria-busy className={tcls(style)}>
             <LoadingPane
                 tile={12}
-                style={['rounded-md', 'h-[35px]', '[max-width:calc(48rem-1px)]', style]}
+                style={['rounded-md', 'h-[35px]', '[max-width:calc(48rem-1px)]']}
             />
         </div>
     );

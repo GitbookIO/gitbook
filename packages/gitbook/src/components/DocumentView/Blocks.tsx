@@ -67,7 +67,7 @@ export function UnwrappedBlocks<TBlock extends DocumentBlock>(props: UnwrappedBl
                             : 'max-w-3xl',
                         blockStyle,
                     ]}
-                    isOffscreen={isOffscreen}
+                    isEstimatedOffscreen={isOffscreen}
                     {...contextProps}
                 />
             })}
