@@ -82,7 +82,14 @@ export function PageBody(props: {
 
                 <PageHeader page={page} />
                 {document && !isNodeEmpty(document) ? (
-                    <React.Suspense fallback={<DocumentViewSkeleton document={document} blockStyle={['page-api-block:ml-0']} />}>
+                    <React.Suspense
+                        fallback={
+                            <DocumentViewSkeleton
+                                document={document}
+                                blockStyle={['page-api-block:ml-0']}
+                            />
+                        }
+                    >
                         <DocumentView
                             document={document}
                             style={['[&>*+*]:mt-5', 'grid']}

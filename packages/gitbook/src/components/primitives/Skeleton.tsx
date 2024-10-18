@@ -46,12 +46,7 @@ export function SkeletonImage(props: { id?: string; style?: ClassValue }) {
         <div id={id} role="status" aria-busy className={tcls(style)}>
             <LoadingPane
                 tile={96}
-                style={[
-                    'rounded-md',
-                    'h-full',
-                    'aspect-video',
-                    '[max-width:calc(48rem-1px)]',
-                ]}
+                style={['rounded-md', 'h-full', 'aspect-video', '[max-width:calc(48rem-1px)]']}
             />
         </div>
     );
@@ -63,12 +58,7 @@ export function SkeletonImage(props: { id?: string; style?: ClassValue }) {
 export function SkeletonCard(props: { id?: string; style?: ClassValue }) {
     const { id, style } = props;
     return (
-        <div
-            id={id}
-            role="status"
-            aria-busy
-            className={tcls('flex', 'gap-[25px]', style)}
-        >
+        <div id={id} role="status" aria-busy className={tcls('flex', 'gap-[25px]', style)}>
             <LoadingPane tile={24} delay={0} style={['rounded-md', 'aspect-[1/1.2]', 'w-full']} />
             <LoadingPane tile={24} delay={1} style={['rounded-md', 'aspect-[1/1.2]', 'w-full']} />
             <LoadingPane tile={24} delay={2} style={['rounded-md', 'aspect-[1/1.2]', 'w-full']} />

@@ -113,10 +113,7 @@ export function getResizedImageURLFactory(
  * Create a new URL for an image with resized parameters.
  * The URL is signed and verified by the server.
  */
-export function getResizedImageURL(
-    input: string,
-    options: ResizeImageOptions,
-): string {
+export function getResizedImageURL(input: string, options: ResizeImageOptions): string {
     const factory = getResizedImageURLFactory(input);
     return factory?.(options) ?? input;
 }

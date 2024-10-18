@@ -159,13 +159,14 @@ function ImagePicture(
         } & ImageCommonProps
     >,
 ) {
-    const {
-        source,
-        ...rest
-    } = props;
+    const { source, ...rest } = props;
     const { size } = source;
 
-    return size ? <ImagePictureSized {...rest} source={{ ...source, size }} /> : <ImagePictureUnsized {...rest} source={source} />;
+    return size ? (
+        <ImagePictureSized {...rest} source={{ ...source, size }} />
+    ) : (
+        <ImagePictureUnsized {...rest} source={source} />
+    );
 }
 
 async function ImagePictureUnsized(
@@ -176,15 +177,11 @@ async function ImagePictureUnsized(
         } & ImageCommonProps
     >,
 ) {
-    const {
-        source,
-        ...rest
-    } = props;
+    const { source, ...rest } = props;
 
     const size = await getImageSize(source.src);
     return <ImagePictureSized {...rest} source={{ ...source, size }} />;
 }
-
 
 function ImagePictureSized(
     props: PolymorphicComponentProp<
@@ -241,7 +238,6 @@ function ImagePictureSized(
 
     return zoom ? <ZoomImage {...imgProps} /> : <img {...imgProps} alt={imgProps.alt ?? ''} />;
 }
-
 
 /**
  * Get the attributes for an image.

@@ -69,10 +69,10 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
                     return;
                 }
 
-                    setState({
-                        type: 'answer',
-                        answer: chunk,
-                    });
+                setState({
+                    type: 'answer',
+                    answer: chunk,
+                });
             }
         })().catch((error) => {
             if (cancelled) {
@@ -101,9 +101,9 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
 
     const loading = (
         <div className={tcls('w-full', 'flex', 'items-center', 'justify-center')}>
-                    <Loading className={tcls('w-5', 'py-4', 'text-primary')} />
-                </div>
-    )
+            <Loading className={tcls('w-5', 'py-4', 'text-primary')} />
+        </div>
+    );
 
     return (
         <div
@@ -129,9 +129,7 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
             {state?.type === 'error' ? (
                 <div className={tcls('p-4')}>{t(language, 'search_ask_error')}</div>
             ) : null}
-            {state?.type === 'loading' ? (
-                loading
-            ) : null}
+            {state?.type === 'loading' ? loading : null}
         </div>
     );
 }
@@ -143,17 +141,20 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
 function TransitionAnswerBody(props: { answer: AskAnswerResult; placeholder: React.ReactNode }) {
     const { answer, placeholder } = props;
     const [display, setDisplay] = React.useState<AskAnswerResult | null>(null);
-    const [isPending, startTransition] = React.useTransition()
+    const [isPending, startTransition] = React.useTransition();
 
     React.useEffect(() => {
         startTransition(() => {
-            setDisplay(answer)
-        })
+            setDisplay(answer);
+        });
     }, [answer]);
 
-
-    return (
-        display ? <div className={tcls('w-full')}><AnswerBody answer={display} /></div> : <>{placeholder}</>
+    return display ? (
+        <div className={tcls('w-full')}>
+            <AnswerBody answer={display} />
+        </div>
+    ) : (
+        <>{placeholder}</>
     );
 }
 
