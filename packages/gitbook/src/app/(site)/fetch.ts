@@ -1,4 +1,5 @@
-import { RevisionPage, Space } from '@gitbook/api';
+import { RevisionPage, SiteSection, SiteSpace, Space } from '@gitbook/api';
+import { assert } from 'ts-essentials';
 
 import {
     getRevisionPageByPath,
@@ -6,8 +7,8 @@ import {
     ContentTarget,
     getSiteData,
     getSite,
-    getSiteSpaces,
     getCurrentSiteCustomization,
+    getSiteStructure,
 } from '@/lib/api';
 import { resolvePagePath, resolvePageId } from '@/lib/pages';
 import { getSiteContentPointer } from '@/lib/pointer';
@@ -19,6 +20,8 @@ export interface PagePathParams {
 export interface PageIdParams {
     pageId: string;
 }
+
+type SectionsList = { list: SiteSection[]; section: SiteSection };
 
 /**
  * Fetch all the data needed to render the content layout.
@@ -37,21 +40,41 @@ export async function fetchContentData() {
         ]);
 
     const site = siteStructure.site;
-    const spaces = siteStructure.spaces;
+
+    const siteSections =
+        content.siteSectionId && siteStructure.sections
+            ? parseSiteSectionsList(content.siteSectionId, siteStructure.sections)
+            : null;
+
+    const spaces =
+        siteStructure.spaces ??
+        (siteSections ? parseSpacesFromSiteSpaces(siteSections.section.siteSpaces) : []);
+
     // we grab the space attached to the parent as it contains overriden customizations
-    const spaceRelativeToParent = spaces.find((space) => space.id === content.spaceId);
+    const spaceRelativeToParent = spaces?.find((space) => space.id === content.spaceId);
 
     return {
         content,
         contentTarget,
         space: spaceRelativeToParent ?? space,
         pages,
+        sections: siteSections,
         site,
         spaces,
         customization,
         scripts,
         ancestors: [],
     };
+}
+
+function parseSiteSectionsList(siteSectionId: string, sections: SiteSection[]) {
+    const section = sections.find((section) => section.id === siteSectionId);
+    assert(sectionIsDefined(section), 'A section must be defined when there are multiple sections');
+    return { list: sections, section } satisfies SectionsList;
+}
+
+function sectionIsDefined(section?: SiteSection): section is NonNullable<SiteSection> {
+    return typeof section !== 'undefined' && section !== null;
 }
 
 /**
@@ -129,7 +152,7 @@ async function resolvePage(
 
 /**
  * Fetch the structure of an organization site.
- * This includes the site and its spaces.
+ * This includes the site and its sections or spaces.
  */
 async function fetchSiteStructure(args: {
     organizationId: string;
@@ -137,12 +160,35 @@ async function fetchSiteStructure(args: {
     siteShareKey: string | undefined;
 }) {
     const { organizationId, siteId, siteShareKey } = args;
-    const [orgSite, siteSpaces, siteParentCustomizations] = await Promise.all([
+    const [orgSite, siteStructure, siteParentCustomizations] = await Promise.all([
         getSite(organizationId, siteId),
-        getSiteSpaces({ organizationId, siteId, siteShareKey }),
+        getSiteStructure({ organizationId, siteId, siteShareKey }),
         getCurrentSiteCustomization({ organizationId, siteId, siteSpaceId: undefined }),
     ]);
 
+    const siteSections =
+        siteStructure.type === 'sections' && siteStructure.structure
+            ? siteStructure.structure
+            : null;
+    const siteSpaces =
+        siteStructure.type === 'siteSpaces' && siteStructure.structure
+            ? parseSpacesFromSiteSpaces(siteStructure.structure)
+            : null;
+
+    // override the title with the customization title
+    const site = {
+        ...orgSite,
+        ...(siteParentCustomizations?.title ? { title: siteParentCustomizations.title } : {}),
+    };
+
+    return {
+        site,
+        spaces: siteSpaces,
+        sections: siteSections,
+    };
+}
+
+function parseSpacesFromSiteSpaces(siteSpaces: SiteSpace[]) {
     const spaces: Record<string, Space> = {};
     siteSpaces.forEach((siteSpace) => {
         spaces[siteSpace.space.id] = {
@@ -154,17 +200,7 @@ async function fetchSiteStructure(args: {
             },
         };
     });
-
-    // override the title with the customization title
-    const site = {
-        ...orgSite,
-        ...(siteParentCustomizations?.title ? { title: siteParentCustomizations.title } : {}),
-    };
-
-    return {
-        site,
-        spaces: Object.values(spaces),
-    };
+    return Object.values(spaces);
 }
 
 /**

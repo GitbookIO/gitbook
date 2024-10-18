@@ -46,6 +46,10 @@ export interface SiteContentPointer extends SpaceContentPointer {
     organizationId: string;
     siteId: string;
     /**
+     * ID of the siteSection. When rendering a multi-section site. Can be undefined.
+     */
+    siteSectionId: string | undefined;
+    /**
      * ID of the siteSpace can be undefined when rendering in multi-id mode (for site previews)
      */
     siteSpaceId: string | undefined;
@@ -794,6 +798,36 @@ export const getSiteSpaces = cache({
         return cacheResponse(response, {
             revalidateBefore: 60 * 60,
             data: response.data.items.map((siteSpace) => siteSpace),
+        });
+    },
+});
+
+export const getSiteStructure = cache({
+    name: 'api.getSiteStructure',
+    tag: ({ siteId }) => getAPICacheTag({ tag: 'site', site: siteId }),
+    get: async (
+        args: {
+            organizationId: string;
+            siteId: string;
+            /** Site share key that can be used as context to resolve site space published urls */
+            siteShareKey: string | undefined;
+        },
+        options: CacheFunctionOptions,
+    ) => {
+        const response = await api().orgs.getSiteStructure(
+            args.organizationId,
+            args.siteId,
+            {
+                ...(args.siteShareKey ? { shareKey: args.siteShareKey } : {}),
+            },
+            {
+                ...noCacheFetchOptions,
+                signal: options.signal,
+            },
+        );
+        return cacheResponse(response, {
+            revalidateBefore: 60 * 60,
+            data: response.data,
         });
     },
 });
