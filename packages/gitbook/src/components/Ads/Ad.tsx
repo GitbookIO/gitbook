@@ -82,18 +82,22 @@ export function Ad({
                 (siteAdsStatus === SiteAdsStatus.Pending ||
                     siteAdsStatus === SiteAdsStatus.InReview));
 
-        if (!realZoneId) {
+        if (!realZoneId && !showPlaceholderAd) {
             return;
         }
 
         (async () => {
-            const result = await renderAd({
-                placement,
-                ignore: ignore || preview,
-                zoneId: realZoneId,
-                mode,
-                source: showPlaceholderAd ? 'placeholder' : 'live',
-            });
+            const result = showPlaceholderAd
+                ? await renderAd({ source: 'placeholder' })
+                : realZoneId
+                  ? await renderAd({
+                        placement,
+                        ignore: ignore || preview,
+                        zoneId: realZoneId,
+                        mode,
+                        source: 'live',
+                    })
+                  : undefined;
 
             if (cancelled) {
                 return;
