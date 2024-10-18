@@ -1,13 +1,7 @@
 'use server';
 
+import { RevisionPage, SearchAIAnswer, SearchPageResult, SiteSpace, Space } from '@gitbook/api';
 import * as React from 'react';
-import {
-    RevisionPage,
-    SearchAIAnswer,
-    SearchPageResult,
-    SiteSpace,
-    Space,
-} from '@gitbook/api';
 
 import { streamResponse } from '@/lib/actions';
 import * as api from '@/lib/api';
@@ -182,7 +176,7 @@ function transformAnswer(
     return {
         body:
             answer.answer && 'document' in answer.answer ? (
-                    <DocumentView
+                <DocumentView
                     document={answer.answer.document}
                     context={{
                         mode: 'default',

@@ -4,8 +4,8 @@ import { ContentTarget } from '@/lib/api';
 import { ContentRefContext, ResolveContentRefOptions, ResolvedContentRef } from '@/lib/references';
 import { ClassValue } from '@/lib/tailwind';
 
-import { Blocks } from './Blocks';
 import { BlockSkeleton } from './Block';
+import { Blocks } from './Blocks';
 
 export interface DocumentContext {
     /**
@@ -94,23 +94,24 @@ export function DocumentView(
 /**
  * Placeholder for the entire document layout.
  */
-export function DocumentViewSkeleton(props: {
-    document: JSONDocument;
-    blockStyle: ClassValue;
-}) {
+export function DocumentViewSkeleton(props: { document: JSONDocument; blockStyle: ClassValue }) {
     const { document, blockStyle } = props;
 
     return (
-        <div className='flex flex-col gap-4'>
+        <div className="flex flex-col gap-4">
             {document.nodes.map((block, index) => (
-                <BlockSkeleton key={block.key!} block={block} style={[
-                    'w-full mx-auto decoration-primary/6',
-                    block.data && 'fullWidth' in block.data && block.data.fullWidth
+                <BlockSkeleton
+                    key={block.key!}
+                    block={block}
+                    style={[
+                        'w-full mx-auto decoration-primary/6',
+                        block.data && 'fullWidth' in block.data && block.data.fullWidth
                             ? 'max-w-screen-xl'
                             : 'max-w-3xl',
-                    blockStyle,
-                ]} />   
+                        blockStyle,
+                    ]}
+                />
             ))}
         </div>
-    )
+    );
 }
