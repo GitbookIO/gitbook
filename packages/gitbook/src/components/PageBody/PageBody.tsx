@@ -21,7 +21,7 @@ import { PageFooterNavigation } from './PageFooterNavigation';
 import { PageHeader } from './PageHeader';
 import { PreservePageLayout } from './PreservePageLayout';
 import { TrackPageView } from './TrackPageView';
-import { DocumentView, createHighlightingContext } from '../DocumentView';
+import { DocumentView, DocumentViewSkeleton, createHighlightingContext } from '../DocumentView';
 import { PageFeedbackForm } from '../PageFeedback';
 import { DateRelative } from '../primitives';
 
@@ -82,19 +82,28 @@ export function PageBody(props: {
 
                 <PageHeader page={page} />
                 {document && !isNodeEmpty(document) ? (
-                    <DocumentView
-                        document={document}
-                        style={['[&>*+*]:mt-5', 'grid']}
-                        blockStyle={['page-api-block:ml-0']}
-                        context={{
-                            mode: 'default',
-                            content: contentTarget,
-                            contentRefContext: context,
-                            resolveContentRef: (ref, options) =>
-                                resolveContentRef(ref, context, options),
-                            shouldHighlightCode,
-                        }}
-                    />
+                    <React.Suspense
+                        fallback={
+                            <DocumentViewSkeleton
+                                document={document}
+                                blockStyle={['page-api-block:ml-0']}
+                            />
+                        }
+                    >
+                        <DocumentView
+                            document={document}
+                            style={['[&>*+*]:mt-5', 'grid']}
+                            blockStyle={['page-api-block:ml-0']}
+                            context={{
+                                mode: 'default',
+                                content: contentTarget,
+                                contentRefContext: context,
+                                resolveContentRef: (ref, options) =>
+                                    resolveContentRef(ref, context, options),
+                                shouldHighlightCode,
+                            }}
+                        />
+                    </React.Suspense>
                 ) : (
                     <PageBodyBlankslate page={page} rootPages={context.pages} context={context} />
                 )}
