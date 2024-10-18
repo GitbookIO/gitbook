@@ -69,15 +69,16 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
                     return;
                 }
 
-                setState({
-                    type: 'answer',
-                    answer: chunk,
-                });
+                    setState({
+                        type: 'answer',
+                        answer: chunk,
+                    });
             }
         })().catch((error) => {
             if (cancelled) {
                 return;
             }
+
             setState({
                 type: 'error',
             });
@@ -94,10 +95,11 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
         };
     }, [setState]);
 
-    let hasAnswer = false;
-    if (state && 'answer' in state) {
-        hasAnswer = !!state?.answer?.body;
-    }
+    const loading = (
+        <div className={tcls('w-full', 'flex', 'items-center', 'justify-center')}>
+                    <Loading className={tcls('w-5', 'py-4', 'text-primary')} />
+                </div>
+    )
 
     return (
         <div
@@ -112,9 +114,9 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
             {state?.type === 'answer' ? (
                 <>
                     {state.answer ? (
-                        <div className={tcls('w-full')}>
-                            <AnswerBody answer={state.answer} />
-                        </div>
+                        <React.Suspense fallback={loading}>
+                            <TransitionAnswerBody answer={state.answer} placeholder={loading} />
+                        </React.Suspense>
                     ) : (
                         <div className={tcls('p-4')}>{t(language, 'search_ask_no_answer')}</div>
                     )}
@@ -124,11 +126,30 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
                 <div className={tcls('p-4')}>{t(language, 'search_ask_error')}</div>
             ) : null}
             {state?.type === 'loading' ? (
-                <div className={tcls('w-full', 'flex', 'items-center', 'justify-center')}>
-                    <Loading className={tcls('w-5', 'py-4', 'text-primary')} />
-                </div>
+                loading
             ) : null}
         </div>
+    );
+}
+
+/**
+ * Since the answer can be an async component that could suspend rendering,
+ * we need to wrap it in a transition to avoid flickering.
+ */
+function TransitionAnswerBody(props: { answer: AskAnswerResult; placeholder: React.ReactNode }) {
+    const { answer, placeholder } = props;
+    const [display, setDisplay] = React.useState<AskAnswerResult | null>(null);
+    const [isPending, startTransition] = React.useTransition()
+
+    React.useEffect(() => {
+        startTransition(() => {
+            setDisplay(answer)
+        })
+    }, [answer]);
+
+
+    return (
+        display ? <div className={tcls('w-full')}><AnswerBody answer={display} /></div> : <>{placeholder}</>
     );
 }
 

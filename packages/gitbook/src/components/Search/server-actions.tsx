@@ -1,11 +1,10 @@
 'use server';
 
+import * as React from 'react';
 import {
-    Collection,
     RevisionPage,
     SearchAIAnswer,
     SearchPageResult,
-    Site,
     SiteSpace,
     Space,
 } from '@gitbook/api';
@@ -183,7 +182,7 @@ function transformAnswer(
     return {
         body:
             answer.answer && 'document' in answer.answer ? (
-                <DocumentView
+                    <DocumentView
                     document={answer.answer.document}
                     context={{
                         mode: 'default',
