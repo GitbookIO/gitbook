@@ -15,6 +15,12 @@ type ImageSource = {
     aspectRatio?: string;
 };
 
+type ImageSourceSized = {
+    src: string;
+    size: ImageSize | null;
+    aspectRatio?: string;
+};
+
 export type ImageResponsiveSize = {
     /** Media query to apply this width for */
     media?: string;
@@ -96,7 +102,7 @@ interface ImgDOMPropsWithSrc extends React.ComponentPropsWithoutRef<'img'> {
  * We don't use the `next/image` component because we need to load images from external sources,
  * and we want to avoid client components.
  */
-export async function Image(
+export function Image(
     props: PolymorphicComponentProp<
         'img',
         {
@@ -145,26 +151,118 @@ export async function Image(
     );
 }
 
+function ImagePicture(
+    props: PolymorphicComponentProp<
+        'img',
+        {
+            source: ImageSource;
+        } & ImageCommonProps
+    >,
+) {
+    const {
+        source,
+        ...rest
+    } = props;
+    const { size } = source;
+
+    return size ? <ImagePictureSized {...rest} source={{ ...source, size }} /> : <ImagePictureUnsized {...rest} source={source} />;
+}
+
+async function ImagePictureUnsized(
+    props: PolymorphicComponentProp<
+        'img',
+        {
+            source: ImageSource;
+        } & ImageCommonProps
+    >,
+) {
+    const {
+        source,
+        ...rest
+    } = props;
+
+    const size = await getImageSize(source.src);
+    return <ImagePictureSized {...rest} source={{ ...source, size }} />;
+}
+
+
+function ImagePictureSized(
+    props: PolymorphicComponentProp<
+        'img',
+        {
+            source: ImageSourceSized;
+        } & ImageCommonProps
+    >,
+) {
+    const {
+        source,
+        sizes,
+        style: _style,
+        alt,
+        quality = 100,
+        priority = 'normal',
+        inline = false,
+        zoom = false,
+        resize = true,
+        preload = false,
+        inlineStyle,
+        ...rest
+    } = props;
+
+    if (process.env.NODE_ENV === 'development' && sizes.length === 0) {
+        throw new Error('You must provide at least one size for the image.');
+    }
+
+    const attrs = getImageAttributes({ sizes, source, quality, resize });
+    const canBeFetched = checkIsHttpURL(attrs.src);
+    const fetchPriority = canBeFetched ? getFetchPriority(priority) : undefined;
+    const loading = priority === 'lazy' ? 'lazy' : undefined;
+    const aspectRatioStyle = source.aspectRatio ? { aspectRatio: source.aspectRatio } : {};
+    const style = { ...aspectRatioStyle, ...inlineStyle };
+
+    // Preload the image if needed.
+    if (fetchPriority === 'high' || preload) {
+        ReactDOM.preload(attrs.src, {
+            as: 'image',
+            imageSrcSet: attrs.srcSet,
+            imageSizes: attrs.sizes,
+            fetchPriority,
+        });
+    }
+
+    const imgProps: ImgDOMPropsWithSrc = {
+        alt,
+        style,
+        loading,
+        fetchPriority,
+        ...rest,
+        ...attrs,
+    };
+
+    return zoom ? <ZoomImage {...imgProps} /> : <img {...imgProps} alt={imgProps.alt ?? ''} />;
+}
+
+
 /**
  * Get the attributes for an image.
  * src, srcSet, sizes, width, height, etc.
  */
-async function getImageAttributes(params: {
+function getImageAttributes(params: {
     sizes: ImageResponsiveSize[];
-    source: ImageSource;
+    source: ImageSourceSized;
     quality: number;
     resize: boolean;
-}): Promise<{
+}): {
     src: string;
     srcSet?: string;
     sizes?: string;
     width?: number;
     height?: number;
-}> {
+} {
     const { sizes, source, quality, resize } = params;
     let src = source.src;
 
-    const getURL = resize ? await getResizedImageURLFactory(source.src) : null;
+    const getURL = resize ? getResizedImageURLFactory(source.src) : null;
 
     if (!getURL) {
         return {
@@ -204,11 +302,7 @@ async function getImageAttributes(params: {
         sourceSizes.push(`${defaultSize.width}px`);
     }
 
-    // If we don't know the size of the image, we can try reading it from the image itself.
-    const size =
-        source.size ?? (await getImageSize(source.src, { width: defaultSize?.width, dpr: 3 }));
-
-    if (!size) {
+    if (!source.size) {
         return { src };
     }
 
@@ -216,7 +310,7 @@ async function getImageAttributes(params: {
         src,
         srcSet: sources.join(', '),
         sizes: sourceSizes.join(', '),
-        ...size,
+        ...source.size,
     };
 }
 
@@ -229,60 +323,4 @@ function getFetchPriority(priority: ImageCommonProps['priority']) {
         default:
             return undefined;
     }
-}
-
-async function ImagePicture(
-    props: PolymorphicComponentProp<
-        'img',
-        {
-            source: ImageSource;
-        } & ImageCommonProps
-    >,
-) {
-    const {
-        source,
-        sizes,
-        style: _style,
-        alt,
-        quality = 100,
-        priority = 'normal',
-        inline = false,
-        zoom = false,
-        resize = true,
-        preload = false,
-        inlineStyle,
-        ...rest
-    } = props;
-
-    if (process.env.NODE_ENV === 'development' && sizes.length === 0) {
-        throw new Error('You must provide at least one size for the image.');
-    }
-
-    const attrs = await getImageAttributes({ sizes, source, quality, resize });
-    const canBeFetched = checkIsHttpURL(attrs.src);
-    const fetchPriority = canBeFetched ? getFetchPriority(priority) : undefined;
-    const loading = priority === 'lazy' ? 'lazy' : undefined;
-    const aspectRatioStyle = source.aspectRatio ? { aspectRatio: source.aspectRatio } : {};
-    const style = { ...aspectRatioStyle, ...inlineStyle };
-
-    // Preload the image if needed.
-    if (fetchPriority === 'high' || preload) {
-        ReactDOM.preload(attrs.src, {
-            as: 'image',
-            imageSrcSet: attrs.srcSet,
-            imageSizes: attrs.sizes,
-            fetchPriority,
-        });
-    }
-
-    const imgProps: ImgDOMPropsWithSrc = {
-        alt,
-        style,
-        loading,
-        fetchPriority,
-        ...rest,
-        ...attrs,
-    };
-
-    return zoom ? <ZoomImage {...imgProps} /> : <img {...imgProps} alt={imgProps.alt ?? ''} />;
 }

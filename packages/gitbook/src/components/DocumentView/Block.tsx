@@ -1,5 +1,4 @@
 import { DocumentBlock, JSONDocument } from '@gitbook/api';
-import assertNever from 'assert-never';
 import React from 'react';
 
 import {
@@ -42,6 +41,9 @@ export interface BlockProps<Block extends DocumentBlock> extends DocumentContext
     block: Block;
     document: JSONDocument;
     ancestorBlocks: DocumentBlock[];
+    /** If true, we estimate that the block will be outside the initial viewport */
+    isEstimatedOffscreen: boolean;
+    /** Class names to be passed to the underlying DOM element */
     style?: ClassValue;
 }
 
@@ -53,7 +55,7 @@ function nullIfNever(value: never): null {
 }
 
 export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
-    const { block, style, ...contextProps } = props;
+    const { block, style, isEstimatedOffscreen, ...contextProps } = props;
 
     const content = (() => {
         switch (block.type) {
@@ -117,6 +119,12 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
                 return nullIfNever(block);
         }
     })();
+
+    if (!isEstimatedOffscreen) {
+        // When blocks are estimated to be on the initial viewport, we render them immediately
+        // to avoid a flash of a loading skeleton.
+        return content;
+    }
 
     return (
         <React.Suspense fallback={<BlockPlaceholder block={block} style={style} />}>
