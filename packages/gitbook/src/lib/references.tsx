@@ -1,4 +1,11 @@
-import { ContentRef, Revision, RevisionFile, RevisionPageDocument, RevisionReusableContent, Space } from '@gitbook/api';
+import {
+    ContentRef,
+    Revision,
+    RevisionFile,
+    RevisionPageDocument,
+    RevisionReusableContent,
+    Space,
+} from '@gitbook/api';
 import assertNever from 'assert-never';
 import React from 'react';
 
