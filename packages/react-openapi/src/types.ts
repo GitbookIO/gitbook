@@ -8,6 +8,8 @@ export interface OpenAPIClientContext {
     icons: {
         chevronDown: React.ReactNode;
         chevronRight: React.ReactNode;
+        edit: React.ReactNode;
+        editDone: React.ReactNode;
     };
 
     /**
@@ -15,12 +17,20 @@ export interface OpenAPIClientContext {
      * @default false
      */
     defaultInteractiveOpened?: boolean;
+
     /**
      * The key of the block
      */
     blockKey?: string;
-    /** Optional id attached to the OpenAPI Operation heading and used as an anchor */
+
+    /**
+     * Optional id attached to the OpenAPI Operation heading and used as an anchor
+     */
     id?: string;
+    /**
+     * Optional serverUrl to use with OpenAPI operations
+     */
+    serverUrl?: string | null;
 }
 
 export interface OpenAPIFetcher {
