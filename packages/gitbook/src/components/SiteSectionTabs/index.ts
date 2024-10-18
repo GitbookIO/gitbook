@@ -1,1 +1,1 @@
-export * from './SiteSectionTab';
+export * from './SiteSectionTabs';
