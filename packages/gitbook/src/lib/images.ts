@@ -76,14 +76,14 @@ interface ResizeImageOptions {
 /**
  * Create a function to get resized image URLs for a given image URL.
  */
-export async function getResizedImageURLFactory(
+export function getResizedImageURLFactory(
     input: string,
-): Promise<((options: ResizeImageOptions) => string) | null> {
+): ((options: ResizeImageOptions) => string) | null {
     if (!checkIsSizableImageURL(input)) {
         return null;
     }
 
-    const signature = await generateSignatureV1(input);
+    const signature = generateSignatureV1(input);
 
     return (options) => {
         const url = new URL('/~gitbook/image', rootUrl());
@@ -113,11 +113,8 @@ export async function getResizedImageURLFactory(
  * Create a new URL for an image with resized parameters.
  * The URL is signed and verified by the server.
  */
-export async function getResizedImageURL(
-    input: string,
-    options: ResizeImageOptions,
-): Promise<string> {
-    const factory = await getResizedImageURLFactory(input);
+export function getResizedImageURL(input: string, options: ResizeImageOptions): string {
+    const factory = getResizedImageURLFactory(input);
     return factory?.(options) ?? input;
 }
 
@@ -129,7 +126,7 @@ export async function verifyImageSignature(
     { signature, version }: { signature: string; version: '1' | '0' },
 ): Promise<boolean> {
     const expectedSignature =
-        version === '1' ? await generateSignatureV1(input) : await generateSignatureV0(input);
+        version === '1' ? generateSignatureV1(input) : await generateSignatureV0(input);
     return expectedSignature === signature;
 }
 
@@ -236,7 +233,7 @@ const fnv1aUtf8Buffer = new Uint8Array(512);
  * When setting it in a URL, we use version '1' for the 'sv' querystring parameneter
  * to know that it was the algorithm that was used.
  */
-async function generateSignatureV1(input: string): Promise<string> {
+function generateSignatureV1(input: string): string {
     const all = [input, process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY].filter(Boolean).join(':');
     return fnv1a(all, { utf8Buffer: fnv1aUtf8Buffer }).toString(16);
 }

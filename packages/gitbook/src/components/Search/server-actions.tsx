@@ -1,14 +1,7 @@
 'use server';
 
-import {
-    Collection,
-    RevisionPage,
-    SearchAIAnswer,
-    SearchPageResult,
-    Site,
-    SiteSpace,
-    Space,
-} from '@gitbook/api';
+import { RevisionPage, SearchAIAnswer, SearchPageResult, SiteSpace, Space } from '@gitbook/api';
+import * as React from 'react';
 
 import { streamResponse } from '@/lib/actions';
 import * as api from '@/lib/api';
@@ -189,7 +182,8 @@ function transformAnswer(
                         mode: 'default',
                         contentRefContext: null,
                         resolveContentRef: async () => null,
-                        shouldHighlightCode: () => false,
+                        shouldHighlightCode: () => true,
+                        wrapBlocksInSuspense: false,
                     }}
                     style={['space-y-5']}
                 />
