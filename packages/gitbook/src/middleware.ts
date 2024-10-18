@@ -698,6 +698,7 @@ async function lookupSpaceByAPI(
                 ...('site' in data
                     ? {
                           site: data.site,
+                          siteSection: data.siteSection,
                           siteSpace: data.siteSpace,
                           organization: data.organization,
                           shareKey: data.shareKey,
