@@ -31,6 +31,39 @@ describe('getURLLookupAlternatives', () => {
                 },
             ],
         });
+
+        expect(getURLLookupAlternatives(new URL('https://docs.mycompany.com/a/b/c/d'))).toEqual({
+            revision: undefined,
+            changeRequest: undefined,
+            basePath: undefined,
+            urls: [
+                {
+                    extraPath: 'a/b/c/d',
+                    url: 'https://docs.mycompany.com/',
+                    primary: false,
+                },
+                {
+                    extraPath: 'b/c/d',
+                    url: 'https://docs.mycompany.com/a',
+                    primary: false,
+                },
+                {
+                    extraPath: 'c/d',
+                    url: 'https://docs.mycompany.com/a/b',
+                    primary: false,
+                },
+                {
+                    extraPath: 'd',
+                    url: 'https://docs.mycompany.com/a/b/c',
+                    primary: false,
+                },
+                {
+                    extraPath: '',
+                    url: 'https://docs.mycompany.com/a/b/c/d',
+                    primary: true,
+                },
+            ],
+        });
     });
 
     it('should not match before the variant for a variant url', () => {
@@ -216,29 +249,34 @@ describe('getURLLookupAlternatives', () => {
     });
 
     it('should limit depth', () => {
-        expect(getURLLookupAlternatives(new URL('https://docs.mycompany.com/a/b/c/d'))).toEqual({
+        expect(getURLLookupAlternatives(new URL('https://docs.mycompany.com/a/b/c/d/e'))).toEqual({
             revision: undefined,
             changeRequest: undefined,
             basePath: undefined,
             urls: [
                 {
-                    extraPath: 'a/b/c/d',
+                    extraPath: 'a/b/c/d/e',
                     url: 'https://docs.mycompany.com/',
                     primary: false,
                 },
                 {
-                    extraPath: 'b/c/d',
+                    extraPath: 'b/c/d/e',
                     url: 'https://docs.mycompany.com/a',
                     primary: false,
                 },
                 {
-                    extraPath: 'c/d',
+                    extraPath: 'c/d/e',
                     url: 'https://docs.mycompany.com/a/b',
                     primary: false,
                 },
                 {
-                    extraPath: 'd',
+                    extraPath: 'd/e',
                     url: 'https://docs.mycompany.com/a/b/c',
+                    primary: false,
+                },
+                {
+                    extraPath: 'e',
+                    url: 'https://docs.mycompany.com/a/b/c/d',
                     primary: true,
                 },
             ],
@@ -269,7 +307,12 @@ describe('getURLLookupAlternatives', () => {
                 {
                     extraPath: 'c/d',
                     url: 'https://docs.mycompany.com/a/~/b',
+                    primary: false,
+                },
+                {
+                    extraPath: 'd',
                     primary: true,
+                    url: 'https://docs.mycompany.com/a/~/b/c',
                 },
             ],
         });
