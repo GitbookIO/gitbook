@@ -114,7 +114,7 @@ export function Ad({
     }, [visible, zoneId, ignore, placement, mode, siteAdsStatus]);
 
     return (
-        <div ref={containerRef} className={tcls(style)}>
+        <div ref={containerRef} className={tcls(style)} data-visual-test="removed">
             {ad ? (
                 <>
                     {ad}
