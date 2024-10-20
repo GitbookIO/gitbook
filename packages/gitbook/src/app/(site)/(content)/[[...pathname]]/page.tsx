@@ -77,20 +77,8 @@ export default async function Page(props: {
             {withFullPageCover && page.cover ? (
                 <PageCover as="full" page={page} cover={page.cover} context={contentRefContext} />
             ) : null}
-            <div className={tcls('flex', 'flex-row')}>
-                <PageBody
-                    space={space}
-                    pointer={contentPointer}
-                    contentTarget={contentTarget}
-                    customization={customization}
-                    context={contentRefContext}
-                    page={page}
-                    document={document}
-                    withPageFeedback={
-                        // Display the page feedback in the page footer if the aside is not visible
-                        withPageFeedback && !page.layout.outline
-                    }
-                />
+            {/* We use a flex row reverse to render the aside first because the page is streamed. */}
+            <div className="flex flex-row-reverse justify-end">
                 {page.layout.outline ? (
                     <PageAside
                         space={space}
@@ -104,6 +92,19 @@ export default async function Page(props: {
                         context={contentRefContext}
                     />
                 ) : null}
+                <PageBody
+                    space={space}
+                    pointer={contentPointer}
+                    contentTarget={contentTarget}
+                    customization={customization}
+                    context={contentRefContext}
+                    page={page}
+                    document={document}
+                    withPageFeedback={
+                        // Display the page feedback in the page footer if the aside is not visible
+                        withPageFeedback && !page.layout.outline
+                    }
+                />
             </div>
             <React.Suspense fallback={null}>
                 <PageClientLayout />
