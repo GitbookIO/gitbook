@@ -29,6 +29,7 @@ export default async function Page(props: {
     const {
         content: contentPointer,
         contentTarget,
+        sections,
         space,
         site,
         customization,
@@ -72,6 +73,9 @@ export default async function Page(props: {
         page,
     };
 
+    const withSections = Boolean(sections && sections.length > 0);
+    const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
+
     return (
         <>
             {withFullPageCover && page.cover ? (
@@ -86,7 +90,7 @@ export default async function Page(props: {
                         customization={customization}
                         page={page}
                         document={document}
-                        withHeaderOffset={withTopHeader}
+                        withHeaderOffset={headerOffset}
                         withFullPageCover={withFullPageCover}
                         withPageFeedback={withPageFeedback}
                         context={contentRefContext}

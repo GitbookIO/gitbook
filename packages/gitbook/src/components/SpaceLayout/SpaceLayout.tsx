@@ -60,6 +60,9 @@ export function SpaceLayout(props: {
         pages,
     };
 
+    const withSections = Boolean(sections && sections.list.length > 0);
+    const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
+
     return (
         <>
             {/* <ColorDebugger /> */}
@@ -70,13 +73,20 @@ export function SpaceLayout(props: {
                 spaces={spaces}
                 context={contentRefContext}
                 customization={customization}
-            />
-            <div className={tcls('scroll-nojump')}>
+            >
                 {sections ? (
-                    <div className={tcls(CONTAINER_STYLE)}>
-                        <SiteSectionTabs sections={sections.list} section={sections.section} />
+                    <div
+                        className={tcls(
+                            'w-full shadow-thintop dark:shadow-light/1 bg-light dark:bg-dark z-[9] mt-0.5',
+                        )}
+                    >
+                        <div className={tcls(CONTAINER_STYLE)}>
+                            <SiteSectionTabs sections={sections.list} section={sections.section} />
+                        </div>
                     </div>
                 ) : null}
+            </Header>
+            <div className={tcls('scroll-nojump')}>
                 <div
                     className={tcls(
                         'flex',
@@ -106,7 +116,7 @@ export function SpaceLayout(props: {
                                 />
                             )
                         }
-                        withHeaderOffset={withTopHeader}
+                        headerOffset={headerOffset}
                     />
                     <div className={tcls('flex-1', 'flex', 'flex-col')}>{children}</div>
                 </div>
