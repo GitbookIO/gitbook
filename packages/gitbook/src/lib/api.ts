@@ -1068,7 +1068,11 @@ export const searchSiteContent = cache({
             siteId,
             {
                 query,
-                siteSpaceIds,
+                ...(siteSpaceIds && siteSpaceIds.length > 0
+                    ? { siteSpaceIds }
+                    : {
+                          mode: 'all',
+                      }),
             },
             undefined,
             {
