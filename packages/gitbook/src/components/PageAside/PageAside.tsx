@@ -84,7 +84,7 @@ export function PageAside(props: {
                     // wrap aside's content with `position: absolute` so it doesn't change the flow of the rest of the document on hover
                     'absolute w-full h-fit z-10',
                     // When in api page mode, we display it as an overlay on non-large resolutions
-                    'page-api-block:xl:max-2xl:bg-light-2/9 dark:page-api-block:xl:max-2xl:bg-dark-2/8 page-api-block:xl:max-2xl:backdrop-blur-md page-api-block:xl:max-2xl:backdrop-opacity-5',
+                    'page-api-block:xl:max-2xl:bg-light-2/9 dark:page-api-block:xl:max-2xl:bg-dark-2/8 page-api-block:xl:max-2xl:backdrop-blur-md page-api-block:xl:max-2xl:backdrop-opacity-8 dark:page-api-block:xl:max-2xl:backdrop-opacity-10',
                 )}
             >
                 <div
