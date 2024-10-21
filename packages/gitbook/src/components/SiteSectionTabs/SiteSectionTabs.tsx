@@ -57,6 +57,7 @@ export function SiteSectionTabs(props: { sections: SiteSection[]; section: SiteS
 
     return tabs.length > 0 ? (
         <nav
+            aria-label="Sections"
             ref={navRef}
             className="flex flex-nowrap items-center max-w-screen mb-px"
             style={

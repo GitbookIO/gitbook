@@ -16,6 +16,16 @@ import { PagesList } from './PagesList';
 import { TOCScrollContainer } from './TOCScroller';
 import { Trademark } from './Trademark';
 
+function getTopOffset(props: { sections: boolean; topHeader: boolean; }) {
+    if (props.sections && props.topHeader) {
+        return 'lg:top-32 lg:h-[calc(100vh_-_8rem)]';
+    }
+    if (props.sections || props.topHeader) {
+        return 'lg:top-16 lg:h-[calc(100vh_-_4rem)]';
+    }
+    return 'lg:top-0 lg:h-[100vh]';
+}
+
 export function TableOfContents(props: {
     space: Space;
     customization: CustomizationSettings | SiteCustomizationSettings;
@@ -24,9 +34,12 @@ export function TableOfContents(props: {
     pages: Revision['pages'];
     ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
     header?: React.ReactNode;
-    withHeaderOffset: boolean;
+    headerOffset: { sections: boolean; topHeader: boolean; };
 }) {
-    const { space, customization, pages, ancestors, header, context, withHeaderOffset } = props;
+    const { space, customization, pages, ancestors, header, context, headerOffset } = props;
+    
+    const withHeaderOffset = headerOffset.sections || headerOffset.topHeader;
+    const topOffset = getTopOffset(headerOffset);
 
     return (
         <aside
@@ -50,9 +63,8 @@ export function TableOfContents(props: {
                 'lg:sticky',
                 'dark:bg-dark',
                 'dark:navigation-open:shadow-light/2',
-                withHeaderOffset ? 'lg:h-[calc(100vh_-_4rem)]' : 'lg:h-[100vh]',
-                withHeaderOffset ? 'lg:top-16' : 'lg:top-0',
                 'page-no-toc:hidden',
+                topOffset,
             )}
         >
             {header ? header : null}
