@@ -73,7 +73,7 @@ export function SpaceLayout(props: {
             />
             <div className={tcls('scroll-nojump')}>
                 {sections ? (
-                    <div className='w-full shadow-thinbottom dark:shadow-light/1'>
+                    <div className="w-full shadow-thinbottom dark:shadow-light/1">
                         <div className={tcls(CONTAINER_STYLE)}>
                             <SiteSectionTabs sections={sections.list} section={sections.section} />
                         </div>
