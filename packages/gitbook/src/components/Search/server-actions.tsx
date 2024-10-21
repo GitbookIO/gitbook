@@ -87,7 +87,7 @@ async function searchSiteContent(args: {
                       ...siteSpace,
                       space: {
                           ...siteSpace.space,
-                          title: section.title + ' ›' + siteSpace.space.title,
+                          title: section.title + ' › ' + siteSpace.space.title,
                       },
                   }));
 
