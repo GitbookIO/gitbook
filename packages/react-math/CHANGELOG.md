@@ -1,5 +1,11 @@
 # @gitbook/react-math
 
+## 0.6.0
+
+### Minor Changes
+
+-   5c35f36: Export binary `gitbook-math` to copy assets to a directory
+
 ## 0.5.0
 
 ### Minor Changes

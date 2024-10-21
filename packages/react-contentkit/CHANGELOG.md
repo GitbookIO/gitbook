@@ -1,5 +1,11 @@
 # @gitbook/react-contentkit
 
+## 0.5.1
+
+### Patch Changes
+
+-   0f1565c: Fix rendering of webframe with SSR causing wrong communication between frame and renderer
+
 ## 0.5.0
 
 ### Minor Changes
