@@ -50,7 +50,6 @@ export function PageBody(props: {
     const language = getSpaceLanguage(customization);
     const updatedAt = page.updatedAt ?? page.createdAt;
     const shouldHighlightCode = createHighlightingContext();
-
     return (
         <>
             <main
