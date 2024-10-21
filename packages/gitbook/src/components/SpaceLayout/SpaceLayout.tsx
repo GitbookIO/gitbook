@@ -61,7 +61,8 @@ export function SpaceLayout(props: {
     };
 
     const withSections = Boolean(sections && sections.list.length > 0);
-    const headerOffset = { sections: withSections, topHeader: withTopHeader };
+    const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
+
     return (
         <>
             {/* <ColorDebugger /> */}

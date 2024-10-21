@@ -74,7 +74,7 @@ export default async function Page(props: {
     };
 
     const withSections = Boolean(sections && sections.length > 0);
-    const headerOffset = { sections: withSections, topHeader: withTopHeader };
+    const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
 
     return (
         <>
