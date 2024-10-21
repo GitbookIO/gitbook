@@ -13,7 +13,7 @@ import {
     getRecommendedQuestions,
     OrderedComputedResult,
     searchSiteSpaceContent,
-    searchSiteContent,
+    searchAllSiteContent,
 } from './server-actions';
 import { Loading } from '../primitives';
 
@@ -95,7 +95,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 setCursor(null);
 
                 const fetchedResults = await (global
-                    ? searchSiteContent({ query, pointer, scope: { mode: 'all' } })
+                    ? searchAllSiteContent(query, pointer)
                     : searchSiteSpaceContent(query, pointer, revisionId));
 
                 setResults(withAsk ? withQuestionResult(fetchedResults, query) : fetchedResults);

@@ -46,9 +46,9 @@ export interface AskAnswerResult {
 }
 
 /**
- * Search for content in the entire site.
+ * Search for content in a site by scoping the search to all content, a specific spaces or current space.
  */
-export async function searchSiteContent(args: {
+async function searchSiteContent(args: {
     pointer: api.SiteContentPointer;
     query: string;
     scope:
@@ -117,6 +117,20 @@ export async function searchSiteContent(args: {
 }
 
 /**
+ * Server action to search content in the entire site.
+ */
+export async function searchAllSiteContent(
+    query: string,
+    pointer: api.SiteContentPointer,
+): Promise<OrderedComputedResult[]> {
+    return await searchSiteContent({
+        pointer,
+        query,
+        scope: { mode: 'all' },
+    });
+}
+
+/**
  * Server action to search content in a space.
  */
 export async function searchSiteSpaceContent(
@@ -130,7 +144,8 @@ export async function searchSiteSpaceContent(
     return await searchSiteContent({
         pointer,
         query,
-        // If we have a siteSectionId that means its a sections site use `current` search mode
+        // If we have a siteSectionId that means its a sections site use `current` mode
+        // which searches in the current space + all default spaces of sections
         scope: pointer.siteSectionId
             ? { mode: 'current', siteSpaceId }
             : { mode: 'specific', siteSpaceIds: [siteSpaceId] },
