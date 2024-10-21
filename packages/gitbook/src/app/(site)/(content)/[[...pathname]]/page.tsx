@@ -72,7 +72,7 @@ export default async function Page(props: {
         pages,
         page,
     };
-    
+
     const withSections = Boolean(sections && sections.length > 0);
 
     return (
@@ -81,7 +81,11 @@ export default async function Page(props: {
                 <PageCover as="full" page={page} cover={page.cover} context={contentRefContext} />
             ) : null}
             {/* We use a flex row reverse to render the aside first because the page is streamed. */}
-            <div className={tcls("flex flex-row-reverse justify-end page-api-block:xl:max-2xl:block")}>
+            <div
+                className={tcls(
+                    'flex flex-row-reverse justify-end page-api-block:xl:max-2xl:block',
+                )}
+            >
                 {page.layout.outline ? (
                     <PageAside
                         space={space}
