@@ -22,8 +22,7 @@ import { ScrollSectionsList } from './ScrollSectionsList';
 import { Ad } from '../Ads';
 import { PageFeedbackForm } from '../PageFeedback';
 
-
-function getTopOffset(props: { sections: boolean; topHeader: boolean; }) {
+function getTopOffset(props: { sections: boolean; topHeader: boolean }) {
     if (props.sections && props.topHeader) {
         return 'lg:max-h-[calc(100vh_-_8rem)] top-32 page-api-block:xl:max-2xl:top-32';
     }
@@ -43,7 +42,7 @@ export function PageAside(props: {
     page: RevisionPageDocument;
     document: JSONDocument | null;
     context: ContentRefContext;
-    withHeaderOffset: { sections: boolean; topHeader: boolean; };
+    withHeaderOffset: { sections: boolean; topHeader: boolean };
     withFullPageCover: boolean;
     withPageFeedback: boolean;
 }) {

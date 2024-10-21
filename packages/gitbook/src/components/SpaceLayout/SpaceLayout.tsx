@@ -52,7 +52,7 @@ export function SpaceLayout(props: {
     } = props;
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
-    
+
     const contentRefContext: ContentRefContext = {
         siteContext: content,
         space,
@@ -73,8 +73,12 @@ export function SpaceLayout(props: {
                 context={contentRefContext}
                 customization={customization}
             >
-                 {sections ? (
-                    <div className={tcls("w-full shadow-thintop dark:shadow-light/1 bg-light dark:bg-dark z-[9] mt-0.5")}>
+                {sections ? (
+                    <div
+                        className={tcls(
+                            'w-full shadow-thintop dark:shadow-light/1 bg-light dark:bg-dark z-[9] mt-0.5',
+                        )}
+                    >
                         <div className={tcls(CONTAINER_STYLE)}>
                             <SiteSectionTabs sections={sections.list} section={sections.section} />
                         </div>

@@ -16,7 +16,7 @@ import { PagesList } from './PagesList';
 import { TOCScrollContainer } from './TOCScroller';
 import { Trademark } from './Trademark';
 
-function getTopOffset(props: { sections: boolean; topHeader: boolean; }) {
+function getTopOffset(props: { sections: boolean; topHeader: boolean }) {
     if (props.sections && props.topHeader) {
         return 'lg:top-32 lg:h-[calc(100vh_-_8rem)]';
     }
@@ -34,10 +34,10 @@ export function TableOfContents(props: {
     pages: Revision['pages'];
     ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
     header?: React.ReactNode;
-    headerOffset: { sections: boolean; topHeader: boolean; };
+    headerOffset: { sections: boolean; topHeader: boolean };
 }) {
     const { space, customization, pages, ancestors, header, context, headerOffset } = props;
-    
+
     const withHeaderOffset = headerOffset.sections || headerOffset.topHeader;
     const topOffset = getTopOffset(headerOffset);
 

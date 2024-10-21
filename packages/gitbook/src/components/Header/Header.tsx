@@ -31,7 +31,8 @@ export function Header(props: {
     const isMultiVariants = site && spaces.length > 1;
 
     return (
-        <header className={tcls(
+        <header
+            className={tcls(
                 'flex',
                 'flex-col',
                 `h-[${HEADER_HEIGHT_DESKTOP}px]`,
