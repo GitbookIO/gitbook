@@ -5,6 +5,7 @@ import { en } from './en';
 import { es } from './es';
 import { fr } from './fr';
 import { ja } from './ja';
+import { ka } from './ka';
 import { nl } from './nl';
 import { no } from './no';
 import { pt_br } from './pt-br';
@@ -24,6 +25,7 @@ export const languages: {
     es,
     zh,
     ja,
+    ka,
     nl,
     no,
     'pt-br': pt_br,
