@@ -23,7 +23,7 @@ export function SiteSectionTabs(props: { sections: SiteSection[]; section: SiteS
     const navRef = React.useRef<HTMLDivElement>(null);
 
     const [currentIndex, setCurrentIndex] = React.useState(
-        sections.findIndex((section) => section.id === currentSection?.id) || 0,
+        sections.findIndex((section) => section.id === currentSection?.id),
     );
     const [tabDimensions, setTabDimensions] = React.useState<{
         left: number;
@@ -57,8 +57,9 @@ export function SiteSectionTabs(props: { sections: SiteSection[]; section: SiteS
 
     return tabs.length > 0 ? (
         <nav
+            aria-label="Sections"
             ref={navRef}
-            className="sm:mx-0 md:-mx-2 flex flex-nowrap items-center my-4 max-w-screen"
+            className="flex flex-nowrap items-center max-w-screen mb-px"
             style={
                 {
                     '--tab-scale': `${scale}`,
@@ -68,9 +69,9 @@ export function SiteSectionTabs(props: { sections: SiteSection[]; section: SiteS
         >
             <div
                 className={tcls(
-                    'relative flex gap-2',
+                    'relative flex gap-2 bg-transparent',
                     /* add a pseudo element for active tab indicator */
-                    "after:block after:content-[''] after:origin-left after:absolute after:bottom-0 after:left-0 after:scale-x-[--tab-scale] after:transition-transform after:translate-x-[var(--tab-start)] after:h-0.5 after:w-[100px] after:bg-primary dark:after:bg-primary-500",
+                    "after:block after:content-[''] after:origin-left after:absolute after:-bottom-px after:left-0 after:scale-x-[--tab-scale] after:transition-transform after:translate-x-[var(--tab-start)] after:h-0.5 after:w-[100px] after:bg-primary dark:after:bg-primary-500",
                 )}
                 role="tablist"
             >
@@ -80,9 +81,6 @@ export function SiteSectionTabs(props: { sections: SiteSection[]; section: SiteS
                         key={index + tab.path}
                         label={tab.label}
                         href={tab.path}
-                        onClick={() => {
-                            setCurrentIndex(index);
-                        }}
                         ref={currentIndex === index ? currentTabRef : null}
                     />
                 ))}
@@ -96,27 +94,25 @@ export function SiteSectionTabs(props: { sections: SiteSection[]; section: SiteS
  * The tab item - a link to a site section
  */
 const Tab = React.forwardRef<
-    HTMLAnchorElement,
-    { active: boolean; href: string; label: string; onClick: any }
+    HTMLSpanElement,
+    { active: boolean; href: string; label: string; onClick?: () => void }
 >(function Tab(props, ref) {
     const { active, href, label, onClick } = props;
     return (
-        <div
+        <Link
             className={tcls(
-                'my-0.5 px-2 py-1 rounded',
-                !active && 'hover:bg-dark/1 dark:hover:bg-light/2 transition-colors',
+                'px-3 py-3.5 rounded',
+                active && 'text-primary dark:text-primary-500',
+                !active && 'hover:text-primary dark:hover:text-primary-500 transition-colors',
             )}
+            role="tab"
+            href={href}
+            onClick={onClick}
         >
-            <Link
-                ref={ref}
-                onClick={onClick}
-                className={tcls('inline-flex w-full truncate')}
-                role="tab"
-                href={href}
-            >
+            <span ref={ref} className={tcls('inline-flex w-full truncate')}>
                 {label}
-            </Link>
-        </div>
+            </span>
+        </Link>
     );
 });
 

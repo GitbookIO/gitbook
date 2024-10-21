@@ -22,6 +22,16 @@ import { ScrollSectionsList } from './ScrollSectionsList';
 import { Ad } from '../Ads';
 import { PageFeedbackForm } from '../PageFeedback';
 
+function getTopOffset(props: { sectionsHeader: boolean; topHeader: boolean }) {
+    if (props.sectionsHeader && props.topHeader) {
+        return 'lg:max-h-[calc(100vh_-_8rem)] top-32 page-api-block:xl:max-2xl:top-32';
+    }
+    if (props.sectionsHeader || props.topHeader) {
+        return 'lg:max-h-[calc(100vh_-_4rem)] top-16 page-api-block:xl:max-2xl:top-16';
+    }
+    return 'lg:max-h-screen top-0 page-api-block:xl:max-2xl:top-0';
+}
+
 /**
  * Aside listing the headings in the document.
  */
@@ -32,7 +42,7 @@ export function PageAside(props: {
     page: RevisionPageDocument;
     document: JSONDocument | null;
     context: ContentRefContext;
-    withHeaderOffset: boolean;
+    withHeaderOffset: { sectionsHeader: boolean; topHeader: boolean };
     withFullPageCover: boolean;
     withPageFeedback: boolean;
 }) {
@@ -48,6 +58,7 @@ export function PageAside(props: {
     } = props;
     const language = getSpaceLanguage(customization);
 
+    const topOffset = getTopOffset(withHeaderOffset);
     return (
         <aside
             className={tcls(
@@ -62,10 +73,8 @@ export function PageAside(props: {
                 'py-8',
                 'break-anywhere', // To prevent long words in headings from breaking the layout
                 'lg:h-full',
-                withHeaderOffset ? 'lg:max-h-[calc(100vh_-_4rem)]' : 'lg:max-h-[100vh]',
-                withHeaderOffset ? 'top-16' : 'top-0',
                 'h-[100vh]',
-
+                'page-api-block:xl:max-2xl:z-[1]',
                 // When in api page mode, we display it as an overlay on non-large resolutions
                 'page-api-block:xl:max-2xl:backdrop-blur-md',
                 'page-api-block:xl:max-2xl:fixed',
@@ -77,9 +86,7 @@ export function PageAside(props: {
                 'page-api-block:xl:max-2xl:py-0',
                 'page-api-block:xl:max-2xl:mt-3',
                 'dark:page-api-block:xl:max-2xl:bg-dark-2/8',
-                withHeaderOffset
-                    ? 'page-api-block:xl:max-2xl:top-16'
-                    : 'page-api-block:xl:max-2xl:top-0',
+                topOffset,
             )}
         >
             <div
