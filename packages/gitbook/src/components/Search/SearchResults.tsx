@@ -12,7 +12,7 @@ import { SearchSectionResultItem } from './SearchSectionResultItem';
 import {
     getRecommendedQuestions,
     OrderedComputedResult,
-    searchCurrentSpaceContent,
+    searchSiteSpaceContent,
     searchSiteContent,
 } from './server-actions';
 import { Loading } from '../primitives';
@@ -95,8 +95,8 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 setCursor(null);
 
                 const fetchedResults = await (global
-                    ? searchSiteContent({ query, pointer })
-                    : searchCurrentSpaceContent(query, pointer, revisionId));
+                    ? searchSiteContent({ query, pointer, scope: { mode: 'all' } })
+                    : searchSiteSpaceContent(query, pointer, revisionId));
 
                 setResults(withAsk ? withQuestionResult(fetchedResults, query) : fetchedResults);
             }, 350);

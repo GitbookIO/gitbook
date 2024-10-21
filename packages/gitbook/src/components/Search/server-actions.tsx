@@ -2,6 +2,7 @@
 
 import { RevisionPage, SearchAIAnswer, SearchPageResult, SiteSpace, Space } from '@gitbook/api';
 import * as React from 'react';
+import { assert } from 'ts-essentials';
 
 import { streamResponse } from '@/lib/actions';
 import * as api from '@/lib/api';
@@ -50,42 +51,56 @@ export interface AskAnswerResult {
 export async function searchSiteContent(args: {
     pointer: api.SiteContentPointer;
     query: string;
-    siteSpaceIds?: string[];
+    scope:
+        | { mode: 'all' }
+        | { mode: 'current'; siteSpaceId: string }
+        | { mode: 'specific'; siteSpaceIds: string[] };
     cacheBust?: string;
 }): Promise<OrderedComputedResult[]> {
-    const { pointer, siteSpaceIds, query, cacheBust } = args;
+    const { pointer, scope, query, cacheBust } = args;
 
     if (query.length <= 1) {
         return [];
     }
 
-    if (siteSpaceIds?.length === 0) {
-        // if we have no siteSpaces to search in then we won't find anything. skip the call.
-        return [];
-    }
+    const needsStructure =
+        scope.mode === 'all' ||
+        scope.mode === 'current' ||
+        (scope.mode === 'specific' && scope.siteSpaceIds.length > 1);
 
-    const [searchResults, allSiteSpaces] = await Promise.all([
-        api.searchSiteContent(
-            pointer.organizationId,
-            pointer.siteId,
-            query,
-            siteSpaceIds,
-            cacheBust,
-        ),
-        siteSpaceIds
-            ? null
-            : api.getSiteSpaces({
+    const [searchResults, siteStructure] = await Promise.all([
+        api.searchSiteContent(pointer.organizationId, pointer.siteId, query, scope, cacheBust),
+        needsStructure
+            ? api.getSiteStructure({
                   organizationId: pointer.organizationId,
                   siteId: pointer.siteId,
                   siteShareKey: pointer.siteShareKey,
-              }),
+              })
+            : null,
     ]);
 
-    if (!siteSpaceIds) {
+    const siteSpaces = siteStructure
+        ? siteStructure.type === 'siteSpaces'
+            ? siteStructure.structure
+            : siteStructure.structure.reduce<SiteSpace[]>((prev, section) => {
+                  const sectionSiteSpaces = section.siteSpaces.map((siteSpace) => ({
+                      ...siteSpace,
+                      space: {
+                          ...siteSpace.space,
+                          title: `${section.title} > ${siteSpace.space.title}`,
+                      },
+                  }));
+
+                  prev.push(...sectionSiteSpaces);
+                  return prev;
+              }, [])
+        : null;
+
+    if (siteSpaces) {
         // We are searching all of this Site's content
         return searchResults.items
             .map((spaceItem) => {
-                const siteSpace = allSiteSpaces?.find(
+                const siteSpace = siteSpaces.find(
                     (siteSpace) => siteSpace.space.id === spaceItem.id,
                 );
 
@@ -102,21 +117,24 @@ export async function searchSiteContent(args: {
 }
 
 /**
- * Server action to search content in the current space
+ * Server action to search content in a space.
  */
-export async function searchCurrentSpaceContent(
+export async function searchSiteSpaceContent(
     query: string,
     pointer: api.SiteContentPointer,
     revisionId: string,
 ): Promise<OrderedComputedResult[]> {
-    const siteSpaceIds = pointer.siteSpaceId ? [pointer.siteSpaceId] : []; // if we don't have a siteSpaceID search all content
+    const siteSpaceId = pointer.siteSpaceId;
+    assert(siteSpaceId, 'Expected siteSpaceId for searchSiteSpaceContent');
 
-    // This is a site so use a different function which we can eventually call directly
-    // We also want to break cache for this specific space if the revisionId is different so use it as a cache busting key
     return await searchSiteContent({
         pointer,
-        siteSpaceIds,
         query,
+        // If we have a siteSectionId that means its a sections site use `current` search mode
+        scope: pointer.siteSectionId
+            ? { mode: 'current', siteSpaceId }
+            : { mode: 'specific', siteSpaceIds: [siteSpaceId] },
+        // We want to break cache for this specific space if the revisionId is different so use it as a cache busting key
         cacheBust: revisionId,
     });
 }
