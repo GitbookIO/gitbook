@@ -54,6 +54,7 @@ export function PlainCodeBlock(props: { code: string; syntax: string }) {
             }}
             block={block}
             ancestorBlocks={[]}
+            isEstimatedOffscreen={false}
         />
     );
 }

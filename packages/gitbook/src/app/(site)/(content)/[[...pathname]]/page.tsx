@@ -32,6 +32,7 @@ export default async function Page(props: {
     const {
         content: contentPointer,
         contentTarget,
+        sections,
         space,
         site,
         customization,
@@ -75,12 +76,29 @@ export default async function Page(props: {
         page,
     };
 
+    const withSections = Boolean(sections && sections.length > 0);
+    const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
+
     return (
         <>
             {withFullPageCover && page.cover ? (
                 <PageCover as="full" page={page} cover={page.cover} context={contentRefContext} />
             ) : null}
-            <div className={tcls('flex', 'flex-row')}>
+            {/* We use a flex row reverse to render the aside first because the page is streamed. */}
+            <div className="flex flex-row-reverse justify-end">
+                {page.layout.outline ? (
+                    <PageAside
+                        space={space}
+                        site={site}
+                        customization={customization}
+                        page={page}
+                        document={document}
+                        withHeaderOffset={headerOffset}
+                        withFullPageCover={withFullPageCover}
+                        withPageFeedback={withPageFeedback}
+                        context={contentRefContext}
+                    />
+                ) : null}
                 <PageBody
                     space={space}
                     pointer={contentPointer}
@@ -94,19 +112,6 @@ export default async function Page(props: {
                         withPageFeedback && !page.layout.outline
                     }
                 />
-                {page.layout.outline ? (
-                    <PageAside
-                        space={space}
-                        site={site}
-                        customization={customization}
-                        page={page}
-                        document={document}
-                        withHeaderOffset={withTopHeader}
-                        withFullPageCover={withFullPageCover}
-                        withPageFeedback={withPageFeedback}
-                        context={contentRefContext}
-                    />
-                ) : null}
             </div>
             <React.Suspense fallback={null}>
                 <PageClientLayout />

@@ -74,7 +74,7 @@ export function Button({
     }
 
     return (
-        <button onClick={onClick} className={domClassName}>
+        <button type="button" onClick={onClick} className={domClassName}>
             {children}
         </button>
     );

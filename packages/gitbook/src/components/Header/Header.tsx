@@ -23,8 +23,9 @@ export function Header(props: {
     context: ContentRefContext;
     customization: CustomizationSettings | SiteCustomizationSettings;
     withTopHeader?: boolean;
+    children?: React.ReactNode;
 }) {
-    const { context, space, site, spaces, customization, withTopHeader } = props;
+    const { children, context, space, site, spaces, customization, withTopHeader } = props;
     const isCustomizationDefault =
         customization.header.preset === CustomizationHeaderPreset.Default;
     const isMultiVariants = site && spaces.length > 1;
@@ -33,7 +34,7 @@ export function Header(props: {
         <header
             className={tcls(
                 'flex',
-                'flex-row',
+                'flex-col',
                 `h-[${HEADER_HEIGHT_DESKTOP}px]`,
                 'sticky',
                 'top-0',
@@ -133,6 +134,7 @@ export function Header(props: {
                     </div>
                 </div>
             </div>
+            {children}
         </header>
     );
 }

@@ -11,12 +11,10 @@ import { ClassValue, tcls } from '@/lib/tailwind';
 import { BlockProps } from './Block';
 import { Caption } from './Caption';
 import { DocumentContext } from './DocumentView';
-import { isBlockOffscreen } from './utils';
 
 export function Images(props: BlockProps<DocumentBlockImages>) {
-    const { document, block, ancestorBlocks, style, context } = props;
+    const { document, block, ancestorBlocks, style, context, isEstimatedOffscreen } = props;
 
-    const isOffscreen = isBlockOffscreen({ document, block, ancestorBlocks });
     const isMultipleImages = block.nodes.length > 1;
     const { align = 'center' } = block.data;
 
@@ -41,7 +39,7 @@ export function Images(props: BlockProps<DocumentBlockImages>) {
                     style={[]}
                     siblings={block.nodes.length}
                     context={context}
-                    isOffscreen={isOffscreen}
+                    isEstimatedOffscreen={isEstimatedOffscreen}
                 />
             ))}
         </div>
@@ -67,9 +65,9 @@ async function ImageBlock(props: {
     style: ClassValue;
     context: DocumentContext;
     siblings: number;
-    isOffscreen: boolean;
+    isEstimatedOffscreen: boolean;
 }) {
-    const { block, context, isOffscreen } = props;
+    const { block, context, isEstimatedOffscreen } = props;
 
     const [src, darkSrc] = await Promise.all([
         context.resolveContentRef(block.data.ref),
@@ -97,7 +95,7 @@ async function ImageBlock(props: {
                           }
                         : null,
                 }}
-                priority={isOffscreen ? 'lazy' : 'high'}
+                priority={isEstimatedOffscreen ? 'lazy' : 'high'}
                 preload
                 zoom
                 inlineStyle={{

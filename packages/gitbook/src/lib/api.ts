@@ -12,7 +12,7 @@ import {
     RequestRenderIntegrationUI,
     RevisionFile,
     SiteCustomizationSettings,
-    SpaceIntegrationScript,
+    RevisionReusableContent,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 import { headers } from 'next/headers';
@@ -491,6 +491,43 @@ const getRevisionFileById = cache({
     },
 });
 
+const getRevisionReusableContentById = cache({
+    name: 'api.getRevisionReusableContentById.v1',
+    tag: (spaceId, revisionId) =>
+        getAPICacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
+    get: async (
+        spaceId: string,
+        revisionId: string,
+        reusableContentId: string,
+        options: CacheFunctionOptions,
+    ) => {
+        try {
+            const response = await (async () => {
+                return api().spaces.getReusableContentInRevisionById(
+                    spaceId,
+                    revisionId,
+                    reusableContentId,
+                    {
+                        metadata: false,
+                    },
+                    {
+                        ...noCacheFetchOptions,
+                        signal: options.signal,
+                    },
+                );
+            })();
+
+            return cacheResponse(response, cacheTtl_7days);
+        } catch (error: any) {
+            if (error instanceof GitBookAPIError && error.code === 404) {
+                return { data: null, ...cacheTtl_7days };
+            }
+
+            throw error;
+        }
+    },
+});
+
 /**
  * Get all the files in a revision of a space.
  * It should not be used directly, use `getRevisionFile` instead.
@@ -581,6 +618,30 @@ export const getRevisionFile = batch<[string, string, string], RevisionFile | nu
         },
     },
 );
+
+/**
+ * Get reusable content in a revision.
+ */
+export const getReusableContent = async (
+    spaceId: string,
+    revisionId: string,
+    reusableContentId: string,
+): Promise<RevisionReusableContent | null> => {
+    const hasRevisionInMemory = await getRevision.hasInMemory(spaceId, revisionId, {
+        metadata: false,
+    });
+
+    if (hasRevisionInMemory) {
+        const revision = await getRevision(spaceId, revisionId, { metadata: false });
+        return (
+            revision.reusableContents.find(
+                (reusableContent) => reusableContent.id === reusableContentId,
+            ) ?? null
+        );
+    } else {
+        return getRevisionReusableContentById(spaceId, revisionId, reusableContentId);
+    }
+};
 
 /**
  * Get a document by its ID.
@@ -997,7 +1058,10 @@ export const searchSiteContent = cache({
         organizationId: string,
         siteId: string,
         query: string,
-        siteSpaceIds?: string[],
+        scope:
+            | { mode: 'all' }
+            | { mode: 'current'; siteSpaceId: string }
+            | { mode: 'specific'; siteSpaceIds: string[] },
         /** A cache bust param to avoid revalidating lot of cache entries by tags */
         cacheBust?: string,
         options?: CacheFunctionOptions,
@@ -1007,7 +1071,7 @@ export const searchSiteContent = cache({
             siteId,
             {
                 query,
-                siteSpaceIds,
+                ...scope,
             },
             undefined,
             {

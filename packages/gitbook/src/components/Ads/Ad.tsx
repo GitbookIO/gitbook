@@ -82,18 +82,22 @@ export function Ad({
                 (siteAdsStatus === SiteAdsStatus.Pending ||
                     siteAdsStatus === SiteAdsStatus.InReview));
 
-        if (!realZoneId) {
+        if (!realZoneId && !showPlaceholderAd) {
             return;
         }
 
         (async () => {
-            const result = await renderAd({
-                placement,
-                ignore: ignore || preview,
-                zoneId: realZoneId,
-                mode,
-                source: showPlaceholderAd ? 'placeholder' : 'live',
-            });
+            const result = showPlaceholderAd
+                ? await renderAd({ source: 'placeholder' })
+                : realZoneId
+                  ? await renderAd({
+                        placement,
+                        ignore: ignore || preview,
+                        zoneId: realZoneId,
+                        mode,
+                        source: 'live',
+                    })
+                  : undefined;
 
             if (cancelled) {
                 return;
@@ -109,13 +113,8 @@ export function Ad({
         };
     }, [visible, zoneId, ignore, placement, mode, siteAdsStatus]);
 
-    const viaUrl = new URL('https://www.gitbook.com');
-    viaUrl.searchParams.set('utm_source', 'content');
-    viaUrl.searchParams.set('utm_medium', 'ads');
-    viaUrl.searchParams.set('utm_campaign', spaceId);
-
     return (
-        <div ref={containerRef} className={tcls(style)}>
+        <div ref={containerRef} className={tcls(style)} data-visual-test="removed">
             {ad ? (
                 <>
                     {ad}
@@ -132,7 +131,7 @@ function AdSponsoredLink(props: { spaceId: string }) {
 
     const viaUrl = new URL('https://www.gitbook.com');
     viaUrl.searchParams.set('utm_source', 'content');
-    viaUrl.searchParams.set('utm_medium', 'sponsoring');
+    viaUrl.searchParams.set('utm_medium', 'sponsored-by-gitbook');
     viaUrl.searchParams.set('utm_campaign', spaceId);
 
     return (
