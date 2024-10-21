@@ -35,6 +35,7 @@ export function PageAside(props: {
     withHeaderOffset: boolean;
     withFullPageCover: boolean;
     withPageFeedback: boolean;
+    withSections: boolean;
 }) {
     const {
         space,
@@ -44,10 +45,11 @@ export function PageAside(props: {
         customization,
         withHeaderOffset,
         withPageFeedback,
+        withSections,
         context,
     } = props;
     const language = getSpaceLanguage(customization);
-
+    
     return (
         <aside
             className={tcls(
@@ -65,23 +67,23 @@ export function PageAside(props: {
                 withHeaderOffset ? 'lg:max-h-[calc(100vh_-_4rem)]' : 'lg:max-h-[100vh]',
                 withHeaderOffset ? 'top-16' : 'top-0',
                 'h-[100vh]',
-
-                // When in api page mode, we display it as an overlay on non-large resolutions
-                'page-api-block:xl:max-2xl:backdrop-blur-md',
-                'page-api-block:xl:max-2xl:fixed',
-                'page-api-block:xl:max-2xl:right-8',
+                'page-api-block:xl:max-2xl:z-10',
                 'page-api-block:xl:max-2xl:w-56',
-                'page-api-block:xl:max-2xl:bg-light-2/9',
                 'page-api-block:xl:max-2xl:rounded',
                 'page-api-block:xl:max-2xl:h-auto',
                 'page-api-block:xl:max-2xl:py-0',
                 'page-api-block:xl:max-2xl:mt-3',
-                'dark:page-api-block:xl:max-2xl:bg-dark-2/8',
                 withHeaderOffset
-                    ? 'page-api-block:xl:max-2xl:top-16'
+                    ? 'page-api-block:xl:max-2xl:top-20'
                     : 'page-api-block:xl:max-2xl:top-0',
+               'page-api-block:xl:max-2xl:float-right page-api-block:xl:max-2xl:right-0',
             )}
         >
+            <div className={tcls(
+                // wrap aside's content with `position: absolute` so it doesn't change the flow of the rest of the document on hover
+                "absolute w-full h-fit z-10",
+                // When in api page mode, we display it as an overlay on non-large resolutions
+                 "page-api-block:xl:max-2xl:bg-light-2/9 dark:page-api-block:xl:max-2xl:bg-dark-2/8 page-api-block:xl:max-2xl:backdrop-blur-md page-api-block:xl:max-2xl:backdrop-opacity-5")}>
             <div
                 className={tcls(
                     'hidden',
@@ -194,6 +196,7 @@ export function PageAside(props: {
                 ignore={process.env.NODE_ENV !== 'production'}
                 style={tcls('mt-4')}
             />
+            </div>
         </aside>
     );
 }
