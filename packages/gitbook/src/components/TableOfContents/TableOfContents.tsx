@@ -33,9 +33,9 @@ export function TableOfContents(props: {
     context: ContentRefContext;
     pages: Revision['pages'];
     ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
-    header?: React.ReactNode;
+    header?: React.ReactNode; // Displayed outside the scrollable TOC as a sticky header
     headerOffset: { sectionsHeader: boolean; topHeader: boolean };
-    innerHeader?: React.ReactNode;
+    innerHeader?: React.ReactNode; // Displayed inside the scrollable TOC, directly above the page list
 }) {
     const { innerHeader, space, customization, pages, ancestors, header, context, headerOffset } =
         props;

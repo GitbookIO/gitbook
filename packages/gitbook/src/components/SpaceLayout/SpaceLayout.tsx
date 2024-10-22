@@ -61,6 +61,7 @@ export function SpaceLayout(props: {
     };
 
     const withSections = Boolean(sections && sections.list.length > 0);
+    const withVariants = Boolean(site && spaces.length > 1);
     const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
 
     return (
@@ -106,7 +107,7 @@ export function SpaceLayout(props: {
                             )
                         }
                         innerHeader={
-                            sections || (!withTopHeader && site && spaces.length > 1) ? (
+                            sections || (!withTopHeader && withVariants) ? (
                                 <SpacesDropdown space={space} spaces={spaces} />
                             ) : null
                         }
