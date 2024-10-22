@@ -50,16 +50,12 @@ export function CompactHeader(props: {
                     'grow-0',
                     'md:grow',
                     'sm:max-w-xs',
-                    'lg:my-4',
+                    'lg:mt-2',
+                    'lg:mb-8',
                     'lg:max-w-full',
                     'justify-self-end',
                 )}
             >
-                {isMultiVariants ? (
-                    <div className={tcls('mb-2')}>
-                        <SpacesDropdown space={space} spaces={spaces} />
-                    </div>
-                ) : null}
                 <React.Suspense fallback={null}>
                     <SearchButton>
                         <span className={tcls('flex-1')}>

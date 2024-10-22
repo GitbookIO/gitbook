@@ -106,7 +106,7 @@ export function SpaceLayout(props: {
                             )
                         }
                         innerHeader={
-                            sections ? <SpacesDropdown space={space} spaces={spaces} /> : null
+                            sections || (!withTopHeader && site && spaces.length > 1) ? <SpacesDropdown space={space} spaces={spaces} /> : null
                         }
                         headerOffset={headerOffset}
                     />
