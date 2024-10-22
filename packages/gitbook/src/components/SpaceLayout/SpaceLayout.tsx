@@ -107,7 +107,7 @@ export function SpaceLayout(props: {
                             )
                         }
                         innerHeader={
-                            sections || (!withTopHeader && withVariants) ? (
+                            (sections || !withTopHeader) && withVariants ? (
                                 <SpacesDropdown space={space} spaces={spaces} />
                             ) : null
                         }
