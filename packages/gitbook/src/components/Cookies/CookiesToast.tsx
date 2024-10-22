@@ -27,7 +27,6 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
 
     const onUpdateState = (enabled: boolean) => {
         setCookiesTracking(enabled);
-
         // Reload the page to take the change in consideration
         window.location.reload();
     };
@@ -75,6 +74,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                 )}
             </p>
             <button
+                type="button"
                 onClick={() => setShow(false)}
                 aria-label={tString(language, 'cookies_close')}
                 className={tcls(

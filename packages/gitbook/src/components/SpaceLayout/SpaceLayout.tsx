@@ -21,7 +21,7 @@ import { ContentTarget, SiteContentPointer } from '@/lib/api';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
-import { SiteSectionTabs } from '../SiteSectionTabs';
+import { SpacesDropdown } from '../Header/SpacesDropdown';
 
 /**
  * Render the entire content of the space (header, table of contents, footer, and page content).
@@ -60,6 +60,10 @@ export function SpaceLayout(props: {
         pages,
     };
 
+    const withSections = Boolean(sections && sections.list.length > 0);
+    const withVariants = Boolean(site && spaces.length > 1);
+    const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
+
     return (
         <>
             {/* <ColorDebugger /> */}
@@ -68,15 +72,11 @@ export function SpaceLayout(props: {
                 space={space}
                 site={site}
                 spaces={spaces}
+                sections={sections}
                 context={contentRefContext}
                 customization={customization}
             />
             <div className={tcls('scroll-nojump')}>
-                {sections ? (
-                    <div className={tcls(CONTAINER_STYLE)}>
-                        <SiteSectionTabs sections={sections.list} section={sections.section} />
-                    </div>
-                ) : null}
                 <div
                     className={tcls(
                         'flex',
@@ -106,7 +106,12 @@ export function SpaceLayout(props: {
                                 />
                             )
                         }
-                        withHeaderOffset={withTopHeader}
+                        innerHeader={
+                            (sections || !withTopHeader) && withVariants ? (
+                                <SpacesDropdown space={space} spaces={spaces} />
+                            ) : null
+                        }
+                        headerOffset={headerOffset}
                     />
                     <div className={tcls('flex-1', 'flex', 'flex-col')}>{children}</div>
                 </div>

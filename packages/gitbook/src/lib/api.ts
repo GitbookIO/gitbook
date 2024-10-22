@@ -1058,7 +1058,10 @@ export const searchSiteContent = cache({
         organizationId: string,
         siteId: string,
         query: string,
-        siteSpaceIds?: string[],
+        scope:
+            | { mode: 'all' }
+            | { mode: 'current'; siteSpaceId: string }
+            | { mode: 'specific'; siteSpaceIds: string[] },
         /** A cache bust param to avoid revalidating lot of cache entries by tags */
         cacheBust?: string,
         options?: CacheFunctionOptions,
@@ -1068,7 +1071,7 @@ export const searchSiteContent = cache({
             siteId,
             {
                 query,
-                siteSpaceIds,
+                ...scope,
             },
             undefined,
             {
