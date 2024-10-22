@@ -57,7 +57,7 @@ export function CompactHeader(props: {
             >
                 {isMultiVariants ? (
                     <div className={tcls('mb-2')}>
-                        <SpacesDropdown space={space} spaces={spaces} buttonKind="bordered" />
+                        <SpacesDropdown space={space} spaces={spaces} />
                     </div>
                 ) : null}
                 <React.Suspense fallback={null}>

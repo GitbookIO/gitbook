@@ -21,7 +21,7 @@ import { ContentTarget, SiteContentPointer } from '@/lib/api';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
-import { SiteSectionTabs } from '../SiteSectionTabs';
+import { SpacesDropdown } from '../Header/SpacesDropdown';
 
 /**
  * Render the entire content of the space (header, table of contents, footer, and page content).
@@ -71,21 +71,10 @@ export function SpaceLayout(props: {
                 space={space}
                 site={site}
                 spaces={spaces}
+                sections={sections}
                 context={contentRefContext}
                 customization={customization}
-            >
-                {sections ? (
-                    <div
-                        className={tcls(
-                            'w-full shadow-thintop dark:shadow-light/1 bg-light dark:bg-dark z-[9] mt-0.5',
-                        )}
-                    >
-                        <div className={tcls(CONTAINER_STYLE)}>
-                            <SiteSectionTabs sections={sections.list} section={sections.section} />
-                        </div>
-                    </div>
-                ) : null}
-            </Header>
+            />
             <div className={tcls('scroll-nojump')}>
                 <div
                     className={tcls(
@@ -115,6 +104,9 @@ export function SpaceLayout(props: {
                                     customization={customization}
                                 />
                             )
+                        }
+                        innerHeader={
+                            sections ? <SpacesDropdown space={space} spaces={spaces} /> : null
                         }
                         headerOffset={headerOffset}
                     />

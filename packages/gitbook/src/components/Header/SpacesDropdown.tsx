@@ -5,45 +5,37 @@ import { tcls } from '@/lib/tailwind';
 import { Dropdown, DropdownChevron, DropdownMenu } from './Dropdown';
 import { SpacesDropdownMenuItem } from './SpacesDropdownMenuItem';
 
-export function SpacesDropdown(props: {
-    space: Space;
-    spaces: Space[];
-    buttonKind?: 'default' | 'bordered';
-}) {
-    const { space, spaces, buttonKind = 'default' } = props;
+export function SpacesDropdown(props: { space: Space; spaces: Space[] }) {
+    const { space, spaces } = props;
 
     return (
         <Dropdown
-            className={buttonKind === 'bordered' ? tcls('w-full') : undefined}
             button={(buttonProps) => (
                 <div
                     {...buttonProps}
                     data-testid="space-dropdown-button"
                     className={tcls(
-                        'justify-self-start',
                         'flex',
                         'flex-row',
                         'items-center',
+                        'rounded-2xl',
+                        'straight-corners:rounded-none',
+                        'bg-light-2',
+                        'border',
+                        'border-light-3',
+                        'text-dark-4',
+                        'text-sm',
                         'px-3',
-                        'py-1.5',
-                        'text-header-link-500',
-                        buttonKind === 'bordered'
-                            ? [
-                                  'ring-1',
-                                  'ring-inset',
-                                  'ring-dark/2',
-                                  'pointer-events-auto',
-                                  'justify-between',
-                                  'bg-light',
-                                  'dark:bg-dark',
-                                  'rounded-lg',
-                                  'straight-corners:rounded-none',
-                                  'lg:ring-0',
-                                  'border',
-                                  'border-dark/2',
-                                  'dark:border-light/2',
-                              ]
-                            : [],
+                        'py-1',
+                        'contrast-more:border-dark',
+                        'contrast-more:bg-light',
+                        'contrast-more:text-dark',
+                        'dark:bg-dark-3',
+                        'dark:border-dark-4',
+                        'dark:text-light-4',
+                        'contrast-more:dark:border-light',
+                        'contrast-more:dark:bg-dark',
+                        'contrast-more:dark:text-light',
                     )}
                 >
                     {space.title}
