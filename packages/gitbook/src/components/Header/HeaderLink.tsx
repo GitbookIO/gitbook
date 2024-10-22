@@ -54,7 +54,7 @@ export async function HeaderLink(props: {
                     <Button
                         href={target.href}
                         variant={variant}
-                        size='medium'
+                        size="medium"
                         className={tcls(
                             {
                                 'button-primary':
