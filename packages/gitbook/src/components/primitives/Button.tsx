@@ -9,7 +9,7 @@ type ButtonProps = {
     onClick?: () => void;
     children: React.ReactNode;
     variant?: 'primary' | 'secondary';
-    size?: 'default' | 'small';
+    size?: 'default' | 'medium' | 'small';
     className?: ClassValue;
 };
 
@@ -43,12 +43,13 @@ export function Button({
                   'dark:hover:bg-light/3',
               ];
 
-    const sizeClasses =
-        size === 'default'
-            ? // DEFAULT
-              ['text-base', 'px-4', 'py-2']
-            : // SMALL
-              ['text-xs', 'px-3 py-2'];
+    const sizes = {
+        default: ['text-base', 'px-4', 'py-2'],
+        medium: ['text-base', 'px-3', 'py-1'],
+        small: ['text-xs', 'px-3 py-2'],
+    };
+
+    const sizeClasses = sizes[size] || sizes.default;
 
     const domClassName = tcls(
         'inline-block',
@@ -60,6 +61,7 @@ export function Button({
         'grow-0',
         'shrink-0',
         'truncate',
+        'transition-colors',
         variantClasses,
         sizeClasses,
         className,
