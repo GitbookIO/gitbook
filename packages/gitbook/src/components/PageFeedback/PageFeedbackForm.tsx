@@ -15,7 +15,6 @@ import { postPageFeedback } from './server-actions';
  */
 export function PageFeedbackForm(props: {
     orientation?: 'horizontal' | 'vertical';
-    spaceId: string;
     pageId: string;
     className?: string;
 }) {

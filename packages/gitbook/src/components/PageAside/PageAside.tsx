@@ -130,11 +130,7 @@ export function PageAside(props: {
                 >
                     {withPageFeedback ? (
                         <React.Suspense fallback={null}>
-                            <PageFeedbackForm
-                                spaceId={space.id}
-                                pageId={page.id}
-                                className={tcls('mt-2')}
-                            />
+                            <PageFeedbackForm pageId={page.id} className={tcls('mt-2')} />
                         </React.Suspense>
                     ) : null}
                     {customization.git.showEditLink && space.gitSync?.url && page.git ? (
