@@ -6,6 +6,7 @@ import React from 'react';
 import { useLanguage } from '@/intl/client';
 import { t, tString } from '@/intl/translate';
 import { getVisitorId } from '@/lib/analytics';
+import { getSiteContentPointer } from '@/lib/pointer';
 import { tcls } from '@/lib/tailwind';
 
 import { postPageFeedback } from './server-actions';
@@ -19,14 +20,15 @@ export function PageFeedbackForm(props: {
     pageId: string;
     className?: string;
 }) {
-    const { orientation = 'vertical', spaceId, pageId, className } = props;
+    const { orientation = 'vertical', pageId, className } = props;
+    const pointer = getSiteContentPointer();
     const languages = useLanguage();
     const [submitted, setSubmitted] = React.useState(false);
 
     const onSubmit = async (rating: PageFeedbackRating) => {
         setSubmitted(true);
         const visitorId = await getVisitorId();
-        await postPageFeedback({ spaceId, pageId, visitorId, rating });
+        await postPageFeedback({ pointer, pageId, visitorId, rating });
     };
 
     return (
