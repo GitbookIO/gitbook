@@ -2,18 +2,18 @@
 
 import { PageFeedbackRating } from '@gitbook/api';
 
-import { api, SiteContentPointer } from '@/lib/api';
+import { api } from '@/lib/api';
+import { getSiteContentPointer } from '@/lib/pointer';
 
 export async function postPageFeedback(args: {
-    pointer: SiteContentPointer;
     pageId: string;
     visitorId: string;
     rating: PageFeedbackRating;
 }) {
-    const { organizationId, siteSpaceId, siteId } = args.pointer;
+    const { organizationId, siteId, siteSpaceId } = getSiteContentPointer();
     if (siteSpaceId === undefined) {
         console.error(
-            `No siteSpaceId in pointer. organizationId: ${organizationId}, siteId: ${args.pointer.siteId}, pageId: ${args.pageId}`,
+            `No siteSpaceId in pointer. organizationId: ${organizationId}, siteId: ${siteId}, pageId: ${args.pageId}`,
         );
 
         return;
