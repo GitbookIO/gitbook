@@ -1,4 +1,10 @@
-import { CustomizationSettings, Site, SiteCustomizationSettings, Space } from '@gitbook/api';
+import {
+    CustomizationSettings,
+    Site,
+    SiteCustomizationSettings,
+    SiteSection,
+    Space,
+} from '@gitbook/api';
 import { CustomizationHeaderPreset } from '@gitbook/api';
 import { Suspense } from 'react';
 
@@ -13,6 +19,7 @@ import { HeaderLinks } from './HeaderLinks';
 import { HeaderLogo } from './HeaderLogo';
 import { SpacesDropdown } from './SpacesDropdown';
 import { SearchButton } from '../Search';
+import { SiteSectionTabs } from '../SiteSectionTabs';
 /**
  * Render the header for the space.
  */
@@ -20,14 +27,17 @@ export function Header(props: {
     space: Space;
     site: Site | null;
     spaces: Space[];
+    sections: { list: SiteSection[]; section: SiteSection } | null;
     context: ContentRefContext;
     customization: CustomizationSettings | SiteCustomizationSettings;
     withTopHeader?: boolean;
     children?: React.ReactNode;
 }) {
-    const { children, context, space, site, spaces, customization, withTopHeader } = props;
+    const { children, context, space, site, spaces, sections, customization, withTopHeader } =
+        props;
     const isCustomizationDefault =
         customization.header.preset === CustomizationHeaderPreset.Default;
+    const hasSiteSections = sections && sections.list.length > 1;
     const isMultiVariants = site && spaces.length > 1;
 
     return (
@@ -70,7 +80,9 @@ export function Header(props: {
                 >
                     <HeaderLogo site={site} space={space} customization={customization} />
                     <span>
-                        {isMultiVariants ? <SpacesDropdown space={space} spaces={spaces} /> : null}
+                        {!hasSiteSections && isMultiVariants ? (
+                            <SpacesDropdown space={space} spaces={spaces} />
+                        ) : null}
                     </span>
                     <HeaderLinks>
                         {customization.header.links.map((link, index) => {
@@ -134,7 +146,17 @@ export function Header(props: {
                     </div>
                 </div>
             </div>
-            {children}
+            {sections ? (
+                <div
+                    className={tcls(
+                        'w-full shadow-thintop dark:shadow-light/1 bg-light dark:bg-dark z-[9] mt-0.5',
+                    )}
+                >
+                    <div className={tcls(CONTAINER_STYLE)}>
+                        <SiteSectionTabs sections={sections.list} section={sections.section} />
+                    </div>
+                </div>
+            ) : null}
         </header>
     );
 }

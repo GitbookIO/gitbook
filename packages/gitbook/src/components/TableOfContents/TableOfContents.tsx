@@ -33,10 +33,12 @@ export function TableOfContents(props: {
     context: ContentRefContext;
     pages: Revision['pages'];
     ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
-    header?: React.ReactNode;
+    header?: React.ReactNode; // Displayed outside the scrollable TOC as a sticky header
     headerOffset: { sectionsHeader: boolean; topHeader: boolean };
+    innerHeader?: React.ReactNode; // Displayed inside the scrollable TOC, directly above the page list
 }) {
-    const { space, customization, pages, ancestors, header, context, headerOffset } = props;
+    const { innerHeader, space, customization, pages, ancestors, header, context, headerOffset } =
+        props;
 
     const withHeaderOffset = headerOffset.sectionsHeader || headerOffset.topHeader;
     const topOffset = getTopOffset(headerOffset);
@@ -91,6 +93,7 @@ export function TableOfContents(props: {
                     customization.trademark.enabled ? 'lg:pb-20' : 'lg:pb-4',
                 )}
             >
+                {innerHeader && <div className={tcls('ms-5', 'mb-4')}>{innerHeader}</div>}
                 <PagesList
                     rootPages={pages}
                     pages={pages}

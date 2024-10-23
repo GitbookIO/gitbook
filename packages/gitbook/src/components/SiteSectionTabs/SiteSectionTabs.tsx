@@ -69,9 +69,24 @@ export function SiteSectionTabs(props: { sections: SiteSection[]; section: SiteS
         >
             <div
                 className={tcls(
-                    'relative flex gap-2 bg-transparent',
+                    'relative',
+                    'flex',
+                    'gap-2',
+                    'bg-transparent',
                     /* add a pseudo element for active tab indicator */
-                    "after:block after:content-[''] after:origin-left after:absolute after:-bottom-px after:left-0 after:scale-x-[--tab-scale] after:transition-transform after:translate-x-[var(--tab-start)] after:h-0.5 after:w-[100px] after:bg-primary dark:after:bg-primary-500",
+                    'after:block',
+                    "after:content-['']",
+                    'after:origin-left',
+                    'after:absolute',
+                    'after:-bottom-px',
+                    'after:left-0',
+                    'after:scale-x-[--tab-scale]',
+                    'after:transition-transform',
+                    'after:translate-x-[var(--tab-start)]',
+                    'after:h-0.5',
+                    'after:w-[100px]',
+                    'after:bg-primary',
+                    'dark:after:bg-primary-400',
                 )}
                 role="tablist"
             >
@@ -82,6 +97,7 @@ export function SiteSectionTabs(props: { sections: SiteSection[]; section: SiteS
                         label={tab.label}
                         href={tab.path}
                         ref={currentIndex === index ? currentTabRef : null}
+                        onClick={() => setCurrentIndex(index)}
                     />
                 ))}
             </div>
@@ -101,9 +117,9 @@ const Tab = React.forwardRef<
     return (
         <Link
             className={tcls(
-                'px-3 py-3.5 rounded',
-                active && 'text-primary dark:text-primary-500',
-                !active && 'hover:text-primary dark:hover:text-primary-500 transition-colors',
+                'px-3 py-1 my-2 rounded straight-corners:rounded-none transition-colors',
+                active && 'text-primary dark:text-primary-400',
+                !active && ' hover:bg-light-2 dark:hover:bg-dark-3',
             )}
             role="tab"
             href={href}
