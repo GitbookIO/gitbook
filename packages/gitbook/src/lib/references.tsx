@@ -281,8 +281,6 @@ export async function resolveContentRef(
                 reusableContent,
             };
         }
-        case 'synced-block':
-            return null;
 
         default:
             assertNever(contentRef);
