@@ -328,22 +328,3 @@ async function resolveContentRefInSpace(
         subText: space.title,
     };
 }
-
-export function resolveContentRefWithFiles(
-    files: RevisionFile[],
-    contentRef: ContentRef,
-): ResolvedContentRef | null | undefined {
-    if (contentRef.kind === 'file') {
-        const file = files.find((file) => file.id === contentRef.file);
-        if (file) {
-            return {
-                href: file.downloadURL,
-                text: file.name,
-                active: false,
-                file,
-            };
-        }
-        return null;
-    }
-    return undefined;
-}

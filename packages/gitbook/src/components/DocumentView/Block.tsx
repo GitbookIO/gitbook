@@ -11,7 +11,6 @@ import {
 import { ClassValue } from '@/lib/tailwind';
 
 import { BlockContentRef } from './BlockContentRef';
-import { BlockSyncedBlock } from './BlockSyncedBlock';
 import { CodeBlock } from './CodeBlock';
 import { Divider } from './Divider';
 import { DocumentContextProps } from './DocumentView';
@@ -107,8 +106,6 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
                 throw new Error('Blocks should be directly rendered by parent');
             case 'integration':
                 return <IntegrationBlock {...props} block={block} />;
-            case 'synced-block':
-                return <BlockSyncedBlock {...props} block={block} />;
             case 'reusable-content':
                 return <ReusableContent {...props} block={block} />;
             case 'stepper':
@@ -165,7 +162,6 @@ export function BlockSkeleton(props: { block: DocumentBlock; style: ClassValue }
         case 'content-ref':
         case 'integration':
         case 'stepper':
-        case 'synced-block':
         case 'reusable-content':
             return <SkeletonCard id={id} style={style} />;
         case 'embed':
