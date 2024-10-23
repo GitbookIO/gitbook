@@ -54,14 +54,13 @@ jobs:
                   SENTRY_DSN: ${{ vars.SENTRY_DSN }}
             - id: cloudflare
               name: Publish to Cloudflare Pages
-              uses: cloudflare/pages-action@v1
+              uses: cloudflare/wrangler-action@v3
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                  projectName: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
-                  directory: ./packages/gitbook/.vercel/output/static
                   gitHubToken: ${{ secrets.GITHUB_TOKEN }}
                   workingDirectory: ./
+                  command: pages deploy ./packages/gitbook/.vercel/output/static --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }}
             - name: Outputs
               run: |
                   echo "ID: ${{ steps.cloudflare.outputs.id }}"
