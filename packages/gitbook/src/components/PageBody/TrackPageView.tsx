@@ -103,6 +103,7 @@ async function trackPageView(args: {
                   body: {
                       ...sharedTrackedProps,
                       spaceId,
+                      siteSpaceId: sitePointer.siteSpaceId,
                   },
               })
             : await sendSpaceTrackPageViewRequest({ apiHost, spaceId, body: sharedTrackedProps });
