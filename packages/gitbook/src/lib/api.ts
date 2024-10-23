@@ -193,48 +193,6 @@ export const getUserById = cache({
 });
 
 /**
- * Get a synced block by its ref.
- */
-export const getSyncedBlockContent = cache({
-    name: 'api.getSyncedBlockContent',
-    tag: (apiToken, organizationId, syncedBlockId) =>
-        getAPICacheTag({
-            tag: 'synced-block',
-            syncedBlock: syncedBlockId,
-        }),
-    get: async (
-        apiToken: string,
-        organizationId: string,
-        syncedBlockId: string,
-        options: CacheFunctionOptions,
-    ) => {
-        try {
-            const response = await apiWithToken(apiToken).orgs.getSyncedBlockContent(
-                organizationId,
-                syncedBlockId,
-                {
-                    ...noCacheFetchOptions,
-                    signal: options.signal,
-                },
-            );
-            return cacheResponse(response, {
-                revalidateBefore: 60 * 60,
-            });
-        } catch (error) {
-            if ((error as GitBookAPIError).code === 404) {
-                return {
-                    revalidateBefore: 60 * 60,
-                    data: null,
-                };
-            }
-
-            throw error;
-        }
-    },
-    // We don't cache apiToken as it's not a stable key
-    getKeyArgs: (args) => [args[1], args[2]],
-});
-/**
  * Resolve a URL to the content to render.
  */
 export const getPublishedContentByUrl = cache({
@@ -1208,11 +1166,6 @@ export function getAPICacheTag(
               tag: 'collection';
               collection: string;
           }
-        // All data related to a synced block
-        | {
-              tag: 'synced-block';
-              syncedBlock: string;
-          }
         // All data related to a site
         | {
               tag: 'site';
@@ -1234,8 +1187,6 @@ export function getAPICacheTag(
             return `space:${spec.space}:document:${spec.document}`;
         case 'collection':
             return `collection:${spec.collection}`;
-        case 'synced-block':
-            return `synced-block:${spec.syncedBlock}`;
         case 'site':
             return `site:${spec.site}`;
         case 'integration':
