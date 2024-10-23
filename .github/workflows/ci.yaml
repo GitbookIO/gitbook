@@ -88,7 +88,7 @@ jobs:
             - name: Run Playwright tests
               run: bun e2e
               env:
-                  BASE_URL: ${{needs.cloudflare.outputs.deployment-url}}
+                  BASE_URL: ${{needs.deploy.outputs.deployment_url}}
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
             - uses: actions/upload-artifact@v4
               if: ${{ !cancelled() }}
