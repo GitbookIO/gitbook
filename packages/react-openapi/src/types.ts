@@ -2,6 +2,9 @@ export type IconComponent = React.ComponentType<{ className?: string }>;
 
 export interface OpenAPIContextProps extends OpenAPIClientContext {
     CodeBlock: React.ComponentType<{ code: string; syntax: string }>;
+
+    /** Spec url for the Scalar Api Client */
+    specUrl: string;
 }
 
 export interface OpenAPIClientContext {

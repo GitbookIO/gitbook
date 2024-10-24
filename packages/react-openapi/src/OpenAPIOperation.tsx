@@ -1,5 +1,6 @@
 import * as React from 'react';
 import classNames from 'classnames';
+import { ApiClientModalProvider } from '@scalar/api-client-react';
 
 import { OpenAPIOperationData, toJSON } from './fetchOpenAPIOperation';
 import { Markdown } from './Markdown';
@@ -8,7 +9,6 @@ import { OpenAPIResponseExample } from './OpenAPIResponseExample';
 import { OpenAPIServerURL } from './OpenAPIServerURL';
 import { OpenAPISpec } from './OpenAPISpec';
 import { OpenAPIClientContext, OpenAPIContextProps } from './types';
-import { ScalarApiClient } from './ScalarApiButton';
 
 /**
  * Display an interactive OpenAPI operation.
@@ -28,7 +28,10 @@ export function OpenAPIOperation(props: {
     };
 
     return (
-        <ScalarApiClient>
+        <ApiClientModalProvider
+            configuration={{ spec: { url: context.specUrl } }}
+            initialRequest={{ path: data.path, method: data.method }}
+        >
             <div className={classNames('openapi-operation', className)}>
                 <div className="openapi-intro">
                     <h2 className="openapi-summary" id={context.id}>
@@ -64,6 +67,6 @@ export function OpenAPIOperation(props: {
                     </div>
                 </div>
             </div>
-        </ScalarApiClient>
+        </ApiClientModalProvider>
     );
 }
