@@ -85,7 +85,7 @@ export function SiteSectionTabs(props: { sections: SiteSection[]; section: SiteS
                     'after:left-0',
                     'after:opacity-[--tab-opacity]',
                     'after:scale-x-[--tab-scale]',
-                    'after:transition-all',
+                    'after:[transition:_opacity_150ms_25ms,transform_150ms]',
                     'after:motion-reduce:transition-none',
                     'after:translate-x-[var(--tab-start)]',
                     'after:will-change-transform',
