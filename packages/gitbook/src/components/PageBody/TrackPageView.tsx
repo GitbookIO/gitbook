@@ -1,6 +1,6 @@
 'use client';
 
-import type { RequestSiteTrackPageView, RequestSpaceTrackPageView } from '@gitbook/api';
+import type { RequestSiteTrackPageView } from '@gitbook/api';
 import cookies from 'js-cookie';
 import * as React from 'react';
 
@@ -13,34 +13,15 @@ import { SiteContentPointer } from '@/lib/api';
 export function TrackPageView(props: {
     apiHost: string;
     sitePointer: SiteContentPointer;
-    spaceId: string;
     pageId: string | undefined;
 }) {
-    const { apiHost, sitePointer, spaceId, pageId } = props;
+    const { apiHost, sitePointer, pageId } = props;
 
     React.useEffect(() => {
-        trackPageView({ apiHost, sitePointer, spaceId, pageId });
-    }, [apiHost, spaceId, pageId, sitePointer]);
+        trackPageView({ apiHost, sitePointer, pageId });
+    }, [apiHost, pageId, sitePointer]);
 
     return null;
-}
-
-async function sendSpaceTrackPageViewRequest(args: {
-    apiHost: string;
-    spaceId: string;
-    body: RequestSpaceTrackPageView;
-}) {
-    const { apiHost, spaceId, body } = args;
-    const url = new URL(apiHost);
-    url.pathname = `/v1/spaces/${spaceId}/insights/track_view`;
-
-    await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-    });
 }
 
 async function sendSiteTrackPageViewRequest(args: {
@@ -71,10 +52,9 @@ let latestPageId: string | undefined | null = null;
 async function trackPageView(args: {
     apiHost: string;
     sitePointer: SiteContentPointer;
-    spaceId: string;
     pageId: string | undefined;
 }) {
-    const { apiHost, sitePointer, pageId, spaceId } = args;
+    const { apiHost, sitePointer, pageId } = args;
     if (pageId === latestPageId) {
         // The hook can be called multiple times, we only want to track once.
         return;
@@ -96,17 +76,14 @@ async function trackPageView(args: {
     };
 
     try {
-        sitePointer
-            ? await sendSiteTrackPageViewRequest({
-                  apiHost,
-                  sitePointer,
-                  body: {
-                      ...sharedTrackedProps,
-                      spaceId,
-                      siteSpaceId: sitePointer.siteSpaceId,
-                  },
-              })
-            : await sendSpaceTrackPageViewRequest({ apiHost, spaceId, body: sharedTrackedProps });
+        await sendSiteTrackPageViewRequest({
+            apiHost,
+            sitePointer,
+            body: {
+                ...sharedTrackedProps,
+                siteSpaceId: sitePointer.siteSpaceId,
+            },
+        });
     } catch (error) {
         console.error('Failed to track page view', error);
     }
