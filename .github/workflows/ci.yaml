@@ -52,7 +52,7 @@ jobs:
                   SENTRY_ORG: ${{ vars.SENTRY_ORG }}
                   SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
                   SENTRY_DSN: ${{ vars.SENTRY_DSN }}
-            - id: cloudflare
+            - id: deploy
               name: Publish to Cloudflare Pages
               uses: cloudflare/wrangler-action@v3
               with:
@@ -65,9 +65,13 @@ jobs:
               env:
                   DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
               run: echo $DEPLOYMENT_URL
+            - name: print deployment-alias-url
+              env:
+                  DEPLOYMENT_ALIAS_URL: ${{ steps.deploy.outputs.deployment-alias-url }}
+              run: echo $DEPLOYMENT_ALIAS_URL
             - name: Outputs
               run: |
-                  echo "URL: ${{ steps.cloudflare.outputs.deployment-url }}"
+                  echo "URL: ${{ steps.deploy.outputs.deployment-url }}"
                   echo "Alias URL: ${{ steps.deploy.outputs.deployment-alias-url }}"
             - name: Archive build output
               uses: actions/upload-artifact@v4
@@ -77,7 +81,7 @@ jobs:
             # Until https://github.com/cloudflare/wrangler-action/issues/301 is done
             - name: Update Deployment Status to Success
               env:
-                  DEPLOYMENT_URL: ${{ steps.cloudflare.outputs.deployment-url }}
+                  DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
               run: |
                   curl -X POST \
                     -H "Authorization: token ${{ secrets.GH_PERSONAL_TOKEN }}" \
