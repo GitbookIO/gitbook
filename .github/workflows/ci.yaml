@@ -61,14 +61,6 @@ jobs:
                   workingDirectory: ./
                   wranglerVersion: '3.82.0'
                   command: pages deploy ./packages/gitbook/.vercel/output/static --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }}
-            - name: print deployment-url
-              env:
-                  DEPLOYMENT_URL: ${{ steps.deploy.outputs.url }}
-              run: echo $DEPLOYMENT_URL
-            - name: print deployment-alias-url
-              env:
-                  DEPLOYMENT_ALIAS_URL: ${{ steps.deploy.outputs.deployment-alias-url }}
-              run: echo $DEPLOYMENT_ALIAS_URL
             - name: Outputs
               run: |
                   echo "URL: ${{ steps.deploy.outputs.url }}"
@@ -86,7 +78,7 @@ jobs:
                   curl -X POST \
                     -H "Authorization: token ${{ secrets.GH_PERSONAL_TOKEN }}" \
                     -H "Accept: application/vnd.github.v3+json" \
-                    -d '{"state": "success", "target_url": "$DEPLOYMENT_URL", "description": "GitBook Preview URL", "context": "deploy/preview"}' \
+                    -d '{"state": "success", "target_url": "${{ steps.deploy.outputs.url }}", "description": "GitBook Preview URL", "context": "deploy/preview"}' \
                     https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}
     visual-testing:
         runs-on: ubuntu-latest
