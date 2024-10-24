@@ -18,7 +18,7 @@ jobs:
             checks: write
             statuses: write
         outputs:
-            deployment_url: ${{ steps.cloudflare.outputs.url }}
+            deployment_url: ${{ steps.deploy.outputs.url }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -88,6 +88,7 @@ jobs:
             - name: Find GitHub Comment
               uses: peter-evans/find-comment@v3
               id: fc
+              if: 1 && !startsWith(github.ref, 'refs/heads/main')
               with:
                   issue-number: ${{ github.event.pull_request.number }}
                   comment-author: 'github-actions[bot]'
@@ -95,6 +96,7 @@ jobs:
 
             - name: Create or update GitHub comment
               uses: peter-evans/create-or-update-comment@v4
+              if: 1 && !startsWith(github.ref, 'refs/heads/main')
               with:
                   comment-id: ${{ steps.fc.outputs.comment-id }}
                   issue-number: ${{ github.event.pull_request.number }}
