@@ -13,8 +13,12 @@ jobs:
         permissions:
             contents: read
             deployments: write
+            issues: write
+            pull-requests: write
+            checks: write
+            statuses: write
         outputs:
-            deployment_url: ${{ steps.cloudflare.outputs.url }}
+            deployment_url: ${{ steps.deploy.outputs.url }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -52,27 +56,55 @@ jobs:
                   SENTRY_ORG: ${{ vars.SENTRY_ORG }}
                   SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
                   SENTRY_DSN: ${{ vars.SENTRY_DSN }}
-            - id: cloudflare
-              name: Publish to Cloudflare Pages
-              uses: cloudflare/pages-action@v1
+            - id: deploy
+              name: Publish to Cloudflare Pages (Preview)
+              uses: cloudflare/wrangler-action@v3
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                  projectName: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
-                  directory: ./packages/gitbook/.vercel/output/static
-                  gitHubToken: ${{ secrets.GITHUB_TOKEN }}
                   workingDirectory: ./
+                  wranglerVersion: '3.82.0'
+                  command: pages deploy ./packages/gitbook/.vercel/output/static --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }} --branch=${{ github.ref == 'refs/heads/main' && 'main' || format('pr{0}', github.event.pull_request.number) }}
             - name: Outputs
               run: |
-                  echo "ID: ${{ steps.cloudflare.outputs.id }}"
-                  echo "URL: ${{ steps.cloudflare.outputs.url }}"
-                  echo "Environment: ${{ steps.cloudflare.outputs.environment }}"
-                  echo "Alias: ${{ steps.cloudflare.outputs.alias }}"
+                  echo "URL: ${{ steps.deploy.outputs.url }}"
+                  echo "Alias URL: ${{ steps.deploy.outputs.deployment-alias-url }}"
             - name: Archive build output
               uses: actions/upload-artifact@v4
               with:
                   name: build-output
                   path: .vercel/
+            # Until https://github.com/cloudflare/wrangler-action/issues/301 is done
+            - name: Update Deployment Status to Success
+              env:
+                  DEPLOYMENT_URL: ${{ steps.deploy.outputs.url }}
+              run: |
+                  curl -X POST \
+                    -H "Authorization: token ${{ secrets.GH_PERSONAL_TOKEN }}" \
+                    -H "Accept: application/vnd.github.v3+json" \
+                    -d '{"state": "success", "target_url": "${{ steps.deploy.outputs.url }}", "description": "GitBook Preview URL", "context": "default"}' \
+                    https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}
+
+            - name: Find GitHub Comment
+              uses: peter-evans/find-comment@v3
+              id: fc
+              if: 1 && !startsWith(github.ref, 'refs/heads/main')
+              with:
+                  issue-number: ${{ github.event.pull_request.number }}
+                  comment-author: 'github-actions[bot]'
+                  body-includes: GitBook Preview
+
+            - name: Create or update GitHub comment
+              uses: peter-evans/create-or-update-comment@v4
+              if: 1 && !startsWith(github.ref, 'refs/heads/main')
+              with:
+                  comment-id: ${{ steps.fc.outputs.comment-id }}
+                  issue-number: ${{ github.event.pull_request.number }}
+                  body: |
+                      **GitBook Preview**
+                      Latest commit: [${{ steps.deploy.outputs.url }}](${{ steps.deploy.outputs.url }})
+                      PR: [${{ steps.deploy.outputs.alias }}](${{ steps.deploy.outputs.alias }})
+                  edit-mode: replace
     visual-testing:
         runs-on: ubuntu-latest
         name: Visual Testing
