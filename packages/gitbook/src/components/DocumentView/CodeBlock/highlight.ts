@@ -5,23 +5,14 @@ import {
     createCssVariablesTheme,
     HighlighterGeneric,
 } from 'shiki/core';
-// @ts-ignore - internal module
-import { bundledLanguages } from 'shiki/dist/langs';
 import { loadWasm, createOnigurumaEngine } from 'shiki/engine/oniguruma'
+import { bundledLanguages } from 'shiki/langs';
 // @ts-ignore - onigWasm is a Wasm module
 import onigWasm from 'shiki/onig.wasm?module';
 
 import { asyncMutexFunction, singleton } from '@/lib/async';
 import { getNodeText } from '@/lib/document';
 import { trace } from '@/lib/tracing';
-
-const createHighlighter = createdBundledHighlighter<
-  any, any
->({
-  langs: bundledLanguages,
-  themes: {},
-  engine: () => createOnigurumaEngine(onigWasm),
-})
 
 export type HighlightLine = {
     highlighted: boolean;
@@ -55,7 +46,6 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
     });
 
     const highlighter = await loadHighlighter();
-    // @ts-ignore
     await loadHighlighterLanguage(highlighter, langName);
 
     const lines = highlighter.codeToTokensBase(code, {
@@ -306,6 +296,14 @@ function cleanupLine(line: string): string {
     return line.replace(/\r/g, '');
 }
 
+const createHighlighter = createdBundledHighlighter<
+    any, any
+    >({
+    langs: bundledLanguages,
+    themes: {},
+    engine: () => createOnigurumaEngine(import('shiki/wasm')),
+})
+
 /**
  * Load the highlighter, only once, and reuse it.
  * It makes sure to handle concurrent calls.
@@ -319,6 +317,7 @@ const loadHighlighter = singleton(async () => {
             // Otherwise for Vercel/Cloudflare, we need to load it ourselves.
             await loadWasm((obj) => WebAssembly.instantiate(onigWasm, obj));
         }
+
         const highlighter = await createHighlighter({
             themes: [createCssVariablesTheme()],
             langs: [],
@@ -330,7 +329,7 @@ const loadHighlighter = singleton(async () => {
 const loadLanguagesMutex = asyncMutexFunction();
 async function loadHighlighterLanguage(
     highlighter: HighlighterGeneric<any, any>,
-    lang: string // keyof typeof bundledLanguages,
+    lang: keyof typeof bundledLanguages,
 ) {
     await loadLanguagesMutex.runBlocking(async () => {
         if (highlighter.getLoadedLanguages().includes(lang)) {
