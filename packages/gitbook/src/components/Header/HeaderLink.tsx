@@ -66,8 +66,10 @@ export async function HeaderLink(props: {
                                           )
                                         : null,
                                 'button-secondary': tcls(
+                                    'bg:transparent hover:bg-transparent',
                                     'dark:bg-transparent dark:hover:bg-transparent',
-                                    'ring-header-link-500 hover:ring-header-link-300 dark:ring-header-link-500 dark:hover:ring-header-link-300 text-header-link-500 dark:text-header-link-500',
+                                    'ring-header-link-500 hover:ring-header-link-300 text-header-link-500',
+                                    'dark:ring-header-link-500 dark:hover:ring-header-link-300 dark:text-header-link-500',
                                 ),
                             }[linkStyle],
                         )}
