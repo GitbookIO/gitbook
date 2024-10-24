@@ -4,11 +4,6 @@ on:
     push:
         branches:
             - main
-permissions:
-    issues: write
-    pull-requests: write
-    checks: write
-    statuses: write
 env:
     NPMRC_FONT_AWESOME_TOKEN: ${{ secrets.NPMRC_FONT_AWESOME_TOKEN }}
 jobs:
@@ -18,6 +13,10 @@ jobs:
         permissions:
             contents: read
             deployments: write
+            issues: write
+            pull-requests: write
+            checks: write
+            statuses: write
         outputs:
             deployment_url: ${{ steps.cloudflare.outputs.url }}
         steps:
