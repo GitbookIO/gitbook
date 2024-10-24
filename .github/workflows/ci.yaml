@@ -103,7 +103,7 @@ jobs:
                   body: |
                       **GitBook Preview**
                       Latest commit: [${{ steps.deploy.outputs.url }}](${{ steps.deploy.outputs.url }})
-                      PR: [${{ steps.deploy.outputs.url }}](${{ steps.deploy.outputs.alias }})
+                      PR: [${{ steps.deploy.outputs.alias }}](${{ steps.deploy.outputs.alias }})
                   edit-mode: replace
     visual-testing:
         runs-on: ubuntu-latest
