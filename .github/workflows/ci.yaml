@@ -78,7 +78,7 @@ jobs:
                   curl -X POST \
                     -H "Authorization: token ${{ secrets.GH_PERSONAL_TOKEN }}" \
                     -H "Accept: application/vnd.github.v3+json" \
-                    -d '{"state": "success", "target_url": "${{ steps.deploy.outputs.url }}", "description": "GitBook Preview URL", "context": "deploy/preview"}' \
+                    -d '{"state": "success", "target_url": "${{ steps.deploy.outputs.url }}", "description": "GitBook Preview URL", "context": "default"}' \
                     https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}
     visual-testing:
         runs-on: ubuntu-latest
