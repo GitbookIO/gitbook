@@ -60,6 +60,10 @@ jobs:
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   workingDirectory: ./
                   command: pages deploy ./packages/gitbook/.vercel/output/static --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }}
+            - name: print deployment-url
+              env:
+                  DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
+              run: echo $DEPLOYMENT_URL
             - name: Outputs
               run: |
                   echo "URL: ${{ steps.cloudflare.outputs.deployment-url }}"
