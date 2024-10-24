@@ -22,8 +22,8 @@ export function SiteSectionTabs(props: { sections: SiteSection[]; section: SiteS
     const currentTabRef = React.useRef<HTMLAnchorElement>(null);
     const navRef = React.useRef<HTMLDivElement>(null);
 
-    // we don't set the current tab with a click event because the tab will navigate to a different section and trigger a page reload. 
-    const currentIndex = sections.findIndex((section) => section.id === currentSection?.id); 
+    // we don't set the current tab with a click event because the tab will navigate to a different section and trigger a page reload.
+    const currentIndex = sections.findIndex((section) => section.id === currentSection?.id);
 
     const [tabDimensions, setTabDimensions] = React.useState<{
         left: number;
@@ -48,7 +48,7 @@ export function SiteSectionTabs(props: { sections: SiteSection[]; section: SiteS
         () => {
             window.removeEventListener('resize', updateTabDimensions);
             window.removeEventListener('load', updateTabDimensions);
-        }
+        };
     }, [updateTabDimensions]);
 
     const opacity = Boolean(tabDimensions) ? 1 : 0.0;
@@ -114,28 +114,27 @@ export function SiteSectionTabs(props: { sections: SiteSection[]; section: SiteS
 /**
  * The tab item - a link to a site section
  */
-const Tab = React.forwardRef<
-    HTMLSpanElement,
-    { active: boolean; href: string; label: string; }
->(function Tab(props, ref) {
-    const { active, href, label } = props;
-    return (
-        <Link
-            className={tcls(
-                'px-3 py-1 my-2 rounded straight-corners:rounded-none transition-colors',
-                active && 'text-primary dark:text-primary-400',
-                !active &&
-                    'text-dark/8 hover:bg-dark/1 hover:text-dark/9 dark:text-light/8 dark:hover:bg-light/2 dark:hover:text-light/9',
-            )}
-            role="tab"
-            href={href}
-        >
-            <span ref={ref} className={tcls('inline-flex w-full truncate')}>
-                {label}
-            </span>
-        </Link>
-    );
-});
+const Tab = React.forwardRef<HTMLSpanElement, { active: boolean; href: string; label: string }>(
+    function Tab(props, ref) {
+        const { active, href, label } = props;
+        return (
+            <Link
+                className={tcls(
+                    'px-3 py-1 my-2 rounded straight-corners:rounded-none transition-colors',
+                    active && 'text-primary dark:text-primary-400',
+                    !active &&
+                        'text-dark/8 hover:bg-dark/1 hover:text-dark/9 dark:text-light/8 dark:hover:bg-light/2 dark:hover:text-light/9',
+                )}
+                role="tab"
+                href={href}
+            >
+                <span ref={ref} className={tcls('inline-flex w-full truncate')}>
+                    {label}
+                </span>
+            </Link>
+        );
+    },
+);
 
 /**
  * Dropdown trigger for when there are too many sections to show them all
