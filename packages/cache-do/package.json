@@ -21,7 +21,7 @@
     },
     "devDependencies": {
         "typescript": "^5.5.3",
-        "wrangler": "^3.78.7"
+        "wrangler": "3.82.0"
     },
     "scripts": {
         "generate": "wrangler types --experimental-include-runtime",
