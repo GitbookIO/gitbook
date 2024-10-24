@@ -119,7 +119,8 @@ const Tab = React.forwardRef<
             className={tcls(
                 'px-3 py-1 my-2 rounded straight-corners:rounded-none transition-colors',
                 active && 'text-primary dark:text-primary-400',
-                !active && ' hover:bg-light-2 dark:hover:bg-dark-3',
+                !active &&
+                    'text-dark/8 hover:bg-dark/1 hover:text-dark/9 dark:text-light/8 dark:hover:bg-light/2 dark:hover:text-light/9',
             )}
             role="tab"
             href={href}
