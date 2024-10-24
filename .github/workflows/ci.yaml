@@ -5,6 +5,7 @@ on:
         branches:
             - main
 permissions:
+    issues: write
     pull-requests: write
     checks: write
     statuses: write
