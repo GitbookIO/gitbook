@@ -141,11 +141,7 @@ export function PageBody(props: {
                         </p>
                     ) : null}
                     {withPageFeedback ? (
-                        <PageFeedbackForm
-                            orientation="horizontal"
-                            spaceId={space.id}
-                            pageId={page.id}
-                        />
+                        <PageFeedbackForm orientation="horizontal" pageId={page.id} />
                     ) : null}
                 </div>
             </main>

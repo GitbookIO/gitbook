@@ -15,18 +15,17 @@ import { postPageFeedback } from './server-actions';
  */
 export function PageFeedbackForm(props: {
     orientation?: 'horizontal' | 'vertical';
-    spaceId: string;
     pageId: string;
     className?: string;
 }) {
-    const { orientation = 'vertical', spaceId, pageId, className } = props;
+    const { orientation = 'vertical', pageId, className } = props;
     const languages = useLanguage();
     const [submitted, setSubmitted] = React.useState(false);
 
     const onSubmit = async (rating: PageFeedbackRating) => {
         setSubmitted(true);
         const visitorId = await getVisitorId();
-        await postPageFeedback({ spaceId, pageId, visitorId, rating });
+        await postPageFeedback({ pageId, visitorId, rating });
     };
 
     return (
