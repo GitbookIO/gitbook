@@ -70,6 +70,32 @@ jobs:
               with:
                   name: build-output
                   path: .vercel/
+            - name: Create GitHub Deployment
+              id: create_deployment
+              run: |
+                  curl -X POST \
+                    -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                    -H "Accept: application/vnd.github.v3+json" \
+                    https://api.github.com/repos/${{ github.repository }}/deployments \
+                    -d '{"ref": "${{ github.sha }}", "environment": "staging", "auto_merge": false, "required_contexts": [], "description": "Deployment for PR #${{ github.event.number }}", "transient_environment": true, "production_environment": false}'
+
+            - name: Update Deployment Status
+              run: |
+                  curl -X POST \
+                    -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                    -H "Accept: application/vnd.github.v3+json" \
+                    https://api.github.com/repos/${{ github.repository }}/deployments/${{ steps.create_deployment.outputs.deployment_id }}/statuses \
+                    -d '{"state": "success", "environment_url": "${{ steps.cloudflare.outputs.deployment-url }}", "log_url": "${{ steps.cloudflare.outputs.deployment-url }}", "description": "Deployment successful", "auto_inactive": true}'
+
+            - name: Comment on Pull Request
+              run: |
+                  PR_URL="https://github.com/${{ github.repository }}/pull/${{ github.event.number }}"
+                  DEPLOYMENT_URL="${{ steps.cloudflare.outputs.deployment-url }}"
+                  curl -X POST \
+                    -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                    -H "Accept: application/vnd.github.v3+json" \
+                    -d '{"body": "🚀 Deployment successful! [View deployment here]('"$DEPLOYMENT_URL"')"}' \
+                    https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.number }}/comments
     visual-testing:
         runs-on: ubuntu-latest
         name: Visual Testing
