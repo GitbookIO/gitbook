@@ -53,14 +53,14 @@ jobs:
                   SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
                   SENTRY_DSN: ${{ vars.SENTRY_DSN }}
             - id: deploy
-              name: Publish to Cloudflare Pages
+              name: Publish to Cloudflare Pages (Preview)
               uses: cloudflare/wrangler-action@v3
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   workingDirectory: ./
                   wranglerVersion: '3.82.0'
-                  command: pages deploy ./packages/gitbook/.vercel/output/static --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }}
+                  command: pages deploy ./packages/gitbook/.vercel/output/static --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }} --branch ${{ github.ref == 'refs/heads/main' && 'main' || github.event.pull_request.number }}
             - name: Outputs
               run: |
                   echo "URL: ${{ steps.deploy.outputs.url }}"
@@ -80,6 +80,25 @@ jobs:
                     -H "Accept: application/vnd.github.v3+json" \
                     -d '{"state": "success", "target_url": "${{ steps.deploy.outputs.url }}", "description": "GitBook Preview URL", "context": "default"}' \
                     https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}
+
+            - name: Find GitHub Comment
+              uses: peter-evans/find-comment@v3
+              id: fc
+              with:
+                  issue-number: ${{ github.event.pull_request.number }}
+                  comment-author: 'github-actions[bot]'
+                  body-includes: Build output
+
+            - name: Create or update GitHub comment
+              uses: peter-evans/create-or-update-comment@v4
+              with:
+                  comment-id: ${{ steps.fc.outputs.comment-id }}
+                  issue-number: ${{ github.event.pull_request.number }}
+                  body: |
+                      **GitBook Preview**
+                      Latest commit: [${{ steps.deploy.outputs.url }}](${{ steps.deploy.outputs.url }})
+                      PR: [${{ steps.deploy.outputs.url }}](${{ steps.deploy.outputs.alias }})
+                  edit-mode: replace
     visual-testing:
         runs-on: ubuntu-latest
         name: Visual Testing
