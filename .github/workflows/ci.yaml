@@ -74,7 +74,7 @@ jobs:
             - name: Update Deployment Status to Success
               run: |
                   curl -X POST \
-                    -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                    -H "Authorization: token ${{ secrets.GH_PERSONAL_TOKEN }}" \
                     -H "Accept: application/vnd.github.v3+json" \
                     -d '{"state": "success", "target_url": "${{ steps.cloudflare.outputs.deployment-url }}", "description": "GitBook Preview URL", "context": "deploy/preview"}' \
                     https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}
