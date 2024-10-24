@@ -5,7 +5,7 @@ import {
     createCssVariablesTheme,
     HighlighterGeneric,
 } from 'shiki/core';
-import { loadWasm, createOnigurumaEngine } from 'shiki/engine/oniguruma'
+import { loadWasm, createOnigurumaEngine } from 'shiki/engine/oniguruma';
 import { bundledLanguages } from 'shiki/langs';
 // @ts-ignore - onigWasm is a Wasm module
 import onigWasm from 'shiki/onig.wasm?module';
@@ -296,13 +296,11 @@ function cleanupLine(line: string): string {
     return line.replace(/\r/g, '');
 }
 
-const createHighlighter = createdBundledHighlighter<
-    any, any
-    >({
+const createHighlighter = createdBundledHighlighter<any, any>({
     langs: bundledLanguages,
     themes: {},
     engine: () => createOnigurumaEngine(import('shiki/wasm')),
-})
+});
 
 /**
  * Load the highlighter, only once, and reuse it.
