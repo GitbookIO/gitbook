@@ -58,7 +58,6 @@ jobs:
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                  gitHubToken: ${{ secrets.GITHUB_TOKEN }}
                   workingDirectory: ./
                   command: pages deploy ./packages/gitbook/.vercel/output/static --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }}
             - name: Outputs
@@ -72,11 +71,13 @@ jobs:
                   path: .vercel/
             # Until https://github.com/cloudflare/wrangler-action/issues/301 is done
             - name: Update Deployment Status to Success
+              env:
+                  DEPLOYMENT_URL: ${{ steps.cloudflare.outputs.deployment-url }}
               run: |
                   curl -X POST \
                     -H "Authorization: token ${{ secrets.GH_PERSONAL_TOKEN }}" \
                     -H "Accept: application/vnd.github.v3+json" \
-                    -d '{"state": "success", "target_url": "${{ steps.cloudflare.outputs.deployment-url }}", "description": "GitBook Preview URL", "context": "deploy/preview"}' \
+                    -d '{"state": "success", "target_url": "$DEPLOYMENT_URL", "description": "GitBook Preview URL", "context": "deploy/preview"}' \
                     https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}
     visual-testing:
         runs-on: ubuntu-latest
