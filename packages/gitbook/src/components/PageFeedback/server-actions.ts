@@ -1,6 +1,7 @@
 'use server';
 
 import { PageFeedbackRating } from '@gitbook/api';
+import { assert } from 'ts-essentials';
 
 import { api } from '@/lib/api';
 import { getSiteContentPointer } from '@/lib/pointer';
@@ -11,13 +12,11 @@ export async function postPageFeedback(args: {
     rating: PageFeedbackRating;
 }) {
     const { organizationId, siteId, siteSpaceId } = getSiteContentPointer();
-    if (siteSpaceId === undefined) {
-        console.error(
-            `No siteSpaceId in pointer. organizationId: ${organizationId}, siteId: ${siteId}, pageId: ${args.pageId}`,
-        );
 
-        return;
-    }
+    assert(
+        siteSpaceId,
+        `No siteSpaceId in pointer. organizationId: ${organizationId}, siteId: ${siteId}, pageId: ${args.pageId}`,
+    );
 
     await api().orgs.createSitesPageFeedback(
         organizationId,
