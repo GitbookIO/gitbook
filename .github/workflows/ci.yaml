@@ -4,6 +4,10 @@ on:
     push:
         branches:
             - main
+permissions:
+    pull-requests: write
+    checks: write
+    statuses: write
 env:
     NPMRC_FONT_AWESOME_TOKEN: ${{ secrets.NPMRC_FONT_AWESOME_TOKEN }}
 jobs:
@@ -60,7 +64,7 @@ jobs:
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   workingDirectory: ./
                   wranglerVersion: '3.82.0'
-                  command: pages deploy ./packages/gitbook/.vercel/output/static --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }} --branch ${{ github.ref == 'refs/heads/main' && 'main' || github.event.pull_request.number }}
+                  command: pages deploy ./packages/gitbook/.vercel/output/static --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }} --branch ${{ github.ref == 'refs/heads/main' && 'main' || format('pr{0}', github.event.pull_request.number) }}
             - name: Outputs
               run: |
                   echo "URL: ${{ steps.deploy.outputs.url }}"
@@ -85,15 +89,13 @@ jobs:
               uses: peter-evans/find-comment@v3
               id: fc
               with:
-                  token: ${{ secrets.GH_PERSONAL_TOKEN }}
                   issue-number: ${{ github.event.pull_request.number }}
                   comment-author: 'github-actions[bot]'
-                  body-includes: Build output
+                  body-includes: GitBook Preview
 
             - name: Create or update GitHub comment
               uses: peter-evans/create-or-update-comment@v4
               with:
-                  token: ${{ secrets.GH_PERSONAL_TOKEN }}
                   comment-id: ${{ steps.fc.outputs.comment-id }}
                   issue-number: ${{ github.event.pull_request.number }}
                   body: |
