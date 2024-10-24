@@ -57,7 +57,7 @@ jobs:
                   SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
                   SENTRY_DSN: ${{ vars.SENTRY_DSN }}
             - id: deploy
-              name: Publish to Cloudflare Pages (Preview)
+              name: Deploy to Cloudflare
               uses: cloudflare/wrangler-action@v3
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
