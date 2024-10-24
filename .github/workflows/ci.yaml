@@ -14,7 +14,7 @@ jobs:
             contents: read
             deployments: write
         outputs:
-            deployment_url: ${{ steps.cloudflare.outputs.deployment-url }}
+            deployment_url: ${{ steps.cloudflare.outputs.url }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -63,7 +63,7 @@ jobs:
                   command: pages deploy ./packages/gitbook/.vercel/output/static --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }}
             - name: print deployment-url
               env:
-                  DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
+                  DEPLOYMENT_URL: ${{ steps.deploy.outputs.url }}
               run: echo $DEPLOYMENT_URL
             - name: print deployment-alias-url
               env:
@@ -71,7 +71,7 @@ jobs:
               run: echo $DEPLOYMENT_ALIAS_URL
             - name: Outputs
               run: |
-                  echo "URL: ${{ steps.deploy.outputs.deployment-url }}"
+                  echo "URL: ${{ steps.deploy.outputs.url }}"
                   echo "Alias URL: ${{ steps.deploy.outputs.deployment-alias-url }}"
             - name: Archive build output
               uses: actions/upload-artifact@v4
@@ -81,7 +81,7 @@ jobs:
             # Until https://github.com/cloudflare/wrangler-action/issues/301 is done
             - name: Update Deployment Status to Success
               env:
-                  DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
+                  DEPLOYMENT_URL: ${{ steps.deploy.outputs.url }}
               run: |
                   curl -X POST \
                     -H "Authorization: token ${{ secrets.GH_PERSONAL_TOKEN }}" \
