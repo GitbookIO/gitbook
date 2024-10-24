@@ -11,7 +11,7 @@
         "typecheck": "tsc --noEmit",
         "e2e": "playwright test",
         "unit": "bun test {src,packages}",
-        "generate": "gitbook-icons ./public/~gitbook/static/icons custom-icons && gitbook-math ./public/~gitbook/static/math && bun run ./scripts/copy-tm-grammars.ts ./public/~gitbook/static/tm-grammars",
+        "generate": "gitbook-icons ./public/~gitbook/static/icons custom-icons && gitbook-math ./public/~gitbook/static/math",
         "copy:icons": "gitbook-icons ./public/~gitbook/static/icons",
         "clean": "rm -rf ./.next && rm -rf ./public/~gitbook/static"
     },
@@ -91,7 +91,6 @@
         "tailwindcss": "^3.4.0",
         "typescript": "^5.5.3",
         "env-cmd": "^10.1.0",
-        "ts-essentials": "^10.0.1",
-        "tm-grammars": "^1.18.5"
+        "ts-essentials": "^10.0.1"
     }
 }
