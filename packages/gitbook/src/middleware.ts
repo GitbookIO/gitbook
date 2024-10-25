@@ -264,13 +264,15 @@ export async function middleware(request: NextRequest) {
 
     const isPrefetch = request.headers.has('x-middleware-prefetch');
 
-    if (isPrefetch) {
-        // To avoid cache poisoning, we don't cache prefetch requests
-        response.headers.set(
-            'cache-control',
-            'private, no-cache, no-store, max-age=0, must-revalidate',
-        );
-    } else {
+    console.log('isPrefetch', isPrefetch);
+
+    // if (isPrefetch) {
+    //     // To avoid cache poisoning, we don't cache prefetch requests
+    //     response.headers.set(
+    //         'cache-control',
+    //         'private, no-cache, no-store, max-age=0, must-revalidate',
+    //     );
+    // } else {
         if (typeof resolved.cacheMaxAge === 'number') {
             const cacheControl = `public, max-age=0, s-maxage=${resolved.cacheMaxAge}, stale-if-error=0`;
 
@@ -284,12 +286,12 @@ export async function middleware(request: NextRequest) {
                 response.headers.set('x-gitbook-cache-control', cacheControl);
             }
         }
+    // }
 
-        if (resolved.cacheTags && resolved.cacheTags.length > 0) {
-            const headerCacheTag = resolved.cacheTags.join(',');
-            response.headers.set('cache-tag', headerCacheTag);
-            response.headers.set('x-gitbook-cache-tag', headerCacheTag);
-        }
+    if (resolved.cacheTags && resolved.cacheTags.length > 0) {
+        const headerCacheTag = resolved.cacheTags.join(',');
+        response.headers.set('cache-tag', headerCacheTag);
+        response.headers.set('x-gitbook-cache-tag', headerCacheTag);
     }
 
     return response;
