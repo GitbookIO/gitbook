@@ -21,7 +21,7 @@ export interface PageIdParams {
     pageId: string;
 }
 
-export type SectionsList = { list: SiteSection[]; section: SiteSection; index: number; };
+export type SectionsList = { list: SiteSection[]; section: SiteSection; index: number };
 
 /**
  * Fetch all the data needed to render the content layout.

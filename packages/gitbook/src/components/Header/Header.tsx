@@ -1,9 +1,4 @@
-import {
-    CustomizationSettings,
-    Site,
-    SiteCustomizationSettings,
-    Space,
-} from '@gitbook/api';
+import { CustomizationSettings, Site, SiteCustomizationSettings, Space } from '@gitbook/api';
 import { CustomizationHeaderPreset } from '@gitbook/api';
 import { Suspense } from 'react';
 

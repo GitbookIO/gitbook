@@ -10,7 +10,11 @@ import { Button, Link } from '../primitives';
 /**
  * A set of navigational tabs representing site sections for multi-section sites
  */
-export function SiteSectionTabs(props: { list: SiteSection[]; section: SiteSection; index: number; }) {
+export function SiteSectionTabs(props: {
+    list: SiteSection[];
+    section: SiteSection;
+    index: number;
+}) {
     const { list: sections, section: currentSection, index: currentIndex } = props;
 
     const tabs = sections.map((section) => ({
