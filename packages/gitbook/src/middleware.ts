@@ -244,6 +244,15 @@ export async function middleware(request: NextRequest) {
     const target = new URL(rewritePathname, request.nextUrl.toString());
     target.search = url.search;
 
+    if (1) {
+        return NextResponse.json({ test: 'test' }, {
+            headers: {
+                'x-gitbook-version': buildVersion(),
+                'x-gitbook-test': 'works'
+            }
+        });
+    }
+
     const response = writeCookies(
         NextResponse.rewrite(target, {
             request: {
