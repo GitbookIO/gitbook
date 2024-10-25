@@ -6,11 +6,11 @@ import {
     RevisionPageGroup,
     Site,
     SiteCustomizationSettings,
-    SiteSection,
     Space,
 } from '@gitbook/api';
 import React from 'react';
 
+import { SectionsList } from '@/app/(site)/fetch';
 import { Footer } from '@/components/Footer';
 import { CompactHeader, Header } from '@/components/Header';
 import { CONTAINER_STYLE } from '@/components/layout';
@@ -31,7 +31,7 @@ export function SpaceLayout(props: {
     contentTarget: ContentTarget;
     space: Space;
     site: Site | null;
-    sections: { list: SiteSection[]; section: SiteSection } | null;
+    sections: SectionsList | null;
     spaces: Space[];
     customization: CustomizationSettings | SiteCustomizationSettings;
     pages: Revision['pages'];

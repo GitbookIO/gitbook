@@ -10,8 +10,8 @@ import { Button, Link } from '../primitives';
 /**
  * A set of navigational tabs representing site sections for multi-section sites
  */
-export function SiteSectionTabs(props: { sections: SiteSection[]; section: SiteSection }) {
-    const { sections, section: currentSection } = props;
+export function SiteSectionTabs(props: { list: SiteSection[]; section: SiteSection; index: number; }) {
+    const { list: sections, section: currentSection, index: currentIndex } = props;
 
     const tabs = sections.map((section) => ({
         id: section.id,
@@ -21,9 +21,6 @@ export function SiteSectionTabs(props: { sections: SiteSection[]; section: SiteS
 
     const currentTabRef = React.useRef<HTMLAnchorElement>(null);
     const navRef = React.useRef<HTMLDivElement>(null);
-
-    // we don't set the current tab with a click event because the tab will navigate to a different section and trigger a page reload.
-    const currentIndex = sections.findIndex((section) => section.id === currentSection?.id);
 
     const [tabDimensions, setTabDimensions] = React.useState<{
         left: number;
