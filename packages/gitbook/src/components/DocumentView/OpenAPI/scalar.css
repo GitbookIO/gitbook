@@ -57,6 +57,9 @@
     --scalar-shadow-1: 0 1px 3px 0 rgba(0, 0, 0, 0.11);
     --scalar-shadow-2: rgba(0, 0, 0, 0.08) 0px 13px 20px 0px, rgba(0, 0, 0, 0.08) 0px 3px 8px 0px,
         #eeeeed 0px 0 0 1px;
+
+    --scalar-selection-background: rgba(96, 175, 255, 0.4);
+    --scalar-selection-color: rgb(var(--dark-base, 22 22 22));
 }
 .dark .scalar-modal-layout,
 .dark .scalar-app,
@@ -114,6 +117,9 @@
     --scalar-shadow-1: 0 1px 3px 0 rgb(0, 0, 0, 0.1);
     --scalar-shadow-2: rgba(15, 15, 15, 0.2) 0px 3px 6px, rgba(15, 15, 15, 0.4) 0px 9px 24px,
         0 0 0 1px rgba(255, 255, 255, 0.1);
+
+    --scalar-selection-background: rgba(96, 175, 255, 0.4);
+    --scalar-selection-color: rgb(var(--light-base, 255 255 255));
 }
 .scalar-modal-layout,
 .scalar-app,
