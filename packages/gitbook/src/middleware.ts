@@ -253,8 +253,6 @@ export async function middleware(request: NextRequest) {
         resolved.cookies,
     );
 
-    console.log('headers', Array.from(response.headers.entries()));
-
     response.headers.set('x-gitbook-version', buildVersion());
 
     // Add Content Security Policy header
@@ -296,6 +294,7 @@ export async function middleware(request: NextRequest) {
         response.headers.set('x-gitbook-cache-tag', headerCacheTag);
     }
 
+    console.log('headers end', Array.from(response.headers.entries()));
     return response;
 }
 
