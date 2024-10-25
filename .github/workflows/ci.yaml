@@ -123,7 +123,7 @@ jobs:
             - name: Run Playwright tests
               run: bun e2e
               env:
-                  BASE_URL: ${{needs.deploy.outputs.deployment_url}}
+                  BASE_URL: ${{needs.deploy.outputs.url}}
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
             - uses: actions/upload-artifact@v4
               if: ${{ !cancelled() }}
@@ -149,7 +149,7 @@ jobs:
             - name: Run pagespeed tests
               run: bun ./packages/gitbook/tests/pagespeed-testing.ts $DEPLOYMENT_URL
               env:
-                  DEPLOYMENT_URL: ${{needs.deploy.outputs.deployment_url}}
+                  DEPLOYMENT_URL: ${{needs.deploy.outputs.url}}
                   PAGESPEED_API_KEY: ${{ secrets.PAGESPEED_API_KEY }}
     format:
         runs-on: ubuntu-latest
