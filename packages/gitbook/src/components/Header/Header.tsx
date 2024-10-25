@@ -1,13 +1,8 @@
-import {
-    CustomizationSettings,
-    Site,
-    SiteCustomizationSettings,
-    SiteSection,
-    Space,
-} from '@gitbook/api';
+import { CustomizationSettings, Site, SiteCustomizationSettings, Space } from '@gitbook/api';
 import { CustomizationHeaderPreset } from '@gitbook/api';
 import { Suspense } from 'react';
 
+import type { SectionsList } from '@/app/(site)/fetch';
 import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '@/components/layout';
 import { t, getSpaceLanguage } from '@/intl/server';
 import { ContentRefContext } from '@/lib/references';
@@ -27,7 +22,7 @@ export function Header(props: {
     space: Space;
     site: Site | null;
     spaces: Space[];
-    sections: { list: SiteSection[]; section: SiteSection } | null;
+    sections: SectionsList | null;
     context: ContentRefContext;
     customization: CustomizationSettings | SiteCustomizationSettings;
     withTopHeader?: boolean;
@@ -153,7 +148,7 @@ export function Header(props: {
                     )}
                 >
                     <div className={tcls(CONTAINER_STYLE)}>
-                        <SiteSectionTabs sections={sections.list} section={sections.section} />
+                        <SiteSectionTabs {...sections} />
                     </div>
                 </div>
             ) : null}

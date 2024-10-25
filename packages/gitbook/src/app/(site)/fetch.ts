@@ -21,7 +21,7 @@ export interface PageIdParams {
     pageId: string;
 }
 
-type SectionsList = { list: SiteSection[]; section: SiteSection };
+export type SectionsList = { list: SiteSection[]; section: SiteSection; index: number };
 
 /**
  * Fetch all the data needed to render the content layout.
@@ -70,7 +70,7 @@ export async function fetchContentData() {
 function parseSiteSectionsList(siteSectionId: string, sections: SiteSection[]) {
     const section = sections.find((section) => section.id === siteSectionId);
     assert(sectionIsDefined(section), 'A section must be defined when there are multiple sections');
-    return { list: sections, section } satisfies SectionsList;
+    return { list: sections, section, index: sections.indexOf(section) } satisfies SectionsList;
 }
 
 function sectionIsDefined(section?: SiteSection): section is NonNullable<SiteSection> {
