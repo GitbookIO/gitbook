@@ -264,7 +264,7 @@ export async function middleware(request: NextRequest) {
 
     const isPrefetch = request.headers.has('x-middleware-prefetch');
 
-    console.log('isPrefetch', isPrefetch);
+    console.log('isPrefetch', isPrefetch, resolved.cacheMaxAge, resolved.cacheTags);
 
     // if (isPrefetch) {
     //     // To avoid cache poisoning, we don't cache prefetch requests
