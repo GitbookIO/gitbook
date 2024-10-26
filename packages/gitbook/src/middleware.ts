@@ -20,7 +20,7 @@ import {
 import { race } from '@/lib/async';
 import { buildVersion } from '@/lib/build';
 import { createContentSecurityPolicyNonce, getContentSecurityPolicy } from '@/lib/csp';
-import { getURLLookupAlternatives, normalizeURL } from '@/lib/middleware';
+import { getURLLookupAlternatives, normalizeURL, setMiddlewareHeader } from '@/lib/middleware';
 import {
     VisitorAuthCookieValue,
     getVisitorAuthCookieName,
@@ -253,43 +253,31 @@ export async function middleware(request: NextRequest) {
         resolved.cookies,
     );
 
-    response.headers.set('x-gitbook-version', buildVersion());
+    setMiddlewareHeader(response, 'x-gitbook-version', buildVersion());
 
     // Add Content Security Policy header
-    response.headers.set('content-security-policy', csp);
+    setMiddlewareHeader(response, 'content-security-policy', csp);
     // Basic security headers
-    response.headers.set('strict-transport-security', 'max-age=31536000');
-    response.headers.set('referrer-policy', 'no-referrer-when-downgrade');
-    response.headers.set('x-content-type-options', 'nosniff');
+    setMiddlewareHeader(response, 'strict-transport-security', 'max-age=31536000');
+    setMiddlewareHeader(response, 'referrer-policy', 'no-referrer-when-downgrade');
+    setMiddlewareHeader(response, 'x-content-type-options', 'nosniff');
 
-    const isPrefetch = request.headers.has('x-middleware-prefetch');
+    if (typeof resolved.cacheMaxAge === 'number') {
+        const cacheControl = `public, max-age=0, s-maxage=${resolved.cacheMaxAge}, stale-if-error=0`;
 
-    if (isPrefetch) {
-        // To avoid cache poisoning, we don't cache prefetch requests
-        response.headers.set(
-            'cache-control',
-            'private, no-cache, no-store, max-age=0, must-revalidate',
-        );
-    } else {
-        if (typeof resolved.cacheMaxAge === 'number') {
-            const cacheControl = `public, max-age=0, s-maxage=${resolved.cacheMaxAge}, stale-if-error=0`;
-
-            if (
-                process.env.GITBOOK_OUTPUT_CACHE === 'true' &&
-                process.env.NODE_ENV !== 'development'
-            ) {
-                response.headers.set('cache-control', cacheControl);
-                response.headers.set('Cloudflare-CDN-Cache-Control', cacheControl);
-            } else {
-                response.headers.set('x-gitbook-cache-control', cacheControl);
-            }
+        if (process.env.GITBOOK_OUTPUT_CACHE === 'true' && process.env.NODE_ENV !== 'development') {
+            setMiddlewareHeader(response, 'cache-control', cacheControl);
+            setMiddlewareHeader(response, 'Cloudflare-CDN-Cache-Control', cacheControl);
+        } else {
+            setMiddlewareHeader(response, 'x-gitbook-cache-control', cacheControl);
         }
+    }
+    // }
 
-        if (resolved.cacheTags && resolved.cacheTags.length > 0) {
-            const headerCacheTag = resolved.cacheTags.join(',');
-            response.headers.set('cache-tag', headerCacheTag);
-            response.headers.set('x-gitbook-cache-tag', headerCacheTag);
-        }
+    if (resolved.cacheTags && resolved.cacheTags.length > 0) {
+        const headerCacheTag = resolved.cacheTags.join(',');
+        setMiddlewareHeader(response, 'cache-tag', headerCacheTag);
+        setMiddlewareHeader(response, 'x-gitbook-cache-tag', headerCacheTag);
     }
 
     return response;
