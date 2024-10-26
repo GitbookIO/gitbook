@@ -11,6 +11,8 @@ export function setMiddlewareHeader(response: Response, name: string, value: str
     const responseHeaders = responseHeadersLocalStorage.getStore();
     response.headers.set(name, value);
 
+    console.log('setMiddlewareHeader', name, !!responseHeaders);
+
     if (responseHeaders) {
         responseHeaders.set(name, value);
     }
@@ -25,6 +27,7 @@ export async function withMiddlewareHeadersStorage(
     const responseHeaders = new Headers();
     const response = await responseHeadersLocalStorage.run(responseHeaders, handler);
 
+    console.log('withMiddlewareHeadersStorage', Array.from(responseHeaders.entries()));
     for (const [name, value] of responseHeaders.entries()) {
         response.headers.set(name, value);
     }
