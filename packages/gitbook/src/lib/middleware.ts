@@ -1,17 +1,19 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 
-const responseHeadersLocalStorage = new AsyncLocalStorage<Headers>();
-
 /**
  * Set a header on the middleware response.
  * We do this because of https://github.com/opennextjs/opennextjs-cloudflare/issues/92
  * It can be removed as soon as we move to opennext where hopefully this is fixed.
  */
 export function setMiddlewareHeader(response: Response, name: string, value: string) {
+    // @ts-ignore
+    const responseHeadersLocalStorage =
+        global.responseHeadersLocalStorage as AsyncLocalStorage<Headers>;
+    console.log('setMiddlewareHeader 0', name, !!responseHeadersLocalStorage);
     const responseHeaders = responseHeadersLocalStorage.getStore();
     response.headers.set(name, value);
 
-    console.log('setMiddlewareHeader', name, !!responseHeaders);
+    console.log('setMiddlewareHeader 1', name, !!responseHeaders);
 
     if (responseHeaders) {
         responseHeaders.set(name, value);
@@ -24,6 +26,13 @@ export function setMiddlewareHeader(response: Response, name: string, value: str
 export async function withMiddlewareHeadersStorage(
     handler: () => Promise<Response>,
 ): Promise<Response> {
+    // @ts-ignore
+    const responseHeadersLocalStorage =
+        (global.responseHeadersLocalStorage as AsyncLocalStorage<Headers>) ??
+        new AsyncLocalStorage<Headers>();
+    // @ts-ignore
+    global.responseHeadersLocalStorage = responseHeadersLocalStorage;
+
     const responseHeaders = new Headers();
     const response = await responseHeadersLocalStorage.run(responseHeaders, handler);
 
