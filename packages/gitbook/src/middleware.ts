@@ -262,17 +262,6 @@ export async function middleware(request: NextRequest) {
     setMiddlewareHeader(response, 'referrer-policy', 'no-referrer-when-downgrade');
     setMiddlewareHeader(response, 'x-content-type-options', 'nosniff');
 
-    const isPrefetch = request.headers.has('x-middleware-prefetch');
-
-    console.log('isPrefetch', isPrefetch, resolved.cacheMaxAge, resolved.cacheTags);
-
-    // if (isPrefetch) {
-    //     // To avoid cache poisoning, we don't cache prefetch requests
-    //     response.headers.set(
-    //         'cache-control',
-    //         'private, no-cache, no-store, max-age=0, must-revalidate',
-    //     );
-    // } else {
     if (typeof resolved.cacheMaxAge === 'number') {
         const cacheControl = `public, max-age=0, s-maxage=${resolved.cacheMaxAge}, stale-if-error=0`;
 
