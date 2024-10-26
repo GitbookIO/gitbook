@@ -1,0 +1,12 @@
+diff --git a/dist/index.js b/dist/index.js
+index 32fec63484ec332eb291a7253e5e168223627535..653dee64794140bafe57219356c712b197c17530 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -6983,6 +6983,7 @@ async function buildWorkerFile({ vercelConfig, vercelOutput }, {
+       outfile: outputFile,
+       allowOverwrite: true,
+       bundle: true,
++      external: ["node:*", "cloudflare:*"],
+       plugins: [
+         {
+           name: "custom-entrypoint-import-plugin",
