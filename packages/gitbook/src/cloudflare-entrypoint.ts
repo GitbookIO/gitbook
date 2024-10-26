@@ -9,11 +9,9 @@ import { withMiddlewareHeadersStorage } from './lib/middleware';
  */
 export default {
     async fetch(request, env, ctx) {
-        console.log('start custom fetch');
         const response = await withMiddlewareHeadersStorage(() =>
             nextOnPagesHandler.fetch(request, env, ctx),
         );
-        console.log('end custom fetch');
 
         return response;
     },

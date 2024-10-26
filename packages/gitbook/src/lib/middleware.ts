@@ -8,12 +8,9 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 export function setMiddlewareHeader(response: Response, name: string, value: string) {
     const responseHeadersLocalStorage =
         // @ts-ignore
-        globalThis.responseHeadersLocalStorage as AsyncLocalStorage<Headers>;
-    console.log('setMiddlewareHeader 0', name, !!responseHeadersLocalStorage);
-    const responseHeaders = responseHeadersLocalStorage.getStore();
+        globalThis.responseHeadersLocalStorage as AsyncLocalStorage<Headers> | undefined;
+    const responseHeaders = responseHeadersLocalStorage?.getStore();
     response.headers.set(name, value);
-
-    console.log('setMiddlewareHeader 1', name, !!responseHeaders);
 
     if (responseHeaders) {
         responseHeaders.set(name, value);
@@ -36,7 +33,6 @@ export async function withMiddlewareHeadersStorage(
     const responseHeaders = new Headers();
     const response = await responseHeadersLocalStorage.run(responseHeaders, handler);
 
-    console.log('withMiddlewareHeadersStorage', Array.from(responseHeaders.entries()));
     for (const [name, value] of responseHeaders.entries()) {
         response.headers.set(name, value);
     }
