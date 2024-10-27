@@ -11,8 +11,7 @@ migrations = [
 ]
 
 [observability]
-enabled = true
-head_sampling_rate = 0.01
+enabled = false
 
 [env.preview]
 name = "gitbook-open-cache-preview"
@@ -25,4 +24,4 @@ migrations = [
 
 [env.preview.observability]
 enabled = true
-head_sampling_rate = 1
+head_sampling_rate = 0.1
