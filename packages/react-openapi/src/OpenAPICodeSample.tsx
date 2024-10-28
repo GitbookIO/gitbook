@@ -119,7 +119,7 @@ export function OpenAPICodeSample(props: {
             tabs={samples}
             overlay={
                 data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'] ? null : (
-                    <ScalarApiButton />
+                    <ScalarApiButton method={data.method} path={data.path} />
                 )
             }
         />

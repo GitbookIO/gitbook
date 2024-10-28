@@ -6,12 +6,15 @@ import React from 'react';
 /**
  * Button which launches the Scalar API Client
  */
-export function ScalarApiButton() {
+export function ScalarApiButton({ method, path }: { method: string; path: string }) {
     const client = useApiClientModal();
 
     return (
         <div className="scalar scalar-activate">
-            <button className="scalar-activate-button" onClick={() => client?.open()}>
+            <button
+                className="scalar-activate-button"
+                onClick={() => client?.open({ method, path })}
+            >
                 <svg xmlns="http://www.w3.org/2000/svg" width="10" height="12" fill="none">
                     <path
                         stroke="currentColor"
