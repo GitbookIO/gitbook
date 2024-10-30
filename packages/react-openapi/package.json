@@ -10,7 +10,7 @@
     },
     "version": "0.7.0",
     "dependencies": {
-        "@scalar/api-client-react": "1.0.72",
+        "@scalar/api-client-react": "1.0.76",
         "classnames": "^2.5.1",
         "flatted": "^3.2.9",
         "openapi-types": "^12.1.3",
