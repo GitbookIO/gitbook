@@ -34,8 +34,12 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
                 'min-h-[1lh]',
                 // flip heading hash icon if list item is a heading
                 'flip-heading-hash',
+                // remove margin-top for the first heading in a list
+                '[&:is(h2)>div]:mt-0',
+                '[&:is(h3)>div]:mt-0',
+                '[&:is(h4)>div]:mt-0',
             )}
-            style="space-y-2 flex flex-col"
+            style="space-y-2 flex flex-col flex-1"
         />
     );
 
