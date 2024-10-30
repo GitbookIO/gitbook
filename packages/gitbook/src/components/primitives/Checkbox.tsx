@@ -6,16 +6,22 @@ import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
+export type CheckboxProps = React.ComponentProps<typeof CheckboxPrimitive.Root> & {
+    /**
+     * The size of the checkbox.
+     * @default medium
+     */
+    size?: 'small' | 'medium';
+};
+
 export const Checkbox = React.forwardRef<
     React.ElementRef<typeof CheckboxPrimitive.Root>,
-    React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>
->(({ className, ...props }, ref) => (
+    CheckboxProps
+>(({ className, size = 'medium', ...props }, ref) => (
     <CheckboxPrimitive.Root
         ref={ref}
         className={tcls(
             'peer',
-            'h-5',
-            'w-5',
             'shrink-0',
             'rounded-sm',
             'straight-corners:rounded-none',
@@ -32,11 +38,12 @@ export const Checkbox = React.forwardRef<
             'dark:ring-light/3',
             'dark:contrast-more:ring-light/6',
             'dark:data-[state=checked]:bg-primary-500',
+            { small: 'size-4', medium: 'size-5' }[size],
             className,
         )}
         {...props}
     >
-        <CheckboxPrimitive.Indicator className={tcls('relative', 'text-current')}>
+        <CheckboxPrimitive.Indicator className="relative text-current">
             {props.checked ? (
                 <Icon icon="check" iconStyle={IconStyle.Solid} className={'size-3'} />
             ) : null}

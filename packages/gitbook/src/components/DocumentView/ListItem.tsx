@@ -1,114 +1,227 @@
 import {
+    DocumentBlock,
     DocumentBlockListItem,
     DocumentBlockListOrdered,
-    DocumentBlockListTasks,
     DocumentBlockListUnordered,
 } from '@gitbook/api';
-import classNames from 'classnames';
+import assertNever from 'assert-never';
+import { assert } from 'ts-essentials';
 
 import { Checkbox } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
 
 import { BlockProps } from './Block';
 import { Blocks } from './Blocks';
-import styles from './ListItem.module.css';
 import { getBlockTextStyle } from './spacing';
 
 export function ListItem(props: BlockProps<DocumentBlockListItem>) {
     const { block, ancestorBlocks, ...contextProps } = props;
 
-    const textStyle = getBlockTextStyle(block);
+    const parent = ancestorBlocks[ancestorBlocks.length - 1];
+    assert(
+        (parent && parent.type === 'list-ordered') ||
+            parent.type === 'list-unordered' ||
+            parent.type === 'list-tasks',
+        'Invalid parent list type',
+    );
 
-    const parent = ancestorBlocks[ancestorBlocks.length - 1] as
-        | DocumentBlockListOrdered
-        | DocumentBlockListUnordered
-        | DocumentBlockListTasks
-        | undefined;
+    const blocksElement = (
+        <Blocks
+            {...contextProps}
+            nodes={block.nodes}
+            ancestorBlocks={[...ancestorBlocks, block]}
+            blockStyle={tcls(
+                'min-h-[1lh]',
+                // flip heading hash icon if list item is a heading
+                'flip-heading-hash',
+            )}
+            style="space-y-2 flex flex-col"
+        />
+    );
 
-    const ListItemType = () => {
-        switch (parent?.type) {
-            case 'list-tasks':
-                return (
-                    <li>
-                        <div className={tcls('flex', 'flex-row')}>
-                            <div
-                                className={tcls(
-                                    textStyle.textSize,
-                                    'flex',
-                                    'flex-col',
-                                    'justify-center',
-                                    'h-[1lh]',
-                                )}
-                            >
-                                <Checkbox
-                                    id={block.key!}
-                                    disabled
-                                    checked={block.data?.checked}
-                                    className={tcls('relative')}
-                                />
-                            </div>
-
-                            <label htmlFor={block.key} className={tcls('flex-1')}>
-                                <Blocks
-                                    {...contextProps}
-                                    nodes={block.nodes}
-                                    ancestorBlocks={[...ancestorBlocks, block]}
-                                    blockStyle={tcls('flip-heading-hash')}
-                                    style={tcls('ml-2', 'space-y-2')}
-                                />
-                            </label>
-                        </div>
-                    </li>
-                );
-            case 'list-ordered':
-                const start = parent.data.start ?? 1;
-                const indexInParent = parent.nodes.findIndex((node) => node.key === block.key) ?? 0;
-                const index = indexInParent + start;
-
-                return (
-                    <li value={index} className={tcls(textStyle.lineHeight)}>
-                        <div
-                            data-value={index}
-                            className={classNames(
-                                'bullet',
-                                styles.olListItemBullet,
-                                tcls(textStyle.textSize),
-                            )}
-                        ></div>
-                        {/* zero width space to force layouts with empty lists */}
-                        <Blocks
-                            {...contextProps}
-                            nodes={block.nodes}
-                            ancestorBlocks={[...ancestorBlocks, block]}
-                            style={tcls('space-y-2', 'flex-1', 'flex', 'flex-col')}
-                            blockStyle={tcls(
-                                textStyle.lineHeight,
-                                'min-h-[1lh]',
-                                //flip heading hash icon if list item is a heading
-                                'flip-heading-hash',
-                            )}
+    switch (parent.type) {
+        case 'list-tasks':
+            return (
+                <ListItemLI block={block}>
+                    <ListItemPrefix block={block}>
+                        <Checkbox
+                            id={block.key!}
+                            disabled
+                            checked={block.data?.checked}
+                            className="relative"
+                            size="small"
                         />
-                    </li>
-                );
-            default:
-                return (
-                    <li className={tcls(textStyle.lineHeight)}>
-                        <div className={tcls('bullet', textStyle.textSize)}></div>
-                        <Blocks
-                            {...contextProps}
-                            nodes={block.nodes}
-                            ancestorBlocks={[...ancestorBlocks, block]}
-                            style={tcls('space-y-2', 'flex', 'flex-col')}
-                            blockStyle={tcls(
-                                'min-h-[1lh]',
-                                //flip heading hash icon if list item is a heading
-                                'flip-heading-hash',
-                            )}
+                    </ListItemPrefix>
+
+                    <label htmlFor={block.key} className={tcls('flex-1')}>
+                        {blocksElement}
+                    </label>
+                </ListItemLI>
+            );
+        case 'list-ordered':
+            return (
+                <ListItemLI block={block}>
+                    <ListItemPrefix block={block}>
+                        <PseudoBefore
+                            content={getOrderedListItemPrefixContent({
+                                depth: getListItemDepth({ ancestorBlocks, type: parent.type }),
+                                block,
+                                parent,
+                            })}
+                            style={{
+                                fontSize: 'min(1em, 24px)',
+                            }}
                         />
-                    </li>
-                );
+                    </ListItemPrefix>
+                    {blocksElement}
+                </ListItemLI>
+            );
+        case 'list-unordered':
+            return (
+                <ListItemLI block={block}>
+                    <ListItemPrefix block={block}>
+                        <PseudoBefore
+                            content={getUnorderedListItemsPrefixContent({
+                                depth: getListItemDepth({ ancestorBlocks, type: parent.type }),
+                            })}
+                            fontFamily="Arial"
+                            style={{ fontSize: 'min(1.5em, 24px)', lineHeight: 1 }}
+                        />
+                    </ListItemPrefix>
+                    {blocksElement}
+                </ListItemLI>
+            );
+        default:
+            assertNever(parent);
+    }
+}
+
+function getListItemDepth(input: {
+    ancestorBlocks: DocumentBlock[];
+    type: DocumentBlockListOrdered['type'] | DocumentBlockListUnordered['type'];
+}): number {
+    const { ancestorBlocks, type } = input;
+
+    let depth = -1;
+
+    for (let i = ancestorBlocks.length - 1; i >= 0; i--) {
+        const block = ancestorBlocks[i];
+        if (block.type === type) {
+            depth = depth + 1;
+            continue;
         }
-    };
+        if (block.type === 'list-item') {
+            continue;
+        }
+        break;
+    }
 
-    return <ListItemType />;
+    return depth;
+}
+
+function ListItemLI(props: { block: DocumentBlockListItem; children: React.ReactNode }) {
+    const textStyle = getBlockTextStyle(props.block);
+    return <li className={tcls(textStyle.lineHeight, 'flex items-start')}>{props.children}</li>;
+}
+
+function ListItemPrefix(props: { block: DocumentBlockListItem; children: React.ReactNode }) {
+    const textStyle = getBlockTextStyle(props.block);
+    return (
+        <div
+            className={tcls(
+                textStyle.textSize,
+                textStyle.lineHeight,
+                'flex items-center justify-center mr-1 min-h-[1lh] min-w-6 text-dark/6 dark:text-light/5',
+            )}
+        >
+            {props.children}
+        </div>
+    );
+}
+
+function getUnorderedListItemsPrefixContent(input: { depth: number }): string {
+    switch (input.depth % 3) {
+        case 0:
+            return '•';
+        case 1:
+            return '◦';
+        case 2:
+            return '▪';
+        default:
+            return '•';
+    }
+}
+
+function PseudoBefore(props: {
+    style?: React.CSSProperties;
+    content: string;
+    fontFamily?: string;
+}) {
+    return (
+        <div
+            className="before:font-var before:content-[--pseudoBefore--content]"
+            style={
+                {
+                    '--pseudoBefore--content': `'${props.content}'`,
+                    '--font-family': props.fontFamily ?? 'inherit',
+                    ...props.style,
+                } as React.CSSProperties
+            }
+        />
+    );
+}
+
+function getOrderedListItemPrefixContent(input: {
+    depth: number;
+    parent: DocumentBlockListOrdered;
+    block: DocumentBlockListItem;
+}): string {
+    const { parent, block } = input;
+    const start = parent.data.start ?? 1;
+    const index = parent.nodes.findIndex((node) => node.key === block.key) ?? 0;
+    const value = index + start;
+    switch (input.depth % 3) {
+        // Use numbers
+        case 0: {
+            return `${value}.`;
+        }
+        // Use letters
+        case 1: {
+            const letters = 'abcdefghijklmnopqrstuvwxyz';
+            return `${letters[(value - 1) % letters.length]}.`;
+        }
+        // Use roman numbers
+        case 2: {
+            return `${toRoman(value).toLowerCase()}.`;
+        }
+        default:
+            return '•';
+    }
+}
+
+function toRoman(input: number): string {
+    const lookup = {
+        M: 1000,
+        CM: 900,
+        D: 500,
+        CD: 400,
+        C: 100,
+        XC: 90,
+        L: 50,
+        XL: 40,
+        X: 10,
+        IX: 9,
+        V: 5,
+        IV: 4,
+        I: 1,
+    };
+    let roman = '';
+    let number = input;
+    for (const i in lookup) {
+        while (number >= lookup[i as keyof typeof lookup]) {
+            roman += i;
+            number -= lookup[i as keyof typeof lookup];
+        }
+    }
+    return roman;
 }
