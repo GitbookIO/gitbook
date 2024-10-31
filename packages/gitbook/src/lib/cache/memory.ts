@@ -71,9 +71,11 @@ async function getMemoryCache(): Promise<Map<string, CacheEntry>> {
     } = await getGlobalContext();
 
     if (ctx.gitbookMemoryCache) {
+        console.log('Memory cache already exists');
         return ctx.gitbookMemoryCache;
     }
-
+    
+    console.log('Creating memory cache');
     const gitbookMemoryCache = new Map<string, CacheEntry>();
     ctx.gitbookMemoryCache = gitbookMemoryCache;
 
