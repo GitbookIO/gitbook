@@ -4,7 +4,6 @@ import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
-import { getContainerHorizontalPaddingStyle } from '../layout';
 import { Link } from '../primitives';
 
 /**
@@ -118,11 +117,6 @@ export function SiteSectionTabs(props: {
         </nav>
     ) : null;
 }
-
-/**
- * Horizontal padding for the tabs. Gives a nice hover effect and is used to calculate the padding of the container.
- */
-const TAB_HORIZONTAL_PADDING = 3;
 
 /**
  * The tab item - a link to a site section
