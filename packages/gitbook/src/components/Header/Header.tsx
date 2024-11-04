@@ -26,10 +26,8 @@ export function Header(props: {
     context: ContentRefContext;
     customization: CustomizationSettings | SiteCustomizationSettings;
     withTopHeader?: boolean;
-    children?: React.ReactNode;
 }) {
-    const { children, context, space, site, spaces, sections, customization, withTopHeader } =
-        props;
+    const { context, space, site, spaces, sections, customization, withTopHeader } = props;
     const isCustomizationDefault =
         customization.header.preset === CustomizationHeaderPreset.Default;
     const hasSiteSections = sections && sections.list.length > 1;
@@ -145,11 +143,11 @@ export function Header(props: {
                 <div
                     className={tcls(
                         'w-full shadow-thintop dark:shadow-light/1 bg-light dark:bg-dark z-[9] mt-0.5',
+                        // Handle long section tabs, particularly on smaller screens.
+                        'overflow-x-auto hide-scroll',
                     )}
                 >
-                    <div className={tcls(CONTAINER_STYLE)}>
-                        <SiteSectionTabs {...sections} />
-                    </div>
+                    <SiteSectionTabs {...sections} />
                 </div>
             ) : null}
         </header>

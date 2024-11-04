@@ -1,11 +1,11 @@
 'use client';
 import { SiteSection } from '@gitbook/api';
-import { Icon } from '@gitbook/icons';
 import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
-import { Button, Link } from '../primitives';
+import { getContainerHorizontalPaddingStyle } from '../layout';
+import { Link } from '../primitives';
 
 /**
  * A set of navigational tabs representing site sections for multi-section sites
@@ -35,7 +35,11 @@ export function SiteSectionTabs(props: {
         if (currentTabRef.current && navRef.current) {
             const rect = currentTabRef.current.getBoundingClientRect();
             const navRect = navRef.current.getBoundingClientRect();
-            setTabDimensions({ left: rect.left - navRect.left, width: rect.width });
+
+            setTabDimensions({
+                left: rect.left - navRect.left,
+                width: rect.width,
+            });
         }
     }, []);
 
@@ -56,13 +60,11 @@ export function SiteSectionTabs(props: {
     const scale = (tabDimensions?.width ?? 0) * 0.01;
     const startPos = `${tabDimensions?.left ?? 0}px`;
 
-    const hasMoreSections = false; /** TODO: determine whether we need to show the more button */
-
     return tabs.length > 0 ? (
         <nav
             aria-label="Sections"
             ref={navRef}
-            className="flex flex-nowrap items-center max-w-screen mb-px"
+            className="flex-nowrap items-center mb-px"
             style={
                 {
                     '--tab-opacity': `${opacity}`,
@@ -77,6 +79,10 @@ export function SiteSectionTabs(props: {
                     'flex',
                     'gap-2',
                     'bg-transparent',
+
+                    // Calculate horizontal padding, considering the horizontal padding of the tabs themselves.
+                    getContainerHorizontalPaddingStyle(TAB_HORIZONTAL_PADDING),
+
                     /* add a pseudo element for active tab indicator */
                     'after:block',
                     "after:content-['']",
@@ -107,10 +113,14 @@ export function SiteSectionTabs(props: {
                     />
                 ))}
             </div>
-            {hasMoreSections ? <MoreSectionsButton /> : null}
         </nav>
     ) : null;
 }
+
+/**
+ * Horizontal padding for the tabs. Gives a nice hover effect and is used to calculate the padding of the container.
+ */
+const TAB_HORIZONTAL_PADDING = 3;
 
 /**
  * The tab item - a link to a site section
@@ -121,7 +131,8 @@ const Tab = React.forwardRef<HTMLSpanElement, { active: boolean; href: string; l
         return (
             <Link
                 className={tcls(
-                    'px-3 py-1 my-2 rounded straight-corners:rounded-none transition-colors',
+                    `px-${TAB_HORIZONTAL_PADDING}`,
+                    'py-1 my-2 rounded straight-corners:rounded-none transition-colors',
                     active && 'text-primary dark:text-primary-400',
                     !active &&
                         'text-dark/8 hover:bg-dark/1 hover:text-dark/9 dark:text-light/8 dark:hover:bg-light/2 dark:hover:text-light/9',
@@ -136,16 +147,3 @@ const Tab = React.forwardRef<HTMLSpanElement, { active: boolean; href: string; l
         );
     },
 );
-
-/**
- * Dropdown trigger for when there are too many sections to show them all
- */
-function MoreSectionsButton() {
-    return (
-        <div>
-            <Button variant="secondary" size="small">
-                <Icon icon="ellipsis-h" size={12} />
-            </Button>
-        </div>
-    );
-}
