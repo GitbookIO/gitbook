@@ -6,25 +6,12 @@ import { ClassValue } from '@/lib/tailwind';
 export const HEADER_HEIGHT_DESKTOP = 64 as const;
 
 /**
- * Returns horizontal padding classes for the application. Optionally provide
- * an offset to adjust the padding.
- */
-export function getContainerHorizontalPaddingStyle(offset: number = 0): ClassValue {
-    return [
-        // px-4
-        `px-${4 - offset}`,
-        // sm:px-6
-        `sm:px-${6 - offset}`,
-        // md:px-8
-        `md:px-${8 - offset}`,
-    ];
-}
-
-/**
  * Style for the container to adapt between normal and full width.
  */
 export const CONTAINER_STYLE: ClassValue = [
-    getContainerHorizontalPaddingStyle(),
+    'px-4',
+    'sm:px-6',
+    'md:px-8',
     'max-w-screen-2xl',
     'mx-auto',
     'page-full-width:max-w-full',

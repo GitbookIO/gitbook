@@ -80,8 +80,10 @@ export function SiteSectionTabs(props: {
                     'gap-2',
                     'bg-transparent',
 
-                    // Calculate horizontal padding, considering the horizontal padding of the tabs themselves.
-                    getContainerHorizontalPaddingStyle(TAB_HORIZONTAL_PADDING),
+                    // Horizontal padding, which is the layout padding minus the padding of the tabs themselves.
+                    'px-1',
+                    'sm:px-3',
+                    'md:px-5',
 
                     /* add a pseudo element for active tab indicator */
                     'after:block',
@@ -131,8 +133,7 @@ const Tab = React.forwardRef<HTMLSpanElement, { active: boolean; href: string; l
         return (
             <Link
                 className={tcls(
-                    `px-${TAB_HORIZONTAL_PADDING}`,
-                    'py-1 my-2 rounded straight-corners:rounded-none transition-colors',
+                    'px-3 py-1 my-2 rounded straight-corners:rounded-none transition-colors',
                     active && 'text-primary dark:text-primary-400',
                     !active &&
                         'text-dark/8 hover:bg-dark/1 hover:text-dark/9 dark:text-light/8 dark:hover:bg-light/2 dark:hover:text-light/9',
