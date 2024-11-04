@@ -64,7 +64,7 @@ export function SiteSectionTabs(props: {
         <nav
             aria-label="Sections"
             ref={navRef}
-            className="flex-nowrap items-center mb-px"
+            className="flex flex-nowrap items-center mb-px"
             style={
                 {
                     '--tab-opacity': `${opacity}`,
