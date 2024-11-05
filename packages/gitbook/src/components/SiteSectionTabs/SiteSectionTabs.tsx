@@ -63,7 +63,7 @@ export function SiteSectionTabs(props: {
         <nav
             aria-label="Sections"
             ref={navRef}
-            className="flex flex-nowrap items-center mb-px"
+            className="flex flex-nowrap items-center mb-px max-w-screen-2xl mx-auto page-full-width:max-w-full"
             style={
                 {
                     '--tab-opacity': `${opacity}`,
@@ -72,47 +72,52 @@ export function SiteSectionTabs(props: {
                 } as React.CSSProperties
             }
         >
-            <div
-                className={tcls(
-                    'relative',
-                    'flex',
-                    'gap-2',
-                    'bg-transparent',
-
-                    // Horizontal padding, which is the layout padding minus the padding of the tabs themselves.
-                    'px-1',
-                    'sm:px-3',
-                    'md:px-5',
-
-                    /* add a pseudo element for active tab indicator */
-                    'after:block',
-                    "after:content-['']",
-                    'after:origin-left',
-                    'after:absolute',
-                    'after:-bottom-px',
-                    'after:left-0',
-                    'after:opacity-[--tab-opacity]',
-                    'after:scale-x-[--tab-scale]',
-                    'after:[transition:_opacity_150ms_25ms,transform_150ms]',
-                    'after:motion-reduce:transition-none',
-                    'after:translate-x-[var(--tab-start)]',
-                    'after:will-change-transform',
-                    'after:h-0.5',
-                    'after:w-[100px]',
-                    'after:bg-primary',
-                    'dark:after:bg-primary-400',
-                )}
-                role="tablist"
-            >
-                {tabs.map((tab, index) => (
-                    <Tab
-                        active={currentIndex === index}
-                        key={index + tab.path}
-                        label={tab.label}
-                        href={tab.path}
-                        ref={currentIndex === index ? currentTabRef : null}
-                    />
-                ))}
+            <div className="flex flex-col bg-transparent">
+                {/* An element for the tabs which includes the page padding */}
+                <div
+                    role="tablist"
+                    className={tcls(
+                        'flex flex-row gap-2',
+                        // Horizontal padding, which is the layout padding minus the padding of the tabs themselves.
+                        'px-1',
+                        'sm:px-3',
+                        'md:px-5',
+                    )}
+                >
+                    {tabs.map((tab, index) => (
+                        <Tab
+                            active={currentIndex === index}
+                            key={index + tab.path}
+                            label={tab.label}
+                            href={tab.path}
+                            ref={currentIndex === index ? currentTabRef : null}
+                        />
+                    ))}
+                </div>
+                {/* A container for a pseudo element for active tab indicator. A container is needed so we can set
+                    a relative position without breaking the z-index of other parts of the header. */}
+                <div
+                    className={tcls(
+                        'flex',
+                        'relative',
+                        'after:block',
+                        "after:content-['']",
+                        'after:origin-left',
+                        'after:absolute',
+                        'after:-bottom-px',
+                        'after:left-0',
+                        'after:opacity-[--tab-opacity]',
+                        'after:scale-x-[--tab-scale]',
+                        'after:[transition:_opacity_150ms_25ms,transform_150ms]',
+                        'after:motion-reduce:transition-none',
+                        'after:translate-x-[var(--tab-start)]',
+                        'after:will-change-transform',
+                        'after:h-0.5',
+                        'after:w-[100px]',
+                        'after:bg-primary',
+                        'dark:after:bg-primary-400',
+                    )}
+                ></div>
             </div>
         </nav>
     ) : null;
