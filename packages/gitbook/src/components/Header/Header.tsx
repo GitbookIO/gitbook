@@ -142,7 +142,7 @@ export function Header(props: {
             {sections ? (
                 <div
                     className={tcls(
-                        'w-full shadow-thintop dark:shadow-light/1 bg-light dark:bg-dark z-[9] mt-0.5',
+                        'w-full shadow-thintop dark:shadow-light/1 bg-light dark:bg-dark mt-0.5',
                         // Handle long section tabs, particularly on smaller screens.
                         'overflow-x-auto hide-scroll',
                     )}
