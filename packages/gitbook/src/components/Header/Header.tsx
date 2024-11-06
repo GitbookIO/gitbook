@@ -72,11 +72,11 @@ export function Header(props: {
                     )}
                 >
                     <HeaderLogo site={site} space={space} customization={customization} />
-                    <span>
+                    <div className="z-20">
                         {!hasSiteSections && isMultiVariants ? (
                             <SpacesDropdown space={space} spaces={spaces} />
                         ) : null}
-                    </span>
+                    </div>
                     <HeaderLinks>
                         {customization.header.links.map((link, index) => {
                             return (
