@@ -39,6 +39,7 @@ export const ibmPlexMono = IBM_Plex_Mono({
     display: 'swap',
     preload: false,
     fallback: ['monospace'],
+    adjustFontFallback: false,
 });
 
 const firaSans = Fira_Sans_Extra_Condensed({
