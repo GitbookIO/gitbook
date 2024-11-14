@@ -483,7 +483,11 @@ async function lookupSiteOrSpaceInMultiIdMode(
     // (the cache is not dependend on the auth token, so it could leak data)
     if (source.kind === 'site') {
         await withAPI(gitbookAPI, () =>
-            getPublishedContentSite.revalidate(decoded.organization, source.id, undefined),
+            getPublishedContentSite.revalidate({
+                organizationId: decoded.organization,
+                siteId: source.id,
+                siteShareKey: undefined,
+            }),
         );
     }
 

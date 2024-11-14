@@ -1,7 +1,7 @@
 import { SpaceIntegrationScript } from '@gitbook/api';
 
 import { CustomizationRootLayout } from '@/components/RootLayout';
-import { getCurrentSiteCustomization, getSpaceCustomization } from '@/lib/api';
+import { getSiteData, getSpaceCustomization } from '@/lib/api';
 
 import { getSiteOrSpacePointerForPDF } from './pointer';
 
@@ -13,11 +13,9 @@ export default async function PDFRootLayout(props: { children: React.ReactNode }
     const { children } = props;
 
     const pointer = getSiteOrSpacePointerForPDF();
-    const data = await ('siteId' in pointer
-        ? getCurrentSiteCustomization(pointer)
+    const { customization } = await ('siteId' in pointer
+        ? getSiteData(pointer)
         : getSpaceLayoutData(pointer.spaceId));
-
-    const customization = 'customization' in data ? data.customization : data;
 
     return (
         <CustomizationRootLayout customization={customization}>{children}</CustomizationRootLayout>
@@ -28,7 +26,7 @@ export default async function PDFRootLayout(props: { children: React.ReactNode }
  * Fetch all the layout data about a space at once.
  */
 async function getSpaceLayoutData(spaceId: string) {
-    const [customization, scripts] = await Promise.all([
+    const [{ customization }, scripts] = await Promise.all([
         getSpaceCustomization(spaceId),
         [] as SpaceIntegrationScript[],
     ]);
