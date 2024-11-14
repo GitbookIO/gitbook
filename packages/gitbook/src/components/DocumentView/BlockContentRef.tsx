@@ -48,7 +48,7 @@ async function SpaceRefCard(
         return null;
     }
 
-    const spaceCustomization = await ignoreAPIError(getSpaceCustomization(spaceId));
+    const spaceCustomization = getSpaceCustomization(spaceId);
     const customFavicon = spaceCustomization?.favicon;
     const customEmoji = customFavicon && 'emoji' in customFavicon ? customFavicon.emoji : undefined;
     const customIcon = customFavicon && 'icon' in customFavicon ? customFavicon.icon : undefined;

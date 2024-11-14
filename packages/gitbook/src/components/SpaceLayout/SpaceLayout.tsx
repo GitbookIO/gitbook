@@ -10,14 +10,13 @@ import {
 } from '@gitbook/api';
 import React from 'react';
 
-import { SectionsList } from '@/app/(site)/fetch';
 import { Footer } from '@/components/Footer';
 import { CompactHeader, Header } from '@/components/Header';
 import { CONTAINER_STYLE } from '@/components/layout';
 import { ColorDebugger } from '@/components/primitives/ColorDebugger';
 import { SearchModal } from '@/components/Search';
 import { TableOfContents } from '@/components/TableOfContents';
-import { ContentTarget, SiteContentPointer } from '@/lib/api';
+import { ContentTarget, type SectionsList, SiteContentPointer } from '@/lib/api';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 

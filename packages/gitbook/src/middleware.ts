@@ -14,8 +14,8 @@ import {
     userAgent,
     withAPI,
     DEFAULT_API_ENDPOINT,
-    getSiteLayoutData,
-    getSite,
+    getPublishedContentSite,
+    getSiteData,
 } from '@/lib/api';
 import { race } from '@/lib/async';
 import { buildVersion } from '@/lib/build';
@@ -175,10 +175,12 @@ export async function middleware(request: NextRequest) {
             );
 
             const { scripts } = await ('site' in resolved
-                ? getSiteLayoutData({
+                ? getSiteData({
                       organizationId: resolved.organization,
                       siteId: resolved.site,
+                      siteSectionId: resolved.siteSection,
                       siteSpaceId: resolved.siteSpace,
+                      siteShareKey: resolved.shareKey,
                   })
                 : { scripts: [] });
             return getContentSecurityPolicy(scripts, nonce);
@@ -480,7 +482,9 @@ async function lookupSiteOrSpaceInMultiIdMode(
     // Verify access to the site to avoid leaking cached data in this mode
     // (the cache is not dependend on the auth token, so it could leak data)
     if (source.kind === 'site') {
-        await withAPI(gitbookAPI, () => getSite.revalidate(decoded.organization, source.id));
+        await withAPI(gitbookAPI, () =>
+            getPublishedContentSite.revalidate(decoded.organization, source.id, undefined),
+        );
     }
 
     const cookies: LookupCookies = {
