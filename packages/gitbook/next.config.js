@@ -2,6 +2,8 @@ const { withSentryConfig } = require('@sentry/nextjs');
 
 module.exports = withSentryConfig(
     {
+        output: 'standalone',
+
         env: {
             BUILD_VERSION: (process.env.GITHUB_SHA ?? '').slice(0, 7),
             SENTRY_DSN: process.env.SENTRY_DSN ?? '',

@@ -27,7 +27,8 @@
         "release": "turbo run release && changeset publish",
         "release:preview": "turbo run release:preview",
         "download:env": "op read op://gitbook-x-dev/gitbook-open/.env.local >> .env.local",
-        "clean": "turbo run clean"
+        "clean": "turbo run clean",
+        "start": "cd packages/gitbook && bun run start"
     },
     "workspaces": [
         "packages/*"
