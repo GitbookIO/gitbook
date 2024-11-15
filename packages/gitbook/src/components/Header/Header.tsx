@@ -2,9 +2,9 @@ import { CustomizationSettings, Site, SiteCustomizationSettings, Space } from '@
 import { CustomizationHeaderPreset } from '@gitbook/api';
 import { Suspense } from 'react';
 
-import type { SectionsList } from '@/app/(site)/fetch';
 import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '@/components/layout';
 import { t, getSpaceLanguage } from '@/intl/server';
+import type { SectionsList } from '@/lib/api';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 

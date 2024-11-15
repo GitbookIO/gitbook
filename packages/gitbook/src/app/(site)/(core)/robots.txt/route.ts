@@ -1,7 +1,6 @@
-import { ContentVisibility } from '@gitbook/api';
 import { NextRequest } from 'next/server';
 
-import { getCollection, getSite, getSpace } from '@/lib/api';
+import { getSpace, getSite } from '@/lib/api';
 import { absoluteHref } from '@/lib/links';
 import { getSiteContentPointer } from '@/lib/pointer';
 import { isSpaceIndexable } from '@/lib/seo';

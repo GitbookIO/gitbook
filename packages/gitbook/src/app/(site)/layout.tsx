@@ -1,5 +1,5 @@
 import { CustomizationRootLayout } from '@/components/RootLayout';
-import { getSiteLayoutData } from '@/lib/api';
+import { getSiteData } from '@/lib/api';
 import { getSiteContentPointer } from '@/lib/pointer';
 
 /**
@@ -10,7 +10,7 @@ export default async function SiteRootLayout(props: { children: React.ReactNode 
     const { children } = props;
 
     const pointer = getSiteContentPointer();
-    const { customization } = await getSiteLayoutData(pointer);
+    const { customization } = await getSiteData(pointer);
 
     return (
         <CustomizationRootLayout customization={customization}>{children}</CustomizationRootLayout>
