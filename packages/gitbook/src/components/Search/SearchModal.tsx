@@ -220,7 +220,7 @@ function SearchModalBody(
                     'flex',
                     'flex-row',
                     'items-start',
-                    'border-b',
+                    state.query !== null ? 'border-b' : null,
                     'border-dark/2',
                     'dark:border-light/2',
                 )}
