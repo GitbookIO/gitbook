@@ -22,10 +22,8 @@ import { Heading } from './Heading';
 import { Hint } from './Hint';
 import { Images } from './Images';
 import { IntegrationBlock } from './Integration';
+import { List } from './List';
 import { ListItem } from './ListItem';
-import { ListOrdered } from './ListOrdered';
-import { ListTasks } from './ListTasks';
-import { ListUnordered } from './ListUnordered';
 import { BlockMath } from './Math';
 import { OpenAPI } from './OpenAPI';
 import { Paragraph } from './Paragraph';
@@ -65,11 +63,9 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
             case 'heading-3':
                 return <Heading {...props} block={block} />;
             case 'list-ordered':
-                return <ListOrdered {...props} block={block} />;
             case 'list-unordered':
-                return <ListUnordered {...props} block={block} />;
             case 'list-tasks':
-                return <ListTasks {...props} block={block} />;
+                return <List {...props} block={block} />;
             case 'list-item':
                 return <ListItem {...props} block={block} />;
             case 'code':

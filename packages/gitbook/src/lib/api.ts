@@ -13,11 +13,15 @@ import {
     RevisionFile,
     SiteCustomizationSettings,
     RevisionReusableContent,
+    SiteSpace,
+    Space,
+    SiteSection,
+    PublishedSiteContent,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 import { headers } from 'next/headers';
 import rison from 'rison';
-import { DeepPartial } from 'ts-essentials';
+import { assert, DeepPartial } from 'ts-essentials';
 
 import { batch } from './async';
 import { buildVersion } from './build';
@@ -131,22 +135,10 @@ export function withAPI<T>(client: GitBookAPI, fn: () => Promise<T>): Promise<T>
     return apiSyncStorage.run(client, fn);
 }
 
-// FIXME: Fix @gitbook/api types for PublishedSiteContentLookup
-type SpaceContentLookup = {
-    kind: 'space';
-    /** ID of the space matching. */
-    space: string;
-    /** Identifier of the change request being previewed in this URL. */
-    changeRequest?: string;
-    /** Identifier of the revision being previewed in this URL. */
-    revision?: string;
-    /** Path of the content relative to the space */
-    pathname: string;
-    /** Prefix of the path in the URL dedicated to the space */
-    basePath: string;
-    /** Short-lived API token to fetch content related to the space in the context of the URL. */
-    apiToken: string;
-};
+type SpaceContentLookup = Pick<
+    PublishedSiteContent,
+    'space' | 'changeRequest' | 'revision' | 'pathname' | 'basePath' | 'apiToken'
+> & { kind: 'space' };
 
 export type PublishedContentWithCache =
     | ((SpaceContentLookup | PublishedSiteContentLookup) & {
@@ -629,84 +621,6 @@ export const getDocument = cache({
 });
 
 /**
- * Get the customization settings for a site-space from the API.
- */
-const getSiteSpaceCustomizationFromAPI = cache({
-    name: 'api.getSiteSpaceCustomizationById',
-    tag: (organizationId, siteId, siteSpaceId) => getAPICacheTag({ tag: 'site', site: siteId }),
-    get: async (
-        organizationId: string,
-        siteId: string,
-        siteSpaceId: string,
-        options: CacheFunctionOptions,
-    ) => {
-        const response = await api().orgs.getSiteSpaceCustomizationById(
-            organizationId,
-            siteId,
-            siteSpaceId,
-            {},
-            {
-                signal: options.signal,
-                ...noCacheFetchOptions,
-            },
-        );
-        return cacheResponse(response, {
-            revalidateBefore: 60 * 60,
-        });
-    },
-});
-
-/**
- * Get the customization settings for a site from the API.
- */
-const getSiteCustomizationFromAPI = cache({
-    name: 'api.getSiteCustomizationById',
-    tag: (organizationId, siteId) => getAPICacheTag({ tag: 'site', site: siteId }),
-    get: async (organizationId: string, siteId: string, options: CacheFunctionOptions) => {
-        const response = await api().orgs.getSiteCustomizationById(
-            organizationId,
-            siteId,
-            {},
-            {
-                signal: options.signal,
-                ...noCacheFetchOptions,
-            },
-        );
-        return cacheResponse(response, {
-            revalidateBefore: 60 * 60,
-        });
-    },
-});
-
-/**
- * Get the customization settings for a site space from the API.
- */
-async function getSiteSpaceCustomization(args: {
-    organizationId: string;
-    siteId: string;
-    siteSpaceId: string;
-}): Promise<SiteCustomizationSettings> {
-    const raw = await getSiteSpaceCustomizationFromAPI(
-        args.organizationId,
-        args.siteId,
-        args.siteSpaceId,
-    );
-
-    return mergeCustomizationWithExtend(raw);
-}
-
-/**
- * Get the customization settings for a site space from the API.
- */
-async function getSiteCustomization(args: {
-    organizationId: string;
-    siteId: string;
-}): Promise<SiteCustomizationSettings> {
-    const raw = await getSiteCustomizationFromAPI(args.organizationId, args.siteId);
-    return mergeCustomizationWithExtend(raw);
-}
-
-/**
  * Get the infos about a site by its ID.
  */
 export const getSite = cache({
@@ -724,59 +638,24 @@ export const getSite = cache({
 });
 
 /**
- * List all the site-spaces variants published in a site.
+ * Get the published content site data for a site's published experience
  */
-export const getSiteSpaces = cache({
-    name: 'api.getSiteSpaces',
+export const getPublishedContentSite = cache({
+    name: 'api.getPublishedContentSite',
     tag: ({ siteId }) => getAPICacheTag({ tag: 'site', site: siteId }),
     get: async (
         args: {
             organizationId: string;
-            siteId: string;
-            /** Site share key that can be used as context to resolve site space published urls */
+            siteId: string /** Site share key that can be used as context to resolve site space published urls */;
             siteShareKey: string | undefined;
         },
         options: CacheFunctionOptions,
     ) => {
-        const response = await getAll((params) =>
-            api().orgs.listSiteSpaces(
-                args.organizationId,
-                args.siteId,
-                {
-                    ...params,
-                    ...(args.siteShareKey ? { shareKey: args.siteShareKey } : {}),
-                },
-                {
-                    ...noCacheFetchOptions,
-                    signal: options.signal,
-                },
-            ),
-        );
-
-        return cacheResponse(response, {
-            revalidateBefore: 60 * 60,
-            data: response.data.items.map((siteSpace) => siteSpace),
-        });
-    },
-});
-
-export const getSiteStructure = cache({
-    name: 'api.getSiteStructure',
-    tag: ({ siteId }) => getAPICacheTag({ tag: 'site', site: siteId }),
-    get: async (
-        args: {
-            organizationId: string;
-            siteId: string;
-            /** Site share key that can be used as context to resolve site space published urls */
-            siteShareKey: string | undefined;
-        },
-        options: CacheFunctionOptions,
-    ) => {
-        const response = await api().orgs.getSiteStructure(
+        const response = await api().orgs.getPublishedContentSite(
             args.organizationId,
             args.siteId,
             {
-                ...(args.siteShareKey ? { shareKey: args.siteShareKey } : {}),
+                shareKey: args.siteShareKey,
             },
             {
                 ...noCacheFetchOptions,
@@ -785,89 +664,93 @@ export const getSiteStructure = cache({
         );
         return cacheResponse(response, {
             revalidateBefore: 60 * 60,
-            data: response.data,
         });
     },
 });
 
-/**
- * List the scripts to load for the site.
- */
-export const getSiteIntegrationScripts = cache({
-    name: 'api.getSiteIntegrationScripts',
-    tag: (organizationId, siteId) => getAPICacheTag({ tag: 'site', site: siteId }),
-    get: async (organizationId: string, siteId: string, options: CacheFunctionOptions) => {
-        const response = await api().orgs.listSiteIntegrationScripts(organizationId, siteId, {
-            ...noCacheFetchOptions,
-            signal: options.signal,
-        });
-        return cacheResponse(response, {
-            revalidateBefore: 60 * 60,
-        });
-    },
-});
+export type SectionsList = { list: SiteSection[]; section: SiteSection; index: number };
 
-/**
- * Fetch all the data to render the current site at once.
- */
-export async function getSiteData(pointer: SiteContentPointer) {
-    const [{ space, pages, contentTarget }, { customization, scripts }] = await Promise.all([
-        getSpaceContentData(pointer, pointer.siteShareKey),
-        getSiteLayoutData(pointer),
-    ]);
+function parseSpacesFromSiteSpaces(siteSpaces: SiteSpace[]) {
+    const spaces: Record<string, Space> = {};
+    siteSpaces.forEach((siteSpace) => {
+        spaces[siteSpace.space.id] = {
+            ...siteSpace.space,
+            title: siteSpace.title ?? siteSpace.space.title,
+            urls: {
+                ...siteSpace.space.urls,
+                published: siteSpace.urls.published,
+            },
+        };
+    });
+    return Object.values(spaces);
+}
 
-    return {
-        space,
-        pages,
-        contentTarget,
-        customization,
-        scripts,
-    };
+function parseSiteSectionsList(siteSectionId: string, sections: SiteSection[]) {
+    const section = sections.find((section) => section.id === siteSectionId);
+    assert(section, 'A section must be defined when there are multiple sections');
+    return { list: sections, section, index: sections.indexOf(section) } satisfies SectionsList;
 }
 
 /**
- * Fetch all the layout data about the current site at once.
+ * This function fetches the published content site data to render the published
+ * experience for the site (structure, customizations, scripts etc)
  */
-export async function getSiteLayoutData(args: {
-    organizationId: string;
-    siteId: string;
-    siteSpaceId: string | undefined;
-}) {
-    const [customization, scripts] = await Promise.all([
-        getCurrentSiteCustomization(args),
-        getSiteIntegrationScripts(args.organizationId, args.siteId),
-    ]);
+export async function getSiteData(
+    pointer: Pick<
+        SiteContentPointer,
+        'organizationId' | 'siteId' | 'siteSectionId' | 'siteSpaceId' | 'siteShareKey'
+    >,
+) {
+    const {
+        site: orgSite,
+        structure: siteStructure,
+        customizations,
+        scripts,
+    } = await getPublishedContentSite({
+        organizationId: pointer.organizationId,
+        siteId: pointer.siteId,
+        siteShareKey: pointer.siteShareKey,
+    });
+
+    const siteSections =
+        siteStructure.type === 'sections' && siteStructure.structure
+            ? siteStructure.structure
+            : null;
+    const siteSpaces =
+        siteStructure.type === 'siteSpaces' && siteStructure.structure
+            ? parseSpacesFromSiteSpaces(siteStructure.structure)
+            : null;
+    // override the title with the customization title
+    const site = {
+        ...orgSite,
+        ...(customizations.site?.title ? { title: customizations.site.title } : {}),
+    };
+
+    const sections =
+        pointer.siteSectionId && siteSections
+            ? parseSiteSectionsList(pointer.siteSectionId, siteSections)
+            : null;
+    const spaces =
+        siteSpaces ?? (sections ? parseSpacesFromSiteSpaces(sections.section.siteSpaces) : []);
+
+    const customization = mergeCustomizationWithExtend(
+        pointer.siteSpaceId ? customizations.siteSpaces[pointer.siteSpaceId] : customizations.site,
+    );
 
     return {
         customization,
+        site,
+        structure: siteStructure,
+        sections,
+        spaces,
         scripts,
     };
-}
-
-/**
- * Get the customization settings for the current site from the API.
- */
-export async function getCurrentSiteCustomization(args: {
-    organizationId: string;
-    siteId: string;
-    siteSpaceId: string | undefined;
-}): Promise<SiteCustomizationSettings> {
-    return args.siteSpaceId
-        ? getSiteSpaceCustomization({
-              organizationId: args.organizationId,
-              siteId: args.siteId,
-              siteSpaceId: args.siteSpaceId,
-          })
-        : getSiteCustomization({
-              organizationId: args.organizationId,
-              siteId: args.siteId,
-          });
 }
 
 /**
  * Get the customization settings for a space from the API.
  */
-export async function getSpaceCustomization(spaceId: string): Promise<CustomizationSettings> {
+export function getSpaceCustomization(spaceId: string): { customization: CustomizationSettings } {
     const headersList = headers();
     const raw = defaultCustomizationForSpace();
 
@@ -875,7 +758,7 @@ export async function getSpaceCustomization(spaceId: string): Promise<Customizat
     if (extend) {
         try {
             const parsed = rison.decode_object<Partial<CustomizationSettings>>(extend);
-            return { ...raw, ...parsed };
+            return { customization: { ...raw, ...parsed } };
         } catch (error) {
             console.error(
                 `Failed to parse x-gitbook-customization header (ignored): ${
@@ -885,7 +768,9 @@ export async function getSpaceCustomization(spaceId: string): Promise<Customizat
         }
     }
 
-    return raw;
+    return {
+        customization: raw,
+    };
 }
 
 /**

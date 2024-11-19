@@ -1,14 +1,11 @@
-import { RevisionPage, SiteSection, SiteSpace, Space } from '@gitbook/api';
-import { assert } from 'ts-essentials';
+import { RevisionPage } from '@gitbook/api';
 
 import {
     getRevisionPageByPath,
     getDocument,
     ContentTarget,
+    getSpaceContentData,
     getSiteData,
-    getSite,
-    getCurrentSiteCustomization,
-    getSiteStructure,
 } from '@/lib/api';
 import { resolvePagePath, resolvePageId } from '@/lib/pages';
 import { getSiteContentPointer } from '@/lib/pointer';
@@ -21,34 +18,17 @@ export interface PageIdParams {
     pageId: string;
 }
 
-export type SectionsList = { list: SiteSection[]; section: SiteSection; index: number };
-
 /**
  * Fetch all the data needed to render the content layout.
  */
 export async function fetchContentData() {
     const content = getSiteContentPointer();
 
-    const [{ space, contentTarget, pages, customization, scripts }, siteStructure] =
+    const [{ space, contentTarget, pages }, { customization, site, sections, spaces, scripts }] =
         await Promise.all([
+            getSpaceContentData(content, content.siteShareKey),
             getSiteData(content),
-            fetchSiteStructure({
-                organizationId: content.organizationId,
-                siteId: content.siteId,
-                siteShareKey: content.siteShareKey,
-            }),
         ]);
-
-    const site = siteStructure.site;
-
-    const siteSections =
-        content.siteSectionId && siteStructure.sections
-            ? parseSiteSectionsList(content.siteSectionId, siteStructure.sections)
-            : null;
-
-    const spaces =
-        siteStructure.spaces ??
-        (siteSections ? parseSpacesFromSiteSpaces(siteSections.section.siteSpaces) : []);
 
     // we grab the space attached to the parent as it contains overriden customizations
     const spaceRelativeToParent = spaces?.find((space) => space.id === content.spaceId);
@@ -58,8 +38,8 @@ export async function fetchContentData() {
         contentTarget,
         space: spaceRelativeToParent ?? space,
         pages,
-        sections: siteSections,
         site,
+        sections,
         spaces,
         customization,
         scripts,
@@ -67,44 +47,21 @@ export async function fetchContentData() {
     };
 }
 
-function parseSiteSectionsList(siteSectionId: string, sections: SiteSection[]) {
-    const section = sections.find((section) => section.id === siteSectionId);
-    assert(sectionIsDefined(section), 'A section must be defined when there are multiple sections');
-    return { list: sections, section, index: sections.indexOf(section) } satisfies SectionsList;
-}
-
-function sectionIsDefined(section?: SiteSection): section is NonNullable<SiteSection> {
-    return typeof section !== 'undefined' && section !== null;
-}
-
 /**
  * Fetch all the data needed to render the content.
  * Optimized to fetch in parallel as much as possible.
  */
 export async function fetchPageData(params: PagePathParams | PageIdParams) {
-    const content = getSiteContentPointer();
+    const contentData = await fetchContentData();
 
-    const { space, contentTarget, pages, customization, scripts } = await getSiteData(content);
-    const page = await resolvePage(contentTarget, pages, params);
-    const [siteStructure, document] = await Promise.all([
-        fetchSiteStructure({
-            organizationId: content.organizationId,
-            siteId: content.siteId,
-            siteShareKey: content.siteShareKey,
-        }),
-        page?.page.documentId ? getDocument(space.id, page.page.documentId) : null,
-    ]);
+    const page = await resolvePage(contentData.contentTarget, contentData.pages, params);
+    const document = page?.page.documentId
+        ? await getDocument(contentData.space.id, page.page.documentId)
+        : null;
 
     return {
-        content,
-        contentTarget,
-        space,
-        pages,
-        customization,
-        scripts,
-        ancestors: [],
+        ...contentData,
         ...page,
-        ...siteStructure,
         document,
     };
 }
@@ -148,59 +105,6 @@ async function resolvePage(
     }
 
     return undefined;
-}
-
-/**
- * Fetch the structure of an organization site.
- * This includes the site and its sections or spaces.
- */
-async function fetchSiteStructure(args: {
-    organizationId: string;
-    siteId: string;
-    siteShareKey: string | undefined;
-}) {
-    const { organizationId, siteId, siteShareKey } = args;
-    const [orgSite, siteStructure, siteParentCustomizations] = await Promise.all([
-        getSite(organizationId, siteId),
-        getSiteStructure({ organizationId, siteId, siteShareKey }),
-        getCurrentSiteCustomization({ organizationId, siteId, siteSpaceId: undefined }),
-    ]);
-
-    const siteSections =
-        siteStructure.type === 'sections' && siteStructure.structure
-            ? siteStructure.structure
-            : null;
-    const siteSpaces =
-        siteStructure.type === 'siteSpaces' && siteStructure.structure
-            ? parseSpacesFromSiteSpaces(siteStructure.structure)
-            : null;
-
-    // override the title with the customization title
-    const site = {
-        ...orgSite,
-        ...(siteParentCustomizations?.title ? { title: siteParentCustomizations.title } : {}),
-    };
-
-    return {
-        site,
-        spaces: siteSpaces,
-        sections: siteSections,
-    };
-}
-
-function parseSpacesFromSiteSpaces(siteSpaces: SiteSpace[]) {
-    const spaces: Record<string, Space> = {};
-    siteSpaces.forEach((siteSpace) => {
-        spaces[siteSpace.space.id] = {
-            ...siteSpace.space,
-            title: siteSpace.title ?? siteSpace.space.title,
-            urls: {
-                ...siteSpace.space.urls,
-                published: siteSpace.urls.published,
-            },
-        };
-    });
-    return Object.values(spaces);
 }
 
 /**

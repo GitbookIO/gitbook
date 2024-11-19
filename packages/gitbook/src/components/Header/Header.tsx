@@ -2,9 +2,9 @@ import { CustomizationSettings, Site, SiteCustomizationSettings, Space } from '@
 import { CustomizationHeaderPreset } from '@gitbook/api';
 import { Suspense } from 'react';
 
-import type { SectionsList } from '@/app/(site)/fetch';
 import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '@/components/layout';
 import { t, getSpaceLanguage } from '@/intl/server';
+import type { SectionsList } from '@/lib/api';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
@@ -26,10 +26,8 @@ export function Header(props: {
     context: ContentRefContext;
     customization: CustomizationSettings | SiteCustomizationSettings;
     withTopHeader?: boolean;
-    children?: React.ReactNode;
 }) {
-    const { children, context, space, site, spaces, sections, customization, withTopHeader } =
-        props;
+    const { context, space, site, spaces, sections, customization, withTopHeader } = props;
     const isCustomizationDefault =
         customization.header.preset === CustomizationHeaderPreset.Default;
     const hasSiteSections = sections && sections.list.length > 1;
@@ -74,11 +72,11 @@ export function Header(props: {
                     )}
                 >
                     <HeaderLogo site={site} space={space} customization={customization} />
-                    <span>
+                    <div className="z-20">
                         {!hasSiteSections && isMultiVariants ? (
                             <SpacesDropdown space={space} spaces={spaces} />
                         ) : null}
-                    </span>
+                    </div>
                     <HeaderLinks>
                         {customization.header.links.map((link, index) => {
                             return (
@@ -144,12 +142,12 @@ export function Header(props: {
             {sections ? (
                 <div
                     className={tcls(
-                        'w-full shadow-thintop dark:shadow-light/1 bg-light dark:bg-dark z-[9] mt-0.5',
+                        'w-full shadow-thintop dark:shadow-light/1 bg-light dark:bg-dark mt-0.5',
+                        // Handle long section tabs, particularly on smaller screens.
+                        'overflow-x-auto hide-scroll',
                     )}
                 >
-                    <div className={tcls(CONTAINER_STYLE)}>
-                        <SiteSectionTabs {...sections} />
-                    </div>
+                    <SiteSectionTabs {...sections} />
                 </div>
             ) : null}
         </header>

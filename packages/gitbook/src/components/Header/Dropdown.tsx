@@ -44,7 +44,6 @@ export function Dropdown<E extends HTMLElement>(props: {
                     'absolute',
                     'top-full',
                     'left-0',
-                    'z-10',
                     'origin-top-left',
                     'invisible',
                     'transition-opacity',

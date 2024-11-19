@@ -64,6 +64,7 @@ const config: Config = {
             fontFamily: {
                 sans: ['var(--font-content)'],
                 mono: ['var(--font-mono)'],
+                var: ['var(--font-family)'],
             },
             colors: {
                 // Dynamic colors matching the customization settings
