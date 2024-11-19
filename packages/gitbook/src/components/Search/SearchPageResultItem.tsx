@@ -5,6 +5,7 @@ import { tcls } from '@/lib/tailwind';
 import { HighlightQuery } from './HighlightQuery';
 import type { ComputedPageResult } from './server-actions';
 import { Link } from '../primitives';
+import { Icon } from '@gitbook/icons';
 
 export const SearchPageResultItem = React.forwardRef(function SearchPageResultItem(
     props: {
@@ -23,25 +24,43 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
             className={tcls(
                 'flex',
                 'flex-row',
-                'px-6',
-                'py-3',
+                'items-center',
+                'px-4',
+                'sm:px-12',
+                'py-4',
+                'sm:py-6',
+                'border-t',
+                'first:border-t-0',
+                'border-dark/2',
+                'dark:border-light/2',
                 'hover:bg-dark-4/2',
                 'text-base',
                 'text-dark',
-                'font-semibold',
+                'font-medium',
                 'first:mt-0',
-                '[&:has(+.search-section-result-item):not(:first-child)]:mt-6',
                 'dark:text-light',
                 'dark:hover:bg-light-4/2',
                 active ? ['bg-dark/1', 'dark:bg-light/1'] : null,
             )}
         >
-            {item.spaceTitle ? (
-                <span className={tcls('opacity-6', 'font-normal', 'mr-2')}>
-                    {item.spaceTitle + ' ›'}
-                </span>
-            ) : null}
-            <HighlightQuery query={query} text={item.title} />
+            <div className={tcls('flex', 'flex-col', 'w-full')}>
+                {item.spaceTitle ? (
+                    <div
+                        className={tcls(
+                            'text-xs',
+                            'opacity-6',
+                            'font-normal',
+                            'uppercase',
+                            'tracking-wider',
+                            'mb-1',
+                        )}
+                    >
+                        {item.spaceTitle}
+                    </div>
+                ) : null}
+                <HighlightQuery query={query} text={item.title} />
+            </div>
+            <Icon icon="chevron-right" className={tcls('size-4', 'text-dark', 'dark:text-light', 'opacity-6')} />
         </Link>
     );
 });

@@ -176,12 +176,9 @@ export const SearchResults = React.forwardRef(function SearchResults(
     return (
         <div
             className={tcls(
-                'max-h-[60vh]',
+                'max-h-[70vh]',
                 'overflow-auto',
                 'relative',
-                'shadow-[0_1px_0_0_inset]',
-                'shadow-dark/2',
-                'dark:shadow-light/2',
             )}
         >
             {children}
@@ -189,9 +186,9 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 <div
                     data-test="search-noresults"
                     className={tcls(
-                        'text-sm',
-                        'text-dark',
-                        'p-6',
+                        'text',
+                        'text-dark/8',
+                        'p-8',
                         'text-center',
                         'dark:text-light/8',
                     )}

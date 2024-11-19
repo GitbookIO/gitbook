@@ -182,7 +182,7 @@ function SearchModalBody(
     };
 
     return (
-        <div
+        <motion.div
             role="dialog"
             aria-label={tString(language, 'search')}
             className={tcls(
@@ -193,29 +193,55 @@ function SearchModalBody(
                 'max-w-[768px]',
                 'mt-[-1px]',
                 'w-full',
-                'max-h',
                 'rounded-lg',
+                'straight-corners:rounded-sm',
                 'ring-1',
                 'ring-dark/1',
                 'shadow-2xl',
-                'backdrop-blur-lg',
                 'overflow-hidden',
                 'dark:ring-inset',
                 'dark:bg-dark-3',
                 'dark:ring-light/2',
             )}
+            initial={{
+                scale: 0.95,
+                opacity: 0,
+            }}
+            animate={{
+                scale: 1,
+                opacity: 1,
+            }}
             onClick={(event) => {
                 event.stopPropagation();
             }}
         >
-            <div className={tcls('flex', 'flex-row', 'items-center')}>
-                <div className={tcls('p-2', 'pl-4')}>
+            <div
+                className={tcls(
+                    'flex',
+                    'flex-row',
+                    'items-start',
+                    'border-b',
+                    'border-dark/2',
+                    'dark:border-light/2',
+                )}
+            >
+                <div className={tcls('p-2', 'pl-4', 'pt-4')}>
                     <Icon
                         icon="magnifying-glass"
                         className={tcls('size-4', 'text-dark/4', 'dark:text-light/5')}
                     />
                 </div>
-                <div className={tcls('flex-1')}>
+                <div
+                    className={tcls(
+                        'w-full',
+                        'flex',
+                        'flex-row',
+                        'flex-wrap',
+                        'gap-y-0',
+                        'gap-x-4',
+                        'items-end',
+                    )}
+                >
                     <input
                         ref={inputRef}
                         value={state.query}
@@ -226,7 +252,7 @@ function SearchModalBody(
                             'placeholder:text-dark/7',
                             'flex',
                             'resize-none',
-                            'w-full',
+                            'flex-1',
                             'h-12',
                             'p-2',
                             'focus:outline-none',
@@ -243,6 +269,7 @@ function SearchModalBody(
                         autoComplete="off"
                         autoCorrect="off"
                     />
+                    {isMultiVariants ? <SearchScopeToggle spaceTitle={spaceTitle} /> : null}
                 </div>
             </div>
             {!state.ask || !withAsk ? (
@@ -261,15 +288,11 @@ function SearchModalBody(
                             global: state.global,
                         });
                     }}
-                >
-                    {isMultiVariants && state.query ? (
-                        <SearchScopeToggle spaceTitle={spaceTitle} />
-                    ) : null}
-                </SearchResults>
+                ></SearchResults>
             ) : null}
             {state.query && state.ask && withAsk ? (
                 <SearchAskAnswer spaceId={spaceId} query={state.query} />
             ) : null}
-        </div>
+        </motion.div>
     );
 }

@@ -28,11 +28,9 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                 'flex',
                 'flex-row',
                 'px-4',
-                'py-2',
+                'py-3',
                 'hover:bg-dark-4/2',
                 'text-dark/7',
-                'text-sm',
-                'font-medium',
                 'first:mt-0',
                 'last:pb-3',
                 'dark:text-light/8',
@@ -47,8 +45,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
             <Icon
                 icon="magnifying-glass"
                 className={tcls(
-                    'w-[15px]',
-                    'h-[15px]',
+                    'size-4',
                     'shrink-0',
                     'mt-0.5',
                     'mr-4',
