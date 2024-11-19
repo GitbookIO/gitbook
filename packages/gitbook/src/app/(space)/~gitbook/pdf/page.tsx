@@ -21,7 +21,7 @@ import {
     getSpace,
     getSpaceCustomization,
     getSpaceContentData,
-    getCurrentSiteCustomization,
+    getSiteData,
 } from '@/lib/api';
 import { pagePDFContainerId, PageHrefContext, absoluteHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
@@ -40,11 +40,9 @@ export const runtime = 'edge';
 
 export async function generateMetadata(): Promise<Metadata> {
     const pointer = getSiteOrSpacePointerForPDF();
-    const [space, customization] = await Promise.all([
+    const [space, { customization }] = await Promise.all([
         getSpace(pointer.spaceId, 'siteId' in pointer ? pointer.siteShareKey : undefined),
-        'siteId' in pointer
-            ? getCurrentSiteCustomization(pointer)
-            : getSpaceCustomization(pointer.spaceId),
+        'siteId' in pointer ? getSiteData(pointer) : getSpaceCustomization(pointer.spaceId),
     ]);
 
     return {
@@ -67,10 +65,8 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
     currentPDFUrl += '?' + searchParams.toString();
 
     // Load the content,
-    const [customization, { space, contentTarget, pages: rootPages }] = await Promise.all([
-        'siteId' in pointer
-            ? getCurrentSiteCustomization(pointer)
-            : getSpaceCustomization(pointer.spaceId),
+    const [{ customization }, { space, contentTarget, pages: rootPages }] = await Promise.all([
+        'siteId' in pointer ? getSiteData(pointer) : getSpaceCustomization(pointer.spaceId),
         getSpaceContentData(pointer, 'siteId' in pointer ? pointer.siteShareKey : undefined),
     ]);
     const language = getSpaceLanguage(customization);
