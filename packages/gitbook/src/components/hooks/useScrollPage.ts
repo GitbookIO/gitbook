@@ -15,7 +15,9 @@ export function useScrollPage(props: { scrollMarginTop?: number }) {
         if (hash) {
             const element = document.getElementById(hash);
             if (element) {
-                if (props.scrollMarginTop) { element.style.scrollMarginTop = `${props.scrollMarginTop}px`; }
+                if (props.scrollMarginTop) {
+                    element.style.scrollMarginTop = `${props.scrollMarginTop}px`;
+                }
                 element.scrollIntoView({
                     block: 'start',
                     behavior: 'smooth',
