@@ -68,16 +68,11 @@ async function searchSiteContent(args: {
         scope.mode === 'current' ||
         (scope.mode === 'specific' && scope.siteSpaceIds.length > 1);
 
-    const [searchResults, siteStructure] = await Promise.all([
+    const [searchResults, siteData] = await Promise.all([
         api.searchSiteContent(pointer.organizationId, pointer.siteId, query, scope, cacheBust),
-        needsStructure
-            ? api.getSiteStructure({
-                  organizationId: pointer.organizationId,
-                  siteId: pointer.siteId,
-                  siteShareKey: pointer.siteShareKey,
-              })
-            : null,
+        needsStructure ? api.getSiteData(pointer) : null,
     ]);
+    const siteStructure = siteData?.structure;
 
     const siteSpaces = siteStructure
         ? siteStructure.type === 'siteSpaces'

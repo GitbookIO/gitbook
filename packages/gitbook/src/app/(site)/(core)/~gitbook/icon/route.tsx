@@ -3,7 +3,7 @@ import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 import React from 'react';
 
-import { getCurrentSiteCustomization, getSite, getSpace } from '@/lib/api';
+import { getSite, getSiteData, getSpace } from '@/lib/api';
 import { getEmojiForCode } from '@/lib/emojis';
 import { getSiteContentPointer } from '@/lib/pointer';
 import { tcls } from '@/lib/tailwind';
@@ -38,9 +38,9 @@ export async function GET(req: NextRequest) {
     const pointer = getSiteContentPointer();
     const spaceId = pointer.spaceId;
 
-    const [space, customization] = await Promise.all([
+    const [space, { customization }] = await Promise.all([
         getSpace(spaceId, pointer.siteShareKey),
-        getCurrentSiteCustomization(pointer),
+        getSiteData(pointer),
     ]);
     const site = await getSite(pointer.organizationId, pointer.siteId);
     const contentTitle = getContentTitle(space, customization, site);
