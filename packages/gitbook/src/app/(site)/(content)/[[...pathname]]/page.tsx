@@ -111,7 +111,7 @@ export default async function Page(props: {
                 />
             </div>
             <React.Suspense fallback={null}>
-                <PageClientLayout />
+                <PageClientLayout withSections={withSections} />
             </React.Suspense>
         </>
     );
