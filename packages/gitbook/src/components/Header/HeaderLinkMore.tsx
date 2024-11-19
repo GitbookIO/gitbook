@@ -43,7 +43,7 @@ export function HeaderLinkMore(props: {
     );
 
     return (
-        <div className={`${styles.linkEllipsis} items-center`}>
+        <div className={`${styles.linkEllipsis} items-center z-20`}>
             <Dropdown button={renderButton} className="-translate-x-48 md:translate-x-0">
                 <DropdownMenu>
                     {links.map((link, index) => (
