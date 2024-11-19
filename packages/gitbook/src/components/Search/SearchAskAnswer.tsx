@@ -188,15 +188,7 @@ function AnswerFollowupQuestions(props: { followupQuestions: string[] }) {
     const getSearchLinkProps = useSearchLink();
 
     return (
-        <div
-            className={tcls(
-                'flex',
-                'flex-col',
-                'flex-wrap',
-                'mt-4',
-                'sm:mt-6',
-            )}
-        >
+        <div className={tcls('flex', 'flex-col', 'flex-wrap', 'mt-4', 'sm:mt-6')}>
             {followupQuestions.map((question) => (
                 <Link
                     key={question}

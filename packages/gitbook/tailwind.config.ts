@@ -100,7 +100,7 @@ const config: Config = {
                 periwinkle: generateShades('#acc6ee'),
             },
             animation: {
-                present: 'present .5s ease-out both'
+                present: 'present .5s ease-out both',
             },
             keyframes: {
                 pulseAlt: {
@@ -125,14 +125,14 @@ const config: Config = {
                     },
                 },
                 present: {
-                    'from': {
+                    from: {
                         opacity: '0',
-                        transform: 'translateY(2rem) scale(0.9)'
+                        transform: 'translateY(2rem) scale(0.9)',
                     },
-                    'to': {
+                    to: {
                         opacity: '1',
-                        transform: 'translateY(0) scale(1)'
-                    }
+                        transform: 'translateY(0) scale(1)',
+                    },
                 },
                 rotateLoop: {
                     '0%': {

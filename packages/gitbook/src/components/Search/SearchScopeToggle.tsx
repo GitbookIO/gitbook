@@ -20,11 +20,7 @@ export function SearchScopeToggle(props: { spaceTitle: string }) {
         <div
             role="toolbar"
             aria-orientation="horizontal"
-            className={tcls(
-                'flex',
-                'flex-row',
-                'mr-4',
-            )}
+            className={tcls('flex', 'flex-row', 'mr-4')}
         >
             <ToggleButton
                 active={!state.global}
@@ -68,13 +64,7 @@ function ToggleButton(props: { onClick: () => void; children: React.ReactNode; a
                 'border-b-2',
                 'whitespace-pre',
                 '-mb-[1px]',
-                active
-                    ? [
-                          'text-primary-500',
-                          'border-primary-500',
-                          
-                      ]
-                    : ['border-transparent'],
+                active ? ['text-primary-500', 'border-primary-500'] : ['border-transparent'],
             )}
         >
             {children}

@@ -174,13 +174,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     }
 
     return (
-        <div
-            className={tcls(
-                'max-h-[70vh]',
-                'overflow-auto',
-                'relative',
-            )}
-        >
+        <div className={tcls('max-h-[70vh]', 'overflow-auto', 'relative')}>
             {children}
             {results.length === 0 ? (
                 <div

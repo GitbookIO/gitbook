@@ -11,7 +11,21 @@ export function HighlightQuery(props: {
     /** Style to apply on matching parts (default to primary) */
     highlight?: ClassValue;
 }): React.ReactElement {
-    const { query, text, highlight = ['text-bold', 'bg-primary-100', 'text-contrast-primary-100', 'dark:bg-primary-700', 'dark:text-contrast-primary-700', 'px-0.5', '-mx-0.5', 'py-0.5', 'rounded'] } = props;
+    const {
+        query,
+        text,
+        highlight = [
+            'text-bold',
+            'bg-primary-100',
+            'text-contrast-primary-100',
+            'dark:bg-primary-700',
+            'dark:text-contrast-primary-700',
+            'px-0.5',
+            '-mx-0.5',
+            'py-0.5',
+            'rounded',
+        ],
+    } = props;
     const matches = matchString(text, query);
 
     return (

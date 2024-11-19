@@ -1,3 +1,4 @@
+import { Icon } from '@gitbook/icons';
 import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
@@ -5,7 +6,6 @@ import { tcls } from '@/lib/tailwind';
 import { HighlightQuery } from './HighlightQuery';
 import type { ComputedPageResult } from './server-actions';
 import { Link } from '../primitives';
-import { Icon } from '@gitbook/icons';
 
 export const SearchPageResultItem = React.forwardRef(function SearchPageResultItem(
     props: {
@@ -60,7 +60,10 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                 ) : null}
                 <HighlightQuery query={query} text={item.title} />
             </div>
-            <Icon icon="chevron-right" className={tcls('size-4', 'text-dark', 'dark:text-light', 'opacity-6')} />
+            <Icon
+                icon="chevron-right"
+                className={tcls('size-4', 'text-dark', 'dark:text-light', 'opacity-6')}
+            />
         </Link>
     );
 });
