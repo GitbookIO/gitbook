@@ -10,7 +10,7 @@ export const pt_br = {
     search_input_placeholder: 'Buscar conteúdo',
     search_ask_input_placeholder: 'Buscar conteúdo ou fazer uma pergunta',
     search_no_results: 'Sem resultados para "${1}".',
-    search_scope_space: 'Somente em ${1}',
+    search_scope_space: '${1}',
     search_scope_all: 'Todo o conteúdo',
     search_ask: 'Perguntar "${1}"',
     search_ask_sources: 'Fontes',
