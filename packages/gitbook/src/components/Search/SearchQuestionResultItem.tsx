@@ -28,7 +28,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                 'flex',
                 'flex-row',
                 'px-4',
-                'py-3',
+                'py-2',
                 'hover:bg-dark-4/2',
                 'text-dark/7',
                 'first:mt-0',
@@ -49,6 +49,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                     'shrink-0',
                     'mt-0.5',
                     'mr-4',
+                    'mt-1',
                     'text-dark/5',
                     'dark:text-light/5',
                 )}
