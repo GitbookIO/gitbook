@@ -12,7 +12,7 @@ export const fr: TranslationLanguage = {
     search_input_placeholder: 'Rechercher le contenu',
     search_ask_input_placeholder: 'Rechercher du contenu ou poser une question',
     search_no_results: 'Aucun résultat pour "${1}".',
-    search_scope_space: 'Uniquement dans ${1}',
+    search_scope_space: '${1}',
     search_scope_all: 'Tout le contenu',
     search_ask: 'Demander "${1}"',
     search_ask_sources: 'Sources',

@@ -12,7 +12,7 @@ export const zh: TranslationLanguage = {
     search_input_placeholder: '搜索内容',
     search_ask_input_placeholder: '搜索内容或提问',
     search_no_results: '没有找到"${1}"的结果。',
-    search_scope_space: '仅在${1}中',
+    search_scope_space: '${1}',
     search_scope_all: '所有内容',
     search_ask: '询问"${1}"',
     search_ask_sources: '来源',
