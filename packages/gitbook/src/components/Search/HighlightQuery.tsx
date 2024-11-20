@@ -24,7 +24,7 @@ export function HighlightQuery(props: {
             '-mx-0.5',
             'py-0.5',
             'rounded',
-            'straight-corners:rounded-sm'
+            'straight-corners:rounded-sm',
         ],
     } = props;
     const matches = matchString(text, query);
