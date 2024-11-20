@@ -8,10 +8,10 @@ import { useScrollPage } from '@/components/hooks';
 /**
  * Client component to initialize interactivity for a page.
  */
-export function PageClientLayout(props: {}) {
+export function PageClientLayout(props: { withSections?: boolean }) {
     // We use this hook in the page layout to ensure the elements for the blocks
     // are rendered before we scroll to a hash or to the top of the page
-    useScrollPage();
+    useScrollPage({ scrollMarginTop: props.withSections ? 50 : undefined });
 
     useStripFallbackQueryParam();
     return null;
