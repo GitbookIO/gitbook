@@ -12,7 +12,7 @@ export const no: TranslationLanguage = {
     search_input_placeholder: 'Søk i innhold',
     search_ask_input_placeholder: 'Søk i innhold eller still et spørsmål',
     search_no_results: 'Ingen resultater for "${1}".',
-    search_scope_space: 'Kun i ${1}',
+    search_scope_space: '${1}',
     search_scope_all: 'Alt innhold',
     search_ask: 'Spør "${1}"',
     search_ask_sources: 'Kilder',

@@ -25,15 +25,29 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                 '[&:has(+:not(&))]:mb-6',
                 'flex',
                 'flex-col',
-                'pl-6',
+                'mb-2',
+                'px-4',
+                'sm:px-12',
                 'hover:bg-dark-4/2',
                 'dark:hover:bg-light-4/2',
+                'text-dark/8',
+                'dark:text-light/8',
+                'font-normal',
+                'transition-colors',
                 active ? ['bg-dark/1', 'dark:bg-light/1'] : null,
             )}
         >
-            <div className={tcls('border-l', 'p-3', 'border-dark/2', 'dark:border-light/2')}>
+            <div
+                className={tcls(
+                    'border-l-2',
+                    'px-4',
+                    'py-2',
+                    'border-dark/2',
+                    'dark:border-light/2',
+                )}
+            >
                 {item.title ? (
-                    <p className={tcls('text-base', 'text-dark/7', 'dark:text-light/8')}>
+                    <p className={tcls('text-base', 'mb-2')}>
                         <HighlightQuery query={query} text={item.title} />
                     </p>
                 ) : null}
@@ -41,12 +55,9 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                     <p
                         className={tcls(
                             'text-sm',
-                            'text-dark',
-                            'line-clamp-6',
-                            'linear-mask-gradient',
+                            'line-clamp-3',
                             'z-[-1]', //to force stacking order
                             'relative',
-                            'dark:text-light/8',
                         )}
                     >
                         <HighlightQuery query={query} text={item.body} />

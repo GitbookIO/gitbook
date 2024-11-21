@@ -99,6 +99,9 @@ const config: Config = {
                 pomegranate: generateShades('#f25b3a'),
                 periwinkle: generateShades('#acc6ee'),
             },
+            animation: {
+                present: 'present .5s ease-out both',
+            },
             keyframes: {
                 pulseAlt: {
                     '0%': {
@@ -119,6 +122,16 @@ const config: Config = {
                     },
                     '100%': {
                         opacity: '1',
+                    },
+                },
+                present: {
+                    from: {
+                        opacity: '0',
+                        transform: 'translateY(2rem) scale(0.9)',
+                    },
+                    to: {
+                        opacity: '1',
+                        transform: 'translateY(0) scale(1)',
                     },
                 },
                 rotateLoop: {
