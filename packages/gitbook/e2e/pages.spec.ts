@@ -499,7 +499,7 @@ const testCases: TestsCase[] = [
                 name: 'Redirect to SSO page',
                 url: 'a/redirect/to/sso',
                 run: async (page) => {
-                    await expect(page.getByText('SSO')).toBeVisible();
+                    await expect(page.locator('h1')).toHaveText('SSO');
                 },
             },
         ],
