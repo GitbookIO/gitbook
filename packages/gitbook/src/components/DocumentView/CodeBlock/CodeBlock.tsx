@@ -99,6 +99,8 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
                     'overflow-auto',
                     'bg-light-2',
                     'dark:bg-dark-2',
+                    'border-light-4',
+                    'dark:border-dark-4',
                     'hide-scroll',
                     titleRoundingStyle,
                 )}
