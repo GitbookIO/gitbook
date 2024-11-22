@@ -1,11 +1,12 @@
 import { RevisionPage } from '@gitbook/api';
+import { redirect } from 'next/navigation';
 
 import {
     getRevisionPageByPath,
     getDocument,
-    ContentTarget,
     getSpaceContentData,
     getSiteData,
+    getSiteRedirectBySource,
 } from '@/lib/api';
 import { resolvePagePath, resolvePageId } from '@/lib/pages';
 import { getSiteContentPointer } from '@/lib/pointer';
@@ -41,6 +42,7 @@ export async function fetchContentData() {
         site,
         sections,
         spaces,
+        shareKey: content.siteShareKey,
         customization,
         scripts,
         ancestors: [],
@@ -54,7 +56,15 @@ export async function fetchContentData() {
 export async function fetchPageData(params: PagePathParams | PageIdParams) {
     const contentData = await fetchContentData();
 
-    const page = await resolvePage(contentData.contentTarget, contentData.pages, params);
+    const page = await resolvePage({
+        organizationId: contentData.space.organization,
+        siteId: contentData.site.id,
+        spaceId: contentData.contentTarget.spaceId,
+        revisionId: contentData.contentTarget.revisionId,
+        pages: contentData.pages,
+        shareKey: contentData.shareKey,
+        params,
+    });
     const document = page?.page.documentId
         ? await getDocument(contentData.space.id, page.page.documentId)
         : null;
@@ -70,11 +80,17 @@ export async function fetchPageData(params: PagePathParams | PageIdParams) {
  * Resolve a page from the params.
  * If the path can't be found, we try to resolve it from the API to handle redirects.
  */
-async function resolvePage(
-    contentTarget: ContentTarget,
-    pages: RevisionPage[],
-    params: PagePathParams | PageIdParams,
-) {
+async function resolvePage(input: {
+    organizationId: string;
+    siteId: string;
+    spaceId: string;
+    revisionId: string;
+    shareKey: string | undefined;
+    pages: RevisionPage[];
+    params: PagePathParams | PageIdParams;
+}) {
+    const { organizationId, siteId, spaceId, revisionId, pages, shareKey, params } = input;
+
     if ('pageId' in params) {
         return resolvePageId(pages, params.pageId);
     }
@@ -88,19 +104,25 @@ async function resolvePage(
         return page;
     }
 
-    // If page can't be found, we try with the API, in case we have a redirect
-    // We use the raw pathname to handle special/malformed redirects setup by users in the GitSync.
-    // The page rendering will take care of redirecting to a normalized pathname.
-    //
     // We don't test path that are too long as GitBook doesn't support them and will return a 404 anyway.
     if (rawPathname.length <= 512) {
-        const resolved = await getRevisionPageByPath(
-            contentTarget.spaceId,
-            contentTarget.revisionId,
-            rawPathname,
-        );
+        // If page can't be found, we try with the API, in case we have a redirect at space level.
+        // We use the raw pathname to handle special/malformed redirects setup by users in the GitSync.
+        // The page rendering will take care of redirecting to a normalized pathname.
+        const resolved = await getRevisionPageByPath(spaceId, revisionId, rawPathname);
         if (resolved) {
             return resolvePageId(pages, resolved.id);
+        }
+
+        // If a page still can't be found, we try with the API, in case we have a redirect at site level.
+        const resolvedSiteRedirect = await getSiteRedirectBySource({
+            organizationId,
+            siteId,
+            source: rawPathname.startsWith('/') ? rawPathname : `/${rawPathname}`,
+            siteShareKey: input.shareKey,
+        });
+        if (resolvedSiteRedirect) {
+            return redirect(resolvedSiteRedirect.target);
         }
     }
 
