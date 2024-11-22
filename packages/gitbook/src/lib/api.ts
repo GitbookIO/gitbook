@@ -831,13 +831,11 @@ export async function getSpaceContentData(
         spaceId: pointer.spaceId,
         revisionId: changeRequest?.revision ?? pointer.revisionId ?? space.revision,
     };
-    const [pages] = await Promise.all([
-        getRevisionPages(space.id, contentTarget.revisionId, {
-            // We only care about the Git metadata when the Git sync is enabled
-            // otherwise we can optimize performance by not fetching it
-            metadata: !!space.gitSync,
-        }),
-    ]);
+    const pages = await getRevisionPages(space.id, contentTarget.revisionId, {
+        // We only care about the Git metadata when the Git sync is enabled
+        // otherwise we can optimize performance by not fetching it
+        metadata: !!space.gitSync,
+    });
 
     return {
         space,
