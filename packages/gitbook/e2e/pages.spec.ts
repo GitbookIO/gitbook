@@ -492,6 +492,42 @@ const testCases: TestsCase[] = [
         ],
     },
     {
+        name: 'Shared space navigation (first site)',
+        baseUrl: 'https://gitbook-open-e2e-sites.gitbook.io/shared-space-uno/',
+        tests: [
+            {
+                name: 'Navigation to shared space',
+                url: '',
+                run: async (page) => {
+                    const sharedSpaceLink = page.locator('a.underline');
+                    await sharedSpaceLink.click();
+                    expect(page.locator('h1')).toHaveText('shared');
+                    const url = page.url();
+                    expect(url.includes('shared-space-uno')).toBeTruthy(); // same uno site
+                    expect(url.endsWith('/shared')).toBeTruthy(); // correct page
+                },
+            },
+        ],
+    },
+    {
+        name: 'Shared space navigation (second site)',
+        baseUrl: 'https://gitbook-open-e2e-sites.gitbook.io/shared-space-dos/',
+        tests: [
+            {
+                name: 'Navigation to shared space',
+                url: '',
+                run: async (page) => {
+                    const sharedSpaceLink = page.locator('a.underline');
+                    await sharedSpaceLink.click();
+                    expect(page.locator('h1')).toHaveText('shared');
+                    const url = page.url();
+                    expect(url.includes('shared-space-dos')).toBeTruthy(); // same dos site
+                    expect(url.endsWith('/shared')).toBeTruthy(); // correct page
+                },
+            },
+        ],
+    },
+    {
         name: 'Site Redirects',
         baseUrl: 'https://gitbook-open-e2e-sites.gitbook.io/gitbook-doc/',
         tests: [
