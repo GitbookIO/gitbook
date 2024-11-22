@@ -713,7 +713,10 @@ export const getPublishedContentSite = cache({
 
 export type SectionsList = { list: SiteSection[]; section: SiteSection; index: number };
 
-function parseSpacesFromSiteSpaces(siteSpaces: SiteSpace[]) {
+/**
+ * Parse the site spaces into a list of spaces with their title and urls.
+ */
+export function parseSpacesFromSiteSpaces(siteSpaces: SiteSpace[]) {
     const spaces: Record<string, Space> = {};
     siteSpaces.forEach((siteSpace) => {
         spaces[siteSpace.space.id] = {
