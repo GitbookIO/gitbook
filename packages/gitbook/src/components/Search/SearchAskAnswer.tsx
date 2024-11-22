@@ -101,20 +101,12 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
 
     const loading = (
         <div className={tcls('w-full', 'flex', 'items-center', 'justify-center')}>
-            <Loading className={tcls('w-5', 'py-4', 'text-primary')} />
+            <Loading className={tcls('w-6', 'py-8', 'text-primary')} />
         </div>
     );
 
     return (
-        <div
-            className={tcls(
-                'max-h-[60vh]',
-                'overflow-y-auto',
-                'border-t',
-                'border-dark/2',
-                'dark:border-light/1',
-            )}
-        >
+        <div className={tcls('max-h-[60vh]', 'overflow-y-auto')}>
             {state?.type === 'answer' ? (
                 <>
                     {state.answer ? (
@@ -166,13 +158,20 @@ function AnswerBody(props: { answer: AskAnswerResult }) {
         <>
             <div
                 data-test="search-ask-answer"
-                className={tcls('mt-4', 'px-4', 'text-dark/9', 'dark:text-light/8')}
+                className={tcls(
+                    'mt-4',
+                    'sm:mt-6',
+                    'px-4',
+                    'sm:px-12',
+                    'text-dark/9',
+                    'dark:text-light/8',
+                )}
             >
                 {answer.hasAnswer ? answer.body : t(language, 'search_ask_no_answer')}
+                {answer.followupQuestions.length > 0 ? (
+                    <AnswerFollowupQuestions followupQuestions={answer.followupQuestions} />
+                ) : null}
             </div>
-            {answer.followupQuestions.length > 0 ? (
-                <AnswerFollowupQuestions followupQuestions={answer.followupQuestions} />
-            ) : null}
             {answer.sources.length > 0 ? (
                 <AnswerSources
                     hasAnswer={answer.hasAnswer}
@@ -189,23 +188,25 @@ function AnswerFollowupQuestions(props: { followupQuestions: string[] }) {
     const getSearchLinkProps = useSearchLink();
 
     return (
-        <div className={tcls('mt-7 mb-4', 'flex', 'flex-col', 'flex-wrap', 'gap-1')}>
+        <div className={tcls('flex', 'flex-col', 'flex-wrap', 'mt-4', 'sm:mt-6')}>
             {followupQuestions.map((question) => (
                 <Link
                     key={question}
                     className={tcls(
-                        'text-sm',
-                        'font-medium',
-                        'inline-flex',
-                        'items-start',
+                        'flex',
+                        'items-center',
                         'gap-2',
                         'px-4',
-                        'py-1',
-                        'text-primary-500',
-                        'focus-within:text-primary-700',
-                        'hover:bg-primary/2',
-                        'dark:text-primary-400',
-                        'dark:hover:bg-primary-500/3',
+                        '-mx-4',
+                        'py-2',
+                        'rounded',
+                        'straight-corners:rounded-none',
+                        'text-dark/7',
+                        'dark:text-light/8',
+                        'hover:bg-dark-4/2',
+                        'dark:hover:bg-light-4/2',
+                        'focus-within:bg-dark-4/2',
+                        'dark:focus-within:bg-light-4/2',
                     )}
                     {...getSearchLinkProps({
                         query: question,
@@ -214,7 +215,13 @@ function AnswerFollowupQuestions(props: { followupQuestions: string[] }) {
                 >
                     <Icon
                         icon="magnifying-glass"
-                        className={tcls('size-[15px]', 'shrink-0', 'mt-0.5', '[opacity:0.64]')}
+                        className={tcls(
+                            'size-4',
+                            'shrink-0',
+                            'mr-2',
+                            'text-dark/5',
+                            'dark:text-light/5',
+                        )}
                     />
                     <span>{question}</span>
                 </Link>
@@ -236,7 +243,8 @@ function AnswerSources(props: {
                 'flex',
                 'flex-wrap',
                 'gap-2',
-                'mt-7',
+                'mt-4',
+                'sm:mt-6',
                 'py-4',
                 'px-4',
                 'border-t',
@@ -244,7 +252,7 @@ function AnswerSources(props: {
                 'dark:border-light/1',
             )}
         >
-            <span className={tcls('text-sm')}>
+            <span>
                 {t(language, hasAnswer ? 'search_ask_sources' : 'search_ask_sources_no_answer')}
             </span>
 
@@ -253,7 +261,9 @@ function AnswerSources(props: {
                     <Link
                         className={tcls(
                             'flex',
-                            'text-sm',
+                            'flex-wrap',
+                            'gap-1',
+                            'items-center',
                             'text-dark/7',
                             'hover:underline',
                             'focus-within:text-primary-700',
@@ -266,11 +276,8 @@ function AnswerSources(props: {
                             icon="arrow-up-right"
                             className={tcls(
                                 'text-dark/6',
-                                'w-[15px]',
-                                'h-[15px]',
+                                'size-4',
                                 'shrink-0',
-                                'mt-0.5',
-                                'mr-0.5',
                                 'dark:text-light/6',
                             )}
                         />

@@ -10,7 +10,7 @@ export const de = {
     search_input_placeholder: 'Inhalt durchsuchen',
     search_ask_input_placeholder: 'Inhalt durchsuchen oder eine Frage stellen',
     search_no_results: 'Keine Ergebnisse für "${1}".',
-    search_scope_space: 'Nur in ${1}',
+    search_scope_space: '${1}',
     search_scope_all: 'Alle Inhalte',
     search_ask: 'Fragen "${1}"',
     search_ask_sources: 'Quellen',

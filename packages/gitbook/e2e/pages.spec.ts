@@ -492,6 +492,19 @@ const testCases: TestsCase[] = [
         ],
     },
     {
+        name: 'Site Redirects',
+        baseUrl: 'https://gitbook-open-e2e-sites.gitbook.io/gitbook-doc/',
+        tests: [
+            {
+                name: 'Redirect to SSO page',
+                url: 'a/redirect/to/sso',
+                run: async (page) => {
+                    await expect(page.locator('h1')).toHaveText('SSO');
+                },
+            },
+        ],
+    },
+    {
         name: 'Share links',
         baseUrl: 'https://gitbook.gitbook.io/gbo-tests-share-links/',
         tests: [

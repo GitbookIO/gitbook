@@ -12,7 +12,7 @@ export const ja: TranslationLanguage = {
     search_input_placeholder: 'コンテンツを検索',
     search_ask_input_placeholder: 'コンテンツを検索するか質問をする',
     search_no_results: '"${1}" の結果はありません。',
-    search_scope_space: '${1}内のみ',
+    search_scope_space: '${1}',
     search_scope_all: '全てのコンテンツ',
     search_ask: '"${1}" を質問する',
     search_ask_sources: '情報源',

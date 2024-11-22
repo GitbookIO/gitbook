@@ -12,7 +12,7 @@ export const nl: TranslationLanguage = {
     search_input_placeholder: 'Zoek inhoud',
     search_ask_input_placeholder: 'Zoek inhoud of stel een vraag',
     search_no_results: 'Geen resultaten voor "${1}".',
-    search_scope_space: 'Alleen in ${1}',
+    search_scope_space: '${1}',
     search_scope_all: 'Alle inhoud',
     search_ask: 'Vraag "${1}"',
     search_ask_sources: 'Bronnen',
