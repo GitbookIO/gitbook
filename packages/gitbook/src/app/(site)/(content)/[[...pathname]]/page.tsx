@@ -5,12 +5,10 @@ import React from 'react';
 
 import { PageAside } from '@/components/PageAside';
 import { PageBody, PageCover } from '@/components/PageBody';
-import { SkeletonHeading, SkeletonParagraph } from '@/components/primitives';
 import { PageHrefContext, absoluteHref, pageHref } from '@/lib/links';
 import { getPagePath, resolveFirstDocument } from '@/lib/pages';
 import { ContentRefContext } from '@/lib/references';
 import { isSpaceIndexable, isPageIndexable } from '@/lib/seo';
-import { tcls } from '@/lib/tailwind';
 import { getContentTitle } from '@/lib/utils';
 
 import { PageClientLayout } from './PageClientLayout';
