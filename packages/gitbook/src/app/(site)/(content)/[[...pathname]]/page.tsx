@@ -23,41 +23,7 @@ type PageProps = {
     searchParams: { fallback?: string };
 };
 
-/**
- * Fetch and render a page.
- */
 export default async function Page(props: PageProps) {
-    return (
-        <React.Suspense fallback={<PageContentSkeleton />}>
-            <PageContent {...props} />
-        </React.Suspense>
-    );
-}
-
-function PageContentSkeleton() {
-    return (
-        <div
-            className={tcls(
-                'flex',
-                'flex-row',
-                'flex-1',
-                'relative',
-                'py-8',
-                'lg:px-16',
-                'xl:mr-56',
-                'items-center',
-                'lg:items-start',
-            )}
-        >
-            <div className={tcls('flex-1', 'max-w-3xl', 'mx-auto', 'page-full-width:mx-0')}>
-                <SkeletonHeading style={tcls('mb-8')} />
-                <SkeletonParagraph style={tcls('mb-4')} />
-            </div>
-        </div>
-    );
-}
-
-async function PageContent(props: PageProps) {
     const {
         content: contentPointer,
         contentTarget,
@@ -68,7 +34,7 @@ async function PageContent(props: PageProps) {
         pages,
         page,
         document,
-    } = await getPageDataWithFallback(props);
+    } = await getPageDataWithFallback(props, { redirectOnFallback: true });
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
     const withFullPageCover = !!(
@@ -142,8 +108,10 @@ export async function generateViewport({ params }: PageProps): Promise<Viewport>
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
-    const { space, pages, page, customization, site, ancestors } =
-        await getPageDataWithFallback(props);
+    const { space, pages, page, customization, site, ancestors } = await getPageDataWithFallback(
+        props,
+        { redirectOnFallback: false },
+    );
 
     return {
         title: [page.title, getContentTitle(space, customization, site ?? null)]
@@ -169,8 +137,14 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 /**
  * Fetches the page data matching the requested pathname and fallback to root page when page is not found.
  */
-async function getPageDataWithFallback(props: PageProps) {
+async function getPageDataWithFallback(
+    props: PageProps,
+    behaviour: {
+        redirectOnFallback: boolean;
+    },
+) {
     const { params, searchParams } = props;
+    const { redirectOnFallback } = behaviour;
 
     const { pages, page: targetPage, ...otherPageData } = await fetchPageData(params);
 
@@ -179,7 +153,7 @@ async function getPageDataWithFallback(props: PageProps) {
     if (!page && canFallback) {
         const rootPage = resolveFirstDocument(pages, []);
 
-        if (rootPage?.page) {
+        if (redirectOnFallback && rootPage?.page) {
             redirect(pageHref(pages, rootPage?.page));
         }
 
