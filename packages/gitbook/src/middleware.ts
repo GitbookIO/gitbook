@@ -161,28 +161,31 @@ export async function middleware(request: NextRequest) {
             userAgent: userAgent(),
         }),
         async () => {
-            // Start fetching everything as soon as possible, but do not block the middleware on it
-            // the cache will handle concurrent calls
-            await waitUntil(
-                getSpaceContentData(
-                    {
-                        spaceId: resolved.space,
-                        changeRequestId: resolved.changeRequest,
-                        revisionId: resolved.revision,
-                    },
-                    'site' in resolved ? resolved.shareKey : undefined,
+            const [siteData] = await Promise.all([
+                'site' in resolved
+                    ? getSiteData({
+                          organizationId: resolved.organization,
+                          siteId: resolved.site,
+                          siteSectionId: resolved.siteSection,
+                          siteSpaceId: resolved.siteSpace,
+                          siteShareKey: resolved.shareKey,
+                      })
+                    : null,
+                // Start fetching everything as soon as possible, but do not block the middleware on it
+                // the cache will handle concurrent calls
+                waitUntil(
+                    getSpaceContentData(
+                        {
+                            spaceId: resolved.space,
+                            changeRequestId: resolved.changeRequest,
+                            revisionId: resolved.revision,
+                        },
+                        'site' in resolved ? resolved.shareKey : undefined,
+                    ),
                 ),
-            );
+            ]);
 
-            const { scripts } = await ('site' in resolved
-                ? getSiteData({
-                      organizationId: resolved.organization,
-                      siteId: resolved.site,
-                      siteSectionId: resolved.siteSection,
-                      siteSpaceId: resolved.siteSpace,
-                      siteShareKey: resolved.shareKey,
-                  })
-                : { scripts: [] });
+            const scripts = siteData?.scripts ?? [];
             return getContentSecurityPolicy(scripts, nonce);
         },
     );
