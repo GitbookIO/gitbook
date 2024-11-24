@@ -49,7 +49,6 @@ export function PageBody(props: {
     const asFullWidth = document ? hasFullWidthBlock(document) : false;
     const language = getSpaceLanguage(customization);
     const updatedAt = page.updatedAt ?? page.createdAt;
-    const shouldHighlightCode = createHighlightingContext();
 
     return (
         <>
@@ -100,7 +99,7 @@ export function PageBody(props: {
                                 contentRefContext: context,
                                 resolveContentRef: (ref, options) =>
                                     resolveContentRef(ref, context, options),
-                                shouldHighlightCode,
+                                shouldHighlightCode: createHighlightingContext(),
                             }}
                         />
                     </React.Suspense>
