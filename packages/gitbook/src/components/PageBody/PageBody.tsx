@@ -99,7 +99,6 @@ export function PageBody(props: {
                                 contentRefContext: context,
                                 resolveContentRef: (ref, options) =>
                                     resolveContentRef(ref, context, options),
-                                shouldHighlightCode: createHighlightingContext(),
                             }}
                         />
                     </React.Suspense>

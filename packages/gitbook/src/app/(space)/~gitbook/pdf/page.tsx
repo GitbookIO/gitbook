@@ -227,7 +227,6 @@ async function PDFPageDocument(props: {
     const { space, page, refContext } = props;
 
     const document = page.documentId ? await getDocument(space.id, page.documentId) : null;
-    const shouldHighlightCode = createHighlightingContext();
 
     return (
         <PrintPage id={pagePDFContainerId(page)}>
@@ -250,7 +249,6 @@ async function PDFPageDocument(props: {
                         contentRefContext: refContext,
                         resolveContentRef: (ref) => resolveContentRef(ref, refContext),
                         getId: (id) => pagePDFContainerId(page, id),
-                        shouldHighlightCode,
                     }}
                 />
             ) : null}
