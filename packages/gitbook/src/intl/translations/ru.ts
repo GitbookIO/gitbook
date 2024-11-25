@@ -1,3 +1,5 @@
+import { TranslationLanguage } from './types';
+
 export const ru = {
     locale: 'ru',
     powered_by_gitbook: 'При поддержке GitBook',
