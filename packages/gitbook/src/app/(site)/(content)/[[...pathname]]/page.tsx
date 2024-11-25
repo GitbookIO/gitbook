@@ -152,11 +152,8 @@ function getTitle(input: Awaited<ReturnType<typeof getPageDataWithFallback>>) {
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
-    const headerList = await headers();
-    const fetchMode = headerList.get('sec-fetch-mode');
-
     // We only generate metadata in navigation mode. Else we let the browser handle it.
-    if (fetchMode !== 'navigate') {
+    if (await checkIsInAppNavigation()) {
         return {};
     }
 
@@ -181,6 +178,16 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
                 ? 'index, follow'
                 : 'noindex, nofollow',
     };
+}
+
+/**
+ * Check if the navigation is in-app, meaning the user clicks on a link.
+ */
+async function checkIsInAppNavigation() {
+    const headerList = await headers();
+    const fetchMode = headerList.get('sec-fetch-mode');
+
+    return fetchMode === 'cors';
 }
 
 /**
