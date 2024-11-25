@@ -71,7 +71,7 @@ export function Caption(
                     'text-center',
                     'mt-2',
                     'text-dark/7',
-                    'dark:text-light/6',
+                    'dark:text-light/7',
                 )}
             >
                 <Inlines
