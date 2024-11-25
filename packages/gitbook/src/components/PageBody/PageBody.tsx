@@ -21,7 +21,7 @@ import { PageFooterNavigation } from './PageFooterNavigation';
 import { PageHeader } from './PageHeader';
 import { PreservePageLayout } from './PreservePageLayout';
 import { TrackPageView } from './TrackPageView';
-import { DocumentView, DocumentViewSkeleton, createHighlightingContext } from '../DocumentView';
+import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
 import { PageFeedbackForm } from '../PageFeedback';
 import { DateRelative } from '../primitives';
 

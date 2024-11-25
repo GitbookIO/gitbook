@@ -11,7 +11,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import * as React from 'react';
 
-import { DocumentView, createHighlightingContext } from '@/components/DocumentView';
+import { DocumentView } from '@/components/DocumentView';
 import { TrademarkLink } from '@/components/TableOfContents/Trademark';
 import { PolymorphicComponentProp } from '@/components/utils/types';
 import { getSpaceLanguage } from '@/intl/server';
