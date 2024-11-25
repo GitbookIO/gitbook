@@ -320,7 +320,10 @@ async function getBestTargetSpace(
                       return acc;
                   }, []);
         const spaces = parseSpacesFromSiteSpaces(siteSpaces);
-        return spaces.find((space) => space.id === spaceId);
+        const foundSpace = spaces.find((space) => space.id === spaceId);
+        if (foundSpace) {
+            return foundSpace;
+        }
     }
 
     // Else we try return the fetched space from the API.
