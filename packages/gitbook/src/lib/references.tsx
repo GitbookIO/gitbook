@@ -1,9 +1,11 @@
 import {
     ContentRef,
+    ContentRefSpace,
     Revision,
     RevisionFile,
     RevisionPageDocument,
     RevisionReusableContent,
+    SiteSpace,
     Space,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
@@ -16,12 +18,14 @@ import {
     SpaceContentPointer,
     getCollection,
     getDocument,
+    getPublishedContentSite,
     getReusableContent,
     getRevisionFile,
     getSpace,
     getSpaceContentData,
     getUserById,
     ignoreAPIError,
+    parseSpacesFromSiteSpaces,
 } from './api';
 import { getBlockById, getBlockTitle } from './document';
 import { gitbookAppHref, pageHref, PageHrefContext } from './links';
@@ -205,12 +209,7 @@ export async function resolveContentRef(
             const targetSpace =
                 contentRef.space === space.id
                     ? space
-                    : await ignoreAPIError(
-                          getSpace(
-                              contentRef.space,
-                              siteContext?.siteShareKey ? siteContext.siteShareKey : undefined,
-                          ),
-                      );
+                    : await getBestTargetSpace(contentRef.space, siteContext);
 
             if (!targetSpace) {
                 return {
@@ -287,6 +286,50 @@ export async function resolveContentRef(
     }
 }
 
+/**
+ * This function is used to get the best possible target space while resolving a content ref.
+ * It will try to return the space in the site context if it exists to avoid cross-site links.
+ */
+async function getBestTargetSpace(
+    spaceId: string,
+    siteContext: SiteContentPointer | null,
+): Promise<Space | undefined> {
+    const [fetchedSpace, publishedContentSite] = await Promise.all([
+        ignoreAPIError(
+            getSpace(spaceId, siteContext?.siteShareKey ? siteContext.siteShareKey : undefined),
+        ),
+        siteContext
+            ? ignoreAPIError(
+                  getPublishedContentSite({
+                      organizationId: siteContext.organizationId,
+                      siteId: siteContext.siteId,
+                      siteShareKey: siteContext.siteShareKey,
+                  }),
+              )
+            : null,
+    ]);
+
+    // In the context of sites, we try to find our target space in the site structure.
+    // because the url of this space will be in the same site.
+    if (publishedContentSite) {
+        const siteSpaces =
+            publishedContentSite.structure.type === 'siteSpaces'
+                ? publishedContentSite.structure.structure
+                : publishedContentSite.structure.structure.reduce<SiteSpace[]>((acc, section) => {
+                      acc.push(...section.siteSpaces);
+                      return acc;
+                  }, []);
+        const spaces = parseSpacesFromSiteSpaces(siteSpaces);
+        const foundSpace = spaces.find((space) => space.id === spaceId);
+        if (foundSpace) {
+            return foundSpace;
+        }
+    }
+
+    // Else we try return the fetched space from the API.
+    return fetchedSpace ?? undefined;
+}
+
 async function resolveContentRefInSpace(
     spaceId: string,
     siteContext: SiteContentPointer | null,
@@ -296,12 +339,16 @@ async function resolveContentRefInSpace(
         spaceId,
     };
 
-    const result = await ignoreAPIError(getSpaceContentData(pointer, siteContext?.siteShareKey));
+    const [result, bestTargetSpace] = await Promise.all([
+        ignoreAPIError(getSpaceContentData(pointer, siteContext?.siteShareKey)),
+        getBestTargetSpace(spaceId, siteContext),
+    ]);
     if (!result) {
         return null;
     }
 
-    const { space, pages } = result;
+    const { pages } = result;
+    const space = bestTargetSpace ?? result.space;
 
     // Base URL to use to prepend to relative URLs.
     let baseUrl = space.urls.published ?? space.urls.app;
