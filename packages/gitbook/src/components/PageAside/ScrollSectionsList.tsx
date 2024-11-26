@@ -1,17 +1,25 @@
 'use client';
-
+import { motion } from 'framer-motion';
 import React from 'react';
 
 import { useScrollActiveId } from '@/components/hooks';
 import { DocumentSection } from '@/lib/document';
 import { tcls } from '@/lib/tailwind';
 
+import { AnimatedLine } from './AnimatedLine';
 import { HEADER_HEIGHT_DESKTOP } from '../layout';
 
 /**
  * The threshold at which we consider a section as intersecting the viewport.
  */
 const SECTION_INTERSECTING_THRESHOLD = 0.9;
+
+const springCurve = {
+    type: 'spring',
+    stiffness: 700,
+    damping: 50,
+    mass: 0.8,
+};
 
 export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
     const { sections } = props;
@@ -28,37 +36,44 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
     });
 
     return (
-        <ul className={tcls('border-l', 'border-dark/2', 'dark:border-light/1', 'space-y-1')}>
+        <ul className={tcls('border-l', 'border-dark/2', 'dark:border-light/1', 'pl-1')}>
             {sections.map((section) => (
-                <li key={section.id} className={tcls('flex', 'flex-row')}>
+                <motion.li
+                    key={section.id}
+                    className={tcls('flex', 'flex-row', 'relative', 'h-fit')}
+                >
+                    {activeId === section.id ? <AnimatedLine transition={springCurve} /> : null}
                     <a
                         href={`#${section.id}`}
                         className={tcls(
                             'flex',
                             'flex-row',
+                            'z-10',
+                            'w-full',
                             'items-baseline',
                             'left-[-1px]',
                             'relative',
                             'text-sm',
                             'py-1',
                             'ps-3',
-                            'hover:text-primary',
+                            'pe-2',
                             'transition-all',
-                            'border-l',
-                            'border-transparent',
+                            'duration-200',
                             section.depth > 1 ? ['ps-6', 'opacity-8'] : null,
                             activeId === section.id
                                 ? [
                                       'text-primary',
-                                      'border-primary',
                                       'dark:text-primary-400',
-                                      'dark:border-primary-400',
-                                      'opacity-[1]',
                                       '[&>span]:bg-primary-400',
                                       'dark:[&>span]:bg-primary-600',
                                       'dark:[&>span]:text-dark',
                                   ]
-                                : '',
+                                : [
+                                      'text-neutral-500',
+                                      'dark:text-neutral-400',
+                                      'hover:text-neutral-900',
+                                      'dark:hover:text-neutral-100',
+                                  ],
                         )}
                     >
                         {section.tag ? (
@@ -71,7 +86,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
 
                         {section.title}
                     </a>
-                </li>
+                </motion.li>
             ))}
         </ul>
     );
