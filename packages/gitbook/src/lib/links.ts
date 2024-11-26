@@ -79,9 +79,14 @@ export function baseUrl(): string {
 
 /**
  * Create an absolute href in the current content.
+ * If it's the root URL, the trailing slash will be removed.
  */
 export function absoluteHref(href: string, withHost: boolean = false): string {
     const base = withHost ? baseUrl() : basePath();
+    if (href === '') {
+        // Remove the trailing slash if it's the root URL
+        return base.slice(0, -1);
+    }
     return `${base}${href.startsWith('/') ? href.slice(1) : href}`;
 }
 
