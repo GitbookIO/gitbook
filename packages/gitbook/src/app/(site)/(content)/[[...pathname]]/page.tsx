@@ -1,12 +1,10 @@
 import { CustomizationHeaderPreset, CustomizationThemeMode } from '@gitbook/api';
 import { Metadata, Viewport } from 'next';
-import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
-import React, { Suspense } from 'react';
+import React from 'react';
 
 import { PageAside } from '@/components/PageAside';
 import { PageBody, PageCover } from '@/components/PageBody';
-import { SkeletonHeading, SkeletonParagraph } from '@/components/primitives';
 import { PageHrefContext, absoluteHref, pageHref } from '@/lib/links';
 import { getPagePath, resolveFirstDocument } from '@/lib/pages';
 import { ContentRefContext } from '@/lib/references';
@@ -19,23 +17,15 @@ import { PagePathParams, fetchPageData, getPathnameParam, normalizePathname } fr
 
 export const runtime = 'edge';
 
-type PageProps = {
+/**
+ * Fetch and render a page.
+ */
+export default async function Page(props: {
     params: PagePathParams;
     searchParams: { fallback?: string };
-};
+}) {
+    const { params, searchParams } = props;
 
-export default async function Page(props: PageProps) {
-    // We wrap the page in Suspense to enable streaming at page level
-    // it's only enabled in "navigation" mode
-    return (
-        <Suspense fallback={<PageSkeleton />}>
-            <PageContent {...props} />
-        </Suspense>
-    );
-}
-
-async function PageContent(props: PageProps) {
-    const data = await getPageDataWithFallback(props, { redirectOnFallback: true });
     const {
         content: contentPointer,
         contentTarget,
@@ -46,7 +36,26 @@ async function PageContent(props: PageProps) {
         pages,
         page,
         document,
-    } = data;
+    } = await getPageDataWithFallback({
+        pagePathParams: params,
+        searchParams,
+        redirectOnFallback: true,
+    });
+
+    const linksContext: PageHrefContext = {};
+    const rawPathname = getPathnameParam(params);
+    if (!page) {
+        const pathname = normalizePathname(rawPathname);
+        if (pathname !== rawPathname) {
+            // If the pathname was not normalized, redirect to the normalized version
+            // before trying to resolve the page again
+            redirect(absoluteHref(pathname));
+        } else {
+            notFound();
+        }
+    } else if (getPagePath(pages, page) !== rawPathname) {
+        redirect(pageHref(pages, page, linksContext));
+    }
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
     const withFullPageCover = !!(
@@ -69,8 +78,6 @@ async function PageContent(props: PageProps) {
 
     return (
         <>
-            {/* Title is displayed by the browser, except in navigation mode */}
-            <title>{getTitle(data)}</title>
             {withFullPageCover && page.cover ? (
                 <PageCover as="full" page={page} cover={page.cover} context={contentRefContext} />
             ) : null}
@@ -110,30 +117,7 @@ async function PageContent(props: PageProps) {
     );
 }
 
-function PageSkeleton() {
-    return (
-        <div
-            className={tcls(
-                'flex',
-                'flex-row',
-                'flex-1',
-                'relative',
-                'py-8',
-                'lg:px-16',
-                'xl:mr-56',
-                'items-center',
-                'lg:items-start',
-            )}
-        >
-            <div className={tcls('flex-1', 'max-w-3xl', 'mx-auto', 'page-full-width:mx-0')}>
-                <SkeletonHeading style={tcls('mb-8')} />
-                <SkeletonParagraph style={tcls('mb-4')} />
-            </div>
-        </div>
-    );
-}
-
-export async function generateViewport({ params }: PageProps): Promise<Viewport> {
+export async function generateViewport({ params }: { params: PagePathParams }): Promise<Viewport> {
     const { customization } = await fetchPageData(params);
     return {
         colorScheme: customization.themes.toggeable
@@ -144,25 +128,26 @@ export async function generateViewport({ params }: PageProps): Promise<Viewport>
     };
 }
 
-function getTitle(input: Awaited<ReturnType<typeof getPageDataWithFallback>>) {
-    const { page, space, customization, site } = input;
-    return [page.title, getContentTitle(space, customization, site ?? null)]
-        .filter(Boolean)
-        .join(' | ');
-}
+export async function generateMetadata({
+    params,
+    searchParams,
+}: {
+    params: PagePathParams;
+    searchParams: { fallback?: string };
+}): Promise<Metadata> {
+    const { space, pages, page, customization, site, ancestors } = await getPageDataWithFallback({
+        pagePathParams: params,
+        searchParams,
+    });
 
-export async function generateMetadata(props: PageProps): Promise<Metadata> {
-    // We only generate metadata in navigation mode. Else we let the browser handle it.
-    if (await checkIsInAppNavigation()) {
-        return {};
+    if (!page) {
+        notFound();
     }
 
-    const data = await getPageDataWithFallback(props, { redirectOnFallback: false });
-
-    const { page, pages, space, customization, site, ancestors } = data;
-
     return {
-        title: getTitle(data),
+        title: [page.title, getContentTitle(space, customization, site ?? null)]
+            .filter(Boolean)
+            .join(' | '),
         description: page.description ?? '',
         alternates: {
             canonical: absoluteHref(getPagePath(pages, page), true),
@@ -181,29 +166,16 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 }
 
 /**
- * Check if the navigation is in-app, meaning the user clicks on a link.
- */
-async function checkIsInAppNavigation() {
-    const headerList = await headers();
-    const fetchMode = headerList.get('sec-fetch-mode');
-
-    return fetchMode === 'cors';
-}
-
-/**
  * Fetches the page data matching the requested pathname and fallback to root page when page is not found.
  */
-async function getPageDataWithFallback(
-    props: PageProps,
-    behaviour: {
-        redirectOnFallback: boolean;
-    },
-) {
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    const { params, searchParams } = props;
-    const { redirectOnFallback } = behaviour;
+async function getPageDataWithFallback(args: {
+    pagePathParams: PagePathParams;
+    searchParams: { fallback?: string };
+    redirectOnFallback?: boolean;
+}) {
+    const { pagePathParams, searchParams, redirectOnFallback = false } = args;
 
-    const { pages, page: targetPage, ...otherPageData } = await fetchPageData(params);
+    const { pages, page: targetPage, ...otherPageData } = await fetchPageData(pagePathParams);
 
     let page = targetPage;
     const canFallback = !!searchParams.fallback;
@@ -215,21 +187,6 @@ async function getPageDataWithFallback(
         }
 
         page = rootPage?.page;
-    }
-
-    const linksContext: PageHrefContext = {};
-    const rawPathname = getPathnameParam(params);
-    if (!page) {
-        const pathname = normalizePathname(rawPathname);
-        if (pathname !== rawPathname) {
-            // If the pathname was not normalized, redirect to the normalized version
-            // before trying to resolve the page again
-            redirect(absoluteHref(pathname));
-        } else {
-            notFound();
-        }
-    } else if (getPagePath(pages, page) !== rawPathname) {
-        redirect(pageHref(pages, page, linksContext));
     }
 
     return {
