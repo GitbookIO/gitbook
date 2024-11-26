@@ -50,7 +50,6 @@ export function PlainCodeBlock(props: { code: string; syntax: string }) {
                 mode: 'default',
                 contentRefContext: null,
                 resolveContentRef: async () => null,
-                shouldHighlightCode: () => true,
             }}
             block={block}
             ancestorBlocks={[]}
