@@ -22,7 +22,6 @@ const springCurve = {
 };
 
 export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
-    const [hoveredId, setHoveredId] = React.useState<null | string>(null);
     const { sections } = props;
 
     const ids = React.useMemo(() => {
@@ -42,8 +41,6 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                 <motion.li
                     key={section.id}
                     className={tcls('flex', 'flex-row', 'relative', 'h-fit')}
-                    onMouseEnter={() => setHoveredId(section.id)}
-                    onMouseLeave={() => setHoveredId(activeId)}
                 >
                     {activeId === section.id ? <AnimatedLine transition={springCurve} /> : null}
                     <a
