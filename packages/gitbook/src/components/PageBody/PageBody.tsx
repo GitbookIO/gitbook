@@ -21,7 +21,7 @@ import { PageFooterNavigation } from './PageFooterNavigation';
 import { PageHeader } from './PageHeader';
 import { PreservePageLayout } from './PreservePageLayout';
 import { TrackPageView } from './TrackPageView';
-import { DocumentView, DocumentViewSkeleton, createHighlightingContext } from '../DocumentView';
+import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
 import { PageFeedbackForm } from '../PageFeedback';
 import { DateRelative } from '../primitives';
 
@@ -49,7 +49,6 @@ export function PageBody(props: {
     const asFullWidth = document ? hasFullWidthBlock(document) : false;
     const language = getSpaceLanguage(customization);
     const updatedAt = page.updatedAt ?? page.createdAt;
-    const shouldHighlightCode = createHighlightingContext();
 
     return (
         <>
@@ -100,7 +99,6 @@ export function PageBody(props: {
                                 contentRefContext: context,
                                 resolveContentRef: (ref, options) =>
                                     resolveContentRef(ref, context, options),
-                                shouldHighlightCode,
                             }}
                         />
                     </React.Suspense>
