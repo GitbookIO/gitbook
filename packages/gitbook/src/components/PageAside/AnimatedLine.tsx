@@ -19,6 +19,7 @@ export function AnimatedLine({ transition }: { transition?: Transition }) {
                 'h-full',
                 'absolute',
                 'z-20',
+                '-left-[5px]',
             ])}
             transition={prefersReducedMotion ? { duration: 0 } : transition}
         />

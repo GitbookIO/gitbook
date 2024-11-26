@@ -1,12 +1,11 @@
 'use client';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import React from 'react';
 
 import { useScrollActiveId } from '@/components/hooks';
 import { DocumentSection } from '@/lib/document';
 import { tcls } from '@/lib/tailwind';
 
-import { AnimatedBackground } from './AnimatedBackground';
 import { AnimatedLine } from './AnimatedLine';
 import { HEADER_HEIGHT_DESKTOP } from '../layout';
 
@@ -24,7 +23,6 @@ const springCurve = {
 
 export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
     const [hoveredId, setHoveredId] = React.useState<null | string>(null);
-
     const { sections } = props;
 
     const ids = React.useMemo(() => {
@@ -39,7 +37,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
     });
 
     return (
-        <ul className={tcls('border-l', 'border-dark/2', 'dark:border-light/1')}>
+        <ul className={tcls('border-l', 'border-dark/2', 'dark:border-light/1', 'pl-1')}>
             {sections.map((section) => (
                 <motion.li
                     key={section.id}
@@ -48,9 +46,6 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                     onMouseLeave={() => setHoveredId(activeId)}
                 >
                     {activeId === section.id ? <AnimatedLine transition={springCurve} /> : null}
-                    {activeId === section.id || hoveredId === section.id ? (
-                        <AnimatedBackground transition={springCurve} />
-                    ) : null}
                     <a
                         href={`#${section.id}`}
                         className={tcls(
@@ -64,17 +59,24 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                             'text-sm',
                             'py-1',
                             'ps-3',
+                            'pe-2',
+                            'transition-all',
+                            'duration-200',
                             section.depth > 1 ? ['ps-6', 'opacity-8'] : null,
                             activeId === section.id
                                 ? [
                                       'text-primary',
                                       'dark:text-primary-400',
-                                      'opacity-[1]',
                                       '[&>span]:bg-primary-400',
                                       'dark:[&>span]:bg-primary-600',
                                       'dark:[&>span]:text-dark',
                                   ]
-                                : '',
+                                : [
+                                      'text-neutral-500',
+                                      'dark:text-neutral-400',
+                                      'hover:text-neutral-900',
+                                      'dark:hover:text-neutral-100',
+                                  ],
                         )}
                     >
                         {section.tag ? (
