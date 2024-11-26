@@ -39,16 +39,6 @@ export interface DocumentContext {
     getId?: (id: string) => string;
 
     /**
-     * Returns true if the given code block should be highlighted.
-     * This function was added to protect against memory issues when highlighting
-     * a large number of code blocks.
-     * Once highlighting can scale up to a large number of code blocks, it can be removed.
-     *
-     * https://linear.app/gitbook-x/issue/RND-3588/gitbook-open-code-syntax-highlighting-runs-out-of-memory-after-a
-     */
-    shouldHighlightCode: (spaceId: string | undefined) => boolean;
-
-    /**
      * True if the blocks should be wrapped in suspense boundary for isolated loading skeletons.
      * @default true
      */

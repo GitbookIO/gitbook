@@ -621,6 +621,49 @@ export const getDocument = cache({
 });
 
 /**
+ * Resolve a site redirect by its source path.
+ */
+export const getSiteRedirectBySource = cache({
+    name: 'api.getSiteRedirectBySource',
+    tag: ({ siteId }) => getAPICacheTag({ tag: 'site', site: siteId }),
+    get: async (
+        args: {
+            organizationId: string;
+            siteId: string;
+            /** Site share key that can be used as context to resolve site space published urls */
+            siteShareKey: string | undefined;
+            source: string;
+        },
+        options: CacheFunctionOptions,
+    ) => {
+        try {
+            const response = await api().orgs.getSiteRedirectBySource(
+                args.organizationId,
+                args.siteId,
+                {
+                    shareKey: args.siteShareKey,
+                    source: args.source,
+                },
+                {
+                    ...noCacheFetchOptions,
+                    signal: options.signal,
+                },
+            );
+            return cacheResponse(response, cacheTtl_1day);
+        } catch (error) {
+            if ((error as GitBookAPIError).code === 404) {
+                return {
+                    data: null,
+                    ...cacheTtl_1day,
+                };
+            }
+
+            throw error;
+        }
+    },
+});
+
+/**
  * Get the infos about a site by its ID.
  */
 export const getSite = cache({
@@ -670,7 +713,10 @@ export const getPublishedContentSite = cache({
 
 export type SectionsList = { list: SiteSection[]; section: SiteSection; index: number };
 
-function parseSpacesFromSiteSpaces(siteSpaces: SiteSpace[]) {
+/**
+ * Parse the site spaces into a list of spaces with their title and urls.
+ */
+export function parseSpacesFromSiteSpaces(siteSpaces: SiteSpace[]) {
     const spaces: Record<string, Space> = {};
     siteSpaces.forEach((siteSpace) => {
         spaces[siteSpace.space.id] = {
@@ -831,13 +877,11 @@ export async function getSpaceContentData(
         spaceId: pointer.spaceId,
         revisionId: changeRequest?.revision ?? pointer.revisionId ?? space.revision,
     };
-    const [pages] = await Promise.all([
-        getRevisionPages(space.id, contentTarget.revisionId, {
-            // We only care about the Git metadata when the Git sync is enabled
-            // otherwise we can optimize performance by not fetching it
-            metadata: !!space.gitSync,
-        }),
-    ]);
+    const pages = await getRevisionPages(space.id, contentTarget.revisionId, {
+        // We only care about the Git metadata when the Git sync is enabled
+        // otherwise we can optimize performance by not fetching it
+        metadata: !!space.gitSync,
+    });
 
     return {
         space,

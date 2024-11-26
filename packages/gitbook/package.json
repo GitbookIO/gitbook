@@ -16,7 +16,7 @@
         "clean": "rm -rf ./.next && rm -rf ./public/~gitbook/static"
     },
     "dependencies": {
-        "@gitbook/api": "^0.76.0",
+        "@gitbook/api": "^0.77.0",
         "@gitbook/cache-do": "workspace:*",
         "@gitbook/emoji-codepoints": "workspace:*",
         "@gitbook/icons": "workspace:*",
@@ -60,7 +60,7 @@
         "remark-rehype": "^11.1.0",
         "rison": "^0.1.1",
         "server-only": "^0.0.1",
-        "shiki": "^1.22.0",
+        "shiki": "^1.23.1",
         "tailwind-merge": "^2.2.0",
         "tailwind-shades": "^1.1.2",
         "unified": "^11.0.4",
