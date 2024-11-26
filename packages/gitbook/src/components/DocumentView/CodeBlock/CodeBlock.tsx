@@ -15,8 +15,7 @@ import './theme.css';
  */
 export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
     const { block, document, style, context } = props;
-    const withHighlighting = context.shouldHighlightCode(context.content?.spaceId);
-    const lines = withHighlighting ? await highlight(block) : plainHighlighting(block);
+    const lines = await highlight(block);
 
     const id = block.key!;
 
@@ -99,6 +98,8 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
                     'overflow-auto',
                     'bg-light-2',
                     'dark:bg-dark-2',
+                    'border-light-4',
+                    'dark:border-dark-4',
                     'hide-scroll',
                     titleRoundingStyle,
                 )}

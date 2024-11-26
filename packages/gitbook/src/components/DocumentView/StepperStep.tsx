@@ -30,17 +30,17 @@ export function StepperStep(props: BlockProps<DocumentBlockStepperStep>) {
     })();
 
     return (
-        <div className="flex flex-row gap-4 md:gap-8 max-w-3xl w-full mx-auto">
+        <div className={tcls('flex flex-row gap-4 md:gap-8 max-w-3xl w-full mx-auto', style)}>
             <div className="relative select-none">
                 <div
                     className={tcls(
-                        'flex size-[calc(1.75rem+1px)] items-center justify-center rounded-full bg-primary-50 dark:bg-primary-900 tabular-nums',
+                        'can-override-bg can-override-text flex size-[calc(1.75rem+1px)] items-center justify-center rounded-full bg-primary-50 dark:bg-primary-900 tabular-nums',
                         'font-medium text-primary-800 dark:text-primary-200',
                     )}
                 >
                     {index + 1}
                 </div>
-                <div className="absolute bottom-2 left-[0.875rem] top-9 w-px bg-primary-50 dark:bg-primary-900" />
+                <div className="absolute bottom-2 left-[0.875rem] top-9 w-px bg-primary-50 dark:bg-primary-900 can-override-bg" />
             </div>
             <Blocks
                 {...contextProps}
