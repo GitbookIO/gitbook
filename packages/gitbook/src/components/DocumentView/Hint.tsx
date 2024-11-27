@@ -44,7 +44,7 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
                         hintStyle.bodyColor,
                         // render hash icon on the other side of the heading
                         'flip-heading-hash',
-                        'decoration-inherit'
+                        'decoration-inherit',
                     )}
                     style={['flex-1', 'space-y-4', '[&_.hint]:border', '[&_pre]:border']}
                 />
