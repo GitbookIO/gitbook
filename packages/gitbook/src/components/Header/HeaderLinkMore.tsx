@@ -10,7 +10,7 @@ import React from 'react';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
-import { Dropdown, DropdownMenu, DropdownMenuItem } from './Dropdown';
+import { Dropdown, DropdownChevron, DropdownMenu, DropdownMenuItem } from './Dropdown';
 import styles from './headerLinks.module.css';
 
 /**
@@ -30,15 +30,23 @@ export function HeaderLinkMore(props: {
     const renderButton = () => (
         <button
             className={tcls(
-                'px-1',
-                !isCustomizationDefault
-                    ? ['text-header-link-500']
-                    : ['text-dark/8', 'dark:text-light/8', 'dark:hover:text-light'],
-                'hover:text-header-link-400',
+                isCustomizationDefault
+                    ? [
+                          'text-dark/8',
+                          'dark:text-light/8',
+                          'hover:text-primary',
+                          'dark:hover:text-primary',
+                      ]
+                    : ['text-header-link', 'hover:text-header-link/8'],
+                'flex',
+                'gap-1',
+                'items-center',
             )}
         >
             <span className="sr-only">{label}</span>
-            <Icon icon="ellipsis" className={tcls('opacity-6', 'size-3', 'ms-1')} />
+            <Icon icon="ellipsis" className={tcls('size-4')} />
+            <DropdownChevron />
+            {/* <Icon icon="chevron-down" className={tcls('size-3')} /> */}
         </button>
     );
 

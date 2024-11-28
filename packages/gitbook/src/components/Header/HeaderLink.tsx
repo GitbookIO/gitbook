@@ -85,14 +85,18 @@ export async function HeaderLink(props: {
                         href={target.href}
                         className={tcls(
                             'overflow-hidden',
-                            'text-sm lg:text-base',
+
                             'flex flex-row items-center',
                             'whitespace-nowrap',
-                            'hover:text-header-link-400 dark:hover:text-light',
 
                             headerPreset === CustomizationHeaderPreset.Default
-                                ? ['text-dark/8', 'dark:text-light/8']
-                                : ['text-header-link-500 hover:text-header-link-400'],
+                                ? [
+                                      'text-dark/8',
+                                      'dark:text-light/8',
+                                      'hover:text-primary',
+                                      'dark:hover:text-primary',
+                                  ]
+                                : ['text-header-link hover:text-header-link/8'],
                         )}
                     >
                         <span className={tcls('truncate')}>{link.title}</span>
