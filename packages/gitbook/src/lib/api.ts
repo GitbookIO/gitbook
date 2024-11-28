@@ -91,8 +91,6 @@ const apiSyncStorage = new AsyncLocalStorage<GitBookAPI>();
 
 export const DEFAULT_API_ENDPOINT = process.env.GITBOOK_API_URL ?? 'https://api.gitbook.com';
 
-console.log("API endpoint", DEFAULT_API_ENDPOINT);
-
 /**
  * Create a new API client with a token.
  */
@@ -117,8 +115,11 @@ export function apiWithToken(apiToken: string): GitBookAPI {
 export function api(): GitBookAPI {
     const existing = apiSyncStorage.getStore();
     if (existing) {
+        console.log("Existing", existing);
         return existing;
     }
+
+    console.log("Bringing up API");
 
     const headersList = headers();
     const apiToken = headersList.get('x-gitbook-token');
@@ -203,6 +204,7 @@ export const getPublishedContentByUrl = cache({
         visitorAuthToken: string | undefined,
         options: CacheFunctionOptions,
     ) => {
+        console.log("Requesting URL", url);
         try {
             const response = await api().urls.getPublishedContentByUrl(
                 {
