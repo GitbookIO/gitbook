@@ -91,12 +91,16 @@ const apiSyncStorage = new AsyncLocalStorage<GitBookAPI>();
 
 export const DEFAULT_API_ENDPOINT = process.env.GITBOOK_API_URL ?? 'https://api.gitbook.com';
 
+console.log("API endpoint", DEFAULT_API_ENDPOINT);
+
 /**
  * Create a new API client with a token.
  */
 export function apiWithToken(apiToken: string): GitBookAPI {
     const headersList = headers();
     const apiEndpoint = headersList.get('x-gitbook-api') ?? DEFAULT_API_ENDPOINT;
+
+    console.log("API Endpoint", apiEndpoint);
 
     const gitbook = new GitBookAPI({
         authToken: apiToken,
