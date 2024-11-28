@@ -56,7 +56,6 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                         className={tcls(
                             'text-sm',
                             'line-clamp-3',
-                            'z-[-1]', //to force stacking order
                             'relative',
                         )}
                     >

@@ -27,22 +27,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
     };
 
     return (
-        <motion.button
-            layout="position"
-            layoutId="searchbox"
-            transition={{
-                layout: {
-                    type: 'spring',
-                    bounce: 0,
-                    duration: 0.2,
-                },
-            }}
-            whileHover={{
-                scale: 1.02,
-            }}
-            whileTap={{
-                scale: 0.98,
-            }}
+        <button
             onClick={onClick}
             aria-label={tString(language, 'search')}
             className={tcls(
@@ -52,7 +37,8 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'justify-center',
                 'items-center',
                 'w-full',
-                'p-2',
+                'px-3',
+                'py-2',
                 'gap-2',
 
                 'bg-light',
@@ -76,22 +62,20 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'contrast-more:dark:ring-light',
                 'contrast-more:dark:text-light',
 
-                'transition-[box-shadow,color,background-color]',
+                'transition-all',
                 'hover:shadow-md',
-                'dark:hover:bg-light/1',
+                'hover:scale-102',
+                'dark:hover:bg-dark-3',
                 'hover:ring-dark/2',
-                'hover:text-dark/8',
+                'hover:text-dark/10',
                 'dark:hover:ring-light/4',
-                'dark:hover:text-light/8',
+                'dark:hover:text-light',
 
                 'active:shadow-sm',
+                'active:scale-98',
 
-                // '[&>p]:hidden',
-                // '[&>span]:hidden',
                 'md:justify-start',
                 'flex',
-                // 'md:[&>p]:flex',
-                // 'md:[&>span]:flex',
                 'md:w-full',
                 style,
             )}
@@ -101,7 +85,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 {children}
             </div>
             <Shortcut />
-        </motion.button>
+        </button>
     );
 }
 
@@ -124,13 +108,14 @@ const Shortcut = () => {
     return (
         <div
             className={tcls(
+                'shortcut',
                 'hidden',
                 'md:inline',
                 'justify-end',
                 'text-xs',
-                'text-dark/5',
+                'text-dark/6',
                 'contrast-more:text-dark',
-                'dark:text-light/5',
+                'dark:text-light/6',
                 'whitespace-nowrap',
                 'contrast-more:dark:text-light',
                 `[font-feature-settings:"calt",_"case"]`,

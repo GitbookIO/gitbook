@@ -86,6 +86,7 @@ export function SearchModal(props: SearchModalProps) {
                     }}
                     transition={{
                         duration: 0.2,
+                        delay: 0.1,
                     }}
                     role="dialog"
                     className={tcls(
@@ -193,22 +194,28 @@ function SearchModalBody(
 
     return (
         <motion.div
-            layout
             transition={{
-                default: {
-                    duration: 0
-                },
-                layout: {
-                    type: 'spring',
-                    bounce: 0.15,
-                    duration: 0.2,
-                },
+                duration: 0.2,
+                delay: 0.1,
+                ease: 'easeOut',
             }}
-            layoutId="searchbox"
+            initial={{
+                scale: 0.95,
+                opacity: 0,
+            }}
+            animate={{
+                scale: 1,
+                opacity: 1,
+            }}
+            exit={{
+                scale: 0.95,
+                opacity: 0,
+            }}
             role="dialog"
             aria-label={tString(language, 'search')}
             className={tcls(
                 'z-40',
+                'relative',
                 'flex',
                 'flex-col',
                 'bg-white',

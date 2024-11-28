@@ -30,7 +30,14 @@ export function HeaderLogo(props: HeaderLogoProps) {
     const { customization } = props;
 
     return (
-        <div className={tcls('flex', 'flex-row', 'gap-2')}>
+        <div
+            className={tcls(
+                'flex',
+                'shrink-0',
+                'flex-row',
+                'gap-2',
+            )}
+        >
             <HeaderMobileMenu
                 className={tcls(
                     'lg:hidden',
@@ -47,7 +54,10 @@ export function HeaderLogo(props: HeaderLogoProps) {
                     'flex',
                     'flex-row',
                     'items-center',
-                    'shrink-0',
+                    'max-w-40',
+                    'lg:max-w-56',
+                    'max-h-10',
+                    'lg:max-h-12',
                 )}
             >
                 {customization.header.logo ? (
@@ -74,14 +84,13 @@ export function HeaderLogo(props: HeaderLogoProps) {
                         ]}
                         priority="high"
                         style={tcls(
-                            'max-w-[8rem]',
-                            'lg:max-w-[12rem]',
-                            'max-h-[3rem]',
                             'rounded',
                             'straight-corners:rounded-sm',
                             'overflow-hidden',
                             'object-contain',
                             'object-left',
+                            'w-full',
+                            'h-full',
                         )}
                     />
                 ) : (

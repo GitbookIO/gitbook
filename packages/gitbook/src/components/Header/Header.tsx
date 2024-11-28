@@ -51,17 +51,21 @@ export function Header(props: {
                     ? ['bg-light', 'dark:bg-dark']
                     : ['bg-header-background', 'bg-header-background'],
                 'text-sm',
-                'bg-opacity-9',
-                'dark:bg-opacity-9',
-                'backdrop-blur-lg',
-                'contrast-more:bg-opacity-11',
-                'contrast-more:dark:bg-opacity-11',
+                isCustomizationDefault
+                    ? [
+                          'bg-opacity-9',
+                          'dark:bg-opacity-9',
+                          'backdrop-blur-lg',
+                          'contrast-more:bg-opacity-11',
+                          'contrast-more:dark:bg-opacity-11',
+                      ]
+                    : null,
             )}
         >
             <div className={tcls('scroll-nojump')}>
                 <div
                     className={tcls(
-                        'gap-4',
+                        'gap-6',
                         'lg:gap-8',
                         'flex',
                         'h-16',
@@ -72,11 +76,11 @@ export function Header(props: {
                     )}
                 >
                     <HeaderLogo site={site} space={space} customization={customization} />
-                    <div className="z-20">
-                        {!hasSiteSections && isMultiVariants ? (
+                    {!hasSiteSections && isMultiVariants ? (
+                        <div className="z-20">
                             <SpacesDropdown space={space} spaces={spaces} />
-                        ) : null}
-                    </div>
+                        </div>
+                    ) : null}
                     <HeaderLinks>
                         {customization.header.links.map((link, index) => {
                             return (
@@ -109,11 +113,38 @@ export function Header(props: {
                                 style={
                                     !isCustomizationDefault && withTopHeader
                                         ? [
-                                              //   'bg-header-link/3',
+                                              // 'bg-transparent',
+                                              // 'dark:bg-transparent',
+                                              'bg-header-link/2',
+                                              'dark:bg-header-link/2',
+                                              'hover:bg-header-link/3',
+                                              'dark:hover:bg-header-link/3',
+
+                                              'text-header-link/8',
+                                              'dark:text-header-link/8',
+                                              'hover:text-header-link',
+                                              'dark:hover:text-header-link',
+
+                                              'ring-header-link/4',
+                                              'dark:ring-header-link/4',
+                                              'hover:ring-header-link/5',
+                                              'dark:hover:ring-header-link/5',
+
+                                              '[&_svg]:text-header-link/10',
+                                              'dark:[&_svg]:text-header-link/10',
+                                              '[&_.shortcut]:text-header-link/8',
+                                              'dark:[&_.shortcut]:text-header-link/8',
+
+                                              'shadow-none',
+                                              'hover:shadow-none',
+                                              // 'bg-primary',
+                                              // 'text-contrast-primary/6',
+                                              // 'ring-contrast-primary/1',
+                                              // 'bg-header-link/3',
                                               //   'shadow-sm',
-                                              //   'ring-header-link/3',
-                                              //   '[&>span]:!text-header-link/7',
-                                              //   '[&_svg]:text-header-link',
+                                              // 'ring-header-link/3',
+                                              // '[&>span]:!text-header-link/7',
+                                              // '[&_svg]:text-header-link',
                                               //   'contrast-more:bg-transparent',
                                               //   'contrast-more:ring-header-link',
                                               //   'contrast-more:[&>span]:!text-header-link',
