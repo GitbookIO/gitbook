@@ -1,10 +1,12 @@
 'use client';
-import { SiteSection } from '@gitbook/api';
+
+import type { SiteSection } from '@gitbook/api';
 import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
 import { Link } from '../primitives';
+import { SectionIcon } from './SectionIcon';
 
 /**
  * A set of navigational tabs representing site sections for multi-section sites
@@ -14,12 +16,13 @@ export function SiteSectionTabs(props: {
     section: SiteSection;
     index: number;
 }) {
-    const { list: sections, section: currentSection, index: currentIndex } = props;
+    const { list: sections, index: currentIndex } = props;
 
-    const tabs = sections.map((section) => ({
+    const tabs = sections.map( (section) => ({
         id: section.id,
         label: section.title,
         path: section.urls.published ?? '',
+        icon: section.icon ? <SectionIcon section={section} /> : null,
     }));
 
     const currentTabRef = React.useRef<HTMLAnchorElement>(null);
@@ -43,7 +46,9 @@ export function SiteSectionTabs(props: {
     }, []);
 
     React.useEffect(() => {
-        updateTabDimensions();
+        if (currentIndex >= 0) {
+            updateTabDimensions();
+        }
     }, [currentIndex, updateTabDimensions]);
 
     React.useLayoutEffect(() => {
@@ -55,7 +60,7 @@ export function SiteSectionTabs(props: {
         };
     }, [updateTabDimensions]);
 
-    const opacity = Boolean(tabDimensions) ? 1 : 0.0;
+    const opacity = tabDimensions ? 1 : 0.0;
     const scale = (tabDimensions?.width ?? 0) * 0.01;
     const startPos = `${tabDimensions?.left ?? 0}px`;
 
@@ -87,10 +92,11 @@ export function SiteSectionTabs(props: {
                     {tabs.map((tab, index) => (
                         <Tab
                             active={currentIndex === index}
-                            key={index + tab.path}
+                            key={tab.id}
                             label={tab.label}
                             href={tab.path}
                             ref={currentIndex === index ? currentTabRef : null}
+                            icon={tab.icon}
                         />
                     ))}
                 </div>
@@ -117,7 +123,7 @@ export function SiteSectionTabs(props: {
                         'after:bg-primary',
                         'dark:after:bg-primary-400',
                     )}
-                ></div>
+                />
             </div>
         </nav>
     ) : null;
@@ -126,9 +132,9 @@ export function SiteSectionTabs(props: {
 /**
  * The tab item - a link to a site section
  */
-const Tab = React.forwardRef<HTMLSpanElement, { active: boolean; href: string; label: string }>(
+const Tab = React.forwardRef<HTMLSpanElement, { active: boolean; href: string; icon?: React.ReactNode; label: string }>(
     function Tab(props, ref) {
-        const { active, href, label } = props;
+        const { active, href, icon, label } = props;
         return (
             <Link
                 className={tcls(
@@ -140,9 +146,10 @@ const Tab = React.forwardRef<HTMLSpanElement, { active: boolean; href: string; l
                 role="tab"
                 href={href}
             >
-                <span ref={ref} className={tcls('inline-flex w-full truncate')}>
+                <span ref={ref} className={tcls('inline-flex gap-2 items-center w-full truncate')}>
+                    {icon}
                     {label}
-                </span>
+                </span> 
             </Link>
         );
     },
