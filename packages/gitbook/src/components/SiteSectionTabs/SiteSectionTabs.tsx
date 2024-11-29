@@ -18,11 +18,13 @@ export function SiteSectionTabs(props: {
 }) {
     const { list: sections, index: currentIndex } = props;
 
-    const tabs = sections.map( (section) => ({
+    const tabs = sections.map((section) => ({
         id: section.id,
         label: section.title,
         path: section.urls.published ?? '',
-        icon: section.icon ? <SectionIcon className="text-primary dark:text-primary-400" section={section} /> : null,
+        icon: section.icon ? (
+            <SectionIcon className="text-primary dark:text-primary-400" section={section} />
+        ) : null,
     }));
 
     const currentTabRef = React.useRef<HTMLAnchorElement>(null);
@@ -132,25 +134,26 @@ export function SiteSectionTabs(props: {
 /**
  * The tab item - a link to a site section
  */
-const Tab = React.forwardRef<HTMLSpanElement, { active: boolean; href: string; icon?: React.ReactNode; label: string }>(
-    function Tab(props, ref) {
-        const { active, href, icon, label } = props;
-        return (
-            <Link
-                className={tcls(
-                    'px-3 py-1 my-2 rounded straight-corners:rounded-none transition-colors',
-                    active && 'text-primary dark:text-primary-400',
-                    !active &&
-                        'text-dark/8 hover:bg-dark/1 hover:text-dark/9 dark:text-light/8 dark:hover:bg-light/2 dark:hover:text-light/9',
-                )}
-                role="tab"
-                href={href}
-            >
-                <span ref={ref} className={tcls('inline-flex gap-2 items-center w-full truncate')}>
-                    {icon}
-                    {label}
-                </span> 
-            </Link>
-        );
-    },
-);
+const Tab = React.forwardRef<
+    HTMLSpanElement,
+    { active: boolean; href: string; icon?: React.ReactNode; label: string }
+>(function Tab(props, ref) {
+    const { active, href, icon, label } = props;
+    return (
+        <Link
+            className={tcls(
+                'px-3 py-1 my-2 rounded straight-corners:rounded-none transition-colors',
+                active && 'text-primary dark:text-primary-400',
+                !active &&
+                    'text-dark/8 hover:bg-dark/1 hover:text-dark/9 dark:text-light/8 dark:hover:bg-light/2 dark:hover:text-light/9',
+            )}
+            role="tab"
+            href={href}
+        >
+            <span ref={ref} className={tcls('inline-flex gap-2 items-center w-full truncate')}>
+                {icon}
+                {label}
+            </span>
+        </Link>
+    );
+});
