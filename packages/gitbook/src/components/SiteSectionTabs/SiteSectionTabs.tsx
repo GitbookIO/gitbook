@@ -1,10 +1,13 @@
 'use client';
-import { SiteSection } from '@gitbook/api';
+
+import type { SiteSection } from '@gitbook/api';
+import type { IconName } from '@gitbook/icons';
 import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
 import { Link } from '../primitives';
+import { SectionIcon } from './SectionIcon';
 
 /**
  * A set of navigational tabs representing site sections for multi-section sites
@@ -14,13 +17,7 @@ export function SiteSectionTabs(props: {
     section: SiteSection;
     index: number;
 }) {
-    const { list: sections, section: currentSection, index: currentIndex } = props;
-
-    const tabs = sections.map((section) => ({
-        id: section.id,
-        label: section.title,
-        path: section.urls.published ?? '',
-    }));
+    const { list: sections, index: currentIndex } = props;
 
     const currentTabRef = React.useRef<HTMLAnchorElement>(null);
     const navRef = React.useRef<HTMLDivElement>(null);
@@ -43,7 +40,9 @@ export function SiteSectionTabs(props: {
     }, []);
 
     React.useEffect(() => {
-        updateTabDimensions();
+        if (currentIndex >= 0) {
+            updateTabDimensions();
+        }
     }, [currentIndex, updateTabDimensions]);
 
     React.useLayoutEffect(() => {
@@ -55,11 +54,11 @@ export function SiteSectionTabs(props: {
         };
     }, [updateTabDimensions]);
 
-    const opacity = Boolean(tabDimensions) ? 1 : 0.0;
+    const opacity = tabDimensions ? 1 : 0.0;
     const scale = (tabDimensions?.width ?? 0) * 0.01;
     const startPos = `${tabDimensions?.left ?? 0}px`;
 
-    return tabs.length > 0 ? (
+    return sections.length > 0 ? (
         <nav
             aria-label="Sections"
             ref={navRef}
@@ -84,15 +83,24 @@ export function SiteSectionTabs(props: {
                         'md:px-5',
                     )}
                 >
-                    {tabs.map((tab, index) => (
-                        <Tab
-                            active={currentIndex === index}
-                            key={index + tab.path}
-                            label={tab.label}
-                            href={tab.path}
-                            ref={currentIndex === index ? currentTabRef : null}
-                        />
-                    ))}
+                    {sections.map((section, index) => {
+                        const { id, urls, title, icon } = section;
+                        const isActive = index === currentIndex;
+                        return (
+                            <Tab
+                                active={isActive}
+                                key={id}
+                                label={title}
+                                href={urls.published ?? ''}
+                                ref={isActive ? currentTabRef : null}
+                                icon={
+                                    icon ? (
+                                        <SectionIcon isActive={isActive} icon={icon as IconName} />
+                                    ) : null
+                                }
+                            />
+                        );
+                    })}
                 </div>
                 {/* A container for a pseudo element for active tab indicator. A container is needed so we can set
                     a relative position without breaking the z-index of other parts of the header. */}
@@ -117,7 +125,7 @@ export function SiteSectionTabs(props: {
                         'after:bg-primary',
                         'dark:after:bg-primary-400',
                     )}
-                ></div>
+                />
             </div>
         </nav>
     ) : null;
@@ -126,24 +134,26 @@ export function SiteSectionTabs(props: {
 /**
  * The tab item - a link to a site section
  */
-const Tab = React.forwardRef<HTMLSpanElement, { active: boolean; href: string; label: string }>(
-    function Tab(props, ref) {
-        const { active, href, label } = props;
-        return (
-            <Link
-                className={tcls(
-                    'px-3 py-1 my-2 rounded straight-corners:rounded-none transition-colors',
-                    active && 'text-primary dark:text-primary-400',
-                    !active &&
-                        'text-dark/8 hover:bg-dark/1 hover:text-dark/9 dark:text-light/8 dark:hover:bg-light/2 dark:hover:text-light/9',
-                )}
-                role="tab"
-                href={href}
-            >
-                <span ref={ref} className={tcls('inline-flex w-full truncate')}>
-                    {label}
-                </span>
-            </Link>
-        );
-    },
-);
+const Tab = React.forwardRef<
+    HTMLSpanElement,
+    { active: boolean; href: string; icon?: React.ReactNode; label: string }
+>(function Tab(props, ref) {
+    const { active, href, icon, label } = props;
+    return (
+        <Link
+            className={tcls(
+                'group/tab px-3 py-1 my-2 rounded straight-corners:rounded-none transition-colors',
+                active && 'text-primary dark:text-primary-400',
+                !active &&
+                    'text-dark/8 hover:bg-dark/1 hover:text-dark/9 dark:text-light/8 dark:hover:bg-light/2 dark:hover:text-light/9',
+            )}
+            role="tab"
+            href={href}
+        >
+            <span ref={ref} className={tcls('inline-flex gap-2 items-center w-full truncate')}>
+                {icon}
+                {label}
+            </span>
+        </Link>
+    );
+});
