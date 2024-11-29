@@ -79,7 +79,7 @@ export function generateSchemaExample(
         return 'text';
     }
 
-    if (schema.type === 'number') {
+    if (schema.type === 'number' || schema.type === 'integer') {
         return schema.default || 0;
     }
 
