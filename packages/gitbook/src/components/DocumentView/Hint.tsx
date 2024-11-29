@@ -44,7 +44,6 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
                         hintStyle.bodyColor,
                         // render hash icon on the other side of the heading
                         'flip-heading-hash',
-                        'decoration-inherit',
                     )}
                     style={['flex-1', 'space-y-4', '[&_.hint]:border', '[&_pre]:border']}
                 />
@@ -92,6 +91,8 @@ const HINT_STYLES: {
             '[&_.can-override-bg]:bg-orange-500/3',
             '[&_.can-override-text]:text-orange-800',
             'dark:[&_.can-override-text]:text-orange-400',
+            'decoration-orange-800/6',
+            'dark:decoration-orange-400/6',
         ],
         style: ['bg-orange-500/2', 'border-orange-500/4'],
     },
@@ -105,6 +106,8 @@ const HINT_STYLES: {
             'dark:[&_a:hover]:text-red-300',
             '[&_.can-override-bg]:bg-red-500/3',
             '[&_.can-override-text]:text-red-400',
+            'decoration-red-800/6',
+            'dark:decoration-red-400/6',
         ],
         style: ['bg-red-500/2', 'border-red-500/4'],
     },
@@ -119,6 +122,8 @@ const HINT_STYLES: {
             '[&_.can-override-bg]:bg-green-500/3',
             '[&_.can-override-text]:text-green-800',
             'dark:[&_.can-override-text]:text-green-400',
+            'decoration-green-800/6',
+            'dark:decoration-green-400/6',
         ],
         style: ['bg-green-500/2', 'border-green-500/4'],
     },
