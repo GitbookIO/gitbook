@@ -93,7 +93,7 @@ export function SiteSectionTabs(props: {
                             href={urls.published ?? ''}
                             ref={isActive ? currentTabRef : null}
                             icon={icon ? (
-                                <SectionIcon className={tcls("text-primary/7 dark:text-primary-400/7", isActive && "text-inherit")} section={section} />
+                                <SectionIcon className={tcls("text-inherit opacity-8", isActive && "text-inherit opacity-10")} section={section} />
                             ) : null}
                         />
                     )})}
@@ -138,7 +138,7 @@ const Tab = React.forwardRef<
     return (
         <Link
             className={tcls(
-                'px-3 py-1 my-2 rounded straight-corners:rounded-none transition-colors',
+                'group/tab px-3 py-1 my-2 rounded straight-corners:rounded-none transition-colors',
                 active && 'text-primary dark:text-primary-400',
                 !active &&
                     'text-dark/8 hover:bg-dark/1 hover:text-dark/9 dark:text-light/8 dark:hover:bg-light/2 dark:hover:text-light/9',
