@@ -22,7 +22,7 @@ export function SiteSectionTabs(props: {
         id: section.id,
         label: section.title,
         path: section.urls.published ?? '',
-        icon: section.icon ? <SectionIcon section={section} /> : null,
+        icon: section.icon ? <SectionIcon className="text-primary dark:text-primary-400" section={section} /> : null,
     }));
 
     const currentTabRef = React.useRef<HTMLAnchorElement>(null);
