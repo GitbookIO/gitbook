@@ -150,7 +150,7 @@ const Tab = React.forwardRef<
             role="tab"
             href={href}
         >
-            <span ref={ref} className={tcls('inline-flex gap-2 items-center w-full truncate')}>
+            <span ref={ref} className={tcls('flex gap-2 items-center w-full truncate')}>
                 {icon}
                 {label}
             </span>
