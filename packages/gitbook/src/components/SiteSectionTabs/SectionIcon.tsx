@@ -3,6 +3,9 @@ import { Icon, type IconName } from "@gitbook/icons";
 
 import { type ClassValue, tcls } from "@/lib/tailwind";
 
+/**
+ * Icon shown beside a section in the site section tabs.
+ */
 export function SectionIcon(props: { section: SiteSection; className?: ClassValue }) {
     const { section, className } = props;
 
