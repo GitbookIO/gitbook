@@ -86,17 +86,26 @@ export function SiteSectionTabs(props: {
                         const { id, urls, title, icon } = section;
                         const isActive = index === currentIndex;
                         return (
-                        <Tab
-                            active={isActive}
-                            key={id}
-                            label={title}
-                            href={urls.published ?? ''}
-                            ref={isActive ? currentTabRef : null}
-                            icon={icon ? (
-                                <SectionIcon className={tcls("text-inherit opacity-8", isActive && "text-inherit opacity-10")} section={section} />
-                            ) : null}
-                        />
-                    )})}
+                            <Tab
+                                active={isActive}
+                                key={id}
+                                label={title}
+                                href={urls.published ?? ''}
+                                ref={isActive ? currentTabRef : null}
+                                icon={
+                                    icon ? (
+                                        <SectionIcon
+                                            className={tcls(
+                                                'text-inherit opacity-8',
+                                                isActive && 'text-inherit opacity-10',
+                                            )}
+                                            section={section}
+                                        />
+                                    ) : null
+                                }
+                            />
+                        );
+                    })}
                 </div>
                 {/* A container for a pseudo element for active tab indicator. A container is needed so we can set
                     a relative position without breaking the z-index of other parts of the header. */}
