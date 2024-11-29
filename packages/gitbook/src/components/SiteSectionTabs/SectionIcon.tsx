@@ -6,10 +6,16 @@ import { type ClassValue, tcls } from '@/lib/tailwind';
 /**
  * Icon shown beside a section in the site section tabs.
  */
-export function SectionIcon(props: { section: SiteSection; className?: ClassValue }) {
-    const { section, className } = props;
+export function SectionIcon(props: { icon: IconName; isActive: boolean }) {
+    const { icon, isActive } = props;
 
-    return section.icon ? (
-        <Icon icon={section.icon as IconName} className={tcls('size-[1em]', className)} />
-    ) : null;
+    return (
+        <Icon
+            icon={icon}
+            className={tcls(
+                'size-[1em] text-inherit opacity-8',
+                isActive && 'text-inherit opacity-10',
+            )}
+        />
+    );
 }

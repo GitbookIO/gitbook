@@ -1,6 +1,7 @@
 'use client';
 
 import type { SiteSection } from '@gitbook/api';
+import type { IconName } from '@gitbook/icons';
 import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
@@ -94,13 +95,7 @@ export function SiteSectionTabs(props: {
                                 ref={isActive ? currentTabRef : null}
                                 icon={
                                     icon ? (
-                                        <SectionIcon
-                                            className={tcls(
-                                                'text-inherit opacity-8',
-                                                isActive && 'text-inherit opacity-10',
-                                            )}
-                                            section={section}
-                                        />
+                                        <SectionIcon isActive={isActive} icon={icon as IconName} />
                                     ) : null
                                 }
                             />
