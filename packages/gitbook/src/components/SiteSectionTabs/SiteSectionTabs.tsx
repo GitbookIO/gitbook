@@ -18,15 +18,6 @@ export function SiteSectionTabs(props: {
 }) {
     const { list: sections, index: currentIndex } = props;
 
-    const tabs = sections.map((section) => ({
-        id: section.id,
-        label: section.title,
-        path: section.urls.published ?? '',
-        icon: section.icon ? (
-            <SectionIcon className="text-primary dark:text-primary-400" section={section} />
-        ) : null,
-    }));
-
     const currentTabRef = React.useRef<HTMLAnchorElement>(null);
     const navRef = React.useRef<HTMLDivElement>(null);
 
@@ -66,7 +57,7 @@ export function SiteSectionTabs(props: {
     const scale = (tabDimensions?.width ?? 0) * 0.01;
     const startPos = `${tabDimensions?.left ?? 0}px`;
 
-    return tabs.length > 0 ? (
+    return sections.length > 0 ? (
         <nav
             aria-label="Sections"
             ref={navRef}
@@ -91,16 +82,21 @@ export function SiteSectionTabs(props: {
                         'md:px-5',
                     )}
                 >
-                    {tabs.map((tab, index) => (
+                    {sections.map((section, index) => {
+                        const { id, urls, title, icon } = section;
+                        const isActive = index === currentIndex;
+                        return (
                         <Tab
-                            active={currentIndex === index}
-                            key={tab.id}
-                            label={tab.label}
-                            href={tab.path}
-                            ref={currentIndex === index ? currentTabRef : null}
-                            icon={tab.icon}
+                            active={isActive}
+                            key={id}
+                            label={title}
+                            href={urls.published ?? ''}
+                            ref={isActive ? currentTabRef : null}
+                            icon={icon ? (
+                                <SectionIcon className={tcls("text-primary/7 dark:text-primary-400/7", isActive && "text-inherit")} section={section} />
+                            ) : null}
                         />
-                    ))}
+                    )})}
                 </div>
                 {/* A container for a pseudo element for active tab indicator. A container is needed so we can set
                     a relative position without breaking the z-index of other parts of the header. */}
