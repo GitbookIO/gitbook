@@ -235,10 +235,10 @@ const fnv1aUtf8Buffer = new Uint8Array(512);
 function generateSignature(input: string) {
     const hostName = host();
     const all = [
-            input,
-            hostName, // The hostname is used to avoid serving images from other sites on the same domain
-            process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY
-        ]
+        input,
+        hostName, // The hostname is used to avoid serving images from other sites on the same domain
+        process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY,
+    ]
         .filter(Boolean)
         .join(':');
     return fnv1a(all, { utf8Buffer: fnv1aUtf8Buffer }).toString(16);
