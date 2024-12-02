@@ -21,8 +21,7 @@ export async function GET(request: NextRequest) {
     const signature = request.nextUrl.searchParams.get('sign');
 
     // The current signature algorithm sets version as 2, but we need to support the older version as well
-    // for previously generated content. In this case, we default to version 0.
-    const signatureVersion = (request.nextUrl.searchParams.get('sv') as string) || '0';
+    const signatureVersion = (request.nextUrl.searchParams.get('sv') as string | undefined);
     if (!urlParam || !signature) {
         return new Response('Missing url/sign parameters', { status: 400 });
     }
