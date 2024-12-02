@@ -1,11 +1,10 @@
 import 'server-only';
 
 import fnv1a from '@sindresorhus/fnv1a';
-import { headers } from 'next/headers';
 
 import { noCacheFetchOptions } from '@/lib/cache/http';
 
-import { rootUrl } from './links';
+import { host, rootUrl } from './links';
 import { getImageAPIUrl } from './urls';
 
 export interface CloudflareImageJsonFormat {
@@ -126,7 +125,7 @@ export function getResizedImageURL(input: string, options: ResizeImageOptions): 
  */
 export async function verifyImageSignature(
     input: string,
-    { signature }: { signature: string; },
+    { signature }: { signature: string },
 ): Promise<boolean> {
     return generateSignature(input) === signature;
 }
@@ -234,13 +233,8 @@ const fnv1aUtf8Buffer = new Uint8Array(512);
  * The signature is relative to the current site being rendered to avoid serving images from other sites on the same domain.
  */
 function generateSignature(input: string) {
-    const headerList = headers();
-    const siteId = headerList.get('x-gitbook-content-site');
-    if (!siteId) {
-        throw new Error('Missing x-gitbook-content-site header');
-    }
-
-    const all = [input, siteId, process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY]
+    const hostName = host();
+    const all = [input, hostName, process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY]
         .filter(Boolean)
         .join(':');
     return fnv1a(all, { utf8Buffer: fnv1aUtf8Buffer }).toString(16);
