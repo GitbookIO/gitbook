@@ -32,6 +32,8 @@ export interface CloudflareImageOptions {
     quality?: number;
 }
 
+export const imagesResizingSignVersion = '2';
+
 /**
  * Return true if images resizing is enabled.
  */
@@ -84,7 +86,7 @@ export function getResizedImageURLFactory(
         return null;
     }
 
-    const signature = generateSignatureV2(input);
+    const signature = generateSignature(input);
 
     return (options) => {
         const url = new URL('/~gitbook/image', rootUrl());
@@ -104,7 +106,7 @@ export function getResizedImageURLFactory(
         }
 
         url.searchParams.set('sign', signature);
-        url.searchParams.set('sv', '2');
+        url.searchParams.set('sv', imagesResizingSignVersion);
 
         return url.toString();
     };
@@ -124,19 +126,9 @@ export function getResizedImageURL(input: string, options: ResizeImageOptions): 
  */
 export async function verifyImageSignature(
     input: string,
-    { signature, version }: { signature: string; version: string },
+    { signature }: { signature: string; },
 ): Promise<boolean> {
-    switch (version) {
-        case '2': {
-            return generateSignatureV2(input) === signature;
-        }
-        case '1': {
-            return generateSignatureV1(input) === signature;
-        }
-        default: {
-            return (await generateSignatureV0(input)) === signature;
-        }
-    }
+    return generateSignature(input) === signature;
 }
 
 /**
@@ -241,7 +233,7 @@ const fnv1aUtf8Buffer = new Uint8Array(512);
  * Generate a signature for an image.
  * The signature is relative to the current site being rendered to avoid serving images from other sites on the same domain.
  */
-function generateSignatureV2(input: string) {
+function generateSignature(input: string) {
     const headerList = headers();
     const siteId = headerList.get('x-gitbook-content-site');
     if (!siteId) {
@@ -252,29 +244,4 @@ function generateSignatureV2(input: string) {
         .filter(Boolean)
         .join(':');
     return fnv1a(all, { utf8Buffer: fnv1aUtf8Buffer }).toString(16);
-}
-
-/**
- * New and faster algorithm to generate a signature for an image.
- * When setting it in a URL, we use version '1' for the 'sv' querystring parameneter
- * to know that it was the algorithm that was used.
- */
-function generateSignatureV1(input: string): string {
-    const all = [input, process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY].filter(Boolean).join(':');
-    return fnv1a(all, { utf8Buffer: fnv1aUtf8Buffer }).toString(16);
-}
-
-/**
- * Initial algorithm used to generate a signature for an image. It didn't use any versioning in the URL.
- * We still need it to validate older signatures that were generated without versioning
- * but still exist in previously generated and cached content.
- */
-async function generateSignatureV0(input: string): Promise<string> {
-    const all = [input, process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY].filter(Boolean).join(':');
-    const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(all));
-
-    // Convert ArrayBuffer to hex string
-    const hashArray = Array.from(new Uint8Array(hash));
-    const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
-    return hashHex;
 }

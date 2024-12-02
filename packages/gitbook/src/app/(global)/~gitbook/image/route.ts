@@ -5,6 +5,7 @@ import {
     resizeImage,
     CloudflareImageOptions,
     checkIsSizableImageURL,
+    imagesResizingSignVersion,
 } from '@/lib/images';
 import { parseImageAPIURL } from '@/lib/urls';
 
@@ -26,21 +27,16 @@ export async function GET(request: NextRequest) {
         return new Response('Missing url/sign parameters', { status: 400 });
     }
 
-    // URL generated with v1 signature algorithm could be used for phishing
-    // we don't serve on hostnames on content, but instead redirect to a neutral hostname
-    // to prevent phishing attacks
-    const v1Hostname = 'open.gitbook.com';
-    if (signatureVersion === '1' && request.nextUrl.hostname !== v1Hostname) {
-        const redirect = new URL(request.url);
-        redirect.hostname = v1Hostname;
-        return Response.redirect(redirect.toString(), 302);
-    }
-
     const url = parseImageAPIURL(urlParam);
 
     // Prevent infinite loops
     if (url.includes('/~gitbook/image')) {
         return new Response('Invalid url parameter', { status: 400 });
+    }
+
+    // For older signatures, we redirect to the url.
+    if (signatureVersion !== imagesResizingSignVersion) {
+        return Response.redirect(url, 302);
     }
 
     // Check again if the image can be sized, even though we checked when rendering the Image component
@@ -50,7 +46,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Verify the signature
-    const verified = await verifyImageSignature(url, { signature, version: signatureVersion });
+    const verified = await verifyImageSignature(url, { signature });
     if (!verified) {
         return new Response(`Invalid signature "${signature ?? ''}" for "${url}"`, { status: 400 });
     }
