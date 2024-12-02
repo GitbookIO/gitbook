@@ -1,12 +1,12 @@
 import 'server-only';
 
 import fnv1a from '@sindresorhus/fnv1a';
+import { headers } from 'next/headers';
 
 import { noCacheFetchOptions } from '@/lib/cache/http';
 
 import { rootUrl } from './links';
 import { getImageAPIUrl } from './urls';
-import { headers } from 'next/headers';
 
 export interface CloudflareImageJsonFormat {
     width: number;
