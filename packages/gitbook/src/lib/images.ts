@@ -6,6 +6,7 @@ import { noCacheFetchOptions } from '@/lib/cache/http';
 
 import { rootUrl } from './links';
 import { getImageAPIUrl } from './urls';
+import { headers } from 'next/headers';
 
 export interface CloudflareImageJsonFormat {
     width: number;
@@ -83,7 +84,7 @@ export function getResizedImageURLFactory(
         return null;
     }
 
-    const signature = generateSignatureV1(input);
+    const signature = generateSignatureV2(input);
 
     return (options) => {
         const url = new URL('/~gitbook/image', rootUrl());
@@ -103,7 +104,7 @@ export function getResizedImageURLFactory(
         }
 
         url.searchParams.set('sign', signature);
-        url.searchParams.set('sv', '1');
+        url.searchParams.set('sv', '2');
 
         return url.toString();
     };
@@ -123,11 +124,19 @@ export function getResizedImageURL(input: string, options: ResizeImageOptions): 
  */
 export async function verifyImageSignature(
     input: string,
-    { signature, version }: { signature: string; version: '1' | '0' },
+    { signature, version }: { signature: string; version: string },
 ): Promise<boolean> {
-    const expectedSignature =
-        version === '1' ? generateSignatureV1(input) : await generateSignatureV0(input);
-    return expectedSignature === signature;
+    switch (version) {
+        case '2': {
+            return generateSignatureV2(input) === signature;
+        }
+        case '1': {
+            return generateSignatureV1(input) === signature;
+        }
+        default: {
+            return (await generateSignatureV0(input)) === signature;
+        }
+    }
 }
 
 /**
@@ -227,6 +236,23 @@ function stringifyOptions(options: CloudflareImageOptions): string {
 
 // Reused buffer for FNV-1a hashing
 const fnv1aUtf8Buffer = new Uint8Array(512);
+
+/**
+ * Generate a signature for an image.
+ * The signature is relative to the current site being rendered to avoid serving images from other sites on the same domain.
+ */
+function generateSignatureV2(input: string) {
+    const headerList = headers();
+    const siteId = headerList.get('x-gitbook-content-site');
+    if (!siteId) {
+        throw new Error('Missing x-gitbook-content-site header');
+    }
+
+    const all = [input, siteId, process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY]
+        .filter(Boolean)
+        .join(':');
+    return fnv1a(all, { utf8Buffer: fnv1aUtf8Buffer }).toString(16);
+}
 
 /**
  * New and faster algorithm to generate a signature for an image.
