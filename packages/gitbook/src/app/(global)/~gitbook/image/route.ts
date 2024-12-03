@@ -5,6 +5,7 @@ import {
     resizeImage,
     CloudflareImageOptions,
     checkIsSizableImageURL,
+    imagesResizingSignVersion,
 } from '@/lib/images';
 import { parseImageAPIURL } from '@/lib/urls';
 
@@ -18,9 +19,9 @@ export const runtime = 'edge';
 export async function GET(request: NextRequest) {
     let urlParam = request.nextUrl.searchParams.get('url');
     const signature = request.nextUrl.searchParams.get('sign');
-    // The current signature algorithm sets version as 1, but we need to support the older version as well
-    // for previously generated content. In this case, we default to version 0.
-    const signatureVersion = (request.nextUrl.searchParams.get('sv') as '1') || '0';
+
+    // The current signature algorithm sets version as 2, but we need to support the older version as well
+    const signatureVersion = request.nextUrl.searchParams.get('sv') as string | undefined;
     if (!urlParam || !signature) {
         return new Response('Missing url/sign parameters', { status: 400 });
     }
@@ -32,6 +33,11 @@ export async function GET(request: NextRequest) {
         return new Response('Invalid url parameter', { status: 400 });
     }
 
+    // For older signatures, we redirect to the url.
+    if (signatureVersion !== imagesResizingSignVersion) {
+        return Response.redirect(url, 302);
+    }
+
     // Check again if the image can be sized, even though we checked when rendering the Image component
     // Otherwise, it's possible to pass just any link to this endpoint and trigger HTML injection on the domain
     if (!checkIsSizableImageURL(url)) {
@@ -39,7 +45,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Verify the signature
-    const verified = await verifyImageSignature(url, { signature, version: signatureVersion });
+    const verified = await verifyImageSignature(url, { signature });
     if (!verified) {
         return new Response(`Invalid signature "${signature ?? ''}" for "${url}"`, { status: 400 });
     }
