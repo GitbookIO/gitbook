@@ -501,7 +501,7 @@ async function lookupSiteOrSpaceInMultiIdMode(
                 httpOnly: true,
                 maxAge: 60 * 30,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'none',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
             },
         },
     };
