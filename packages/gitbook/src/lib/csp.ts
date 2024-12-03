@@ -54,7 +54,7 @@ export function getContentSecurityPolicy(scripts: SpaceIntegrationScript[], nonc
         object-src 'none';
         base-uri 'self' ${assetsDomain};
         form-action 'self' ${assetsDomain};
-        frame-ancestors  https:;
+        frame-ancestors https: ${process.env.NODE_ENV !== 'production' ? 'http:' : ''};
     `;
 
     const result = scripts
