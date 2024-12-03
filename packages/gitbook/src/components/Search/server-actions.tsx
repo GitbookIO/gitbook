@@ -11,6 +11,7 @@ import { resolvePageId } from '@/lib/pages';
 import { filterOutNullable } from '@/lib/typescript';
 
 import { DocumentView } from '../DocumentView';
+import pMap from 'p-map';
 
 export type OrderedComputedResult = ComputedPageResult | ComputedSectionResult;
 
@@ -152,17 +153,16 @@ export async function searchSiteSpaceContent(
 /**
  * Server action to ask a question in a space.
  */
-export const streamAskQuestion = streamResponse(async function* (spaceId: string, query: string) {
+export const streamAskQuestion = streamResponse(async function* (pointer: api.SiteContentPointer, question: string) {
     const stream = api
         .api()
-        .spaces.streamAskInSpace(spaceId, { query, format: 'document', details: true });
-    const pagesPromise = api.getSpaceContentData({ spaceId }, undefined);
-
+        .spaces.streamAskInSite(pointer.organizationId, pointer.siteId, { format: 'document' }, { question, scope: {
+            mode: 'default',
+        } });
+    
+    const spaceData = new Map<string, RevisionPage[]>();
     for await (const chunk of stream) {
-        // We run the AI search and fetch the pages in parallel
-        const { pages } = await pagesPromise;
-
-        yield transformAnswer(chunk.answer, pages);
+        yield transformAnswer(chunk.answer, spaceData);
     }
 });
 
@@ -174,17 +174,42 @@ export async function getRecommendedQuestions(spaceId: string): Promise<string[]
     return data.questions;
 }
 
-function transformAnswer(
+async function transformAnswer(
     answer: SearchAIAnswer | undefined,
-    pages: RevisionPage[],
-): AskAnswerResult | null {
+    spaceData: Map<string, RevisionPage[]>
+): Promise<AskAnswerResult | null> {
     if (!answer) {
         return null;
     }
 
+    const spaces = new Set<string>();
+    answer.sources.forEach((source) => {
+        if (source.type !== 'page') {
+            return null;
+        }
+
+        spaces.add(source.space);
+    });
+
+    
+    await pMap(spaces.values(), async (spaceId) => {
+        if (spaceData.has(spaceId)) {
+            return;
+        }
+
+        const { pages } = await api.getSpaceContentData({ spaceId }, undefined);
+        spaceData.set(spaceId, pages);
+    }, { concurrency: 10 });
+
     const sources = answer.sources
         .map((source) => {
             if (source.type !== 'page') {
+                return null;
+            }
+
+            const pages = spaceData.get(source.space);
+
+            if (!pages) {
                 return null;
             }
 
@@ -194,7 +219,7 @@ function transformAnswer(
             }
 
             return {
-                id: page.page.id,
+                id: source.page,
                 title: page.page.title,
                 href: pageHref(pages, page.page),
             };
