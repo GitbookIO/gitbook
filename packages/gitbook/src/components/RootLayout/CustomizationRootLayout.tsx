@@ -38,8 +38,6 @@ export async function CustomizationRootLayout(props: {
 
     const defaultTintColor = '#787878';
 
-    console.log('====customization', customization);
-
     return (
         <html
             suppressHydrationWarning
@@ -277,12 +275,22 @@ function generateHeaderTheme(customization: CustomizationSettings | SiteCustomiz
                 },
                 linkColor: {
                     light:
-                        customization.styling.tint?.color.light ??
                         customization.header.linkColor?.light ??
+                        (customization.styling.tint?.color.light &&
+                            colorContrast(
+                                customization.styling.tint?.color.light,
+                                [colors.white, colors.black],
+                                'aaa',
+                            )) ??
                         customization.styling.primaryColor.light,
                     dark:
-                        customization.styling.tint?.color.dark ??
                         customization.header.linkColor?.dark ??
+                        (customization.styling.tint?.color.dark &&
+                            colorContrast(
+                                customization.styling.tint?.color.dark,
+                                [colors.white, colors.black],
+                                'aaa',
+                            )) ??
                         customization.styling.primaryColor.dark,
                 },
             };
