@@ -13,7 +13,7 @@ export function FooterLinksGroup(props: {
 
     return (
         <div className={tcls('flex', 'flex-col', 'gap-3')}>
-            <p className={tcls('text-base', 'font-medium')}>{group.title}</p>
+            <p className={tcls('text-base', 'font-semibold')}>{group.title}</p>
             {group.links.map((link, index) => {
                 return <FooterLink key={index} link={link} context={context} />;
             })}
@@ -32,7 +32,14 @@ async function FooterLink(props: { link: CustomizationContentLink; context: Cont
     return (
         <Link
             href={resolved.href}
-            className={tcls('text-sm', 'text-primary-400', 'hover:text-primary-500')}
+            className={tcls(
+                'text-sm',
+                'font-normal',
+                'text-dark/8',
+                'hover:text-dark/9',
+                'dark:text-light/8',
+                'dark:hover:text-light/9',
+            )}
         >
             {link.title}
         </Link>

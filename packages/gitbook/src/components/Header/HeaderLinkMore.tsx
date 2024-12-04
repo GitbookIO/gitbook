@@ -13,12 +13,17 @@ import { tcls } from '@/lib/tailwind';
 import { Dropdown, DropdownMenu, DropdownMenuItem } from './Dropdown';
 import styles from './headerLinks.module.css';
 
+// @TODO replace by api.CustomizationHeaderItem when available
+type CustomizationHeaderItem = Omit<CustomizationHeaderLink, 'to'> & {
+    to: CustomizationHeaderLink['to'] | null;
+};
+
 /**
  * Dropdown menu for header links hidden at small screen size.
  */
 export function HeaderLinkMore(props: {
     label: React.ReactNode;
-    links: CustomizationHeaderLink[];
+    links: CustomizationHeaderItem[];
     context: ContentRefContext;
     customization: CustomizationSettings | SiteCustomizationSettings;
 }) {
@@ -55,10 +60,10 @@ export function HeaderLinkMore(props: {
     );
 }
 
-async function MoreMenuLink(props: { context: ContentRefContext; link: CustomizationHeaderLink }) {
+async function MoreMenuLink(props: { context: ContentRefContext; link: CustomizationHeaderItem }) {
     const { context, link } = props;
 
-    const target = await resolveContentRef(link.to, context);
+    const target = link.to ? await resolveContentRef(link.to, context) : null;
 
     if (!target) {
         return null;
