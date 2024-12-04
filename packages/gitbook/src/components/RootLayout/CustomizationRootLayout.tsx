@@ -36,26 +36,23 @@ export async function CustomizationRootLayout(props: {
     const headerTheme = generateHeaderTheme(customization);
     const language = getSpaceLanguage(customization);
 
+    const defaultTintColor = '#787878';
+
+    console.log('====customization', customization);
+
     return (
         <html
             suppressHydrationWarning
             lang={customization.internationalization.locale}
-            className={
-                tcls(
-                    customization.header.preset === CustomizationHeaderPreset.None
-                        ? null
-                        : [
-                              // Take the sticky header in consideration for the scrolling
-                              `scroll-pt-[76px]`,
-                          ],
-                ) +
-                (customization.styling.corners === CustomizationCorners.Straight
+            className={tcls(
+                customization.header.preset === CustomizationHeaderPreset.None
+                    ? null
+                    : ['scroll-pt-[76px]'], // Take the sticky header in consideration for the scrolling
+                customization.styling.corners === CustomizationCorners.Straight
                     ? ' straight-corners'
-                    : '') +
-                (customization.styling.background === CustomizationBackground.Plain
-                    ? ' plain-background'
-                    : '')
-            }
+                    : '',
+                customization.styling.tint ? ' tint' : 'no-tint',
+            )}
         >
             <head>
                 {customization.privacyPolicy.url ? (
@@ -88,9 +85,27 @@ export async function CustomizationRootLayout(props: {
                         }
 
                         ${generateColorVariable(
-                            'primary-base',
-                            customization.styling.primaryColor.light,
+                            'tint-color',
+                            customization.styling.tint?.color.light ?? defaultTintColor,
                         )}
+                        ${
+                            // Generate the right contrast color for each shade of primary-color
+                            generateColorVariable(
+                                'contrast-tint',
+                                Object.fromEntries(
+                                    Object.entries(
+                                        shadesOfColor(
+                                            customization.styling.tint?.color.light ??
+                                                defaultTintColor,
+                                        ),
+                                    ).map(([index, color]) => [
+                                        index,
+                                        colorContrast(color, ['#000', '#fff']),
+                                    ]),
+                                ),
+                            )
+                        }
+
                         ${generateColorVariable(
                             'header-background',
                             headerTheme.backgroundColor.light,
@@ -101,10 +116,6 @@ export async function CustomizationRootLayout(props: {
                     .dark {
                         ${generateColorVariable(
                             'primary-color',
-                            customization.styling.primaryColor.dark,
-                        )}
-                        ${generateColorVariable(
-                            'primary-base',
                             customization.styling.primaryColor.dark,
                         )}
                         ${
@@ -121,6 +132,29 @@ export async function CustomizationRootLayout(props: {
                                 ),
                             )
                         }
+
+                        ${generateColorVariable(
+                            'tint-color',
+                            customization.styling.tint?.color.dark ?? defaultTintColor,
+                        )}
+                        ${
+                            // Generate the right contrast color for each shade of primary-color
+                            generateColorVariable(
+                                'contrast-tint',
+                                Object.fromEntries(
+                                    Object.entries(
+                                        shadesOfColor(
+                                            customization.styling.tint?.color.dark ??
+                                                defaultTintColor,
+                                        ),
+                                    ).map(([index, color]) => [
+                                        index,
+                                        colorContrast(color, ['#000', '#fff']),
+                                    ]),
+                                ),
+                            )
+                        }
+
                         ${generateColorVariable(
                             'header-background',
                             headerTheme.backgroundColor.dark,
@@ -194,17 +228,23 @@ function generateHeaderTheme(customization: CustomizationSettings | SiteCustomiz
         case CustomizationHeaderPreset.Bold: {
             return {
                 backgroundColor: {
-                    light: customization.styling.primaryColor.light,
-                    dark: customization.styling.primaryColor.dark,
+                    light:
+                        customization.styling.tint?.color.light ??
+                        customization.styling.primaryColor.light,
+                    dark:
+                        customization.styling.tint?.color.dark ??
+                        customization.styling.primaryColor.dark,
                 },
                 linkColor: {
                     light: colorContrast(
-                        customization.styling.primaryColor.light,
+                        customization.styling.tint?.color.light ??
+                            customization.styling.primaryColor.light,
                         [colors.white, colors.black],
                         'aaa',
                     ),
                     dark: colorContrast(
-                        customization.styling.primaryColor.dark,
+                        customization.styling.tint?.color.dark ??
+                            customization.styling.primaryColor.dark,
                         [colors.white, colors.black],
                         'aaa',
                     ),
@@ -226,14 +266,22 @@ function generateHeaderTheme(customization: CustomizationSettings | SiteCustomiz
         case CustomizationHeaderPreset.Custom: {
             return {
                 backgroundColor: {
-                    light: customization.header.backgroundColor?.light ?? colors.white,
-                    dark: customization.header.backgroundColor?.dark ?? colors.black,
+                    light:
+                        customization.styling.tint?.color.light ??
+                        customization.header.backgroundColor?.light ??
+                        colors.white,
+                    dark:
+                        customization.styling.tint?.color.dark ??
+                        customization.header.backgroundColor?.dark ??
+                        colors.black,
                 },
                 linkColor: {
                     light:
+                        customization.styling.tint?.color.light ??
                         customization.header.linkColor?.light ??
                         customization.styling.primaryColor.light,
                     dark:
+                        customization.styling.tint?.color.dark ??
                         customization.header.linkColor?.dark ??
                         customization.styling.primaryColor.dark,
                 },
