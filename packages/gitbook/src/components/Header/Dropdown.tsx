@@ -82,11 +82,12 @@ export function Dropdown<E extends HTMLElement>(props: {
 /**
  * Animated chevron to display in the dropdown button.
  */
-export function DropdownChevron(props: {}) {
+export function DropdownChevron() {
     return (
         <Icon
             icon="chevron-down"
             className={tcls(
+                'shrink-0',
                 'opacity-6',
                 'size-3',
                 'ms-1',
