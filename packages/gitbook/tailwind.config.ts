@@ -236,7 +236,7 @@ const config: Config = {
             /**
              * Variant when the space is configured without a theme matching background.
              */
-             addVariant('no-tint', 'html.no-tint &');
+            addVariant('no-tint', 'html.no-tint &');
 
             /**
              * Variant when the page contains a block that will be rendered in full-width mode.
