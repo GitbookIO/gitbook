@@ -553,7 +553,6 @@ const testCases: TestsCase[] = [
                 }),
                 run: waitForCookiesDialog,
             },
-
         ],
     },
     {
