@@ -1,25 +1,25 @@
 'use client';
 
+import type { ComponentPropsWithoutRef, HTMLAttributes } from 'react';
+
 import { tcls, ClassValue } from '@/lib/tailwind';
 
 import { Link } from './Link';
 
 type ButtonProps = {
     href?: string;
-    onClick?: () => void;
-    children: React.ReactNode;
     variant?: 'primary' | 'secondary';
     size?: 'default' | 'medium' | 'small';
     className?: ClassValue;
-};
+} & HTMLAttributes<HTMLElement>;
 
 export function Button({
     href,
-    onClick,
     children,
     variant = 'primary',
     size = 'default',
     className,
+    ...rest
 }: ButtonProps) {
     const variantClasses =
         variant === 'primary'
@@ -69,14 +69,14 @@ export function Button({
 
     if (href) {
         return (
-            <Link href={href} className={domClassName}>
+            <Link href={href} className={domClassName} {...rest}>
                 {children}
             </Link>
         );
     }
 
     return (
-        <button type="button" onClick={onClick} className={domClassName}>
+        <button type="button" className={domClassName} {...rest}>
             {children}
         </button>
     );
