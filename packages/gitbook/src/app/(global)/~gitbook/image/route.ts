@@ -4,8 +4,8 @@ import {
     verifyImageSignature,
     resizeImage,
     CloudflareImageOptions,
-    checkIsSizableImageURL,
     imagesResizingSignVersion,
+    checkIsSizableImageURL,
 } from '@/lib/images';
 import { parseImageAPIURL } from '@/lib/urls';
 
@@ -28,20 +28,16 @@ export async function GET(request: NextRequest) {
 
     const url = parseImageAPIURL(urlParam);
 
-    // Prevent infinite loops
-    if (url.includes('/~gitbook/image')) {
+    // Check again if the image can be sized, even though we checked when rendering the Image component
+    // Otherwise, it's possible to pass just any link to this endpoint and trigger HTML injection on the domain
+    // Also prevent infinite redirects.
+    if (!checkIsSizableImageURL(url)) {
         return new Response('Invalid url parameter', { status: 400 });
     }
 
     // For older signatures, we redirect to the url.
     if (signatureVersion !== imagesResizingSignVersion) {
         return Response.redirect(url, 302);
-    }
-
-    // Check again if the image can be sized, even though we checked when rendering the Image component
-    // Otherwise, it's possible to pass just any link to this endpoint and trigger HTML injection on the domain
-    if (!checkIsSizableImageURL(url)) {
-        return new Response('Invalid url parameter', { status: 400 });
     }
 
     // Verify the signature
