@@ -291,7 +291,7 @@ function SearchModalBody(
                 ></SearchResults>
             ) : null}
             {state.query && state.ask && withAsk ? (
-                <SearchAskAnswer spaceId={spaceId} query={state.query} />
+                <SearchAskAnswer pointer={pointer} query={state.query} />
             ) : null}
         </motion.div>
     );
