@@ -15,7 +15,6 @@ type ButtonProps = {
 
 export function Button({
     href,
-    onClick,
     children,
     variant = 'primary',
     size = 'default',
