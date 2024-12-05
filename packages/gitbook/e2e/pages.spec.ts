@@ -1,5 +1,6 @@
 import { argosScreenshot } from '@argos-ci/playwright';
 import {
+    CustomizationBackground,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
     CustomizationLocale,
@@ -478,6 +479,81 @@ const testCases: TestsCase[] = [
                 }),
                 run: waitForCookiesDialog,
             },
+            {
+                name: 'With tint - Legacy background match',
+                url: getCustomizationURL({
+                    styling: {
+                        background: CustomizationBackground.Match,
+                    },
+                    header: {
+                        preset: CustomizationHeaderPreset.Default,
+                    },
+                }),
+                run: waitForCookiesDialog,
+            },
+            {
+                name: 'With tint - Default preset',
+                url: getCustomizationURL({
+                    styling: {
+                        tint: { color: { light: '#346DDB', dark: '#346DDB' } },
+                    },
+                    header: {
+                        preset: CustomizationHeaderPreset.Default,
+                    },
+                }),
+                run: waitForCookiesDialog,
+            },
+            {
+                name: 'With tint - Bold preset',
+                url: getCustomizationURL({
+                    styling: {
+                        tint: { color: { light: '#346DDB', dark: '#346DDB' } },
+                    },
+                    header: {
+                        preset: CustomizationHeaderPreset.Bold,
+                    },
+                }),
+                run: waitForCookiesDialog,
+            },
+            {
+                name: 'With tint - Contrast',
+                url: getCustomizationURL({
+                    styling: {
+                        tint: { color: { light: '#346DDB', dark: '#346DDB' } },
+                    },
+                    header: {
+                        preset: CustomizationHeaderPreset.Contrast,
+                    },
+                }),
+                run: waitForCookiesDialog,
+            },
+            {
+                name: 'With tint - Custom preset',
+                url: getCustomizationURL({
+                    styling: {
+                        tint: { color: { light: '#346DDB', dark: '#346DDB' } },
+                    },
+                    header: {
+                        preset: CustomizationHeaderPreset.Contrast,
+                        backgroundColor: { light: '#C62C68', dark: '#EF96B8' },
+                        linkColor: { light: '#4DDE98', dark: '#0C693D' },
+                        links: [
+                            {
+                                title: 'Secondary button',
+                                to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                style: 'button-secondary',
+                            },
+                            {
+                                title: 'Primary button',
+                                to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                style: 'button-primary',
+                            },
+                        ],
+                    },
+                }),
+                run: waitForCookiesDialog,
+            },
+
         ],
     },
     {
