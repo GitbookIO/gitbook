@@ -1,4 +1,4 @@
-import { GitBookAPI, ContentAPITokenPayload } from '@gitbook/api';
+import { ContentAPITokenPayload } from '@gitbook/api';
 import { setTag, setContext } from '@sentry/nextjs';
 import assertNever from 'assert-never';
 import jwt from 'jsonwebtoken';
