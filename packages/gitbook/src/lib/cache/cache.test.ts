@@ -1,9 +1,11 @@
-import { Mock, beforeEach, describe, expect, it, mock } from 'bun:test';
+import {  beforeEach, describe, expect, it, mock } from 'bun:test';
+import hash from 'object-hash';
 
 import { CacheFunction, CacheFunctionOptions, cache } from './cache';
 
 describe('cache', () => {
     const impl = mock((arg: string) => 'test-' + arg);
+    const getKeySuffixImpl = mock(() => hash({ test: 1}))
 
     let fn: CacheFunction<[string], string>;
     let testId = 0;
@@ -18,6 +20,7 @@ describe('cache', () => {
         fn = cache({
             name: `cache-${testId}`,
             tag: (arg) => 'test',
+            getKeySuffix: getKeySuffixImpl,
             get: async (arg: string, options: CacheFunctionOptions) => {
                 await new Promise((resolve) => setTimeout(resolve, 20));
                 return {
@@ -67,5 +70,23 @@ describe('cache', () => {
         expect(await fn('a')).toEqual('test-a');
 
         expect(impl).toHaveBeenCalledTimes(2);
+    });
+
+    it('should execute when the args do not change but the key suffix does', async () => {
+        const result = await Promise.all([fn('a'), fn('b')]);
+
+        expect(result).toEqual(['test-a', 'test-b']);
+
+        expect(impl).toHaveBeenCalled();
+        expect(impl).toHaveBeenCalledTimes(2);
+
+        expect(await fn('a')).toEqual('test-a');
+
+        expect(impl).toHaveBeenCalledTimes(2);
+
+        getKeySuffixImpl.mockImplementation(() => hash({test: 2}))
+        expect(await fn('a')).toEqual('test-a');
+
+        expect(impl).toHaveBeenCalledTimes(3);
     });
 });
