@@ -1,6 +1,5 @@
 'use client';
 
-import { Collection, Site } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';

@@ -1,3 +1,5 @@
+'use client';
+
 import { Icon } from '@gitbook/icons';
 import React from 'react';
 import { atom, useRecoilState } from 'recoil';
@@ -44,6 +46,7 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
     const language = useLanguage();
     const [, setSearchState] = useSearch();
     const [state, setState] = useRecoilState(searchAskState);
+    const { organizationId, siteId, siteSpaceId } = pointer;
 
     React.useEffect(() => {
         let cancelled = false;
@@ -53,7 +56,9 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
         });
 
         (async () => {
-            const stream = iterateStreamResponse(streamAskQuestion(pointer, query));
+            const stream = iterateStreamResponse(
+                streamAskQuestion(organizationId, siteId, siteSpaceId ?? null, query),
+            );
 
             setSearchState((prev) =>
                 prev
@@ -92,7 +97,7 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
                 cancelled = true;
             }
         };
-    }, [pointer, query, setSearchState, setState]);
+    }, [organizationId, siteId, siteSpaceId, query, setSearchState, setState]);
 
     React.useEffect(() => {
         return () => {
