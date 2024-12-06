@@ -1,11 +1,11 @@
-import {  beforeEach, describe, expect, it, mock } from 'bun:test';
+import { beforeEach, describe, expect, it, mock } from 'bun:test';
 import hash from 'object-hash';
 
 import { CacheFunction, CacheFunctionOptions, cache } from './cache';
 
 describe('cache', () => {
     const impl = mock((arg: string) => 'test-' + arg);
-    const getKeySuffixImpl = mock(() => hash({ test: 1}))
+    const getKeySuffixImpl = mock(() => hash({ test: 1 }));
 
     let fn: CacheFunction<[string], string>;
     let testId = 0;
@@ -84,7 +84,7 @@ describe('cache', () => {
 
         expect(impl).toHaveBeenCalledTimes(2);
 
-        getKeySuffixImpl.mockImplementation(() => hash({test: 2}))
+        getKeySuffixImpl.mockImplementation(() => hash({ test: 2 }));
         expect(await fn('a')).toEqual('test-a');
 
         expect(impl).toHaveBeenCalledTimes(3);
