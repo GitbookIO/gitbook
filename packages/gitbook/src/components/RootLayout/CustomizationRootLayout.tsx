@@ -266,12 +266,12 @@ function generateHeaderTheme(customization: CustomizationSettings | SiteCustomiz
             return {
                 backgroundColor: {
                     light:
-                        tintColor?.light ??
                         customization.header.backgroundColor?.light ??
+                        tintColor?.light ??
                         colors.white,
                     dark:
-                        tintColor?.dark ??
                         customization.header.backgroundColor?.dark ??
+                        tintColor?.dark ??
                         colors.black,
                 },
                 linkColor: {
