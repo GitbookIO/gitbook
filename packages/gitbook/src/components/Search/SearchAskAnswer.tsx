@@ -73,11 +73,11 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
             );
 
             for await (const chunk of stream) {
+                console.log(`chunk ${cancelled ? 'cancelled' : ''}`, chunk);
                 if (cancelled) {
                     return;
                 }
 
-                console.log(`chunk`, chunk);
 
                 setState({
                     type: 'answer',
@@ -97,7 +97,7 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
         });
 
         return () => {
-            console.log('useEffect teardown');
+            console.log('useEffect teardown', process.env.NODE_ENV);
             // During development, the useEffect is called twice and the second call doesn't process the stream,
             // causing the component to get stuck in the loading state.
             if (process.env.NODE_ENV !== 'development') {
