@@ -162,7 +162,7 @@ export async function middleware(request: NextRequest) {
             endpoint: apiEndpoint,
             authToken: resolved.apiToken,
             userAgent: userAgent(),
-            contextKey
+            contextKey,
         }),
         async () => {
             const [siteData] = await Promise.all([
@@ -482,7 +482,7 @@ async function lookupSiteOrSpaceInMultiIdMode(
         endpoint: apiEndpoint ?? api().endpoint,
         authToken: apiToken,
         userAgent: userAgent(),
-        contextKey
+        contextKey,
     });
 
     // Verify access to the space to avoid leaking cached data in this mode

@@ -92,14 +92,15 @@ const apiSyncStorage = new AsyncLocalStorage<GitBookAPIWithContextKey>();
 export const DEFAULT_API_ENDPOINT = process.env.GITBOOK_API_URL ?? 'https://api.gitbook.com';
 
 export class GitBookAPIWithContextKey extends GitBookAPI {
-
     #contextKey?: string;
 
-    constructor(options?: ConstructorParameters<typeof GitBookAPI>['0'] & {
-        /** Context key matching the hash of the claims included in the visitor JWT token */
-        contextKey?: string;
-    }) {
-        const { contextKey, ...apiClientOpts} = options || {};
+    constructor(
+        options?: ConstructorParameters<typeof GitBookAPI>['0'] & {
+            /** Context key matching the hash of the claims included in the visitor JWT token */
+            contextKey?: string;
+        },
+    ) {
+        const { contextKey, ...apiClientOpts } = options || {};
         super(apiClientOpts);
 
         this.#contextKey = options?.contextKey;
@@ -121,7 +122,7 @@ export function apiWithToken(apiToken: string, contextKey?: string): GitBookAPIW
         authToken: apiToken,
         endpoint: apiEndpoint,
         userAgent: userAgent(),
-        contextKey
+        contextKey,
     });
 
     return gitbook;

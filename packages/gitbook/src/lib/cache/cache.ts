@@ -285,7 +285,7 @@ export function getCacheKey(fnName: string, args: any[], context?: string) {
 
     // When a context is included add it to the cache key as this means that user claims have changed.
     if (context) {
-        hashedArgs.push(context)
+        hashedArgs.push(context);
     }
     let innerKey = hashedArgs.join(',');
 
