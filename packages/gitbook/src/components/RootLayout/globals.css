@@ -29,6 +29,7 @@
         @apply gutter-stable;
     }
     html:is(.no-tint) {
+        --light-base: 255 255 255;
         --light-DEFAULT: color-mix(
             in srgb,
             rgb(var(--tint-color-500)),
