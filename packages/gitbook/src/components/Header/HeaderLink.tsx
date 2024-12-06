@@ -3,17 +3,12 @@ import {
     CustomizationSettings,
     CustomizationHeaderPreset,
     SiteCustomizationSettings,
-    CustomizationHeaderLink,
+    CustomizationHeaderItem,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
-
-// @TODO replace by api.CustomizationHeaderItem when available
-type CustomizationHeaderItem = Omit<CustomizationHeaderLink, 'to'> & {
-    to: CustomizationHeaderLink['to'] | null;
-};
 
 import {
     Dropdown,
@@ -85,7 +80,7 @@ export async function HeaderLink(props: {
 }
 
 export type HeaderLinkNavItemProps = {
-    linkStyle: NonNullable<CustomizationHeaderLink['style']>;
+    linkStyle: NonNullable<CustomizationHeaderItem['style']>;
     headerPreset: CustomizationHeaderPreset;
     title: string;
     href: string;
