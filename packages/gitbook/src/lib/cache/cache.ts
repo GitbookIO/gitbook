@@ -252,7 +252,8 @@ export function cache<Args extends any[], Result>(
 
     cacheFn.hasInMemory = async (...args: Args) => {
         const cacheArgs = cacheDef.getKeyArgs ? cacheDef.getKeyArgs(args) : args;
-        const key = getCacheKey(cacheDef.name, cacheArgs);
+        const cacheContextKey = cacheDef.getContextKey ? cacheDef.getContextKey() : undefined;
+        const key = getCacheKey(cacheDef.name, cacheArgs, cacheContextKey);
         const tag = cacheDef.tag?.(...args);
 
         const memoryEntry = await memoryCache.get({ key, tag });
@@ -280,7 +281,7 @@ export function getCache(name: string): CacheFunction<any[], any> | null {
 /**
  * Get a cache key for a function and its arguments.
  */
-export function getCacheKey(fnName: string, args: any[], context?: string) {
+export function getCacheKey(fnName: string, args: any[], context: string | undefined) {
     const hashedArgs = args.map((arg) => hashValue(arg));
 
     // When a context is included add it to the cache key as this means that user claims have changed.

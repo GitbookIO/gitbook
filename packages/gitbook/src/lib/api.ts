@@ -114,7 +114,7 @@ export class GitBookAPIWithContextKey extends GitBookAPI {
 /**
  * Create a new API client with a token.
  */
-export function apiWithToken(apiToken: string, contextKey?: string): GitBookAPIWithContextKey {
+export function apiWithToken(apiToken: string, contextKey: string | undefined): GitBookAPIWithContextKey {
     const headersList = headers();
     const apiEndpoint = headersList.get('x-gitbook-api') ?? DEFAULT_API_ENDPOINT;
 
