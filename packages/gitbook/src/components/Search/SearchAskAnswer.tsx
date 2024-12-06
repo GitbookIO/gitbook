@@ -7,6 +7,7 @@ import { useLanguage } from '@/intl/client';
 import { t } from '@/intl/translate';
 import { TranslationLanguage } from '@/intl/translations';
 import { iterateStreamResponse } from '@/lib/actions';
+import { SiteContentPointer } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
 import { AskAnswerResult, AskAnswerSource, streamAskQuestion } from './server-actions';
@@ -37,8 +38,8 @@ export const searchAskState = atom<
 /**
  * Fetch and render the answers to a question.
  */
-export function SearchAskAnswer(props: { spaceId: string; query: string }) {
-    const { spaceId, query } = props;
+export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: string }) {
+    const { pointer, query } = props;
 
     const language = useLanguage();
     const [, setSearchState] = useSearch();
@@ -52,7 +53,7 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
         });
 
         (async () => {
-            const stream = iterateStreamResponse(streamAskQuestion(spaceId, query));
+            const stream = iterateStreamResponse(streamAskQuestion(pointer, query));
 
             setSearchState((prev) =>
                 prev
@@ -91,7 +92,7 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
                 cancelled = true;
             }
         };
-    }, [spaceId, query, setSearchState, setState]);
+    }, [pointer, query, setSearchState, setState]);
 
     React.useEffect(() => {
         return () => {
@@ -159,7 +160,7 @@ function AnswerBody(props: { answer: AskAnswerResult }) {
             <div
                 data-test="search-ask-answer"
                 className={tcls(
-                    'mt-4',
+                    'my-4',
                     'sm:mt-6',
                     'px-4',
                     'sm:px-12',
