@@ -154,24 +154,26 @@ export async function searchSiteSpaceContent(
  * Server action to ask a question in a space.
  */
 export const streamAskQuestion = streamResponse(async function* (
-    pointer: api.SiteContentPointer,
+    organizationId: string,
+    siteId: string,
+    siteSpaceId: string | null,
     question: string,
 ) {
     const stream = api.api().orgs.streamAskInSite(
-        pointer.organizationId,
-        pointer.siteId,
+        organizationId,
+        siteId,
         {
             question,
-            context: pointer.siteSpaceId
+            context: siteSpaceId
                 ? {
-                      siteSpaceId: pointer.siteSpaceId,
+                      siteSpaceId,
                   }
                 : undefined,
             scope: {
                 mode: 'default',
 
                 // Include the current site space regardless.
-                includedSiteSpaces: pointer.siteSpaceId ? [pointer.siteSpaceId] : undefined,
+                includedSiteSpaces: siteSpaceId ? [siteSpaceId] : undefined,
             },
         },
         { format: 'document' },
@@ -221,7 +223,7 @@ async function transformAnswer(
             const { pages } = await api.getSpaceContentData({ spaceId }, undefined);
             spaceData.set(spaceId, pages);
         },
-        { concurrency: 10 },
+        { concurrency: 3 },
     );
 
     const sources = answer.sources
