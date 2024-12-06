@@ -167,16 +167,16 @@ function AnswerBody(props: { answer: AskAnswerResult }) {
                     'dark:text-light/8',
                 )}
             >
-                {answer.hasAnswer ? answer.body : t(language, 'search_ask_no_answer')}
+                {answer.body ?? t(language, 'search_ask_no_answer')}
                 {answer.followupQuestions.length > 0 ? (
                     <AnswerFollowupQuestions followupQuestions={answer.followupQuestions} />
                 ) : null}
             </div>
             {answer.sources.length > 0 ? (
                 <AnswerSources
-                    hasAnswer={answer.hasAnswer}
                     sources={answer.sources}
                     language={language}
+                    hasAnswer={Boolean(answer.body)}
                 />
             ) : null}
         </>
@@ -233,7 +233,7 @@ function AnswerFollowupQuestions(props: { followupQuestions: string[] }) {
 function AnswerSources(props: {
     sources: AskAnswerSource[];
     language: TranslationLanguage;
-    hasAnswer?: boolean;
+    hasAnswer: boolean;
 }) {
     const { sources, language, hasAnswer } = props;
 

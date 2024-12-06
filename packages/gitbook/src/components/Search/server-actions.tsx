@@ -40,10 +40,10 @@ export interface AskAnswerSource {
 }
 
 export interface AskAnswerResult {
+    /** Undefined if no answer. */
     body?: React.ReactNode;
     followupQuestions: string[];
     sources: AskAnswerSource[];
-    hasAnswer: boolean;
 }
 
 /**
@@ -181,7 +181,12 @@ export const streamAskQuestion = streamResponse(async function* (
 
     const spaceData = new Map<string, RevisionPage[]>();
     for await (const chunk of stream) {
-        yield transformAnswer(chunk.answer, spaceData);
+        if (!chunk) {
+            continue;
+        }
+
+        const encoded = await transformAnswer(chunk.answer, spaceData);
+        yield encoded;
     }
 });
 
@@ -223,7 +228,7 @@ async function transformAnswer(
             const { pages } = await api.getSpaceContentData({ spaceId }, undefined);
             spaceData.set(spaceId, pages);
         },
-        { concurrency: 3 },
+        { concurrency: 1 },
     );
 
     const sources = answer.sources
@@ -267,7 +272,6 @@ async function transformAnswer(
             ) : null,
         followupQuestions: answer.followupQuestions,
         sources,
-        hasAnswer: !!answer.answer && 'document' in answer.answer,
     };
 }
 
