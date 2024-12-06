@@ -162,9 +162,11 @@ export const streamAskQuestion = streamResponse(async function* (
         pointer.siteId,
         {
             question,
-            context: pointer.siteSpaceId ? {
-                siteSpaceId: pointer.siteSpaceId,
-            } : undefined,
+            context: pointer.siteSpaceId
+                ? {
+                      siteSpaceId: pointer.siteSpaceId,
+                  }
+                : undefined,
             scope: {
                 mode: 'default',
 
