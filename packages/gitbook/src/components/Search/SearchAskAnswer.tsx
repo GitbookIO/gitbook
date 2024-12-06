@@ -51,11 +51,13 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
     React.useEffect(() => {
         let cancelled = false;
 
+        console.log('search effect', query);
         setState({
             type: 'loading',
         });
 
         (async () => {
+            console.log('search server', organizationId, siteId, siteSpaceId ?? null, query);
             const stream = iterateStreamResponse(
                 streamAskQuestion(organizationId, siteId, siteSpaceId ?? null, query),
             );
@@ -75,11 +77,15 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
                     return;
                 }
 
+                console.log(`chunk`, chunk);
+
                 setState({
                     type: 'answer',
                     answer: chunk,
                 });
             }
+
+            console.log('chunk over');
         })().catch((error) => {
             if (cancelled) {
                 return;
@@ -91,13 +97,14 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
         });
 
         return () => {
+            console.log('useEffect teardown');
             // During development, the useEffect is called twice and the second call doesn't process the stream,
             // causing the component to get stuck in the loading state.
             if (process.env.NODE_ENV !== 'development') {
                 cancelled = true;
             }
         };
-    }, [organizationId, siteId, siteSpaceId, query, setSearchState, setState]);
+    }, [organizationId, siteId, siteSpaceId, query]);
 
     React.useEffect(() => {
         return () => {
