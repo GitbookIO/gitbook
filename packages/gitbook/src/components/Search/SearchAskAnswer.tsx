@@ -160,7 +160,7 @@ function AnswerBody(props: { answer: AskAnswerResult }) {
             <div
                 data-test="search-ask-answer"
                 className={tcls(
-                    'mt-4',
+                    'my-4',
                     'sm:mt-6',
                     'px-4',
                     'sm:px-12',

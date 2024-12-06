@@ -162,8 +162,14 @@ export const streamAskQuestion = streamResponse(async function* (
         pointer.siteId,
         {
             question,
+            context: pointer.siteSpaceId ? {
+                siteSpaceId: pointer.siteSpaceId,
+            } : undefined,
             scope: {
                 mode: 'default',
+
+                // Include the current site space regardless.
+                includedSiteSpaces: pointer.siteSpaceId ? [pointer.siteSpaceId] : undefined,
             },
         },
         { format: 'document' },
@@ -184,13 +190,9 @@ export async function getRecommendedQuestions(spaceId: string): Promise<string[]
 }
 
 async function transformAnswer(
-    answer: SearchAIAnswer | undefined,
+    answer: SearchAIAnswer,
     spaceData: Map<string, RevisionPage[]>,
-): Promise<AskAnswerResult | null> {
-    if (!answer) {
-        return null;
-    }
-
+): Promise<AskAnswerResult> {
     const spaces = new Set<string>();
     answer.sources.forEach((source) => {
         if (source.type !== 'page') {
