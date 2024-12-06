@@ -193,17 +193,24 @@ export async function getRecommendedQuestions(spaceId: string): Promise<string[]
 
 async function transformAnswer(
     answer: SearchAIAnswer,
+
+    /**
+     * Transforming an answer requires fetching space data so we can calculate absolute
+     * and relative page paths. Maintain an in-memory cache of space data to avoid
+     * refetching for the same source.
+     */
     spaceData: Map<string, RevisionPage[]>,
 ): Promise<AskAnswerResult> {
-    const spaces = new Set<string>();
-    answer.sources.forEach((source) => {
+    // Gather a unique set of all space IDs referenced in this answer.
+    const spaces = answer.sources.reduce<Set<string>>((set, source) => {
         if (source.type !== 'page') {
-            return null;
+            return set;
         }
 
-        spaces.add(source.space);
-    });
+        return set.add(source.space);
+    }, new Set<string>());
 
+    // Fetch the content of all spaces referenced in this answer, if not already fetched.
     await pMap(
         spaces.values(),
         async (spaceId) => {
