@@ -80,10 +80,11 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 style,
             )}
         >
-            <Icon icon="magnifying-glass" className={tcls('text-dark/8', 'dark:text-light/8', 'shrink-0', 'size-4')} />
-            <div className={tcls('w-full', 'hidden', 'md:block', 'text-left')}>
-                {children}
-            </div>
+            <Icon
+                icon="magnifying-glass"
+                className={tcls('text-dark/8', 'dark:text-light/8', 'shrink-0', 'size-4')}
+            />
+            <div className={tcls('w-full', 'hidden', 'md:block', 'text-left')}>{children}</div>
             <Shortcut />
         </button>
     );

@@ -30,74 +30,50 @@ export function HeaderLogo(props: HeaderLogoProps) {
     const { customization } = props;
 
     return (
-        <div
-            className={tcls(
-                'flex',
-                'shrink-0',
-                'flex-row',
-                'gap-2',
-            )}
+        <Link
+            href={absoluteHref('')}
+            className={tcls('group/headerlogo', 'min-w-0', 'shrink', 'flex', 'items-center')}
         >
-            <HeaderMobileMenu
-                className={tcls(
-                    'lg:hidden',
-                    customization.header.preset === CustomizationHeaderPreset.Default
-                        ? ['text-dark', 'dark:text-light']
-                        : 'text-header-link',
-                )}
-            />
-            <Link
-                href={absoluteHref('')}
-                className={tcls(
-                    'group/headerlogo',
-                    'flex-1',
-                    'flex',
-                    'flex-row',
-                    'items-center',
-                    'max-w-40',
-                    'lg:max-w-56',
-                    'max-h-10',
-                    'lg:max-h-12',
-                )}
-            >
-                {customization.header.logo ? (
-                    <Image
-                        alt="Logo"
-                        sources={{
-                            light: {
-                                src: customization.header.logo.light,
-                            },
-                            dark: customization.header.logo.dark
-                                ? {
-                                      src: customization.header.logo.dark,
-                                  }
-                                : null,
-                        }}
-                        sizes={[
-                            {
-                                media: '(max-width: 1024px)',
-                                width: 128,
-                            },
-                            {
-                                width: 192,
-                            },
-                        ]}
-                        priority="high"
-                        style={tcls(
-                            'rounded',
-                            'straight-corners:rounded-sm',
-                            'overflow-hidden',
-                            'object-contain',
-                            'object-left',
-                            'w-full',
-                            'h-full',
-                        )}
-                    />
-                ) : (
-                    <LogoFallback {...props} />
-                )}
-            </Link>
-        </div>
+            {customization.header.logo ? (
+                <Image
+                    alt="Logo"
+                    sources={{
+                        light: {
+                            src: customization.header.logo.light,
+                        },
+                        dark: customization.header.logo.dark
+                            ? {
+                                  src: customization.header.logo.dark,
+                              }
+                            : null,
+                    }}
+                    sizes={[
+                        {
+                            media: '(max-width: 1024px)',
+                            width: 128,
+                        },
+                        {
+                            width: 192,
+                        },
+                    ]}
+                    priority="high"
+                    style={tcls(
+                        'rounded',
+                        'straight-corners:rounded-sm',
+                        'overflow-hidden',
+                        'object-contain',
+                        'object-left',
+                        'min-w-20',
+                        'max-w-48',
+                        'lg:max-w-64',
+                        'max-h-10',
+                        'lg:max-h-11',
+                    )}
+                />
+            ) : (
+                <LogoFallback {...props} />
+            )}
+        </Link>
     );
 }
 
@@ -120,13 +96,13 @@ function LogoFallback(props: HeaderLogoProps) {
                 className={tcls(
                     'text-pretty',
                     'line-clamp-3',
-                    'leading-[1.1]',
                     'tracking-tight',
                     'max-w-[18ch]',
                     'lg:max-w-[24ch]',
-                    'lg:text-lg/tight',
                     'font-semibold',
                     'ms-3',
+                    'text-base',
+                    'leading-tight',
                     customization.header.preset === CustomizationHeaderPreset.Default ||
                         customization.header.preset === CustomizationHeaderPreset.None
                         ? ['text-dark', 'dark:text-light']

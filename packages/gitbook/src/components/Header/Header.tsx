@@ -15,6 +15,7 @@ import { HeaderLogo } from './HeaderLogo';
 import { SpacesDropdown } from './SpacesDropdown';
 import { SearchButton } from '../Search';
 import { SiteSectionTabs } from '../SiteSectionTabs';
+import { HeaderMobileMenu } from './HeaderMobileMenu';
 /**
  * Render the header for the space.
  */
@@ -65,7 +66,7 @@ export function Header(props: {
             <div className={tcls('scroll-nojump')}>
                 <div
                     className={tcls(
-                        'gap-6',
+                        'gap-4',
                         'lg:gap-8',
                         'flex',
                         'h-16',
@@ -75,30 +76,44 @@ export function Header(props: {
                         CONTAINER_STYLE,
                     )}
                 >
-                    <HeaderLogo site={site} space={space} customization={customization} />
-                    {!hasSiteSections && isMultiVariants ? (
-                        <div className="z-20">
-                            <SpacesDropdown space={space} spaces={spaces} />
-                        </div>
-                    ) : null}
-                    <HeaderLinks>
-                        {customization.header.links.map((link, index) => {
-                            return (
-                                <HeaderLink
-                                    key={index}
-                                    link={link}
-                                    context={context}
-                                    customization={customization}
-                                />
-                            );
-                        })}
-                        <HeaderLinkMore
-                            label={t(getSpaceLanguage(customization), 'more')}
-                            links={customization.header.links}
-                            context={context}
-                            customization={customization}
+                    <div className="flex max-w-full shrink min-w-0 gap-2 lg:gap-4 justify-start items-center">
+                        <HeaderMobileMenu
+                            className={tcls(
+                                'lg:hidden',
+                                '-ml-2',
+                                customization.header.preset === CustomizationHeaderPreset.Default
+                                    ? ['text-dark', 'dark:text-light']
+                                    : 'text-header-link',
+                            )}
                         />
-                    </HeaderLinks>
+                        <HeaderLogo site={site} space={space} customization={customization} />
+                        {!hasSiteSections && isMultiVariants ? (
+                            <div className="z-20 shrink">
+                                <SpacesDropdown space={space} spaces={spaces} />
+                            </div>
+                        ) : null}
+                    </div>
+
+                    {customization.header.links.length > 0 && (
+                        <HeaderLinks>
+                            {customization.header.links.map((link, index) => {
+                                return (
+                                    <HeaderLink
+                                        key={index}
+                                        link={link}
+                                        context={context}
+                                        customization={customization}
+                                    />
+                                );
+                            })}
+                            <HeaderLinkMore
+                                label={t(getSpaceLanguage(customization), 'more')}
+                                links={customization.header.links}
+                                context={context}
+                                customization={customization}
+                            />
+                        </HeaderLinks>
+                    )}
                     <div
                         className={tcls(
                             'flex',
