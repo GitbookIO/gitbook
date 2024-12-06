@@ -223,7 +223,7 @@ async function transformAnswer(
             const { pages } = await api.getSpaceContentData({ spaceId }, undefined);
             spaceData.set(spaceId, pages);
         },
-        { concurrency: 1 },
+        { concurrency: 3 },
     );
 
     const sources = answer.sources

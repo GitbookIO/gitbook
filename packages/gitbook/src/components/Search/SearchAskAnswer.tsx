@@ -137,7 +137,6 @@ function TransitionAnswerBody(props: { answer: AskAnswerResult; placeholder: Rea
 
     React.useEffect(() => {
         startTransition(() => {
-            console.log('transition DONE');
             setDisplay(answer);
         });
     }, [answer]);
