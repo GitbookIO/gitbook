@@ -181,7 +181,7 @@ function SearchModalBody(
     };
 
     return (
-        <div
+        <motion.div
             role="dialog"
             aria-label={tString(language, 'search')}
             className={tcls(
@@ -292,6 +292,6 @@ function SearchModalBody(
             {state.query && state.ask && withAsk ? (
                 <SearchAskAnswer pointer={pointer} query={state.query} />
             ) : null}
-        </div>
+        </motion.div>
     );
 }
