@@ -52,11 +52,11 @@ export interface CacheDefinition<Args extends any[], Result> {
     /** Tag to associate to the entry */
     tag?: (...args: Args) => string;
 
-    /** Context key matching the hash of the claims included in the visitor JWT token */
-    getContextKey?: () => string | undefined;
-
     /** Filter the arguments that should be taken into consideration for the cache key */
     getKeyArgs?: (args: Args) => any[];
+
+    /** Returns a precomputed hash that is used alongside arguments to generate the cache key */
+    getKeySuffix?: () => string | undefined;
 
     /** Default ttl (in seconds) */
     defaultTtl?: number;
@@ -225,8 +225,8 @@ export function cache<Args extends any[], Result>(
         const [args, { signal }] = extractCacheFunctionOptions<Args>(rawArgs);
 
         const cacheArgs = cacheDef.getKeyArgs ? cacheDef.getKeyArgs(args) : args;
-        const cacheContextKey = cacheDef.getContextKey ? cacheDef.getContextKey() : undefined;
-        const key = getCacheKey(cacheDef.name, cacheArgs, cacheContextKey);
+        const cacheKeySuffix = cacheDef.getKeySuffix ? cacheDef.getKeySuffix() : undefined;
+        const key = getCacheKey(cacheDef.name, cacheArgs, cacheKeySuffix);
 
         return await trace(
             {
@@ -243,8 +243,8 @@ export function cache<Args extends any[], Result>(
     cacheFn.revalidate = async (...rawArgs: Args | [...Args, CacheFunctionOptions]) => {
         const [args, { signal }] = extractCacheFunctionOptions<Args>(rawArgs);
         const cacheArgs = cacheDef.getKeyArgs ? cacheDef.getKeyArgs(args) : args;
-        const cacheContextKey = cacheDef.getContextKey ? cacheDef.getContextKey() : undefined;
-        const key = getCacheKey(cacheDef.name, cacheArgs, cacheContextKey);
+        const cacheKeySuffix = cacheDef.getKeySuffix ? cacheDef.getKeySuffix() : undefined;
+        const key = getCacheKey(cacheDef.name, cacheArgs, cacheKeySuffix);
 
         const result = await revalidate(key, signal, ...args);
         return result.data;
@@ -252,8 +252,8 @@ export function cache<Args extends any[], Result>(
 
     cacheFn.hasInMemory = async (...args: Args) => {
         const cacheArgs = cacheDef.getKeyArgs ? cacheDef.getKeyArgs(args) : args;
-        const cacheContextKey = cacheDef.getContextKey ? cacheDef.getContextKey() : undefined;
-        const key = getCacheKey(cacheDef.name, cacheArgs, cacheContextKey);
+        const cacheKeySuffix = cacheDef.getKeySuffix ? cacheDef.getKeySuffix() : undefined;
+        const key = getCacheKey(cacheDef.name, cacheArgs, cacheKeySuffix);
         const tag = cacheDef.tag?.(...args);
 
         const memoryEntry = await memoryCache.get({ key, tag });
@@ -281,12 +281,11 @@ export function getCache(name: string): CacheFunction<any[], any> | null {
 /**
  * Get a cache key for a function and its arguments.
  */
-export function getCacheKey(fnName: string, args: any[], context: string | undefined) {
+export function getCacheKey(fnName: string, args: any[], suffix: string | undefined) {
     const hashedArgs = args.map((arg) => hashValue(arg));
 
-    // When a context is included add it to the cache key as this means that user claims have changed.
-    if (context) {
-        hashedArgs.push(context);
+    if (suffix) {
+        hashedArgs.push(suffix);
     }
     let innerKey = hashedArgs.join(',');
 
