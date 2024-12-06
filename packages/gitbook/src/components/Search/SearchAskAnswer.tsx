@@ -1,7 +1,7 @@
 'use client';
 
 import { Icon } from '@gitbook/icons';
-import React from 'react';
+import React, { useState } from 'react';
 import { atom, useRecoilState } from 'recoil';
 
 import { Loading } from '@/components/primitives';
@@ -16,23 +16,23 @@ import { AskAnswerResult, AskAnswerSource, streamAskQuestion } from './server-ac
 import { useSearch, useSearchLink } from './useSearch';
 import { Link } from '../primitives';
 
-/**
- * Store the state of the answer in a global state so that it can be
- * accessed from anywhere to show a loading indicator.
- */
-export const searchAskState = atom<
+type SearchState =
     | {
           type: 'answer';
-          answer: AskAnswerResult | null;
+          answer: AskAnswerResult;
       }
     | {
           type: 'error';
       }
     | {
           type: 'loading';
-      }
-    | null
->({
+      };
+
+/**
+- * Store the state of the answer in a global state so that it can be
+- * accessed from anywhere to show a loading indicator.
+- */
+export const searchAskState = atom<SearchState | null>({
     key: 'searchAskState',
     default: null,
 });
@@ -51,13 +51,11 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
     React.useEffect(() => {
         let cancelled = false;
 
-        console.log('search effect', query);
         setState({
             type: 'loading',
         });
 
         (async () => {
-            console.log('search server', organizationId, siteId, siteSpaceId ?? null, query);
             const stream = iterateStreamResponse(
                 streamAskQuestion(organizationId, siteId, siteSpaceId ?? null, query),
             );
@@ -73,19 +71,15 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
             );
 
             for await (const chunk of stream) {
-                console.log(`chunk ${cancelled ? 'cancelled' : ''}`, chunk);
                 if (cancelled) {
                     return;
                 }
-
 
                 setState({
                     type: 'answer',
                     answer: chunk,
                 });
             }
-
-            console.log('chunk over');
         })().catch((error) => {
             if (cancelled) {
                 return;
@@ -97,7 +91,6 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
         });
 
         return () => {
-            console.log('useEffect teardown', process.env.NODE_ENV);
             // During development, the useEffect is called twice and the second call doesn't process the stream,
             // causing the component to get stuck in the loading state.
             if (process.env.NODE_ENV !== 'development') {
@@ -121,15 +114,9 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
     return (
         <div className={tcls('max-h-[60vh]', 'overflow-y-auto')}>
             {state?.type === 'answer' ? (
-                <>
-                    {state.answer ? (
-                        <React.Suspense fallback={loading}>
-                            <TransitionAnswerBody answer={state.answer} placeholder={loading} />
-                        </React.Suspense>
-                    ) : (
-                        <div className={tcls('p-4')}>{t(language, 'search_ask_no_answer')}</div>
-                    )}
-                </>
+                <React.Suspense fallback={loading}>
+                    <TransitionAnswerBody answer={state.answer} placeholder={loading} />
+                </React.Suspense>
             ) : null}
             {state?.type === 'error' ? (
                 <div className={tcls('p-4')}>{t(language, 'search_ask_error')}</div>
@@ -150,6 +137,7 @@ function TransitionAnswerBody(props: { answer: AskAnswerResult; placeholder: Rea
 
     React.useEffect(() => {
         startTransition(() => {
+            console.log('transition DONE');
             setDisplay(answer);
         });
     }, [answer]);
