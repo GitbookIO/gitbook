@@ -13,7 +13,7 @@ export function ScalarApiButton({ method, path }: { method: string; path: string
         <div className="scalar scalar-activate">
             <button
                 className="scalar-activate-button"
-                onClick={() => client?.open({ method, path })}
+                onClick={() => client?.open({ method, path, _source: 'gitbook' })}
             >
                 <svg xmlns="http://www.w3.org/2000/svg" width="10" height="12" fill="none">
                     <path
