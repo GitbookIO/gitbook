@@ -52,6 +52,9 @@ export interface CacheDefinition<Args extends any[], Result> {
     /** Tag to associate to the entry */
     tag?: (...args: Args) => string;
 
+    /** Context key matching the hash of the claims included in the visitor JWT token */
+    getContextKey?: () => string | undefined;
+
     /** Filter the arguments that should be taken into consideration for the cache key */
     getKeyArgs?: (args: Args) => any[];
 
@@ -222,7 +225,8 @@ export function cache<Args extends any[], Result>(
         const [args, { signal }] = extractCacheFunctionOptions<Args>(rawArgs);
 
         const cacheArgs = cacheDef.getKeyArgs ? cacheDef.getKeyArgs(args) : args;
-        const key = getCacheKey(cacheDef.name, cacheArgs);
+        const cacheContextKey = cacheDef.getContextKey ? cacheDef.getContextKey() : undefined;
+        const key = getCacheKey(cacheDef.name, cacheArgs, cacheContextKey);
 
         return await trace(
             {
@@ -239,7 +243,8 @@ export function cache<Args extends any[], Result>(
     cacheFn.revalidate = async (...rawArgs: Args | [...Args, CacheFunctionOptions]) => {
         const [args, { signal }] = extractCacheFunctionOptions<Args>(rawArgs);
         const cacheArgs = cacheDef.getKeyArgs ? cacheDef.getKeyArgs(args) : args;
-        const key = getCacheKey(cacheDef.name, cacheArgs);
+        const cacheContextKey = cacheDef.getContextKey ? cacheDef.getContextKey() : undefined;
+        const key = getCacheKey(cacheDef.name, cacheArgs, cacheContextKey);
 
         const result = await revalidate(key, signal, ...args);
         return result.data;
@@ -275,8 +280,14 @@ export function getCache(name: string): CacheFunction<any[], any> | null {
 /**
  * Get a cache key for a function and its arguments.
  */
-export function getCacheKey(fnName: string, args: any[]) {
-    let innerKey = args.map((arg) => hashValue(arg)).join(',');
+export function getCacheKey(fnName: string, args: any[], context?: string) {
+    const hashedArgs = args.map((arg) => hashValue(arg));
+
+    // When a context is included add it to the cache key as this means that user claims have changed.
+    if (context) {
+        hashedArgs.push(context)
+    }
+    let innerKey = hashedArgs.join(',');
 
     // Avoid crazy long keys, by fallbacking to a hash
     if (innerKey.length > 400) {

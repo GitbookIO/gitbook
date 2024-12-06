@@ -4,6 +4,7 @@ import assertNever from 'assert-never';
 import jwt from 'jsonwebtoken';
 import type { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 import { NextResponse, NextRequest } from 'next/server';
+import hash from 'object-hash';
 
 import {
     PublishedContentWithCache,
@@ -16,6 +17,7 @@ import {
     DEFAULT_API_ENDPOINT,
     getPublishedContentSite,
     getSiteData,
+    GitBookAPIWithContextKey,
 } from '@/lib/api';
 import { race } from '@/lib/async';
 import { buildVersion } from '@/lib/build';
@@ -108,7 +110,7 @@ export async function middleware(request: NextRequest) {
     const inputURL = stripURLBasePath(url, originBasePath);
 
     const resolved = await withAPI(
-        new GitBookAPI({
+        new GitBookAPIWithContextKey({
             endpoint: apiEndpoint,
             authToken: getDefaultAPIToken(apiEndpoint),
             userAgent: userAgent(),
@@ -153,12 +155,14 @@ export async function middleware(request: NextRequest) {
     // Resolution might have changed the API endpoint
     apiEndpoint = resolved.apiEndpoint ?? apiEndpoint;
 
+    const contextKey = 'site' in resolved ? resolved.contextId : undefined;
     const nonce = createContentSecurityPolicyNonce();
     const csp = await withAPI(
-        new GitBookAPI({
+        new GitBookAPIWithContextKey({
             endpoint: apiEndpoint,
             authToken: resolved.apiToken,
             userAgent: userAgent(),
+            contextKey
         }),
         async () => {
             const [siteData] = await Promise.all([
@@ -198,6 +202,9 @@ export async function middleware(request: NextRequest) {
     headers.set('x-forwarded-host', inputURL.host);
     headers.set('origin', inputURL.origin);
     headers.set('x-gitbook-token', resolved.apiToken);
+    if (contextKey) {
+        headers.set('x-gitbook-token-context', contextKey);
+    }
     headers.set('x-gitbook-mode', mode);
     headers.set('x-gitbook-origin-basepath', originBasePath);
     headers.set('x-gitbook-basepath', joinPath(originBasePath, resolved.basePath));
@@ -470,10 +477,12 @@ async function lookupSiteOrSpaceInMultiIdMode(
         throw new Error('Collection is not supported in multi-id mode');
     }
 
-    const gitbookAPI = new GitBookAPI({
+    const contextKey = decoded.claims ? hash(decoded.claims) : undefined;
+    const gitbookAPI = new GitBookAPIWithContextKey({
         endpoint: apiEndpoint ?? api().endpoint,
         authToken: apiToken,
         userAgent: userAgent(),
+        contextKey
     });
 
     // Verify access to the space to avoid leaking cached data in this mode
