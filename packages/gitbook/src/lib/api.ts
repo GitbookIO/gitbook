@@ -135,10 +135,6 @@ export function withAPI<T>(client: GitBookAPI, fn: () => Promise<T>): Promise<T>
     return apiSyncStorage.run(client, fn);
 }
 
-export function withAPIStream<T>(client: GitBookAPI, fn: () => T): T {
-    return apiSyncStorage.run(client, fn);
-}
-
 type SpaceContentLookup = Pick<
     PublishedSiteContent,
     'space' | 'changeRequest' | 'revision' | 'pathname' | 'basePath' | 'apiToken'
