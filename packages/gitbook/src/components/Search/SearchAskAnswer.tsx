@@ -1,7 +1,7 @@
 'use client';
 
 import { Icon } from '@gitbook/icons';
-import React, { useState } from 'react';
+import React from 'react';
 import { atom, useRecoilState } from 'recoil';
 
 import { Loading } from '@/components/primitives';
@@ -74,7 +74,6 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
                 if (cancelled) {
                     return;
                 }
-
                 setState({
                     type: 'answer',
                     answer: chunk,

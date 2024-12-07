@@ -1,7 +1,6 @@
 'use server';
 
 import { RevisionPage, SearchAIAnswer, SearchPageResult, SiteSpace, Space } from '@gitbook/api';
-import pMap from 'p-map';
 import * as React from 'react';
 import { assert } from 'ts-essentials';
 
@@ -179,14 +178,28 @@ export const streamAskQuestion = streamResponse(async function* (
         { format: 'document' },
     );
 
-    const spaceData = new Map<string, RevisionPage[]>();
+    const spaceData = new PromiseQueue<string, RevisionPage[]>();
     for await (const chunk of stream) {
-        if (!chunk) {
-            continue;
-        }
+        const answer = chunk.answer;
 
-        const encoded = await transformAnswer(chunk.answer, spaceData);
-        yield encoded;
+        // Register the space of each page source into the promise queue.
+        const spaces = answer.sources
+            .map((source) => {
+                if (source.type !== 'page') {
+                    return null;
+                }
+
+                spaceData.registerPromise(source.space, () => {
+                    return api.getRevisionPages(source.space, source.revision, { metadata: false });
+                });
+
+                return source.space;
+            })
+            .filter(filterOutNullable);
+
+        // Get the pages for all spaces referenced by this answer.
+        const pages = await spaceData.getPromises(spaces);
+        yield transformAnswer(chunk.answer, pages);
     }
 });
 
@@ -198,46 +211,17 @@ export async function getRecommendedQuestions(spaceId: string): Promise<string[]
     return data.questions;
 }
 
-async function transformAnswer(
+function transformAnswer(
     answer: SearchAIAnswer,
-
-    /**
-     * Transforming an answer requires fetching space data so we can calculate absolute
-     * and relative page paths. Maintain an in-memory cache of space data to avoid
-     * refetching for the same source.
-     */
-    spaceData: Map<string, RevisionPage[]>,
-): Promise<AskAnswerResult> {
-    // Gather a unique set of all space IDs referenced in this answer.
-    const spaces = answer.sources.reduce<Set<string>>((set, source) => {
-        if (source.type !== 'page') {
-            return set;
-        }
-
-        return set.add(source.space);
-    }, new Set<string>());
-
-    // Fetch the content of all spaces referenced in this answer, if not already fetched.
-    await pMap(
-        spaces.values(),
-        async (spaceId) => {
-            if (spaceData.has(spaceId)) {
-                return;
-            }
-
-            const { pages } = await api.getSpaceContentData({ spaceId }, undefined);
-            spaceData.set(spaceId, pages);
-        },
-        { concurrency: 1 },
-    );
-
+    spacePages: Map<string, RevisionPage[]>,
+): AskAnswerResult {
     const sources = answer.sources
         .map((source) => {
             if (source.type !== 'page') {
                 return null;
             }
 
-            const pages = spaceData.get(source.space);
+            const pages = spacePages.get(source.space);
 
             if (!pages) {
                 return null;
@@ -336,4 +320,71 @@ function transformPageResult(item: SearchPageResult, space?: Space) {
     });
 
     return [page, ...sections];
+}
+
+/**
+ * A queue for promises that performs deduplication of requests
+ * and ensures they run sequentially.
+ *
+ * This is useful when you want to make multiple async requests
+ * but want to avoid making the same request multiple times.
+ *
+ * Running the promises sequentially gives us some safety about
+ * hitting Cloudflare Worker's 6 parallel subrequest limits.
+ */
+class PromiseQueue<Key extends string, Value> {
+    private promiseQueue: (() => Promise<Value>)[] = [];
+    private results: Map<Key, Value> = new Map();
+    private registeredKeys: Set<Key> = new Set();
+    private currentExecution: Promise<void> | null = null;
+
+    private async executeQueue() {
+        while (this.promiseQueue.length > 0) {
+            const promiseFn = this.promiseQueue.shift()!;
+            await promiseFn();
+        }
+        this.currentExecution = null; // Mark the queue as idle
+    }
+
+    registerPromise(key: Key, fn: () => Promise<Value>): void {
+        if (this.registeredKeys.has(key)) {
+            return;
+        }
+
+        this.registeredKeys.add(key);
+
+        const wrapperFn = async () => {
+            const result = await fn();
+            this.results.set(key, result);
+            return result;
+        };
+
+        this.promiseQueue.push(wrapperFn);
+
+        // Start executing if not already running
+        if (!this.currentExecution) {
+            this.currentExecution = this.executeQueue();
+        }
+    }
+
+    /**
+     * Returns a promise that resolves to a map of results for the given keys.
+     * If the key has not been registered in the queue, it will be ignored.
+     */
+    async getPromises(keys: Key[]): Promise<Map<Key, Value>> {
+        // Wait for any ongoing executions to finish
+        if (this.currentExecution) {
+            await this.currentExecution;
+        }
+
+        return keys.reduce((map, key) => {
+            const data = this.results.get(key);
+
+            if (data) {
+                return map.set(key, data);
+            }
+
+            return map;
+        }, new Map<Key, Value>());
+    }
 }
