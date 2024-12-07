@@ -178,10 +178,11 @@ export const streamAskQuestion = streamResponse(async function* (
         { format: 'document' },
     );
 
-    const spaceData = new PromiseBatcher<RevisionPage[]>();
+    const spaceData = new PromiseQueue<string, RevisionPage[]>();
     for await (const chunk of stream) {
         const answer = chunk.answer;
 
+        // Register the space of each page source into the promise queue.
         const spaces = answer.sources
             .map((source) => {
                 if (source.type !== 'page') {
@@ -189,7 +190,6 @@ export const streamAskQuestion = streamResponse(async function* (
                 }
 
                 spaceData.registerPromise(source.space, () => {
-                    console.log('register', source.space);
                     return api.getRevisionPages(source.space, source.revision, { metadata: false });
                 });
 
@@ -197,6 +197,7 @@ export const streamAskQuestion = streamResponse(async function* (
             })
             .filter(filterOutNullable);
 
+        // Get the pages for all spaces referenced by this answer.
         const pages = await spaceData.getPromises(spaces);
         yield transformAnswer(chunk.answer, pages);
     }
@@ -321,10 +322,20 @@ function transformPageResult(item: SearchPageResult, space?: Space) {
     return [page, ...sections];
 }
 
-class PromiseBatcher<T> {
-    private promiseQueue: (() => Promise<T>)[] = [];
-    private results: Map<string, T> = new Map();
-    private registeredKeys: Set<string> = new Set();
+/**
+ * A queue for promises that performs deduplication of requests
+ * and ensures they run sequentially.
+ *
+ * This is useful when you want to make multiple async requests
+ * but want to avoid making the same request multiple times.
+ *
+ * Running the promises sequentially gives us some safety about
+ * hitting Cloudflare Worker's 6 parallel subrequest limits.
+ */
+class PromiseQueue<Key extends string, Value> {
+    private promiseQueue: (() => Promise<Value>)[] = [];
+    private results: Map<Key, Value> = new Map();
+    private registeredKeys: Set<Key> = new Set();
     private currentExecution: Promise<void> | null = null;
 
     private async executeQueue() {
@@ -335,7 +346,7 @@ class PromiseBatcher<T> {
         this.currentExecution = null; // Mark the queue as idle
     }
 
-    registerPromise(key: string, fn: () => Promise<T>): void {
+    registerPromise(key: Key, fn: () => Promise<Value>): void {
         if (this.registeredKeys.has(key)) {
             return;
         }
@@ -356,7 +367,11 @@ class PromiseBatcher<T> {
         }
     }
 
-    async getPromises(keys: string[]): Promise<Map<string, T>> {
+    /**
+     * Returns a promise that resolves to a map of results for the given keys.
+     * If the key has not been registered in the queue, it will be ignored.
+     */
+    async getPromises(keys: Key[]): Promise<Map<Key, Value>> {
         // Wait for any ongoing executions to finish
         if (this.currentExecution) {
             await this.currentExecution;
@@ -370,6 +385,6 @@ class PromiseBatcher<T> {
             }
 
             return map;
-        }, new Map<string, T>());
+        }, new Map<Key, Value>());
     }
 }
