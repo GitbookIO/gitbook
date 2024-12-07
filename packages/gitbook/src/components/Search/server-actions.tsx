@@ -183,17 +183,19 @@ export const streamAskQuestion = streamResponse(async function* (
     for await (const chunk of stream) {
         const answer = chunk.answer;
 
-        const spaces = answer.sources.map((source) => {
-            if (source.type !== 'page') {
-                return null;
-            }
+        const spaces = answer.sources
+            .map((source) => {
+                if (source.type !== 'page') {
+                    return null;
+                }
 
-            spaceData.registerPromise(source.space, () => {
-                return api.getRevisionPages(source.space, source.revision, { metadata: false });
-            });
+                spaceData.registerPromise(source.space, () => {
+                    return api.getRevisionPages(source.space, source.revision, { metadata: false });
+                });
 
-            return source.space;
-        }).filter(filterOutNullable);
+                return source.space;
+            })
+            .filter(filterOutNullable);
 
         const pages = await spaceData.getPromises(spaces);
         yield transformAnswer(chunk.answer, pages);
@@ -318,7 +320,6 @@ function transformPageResult(item: SearchPageResult, space?: Space) {
 
     return [page, ...sections];
 }
-
 
 class PromiseBatcher<T> {
     private promiseQueue: (() => Promise<T>)[] = [];
