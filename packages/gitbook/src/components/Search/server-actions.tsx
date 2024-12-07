@@ -1,7 +1,6 @@
 'use server';
 
-import { GitBookAPI, RevisionPage, SearchAIAnswer, SearchPageResult, SiteSpace, Space } from '@gitbook/api';
-import { headers } from 'next/headers';
+import { RevisionPage, SearchAIAnswer, SearchPageResult, SiteSpace, Space } from '@gitbook/api';
 import * as React from 'react';
 import { assert } from 'ts-essentials';
 
@@ -12,7 +11,6 @@ import { resolvePageId } from '@/lib/pages';
 import { filterOutNullable } from '@/lib/typescript';
 
 import { DocumentView } from '../DocumentView';
-
 
 export type OrderedComputedResult = ComputedPageResult | ComputedSectionResult;
 
@@ -160,32 +158,24 @@ export const streamAskQuestion = streamResponse(async function* (
     siteSpaceId: string | null,
     question: string,
 ) {
-    let apiEndpoint = headers().get('x-gitbook-api') ?? api.DEFAULT_API_ENDPOINT;
-    const stream = api.withAPIStream(
-        new GitBookAPI({
-            endpoint: apiEndpoint,
-            authToken: process.env.GITBOOK_TOKEN,
-            userAgent: api.userAgent(),
-        }),
-        () => api.api().orgs.streamAskInSite(
-            organizationId,
-            siteId,
-            {
-                question,
-                context: siteSpaceId
-                    ? {
-                          siteSpaceId,
-                      }
-                    : undefined,
-                scope: {
-                    mode: 'default',
-    
-                    // Include the current site space regardless.
-                    includedSiteSpaces: siteSpaceId ? [siteSpaceId] : undefined,
-                },
+    const stream = api.api().orgs.streamAskInSite(
+        organizationId,
+        siteId,
+        {
+            question,
+            context: siteSpaceId
+                ? {
+                      siteSpaceId,
+                  }
+                : undefined,
+            scope: {
+                mode: 'default',
+
+                // Include the current site space regardless.
+                includedSiteSpaces: siteSpaceId ? [siteSpaceId] : undefined,
             },
-            { format: 'document' },
-        ),
+        },
+        { format: 'document' },
     );
 
     const spaceData = new PromiseBatcher<RevisionPage[]>();
@@ -207,13 +197,9 @@ export const streamAskQuestion = streamResponse(async function* (
             })
             .filter(filterOutNullable);
 
-        console.log('waiting for ', spaces);
         const pages = await spaceData.getPromises(spaces);
-        console.log('resolved', spaces);
         yield transformAnswer(chunk.answer, pages);
-        console.log('yield', chunk.answer.text);
     }
-    console.log('streamAskQuestion done');
 });
 
 /**

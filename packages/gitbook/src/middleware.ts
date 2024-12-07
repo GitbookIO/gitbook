@@ -93,7 +93,7 @@ export async function middleware(request: NextRequest) {
         rawRequestURL: request.url,
         userAgent: userAgent(),
     });
-    
+
     if (request.method === 'POST') {
         return NextResponse.next();
     }
