@@ -39,10 +39,10 @@ export interface AskAnswerSource {
 }
 
 export interface AskAnswerResult {
+    /** Undefined if no answer. */
     body?: React.ReactNode;
     followupQuestions: string[];
     sources: AskAnswerSource[];
-    hasAnswer: boolean;
 }
 
 /**
@@ -152,16 +152,53 @@ export async function searchSiteSpaceContent(
 /**
  * Server action to ask a question in a space.
  */
-export const streamAskQuestion = streamResponse(async function* (spaceId: string, query: string) {
-    const stream = api
-        .api()
-        .spaces.streamAskInSpace(spaceId, { query, format: 'document', details: true });
-    const pagesPromise = api.getSpaceContentData({ spaceId }, undefined);
+export const streamAskQuestion = streamResponse(async function* (
+    organizationId: string,
+    siteId: string,
+    siteSpaceId: string | null,
+    question: string,
+) {
+    const stream = api.api().orgs.streamAskInSite(
+        organizationId,
+        siteId,
+        {
+            question,
+            context: siteSpaceId
+                ? {
+                      siteSpaceId,
+                  }
+                : undefined,
+            scope: {
+                mode: 'default',
 
+                // Include the current site space regardless.
+                includedSiteSpaces: siteSpaceId ? [siteSpaceId] : undefined,
+            },
+        },
+        { format: 'document' },
+    );
+
+    const spaceData = new PromiseQueue<string, RevisionPage[]>();
     for await (const chunk of stream) {
-        // We run the AI search and fetch the pages in parallel
-        const { pages } = await pagesPromise;
+        const answer = chunk.answer;
 
+        // Register the space of each page source into the promise queue.
+        const spaces = answer.sources
+            .map((source) => {
+                if (source.type !== 'page') {
+                    return null;
+                }
+
+                spaceData.registerPromise(source.space, () => {
+                    return api.getRevisionPages(source.space, source.revision, { metadata: false });
+                });
+
+                return source.space;
+            })
+            .filter(filterOutNullable);
+
+        // Get the pages for all spaces referenced by this answer.
+        const pages = await spaceData.getPromises(spaces);
         yield transformAnswer(chunk.answer, pages);
     }
 });
@@ -175,16 +212,18 @@ export async function getRecommendedQuestions(spaceId: string): Promise<string[]
 }
 
 function transformAnswer(
-    answer: SearchAIAnswer | undefined,
-    pages: RevisionPage[],
-): AskAnswerResult | null {
-    if (!answer) {
-        return null;
-    }
-
+    answer: SearchAIAnswer,
+    spacePages: Map<string, RevisionPage[]>,
+): AskAnswerResult {
     const sources = answer.sources
         .map((source) => {
             if (source.type !== 'page') {
+                return null;
+            }
+
+            const pages = spacePages.get(source.space);
+
+            if (!pages) {
                 return null;
             }
 
@@ -194,7 +233,7 @@ function transformAnswer(
             }
 
             return {
-                id: page.page.id,
+                id: source.page,
                 title: page.page.title,
                 href: pageHref(pages, page.page),
             };
@@ -217,7 +256,6 @@ function transformAnswer(
             ) : null,
         followupQuestions: answer.followupQuestions,
         sources,
-        hasAnswer: !!answer.answer && 'document' in answer.answer,
     };
 }
 
@@ -282,4 +320,71 @@ function transformPageResult(item: SearchPageResult, space?: Space) {
     });
 
     return [page, ...sections];
+}
+
+/**
+ * A queue for promises that performs deduplication of requests
+ * and ensures they run sequentially.
+ *
+ * This is useful when you want to make multiple async requests
+ * but want to avoid making the same request multiple times.
+ *
+ * Running the promises sequentially gives us some safety about
+ * hitting Cloudflare Worker's 6 parallel subrequest limits.
+ */
+class PromiseQueue<Key extends string, Value> {
+    private promiseQueue: (() => Promise<Value>)[] = [];
+    private results: Map<Key, Value> = new Map();
+    private registeredKeys: Set<Key> = new Set();
+    private currentExecution: Promise<void> | null = null;
+
+    private async executeQueue() {
+        while (this.promiseQueue.length > 0) {
+            const promiseFn = this.promiseQueue.shift()!;
+            await promiseFn();
+        }
+        this.currentExecution = null; // Mark the queue as idle
+    }
+
+    registerPromise(key: Key, fn: () => Promise<Value>): void {
+        if (this.registeredKeys.has(key)) {
+            return;
+        }
+
+        this.registeredKeys.add(key);
+
+        const wrapperFn = async () => {
+            const result = await fn();
+            this.results.set(key, result);
+            return result;
+        };
+
+        this.promiseQueue.push(wrapperFn);
+
+        // Start executing if not already running
+        if (!this.currentExecution) {
+            this.currentExecution = this.executeQueue();
+        }
+    }
+
+    /**
+     * Returns a promise that resolves to a map of results for the given keys.
+     * If the key has not been registered in the queue, it will be ignored.
+     */
+    async getPromises(keys: Key[]): Promise<Map<Key, Value>> {
+        // Wait for any ongoing executions to finish
+        if (this.currentExecution) {
+            await this.currentExecution;
+        }
+
+        return keys.reduce((map, key) => {
+            const data = this.results.get(key);
+
+            if (data) {
+                return map.set(key, data);
+            }
+
+            return map;
+        }, new Map<Key, Value>());
+    }
 }

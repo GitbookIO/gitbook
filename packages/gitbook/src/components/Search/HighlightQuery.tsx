@@ -30,13 +30,13 @@ export function HighlightQuery(props: {
     const matches = matchString(text, query);
 
     return (
-        <div className={tcls('whitespace-break-spaces')}>
+        <span className={tcls('whitespace-break-spaces')}>
             {matches.map((entry, index) => (
                 <span key={index} className={tcls(entry.match ? highlight : null)}>
                     {entry.text}
                 </span>
             ))}
-        </div>
+        </span>
     );
 }
 
