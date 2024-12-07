@@ -51,6 +51,7 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
     React.useEffect(() => {
         let cancelled = false;
 
+        console.log('setState:loading');
         setState({
             type: 'loading',
         });
@@ -71,16 +72,17 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
             );
 
             for await (const chunk of stream) {
+                console.log(`setState:answer${cancelled ? ' (cancelled)' : ''}`);
                 if (cancelled) {
                     return;
                 }
-
                 setState({
                     type: 'answer',
                     answer: chunk,
                 });
             }
         })().catch((error) => {
+            console.log(`setState:error ${error.message} ${cancelled ? ' (cancelled)' : ''}`);
             if (cancelled) {
                 return;
             }
@@ -101,6 +103,7 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
 
     React.useEffect(() => {
         return () => {
+            console.log(`setState:null`);
             setState(null);
         };
     }, [setState]);
@@ -141,6 +144,7 @@ function TransitionAnswerBody(props: { answer: AskAnswerResult; placeholder: Rea
         });
     }, [answer]);
 
+    console.log(`TransitionAnswerBody: ${!!display} ${isPending ? 'pending' : 'done'}`);
     return display ? (
         <div className={tcls('w-full')}>
             <AnswerBody answer={display} />

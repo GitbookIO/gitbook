@@ -204,6 +204,7 @@ export const streamAskQuestion = streamResponse(async function* (
         yield transformAnswer(chunk.answer, pages);
         console.log('yield', chunk.answer.text);
     }
+    console.log('streamAskQuestion done');
 });
 
 /**
