@@ -190,6 +190,7 @@ export const streamAskQuestion = streamResponse(async function* (
                 }
 
                 spaceData.registerPromise(source.space, () => {
+                    console.log('register', source.space);
                     return api.getRevisionPages(source.space, source.revision, { metadata: false });
                 });
 
@@ -197,8 +198,11 @@ export const streamAskQuestion = streamResponse(async function* (
             })
             .filter(filterOutNullable);
 
+        console.log('waiting for ', spaces);
         const pages = await spaceData.getPromises(spaces);
+        console.log('resolved', spaces);
         yield transformAnswer(chunk.answer, pages);
+        console.log('yield', chunk.answer.text);
     }
 });
 
