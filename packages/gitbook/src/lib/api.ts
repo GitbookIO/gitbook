@@ -1216,8 +1216,6 @@ function getActiveCustomizationSettings(
         try {
             const parsedSettings = rison.decode_object<SiteCustomizationSettings>(extend);
 
-            console.log('=====> parsedSettings', parsedSettings);
-
             return parsedSettings;
         } catch (error) {
             console.error(

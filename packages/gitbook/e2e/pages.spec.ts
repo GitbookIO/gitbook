@@ -1,9 +1,12 @@
 import { argosScreenshot } from '@argos-ci/playwright';
 import {
     CustomizationBackground,
+    CustomizationCorners,
+    CustomizationFont,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
     CustomizationLocale,
+    CustomizationThemeMode,
     SiteCustomizationSettings,
 } from '@gitbook/api';
 import { test, expect, Page } from '@playwright/test';
@@ -971,7 +974,59 @@ for (const testCase of testCases) {
  * Create a URL with customization settings.
  */
 function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettings>): string {
-    const encoded = rison.encode_object(partial);
+    /**
+     * Default customization settings.
+     *
+     * The customization object passed to the URL should be a valid API settings object. Hence we extend the test with necessary defaults.
+     */
+    const DEFAULT_CUSTOMIZATION: SiteCustomizationSettings = {
+        styling: {
+            primaryColor: { light: '#346DDB', dark: '#346DDB' },
+            corners: CustomizationCorners.Rounded,
+            font: CustomizationFont.Inter,
+            background: CustomizationBackground.Plain,
+            icons: CustomizationIconsStyle.Regular,
+        },
+        internationalization: {
+            locale: CustomizationLocale.En,
+        },
+        favicon: {},
+        header: {
+            preset: CustomizationHeaderPreset.Default,
+            links: [],
+        },
+        footer: {
+            groups: [],
+        },
+        themes: {
+            default: CustomizationThemeMode.Light,
+            toggeable: true,
+        },
+        pdf: {
+            enabled: true,
+        },
+        feedback: {
+            enabled: false,
+        },
+        aiSearch: {
+            enabled: true,
+        },
+        advancedCustomization: {
+            enabled: true,
+        },
+        git: {
+            showEditLink: false,
+        },
+        pagination: {
+            enabled: true,
+        },
+        trademark: {
+            enabled: true,
+        },
+        privacyPolicy: {},
+        socialPreview: {},
+    };
+    const encoded = rison.encode_object({ ...DEFAULT_CUSTOMIZATION, ...partial });
 
     const searchParams = new URLSearchParams();
     searchParams.set('customization', encoded);
