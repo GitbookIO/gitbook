@@ -5,8 +5,8 @@ import { tcls } from '@/lib/tailwind';
 import { Dropdown, DropdownChevron, DropdownMenu } from './Dropdown';
 import { SpacesDropdownMenuItem } from './SpacesDropdownMenuItem';
 
-export function SpacesDropdown(props: { space: Space; spaces: Space[] }) {
-    const { space, spaces } = props;
+export function SpacesDropdown(props: { space: Space; spaces: Space[], className?: string}) {
+    const { space, spaces, className } = props;
 
     return (
         <Dropdown
@@ -36,6 +36,7 @@ export function SpacesDropdown(props: { space: Space; spaces: Space[] }) {
                         'contrast-more:dark:border-light',
                         'contrast-more:dark:bg-dark',
                         'contrast-more:dark:text-light',
+                        className
                     )}
                 >
                     <span className={tcls('line-clamp-2')}>{space.title}</span>

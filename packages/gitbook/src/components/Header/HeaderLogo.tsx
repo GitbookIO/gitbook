@@ -102,6 +102,7 @@ function LogoFallback(props: HeaderLogoProps) {
                     'font-semibold',
                     'ms-3',
                     'text-base',
+                    'lg:text-lg',
                     'leading-tight',
                     customization.header.preset === CustomizationHeaderPreset.Default ||
                         customization.header.preset === CustomizationHeaderPreset.None

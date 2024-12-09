@@ -88,7 +88,7 @@ export function Header(props: {
                         />
                         <HeaderLogo site={site} space={space} customization={customization} />
                         {!hasSiteSections && isMultiVariants ? (
-                            <div className="z-20 shrink">
+                            <div className="z-20 shrink hidden sm:block">
                                 <SpacesDropdown space={space} spaces={spaces} />
                             </div>
                         ) : null}

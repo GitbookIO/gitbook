@@ -106,9 +106,7 @@ export function SpaceLayout(props: {
                             )
                         }
                         innerHeader={
-                            (sections || !withTopHeader) && withVariants ? (
-                                <SpacesDropdown space={space} spaces={spaces} />
-                            ) : null
+                            withVariants && <SpacesDropdown className={(!sections || withTopHeader) ? 'sm:hidden' : undefined} space={space} spaces={spaces} />
                         }
                         headerOffset={headerOffset}
                     />
