@@ -1,5 +1,5 @@
 import {
-    CustomizationHeaderLink,
+    CustomizationHeaderItem,
     CustomizationHeaderPreset,
     CustomizationSettings,
     SiteCustomizationSettings,
@@ -12,11 +12,6 @@ import { tcls } from '@/lib/tailwind';
 
 import { Dropdown, DropdownChevron, DropdownMenu, DropdownMenuItem } from './Dropdown';
 import styles from './headerLinks.module.css';
-
-// @TODO replace by api.CustomizationHeaderItem when available
-type CustomizationHeaderItem = Omit<CustomizationHeaderLink, 'to'> & {
-    to: CustomizationHeaderLink['to'] | null;
-};
 
 /**
  * Dropdown menu for header links hidden at small screen size.

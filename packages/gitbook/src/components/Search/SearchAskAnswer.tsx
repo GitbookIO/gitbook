@@ -1,3 +1,5 @@
+'use client';
+
 import { Icon } from '@gitbook/icons';
 import React from 'react';
 import { atom, useRecoilState } from 'recoil';
@@ -7,29 +9,30 @@ import { useLanguage } from '@/intl/client';
 import { t } from '@/intl/translate';
 import { TranslationLanguage } from '@/intl/translations';
 import { iterateStreamResponse } from '@/lib/actions';
+import { SiteContentPointer } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
 import { AskAnswerResult, AskAnswerSource, streamAskQuestion } from './server-actions';
 import { useSearch, useSearchLink } from './useSearch';
 import { Link } from '../primitives';
 
-/**
- * Store the state of the answer in a global state so that it can be
- * accessed from anywhere to show a loading indicator.
- */
-export const searchAskState = atom<
+type SearchState =
     | {
           type: 'answer';
-          answer: AskAnswerResult | null;
+          answer: AskAnswerResult;
       }
     | {
           type: 'error';
       }
     | {
           type: 'loading';
-      }
-    | null
->({
+      };
+
+/**
+- * Store the state of the answer in a global state so that it can be
+- * accessed from anywhere to show a loading indicator.
+- */
+export const searchAskState = atom<SearchState | null>({
     key: 'searchAskState',
     default: null,
 });
@@ -37,12 +40,13 @@ export const searchAskState = atom<
 /**
  * Fetch and render the answers to a question.
  */
-export function SearchAskAnswer(props: { spaceId: string; query: string }) {
-    const { spaceId, query } = props;
+export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: string }) {
+    const { pointer, query } = props;
 
     const language = useLanguage();
     const [, setSearchState] = useSearch();
     const [state, setState] = useRecoilState(searchAskState);
+    const { organizationId, siteId, siteSpaceId } = pointer;
 
     React.useEffect(() => {
         let cancelled = false;
@@ -52,7 +56,9 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
         });
 
         (async () => {
-            const stream = iterateStreamResponse(streamAskQuestion(spaceId, query));
+            const stream = iterateStreamResponse(
+                streamAskQuestion(organizationId, siteId, siteSpaceId ?? null, query),
+            );
 
             setSearchState((prev) =>
                 prev
@@ -68,7 +74,6 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
                 if (cancelled) {
                     return;
                 }
-
                 setState({
                     type: 'answer',
                     answer: chunk,
@@ -91,7 +96,7 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
                 cancelled = true;
             }
         };
-    }, [spaceId, query, setSearchState, setState]);
+    }, [organizationId, siteId, siteSpaceId, query]);
 
     React.useEffect(() => {
         return () => {
@@ -108,15 +113,9 @@ export function SearchAskAnswer(props: { spaceId: string; query: string }) {
     return (
         <div className={tcls('max-h-[60vh]', 'overflow-y-auto')}>
             {state?.type === 'answer' ? (
-                <>
-                    {state.answer ? (
-                        <React.Suspense fallback={loading}>
-                            <TransitionAnswerBody answer={state.answer} placeholder={loading} />
-                        </React.Suspense>
-                    ) : (
-                        <div className={tcls('p-4')}>{t(language, 'search_ask_no_answer')}</div>
-                    )}
-                </>
+                <React.Suspense fallback={loading}>
+                    <TransitionAnswerBody answer={state.answer} placeholder={loading} />
+                </React.Suspense>
             ) : null}
             {state?.type === 'error' ? (
                 <div className={tcls('p-4')}>{t(language, 'search_ask_error')}</div>
@@ -159,7 +158,7 @@ function AnswerBody(props: { answer: AskAnswerResult }) {
             <div
                 data-test="search-ask-answer"
                 className={tcls(
-                    'mt-4',
+                    'my-4',
                     'sm:mt-6',
                     'px-4',
                     'sm:px-12',
@@ -167,16 +166,16 @@ function AnswerBody(props: { answer: AskAnswerResult }) {
                     'dark:text-light/8',
                 )}
             >
-                {answer.hasAnswer ? answer.body : t(language, 'search_ask_no_answer')}
+                {answer.body ?? t(language, 'search_ask_no_answer')}
                 {answer.followupQuestions.length > 0 ? (
                     <AnswerFollowupQuestions followupQuestions={answer.followupQuestions} />
                 ) : null}
             </div>
             {answer.sources.length > 0 ? (
                 <AnswerSources
-                    hasAnswer={answer.hasAnswer}
                     sources={answer.sources}
                     language={language}
+                    hasAnswer={Boolean(answer.body)}
                 />
             ) : null}
         </>
@@ -233,7 +232,7 @@ function AnswerFollowupQuestions(props: { followupQuestions: string[] }) {
 function AnswerSources(props: {
     sources: AskAnswerSource[];
     language: TranslationLanguage;
-    hasAnswer?: boolean;
+    hasAnswer: boolean;
 }) {
     const { sources, language, hasAnswer } = props;
 
