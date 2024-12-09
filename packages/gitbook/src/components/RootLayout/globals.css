@@ -11,7 +11,7 @@
 
         --light-1: color-mix(in srgb, rgb(var(--tint-color-600)), rgb(var(--light-base)) 99%);
         --light-DEFAULT: color-mix(in srgb, rgb(var(--tint-color-700)), rgb(var(--light-base)) 96%);
-        --light-2: color-mix(in srgb, rgb(var(--tint-color-700)), rgb(var(--light-base)) 92%);
+        --light-2: color-mix(in srgb, rgb(var(--tint-color-700)), rgb(var(--light-base)) 94%);
         --light-3: color-mix(in srgb, rgb(var(--tint-color-800)), rgb(var(--light-base)) 88%);
         --light-4: color-mix(in srgb, rgb(var(--tint-color-800)), rgb(var(--light-base)) 72%);
 
