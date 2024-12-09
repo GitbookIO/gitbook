@@ -1,14 +1,19 @@
 import { argosScreenshot } from '@argos-ci/playwright';
 import {
+    CustomizationBackground,
+    CustomizationCorners,
+    CustomizationFont,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
     CustomizationLocale,
+    CustomizationThemeMode,
     SiteCustomizationSettings,
 } from '@gitbook/api';
 import { test, expect, Page } from '@playwright/test';
 import jwt from 'jsonwebtoken';
 import rison from 'rison';
 import { DeepPartial } from 'ts-essentials';
+import deepMerge from 'deepmerge';
 
 import { getContentTestURL } from '../tests/utils';
 
@@ -32,6 +37,18 @@ const allLocales: CustomizationLocale[] = [
     CustomizationLocale.Es,
     CustomizationLocale.Ja,
     CustomizationLocale.Zh,
+];
+
+const allThemeModes: CustomizationThemeMode[] = [
+    CustomizationThemeMode.Light,
+    CustomizationThemeMode.Dark,
+];
+
+const allThemePresets: CustomizationHeaderPreset[] = [
+    CustomizationHeaderPreset.Default,
+    CustomizationHeaderPreset.Bold,
+    CustomizationHeaderPreset.Contrast,
+    CustomizationHeaderPreset.Custom,
 ];
 
 async function waitForCookiesDialog(page: Page) {
@@ -435,30 +452,38 @@ const testCases: TestsCase[] = [
     {
         name: 'Customization',
         baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
-        tests: [
+        tests: allThemeModes.flatMap((theme) => [
             {
-                name: 'Without header',
+                name: `Without header - Theme ${theme}`,
                 url: getCustomizationURL({
                     header: {
                         preset: CustomizationHeaderPreset.None,
                         links: [],
                     },
+                    themes: {
+                        default: theme,
+                        toggeable: false,
+                    },
                 }),
                 run: waitForCookiesDialog,
             },
             {
-                name: 'With duotone icons',
+                name: `With duotone icons - Theme ${theme}`,
                 url:
                     'page-options/page-with-icon' +
                     getCustomizationURL({
                         styling: {
                             icons: CustomizationIconsStyle.Duotone,
                         },
+                        themes: {
+                            default: theme,
+                            toggeable: false,
+                        },
                     }),
                 run: waitForCookiesDialog,
             },
             {
-                name: 'With header buttons',
+                name: `With header buttons - Theme ${theme}`,
                 url: getCustomizationURL({
                     header: {
                         preset: CustomizationHeaderPreset.Default,
@@ -475,10 +500,101 @@ const testCases: TestsCase[] = [
                             },
                         ],
                     },
+                    themes: {
+                        default: theme,
+                        toggeable: false,
+                    },
                 }),
                 run: waitForCookiesDialog,
             },
-        ],
+            {
+                name: `Without tint - Default preset - Theme ${theme}`,
+                url: getCustomizationURL({
+                    header: {
+                        preset: CustomizationHeaderPreset.Default,
+                        links: [
+                            {
+                                title: 'Secondary button',
+                                to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                style: 'button-secondary',
+                            },
+                            {
+                                title: 'Primary button',
+                                to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                style: 'button-primary',
+                            },
+                        ],
+                    },
+                    themes: {
+                        default: theme,
+                        toggeable: false,
+                    },
+                }),
+                run: waitForCookiesDialog,
+            },
+            ...allThemePresets.flatMap((preset) => ({
+                name: `With tint - Preset ${preset} - Theme ${theme}`,
+                url: getCustomizationURL({
+                    styling: {
+                        tint: { color: { light: '#346DDB', dark: '#346DDB' } },
+                    },
+                    header: {
+                        preset,
+                        ...(preset === CustomizationHeaderPreset.Custom
+                            ? {
+                                  backgroundColor: { light: '#C62C68', dark: '#EF96B8' },
+                                  linkColor: { light: '#4DDE98', dark: '#0C693D' },
+                              }
+                            : {}),
+                        links: [
+                            {
+                                title: 'Secondary button',
+                                to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                style: 'button-secondary',
+                            },
+                            {
+                                title: 'Primary button',
+                                to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                style: 'button-primary',
+                            },
+                        ],
+                    },
+                    themes: {
+                        default: theme,
+                        toggeable: false,
+                    },
+                }),
+                run: waitForCookiesDialog,
+            })),
+            {
+                name: `With tint - Legacy background match - Theme ${theme}`,
+                url: getCustomizationURL({
+                    styling: {
+                        background: CustomizationBackground.Match,
+                    },
+                    header: {
+                        preset: CustomizationHeaderPreset.Default,
+                        links: [
+                            {
+                                title: 'Secondary button',
+                                to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                style: 'button-secondary',
+                            },
+                            {
+                                title: 'Primary button',
+                                to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                style: 'button-primary',
+                            },
+                        ],
+                    },
+                    themes: {
+                        default: theme,
+                        toggeable: false,
+                    },
+                }),
+                run: waitForCookiesDialog,
+            },
+        ]),
     },
     {
         name: 'Ads',
@@ -848,7 +964,62 @@ for (const testCase of testCases) {
  * Create a URL with customization settings.
  */
 function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettings>): string {
-    const encoded = rison.encode_object(partial);
+    /**
+     * Default customization settings.
+     *
+     * The customization object passed to the URL should be a valid API settings object. Hence we extend the test with necessary defaults.
+     */
+    const DEFAULT_CUSTOMIZATION: SiteCustomizationSettings = {
+        styling: {
+            primaryColor: { light: '#346DDB', dark: '#346DDB' },
+            corners: CustomizationCorners.Rounded,
+            font: CustomizationFont.Inter,
+            background: CustomizationBackground.Plain,
+            icons: CustomizationIconsStyle.Regular,
+        },
+        internationalization: {
+            locale: CustomizationLocale.En,
+        },
+        favicon: {},
+        header: {
+            preset: CustomizationHeaderPreset.Default,
+            links: [],
+        },
+        footer: {
+            groups: [],
+        },
+        themes: {
+            default: CustomizationThemeMode.Light,
+            toggeable: true,
+        },
+        pdf: {
+            enabled: true,
+        },
+        feedback: {
+            enabled: false,
+        },
+        aiSearch: {
+            enabled: true,
+        },
+        advancedCustomization: {
+            enabled: true,
+        },
+        git: {
+            showEditLink: false,
+        },
+        pagination: {
+            enabled: true,
+        },
+        trademark: {
+            enabled: true,
+        },
+        privacyPolicy: {
+            url: 'https://www.gitbook.com/privacy',
+        },
+        socialPreview: {},
+    };
+
+    const encoded = rison.encode_object(deepMerge(DEFAULT_CUSTOMIZATION, partial));
 
     const searchParams = new URLSearchParams();
     searchParams.set('customization', encoded);

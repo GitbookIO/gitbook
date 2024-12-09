@@ -25,7 +25,11 @@ export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
 
     return (
         /* Ensure images dont expand to the size of the container where this Image may be nested in. Now it's always nested in a size-restricted container */
-        <span className={tcls(size !== 'line' ? ['inline-flex', 'max-w-[300px]'] : null)}>
+        <span
+            className={tcls(
+                size !== 'line' ? ['inline-flex', 'max-w-[300px]', 'align-middle'] : null,
+            )}
+        >
             <Image
                 alt={inline.data.caption ?? ''}
                 sizes={await getImageSizes(size, src)}
