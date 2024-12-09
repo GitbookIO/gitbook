@@ -13,6 +13,7 @@ import { test, expect, Page } from '@playwright/test';
 import jwt from 'jsonwebtoken';
 import rison from 'rison';
 import { DeepPartial } from 'ts-essentials';
+import deepMerge from 'deepmerge';
 
 import { getContentTestURL } from '../tests/utils';
 
@@ -1026,7 +1027,8 @@ function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettings>): s
         privacyPolicy: {},
         socialPreview: {},
     };
-    const encoded = rison.encode_object({ ...DEFAULT_CUSTOMIZATION, ...partial });
+
+    const encoded = rison.encode_object(deepMerge(DEFAULT_CUSTOMIZATION, partial));
 
     const searchParams = new URLSearchParams();
     searchParams.set('customization', encoded);
