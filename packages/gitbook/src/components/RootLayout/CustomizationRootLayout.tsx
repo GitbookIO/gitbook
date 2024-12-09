@@ -1,9 +1,9 @@
 import {
-    CustomizationBackground,
     CustomizationCorners,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
     CustomizationSettings,
+    CustomizationTint,
     SiteCustomizationSettings,
 } from '@gitbook/api';
 import { IconsProvider, IconStyle } from '@gitbook/icons';
@@ -17,11 +17,13 @@ import { getStaticFileURL } from '@/lib/assets';
 import { hexToRgb, shadesOfColor } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
 
-import { ClientContexts } from './ClientContexts';
 import { emojiFontClassName } from '../primitives';
+import { ClientContexts } from './ClientContexts';
 
-import './globals.css';
 import '@gitbook/icons/style.css';
+import './globals.css';
+
+const DEFAULT_TINT_COLOR = '#787878';
 
 /**
  * Layout shared between the content and the PDF renderer.
@@ -36,7 +38,7 @@ export async function CustomizationRootLayout(props: {
     const headerTheme = generateHeaderTheme(customization);
     const language = getSpaceLanguage(customization);
 
-    const defaultTintColor = '#787878';
+    const tintColor = getTintColor(customization);
 
     return (
         <html
@@ -49,7 +51,7 @@ export async function CustomizationRootLayout(props: {
                 customization.styling.corners === CustomizationCorners.Straight
                     ? ' straight-corners'
                     : '',
-                customization.styling.tint ? ' tint' : 'no-tint',
+                tintColor ? ' tint' : 'no-tint',
             )}
         >
             <head>
@@ -64,99 +66,87 @@ export async function CustomizationRootLayout(props: {
                 >{`
                     :root {
                         ${generateColorVariable(
-                            'primary-color',
-                            customization.styling.primaryColor.light,
-                        )}
+                    'primary-color',
+                    customization.styling.primaryColor.light,
+                )}
                         ${
-                            // Generate the right contrast color for each shade of primary-color
-                            generateColorVariable(
-                                'contrast-primary',
-                                Object.fromEntries(
-                                    Object.entries(
-                                        shadesOfColor(customization.styling.primaryColor.light),
-                                    ).map(([index, color]) => [
-                                        index,
-                                        colorContrast(color, ['#000', '#fff']),
-                                    ]),
-                                ),
-                            )
-                        }
+                    // Generate the right contrast color for each shade of primary-color
+                    generateColorVariable(
+                        'contrast-primary',
+                        Object.fromEntries(
+                            Object.entries(
+                                shadesOfColor(customization.styling.primaryColor.light),
+                            ).map(([index, color]) => [
+                                index,
+                                colorContrast(color, ['#000', '#fff']),
+                            ]),
+                        ),
+                    )
+                    }
+
+                        ${generateColorVariable('tint-color', tintColor?.light ?? DEFAULT_TINT_COLOR)}
+                        ${
+                    // Generate the right contrast color for each shade of primary-color
+                    generateColorVariable(
+                        'contrast-tint',
+                        Object.fromEntries(
+                            Object.entries(shadesOfColor(tintColor?.light || DEFAULT_TINT_COLOR)).map(
+                                ([index, color]) => [
+                                    index,
+                                    colorContrast(color, ['#000', '#fff']),
+                                ],
+                            ),
+                        ),
+                    )
+                    }
 
                         ${generateColorVariable(
-                            'tint-color',
-                            customization.styling.tint?.color.light ?? defaultTintColor,
-                        )}
-                        ${
-                            // Generate the right contrast color for each shade of primary-color
-                            generateColorVariable(
-                                'contrast-tint',
-                                Object.fromEntries(
-                                    Object.entries(
-                                        shadesOfColor(
-                                            customization.styling.tint?.color.light ??
-                                                defaultTintColor,
-                                        ),
-                                    ).map(([index, color]) => [
-                                        index,
-                                        colorContrast(color, ['#000', '#fff']),
-                                    ]),
-                                ),
-                            )
-                        }
-
-                        ${generateColorVariable(
-                            'header-background',
-                            headerTheme.backgroundColor.light,
-                        )}
+                        'header-background',
+                        headerTheme.backgroundColor.light,
+                    )}
                         ${generateColorVariable('header-link', headerTheme.linkColor.light)}
                         ${generateColorVariable('header-button-text', colorContrast(headerTheme.linkColor.light as string, ['#000', '#fff']))}
                     }
                     .dark {
                         ${generateColorVariable(
-                            'primary-color',
-                            customization.styling.primaryColor.dark,
-                        )}
+                        'primary-color',
+                        customization.styling.primaryColor.dark,
+                    )}
                         ${
-                            // Generate the right contrast color for each shade of primary-color
-                            generateColorVariable(
-                                'contrast-primary',
-                                Object.fromEntries(
-                                    Object.entries(
-                                        shadesOfColor(customization.styling.primaryColor.dark),
-                                    ).map(([index, color]) => [
-                                        index,
-                                        colorContrast(color, ['#000', '#fff']),
-                                    ]),
-                                ),
-                            )
-                        }
+                    // Generate the right contrast color for each shade of primary-color
+                    generateColorVariable(
+                        'contrast-primary',
+                        Object.fromEntries(
+                            Object.entries(
+                                shadesOfColor(customization.styling.primaryColor.dark),
+                            ).map(([index, color]) => [
+                                index,
+                                colorContrast(color, ['#000', '#fff']),
+                            ]),
+                        ),
+                    )
+                    }
+
+                        ${generateColorVariable('tint-color', tintColor?.dark ?? DEFAULT_TINT_COLOR)}
+                        ${
+                    // Generate the right contrast color for each shade of primary-color
+                    generateColorVariable(
+                        'contrast-tint',
+                        Object.fromEntries(
+                            Object.entries(shadesOfColor(tintColor?.dark || DEFAULT_TINT_COLOR)).map(
+                                ([index, color]) => [
+                                    index,
+                                    colorContrast(color, ['#000', '#fff']),
+                                ],
+                            ),
+                        ),
+                    )
+                    }
 
                         ${generateColorVariable(
-                            'tint-color',
-                            customization.styling.tint?.color.dark ?? defaultTintColor,
-                        )}
-                        ${
-                            // Generate the right contrast color for each shade of primary-color
-                            generateColorVariable(
-                                'contrast-tint',
-                                Object.fromEntries(
-                                    Object.entries(
-                                        shadesOfColor(
-                                            customization.styling.tint?.color.dark ??
-                                                defaultTintColor,
-                                        ),
-                                    ).map(([index, color]) => [
-                                        index,
-                                        colorContrast(color, ['#000', '#fff']),
-                                    ]),
-                                ),
-                            )
-                        }
-
-                        ${generateColorVariable(
-                            'header-background',
-                            headerTheme.backgroundColor.dark,
-                        )}
+                        'header-background',
+                        headerTheme.backgroundColor.dark,
+                    )}
                         ${generateColorVariable('header-link', headerTheme.linkColor.dark)}
                         ${generateColorVariable('header-button-text', colorContrast(headerTheme.linkColor.dark as string, ['#000', '#fff']))}
                     }
@@ -192,6 +182,19 @@ export async function CustomizationRootLayout(props: {
     );
 }
 
+/**
+ * Get the tint color from the customization settings.
+ * If the tint color is not set or it is a space customization, it will return the default color.
+ */
+export function getTintColor(customization: CustomizationSettings | SiteCustomizationSettings): CustomizationTint['color'] | undefined {
+    if ('tint' in customization.styling && customization.styling.tint) {
+        return {
+            light: customization.styling.tint?.color.light ?? DEFAULT_TINT_COLOR,
+            dark: customization.styling.tint?.color.dark ?? DEFAULT_TINT_COLOR,
+        };
+    }
+}
+
 type ColorInput = string | Record<string, string>;
 function generateColorVariable(name: string, color: ColorInput) {
     const shades: Record<string, string> = typeof color === 'string' ? shadesOfColor(color) : color;
@@ -209,6 +212,9 @@ function generateHeaderTheme(customization: CustomizationSettings | SiteCustomiz
     backgroundColor: { light: ColorInput; dark: ColorInput };
     linkColor: { light: ColorInput; dark: ColorInput };
 } {
+
+    const tintColor = getTintColor(customization);
+
     switch (customization.header.preset) {
         case CustomizationHeaderPreset.None:
         case CustomizationHeaderPreset.Default: {
@@ -227,22 +233,22 @@ function generateHeaderTheme(customization: CustomizationSettings | SiteCustomiz
             return {
                 backgroundColor: {
                     light:
-                        customization.styling.tint?.color.light ??
+                        tintColor?.light ??
                         customization.styling.primaryColor.light,
                     dark:
-                        customization.styling.tint?.color.dark ??
+                        tintColor?.dark ??
                         customization.styling.primaryColor.dark,
                 },
                 linkColor: {
                     light: colorContrast(
-                        customization.styling.tint?.color.light ??
-                            customization.styling.primaryColor.light,
+                        tintColor?.light ??
+                        customization.styling.primaryColor.light,
                         [colors.white, colors.black],
                         'aaa',
                     ),
                     dark: colorContrast(
-                        customization.styling.tint?.color.dark ??
-                            customization.styling.primaryColor.dark,
+                        tintColor?.dark ??
+                        customization.styling.primaryColor.dark,
                         [colors.white, colors.black],
                         'aaa',
                     ),
@@ -265,29 +271,29 @@ function generateHeaderTheme(customization: CustomizationSettings | SiteCustomiz
             return {
                 backgroundColor: {
                     light:
-                        customization.styling.tint?.color.light ??
+                        tintColor?.light ??
                         customization.header.backgroundColor?.light ??
                         colors.white,
                     dark:
-                        customization.styling.tint?.color.dark ??
+                        tintColor?.dark ??
                         customization.header.backgroundColor?.dark ??
                         colors.black,
                 },
                 linkColor: {
                     light:
                         customization.header.linkColor?.light ??
-                        (customization.styling.tint?.color.light &&
+                        (tintColor?.light &&
                             colorContrast(
-                                customization.styling.tint?.color.light,
+                                tintColor.light,
                                 [colors.white, colors.black],
                                 'aaa',
                             )) ??
                         customization.styling.primaryColor.light,
                     dark:
                         customization.header.linkColor?.dark ??
-                        (customization.styling.tint?.color.dark &&
+                        (tintColor?.dark &&
                             colorContrast(
-                                customization.styling.tint?.color.dark,
+                                tintColor.dark,
                                 [colors.white, colors.black],
                                 'aaa',
                             )) ??
