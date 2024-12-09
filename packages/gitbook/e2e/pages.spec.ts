@@ -462,6 +462,7 @@ const testCases: TestsCase[] = [
                     },
                     themes: {
                         default: theme,
+                        toggeable: false,
                     },
                 }),
                 run: waitForCookiesDialog,
@@ -476,6 +477,7 @@ const testCases: TestsCase[] = [
                         },
                         themes: {
                             default: theme,
+                            toggeable: false,
                         },
                     }),
                 run: waitForCookiesDialog,
@@ -500,6 +502,7 @@ const testCases: TestsCase[] = [
                     },
                     themes: {
                         default: theme,
+                        toggeable: false,
                     },
                 }),
                 run: waitForCookiesDialog,
@@ -524,6 +527,7 @@ const testCases: TestsCase[] = [
                     },
                     themes: {
                         default: theme,
+                        toggeable: false,
                     },
                 }),
                 run: waitForCookiesDialog,
@@ -557,6 +561,7 @@ const testCases: TestsCase[] = [
                     },
                     themes: {
                         default: theme,
+                        toggeable: false,
                     },
                 }),
                 run: waitForCookiesDialog,
@@ -584,6 +589,7 @@ const testCases: TestsCase[] = [
                     },
                     themes: {
                         default: theme,
+                        toggeable: false,
                     },
                 }),
                 run: waitForCookiesDialog,
