@@ -450,16 +450,19 @@ async function lookupSiteOrSpaceInMultiIdMode(
 
     // Get the auth token from the URL query
     const AUTH_TOKEN_QUERY = 'token';
+    const AUTH_TOKEN_CONTEXT = 'context';
     const API_ENDPOINT_QUERY = 'api';
     const cookieName = `gitbook-token-${source.id}`;
 
-    const { apiToken, apiEndpoint } = url.searchParams.has(AUTH_TOKEN_QUERY)
+    const { apiToken, apiTokenContext, apiEndpoint } = url.searchParams.has(AUTH_TOKEN_QUERY)
         ? {
               apiToken: url.searchParams.get(AUTH_TOKEN_QUERY) ?? '',
+              apiTokenContext: url.searchParams.get(AUTH_TOKEN_CONTEXT) ?? '',
               apiEndpoint: url.searchParams.get(API_ENDPOINT_QUERY) ?? undefined,
           }
         : (decodeGitBookTokenCookie(source.id, request.cookies.get(cookieName)?.value) ?? {
               apiToken: undefined,
+              apiTokenContext: undefined,
               apiEndpoint: undefined,
           });
 
@@ -477,12 +480,11 @@ async function lookupSiteOrSpaceInMultiIdMode(
         throw new Error('Collection is not supported in multi-id mode');
     }
 
-    const contextKey = decoded.claims ? hash(decoded.claims) : undefined;
     const gitbookAPI = new GitBookAPIWithContextKey({
         endpoint: apiEndpoint ?? api().endpoint,
         authToken: apiToken,
         userAgent: userAgent(),
-        contextKey,
+        contextKey: apiTokenContext,
     });
 
     // Verify access to the space to avoid leaking cached data in this mode
@@ -505,7 +507,7 @@ async function lookupSiteOrSpaceInMultiIdMode(
 
     const cookies: LookupCookies = {
         [cookieName]: {
-            value: encodeGitBookTokenCookie(source.id, apiToken, apiEndpoint),
+            value: encodeGitBookTokenCookie(source.id, apiToken, apiTokenContext, apiEndpoint),
             options: {
                 httpOnly: true,
                 maxAge: 60 * 30,
@@ -516,10 +518,15 @@ async function lookupSiteOrSpaceInMultiIdMode(
     };
 
     // Get rid of the token from the URL
-    if (url.searchParams.has(AUTH_TOKEN_QUERY) || url.searchParams.has(API_ENDPOINT_QUERY)) {
+    if (
+        url.searchParams.has(AUTH_TOKEN_QUERY) ||
+        url.searchParams.has(API_ENDPOINT_QUERY) ||
+        url.searchParams.has(AUTH_TOKEN_CONTEXT)
+    ) {
         const withoutToken = new URL(url);
         withoutToken.searchParams.delete(AUTH_TOKEN_QUERY);
         withoutToken.searchParams.delete(API_ENDPOINT_QUERY);
+        withoutToken.searchParams.delete(AUTH_TOKEN_CONTEXT);
 
         return {
             target: 'external',
@@ -836,7 +843,9 @@ function encodePathname(pathname: string): string {
 function decodeGitBookTokenCookie(
     sourceId: string,
     cookie: string | undefined,
-): { apiToken: string; apiEndpoint: string | undefined } | undefined {
+):
+    | { apiToken: string; apiTokenContext: string | undefined; apiEndpoint: string | undefined }
+    | undefined {
     if (!cookie) {
         return;
     }
@@ -846,6 +855,7 @@ function decodeGitBookTokenCookie(
         if (typeof parsed.t === 'string' && parsed.s === sourceId) {
             return {
                 apiToken: parsed.t,
+                apiTokenContext: typeof parsed.c === 'string' ? parsed.c : undefined,
                 apiEndpoint: typeof parsed.e === 'string' ? parsed.e : undefined,
             };
         }
@@ -857,9 +867,10 @@ function decodeGitBookTokenCookie(
 function encodeGitBookTokenCookie(
     spaceId: string,
     token: string,
+    context: string | undefined,
     apiEndpoint: string | undefined,
 ): string {
-    return JSON.stringify({ s: spaceId, t: token, e: apiEndpoint });
+    return JSON.stringify({ s: spaceId, t: token, c: context, e: apiEndpoint });
 }
 
 function writeCookies<R extends NextResponse>(
