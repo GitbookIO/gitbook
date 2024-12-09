@@ -47,147 +47,156 @@ export function Header(props: {
                 'flex-none',
                 'shadow-thinbottom',
                 'dark:shadow-light/2',
+                'bg-light',
+                'dark:bg-dark',
                 withTopHeader ? null : 'lg:hidden',
-                isCustomizationDefault || !withTopHeader
-                    ? ['bg-light', 'dark:bg-dark']
-                    : ['bg-header-background', 'bg-header-background'],
                 'text-sm',
-                isCustomizationDefault
-                    ? [
-                          'bg-opacity-9',
-                          'dark:bg-opacity-9',
-                          'backdrop-blur-lg',
-                          'contrast-more:bg-opacity-11',
-                          'contrast-more:dark:bg-opacity-11',
-                      ]
-                    : null,
+                'bg-opacity-9',
+                'dark:bg-opacity-9',
+                'backdrop-blur-lg',
+                'contrast-more:bg-opacity-11',
+                'contrast-more:dark:bg-opacity-11',
             )}
         >
-            <div className={tcls('scroll-nojump')}>
-                <div
-                    className={tcls(
-                        'gap-4',
-                        'lg:gap-8',
-                        'flex',
-                        'h-16',
-                        'items-center',
-                        'justify-between',
-                        'w-full',
-                        CONTAINER_STYLE,
-                    )}
-                >
-                    <div className="flex max-w-full shrink min-w-0 gap-2 lg:gap-4 justify-start items-center">
-                        <HeaderMobileMenu
-                            className={tcls(
-                                'lg:hidden',
-                                '-ml-2',
-                                customization.header.preset === CustomizationHeaderPreset.Default
-                                    ? ['text-dark', 'dark:text-light']
-                                    : 'text-header-link',
-                            )}
-                        />
-                        <HeaderLogo site={site} space={space} customization={customization} />
-                        {!hasSiteSections && isMultiVariants ? (
-                            <div className="z-20 shrink hidden sm:block">
-                                <SpacesDropdown space={space} spaces={spaces} />
-                            </div>
-                        ) : null}
-                    </div>
-
-                    {customization.header.links.length > 0 && (
-                        <HeaderLinks>
-                            {customization.header.links.map((link, index) => {
-                                return (
-                                    <HeaderLink
-                                        key={index}
-                                        link={link}
-                                        context={context}
-                                        customization={customization}
-                                    />
-                                );
-                            })}
-                            <HeaderLinkMore
-                                label={t(getSpaceLanguage(customization), 'more')}
-                                links={customization.header.links}
-                                context={context}
-                                customization={customization}
-                            />
-                        </HeaderLinks>
-                    )}
+            <div
+                className={tcls(
+                    !isCustomizationDefault && [
+                        'bg-header-background',
+                        'shadow-thinbottom',
+                        'dark:shadow-light/2',
+                    ],
+                )}
+            >
+                <div className={tcls('scroll-nojump')}>
                     <div
                         className={tcls(
+                            'gap-4',
+                            'lg:gap-8',
                             'flex',
-                            'md:w-56',
-                            'grow-0',
-                            'shrink-0',
-                            'justify-self-end',
+                            'h-16',
+                            'items-center',
+                            'justify-between',
+                            'w-full',
+                            CONTAINER_STYLE,
                         )}
                     >
-                        <Suspense fallback={null}>
-                            <SearchButton
-                                style={
-                                    !isCustomizationDefault && withTopHeader
-                                        ? [
-                                              // 'bg-transparent',
-                                              // 'dark:bg-transparent',
-                                              'bg-header-link/2',
-                                              'dark:bg-header-link/2',
-                                              'hover:bg-header-link/3',
-                                              'dark:hover:bg-header-link/3',
+                        <div className="flex max-w-full shrink min-w-0 gap-2 lg:gap-4 justify-start items-center">
+                            <HeaderMobileMenu
+                                className={tcls(
+                                    'lg:hidden',
+                                    '-ml-2',
+                                    customization.header.preset ===
+                                        CustomizationHeaderPreset.Default
+                                        ? ['text-dark', 'dark:text-light']
+                                        : 'text-header-link',
+                                )}
+                            />
+                            <HeaderLogo site={site} space={space} customization={customization} />
+                            {!hasSiteSections && isMultiVariants ? (
+                                <div className="z-20 shrink hidden sm:block">
+                                    <SpacesDropdown space={space} spaces={spaces} />
+                                </div>
+                            ) : null}
+                        </div>
 
-                                              'text-header-link/8',
-                                              'dark:text-header-link/8',
-                                              'hover:text-header-link',
-                                              'dark:hover:text-header-link',
+                        {customization.header.links.length > 0 && (
+                            <HeaderLinks>
+                                {customization.header.links.map((link, index) => {
+                                    return (
+                                        <HeaderLink
+                                            key={index}
+                                            link={link}
+                                            context={context}
+                                            customization={customization}
+                                        />
+                                    );
+                                })}
+                                <HeaderLinkMore
+                                    label={t(getSpaceLanguage(customization), 'more')}
+                                    links={customization.header.links}
+                                    context={context}
+                                    customization={customization}
+                                />
+                            </HeaderLinks>
+                        )}
+                        <div
+                            className={tcls(
+                                'flex',
+                                'md:w-56',
+                                'grow-0',
+                                'shrink-0',
+                                'justify-self-end',
+                            )}
+                        >
+                            <Suspense fallback={null}>
+                                <SearchButton
+                                    style={
+                                        !isCustomizationDefault && withTopHeader
+                                            ? [
+                                                  // 'bg-transparent',
+                                                  // 'dark:bg-transparent',
+                                                  'bg-header-link/2',
+                                                  'dark:bg-header-link/2',
+                                                  'hover:bg-header-link/3',
+                                                  'dark:hover:bg-header-link/3',
 
-                                              'ring-header-link/4',
-                                              'dark:ring-header-link/4',
-                                              'hover:ring-header-link/5',
-                                              'dark:hover:ring-header-link/5',
+                                                  'text-header-link/8',
+                                                  'dark:text-header-link/8',
+                                                  'hover:text-header-link',
+                                                  'dark:hover:text-header-link',
 
-                                              '[&_svg]:text-header-link/10',
-                                              'dark:[&_svg]:text-header-link/10',
-                                              '[&_.shortcut]:text-header-link/8',
-                                              'dark:[&_.shortcut]:text-header-link/8',
+                                                  'ring-header-link/4',
+                                                  'dark:ring-header-link/4',
+                                                  'hover:ring-header-link/5',
+                                                  'dark:hover:ring-header-link/5',
 
-                                              'shadow-none',
-                                              'hover:shadow-none',
-                                              // 'bg-primary',
-                                              // 'text-contrast-primary/6',
-                                              // 'ring-contrast-primary/1',
-                                              // 'bg-header-link/3',
-                                              //   'shadow-sm',
-                                              // 'ring-header-link/3',
-                                              // '[&>span]:!text-header-link/7',
-                                              // '[&_svg]:text-header-link',
-                                              //   'contrast-more:bg-transparent',
-                                              //   'contrast-more:ring-header-link',
-                                              //   'contrast-more:[&>span]:!text-header-link',
-                                              //   'dark:bg-header-link/3',
-                                              //   'dark:ring-header-link/3',
-                                              //   '[&>span]:!text-header-link/7',
-                                              //   'dark:[&_svg]:text-header-link',
-                                              //   'dark:contrast-more:bg-transparent',
-                                              //   'dark:contrast-more:ring-header-link',
-                                              //   'dark:contrast-more:[&>span]:!text-header-link',
-                                          ]
-                                        : null
-                                }
-                            >
-                                <span className={tcls('flex-1')}>
-                                    {t(
-                                        getSpaceLanguage(customization),
-                                        customization.aiSearch.enabled ? 'search_or_ask' : 'search',
-                                    )}
-                                </span>
-                            </SearchButton>
-                        </Suspense>
+                                                  '[&_svg]:text-header-link/10',
+                                                  'dark:[&_svg]:text-header-link/10',
+                                                  '[&_.shortcut]:text-header-link/8',
+                                                  'dark:[&_.shortcut]:text-header-link/8',
+
+                                                  'shadow-none',
+                                                  'hover:shadow-none',
+                                                  // 'bg-primary',
+                                                  // 'text-contrast-primary/6',
+                                                  // 'ring-contrast-primary/1',
+                                                  // 'bg-header-link/3',
+                                                  //   'shadow-sm',
+                                                  // 'ring-header-link/3',
+                                                  // '[&>span]:!text-header-link/7',
+                                                  // '[&_svg]:text-header-link',
+                                                  //   'contrast-more:bg-transparent',
+                                                  //   'contrast-more:ring-header-link',
+                                                  //   'contrast-more:[&>span]:!text-header-link',
+                                                  //   'dark:bg-header-link/3',
+                                                  //   'dark:ring-header-link/3',
+                                                  //   '[&>span]:!text-header-link/7',
+                                                  //   'dark:[&_svg]:text-header-link',
+                                                  //   'dark:contrast-more:bg-transparent',
+                                                  //   'dark:contrast-more:ring-header-link',
+                                                  //   'dark:contrast-more:[&>span]:!text-header-link',
+                                              ]
+                                            : null
+                                    }
+                                >
+                                    <span className={tcls('flex-1')}>
+                                        {t(
+                                            getSpaceLanguage(customization),
+                                            customization.aiSearch.enabled
+                                                ? 'search_or_ask'
+                                                : 'search',
+                                        )}
+                                    </span>
+                                </SearchButton>
+                            </Suspense>
+                        </div>
                     </div>
                 </div>
             </div>
             {sections ? (
                 <div
                     className={tcls(
+                        'scroll-nojump',
                         'w-full',
                         // Handle long section tabs, particularly on smaller screens.
                         'overflow-x-auto hide-scroll',
