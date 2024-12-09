@@ -6,7 +6,7 @@ export const en = {
     switch_to_light_theme: 'Switch to light theme',
     switch_to_system_theme: 'Switch to system theme',
     search: 'Search',
-    search_or_ask: 'Ask or Search',
+    search_or_ask: 'Search or ask...',
     search_input_placeholder: 'Search content',
     search_ask_input_placeholder: 'Search content or ask a question',
     search_no_results: 'No results for "${1}".',

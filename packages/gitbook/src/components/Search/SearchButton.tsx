@@ -1,6 +1,7 @@
 'use client';
 
 import { Icon } from '@gitbook/icons';
+import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
 import { useLanguage, tString } from '@/intl/client';
@@ -35,45 +36,55 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'flex-row',
                 'justify-center',
                 'items-center',
-                'px-2',
-                'gap-3',
-                'text-dark/7',
-                'min-h-[2.5rem]',
-                'w-[2.5rem]',
+                'w-full',
+                'px-3',
+                'py-2',
+                'gap-2',
+
+                'bg-light',
+                'dark:bg-dark',
+
+                'ring-1',
+                'ring-dark/1',
+                'dark:ring-light/2',
+
+                'shadow',
+                'dark:shadow-none',
+
+                'text-dark/6',
+                'dark:text-light/6',
+
                 'rounded-lg',
                 'straight-corners:rounded-none',
-                'bg-dark/2',
-                'transition-colors',
-                'transition-opacity',
-                'ease-out',
-                'hover:opacity-8',
-                'ring-1',
-                'ring-inset',
-                'ring-dark/1',
+
                 'contrast-more:ring-dark',
-                'contrast-more:bg-light',
                 'contrast-more:text-dark',
-                'dark:bg-light/1',
-                'dark:ring-light/1',
-                'dark:text-light/7',
                 'contrast-more:dark:ring-light',
-                'contrast-more:dark:bg-dark',
                 'contrast-more:dark:text-light',
-                '[&>p]:hidden',
-                '[&>span]:hidden',
+
+                'transition-all',
+                'hover:shadow-md',
+                'hover:scale-102',
+                'dark:hover:bg-dark-3',
+                'hover:ring-dark/2',
+                'hover:text-dark/10',
+                'dark:hover:ring-light/4',
+                'dark:hover:text-light',
+
+                'active:shadow-sm',
+                'active:scale-98',
+
                 'md:justify-start',
-                'md:[&>p]:flex',
-                'md:[&>span]:flex',
+                'flex',
                 'md:w-full',
-                'md:px-3.5',
-                'text-base',
                 style,
             )}
         >
-            <div className={tcls('text-dark/7', 'pt-1.5', 'pb-2', 'dark:text-light/7')}>
-                <Icon icon="magnifying-glass" className={tcls('shrink-0', 'size-4')} />
-            </div>
-            {children}
+            <Icon
+                icon="magnifying-glass"
+                className={tcls('text-dark/8', 'dark:text-light/8', 'shrink-0', 'size-4')}
+            />
+            <div className={tcls('w-full', 'hidden', 'md:block', 'text-left')}>{children}</div>
             <Shortcut />
         </button>
     );
@@ -96,20 +107,22 @@ const Shortcut = () => {
     }, []);
 
     return (
-        <span
+        <div
             className={tcls(
+                'shortcut',
                 'hidden',
                 'md:inline',
                 'justify-end',
                 'text-xs',
-                'text-dark/5',
+                'text-dark/6',
                 'contrast-more:text-dark',
-                'dark:text-light/5',
+                'dark:text-light/6',
+                'whitespace-nowrap',
                 'contrast-more:dark:text-light',
                 `[font-feature-settings:"calt",_"case"]`,
             )}
         >
             {operatingSystem === 'mac' ? '⌘' : 'Ctrl +'} K
-        </span>
+        </div>
     );
 };
