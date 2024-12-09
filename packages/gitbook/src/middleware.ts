@@ -481,6 +481,8 @@ async function lookupSiteOrSpaceInMultiIdMode(
         throw new Error('Collection is not supported in multi-id mode');
     }
 
+    const decodedClaims = decoded.claims ? sanitizeJWTTokenClaims(decoded.claims) : undefined;
+    const contextKey = decodedClaims ? hash(decodedClaims) : undefined;
     const gitbookAPI = new GitBookAPI({
         endpoint: apiEndpoint ?? api().client.endpoint,
         authToken: apiToken,
@@ -490,7 +492,7 @@ async function lookupSiteOrSpaceInMultiIdMode(
     // Verify access to the space to avoid leaking cached data in this mode
     // (the cache is not dependend on the auth token, so it could leak data)
     if (source.kind === 'space') {
-        await withAPI({ client: gitbookAPI, contextKey: apiTokenContext }, () =>
+        await withAPI({ client: gitbookAPI, contextKey }, () =>
             getSpace.revalidate(source.id, undefined),
         );
     }
@@ -498,7 +500,7 @@ async function lookupSiteOrSpaceInMultiIdMode(
     // Verify access to the site to avoid leaking cached data in this mode
     // (the cache is not dependend on the auth token, so it could leak data)
     if (source.kind === 'site') {
-        await withAPI({ client: gitbookAPI, contextKey: apiTokenContext }, () =>
+        await withAPI({ client: gitbookAPI, contextKey }, () =>
             getPublishedContentSite.revalidate({
                 organizationId: decoded.organization,
                 siteId: source.id,
@@ -881,4 +883,18 @@ function writeCookies<R extends NextResponse>(
     });
 
     return response;
+}
+
+const EXCLUDED_CLAIMS = ['iat', 'exp', 'iss', 'aud', 'jti', 'ver'];
+
+function sanitizeJWTTokenClaims(claims: object) {
+    const result: Record<string, unknown> = {};
+
+    Object.entries(claims).forEach(([key, value]) => {
+        if (EXCLUDED_CLAIMS.includes(key)) {
+            return;
+        }
+        result[key] = value;
+    });
+    return result;
 }
