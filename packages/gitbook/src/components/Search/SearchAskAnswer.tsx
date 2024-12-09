@@ -1,3 +1,5 @@
+'use client';
+
 import { Icon } from '@gitbook/icons';
 import React from 'react';
 import { atom, useRecoilState } from 'recoil';
@@ -14,23 +16,23 @@ import { AskAnswerResult, AskAnswerSource, streamAskQuestion } from './server-ac
 import { useSearch, useSearchLink } from './useSearch';
 import { Link } from '../primitives';
 
-/**
- * Store the state of the answer in a global state so that it can be
- * accessed from anywhere to show a loading indicator.
- */
-export const searchAskState = atom<
+type SearchState =
     | {
           type: 'answer';
-          answer: AskAnswerResult | null;
+          answer: AskAnswerResult;
       }
     | {
           type: 'error';
       }
     | {
           type: 'loading';
-      }
-    | null
->({
+      };
+
+/**
+- * Store the state of the answer in a global state so that it can be
+- * accessed from anywhere to show a loading indicator.
+- */
+export const searchAskState = atom<SearchState | null>({
     key: 'searchAskState',
     default: null,
 });
@@ -44,6 +46,7 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
     const language = useLanguage();
     const [, setSearchState] = useSearch();
     const [state, setState] = useRecoilState(searchAskState);
+    const { organizationId, siteId, siteSpaceId } = pointer;
 
     React.useEffect(() => {
         let cancelled = false;
@@ -53,7 +56,9 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
         });
 
         (async () => {
-            const stream = iterateStreamResponse(streamAskQuestion(pointer, query));
+            const stream = iterateStreamResponse(
+                streamAskQuestion(organizationId, siteId, siteSpaceId ?? null, query),
+            );
 
             setSearchState((prev) =>
                 prev
@@ -69,7 +74,6 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
                 if (cancelled) {
                     return;
                 }
-
                 setState({
                     type: 'answer',
                     answer: chunk,
@@ -92,7 +96,7 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
                 cancelled = true;
             }
         };
-    }, [pointer, query, setSearchState, setState]);
+    }, [organizationId, siteId, siteSpaceId, query]);
 
     React.useEffect(() => {
         return () => {
@@ -109,15 +113,9 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
     return (
         <div className={tcls('max-h-[60vh]', 'overflow-y-auto')}>
             {state?.type === 'answer' ? (
-                <>
-                    {state.answer ? (
-                        <React.Suspense fallback={loading}>
-                            <TransitionAnswerBody answer={state.answer} placeholder={loading} />
-                        </React.Suspense>
-                    ) : (
-                        <div className={tcls('p-4')}>{t(language, 'search_ask_no_answer')}</div>
-                    )}
-                </>
+                <React.Suspense fallback={loading}>
+                    <TransitionAnswerBody answer={state.answer} placeholder={loading} />
+                </React.Suspense>
             ) : null}
             {state?.type === 'error' ? (
                 <div className={tcls('p-4')}>{t(language, 'search_ask_error')}</div>
@@ -168,16 +166,16 @@ function AnswerBody(props: { answer: AskAnswerResult }) {
                     'dark:text-light/8',
                 )}
             >
-                {answer.hasAnswer ? answer.body : t(language, 'search_ask_no_answer')}
+                {answer.body ?? t(language, 'search_ask_no_answer')}
                 {answer.followupQuestions.length > 0 ? (
                     <AnswerFollowupQuestions followupQuestions={answer.followupQuestions} />
                 ) : null}
             </div>
             {answer.sources.length > 0 ? (
                 <AnswerSources
-                    hasAnswer={answer.hasAnswer}
                     sources={answer.sources}
                     language={language}
+                    hasAnswer={Boolean(answer.body)}
                 />
             ) : null}
         </>
@@ -234,7 +232,7 @@ function AnswerFollowupQuestions(props: { followupQuestions: string[] }) {
 function AnswerSources(props: {
     sources: AskAnswerSource[];
     language: TranslationLanguage;
-    hasAnswer?: boolean;
+    hasAnswer: boolean;
 }) {
     const { sources, language, hasAnswer } = props;
 
