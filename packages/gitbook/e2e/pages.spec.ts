@@ -1024,7 +1024,9 @@ function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettings>): s
         trademark: {
             enabled: true,
         },
-        privacyPolicy: {},
+        privacyPolicy: {
+            url: 'https://www.gitbook.com/privacy',
+        },
         socialPreview: {},
     };
 
