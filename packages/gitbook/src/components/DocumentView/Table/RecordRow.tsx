@@ -33,7 +33,7 @@ export async function RecordRow(
                             'dark:border-light/2',
                         )}
                     >
-                            <RecordColumnValue key={column} {...props} column={column} />
+                        <RecordColumnValue key={column} {...props} column={column} />
                     </td>
                 );
             })}
