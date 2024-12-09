@@ -68,9 +68,9 @@
     },
     "devDependencies": {
         "@argos-ci/playwright": "^2.0.0",
-        "@playwright/test": "^1.42.1",
         "@cloudflare/next-on-pages": "^1.13.5",
         "@cloudflare/workers-types": "^4.20240725.0",
+        "@playwright/test": "^1.42.1",
         "@types/js-cookie": "^3.0.6",
         "@types/jsontoxml": "^1.0.5",
         "@types/jsonwebtoken": "^9.0.6",
@@ -82,6 +82,8 @@
         "@types/react-dom": "18.3.1",
         "@types/rison": "^0.0.9",
         "autoprefixer": "^10",
+        "deepmerge": "^4.3.1",
+        "env-cmd": "^10.1.0",
         "eslint": "^8",
         "eslint-config-next": "^14.2.5",
         "eslint-plugin-import": "^2.29.1",
@@ -89,8 +91,7 @@
         "postcss": "^8",
         "psi": "^4.1.0",
         "tailwindcss": "^3.4.0",
-        "typescript": "^5.5.3",
-        "env-cmd": "^10.1.0",
-        "ts-essentials": "^10.0.1"
+        "ts-essentials": "^10.0.1",
+        "typescript": "^5.5.3"
     }
 }

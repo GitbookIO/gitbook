@@ -72,9 +72,8 @@ const config: Config = {
                 /** primary-color used to accent elements, these colors remain unchanged when toggling between the CustomizationBackground options**/
                 primary: generateVarShades('primary-color'),
                 'contrast-primary': generateVarShades('contrast-primary'),
-
-                /** primary-base is an internal color that generates the same colors as primary-color. But it's shades will change into a grayscale if CustomizationBackground.Plain is selected. (globals.css) **/
-                primarybase: generateVarShades('primary-base'),
+                tint: generateVarShades('primary-color'),
+                'contrast-tint': generateVarShades('contrast-primary'),
 
                 'header-background': generateVarShades('header-background'),
                 'header-link': generateVarShades('header-link'),
@@ -232,7 +231,12 @@ const config: Config = {
             /**
              * Variant when the space is configured with a theme matching background.
              */
-            addVariant('plain-background', 'html.plain-background &');
+            addVariant('tint', 'html.tint &');
+
+            /**
+             * Variant when the space is configured without a theme matching background.
+             */
+            addVariant('no-tint', 'html.no-tint &');
 
             /**
              * Variant when the page contains a block that will be rendered in full-width mode.

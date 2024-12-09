@@ -5,7 +5,7 @@
 .light .scalar {
     --scalar-color-1: color-mix(
         in srgb,
-        rgb(var(--primary-base-300, 180 180 180)),
+        rgb(var(--tint-color-300, 180 180 180)),
         rgb(var(--dark-base, 23 23 23)) 96%
     );
     --scalar-color-2: color-mix(
@@ -23,12 +23,12 @@
     --scalar-background-1: rgb(var(--light-base, 255 255 255));
     --scalar-background-2: color-mix(
         in srgb,
-        rgb(var(--primary-base-800, 30 30 30)),
+        rgb(var(--tint-color-800, 30 30 30)),
         var(--scalar-background-1) 96%
     );
     --scalar-background-3: color-mix(
         in srgb,
-        rgb(var(--primary-base-800, 30 30 30)),
+        rgb(var(--tint-color-800, 30 30 30)),
         var(--scalar-background-1) 90%
     );
     --scalar-background-accent: #007d9c1f;
@@ -66,7 +66,7 @@
 .dark .scalar {
     --scalar-color-1: color-mix(
         in srgb,
-        rgb(var(--primary-base-700, 70 70 70)),
+        rgb(var(--tint-color-700, 70 70 70)),
         rgb(var(--light-base, 255 255 255)) 100%
     );
     --scalar-color-2: color-mix(
@@ -84,12 +84,12 @@
     --scalar-background-1: rgb(var(--dark-base, 22 22 22));
     --scalar-background-2: color-mix(
         in srgb,
-        rgb(var(--primary-base-200, 200 200 200)),
+        rgb(var(--tint-color-200, 200 200 200)),
         var(--scalar-background-1) 92%
     );
     --scalar-background-3: color-mix(
         in srgb,
-        rgb(var(--primary-base-200, 200 200 200)),
+        rgb(var(--tint-color-200, 200 200 200)),
         var(--scalar-background-1) 88%
     );
     --scalar-background-accent: #8ab4f81f;
