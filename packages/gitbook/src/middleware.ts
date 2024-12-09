@@ -1,4 +1,4 @@
-import { ContentAPITokenPayload } from '@gitbook/api';
+import { ContentAPITokenPayload, GitBookAPI } from '@gitbook/api';
 import { setTag, setContext } from '@sentry/nextjs';
 import assertNever from 'assert-never';
 import jwt from 'jsonwebtoken';
@@ -17,7 +17,6 @@ import {
     DEFAULT_API_ENDPOINT,
     getPublishedContentSite,
     getSiteData,
-    GitBookAPIWithContextKey,
 } from '@/lib/api';
 import { race } from '@/lib/async';
 import { buildVersion } from '@/lib/build';
@@ -110,11 +109,14 @@ export async function middleware(request: NextRequest) {
     const inputURL = stripURLBasePath(url, originBasePath);
 
     const resolved = await withAPI(
-        new GitBookAPIWithContextKey({
-            endpoint: apiEndpoint,
-            authToken: getDefaultAPIToken(apiEndpoint),
-            userAgent: userAgent(),
-        }),
+        {
+            client: new GitBookAPI({
+                endpoint: apiEndpoint,
+                authToken: getDefaultAPIToken(apiEndpoint),
+                userAgent: userAgent(),
+            }),
+            contextKey: undefined,
+        },
         () => lookupSpaceForURL(mode, request, inputURL),
     );
     if ('error' in resolved) {
@@ -158,12 +160,14 @@ export async function middleware(request: NextRequest) {
     const contextKey = 'site' in resolved ? resolved.contextId : undefined;
     const nonce = createContentSecurityPolicyNonce();
     const csp = await withAPI(
-        new GitBookAPIWithContextKey({
-            endpoint: apiEndpoint,
-            authToken: resolved.apiToken,
-            userAgent: userAgent(),
+        {
+            client: new GitBookAPI({
+                endpoint: apiEndpoint,
+                authToken: resolved.apiToken,
+                userAgent: userAgent(),
+            }),
             contextKey,
-        }),
+        },
         async () => {
             const [siteData] = await Promise.all([
                 'site' in resolved
@@ -366,7 +370,7 @@ async function lookupSpaceInSingleMode(url: URL): Promise<LookupResult> {
         );
     }
 
-    const apiToken = getDefaultAPIToken(api().endpoint);
+    const apiToken = getDefaultAPIToken(api().client.endpoint);
     if (!apiToken) {
         throw new Error(
             `Missing GITBOOK_TOKEN environment variable. It should be passed when using GITBOOK_MODE=single.`,
@@ -480,23 +484,24 @@ async function lookupSiteOrSpaceInMultiIdMode(
         throw new Error('Collection is not supported in multi-id mode');
     }
 
-    const gitbookAPI = new GitBookAPIWithContextKey({
-        endpoint: apiEndpoint ?? api().endpoint,
+    const gitbookAPI = new GitBookAPI({
+        endpoint: apiEndpoint ?? api().client.endpoint,
         authToken: apiToken,
         userAgent: userAgent(),
-        contextKey: apiTokenContext,
     });
 
     // Verify access to the space to avoid leaking cached data in this mode
     // (the cache is not dependend on the auth token, so it could leak data)
     if (source.kind === 'space') {
-        await withAPI(gitbookAPI, () => getSpace.revalidate(source.id, undefined));
+        await withAPI({ client: gitbookAPI, contextKey: apiTokenContext }, () =>
+            getSpace.revalidate(source.id, undefined),
+        );
     }
 
     // Verify access to the site to avoid leaking cached data in this mode
     // (the cache is not dependend on the auth token, so it could leak data)
     if (source.kind === 'site') {
-        await withAPI(gitbookAPI, () =>
+        await withAPI({ client: gitbookAPI, contextKey: apiTokenContext }, () =>
             getPublishedContentSite.revalidate({
                 organizationId: decoded.organization,
                 siteId: source.id,

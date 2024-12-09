@@ -18,7 +18,7 @@ export async function postPageFeedback(args: {
         `No siteSpaceId in pointer. organizationId: ${organizationId}, siteId: ${siteId}, pageId: ${args.pageId}`,
     );
 
-    await api().orgs.createSitesPageFeedback(
+    await api().client.orgs.createSitesPageFeedback(
         organizationId,
         siteId,
         siteSpaceId,
