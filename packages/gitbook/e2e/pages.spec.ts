@@ -487,6 +487,18 @@ const testCases: TestsCase[] = [
                     },
                     header: {
                         preset: CustomizationHeaderPreset.Default,
+                        links: [
+                            {
+                                title: 'Secondary button',
+                                to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                style: 'button-secondary',
+                            },
+                            {
+                                title: 'Primary button',
+                                to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                style: 'button-primary',
+                            },
+                        ],
                     },
                 }),
                 run: waitForCookiesDialog,
@@ -499,6 +511,18 @@ const testCases: TestsCase[] = [
                     },
                     header: {
                         preset: CustomizationHeaderPreset.Default,
+                        links: [
+                            {
+                                title: 'Secondary button',
+                                to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                style: 'button-secondary',
+                            },
+                            {
+                                title: 'Primary button',
+                                to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                style: 'button-primary',
+                            },
+                        ],
                     },
                 }),
                 run: waitForCookiesDialog,
@@ -511,6 +535,18 @@ const testCases: TestsCase[] = [
                     },
                     header: {
                         preset: CustomizationHeaderPreset.Bold,
+                        links: [
+                            {
+                                title: 'Secondary button',
+                                to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                style: 'button-secondary',
+                            },
+                            {
+                                title: 'Primary button',
+                                to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                style: 'button-primary',
+                            },
+                        ],
                     },
                 }),
                 run: waitForCookiesDialog,
@@ -523,6 +559,18 @@ const testCases: TestsCase[] = [
                     },
                     header: {
                         preset: CustomizationHeaderPreset.Contrast,
+                        links: [
+                            {
+                                title: 'Secondary button',
+                                to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                style: 'button-secondary',
+                            },
+                            {
+                                title: 'Primary button',
+                                to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                style: 'button-primary',
+                            },
+                        ],
                     },
                 }),
                 run: waitForCookiesDialog,
