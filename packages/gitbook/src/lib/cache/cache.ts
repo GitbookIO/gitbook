@@ -55,6 +55,9 @@ export interface CacheDefinition<Args extends any[], Result> {
     /** Filter the arguments that should be taken into consideration for the cache key */
     getKeyArgs?: (args: Args) => any[];
 
+    /** Returns a precomputed hash that is used alongside arguments to generate the cache key */
+    getKeySuffix?: () => string | undefined;
+
     /** Default ttl (in seconds) */
     defaultTtl?: number;
 
@@ -222,7 +225,8 @@ export function cache<Args extends any[], Result>(
         const [args, { signal }] = extractCacheFunctionOptions<Args>(rawArgs);
 
         const cacheArgs = cacheDef.getKeyArgs ? cacheDef.getKeyArgs(args) : args;
-        const key = getCacheKey(cacheDef.name, cacheArgs);
+        const cacheKeySuffix = cacheDef.getKeySuffix ? cacheDef.getKeySuffix() : undefined;
+        const key = getCacheKey(cacheDef.name, cacheArgs, cacheKeySuffix);
 
         return await trace(
             {
@@ -239,7 +243,8 @@ export function cache<Args extends any[], Result>(
     cacheFn.revalidate = async (...rawArgs: Args | [...Args, CacheFunctionOptions]) => {
         const [args, { signal }] = extractCacheFunctionOptions<Args>(rawArgs);
         const cacheArgs = cacheDef.getKeyArgs ? cacheDef.getKeyArgs(args) : args;
-        const key = getCacheKey(cacheDef.name, cacheArgs);
+        const cacheKeySuffix = cacheDef.getKeySuffix ? cacheDef.getKeySuffix() : undefined;
+        const key = getCacheKey(cacheDef.name, cacheArgs, cacheKeySuffix);
 
         const result = await revalidate(key, signal, ...args);
         return result.data;
@@ -247,7 +252,8 @@ export function cache<Args extends any[], Result>(
 
     cacheFn.hasInMemory = async (...args: Args) => {
         const cacheArgs = cacheDef.getKeyArgs ? cacheDef.getKeyArgs(args) : args;
-        const key = getCacheKey(cacheDef.name, cacheArgs);
+        const cacheKeySuffix = cacheDef.getKeySuffix ? cacheDef.getKeySuffix() : undefined;
+        const key = getCacheKey(cacheDef.name, cacheArgs, cacheKeySuffix);
         const tag = cacheDef.tag?.(...args);
 
         const memoryEntry = await memoryCache.get({ key, tag });
@@ -275,8 +281,13 @@ export function getCache(name: string): CacheFunction<any[], any> | null {
 /**
  * Get a cache key for a function and its arguments.
  */
-export function getCacheKey(fnName: string, args: any[]) {
-    let innerKey = args.map((arg) => hashValue(arg)).join(',');
+export function getCacheKey(fnName: string, args: any[], suffix: string | undefined) {
+    const hashedArgs = args.map((arg) => hashValue(arg));
+
+    if (suffix) {
+        hashedArgs.push(suffix);
+    }
+    let innerKey = hashedArgs.join(',');
 
     // Avoid crazy long keys, by fallbacking to a hash
     if (innerKey.length > 400) {

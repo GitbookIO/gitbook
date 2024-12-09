@@ -148,7 +148,7 @@ export function PageBody(props: {
                     sitePointer={pointer}
                     spaceId={space.id}
                     pageId={page.id}
-                    apiHost={api().endpoint}
+                    apiHost={api().client.endpoint}
                 />
             ) : null}
         </>

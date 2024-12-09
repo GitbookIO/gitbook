@@ -1,9 +1,10 @@
-import { GitBookAPI, ContentAPITokenPayload } from '@gitbook/api';
+import { ContentAPITokenPayload, GitBookAPI } from '@gitbook/api';
 import { setTag, setContext } from '@sentry/nextjs';
 import assertNever from 'assert-never';
 import jwt from 'jsonwebtoken';
 import type { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 import { NextResponse, NextRequest } from 'next/server';
+import hash from 'object-hash';
 
 import {
     PublishedContentWithCache,
@@ -108,11 +109,14 @@ export async function middleware(request: NextRequest) {
     const inputURL = stripURLBasePath(url, originBasePath);
 
     const resolved = await withAPI(
-        new GitBookAPI({
-            endpoint: apiEndpoint,
-            authToken: getDefaultAPIToken(apiEndpoint),
-            userAgent: userAgent(),
-        }),
+        {
+            client: new GitBookAPI({
+                endpoint: apiEndpoint,
+                authToken: getDefaultAPIToken(apiEndpoint),
+                userAgent: userAgent(),
+            }),
+            contextKey: undefined,
+        },
         () => lookupSpaceForURL(mode, request, inputURL),
     );
     if ('error' in resolved) {
@@ -153,13 +157,17 @@ export async function middleware(request: NextRequest) {
     // Resolution might have changed the API endpoint
     apiEndpoint = resolved.apiEndpoint ?? apiEndpoint;
 
+    const contextKey = 'site' in resolved ? resolved.contextId : undefined;
     const nonce = createContentSecurityPolicyNonce();
     const csp = await withAPI(
-        new GitBookAPI({
-            endpoint: apiEndpoint,
-            authToken: resolved.apiToken,
-            userAgent: userAgent(),
-        }),
+        {
+            client: new GitBookAPI({
+                endpoint: apiEndpoint,
+                authToken: resolved.apiToken,
+                userAgent: userAgent(),
+            }),
+            contextKey,
+        },
         async () => {
             const [siteData] = await Promise.all([
                 'site' in resolved
@@ -198,6 +206,9 @@ export async function middleware(request: NextRequest) {
     headers.set('x-forwarded-host', inputURL.host);
     headers.set('origin', inputURL.origin);
     headers.set('x-gitbook-token', resolved.apiToken);
+    if (contextKey) {
+        headers.set('x-gitbook-token-context', contextKey);
+    }
     headers.set('x-gitbook-mode', mode);
     headers.set('x-gitbook-origin-basepath', originBasePath);
     headers.set('x-gitbook-basepath', joinPath(originBasePath, resolved.basePath));
@@ -359,7 +370,7 @@ async function lookupSpaceInSingleMode(url: URL): Promise<LookupResult> {
         );
     }
 
-    const apiToken = getDefaultAPIToken(api().endpoint);
+    const apiToken = getDefaultAPIToken(api().client.endpoint);
     if (!apiToken) {
         throw new Error(
             `Missing GITBOOK_TOKEN environment variable. It should be passed when using GITBOOK_MODE=single.`,
@@ -470,8 +481,10 @@ async function lookupSiteOrSpaceInMultiIdMode(
         throw new Error('Collection is not supported in multi-id mode');
     }
 
+    const decodedClaims = decoded.claims ? sanitizeJWTTokenClaims(decoded.claims) : undefined;
+    const contextKey = decodedClaims ? hash(decodedClaims) : undefined;
     const gitbookAPI = new GitBookAPI({
-        endpoint: apiEndpoint ?? api().endpoint,
+        endpoint: apiEndpoint ?? api().client.endpoint,
         authToken: apiToken,
         userAgent: userAgent(),
     });
@@ -479,13 +492,15 @@ async function lookupSiteOrSpaceInMultiIdMode(
     // Verify access to the space to avoid leaking cached data in this mode
     // (the cache is not dependend on the auth token, so it could leak data)
     if (source.kind === 'space') {
-        await withAPI(gitbookAPI, () => getSpace.revalidate(source.id, undefined));
+        await withAPI({ client: gitbookAPI, contextKey }, () =>
+            getSpace.revalidate(source.id, undefined),
+        );
     }
 
     // Verify access to the site to avoid leaking cached data in this mode
     // (the cache is not dependend on the auth token, so it could leak data)
     if (source.kind === 'site') {
-        await withAPI(gitbookAPI, () =>
+        await withAPI({ client: gitbookAPI, contextKey }, () =>
             getPublishedContentSite.revalidate({
                 organizationId: decoded.organization,
                 siteId: source.id,
@@ -868,4 +883,18 @@ function writeCookies<R extends NextResponse>(
     });
 
     return response;
+}
+
+const EXCLUDED_CLAIMS = ['iat', 'exp', 'iss', 'aud', 'jti', 'ver'];
+
+function sanitizeJWTTokenClaims(claims: object) {
+    const result: Record<string, unknown> = {};
+
+    Object.entries(claims).forEach(([key, value]) => {
+        if (EXCLUDED_CLAIMS.includes(key)) {
+            return;
+        }
+        result[key] = value;
+    });
+    return result;
 }
