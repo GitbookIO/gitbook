@@ -39,6 +39,18 @@ const allLocales: CustomizationLocale[] = [
     CustomizationLocale.Zh,
 ];
 
+const allThemeModes: CustomizationThemeMode[] = [
+    CustomizationThemeMode.Light,
+    CustomizationThemeMode.Dark,
+];
+
+const allThemePresets: CustomizationHeaderPreset[] = [
+    CustomizationHeaderPreset.Default,
+    CustomizationHeaderPreset.Bold,
+    CustomizationHeaderPreset.Contrast,
+    CustomizationHeaderPreset.Custom,
+];
+
 async function waitForCookiesDialog(page: Page) {
     const dialog = page.getByRole('dialog', { name: 'Cookies' });
     const accept = dialog.getByRole('button', { name: 'Accept' });
@@ -440,30 +452,36 @@ const testCases: TestsCase[] = [
     {
         name: 'Customization',
         baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
-        tests: [
+        tests: allThemeModes.flatMap((theme) => [
             {
-                name: 'Without header',
+                name: `Without header - Theme ${theme}`,
                 url: getCustomizationURL({
                     header: {
                         preset: CustomizationHeaderPreset.None,
                         links: [],
                     },
+                    themes: {
+                        default: theme,
+                    },
                 }),
                 run: waitForCookiesDialog,
             },
             {
-                name: 'With duotone icons',
+                name: `With duotone icons - Theme ${theme}`,
                 url:
                     'page-options/page-with-icon' +
                     getCustomizationURL({
                         styling: {
                             icons: CustomizationIconsStyle.Duotone,
                         },
+                        themes: {
+                            default: theme,
+                        },
                     }),
                 run: waitForCookiesDialog,
             },
             {
-                name: 'With header buttons',
+                name: `With header buttons - Theme ${theme}`,
                 url: getCustomizationURL({
                     header: {
                         preset: CustomizationHeaderPreset.Default,
@@ -480,11 +498,71 @@ const testCases: TestsCase[] = [
                             },
                         ],
                     },
+                    themes: {
+                        default: theme,
+                    },
                 }),
                 run: waitForCookiesDialog,
             },
             {
-                name: 'With tint - Legacy background match',
+                name: `Without tint - Default preset - Theme ${theme}`,
+                url: getCustomizationURL({
+                    header: {
+                        preset: CustomizationHeaderPreset.Default,
+                        links: [
+                            {
+                                title: 'Secondary button',
+                                to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                style: 'button-secondary',
+                            },
+                            {
+                                title: 'Primary button',
+                                to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                style: 'button-primary',
+                            },
+                        ],
+                    },
+                    themes: {
+                        default: theme,
+                    },
+                }),
+                run: waitForCookiesDialog,
+            },
+            ...allThemePresets.flatMap((preset) => ({
+                name: `With tint - Preset ${preset} - Theme ${theme}`,
+                url: getCustomizationURL({
+                    styling: {
+                        tint: { color: { light: '#346DDB', dark: '#346DDB' } },
+                    },
+                    header: {
+                        preset,
+                        ...(preset === CustomizationHeaderPreset.Custom
+                            ? {
+                                  backgroundColor: { light: '#C62C68', dark: '#EF96B8' },
+                                  linkColor: { light: '#4DDE98', dark: '#0C693D' },
+                              }
+                            : {}),
+                        links: [
+                            {
+                                title: 'Secondary button',
+                                to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                style: 'button-secondary',
+                            },
+                            {
+                                title: 'Primary button',
+                                to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                style: 'button-primary',
+                            },
+                        ],
+                    },
+                    themes: {
+                        default: theme,
+                    },
+                }),
+                run: waitForCookiesDialog,
+            })),
+            {
+                name: `With tint - Legacy background match - Theme ${theme}`,
                 url: getCustomizationURL({
                     styling: {
                         background: CustomizationBackground.Match,
@@ -504,108 +582,13 @@ const testCases: TestsCase[] = [
                             },
                         ],
                     },
-                }),
-                run: waitForCookiesDialog,
-            },
-            {
-                name: 'With tint - Default preset',
-                url: getCustomizationURL({
-                    styling: {
-                        tint: { color: { light: '#346DDB', dark: '#346DDB' } },
-                    },
-                    header: {
-                        preset: CustomizationHeaderPreset.Default,
-                        links: [
-                            {
-                                title: 'Secondary button',
-                                to: { kind: 'url', url: 'https://www.gitbook.com' },
-                                style: 'button-secondary',
-                            },
-                            {
-                                title: 'Primary button',
-                                to: { kind: 'url', url: 'https://www.gitbook.com' },
-                                style: 'button-primary',
-                            },
-                        ],
+                    themes: {
+                        default: theme,
                     },
                 }),
                 run: waitForCookiesDialog,
             },
-            {
-                name: 'With tint - Bold preset',
-                url: getCustomizationURL({
-                    styling: {
-                        tint: { color: { light: '#346DDB', dark: '#346DDB' } },
-                    },
-                    header: {
-                        preset: CustomizationHeaderPreset.Bold,
-                        links: [
-                            {
-                                title: 'Secondary button',
-                                to: { kind: 'url', url: 'https://www.gitbook.com' },
-                                style: 'button-secondary',
-                            },
-                            {
-                                title: 'Primary button',
-                                to: { kind: 'url', url: 'https://www.gitbook.com' },
-                                style: 'button-primary',
-                            },
-                        ],
-                    },
-                }),
-                run: waitForCookiesDialog,
-            },
-            {
-                name: 'With tint - Contrast',
-                url: getCustomizationURL({
-                    styling: {
-                        tint: { color: { light: '#346DDB', dark: '#346DDB' } },
-                    },
-                    header: {
-                        preset: CustomizationHeaderPreset.Contrast,
-                        links: [
-                            {
-                                title: 'Secondary button',
-                                to: { kind: 'url', url: 'https://www.gitbook.com' },
-                                style: 'button-secondary',
-                            },
-                            {
-                                title: 'Primary button',
-                                to: { kind: 'url', url: 'https://www.gitbook.com' },
-                                style: 'button-primary',
-                            },
-                        ],
-                    },
-                }),
-                run: waitForCookiesDialog,
-            },
-            {
-                name: 'With tint - Custom preset',
-                url: getCustomizationURL({
-                    styling: {
-                        tint: { color: { light: '#346DDB', dark: '#346DDB' } },
-                    },
-                    header: {
-                        preset: CustomizationHeaderPreset.Custom,
-                        backgroundColor: { light: '#C62C68', dark: '#EF96B8' },
-                        linkColor: { light: '#4DDE98', dark: '#0C693D' },
-                        links: [
-                            {
-                                title: 'Secondary button',
-                                to: { kind: 'url', url: 'https://www.gitbook.com' },
-                                style: 'button-secondary',
-                            },
-                            {
-                                title: 'Primary button',
-                                to: { kind: 'url', url: 'https://www.gitbook.com' },
-                                style: 'button-primary',
-                            },
-                        ],
-                    },
-                }),
-                run: waitForCookiesDialog,
-            },
-        ],
+        ]),
     },
     {
         name: 'Ads',
