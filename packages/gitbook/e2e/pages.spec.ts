@@ -582,7 +582,7 @@ const testCases: TestsCase[] = [
                         tint: { color: { light: '#346DDB', dark: '#346DDB' } },
                     },
                     header: {
-                        preset: CustomizationHeaderPreset.Contrast,
+                        preset: CustomizationHeaderPreset.Custom,
                         backgroundColor: { light: '#C62C68', dark: '#EF96B8' },
                         linkColor: { light: '#4DDE98', dark: '#0C693D' },
                         links: [
