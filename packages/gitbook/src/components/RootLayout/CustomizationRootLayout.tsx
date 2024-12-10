@@ -1,9 +1,9 @@
 import {
-    CustomizationBackground,
     CustomizationCorners,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
     CustomizationSettings,
+    CustomizationTint,
     SiteCustomizationSettings,
 } from '@gitbook/api';
 import { IconsProvider, IconStyle } from '@gitbook/icons';
@@ -17,11 +17,13 @@ import { getStaticFileURL } from '@/lib/assets';
 import { hexToRgb, shadesOfColor } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
 
-import { ClientContexts } from './ClientContexts';
 import { emojiFontClassName } from '../primitives';
+import { ClientContexts } from './ClientContexts';
 
-import './globals.css';
 import '@gitbook/icons/style.css';
+import './globals.css';
+
+const DEFAULT_TINT_COLOR = '#787878';
 
 /**
  * Layout shared between the content and the PDF renderer.
@@ -36,26 +38,21 @@ export async function CustomizationRootLayout(props: {
     const headerTheme = generateHeaderTheme(customization);
     const language = getSpaceLanguage(customization);
 
+    const tintColor = getTintColor(customization);
+
     return (
         <html
             suppressHydrationWarning
             lang={customization.internationalization.locale}
-            className={
-                tcls(
-                    customization.header.preset === CustomizationHeaderPreset.None
-                        ? null
-                        : [
-                              // Take the sticky header in consideration for the scrolling
-                              `scroll-pt-[76px]`,
-                          ],
-                ) +
-                (customization.styling.corners === CustomizationCorners.Straight
+            className={tcls(
+                customization.header.preset === CustomizationHeaderPreset.None
+                    ? null
+                    : 'scroll-pt-[76px]', // Take the sticky header in consideration for the scrolling
+                customization.styling.corners === CustomizationCorners.Straight
                     ? ' straight-corners'
-                    : '') +
-                (customization.styling.background === CustomizationBackground.Plain
-                    ? ' plain-background'
-                    : '')
-            }
+                    : '',
+                tintColor ? ' tint' : 'no-tint',
+            )}
         >
             <head>
                 {customization.privacyPolicy.url ? (
@@ -87,10 +84,22 @@ export async function CustomizationRootLayout(props: {
                             )
                         }
 
-                        ${generateColorVariable(
-                            'primary-base',
-                            customization.styling.primaryColor.light,
-                        )}
+                        ${generateColorVariable('tint-color', tintColor?.light ?? DEFAULT_TINT_COLOR)}
+                        ${
+                            // Generate the right contrast color for each shade of tint-color
+                            generateColorVariable(
+                                'contrast-tint',
+                                Object.fromEntries(
+                                    Object.entries(
+                                        shadesOfColor(tintColor?.light || DEFAULT_TINT_COLOR),
+                                    ).map(([index, color]) => [
+                                        index,
+                                        colorContrast(color, ['#000', '#fff']),
+                                    ]),
+                                ),
+                            )
+                        }
+
                         ${generateColorVariable(
                             'header-background',
                             headerTheme.backgroundColor.light,
@@ -101,10 +110,6 @@ export async function CustomizationRootLayout(props: {
                     .dark {
                         ${generateColorVariable(
                             'primary-color',
-                            customization.styling.primaryColor.dark,
-                        )}
-                        ${generateColorVariable(
-                            'primary-base',
                             customization.styling.primaryColor.dark,
                         )}
                         ${
@@ -121,6 +126,23 @@ export async function CustomizationRootLayout(props: {
                                 ),
                             )
                         }
+
+                        ${generateColorVariable('tint-color', tintColor?.dark ?? DEFAULT_TINT_COLOR)}
+                        ${
+                            // Generate the right contrast color for each shade of tint-color
+                            generateColorVariable(
+                                'contrast-tint',
+                                Object.fromEntries(
+                                    Object.entries(
+                                        shadesOfColor(tintColor?.dark || DEFAULT_TINT_COLOR),
+                                    ).map(([index, color]) => [
+                                        index,
+                                        colorContrast(color, ['#000', '#fff']),
+                                    ]),
+                                ),
+                            )
+                        }
+
                         ${generateColorVariable(
                             'header-background',
                             headerTheme.backgroundColor.dark,
@@ -160,6 +182,21 @@ export async function CustomizationRootLayout(props: {
     );
 }
 
+/**
+ * Get the tint color from the customization settings.
+ * If the tint color is not set or it is a space customization, it will return the default color.
+ */
+export function getTintColor(
+    customization: CustomizationSettings | SiteCustomizationSettings,
+): CustomizationTint['color'] | undefined {
+    if ('tint' in customization.styling && customization.styling.tint) {
+        return {
+            light: customization.styling.tint?.color.light ?? DEFAULT_TINT_COLOR,
+            dark: customization.styling.tint?.color.dark ?? DEFAULT_TINT_COLOR,
+        };
+    }
+}
+
 type ColorInput = string | Record<string, string>;
 function generateColorVariable(name: string, color: ColorInput) {
     const shades: Record<string, string> = typeof color === 'string' ? shadesOfColor(color) : color;
@@ -177,6 +214,8 @@ function generateHeaderTheme(customization: CustomizationSettings | SiteCustomiz
     backgroundColor: { light: ColorInput; dark: ColorInput };
     linkColor: { light: ColorInput; dark: ColorInput };
 } {
+    const tintColor = getTintColor(customization);
+
     switch (customization.header.preset) {
         case CustomizationHeaderPreset.None:
         case CustomizationHeaderPreset.Default: {
@@ -194,17 +233,17 @@ function generateHeaderTheme(customization: CustomizationSettings | SiteCustomiz
         case CustomizationHeaderPreset.Bold: {
             return {
                 backgroundColor: {
-                    light: customization.styling.primaryColor.light,
-                    dark: customization.styling.primaryColor.dark,
+                    light: tintColor?.light ?? customization.styling.primaryColor.light,
+                    dark: tintColor?.dark ?? customization.styling.primaryColor.dark,
                 },
                 linkColor: {
                     light: colorContrast(
-                        customization.styling.primaryColor.light,
+                        tintColor?.light ?? customization.styling.primaryColor.light,
                         [colors.white, colors.black],
                         'aaa',
                     ),
                     dark: colorContrast(
-                        customization.styling.primaryColor.dark,
+                        tintColor?.dark ?? customization.styling.primaryColor.dark,
                         [colors.white, colors.black],
                         'aaa',
                     ),
@@ -226,15 +265,25 @@ function generateHeaderTheme(customization: CustomizationSettings | SiteCustomiz
         case CustomizationHeaderPreset.Custom: {
             return {
                 backgroundColor: {
-                    light: customization.header.backgroundColor?.light ?? colors.white,
-                    dark: customization.header.backgroundColor?.dark ?? colors.black,
+                    light:
+                        customization.header.backgroundColor?.light ??
+                        tintColor?.light ??
+                        colors.white,
+                    dark:
+                        customization.header.backgroundColor?.dark ??
+                        tintColor?.dark ??
+                        colors.black,
                 },
                 linkColor: {
                     light:
                         customization.header.linkColor?.light ??
+                        (tintColor?.light &&
+                            colorContrast(tintColor.light, [colors.white, colors.black], 'aaa')) ??
                         customization.styling.primaryColor.light,
                     dark:
                         customization.header.linkColor?.dark ??
+                        (tintColor?.dark &&
+                            colorContrast(tintColor.dark, [colors.white, colors.black], 'aaa')) ??
                         customization.styling.primaryColor.dark,
                 },
             };
