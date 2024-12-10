@@ -481,7 +481,10 @@ async function lookupSiteOrSpaceInMultiIdMode(
         throw new Error('Collection is not supported in multi-id mode');
     }
 
-    const decodedClaims = decoded.claims ? sanitizeJWTTokenClaims(decoded.claims) : undefined;
+    const decodedClaims =
+        decoded.claims && Object.keys(decoded.claims).length
+            ? sanitizeJWTTokenClaims(decoded.claims)
+            : undefined;
     const contextKey = decodedClaims ? hash(decodedClaims) : undefined;
     const gitbookAPI = new GitBookAPI({
         endpoint: apiEndpoint ?? api().client.endpoint,
