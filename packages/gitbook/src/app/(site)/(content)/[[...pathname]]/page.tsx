@@ -150,7 +150,8 @@ export async function generateMetadata({
             .join(' | '),
         description: page.description ?? '',
         alternates: {
-            canonical: absoluteHref(getPagePath(pages, page), true),
+            // Trim trailing slashes in canonical URL to match the redirect behavior
+            canonical: absoluteHref(getPagePath(pages, page), true).replace(/\/+$/, ''),
         },
         openGraph: {
             images: [
