@@ -12,7 +12,7 @@ runs:
 
         # Cache browser binaries, cache key is based on Playwright version and OS
         - name: 🧰 Cache Playwright browser binaries
-          uses: actions/cache@v3
+          uses: actions/cache@v4
           id: playwright-cache
           with:
               path: '~/.cache/ms-playwright'
