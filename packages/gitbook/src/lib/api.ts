@@ -96,11 +96,11 @@ export type GitBookAPIContext = {
     /**
      * Context ID representing a hash of the visitor's attributes/assertions that are
      * included in the claims property of the content API JWT token.
-     * 
+     *
      * It serves as a suffix for the cache key to ensure that the content cache is invalidated
      * when these attributees/assertions change.
      */
-    contextKey: string | undefined;
+    contextId: string | undefined;
 };
 
 const apiSyncStorage = new AsyncLocalStorage<GitBookAPIContext>();
@@ -110,7 +110,7 @@ export const DEFAULT_API_ENDPOINT = process.env.GITBOOK_API_URL ?? 'https://api.
 /**
  * Create a new API client with a token.
  */
-export function apiWithToken(apiToken: string, contextKey: string | undefined): GitBookAPIContext {
+export function apiWithToken(apiToken: string, contextId: string | undefined): GitBookAPIContext {
     const headersList = headers();
     const apiEndpoint = headersList.get('x-gitbook-api') ?? DEFAULT_API_ENDPOINT;
 
@@ -120,7 +120,7 @@ export function apiWithToken(apiToken: string, contextKey: string | undefined): 
         userAgent: userAgent(),
     });
 
-    return { client: gitbook, contextKey };
+    return { client: gitbook, contextId };
 }
 
 /**
@@ -134,7 +134,7 @@ export function api(): GitBookAPIContext {
 
     const headersList = headers();
     const apiToken = headersList.get('x-gitbook-token');
-    const contextKey = headersList.get('x-gitbook-token-context') ?? undefined;
+    const contextId = headersList.get('x-gitbook-token-context') ?? undefined;
 
     if (!apiToken) {
         throw new Error(
@@ -142,7 +142,7 @@ export function api(): GitBookAPIContext {
         );
     }
 
-    return apiWithToken(apiToken, contextKey);
+    return apiWithToken(apiToken, contextId);
 }
 
 /**
@@ -318,7 +318,7 @@ export const getRevision = cache({
     name: 'api.getRevision.v2',
     tag: (spaceId, revisionId) =>
         getAPICacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
-    getKeySuffix: () => api().contextKey,
+    getKeySuffix: () => api().contextId,
     get: async (
         spaceId: string,
         revisionId: string,
@@ -349,7 +349,7 @@ export const getRevisionPages = cache({
     name: 'api.getRevisionPages.v4',
     tag: (spaceId, revisionId) =>
         getAPICacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
-    getKeySuffix: () => api().contextKey,
+    getKeySuffix: () => api().contextId,
     get: async (
         spaceId: string,
         revisionId: string,
@@ -383,7 +383,7 @@ export const getRevisionPageByPath = cache({
     name: 'api.getRevisionPageByPath.v3',
     tag: (spaceId, revisionId) =>
         getAPICacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
-    getKeySuffix: () => api().contextKey,
+    getKeySuffix: () => api().contextId,
     get: async (
         spaceId: string,
         revisionId: string,
@@ -465,7 +465,7 @@ const getRevisionReusableContentById = cache({
     name: 'api.getRevisionReusableContentById.v1',
     tag: (spaceId, revisionId) =>
         getAPICacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
-    getKeySuffix: () => api().contextKey,
+    getKeySuffix: () => api().contextId,
     get: async (
         spaceId: string,
         revisionId: string,
@@ -621,7 +621,7 @@ export const getDocument = cache({
     name: 'api.getDocument.v2',
     tag: (spaceId, documentId) =>
         getAPICacheTag({ tag: 'document', space: spaceId, document: documentId }),
-    getKeySuffix: () => api().contextKey,
+    getKeySuffix: () => api().contextId,
     get: async (spaceId: string, documentId: string, options: CacheFunctionOptions) => {
         const response = await api().client.spaces.getDocumentById(
             spaceId,
@@ -648,7 +648,7 @@ export const getDocument = cache({
 export const getSiteRedirectBySource = cache({
     name: 'api.getSiteRedirectBySource',
     tag: ({ siteId }) => getAPICacheTag({ tag: 'site', site: siteId }),
-    getKeySuffix: () => api().contextKey,
+    getKeySuffix: () => api().contextId,
     get: async (
         args: {
             organizationId: string;
@@ -692,7 +692,7 @@ export const getSiteRedirectBySource = cache({
 export const getSite = cache({
     name: 'api.getSite',
     tag: (organizationId, siteId) => getAPICacheTag({ tag: 'site', site: siteId }),
-    getKeySuffix: () => api().contextKey,
+    getKeySuffix: () => api().contextId,
     get: async (organizationId: string, siteId: string, options: CacheFunctionOptions) => {
         const response = await api().client.orgs.getSiteById(organizationId, siteId, {
             ...noCacheFetchOptions,
@@ -710,7 +710,7 @@ export const getSite = cache({
 export const getPublishedContentSite = cache({
     name: 'api.getPublishedContentSite',
     tag: ({ siteId }) => getAPICacheTag({ tag: 'site', site: siteId }),
-    getKeySuffix: () => api().contextKey,
+    getKeySuffix: () => api().contextId,
     get: async (
         args: {
             organizationId: string;
@@ -921,7 +921,7 @@ export async function getSpaceContentData(
 export const searchSpaceContent = cache({
     name: 'api.searchSpaceContent',
     tag: (spaceId) => getAPICacheTag({ tag: 'space', space: spaceId }),
-    getKeySuffix: () => api().contextKey,
+    getKeySuffix: () => api().contextId,
     get: async (
         spaceId: string,
         /** The revision ID is used as a cache bust key, to avoid revalidating lot of cache entries by tags */
@@ -947,7 +947,7 @@ export const searchSpaceContent = cache({
 export const searchParentContent = cache({
     name: 'api.searchParentContent',
     tag: (spaceId) => getAPICacheTag({ tag: 'space', space: spaceId }),
-    getKeySuffix: () => api().contextKey,
+    getKeySuffix: () => api().contextId,
     get: async (parentId: string, query: string, options: CacheFunctionOptions) => {
         const response = await api().client.search.searchContent(
             { query },
@@ -968,7 +968,7 @@ export const searchParentContent = cache({
 export const searchSiteContent = cache({
     name: 'api.searchSiteContent',
     tag: (organizationId, siteId) => getAPICacheTag({ tag: 'site', site: siteId }),
-    getKeySuffix: () => api().contextKey,
+    getKeySuffix: () => api().contextId,
     get: async (
         organizationId: string,
         siteId: string,

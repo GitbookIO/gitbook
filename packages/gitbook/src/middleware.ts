@@ -115,7 +115,7 @@ export async function middleware(request: NextRequest) {
                 authToken: getDefaultAPIToken(apiEndpoint),
                 userAgent: userAgent(),
             }),
-            contextKey: undefined,
+            contextId: undefined,
         },
         () => lookupSpaceForURL(mode, request, inputURL),
     );
@@ -157,7 +157,7 @@ export async function middleware(request: NextRequest) {
     // Resolution might have changed the API endpoint
     apiEndpoint = resolved.apiEndpoint ?? apiEndpoint;
 
-    const contextKey = 'site' in resolved ? resolved.contextId : undefined;
+    const contextId = 'site' in resolved ? resolved.contextId : undefined;
     const nonce = createContentSecurityPolicyNonce();
     const csp = await withAPI(
         {
@@ -166,7 +166,7 @@ export async function middleware(request: NextRequest) {
                 authToken: resolved.apiToken,
                 userAgent: userAgent(),
             }),
-            contextKey,
+            contextId,
         },
         async () => {
             const [siteData] = await Promise.all([
@@ -206,8 +206,8 @@ export async function middleware(request: NextRequest) {
     headers.set('x-forwarded-host', inputURL.host);
     headers.set('origin', inputURL.origin);
     headers.set('x-gitbook-token', resolved.apiToken);
-    if (contextKey) {
-        headers.set('x-gitbook-token-context', contextKey);
+    if (contextId) {
+        headers.set('x-gitbook-token-context', contextId);
     }
     headers.set('x-gitbook-mode', mode);
     headers.set('x-gitbook-origin-basepath', originBasePath);
@@ -485,7 +485,7 @@ async function lookupSiteOrSpaceInMultiIdMode(
         decoded.claims && Object.keys(decoded.claims).length
             ? sanitizeJWTTokenClaims(decoded.claims)
             : undefined;
-    const contextKey = decodedClaims ? hash(decodedClaims) : undefined;
+    const contextId = decodedClaims ? hash(decodedClaims) : undefined;
     const gitbookAPI = new GitBookAPI({
         endpoint: apiEndpoint ?? api().client.endpoint,
         authToken: apiToken,
@@ -495,7 +495,7 @@ async function lookupSiteOrSpaceInMultiIdMode(
     // Verify access to the space to avoid leaking cached data in this mode
     // (the cache is not dependend on the auth token, so it could leak data)
     if (source.kind === 'space') {
-        await withAPI({ client: gitbookAPI, contextKey }, () =>
+        await withAPI({ client: gitbookAPI, contextId }, () =>
             getSpace.revalidate(source.id, undefined),
         );
     }
@@ -503,7 +503,7 @@ async function lookupSiteOrSpaceInMultiIdMode(
     // Verify access to the site to avoid leaking cached data in this mode
     // (the cache is not dependend on the auth token, so it could leak data)
     if (source.kind === 'site') {
-        await withAPI({ client: gitbookAPI, contextKey }, () =>
+        await withAPI({ client: gitbookAPI, contextId }, () =>
             getPublishedContentSite.revalidate({
                 organizationId: decoded.organization,
                 siteId: source.id,
