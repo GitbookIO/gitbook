@@ -722,6 +722,7 @@ async function lookupSpaceByAPI(
                           siteSpace: data.siteSpace,
                           organization: data.organization,
                           shareKey: data.shareKey,
+                          ...(data.contextId ? { contextId: data.contextId} : {}),
                       }
                     : {}),
             } as PublishedContentWithCache;
