@@ -88,7 +88,18 @@ const cacheTtl_1day = {
 };
 
 export type GitBookAPIContext = {
+    /**
+     * Instance of the GitBook API client.
+     */
     client: GitBookAPI;
+
+    /**
+     * Context ID representing a hash of the visitor's attributes/assertions that are
+     * included in the claims property of the content API JWT token.
+     * 
+     * It serves as a suffix for the cache key to ensure that the content cache is invalidated
+     * when these attributees/assertions change.
+     */
     contextKey: string | undefined;
 };
 
