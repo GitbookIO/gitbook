@@ -9,6 +9,8 @@ describe('getEmojiForCode', () => {
 
     it('should handle complex codes', () => {
         expect(getEmojiForCode('1f935-2642')).toEqual('🤵‍♂️');
+        expect(getEmojiForCode('1f3c3-2642')).toEqual('🏃‍♂️');
+        expect(getEmojiForCode('1f468-2696')).toEqual('👨‍⚖️');
     });
 
     it('should return an empty string if invalid', () => {

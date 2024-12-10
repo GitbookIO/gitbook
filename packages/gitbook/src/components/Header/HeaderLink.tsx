@@ -104,7 +104,7 @@ function HeaderItemButton(
         linkStyle: 'button-secondary' | 'button-primary';
     },
 ) {
-    const { linkStyle, headerPreset, title, href, ...rest } = props;
+    const { linkStyle, headerPreset, title, href, isDropdown, ...rest } = props;
     const variant = (() => {
         switch (linkStyle) {
             case 'button-secondary':
