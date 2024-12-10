@@ -481,11 +481,14 @@ async function lookupSiteOrSpaceInMultiIdMode(
         throw new Error('Collection is not supported in multi-id mode');
     }
 
-    const decodedClaims =
-        decoded.claims && Object.keys(decoded.claims).length
-            ? sanitizeJWTTokenClaims(decoded.claims)
-            : undefined;
-    const contextId = decodedClaims ? hash(decodedClaims) : undefined;
+    // The claims property in the content API token is included when
+    // visitor attributes/assertions are passed to the site preview URL.
+    //
+    // When it's present, we generate a hash using the same method as
+    // getPublishedContentByURL to get the context ID so the cache can be
+    // invalidated when trying to preview the site with different visitor
+    // attributes.
+    const contextId = decoded.claims ? hash(decoded.claims) : undefined;
     const gitbookAPI = new GitBookAPI({
         endpoint: apiEndpoint ?? api().client.endpoint,
         authToken: apiToken,
@@ -886,18 +889,4 @@ function writeCookies<R extends NextResponse>(
     });
 
     return response;
-}
-
-const EXCLUDED_CLAIMS = ['iat', 'exp', 'iss', 'aud', 'jti', 'ver'];
-
-function sanitizeJWTTokenClaims(claims: object) {
-    const result: Record<string, unknown> = {};
-
-    Object.entries(claims).forEach(([key, value]) => {
-        if (EXCLUDED_CLAIMS.includes(key)) {
-            return;
-        }
-        result[key] = value;
-    });
-    return result;
 }
