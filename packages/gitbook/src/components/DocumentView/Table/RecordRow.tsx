@@ -4,11 +4,6 @@ import React from 'react';
 import { RecordColumnValue } from './RecordColumnValue';
 import { TableRecordKV, TableViewProps } from './Table';
 import styles from './table.module.css';
-
-import { tcls } from '@/lib/tailwind';
-
-import { RecordColumnValue } from './RecordColumnValue';
-import { TableRecordKV, TableViewProps } from './Table';
 import { getColumnWidth } from './ViewGrid';
 
 export function RecordRow(
