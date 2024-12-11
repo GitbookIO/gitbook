@@ -67,7 +67,7 @@ export function HeaderLogo(props: HeaderLogoProps) {
                         'max-w-48',
                         'lg:max-w-64',
                         'max-h-10',
-                        'lg:max-h-11',
+                        'lg:max-h-10',
                     )}
                 />
             ) : (
@@ -101,9 +101,8 @@ function LogoFallback(props: HeaderLogoProps) {
                     'lg:max-w-[24ch]',
                     'font-semibold',
                     'ms-3',
-                    'text-base',
-                    'lg:text-lg',
-                    'leading-tight',
+                    'text-base/tight',
+                    'lg:text-lg/tight',
                     customization.header.preset === CustomizationHeaderPreset.Default ||
                         customization.header.preset === CustomizationHeaderPreset.None
                         ? ['text-dark', 'dark:text-light']

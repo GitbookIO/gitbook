@@ -48,14 +48,15 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'ring-dark/1',
                 'dark:ring-light/2',
 
-                'shadow',
+                'shadow-sm',
+                'shadow-dark/4',
                 'dark:shadow-none',
 
                 'text-dark/6',
                 'dark:text-light/6',
 
                 'rounded-lg',
-                'straight-corners:rounded-none',
+                'straight-corners:rounded-sm',
 
                 'contrast-more:ring-dark',
                 'contrast-more:text-dark',
@@ -65,17 +66,30 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'transition-all',
                 'hover:shadow-md',
                 'hover:scale-102',
-                'dark:hover:bg-dark-3',
                 'hover:ring-dark/2',
                 'hover:text-dark/10',
+                'focus:shadow-md',
+                'focus:scale-102',
+                'focus:ring-dark/2',
+                'focus:text-dark/10',
+                'dark:hover:bg-dark-3',
                 'dark:hover:ring-light/4',
                 'dark:hover:text-light',
+                'dark:focus:bg-dark-3',
+                'dark:focus:ring-light/4',
+                'dark:focus:text-light',
+
+                'contrast-more:hover:ring-2',
+                'contrast-more:hover:ring-dark',
+                'dark:contrast-more:hover:ring-light',
+                'contrast-more:focus:ring-2',
+                'contrast-more:focus:ring-dark',
+                'dark:contrast-more:focus:ring-light',
 
                 'active:shadow-sm',
                 'active:scale-98',
 
                 'md:justify-start',
-                'flex',
                 'md:w-full',
                 style,
             )}
