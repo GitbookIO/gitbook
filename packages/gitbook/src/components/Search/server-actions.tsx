@@ -158,7 +158,7 @@ export const streamAskQuestion = streamResponse(async function* (
     siteSpaceId: string | null,
     question: string,
 ) {
-    const stream = api.api().orgs.streamAskInSite(
+    const stream = api.api().client.orgs.streamAskInSite(
         organizationId,
         siteId,
         {
