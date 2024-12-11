@@ -200,7 +200,8 @@ export function Header(props: {
                                             customization.aiSearch.enabled
                                                 ? 'search_or_ask'
                                                 : 'search',
-                                        )}...
+                                        )}
+                                        ...
                                     </span>
                                 </SearchButton>
                             </Suspense>
