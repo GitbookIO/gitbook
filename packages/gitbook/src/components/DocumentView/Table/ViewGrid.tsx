@@ -29,19 +29,7 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
         view.columns.some((columnId) => block.data.definition[columnId].title.trim().length > 0);
 
     return (
-        <div
-            className={tcls(
-                style,
-                styles.progressContainer,
-                styles.tableWrapper,
-                'relative',
-                'grid',
-                'w-full',
-                'overflow-x-auto',
-                'overflow-y-hidden',
-                'mx-auto',
-            )}
-        >
+        <div className={tcls(style, styles.tableWrapper)}>
             {/* Table */}
             <div role="table" className={tcls('flex', 'flex-col')}>
                 {/* Header */}
@@ -55,15 +43,7 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                                         key={column}
                                         role="columnheader"
                                         className={tcls(
-                                            'align-middle',
-                                            'text-left',
-                                            'text-base',
-                                            'font-medium',
-                                            'border-b',
-                                            'dark:border-l-light/2',
-                                            'dark:border-b-light/4',
-                                            'py-2',
-                                            'px-3',
+                                            styles.columnHeader,
                                             alignment === 'right' ? 'text-right' : null,
                                             alignment === 'center' ? 'text-center' : null,
                                         )}

@@ -1,10 +1,9 @@
 import { DocumentTableViewGrid } from '@gitbook/api';
 import React from 'react';
 
-import { tcls } from '@/lib/tailwind';
-
 import { RecordColumnValue } from './RecordColumnValue';
 import { TableRecordKV, TableViewProps } from './Table';
+import styles from './table.module.css';
 import { getColumnWidth } from './ViewGrid';
 
 export function RecordRow(
@@ -17,10 +16,7 @@ export function RecordRow(
     const { view, autoSizedColumns, fixedColumns } = props;
 
     return (
-        <div
-            className={tcls('flex', 'border-dark/3', 'dark:border-light/2', '[&>*+*]:border-l')}
-            role="row"
-        >
+        <div className={styles.row} role="row">
             {view.columns.map((column) => {
                 const columnWidth = getColumnWidth({
                     column,
@@ -32,16 +28,7 @@ export function RecordRow(
                     <div
                         key={column}
                         role="cell"
-                        className={tcls(
-                            'flex-1',
-                            'align-middle',
-                            'border-dark/2',
-                            'py-2',
-                            'px-3',
-                            'text-sm',
-                            'lg:text-base',
-                            'dark:border-light/2',
-                        )}
+                        className={styles.cell}
                         style={{
                             width: columnWidth,
                             minWidth: columnWidth || '100px',
