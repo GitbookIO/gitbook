@@ -60,11 +60,12 @@ export function Header(props: {
         >
             <div
                 className={tcls(
-                    !isCustomizationDefault && [
-                        'bg-header-background',
-                        'shadow-thinbottom',
-                        'dark:shadow-light/2',
-                    ],
+                    !isCustomizationDefault &&
+                        withTopHeader && [
+                            'bg-header-background',
+                            'shadow-thinbottom',
+                            'dark:shadow-light/2',
+                        ],
                 )}
             >
                 <div className={tcls('scroll-nojump')}>
