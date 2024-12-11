@@ -39,7 +39,7 @@ export function Dropdown<E extends HTMLElement>(props: {
                 aria-labelledby={dropdownId}
                 className={tcls(
                     'w-52',
-                    'max-h-56',
+                    'max-h-80',
                     'flex',
                     'absolute',
                     'top-full',
@@ -111,31 +111,38 @@ export function DropdownMenu(props: { children: React.ReactNode }) {
  * Menu item in a dropdown.
  */
 export function DropdownMenuItem(props: {
-    href: string;
+    href: string | null;
     active?: boolean;
+    className?: ClassValue;
     children: React.ReactNode;
 }) {
-    const { children, active = false, href } = props;
+    const { children, active = false, href, className } = props;
+
+    if (href) {
+        return (
+            <Link
+                href={href}
+                prefetch={false}
+                className={tcls(
+                    'px-3 py-1 text-sm rounded straight-corners:rounded-sm',
+                    active ? 'bg-primary/3 dark:bg-light/2 text-primary-600' : null,
+                    'hover:bg-dark/2 dark:hover:bg-light/2',
+                    className,
+                )}
+            >
+                {children}
+            </Link>
+        );
+    }
 
     return (
-        <Link
-            href={href}
-            prefetch={false}
+        <div
             className={tcls(
-                'flex',
-                'flex-row',
-                'items-center',
-                'text-sm',
-                'px-3',
-                'py-1',
-                'rounded',
-                'straight-corners:rounded-sm',
-                active
-                    ? ['bg-primary/3', 'dark:bg-light/2', 'text-primary-600']
-                    : ['hover:bg-dark/2', 'dark:hover:bg-light/2'],
+                'text-xs px-3 py-1 font-medium text-dark/8 dark:text-light/8',
+                className,
             )}
         >
             {children}
-        </Link>
+        </div>
     );
 }

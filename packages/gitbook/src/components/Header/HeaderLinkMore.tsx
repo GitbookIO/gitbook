@@ -1,4 +1,5 @@
 import {
+    CustomizationContentLink,
     CustomizationHeaderItem,
     CustomizationHeaderPreset,
     CustomizationSettings,
@@ -55,14 +56,25 @@ export function HeaderLinkMore(props: {
     );
 }
 
-async function MoreMenuLink(props: { context: ContentRefContext; link: CustomizationHeaderItem }) {
+async function MoreMenuLink(props: {
+    context: ContentRefContext;
+    link: CustomizationHeaderItem | CustomizationContentLink;
+}) {
     const { context, link } = props;
 
     const target = link.to ? await resolveContentRef(link.to, context) : null;
 
-    if (!target) {
-        return null;
-    }
-
-    return <DropdownMenuItem href={target.href}>{link.title}</DropdownMenuItem>;
+    return (
+        <>
+            {'links' in link && link.links.length > 0 && (
+                <hr className="first:hidden border-t border-light-3 dark:border-dark-3 my-1 -mx-2" />
+            )}
+            <DropdownMenuItem href={target?.href ?? null}>{link.title}</DropdownMenuItem>
+            {'links' in link
+                ? link.links.map((subLink, index) => (
+                      <MoreMenuLink key={index} {...props} link={subLink} />
+                  ))
+                : null}
+        </>
+    );
 }
