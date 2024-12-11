@@ -55,9 +55,9 @@ export function SearchModal(props: SearchModalProps) {
         };
     }, [isSearchOpened]);
 
-    if (state === null) {
-        return null;
-    }
+    // if (state === null) {
+    //     return null;
+    // }
 
     const onChangeQuery = (newQuery: SearchState) => {
         setSearchState(newQuery);
@@ -71,62 +71,75 @@ export function SearchModal(props: SearchModalProps) {
     };
 
     return (
-        <>
-            <div
-                role="dialog"
-                className={tcls(
-                    'flex',
-                    'items-start',
-                    'justify-center',
-                    'fixed',
-                    'inset-0',
-                    'bg-dark/4',
-                    'backdrop-blur-2xl',
-                    'opacity-[1]',
-                    'z-30',
-                    'px-4',
-                    'pt-4',
-                    'dark:bg-dark/8',
-                    'md:pt-[min(8vw,_6rem)]',
-                )}
-                onClick={() => {
-                    onClose();
-                }}
-            >
-                <AnimatePresence>
-                    {askState?.type === 'loading' ? (
-                        <motion.div
-                            key="loading"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 1 }}
-                            className={tcls(
-                                'w-[100vw]',
-                                'h-[100vh]',
-                                'fixed',
-                                'inset-0',
-                                'z-10',
-                                'pointer-events-none',
-                            )}
-                        >
-                            <LoadingPane
-                                gridStyle={['h-[100vh]', 'aspect-auto', 'top-[-30%]']}
-                                pulse
-                                tile={96}
-                                style={['grid']}
-                            />
-                        </motion.div>
-                    ) : null}
-                </AnimatePresence>
-                <SearchModalBody
-                    {...props}
-                    state={state}
-                    onChangeQuery={onChangeQuery}
-                    onClose={onClose}
-                />
-            </div>
-        </>
+        <AnimatePresence>
+            {state !== null ? (
+                <motion.div
+                    initial={{
+                        opacity: 0,
+                    }}
+                    animate={{
+                        opacity: 1,
+                    }}
+                    exit={{
+                        opacity: 0,
+                    }}
+                    transition={{
+                        duration: 0.2,
+                        delay: 0.1,
+                    }}
+                    role="dialog"
+                    className={tcls(
+                        'fixed',
+                        'inset-0',
+                        'bg-dark/4',
+                        'backdrop-blur-2xl',
+                        'z-30',
+                        'px-4',
+                        'pt-4',
+                        'dark:bg-dark/8',
+                        'md:pt-[min(8vh,6rem)]',
+                    )}
+                    onClick={() => {
+                        onClose();
+                    }}
+                >
+                    <div className="scroll-nojump">
+                        <AnimatePresence>
+                            {askState?.type === 'loading' ? (
+                                <motion.div
+                                    key="loading"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 1 }}
+                                    className={tcls(
+                                        'w-screen',
+                                        'h-screen',
+                                        'fixed',
+                                        'inset-0',
+                                        'z-10',
+                                        'pointer-events-none',
+                                    )}
+                                >
+                                    <LoadingPane
+                                        gridStyle={['h-screen', 'aspect-auto', 'top-[-30%]']}
+                                        pulse
+                                        tile={96}
+                                        style={['grid']}
+                                    />
+                                </motion.div>
+                            ) : null}
+                        </AnimatePresence>
+                        <SearchModalBody
+                            {...props}
+                            state={state}
+                            onChangeQuery={onChangeQuery}
+                            onClose={onClose}
+                        />
+                    </div>
+                </motion.div>
+            ) : null}
+        </AnimatePresence>
     );
 }
 
@@ -182,15 +195,34 @@ function SearchModalBody(
 
     return (
         <motion.div
+            transition={{
+                duration: 0.2,
+                delay: 0.1,
+                ease: 'easeOut',
+            }}
+            initial={{
+                scale: 0.95,
+                opacity: 0,
+            }}
+            animate={{
+                scale: 1,
+                opacity: 1,
+            }}
+            exit={{
+                scale: 0.95,
+                opacity: 0,
+            }}
             role="dialog"
             aria-label={tString(language, 'search')}
             className={tcls(
                 'z-40',
+                'relative',
                 'flex',
                 'flex-col',
                 'bg-white',
-                'max-w-[768px]',
-                'mt-[-1px]',
+                'max-w-prose',
+                'mx-auto',
+                'max-h-[70dvh]',
                 'w-full',
                 'rounded-lg',
                 'straight-corners:rounded-sm',
@@ -202,14 +234,6 @@ function SearchModalBody(
                 'dark:bg-dark-3',
                 'dark:ring-light/2',
             )}
-            initial={{
-                scale: 0.95,
-                opacity: 0,
-            }}
-            animate={{
-                scale: 1,
-                opacity: 1,
-            }}
             onClick={(event) => {
                 event.stopPropagation();
             }}
