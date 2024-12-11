@@ -1,3 +1,33 @@
+/* Detect whether a scrollbar exists on the table */
+@keyframes detect-scroll {
+    from,
+    to {
+        --can-scroll: ;
+    }
+}
+
+/* Apply styles to the Table if scrollbar exists */
+.tableWrapper {
+    animation: detect-scroll linear;
+    animation-timeline: scroll(self x);
+
+    --border-radius-if-can-scroll: var(--can-scroll) 0.375rem;
+    --border-radius-if-cant-scroll: 0;
+    border-radius: var(--border-radius-if-can-scroll, var(--border-radius-if-cant-scroll));
+
+    --border-width-if-can-scroll: var(--can-scroll) 1px;
+    --border-width-if-cant-scroll: 0;
+    border-width: var(--border-width-if-can-scroll, var(--border-width-if-cant-scroll));
+
+    @apply border-dark/3;
+}
+
+:global(.dark) .tableWrapper {
+    @apply border-light/2;
+}
+
+/* Styles for circular scroll progress animation on scrollable tables */
+
 /* Hide it on browsers (firefox / safari) that do not support it */
 .progressOpacitySharp {
     display: none;
