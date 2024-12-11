@@ -770,7 +770,7 @@ function getLookupResultForVisitorAuth(
                           ),
                           options: {
                               httpOnly: true,
-                              sameSite: 'none',
+                              sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
                               secure: process.env.NODE_ENV === 'production',
                               maxAge: 7 * 24 * 60 * 60,
                           },
