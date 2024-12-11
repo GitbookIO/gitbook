@@ -103,38 +103,40 @@ export function SearchModal(props: SearchModalProps) {
                         onClose();
                     }}
                 >
-                    <AnimatePresence>
-                        {askState?.type === 'loading' ? (
-                            <motion.div
-                                key="loading"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: 1 }}
-                                className={tcls(
-                                    'w-screen',
-                                    'h-screen',
-                                    'fixed',
-                                    'inset-0',
-                                    'z-10',
-                                    'pointer-events-none',
-                                )}
-                            >
-                                <LoadingPane
-                                    gridStyle={['h-screen', 'aspect-auto', 'top-[-30%]']}
-                                    pulse
-                                    tile={96}
-                                    style={['grid']}
-                                />
-                            </motion.div>
-                        ) : null}
-                    </AnimatePresence>
-                    <SearchModalBody
-                        {...props}
-                        state={state}
-                        onChangeQuery={onChangeQuery}
-                        onClose={onClose}
-                    />
+                    <div className="scroll-nojump">
+                        <AnimatePresence>
+                            {askState?.type === 'loading' ? (
+                                <motion.div
+                                    key="loading"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 1 }}
+                                    className={tcls(
+                                        'w-screen',
+                                        'h-screen',
+                                        'fixed',
+                                        'inset-0',
+                                        'z-10',
+                                        'pointer-events-none',
+                                    )}
+                                >
+                                    <LoadingPane
+                                        gridStyle={['h-screen', 'aspect-auto', 'top-[-30%]']}
+                                        pulse
+                                        tile={96}
+                                        style={['grid']}
+                                    />
+                                </motion.div>
+                            ) : null}
+                        </AnimatePresence>
+                        <SearchModalBody
+                            {...props}
+                            state={state}
+                            onChangeQuery={onChangeQuery}
+                            onClose={onClose}
+                        />
+                    </div>
                 </motion.div>
             ) : null}
         </AnimatePresence>
