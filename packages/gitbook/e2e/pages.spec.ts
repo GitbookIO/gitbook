@@ -112,7 +112,9 @@ const testCases: TestsCase[] = [
                 name: 'Variants dropdown',
                 url: '',
                 run: async (page) => {
-                    const spaceDrowpdown = page.locator('[data-testid="space-dropdown-button"]').locator('visible=true');
+                    const spaceDrowpdown = page
+                        .locator('[data-testid="space-dropdown-button"]')
+                        .locator('visible=true');
                     await spaceDrowpdown.waitFor();
                 },
             },
@@ -128,7 +130,9 @@ const testCases: TestsCase[] = [
                 name: 'Customized variant titles are displayed',
                 url: '',
                 run: async (page) => {
-                    const spaceDrowpdown = page.locator('[data-testid="space-dropdown-button"]').locator('visible=true');
+                    const spaceDrowpdown = page
+                        .locator('[data-testid="space-dropdown-button"]')
+                        .locator('visible=true');
                     await spaceDrowpdown.click();
 
                     const variantSelectionDropdown = page.locator(
@@ -160,9 +164,9 @@ const testCases: TestsCase[] = [
                 url: 'api-multi-versions/reference/api-reference/pets',
                 screenshot: false,
                 run: async (page) => {
-                    const spaceDrowpdown = await page.locator(
-                        '[data-testid="space-dropdown-button"]',
-                    ).locator('visible=true');
+                    const spaceDrowpdown = await page
+                        .locator('[data-testid="space-dropdown-button"]')
+                        .locator('visible=true');
                     await spaceDrowpdown.click();
 
                     // Click the second variant in the dropdown
@@ -183,9 +187,9 @@ const testCases: TestsCase[] = [
                 url: 'api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/reference/api-reference/pets',
                 screenshot: false,
                 run: async (page) => {
-                    const spaceDrowpdown = await page.locator(
-                        '[data-testid="space-dropdown-button"]',
-                    ).locator('visible=true');
+                    const spaceDrowpdown = await page
+                        .locator('[data-testid="space-dropdown-button"]')
+                        .locator('visible=true');
                     await spaceDrowpdown.click();
 
                     // Click the second variant in the dropdown
@@ -218,9 +222,9 @@ const testCases: TestsCase[] = [
                     return `api-multi-versions-va/reference/api-reference/pets?jwt_token=${token}`;
                 })(),
                 run: async (page) => {
-                    const spaceDrowpdown = await page.locator(
-                        '[data-testid="space-dropdown-button"]',
-                    ).locator('visible=true');
+                    const spaceDrowpdown = await page
+                        .locator('[data-testid="space-dropdown-button"]')
+                        .locator('visible=true');
                     await spaceDrowpdown.click();
 
                     // Click the second variant in the dropdown
