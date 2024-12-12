@@ -27,6 +27,7 @@ import {
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
     getVisitorAuthToken,
+    isVisitorAuthTokenFromCookies,
     normalizeVisitorAuthURL,
 } from '@/lib/visitor-auth';
 
@@ -643,6 +644,11 @@ async function lookupSpaceByAPI(
         `lookup content for url "${url.toString()}", with ${lookup.urls.length} alternatives`,
     );
 
+    // When the cookie is pulled from the cookie, set redirectOnError when calling getPublishedContentByUrl to allow
+    // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
+    // For example when the VA backend signature has changed but the token stored in the cookie is not yet expired.
+    const redirectOnError = typeof visitorAuthToken !== 'undefined' && isVisitorAuthTokenFromCookies(visitorAuthToken) ? true : false;
+
     const result = await race(lookup.urls, async (alternative, { signal }) => {
         const data = await getPublishedContentByUrl(
             alternative.url,
@@ -651,6 +657,7 @@ async function lookupSpaceByAPI(
                 : typeof visitorAuthToken === 'string'
                   ? visitorAuthToken
                   : visitorAuthToken.token,
+            redirectOnError,
             {
                 signal,
             },
