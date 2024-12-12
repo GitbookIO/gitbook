@@ -12,7 +12,8 @@ export function PageHeader(props: { page: RevisionPageDocument; pages: RevisionP
     }
 
     const pageGroup = pages.find(
-        (item) => item.type == 'group' && item.path == page.path.match(/([^\/]+)/g)?.[0],
+        /* Use the first segment of the page's path to find the page group it belongs to */
+        (item) => item.type == 'group' && item.path == page.path.split('/')?.[0],
     );
 
     return (
@@ -38,8 +39,6 @@ export function PageHeader(props: { page: RevisionPageDocument; pages: RevisionP
                                 page={pageGroup}
                                 style={tcls('size-4', 'text-base', 'leading-none')}
                             />
-                            {/* {pageGroup.icon && <Icon icon={pageGroup.icon as IconName} className='size-4' />}
-                            {pageGroup.emoji && <span className='size-4'><Emoji code={pageGroup.emoji}> /></span>} */}
                             {pageGroup.title}
                         </p>
                     )}
