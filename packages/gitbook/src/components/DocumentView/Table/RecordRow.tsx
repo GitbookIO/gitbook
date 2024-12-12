@@ -1,42 +1,43 @@
 import { DocumentTableViewGrid } from '@gitbook/api';
-
-import { tcls } from '@/lib/tailwind';
+import React from 'react';
 
 import { RecordColumnValue } from './RecordColumnValue';
 import { TableRecordKV, TableViewProps } from './Table';
+import styles from './table.module.css';
+import { getColumnWidth } from './ViewGrid';
 
-export async function RecordRow(
+export function RecordRow(
     props: TableViewProps<DocumentTableViewGrid> & {
         record: TableRecordKV;
+        autoSizedColumns: string[];
+        fixedColumns: string[];
     },
 ) {
-    const { view } = props;
-    const columnsLengthThreshold = view.columns.length >= 7;
-
-    const tableTR = columnsLengthThreshold
-        ? ['[&>*+*]:border-l', '[&>*]:px-4']
-        : ['[&>*+*]:border-l', '[&>*+*]:pl-4'];
+    const { view, autoSizedColumns, fixedColumns } = props;
 
     return (
-        <tr className={tcls(tableTR, 'border-dark/3', 'dark:border-light/2')}>
+        <div className={styles.row} role="row">
             {view.columns.map((column) => {
+                const columnWidth = getColumnWidth({
+                    column,
+                    columnWidths: view.columnWidths,
+                    autoSizedColumns,
+                    fixedColumns,
+                });
                 return (
-                    <td
+                    <div
                         key={column}
-                        className={tcls(
-                            'align-middle',
-                            'min-w-[8rem]',
-                            'border-dark/2',
-                            'py-3',
-                            'text-sm',
-                            'lg:text-base',
-                            'dark:border-light/2',
-                        )}
+                        role="cell"
+                        className={styles.cell}
+                        style={{
+                            width: columnWidth,
+                            minWidth: columnWidth || '100px',
+                        }}
                     >
-                        <RecordColumnValue key={column} {...props} column={column} />
-                    </td>
+                        <RecordColumnValue {...props} column={column} />
+                    </div>
                 );
             })}
-        </tr>
+        </div>
     );
 }
