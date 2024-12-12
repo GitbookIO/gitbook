@@ -169,6 +169,12 @@ function SearchModalBody(
         } else if (event.key === 'Enter') {
             event.preventDefault();
             resultsRef.current?.select();
+
+            onChangeQuery({
+                ask: withAsk,
+                query: state.query,
+                global: state.global,
+            });
         }
     };
 
