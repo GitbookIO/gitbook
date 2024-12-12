@@ -67,7 +67,7 @@ export function checkIsSizableImageURL(input: string): boolean {
     }
 
     const parsed = new URL(input);
-    if (parsed.pathname.endsWith('.svg')) {
+    if (parsed.pathname.endsWith('.svg') || parsed.pathname.endsWith('.avif')) {
         return false;
     }
     if (!checkIsHttpURL(parsed)) {

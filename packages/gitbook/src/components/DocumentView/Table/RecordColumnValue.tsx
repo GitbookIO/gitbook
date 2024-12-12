@@ -2,7 +2,7 @@ import { ContentRef, DocumentBlockTable } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import assertNever from 'assert-never';
 
-import { Checkbox, Emoji } from '@/components/primitives';
+import { Checkbox } from '@/components/primitives';
 import { StyledLink } from '@/components/primitives';
 import { Image } from '@/components/utils';
 import { getNodeFragmentByName } from '@/lib/document';

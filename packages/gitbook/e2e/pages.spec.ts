@@ -10,10 +10,10 @@ import {
     SiteCustomizationSettings,
 } from '@gitbook/api';
 import { test, expect, Page } from '@playwright/test';
+import deepMerge from 'deepmerge';
 import jwt from 'jsonwebtoken';
 import rison from 'rison';
 import { DeepPartial } from 'ts-essentials';
-import deepMerge from 'deepmerge';
 
 import { getContentTestURL } from '../tests/utils';
 
@@ -926,6 +926,94 @@ const testCases: TestsCase[] = [
                 run: async (page) => {
                     const metaRobots = page.locator('meta[name="robots"]');
                     await expect(metaRobots).toHaveAttribute('content', 'noindex, nofollow');
+                },
+            },
+        ],
+    },
+    {
+        name: 'Adaptive Content - VA',
+        baseUrl: `https://gitbook-open-e2e-sites.gitbook.io/adaptive-content-va/`,
+        tests: [
+            {
+                name: 'isAlphaUser',
+                url: (() => {
+                    const privateKey = 'afe09cdf-0f43-480a-b54c-8b1f62f174f9';
+                    const token = jwt.sign(
+                        {
+                            name: 'gitbook-open-tests',
+                            isAlphaUser: true,
+                        },
+                        privateKey,
+                        {
+                            expiresIn: '24h',
+                        },
+                    );
+                    return `?jwt_token=${token}`;
+                })(),
+                run: async (page) => {
+                    const alphaUserPage = page
+                        .locator('a[class*="group\\/toclink"]')
+                        .filter({ hasText: 'Alpha users' });
+                    const betaUserPage = page
+                        .locator('a[class*="group\\/toclink"]')
+                        .filter({ hasText: 'Beta users' });
+                    await expect(alphaUserPage).toBeVisible();
+                    await expect(betaUserPage).toHaveCount(0);
+                },
+            },
+            {
+                name: 'isBetaUser',
+                url: (() => {
+                    const privateKey = 'afe09cdf-0f43-480a-b54c-8b1f62f174f9';
+                    const token = jwt.sign(
+                        {
+                            name: 'gitbook-open-tests',
+                            isBetaUser: true,
+                        },
+                        privateKey,
+                        {
+                            expiresIn: '24h',
+                        },
+                    );
+                    return `?jwt_token=${token}`;
+                })(),
+                run: async (page) => {
+                    const alphaUserPage = page
+                        .locator('a[class*="group\\/toclink"]')
+                        .filter({ hasText: 'Alpha users' });
+                    const betaUserPage = page
+                        .locator('a[class*="group\\/toclink"]')
+                        .filter({ hasText: 'Beta users' });
+                    await expect(betaUserPage).toBeVisible();
+                    await expect(alphaUserPage).toHaveCount(0);
+                },
+            },
+            {
+                name: 'isAlphaUser & isBetaUser',
+                url: (() => {
+                    const privateKey = 'afe09cdf-0f43-480a-b54c-8b1f62f174f9';
+                    const token = jwt.sign(
+                        {
+                            name: 'gitbook-open-tests',
+                            isAlphaUser: true,
+                            isBetaUser: true,
+                        },
+                        privateKey,
+                        {
+                            expiresIn: '24h',
+                        },
+                    );
+                    return `?jwt_token=${token}`;
+                })(),
+                run: async (page) => {
+                    const alphaUserPage = page
+                        .locator('a[class*="group\\/toclink"]')
+                        .filter({ hasText: 'Alpha users' });
+                    const betaUserPage = page
+                        .locator('a[class*="group\\/toclink"]')
+                        .filter({ hasText: 'Beta users' });
+                    await expect(alphaUserPage).toBeVisible();
+                    await expect(betaUserPage).toBeVisible();
                 },
             },
         ],
