@@ -64,10 +64,10 @@ export function HeaderLogo(props: HeaderLogoProps) {
                         'object-contain',
                         'object-left',
                         'min-w-20',
-                        'max-w-48',
+                        'max-w-40',
                         'lg:max-w-64',
                         'max-h-10',
-                        'lg:max-h-10',
+                        'lg:max-h-12',
                     )}
                 />
             ) : (
