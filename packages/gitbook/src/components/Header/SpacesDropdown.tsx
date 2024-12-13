@@ -40,7 +40,7 @@ export function SpacesDropdown(props: { space: Space; spaces: Space[]; className
                         className,
                     )}
                 >
-                    <span className={tcls('line-clamp-2')}>{space.title}</span>
+                    <span className="line-clamp-2">{space.title}</span>
                     <DropdownChevron />
                 </div>
             )}

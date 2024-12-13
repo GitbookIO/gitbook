@@ -46,7 +46,6 @@ export function HeaderLinkMore(props: {
             <span className="sr-only">{label}</span>
             <Icon icon="ellipsis" className={tcls('size-4')} />
             <DropdownChevron />
-            {/* <Icon icon="chevron-down" className={tcls('size-3')} /> */}
         </button>
     );
 
