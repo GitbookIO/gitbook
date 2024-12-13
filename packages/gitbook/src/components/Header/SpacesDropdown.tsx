@@ -52,7 +52,10 @@ export function SpacesDropdown(props: { space: Space; spaces: Space[]; className
                         variantSpace={{
                             id: otherSpace.id,
                             title: otherSpace.title,
-                            url: otherSpace.urls.published ?? otherSpace.urls.app,
+                            url:
+                                process.env.NODE_ENV === 'development'
+                                    ? `http://localhost:3000/${otherSpace.urls.published?.replace(/https?:\/\//, '')}`
+                                    : (otherSpace.urls.published ?? otherSpace.urls.app),
                         }}
                         active={otherSpace.id === space.id}
                     />

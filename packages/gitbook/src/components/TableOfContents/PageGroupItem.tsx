@@ -33,11 +33,10 @@ export function PageGroupItem(props: {
                     '-top-4',
                     'bg-gradient-to-b',
                     'from-light',
+                    'lg:from-sidebar-background',
                     'to-transparent',
                     'from-65%',
-                    'dark:from-dark',
                     'dark:tracking-wider',
-                    'dark:to-transparent',
                 )}
             >
                 <TOCPageIcon page={page} />

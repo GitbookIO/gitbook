@@ -3,6 +3,8 @@ import {
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
     CustomizationSettings,
+    CustomizationSidebarBackgroundStyle,
+    CustomizationSidebarListStyle,
     CustomizationTint,
     SiteCustomizationSettings,
 } from '@gitbook/api';
@@ -24,6 +26,10 @@ import '@gitbook/icons/style.css';
 import './globals.css';
 
 const DEFAULT_TINT_COLOR = '#787878';
+const SIDEBAR_TINT_COLOR_LIGHT = '#FFFFFF';
+const SIDEBAR_TINT_COLOR_DARK = '#000000';
+const SIDEBAR_NO_TINT_COLOR_LIGHT = 'var(--light-2)';
+const SIDEBAR_NO_TINT_COLOR_DARK = 'var(--dark-2)';
 
 /**
  * Layout shared between the content and the PDF renderer.
@@ -37,8 +43,20 @@ export async function CustomizationRootLayout(props: {
 
     const headerTheme = generateHeaderTheme(customization);
     const language = getSpaceLanguage(customization);
-
     const tintColor = getTintColor(customization);
+    const sidebarStyles = getSidebarStyles(customization);
+    const sidebarBackgroundColorLight =
+        sidebarStyles.background === CustomizationSidebarBackgroundStyle.Filled
+            ? tintColor
+                ? SIDEBAR_TINT_COLOR_LIGHT
+                : SIDEBAR_NO_TINT_COLOR_LIGHT
+            : 'var(--light-DEFAULT)';
+    const sidebarBackgroundColorDark =
+        sidebarStyles.background === CustomizationSidebarBackgroundStyle.Filled
+            ? tintColor
+                ? SIDEBAR_TINT_COLOR_DARK
+                : SIDEBAR_NO_TINT_COLOR_DARK
+            : 'var(--dark-DEFAULT)';
 
     return (
         <html
@@ -106,6 +124,7 @@ export async function CustomizationRootLayout(props: {
                         )}
                         ${generateColorVariable('header-link', headerTheme.linkColor.light)}
                         ${generateColorVariable('header-button-text', colorContrast(headerTheme.linkColor.light as string, ['#000', '#fff']))}
+			--sidebar-background: ${sidebarBackgroundColorLight}
                     }
                     .dark {
                         ${generateColorVariable(
@@ -149,6 +168,7 @@ export async function CustomizationRootLayout(props: {
                         )}
                         ${generateColorVariable('header-link', headerTheme.linkColor.dark)}
                         ${generateColorVariable('header-button-text', colorContrast(headerTheme.linkColor.dark as string, ['#000', '#fff']))}
+                    --sidebar-background: ${sidebarBackgroundColorDark};
                     }
                 `}</style>
             </head>
@@ -186,7 +206,7 @@ export async function CustomizationRootLayout(props: {
  * Get the tint color from the customization settings.
  * If the tint color is not set or it is a space customization, it will return the default color.
  */
-export function getTintColor(
+function getTintColor(
     customization: CustomizationSettings | SiteCustomizationSettings,
 ): CustomizationTint['color'] | undefined {
     if ('tint' in customization.styling && customization.styling.tint) {
@@ -195,6 +215,26 @@ export function getTintColor(
             dark: customization.styling.tint?.color.dark ?? DEFAULT_TINT_COLOR,
         };
     }
+}
+
+/**
+ * Get the sidebar styles from the customization settings.
+ * If it is a space customization, it will return the default styles.
+ */
+function getSidebarStyles(
+    customization: CustomizationSettings | SiteCustomizationSettings,
+): SiteCustomizationSettings['styling']['sidebar'] {
+    if ('sidebar' in customization.styling) {
+        return {
+            background: customization.styling.sidebar.background,
+            list: customization.styling.sidebar.list,
+        };
+    }
+
+    return {
+        background: CustomizationSidebarBackgroundStyle.Default,
+        list: CustomizationSidebarListStyle.Default,
+    };
 }
 
 type ColorInput = string | Record<string, string>;

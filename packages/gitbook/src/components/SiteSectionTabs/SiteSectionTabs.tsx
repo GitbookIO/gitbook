@@ -91,7 +91,11 @@ export function SiteSectionTabs(props: {
                                 active={isActive}
                                 key={id}
                                 label={title}
-                                href={urls.published ?? ''}
+                                href={
+                                    process.env.NODE_ENV === 'development'
+                                        ? `http://localhost:3000/${urls.published?.replace(/https?:\/\//, '')}`
+                                        : (urls.published ?? '')
+                                }
                                 ref={isActive ? currentTabRef : null}
                                 icon={
                                     icon ? (
