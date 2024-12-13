@@ -123,7 +123,7 @@ export function Header(props: {
                         <div
                             className={tcls(
                                 'flex',
-                                'md:w-56',
+                                'md:min-w-56',
                                 'grow-0',
                                 'shrink-0',
                                 'justify-self-end',
