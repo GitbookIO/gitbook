@@ -52,14 +52,7 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                     </p>
                 ) : null}
                 {item.body ? (
-                    <p
-                        className={tcls(
-                            'text-sm',
-                            'line-clamp-3',
-                            'z-[-1]', //to force stacking order
-                            'relative',
-                        )}
-                    >
+                    <p className={tcls('text-sm', 'line-clamp-3', 'relative')}>
                         <HighlightQuery query={query} text={item.body} />
                     </p>
                 ) : null}
