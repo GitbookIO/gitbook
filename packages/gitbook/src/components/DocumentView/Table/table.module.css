@@ -1,87 +1,59 @@
-/* Hide it on browsers (firefox / safari) that do not support it */
-.progressOpacitySharp {
-    display: none;
+/* Detect whether a scrollbar exists on the table */
+@keyframes detect-scroll {
+    from,
+    to {
+        --can-scroll: ;
+    }
 }
 
-@supports (animation-timeline: scroll()) {
-    .progressContainer {
-        scroll-timeline-name: --squareTimeline;
-        scroll-timeline-axis: x;
-    }
+/* Apply styles to the Table if scrollbar exists */
+.tableWrapper {
+    animation: detect-scroll linear;
+    animation-timeline: scroll(self x);
 
-    .progressOpacity {
-        animation-name: opacityProgress;
-        animation-duration: 1ms;
-        animation-direction: alternate;
-        animation-timeline: --squareTimeline;
-        animation-timing-function: linear;
-    }
+    --border-radius-if-can-scroll: var(--can-scroll) 0.375rem;
+    --border-radius-if-cant-scroll: 0;
+    border-radius: var(--border-radius-if-can-scroll, var(--border-radius-if-cant-scroll));
 
-    .progressOpacitySharp {
-        display: grid;
-        opacity: 0;
-        animation-name: opacityProgressSharp;
-        animation-duration: 1ms;
-        animation-direction: alternate;
-        animation-timeline: --squareTimeline;
-        animation-timing-function: linear;
-    }
+    --border-width-if-can-scroll: var(--can-scroll) 1px;
+    --border-width-if-cant-scroll: 0;
+    border-width: var(--border-width-if-can-scroll, var(--border-width-if-cant-scroll));
 
-    .strokeOpacityProgressInverted {
-        animation-name: strokeOpacityProgressInverted;
-        animation-duration: 1ms;
-        animation-direction: alternate;
-        animation-timeline: --squareTimeline;
-        animation-timing-function: linear;
-    }
+    @apply relative grid w-full overflow-x-auto overflow-y-hidden mx-auto border-dark/3;
+}
 
-    .progressSvg {
-        animation-name: svgProgress;
-        animation-duration: 1ms;
-        animation-direction: alternate;
-        animation-timeline: --squareTimeline;
-        animation-timing-function: linear;
-    }
+:global(.dark) .tableWrapper {
+    @apply border-tint-50;
+}
 
-    @keyframes opacityProgress {
-        0%,
-        50% {
-            opacity: 1;
-        }
-        100% {
-            opacity: 0;
-        }
-    }
+.columnHeader {
+    @apply text-sm font-medium py-3 px-4 text-tint-900;
+}
 
-    @keyframes opacityProgressSharp {
-        0%,
-        98% {
-            opacity: 1;
-        }
-        100% {
-            opacity: 0;
-        }
-    }
+:global(.dark) .columnHeader {
+    @apply text-white;
+}
 
-    @keyframes strokeOpacityProgressInverted {
-        0%,
-        10% {
-            stroke-opacity: 0;
-        }
-        30% {
-            stroke-opacity: 0.88;
-        }
-        100% {
-            stroke-opacity: 0.88;
-        }
-    }
+.row {
+    @apply flex border-tint-700/2;
+}
 
-    @keyframes svgProgress {
-        from {
-            stroke-dasharray: 0 100;
-        }
-        to {
-            stroke-dasharray: 100 100;
-        }
-    }
+:global(.dark) .row {
+    @apply border-tint-300/3;
+}
+
+.rowGroup {
+    @apply flex flex-col border rounded-lg bg-tint-800/1 border-tint-700/2;
+}
+
+:global(.dark) .rowGroup {
+    @apply bg-tint-300/2 border-tint-300/3;
+}
+
+.cell {
+    @apply flex-1 align-middle border-dark/2 py-2 px-4 text-sm;
+}
+
+:global(.dark) .cell {
+    @apply border-light/2;
 }

@@ -154,7 +154,7 @@ export function isNodeEmpty(
 export function getBlockTitle(block: DocumentBlock): string {
     switch (block.type) {
         case 'expandable': {
-            const titleFragment = getNodeFragmentByType(block, 'title');
+            const titleFragment = getNodeFragmentByType(block, 'expandable-title');
             if (titleFragment) {
                 return getNodeText(titleFragment);
             }

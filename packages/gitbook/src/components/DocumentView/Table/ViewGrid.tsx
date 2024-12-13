@@ -1,4 +1,5 @@
 import { DocumentTableViewGrid } from '@gitbook/api';
+import * as React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
@@ -7,159 +8,113 @@ import { TableViewProps } from './Table';
 import styles from './table.module.css';
 import { getColumnAlignment } from './utils';
 
+/* Columns are sized in 3 ways:
+     1. Set to auto-size by default, these columns share the available width
+     2. Explicitly set by the user by dragging column separator (we then turn off auto-size)
+     3. Auto-size is turned off without setting a width, we then default to a fixed width of 100px
+*/
 export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
     const { block, view, records, style } = props;
-    const columnsOverThreshold = view.columns.length >= 7;
 
-    const tableWrapper = columnsOverThreshold
-        ? [
-              // has over X columns
-              'overflow-x-auto',
-              'overflow-y-hidden',
-              'mx-auto',
-              'rounded-md',
-              'border',
-              'border-dark/3',
-              'dark:border-light/2',
-          ]
-        : ['overflow-x-auto', 'overflow-y-hidden', 'mx-auto'];
+    /* Calculate how many columns are auto-sized vs fixed width */
+    const columnWidths = view.columnWidths;
+    const autoSizedColumns = view.columns.filter((column) => !columnWidths?.[column]);
+    const fixedColumns = view.columns.filter((column) => columnWidths?.[column]);
 
-    const tableTR = columnsOverThreshold
-        ? ['[&>*+*]:border-l', '[&>*]:px-4']
-        : ['[&>*+*]:border-l', '[&>*+*]:px-4'];
+    const tableWidth = autoSizedColumns.length > 0 ? 'w-full' : 'w-fit';
 
-    const tableTH = columnsOverThreshold ? ['py-3'] : ['py-1', 'pt-0'];
-
-    // Only show the header when configured and not empty
+    /* Only show the header when configured and not empty */
     const withHeader =
         !view.hideHeader &&
         view.columns.some((columnId) => block.data.definition[columnId].title.trim().length > 0);
 
     return (
-        <div
-            className={`${tcls(style, 'relative', 'grid', tableWrapper, styles.progressContainer)}`}
-        >
-            {/* ProgressScroller: */}
-            <div
-                className={`${styles.progressOpacitySharp} ${tcls(
-                    'grid',
-                    'items-center',
-                    'grid-area-1-1',
-                    'w-[5rem]',
-                    'h-full',
-                    'top-0',
-                    'z-[1]',
-                    'sticky',
-                    'left-[calc(100%-5rem)]',
-                    'pointer-events-none',
-                )}`}
-            >
-                <svg
-                    className={`${styles.progressSvg} ${tcls(
-                        'grid-area-1-1',
-                        'relative',
-                        '[strokeDasharray:_0_100]',
-                        'z-[1]',
-                        'w-7',
-                        'mt-3',
-                        'mr-3',
-                        'self-start',
-                        'justify-self-end',
-                        'stroke-primary-600',
-                        'shadow-1xs',
-                        'bg-light',
-                        'ring-1',
-                        'ring-inset',
-                        'rounded-full',
-                        'ring-dark/2',
-                        'dark:ring-light/2',
-                        'dark:bg-dark',
-                        'dark:stroke-primary-400',
-                    )}`}
-                    preserveAspectRatio="xMaxYMid meet"
-                    width="100%"
-                    viewBox="0 0 26 26"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <circle
-                        cx="13"
-                        className={`${styles.strokeOpacityProgressInverted}`}
-                        cy="13"
-                        r="12.5"
-                        fill="none"
-                        stroke="inherit"
-                        strokeWidth="1.5"
-                        pathLength="100"
-                        strokeLinecap="round"
-                        strokeOpacity={0}
-                    />
-
-                    <path
-                        strokeDasharray="none"
-                        d="M12 10L15 13L12 16"
-                        stroke="inherit"
-                        fill="none"
-                        strokeOpacity={0.64}
-                    />
-                </svg>
-
-                <div
-                    className={`${styles.progressOpacity}  ${tcls(
-                        'bg-gradient-to-r',
-                        'from-transparent',
-                        'to-light',
-                        'to-40%',
-                        'grid-area-1-1',
-                        'w-full',
-                        'h-full',
-                        'dark:from-transparent',
-                        'dark:to-dark/10',
-                    )}`}
-                ></div>
-            </div>
-
-            {/* Table: */}
-            <table className={tcls('w-full', 'grid-area-1-1', 'table-auto')}>
-                {withHeader ? (
-                    <thead>
-                        <tr className={tcls(tableTR)}>
+        <div className={tcls(style, styles.tableWrapper)}>
+            {/* Table */}
+            <div role="table" className={tcls('flex', 'flex-col')}>
+                {/* Header */}
+                {withHeader && (
+                    <div
+                        role="rowgroup"
+                        className={tcls(
+                            tableWidth,
+                            styles.rowGroup,
+                            'straight-corners:rounded-none',
+                        )}
+                    >
+                        <div role="row" className={tcls('flex', 'w-full')}>
                             {view.columns.map((column) => {
-                                const columnWidth = view.columnWidths?.[column];
                                 const alignment = getColumnAlignment(block.data.definition[column]);
-
                                 return (
-                                    <th
+                                    <div
                                         key={column}
+                                        role="columnheader"
                                         className={tcls(
-                                            tableTH,
-                                            'align-middle',
-                                            'text-balance',
-                                            'border-b',
-                                            'border-b-dark/5',
-                                            'text-left',
-                                            'text-xs',
-                                            'lg:text-base',
-                                            'dark:border-l-light/2',
-                                            'dark:border-b-light/4',
+                                            styles.columnHeader,
                                             alignment === 'right' ? 'text-right' : null,
                                             alignment === 'center' ? 'text-center' : null,
                                         )}
-                                        style={columnWidth ? { width: columnWidth } : undefined}
+                                        style={{
+                                            width: getColumnWidth({
+                                                column,
+                                                columnWidths,
+                                                autoSizedColumns,
+                                                fixedColumns,
+                                            }),
+                                            minWidth: columnWidths?.[column] || '100px',
+                                        }}
+                                        title={block.data.definition[column].title}
                                     >
                                         {block.data.definition[column].title}
-                                    </th>
+                                    </div>
                                 );
                             })}
-                        </tr>
-                    </thead>
-                ) : null}
-                <tbody className={tcls('[&>*+*]:border-t')}>
-                    {records.map((record) => {
-                        return <RecordRow key={record[0]} {...props} record={record} />;
-                    })}
-                </tbody>
-            </table>
+                        </div>
+                    </div>
+                )}
+                <div
+                    role="rowgroup"
+                    className={tcls('flex', 'flex-col', tableWidth, '[&>*+*]:border-t')}
+                >
+                    {records.map((record) => (
+                        <RecordRow
+                            key={record[0]}
+                            record={record}
+                            autoSizedColumns={autoSizedColumns}
+                            fixedColumns={fixedColumns}
+                            {...props}
+                        />
+                    ))}
+                </div>
+            </div>
         </div>
     );
 }
+
+export const getColumnWidth = ({
+    column,
+    columnWidths,
+    autoSizedColumns,
+    fixedColumns,
+}: {
+    column: string;
+    columnWidths: Record<string, number> | undefined;
+    autoSizedColumns: string[];
+    fixedColumns: string[];
+}) => {
+    const columnWidth = columnWidths?.[column];
+
+    /* Column was explicitly set by user or user turned off auto-sizing (in that case, columnWidth should've also been set to 100px) */
+    if (columnWidth) return `${columnWidth}px`;
+
+    /* Fallback minimum width for columns, so the columns don't become unreadable from being too narrow and instead table will become scrollable. */
+    const minAutoColumnWidth = '100px';
+
+    const totalFixedWidth = fixedColumns.reduce((sum, col) => {
+        return sum + (columnWidths?.[col] || 0);
+    }, 0);
+
+    /* Column should use auto-sizing, which means it grows to fill available space */
+    const availableWidth = `calc((100% - ${totalFixedWidth}px) / ${autoSizedColumns.length})`;
+    return `clamp(${minAutoColumnWidth}, ${availableWidth}, 100%)`;
+};

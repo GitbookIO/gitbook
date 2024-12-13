@@ -1022,6 +1022,90 @@ const testCases: TestsCase[] = [
             },
         ],
     },
+    {
+        name: 'Tables',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        tests: [
+            {
+                name: 'Default table',
+                url: 'blocks/tables',
+                run: waitForCookiesDialog,
+                fullPage: true,
+            },
+            {
+                name: 'Table with straight corners',
+                url:
+                    'blocks/tables' +
+                    getCustomizationURL({
+                        styling: {
+                            corners: CustomizationCorners.Straight,
+                        },
+                    }),
+                run: waitForCookiesDialog,
+                fullPage: true,
+            },
+            {
+                name: 'Table with primary color',
+                url:
+                    'blocks/tables' +
+                    getCustomizationURL({
+                        styling: {
+                            tint: { color: { light: '#346DDB', dark: '#346DDB' } },
+                        },
+                    }),
+                run: waitForCookiesDialog,
+                fullPage: true,
+            },
+            // Test dark mode for each variant
+            ...allThemeModes.flatMap((theme) => [
+                {
+                    name: `Table in ${theme} mode`,
+                    url:
+                        'blocks/tables' +
+                        getCustomizationURL({
+                            themes: {
+                                default: theme,
+                                toggeable: false,
+                            },
+                        }),
+                    run: waitForCookiesDialog,
+                    fullPage: true,
+                },
+                {
+                    name: `Table with straight corners in ${theme} mode`,
+                    url:
+                        'blocks/tables' +
+                        getCustomizationURL({
+                            styling: {
+                                corners: CustomizationCorners.Straight,
+                            },
+                            themes: {
+                                default: theme,
+                                toggeable: false,
+                            },
+                        }),
+                    run: waitForCookiesDialog,
+                    fullPage: true,
+                },
+                {
+                    name: `Table with primary color in ${theme} mode`,
+                    url:
+                        'blocks/tables' +
+                        getCustomizationURL({
+                            styling: {
+                                tint: { color: { light: '#346DDB', dark: '#346DDB' } },
+                            },
+                            themes: {
+                                default: theme,
+                                toggeable: false,
+                            },
+                        }),
+                    run: waitForCookiesDialog,
+                    fullPage: true,
+                },
+            ]),
+        ],
+    },
 ];
 
 for (const testCase of testCases) {
