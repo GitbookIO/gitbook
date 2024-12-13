@@ -31,7 +31,7 @@ export function PageHeader(props: { page: RevisionPageDocument; pages: RevisionP
         <header
             className={tcls('max-w-3xl', 'mx-auto', 'mb-6', 'space-y-3', 'page-api-block:ml-0')}
         >
-            {breadcrumbs && (
+            {breadcrumbs?.length > 0 && (
                 <nav>
                     <ol className={tcls('flex', 'flex-wrap', 'items-center', 'gap-2')}>
                         {breadcrumbs.map((breadcrumb, index) => (
