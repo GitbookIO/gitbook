@@ -180,7 +180,7 @@ function HeaderItemDropdown(
             className={tcls(getHeaderLinkClassName({ headerPreset }), 'cursor-default')}
             {...rest}
         >
-            <span className="truncate">{title}</span>
+            {title}
             <DropdownChevron />
         </span>
     );
