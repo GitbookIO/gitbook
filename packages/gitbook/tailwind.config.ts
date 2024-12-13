@@ -6,7 +6,7 @@ import plugin from 'tailwindcss/plugin';
 import { hexToRgb, shadesOfColor } from './src/lib/colors';
 
 export const shades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
-export const opacities = [0, 4, 8, 12, 16, 24, 40, 64, 72, 88, 96];
+export const opacities = [0, 4, 8, 12, 16, 24, 40, 64, 72, 88, 96, 100];
 
 /**
  * Generate a Tailwind color shades from a variable.
@@ -207,6 +207,10 @@ const config: Config = {
                 thinbottom: '0px 1px 0px rgba(0, 0, 0, 0.05)',
                 thintop: '0px -1px 0px  rgba(0, 0, 0, 0.05)',
                 '1xs': '0px 1px 1px rgba(0, 0, 0, 0.09), 0px 3.267px 2.754px rgb(0, 0, 0, 0.05), 0px 6.278px 6.63px rgb(0, 0, 0, 0.05), 0px 14px 22px rgb(0, 0, 0, 0.04)',
+            },
+            scale: {
+                '98': '0.98',
+                '102': '1.02',
             },
         },
         opacity: opacity(),

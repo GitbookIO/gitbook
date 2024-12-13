@@ -60,12 +60,12 @@
     }
     .containerHeaderlinks > :nth-child(n + 5) ~ .linkEllipsis {
         display: flex;
-        & div > :nth-child(n + 5) {
+        & div > a:nth-of-type(n + 5) {
             display: flex;
         }
     }
 }
-@container headerlinks ( width < 900px ) {
+@container headerlinks ( width < 850px ) {
     .containerHeaderlinks > :nth-child(n + 6) {
         display: none;
     }
