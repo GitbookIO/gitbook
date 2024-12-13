@@ -13,8 +13,10 @@ import React from 'react';
 import { Footer } from '@/components/Footer';
 import { CompactHeader, Header } from '@/components/Header';
 import { CONTAINER_STYLE } from '@/components/layout';
-import { SearchModal } from '@/components/Search';
+import { SearchButton, SearchModal } from '@/components/Search';
 import { TableOfContents } from '@/components/TableOfContents';
+import { getSpaceLanguage } from '@/intl/server';
+import { t } from '@/intl/translate';
 import { api, ContentTarget, type SectionsList, SiteContentPointer } from '@/lib/api';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -63,7 +65,10 @@ export async function SpaceLayout(props: {
 
     const withSections = Boolean(sections && sections.list.length > 0);
     const withVariants = Boolean(site && spaces.length > 1);
-    const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
+    const headerOffset = {
+        sectionsHeader: withSections,
+        topHeader: withTopHeader,
+    };
     const apiHost = (await api()).client.endpoint;
     const visitorAuthToken = await getCurrentVisitorToken();
     const enabled = await shouldTrackEvents();
@@ -116,13 +121,43 @@ export async function SpaceLayout(props: {
                             )
                         }
                         innerHeader={
-                            withVariants && (
-                                <SpacesDropdown
-                                    className={withTopHeader && !sections ? 'sm:hidden' : undefined}
-                                    space={space}
-                                    spaces={spaces}
-                                />
-                            )
+                            withVariants || !withTopHeader ? (
+                                <div className="flex flex-col gap-6">
+                                    {!withTopHeader ? (
+                                        <div
+                                            className={tcls(
+                                                'flex-shrink-0',
+                                                'grow-0',
+                                                'md:grow',
+                                                'sm:max-w-xs',
+                                                'lg:max-w-full',
+                                            )}
+                                        >
+                                            <React.Suspense fallback={null}>
+                                                <SearchButton>
+                                                    <span className={tcls('flex-1')}>
+                                                        {t(
+                                                            getSpaceLanguage(customization),
+                                                            customization.aiSearch.enabled
+                                                                ? 'search_or_ask'
+                                                                : 'search',
+                                                        )}
+                                                    </span>
+                                                </SearchButton>
+                                            </React.Suspense>
+                                        </div>
+                                    ) : null}
+                                    {withVariants && (
+                                        <SpacesDropdown
+                                            className={
+                                                withTopHeader && !sections ? 'sm:hidden' : undefined
+                                            }
+                                            space={space}
+                                            spaces={spaces}
+                                        />
+                                    )}
+                                </div>
+                            ) : null
                         }
                         headerOffset={headerOffset}
                     />
