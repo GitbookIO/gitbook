@@ -18,12 +18,16 @@ export function SpacesDropdown(props: { space: Space; spaces: Space[]; className
                         'flex',
                         'flex-row',
                         'items-center',
-                        'rounded-2xl',
-                        'straight-corners:rounded-none',
+                        'gap-2',
 
+                        'straight-corners:rounded-none',
+                        'rounded-2xl',
+                        'border-1',
+                        'shadow-[0_0_2px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.12)]',
+                        'dark:shadow-[0_1px_2px_rgba(0,0,0,0.5),0_0_1px_rgba(0,0,0,0.3)]',
                         'hover:cursor-pointer',
-                        'bg-dark/1',
-                        'dark:bg-light/1',
+                        'bg-light',
+                        'dark:bg-dark-3',
 
                         'text-sm',
                         'text-dark-4',
@@ -36,7 +40,7 @@ export function SpacesDropdown(props: { space: Space; spaces: Space[]; className
                         'dark:contrast-more:bg-dark',
 
                         'px-3',
-                        'py-1',
+                        'py-1.5',
                         className,
                     )}
                 >
