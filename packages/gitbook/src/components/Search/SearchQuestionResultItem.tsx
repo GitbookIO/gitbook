@@ -39,7 +39,6 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                     'text-contrast-primary-50',
                     'dark:bg-primary-800',
                     'dark:text-contrast-primary-800',
-
                     'hover:bg-primary-100/8',
                     'dark:hover:bg-primary-700/7',
                 ],
@@ -56,7 +55,6 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                     'shrink-0',
                     'mt-1.5',
                     'mr-4',
-
                     active ? ['text-primary'] : ['text-dark/5', 'dark:text-light/5'],
                 )}
             />
