@@ -50,7 +50,7 @@ export function HeaderLogo(props: HeaderLogoProps) {
                     sizes={[
                         {
                             media: '(max-width: 1024px)',
-                            width: 128,
+                            width: 160,
                         },
                         {
                             width: 260,
