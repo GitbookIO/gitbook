@@ -11,7 +11,7 @@ import { tString, useLanguage } from '@/intl/client';
 import { SiteContentPointer } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
-import { isQuestion } from './isQuestion'
+import { isQuestion } from './isQuestion';
 import { SearchAskAnswer, searchAskState } from './SearchAskAnswer';
 import { SearchResults, SearchResultsRef } from './SearchResults';
 import { SearchScopeToggle } from './SearchScopeToggle';
@@ -184,7 +184,7 @@ function SearchModalBody(
             event.preventDefault();
             resultsRef.current?.select();
 
-            const queryIsQuestion = isQuestion(state.query)
+            const queryIsQuestion = isQuestion(state.query);
 
             onChangeQuery({
                 ask: queryIsQuestion && withAsk,
