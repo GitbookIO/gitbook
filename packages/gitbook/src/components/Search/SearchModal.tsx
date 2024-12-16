@@ -177,7 +177,7 @@ function SearchModalBody(
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         };
-  }, [onClose]);
+    }, [onClose]);
 
     const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'ArrowUp') {
