@@ -110,6 +110,13 @@ export const SearchResults = React.forwardRef(function SearchResults(
         }
     }, [query, global, pointer, spaceId, revisionId, withAsk]);
 
+    // Auto-focus the first result.
+    React.useEffect(() => {
+        if (results && results.length > 0) {
+            setCursor(0);
+        }
+    }, [results]);
+
     // Scroll to the active result.
     React.useEffect(() => {
         if (cursor === null || !refs.current[cursor]) {
@@ -256,12 +263,11 @@ export const SearchResults = React.forwardRef(function SearchResults(
     );
 });
 
+/**
+ * Add a "Ask <question>" item at the top of the results list.
+ */
 function withQuestionResult(results: null | ResultType[], query: string): null | ResultType[] {
     const without = results ? results.filter((result) => result.type !== 'question') : null;
-
-    if (!isQuestion(query)) {
-        return without;
-    }
 
     return [{ type: 'question', id: 'question', query }, ...(without ?? [])];
 }

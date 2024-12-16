@@ -183,14 +183,6 @@ function SearchModalBody(
         } else if (event.key === 'Enter') {
             event.preventDefault();
             resultsRef.current?.select();
-
-            const queryIsQuestion = isQuestion(state.query);
-
-            onChangeQuery({
-                ask: queryIsQuestion && withAsk,
-                query: state.query,
-                global: state.global,
-            });
         }
     };
 
