@@ -107,8 +107,8 @@ export const SearchResults = React.forwardRef(function SearchResults(
         }
     }, [query, global, pointer, spaceId, revisionId, withAsk]);
 
-    // Auto-focus the first result
     React.useEffect(() => {
+        // Auto-focus the first result
         if (results && results.length > 0) {
             setCursor(0);
         }

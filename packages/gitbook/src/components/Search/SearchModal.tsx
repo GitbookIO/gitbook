@@ -55,10 +55,6 @@ export function SearchModal(props: SearchModalProps) {
         };
     }, [isSearchOpened]);
 
-    // if (state === null) {
-    //     return null;
-    // }
-
     const onChangeQuery = (newQuery: SearchState) => {
         setSearchState(newQuery);
     };
