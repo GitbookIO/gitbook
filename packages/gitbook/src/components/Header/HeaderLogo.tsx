@@ -53,7 +53,7 @@ export function HeaderLogo(props: HeaderLogoProps) {
                             width: 128,
                         },
                         {
-                            width: 192,
+                            width: 260,
                         },
                     ]}
                     priority="high"
@@ -61,13 +61,14 @@ export function HeaderLogo(props: HeaderLogoProps) {
                         'rounded',
                         'straight-corners:rounded-sm',
                         'overflow-hidden',
-                        'object-contain',
-                        'object-left',
-                        'min-w-20',
+                        'shrink',
+                        'min-w-0',
                         'max-w-40',
                         'lg:max-w-64',
                         'max-h-10',
                         'lg:max-h-12',
+                        'h-full',
+                        'w-auto',
                     )}
                 />
             ) : (
