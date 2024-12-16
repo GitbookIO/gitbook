@@ -1,3 +1,4 @@
+import { Icon } from '@gitbook/icons';
 import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
@@ -5,7 +6,6 @@ import { tcls } from '@/lib/tailwind';
 import { HighlightQuery } from './HighlightQuery';
 import type { ComputedSectionResult } from './server-actions';
 import { Link } from '../primitives';
-import { Icon } from '@gitbook/icons';
 
 export const SearchSectionResultItem = React.forwardRef(function SearchSectionResultItem(
     props: {

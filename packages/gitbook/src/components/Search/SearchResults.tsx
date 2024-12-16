@@ -5,7 +5,6 @@ import { t, useLanguage } from '@/intl/client';
 import { SiteContentPointer } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
-import { isQuestion } from './isQuestion';
 import { SearchPageResultItem } from './SearchPageResultItem';
 import { SearchQuestionResultItem } from './SearchQuestionResultItem';
 import { SearchSectionResultItem } from './SearchSectionResultItem';
