@@ -27,7 +27,8 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                 'flex',
                 'items-center',
 
-                'pl-12',
+                'pl-6',
+                'sm:pl-12',
                 'pr-4',
 
                 'text-dark/8',
@@ -83,7 +84,9 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                     'straight-corners:rounded-none',
                     'bg-primary',
                     'text-contrast-primary',
-                    !active && 'opacity-0',
+                    'hidden',
+                    'sm:block',
+                    active ? ['opacity-11', 'block'] : ['opacity-0'],
                 )}
             >
                 <Icon icon="arrow-turn-down-left" className={tcls('size-4')} />
