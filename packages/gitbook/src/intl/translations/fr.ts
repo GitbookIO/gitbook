@@ -15,6 +15,7 @@ export const fr: TranslationLanguage = {
     search_scope_space: '${1}',
     search_scope_all: 'Tout le contenu',
     search_ask: 'Demander "${1}"',
+    search_ask_description: 'Laissez GitBook AI répondre à votre question',
     search_ask_sources: 'Sources',
     search_ask_sources_no_answer: 'Pages connexes',
     search_ask_no_answer:

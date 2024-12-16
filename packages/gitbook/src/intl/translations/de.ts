@@ -13,6 +13,7 @@ export const de = {
     search_scope_space: '${1}',
     search_scope_all: 'Alle Inhalte',
     search_ask: 'Fragen "${1}"',
+    search_ask_description: 'Lass GitBook AI deine Frage beantworten',
     search_ask_sources: 'Quellen',
     search_ask_sources_no_answer: 'Verwandte Seiten',
     search_ask_no_answer:

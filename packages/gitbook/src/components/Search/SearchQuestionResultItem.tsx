@@ -67,7 +67,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                     <>
                         <div className="font-medium">{t(language, 'search_ask', [question])}</div>
                         <div className={tcls('text-sm', 'text-dark/8', 'dark:text-light/8')}>
-                            Let AI answer your question
+                            {t(language, 'search_ask_description')}
                         </div>
                     </>
                 )}
