@@ -57,7 +57,10 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
             )}
         >
             <div className="size-4">
-                <Icon icon="file-lines" className={tcls('size-4', active ? 'text-primary' : 'opacity-5',)} />
+                <Icon
+                    icon="file-lines"
+                    className={tcls('size-4', active ? 'text-primary' : 'opacity-5')}
+                />
             </div>
             <div className={tcls('flex', 'flex-col', 'w-full')}>
                 {item.spaceTitle ? (

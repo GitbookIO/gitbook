@@ -92,8 +92,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
             }
 
             debounceTimeout.current = setTimeout(async () => {
-                setCursor(null);
-
                 const fetchedResults = await (global
                     ? searchAllSiteContent(query, pointer)
                     : searchSiteSpaceContent(query, pointer, revisionId));
@@ -114,6 +112,10 @@ export const SearchResults = React.forwardRef(function SearchResults(
     React.useEffect(() => {
         if (results && results.length > 0) {
             setCursor(0);
+        }
+
+        if (!query) {
+            setCursor(null);
         }
     }, [results]);
 
