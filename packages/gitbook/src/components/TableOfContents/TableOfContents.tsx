@@ -73,6 +73,7 @@ export function TableOfContents(props: {
             <TOCScrollContainer
                 className={tcls(
                     withHeaderOffset ? 'pt-4' : ['pt-4', 'lg:pt-0'],
+                    'gap-6',
                     'hidden',
                     'lg:flex',
                     'flex-grow',
@@ -93,7 +94,7 @@ export function TableOfContents(props: {
                     customization.trademark.enabled ? 'lg:pb-20' : 'lg:pb-4',
                 )}
             >
-                {innerHeader && <div className={tcls('ms-5', 'mb-4')}>{innerHeader}</div>}
+                {innerHeader && <div className={tcls('ms-5', 'pt-3')}>{innerHeader}</div>}
                 <PagesList
                     rootPages={pages}
                     pages={pages}
