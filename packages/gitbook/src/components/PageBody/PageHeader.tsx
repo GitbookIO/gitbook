@@ -1,9 +1,4 @@
-import {
-    RevisionPage,
-    RevisionPageDocument,
-    RevisionPageGroup,
-    RevisionPageType,
-} from '@gitbook/api';
+import { RevisionPage, RevisionPageDocument } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 
 import { pageHref } from '@/lib/links';
@@ -83,11 +78,4 @@ export function PageHeader(props: {
             ) : null}
         </header>
     );
-}
-
-function flattenPages(pages: RevisionPage[]): RevisionPage[] {
-    return pages.reduce<RevisionPage[]>((acc, page) => {
-        const nestedPages = 'pages' in page && page.pages ? flattenPages(page.pages) : [];
-        return acc.concat(page, ...nestedPages);
-    }, []);
 }
