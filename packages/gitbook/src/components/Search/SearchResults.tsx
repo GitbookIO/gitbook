@@ -107,16 +107,17 @@ export const SearchResults = React.forwardRef(function SearchResults(
         }
     }, [query, global, pointer, spaceId, revisionId, withAsk]);
 
-    // Auto-focus the first result.
+    // Auto-focus the first result
     React.useEffect(() => {
         if (results && results.length > 0) {
             setCursor(0);
         }
 
+        // Reset the cursor when the query is cleared
         if (!query) {
             setCursor(null);
         }
-    }, [results]);
+    }, [results, query]);
 
     // Scroll to the active result.
     React.useEffect(() => {

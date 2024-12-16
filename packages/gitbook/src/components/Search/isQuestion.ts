@@ -28,7 +28,7 @@ const questionWords = new Set([
  * Return true if an input query looks like a question.
  */
 export function isQuestion(query: string): boolean {
-    if (query.length > 25 || query.includes('?')) {
+    if (query.length > 25 || query.includes('?') || query.includes(' ')) {
         return true;
     }
 
