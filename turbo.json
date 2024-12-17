@@ -15,11 +15,13 @@
         // Build the package for publishing
         "build": {
             "dependsOn": ["^build", "generate"],
-            "outputs": [".next/**", "!.next/cache/**", "dist"]
+            "outputs": [".next/**", "!.next/cache/**", "dist"],
+            "env": ["GITBOOK_ASSETS_PREFIX"]
         },
         // Build the package for Cloudflare Pages
         "build:cloudflare": {
-            "dependsOn": ["^build", "generate"]
+            "dependsOn": ["^build", "generate"],
+            "env": ["GITBOOK_ASSETS_PREFIX"]
         },
         // Check the package for type errors
         "typecheck": {
