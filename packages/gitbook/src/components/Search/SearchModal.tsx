@@ -192,13 +192,31 @@ function SearchModalBody(
         }
     };
 
-    const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        onChangeQuery({
-            ask: false, // When typing, we go back to the default search mode
-            query: event.target.value,
-            global: state.global,
-        });
-    };
+    // Mange input value locally to avoid flickering during typing when global state updates
+    const [inputValue, setInputValue] = React.useState(state?.query || '');
+    const timeoutIdRef = React.useRef<number | null>(null);
+
+    const onChange = React.useCallback(
+        (event: React.ChangeEvent<HTMLInputElement>) => {
+            const value = event.target.value;
+            setInputValue(value);
+
+            // Clear any previous timeout
+            if (timeoutIdRef.current) {
+                clearTimeout(timeoutIdRef.current);
+            }
+
+            // Update search state after 300ms
+            timeoutIdRef.current = window.setTimeout(() => {
+                onChangeQuery({
+                    ask: false, // When typing, we go back to the default search mode
+                    query: value,
+                    global: state.global,
+                });
+            }, 300);
+        },
+        [onChangeQuery, state?.global],
+    );
 
     return (
         <motion.div
@@ -274,7 +292,7 @@ function SearchModalBody(
                 >
                     <input
                         ref={inputRef}
-                        value={state.query}
+                        value={inputValue}
                         onKeyDown={onKeyDown}
                         onChange={onChange}
                         className={tcls(
