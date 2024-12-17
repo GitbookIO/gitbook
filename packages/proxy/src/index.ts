@@ -10,6 +10,12 @@ export interface ProxyToGitBookOptions {
      * @example "/docs"
      */
     basePath: string;
+
+    /**
+     * Hostname used by GitBook to serve content.
+     * Do not set this option unless you know what you are doing.
+     */
+    gitbookHost?: string;
 }
 
 export interface ProxySite {
@@ -33,10 +39,12 @@ export interface ProxySite {
  * Proxies requests to a GitBook site.
  */
 export function proxyToGitBook(options: ProxyToGitBookOptions): ProxySite {
-    const siteUrl = new URL(options.site);
-    const basePath = normalizeBasePath(options.basePath);
+    const { gitbookHost = 'hosting.gitbook.io' } = options;
 
-    const siteUrlPathname = withoutTrailingSlash(siteUrl.pathname);
+    const siteUrl = new URL(options.site);
+    const rawSiteUrl = siteUrl.toString();
+
+    const basePath = normalizeBasePath(options.basePath);
 
     const site: ProxySite = {
         match: (request) => {
@@ -47,19 +55,21 @@ export function proxyToGitBook(options: ProxyToGitBookOptions): ProxySite {
         request: (originRequest) => {
             const originUrl = new URL(originRequest.url);
 
-            const pathname = withLeadingSlash(originUrl.pathname.slice(basePath.length));
-
             const url = new URL(originUrl);
-            url.hostname = siteUrl.hostname;
-            url.pathname = siteUrlPathname + pathname;
+            url.hostname = gitbookHost;
 
             const proxyRequest = new Request(url, originRequest);
+            proxyRequest.headers.set('Host', gitbookHost);
 
-            proxyRequest.headers.set('Host', siteUrl.hostname);
+            // Pass the original host and protocol
             proxyRequest.headers.set('X-Forwarded-Host', originUrl.hostname);
             proxyRequest.headers.set('X-Forwarded-Proto', 'https');
 
+            // Pass the basepath on the original URL
             proxyRequest.headers.set('X-GitBook-BasePath', basePath);
+
+            // Pass the site URL
+            proxyRequest.headers.set('X-GitBook-Site-URL', rawSiteUrl);
 
             return proxyRequest;
         },

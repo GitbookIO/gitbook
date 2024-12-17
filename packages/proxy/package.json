@@ -2,7 +2,6 @@
     "name": "@gitbook/proxy",
     "description": "Host a GitBook site on your own domain as a subpath",
     "version": "0.0.0",
-    "private": true,
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
