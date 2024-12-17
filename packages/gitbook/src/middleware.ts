@@ -144,8 +144,8 @@ export async function middleware(request: NextRequest) {
 
     // Make sure the URL is clean of any va token after a successful lookup
     // The token is stored in a cookie that is set on the redirect response
-    const normalizedVA = normalizeVisitorAuthURL(url);
-    if (normalizedVA.toString() !== url.toString()) {
+    const normalizedVA = normalizeVisitorAuthURL(normalized);
+    if (normalizedVA.toString() !== normalized.toString()) {
         console.log(`redirecting to ${normalizedVA.toString()}`);
         return writeCookies(NextResponse.redirect(normalizedVA.toString()), resolved.cookies);
     }
