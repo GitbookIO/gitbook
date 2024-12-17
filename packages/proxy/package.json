@@ -1,0 +1,15 @@
+{
+    "name": "@gitbook/proxy",
+    "description": "Host a GitBook site on your own domain as a subpath",
+    "version": "0.0.0",
+    "private": true,
+    "exports": "./dist/index.ts",
+    "dependencies": {},
+    "devDependencies": {
+        "emoji-assets": "^8.0.0"
+    },
+    "scripts": {
+        "generate": "bun ./build.ts",
+        "clean": "rm -rf ./dist"
+    }
+}
