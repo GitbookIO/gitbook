@@ -26,8 +26,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                 'gap-4',
                 'flex-row',
                 'items-center',
-                'px-4',
-                'py-4',
+                'p-4',
                 'border-t',
                 'border-dark/2',
                 'dark:border-light/1',
@@ -75,8 +74,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
             </div>
             <div
                 className={tcls(
-                    'px-2',
-                    'py-2',
+                    'p-2',
                     'rounded',
                     'straight-corners:rounded-none',
                     active ? ['bg-primary', 'text-contrast-primary'] : ['opacity-6'],

@@ -71,8 +71,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
             </div>
             <div
                 className={tcls(
-                    'px-2',
-                    'py-2',
+                    'p-2',
                     'rounded',
                     'self-center',
                     'straight-corners:rounded-none',
