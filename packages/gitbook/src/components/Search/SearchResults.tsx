@@ -271,5 +271,9 @@ export const SearchResults = React.forwardRef(function SearchResults(
 function withQuestionResult(results: null | ResultType[], query: string): null | ResultType[] {
     const without = results ? results.filter((result) => result.type !== 'question') : null;
 
+    if (!query.length) {
+        return without;
+    }
+
     return [{ type: 'question', id: 'question', query }, ...(without ?? [])];
 }
