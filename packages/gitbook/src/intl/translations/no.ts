@@ -15,6 +15,7 @@ export const no: TranslationLanguage = {
     search_scope_space: '${1}',
     search_scope_all: 'Alt innhold',
     search_ask: 'Spør "${1}"',
+    search_ask_description: 'Finn svaret med AI',
     search_ask_sources: 'Kilder',
     search_ask_sources_no_answer: 'Relaterte sider',
     search_ask_no_answer:

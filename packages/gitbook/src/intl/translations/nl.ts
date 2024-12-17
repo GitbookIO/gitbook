@@ -15,6 +15,7 @@ export const nl: TranslationLanguage = {
     search_scope_space: '${1}',
     search_scope_all: 'Alle inhoud',
     search_ask: 'Vraag "${1}"',
+    search_ask_description: 'Vind het antwoord met AI',
     search_ask_sources: 'Bronnen',
     search_ask_sources_no_answer: 'Gerelateerde pagina’s',
     search_ask_no_answer:

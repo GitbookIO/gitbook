@@ -25,6 +25,10 @@ export function HighlightQuery(props: {
             'py-0.5',
             'rounded',
             'straight-corners:rounded-sm',
+            'group-[.is-active]:bg-primary-200',
+            'group-[.is-active]:text-contrast-primary-200',
+            'dark:group-[.is-active]:bg-primary-700',
+            'dark:group-[.is-active]:text-contrast-primary-700',
         ],
     } = props;
     const matches = matchString(text, query);
