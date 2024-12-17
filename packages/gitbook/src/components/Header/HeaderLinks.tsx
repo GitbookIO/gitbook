@@ -13,7 +13,7 @@ export async function HeaderLinks({ children }: HeaderLinksProps) {
         <div
             className={tcls(
                 styles.containerHeaderlinks,
-                'grow shrink flex justify-end items-center gap-x-6 lg:gap-x-8 min-w-9 z-20',
+                'grow shrink flex justify-end items-center gap-x-6 min-w-9 z-20',
             )}
         >
             {children}
