@@ -5,7 +5,6 @@ import { t, useLanguage } from '@/intl/client';
 import { SiteContentPointer } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
-import { isQuestion } from './isQuestion';
 import { SearchPageResultItem } from './SearchPageResultItem';
 import { SearchQuestionResultItem } from './SearchQuestionResultItem';
 import { SearchSectionResultItem } from './SearchSectionResultItem';
@@ -92,8 +91,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
             }
 
             debounceTimeout.current = setTimeout(async () => {
-                setCursor(null);
-
                 const fetchedResults = await (global
                     ? searchAllSiteContent(query, pointer)
                     : searchSiteSpaceContent(query, pointer, revisionId));
@@ -109,6 +106,16 @@ export const SearchResults = React.forwardRef(function SearchResults(
             };
         }
     }, [query, global, pointer, spaceId, revisionId, withAsk]);
+
+    React.useEffect(() => {
+        if (!query) {
+            // Reset the cursor when there's no query
+            setCursor(null);
+        } else if (results && results.length > 0) {
+            // Auto-focus the first result
+            setCursor(0);
+        }
+    }, [results, query]);
 
     // Scroll to the active result.
     React.useEffect(() => {
@@ -174,7 +181,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     }
 
     return (
-        <div className={tcls('max-h-[70vh]', 'overflow-auto', 'relative')}>
+        <div className={tcls('overflow-auto')}>
             {children}
             {results.length === 0 ? (
                 <div
@@ -256,10 +263,13 @@ export const SearchResults = React.forwardRef(function SearchResults(
     );
 });
 
+/**
+ * Add a "Ask <question>" item at the top of the results list.
+ */
 function withQuestionResult(results: null | ResultType[], query: string): null | ResultType[] {
     const without = results ? results.filter((result) => result.type !== 'question') : null;
 
-    if (!isQuestion(query)) {
+    if (query.length === 0) {
         return without;
     }
 

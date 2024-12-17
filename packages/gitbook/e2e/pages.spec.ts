@@ -112,7 +112,9 @@ const testCases: TestsCase[] = [
                 name: 'Variants dropdown',
                 url: '',
                 run: async (page) => {
-                    const spaceDrowpdown = page.locator('[data-testid="space-dropdown-button"]');
+                    const spaceDrowpdown = page
+                        .locator('[data-testid="space-dropdown-button"]')
+                        .locator('visible=true');
                     await spaceDrowpdown.waitFor();
                 },
             },
@@ -128,7 +130,9 @@ const testCases: TestsCase[] = [
                 name: 'Customized variant titles are displayed',
                 url: '',
                 run: async (page) => {
-                    const spaceDrowpdown = page.locator('[data-testid="space-dropdown-button"]');
+                    const spaceDrowpdown = page
+                        .locator('[data-testid="space-dropdown-button"]')
+                        .locator('visible=true');
                     await spaceDrowpdown.click();
 
                     const variantSelectionDropdown = page.locator(
@@ -160,9 +164,9 @@ const testCases: TestsCase[] = [
                 url: 'api-multi-versions/reference/api-reference/pets',
                 screenshot: false,
                 run: async (page) => {
-                    const spaceDrowpdown = await page.waitForSelector(
-                        '[data-testid="space-dropdown-button"]',
-                    );
+                    const spaceDrowpdown = await page
+                        .locator('[data-testid="space-dropdown-button"]')
+                        .locator('visible=true');
                     await spaceDrowpdown.click();
 
                     // Click the second variant in the dropdown
@@ -183,9 +187,9 @@ const testCases: TestsCase[] = [
                 url: 'api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/reference/api-reference/pets',
                 screenshot: false,
                 run: async (page) => {
-                    const spaceDrowpdown = await page.waitForSelector(
-                        '[data-testid="space-dropdown-button"]',
-                    );
+                    const spaceDrowpdown = await page
+                        .locator('[data-testid="space-dropdown-button"]')
+                        .locator('visible=true');
                     await spaceDrowpdown.click();
 
                     // Click the second variant in the dropdown
@@ -218,9 +222,9 @@ const testCases: TestsCase[] = [
                     return `api-multi-versions-va/reference/api-reference/pets?jwt_token=${token}`;
                 })(),
                 run: async (page) => {
-                    const spaceDrowpdown = await page.waitForSelector(
-                        '[data-testid="space-dropdown-button"]',
-                    );
+                    const spaceDrowpdown = await page
+                        .locator('[data-testid="space-dropdown-button"]')
+                        .locator('visible=true');
                     await spaceDrowpdown.click();
 
                     // Click the second variant in the dropdown
@@ -1016,6 +1020,90 @@ const testCases: TestsCase[] = [
                     await expect(betaUserPage).toBeVisible();
                 },
             },
+        ],
+    },
+    {
+        name: 'Tables',
+        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        tests: [
+            {
+                name: 'Default table',
+                url: 'blocks/tables',
+                run: waitForCookiesDialog,
+                fullPage: true,
+            },
+            {
+                name: 'Table with straight corners',
+                url:
+                    'blocks/tables' +
+                    getCustomizationURL({
+                        styling: {
+                            corners: CustomizationCorners.Straight,
+                        },
+                    }),
+                run: waitForCookiesDialog,
+                fullPage: true,
+            },
+            {
+                name: 'Table with primary color',
+                url:
+                    'blocks/tables' +
+                    getCustomizationURL({
+                        styling: {
+                            tint: { color: { light: '#346DDB', dark: '#346DDB' } },
+                        },
+                    }),
+                run: waitForCookiesDialog,
+                fullPage: true,
+            },
+            // Test dark mode for each variant
+            ...allThemeModes.flatMap((theme) => [
+                {
+                    name: `Table in ${theme} mode`,
+                    url:
+                        'blocks/tables' +
+                        getCustomizationURL({
+                            themes: {
+                                default: theme,
+                                toggeable: false,
+                            },
+                        }),
+                    run: waitForCookiesDialog,
+                    fullPage: true,
+                },
+                {
+                    name: `Table with straight corners in ${theme} mode`,
+                    url:
+                        'blocks/tables' +
+                        getCustomizationURL({
+                            styling: {
+                                corners: CustomizationCorners.Straight,
+                            },
+                            themes: {
+                                default: theme,
+                                toggeable: false,
+                            },
+                        }),
+                    run: waitForCookiesDialog,
+                    fullPage: true,
+                },
+                {
+                    name: `Table with primary color in ${theme} mode`,
+                    url:
+                        'blocks/tables' +
+                        getCustomizationURL({
+                            styling: {
+                                tint: { color: { light: '#346DDB', dark: '#346DDB' } },
+                            },
+                            themes: {
+                                default: theme,
+                                toggeable: false,
+                            },
+                        }),
+                    run: waitForCookiesDialog,
+                    fullPage: true,
+                },
+            ]),
         ],
     },
 ];

@@ -23,21 +23,37 @@
 }
 
 :global(.dark) .tableWrapper {
-    @apply border-light/2;
-}
-
-.row {
-    @apply flex border-dark/3 dark:border-light/2;
-}
-
-.row > * + * {
-    @apply border-l;
-}
-
-.cell {
-    @apply flex-1 align-middle border-dark/2 py-2 px-3 text-sm lg:text-base dark:border-light/2;
+    @apply border-tint-50;
 }
 
 .columnHeader {
-    @apply align-middle text-left text-base font-medium border-b dark:border-l-light/2 dark:border-b-light/4 py-2 px-3;
+    @apply text-sm font-medium py-3 px-4 text-tint-900;
+}
+
+:global(.dark) .columnHeader {
+    @apply text-white;
+}
+
+.row {
+    @apply flex border-tint-700/2;
+}
+
+:global(.dark) .row {
+    @apply border-tint-300/3;
+}
+
+.rowGroup {
+    @apply flex flex-col border rounded-lg bg-tint-800/1 border-tint-700/2;
+}
+
+:global(.dark) .rowGroup {
+    @apply bg-tint-300/2 border-tint-300/3;
+}
+
+.cell {
+    @apply flex-1 align-middle border-dark/2 py-2 px-4 text-sm;
+}
+
+:global(.dark) .cell {
+    @apply border-light/2;
 }

@@ -33,6 +33,7 @@ export async function HeaderLink(props: {
     if (link.links && link.links.length > 0) {
         return (
             <Dropdown
+                className="shrink"
                 button={(buttonProps) => {
                     if (!target) {
                         return (
@@ -147,12 +148,9 @@ function HeaderItemButton(
 
 function getHeaderLinkClassName(props: { headerPreset: CustomizationHeaderPreset }) {
     return tcls(
-        'overflow-hidden',
-        'text-sm lg:text-base',
-        'flex flex-row items-center',
-        'whitespace-nowrap',
+        'flex items-center shrink',
         'hover:text-header-link-400 dark:hover:text-light',
-        'truncate',
+        'min-w-0',
 
         props.headerPreset === CustomizationHeaderPreset.Default
             ? ['text-dark/8', 'dark:text-light/8']
@@ -164,7 +162,7 @@ function HeaderItemLink(props: HeaderLinkNavItemProps) {
     const { headerPreset, title, isDropdown, href, ...rest } = props;
     return (
         <Link href={href} className={getHeaderLinkClassName({ headerPreset })} {...rest}>
-            {title}
+            <span className="truncate min-w-0">{title}</span>
             {isDropdown ? <DropdownChevron /> : null}
         </Link>
     );

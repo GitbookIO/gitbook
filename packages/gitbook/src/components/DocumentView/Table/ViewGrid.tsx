@@ -34,8 +34,15 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
             <div role="table" className={tcls('flex', 'flex-col')}>
                 {/* Header */}
                 {withHeader && (
-                    <div role="rowgroup" className={tcls('flex flex-col', tableWidth)}>
-                        <div role="row" className={tcls('flex', 'w-full', '[&>*+*]:border-l')}>
+                    <div
+                        role="rowgroup"
+                        className={tcls(
+                            tableWidth,
+                            styles.rowGroup,
+                            'straight-corners:rounded-none',
+                        )}
+                    >
+                        <div role="row" className={tcls('flex', 'w-full')}>
                             {view.columns.map((column) => {
                                 const alignment = getColumnAlignment(block.data.definition[column]);
                                 return (

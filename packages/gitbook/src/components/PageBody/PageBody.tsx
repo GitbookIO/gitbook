@@ -11,6 +11,7 @@ import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import { ContentTarget, SiteContentPointer, api } from '@/lib/api';
 import { hasFullWidthBlock, isNodeEmpty } from '@/lib/document';
+import { AncestorRevisionPage } from '@/lib/pages';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { shouldTrackPageViews } from '@/lib/tracking';
@@ -31,6 +32,7 @@ export function PageBody(props: {
     contentTarget: ContentTarget;
     customization: CustomizationSettings | SiteCustomizationSettings;
     page: RevisionPageDocument;
+    ancestors: AncestorRevisionPage[];
     document: JSONDocument | null;
     context: ContentRefContext;
     withPageFeedback: boolean;
@@ -42,6 +44,7 @@ export function PageBody(props: {
         customization,
         context,
         page,
+        ancestors,
         document,
         withPageFeedback,
     } = props;
@@ -79,7 +82,7 @@ export function PageBody(props: {
                     <PageCover as="hero" page={page} cover={page.cover} context={context} />
                 ) : null}
 
-                <PageHeader page={page} />
+                <PageHeader page={page} ancestors={ancestors} pages={context.pages} />
                 {document && !isNodeEmpty(document) ? (
                     <React.Suspense
                         fallback={
