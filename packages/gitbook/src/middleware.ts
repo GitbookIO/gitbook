@@ -90,7 +90,7 @@ export type LookupResult = PublishedContentWithCache & {
  *
  * Once the site has been looked-up, the middleware passes the info to the rendering
  * using a rewrite with a set of headers. This is the only way in next.js to do this (basically similar to AsyncLocalStorage).
- * 
+ *
  * The middleware also takes care of persisting the visitor authentication state.
  */
 export async function middleware(request: NextRequest) {
@@ -220,7 +220,10 @@ export async function middleware(request: NextRequest) {
     }
     headers.set('x-gitbook-mode', mode);
     headers.set('x-gitbook-origin-basepath', originBasePath);
-    headers.set('x-gitbook-basepath', mode === 'proxy' ? originBasePath : joinPath(originBasePath, resolved.basePath));
+    headers.set(
+        'x-gitbook-basepath',
+        mode === 'proxy' ? originBasePath : joinPath(originBasePath, resolved.basePath),
+    );
     headers.set('x-gitbook-content-space', resolved.space);
     if ('site' in resolved) {
         headers.set('x-gitbook-content-organization', resolved.organization);
