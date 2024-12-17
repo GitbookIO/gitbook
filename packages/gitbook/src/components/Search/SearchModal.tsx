@@ -55,10 +55,6 @@ export function SearchModal(props: SearchModalProps) {
         };
     }, [isSearchOpened]);
 
-    // if (state === null) {
-    //     return null;
-    // }
-
     const onChangeQuery = (newQuery: SearchState) => {
         setSearchState(newQuery);
     };
@@ -170,10 +166,21 @@ function SearchModalBody(
         inputRef.current?.focus();
     }, []);
 
+    React.useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                onClose();
+            }
+        };
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [onClose]);
+
     const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Escape') {
-            onClose();
-        } else if (event.key === 'ArrowUp') {
+        if (event.key === 'ArrowUp') {
             event.preventDefault();
             resultsRef.current?.moveUp();
         } else if (event.key === 'ArrowDown') {
