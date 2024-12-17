@@ -59,7 +59,7 @@ export function proxyToGitBook(options: ProxyToGitBookOptions): ProxySite {
             proxyRequest.headers.set('X-Forwarded-Host', originUrl.hostname);
             proxyRequest.headers.set('X-Forwarded-Proto', 'https');
 
-            proxyRequest.headers.set('X-GitBook-Forwarded-BasePath', basePath);
+            proxyRequest.headers.set('X-GitBook-BasePath', basePath);
 
             return proxyRequest;
         },
