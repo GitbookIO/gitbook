@@ -12,7 +12,9 @@ export type VisitorAuthCookieValue = {
     token: string;
 };
 
-export function isVisitorAuthTokenFromCookies(visitorAuthToken: NonNullable<ReturnType<typeof getVisitorAuthToken>>) {
+export function isVisitorAuthTokenFromCookies(
+    visitorAuthToken: NonNullable<ReturnType<typeof getVisitorAuthToken>>,
+) {
     if (typeof visitorAuthToken === 'string') {
         return false;
     }
