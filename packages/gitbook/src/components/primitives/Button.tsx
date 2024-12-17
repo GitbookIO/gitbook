@@ -35,7 +35,6 @@ export function Button({
               ]
             : // SECONDARY
               [
-                  'bg-dark/2',
                   'ring-dark/1',
                   'hover:bg-dark/3',
                   'dark:bg-light/2',
