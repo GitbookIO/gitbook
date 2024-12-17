@@ -3,13 +3,27 @@
     "description": "Host a GitBook site on your own domain as a subpath",
     "version": "0.0.0",
     "private": true,
-    "exports": "./dist/index.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "development": "./src/index.ts",
+            "default": "./dist/index.js"
+        }
+    },
     "dependencies": {},
     "devDependencies": {
-        "emoji-assets": "^8.0.0"
+        "typescript": "^5.5.3"
     },
     "scripts": {
-        "generate": "bun ./build.ts",
-        "clean": "rm -rf ./dist"
-    }
+        "build": "tsc",
+        "typecheck": "tsc --noEmit",
+        "clean": "rm -rf ./dist",
+        "unit": "bun test"
+    },
+    "files": [
+        "dist",
+        "src",
+        "README.md",
+        "CHANGELOG.md"
+    ]
 }
