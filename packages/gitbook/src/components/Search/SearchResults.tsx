@@ -108,14 +108,12 @@ export const SearchResults = React.forwardRef(function SearchResults(
     }, [query, global, pointer, spaceId, revisionId, withAsk]);
 
     React.useEffect(() => {
-        // Auto-focus the first result
-        if (results && results.length > 0) {
-            setCursor(0);
-        }
-
-        // Reset the cursor when the query is cleared
         if (!query) {
+            // Reset the cursor when there's no query
             setCursor(null);
+        } else if (results && results.length > 0) {
+            // Auto-focus the first result
+            setCursor(0);
         }
     }, [results, query]);
 
@@ -271,7 +269,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
 function withQuestionResult(results: null | ResultType[], query: string): null | ResultType[] {
     const without = results ? results.filter((result) => result.type !== 'question') : null;
 
-    if (!query.length) {
+    if (query.length === 0) {
         return without;
     }
 

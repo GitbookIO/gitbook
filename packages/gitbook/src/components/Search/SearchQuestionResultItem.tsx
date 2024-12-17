@@ -27,8 +27,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
             className={tcls(
                 'flex',
                 'px-4',
-                recommended ? 'py-2' : 'py-4',
-                recommended && ['text-dark/7', 'dark:text-light/8'],
+                recommended ? ['py-2', 'text-dark/7', 'dark:text-light/8'] : 'py-4',
                 'hover:bg-dark/1',
                 'dark:hover:bg-light/1',
                 'first:mt-0',
