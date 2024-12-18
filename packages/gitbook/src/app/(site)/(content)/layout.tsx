@@ -1,6 +1,7 @@
 import { CustomizationThemeMode } from '@gitbook/api';
 import { Metadata, Viewport } from 'next';
 import { headers } from 'next/headers';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import React from 'react';
 import * as ReactDOM from 'react-dom';
 
@@ -55,46 +56,48 @@ export default async function ContentLayout(props: { children: React.ReactNode }
     });
 
     return (
-        <ClientContexts
-            nonce={nonce}
-            forcedTheme={
-                getQueryStringTheme() ??
-                (customization.themes.toggeable ? undefined : customization.themes.default)
-            }
-        >
-            <SpaceLayout
-                space={space}
-                contentTarget={contentTarget}
-                site={site}
-                spaces={spaces}
-                sections={sections}
-                customization={customization}
-                pages={pages}
-                ancestors={ancestors}
-                content={content}
+        <NuqsAdapter>
+            <ClientContexts
+                nonce={nonce}
+                forcedTheme={
+                    getQueryStringTheme() ??
+                    (customization.themes.toggeable ? undefined : customization.themes.default)
+                }
             >
-                {children}
-            </SpaceLayout>
+                <SpaceLayout
+                    space={space}
+                    contentTarget={contentTarget}
+                    site={site}
+                    spaces={spaces}
+                    sections={sections}
+                    customization={customization}
+                    pages={pages}
+                    ancestors={ancestors}
+                    content={content}
+                >
+                    {children}
+                </SpaceLayout>
 
-            {scripts.length > 0 ? (
-                <>
-                    <LoadIntegrations />
-                    {scripts.map(({ script }) => (
-                        <script key={script} async src={script} nonce={nonce} />
-                    ))}
-                </>
-            ) : null}
+                {scripts.length > 0 ? (
+                    <>
+                        <LoadIntegrations />
+                        {scripts.map(({ script }) => (
+                            <script key={script} async src={script} nonce={nonce} />
+                        ))}
+                    </>
+                ) : null}
 
-            {scripts.some((script) => script.cookies) || customization.privacyPolicy.url ? (
-                <React.Suspense fallback={null}>
-                    <CookiesToast privacyPolicy={customization.privacyPolicy.url} />
-                </React.Suspense>
-            ) : null}
+                {scripts.some((script) => script.cookies) || customization.privacyPolicy.url ? (
+                    <React.Suspense fallback={null}>
+                        <CookiesToast privacyPolicy={customization.privacyPolicy.url} />
+                    </React.Suspense>
+                ) : null}
 
-            <RocketLoaderDetector nonce={nonce} />
+                <RocketLoaderDetector nonce={nonce} />
 
-            <AdminToolbar space={space} content={content} />
-        </ClientContexts>
+                <AdminToolbar space={space} content={content} />
+            </ClientContexts>
+        </NuqsAdapter>
     );
 }
 
