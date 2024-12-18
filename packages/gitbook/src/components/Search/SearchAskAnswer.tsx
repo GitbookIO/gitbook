@@ -51,42 +51,29 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
     React.useEffect(() => {
         let cancelled = false;
 
-        setState({
-            type: 'loading',
-        });
+        setState({ type: 'loading' });
 
         (async () => {
-            const stream = iterateStreamResponse(
-                streamAskQuestion(organizationId, siteId, siteSpaceId ?? null, query),
-            );
+            const response = streamAskQuestion(organizationId, siteId, siteSpaceId ?? null, query);
+            const stream = iterateStreamResponse(response);
 
-            setSearchState((prev) =>
-                prev
-                    ? {
-                          ...prev,
-                          ask: true,
-                          query,
-                      }
-                    : null,
-            );
+            // When we pass in "ask" mode, the query could still be updated by the client
+            // we ensure that the query is up-to-date before starting the stream.
+            setSearchState((prev) => (prev ? { ...prev, query, ask: true } : null));
 
             for await (const chunk of stream) {
                 if (cancelled) {
                     return;
                 }
-                setState({
-                    type: 'answer',
-                    answer: chunk,
-                });
+
+                setState({ type: 'answer', answer: chunk });
             }
-        })().catch((error) => {
+        })().catch(() => {
             if (cancelled) {
                 return;
             }
 
-            setState({
-                type: 'error',
-            });
+            setState({ type: 'error' });
         });
 
         return () => {
@@ -96,7 +83,7 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
                 cancelled = true;
             }
         };
-    }, [organizationId, siteId, siteSpaceId, query]);
+    }, [organizationId, siteId, siteSpaceId, query, setState, setSearchState]);
 
     React.useEffect(() => {
         return () => {

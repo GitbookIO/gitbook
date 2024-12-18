@@ -14,7 +14,7 @@ import { tcls } from '@/lib/tailwind';
 import { SearchAskAnswer, searchAskState } from './SearchAskAnswer';
 import { SearchResults, SearchResultsRef } from './SearchResults';
 import { SearchScopeToggle } from './SearchScopeToggle';
-import { SearchState, useSearch } from './useSearch';
+import { SearchState, UpdateSearchState, useSearch } from './useSearch';
 import { LoadingPane } from '../primitives/LoadingPane';
 
 interface SearchModalProps {
@@ -54,10 +54,6 @@ export function SearchModal(props: SearchModalProps) {
             document.body.style.overflow = 'auto';
         };
     }, [isSearchOpened]);
-
-    const onChangeQuery = (newQuery: SearchState) => {
-        setSearchState(newQuery);
-    };
 
     const onClose = async (to?: string) => {
         await setSearchState(null);
@@ -129,7 +125,7 @@ export function SearchModal(props: SearchModalProps) {
                         <SearchModalBody
                             {...props}
                             state={state}
-                            onChangeQuery={onChangeQuery}
+                            setSearchState={setSearchState}
                             onClose={onClose}
                         />
                     </div>
@@ -142,7 +138,7 @@ export function SearchModal(props: SearchModalProps) {
 function SearchModalBody(
     props: SearchModalProps & {
         state: SearchState;
-        onChangeQuery: (newQuery: SearchState) => void;
+        setSearchState: UpdateSearchState;
         onClose: (to?: string) => void;
     },
 ) {
@@ -154,7 +150,7 @@ function SearchModalBody(
         withAsk,
         isMultiVariants,
         state,
-        onChangeQuery,
+        setSearchState,
         onClose,
     } = props;
 
@@ -193,7 +189,7 @@ function SearchModalBody(
     };
 
     const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        onChangeQuery({
+        setSearchState({
             ask: false, // When typing, we go back to the default search mode
             query: event.target.value,
             global: state.global,
@@ -312,11 +308,7 @@ function SearchModalBody(
                     query={state.query}
                     withAsk={withAsk}
                     onSwitchToAsk={() => {
-                        onChangeQuery({
-                            ask: true,
-                            query: state.query,
-                            global: state.global,
-                        });
+                        setSearchState((state) => (state ? { ...state, ask: true } : null));
                     }}
                 ></SearchResults>
             ) : null}
