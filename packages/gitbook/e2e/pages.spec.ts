@@ -6,6 +6,8 @@ import {
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
     CustomizationLocale,
+    CustomizationSidebarBackgroundStyle,
+    CustomizationSidebarListStyle,
     CustomizationThemeMode,
     SiteCustomizationSettings,
 } from '@gitbook/api';
@@ -1152,6 +1154,10 @@ function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettings>): s
             font: CustomizationFont.Inter,
             background: CustomizationBackground.Plain,
             icons: CustomizationIconsStyle.Regular,
+            sidebar: {
+                background: CustomizationSidebarBackgroundStyle.Default,
+                list: CustomizationSidebarListStyle.Default,
+            },
         },
         internationalization: {
             locale: CustomizationLocale.En,
