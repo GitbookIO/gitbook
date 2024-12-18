@@ -874,14 +874,14 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Visitor Auth - Site (redirects to fallback/auth URL)',
-        baseUrl: `https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-va/`,
+        baseUrl: `https://gitbook-open-e2e-sites.gitbook.io/va-site-redirects-fallback/`,
         tests: [
             {
                 name: 'Redirect to fallback on invalid token pulled from cookie',
                 url: '',
                 screenshot: false,
                 cookies: (() => {
-                    const basePath = '/api-multi-versions-va/';
+                    const basePath = '/va-site-redirects-fallback/';
                     const invalidToken = jwt.sign(
                         {
                             name: 'gitbook-open-tests',
@@ -916,7 +916,7 @@ const testCases: TestsCase[] = [
                             expiresIn: '24h',
                         },
                     );
-                    return `first?jwt_token=${token}`;
+                    return `?jwt_token=${token}`;
                 })(),
                 run: async (page) => {
                     await expect(page.locator('pre')).toContainText(
