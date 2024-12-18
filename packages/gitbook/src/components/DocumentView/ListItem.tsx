@@ -38,6 +38,8 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
                 '[&:is(h2)>div]:mt-0',
                 '[&:is(h3)>div]:mt-0',
                 '[&:is(h4)>div]:mt-0',
+                // Override the "mx-auto" class from UnwrappedBlocks
+                'mx-0',
             )}
             style="space-y-2 flex flex-col flex-1"
         />
