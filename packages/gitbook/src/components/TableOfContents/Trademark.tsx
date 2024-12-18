@@ -37,7 +37,7 @@ export function Trademark(props: {
                     'mb-4',
                     'bg-[size:250%_125%]',
                     'bg-[position:50%_35%]',
-                    'bg-[radial-gradient(farthest-side_at_50%_-70%,_var(--tw-gradient-stops))] from-transparent from-60% to-light to-80%',
+                    'bg-[radial-gradient(farthest-side_at_50%_-70%,_var(--tw-gradient-stops))] from-transparent from-60% to-sidebar-background to-80%',
                     'lg:pr-2',
                     'lg:mt-0',
                     'lg:mb-0',

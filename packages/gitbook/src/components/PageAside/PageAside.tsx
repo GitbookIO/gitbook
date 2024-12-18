@@ -27,7 +27,7 @@ function getTopOffset(props: { sectionsHeader: boolean; topHeader: boolean }) {
         return 'lg:max-h-[calc(100vh_-_8rem)] top-32 page-api-block:xl:max-2xl:top-32';
     }
     if (props.topHeader) {
-        return 'lg:max-h-[calc(100vh_-_4rem)] top-16 page-api-block:xl:max-2xl:top-16';
+        return 'lg:max-h-[calc(100vh_-_6rem)] top-24 page-api-block:xl:max-2xl:top-24';
     }
     return 'lg:max-h-screen top-0 page-api-block:xl:max-2xl:top-0';
 }

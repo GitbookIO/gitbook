@@ -20,9 +20,11 @@ function getTopOffset(props: { sectionsHeader: boolean; topHeader: boolean }) {
     if (props.sectionsHeader && props.topHeader) {
         return 'lg:top-32 lg:h-[calc(100vh_-_8rem)]';
     }
+
     if (props.topHeader) {
-        return 'lg:top-16 lg:h-[calc(100vh_-_4rem)]';
+        return 'lg:top-24 lg:h-[calc(100vh_-_6rem)]';
     }
+
     return 'lg:top-0 lg:h-[100vh]';
 }
 
@@ -71,7 +73,8 @@ export function TableOfContents(props: {
             {header ? header : null}
             <div
                 className={tcls(
-                    innerHeader ? 'pt-4' : 'pt-2',
+                    'navigation-open:pt-4',
+                    innerHeader ? (headerOffset.topHeader ? '' : 'lg:pt-4') : 'lg:pt-2',
                     'flex',
                     'flex-col',
                     'gap-4',

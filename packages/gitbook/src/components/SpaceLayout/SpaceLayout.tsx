@@ -11,7 +11,7 @@ import {
 import React from 'react';
 
 import { Footer } from '@/components/Footer';
-import { CompactHeader, Header } from '@/components/Header';
+import { Header, HeaderLogo } from '@/components/Header';
 import { CONTAINER_STYLE } from '@/components/layout';
 import { SearchButton, SearchModal } from '@/components/Search';
 import { TableOfContents } from '@/components/TableOfContents';
@@ -112,17 +112,28 @@ export async function SpaceLayout(props: {
                         context={contentRefContext}
                         header={
                             withTopHeader ? null : (
-                                <CompactHeader
-                                    space={space}
-                                    site={site}
-                                    spaces={spaces}
-                                    customization={customization}
-                                />
+                                <div
+                                    className={tcls(
+                                        'hidden',
+                                        'pr-4',
+                                        'mt-5',
+                                        'lg:flex',
+                                        'flex-grow-0',
+                                        'flex-wrap',
+                                        'dark:shadow-light/1',
+                                    )}
+                                >
+                                    <HeaderLogo
+                                        site={site}
+                                        space={space}
+                                        customization={customization}
+                                    />
+                                </div>
                             )
                         }
                         innerHeader={
                             withVariants || !withTopHeader ? (
-                                <div className="flex flex-col gap-6">
+                                <div className="hidden lg:flex flex-col gap-6">
                                     {!withTopHeader ? (
                                         <div
                                             className={tcls(
