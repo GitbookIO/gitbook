@@ -1,5 +1,11 @@
 # @gitbook/cache-do
 
+## 0.1.1
+
+### Patch Changes
+
+-   b7a5106: Disable cloudflare observability in production
+
 ## 0.1.0
 
 ### Minor Changes
