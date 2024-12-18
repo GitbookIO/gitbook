@@ -13,6 +13,7 @@ export const pt_br = {
     search_scope_space: '${1}',
     search_scope_all: 'Todo o conteúdo',
     search_ask: 'Perguntar "${1}"',
+    search_ask_description: 'Encontre a resposta com IA',
     search_ask_sources: 'Fontes',
     search_ask_sources_no_answer: 'Páginas relacionadas',
     search_ask_no_answer:
