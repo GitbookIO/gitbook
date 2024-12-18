@@ -46,6 +46,12 @@ type URLLookupMode =
      */
     | 'single'
     /**
+     * Mode when a site is being proxied on a different base URL.
+     * - x-gitbook-site-url is used to determine the site to serve.
+     * - host / x-forwarded-host / x-gitbook-host + x-gitbook-basepath is used to determine the base URL.
+     */
+    | 'proxy'
+    /**
      * Spaces are located using the incoming URL (using forwarded host headers).
      * This mode is the default one when serving on the GitBook infrastructure.
      */
@@ -78,10 +84,13 @@ export type LookupResult = PublishedContentWithCache & {
 };
 
 /**
- * Middleware to lookup the space to render.
+ * Middleware to lookup the site to render.
  * It takes as input a request with an URL, and a set of headers:
  *   - x-gitbook-api: the API endpoint to use, if undefined, the default one is used
  *   - x-gitbook-basepath: base in the path that should be ignored for routing
+ *
+ * Once the site has been looked-up, the middleware passes the info to the rendering
+ * using a rewrite with a set of headers. This is the only way in next.js to do this (basically similar to AsyncLocalStorage).
  *
  * The middleware also takes care of persisting the visitor authentication state.
  */
@@ -107,7 +116,7 @@ export async function middleware(request: NextRequest) {
     let apiEndpoint = request.headers.get('x-gitbook-api') ?? DEFAULT_API_ENDPOINT;
     const originBasePath = request.headers.get('x-gitbook-basepath') ?? '';
 
-    const inputURL = stripURLBasePath(url, originBasePath);
+    const inputURL = mode === 'proxy' ? url : stripURLBasePath(url, originBasePath);
 
     const resolved = await withAPI(
         {
@@ -118,7 +127,7 @@ export async function middleware(request: NextRequest) {
             }),
             contextId: undefined,
         },
-        () => lookupSpaceForURL(mode, request, inputURL),
+        () => lookupSiteForURL(mode, request, inputURL),
     );
     if ('error' in resolved) {
         return new NextResponse(resolved.error.message, {
@@ -212,7 +221,10 @@ export async function middleware(request: NextRequest) {
     }
     headers.set('x-gitbook-mode', mode);
     headers.set('x-gitbook-origin-basepath', originBasePath);
-    headers.set('x-gitbook-basepath', joinPath(originBasePath, resolved.basePath));
+    headers.set(
+        'x-gitbook-basepath',
+        mode === 'proxy' ? originBasePath : joinPath(originBasePath, resolved.basePath),
+    );
     headers.set('x-gitbook-content-space', resolved.space);
     if ('site' in resolved) {
         headers.set('x-gitbook-content-organization', resolved.organization);
@@ -303,7 +315,10 @@ export async function middleware(request: NextRequest) {
 /**
  * Compute the input URL the user is trying to access.
  */
-function getInputURL(request: NextRequest): { url: URL; mode: URLLookupMode } {
+function getInputURL(request: NextRequest): {
+    url: URL;
+    mode: URLLookupMode;
+} {
     const url = new URL(request.url);
     let mode: URLLookupMode =
         (process.env.GITBOOK_MODE as URLLookupMode | undefined) ?? 'multi-path';
@@ -333,27 +348,36 @@ function getInputURL(request: NextRequest): { url: URL; mode: URLLookupMode } {
         mode = 'multi-id';
     }
 
+    // When passing a x-gitbook-site-url header, this URL is used instead of the request URL
+    // to determine the site to serve.
+    const xGitbookSite = request.headers.get('x-gitbook-site-url');
+    if (xGitbookSite) {
+        mode = 'proxy';
+    }
+
     return { url, mode };
 }
 
-async function lookupSpaceForURL(
+async function lookupSiteForURL(
     mode: URLLookupMode,
     request: NextRequest,
     url: URL,
 ): Promise<LookupResult> {
     switch (mode) {
         case 'single': {
-            return await lookupSpaceInSingleMode(url);
+            return await lookupSiteInSingleMode(url);
         }
         case 'multi': {
-            return await lookupSpaceInMultiMode(request, url);
+            return await lookupSiteInMultiMode(request, url);
         }
         case 'multi-path': {
-            return await lookupSpaceInMultiPathMode(request, url);
+            return await lookupSiteInMultiPathMode(request, url);
         }
         case 'multi-id': {
             return await lookupSiteOrSpaceInMultiIdMode(request, url);
         }
+        case 'proxy':
+            return await lookupSiteInProxy(request, url);
         default:
             assertNever(mode);
     }
@@ -363,7 +387,7 @@ async function lookupSpaceForURL(
  * GITBOOK_MODE=single
  * When serving a single space, configured using GITBOOK_SPACE_ID and GITBOOK_TOKEN.
  */
-async function lookupSpaceInSingleMode(url: URL): Promise<LookupResult> {
+async function lookupSiteInSingleMode(url: URL): Promise<LookupResult> {
     const spaceId = process.env.GITBOOK_SPACE_ID;
     if (!spaceId) {
         throw new Error(
@@ -388,12 +412,30 @@ async function lookupSpaceInSingleMode(url: URL): Promise<LookupResult> {
 }
 
 /**
+ * GITBOOK_MODE=proxy
+ * When proxying a site on a different base URL.
+ */
+async function lookupSiteInProxy(request: NextRequest, url: URL): Promise<LookupResult> {
+    const rawSiteUrl = request.headers.get('x-gitbook-site-url');
+    if (!rawSiteUrl) {
+        throw new Error(
+            `Missing x-gitbook-site-url header. It should be passed when using GITBOOK_MODE=proxy.`,
+        );
+    }
+
+    const siteUrl = new URL(rawSiteUrl);
+    siteUrl.pathname = joinPath(siteUrl.pathname, url.pathname);
+
+    return await lookupSiteInMultiMode(request, siteUrl);
+}
+
+/**
  * GITBOOK_MODE=multi
  * When serving multi spaces based on the current URL.
  */
-async function lookupSpaceInMultiMode(request: NextRequest, url: URL): Promise<LookupResult> {
+async function lookupSiteInMultiMode(request: NextRequest, url: URL): Promise<LookupResult> {
     const visitorAuthToken = getVisitorAuthToken(request, url);
-    const lookup = await lookupSpaceByAPI(url, visitorAuthToken);
+    const lookup = await lookupSiteByAPI(url, visitorAuthToken);
     return {
         ...lookup,
         ...('basePath' in lookup && visitorAuthToken
@@ -558,7 +600,7 @@ async function lookupSiteOrSpaceInMultiIdMode(
  * GITBOOK_MODE=multi-path
  * When serving multi spaces with the url passed in the path.
  */
-async function lookupSpaceInMultiPathMode(request: NextRequest, url: URL): Promise<LookupResult> {
+async function lookupSiteInMultiPathMode(request: NextRequest, url: URL): Promise<LookupResult> {
     // Skip useless requests
     if (
         url.pathname === '/favicon.ico' ||
@@ -597,7 +639,7 @@ async function lookupSpaceInMultiPathMode(request: NextRequest, url: URL): Promi
 
     const visitorAuthToken = getVisitorAuthToken(request, target);
 
-    const lookup = await lookupSpaceByAPI(target, visitorAuthToken);
+    const lookup = await lookupSiteByAPI(target, visitorAuthToken);
     if ('error' in lookup) {
         return lookup;
     }
@@ -633,7 +675,7 @@ async function lookupSpaceInMultiPathMode(request: NextRequest, url: URL): Promi
  * Lookup a space by its URL using the GitBook API.
  * To optimize caching, we try multiple lookup alternatives and return the first one that matches.
  */
-async function lookupSpaceByAPI(
+async function lookupSiteByAPI(
     lookupURL: URL,
     visitorAuthToken: ReturnType<typeof getVisitorAuthToken>,
 ): Promise<LookupResult> {
