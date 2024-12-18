@@ -699,9 +699,9 @@ async function lookupSiteByAPI(
             alternative.url,
             typeof visitorAuthToken === 'undefined'
                 ? undefined
-                : typeof visitorAuthToken === 'string'
-                  ? visitorAuthToken
-                  : visitorAuthToken.token,
+                : isVisitorAuthTokenFromCookies(visitorAuthToken)
+                  ? visitorAuthToken.token
+                  : visitorAuthToken,
             redirectOnError,
             {
                 signal,
