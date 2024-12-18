@@ -16,13 +16,14 @@ const keyMap = {
     global: parseAsBoolean,
 };
 
+export type UpdateSearchState = (
+    update: React.SetStateAction<SearchState | null>,
+) => Promise<URLSearchParams>;
+
 /**
  * Hook to access the current search query and update it.
  */
-export function useSearch(): [
-    SearchState | null,
-    (update: React.SetStateAction<SearchState | null>) => Promise<URLSearchParams>,
-] {
+export function useSearch(): [SearchState | null, UpdateSearchState] {
     const [rawState, setRawState] = useQueryStates(keyMap, {
         history: 'replace',
     });
