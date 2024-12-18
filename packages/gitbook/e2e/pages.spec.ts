@@ -878,7 +878,7 @@ const testCases: TestsCase[] = [
         baseUrl: `https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-va/`,
         tests: [
             {
-                name: 'redirect to fallback on invalid token pulled from cookie',
+                name: 'Redirect to fallback on invalid token pulled from cookie',
                 url: '',
                 screenshot: false,
                 cookies: (() => {
@@ -905,7 +905,7 @@ const testCases: TestsCase[] = [
                 },
             },
             {
-                name: 'show error message when invalid token is passed to url via jwt_token query param',
+                name: 'Show error message when invalid token is passed to url',
                 screenshot: false,
                 url: (() => {
                     const token = jwt.sign(
