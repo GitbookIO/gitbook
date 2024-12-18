@@ -1,5 +1,15 @@
 # @gitbook/react-openapi
 
+## 0.7.1
+
+### Patch Changes
+
+-   4771c78: Fixed scalar api client routing
+-   ff50ac2: Bump @scalar/api-client-react version
+-   867481c: Support Integers in Response example
+-   7ba67fd: bumped the scalar api client dependency
+-   a78c1ec: Bumped scalar api client pacakge
+
 ## 0.7.0
 
 ### Minor Changes
