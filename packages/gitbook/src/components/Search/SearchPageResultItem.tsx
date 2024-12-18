@@ -23,26 +23,38 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
             href={item.href}
             className={tcls(
                 'flex',
+                'gap-4',
                 'flex-row',
                 'items-center',
-                'px-4',
-                'sm:px-12',
-                'py-4',
-                'sm:py-6',
+                'p-4',
                 'border-t',
-                'first:border-t-0',
                 'border-dark/2',
-                'dark:border-light/2',
-                'hover:bg-dark-4/2',
+                'dark:border-light/1',
+                'first:border-none',
                 'text-base',
-                'text-dark',
                 'font-medium',
-                'first:mt-0',
-                'dark:text-light',
-                'dark:hover:bg-light-4/2',
-                active ? ['bg-dark/1', 'dark:bg-light/1'] : null,
+                'hover:bg-dark/1',
+                'dark:hover:bg-light/1',
+                'group',
+                active
+                    ? [
+                          'is-active',
+                          'bg-primary-50',
+                          'text-contrast-primary-50',
+                          'dark:bg-primary-800',
+                          'dark:text-contrast-primary-800',
+                          'hover:bg-primary-100/8',
+                          'dark:hover:bg-primary-700/7',
+                      ]
+                    : null,
             )}
         >
+            <div className="size-4">
+                <Icon
+                    icon="file-lines"
+                    className={tcls('size-4', active ? 'text-primary' : 'opacity-5')}
+                />
+            </div>
             <div className={tcls('flex', 'flex-col', 'w-full')}>
                 {item.spaceTitle ? (
                     <div
@@ -60,10 +72,19 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                 ) : null}
                 <HighlightQuery query={query} text={item.title} />
             </div>
-            <Icon
-                icon="chevron-right"
-                className={tcls('size-4', 'text-dark', 'dark:text-light', 'opacity-6')}
-            />
+            <div
+                className={tcls(
+                    'p-2',
+                    'rounded',
+                    'straight-corners:rounded-none',
+                    active ? ['bg-primary', 'text-contrast-primary'] : ['opacity-6'],
+                )}
+            >
+                <Icon
+                    icon={active ? 'arrow-turn-down-left' : 'chevron-right'}
+                    className={tcls('size-4')}
+                />
+            </div>
         </Link>
     );
 });
