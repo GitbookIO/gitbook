@@ -1,6 +1,7 @@
 import {
     CustomizationHeaderPreset,
     CustomizationSettings,
+    CustomizationSidebarBackgroundStyle,
     Revision,
     RevisionPageDocument,
     RevisionPageGroup,
@@ -68,6 +69,9 @@ export async function SpaceLayout(props: {
     const headerOffset = {
         sectionsHeader: withSections,
         topHeader: withTopHeader,
+        sidebarBackgroundFilled:
+            'sidebar' in customization.styling &&
+            customization.styling.sidebar.background === CustomizationSidebarBackgroundStyle.Filled,
     };
     const apiHost = (await api()).client.endpoint;
     const visitorAuthToken = await getCurrentVisitorToken();

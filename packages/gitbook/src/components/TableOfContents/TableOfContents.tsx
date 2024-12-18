@@ -16,13 +16,21 @@ import { PagesList } from './PagesList';
 import { TOCScrollContainer } from './TOCScroller';
 import { Trademark } from './Trademark';
 
-function getTopOffset(props: { sectionsHeader: boolean; topHeader: boolean }) {
-    if (props.sectionsHeader && props.topHeader) {
+function getTopOffset(props: {
+    sectionsHeader: boolean;
+    topHeader: boolean;
+    sidebarBackgroundFilled: boolean;
+}) {
+    if (props.topHeader && props.sectionsHeader) {
         return 'lg:top-32 lg:h-[calc(100vh_-_8rem)]';
     }
 
-    if (props.topHeader) {
+    if (props.topHeader && props.sidebarBackgroundFilled) {
         return 'lg:top-24 lg:h-[calc(100vh_-_6rem)]';
+    }
+
+    if (props.topHeader && !props.sidebarBackgroundFilled) {
+        return 'lg:top-16 lg:h-[calc(100vh_-_4rem)]';
     }
 
     return 'lg:top-0 lg:h-[100vh]';
@@ -36,7 +44,11 @@ export function TableOfContents(props: {
     pages: Revision['pages'];
     ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
     header?: React.ReactNode; // Displayed outside the scrollable TOC as a sticky header
-    headerOffset: { sectionsHeader: boolean; topHeader: boolean };
+    headerOffset: {
+        sectionsHeader: boolean;
+        topHeader: boolean;
+        sidebarBackgroundFilled: boolean;
+    };
     innerHeader?: React.ReactNode; // Displayed outside the scrollable TOC, directly above the page list
 }) {
     const { innerHeader, space, customization, pages, ancestors, header, context, headerOffset } =
