@@ -11,13 +11,12 @@ import assertNever from 'assert-never';
 import colorContrast from 'postcss-color-contrast/js';
 import colors from 'tailwindcss/colors';
 
-import { fonts, ibmPlexMono } from '@/fonts';
+import { fontNotoColorEmoji, fonts, ibmPlexMono } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
 import { getStaticFileURL } from '@/lib/assets';
 import { hexToRgb, shadesOfColor } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
 
-import { emojiFontClassName } from '../primitives';
 import { ClientContexts } from './ClientContexts';
 
 import '@gitbook/icons/style.css';
@@ -154,7 +153,7 @@ export async function CustomizationRootLayout(props: {
             </head>
             <body
                 className={tcls(
-                    emojiFontClassName,
+                    fontNotoColorEmoji.className,
                     `${fonts[customization.styling.font].className}`,
                     `${ibmPlexMono.variable}`,
                     'bg-light',
