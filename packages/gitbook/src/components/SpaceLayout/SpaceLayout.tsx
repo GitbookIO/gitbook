@@ -21,6 +21,7 @@ import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { SpacesDropdown } from '../Header/SpacesDropdown';
+import { InsightsProvider } from '../Insights';
 
 /**
  * Render the entire content of the space (header, table of contents, footer, and page content).
@@ -64,7 +65,9 @@ export function SpaceLayout(props: {
     const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
 
     return (
-        <>
+        <InsightsProvider
+            {...content}
+        >
             {/* <ColorDebugger /> */}
             <Header
                 withTopHeader={withTopHeader}
@@ -137,6 +140,6 @@ export function SpaceLayout(props: {
                     pointer={content}
                 />
             </React.Suspense>
-        </>
+        </InsightsProvider>
     );
 }

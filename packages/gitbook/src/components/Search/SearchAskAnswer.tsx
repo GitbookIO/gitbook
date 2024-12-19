@@ -15,6 +15,7 @@ import { tcls } from '@/lib/tailwind';
 import { AskAnswerResult, AskAnswerSource, streamAskQuestion } from './server-actions';
 import { useSearch, useSearchLink } from './useSearch';
 import { Link } from '../primitives';
+import { useTrackEvent } from '../Insights';
 
 type SearchState =
     | {
@@ -44,6 +45,7 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
     const { pointer, query } = props;
 
     const language = useLanguage();
+    const trackEvent = useTrackEvent();
     const [, setSearchState] = useSearch();
     const [state, setState] = useRecoilState(searchAskState);
     const { organizationId, siteId, siteSpaceId } = pointer;
@@ -54,6 +56,11 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
         setState({ type: 'loading' });
 
         (async () => {
+            trackEvent({
+                type: 'ask_question',
+                query,
+            });
+
             const response = streamAskQuestion(organizationId, siteId, siteSpaceId ?? null, query);
             const stream = iterateStreamResponse(response);
 
