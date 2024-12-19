@@ -214,7 +214,8 @@ export const getPublishedContentByUrl = cache({
     get: async (
         url: string,
         visitorAuthToken: string | undefined,
-        redirectOnError: boolean | undefined,
+        // Prefer undefined for a better cache key.
+        redirectOnError: true | undefined,
         options: CacheFunctionOptions,
     ) => {
         try {

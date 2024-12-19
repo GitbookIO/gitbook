@@ -694,7 +694,7 @@ async function lookupSiteByAPI(
         const data = await getPublishedContentByUrl(
             alternative.url,
             visitorTokenLookup?.token,
-            redirectOnError,
+            redirectOnError || undefined,
             {
                 signal,
             },
