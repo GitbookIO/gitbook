@@ -6,20 +6,25 @@ import {
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
     CustomizationLocale,
+    CustomizationSidebarBackgroundStyle,
+    CustomizationSidebarListStyle,
     CustomizationThemeMode,
     SiteCustomizationSettings,
 } from '@gitbook/api';
-import { test, expect, Page } from '@playwright/test';
+import { test, expect, Page, BrowserContext } from '@playwright/test';
 import deepMerge from 'deepmerge';
 import jwt from 'jsonwebtoken';
 import rison from 'rison';
 import { DeepPartial } from 'ts-essentials';
+
+import { getVisitorAuthCookieName, getVisitorAuthCookieValue } from '@/lib/visitor-auth';
 
 import { getContentTestURL } from '../tests/utils';
 
 interface Test {
     name: string;
     url: string; // URL to visit for testing
+    cookies?: Parameters<BrowserContext['addCookies']>[0];
     run?: (page: Page) => Promise<unknown>; // The test to run
     fullPage?: boolean; // Whether the test should be fullscreened during testing
     screenshot?: false; // Should a screenshot be stored
@@ -868,6 +873,60 @@ const testCases: TestsCase[] = [
         ],
     },
     {
+        name: 'Visitor Auth - Site (redirects to fallback/auth URL)',
+        baseUrl: `https://gitbook-open-e2e-sites.gitbook.io/va-site-redirects-fallback/`,
+        tests: [
+            {
+                name: 'Redirect to fallback on invalid token pulled from cookie',
+                url: '',
+                screenshot: false,
+                cookies: (() => {
+                    const basePath = '/va-site-redirects-fallback/';
+                    const invalidToken = jwt.sign(
+                        {
+                            name: 'gitbook-open-tests',
+                        },
+                        'invalidKey',
+                        {
+                            expiresIn: '24h',
+                        },
+                    );
+                    return [
+                        {
+                            name: getVisitorAuthCookieName(basePath),
+                            value: getVisitorAuthCookieValue(basePath, invalidToken),
+                            httpOnly: true,
+                        },
+                    ];
+                })(),
+                run: async (page) => {
+                    await expect(page).toHaveURL(/https:\/\/www.google.com/);
+                },
+            },
+            {
+                name: 'Show error message when invalid token is passed to url',
+                screenshot: false,
+                url: (() => {
+                    const token = jwt.sign(
+                        {
+                            name: 'gitbook-open-tests',
+                        },
+                        'invalidKey',
+                        {
+                            expiresIn: '24h',
+                        },
+                    );
+                    return `?jwt_token=${token}`;
+                })(),
+                run: async (page) => {
+                    await expect(page.locator('pre')).toContainText(
+                        'Error while validating the JWT token. Reason: The token signature is invalid.',
+                    );
+                },
+            },
+        ],
+    },
+    {
         name: 'Languages',
         baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: allLocales.map((locale) => ({
@@ -1112,9 +1171,18 @@ for (const testCase of testCases) {
     test.describe(testCase.name, () => {
         for (const testEntry of testCase.tests) {
             const testFn = testEntry.only ? test.only : test;
-            testFn(testEntry.name, async ({ page, baseURL }) => {
+            testFn(testEntry.name, async ({ page, baseURL, context }) => {
                 const contentUrl = new URL(testEntry.url, testCase.baseUrl);
                 const url = getContentTestURL(contentUrl.toString(), baseURL);
+                if (testEntry.cookies) {
+                    await context.addCookies(
+                        testEntry.cookies.map((cookie) => ({
+                            ...cookie,
+                            domain: new URL(url).host,
+                            path: '/',
+                        })),
+                    );
+                }
                 await page.goto(url);
                 if (testEntry.run) {
                     await testEntry.run(page);
@@ -1152,6 +1220,10 @@ function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettings>): s
             font: CustomizationFont.Inter,
             background: CustomizationBackground.Plain,
             icons: CustomizationIconsStyle.Regular,
+            sidebar: {
+                background: CustomizationSidebarBackgroundStyle.Default,
+                list: CustomizationSidebarListStyle.Default,
+            },
         },
         internationalization: {
             locale: CustomizationLocale.En,
