@@ -26,10 +26,10 @@ import {
     VisitorAuthCookieValue,
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
-    getVisitorAuthToken,
+    getVisitorToken,
     isVisitorAuthTokenFromCookies,
     normalizeVisitorAuthURL,
-} from '@/lib/visitor-auth';
+} from '@/lib/visitor-token';
 
 import { waitUntil } from './lib/waitUntil';
 
@@ -434,7 +434,7 @@ async function lookupSiteInProxy(request: NextRequest, url: URL): Promise<Lookup
  * When serving multi spaces based on the current URL.
  */
 async function lookupSiteInMultiMode(request: NextRequest, url: URL): Promise<LookupResult> {
-    const visitorAuthToken = getVisitorAuthToken(request, url);
+    const visitorAuthToken = getVisitorToken(request, url);
     const lookup = await lookupSiteByAPI(url, visitorAuthToken);
     return {
         ...lookup,
@@ -637,7 +637,7 @@ async function lookupSiteInMultiPathMode(request: NextRequest, url: URL): Promis
     const target = new URL(targetStr);
     target.search = url.search;
 
-    const visitorAuthToken = getVisitorAuthToken(request, target);
+    const visitorAuthToken = getVisitorToken(request, target);
 
     const lookup = await lookupSiteByAPI(target, visitorAuthToken);
     if ('error' in lookup) {
@@ -677,7 +677,7 @@ async function lookupSiteInMultiPathMode(request: NextRequest, url: URL): Promis
  */
 async function lookupSiteByAPI(
     lookupURL: URL,
-    visitorAuthToken: ReturnType<typeof getVisitorAuthToken>,
+    visitorAuthToken: ReturnType<typeof getVisitorToken>,
 ): Promise<LookupResult> {
     const url = stripURLSearch(lookupURL);
     const lookup = getURLLookupAlternatives(url);

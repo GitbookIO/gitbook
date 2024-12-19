@@ -5,20 +5,20 @@ import {
     VisitorAuthCookieValue,
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
-    getVisitorAuthToken,
-} from './visitor-auth';
+    getVisitorToken,
+} from './visitor-token';
 
 describe('getVisitorAuthToken', () => {
     it('should return the token from the query parameters', () => {
         const request = nextRequest('https://example.com?jwt_token=123');
-        expect(getVisitorAuthToken(request, request.nextUrl)).toEqual('123');
+        expect(getVisitorToken(request, request.nextUrl)).toEqual('123');
     });
 
     it('should return the token from the cookie root basepath', () => {
         const request = nextRequest('https://example.com', {
             [getVisitorAuthCookieName('/')]: { value: getVisitorAuthCookieValue('/', '123') },
         });
-        const visitorAuth = getVisitorAuthToken(request, request.nextUrl);
+        const visitorAuth = getVisitorToken(request, request.nextUrl);
         assertVisitorAuthCookieValue(visitorAuth);
         expect(visitorAuth.token).toEqual('123');
     });
@@ -27,7 +27,7 @@ describe('getVisitorAuthToken', () => {
         const request = nextRequest('https://example.com/hello/world', {
             [getVisitorAuthCookieName('/')]: { value: getVisitorAuthCookieValue('/', '123') },
         });
-        const visitorAuth = getVisitorAuthToken(request, request.nextUrl);
+        const visitorAuth = getVisitorToken(request, request.nextUrl);
         assertVisitorAuthCookieValue(visitorAuth);
         expect(visitorAuth.token).toEqual('123');
     });
@@ -39,7 +39,7 @@ describe('getVisitorAuthToken', () => {
                 value: getVisitorAuthCookieValue('/hello/', '123'),
             },
         });
-        const visitorAuth = getVisitorAuthToken(request, request.nextUrl);
+        const visitorAuth = getVisitorToken(request, request.nextUrl);
         assertVisitorAuthCookieValue(visitorAuth);
         expect(visitorAuth.token).toEqual('123');
     });
@@ -50,14 +50,14 @@ describe('getVisitorAuthToken', () => {
                 value: getVisitorAuthCookieValue('/hello/v/space1/', '123'),
             },
         });
-        const visitorAuth = getVisitorAuthToken(request, request.nextUrl);
+        const visitorAuth = getVisitorToken(request, request.nextUrl);
         assertVisitorAuthCookieValue(visitorAuth);
         expect(visitorAuth.token).toEqual('123');
     });
 
     it('should return undefined if no cookie and no query param', () => {
         const request = nextRequest('https://example.com');
-        expect(getVisitorAuthToken(request, request.nextUrl)).toBeUndefined();
+        expect(getVisitorToken(request, request.nextUrl)).toBeUndefined();
     });
 
     // For backwards compatibility
@@ -69,7 +69,7 @@ describe('getVisitorAuthToken', () => {
             },
         });
 
-        const visitorAuth = getVisitorAuthToken(request, request.nextUrl);
+        const visitorAuth = getVisitorToken(request, request.nextUrl);
         assertVisitorAuthCookieValue(visitorAuth);
         expect(visitorAuth.token).toEqual('gotcha');
     });

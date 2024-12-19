@@ -13,7 +13,7 @@ export type VisitorAuthCookieValue = {
 };
 
 export function isVisitorAuthTokenFromCookies(
-    visitorAuthToken: NonNullable<ReturnType<typeof getVisitorAuthToken>>,
+    visitorAuthToken: NonNullable<ReturnType<typeof getVisitorToken>>,
 ) {
     return (
         typeof visitorAuthToken !== 'string' &&
@@ -23,14 +23,18 @@ export function isVisitorAuthTokenFromCookies(
 }
 
 /**
- * Get the visitor authentication token for the request. This token can either be in the
+ * Get the visitor token for the request. This token can either be in the
  * query parameters or stored as a cookie.
  */
-export function getVisitorAuthToken(
+export function getVisitorToken(
     request: NextRequest,
     url: URL | NextRequest['nextUrl'],
 ): string | VisitorAuthCookieValue | undefined {
-    return url.searchParams.get(VISITOR_AUTH_PARAM) ?? getVisitorAuthTokenFromCookies(request, url);
+    return (
+        url.searchParams.get(VISITOR_AUTH_PARAM) ??
+        getVisitorAuthTokenFromCookies(request, url) ??
+        getVisitorCustomTokenFromCookies(request)
+    );
 }
 
 /**
@@ -49,6 +53,14 @@ export function getVisitorAuthCookieName(basePath: string): string {
 export function getVisitorAuthCookieValue(basePath: string, token: string): string {
     const value: VisitorAuthCookieValue = { basePath, token };
     return JSON.stringify(value);
+}
+
+/**
+ * Get the name of the customer cookie that can be set by third party backends
+ * to pass information in the form of claims about the visitor.
+ */
+export function getVisitorCustomCookieName(): string {
+    return VISITOR_AUTH_COOKIE_ROOT;
 }
 
 /**
@@ -104,6 +116,19 @@ function getVisitorAuthTokenFromCookies(
 
     // couldn't find any token for the current URL
     return undefined;
+}
+
+/**
+ * Return the value of a custom visitor cookie that can be set by third party backends
+ * when they authenticate their users off flow to relay information in the form of claims
+ * about the visitor.
+ *
+ * The cookie should contain as value a JWT encoded token that contains the claims of the visitor.
+ */
+function getVisitorCustomTokenFromCookies(request: NextRequest): string | undefined {
+    const cookieName = getVisitorCustomCookieName();
+    const visitorCustomCookie = request.cookies.get(cookieName);
+    return visitorCustomCookie?.value;
 }
 
 /**
