@@ -1,5 +1,11 @@
 # @gitbook/react-contentkit
 
+## 0.6.0
+
+### Minor Changes
+
+-   ea1468c: Send redirectOnError param to getPublishedContent when token is pulled from cookie
+
 ## 0.5.1
 
 ### Patch Changes
