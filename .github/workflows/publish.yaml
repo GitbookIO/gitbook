@@ -18,9 +18,9 @@ jobs:
                   # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
                   fetch-depth: 0
             - name: Setup bun
-              uses: oven-sh/setup-bun@v1
+              uses: oven-sh/setup-bun@v2
               with:
-                  bun-version: 1.1.18
+                  bun-version-file: '.bun-version'
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:
@@ -46,9 +46,9 @@ jobs:
             - name: Checkout Repo
               uses: actions/checkout@v3
             - name: Setup bun
-              uses: oven-sh/setup-bun@v1
+              uses: oven-sh/setup-bun@v2
               with:
-                  bun-version: 1.1.18
+                  bun-version-file: '.bun-version'
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:
