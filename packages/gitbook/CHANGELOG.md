@@ -1,5 +1,21 @@
 # gitbook
 
+## 0.6.0
+
+### Minor Changes
+
+-   98245e5: Adapt code to pull token from customer backend generated custom cookies
+-   ea1468c: Send redirectOnError param to getPublishedContent when token is pulled from cookie
+
+### Patch Changes
+
+-   8af1abc: Improve contrast of search box placeholder
+-   48ab59f: Improve colour contrast of list item decoration
+-   0b6ddca: Fix variant selector contrast for non-default themes
+-   e8e64bf: Fix bullet list display on full size blocks
+-   Updated dependencies [ea1468c]
+    -   @gitbook/react-contentkit@0.6.0
+
 ## 0.5.0
 
 ### Minor Changes
