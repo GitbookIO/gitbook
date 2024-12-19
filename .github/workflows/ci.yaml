@@ -22,10 +22,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Setup bun
-              uses: oven-sh/setup-bun@v2
-              with:
-                  bun-version-file: '.bun-version'
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:
@@ -102,10 +100,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Setup bun
-              uses: oven-sh/setup-bun@v2
-              with:
-                  bun-version-file: '.bun-version'
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
             - name: Install dependencies
               run: bun install --frozen-lockfile
             - name: Setup Playwright
@@ -128,10 +124,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Setup bun
-              uses: oven-sh/setup-bun@v2
-              with:
-                  bun-version-file: '.bun-version'
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:
@@ -147,10 +141,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Setup bun
-              uses: oven-sh/setup-bun@v2
-              with:
-                  bun-version-file: '.bun-version'
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:
@@ -162,10 +154,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Setup bun
-              uses: oven-sh/setup-bun@v2
-              with:
-                  bun-version-file: '.bun-version'
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:
@@ -177,10 +167,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Setup bun
-              uses: oven-sh/setup-bun@v2
-              with:
-                  bun-version-file: '.bun-version'
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:
@@ -195,10 +183,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Setup bun
-              uses: oven-sh/setup-bun@v2
-              with:
-                  bun-version-file: '.bun-version'
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:
@@ -210,10 +196,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Setup bun
-              uses: oven-sh/setup-bun@v2
-              with:
-                  bun-version-file: '.bun-version'
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:
