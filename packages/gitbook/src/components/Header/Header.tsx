@@ -97,18 +97,19 @@ export function Header(props: {
                                 <div className="z-20 shrink hidden sm:block">
                                     <SpacesDropdown
                                         className={tcls(
-                                            !isCustomizationDefault && withTopHeader && [
-                                                'bg-header-link/2',
-                                                'dark:bg-header-link/2',
-                                                'text-header-link/8',
-                                                'dark:text-header-link/8',
-                                                'ring-1',
-                                                'ring-header-link/4',
-                                                'dark:ring-header-link/4',
-                                                'contrast-more:bg-header-background',
-                                                'contrast-more:text-header-link',
-                                                'contrast-more:ring-header-link',
-                                            ],
+                                            !isCustomizationDefault &&
+                                                withTopHeader && [
+                                                    'bg-header-link/2',
+                                                    'dark:bg-header-link/2',
+                                                    'text-header-link/8',
+                                                    'dark:text-header-link/8',
+                                                    'ring-1',
+                                                    'ring-header-link/4',
+                                                    'dark:ring-header-link/4',
+                                                    'contrast-more:bg-header-background',
+                                                    'contrast-more:text-header-link',
+                                                    'contrast-more:ring-header-link',
+                                                ],
                                         )}
                                         space={space}
                                         spaces={spaces}
