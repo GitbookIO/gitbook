@@ -17,7 +17,11 @@ import jwt from 'jsonwebtoken';
 import rison from 'rison';
 import { DeepPartial } from 'ts-essentials';
 
-import { getVisitorAuthCookieName, getVisitorAuthCookieValue } from '@/lib/visitor-auth';
+import {
+    getVisitorAuthCookieName,
+    getVisitorAuthCookieValue,
+    getVisitorCustomCookieName,
+} from '@/lib/visitor-token';
 
 import { getContentTestURL } from '../tests/utils';
 
@@ -1077,6 +1081,149 @@ const testCases: TestsCase[] = [
                         .filter({ hasText: 'Beta users' });
                     await expect(alphaUserPage).toBeVisible();
                     await expect(betaUserPage).toBeVisible();
+                },
+            },
+        ],
+    },
+    {
+        name: 'Adaptive Content - Public',
+        baseUrl: `https://gitbook-open-e2e-sites.gitbook.io/adaptive-content-public/`,
+        tests: [
+            {
+                name: 'No custom cookie',
+                url: '',
+                run: async (page) => {
+                    const welcomePage = page
+                        .locator('a[class*="group\\/toclink"]')
+                        .filter({ hasText: 'Welcome Page' });
+                    const alphaUserPage = page
+                        .locator('a[class*="group\\/toclink"]')
+                        .filter({ hasText: 'Alpha User' });
+                    const betaUserPage = page
+                        .locator('a[class*="group\\/toclink"]')
+                        .filter({ hasText: 'Beta User' });
+
+                    await expect(welcomePage).toBeVisible();
+                    await expect(alphaUserPage).toHaveCount(0);
+                    await expect(betaUserPage).toHaveCount(0);
+                },
+            },
+            {
+                name: 'Custom cookie with isAlphaUser claim',
+                cookies: (() => {
+                    const privateKey = '4ddd3c2f-e4b7-4e73-840b-526c3be19746';
+                    const token = jwt.sign(
+                        {
+                            name: 'gitbook-open-tests',
+                            isAlphaUser: true,
+                        },
+                        privateKey,
+                        {
+                            expiresIn: '24h',
+                        },
+                    );
+                    return [
+                        {
+                            name: getVisitorCustomCookieName(),
+                            value: token,
+                            httpOnly: true,
+                        },
+                    ];
+                })(),
+                url: '',
+                run: async (page) => {
+                    const welcomePage = page
+                        .locator('a[class*="group\\/toclink"]')
+                        .filter({ hasText: 'Welcome Page' });
+                    const alphaUserPage = page
+                        .locator('a[class*="group\\/toclink"]')
+                        .filter({ hasText: 'Alpha User' });
+                    const betaUserPage = page
+                        .locator('a[class*="group\\/toclink"]')
+                        .filter({ hasText: 'Beta User' });
+
+                    await expect(welcomePage).toBeVisible();
+                    await expect(alphaUserPage).toBeVisible();
+                    await expect(betaUserPage).toHaveCount(0);
+                },
+            },
+            {
+                name: 'Custom cookie with isBetaUser claim',
+                cookies: (() => {
+                    const privateKey = '4ddd3c2f-e4b7-4e73-840b-526c3be19746';
+                    const token = jwt.sign(
+                        {
+                            name: 'gitbook-open-tests',
+                            isBetaUser: true,
+                        },
+                        privateKey,
+                        {
+                            expiresIn: '24h',
+                        },
+                    );
+                    return [
+                        {
+                            name: getVisitorCustomCookieName(),
+                            value: token,
+                            httpOnly: true,
+                        },
+                    ];
+                })(),
+                url: '',
+                run: async (page) => {
+                    const welcomePage = page
+                        .locator('a[class*="group\\/toclink"]')
+                        .filter({ hasText: 'Welcome Page' });
+                    const alphaUserPage = page
+                        .locator('a[class*="group\\/toclink"]')
+                        .filter({ hasText: 'Alpha User' });
+                    const betaUserPage = page
+                        .locator('a[class*="group\\/toclink"]')
+                        .filter({ hasText: 'Beta User' });
+
+                    await expect(welcomePage).toBeVisible();
+                    await expect(betaUserPage).toBeVisible();
+                    await expect(alphaUserPage).toHaveCount(0);
+                },
+            },
+            {
+                name: 'Custom cookie with isAlphaUser & isBetaUser claims',
+                cookies: (() => {
+                    const privateKey = '4ddd3c2f-e4b7-4e73-840b-526c3be19746';
+                    const token = jwt.sign(
+                        {
+                            name: 'gitbook-open-tests',
+                            isAlphaUser: true,
+                            isBetaUser: true,
+                        },
+                        privateKey,
+                        {
+                            expiresIn: '24h',
+                        },
+                    );
+                    return [
+                        {
+                            name: getVisitorCustomCookieName(),
+                            value: token,
+                            httpOnly: true,
+                        },
+                    ];
+                })(),
+                url: '',
+                run: async (page) => {
+                    const welcomePage = page
+                        .locator('a[class*="group\\/toclink"]')
+                        .filter({ hasText: 'Welcome Page' });
+                    const alphaUserPage = page
+                        .locator('a[class*="group\\/toclink"]')
+                        .filter({ hasText: 'Alpha User' });
+                    const betaUserPage = page
+                        .locator('a[class*="group\\/toclink"]')
+                        .filter({ hasText: 'Beta User' });
+
+                    await expect(welcomePage).toBeVisible();
+                    await expect(betaUserPage).toBeVisible();
+                    await expect(alphaUserPage).toBeVisible();
                 },
             },
         ],
