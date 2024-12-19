@@ -16,7 +16,7 @@
         "clean": "rm -rf ./.next && rm -rf ./public/~gitbook/static"
     },
     "dependencies": {
-        "@gitbook/api": "^0.81.0",
+        "@gitbook/api": "^0.83.0",
         "@gitbook/cache-do": "workspace:*",
         "@gitbook/emoji-codepoints": "workspace:*",
         "@gitbook/icons": "workspace:*",
@@ -43,7 +43,7 @@
         "memoizee": "^0.4.15",
         "next": "14.2.15",
         "next-themes": "^0.2.1",
-        "nuqs": "^1.17.4",
+        "nuqs": "^2.2.3",
         "object-hash": "^3.0.0",
         "openapi-types": "^12.1.3",
         "p-map": "^7.0.0",
