@@ -2,7 +2,6 @@ import { it, describe, expect } from 'bun:test';
 import { NextRequest } from 'next/server';
 
 import {
-    VisitorAuthCookieValue,
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
     getVisitorToken,
@@ -11,7 +10,7 @@ import {
 describe('getVisitorAuthToken', () => {
     it('should return the token from the query parameters', () => {
         const request = nextRequest('https://example.com?jwt_token=123');
-        expect(getVisitorToken(request, request.nextUrl)).toEqual('123');
+        expect(getVisitorToken(request, request.nextUrl)).toEqual({ source: 'url', token: '123' });
     });
 
     it('should return the token from the cookie root basepath', () => {
@@ -75,8 +74,8 @@ describe('getVisitorAuthToken', () => {
     });
 });
 
-function assertVisitorAuthCookieValue(value: unknown): asserts value is VisitorAuthCookieValue {
-    if (value && typeof value === 'object' && 'token' in value) {
+function assertVisitorAuthCookieValue(value: unknown): asserts value is { source: 'visitor-auth-cookie'; basePath: string; token: string } {
+    if (value && typeof value === 'object' && 'source' in value && value.source === 'visitor-auth-cookie') {
         return;
     }
 
