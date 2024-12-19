@@ -23,11 +23,10 @@ import { buildVersion } from '@/lib/build';
 import { createContentSecurityPolicyNonce, getContentSecurityPolicy } from '@/lib/csp';
 import { getURLLookupAlternatives, normalizeURL, setMiddlewareHeader } from '@/lib/middleware';
 import {
-    VisitorAuthCookieValue,
+    VisitorTokenLookup,
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
     getVisitorToken,
-    isVisitorAuthTokenFromCookies,
     normalizeVisitorAuthURL,
 } from '@/lib/visitor-token';
 
@@ -677,7 +676,7 @@ async function lookupSiteInMultiPathMode(request: NextRequest, url: URL): Promis
  */
 async function lookupSiteByAPI(
     lookupURL: URL,
-    visitorAuthToken: ReturnType<typeof getVisitorToken>,
+    visitorTokenLookup: VisitorTokenLookup,
 ): Promise<LookupResult> {
     const url = stripURLSearch(lookupURL);
     const lookup = getURLLookupAlternatives(url);
@@ -689,18 +688,13 @@ async function lookupSiteByAPI(
     // When the visitor auth token is pulled from the cookie, set redirectOnError when calling getPublishedContentByUrl to allow
     // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
     // For example when the VA backend signature has changed but the token stored in the cookie is not yet expired.
-    const redirectOnError =
-        typeof visitorAuthToken !== 'undefined' && isVisitorAuthTokenFromCookies(visitorAuthToken);
+    const redirectOnError = visitorTokenLookup?.source === 'visitor-auth-cookie';
 
     const result = await race(lookup.urls, async (alternative, { signal }) => {
         const data = await getPublishedContentByUrl(
             alternative.url,
-            typeof visitorAuthToken === 'undefined'
-                ? undefined
-                : isVisitorAuthTokenFromCookies(visitorAuthToken)
-                  ? visitorAuthToken.token
-                  : visitorAuthToken,
-            typeof visitorAuthToken === 'undefined' ? undefined : redirectOnError,
+            visitorTokenLookup?.token,
+            redirectOnError,
             {
                 signal,
             },
@@ -797,7 +791,7 @@ async function lookupSiteByAPI(
  */
 function getLookupResultForVisitorAuth(
     basePath: string,
-    visitorAuthToken: string | VisitorAuthCookieValue,
+    visitorTokenLookup: VisitorTokenLookup,
 ): Partial<LookupResult> {
     return {
         // No caching for content served with visitor auth
@@ -805,19 +799,17 @@ function getLookupResultForVisitorAuth(
         cacheTags: [],
         cookies: {
             /**
-             * If the visitorAuthToken has been retrieved from a cookie, we set it back only
-             * if the basePath matches the current one. This is to avoid setting cookie for
-             * different base paths.
+             * If the visitor token has been retrieve from the URL, or if its a VA cookie and the basePath is the same, set it
+             * as a cookie on the response.
+             *
+             * Note that we do not re-store the gitbook-visitor-cookie in another cookie, to maintain a single source of truth.
              */
-            ...(typeof visitorAuthToken === 'string' || visitorAuthToken.basePath === basePath
+            ...(visitorTokenLookup?.source === 'url' ||
+            (visitorTokenLookup?.source === 'visitor-auth-cookie' &&
+                visitorTokenLookup.basePath === basePath)
                 ? {
                       [getVisitorAuthCookieName(basePath)]: {
-                          value: getVisitorAuthCookieValue(
-                              basePath,
-                              typeof visitorAuthToken === 'string'
-                                  ? visitorAuthToken
-                                  : visitorAuthToken.token,
-                          ),
+                          value: getVisitorAuthCookieValue(basePath, visitorTokenLookup.token),
                           options: {
                               httpOnly: true,
                               sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,

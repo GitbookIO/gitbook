@@ -20,7 +20,7 @@ import { DeepPartial } from 'ts-essentials';
 import {
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
-    getVisitorCustomCookieName,
+    VISITOR_TOKEN_COOKIE,
 } from '@/lib/visitor-token';
 
 import { getContentTestURL } from '../tests/utils';
@@ -1124,7 +1124,7 @@ const testCases: TestsCase[] = [
                     );
                     return [
                         {
-                            name: getVisitorCustomCookieName(),
+                            name: VISITOR_TOKEN_COOKIE,
                             value: token,
                             httpOnly: true,
                         },
@@ -1163,7 +1163,7 @@ const testCases: TestsCase[] = [
                     );
                     return [
                         {
-                            name: getVisitorCustomCookieName(),
+                            name: VISITOR_TOKEN_COOKIE,
                             value: token,
                             httpOnly: true,
                         },
@@ -1203,7 +1203,7 @@ const testCases: TestsCase[] = [
                     );
                     return [
                         {
-                            name: getVisitorCustomCookieName(),
+                            name: VISITOR_TOKEN_COOKIE,
                             value: token,
                             httpOnly: true,
                         },

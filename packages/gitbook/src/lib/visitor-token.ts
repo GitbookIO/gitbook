@@ -2,7 +2,8 @@ import type { NextRequest } from 'next/server';
 import hash from 'object-hash';
 
 const VISITOR_AUTH_PARAM = 'jwt_token';
-const VISITOR_AUTH_COOKIE_ROOT = 'gitbook-visitor-token';
+const VISITOR_AUTH_COOKIE_ROOT = 'gitbook-visitor-token~';
+export const VISITOR_TOKEN_COOKIE = 'gitbook-visitor-token';
 
 /**
  * The contents of the visitor authentication cookie.
@@ -12,15 +13,28 @@ export type VisitorAuthCookieValue = {
     token: string;
 };
 
-export function isVisitorAuthTokenFromCookies(
-    visitorAuthToken: NonNullable<ReturnType<typeof getVisitorToken>>,
-) {
-    return (
-        typeof visitorAuthToken !== 'string' &&
-        'basePath' in visitorAuthToken &&
-        'token' in visitorAuthToken
-    );
-}
+/**
+ * The result of a visitor token lookup.
+ */
+export type VisitorTokenLookup =
+    | {
+          /** A visitor token was found in the URL. */
+          source: 'url';
+          token: string;
+      }
+    | {
+          /** A visitor auth token was found in a VA cookie */
+          source: 'visitor-auth-cookie';
+          basePath: string;
+          token: string;
+      }
+    | {
+          /** A visitor token (not auth) was found in a cookie. */
+          source: 'gitbook-visitor-cookie';
+          token: string;
+      }
+    /** Not visitor token was found */
+    | undefined;
 
 /**
  * Get the visitor token for the request. This token can either be in the
@@ -29,12 +43,20 @@ export function isVisitorAuthTokenFromCookies(
 export function getVisitorToken(
     request: NextRequest,
     url: URL | NextRequest['nextUrl'],
-): string | VisitorAuthCookieValue | undefined {
-    return (
-        url.searchParams.get(VISITOR_AUTH_PARAM) ??
-        getVisitorAuthTokenFromCookies(request, url) ??
-        getVisitorCustomTokenFromCookies(request)
-    );
+): VisitorTokenLookup {
+    if (url.searchParams.get(VISITOR_AUTH_PARAM)) {
+        return { source: 'url', token: url.searchParams.get(VISITOR_AUTH_PARAM)! };
+    }
+
+    const visitorAuthToken = getVisitorAuthTokenFromCookies(request, url);
+    if (visitorAuthToken) {
+        return { source: 'visitor-auth-cookie', ...visitorAuthToken };
+    }
+
+    const visitorCustomToken = getVisitorCustomTokenFromCookies(request);
+    if (visitorCustomToken) {
+        return { source: 'gitbook-visitor-cookie', token: visitorCustomToken };
+    }
 }
 
 /**
@@ -44,7 +66,7 @@ export function getVisitorToken(
  * different content hosted on the same subdomain.
  */
 export function getVisitorAuthCookieName(basePath: string): string {
-    return `${VISITOR_AUTH_COOKIE_ROOT}~${hash(basePath)}`;
+    return `${VISITOR_AUTH_COOKIE_ROOT}${hash(basePath)}`;
 }
 
 /**
@@ -53,14 +75,6 @@ export function getVisitorAuthCookieName(basePath: string): string {
 export function getVisitorAuthCookieValue(basePath: string, token: string): string {
     const value: VisitorAuthCookieValue = { basePath, token };
     return JSON.stringify(value);
-}
-
-/**
- * Get the name of the customer cookie that can be set by third party backends
- * to pass information in the form of claims about the visitor.
- */
-export function getVisitorCustomCookieName(): string {
-    return VISITOR_AUTH_COOKIE_ROOT;
 }
 
 /**
@@ -126,9 +140,8 @@ function getVisitorAuthTokenFromCookies(
  * The cookie should contain as value a JWT encoded token that contains the claims of the visitor.
  */
 function getVisitorCustomTokenFromCookies(request: NextRequest): string | undefined {
-    const cookieName = getVisitorCustomCookieName();
     const visitorCustomCookie = Array.from(request.cookies).find(
-        ([, cookie]) => cookie.name === cookieName,
+        ([, cookie]) => cookie.name === VISITOR_TOKEN_COOKIE,
     );
     return visitorCustomCookie ? visitorCustomCookie[1].value : undefined;
 }
