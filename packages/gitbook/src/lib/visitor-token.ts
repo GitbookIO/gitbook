@@ -44,8 +44,11 @@ export function getVisitorToken(
     request: NextRequest,
     url: URL | NextRequest['nextUrl'],
 ): VisitorTokenLookup {
-    if (url.searchParams.get(VISITOR_AUTH_PARAM)) {
-        return { source: 'url', token: url.searchParams.get(VISITOR_AUTH_PARAM)! };
+    const fromUrl = url.searchParams.get(VISITOR_AUTH_PARAM);
+
+    // Allow the empty string to come through
+    if (fromUrl !== null && fromUrl !== undefined) {
+        return { source: 'url', token: fromUrl };
     }
 
     const visitorAuthToken = getVisitorAuthTokenFromCookies(request, url);
