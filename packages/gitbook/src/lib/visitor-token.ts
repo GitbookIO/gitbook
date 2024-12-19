@@ -8,7 +8,7 @@ export const VISITOR_TOKEN_COOKIE = 'gitbook-visitor-token';
 /**
  * The contents of the visitor authentication cookie.
  */
-export type VisitorAuthCookieValue = {
+type VisitorAuthCookieValue = {
     basePath: string;
     token: string;
 };

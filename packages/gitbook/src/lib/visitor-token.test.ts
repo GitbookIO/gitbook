@@ -74,8 +74,15 @@ describe('getVisitorAuthToken', () => {
     });
 });
 
-function assertVisitorAuthCookieValue(value: unknown): asserts value is { source: 'visitor-auth-cookie'; basePath: string; token: string } {
-    if (value && typeof value === 'object' && 'source' in value && value.source === 'visitor-auth-cookie') {
+function assertVisitorAuthCookieValue(
+    value: unknown,
+): asserts value is { source: 'visitor-auth-cookie'; basePath: string; token: string } {
+    if (
+        value &&
+        typeof value === 'object' &&
+        'source' in value &&
+        value.source === 'visitor-auth-cookie'
+    ) {
         return;
     }
 
