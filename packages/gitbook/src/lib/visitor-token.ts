@@ -127,8 +127,8 @@ function getVisitorAuthTokenFromCookies(
  */
 function getVisitorCustomTokenFromCookies(request: NextRequest): string | undefined {
     const cookieName = getVisitorCustomCookieName();
-    const visitorCustomCookie = request.cookies.get(cookieName);
-    return visitorCustomCookie?.value;
+    const visitorCustomCookie = Array.from(request.cookies).find(([, cookie]) => cookie.name === cookieName);
+    return visitorCustomCookie ? visitorCustomCookie[1].value : undefined;
 }
 
 /**
