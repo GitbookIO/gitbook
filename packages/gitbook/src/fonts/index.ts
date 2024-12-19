@@ -15,8 +15,16 @@ import {
     Roboto_Slab,
     Source_Sans_3,
     Ubuntu,
+    Noto_Color_Emoji,
 } from 'next/font/google';
 import localFont from 'next/font/local';
+
+export const fontNotoColorEmoji = Noto_Color_Emoji({
+    variable: '--font-noto-color-emoji',
+    weight: ['400'],
+    preload: false,
+    display: 'swap',
+});
 
 /*
     Fonts are downloaded and loaded by next/font.
