@@ -14,17 +14,16 @@ import { hasFullWidthBlock, isNodeEmpty } from '@/lib/document';
 import { AncestorRevisionPage } from '@/lib/pages';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
-import { shouldTrackPageViews } from '@/lib/tracking';
 
 import { PageBodyBlankslate } from './PageBodyBlankslate';
 import { PageCover } from './PageCover';
 import { PageFooterNavigation } from './PageFooterNavigation';
 import { PageHeader } from './PageHeader';
 import { PreservePageLayout } from './PreservePageLayout';
-import { TrackPageView } from './TrackPageView';
 import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
 import { PageFeedbackForm } from '../PageFeedback';
 import { DateRelative } from '../primitives';
+import { TrackPageViewEvent } from '../Insights';
 
 export function PageBody(props: {
     space: Space;
@@ -39,7 +38,6 @@ export function PageBody(props: {
 }) {
     const {
         space,
-        pointer,
         contentTarget,
         customization,
         context,
@@ -146,14 +144,8 @@ export function PageBody(props: {
                     ) : null}
                 </div>
             </main>
-            {shouldTrackPageViews() ? (
-                <TrackPageView
-                    sitePointer={pointer}
-                    spaceId={space.id}
-                    pageId={page.id}
-                    apiHost={api().client.endpoint}
-                />
-            ) : null}
+
+            <TrackPageViewEvent pageId={page.id} />
         </>
     );
 }

@@ -1,3 +1,4 @@
+import { TrackPageViewEvent } from '@/components/Insights';
 import { getSpaceLanguage, t } from '@/intl/server';
 import { getSiteData } from '@/lib/api';
 import { getSiteContentPointer } from '@/lib/pointer';
@@ -19,6 +20,7 @@ export default async function NotFound() {
                 </h2>
                 <p className={tcls('text-base', 'mb-4')}>{t(language, 'notfound')}</p>
             </div>
+            <TrackPageViewEvent pageId={null} />
         </div>
     );
 }
