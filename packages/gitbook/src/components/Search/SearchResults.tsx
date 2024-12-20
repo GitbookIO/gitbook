@@ -14,8 +14,8 @@ import {
     searchSiteSpaceContent,
     searchAllSiteContent,
 } from './server-actions';
-import { Loading } from '../primitives';
 import { useTrackEvent } from '../Insights';
+import { Loading } from '../primitives';
 
 export interface SearchResultsRef {
     moveUp(): void;

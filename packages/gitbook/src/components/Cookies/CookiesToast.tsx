@@ -7,6 +7,7 @@ import { Button } from '@/components/primitives';
 import { useLanguage } from '@/intl/client';
 import { t, tString } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
+
 import { isCookiesTrackingDisabled, setCookiesTracking } from '../Insights';
 
 /**

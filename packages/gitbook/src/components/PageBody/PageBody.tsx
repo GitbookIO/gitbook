@@ -21,9 +21,9 @@ import { PageFooterNavigation } from './PageFooterNavigation';
 import { PageHeader } from './PageHeader';
 import { PreservePageLayout } from './PreservePageLayout';
 import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
+import { TrackPageViewEvent } from '../Insights';
 import { PageFeedbackForm } from '../PageFeedback';
 import { DateRelative } from '../primitives';
-import { TrackPageViewEvent } from '../Insights';
 
 export function PageBody(props: {
     space: Space;

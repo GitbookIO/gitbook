@@ -1,6 +1,7 @@
 'use client';
 
 import cookies from 'js-cookie';
+
 import { isCookiesTrackingDisabled } from './cookies';
 import { generateRandomId } from './utils';
 

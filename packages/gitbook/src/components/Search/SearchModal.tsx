@@ -198,7 +198,7 @@ function SearchModalBody(
 
     const onSwitchToAsk = () => {
         setSearchState((state) => (state ? { ...state, ask: true } : null));
-    }
+    };
 
     return (
         <motion.div

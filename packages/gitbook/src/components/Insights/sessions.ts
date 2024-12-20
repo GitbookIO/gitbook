@@ -1,6 +1,6 @@
 'use client';
 
-import { generateRandomId } from "./utils";
+import { generateRandomId } from './utils';
 
 const SESSION_TTL = 1000 * 60 * 30; // 30 minutes
 
@@ -22,7 +22,8 @@ export function getSession(): Session {
     }
 
     try {
-        const rawSession = typeof localStorage !== 'undefined' ? localStorage.getItem(SESSION_KEY) : null;
+        const rawSession =
+            typeof localStorage !== 'undefined' ? localStorage.getItem(SESSION_KEY) : null;
 
         if (rawSession) {
             const storedSession = JSON.parse(rawSession);
@@ -55,8 +56,8 @@ export function getSession(): Session {
  */
 export function touchSession() {
     if (currentSession) {
-    currentSession.lastActiveAt = Date.now();
-    saveSession();
+        currentSession.lastActiveAt = Date.now();
+        saveSession();
     }
 }
 

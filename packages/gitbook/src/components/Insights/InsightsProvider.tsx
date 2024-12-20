@@ -1,11 +1,12 @@
 'use client';
 
-import * as React from 'react';
-import cookies from 'js-cookie';
-import { useEventCallback, useDebounceCallback } from 'usehooks-ts'
 import type * as api from '@gitbook/api';
-import { getVisitorId } from './visitorId';
+import cookies from 'js-cookie';
+import * as React from 'react';
+import { useEventCallback, useDebounceCallback } from 'usehooks-ts';
+
 import { getSession } from './sessions';
+import { getVisitorId } from './visitorId';
 
 interface InsightsEventContext {
     organizationId: string;
@@ -23,16 +24,17 @@ interface InsightsEventPageContext {
 
 type SiteEventName = api.SiteInsightsEvent['type'];
 
-type TrackEventInput<EventName extends SiteEventName> = { type: EventName } & Omit<Extract<api.SiteInsightsEvent, { type: EventName}>, 'location' | 'session'>;
+type TrackEventInput<EventName extends SiteEventName> = { type: EventName } & Omit<
+    Extract<api.SiteInsightsEvent, { type: EventName }>,
+    'location' | 'session'
+>;
 
 type TrackEventCallback = <EventName extends SiteEventName>(
     event: TrackEventInput<EventName>,
-    ctx?: InsightsEventPageContext
+    ctx?: InsightsEventPageContext,
 ) => void;
 
 const InsightsContext = React.createContext<TrackEventCallback | null>(null);
-
-
 
 interface InsightsProviderProps extends InsightsEventContext {
     enabled: boolean;
@@ -52,7 +54,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
             events: TrackEventInput<SiteEventName>[];
             context: InsightsEventContext;
             pageContext?: InsightsEventPageContext;
-        }
+        };
     }>({});
 
     const flushEvents = useDebounceCallback((pathname: string) => {
@@ -84,25 +86,24 @@ export function InsightsProvider(props: InsightsProviderProps) {
         });
     }, 500);
 
-    const trackEvent = useEventCallback((
-        event: TrackEventInput<SiteEventName>,
-        ctx?: InsightsEventPageContext
-    ) => {
-        const pathname = window.location.pathname;
-        const previous = eventsRef.current[pathname];
-        eventsRef.current[pathname] = {
-            pageContext: previous?.pageContext ?? ctx,
-            url: previous?.url ?? window.location.href,
-            events: [...(previous?.events ?? []), event],
-            context,
-        };
+    const trackEvent = useEventCallback(
+        (event: TrackEventInput<SiteEventName>, ctx?: InsightsEventPageContext) => {
+            const pathname = window.location.pathname;
+            const previous = eventsRef.current[pathname];
+            eventsRef.current[pathname] = {
+                pageContext: previous?.pageContext ?? ctx,
+                url: previous?.url ?? window.location.href,
+                events: [...(previous?.events ?? []), event],
+                context,
+            };
 
-        if (eventsRef.current[pathname].pageContext !== undefined) {
-            // If the pageId is set, we know that the page_view event has been tracked
-            // and we can flush the events
-            flushEvents(pathname);
-        }
-    });
+            if (eventsRef.current[pathname].pageContext !== undefined) {
+                // If the pageId is set, we know that the page_view event has been tracked
+                // and we can flush the events
+                flushEvents(pathname);
+            }
+        },
+    );
 
     return <InsightsContext.Provider value={trackEvent}>{props.children}</InsightsContext.Provider>;
 }
@@ -138,7 +139,7 @@ async function sendEvents(args: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            events
+            events,
         }),
     });
 }

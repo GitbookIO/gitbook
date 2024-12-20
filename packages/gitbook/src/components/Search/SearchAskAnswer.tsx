@@ -14,8 +14,8 @@ import { tcls } from '@/lib/tailwind';
 
 import { AskAnswerResult, AskAnswerSource, streamAskQuestion } from './server-actions';
 import { useSearch, useSearchLink } from './useSearch';
-import { Link } from '../primitives';
 import { useTrackEvent } from '../Insights';
+import { Link } from '../primitives';
 
 type SearchState =
     | {

@@ -19,10 +19,10 @@ import { TableOfContents } from '@/components/TableOfContents';
 import { api, ContentTarget, type SectionsList, SiteContentPointer } from '@/lib/api';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
+import { shouldTrackEvents } from '@/lib/tracking';
 
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
-import { shouldTrackEvents } from '@/lib/tracking';
 
 /**
  * Render the entire content of the space (header, table of contents, footer, and page content).
