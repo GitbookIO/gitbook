@@ -5,7 +5,7 @@ on:
         branches:
             - main
 env:
-    NPMRC_FONT_AWESOME_TOKEN: ${{ secrets.NPMRC_FONT_AWESOME_TOKEN }}
+    NPM_TOKEN_READONLY: ${{ secrets.NPM_TOKEN_READONLY }}
 jobs:
     deploy:
         name: Deploy to Cloudflare Pages
@@ -191,7 +191,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Build (Open Source)
         env:
-            NPMRC_FONT_AWESOME_TOKEN: ''
+            NPM_TOKEN_READONLY: ''
         steps:
             - name: Checkout
               uses: actions/checkout@v4
