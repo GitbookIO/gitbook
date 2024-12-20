@@ -76,14 +76,17 @@ async function trackPageView(args: {
     };
 
     try {
-        await sendSiteTrackPageViewRequest({
-            apiHost,
-            sitePointer,
-            body: {
-                ...sharedTrackedProps,
-                siteSpaceId: sitePointer.siteSpaceId,
-            },
-        });
+        // siteSpaceId is only undefined in mult-id mode (site previews) so we skip the tracking for those
+        if (sitePointer.siteSpaceId) {
+            await sendSiteTrackPageViewRequest({
+                apiHost,
+                sitePointer,
+                body: {
+                    ...sharedTrackedProps,
+                    siteSpaceId: sitePointer.siteSpaceId,
+                },
+            });
+        }
     } catch (error) {
         console.error('Failed to track page view', error);
     }
