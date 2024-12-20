@@ -16,11 +16,13 @@ import { CONTAINER_STYLE } from '@/components/layout';
 import { ColorDebugger } from '@/components/primitives/ColorDebugger';
 import { SearchModal } from '@/components/Search';
 import { TableOfContents } from '@/components/TableOfContents';
-import { ContentTarget, type SectionsList, SiteContentPointer } from '@/lib/api';
+import { api, ContentTarget, type SectionsList, SiteContentPointer } from '@/lib/api';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
+import { shouldTrackEvents } from '@/lib/tracking';
 
 import { SpacesDropdown } from '../Header/SpacesDropdown';
+import { InsightsProvider } from '../Insights';
 
 /**
  * Render the entire content of the space (header, table of contents, footer, and page content).
@@ -64,7 +66,11 @@ export function SpaceLayout(props: {
     const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
 
     return (
-        <>
+        <InsightsProvider
+            enabled={shouldTrackEvents()}
+            apiHost={api().client.endpoint}
+            {...content}
+        >
             {/* <ColorDebugger /> */}
             <Header
                 withTopHeader={withTopHeader}
@@ -137,6 +143,6 @@ export function SpaceLayout(props: {
                     pointer={content}
                 />
             </React.Suspense>
-        </>
+        </InsightsProvider>
     );
 }
