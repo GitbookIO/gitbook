@@ -83,6 +83,11 @@ export function InsightsProvider(props: InsightsProviderProps) {
             });
 
             console.log('Transformed events', events);
+
+            if (enabled) {
+                console.log('Sending events', events);
+                // await sendEvents({ apiHost, organizationId: context.organizationId, siteId: context.siteId, events });
+            }
         });
     }, 500);
 
