@@ -15,6 +15,7 @@ export const ru = {
     search_scope_space: '${1}',
     search_scope_all: 'Всё содержимое',
     search_ask: 'Спросить "${1}"',
+    search_ask_description: 'Найдите ответ с помощью ИИ',
     search_ask_sources: 'Источники',
     search_ask_sources_no_answer: 'Связанные страницы',
     search_ask_no_answer:
