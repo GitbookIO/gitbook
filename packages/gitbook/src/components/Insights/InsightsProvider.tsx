@@ -173,9 +173,14 @@ function transformEvents(input: {
         revision: input.pageContext.revisionId,
     };
 
-    return input.events.map((event) => ({
-        ...event,
-        session,
-        location,
-    }));
+    return input.events.map((partialEvent) => {
+        // @ts-expect-error: Partial event
+        const event: api.SiteInsightsEvent = {
+            ...partialEvent,
+            session,
+            location,
+        };
+
+        return event;
+    });
 }
