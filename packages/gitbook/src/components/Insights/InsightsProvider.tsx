@@ -49,12 +49,14 @@ export function InsightsProvider(props: InsightsProviderProps) {
     const { enabled, apiHost, children, ...context } = props;
 
     const eventsRef = React.useRef<{
-        [pathname: string]: {
-            url: string;
-            events: TrackEventInput<SiteEventName>[];
-            context: InsightsEventContext;
-            pageContext?: InsightsEventPageContext;
-        } | undefined;
+        [pathname: string]:
+            | {
+                  url: string;
+                  events: TrackEventInput<SiteEventName>[];
+                  context: InsightsEventContext;
+                  pageContext?: InsightsEventPageContext;
+              }
+            | undefined;
     }>({});
 
     const flushEvents = useDebounceCallback(async (pathname: string) => {
@@ -79,7 +81,12 @@ export function InsightsProvider(props: InsightsProviderProps) {
 
         if (enabled) {
             console.log('Sending events', events);
-            await sendEvents({ apiHost, organizationId: context.organizationId, siteId: context.siteId, events });
+            await sendEvents({
+                apiHost,
+                organizationId: context.organizationId,
+                siteId: context.siteId,
+                events,
+            });
         } else {
             console.log('Events not sent', events);
         }
