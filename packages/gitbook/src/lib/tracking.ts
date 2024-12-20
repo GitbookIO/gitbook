@@ -7,8 +7,9 @@ export function shouldTrackEvents(): boolean {
     const headerSet = headers();
 
     if (
-        process.env.GITBOOK_BLOCK_PAGE_VIEWS_TRACKING &&
-        !headerSet.has('x-gitbook-track-page-views')
+        process.env.NODE_ENV === 'development' ||
+        (process.env.GITBOOK_BLOCK_PAGE_VIEWS_TRACKING &&
+            !headerSet.has('x-gitbook-track-page-views'))
     ) {
         return false;
     }
