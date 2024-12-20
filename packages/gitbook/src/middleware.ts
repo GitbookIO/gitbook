@@ -290,17 +290,17 @@ export async function middleware(request: NextRequest) {
     setMiddlewareHeader(response, 'referrer-policy', 'no-referrer-when-downgrade');
     setMiddlewareHeader(response, 'x-content-type-options', 'nosniff');
 
-    if (typeof resolved.cacheMaxAge === 'number') {
-        const cacheControl = `public, max-age=0, s-maxage=${resolved.cacheMaxAge}, stale-if-error=0`;
+    const cacheControl =
+        typeof resolved.cacheMaxAge === 'number'
+            ? `public, max-age=0, s-maxage=${resolved.cacheMaxAge}, stale-if-error=0`
+            : 'no-cache';
 
-        if (process.env.GITBOOK_OUTPUT_CACHE === 'true' && process.env.NODE_ENV !== 'development') {
-            setMiddlewareHeader(response, 'cache-control', cacheControl);
-            setMiddlewareHeader(response, 'Cloudflare-CDN-Cache-Control', cacheControl);
-        } else {
-            setMiddlewareHeader(response, 'x-gitbook-cache-control', cacheControl);
-        }
+    if (process.env.GITBOOK_OUTPUT_CACHE === 'true' && process.env.NODE_ENV !== 'development') {
+        setMiddlewareHeader(response, 'cache-control', cacheControl);
+        setMiddlewareHeader(response, 'Cloudflare-CDN-Cache-Control', cacheControl);
+    } else {
+        setMiddlewareHeader(response, 'x-gitbook-cache-control', cacheControl);
     }
-    // }
 
     if (resolved.cacheTags && resolved.cacheTags.length > 0) {
         const headerCacheTag = resolved.cacheTags.join(',');
