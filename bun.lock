@@ -121,7 +121,7 @@
         "typescript": "^5.5.3",
       },
       "optionalDependencies": {
-        "@awesome.me/kit-a463935e93": "1.0.8",
+        "@gitbook/fontawesome-pro": "1.0.8",
       },
       "peerDependencies": {
         "react": "*",
@@ -199,8 +199,6 @@
     "@argos-ci/playwright": ["@argos-ci/playwright@2.0.0", "", { "dependencies": { "@argos-ci/browser": "1.5.0", "@argos-ci/core": "1.5.5", "@argos-ci/util": "1.2.1", "chalk": "^5.3.0", "debug": "^4.3.4" } }, "sha512-rER3LPRYCS7CD3VK7ddP63tXj/3crQKZqrPGtY3QobyRO0IFech6xejEAHz2zM8ZT8aXH/dQydoU7vR9PCP8SQ=="],
 
     "@argos-ci/util": ["@argos-ci/util@1.2.1", "", {}, "sha512-/o7t0TcSED3BsBnnPrvXdmT+reThGMoGC9Lk+TTghrEE9GFlSKhjBmfYt4fUgXj5hQIe5tcdO01BVB2TsjjYSw=="],
-
-    "@awesome.me/kit-a463935e93": ["@awesome.me/kit-a463935e93@1.0.8", "https://npm.fontawesome.com/@awesome.me/kit-a463935e93/-/1.0.8/kit-a463935e93-1.0.8.tgz", { "dependencies": { "@fortawesome/fontawesome-common-types": "^6.6.0" } }, "sha512-NByu4tcECQiweFue2aMq6O1sZYTerevVAZXjag3gICm1QB0gglun2osBBfh/Wh1dmeSau+zAaOAFBAydCGZzHg=="],
 
     "@babel/code-frame": ["@babel/code-frame@7.25.7", "", { "dependencies": { "@babel/highlight": "^7.25.7", "picocolors": "^1.0.0" } }, "sha512-0xZJFNE5XMpENsgfHYTw8FbX4kv53mFLn2i3XPoq69LyhYSCBJtitaHx9QnsVTrsogI4Z3+HtEfZ2/GFPOtf5g=="],
 
@@ -392,7 +390,9 @@
 
     "@gitbook/emoji-codepoints": ["@gitbook/emoji-codepoints@workspace:packages/emoji-codepoints", { "devDependencies": { "emoji-assets": "^8.0.0" } }],
 
-    "@gitbook/icons": ["@gitbook/icons@workspace:packages/icons", { "dependencies": { "@fortawesome/fontawesome-free": "^6.6.0", "@fortawesome/fontawesome-svg-core": "^6.6.0" }, "devDependencies": { "typescript": "^5.5.3" }, "optionalDependencies": { "@awesome.me/kit-a463935e93": "1.0.8" }, "peerDependencies": { "react": "*" }, "bin": { "gitbook-icons": "./bin/gitbook-icons.js" } }],
+    "@gitbook/fontawesome-pro": ["@gitbook/fontawesome-pro@1.0.8", "", { "dependencies": { "@fortawesome/fontawesome-common-types": "^6.6.0" } }, "sha512-i4PgiuGyUb52Muhc52kK3aMJIMfMkA2RbPW30tre8a6M8T6mWTfYo6gafSgjNvF1vH29zcuB8oBYnF0gO4XcHA=="],
+
+    "@gitbook/icons": ["@gitbook/icons@workspace:packages/icons", { "dependencies": { "@fortawesome/fontawesome-free": "^6.6.0", "@fortawesome/fontawesome-svg-core": "^6.6.0" }, "devDependencies": { "typescript": "^5.5.3" }, "optionalDependencies": { "@gitbook/fontawesome-pro": "1.0.8" }, "peerDependencies": { "react": "*" }, "bin": { "gitbook-icons": "./bin/gitbook-icons.js" } }],
 
     "@gitbook/proxy": ["@gitbook/proxy@workspace:packages/proxy", { "devDependencies": { "typescript": "^5.5.3" } }],
 
