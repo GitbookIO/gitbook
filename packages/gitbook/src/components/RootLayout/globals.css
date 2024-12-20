@@ -4,6 +4,8 @@
 
 @layer base {
     :root {
+        /* See packages/gitbook/src/fonts/index.ts */
+        --font-emoji: 'Apple Color Emoji', var(--font-noto-color-emoji);
         --scrollbar-width: calc(100vw - 100%);
 
         --dark-base: 20 20 20;
@@ -196,26 +198,5 @@ html.dark {
 /* Emojis */
 
 [class*='emoji'] {
-    font-family: var(--font-emojis-sbix);
-}
-
-/* Safari Only CSS here */
-_::-webkit-full-page-media,
-_:future,
-:root [class*='emoji'] {
-    font-family: var(--font-emojis-sbix);
-}
-
-/* Chrome Only CSS here */
-@media screen and (-webkit-min-device-pixel-ratio: 0) {
-    .emoji {
-        font-family: var(--font-emojis-colrv1);
-    }
-}
-
-/* Firefox Only CSS here */
-@-moz-document url-prefix() {
-    .emoji {
-        font-family: var(--font-emojis-colrv1);
-    }
+    font-family: var(--font-emoji);
 }
