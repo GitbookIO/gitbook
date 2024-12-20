@@ -147,7 +147,11 @@ export function PageBody(props: {
                 </div>
             </main>
             {shouldTrackPageViews() ? (
-                <TrackPageView sitePointer={pointer} pageId={page.id} apiHost={api().endpoint} />
+                <TrackPageView
+                    sitePointer={pointer}
+                    pageId={page.id}
+                    apiHost={api().client.endpoint}
+                />
             ) : null}
         </>
     );
