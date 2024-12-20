@@ -34,7 +34,7 @@ export function getSession(): Session {
                 typeof storedSession.id === 'string' &&
                 storedSession.lastActiveAt + SESSION_TTL > Date.now()
             ) {
-                currentSession = storedSession;
+                currentSession = storedSession as Session;
                 touchSession();
                 return currentSession;
             }
