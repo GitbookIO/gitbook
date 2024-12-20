@@ -77,7 +77,12 @@ export function InsightsProvider(props: InsightsProviderProps) {
             visitorId,
             sessionId: session.id,
         });
-        eventsRef.current[pathname] = undefined;
+
+        // Reset the events for the next flush
+        eventsRef.current[pathname] = {
+            ...eventsForPathname,
+            events: [],
+        };
 
         if (enabled) {
             console.log('Sending events', events);
@@ -94,6 +99,8 @@ export function InsightsProvider(props: InsightsProviderProps) {
 
     const trackEvent = useEventCallback(
         (event: TrackEventInput<SiteEventName>, ctx?: InsightsEventPageContext) => {
+            console.log('Logging event', event, ctx);
+
             const pathname = window.location.pathname;
             const previous = eventsRef.current[pathname];
             eventsRef.current[pathname] = {
