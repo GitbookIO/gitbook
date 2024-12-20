@@ -186,7 +186,7 @@ jobs:
             - name: Setup Bun
               uses: ./.github/composite/setup-bun
             - name: Install dependencies
-              run: bun install --frozen-lockfile
+              run: bun install
               env:
                   PUPPETEER_SKIP_DOWNLOAD: 1
             - run: bun run build

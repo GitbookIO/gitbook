@@ -1,4 +1,2 @@
-[install]
-saveTextLockfile = true
 [install.scopes]
 "gitbook" = { token = "$NPM_TOKEN_READONLY", url = "https://registry.npmjs.org" }
