@@ -54,41 +54,35 @@ export function InsightsProvider(props: InsightsProviderProps) {
             events: TrackEventInput<SiteEventName>[];
             context: InsightsEventContext;
             pageContext?: InsightsEventPageContext;
-        };
+        } | undefined;
     }>({});
 
-    const flushEvents = useDebounceCallback((pathname: string) => {
+    const flushEvents = useDebounceCallback(async (pathname: string) => {
+        const visitorId = await getVisitorId();
+        const session = await getSession();
+
         const eventsForPathname = eventsRef.current[pathname];
-        if (!eventsForPathname) {
+        if (!eventsForPathname || !eventsForPathname.pageContext) {
+            console.warn('No events to flush', eventsForPathname);
             return;
         }
 
-        console.log('Flushing events', eventsForPathname);
-
-        getVisitorId().then((visitorId) => {
-            const session = getSession();
-            console.log('Visitor ID', { visitorId, session });
-
-            if (!eventsForPathname.pageContext) {
-                throw new Error('Page context is required');
-            }
-
-            const events = transformEvents({
-                url: eventsForPathname.url,
-                events: eventsForPathname.events,
-                context,
-                pageContext: eventsForPathname.pageContext,
-                visitorId,
-                sessionId: session.id,
-            });
-
-            console.log('Transformed events', events);
-
-            if (enabled) {
-                console.log('Sending events', events);
-                // await sendEvents({ apiHost, organizationId: context.organizationId, siteId: context.siteId, events });
-            }
+        const events = transformEvents({
+            url: eventsForPathname.url,
+            events: eventsForPathname.events,
+            context,
+            pageContext: eventsForPathname.pageContext,
+            visitorId,
+            sessionId: session.id,
         });
+        eventsRef.current[pathname] = undefined;
+
+        if (enabled) {
+            console.log('Sending events', events);
+            await sendEvents({ apiHost, organizationId: context.organizationId, siteId: context.siteId, events });
+        } else {
+            console.log('Events not sent', events);
+        }
     }, 500);
 
     const trackEvent = useEventCallback(
