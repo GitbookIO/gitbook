@@ -174,7 +174,7 @@ function transformEvents(input: {
         userAgent: window.navigator.userAgent,
         language: window.navigator.language,
         cookies: cookies.get(),
-        referrer: document.referrer,
+        referrer: document.referrer || null,
     };
 
     const location: api.SiteInsightsEventLocation = {
