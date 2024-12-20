@@ -8,16 +8,19 @@ import { useTrackEvent } from "./InsightsProvider";
  */
 export function TrackPageViewEvent(props: {
     pageId: string | null;
+    revisionId: string;
 }) {
-    const { pageId } = props;
+    const { pageId, revisionId } = props;
     const trackEvent = useTrackEvent();
 
     React.useEffect(() => {
         trackEvent({
             type: 'page_view',
+        }, {
             pageId,
+            revisionId,
         });
-    }, [pageId, trackEvent]);
+    }, [pageId, revisionId, trackEvent]);
 
     return null;
 }

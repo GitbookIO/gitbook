@@ -145,7 +145,7 @@ export function PageBody(props: {
                 </div>
             </main>
 
-            <TrackPageViewEvent pageId={page.id} />
+            <TrackPageViewEvent pageId={page.id} revisionId={space.revision} />
         </>
     );
 }

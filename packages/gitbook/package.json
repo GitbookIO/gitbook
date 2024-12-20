@@ -16,7 +16,7 @@
         "clean": "rm -rf ./.next && rm -rf ./public/~gitbook/static"
     },
     "dependencies": {
-        "@gitbook/api": "link:@gitbook/api",
+        "@gitbook/api": "^0.84.0",
         "@gitbook/cache-do": "workspace:*",
         "@gitbook/emoji-codepoints": "workspace:*",
         "@gitbook/icons": "workspace:*",
