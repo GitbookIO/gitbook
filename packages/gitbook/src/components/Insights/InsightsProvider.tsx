@@ -133,7 +133,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
         flushEventsSync(pathname);
     }, 500);
 
-    const trackEvent = useEventCallback(
+    const trackEvent: TrackEventCallback = useEventCallback(
         (
             event: TrackEventInput<SiteEventName>,
             ctx?: InsightsEventPageContext,
