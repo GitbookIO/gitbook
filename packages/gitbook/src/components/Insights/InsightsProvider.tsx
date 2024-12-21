@@ -85,7 +85,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
             | undefined;
     }>({});
 
-    const flushEventsSync = (pathname: string) => {
+    const flushEventsSync = useEventCallback((pathname: string) => {
         const visitorId = visitorIdRef.current;
         if (!visitorId) {
             throw new Error('Visitor ID not set');
@@ -124,7 +124,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
         } else {
             console.log('Skipping sending events', events);
         }
-    };
+    });
 
     const flushBatchedEvents = useDebounceCallback(async (pathname: string) => {
         const visitorId = visitorIdRef.current ?? (await getVisitorId());
@@ -161,6 +161,20 @@ export function InsightsProvider(props: InsightsProviderProps) {
             }
         },
     );
+
+    const flushAllEvents = useEventCallback(() => {
+        for (const pathname in eventsRef.current) {
+            flushEventsSync(pathname);
+        }
+    });
+
+    // When the page is unloaded, flush all events
+    React.useEffect(() => {
+        window.addEventListener('beforeunload', flushAllEvents);
+        return () => {
+            window.removeEventListener('beforeunload', flushAllEvents);
+        };
+    }, [flushAllEvents]);
 
     return (
         <InsightsContext.Provider value={trackEvent}>
