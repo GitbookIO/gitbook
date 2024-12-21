@@ -27,7 +27,7 @@
 }
 
 .columnHeader {
-    @apply text-sm font-medium py-3 px-4 text-tint-900;
+    @apply text-sm font-medium py-2 px-4 text-tint-900;
 }
 
 :global(.dark) .columnHeader {
@@ -35,7 +35,7 @@
 }
 
 .row {
-    @apply flex border-tint-700/2;
+    @apply flex border-tint-700/2 hover:bg-tint-700/2 transition-colors;
 }
 
 :global(.dark) .row {
@@ -43,7 +43,7 @@
 }
 
 .rowGroup {
-    @apply flex flex-col border rounded-lg bg-tint-800/1 border-tint-700/2;
+    @apply flex flex-col border rounded-lg bg-tint-800/1 border-tint-700/2 mb-1;
 }
 
 :global(.dark) .rowGroup {
@@ -51,9 +51,9 @@
 }
 
 .cell {
-    @apply flex-1 align-middle border-dark/2 py-2 px-4 text-sm;
+    @apply flex-1 align-middle border-tint-700/2 py-2 px-4 text-sm relative;
 }
 
-:global(.dark) .cell {
-    @apply border-light/2;
+.cell:not(:last-child) {
+    @apply border-r;
 }
