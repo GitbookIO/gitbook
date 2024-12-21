@@ -85,53 +85,76 @@ export function InsightsProvider(props: InsightsProviderProps) {
             | undefined;
     }>({});
 
-    const flushEventsSync = (pathname: string) => {
+    /**
+     * Get the visitor ID and store it in a ref.
+     */
+    React.useEffect(() => {
+        getVisitorId().then((visitorId) => {
+            visitorIdRef.current = visitorId;
+        });
+    }, []);
+
+    /**
+     * Synchronously flush all the pending events.
+     */
+    const flushEventsSync = useEventCallback(() => {
+        const session = getSession();
         const visitorId = visitorIdRef.current;
         if (!visitorId) {
-            throw new Error('Visitor ID not set');
-        }
-        const session = getSession();
-
-        const eventsForPathname = eventsRef.current[pathname];
-        if (!eventsForPathname || !eventsForPathname.pageContext) {
-            console.warn('No events to flush', eventsForPathname);
-            return;
+            throw new Error('Visitor ID should be set before flushing events');
         }
 
-        const events = transformEvents({
-            url: eventsForPathname.url,
-            events: eventsForPathname.events,
-            context,
-            pageContext: eventsForPathname.pageContext,
-            visitorId,
-            sessionId: session.id,
-        });
+        const allEvents: api.SiteInsightsEvent[] = [];
 
-        // Reset the events for the next flush
-        eventsRef.current[pathname] = {
-            ...eventsForPathname,
-            events: [],
-        };
+        for (const pathname in eventsRef.current) {
+            const eventsForPathname = eventsRef.current[pathname];
+            if (!eventsForPathname || !eventsForPathname.events.length) {
+                continue;
+            }
+            if (!eventsForPathname.pageContext) {
+                console.warn('No page context for flushing events of', pathname, eventsForPathname);
+                continue;
+            }
 
-        if (enabled) {
-            console.log('Sending events', events);
-            sendEvents({
-                apiHost,
-                organizationId: context.organizationId,
-                siteId: context.siteId,
-                events,
-            });
-        } else {
-            console.log('Skipping sending events', events);
+            allEvents.push(
+                ...transformEvents({
+                    url: eventsForPathname.url,
+                    events: eventsForPathname.events,
+                    context,
+                    pageContext: eventsForPathname.pageContext,
+                    visitorId,
+                    sessionId: session.id,
+                }),
+            );
+
+            // Reset the events for the next flush
+            eventsRef.current[pathname] = {
+                ...eventsForPathname,
+                events: [],
+            };
         }
-    };
 
-    const flushBatchedEvents = useDebounceCallback(async (pathname: string) => {
+        if (allEvents.length > 0) {
+            if (enabled) {
+                console.log('Sending events', allEvents);
+                sendEvents({
+                    apiHost,
+                    organizationId: context.organizationId,
+                    siteId: context.siteId,
+                    events: allEvents,
+                });
+            } else {
+                console.log('Skipping sending events', allEvents);
+            }
+        }
+    });
+
+    const flushBatchedEvents = useDebounceCallback(async () => {
         const visitorId = visitorIdRef.current ?? (await getVisitorId());
         visitorIdRef.current = visitorId;
 
-        flushEventsSync(pathname);
-    }, 500);
+        flushEventsSync();
+    }, 1500);
 
     const trackEvent: TrackEventCallback = useEventCallback(
         (
@@ -146,7 +169,13 @@ export function InsightsProvider(props: InsightsProviderProps) {
             eventsRef.current[pathname] = {
                 pageContext: previous?.pageContext ?? ctx,
                 url: previous?.url ?? window.location.href,
-                events: [...(previous?.events ?? []), event],
+                events: [
+                    ...(previous?.events ?? []),
+                    {
+                        ...event,
+                        timestamp: new Date().toISOString(),
+                    },
+                ],
                 context,
             };
 
@@ -154,13 +183,22 @@ export function InsightsProvider(props: InsightsProviderProps) {
                 // If the pageId is set, we know that the page_view event has been tracked
                 // and we can flush the events
                 if (options?.immediate && visitorIdRef.current) {
-                    flushEventsSync(pathname);
+                    flushBatchedEvents.cancel();
+                    flushEventsSync();
                 } else {
-                    flushBatchedEvents(pathname);
+                    flushBatchedEvents();
                 }
             }
         },
     );
+
+    // When the page is unloaded, flush all events
+    React.useEffect(() => {
+        window.addEventListener('beforeunload', flushEventsSync);
+        return () => {
+            window.removeEventListener('beforeunload', flushEventsSync);
+        };
+    }, [flushEventsSync]);
 
     return (
         <InsightsContext.Provider value={trackEvent}>

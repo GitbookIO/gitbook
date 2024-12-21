@@ -15,5 +15,15 @@ export async function Mention(props: InlineProps<DocumentInlineMention>) {
         return null;
     }
 
-    return <StyledLink href={resolved.href}>{resolved.text}</StyledLink>;
+    return (
+        <StyledLink
+            href={resolved.href}
+            insights={{
+                target: inline.data.ref,
+                position: 'content',
+            }}
+        >
+            {resolved.text}
+        </StyledLink>
+    );
 }
