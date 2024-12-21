@@ -108,22 +108,24 @@ export function InsightsProvider(props: InsightsProviderProps) {
 
         for (const pathname in eventsRef.current) {
             const eventsForPathname = eventsRef.current[pathname];
-            if (!eventsForPathname ||!eventsForPathname.events.length) {
+            if (!eventsForPathname || !eventsForPathname.events.length) {
                 continue;
             }
             if (!eventsForPathname.pageContext) {
-                console.warn('No page context for flushing events of', pathname,eventsForPathname);
+                console.warn('No page context for flushing events of', pathname, eventsForPathname);
                 continue;
             }
 
-            allEvents.push(...transformEvents({
-                url: eventsForPathname.url,
-                events: eventsForPathname.events,
-                context,
-                pageContext: eventsForPathname.pageContext,
-                visitorId,
-                sessionId: session.id,
-            }));
+            allEvents.push(
+                ...transformEvents({
+                    url: eventsForPathname.url,
+                    events: eventsForPathname.events,
+                    context,
+                    pageContext: eventsForPathname.pageContext,
+                    visitorId,
+                    sessionId: session.id,
+                }),
+            );
 
             // Reset the events for the next flush
             eventsRef.current[pathname] = {
@@ -132,16 +134,18 @@ export function InsightsProvider(props: InsightsProviderProps) {
             };
         }
 
-        if (enabled) {
-            console.log('Sending events', allEvents);
-            sendEvents({
-                apiHost,
-                organizationId: context.organizationId,
-                siteId: context.siteId,
-                events: allEvents,
-            });
-        } else {
-            console.log('Skipping sending events', allEvents);
+        if (allEvents.length > 0) {
+            if (enabled) {
+                console.log('Sending events', allEvents);
+                sendEvents({
+                    apiHost,
+                    organizationId: context.organizationId,
+                    siteId: context.siteId,
+                    events: allEvents,
+                });
+            } else {
+                console.log('Skipping sending events', allEvents);
+            }
         }
     });
 
@@ -179,9 +183,10 @@ export function InsightsProvider(props: InsightsProviderProps) {
                 // If the pageId is set, we know that the page_view event has been tracked
                 // and we can flush the events
                 if (options?.immediate && visitorIdRef.current) {
-                    flushEventsSync(pathname);
+                    flushBatchedEvents.cancel();
+                    flushEventsSync();
                 } else {
-                    flushBatchedEvents(pathname);
+                    flushBatchedEvents();
                 }
             }
         },
