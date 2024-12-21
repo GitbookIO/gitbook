@@ -1,6 +1,7 @@
 'use client';
 
 import type * as api from '@gitbook/api';
+import { OpenAPIOperationContextProvider } from '@gitbook/react-openapi';
 import cookies from 'js-cookie';
 import * as React from 'react';
 import { useEventCallback, useDebounceCallback } from 'usehooks-ts';
@@ -8,6 +9,11 @@ import { useEventCallback, useDebounceCallback } from 'usehooks-ts';
 import { getSession } from './sessions';
 import { getVisitorId } from './visitorId';
 
+type SiteEventName = api.SiteInsightsEvent['type'];
+
+/**
+ * Global context for all events in the session.
+ */
 interface InsightsEventContext {
     organizationId: string;
     siteId: string;
@@ -17,21 +23,40 @@ interface InsightsEventContext {
     siteShareKey: string | undefined;
 }
 
+/**
+ * Context for an event on a page.
+ */
 interface InsightsEventPageContext {
     pageId: string | null;
     revisionId: string;
 }
 
-type SiteEventName = api.SiteInsightsEvent['type'];
+/**
+ * Options when tracking an event.
+ */
+interface InsightsEventOptions {
+    /**
+     * If true, the event will be sent immediately.
+     * Passes true for events that could cause a page unload.
+     */
+    immediate?: boolean;
+}
 
+/**
+ * Input data for an event.
+ */
 type TrackEventInput<EventName extends SiteEventName> = { type: EventName } & Omit<
     Extract<api.SiteInsightsEvent, { type: EventName }>,
     'location' | 'session'
 >;
 
+/**
+ * Callback to track an event.
+ */
 type TrackEventCallback = <EventName extends SiteEventName>(
     event: TrackEventInput<EventName>,
     ctx?: InsightsEventPageContext,
+    options?: InsightsEventOptions,
 ) => void;
 
 const InsightsContext = React.createContext<TrackEventCallback | null>(null);
@@ -48,6 +73,7 @@ interface InsightsProviderProps extends InsightsEventContext {
 export function InsightsProvider(props: InsightsProviderProps) {
     const { enabled, apiHost, children, ...context } = props;
 
+    const visitorIdRef = React.useRef<string | null>(null);
     const eventsRef = React.useRef<{
         [pathname: string]:
             | {
@@ -59,9 +85,12 @@ export function InsightsProvider(props: InsightsProviderProps) {
             | undefined;
     }>({});
 
-    const flushEvents = useDebounceCallback(async (pathname: string) => {
-        const visitorId = await getVisitorId();
-        const session = await getSession();
+    const flushEventsSync = (pathname: string) => {
+        const visitorId = visitorIdRef.current;
+        if (!visitorId) {
+            throw new Error('Visitor ID not set');
+        }
+        const session = getSession();
 
         const eventsForPathname = eventsRef.current[pathname];
         if (!eventsForPathname || !eventsForPathname.pageContext) {
@@ -86,19 +115,30 @@ export function InsightsProvider(props: InsightsProviderProps) {
 
         if (enabled) {
             console.log('Sending events', events);
-            await sendEvents({
+            sendEvents({
                 apiHost,
                 organizationId: context.organizationId,
                 siteId: context.siteId,
                 events,
             });
         } else {
-            console.log('Events not sent', events);
+            console.log('Skipping sending events', events);
         }
+    };
+
+    const flushBatchedEvents = useDebounceCallback(async (pathname: string) => {
+        const visitorId = visitorIdRef.current ?? (await getVisitorId());
+        visitorIdRef.current = visitorId;
+
+        flushEventsSync(pathname);
     }, 500);
 
-    const trackEvent = useEventCallback(
-        (event: TrackEventInput<SiteEventName>, ctx?: InsightsEventPageContext) => {
+    const trackEvent: TrackEventCallback = useEventCallback(
+        (
+            event: TrackEventInput<SiteEventName>,
+            ctx?: InsightsEventPageContext,
+            options?: InsightsEventOptions,
+        ) => {
             console.log('Logging event', event, ctx);
 
             const pathname = window.location.pathname;
@@ -113,12 +153,26 @@ export function InsightsProvider(props: InsightsProviderProps) {
             if (eventsRef.current[pathname].pageContext !== undefined) {
                 // If the pageId is set, we know that the page_view event has been tracked
                 // and we can flush the events
-                flushEvents(pathname);
+                if (options?.immediate && visitorIdRef.current) {
+                    flushEventsSync(pathname);
+                } else {
+                    flushBatchedEvents(pathname);
+                }
             }
         },
     );
 
-    return <InsightsContext.Provider value={trackEvent}>{props.children}</InsightsContext.Provider>;
+    return (
+        <InsightsContext.Provider value={trackEvent}>
+            <OpenAPIOperationContextProvider
+                onOpenClient={(operation) => {
+                    trackEvent({ type: 'api_client_open', operation });
+                }}
+            >
+                {props.children}
+            </OpenAPIOperationContextProvider>
+        </InsightsContext.Provider>
+    );
 }
 
 /**
@@ -136,7 +190,7 @@ export function useTrackEvent(): TrackEventCallback {
 /**
  * Post the events to the server.
  */
-async function sendEvents(args: {
+function sendEvents(args: {
     apiHost: string;
     organizationId: string;
     siteId: string;
@@ -146,11 +200,12 @@ async function sendEvents(args: {
     const url = new URL(apiHost);
     url.pathname = `/v1/orgs/${organizationId}/sites/${siteId}/insights/events`;
 
-    await fetch(url, {
+    fetch(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
+        keepalive: true,
         body: JSON.stringify({
             events,
         }),

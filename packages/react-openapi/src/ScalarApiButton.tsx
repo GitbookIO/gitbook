@@ -3,17 +3,22 @@
 import { useApiClientModal } from '@scalar/api-client-react';
 import React from 'react';
 
+import { useOpenAPIOperationContext } from './OpenAPIOperationContext';
+
 /**
  * Button which launches the Scalar API Client
  */
 export function ScalarApiButton({ method, path }: { method: string; path: string }) {
     const client = useApiClientModal();
-
+    const { onOpenClient } = useOpenAPIOperationContext();
     return (
         <div className="scalar scalar-activate">
             <button
                 className="scalar-activate-button"
-                onClick={() => client?.open({ method, path, _source: 'gitbook' })}
+                onClick={() => {
+                    client?.open({ method, path, _source: 'gitbook' });
+                    onOpenClient({ method, path });
+                }}
             >
                 <svg xmlns="http://www.w3.org/2000/svg" width="10" height="12" fill="none">
                     <path

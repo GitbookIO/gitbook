@@ -1,4 +1,4 @@
-import { DocumentBlockSwagger } from '@gitbook/api';
+import { DocumentBlockOpenAPI } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import { OpenAPIOperation } from '@gitbook/react-openapi';
 import React from 'react';
@@ -16,7 +16,7 @@ import './scalar.css';
 /**
  * Render an OpenAPI block.
  */
-export async function OpenAPI(props: BlockProps<DocumentBlockSwagger>) {
+export async function OpenAPI(props: BlockProps<DocumentBlockOpenAPI>) {
     const { block, style } = props;
     return (
         <div className={tcls('w-full', 'flex', 'flex-row', style, 'max-w-full')}>
@@ -27,7 +27,7 @@ export async function OpenAPI(props: BlockProps<DocumentBlockSwagger>) {
     );
 }
 
-async function OpenAPIBody(props: BlockProps<DocumentBlockSwagger>) {
+async function OpenAPIBody(props: BlockProps<DocumentBlockOpenAPI>) {
     const { block, context } = props;
     const { data, specUrl, error } = await fetchOpenAPIBlock(block, context.resolveContentRef);
 
