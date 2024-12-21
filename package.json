@@ -29,9 +29,6 @@
         "download:env": "op read op://gitbook-x-dev/gitbook-open/.env.local >> .env.local",
         "clean": "turbo run clean"
     },
-    "overrides": {
-        "@codemirror/state": "6.4.1"
-    },
     "workspaces": [
         "packages/*"
     ]
