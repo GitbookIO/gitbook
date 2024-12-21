@@ -76,7 +76,15 @@ async function MoreMenuLink(props: {
             {'links' in link && link.links.length > 0 && (
                 <hr className="first:hidden border-t border-light-3 dark:border-dark-3 my-1 -mx-2" />
             )}
-            <DropdownMenuItem href={target?.href ?? null}>{link.title}</DropdownMenuItem>
+            <DropdownMenuItem
+                href={target?.href ?? null}
+                insights={link.to ? {
+                    target: link.to,
+                    position: 'header',
+                } : undefined}
+            >
+                {link.title}
+            </DropdownMenuItem>
             {'links' in link
                 ? link.links.map((subLink, index) => (
                       <MoreMenuLink key={index} {...props} link={subLink} />

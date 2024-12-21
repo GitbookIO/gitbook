@@ -7,6 +7,7 @@ import { ClassValue, tcls } from '@/lib/tailwind';
 import { RecordColumnValue } from './RecordColumnValue';
 import { TableRecordKV, TableViewProps } from './Table';
 import { getRecordValue } from './utils';
+import { Link } from '@/components/primitives';
 
 export async function RecordCard(
     props: TableViewProps<DocumentTableViewCards> & {
@@ -153,17 +154,21 @@ export async function RecordCard(
         'before:dark:ring-light/2',
     ] as ClassValue;
 
-    if (target) {
+    if (target && targetRef) {
         return (
-            <a
+            <Link
                 href={target.href}
                 className={tcls(style, [
                     'hover:before:ring-dark/4',
                     'dark:hover:before:ring-light/4',
                 ])}
+                insights={{
+                    target: targetRef,
+                    position: 'content',
+                }}
             >
                 {body}
-            </a>
+            </Link>
         );
     }
 

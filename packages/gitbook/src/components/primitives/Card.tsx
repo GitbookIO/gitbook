@@ -2,7 +2,7 @@ import { Icon } from '@gitbook/icons';
 
 import { ClassValue, tcls } from '@/lib/tailwind';
 
-import { Link } from './Link';
+import { Link, LinkInsightsProps } from './Link';
 
 export async function Card(props: {
     href: string;
@@ -11,8 +11,8 @@ export async function Card(props: {
     title: string;
     postTitle?: string;
     style?: ClassValue;
-}) {
-    const { title, leadingIcon, href, preTitle, postTitle, style } = props;
+} & LinkInsightsProps) {
+    const { title, leadingIcon, href, preTitle, postTitle, style, insights } = props;
 
     return (
         <Link
@@ -38,6 +38,7 @@ export async function Card(props: {
                 'dark:hover:ring-primary-300/4',
                 style,
             )}
+            insights={insights}
         >
             {leadingIcon}
             <span className={tcls('flex', 'flex-col', 'flex-1')}>

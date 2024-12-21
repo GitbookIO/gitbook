@@ -6,6 +6,7 @@ import { tcls } from '@/lib/tailwind';
 import { BlockProps } from './Block';
 import { Caption } from './Caption';
 import { FileIcon } from './FileIcon';
+import { Link } from '../primitives';
 
 export async function File(props: BlockProps<DocumentBlockFile>) {
     const { block, context } = props;
@@ -21,9 +22,13 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
 
     return (
         <Caption {...props} wrapperStyle={[]}>
-            <a
+            <Link
                 href={file.downloadURL}
                 download={file.name}
+                insights={{
+                    target: block.data.ref,
+                    position: 'content',
+                }}
                 className={tcls(
                     'group/file',
                     'flex',
@@ -77,7 +82,7 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
                         {contentType}
                     </div>
                 </div>
-            </a>
+            </Link>
         </Caption>
     );
 }
