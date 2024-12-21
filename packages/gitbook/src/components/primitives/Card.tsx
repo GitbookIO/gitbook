@@ -4,14 +4,16 @@ import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { Link, LinkInsightsProps } from './Link';
 
-export async function Card(props: {
-    href: string;
-    leadingIcon?: React.ReactNode;
-    preTitle?: string;
-    title: string;
-    postTitle?: string;
-    style?: ClassValue;
-} & LinkInsightsProps) {
+export async function Card(
+    props: {
+        href: string;
+        leadingIcon?: React.ReactNode;
+        preTitle?: string;
+        title: string;
+        postTitle?: string;
+        style?: ClassValue;
+    } & LinkInsightsProps,
+) {
     const { title, leadingIcon, href, preTitle, postTitle, style, insights } = props;
 
     return (

@@ -148,14 +148,17 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                 href={ref.href}
                                 target="_blank"
                                 style={['flex', 'flex-row', 'items-center', 'gap-2']}
-                                insights={ref.file ?{
-                                    target: {
-                                        kind: 'file',
-                                        file: ref.file.id,
-                                    },
-                                        position: 'content',
-                                    }
-                                : undefined}
+                                insights={
+                                    ref.file
+                                        ? {
+                                              target: {
+                                                  kind: 'file',
+                                                  file: ref.file.id,
+                                              },
+                                              position: 'content',
+                                          }
+                                        : undefined
+                                }
                             >
                                 {contentType === 'image' ? (
                                     <Image
@@ -202,10 +205,14 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                     {resolved ? (
                         <StyledLink
                             href={resolved.href}
-                            insights={contentRef ? {
-                                target: contentRef,
-                                position: 'content',
-                            } : undefined}
+                            insights={
+                                contentRef
+                                    ? {
+                                          target: contentRef,
+                                          position: 'content',
+                                      }
+                                    : undefined
+                            }
                         >
                             {resolved.text}
                         </StyledLink>
@@ -219,26 +226,27 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                     const contentRef: ContentRefUser = {
                         kind: 'user',
                         user: userId,
-                    }
+                    };
                     const resolved = await context.resolveContentRef(contentRef);
                     if (!resolved) {
                         return null;
                     }
 
-                    return [
-                        contentRef,
-                        resolved,
-                    ] as const;
+                    return [contentRef, resolved] as const;
                 }),
             );
 
             return (
                 <Tag className={tcls('text-base')} aria-labelledby={ariaLabelledBy}>
                     {resolved.filter(filterOutNullable).map(([contentRef, resolved], index) => (
-                        <StyledLink key={index} href={resolved.href} insights={{
-                            target: contentRef,
-                            position: 'content',
-                        }}>
+                        <StyledLink
+                            key={index}
+                            href={resolved.href}
+                            insights={{
+                                target: contentRef,
+                                position: 'content',
+                            }}
+                        >
                             {resolved.text}
                         </StyledLink>
                     ))}

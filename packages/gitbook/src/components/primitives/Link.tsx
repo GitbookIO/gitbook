@@ -3,6 +3,7 @@
 import * as api from '@gitbook/api';
 import NextLink, { LinkProps as NextLinkProps } from 'next/link';
 import React from 'react';
+
 import { useTrackEvent } from '../Insights';
 
 // Props from Next, which includes NextLinkProps and all the things anchor elements support.
@@ -14,12 +15,13 @@ type BaseLinkProps = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, keyof N
 export type LinkInsightsProps = {
     /** Target of the link, for insights. */
     insights?: api.SiteInsightsEventLinkClick['link'];
-}
-
-export type LinkProps = Omit<BaseLinkProps, 'href'> & LinkInsightsProps & {
-    /** Enforce href is passed as a string (not a URL). */
-    href: string;
 };
+
+export type LinkProps = Omit<BaseLinkProps, 'href'> &
+    LinkInsightsProps & {
+        /** Enforce href is passed as a string (not a URL). */
+        href: string;
+    };
 
 /**
  * Low-level Link component that handles navigation to external urls.

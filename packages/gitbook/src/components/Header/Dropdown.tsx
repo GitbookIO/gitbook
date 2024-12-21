@@ -110,12 +110,14 @@ export function DropdownMenu(props: { children: React.ReactNode }) {
 /**
  * Menu item in a dropdown.
  */
-export function DropdownMenuItem(props: {
-    href: string | null;
-    active?: boolean;
-    className?: ClassValue;
-    children: React.ReactNode;
-} & LinkInsightsProps) {
+export function DropdownMenuItem(
+    props: {
+        href: string | null;
+        active?: boolean;
+        className?: ClassValue;
+        children: React.ReactNode;
+    } & LinkInsightsProps,
+) {
     const { children, active = false, href, className, insights } = props;
 
     if (href) {

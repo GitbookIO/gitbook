@@ -11,7 +11,8 @@ type ButtonProps = {
     variant?: 'primary' | 'secondary';
     size?: 'default' | 'medium' | 'small';
     className?: ClassValue;
-} & LinkInsightsProps &  HTMLAttributes<HTMLElement>;
+} & LinkInsightsProps &
+    HTMLAttributes<HTMLElement>;
 
 export function Button({
     href,

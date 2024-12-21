@@ -1,13 +1,13 @@
 import { ContentRef, DocumentTableViewCards } from '@gitbook/api';
 import React from 'react';
 
+import { Link } from '@/components/primitives';
 import { Image } from '@/components/utils';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { RecordColumnValue } from './RecordColumnValue';
 import { TableRecordKV, TableViewProps } from './Table';
 import { getRecordValue } from './utils';
-import { Link } from '@/components/primitives';
 
 export async function RecordCard(
     props: TableViewProps<DocumentTableViewCards> & {

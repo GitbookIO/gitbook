@@ -146,10 +146,13 @@ export function InsightsProvider(props: InsightsProviderProps) {
             eventsRef.current[pathname] = {
                 pageContext: previous?.pageContext ?? ctx,
                 url: previous?.url ?? window.location.href,
-                events: [...(previous?.events ?? []), {
-                    ...event,
-                    timestamp: new Date().toISOString(),
-                }],
+                events: [
+                    ...(previous?.events ?? []),
+                    {
+                        ...event,
+                        timestamp: new Date().toISOString(),
+                    },
+                ],
                 context,
             };
 
