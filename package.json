@@ -11,6 +11,9 @@
         "@vercel/next@4.3.15": "patches/@vercel%2Fnext@4.3.15.patch",
         "@cloudflare/next-on-pages@1.13.5": "patches/@cloudflare%2Fnext-on-pages@1.13.5.patch"
     },
+    "overrides": {
+        "@codemirror/state": "6.4.1"
+    },
     "private": true,
     "scripts": {
         "dev": "turbo run dev",
