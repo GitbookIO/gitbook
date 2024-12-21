@@ -9,7 +9,7 @@ import { tcls } from '@/lib/tailwind';
 
 import { useScrollToActiveTOCItem } from './TOCScroller';
 import { useIsMounted } from '../hooks';
-import { Link } from '../primitives';
+import { Link, LinkInsightsProps } from '../primitives';
 
 const show = {
     opacity: 1,
@@ -35,8 +35,8 @@ export function ToggleableLinkItem(props: {
     pathname: string;
     children: React.ReactNode;
     descendants: React.ReactNode;
-}) {
-    const { href, children, descendants, pathname } = props;
+} & LinkInsightsProps) {
+    const { href, children, descendants, pathname, insights } = props;
 
     const rawActiveSegment = useSelectedLayoutSegment() ?? '';
     const activeSegment = decodeURIComponent(rawActiveSegment);
@@ -96,6 +96,7 @@ export function ToggleableLinkItem(props: {
             <Link
                 ref={linkRef}
                 href={href}
+                insights={insights}
                 {...(isActive ? { 'aria-current': 'page' } : {})}
                 className={tcls(
                     'group/toclink',
