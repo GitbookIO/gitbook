@@ -34,7 +34,6 @@ export const Link = React.forwardRef(function Link(
     const { href, prefetch, children, insights, ...domProps } = props;
     const trackEvent = useTrackEvent();
 
-
     // Use a real anchor tag for external links,s and a Next.js Link for internal links.
     // If we use a NextLink for external links, Nextjs won't rerender the top-level layouts.
     const isExternal = URL.canParse ? URL.canParse(props.href) : props.href.startsWith('http');

@@ -30,12 +30,14 @@ const staggerMenuItems = stagger(0.02, { ease: (p) => Math.pow(p, 2) });
 /**
  * Client component for a page document to toggle its children and be marked as active.
  */
-export function ToggleableLinkItem(props: {
-    href: string;
-    pathname: string;
-    children: React.ReactNode;
-    descendants: React.ReactNode;
-} & LinkInsightsProps) {
+export function ToggleableLinkItem(
+    props: {
+        href: string;
+        pathname: string;
+        children: React.ReactNode;
+        descendants: React.ReactNode;
+    } & LinkInsightsProps,
+) {
     const { href, children, descendants, pathname, insights } = props;
 
     const rawActiveSegment = useSelectedLayoutSegment() ?? '';

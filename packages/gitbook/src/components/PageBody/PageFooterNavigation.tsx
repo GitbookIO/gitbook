@@ -76,13 +76,15 @@ export function PageFooterNavigation(props: {
     );
 }
 
-function NavigationCard(props: {
-    icon: IconName;
-    label: React.ReactNode;
-    title: string;
-    href: string;
-    reversed?: boolean;
-} & LinkInsightsProps) {
+function NavigationCard(
+    props: {
+        icon: IconName;
+        label: React.ReactNode;
+        title: string;
+        href: string;
+        reversed?: boolean;
+    } & LinkInsightsProps,
+) {
     const { icon, label, title, href, reversed, insights } = props;
 
     return (
