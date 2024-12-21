@@ -40,6 +40,10 @@ async function FooterLink(props: { link: CustomizationContentLink; context: Cont
                 'dark:text-light/8',
                 'dark:hover:text-light/9',
             )}
+            insights={{
+                target: link.to,
+                position: 'footer',
+            }}
         >
             {link.title}
         </Link>

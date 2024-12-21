@@ -4,6 +4,7 @@ import {
     CustomizationHeaderPreset,
     SiteCustomizationSettings,
     CustomizationHeaderItem,
+    ContentRef,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 
@@ -35,7 +36,7 @@ export async function HeaderLink(props: {
             <Dropdown
                 className="shrink"
                 button={(buttonProps) => {
-                    if (!target) {
+                    if (!target || !link.to) {
                         return (
                             <HeaderItemDropdown
                                 {...buttonProps}
@@ -47,6 +48,7 @@ export async function HeaderLink(props: {
                     return (
                         <HeaderLinkNavItem
                             {...buttonProps}
+                            linkTarget={link.to}
                             linkStyle={linkStyle}
                             headerPreset={headerPreset}
                             title={link.title}
@@ -65,12 +67,13 @@ export async function HeaderLink(props: {
         );
     }
 
-    if (!target) {
+    if (!target || !link.to) {
         return null;
     }
 
     return (
         <HeaderLinkNavItem
+            linkTarget={link.to}
             linkStyle={linkStyle}
             headerPreset={headerPreset}
             title={link.title}
@@ -81,6 +84,7 @@ export async function HeaderLink(props: {
 }
 
 export type HeaderLinkNavItemProps = {
+    linkTarget: ContentRef;
     linkStyle: NonNullable<CustomizationHeaderItem['style']>;
     headerPreset: CustomizationHeaderPreset;
     title: string;
@@ -89,14 +93,15 @@ export type HeaderLinkNavItemProps = {
 } & DropdownButtonProps<HTMLElement>;
 
 function HeaderLinkNavItem(props: HeaderLinkNavItemProps) {
-    switch (props.linkStyle) {
+    const { linkStyle, ...rest } = props;
+    switch (linkStyle) {
         case 'button-secondary':
         case 'button-primary':
-            return <HeaderItemButton {...props} linkStyle={props.linkStyle} />;
+            return <HeaderItemButton {...rest} linkStyle={linkStyle} />;
         case 'link':
-            return <HeaderItemLink {...props} />;
+            return <HeaderItemLink {...rest} />;
         default:
-            assertNever(props.linkStyle);
+            assertNever(linkStyle);
     }
 }
 
@@ -105,7 +110,7 @@ function HeaderItemButton(
         linkStyle: 'button-secondary' | 'button-primary';
     },
 ) {
-    const { linkStyle, headerPreset, title, href, isDropdown, ...rest } = props;
+    const { linkTarget, linkStyle, headerPreset, title, href, isDropdown, ...rest } = props;
     const variant = (() => {
         switch (linkStyle) {
             case 'button-secondary':
@@ -139,6 +144,10 @@ function HeaderItemButton(
                     ),
                 }[linkStyle],
             )}
+            insights={{
+                target: linkTarget,
+                position: 'header',
+            }}
             {...rest}
         >
             {title}
@@ -158,10 +167,18 @@ function getHeaderLinkClassName(props: { headerPreset: CustomizationHeaderPreset
     );
 }
 
-function HeaderItemLink(props: HeaderLinkNavItemProps) {
-    const { headerPreset, title, isDropdown, href, ...rest } = props;
+function HeaderItemLink(props: Omit<HeaderLinkNavItemProps, 'linkStyle'>) {
+    const { linkTarget, headerPreset, title, isDropdown, href, ...rest } = props;
     return (
-        <Link href={href} className={getHeaderLinkClassName({ headerPreset })} {...rest}>
+        <Link
+            href={href}
+            className={getHeaderLinkClassName({ headerPreset })}
+            insights={{
+                target: linkTarget,
+                position: 'header',
+            }}
+            {...rest}
+        >
             <span className="truncate min-w-0">{title}</span>
             {isDropdown ? <DropdownChevron /> : null}
         </Link>
@@ -198,5 +215,9 @@ async function SubHeaderLink(props: {
         return null;
     }
 
-    return <DropdownMenuItem href={target.href}>{link.title}</DropdownMenuItem>;
+    return (
+        <DropdownMenuItem href={target.href} insights={{ target: link.to, position: 'header' }}>
+            {link.title}
+        </DropdownMenuItem>
+    );
 }

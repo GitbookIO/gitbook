@@ -4,14 +4,14 @@ import type { ComponentPropsWithoutRef, HTMLAttributes } from 'react';
 
 import { tcls, ClassValue } from '@/lib/tailwind';
 
-import { Link } from './Link';
+import { Link, LinkInsightsProps } from './Link';
 
 type ButtonProps = {
     href?: string;
     variant?: 'primary' | 'secondary';
     size?: 'default' | 'medium' | 'small';
     className?: ClassValue;
-} & HTMLAttributes<HTMLElement>;
+} & LinkInsightsProps &  HTMLAttributes<HTMLElement>;
 
 export function Button({
     href,
@@ -19,6 +19,7 @@ export function Button({
     variant = 'primary',
     size = 'default',
     className,
+    insights,
     ...rest
 }: ButtonProps) {
     const variantClasses =
@@ -69,7 +70,7 @@ export function Button({
 
     if (href) {
         return (
-            <Link href={href} className={domClassName} {...rest}>
+            <Link href={href} className={domClassName} insights={insights} {...rest}>
                 {children}
             </Link>
         );

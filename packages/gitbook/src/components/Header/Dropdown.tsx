@@ -3,7 +3,7 @@ import { DetailedHTMLProps, HTMLAttributes, useId } from 'react';
 
 import { ClassValue, tcls } from '@/lib/tailwind';
 
-import { Link } from '../primitives';
+import { Link, LinkInsightsProps } from '../primitives';
 
 export type DropdownButtonProps<E extends HTMLElement = HTMLElement> = Omit<
     Partial<DetailedHTMLProps<HTMLAttributes<E>, E>>,
@@ -115,14 +115,15 @@ export function DropdownMenuItem(props: {
     active?: boolean;
     className?: ClassValue;
     children: React.ReactNode;
-}) {
-    const { children, active = false, href, className } = props;
+} & LinkInsightsProps) {
+    const { children, active = false, href, className, insights } = props;
 
     if (href) {
         return (
             <Link
                 href={href}
                 prefetch={false}
+                insights={insights}
                 className={tcls(
                     'px-3 py-1 text-sm rounded straight-corners:rounded-sm',
                     active ? 'bg-primary/3 dark:bg-light/2 text-primary-600' : null,
