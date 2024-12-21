@@ -1,5 +1,28 @@
 # gitbook
 
+## 0.6.0
+
+### Minor Changes
+
+-   98245e5: Adapt code to pull token from customer backend generated custom cookies
+-   c71d159: Track events for site insights using the new dedicated API.
+-   ea1468c: Send redirectOnError param to getPublishedContent when token is pulled from cookie
+-   1417279: Track clicks on links (header, footer, content) for site insights.
+-   e4e2f52: Track an event into site insights when visitor is opening the Scalar API client.
+
+### Patch Changes
+
+-   8af1abc: Improve contrast of search box placeholder
+-   48ab59f: Improve colour contrast of list item decoration
+-   5950657: Fix emojis display
+-   0b6ddca: Fix variant selector contrast for non-default themes
+-   e8e64bf: Fix bullet list display on full size blocks
+-   Updated dependencies [e4e2f52]
+-   Updated dependencies [ea1468c]
+-   Updated dependencies [fc7b16f]
+    -   @gitbook/react-openapi@0.8.0
+    -   @gitbook/react-contentkit@0.6.0
+
 ## 0.5.0
 
 ### Minor Changes
