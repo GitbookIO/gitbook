@@ -61,6 +61,10 @@ export async function PageBodyBlankslate(props: {
                                 leadingIcon={icon}
                                 title={child.title}
                                 href={resolved.href}
+                                insights={{
+                                    target: child.target,
+                                    position: 'content',
+                                }}
                             />
                         );
                     } else {

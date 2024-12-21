@@ -22,6 +22,13 @@ export function PageDocumentItem(props: {
             <ToggleableLinkItem
                 href={pageHref(rootPages, page)}
                 pathname={getPagePath(rootPages, page)}
+                insights={{
+                    target: {
+                        kind: 'page',
+                        page: page.id,
+                    },
+                    position: 'sidebar',
+                }}
                 descendants={
                     page.pages && page.pages.length ? (
                         <PagesList
