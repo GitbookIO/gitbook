@@ -1,4 +1,4 @@
-import { ContentRef, DocumentBlockSwagger } from '@gitbook/api';
+import { ContentRef, DocumentBlockOpenAPI } from '@gitbook/api';
 import {
     OpenAPIOperationData,
     fetchOpenAPIOperation,
@@ -16,7 +16,7 @@ import { ResolvedContentRef } from './references';
  * Fetch an OpenAPI specification for an operation.
  */
 export async function fetchOpenAPIBlock(
-    block: DocumentBlockSwagger,
+    block: DocumentBlockOpenAPI,
     resolveContentRef: (ref: ContentRef) => Promise<ResolvedContentRef | null>,
 ): Promise<
     | { data: OpenAPIOperationData | null; specUrl: string | null; error?: undefined }
