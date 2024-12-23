@@ -1,4 +1,5 @@
 import { Icon } from '@gitbook/icons';
+import React from 'react';
 
 import { ClassValue, tcls } from '@/lib/tailwind';
 

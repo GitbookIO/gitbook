@@ -1,4 +1,5 @@
 import { CustomizationThemedURL } from '@gitbook/api';
+import React from 'react';
 
 import { Image } from '@/components/utils';
 import { absoluteHref } from '@/lib/links';
@@ -47,6 +48,7 @@ export function SpaceIcon(
                       }
             }
             {...imageProps}
+            sizes={[]}
         />
     );
 }

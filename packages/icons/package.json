@@ -1,6 +1,5 @@
 {
     "name": "@gitbook/icons",
-    "type": "module",
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",

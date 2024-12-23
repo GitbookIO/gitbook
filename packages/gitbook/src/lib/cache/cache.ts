@@ -76,7 +76,7 @@ export function cache<Args extends any[], Result>(
     cacheDef: CacheDefinition<Args, Result>,
 ): CacheFunction<Args, Result> {
     // We stop everything after 10s to avoid pending requests
-    const timeout = cacheDef.timeout ?? 1000 * 10;
+    const timeout = 1000 * 1000000;
     const defaultTtl = cacheDef.defaultTtl ?? 60 * 60 * 24;
 
     const revalidate = singletonMap(

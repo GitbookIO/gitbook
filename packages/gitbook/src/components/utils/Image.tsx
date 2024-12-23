@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import ReactDOM from 'react-dom';
+import React from 'react';
 
 import { checkIsHttpURL, getImageSize, getResizedImageURLFactory } from '@/lib/images';
 import { ClassValue, tcls } from '@/lib/tailwind';
@@ -228,7 +229,6 @@ function ImagePictureSized(
     }
 
     const imgProps: ImgDOMPropsWithSrc = {
-        alt,
         style,
         loading,
         fetchPriority,
@@ -236,7 +236,7 @@ function ImagePictureSized(
         ...attrs,
     };
 
-    return zoom ? <ZoomImage {...imgProps} /> : <img {...imgProps} alt={imgProps.alt ?? ''} />;
+    return zoom ? <ZoomImage {...imgProps} /> : <img {...imgProps} />;
 }
 
 /**

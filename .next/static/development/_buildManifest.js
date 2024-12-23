@@ -1,0 +1,1 @@
+self.__BUILD_MANIFEST = (function(a){return {__rewrites:{afterFiles:[{has:[{type:a,key:"o",value:"(?\u003Corgid\u003E\\d*)"},{type:a,key:"p",value:"(?\u003Cprojectid\u003E\\d*)"}],source:"\u002F~gitbook\u002Fmonitoring(\u002F?)",destination:void 0}],beforeFiles:[],fallback:[]},sortedPages:["\u002F_app"]}}("query"));self.__BUILD_MANIFEST_CB && self.__BUILD_MANIFEST_CB()

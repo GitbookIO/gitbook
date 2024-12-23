@@ -1,38 +1,45 @@
 {
-    "name": "gitbook",
-    "version": "0.1.0",
-    "devDependencies": {
-        "@changesets/cli": "^2.27.7",
-        "prettier": "^3.0.3",
-        "turbo": "^2.1.2"
-    },
-    "packageManager": "bun@1.1.18",
-    "patchedDependencies": {
-        "@vercel/next@4.3.15": "patches/@vercel%2Fnext@4.3.15.patch",
-        "@cloudflare/next-on-pages@1.13.5": "patches/@cloudflare%2Fnext-on-pages@1.13.5.patch"
-    },
-    "overrides": {
-        "@codemirror/state": "6.4.1"
-    },
-    "private": true,
-    "scripts": {
-        "dev": "turbo run dev",
-        "build": "turbo run build",
-        "build:cloudflare": "turbo run build:cloudflare",
-        "lint": "turbo run lint",
-        "lint:fix": "turbo run lint -- --fix",
-        "typecheck": "turbo run typecheck",
-        "format": "prettier ./ --ignore-unknown --write",
-        "format:check": "prettier ./ --ignore-unknown --list-different",
-        "unit": "turbo run unit",
-        "e2e": "turbo run e2e",
-        "changeset": "changeset",
-        "release": "turbo run release && changeset publish",
-        "release:preview": "turbo run release:preview",
-        "download:env": "op read op://gitbook-x-dev/gitbook-open/.env.local >> .env.local",
-        "clean": "turbo run clean"
-    },
-    "workspaces": [
-        "packages/*"
-    ]
+  "name": "gitbook",
+  "version": "0.1.0",
+  "type": "module",
+  "devDependencies": {
+    "@changesets/cli": "^2.27.7",
+    "prettier": "^3.0.3",
+    "turbo": "^2.1.2"
+  },
+  "packageManager": "bun@1.1.18",
+  "patchedDependencies": {
+    "@vercel/next@4.3.15": "patches/@vercel%2Fnext@4.3.15.patch",
+    "@cloudflare/next-on-pages@1.13.5": "patches/@cloudflare%2Fnext-on-pages@1.13.5.patch"
+  },
+  "overrides": {
+    "@codemirror/state": "6.4.1"
+  },
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "build:cloudflare": "turbo run build:cloudflare",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint -- --fix",
+    "typecheck": "turbo run typecheck",
+    "format": "prettier ./ --ignore-unknown --write",
+    "format:check": "prettier ./ --ignore-unknown --list-different",
+    "unit": "turbo run unit",
+    "e2e": "turbo run e2e",
+    "changeset": "changeset",
+    "release": "turbo run release && changeset publish",
+    "release:preview": "turbo run release:preview",
+    "download:env": "op read op://gitbook-x-dev/gitbook-open/.env.local >> .env.local",
+    "clean": "turbo run clean"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "dependencies": {
+    "@babel/cli": "^7.26.4",
+    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-react": "^7.26.3",
+    "tsconfig-paths": "^4.2.0"
+  }
 }

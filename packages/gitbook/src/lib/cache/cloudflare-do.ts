@@ -78,24 +78,25 @@ export const cloudflareDOCache: CacheBackend = {
 const globalStubs = new WeakMap<object, Map<string, CacheObjectStub>>();
 
 async function getStub(tag: string): Promise<CacheObjectStub | null> {
-    if (process.env.NODE_ENV === 'test') {
-        return null;
-    }
+    return null;
+    // if (process.env.NODE_ENV === 'test') {
+    //     return null;
+    // }
 
-    // We lazy-load the next-on-pages package to avoid errors when running tests because of 'server-only'.
-    const { getOptionalRequestContext } = await import('@cloudflare/next-on-pages');
-    const cloudflare = getOptionalRequestContext();
-    if (!cloudflare || !cloudflare.env.CACHE) {
-        return null;
-    }
+    // // We lazy-load the next-on-pages package to avoid errors when running tests because of 'server-only'.
+    // const { getOptionalRequestContext } = await import('@cloudflare/next-on-pages');
+    // const cloudflare = getOptionalRequestContext();
+    // if (!cloudflare || !cloudflare.env.CACHE) {
+    //     return null;
+    // }
 
-    const requestStubs = globalStubs.get(cloudflare.cf) ?? new Map();
-    globalStubs.set(cloudflare.cf, requestStubs);
+    // const requestStubs = globalStubs.get(cloudflare.cf) ?? new Map();
+    // globalStubs.set(cloudflare.cf, requestStubs);
 
-    const locationId: CacheLocationId = cloudflare.cf.continent ?? 'NA';
-    const stub =
-        requestStubs.get(tag) ?? new CacheObjectStub(cloudflare.env.CACHE, locationId, tag);
-    requestStubs.set(tag, stub);
+    // const locationId: CacheLocationId = cloudflare.cf.continent ?? 'NA';
+    // const stub =
+    //     requestStubs.get(tag) ?? new CacheObjectStub(cloudflare.env.CACHE, locationId, tag);
+    // requestStubs.set(tag, stub);
 
-    return stub;
+    // return stub;
 }

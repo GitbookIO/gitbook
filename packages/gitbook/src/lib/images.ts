@@ -1,6 +1,6 @@
-import 'server-only';
+//import 'server-only';
 
-import fnv1a from '@sindresorhus/fnv1a';
+// import fnv1a from '@sindresorhus/fnv1a';
 
 import { noCacheFetchOptions } from '@/lib/cache/http';
 
@@ -250,5 +250,6 @@ function generateSignature(input: string) {
     ]
         .filter(Boolean)
         .join(':');
-    return fnv1a(all, { utf8Buffer: fnv1aUtf8Buffer }).toString(16);
+    return 'aaaa';
+    //return fnv1a(all, { utf8Buffer: fnv1aUtf8Buffer }).toString(16);
 }

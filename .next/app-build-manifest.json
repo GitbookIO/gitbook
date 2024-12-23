@@ -1,0 +1,42 @@
+{
+  "pages": {
+    "/global-error": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/global-error.js"
+    ],
+    "/(space)/(content)/[[...pathname]]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(space)/(content)/[[...pathname]]/page.css",
+      "static/chunks/app/(space)/(content)/[[...pathname]]/page.js"
+    ],
+    "/(space)/(content)/[[...pathname]]/loading": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(space)/(content)/[[...pathname]]/loading.js"
+    ],
+    "/(space)/(content)/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(space)/(content)/layout.css",
+      "static/chunks/app/(space)/(content)/layout.js"
+    ],
+    "/(space)/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(space)/layout.css",
+      "static/chunks/app/(space)/layout.js"
+    ],
+    "/(space)/(content)/[[...pathname]]/not-found": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(space)/(content)/[[...pathname]]/not-found.js"
+    ],
+    "/(space)/error": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(space)/error.js"
+    ]
+  }
+}

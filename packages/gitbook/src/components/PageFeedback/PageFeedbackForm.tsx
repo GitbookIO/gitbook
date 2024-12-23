@@ -20,7 +20,7 @@ export function PageFeedbackForm(props: {
 }) {
     const { orientation = 'vertical', pageId, className } = props;
     const languages = useLanguage();
-    const trackEvent = useTrackEvent();
+    // const trackEvent = useTrackEvent();
     const [submitted, setSubmitted] = React.useState(false);
 
     const onSubmit = async (rating: PageFeedbackRating) => {
@@ -28,12 +28,12 @@ export function PageFeedbackForm(props: {
         const visitorId = await getVisitorId();
         await postPageFeedback({ pageId, visitorId, rating });
 
-        trackEvent({
-            type: 'page_post_feedback',
-            feedback: {
-                rating,
-            },
-        });
+        // trackEvent({
+        //     type: 'page_post_feedback',
+        //     feedback: {
+        //         rating,
+        //     },
+        // });
     };
 
     return (

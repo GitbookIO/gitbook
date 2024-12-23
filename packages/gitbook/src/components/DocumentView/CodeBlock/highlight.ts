@@ -1,11 +1,14 @@
 import { DocumentBlockCode, DocumentBlockCodeLine, DocumentInlineAnnotation } from '@gitbook/api';
+// @ts-ignore - onigWasm is a Wasm module
 import {
     createdBundledHighlighter,
     ThemedToken,
     createCssVariablesTheme,
     HighlighterGeneric,
 } from 'shiki/core';
+// @ts-ignore - onigWasm is a Wasm module
 import { loadWasm, createOnigurumaEngine } from 'shiki/engine/oniguruma';
+// @ts-ignore - onigWasm is a Wasm module
 import { bundledLanguages } from 'shiki/langs';
 // @ts-ignore - onigWasm is a Wasm module
 import onigWasm from 'shiki/onig.wasm?module';

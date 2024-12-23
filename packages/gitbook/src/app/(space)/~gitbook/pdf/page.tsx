@@ -11,23 +11,24 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import * as React from 'react';
 
-import { DocumentView } from '@/components/DocumentView';
-import { TrademarkLink } from '@/components/TableOfContents/Trademark';
-import { PolymorphicComponentProp } from '@/components/utils/types';
-import { getSpaceLanguage } from '@/intl/server';
-import { tString } from '@/intl/translate';
+import { DocumentView } from '../../../../components/DocumentView';
+import { TrademarkLink } from '../../../../components/TableOfContents/Trademark';
+import { PolymorphicComponentProp } from '../../../../components/utils/types';
+import { getSpaceLanguage } from '../../../../intl/server';
+import { tString } from '../../../../intl/translate';
 import {
     getDocument,
     getSpace,
     getSpaceCustomization,
     getSpaceContentData,
     getSiteData,
-} from '@/lib/api';
-import { pagePDFContainerId, PageHrefContext, absoluteHref } from '@/lib/links';
-import { resolvePageId } from '@/lib/pages';
-import { ContentRefContext, resolveContentRef } from '@/lib/references';
-import { tcls } from '@/lib/tailwind';
-import { PDFSearchParams, getPDFSearchParams } from '@/lib/urls';
+} from '../../../../lib/api';
+import { pagePDFContainerId, PageHrefContext, absoluteHref } from '../../../../lib/links';
+import { resolvePageId } from '../../../../lib/pages';
+import { ContentRefContext, resolveContentRef } from '../../../../lib/references';
+import { tcls } from '../../../../lib/tailwind';
+import { SiteContentPointer, SpaceContentPointer } from '../../../../lib/api';
+import { PDFSearchParams, getPDFSearchParams } from '../../../../lib/urls';
 
 import './pdf.css';
 import { PageControlButtons } from './PageControlButtons';
@@ -55,7 +56,9 @@ export async function generateMetadata(): Promise<Metadata> {
  * Render a space as a standalone HTML page that can be printed as a PDF.
  */
 export default async function PDFHTMLOutput(props: { searchParams: { [key: string]: string } }) {
-    const pointer = getSiteOrSpacePointerForPDF();
+    const pointer = {"siteId": "site_dIY9z", "spaceId": "-MdwVZ6HOZriajCf5nXH", "siteSpaceId": "sitesp_mX2p5", "organizationId": "-M4tdxG8qotLgGZnLpFR"} as SiteContentPointer | SpaceContentPointer;
+    
+    console.log('vib pointer', JSON.stringify(pointer));
 
     const searchParams = new URLSearchParams(props.searchParams);
     const pdfParams = getPDFSearchParams(new URLSearchParams(searchParams));

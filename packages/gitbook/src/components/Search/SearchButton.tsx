@@ -18,7 +18,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
 
     const language = useLanguage();
     const [, setSearchState] = useSearch();
-    const trackEvent = useTrackEvent();
+    // const trackEvent = useTrackEvent();
 
     const onClick = () => {
         setSearchState({
@@ -27,9 +27,9 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
             query: '',
         });
 
-        trackEvent({
-            type: 'search_open',
-        });
+        // trackEvent({
+        //     type: 'search_open',
+        // });
     };
 
     return (

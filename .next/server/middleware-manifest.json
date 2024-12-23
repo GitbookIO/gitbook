@@ -1,0 +1,71 @@
+{
+  "sortedMiddleware": [
+    "/"
+  ],
+  "middleware": {
+    "/": {
+      "files": [
+        "server/edge-runtime-webpack.js",
+        "server/src/middleware.js"
+      ],
+      "name": "src/middleware",
+      "page": "/",
+      "matchers": [
+        {
+          "regexp": "^/.*$",
+          "originalSource": "/:path*"
+        }
+      ],
+      "wasm": [],
+      "assets": []
+    }
+  },
+  "functions": {
+    "/(global)/~gitbook/image/route": {
+      "files": [
+        "server/middleware-build-manifest.js",
+        "server/middleware-react-loadable-manifest.js",
+        "server/next-font-manifest.js",
+        "server/edge-runtime-webpack.js",
+        "server/app/(global)/~gitbook/image/route.js"
+      ],
+      "name": "app/(global)/~gitbook/image/route",
+      "page": "/(global)/~gitbook/image/route",
+      "matchers": [
+        {
+          "regexp": "^/~gitbook/image$",
+          "originalSource": "/~gitbook/image"
+        }
+      ],
+      "wasm": [],
+      "assets": []
+    },
+    "/(space)/(content)/[[...pathname]]/page": {
+      "files": [
+        "server/server-reference-manifest.js",
+        "server/app/(space)/(content)/[[...pathname]]/page_client-reference-manifest.js",
+        "server/middleware-build-manifest.js",
+        "server/middleware-react-loadable-manifest.js",
+        "server/next-font-manifest.js",
+        "server/edge-runtime-webpack.js",
+        "server/app/(space)/(content)/[[...pathname]]/page.js"
+      ],
+      "name": "app/(space)/(content)/[[...pathname]]/page",
+      "page": "/(space)/(content)/[[...pathname]]/page",
+      "matchers": [
+        {
+          "regexp": "^(?:/(?<pathname>.+?))?$",
+          "originalSource": "/[[...pathname]]"
+        }
+      ],
+      "wasm": [
+        {
+          "name": "wasm_b1644a9e745f1309060531dcd487b2341cd2e3bf",
+          "filePath": "server/edge-chunks/wasm_b1644a9e745f1309060531dcd487b2341cd2e3bf.wasm"
+        }
+      ],
+      "assets": []
+    }
+  },
+  "version": 2
+}

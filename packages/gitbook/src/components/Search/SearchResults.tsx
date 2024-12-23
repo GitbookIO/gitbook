@@ -50,7 +50,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     const { children, query, pointer, spaceId, revisionId, global, withAsk, onSwitchToAsk } = props;
 
     const language = useLanguage();
-    const trackEvent = useTrackEvent();
+    // const trackEvent = useTrackEvent();
     const debounceTimeout = React.useRef<Timer | null>(null);
     const [results, setResults] = React.useState<ResultType[] | null>(null);
     const [cursor, setCursor] = React.useState<number | null>(null);
@@ -99,10 +99,10 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
                 setResults(withAsk ? withQuestionResult(fetchedResults, query) : fetchedResults);
 
-                trackEvent({
-                    type: 'search_type_query',
-                    query,
-                });
+                // trackEvent({
+                //     type: 'search_type_query',
+                //     query,
+                // });
             }, 350);
 
             return () => {
