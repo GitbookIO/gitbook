@@ -57,3 +57,7 @@
 .cell:not(:last-child) {
     @apply border-r;
 }
+
+:global(.dark) .cell {
+    @apply border-tint-300/3;
+}
