@@ -59,7 +59,7 @@ type TrackEventCallback = <EventName extends SiteEventName>(
     options?: InsightsEventOptions,
 ) => void;
 
-const InsightsContext = React.createContext<TrackEventCallback | null>(null);
+const InsightsContext = React.createContext<TrackEventCallback>(() => {});
 
 interface InsightsProviderProps extends InsightsEventContext {
     enabled: boolean;
@@ -217,12 +217,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
  * Get a callback to track an event.
  */
 export function useTrackEvent(): TrackEventCallback {
-    const trackEvent = React.useContext(InsightsContext);
-    if (!trackEvent) {
-        throw new Error('useTrackEvent must be used within an InsightsProvider');
-    }
-
-    return trackEvent;
+    return React.useContext(InsightsContext);
 }
 
 /**
