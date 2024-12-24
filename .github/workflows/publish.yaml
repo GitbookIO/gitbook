@@ -17,10 +17,8 @@ jobs:
               with:
                   # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
                   fetch-depth: 0
-            - name: Setup bun
-              uses: oven-sh/setup-bun@v1
-              with:
-                  bun-version: 1.1.18
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:
@@ -34,7 +32,7 @@ jobs:
                   # Using a PAT instead of GITHUB_TOKEN because we need to run workflows when releases are created
                   # https://github.com/orgs/community/discussions/26875#discussioncomment-3253761
                   GITHUB_TOKEN: ${{ secrets.GH_PERSONAL_TOKEN }}
-                  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+                  NPM_TOKEN_READONLY: ${{ secrets.NPM_TOKEN_READONLY }}
                   CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
     release-preview:
@@ -45,10 +43,8 @@ jobs:
         steps:
             - name: Checkout Repo
               uses: actions/checkout@v3
-            - name: Setup bun
-              uses: oven-sh/setup-bun@v1
-              with:
-                  bun-version: 1.1.18
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:

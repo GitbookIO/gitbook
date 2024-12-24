@@ -9,7 +9,7 @@ import { tcls } from '@/lib/tailwind';
 
 import { useScrollToActiveTOCItem } from './TOCScroller';
 import { useIsMounted } from '../hooks';
-import { Link } from '../primitives';
+import { Link, LinkInsightsProps } from '../primitives';
 
 const show = {
     opacity: 1,
@@ -30,13 +30,15 @@ const staggerMenuItems = stagger(0.02, { ease: (p) => Math.pow(p, 2) });
 /**
  * Client component for a page document to toggle its children and be marked as active.
  */
-export function ToggleableLinkItem(props: {
-    href: string;
-    pathname: string;
-    children: React.ReactNode;
-    descendants: React.ReactNode;
-}) {
-    const { href, children, descendants, pathname } = props;
+export function ToggleableLinkItem(
+    props: {
+        href: string;
+        pathname: string;
+        children: React.ReactNode;
+        descendants: React.ReactNode;
+    } & LinkInsightsProps,
+) {
+    const { href, children, descendants, pathname, insights } = props;
 
     const rawActiveSegment = useSelectedLayoutSegment() ?? '';
     const activeSegment = decodeURIComponent(rawActiveSegment);
@@ -96,6 +98,7 @@ export function ToggleableLinkItem(props: {
             <Link
                 ref={linkRef}
                 href={href}
+                insights={insights}
                 {...(isActive ? { 'aria-current': 'page' } : {})}
                 className={tcls(
                     'group/toclink',

@@ -25,7 +25,11 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
     return (
         <Link
             href={resolved.href}
-            className="underline underline-offset-2 text-primary hover:text-primary-700 transition-colors "
+            className="underline underline-offset-2 text-primary hover:text-primary-700 transition-colors"
+            insights={{
+                target: inline.data.ref,
+                position: 'content',
+            }}
         >
             <Inlines
                 context={context}

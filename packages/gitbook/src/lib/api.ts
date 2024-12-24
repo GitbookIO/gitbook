@@ -214,6 +214,8 @@ export const getPublishedContentByUrl = cache({
     get: async (
         url: string,
         visitorAuthToken: string | undefined,
+        // Prefer undefined for a better cache key.
+        redirectOnError: true | undefined,
         options: CacheFunctionOptions,
     ) => {
         try {
@@ -221,6 +223,7 @@ export const getPublishedContentByUrl = cache({
                 {
                     url,
                     visitorAuthToken,
+                    redirectOnError,
                 },
                 {
                     signal: options.signal,

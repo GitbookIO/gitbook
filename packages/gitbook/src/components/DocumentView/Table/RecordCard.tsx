@@ -1,6 +1,7 @@
 import { ContentRef, DocumentTableViewCards } from '@gitbook/api';
 import React from 'react';
 
+import { Link } from '@/components/primitives';
 import { Image } from '@/components/utils';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
@@ -153,17 +154,21 @@ export async function RecordCard(
         'before:dark:ring-light/2',
     ] as ClassValue;
 
-    if (target) {
+    if (target && targetRef) {
         return (
-            <a
+            <Link
                 href={target.href}
                 className={tcls(style, [
                     'hover:before:ring-dark/4',
                     'dark:hover:before:ring-light/4',
                 ])}
+                insights={{
+                    target: targetRef,
+                    position: 'content',
+                }}
             >
                 {body}
-            </a>
+            </Link>
         );
     }
 
