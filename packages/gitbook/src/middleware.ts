@@ -674,6 +674,7 @@ async function lookupSiteInMultiPathMode(request: NextRequest, url: URL): Promis
         ...('basePath' in lookup && visitorAuthToken
             ? getLookupResultForVisitorAuth(lookup.basePath, visitorAuthToken)
             : {}),
+        visitorToken: visitorAuthToken?.token,
     };
 }
 
