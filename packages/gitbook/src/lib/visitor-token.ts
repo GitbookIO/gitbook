@@ -1,3 +1,4 @@
+import { headers } from 'next/headers';
 import type { NextRequest } from 'next/server';
 import hash from 'object-hash';
 
@@ -87,6 +88,14 @@ export function normalizeVisitorAuthURL(url: URL): URL {
     const withoutVAParam = new URL(url);
     withoutVAParam.searchParams.delete(VISITOR_AUTH_PARAM);
     return withoutVAParam;
+}
+
+/**
+ * Get the visitor token from the request context.
+ */
+export function getCurrentVisitorToken(): string | null {
+    const visitorToken = headers().get('x-gitbook-visitor-token');
+    return visitorToken;
 }
 
 /**
