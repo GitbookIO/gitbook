@@ -1,1 +1,0 @@
-self.__NEXT_FONT_MANIFEST="{\"pages\":{},\"app\":{\"/Users/seemasharma/code/gitbook-open/src/app/(space)/(content)/layout\":[],\"/Users/seemasharma/code/gitbook-open/src/app/(space)/layout\":[]},\"appUsingSizeAdjust\":true,\"pagesUsingSizeAdjust\":false}"

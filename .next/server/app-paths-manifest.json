@@ -1,4 +1,0 @@
-{
-  "/(global)/~gitbook/image/route": "app/(global)/~gitbook/image/route.js",
-  "/(space)/(content)/[[...pathname]]/page": "app/(space)/(content)/[[...pathname]]/page.js"
-}
