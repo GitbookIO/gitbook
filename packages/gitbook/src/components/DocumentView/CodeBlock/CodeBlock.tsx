@@ -283,9 +283,9 @@ function CodeHighlightToken(props: {
         return <>{token.content}</>;
     }
 
-    if (!token.token.color) {
-        return <>{token.token.content}</>;
-    }
+    // if (!token.token.color) {
+    //     return <>{token.token.content}</>;
+    // }
 
-    return <span style={{ color: token.token.color }}>{token.token.content}</span>;
+    // return <span style={{ color: token.token.color }}>{token.token.content}</span>;
 }
