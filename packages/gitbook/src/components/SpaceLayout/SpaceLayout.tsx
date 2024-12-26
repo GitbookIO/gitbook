@@ -13,7 +13,6 @@ import React from 'react';
 import { Footer } from '@/components/Footer';
 import { CompactHeader, Header } from '@/components/Header';
 import { CONTAINER_STYLE } from '@/components/layout';
-import { ColorDebugger } from '@/components/primitives/ColorDebugger';
 import { SearchModal } from '@/components/Search';
 import { TableOfContents } from '@/components/TableOfContents';
 import { api, ContentTarget, type SectionsList, SiteContentPointer } from '@/lib/api';
@@ -23,6 +22,7 @@ import { shouldTrackEvents } from '@/lib/tracking';
 
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
+import { getCurrentVisitorToken } from '@/lib/visitor-token';
 
 /**
  * Render the entire content of the space (header, table of contents, footer, and page content).
@@ -69,6 +69,7 @@ export function SpaceLayout(props: {
         <InsightsProvider
             enabled={shouldTrackEvents()}
             apiHost={api().client.endpoint}
+            visitorAuthToken={getCurrentVisitorToken()}
             {...content}
         >
             {/* <ColorDebugger /> */}

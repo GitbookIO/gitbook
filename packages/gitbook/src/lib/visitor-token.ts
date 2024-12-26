@@ -1,3 +1,4 @@
+import { headers } from 'next/headers';
 import type { NextRequest } from 'next/server';
 import hash from 'object-hash';
 
@@ -90,6 +91,14 @@ export function normalizeVisitorAuthURL(url: URL): URL {
 }
 
 /**
+ * Get the visitor token from the request context.
+ */
+export function getCurrentVisitorToken(): string | null {
+    const visitorToken = headers().get('x-gitbook-visitor-token');
+    return visitorToken;
+}
+
+/**
  * Get all possible basePaths for a given URL. This is used to find the visitor
  * authentication cookie token.
  * It returns the longest one first, and the shortest one last.
@@ -169,3 +178,4 @@ function findVisitorAuthCookieForBasePath(
         undefined,
     );
 }
+
