@@ -296,7 +296,11 @@ export async function middleware(request: NextRequest) {
     setMiddlewareHeader(response, 'referrer-policy', 'no-referrer-when-downgrade');
     setMiddlewareHeader(response, 'x-content-type-options', 'nosniff');
 
-    if (typeof resolved.cacheMaxAge === 'number') {
+    if (
+        typeof resolved.cacheMaxAge === 'number' &&
+        // When the request is authenticated, we don't want to cache the response on the server
+        !resolved.visitorToken
+    ) {
         const cacheControl = `public, max-age=0, s-maxage=${resolved.cacheMaxAge}, stale-if-error=0`;
 
         if (process.env.GITBOOK_OUTPUT_CACHE === 'true' && process.env.NODE_ENV !== 'development') {
