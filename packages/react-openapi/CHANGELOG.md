@@ -1,5 +1,16 @@
 # @gitbook/react-openapi
 
+## 0.8.0
+
+### Minor Changes
+
+-   e4e2f52: Add an optional client context to get a callback called when the Scalar client is opened for a block.
+
+### Patch Changes
+
+-   f92e906: Prevent codemirror from loading multiple versions in scalar
+-   fc7b16f: Updated scalar depdenency
+
 ## 0.7.1
 
 ### Patch Changes
