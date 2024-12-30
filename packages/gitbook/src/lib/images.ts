@@ -1,10 +1,9 @@
 import 'server-only';
 
-import fnv1a from '@sindresorhus/fnv1a';
-
 import { noCacheFetchOptions } from '@/lib/cache/http';
 
-import { host, rootUrl } from './links';
+import { generateImageSignature } from './image-signatures';
+import { rootUrl } from './links';
 import { getImageAPIUrl } from './urls';
 
 export interface CloudflareImageJsonFormat {
@@ -30,8 +29,6 @@ export interface CloudflareImageOptions {
     anim?: boolean;
     quality?: number;
 }
-
-export const imagesResizingSignVersion = '2';
 
 /**
  * Return true if images resizing is enabled.
@@ -94,7 +91,7 @@ export function getResizedImageURLFactory(
         return null;
     }
 
-    const signature = generateSignature(input);
+    const { signature, version } = generateImageSignature(input);
 
     return (options) => {
         const url = new URL('/~gitbook/image', rootUrl());
@@ -114,7 +111,7 @@ export function getResizedImageURLFactory(
         }
 
         url.searchParams.set('sign', signature);
-        url.searchParams.set('sv', imagesResizingSignVersion);
+        url.searchParams.set('sv', version);
 
         return url.toString();
     };
@@ -127,16 +124,6 @@ export function getResizedImageURLFactory(
 export function getResizedImageURL(input: string, options: ResizeImageOptions): string {
     const factory = getResizedImageURLFactory(input);
     return factory?.(options) ?? input;
-}
-
-/**
- * Verify a signature of an image URL
- */
-export async function verifyImageSignature(
-    input: string,
-    { signature }: { signature: string },
-): Promise<boolean> {
-    return generateSignature(input) === signature;
 }
 
 /**
@@ -232,23 +219,4 @@ function stringifyOptions(options: CloudflareImageOptions): string {
     return Object.entries({ ...options }).reduce((rest, [key, value]) => {
         return `${rest}${rest ? ',' : ''}${key}=${value}`;
     }, '');
-}
-
-// Reused buffer for FNV-1a hashing
-const fnv1aUtf8Buffer = new Uint8Array(512);
-
-/**
- * Generate a signature for an image.
- * The signature is relative to the current site being rendered to avoid serving images from other sites on the same domain.
- */
-function generateSignature(input: string) {
-    const hostName = host();
-    const all = [
-        input,
-        hostName, // The hostname is used to avoid serving images from other sites on the same domain
-        process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY,
-    ]
-        .filter(Boolean)
-        .join(':');
-    return fnv1a(all, { utf8Buffer: fnv1aUtf8Buffer }).toString(16);
 }
