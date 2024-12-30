@@ -64,6 +64,7 @@ const InsightsContext = React.createContext<TrackEventCallback>(() => {});
 interface InsightsProviderProps extends InsightsEventContext {
     enabled: boolean;
     apiHost: string;
+    visitorAuthToken: string | null;
     children: React.ReactNode;
 }
 
@@ -71,7 +72,7 @@ interface InsightsProviderProps extends InsightsEventContext {
  * Wrap the content of the app with the InsightsProvider to track events.
  */
 export function InsightsProvider(props: InsightsProviderProps) {
-    const { enabled, apiHost, children, ...context } = props;
+    const { enabled, apiHost, visitorAuthToken, children, ...context } = props;
 
     const visitorIdRef = React.useRef<string | null>(null);
     const eventsRef = React.useRef<{
@@ -124,6 +125,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
                     pageContext: eventsForPathname.pageContext,
                     visitorId,
                     sessionId: session.id,
+                    visitorAuthToken,
                 }),
             );
 
@@ -255,6 +257,7 @@ function transformEvents(input: {
     pageContext: InsightsEventPageContext;
     visitorId: string;
     sessionId: string;
+    visitorAuthToken: string | null;
 }): api.SiteInsightsEvent[] {
     const session: api.SiteInsightsEventSession = {
         sessionId: input.sessionId,
@@ -263,6 +266,7 @@ function transformEvents(input: {
         language: window.navigator.language,
         cookies: cookies.get(),
         referrer: document.referrer || null,
+        visitorAuthToken: input.visitorAuthToken ?? null,
     };
 
     const location: api.SiteInsightsEventLocation = {

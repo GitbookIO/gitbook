@@ -80,6 +80,8 @@ export type LookupResult = PublishedContentWithCache & {
     apiEndpoint?: string;
     /** Cookies to store on the response */
     cookies?: LookupCookies;
+    /** Visitor authentication token */
+    visitorToken?: string;
 };
 
 /**
@@ -269,6 +271,10 @@ export async function middleware(request: NextRequest) {
         headers.set('x-gitbook-api', apiEndpoint);
     }
 
+    if (resolved.visitorToken) {
+        headers.set('x-gitbook-visitor-token', resolved.visitorToken);
+    }
+
     const target = new URL(rewritePathname, request.nextUrl.toString());
     target.search = url.search;
 
@@ -290,7 +296,11 @@ export async function middleware(request: NextRequest) {
     setMiddlewareHeader(response, 'referrer-policy', 'no-referrer-when-downgrade');
     setMiddlewareHeader(response, 'x-content-type-options', 'nosniff');
 
-    if (typeof resolved.cacheMaxAge === 'number') {
+    if (
+        typeof resolved.cacheMaxAge === 'number' &&
+        // When the request is authenticated, we don't want to cache the response on the server
+        !resolved.visitorToken
+    ) {
         const cacheControl = `public, max-age=0, s-maxage=${resolved.cacheMaxAge}, stale-if-error=0`;
 
         if (process.env.GITBOOK_OUTPUT_CACHE === 'true' && process.env.NODE_ENV !== 'development') {
@@ -300,7 +310,6 @@ export async function middleware(request: NextRequest) {
             setMiddlewareHeader(response, 'x-gitbook-cache-control', cacheControl);
         }
     }
-    // }
 
     if (resolved.cacheTags && resolved.cacheTags.length > 0) {
         const headerCacheTag = resolved.cacheTags.join(',');
@@ -407,6 +416,7 @@ async function lookupSiteInSingleMode(url: URL): Promise<LookupResult> {
         basePath: '',
         pathname: url.pathname,
         apiToken,
+        visitorToken: undefined,
     };
 }
 
@@ -440,6 +450,7 @@ async function lookupSiteInMultiMode(request: NextRequest, url: URL): Promise<Lo
         ...('basePath' in lookup && visitorAuthToken
             ? getLookupResultForVisitorAuth(lookup.basePath, visitorAuthToken)
             : {}),
+        visitorToken: visitorAuthToken?.token,
     };
 }
 
@@ -667,6 +678,7 @@ async function lookupSiteInMultiPathMode(request: NextRequest, url: URL): Promis
         ...('basePath' in lookup && visitorAuthToken
             ? getLookupResultForVisitorAuth(lookup.basePath, visitorAuthToken)
             : {}),
+        visitorToken: visitorAuthToken?.token,
     };
 }
 
