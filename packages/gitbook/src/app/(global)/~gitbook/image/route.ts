@@ -1,6 +1,11 @@
 import { NextRequest } from 'next/server';
 
-import { CURRENT_SIGNATURE_VERSION, isSignatureVersion, SignatureVersion, verifyImageSignature } from '@/lib/image-signatures';
+import {
+    CURRENT_SIGNATURE_VERSION,
+    isSignatureVersion,
+    SignatureVersion,
+    verifyImageSignature,
+} from '@/lib/image-signatures';
 import { resizeImage, CloudflareImageOptions, checkIsSizableImageURL } from '@/lib/images';
 import { parseImageAPIURL } from '@/lib/urls';
 
