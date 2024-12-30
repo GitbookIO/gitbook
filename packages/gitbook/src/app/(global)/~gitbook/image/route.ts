@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 import {
     CURRENT_SIGNATURE_VERSION,
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (signatureVersion !== CURRENT_SIGNATURE_VERSION) {
-        return Response.redirect(url, 302);
+        return NextResponse.redirect(url, 302);
     }
 
     // Cloudflare-specific options are in the cf object.
@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
         return response;
     } catch (error) {
         // Redirect to the original image if resizing fails
-        return Response.redirect(url, 302);
+        return NextResponse.redirect(url, 302);
     }
 }
 
