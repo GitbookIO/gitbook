@@ -1,5 +1,33 @@
 # gitbook
 
+## 0.6.0
+
+### Minor Changes
+
+-   98245e5: Adapt code to pull token from customer backend generated custom cookies
+-   e86e51f: Fix an issue where the redirects of potentially malicious images were not going through.
+-   c71d159: Track events for site insights using the new dedicated API.
+-   ea1468c: Send redirectOnError param to getPublishedContent when token is pulled from cookie
+-   1417279: Track clicks on links (header, footer, content) for site insights.
+-   8126a83: Improve readability of tables with hover style and vertical dividers
+-   db74ea3: Image optimization endpoint redirects to underlying image URL if the signature is not the latest.
+-   99579ac: Fix a vulnerability issue for images using an older version of the image signing parameter.
+-   e4e2f52: Track an event into site insights when visitor is opening the Scalar API client.
+
+### Patch Changes
+
+-   8af1abc: Improve contrast of search box placeholder
+-   48ab59f: Improve colour contrast of list item decoration
+-   5950657: Fix emojis display
+-   0b6ddca: Fix variant selector contrast for non-default themes
+-   e8e64bf: Fix bullet list display on full size blocks
+-   Updated dependencies [e4e2f52]
+-   Updated dependencies [ea1468c]
+-   Updated dependencies [f92e906]
+-   Updated dependencies [fc7b16f]
+    -   @gitbook/react-openapi@0.8.0
+    -   @gitbook/react-contentkit@0.6.0
+
 ## 0.5.0
 
 ### Minor Changes
