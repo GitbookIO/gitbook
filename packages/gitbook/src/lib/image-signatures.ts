@@ -9,7 +9,7 @@ import { host } from './links';
  * GitBook has supported different version of image signing in the past. To maintain backwards
  * compatibility, we retain the ability to verify older signatures.
  */
-type SignatureVersion = '0' | '1' | '2';
+export type SignatureVersion = '0' | '1' | '2';
 
 /**
  * A mapping of signature versions to signature functions.
@@ -21,16 +21,8 @@ const IMAGE_SIGNATURE_FUNCTIONS: Record<SignatureVersion, (input: string) => May
         '2': generateSignatureV2,
     };
 
-/**
- * Parse the image signature version from a query param.
- */
-export function parseSignatureVersion(input: string | null): SignatureVersion {
-    // If the query param explicitly asks for a signature version. Otherwise, everything goes to the latest.
-    if (input && isSignatureVersion(input)) {
-        return input;
-    }
-
-    return '2';
+export function isSignatureVersion(input: string): input is SignatureVersion {
+    return Object.keys(IMAGE_SIGNATURE_FUNCTIONS).includes(input);
 }
 
 /**
@@ -104,8 +96,4 @@ async function generateSignatureV0(input: string): Promise<string> {
     const hashArray = Array.from(new Uint8Array(hash));
     const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
     return hashHex;
-}
-
-function isSignatureVersion(input: string): input is SignatureVersion {
-    return Object.keys(IMAGE_SIGNATURE_FUNCTIONS).includes(input);
 }

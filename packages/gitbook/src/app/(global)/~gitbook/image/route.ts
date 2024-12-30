@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 
-import { parseSignatureVersion, verifyImageSignature } from '@/lib/image-signatures';
+import { isSignatureVersion, SignatureVersion, verifyImageSignature } from '@/lib/image-signatures';
 import { resizeImage, CloudflareImageOptions, checkIsSizableImageURL } from '@/lib/images';
 import { parseImageAPIURL } from '@/lib/urls';
 
@@ -15,10 +15,13 @@ export async function GET(request: NextRequest) {
     let urlParam = request.nextUrl.searchParams.get('url');
     const signature = request.nextUrl.searchParams.get('sign');
 
-    // The current signature algorithm sets version as 2, but we need to support the older version as well
-    const signatureVersion = parseSignatureVersion(request.nextUrl.searchParams.get('sv'));
     if (!urlParam || !signature) {
         return new Response('Missing url/sign parameters', { status: 400 });
+    }
+
+    const signatureVersion = parseSignatureVersion(request.nextUrl.searchParams.get('sv'));
+    if (!signatureVersion) {
+        return new Response(`Invalid sv parameter`, { status: 400 });
     }
 
     const url = parseImageAPIURL(urlParam);
@@ -82,4 +85,22 @@ export async function GET(request: NextRequest) {
         // Redirect to the original image if resizing fails
         return Response.redirect(url, 302);
     }
+}
+
+/**
+ * Parse the image signature version from a query param. Returns null if the version is invalid.
+ */
+function parseSignatureVersion(input: string | null): SignatureVersion | null {
+    // Before introducing the sv parameter, all signatures were generated with version 0.
+    if (!input) {
+        return '0';
+    }
+
+    // If the query param explicitly asks for a signature version.
+    if (isSignatureVersion(input)) {
+        return input;
+    }
+
+    // Otherwise the version is invalid.
+    return null;
 }
