@@ -12,6 +12,11 @@ import { host } from './links';
 export type SignatureVersion = '0' | '1' | '2';
 
 /**
+ * The current version of the signature.
+ */
+export const CURRENT_SIGNATURE_VERSION: SignatureVersion = '2';
+
+/**
  * A mapping of signature versions to signature functions.
  */
 const IMAGE_SIGNATURE_FUNCTIONS: Record<SignatureVersion, (input: string) => MaybePromise<string>> =
@@ -48,7 +53,7 @@ export function generateImageSignature(input: string): {
     version: SignatureVersion;
 } {
     const result = generateSignatureV2(input);
-    return { signature: result, version: '2' };
+    return { signature: result, version: CURRENT_SIGNATURE_VERSION };
 }
 
 // Reused buffer for FNV-1a hashing in the v2 algorithm
