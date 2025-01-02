@@ -45,33 +45,9 @@ export async function CustomizationRootLayout(props: {
     const language = getSpaceLanguage(customization);
     const tintColor = getTintColor(customization);
     const sidebarStyles = getSidebarStyles(customization);
-    const sidebarBackgroundColorLight =
-        sidebarStyles.background === CustomizationSidebarBackgroundStyle.Filled
-            ? tintColor
-                ? SIDEBAR_TINT_COLOR_LIGHT
-                : SIDEBAR_NO_TINT_COLOR_LIGHT
-            : 'var(--light-DEFAULT)';
-    const sidebarBackgroundColorDark =
-        sidebarStyles.background === CustomizationSidebarBackgroundStyle.Filled
-            ? tintColor
-                ? SIDEBAR_TINT_COLOR_DARK
-                : SIDEBAR_NO_TINT_COLOR_DARK
-            : 'var(--dark-DEFAULT)';
 
     return (
-        <html
-            suppressHydrationWarning
-            lang={customization.internationalization.locale}
-            className={tcls(
-                customization.header.preset === CustomizationHeaderPreset.None
-                    ? null
-                    : 'scroll-pt-[76px]', // Take the sticky header in consideration for the scrolling
-                customization.styling.corners === CustomizationCorners.Straight
-                    ? ' straight-corners'
-                    : '',
-                tintColor ? ' tint' : 'no-tint',
-            )}
-        >
+        <html suppressHydrationWarning lang={customization.internationalization.locale}>
             <head>
                 {customization.privacyPolicy.url ? (
                     <link rel="privacy-policy" href={customization.privacyPolicy.url} />
@@ -124,7 +100,6 @@ export async function CustomizationRootLayout(props: {
                         )}
                         ${generateColorVariable('header-link', headerTheme.linkColor.light)}
                         ${generateColorVariable('header-button-text', colorContrast(headerTheme.linkColor.light as string, ['#000', '#fff']))}
-			--sidebar-background: ${sidebarBackgroundColorLight}
                     }
                     .dark {
                         ${generateColorVariable(
@@ -168,7 +143,6 @@ export async function CustomizationRootLayout(props: {
                         )}
                         ${generateColorVariable('header-link', headerTheme.linkColor.dark)}
                         ${generateColorVariable('header-button-text', colorContrast(headerTheme.linkColor.dark as string, ['#000', '#fff']))}
-                    --sidebar-background: ${sidebarBackgroundColorDark};
                     }
                 `}</style>
             </head>
@@ -179,6 +153,14 @@ export async function CustomizationRootLayout(props: {
                     `${ibmPlexMono.variable}`,
                     'bg-light',
                     'dark:bg-dark',
+                    customization.header.preset === CustomizationHeaderPreset.None
+                        ? null
+                        : 'scroll-pt-[76px]', // Take the sticky header in consideration for the scrolling
+                    customization.styling.corners === CustomizationCorners.Straight
+                        ? ' straight-corners'
+                        : '',
+                    tintColor ? ' tint' : 'no-tint',
+                    'sidebar-filled', // sidebarStyles.background && ' sidebar-' + sidebarStyles.background,
                 )}
             >
                 <IconsProvider

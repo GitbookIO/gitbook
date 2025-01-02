@@ -74,7 +74,6 @@ export function SpaceLayout(props: {
 
     return (
         <>
-            {/* <ColorDebugger /> */}
             <Header
                 withTopHeader={withTopHeader}
                 space={space}
@@ -110,7 +109,7 @@ export function SpaceLayout(props: {
                                     className={tcls(
                                         'hidden',
                                         'pr-4',
-                                        'mt-5',
+                                        // 'mt-5',
                                         'lg:flex',
                                         'flex-grow-0',
                                         'flex-wrap',
@@ -127,7 +126,7 @@ export function SpaceLayout(props: {
                         }
                         innerHeader={
                             withVariants || !withTopHeader ? (
-                                <div className="hidden lg:flex flex-col gap-6">
+                                <div className="hidden lg:flex flex-col gap-4">
                                     {!withTopHeader ? (
                                         <div
                                             className={tcls(

@@ -79,8 +79,6 @@ const config: Config = {
                 'header-link': generateVarShades('header-link'),
                 'header-button-text': generateVarShades('header-button-text'),
 
-                'sidebar-background': 'var(--sidebar-background)',
-
                 light: {
                     1: `color-mix(in srgb, var(--light-1), transparent calc(100% - 100% * <alpha-value>))`, //1 99%
                     DEFAULT: `color-mix(in srgb, var(--light-DEFAULT), transparent calc(100% - 100% * <alpha-value>))`, //(default) 96%
@@ -232,17 +230,27 @@ const config: Config = {
             /**
              * Variant when the space is configured with straight corners.
              */
-            addVariant('straight-corners', 'html.straight-corners &');
+            addVariant('straight-corners', 'body.straight-corners &');
 
             /**
              * Variant when the space is configured with a theme matching background.
              */
-            addVariant('tint', 'html.tint &');
+            addVariant('tint', 'body.tint &');
 
             /**
              * Variant when the space is configured without a theme matching background.
              */
-            addVariant('no-tint', 'html.no-tint &');
+            addVariant('no-tint', 'body.no-tint &');
+
+            /**
+             * Variant when the space is configured with the default sidebar
+             */
+            addVariant('sidebar-default', 'body.sidebar-default &');
+
+            /**
+             * Variant when the space is configured with a filled sidebar
+             */
+            addVariant('sidebar-filled', 'body.sidebar-filled &');
 
             /**
              * Variant when the page contains a block that will be rendered in full-width mode.

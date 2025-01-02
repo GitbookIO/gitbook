@@ -62,7 +62,7 @@ export function SiteSectionTabs(props: {
         <nav
             aria-label="Sections"
             ref={navRef}
-            className="flex flex-nowrap items-center mb-px max-w-screen-2xl mx-auto page-full-width:max-w-full"
+            className="flex flex-nowrap items-center max-w-screen-2xl mx-auto page-full-width:max-w-full"
             style={
                 {
                     '--tab-opacity': `${opacity}`,
@@ -121,6 +121,7 @@ export function SiteSectionTabs(props: {
                         'after:translate-x-[var(--tab-start)]',
                         'after:will-change-transform',
                         'after:h-0.5',
+                        'after:mb-px',
                         'after:w-[100px]',
                         'after:bg-primary',
                         'dark:after:bg-primary-400',

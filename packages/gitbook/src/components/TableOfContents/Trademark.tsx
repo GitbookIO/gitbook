@@ -17,38 +17,40 @@ export function Trademark(props: {
                 'relative',
                 'z-[2]',
                 'lg:absolute',
-                'bottom-0',
-                'right-0',
+
                 'left-0',
-                'flex',
-                'flex-col',
+                'right-2',
+                'pr-2',
+                'bottom-0',
+
                 'pointer-events-none',
-                'lg:-left-5',
+                'sidebar-filled:pl-4',
+                'sidebar-filled:pr-2',
+                'sidebar-filled:pb-4',
+                // 'lg:-left-5',
+                // 'lg:right-2',
+                // 'lg:pr-2',
+                // 'lg:pb-4',
+                
+                // 'sidebar-filled:lg:pl-2',
+                // 'sidebar-filled:pr-2',
+                // 'sidebar-filled:pb-2',
+
+                'bg-light',
+                'sidebar-filled:bg-light-2',
+
+                'before:content-[""]',
+                'before:absolute',
+                'before:inset-x-0',
+                'before:bottom-full',
+                'before:h-8',
+                'before:bg-gradient-to-b',
+                'before:from-transparent',
+                'before:to-light',
+                'sidebar-filled:before:to-light-2',
             )}
         >
-            <div
-                className={tcls(
-                    'text-sm',
-                    'text-dark/8',
-                    'pr-0',
-                    'pt-2',
-                    'pb-2',
-                    'mt-4',
-                    'mb-4',
-                    'bg-[size:250%_125%]',
-                    'bg-[position:50%_35%]',
-                    'bg-[radial-gradient(farthest-side_at_50%_-70%,_var(--tw-gradient-stops))] from-transparent from-60% to-sidebar-background to-80%',
-                    'lg:pr-2',
-                    'lg:mt-0',
-                    'lg:mb-0',
-                    'lg:mr-2',
-                    'lg:pt-16',
-                    'dark:text-light/6',
-                    'dark:dark:to-dark',
-                )}
-            >
-                <TrademarkLink {...props} />
-            </div>
+            <TrademarkLink {...props} />
         </div>
     );
 }
@@ -73,29 +75,36 @@ export function TrademarkLink(props: {
             target="_blank"
             href={url.toString()}
             className={tcls(
+                'text-sm',
                 'font-semibold',
-                'ring-1',
-                'ring-inset',
-                'ring-dark/2',
-                'pointer-events-auto',
-                'transition-colors',
+                'text-dark/8',
+
                 'flex',
                 'flex-row',
                 'items-center',
-                'hover:bg-dark/1',
-                'lg:bg-sidebar-background',
                 'px-4',
                 'py-4',
+
                 'rounded-lg',
                 'straight-corners:rounded-none',
-                'hover:backdrop-blur-sm',
-                'lg:ring-0',
-                'tracking-[-0.016em]',
+
+                'bg-light',
+                'sidebar-filled:bg-light-2',
+                'hover:bg-light-2',
                 'dark:hover:bg-light/1',
+
+                'ring-1',
+                'lg:ring-0',
+                'ring-inset',
+                'ring-dark/2',
                 'dark:ring-light/1',
+
                 'border',
                 'border-dark/2',
                 'dark:border-light/2',
+
+                'transition-colors',
+                'pointer-events-auto',
             )}
         >
             <Icon icon="gitbook" className={tcls('size-5', 'mr-3')} />
