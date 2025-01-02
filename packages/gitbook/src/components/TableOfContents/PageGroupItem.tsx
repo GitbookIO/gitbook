@@ -15,28 +15,34 @@ export function PageGroupItem(props: {
     const { rootPages, page, ancestors, context } = props;
 
     return (
-        <li className={tcls('flex', 'flex-col')}>
+        <li className={tcls('flex', 'flex-col', 'group/page-group-item')}>
             <div
                 className={tcls(
                     'flex',
                     'items-center',
+
                     'gap-3',
                     'px-5',
+                    'z-[1]',
+                    'sticky',
+
+                    '-top-4',
                     'pt-6',
-                    'pb-1.5',
+                    'group-first/page-group-item:-mt-4',
+                    'pb-4',
+                    '-mb-2',
+
                     'text-xs',
                     'tracking-wide',
                     'font-semibold',
                     'uppercase',
-                    'z-[1]',
-                    'sticky',
-                    '-top-4',
+
                     'bg-gradient-to-b',
                     'from-light',
-                    'lg:from-sidebar-background',
+                    'sidebar-filled:from-light-2',
+                    'sidebar-filled:dark:from-dark-2',
                     'to-transparent',
-                    'from-65%',
-                    'dark:tracking-wider',
+                    'from-70%',
                 )}
             >
                 <TOCPageIcon page={page} />

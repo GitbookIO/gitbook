@@ -22,18 +22,14 @@ function getTopOffset(props: {
     sidebarBackgroundFilled: boolean;
 }) {
     if (props.topHeader && props.sectionsHeader) {
-        return 'lg:top-32 lg:h-[calc(100vh_-_8rem)]';
+        return 'lg:top-[6.75rem] lg:h-[calc(100vh_-_6.75rem)]';
     }
 
-    if (props.topHeader && props.sidebarBackgroundFilled) {
-        return 'lg:top-24 lg:h-[calc(100vh_-_6rem)]';
-    }
-
-    if (props.topHeader && !props.sidebarBackgroundFilled) {
+    if (props.topHeader) {
         return 'lg:top-16 lg:h-[calc(100vh_-_4rem)]';
     }
 
-    return 'lg:top-0 lg:h-[100vh]';
+    return 'lg:top-0 lg:h-screen';
 }
 
 export function TableOfContents(props: {
@@ -59,55 +55,80 @@ export function TableOfContents(props: {
     return (
         <aside
             className={tcls(
-                'relative',
                 'group',
+
+                'grow-0',
+                'shrink-0',
+                'basis-full',
+                'lg:basis-72',
+
+                'relative',
+                'lg:sticky',
+                'top-0',
+                'h-screen',
+                topOffset,
+                'z-[1]',
+
+                'py-4',
                 'flex',
                 'flex-col',
                 'gap-4',
-                'basis-full',
-                'grow-0',
-                'shrink-0',
-                'shadow-transparent',
-                'shadow-thinbottom',
-                'navigation-open:shadow-dark/2',
-                'z-[1]',
-                'top-0',
-                'h-[100vh]',
-                'lg:basis-72',
-                'lg:navigation-open:border-b-0',
-                'lg:sticky',
-                'dark:bg-dark',
-                'dark:navigation-open:shadow-light/2',
-                'page-no-toc:hidden',
-                topOffset,
+
+                'sidebar-filled:pr-4',
+
+                // 'shadow-transparent',
+                // 'shadow-thinbottom',
+                // 'navigation-open:shadow-dark/2',
+
+                // 'lg:navigation-open:border-b-0',
+                // 'dark:bg-dark',
+                // 'dark:navigation-open:shadow-light/2',
+                // 'page-no-toc:hidden',
+
+                // 'lg:py-4',
+                // 'sidebar-filled:lg:pr-4',
+
+                // 'lg:pt-8',
+                // 'sidebar-filled:lg:pt-4',
+                // 'sidebar-filled:lg:pr-4',
+                // 'sidebar-filled:lg:pb-4',
             )}
         >
             {header ? header : null}
             <div
                 className={tcls(
-                    'navigation-open:pt-4',
-                    innerHeader ? (headerOffset.topHeader ? '' : 'lg:pt-4') : 'lg:pt-2',
+                    // 'navigation-open:pt-4',
+
+                    'lg:-ms-5',
+                    'overflow-hidden',
+                    'relative',
+
+                    // 'sidebar-filled:lg:bg-light-2',
+                    'sidebar-filled:tint:bg-red-500',
+
                     'flex',
                     'flex-col',
-                    'gap-4',
                     'flex-grow',
-                    'min-h-0',
-                    'lg:bg-sidebar-background',
-                    'lg:-ms-5',
-                    'rounded-xl',
-                    'straight-corners:rounded-none',
+
+                    'sidebar-filled:rounded-xl',
+                    'sidebar-filled:straight-corners:rounded-none',
                 )}
             >
-                {innerHeader ? <div className="px-4">{innerHeader}</div> : null}
+                {innerHeader ? <div className={tcls('p-4')}>{innerHeader}</div> : null}
                 <TOCScrollContainer
                     className={tcls(
                         'hidden',
                         'lg:flex',
                         'flex-grow',
                         'flex-col',
+
                         'lg:gutter-stable',
-                        'lg:pr-1',
+                        'py-2',
+                        'pr-2',
+                        // 'lg:pr-1',
+
                         'overflow-y-auto',
+
                         'group-hover:[&::-webkit-scrollbar]:bg-dark/1',
                         'group-hover:[&::-webkit-scrollbar-thumb]:bg-dark/3',
                         '[&::-webkit-scrollbar]:bg-transparent',
@@ -116,8 +137,9 @@ export function TableOfContents(props: {
                         'dark:[&::-webkit-scrollbar-thumb]:bg-transparent',
                         'dark:group-hover:[&::-webkit-scrollbar]:bg-light/1',
                         'dark:group-hover:[&::-webkit-scrollbar-thumb]:bg-light/3',
-                        'navigation-open:flex',
-                        customization.trademark.enabled ? 'lg:pb-20' : 'lg:pb-4',
+
+                        // 'navigation-open:flex',
+                        customization.trademark.enabled && 'lg:pb-20',
                     )}
                 >
                     <PagesList
