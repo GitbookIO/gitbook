@@ -103,6 +103,7 @@ export function ToggleableLinkItem(
                 className={tcls(
                     'group/toclink',
                     'relative',
+                    'transition-colors',
 
                     'flex',
                     'flex-row',
@@ -110,21 +111,12 @@ export function ToggleableLinkItem(
 
                     'p-1.5',
                     'pl-3',
-
-                    'text-sm',
-                    'font-normal',
-                    'transition-colors',
-
-                    'text-balance',
-
-                    'before:contents[]',
-                    'before:absolute',
-                    'before:inset-y-0',
-                    'before:-left-px',
-
                     'rounded-md',
                     'straight-corners:rounded-none',
 
+                    'text-sm',
+                    'font-normal',
+                    'text-balance',
                     'text-dark/8',
                     'hover:text-dark/9',
                     'hover:bg-dark/1',
@@ -132,53 +124,42 @@ export function ToggleableLinkItem(
                     'dark:text-light/8',
                     'dark:hover:text-light/9',
                     'dark:hover:bg-light/1',
-                    'hover:before:bg-light/3',
+                    'dark:hover:before:bg-light/3',
 
-                    '[&+div_a]:before:w-px',
+                    'before:contents[]',
+                    'before:absolute',
+                    'before:inset-y-0',
+                    'before:-left-px',
+
                     '[&+div_a]:pl-5',
-                    '[&+div_a]:rounded-l-none',
+                    'sidebar-list-line:before:w-px',
+                    'sidebar-list-default:[&+div_a]:before:w-px',
+                    'sidebar-list-default:[&+div_a]:rounded-l-none',
+                    'sidebar-list-line:rounded-l-none',
 
                     isActive && [
                         'font-semibold',
+                        'sidebar-list-line:before:w-0.5',
 
-                        'before:border-primary',
+                        'before:bg-primary',
                         'text-primary',
+                        'sidebar-list-pill:bg-primary/3',
+                        'sidebar-list-pill:text-primary',
+
                         'hover:bg-primary/3',
                         'hover:text-primary',
                         'hover:before:bg-primary',
+                        'sidebar-list-pill:hover:bg-primary/4',
 
                         'dark:before:bg-primary-400',
                         'dark:text-primary-400',
+                        'dark:sidebar-list-pill:bg-primary-400/3',
+                        'dark:sidebar-list-pill:text-primary-400',
+
                         'dark:hover:bg-primary-400/3',
                         'dark:hover:text-primary-400',
                         'dark:hover:before:bg-primary-400',
                     ],
-
-                    // '[&+div_a]:rounded-l-none',
-                    // isActive
-                    //     ? [
-                    //           'before:border-primary-500',
-                    //           'font-semibold',
-                    //           'text-primary',
-                    //           'hover:bg-primary/3',
-                    //           'dark:before:border-primary-400',
-                    //           'dark:text-primary-400',
-                    //           'hover:before:border-primary',
-                    //           'dark:hover:bg-primary-500/3',
-                    //           'dark:hover:before:border-primary',
-                    //       ]
-                    //     : [
-                    //           'before:border-transparent',
-                    //           'font-normal',
-                    //           'text-dark/8',
-                    //           'hover:bg-dark/1',
-                    //           'hover:text-dark/9',
-                    //           'hover:before:border-dark/3',
-                    //           'dark:text-light/8',
-                    //           'dark:hover:bg-light/2',
-                    //           'dark:hover:before:border-light/3',
-                    //           'dark:hover:text-light/9',
-                    //       ],
                 )}
             >
                 {children}

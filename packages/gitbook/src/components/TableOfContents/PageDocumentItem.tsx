@@ -38,9 +38,10 @@ export async function PageDocumentItem(props: {
                             style={tcls(
                                 'ml-5',
                                 'my-2',
-                                'border-l',
                                 'border-dark/3',
                                 'dark:border-light/2',
+                                'sidebar-list-default:border-l',
+                                'sidebar-list-line:border-l',
                             )}
                             ancestors={ancestors}
                             context={context}

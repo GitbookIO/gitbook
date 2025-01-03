@@ -132,6 +132,11 @@ export function TableOfContents(props: {
                         pages={pages}
                         ancestors={ancestors}
                         context={context}
+                        style={tcls(
+                            'sidebar-list-line:border-l',
+                            'border-dark/3',
+                            'dark:border-light/2',
+                        )}
                     />
                     {customization.trademark.enabled ? (
                         <Trademark space={space} customization={customization} />
