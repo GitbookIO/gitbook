@@ -15,29 +15,36 @@ export function PageGroupItem(props: {
     const { rootPages, page, ancestors, context } = props;
 
     return (
-        <li className={tcls('flex', 'flex-col')}>
+        <li className={tcls('flex', 'flex-col', 'group/page-group-item')}>
             <div
                 className={tcls(
                     'flex',
                     'items-center',
+
                     'gap-3',
-                    'px-5',
+                    'px-3',
+                    'z-[1]',
+                    'sticky',
+                    '-top-5',
                     'pt-6',
-                    'pb-1.5',
+                    'group-first/page-group-item:-mt-5',
+                    'pb-3', // Add extra padding to make the header fade a bit nicer
+                    '-mb-1.5', // Then pull the page items a bit closer, effective bottom padding is 1.5 units / 6px.
+
                     'text-xs',
                     'tracking-wide',
                     'font-semibold',
                     'uppercase',
-                    'z-[1]',
-                    'sticky',
-                    '-top-4',
+
                     'bg-gradient-to-b',
+                    'from-70%', // We want the fade to start past the header, this is a good approximation.
                     'from-light',
-                    'to-transparent',
-                    'from-65%',
+                    'sidebar-filled:from-light-2',
+                    '[html.tint.sidebar-filled_&]:from-light-1',
                     'dark:from-dark',
-                    'dark:tracking-wider',
-                    'dark:to-transparent',
+                    'dark:sidebar-filled:from-dark-1',
+                    'dark:[html.tint.sidebar-filled_&]:from-dark-1',
+                    'to-transparent',
                 )}
             >
                 <TOCPageIcon page={page} />

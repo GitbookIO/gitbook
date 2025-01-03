@@ -35,11 +35,12 @@ export function PageDocumentItem(props: {
                             rootPages={rootPages}
                             pages={page.pages}
                             style={tcls(
-                                'ms-5',
+                                'ml-5',
                                 'my-2',
-                                'border-l',
                                 'border-dark/3',
                                 'dark:border-light/2',
+                                'sidebar-list-default:border-l',
+                                'sidebar-list-line:border-l',
                             )}
                             ancestors={ancestors}
                             context={context}
