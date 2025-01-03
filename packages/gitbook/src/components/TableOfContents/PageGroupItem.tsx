@@ -25,12 +25,11 @@ export function PageGroupItem(props: {
                     'px-5',
                     'z-[1]',
                     'sticky',
-
-                    '-top-4',
+                    '-top-5',
                     'pt-6',
-                    'group-first/page-group-item:-mt-4',
-                    'pb-4',
-                    '-mb-2',
+                    'group-first/page-group-item:-mt-5',
+                    'pb-3', // Add extra padding to make the header fade a bit nicer
+                    '-mb-1.5', // Then pull the page items a bit closer, effective bottom padding is 1.5 units / 6px.
 
                     'text-xs',
                     'tracking-wide',
@@ -38,11 +37,14 @@ export function PageGroupItem(props: {
                     'uppercase',
 
                     'bg-gradient-to-b',
+                    'from-70%', // We want the fade to start past the header, this is a good approximation.
                     'from-light',
                     'sidebar-filled:from-light-2',
-                    'sidebar-filled:dark:from-dark-2',
+                    '[html.tint.sidebar-filled_&]:from-light-1',
+                    'dark:from-dark',
+                    'dark:sidebar-filled:from-dark-1',
+                    'dark:[html.tint.sidebar-filled_&]:from-dark-1',
                     'to-transparent',
-                    'from-70%',
                 )}
             >
                 <TOCPageIcon page={page} />

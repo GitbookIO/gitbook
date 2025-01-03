@@ -47,7 +47,21 @@ export async function CustomizationRootLayout(props: {
     const sidebarStyles = getSidebarStyles(customization);
 
     return (
-        <html suppressHydrationWarning lang={customization.internationalization.locale}>
+        <html
+            suppressHydrationWarning
+            lang={customization.internationalization.locale}
+            className={tcls(
+                customization.header.preset === CustomizationHeaderPreset.None
+                    ? null
+                    : 'scroll-pt-[76px]', // Take the sticky header in consideration for the scrolling
+                customization.styling.corners === CustomizationCorners.Straight
+                    ? ' straight-corners'
+                    : '',
+                    'tint', 'sidebar-filled',
+                // tintColor ? ' tint' : 'no-tint',
+                // sidebarStyles.background && ' sidebar-' + sidebarStyles.background,
+            )}
+        >
             <head>
                 {customization.privacyPolicy.url ? (
                     <link rel="privacy-policy" href={customization.privacyPolicy.url} />
@@ -153,14 +167,6 @@ export async function CustomizationRootLayout(props: {
                     `${ibmPlexMono.variable}`,
                     'bg-light',
                     'dark:bg-dark',
-                    customization.header.preset === CustomizationHeaderPreset.None
-                        ? null
-                        : 'scroll-pt-[76px]', // Take the sticky header in consideration for the scrolling
-                    customization.styling.corners === CustomizationCorners.Straight
-                        ? ' straight-corners'
-                        : '',
-                    tintColor ? ' tint' : 'no-tint',
-                    'sidebar-filled', // sidebarStyles.background && ' sidebar-' + sidebarStyles.background,
                 )}
             >
                 <IconsProvider

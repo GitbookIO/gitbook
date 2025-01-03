@@ -17,28 +17,26 @@ export function Trademark(props: {
                 'relative',
                 'z-[2]',
                 'lg:absolute',
+                'mt-6',
 
                 'left-0',
                 'right-2',
-                'pr-2',
                 'bottom-0',
 
                 'pointer-events-none',
-                'sidebar-filled:pl-4',
-                'sidebar-filled:pr-2',
-                'sidebar-filled:pb-4',
-                // 'lg:-left-5',
-                // 'lg:right-2',
-                // 'lg:pr-2',
-                // 'lg:pb-4',
-                
-                // 'sidebar-filled:lg:pl-2',
-                // 'sidebar-filled:pr-2',
-                // 'sidebar-filled:pb-2',
+                'sidebar-filled:pl-2',
+                'sidebar-filled:pb-2',
 
                 'bg-light',
                 'sidebar-filled:bg-light-2',
+                '[html.tint.sidebar-filled_&]:bg-light-1',
 
+                'dark:bg-dark',
+                'dark:sidebar-filled:bg-dark-1',
+                'dark:[html.tint.sidebar-filled_&]:bg-dark-1',
+
+                'before:hidden',
+                'lg:before:block',
                 'before:content-[""]',
                 'before:absolute',
                 'before:inset-x-0',
@@ -48,6 +46,10 @@ export function Trademark(props: {
                 'before:from-transparent',
                 'before:to-light',
                 'sidebar-filled:before:to-light-2',
+                '[html.tint.sidebar-filled_&]:before:to-light-1',
+                'dark:before:to-dark',
+                'dark:sidebar-filled:before:to-dark-1',
+                'dark:[html.tint.sidebar-filled_&]:before:to-dark-1',
             )}
         >
             <TrademarkLink {...props} />
@@ -78,30 +80,26 @@ export function TrademarkLink(props: {
                 'text-sm',
                 'font-semibold',
                 'text-dark/8',
+                'dark:text-light/8',
 
                 'flex',
                 'flex-row',
                 'items-center',
-                'px-4',
+                'px-5',
                 'py-4',
+                'sidebar-filled:px-3',
 
                 'rounded-lg',
                 'straight-corners:rounded-none',
 
-                'bg-light',
-                'sidebar-filled:bg-light-2',
-                'hover:bg-light-2',
+                'hover:bg-dark/1',
                 'dark:hover:bg-light/1',
 
-                'ring-1',
-                'lg:ring-0',
+                'ring-2',
+                'lg:ring-1',
                 'ring-inset',
                 'ring-dark/2',
                 'dark:ring-light/1',
-
-                'border',
-                'border-dark/2',
-                'dark:border-light/2',
 
                 'transition-colors',
                 'pointer-events-auto',

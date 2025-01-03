@@ -228,29 +228,22 @@ const config: Config = {
             addVariant('space-header', 'body:has(header) &');
 
             /**
+             * Variant for sidebar styles
+             */
+            addVariant('sidebar-default', 'html.sidebar-default &');
+            addVariant('sidebar-filled', 'html.sidebar-filled &');
+            addVariant('tint:sidebar-filled', 'html.tint.sidebar-filled &');
+
+            /**
+             * Variant for tint colours
+             */
+            addVariant('tint', 'html.tint &');
+            addVariant('no-tint', 'html.no-tint &');
+            
+            /**
              * Variant when the space is configured with straight corners.
              */
-            addVariant('straight-corners', 'body.straight-corners &');
-
-            /**
-             * Variant when the space is configured with a theme matching background.
-             */
-            addVariant('tint', 'body.tint &');
-
-            /**
-             * Variant when the space is configured without a theme matching background.
-             */
-            addVariant('no-tint', 'body.no-tint &');
-
-            /**
-             * Variant when the space is configured with the default sidebar
-             */
-            addVariant('sidebar-default', 'body.sidebar-default &');
-
-            /**
-             * Variant when the space is configured with a filled sidebar
-             */
-            addVariant('sidebar-filled', 'body.sidebar-filled &');
+            addVariant('straight-corners', 'html.straight-corners &');
 
             /**
              * Variant when the page contains a block that will be rendered in full-width mode.

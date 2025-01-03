@@ -53,9 +53,10 @@ export function TableOfContents(props: {
     const topOffset = getTopOffset(headerOffset);
 
     return (
-        <aside
+        <aside // Sidebar container, responsible for setting the right dimensions and position for the sidebar.
             className={tcls(
                 'group',
+                'page-no-toc:hidden',
 
                 'grow-0',
                 'shrink-0',
@@ -69,66 +70,54 @@ export function TableOfContents(props: {
                 topOffset,
                 'z-[1]',
 
-                'py-4',
-                'flex',
+                'pt-6',
+                'pb-4',
+                'sidebar-filled:lg:pr-6',
+
+                'hidden',
+                'navigation-open:flex',
+                'lg:flex',
                 'flex-col',
                 'gap-4',
 
-                'sidebar-filled:pr-4',
-
-                // 'shadow-transparent',
-                // 'shadow-thinbottom',
-                // 'navigation-open:shadow-dark/2',
-
-                // 'lg:navigation-open:border-b-0',
-                // 'dark:bg-dark',
-                // 'dark:navigation-open:shadow-light/2',
-                // 'page-no-toc:hidden',
-
-                // 'lg:py-4',
-                // 'sidebar-filled:lg:pr-4',
-
-                // 'lg:pt-8',
-                // 'sidebar-filled:lg:pt-4',
-                // 'sidebar-filled:lg:pr-4',
-                // 'sidebar-filled:lg:pb-4',
+                'navigation-open:border-b',
+                'border-dark/2',
+                'dark:border-light/2',
             )}
         >
-            {header ? header : null}
-            <div
+            {header && header}
+            <div // The actual sidebar, either shown with a filled bg or transparent.
                 className={tcls(
-                    // 'navigation-open:pt-4',
-
                     'lg:-ms-5',
                     'overflow-hidden',
                     'relative',
-
-                    // 'sidebar-filled:lg:bg-light-2',
-                    'sidebar-filled:tint:bg-red-500',
 
                     'flex',
                     'flex-col',
                     'flex-grow',
 
+                    'sidebar-filled:bg-light-2',
+                    '[html.tint.sidebar-filled_&]:bg-light-1',
+                    'dark:sidebar-filled:bg-dark-1',
+                    'dark:[html.tint.sidebar-filled_&]:bg-dark-1',
+
                     'sidebar-filled:rounded-xl',
-                    'sidebar-filled:straight-corners:rounded-none',
+                    'straight-corners:rounded-none',
                 )}
             >
-                {innerHeader ? <div className={tcls('p-4')}>{innerHeader}</div> : null}
-                <TOCScrollContainer
+                {innerHeader && <div className={tcls('px-5 *:my-4')}>{innerHeader}</div>}
+                <TOCScrollContainer // The scrollview inside the sidebar
                     className={tcls(
-                        'hidden',
-                        'lg:flex',
+                        'flex',
                         'flex-grow',
                         'flex-col',
-
-                        'lg:gutter-stable',
-                        'py-2',
+                        
+                        'pt-2',
                         'pr-2',
-                        // 'lg:pr-1',
+                        customization.trademark.enabled && 'lg:pb-20',
 
                         'overflow-y-auto',
-
+                        'lg:gutter-stable',
                         'group-hover:[&::-webkit-scrollbar]:bg-dark/1',
                         'group-hover:[&::-webkit-scrollbar-thumb]:bg-dark/3',
                         '[&::-webkit-scrollbar]:bg-transparent',
@@ -137,9 +126,6 @@ export function TableOfContents(props: {
                         'dark:[&::-webkit-scrollbar-thumb]:bg-transparent',
                         'dark:group-hover:[&::-webkit-scrollbar]:bg-light/1',
                         'dark:group-hover:[&::-webkit-scrollbar-thumb]:bg-light/3',
-
-                        // 'navigation-open:flex',
-                        customization.trademark.enabled && 'lg:pb-20',
                     )}
                 >
                     <PagesList

@@ -41,8 +41,8 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'py-2',
                 'gap-2',
 
-                'bg-light',
-                'dark:bg-dark',
+                'bg-light-1',
+                'dark:bg-dark-1',
 
                 'ring-1',
                 'ring-dark/1',

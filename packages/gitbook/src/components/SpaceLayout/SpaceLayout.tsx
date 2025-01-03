@@ -109,7 +109,6 @@ export function SpaceLayout(props: {
                                     className={tcls(
                                         'hidden',
                                         'pr-4',
-                                        // 'mt-5',
                                         'lg:flex',
                                         'flex-grow-0',
                                         'flex-wrap',
@@ -126,10 +125,12 @@ export function SpaceLayout(props: {
                         }
                         innerHeader={
                             withVariants || !withTopHeader ? (
-                                <div className="hidden lg:flex flex-col gap-4">
-                                    {!withTopHeader ? (
+                                <>
+                                    {!withTopHeader && (
                                         <div
                                             className={tcls(
+                                                'hidden',
+                                                'lg:block',
                                                 'flex-shrink-0',
                                                 'grow-0',
                                                 'md:grow',
@@ -150,17 +151,19 @@ export function SpaceLayout(props: {
                                                 </SearchButton>
                                             </React.Suspense>
                                         </div>
-                                    ) : null}
-                                    {withVariants && (
-                                        <SpacesDropdown
-                                            className={
-                                                withTopHeader && !sections ? 'sm:hidden' : undefined
-                                            }
-                                            space={space}
-                                            spaces={spaces}
-                                        />
                                     )}
-                                </div>
+                                    {withVariants && (
+                                        <div
+                                            className={tcls(
+                                                withTopHeader && !sections
+                                                    ? 'sm:hidden'
+                                                    : ['sm:hidden', 'lg:flex'],
+                                            )}
+                                        >
+                                            <SpacesDropdown space={space} spaces={spaces} />
+                                        </div>
+                                    )}
+                                </>
                             ) : null
                         }
                         headerOffset={headerOffset}
