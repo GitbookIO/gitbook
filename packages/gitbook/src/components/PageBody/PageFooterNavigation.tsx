@@ -13,7 +13,7 @@ import { pageHref } from '@/lib/links';
 import { resolvePrevNextPages } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 
-import { Link } from '../primitives';
+import { Link, LinkInsightsProps } from '../primitives';
 
 /**
  * Show cards to go to previous/next pages at the bottom.
@@ -47,6 +47,13 @@ export function PageFooterNavigation(props: {
                     label={t(language, 'previous_page')}
                     title={previous.title}
                     href={pageHref(pages, previous)}
+                    insights={{
+                        target: {
+                            kind: 'page',
+                            page: previous.id,
+                        },
+                        position: 'content',
+                    }}
                     reversed
                 />
             ) : null}
@@ -56,24 +63,34 @@ export function PageFooterNavigation(props: {
                     label={t(language, 'next_page')}
                     title={next.title}
                     href={pageHref(pages, next)}
+                    insights={{
+                        target: {
+                            kind: 'page',
+                            page: next.id,
+                        },
+                        position: 'content',
+                    }}
                 />
             ) : null}
         </div>
     );
 }
 
-function NavigationCard(props: {
-    icon: IconName;
-    label: React.ReactNode;
-    title: string;
-    href: string;
-    reversed?: boolean;
-}) {
-    const { icon, label, title, href, reversed } = props;
+function NavigationCard(
+    props: {
+        icon: IconName;
+        label: React.ReactNode;
+        title: string;
+        href: string;
+        reversed?: boolean;
+    } & LinkInsightsProps,
+) {
+    const { icon, label, title, href, reversed, insights } = props;
 
     return (
         <Link
             href={href}
+            insights={insights}
             className={tcls(
                 'group',
                 'text-sm',

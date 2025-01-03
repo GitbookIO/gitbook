@@ -14,16 +14,19 @@ import React from 'react';
 import { Footer } from '@/components/Footer';
 import { Header, HeaderLogo } from '@/components/Header';
 import { CONTAINER_STYLE } from '@/components/layout';
-import { ColorDebugger } from '@/components/primitives/ColorDebugger';
+
 import { SearchButton, SearchModal } from '@/components/Search';
 import { TableOfContents } from '@/components/TableOfContents';
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
-import { ContentTarget, type SectionsList, SiteContentPointer } from '@/lib/api';
+import { api, ContentTarget, type SectionsList, SiteContentPointer } from '@/lib/api';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
+import { shouldTrackEvents } from '@/lib/tracking';
+import { getCurrentVisitorToken } from '@/lib/visitor-token';
 
 import { SpacesDropdown } from '../Header/SpacesDropdown';
+import { InsightsProvider } from '../Insights';
 
 /**
  * Render the entire content of the space (header, table of contents, footer, and page content).
@@ -73,7 +76,12 @@ export function SpaceLayout(props: {
     };
 
     return (
-        <>
+        <InsightsProvider
+            enabled={shouldTrackEvents()}
+            apiHost={api().client.endpoint}
+            visitorAuthToken={getCurrentVisitorToken()}
+            {...content}
+        >
             <Header
                 withTopHeader={withTopHeader}
                 space={space}
@@ -189,6 +197,6 @@ export function SpaceLayout(props: {
                     pointer={content}
                 />
             </React.Suspense>
-        </>
+        </InsightsProvider>
     );
 }

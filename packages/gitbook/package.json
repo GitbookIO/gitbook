@@ -16,7 +16,7 @@
         "clean": "rm -rf ./.next && rm -rf ./public/~gitbook/static"
     },
     "dependencies": {
-        "@gitbook/api": "^0.83.0",
+        "@gitbook/api": "^0.85.0",
         "@gitbook/cache-do": "workspace:*",
         "@gitbook/emoji-codepoints": "workspace:*",
         "@gitbook/icons": "workspace:*",
@@ -64,7 +64,8 @@
         "tailwind-merge": "^2.2.0",
         "tailwind-shades": "^1.1.2",
         "unified": "^11.0.4",
-        "url-join": "^5.0.0"
+        "url-join": "^5.0.0",
+        "usehooks-ts": "^3.1.0"
     },
     "devDependencies": {
         "@argos-ci/playwright": "^2.0.0",

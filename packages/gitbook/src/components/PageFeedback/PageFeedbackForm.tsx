@@ -5,9 +5,9 @@ import React from 'react';
 
 import { useLanguage } from '@/intl/client';
 import { t, tString } from '@/intl/translate';
-import { getVisitorId } from '@/lib/analytics';
 import { tcls } from '@/lib/tailwind';
 
+import { getVisitorId, useTrackEvent } from '../Insights';
 import { postPageFeedback } from './server-actions';
 
 /**
@@ -20,12 +20,20 @@ export function PageFeedbackForm(props: {
 }) {
     const { orientation = 'vertical', pageId, className } = props;
     const languages = useLanguage();
+    const trackEvent = useTrackEvent();
     const [submitted, setSubmitted] = React.useState(false);
 
     const onSubmit = async (rating: PageFeedbackRating) => {
         setSubmitted(true);
         const visitorId = await getVisitorId();
         await postPageFeedback({ pageId, visitorId, rating });
+
+        trackEvent({
+            type: 'page_post_feedback',
+            feedback: {
+                rating,
+            },
+        });
     };
 
     return (

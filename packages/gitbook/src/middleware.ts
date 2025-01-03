@@ -23,12 +23,12 @@ import { buildVersion } from '@/lib/build';
 import { createContentSecurityPolicyNonce, getContentSecurityPolicy } from '@/lib/csp';
 import { getURLLookupAlternatives, normalizeURL, setMiddlewareHeader } from '@/lib/middleware';
 import {
-    VisitorAuthCookieValue,
+    VisitorTokenLookup,
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
-    getVisitorAuthToken,
+    getVisitorToken,
     normalizeVisitorAuthURL,
-} from '@/lib/visitor-auth';
+} from '@/lib/visitor-token';
 
 import { waitUntil } from './lib/waitUntil';
 
@@ -80,6 +80,8 @@ export type LookupResult = PublishedContentWithCache & {
     apiEndpoint?: string;
     /** Cookies to store on the response */
     cookies?: LookupCookies;
+    /** Visitor authentication token */
+    visitorToken?: string;
 };
 
 /**
@@ -269,6 +271,10 @@ export async function middleware(request: NextRequest) {
         headers.set('x-gitbook-api', apiEndpoint);
     }
 
+    if (resolved.visitorToken) {
+        headers.set('x-gitbook-visitor-token', resolved.visitorToken);
+    }
+
     const target = new URL(rewritePathname, request.nextUrl.toString());
     target.search = url.search;
 
@@ -290,7 +296,11 @@ export async function middleware(request: NextRequest) {
     setMiddlewareHeader(response, 'referrer-policy', 'no-referrer-when-downgrade');
     setMiddlewareHeader(response, 'x-content-type-options', 'nosniff');
 
-    if (typeof resolved.cacheMaxAge === 'number') {
+    if (
+        typeof resolved.cacheMaxAge === 'number' &&
+        // When the request is authenticated, we don't want to cache the response on the server
+        !resolved.visitorToken
+    ) {
         const cacheControl = `public, max-age=0, s-maxage=${resolved.cacheMaxAge}, stale-if-error=0`;
 
         if (process.env.GITBOOK_OUTPUT_CACHE === 'true' && process.env.NODE_ENV !== 'development') {
@@ -300,7 +310,6 @@ export async function middleware(request: NextRequest) {
             setMiddlewareHeader(response, 'x-gitbook-cache-control', cacheControl);
         }
     }
-    // }
 
     if (resolved.cacheTags && resolved.cacheTags.length > 0) {
         const headerCacheTag = resolved.cacheTags.join(',');
@@ -407,6 +416,7 @@ async function lookupSiteInSingleMode(url: URL): Promise<LookupResult> {
         basePath: '',
         pathname: url.pathname,
         apiToken,
+        visitorToken: undefined,
     };
 }
 
@@ -433,13 +443,14 @@ async function lookupSiteInProxy(request: NextRequest, url: URL): Promise<Lookup
  * When serving multi spaces based on the current URL.
  */
 async function lookupSiteInMultiMode(request: NextRequest, url: URL): Promise<LookupResult> {
-    const visitorAuthToken = getVisitorAuthToken(request, url);
+    const visitorAuthToken = getVisitorToken(request, url);
     const lookup = await lookupSiteByAPI(url, visitorAuthToken);
     return {
         ...lookup,
         ...('basePath' in lookup && visitorAuthToken
             ? getLookupResultForVisitorAuth(lookup.basePath, visitorAuthToken)
             : {}),
+        visitorToken: visitorAuthToken?.token,
     };
 }
 
@@ -636,7 +647,7 @@ async function lookupSiteInMultiPathMode(request: NextRequest, url: URL): Promis
     const target = new URL(targetStr);
     target.search = url.search;
 
-    const visitorAuthToken = getVisitorAuthToken(request, target);
+    const visitorAuthToken = getVisitorToken(request, target);
 
     const lookup = await lookupSiteByAPI(target, visitorAuthToken);
     if ('error' in lookup) {
@@ -667,6 +678,7 @@ async function lookupSiteInMultiPathMode(request: NextRequest, url: URL): Promis
         ...('basePath' in lookup && visitorAuthToken
             ? getLookupResultForVisitorAuth(lookup.basePath, visitorAuthToken)
             : {}),
+        visitorToken: visitorAuthToken?.token,
     };
 }
 
@@ -676,7 +688,7 @@ async function lookupSiteInMultiPathMode(request: NextRequest, url: URL): Promis
  */
 async function lookupSiteByAPI(
     lookupURL: URL,
-    visitorAuthToken: ReturnType<typeof getVisitorAuthToken>,
+    visitorTokenLookup: VisitorTokenLookup,
 ): Promise<LookupResult> {
     const url = stripURLSearch(lookupURL);
     const lookup = getURLLookupAlternatives(url);
@@ -685,14 +697,16 @@ async function lookupSiteByAPI(
         `lookup content for url "${url.toString()}", with ${lookup.urls.length} alternatives`,
     );
 
+    // When the visitor auth token is pulled from the cookie, set redirectOnError when calling getPublishedContentByUrl to allow
+    // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
+    // For example when the VA backend signature has changed but the token stored in the cookie is not yet expired.
+    const redirectOnError = visitorTokenLookup?.source === 'visitor-auth-cookie';
+
     const result = await race(lookup.urls, async (alternative, { signal }) => {
         const data = await getPublishedContentByUrl(
             alternative.url,
-            typeof visitorAuthToken === 'undefined'
-                ? undefined
-                : typeof visitorAuthToken === 'string'
-                  ? visitorAuthToken
-                  : visitorAuthToken.token,
+            visitorTokenLookup?.token,
+            redirectOnError || undefined,
             {
                 signal,
             },
@@ -789,7 +803,7 @@ async function lookupSiteByAPI(
  */
 function getLookupResultForVisitorAuth(
     basePath: string,
-    visitorAuthToken: string | VisitorAuthCookieValue,
+    visitorTokenLookup: VisitorTokenLookup,
 ): Partial<LookupResult> {
     return {
         // No caching for content served with visitor auth
@@ -797,19 +811,17 @@ function getLookupResultForVisitorAuth(
         cacheTags: [],
         cookies: {
             /**
-             * If the visitorAuthToken has been retrieved from a cookie, we set it back only
-             * if the basePath matches the current one. This is to avoid setting cookie for
-             * different base paths.
+             * If the visitor token has been retrieve from the URL, or if its a VA cookie and the basePath is the same, set it
+             * as a cookie on the response.
+             *
+             * Note that we do not re-store the gitbook-visitor-cookie in another cookie, to maintain a single source of truth.
              */
-            ...(typeof visitorAuthToken === 'string' || visitorAuthToken.basePath === basePath
+            ...(visitorTokenLookup?.source === 'url' ||
+            (visitorTokenLookup?.source === 'visitor-auth-cookie' &&
+                visitorTokenLookup.basePath === basePath)
                 ? {
                       [getVisitorAuthCookieName(basePath)]: {
-                          value: getVisitorAuthCookieValue(
-                              basePath,
-                              typeof visitorAuthToken === 'string'
-                                  ? visitorAuthToken
-                                  : visitorAuthToken.token,
-                          ),
+                          value: getVisitorAuthCookieValue(basePath, visitorTokenLookup.token),
                           options: {
                               httpOnly: true,
                               sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,

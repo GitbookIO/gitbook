@@ -196,6 +196,10 @@ function SearchModalBody(
         });
     };
 
+    const onSwitchToAsk = () => {
+        setSearchState((state) => (state ? { ...state, ask: true } : null));
+    };
+
     return (
         <motion.div
             transition={{
@@ -307,9 +311,7 @@ function SearchModalBody(
                     global={isMultiVariants && state.global}
                     query={state.query}
                     withAsk={withAsk}
-                    onSwitchToAsk={() => {
-                        setSearchState((state) => (state ? { ...state, ask: true } : null));
-                    }}
+                    onSwitchToAsk={onSwitchToAsk}
                 ></SearchResults>
             ) : null}
             {state.query && state.ask && withAsk ? (

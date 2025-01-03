@@ -8,6 +8,7 @@ import { useLanguage, tString } from '@/intl/client';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { useSearch } from './useSearch';
+import { useTrackEvent } from '../Insights';
 
 /**
  * Button to open the search modal.
@@ -17,12 +18,17 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
 
     const language = useLanguage();
     const [, setSearchState] = useSearch();
+    const trackEvent = useTrackEvent();
 
     const onClick = () => {
         setSearchState({
             ask: false,
             global: false,
             query: '',
+        });
+
+        trackEvent({
+            type: 'search_open',
         });
     };
 
