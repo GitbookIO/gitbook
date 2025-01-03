@@ -36,7 +36,7 @@ export async function PageDocumentItem(props: {
                             rootPages={rootPages}
                             pages={page.pages}
                             style={tcls(
-                                'ms-5',
+                                'ml-5',
                                 'my-2',
                                 'border-l',
                                 'border-dark/3',

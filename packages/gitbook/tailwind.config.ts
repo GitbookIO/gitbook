@@ -232,14 +232,16 @@ const config: Config = {
              */
             addVariant('sidebar-default', 'html.sidebar-default &');
             addVariant('sidebar-filled', 'html.sidebar-filled &');
-            addVariant('tint:sidebar-filled', 'html.tint.sidebar-filled &');
+            addVariant('sidebar-list-default', 'html.sidebar-list-default &');
+            addVariant('sidebar-list-pill', 'html.sidebar-list-pill &');
+            addVariant('sidebar-list-line', 'html.sidebar-list-line &');
 
             /**
              * Variant for tint colours
              */
             addVariant('tint', 'html.tint &');
             addVariant('no-tint', 'html.no-tint &');
-            
+
             /**
              * Variant when the space is configured with straight corners.
              */

@@ -22,7 +22,7 @@ export function PageGroupItem(props: {
                     'items-center',
 
                     'gap-3',
-                    'px-5',
+                    'px-3',
                     'z-[1]',
                     'sticky',
                     '-top-5',

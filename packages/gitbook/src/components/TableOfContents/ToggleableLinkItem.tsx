@@ -5,7 +5,7 @@ import { motion, stagger, useAnimate } from 'framer-motion';
 import { useSelectedLayoutSegment } from 'next/navigation';
 import React from 'react';
 
-import { tcls } from '@/lib/tailwind';
+import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { useScrollToActiveTOCItem } from './TOCScroller';
 import { useIsMounted } from '../hooks';
@@ -94,7 +94,7 @@ export function ToggleableLinkItem(
     useScrollToActiveTOCItem({ linkRef, isActive });
 
     return (
-        <div>
+        <>
             <Link
                 ref={linkRef}
                 href={href}
@@ -102,48 +102,83 @@ export function ToggleableLinkItem(
                 {...(isActive ? { 'aria-current': 'page' } : {})}
                 className={tcls(
                     'group/toclink',
+                    'relative',
+
                     'flex',
                     'flex-row',
                     'justify-between',
-                    'ms-2',
+
+                    'p-1.5',
                     'pl-3',
-                    'pr-1.5',
-                    'py-1.5',
+
                     'text-sm',
+                    'font-normal',
                     'transition-colors',
-                    'relative',
+
                     'text-balance',
+
+                    'before:contents[]',
                     'before:absolute',
-                    'before:left-[-1px]',
-                    'before:top-0',
-                    'before:h-full',
+                    'before:inset-y-0',
+                    'before:-left-px',
+
                     'rounded-md',
                     'straight-corners:rounded-none',
+
+                    'text-dark/8',
+                    'hover:text-dark/9',
+                    'hover:bg-dark/1',
+                    'hover:before:bg-dark/3',
+                    'dark:text-light/8',
+                    'dark:hover:text-light/9',
+                    'dark:hover:bg-light/1',
+                    'hover:before:bg-light/3',
+
+                    '[&+div_a]:before:w-px',
+                    '[&+div_a]:pl-5',
                     '[&+div_a]:rounded-l-none',
-                    isActive
-                        ? [
-                              'before:border-primary-500',
-                              'font-semibold',
-                              'text-primary',
-                              'hover:bg-primary/3',
-                              'dark:before:border-primary-400',
-                              'dark:text-primary-400',
-                              'hover:before:border-primary',
-                              'dark:hover:bg-primary-500/3',
-                              'dark:hover:before:border-primary',
-                          ]
-                        : [
-                              'before:border-transparent',
-                              'font-normal',
-                              'text-dark/8',
-                              'hover:bg-dark/1',
-                              'hover:text-dark/9',
-                              'hover:before:border-dark/3',
-                              'dark:text-light/8',
-                              'dark:hover:bg-light/2',
-                              'dark:hover:before:border-light/3',
-                              'dark:hover:text-light/9',
-                          ],
+
+                    isActive && [
+                        'font-semibold',
+
+                        'before:border-primary',
+                        'text-primary',
+                        'hover:bg-primary/3',
+                        'hover:text-primary',
+                        'hover:before:bg-primary',
+
+                        'dark:before:bg-primary-400',
+                        'dark:text-primary-400',
+                        'dark:hover:bg-primary-400/3',
+                        'dark:hover:text-primary-400',
+                        'dark:hover:before:bg-primary-400',
+                    ],
+
+                    // '[&+div_a]:rounded-l-none',
+                    // isActive
+                    //     ? [
+                    //           'before:border-primary-500',
+                    //           'font-semibold',
+                    //           'text-primary',
+                    //           'hover:bg-primary/3',
+                    //           'dark:before:border-primary-400',
+                    //           'dark:text-primary-400',
+                    //           'hover:before:border-primary',
+                    //           'dark:hover:bg-primary-500/3',
+                    //           'dark:hover:before:border-primary',
+                    //       ]
+                    //     : [
+                    //           'before:border-transparent',
+                    //           'font-normal',
+                    //           'text-dark/8',
+                    //           'hover:bg-dark/1',
+                    //           'hover:text-dark/9',
+                    //           'hover:before:border-dark/3',
+                    //           'dark:text-light/8',
+                    //           'dark:hover:bg-light/2',
+                    //           'dark:hover:before:border-light/3',
+                    //           'dark:hover:text-light/9',
+                    //       ],
                 )}
             >
                 {children}
@@ -203,6 +238,6 @@ export function ToggleableLinkItem(
                     {descendants}
                 </motion.div>
             ) : null}
-        </div>
+        </>
     );
 }

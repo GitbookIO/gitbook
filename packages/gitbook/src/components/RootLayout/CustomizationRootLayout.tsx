@@ -56,9 +56,9 @@ export async function CustomizationRootLayout(props: {
                 customization.styling.corners === CustomizationCorners.Straight
                     ? ' straight-corners'
                     : '',
-                    'tint', 'sidebar-filled',
-                // tintColor ? ' tint' : 'no-tint',
-                // sidebarStyles.background && ' sidebar-' + sidebarStyles.background,
+                tintColor ? ' tint' : 'no-tint',
+                sidebarStyles.background && ' sidebar-' + sidebarStyles.background,
+                sidebarStyles.list && ' sidebar-list-' + sidebarStyles.list,
             )}
         >
             <head>

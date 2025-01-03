@@ -111,9 +111,8 @@ export function TableOfContents(props: {
                         'flex',
                         'flex-grow',
                         'flex-col',
-                        
-                        'pt-2',
-                        'pr-2',
+
+                        'p-2',
                         customization.trademark.enabled && 'lg:pb-20',
 
                         'overflow-y-auto',
