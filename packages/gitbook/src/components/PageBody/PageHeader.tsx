@@ -1,6 +1,6 @@
 import { RevisionPage, RevisionPageDocument } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import * as React from 'react';
+import { Fragment } from 'react';
 
 import { getPageHref } from '@/lib/links';
 import { AncestorRevisionPage } from '@/lib/pages';
@@ -24,7 +24,7 @@ export async function PageHeader(props: {
         ancestors.map(async (breadcrumb, index) => {
             const href = await getPageHref(pages, breadcrumb);
             return (
-                <React.Fragment key={breadcrumb.id}>
+                <Fragment key={breadcrumb.id}>
                     <li key={breadcrumb.id}>
                         <StyledLink
                             href={href}
@@ -53,7 +53,7 @@ export async function PageHeader(props: {
                             className={tcls('size-3', 'text-light-4', 'dark:text-dark-4')}
                         />
                     )}
-                </React.Fragment>
+                </Fragment>
             );
         }),
     );
