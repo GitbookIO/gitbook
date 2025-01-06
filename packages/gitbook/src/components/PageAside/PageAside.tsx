@@ -23,6 +23,15 @@ import { Ad } from '../Ads';
 import { PageFeedbackForm } from '../PageFeedback';
 
 function getTopOffset(props: { sectionsHeader: boolean; topHeader: boolean }) {
+    if (props.topHeader && props.sectionsHeader) {
+        return 'lg:top-[6.75rem] lg:max-h-[calc(100vh_-_6.75rem)]';
+    }
+
+    if (props.topHeader) {
+        return 'lg:top-16 lg:max-h-[calc(100vh_-_3rem)]';
+    }
+
+    return 'lg:top-0 lg:max-h-screen';
     if (props.sectionsHeader && props.topHeader) {
         return 'lg:max-h-[calc(100vh_-_8rem)] top-32 page-api-block:xl:max-2xl:top-32';
     }
@@ -70,10 +79,10 @@ export function PageAside(props: {
                 'grow-0',
                 'shrink-0',
                 'sticky',
-                withHeaderOffset.topHeader ? 'py-4' : 'py-8',
+                // withHeaderOffset.topHeader ? 'py-4' : 'py-8',
                 'break-anywhere', // To prevent long words in headings from breaking the layout
-                'lg:h-full',
-                'h-screen',
+                // 'lg:h-full',
+                // 'h-screen',
 
                 'text-dark/7',
                 'dark:text-light/7',
@@ -124,6 +133,7 @@ export function PageAside(props: {
                     'flex',
                     'flex-col',
                     'gap-6',
+                    'py-8',
                     '[&::-webkit-scrollbar]:bg-transparent',
                     '[&::-webkit-scrollbar-thumb]:bg-transparent',
 
@@ -138,7 +148,15 @@ export function PageAside(props: {
                     </React.Suspense>
                 ) : null}
                 <div
-                    className={tcls('flex', 'flex-col', 'gap-3', 'page-api-block:xl:max-2xl:px-3')}
+                    className={tcls(
+                        'flex',
+                        'flex-col',
+                        'gap-3',
+                        'sidebar-list-default:px-3',
+                        'border-t',
+                        'pt-4',
+                        'page-api-block:xl:max-2xl:px-3',
+                    )}
                 >
                     {withPageFeedback ? (
                         <React.Suspense fallback={null}>

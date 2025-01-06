@@ -45,18 +45,24 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                         'flex-row',
                         'relative',
                         'h-fit',
-                        section.depth > 1 && ['ml-3', 'sidebar-list-line:ml-0'],
+                        'mt-2',
+                        section.depth > 1 && ['ml-3', 'my-0', 'sidebar-list-line:ml-0'],
                     )}
                 >
                     {activeId === section.id ? (
                         <AsideSectionHighlight
                             transition={springCurve}
                             className={tcls(
-                                section?.depth > 1 && [
-                                    'sidebar-list-default:rounded-l-none',
-                                    'sidebar-list-line:rounded-l-none',
-                                    'sidebar-list-default:border-l',
-                                ],
+                                section?.depth > 1
+                                    ? [
+                                          'sidebar-list-default:rounded-l-none',
+                                          'sidebar-list-line:rounded-l-none',
+                                          'sidebar-list-default:border-l',
+                                      ]
+                                    : [
+                                          'sidebar-list-default:ml-3',
+                                          'contrast-more:sidebar-list-default:ml-0',
+                                      ],
                             )}
                         />
                     ) : null}
@@ -68,10 +74,11 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                             'flex-row',
                             'items-baseline',
                             'z-10',
-                            'w-full',
-                            'p-1',
-                            'px-3',
                             'text-sm',
+
+                            'w-full',
+                            'py-1',
+                            'px-3',
 
                             'transition-all',
                             'duration-200',
@@ -87,6 +94,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                             'contrast-more:hover:ring-current',
 
                             section.depth > 1 && [
+                                'subitem',
                                 'sidebar-list-line:pl-6',
                                 'opacity-8',
                                 'contrast-more:opacity-11',
