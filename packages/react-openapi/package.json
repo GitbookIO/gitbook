@@ -24,8 +24,7 @@
         "typescript": "^5.5.3"
     },
     "peerDependencies": {
-        "react": "*",
-        "recoil": "^0.7.7"
+        "react": "*"
     },
     "scripts": {
         "build": "tsc",
