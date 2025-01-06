@@ -125,6 +125,14 @@ export function ToggleableLinkItem(
                     'dark:hover:text-light/9',
                     'dark:hover:bg-light/1',
                     'dark:hover:before:bg-light/3',
+                    'contrast-more:text-dark',
+                    'contrast-more:dark:text-light',
+
+                    'hover:contrast-more:text-dark',
+                    'dark:hover:contrast-more:text-light',
+                    'hover:contrast-more:ring-1',
+                    'hover:contrast-more:ring-dark',
+                    'dark:contrast-more:hover:ring-light',
 
                     'before:contents[]',
                     'before:absolute',
@@ -150,6 +158,18 @@ export function ToggleableLinkItem(
                         'hover:text-primary',
                         'hover:before:bg-primary',
                         'sidebar-list-pill:hover:bg-primary/4',
+
+                        'contrast-more:text-primary',
+                        'contrast-more:hover:text-primary',
+                        'dark:contrast-more:text-primary-400',
+                        'dark:contrast-more:hover:text-primary-400',
+                        'contrast-more:bg-primary/3',
+                        'dark:contrast-more:bg-primary-400/3',
+                        'contrast-more:ring-1',
+                        'contrast-more:ring-primary',
+                        'contrast-more:hover:ring-primary',
+                        'dark:contrast-more:ring-primary-400',
+                        'dark:contrast-more:hover:ring-primary-400',
 
                         'dark:before:bg-primary-400',
                         'dark:text-primary-400',
@@ -201,8 +221,9 @@ export function ToggleableLinkItem(
                                 'transition-[opacity]',
                                 'text-current',
                                 'transition-transform',
-                                '[opacity:0.40]',
-                                'group-hover:[opacity:1]',
+                                'opacity-6',
+                                'group-hover:opacity-11',
+                                'contrast-more:opacity-11',
 
                                 isVisible ? ['rotate-90'] : ['rotate-0'],
                             )}
