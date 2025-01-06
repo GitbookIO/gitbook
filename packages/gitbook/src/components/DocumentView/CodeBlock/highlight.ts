@@ -5,10 +5,8 @@ import {
     createCssVariablesTheme,
     HighlighterGeneric,
 } from 'shiki/core';
-import { loadWasm, createOnigurumaEngine } from 'shiki/engine/oniguruma';
+import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
 import { BundledLanguage, bundledLanguages } from 'shiki/langs';
-// @ts-ignore - onigWasm is a Wasm module
-import onigWasm from 'shiki/onig.wasm?module';
 
 import { asyncMutexFunction, singleton } from '@/lib/async';
 import { getNodeText } from '@/lib/document';
@@ -316,7 +314,10 @@ function cleanupLine(line: string): string {
 const createHighlighter = createdBundledHighlighter<any, any>({
     langs: bundledLanguages,
     themes: {},
-    engine: () => createOnigurumaEngine(import('shiki/wasm')),
+    engine: () =>
+        createJavaScriptRegexEngine({
+            forgiving: true,
+        }),
 });
 
 /**
@@ -325,14 +326,6 @@ const createHighlighter = createdBundledHighlighter<any, any>({
  */
 const loadHighlighter = singleton(async () => {
     return await trace('highlighting.loadHighlighter', async () => {
-        if (typeof onigWasm !== 'string') {
-            // When running bun test, the import is a string, we ignore it and let the module
-            // loads it on its own.
-            //
-            // Otherwise for Vercel/Cloudflare, we need to load it ourselves.
-            await loadWasm((obj) => WebAssembly.instantiate(onigWasm, obj));
-        }
-
         const highlighter = await createHighlighter({
             themes: [createCssVariablesTheme()],
             langs: [],
