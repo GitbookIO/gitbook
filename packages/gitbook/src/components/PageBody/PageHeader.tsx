@@ -1,5 +1,6 @@
 import { RevisionPage, RevisionPageDocument } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
+import { Fragment } from 'react';
 
 import { pageHref } from '@/lib/links';
 import { AncestorRevisionPage } from '@/lib/pages';
@@ -27,8 +28,8 @@ export function PageHeader(props: {
                 <nav>
                     <ol className={tcls('flex', 'flex-wrap', 'items-center', 'gap-2')}>
                         {ancestors.map((breadcrumb, index) => (
-                            <>
-                                <li key={breadcrumb.id}>
+                            <Fragment key={breadcrumb.id}>
+                                <li>
                                     <StyledLink
                                         href={pageHref(pages, breadcrumb)}
                                         style={tcls(
@@ -60,7 +61,7 @@ export function PageHeader(props: {
                                         )}
                                     />
                                 )}
-                            </>
+                            </Fragment>
                         ))}
                     </ol>
                 </nav>

@@ -1,8 +1,7 @@
 'use client';
 
 import classNames from 'classnames';
-import React from 'react';
-import { atom, useRecoilState } from 'recoil';
+import React, { useCallback } from 'react';
 
 interface InteractiveSectionTab {
     key: string;
@@ -10,10 +9,29 @@ interface InteractiveSectionTab {
     body: React.ReactNode;
 }
 
-const syncedTabsAtom = atom<Record<string, string>>({
-    key: 'syncedTabState',
-    default: {},
-});
+let globalState: Record<string, string> = {};
+const listeners = new Set<() => void>();
+
+function useSyncedTabsGlobalState() {
+    const subscribe = useCallback((callback: () => void) => {
+        listeners.add(callback);
+        return () => listeners.delete(callback);
+    }, []);
+
+    const getSnapshot = useCallback(() => globalState, []);
+
+    const setSyncedTabs = useCallback(
+        (updater: (tabs: Record<string, string>) => Record<string, string>) => {
+            globalState = updater(globalState);
+            listeners.forEach((listener) => listener());
+        },
+        [],
+    );
+
+    const tabs = React.useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+
+    return [tabs, setSyncedTabs] as const;
+}
 
 /**
  * To optimize rendering, most of the components are server-components,
@@ -57,7 +75,7 @@ export function InteractiveSection(props: {
         toggleCloseIcon = '▼',
         stateKey,
     } = props;
-    const [syncedTabs, setSyncedTabs] = useRecoilState(syncedTabsAtom);
+    const [syncedTabs, setSyncedTabs] = useSyncedTabsGlobalState();
     const tabFromState =
         stateKey && stateKey in syncedTabs
             ? tabs.find((tab) => tab.key === syncedTabs[stateKey])
