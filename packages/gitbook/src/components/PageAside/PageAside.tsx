@@ -73,9 +73,15 @@ export function PageAside(props: {
                 withHeaderOffset.topHeader ? 'py-4' : 'py-8',
                 'break-anywhere', // To prevent long words in headings from breaking the layout
                 'lg:h-full',
-                'h-[100vh]',
-                'page-api-block:xl:max-2xl:z-[1]',
+                'h-screen',
+
+                'text-dark/7',
+                'dark:text-light/7',
+                'contrast-more:text-dark',
+                'contrast-more:dark:text-light',
+
                 // When in api page mode, we display it as an overlay on non-large resolutions
+                'page-api-block:xl:max-2xl:z-[1]',
                 'page-api-block:xl:max-2xl:backdrop-blur-md',
                 'page-api-block:xl:max-2xl:fixed',
                 'page-api-block:xl:max-2xl:right-8',
@@ -92,17 +98,23 @@ export function PageAside(props: {
             <div
                 className={tcls(
                     'hidden',
-                    'page-api-block:xl:max-2xl:flex',
+                    // 'page-api-block:xl:max-2xl:flex',
+                    'text-xs',
+                    'tracking-wide',
+                    'font-semibold',
+                    'uppercase',
+
+                    'opacity-6',
+
+                    // 'flex',
                     'flex-row',
                     'items-center',
-                    'gap-3',
-                    'text-sm',
-                    'font-semibold',
+                    'gap-2',
                     'px-2',
                     'py-2',
                 )}
             >
-                <Icon icon="bars" className={tcls('size-3')} />
+                <Icon icon="block-quote" className={tcls('size-3')} />
                 {t(language, 'on_this_page')}
             </div>
             <div
@@ -142,10 +154,8 @@ export function PageAside(props: {
                                     'flex-row',
                                     'items-center',
                                     'text-sm',
-                                    'text-dark/6',
                                     'hover:text-primary',
                                     'py-2',
-                                    'dark:text-light/5',
                                 )}
                             >
                                 <Icon
@@ -174,10 +184,8 @@ export function PageAside(props: {
                                     'flex-row',
                                     'items-center',
                                     'text-sm',
-                                    'text-dark/6',
                                     'hover:text-primary',
                                     'py-2',
-                                    'dark:text-light/5',
                                 )}
                             >
                                 <Icon icon="file-pdf" className={tcls('size-4', 'mr-1.5')} />
