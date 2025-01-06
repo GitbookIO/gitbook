@@ -154,7 +154,11 @@ export function PageAside(props: {
                         'gap-3',
                         'sidebar-list-default:px-3',
                         'border-t',
+                        'first:border-none',
+                        'border-dark/2',
+                        'dark:border-light/2',
                         'pt-4',
+                        'first:pt-0',
                         'page-api-block:xl:max-2xl:px-3',
                     )}
                 >
