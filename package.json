@@ -16,7 +16,7 @@
     },
     "private": true,
     "scripts": {
-        "dev": "turbo run dev",
+        "dev": "turbo run dev --ui=stream",
         "build": "turbo run build",
         "build:cloudflare": "turbo run build:cloudflare",
         "lint": "turbo run lint",
