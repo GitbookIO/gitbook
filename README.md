@@ -88,7 +88,7 @@ The GitBook icon is missing. It indicates that the dependencies were installed w
 
 It means that you've changed the GBO dependencies and bundled in the free version. Only GitBook staff can help with this - if you're not on the GitBook team, please ping us in the PR and we'll help get things moving.
 
-If you are GitBook staff, you'll need our NPM token in your local environment. 
+If you are GitBook staff, you'll need our NPM token in your local environment.
 
 ```
 .env.local
