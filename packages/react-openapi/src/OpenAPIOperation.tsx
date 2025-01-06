@@ -27,6 +27,8 @@ export function OpenAPIOperation(props: {
         blockKey: context.blockKey,
     };
 
+    console.log('OpenAPIOperation', context.specUrl);
+
     return (
         <ApiClientModalProvider
             configuration={{ spec: { url: context.specUrl }, showSidebar: false }}

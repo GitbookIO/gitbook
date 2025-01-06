@@ -30,6 +30,7 @@ export async function OpenAPI(props: BlockProps<DocumentBlockOpenAPI>) {
 async function OpenAPIBody(props: BlockProps<DocumentBlockOpenAPI>) {
     const { block, context } = props;
     const { data, specUrl, error } = await fetchOpenAPIBlock(block, context.resolveContentRef);
+    console.log(`fetched ${specUrl}`, error);
 
     if (error) {
         return (

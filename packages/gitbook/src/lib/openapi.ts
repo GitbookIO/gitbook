@@ -23,6 +23,7 @@ export async function fetchOpenAPIBlock(
     | { error: OpenAPIFetchError; data?: undefined; specUrl?: undefined }
 > {
     const resolved = block.data.ref ? await resolveContentRef(block.data.ref) : null;
+    console.log(`fetching ${JSON.stringify(resolved)}`);
     if (!resolved || !block.data.path || !block.data.method) {
         return { data: null, specUrl: null };
     }
