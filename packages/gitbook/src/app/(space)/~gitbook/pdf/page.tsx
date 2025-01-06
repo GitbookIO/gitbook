@@ -54,10 +54,12 @@ export async function generateMetadata(): Promise<Metadata> {
 /**
  * Render a space as a standalone HTML page that can be printed as a PDF.
  */
-export default async function PDFHTMLOutput(props: { searchParams: { [key: string]: string } }) {
+export default async function PDFHTMLOutput(props: {
+    searchParams: Promise<{ [key: string]: string }>;
+}) {
     const pointer = await getSiteOrSpacePointerForPDF();
 
-    const searchParams = new URLSearchParams(props.searchParams);
+    const searchParams = new URLSearchParams(await props.searchParams);
     const pdfParams = getPDFSearchParams(new URLSearchParams(searchParams));
 
     // Build current PDF URL and preserve all search params

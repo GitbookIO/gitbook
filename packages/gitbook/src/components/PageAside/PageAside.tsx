@@ -59,6 +59,12 @@ export async function PageAside(props: {
     const language = getSpaceLanguage(customization);
 
     const topOffset = getTopOffset(withHeaderOffset);
+    const pdfHref = await getAbsoluteHref(
+        `~gitbook/pdf?${getPDFUrlSearchParams({
+            page: page.id,
+            only: true,
+        }).toString()}`,
+    );
     return (
         <aside
             className={tcls(
@@ -163,12 +169,7 @@ export async function PageAside(props: {
                     {customization.pdf.enabled ? (
                         <div>
                             <a
-                                href={await getAbsoluteHref(
-                                    `~gitbook/pdf?${getPDFUrlSearchParams({
-                                        page: page.id,
-                                        only: true,
-                                    }).toString()}`,
-                                )}
+                                href={pdfHref}
                                 className={tcls(
                                     'flex',
                                     'flex-row',

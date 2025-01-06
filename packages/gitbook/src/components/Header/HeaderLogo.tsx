@@ -26,10 +26,11 @@ interface HeaderLogoProps {
 
 export async function HeaderLogo(props: HeaderLogoProps) {
     const { customization } = props;
+    const href = await getAbsoluteHref('');
 
     return (
         <Link
-            href={await getAbsoluteHref('')}
+            href={href}
             className={tcls('group/headerlogo', 'min-w-0', 'shrink', 'flex', 'items-center')}
         >
             {customization.header.logo ? (

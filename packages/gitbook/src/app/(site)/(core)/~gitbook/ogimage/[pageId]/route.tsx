@@ -92,7 +92,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<PageId
             break;
     }
 
-    const favicon = async () => {
+    const favicon = await (async () => {
         if ('icon' in customization.favicon)
             return (
                 <img
@@ -109,19 +109,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<PageId
                     {String.fromCodePoint(parseInt('0x' + customization.favicon.emoji))}
                 </span>
             );
-        return (
-            <img
-                src={await getAbsoluteHref(
-                    `~gitbook/icon?size=medium&theme=${customization.themes.default}`,
-                    true,
-                )}
-                alt="Icon"
-                width={40}
-                height={40}
-                tw={tcls('mr-4')}
-            />
+        const src = await getAbsoluteHref(
+            `~gitbook/icon?size=medium&theme=${customization.themes.default}`,
+            true,
         );
-    };
+        return <img src={src} alt="Icon" width={40} height={40} tw={tcls('mr-4')} />;
+    })();
 
     return new ImageResponse(
         (
@@ -167,7 +160,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<PageId
                     />
                 ) : (
                     <div tw={tcls('flex')}>
-                        {await favicon()}
+                        {favicon}
                         <h3 tw={tcls('text-4xl', 'my-0')}>
                             {getContentTitle(space, customization, site ?? null)}
                         </h3>

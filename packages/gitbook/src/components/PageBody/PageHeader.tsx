@@ -20,6 +20,44 @@ export async function PageHeader(props: {
         return null;
     }
 
+    const ancestorElements = await Promise.all(
+        ancestors.map(async (breadcrumb, index) => {
+            const href = await getPageHref(pages, breadcrumb);
+            return (
+                <React.Fragment key={breadcrumb.id}>
+                    <li key={breadcrumb.id}>
+                        <StyledLink
+                            href={href}
+                            style={tcls(
+                                'no-underline',
+                                'hover:underline',
+                                'text-xs',
+                                'tracking-wide',
+                                'font-semibold',
+                                'uppercase',
+                                'flex',
+                                'items-center',
+                                'gap-1',
+                            )}
+                        >
+                            <PageIcon
+                                page={breadcrumb}
+                                style={tcls('size-4', 'text-base', 'leading-none')}
+                            />
+                            {breadcrumb.title}
+                        </StyledLink>
+                    </li>
+                    {index != ancestors.length - 1 && (
+                        <Icon
+                            icon="chevron-right"
+                            className={tcls('size-3', 'text-light-4', 'dark:text-dark-4')}
+                        />
+                    )}
+                </React.Fragment>
+            );
+        }),
+    );
+
     return (
         <header
             className={tcls('max-w-3xl', 'mx-auto', 'mb-6', 'space-y-3', 'page-api-block:ml-0')}
@@ -27,44 +65,7 @@ export async function PageHeader(props: {
             {ancestors.length > 0 && (
                 <nav>
                     <ol className={tcls('flex', 'flex-wrap', 'items-center', 'gap-2')}>
-                        {await Promise.all(
-                            ancestors.map(async (breadcrumb, index) => (
-                                <React.Fragment key={breadcrumb.id}>
-                                    <li key={breadcrumb.id}>
-                                        <StyledLink
-                                            href={await getPageHref(pages, breadcrumb)}
-                                            style={tcls(
-                                                'no-underline',
-                                                'hover:underline',
-                                                'text-xs',
-                                                'tracking-wide',
-                                                'font-semibold',
-                                                'uppercase',
-                                                'flex',
-                                                'items-center',
-                                                'gap-1',
-                                            )}
-                                        >
-                                            <PageIcon
-                                                page={breadcrumb}
-                                                style={tcls('size-4', 'text-base', 'leading-none')}
-                                            />
-                                            {breadcrumb.title}
-                                        </StyledLink>
-                                    </li>
-                                    {index != ancestors.length - 1 && (
-                                        <Icon
-                                            icon="chevron-right"
-                                            className={tcls(
-                                                'size-3',
-                                                'text-light-4',
-                                                'dark:text-dark-4',
-                                            )}
-                                        />
-                                    )}
-                                </React.Fragment>
-                            )),
-                        )}
+                        {ancestorElements}
                     </ol>
                 </nav>
             )}

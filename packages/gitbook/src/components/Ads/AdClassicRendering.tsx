@@ -9,6 +9,10 @@ import { AdItem } from './types';
  * Classic rendering for an ad.
  */
 export async function AdClassicRendering({ ad }: { ad: AdItem }) {
+    const smallImgSrc =
+        'smallImage' in ad ? await getResizedImageURL(ad.smallImage, { width: 192, dpr: 2 }) : null;
+    const logoSrc =
+        'logo' in ad ? await getResizedImageURL(ad.logo, { width: 192 - 48, dpr: 2 }) : null;
     return (
         <a
             className={tcls(
@@ -28,25 +32,18 @@ export async function AdClassicRendering({ ad }: { ad: AdItem }) {
             rel="sponsored noopener"
             target="_blank"
         >
-            {'smallImage' in ad ? (
+            {smallImgSrc && 'smallImage' in ad ? (
                 <div>
-                    <img
-                        alt="Ads logo"
-                        className={tcls('rounded-md')}
-                        src={await getResizedImageURL(ad.smallImage, { width: 192, dpr: 2 })}
-                    />
+                    <img alt="Ads logo" className={tcls('rounded-md')} src={smallImgSrc} />
                 </div>
-            ) : (
+            ) : logoSrc && 'logo' in ad ? (
                 <div
                     className={tcls('px-6', 'py-4', 'rounded-md')}
                     style={{ backgroundColor: ad.backgroundColor }}
                 >
-                    <img
-                        alt="Ads logo"
-                        src={await getResizedImageURL(ad.logo, { width: 192 - 48, dpr: 2 })}
-                    />
+                    <img alt="Ads logo" src={logoSrc} />
                 </div>
-            )}
+            ) : null}
             <div className={tcls('flex', 'flex-col')}>
                 <div className={tcls('text-xs')}>{ad.description}</div>
             </div>
