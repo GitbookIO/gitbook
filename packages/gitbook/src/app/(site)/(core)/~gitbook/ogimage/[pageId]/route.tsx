@@ -5,7 +5,7 @@ import { NextRequest } from 'next/server';
 import colorContrast from 'postcss-color-contrast/js';
 import React from 'react';
 
-import { absoluteHref } from '@/lib/links';
+import { getAbsoluteHref } from '@/lib/links';
 import { tcls } from '@/lib/tailwind';
 import { getContentTitle } from '@/lib/utils';
 
@@ -16,8 +16,8 @@ export const runtime = 'edge';
 /**
  * Render the OpenGraph image for a space.
  */
-export async function GET(req: NextRequest, { params }: { params: PageIdParams }) {
-    const { space, page, customization, site } = await fetchPageData(params);
+export async function GET(req: NextRequest, { params }: { params: Promise<PageIdParams> }) {
+    const { space, page, customization, site } = await fetchPageData(await params);
 
     if (customization.socialPreview.url) {
         // If user configured a custom social preview, we redirect to it.
@@ -51,8 +51,10 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
         body: baseColors[useLightTheme ? 'dark' : 'light'], // Invert text on background
     };
 
-    const gridWhite = absoluteHref('~gitbook/static/images/ogimage-grid-white.png', true);
-    const gridBlack = absoluteHref('~gitbook/static/images/ogimage-grid-black.png', true);
+    const [gridWhite, gridBlack] = await Promise.all([
+        getAbsoluteHref('~gitbook/static/images/ogimage-grid-white.png', true),
+        getAbsoluteHref('~gitbook/static/images/ogimage-grid-black.png', true),
+    ]);
 
     let gridAsset = useLightTheme ? gridBlack : gridWhite;
 
@@ -90,7 +92,7 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
             break;
     }
 
-    const favicon = function () {
+    const favicon = async () => {
         if ('icon' in customization.favicon)
             return (
                 <img
@@ -109,7 +111,7 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
             );
         return (
             <img
-                src={absoluteHref(
+                src={await getAbsoluteHref(
                     `~gitbook/icon?size=medium&theme=${customization.themes.default}`,
                     true,
                 )}
@@ -165,7 +167,7 @@ export async function GET(req: NextRequest, { params }: { params: PageIdParams }
                     />
                 ) : (
                     <div tw={tcls('flex')}>
-                        {favicon()}
+                        {await favicon()}
                         <h3 tw={tcls('text-4xl', 'my-0')}>
                             {getContentTitle(space, customization, site ?? null)}
                         </h3>

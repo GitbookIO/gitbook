@@ -403,7 +403,8 @@ async function lookupSiteInSingleMode(url: URL): Promise<LookupResult> {
         );
     }
 
-    const apiToken = getDefaultAPIToken(api().client.endpoint);
+    const apiCtx = await api();
+    const apiToken = getDefaultAPIToken(apiCtx.client.endpoint);
     if (!apiToken) {
         throw new Error(
             `Missing GITBOOK_TOKEN environment variable. It should be passed when using GITBOOK_MODE=single.`,
@@ -542,8 +543,9 @@ async function lookupSiteOrSpaceInMultiIdMode(
     // invalidated when trying to preview the site with different visitor
     // attributes.
     const contextId = decoded.claims ? hash(decoded.claims) : undefined;
+    const apiCtx = await api();
     const gitbookAPI = new GitBookAPI({
-        endpoint: apiEndpoint ?? api().client.endpoint,
+        endpoint: apiEndpoint ?? apiCtx.client.endpoint,
         authToken: apiToken,
         userAgent: userAgent(),
     });

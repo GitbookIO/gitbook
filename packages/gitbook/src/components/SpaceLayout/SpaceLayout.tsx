@@ -27,7 +27,7 @@ import { InsightsProvider } from '../Insights';
 /**
  * Render the entire content of the space (header, table of contents, footer, and page content).
  */
-export function SpaceLayout(props: {
+export async function SpaceLayout(props: {
     content: SiteContentPointer;
     contentTarget: ContentTarget;
     space: Space;
@@ -67,9 +67,9 @@ export function SpaceLayout(props: {
 
     return (
         <InsightsProvider
-            enabled={shouldTrackEvents()}
-            apiHost={api().client.endpoint}
-            visitorAuthToken={getCurrentVisitorToken()}
+            enabled={await shouldTrackEvents()}
+            apiHost={(await api()).client.endpoint}
+            visitorAuthToken={await getCurrentVisitorToken()}
             {...content}
         >
             {/* <ColorDebugger /> */}

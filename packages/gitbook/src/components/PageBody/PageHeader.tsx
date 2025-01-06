@@ -1,15 +1,15 @@
 import { RevisionPage, RevisionPageDocument } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import { Fragment } from 'react';
+import * as React from 'react';
 
-import { pageHref } from '@/lib/links';
+import { getPageHref } from '@/lib/links';
 import { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 
 import { PageIcon } from '../PageIcon';
 import { StyledLink } from '../primitives';
 
-export function PageHeader(props: {
+export async function PageHeader(props: {
     page: RevisionPageDocument;
     ancestors: AncestorRevisionPage[];
     pages: RevisionPage[];
@@ -27,42 +27,44 @@ export function PageHeader(props: {
             {ancestors.length > 0 && (
                 <nav>
                     <ol className={tcls('flex', 'flex-wrap', 'items-center', 'gap-2')}>
-                        {ancestors.map((breadcrumb, index) => (
-                            <Fragment key={breadcrumb.id}>
-                                <li>
-                                    <StyledLink
-                                        href={pageHref(pages, breadcrumb)}
-                                        style={tcls(
-                                            'no-underline',
-                                            'hover:underline',
-                                            'text-xs',
-                                            'tracking-wide',
-                                            'font-semibold',
-                                            'uppercase',
-                                            'flex',
-                                            'items-center',
-                                            'gap-1',
-                                        )}
-                                    >
-                                        <PageIcon
-                                            page={breadcrumb}
-                                            style={tcls('size-4', 'text-base', 'leading-none')}
+                        {await Promise.all(
+                            ancestors.map(async (breadcrumb, index) => (
+                                <React.Fragment key={breadcrumb.id}>
+                                    <li key={breadcrumb.id}>
+                                        <StyledLink
+                                            href={await getPageHref(pages, breadcrumb)}
+                                            style={tcls(
+                                                'no-underline',
+                                                'hover:underline',
+                                                'text-xs',
+                                                'tracking-wide',
+                                                'font-semibold',
+                                                'uppercase',
+                                                'flex',
+                                                'items-center',
+                                                'gap-1',
+                                            )}
+                                        >
+                                            <PageIcon
+                                                page={breadcrumb}
+                                                style={tcls('size-4', 'text-base', 'leading-none')}
+                                            />
+                                            {breadcrumb.title}
+                                        </StyledLink>
+                                    </li>
+                                    {index != ancestors.length - 1 && (
+                                        <Icon
+                                            icon="chevron-right"
+                                            className={tcls(
+                                                'size-3',
+                                                'text-light-4',
+                                                'dark:text-dark-4',
+                                            )}
                                         />
-                                        {breadcrumb.title}
-                                    </StyledLink>
-                                </li>
-                                {index != ancestors.length - 1 && (
-                                    <Icon
-                                        icon="chevron-right"
-                                        className={tcls(
-                                            'size-3',
-                                            'text-light-4',
-                                            'dark:text-dark-4',
-                                        )}
-                                    />
-                                )}
-                            </Fragment>
-                        ))}
+                                    )}
+                                </React.Fragment>
+                            )),
+                        )}
                     </ol>
                 </nav>
             )}

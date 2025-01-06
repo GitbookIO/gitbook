@@ -56,7 +56,7 @@ export interface CacheDefinition<Args extends any[], Result> {
     getKeyArgs?: (args: Args) => any[];
 
     /** Returns a precomputed hash that is used alongside arguments to generate the cache key */
-    getKeySuffix?: () => string | undefined;
+    getKeySuffix?: () => Promise<string | undefined>;
 
     /** Default ttl (in seconds) */
     defaultTtl?: number;
@@ -225,7 +225,7 @@ export function cache<Args extends any[], Result>(
         const [args, { signal }] = extractCacheFunctionOptions<Args>(rawArgs);
 
         const cacheArgs = cacheDef.getKeyArgs ? cacheDef.getKeyArgs(args) : args;
-        const cacheKeySuffix = cacheDef.getKeySuffix ? cacheDef.getKeySuffix() : undefined;
+        const cacheKeySuffix = cacheDef.getKeySuffix ? await cacheDef.getKeySuffix() : undefined;
         const key = getCacheKey(cacheDef.name, cacheArgs, cacheKeySuffix);
 
         return await trace(
@@ -243,7 +243,7 @@ export function cache<Args extends any[], Result>(
     cacheFn.revalidate = async (...rawArgs: Args | [...Args, CacheFunctionOptions]) => {
         const [args, { signal }] = extractCacheFunctionOptions<Args>(rawArgs);
         const cacheArgs = cacheDef.getKeyArgs ? cacheDef.getKeyArgs(args) : args;
-        const cacheKeySuffix = cacheDef.getKeySuffix ? cacheDef.getKeySuffix() : undefined;
+        const cacheKeySuffix = cacheDef.getKeySuffix ? await cacheDef.getKeySuffix() : undefined;
         const key = getCacheKey(cacheDef.name, cacheArgs, cacheKeySuffix);
 
         const result = await revalidate(key, signal, ...args);
@@ -252,7 +252,7 @@ export function cache<Args extends any[], Result>(
 
     cacheFn.hasInMemory = async (...args: Args) => {
         const cacheArgs = cacheDef.getKeyArgs ? cacheDef.getKeyArgs(args) : args;
-        const cacheKeySuffix = cacheDef.getKeySuffix ? cacheDef.getKeySuffix() : undefined;
+        const cacheKeySuffix = cacheDef.getKeySuffix ? await cacheDef.getKeySuffix() : undefined;
         const key = getCacheKey(cacheDef.name, cacheArgs, cacheKeySuffix);
         const tag = cacheDef.tag?.(...args);
 

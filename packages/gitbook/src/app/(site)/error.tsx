@@ -14,6 +14,8 @@ export default function ErrorPage(props: {
     const { error, reset } = props;
     const language = useLanguage();
 
+    console.log(props);
+
     React.useEffect(() => {
         withScope((scope) => {
             if ('_componentStack' in error && error._componentStack) {

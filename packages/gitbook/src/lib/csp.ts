@@ -7,8 +7,8 @@ import { filterOutNullable } from './typescript';
 /**
  * Get the current nonce for the current request.
  */
-export function getContentSecurityPolicyNonce(): string {
-    const headersList = headers();
+export async function getContentSecurityPolicyNonce(): Promise<string> {
+    const headersList = await headers();
     const nonce = headersList.get('x-nonce');
     if (!nonce) {
         throw new Error('No nonce found in headers');

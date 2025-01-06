@@ -8,7 +8,7 @@ import { AdItem } from './types';
 /**
  * Classic rendering for an ad.
  */
-export function AdClassicRendering({ ad }: { ad: AdItem }) {
+export async function AdClassicRendering({ ad }: { ad: AdItem }) {
     return (
         <a
             className={tcls(
@@ -33,7 +33,7 @@ export function AdClassicRendering({ ad }: { ad: AdItem }) {
                     <img
                         alt="Ads logo"
                         className={tcls('rounded-md')}
-                        src={getResizedImageURL(ad.smallImage, { width: 192, dpr: 2 })}
+                        src={await getResizedImageURL(ad.smallImage, { width: 192, dpr: 2 })}
                     />
                 </div>
             ) : (
@@ -43,7 +43,7 @@ export function AdClassicRendering({ ad }: { ad: AdItem }) {
                 >
                     <img
                         alt="Ads logo"
-                        src={getResizedImageURL(ad.logo, { width: 192 - 48, dpr: 2 })}
+                        src={await getResizedImageURL(ad.logo, { width: 192 - 48, dpr: 2 })}
                     />
                 </div>
             )}

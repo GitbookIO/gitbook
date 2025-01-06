@@ -1,5 +1,4 @@
 import {
-    Collection,
     CustomizationHeaderPreset,
     CustomizationSettings,
     Site,
@@ -7,9 +6,8 @@ import {
     Space,
 } from '@gitbook/api';
 
-import { HeaderMobileMenu } from '@/components/Header/HeaderMobileMenu';
 import { Image } from '@/components/utils';
-import { absoluteHref } from '@/lib/links';
+import { getAbsoluteHref } from '@/lib/links';
 import { tcls } from '@/lib/tailwind';
 import { getContentTitle } from '@/lib/utils';
 
@@ -26,12 +24,12 @@ interface HeaderLogoProps {
  * Render the logo for a space using the customization settings.
  */
 
-export function HeaderLogo(props: HeaderLogoProps) {
+export async function HeaderLogo(props: HeaderLogoProps) {
     const { customization } = props;
 
     return (
         <Link
-            href={absoluteHref('')}
+            href={await getAbsoluteHref('')}
             className={tcls('group/headerlogo', 'min-w-0', 'shrink', 'flex', 'items-center')}
         >
             {customization.header.logo ? (

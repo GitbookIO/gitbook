@@ -1,7 +1,7 @@
 import { RevisionPage, RevisionPageDocument, RevisionPageType } from '@gitbook/api';
 
 import { Card } from '@/components/primitives';
-import { pageHref } from '@/lib/links';
+import { getPageHref } from '@/lib/links';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
@@ -68,12 +68,13 @@ export async function PageBodyBlankslate(props: {
                             />
                         );
                     } else {
+                        const href = await getPageHref(rootPages, child);
                         return (
                             <Card
                                 key={child.id}
                                 title={child.title}
                                 leadingIcon={icon}
-                                href={pageHref(rootPages, child)}
+                                href={href}
                             />
                         );
                     }

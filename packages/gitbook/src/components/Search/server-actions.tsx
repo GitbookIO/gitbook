@@ -6,7 +6,7 @@ import { assert } from 'ts-essentials';
 
 import { streamResponse } from '@/lib/actions';
 import * as api from '@/lib/api';
-import { absoluteHref, pageHref } from '@/lib/links';
+import { getAbsoluteHref, getPageHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
 import { filterOutNullable } from '@/lib/typescript';
 
@@ -93,22 +93,28 @@ async function searchSiteContent(args: {
 
     if (siteSpaces) {
         // We are searching all of this Site's content
-        return searchResults.items
-            .map((spaceItem) => {
-                const siteSpace = siteSpaces.find(
-                    (siteSpace) => siteSpace.space.id === spaceItem.id,
-                );
+        return (
+            await Promise.all(
+                searchResults.items.map(async (spaceItem) => {
+                    const siteSpace = siteSpaces.find(
+                        (siteSpace) => siteSpace.space.id === spaceItem.id,
+                    );
 
-                return spaceItem.pages.map((item) => transformSitePageResult(item, siteSpace));
-            })
-            .flat(2);
+                    return Promise.all(
+                        spaceItem.pages.map((item) => transformSitePageResult(item, siteSpace)),
+                    );
+                }),
+            )
+        ).flat(2);
     }
 
-    return searchResults.items
-        .map((spaceItem) => {
-            return spaceItem.pages.map((item) => transformPageResult(item));
-        })
-        .flat(2);
+    return (
+        await Promise.all(
+            searchResults.items.map((spaceItem) => {
+                return Promise.all(spaceItem.pages.map((item) => transformPageResult(item)));
+            }),
+        )
+    ).flat(2);
 }
 
 /**
@@ -158,7 +164,8 @@ export const streamAskQuestion = streamResponse(async function* (
     siteSpaceId: string | null,
     question: string,
 ) {
-    const stream = api.api().client.orgs.streamAskInSite(
+    const apiCtx = await api.api();
+    const stream = apiCtx.client.orgs.streamAskInSite(
         organizationId,
         siteId,
         {
@@ -178,7 +185,7 @@ export const streamAskQuestion = streamResponse(async function* (
         { format: 'document' },
     );
 
-    const spaceData = new PromiseQueue<string, RevisionPage[]>();
+    const spacePromises = new Map<string, Promise<RevisionPage[]>>();
     for await (const chunk of stream) {
         const answer = chunk.answer;
 
@@ -189,17 +196,32 @@ export const streamAskQuestion = streamResponse(async function* (
                     return null;
                 }
 
-                spaceData.registerPromise(source.space, () => {
-                    return api.getRevisionPages(source.space, source.revision, { metadata: false });
-                });
+                if (!spacePromises.has(source.space)) {
+                    spacePromises.set(
+                        source.space,
+                        api.getRevisionPages(source.space, source.revision, { metadata: false }),
+                    );
+                }
 
                 return source.space;
             })
             .filter(filterOutNullable);
 
         // Get the pages for all spaces referenced by this answer.
-        const pages = await spaceData.getPromises(spaces);
-        yield transformAnswer(chunk.answer, pages);
+        const pages = await Promise.all(
+            spaces.map(async (space) => {
+                const pages = await spacePromises.get(space);
+                return { space, pages };
+            }),
+        ).then((results) => {
+            return results.reduce((map, result) => {
+                if (result.pages) {
+                    map.set(result.space, result.pages);
+                }
+                return map;
+            }, new Map<string, RevisionPage[]>());
+        });
+        yield await transformAnswer(chunk.answer, pages);
     }
 });
 
@@ -211,34 +233,36 @@ export async function getRecommendedQuestions(spaceId: string): Promise<string[]
     return data.questions;
 }
 
-function transformAnswer(
+async function transformAnswer(
     answer: SearchAIAnswer,
     spacePages: Map<string, RevisionPage[]>,
-): AskAnswerResult {
-    const sources = answer.sources
-        .map((source) => {
-            if (source.type !== 'page') {
-                return null;
-            }
+): Promise<AskAnswerResult> {
+    const sources = (
+        await Promise.all(
+            answer.sources.map(async (source) => {
+                if (source.type !== 'page') {
+                    return null;
+                }
 
-            const pages = spacePages.get(source.space);
+                const pages = spacePages.get(source.space);
 
-            if (!pages) {
-                return null;
-            }
+                if (!pages) {
+                    return null;
+                }
 
-            const page = resolvePageId(pages, source.page);
-            if (!page) {
-                return null;
-            }
+                const page = resolvePageId(pages, source.page);
+                if (!page) {
+                    return null;
+                }
 
-            return {
-                id: source.page,
-                title: page.page.title,
-                href: pageHref(pages, page.page),
-            };
-        })
-        .filter(filterOutNullable);
+                return {
+                    id: source.page,
+                    title: page.page.title,
+                    href: await getPageHref(pages, page.page),
+                };
+            }),
+        )
+    ).filter(filterOutNullable);
 
     return {
         body:
@@ -259,16 +283,16 @@ function transformAnswer(
     };
 }
 
-function transformSectionsAndPage(args: {
+async function transformSectionsAndPage(args: {
     item: SearchPageResult;
     space?: Space;
     spaceURL?: string;
-}): [ComputedPageResult, ComputedSectionResult[]] {
+}): Promise<[ComputedPageResult, ComputedSectionResult[]]> {
     const { item, space, spaceURL } = args;
 
     // Resolve a relative path to an absolute URL
     // if the search result is relative to another space, we use the space URL
-    const getURL = (path: string, spaceURL?: string) => {
+    const getURL = async (path: string, spaceURL?: string) => {
         if (spaceURL) {
             if (!spaceURL.endsWith('/')) {
                 spaceURL += '/';
@@ -278,32 +302,33 @@ function transformSectionsAndPage(args: {
             }
             return spaceURL + path;
         } else {
-            return absoluteHref(path);
+            return getAbsoluteHref(path);
         }
     };
 
-    const sections =
-        item.sections?.map<ComputedSectionResult>((section) => ({
+    const sections = await Promise.all(
+        item.sections?.map<Promise<ComputedSectionResult>>(async (section) => ({
             type: 'section',
             id: item.id + '/' + section.id,
             title: section.title,
-            href: getURL(section.path, spaceURL),
+            href: await getURL(section.path, spaceURL),
             body: section.body,
-        })) ?? [];
+        })) ?? [],
+    );
 
     const page: ComputedPageResult = {
         type: 'page',
         id: item.id,
         title: item.title,
-        href: getURL(item.path, spaceURL),
+        href: await getURL(item.path, spaceURL),
         spaceTitle: space?.title,
     };
 
     return [page, sections];
 }
 
-function transformSitePageResult(item: SearchPageResult, siteSpace?: SiteSpace) {
-    const [page, sections] = transformSectionsAndPage({
+async function transformSitePageResult(item: SearchPageResult, siteSpace?: SiteSpace) {
+    const [page, sections] = await transformSectionsAndPage({
         item,
         space: siteSpace?.space,
         spaceURL: siteSpace?.urls.published,
@@ -312,79 +337,12 @@ function transformSitePageResult(item: SearchPageResult, siteSpace?: SiteSpace) 
     return [page, ...sections];
 }
 
-function transformPageResult(item: SearchPageResult, space?: Space) {
-    const [page, sections] = transformSectionsAndPage({
+async function transformPageResult(item: SearchPageResult, space?: Space) {
+    const [page, sections] = await transformSectionsAndPage({
         item,
         space,
         spaceURL: space?.urls.published ?? space?.urls.app,
     });
 
     return [page, ...sections];
-}
-
-/**
- * A queue for promises that performs deduplication of requests
- * and ensures they run sequentially.
- *
- * This is useful when you want to make multiple async requests
- * but want to avoid making the same request multiple times.
- *
- * Running the promises sequentially gives us some safety about
- * hitting Cloudflare Worker's 6 parallel subrequest limits.
- */
-class PromiseQueue<Key extends string, Value> {
-    private promiseQueue: (() => Promise<Value>)[] = [];
-    private results: Map<Key, Value> = new Map();
-    private registeredKeys: Set<Key> = new Set();
-    private currentExecution: Promise<void> | null = null;
-
-    private async executeQueue() {
-        while (this.promiseQueue.length > 0) {
-            const promiseFn = this.promiseQueue.shift()!;
-            await promiseFn();
-        }
-        this.currentExecution = null; // Mark the queue as idle
-    }
-
-    registerPromise(key: Key, fn: () => Promise<Value>): void {
-        if (this.registeredKeys.has(key)) {
-            return;
-        }
-
-        this.registeredKeys.add(key);
-
-        const wrapperFn = async () => {
-            const result = await fn();
-            this.results.set(key, result);
-            return result;
-        };
-
-        this.promiseQueue.push(wrapperFn);
-
-        // Start executing if not already running
-        if (!this.currentExecution) {
-            this.currentExecution = this.executeQueue();
-        }
-    }
-
-    /**
-     * Returns a promise that resolves to a map of results for the given keys.
-     * If the key has not been registered in the queue, it will be ignored.
-     */
-    async getPromises(keys: Key[]): Promise<Map<Key, Value>> {
-        // Wait for any ongoing executions to finish
-        if (this.currentExecution) {
-            await this.currentExecution;
-        }
-
-        return keys.reduce((map, key) => {
-            const data = this.results.get(key);
-
-            if (data) {
-                return map.set(key, data);
-            }
-
-            return map;
-        }, new Map<Key, Value>());
-    }
 }
