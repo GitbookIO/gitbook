@@ -677,6 +677,15 @@ export const getSiteRedirectBySource = cache({
             );
             return cacheResponse(response, cacheTtl_1day);
         } catch (error) {
+            // 422 is returned when the source is invalid
+            // we don't want to throw but just return null
+            if ((error as GitBookAPIError).code === 422) {
+                return {
+                    data: null,
+                    ...cacheTtl_1day,
+                };
+            }
+
             if ((error as GitBookAPIError).code === 404) {
                 return {
                     data: null,
