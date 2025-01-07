@@ -23,7 +23,7 @@ export interface PageIdParams {
  * Fetch all the data needed to render the content layout.
  */
 export async function fetchContentData() {
-    const content = getSiteContentPointer();
+    const content = await getSiteContentPointer();
 
     const [{ space, contentTarget, pages }, { customization, site, sections, spaces, scripts }] =
         await Promise.all([

@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 
 import { getSpace, getSite } from '@/lib/api';
-import { absoluteHref } from '@/lib/links';
+import { getAbsoluteHref } from '@/lib/links';
 import { getSiteContentPointer } from '@/lib/pointer';
 import { isSpaceIndexable } from '@/lib/seo';
 
@@ -11,7 +11,7 @@ export const runtime = 'edge';
  * Generate a robots.txt for the current space.
  */
 export async function GET(req: NextRequest) {
-    const pointer = getSiteContentPointer();
+    const pointer = await getSiteContentPointer();
     const [site, space] = await Promise.all([
         getSite(pointer.organizationId, pointer.siteId),
         getSpace(pointer.spaceId, pointer.siteShareKey),
@@ -20,8 +20,8 @@ export async function GET(req: NextRequest) {
     const lines = [
         `User-agent: *`,
         'Disallow: /~gitbook/',
-        ...(isSpaceIndexable({ space, site })
-            ? [`Allow: /`, `Sitemap: ${absoluteHref(`/sitemap.xml`, true)}`]
+        ...((await isSpaceIndexable({ space, site }))
+            ? [`Allow: /`, `Sitemap: ${await getAbsoluteHref(`/sitemap.xml`, true)}`]
             : [`Disallow: /`]),
     ];
     const content = lines.join('\n');

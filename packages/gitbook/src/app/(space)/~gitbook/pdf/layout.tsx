@@ -12,10 +12,10 @@ import { getSiteOrSpacePointerForPDF } from './pointer';
 export default async function PDFRootLayout(props: { children: React.ReactNode }) {
     const { children } = props;
 
-    const pointer = getSiteOrSpacePointerForPDF();
+    const pointer = await getSiteOrSpacePointerForPDF();
     const { customization } = await ('siteId' in pointer
         ? getSiteData(pointer)
-        : getSpaceLayoutData(pointer.spaceId));
+        : getSpaceLayoutData());
 
     return (
         <CustomizationRootLayout customization={customization}>{children}</CustomizationRootLayout>
@@ -25,9 +25,9 @@ export default async function PDFRootLayout(props: { children: React.ReactNode }
 /**
  * Fetch all the layout data about a space at once.
  */
-async function getSpaceLayoutData(spaceId: string) {
+async function getSpaceLayoutData() {
     const [{ customization }, scripts] = await Promise.all([
-        getSpaceCustomization(spaceId),
+        getSpaceCustomization(),
         [] as SpaceIntegrationScript[],
     ]);
 

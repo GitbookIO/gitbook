@@ -5,7 +5,7 @@ import { getSiteContentPointer } from '@/lib/pointer';
 import { tcls } from '@/lib/tailwind';
 
 export default async function NotFound() {
-    const pointer = getSiteContentPointer();
+    const pointer = await getSiteContentPointer();
     const [{ space }, { customization }] = await Promise.all([
         getSpaceContentData(pointer, pointer.siteShareKey),
         getSiteData(pointer),

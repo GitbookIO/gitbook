@@ -5,7 +5,7 @@ import React from 'react';
 
 import { PageAside } from '@/components/PageAside';
 import { PageBody, PageCover } from '@/components/PageBody';
-import { PageHrefContext, absoluteHref, pageHref } from '@/lib/links';
+import { PageHrefContext, getAbsoluteHref, getPageHref } from '@/lib/links';
 import { getPagePath, resolveFirstDocument } from '@/lib/pages';
 import { ContentRefContext } from '@/lib/references';
 import { isSpaceIndexable, isPageIndexable } from '@/lib/seo';
@@ -20,10 +20,13 @@ export const runtime = 'edge';
  * Fetch and render a page.
  */
 export default async function Page(props: {
-    params: PagePathParams;
-    searchParams: { fallback?: string };
+    params: Promise<PagePathParams>;
+    searchParams: Promise<{ fallback?: string }>;
 }) {
-    const { params, searchParams } = props;
+    const { params: rawParams, searchParams: rawSearchParams } = props;
+
+    const params = await rawParams;
+    const searchParams = await rawSearchParams;
 
     const {
         content: contentPointer,
@@ -49,12 +52,12 @@ export default async function Page(props: {
         if (pathname !== rawPathname) {
             // If the pathname was not normalized, redirect to the normalized version
             // before trying to resolve the page again
-            redirect(absoluteHref(pathname));
+            redirect(await getAbsoluteHref(pathname));
         } else {
             notFound();
         }
     } else if (getPagePath(pages, page) !== rawPathname) {
-        redirect(pageHref(pages, page, linksContext));
+        redirect(await getPageHref(pages, page, linksContext));
     }
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
@@ -118,8 +121,12 @@ export default async function Page(props: {
     );
 }
 
-export async function generateViewport({ params }: { params: PagePathParams }): Promise<Viewport> {
-    const { customization } = await fetchPageData(params);
+export async function generateViewport({
+    params,
+}: {
+    params: Promise<PagePathParams>;
+}): Promise<Viewport> {
+    const { customization } = await fetchPageData(await params);
     return {
         colorScheme: customization.themes.toggeable
             ? customization.themes.default === CustomizationThemeMode.Dark
@@ -133,12 +140,12 @@ export async function generateMetadata({
     params,
     searchParams,
 }: {
-    params: PagePathParams;
-    searchParams: { fallback?: string };
+    params: Promise<PagePathParams>;
+    searchParams: Promise<{ fallback?: string }>;
 }): Promise<Metadata> {
     const { space, pages, page, customization, site, ancestors } = await getPageDataWithFallback({
-        pagePathParams: params,
-        searchParams,
+        pagePathParams: await params,
+        searchParams: await searchParams,
     });
 
     if (!page) {
@@ -152,16 +159,17 @@ export async function generateMetadata({
         description: page.description ?? '',
         alternates: {
             // Trim trailing slashes in canonical URL to match the redirect behavior
-            canonical: absoluteHref(getPagePath(pages, page), true).replace(/\/+$/, ''),
+            canonical: (await getAbsoluteHref(getPagePath(pages, page), true)).replace(/\/+$/, ''),
         },
         openGraph: {
             images: [
                 customization.socialPreview.url ??
-                    absoluteHref(`~gitbook/ogimage/${page.id}`, true),
+                    (await getAbsoluteHref(`~gitbook/ogimage/${page.id}`, true)),
             ],
         },
         robots:
-            isSpaceIndexable({ space, site: site ?? null }) && isPageIndexable(ancestors, page)
+            (await isSpaceIndexable({ space, site: site ?? null })) &&
+            isPageIndexable(ancestors, page)
                 ? 'index, follow'
                 : 'noindex, nofollow',
     };
@@ -185,7 +193,7 @@ async function getPageDataWithFallback(args: {
         const rootPage = resolveFirstDocument(pages, []);
 
         if (redirectOnFallback && rootPage?.page) {
-            redirect(pageHref(pages, rootPage?.page));
+            redirect(await getPageHref(pages, rootPage?.page));
         }
 
         page = rootPage?.page;

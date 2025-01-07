@@ -27,7 +27,7 @@ import { InsightsProvider } from '../Insights';
 /**
  * Render the entire content of the space (header, table of contents, footer, and page content).
  */
-export function SpaceLayout(props: {
+export async function SpaceLayout(props: {
     content: SiteContentPointer;
     contentTarget: ContentTarget;
     space: Space;
@@ -64,12 +64,15 @@ export function SpaceLayout(props: {
     const withSections = Boolean(sections && sections.list.length > 0);
     const withVariants = Boolean(site && spaces.length > 1);
     const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
+    const apiHost = (await api()).client.endpoint;
+    const visitorAuthToken = await getCurrentVisitorToken();
+    const enabled = await shouldTrackEvents();
 
     return (
         <InsightsProvider
-            enabled={shouldTrackEvents()}
-            apiHost={api().client.endpoint}
-            visitorAuthToken={getCurrentVisitorToken()}
+            enabled={enabled}
+            apiHost={apiHost}
+            visitorAuthToken={visitorAuthToken}
             {...content}
         >
             {/* <ColorDebugger /> */}

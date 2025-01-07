@@ -9,7 +9,7 @@ import { Icon, IconName } from '@gitbook/icons';
 import React from 'react';
 
 import { t, getSpaceLanguage } from '@/intl/server';
-import { pageHref } from '@/lib/links';
+import { getPageHref } from '@/lib/links';
 import { resolvePrevNextPages } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 
@@ -18,7 +18,7 @@ import { Link, LinkInsightsProps } from '../primitives';
 /**
  * Show cards to go to previous/next pages at the bottom.
  */
-export function PageFooterNavigation(props: {
+export async function PageFooterNavigation(props: {
     space: Space;
     customization: CustomizationSettings | SiteCustomizationSettings;
     pages: Revision['pages'];
@@ -27,6 +27,8 @@ export function PageFooterNavigation(props: {
     const { customization, pages, page } = props;
     const { previous, next } = resolvePrevNextPages(pages, page);
     const language = getSpaceLanguage(customization);
+    const previousHref = previous ? await getPageHref(pages, previous) : '';
+    const nextHref = next ? await getPageHref(pages, next) : '';
 
     return (
         <div
@@ -46,7 +48,7 @@ export function PageFooterNavigation(props: {
                     icon="chevron-left"
                     label={t(language, 'previous_page')}
                     title={previous.title}
-                    href={pageHref(pages, previous)}
+                    href={previousHref}
                     insights={{
                         target: {
                             kind: 'page',
@@ -62,7 +64,7 @@ export function PageFooterNavigation(props: {
                     icon="chevron-right"
                     label={t(language, 'next_page')}
                     title={next.title}
-                    href={pageHref(pages, next)}
+                    href={nextHref}
                     insights={{
                         target: {
                             kind: 'page',

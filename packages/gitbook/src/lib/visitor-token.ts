@@ -93,8 +93,9 @@ export function normalizeVisitorAuthURL(url: URL): URL {
 /**
  * Get the visitor token from the request context.
  */
-export function getCurrentVisitorToken(): string | null {
-    const visitorToken = headers().get('x-gitbook-visitor-token');
+export async function getCurrentVisitorToken(): Promise<string | null> {
+    const headersList = await headers();
+    const visitorToken = headersList.get('x-gitbook-visitor-token');
     return visitorToken;
 }
 

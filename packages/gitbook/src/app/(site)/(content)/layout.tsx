@@ -13,7 +13,7 @@ import { api } from '@/lib/api';
 import { assetsDomain } from '@/lib/assets';
 import { buildVersion } from '@/lib/build';
 import { getContentSecurityPolicyNonce } from '@/lib/csp';
-import { absoluteHref, baseUrl } from '@/lib/links';
+import { getAbsoluteHref, getBaseUrl } from '@/lib/links';
 import { isSpaceIndexable } from '@/lib/seo';
 import { getContentTitle } from '@/lib/utils';
 
@@ -29,7 +29,7 @@ export const runtime = 'edge';
 export default async function ContentLayout(props: { children: React.ReactNode }) {
     const { children } = props;
 
-    const nonce = getContentSecurityPolicyNonce();
+    const nonce = await getContentSecurityPolicyNonce();
     const {
         content,
         space,
@@ -43,7 +43,8 @@ export default async function ContentLayout(props: { children: React.ReactNode }
         sections,
     } = await fetchContentData();
 
-    ReactDOM.preconnect(api().client.endpoint);
+    const apiCtx = await api();
+    ReactDOM.preconnect(apiCtx.client.endpoint);
     if (assetsDomain) {
         ReactDOM.preconnect(assetsDomain);
     }
@@ -55,12 +56,14 @@ export default async function ContentLayout(props: { children: React.ReactNode }
         });
     });
 
+    const queryStringTheme = await getQueryStringTheme();
+
     return (
         <NuqsAdapter>
             <ClientContexts
                 nonce={nonce}
                 forcedTheme={
-                    getQueryStringTheme() ??
+                    queryStringTheme ??
                     (customization.themes.toggeable ? undefined : customization.themes.default)
                 }
             >
@@ -119,34 +122,34 @@ export async function generateMetadata(): Promise<Metadata> {
     return {
         title: getContentTitle(space, customization, site),
         generator: `GitBook (${buildVersion()})`,
-        metadataBase: new URL(baseUrl()),
+        metadataBase: new URL(await getBaseUrl()),
         icons: {
             icon: [
                 {
                     url:
                         customIcon?.light ??
-                        absoluteHref('~gitbook/icon?size=small&theme=light', true),
+                        (await getAbsoluteHref('~gitbook/icon?size=small&theme=light', true)),
                     type: 'image/png',
                     media: '(prefers-color-scheme: light)',
                 },
                 {
                     url:
                         customIcon?.dark ??
-                        absoluteHref('~gitbook/icon?size=small&theme=dark', true),
+                        (await getAbsoluteHref('~gitbook/icon?size=small&theme=dark', true)),
                     type: 'image/png',
                     media: '(prefers-color-scheme: dark)',
                 },
             ],
         },
-        robots: isSpaceIndexable({ space, site }) ? 'index, follow' : 'noindex, nofollow',
+        robots: (await isSpaceIndexable({ space, site })) ? 'index, follow' : 'noindex, nofollow',
     };
 }
 
 /**
  * For preview, the theme can be set via query string (?theme=light).
  */
-function getQueryStringTheme() {
-    const headersList = headers();
+async function getQueryStringTheme() {
+    const headersList = await headers();
     const queryStringTheme = headersList.get('x-gitbook-theme');
     if (!queryStringTheme) {
         return null;

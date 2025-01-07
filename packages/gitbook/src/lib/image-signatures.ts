@@ -3,7 +3,7 @@ import 'server-only';
 import fnv1a from '@sindresorhus/fnv1a';
 import type { MaybePromise } from 'p-map';
 
-import { host } from './links';
+import { getHost } from './links';
 
 /**
  * GitBook has supported different version of image signing in the past. To maintain backwards
@@ -48,11 +48,11 @@ export async function verifyImageSignature(
  * This function is sync. If you need to implement an async version of image signing, you'll need to change
  * ths signature of this fn and where it's used.
  */
-export function generateImageSignature(input: string): {
+export async function generateImageSignature(input: string): Promise<{
     signature: string;
     version: SignatureVersion;
-} {
-    const result = generateSignatureV2(input);
+}> {
+    const result = await generateSignatureV2(input);
     return { signature: result, version: CURRENT_SIGNATURE_VERSION };
 }
 
@@ -63,8 +63,8 @@ const fnv1aUtf8Buffer = new Uint8Array(512);
  * Generate a signature for an image.
  * The signature is relative to the current site being rendered to avoid serving images from other sites on the same domain.
  */
-function generateSignatureV2(input: string): string {
-    const hostName = host();
+async function generateSignatureV2(input: string): Promise<string> {
+    const hostName = await getHost();
     const all = [
         input,
         hostName, // The hostname is used to avoid serving images from other sites on the same domain
