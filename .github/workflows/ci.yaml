@@ -44,6 +44,7 @@ jobs:
                   SENTRY_ORG: ${{ vars.SENTRY_ORG }}
                   SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
                   SENTRY_DSN: ${{ vars.SENTRY_DSN }}
+                  SENTRY_RELEASE: ${{ github.sha }}
             - id: deploy
               name: Deploy to Cloudflare
               uses: cloudflare/wrangler-action@v3.11.0

@@ -5,6 +5,7 @@ if (dsn) {
     init({
         debug: false,
         dsn,
+        release: process.env.SENTRY_RELEASE,
 
         sampleRate: 0.1,
 
