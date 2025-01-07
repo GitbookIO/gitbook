@@ -1,5 +1,7 @@
 'use client';
 
+import * as storage from '@/lib/local-storage';
+
 import { generateRandomId } from './utils';
 
 const SESSION_TTL = 1000 * 60 * 30; // 30 minutes
@@ -22,22 +24,20 @@ export function getSession(): Session {
     }
 
     try {
-        const rawSession =
-            typeof localStorage !== 'undefined' ? localStorage.getItem(SESSION_KEY) : null;
+        const session = storage.getItem<unknown | null>(SESSION_KEY, null);
 
-        if (rawSession) {
-            const storedSession = JSON.parse(rawSession);
-
-            if (
-                typeof storedSession === 'object' &&
-                typeof storedSession.lastActiveAt === 'number' &&
-                typeof storedSession.id === 'string' &&
-                storedSession.lastActiveAt + SESSION_TTL > Date.now()
-            ) {
-                currentSession = storedSession as Session;
-                touchSession();
-                return currentSession;
-            }
+        if (
+            session &&
+            typeof session === 'object' &&
+            'lastActiveAt' in session &&
+            typeof session.lastActiveAt === 'number' &&
+            'id' in session &&
+            typeof session.id === 'string' &&
+            session.lastActiveAt + SESSION_TTL > Date.now()
+        ) {
+            currentSession = session as Session;
+            touchSession();
+            return currentSession;
         }
     } catch (error) {
         console.error('Error parsing session', error);
@@ -65,7 +65,7 @@ export function touchSession() {
  * Save the session to the local storage.
  */
 export function saveSession() {
-    if (typeof localStorage !== 'undefined' && currentSession) {
-        localStorage.setItem(SESSION_KEY, JSON.stringify(currentSession));
+    if (currentSession) {
+        storage.setItem(SESSION_KEY, currentSession);
     }
 }
