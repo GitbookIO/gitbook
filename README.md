@@ -78,6 +78,26 @@ Any published GitBook site can be accessed through your local development instan
 
 All pull-requests will be tested against both visual and performances testing to prevent regressions.
 
+## Fonts and Icons
+
+GitBook Open uses fontawesome. During development, your local environment will use the free version. However, only the pro version will be accepted by CI. If you see the following error:
+
+```
+The GitBook icon is missing. It indicates that the dependencies were installed without the correct font-awesome package. These changes have probably been persisted in the Bun lockfile. Read the README for more information.
+```
+
+It means that you've changed the GBO dependencies and bundled in the free version. Only GitBook staff can help with this - if you're not on the GitBook team, please ping us in the PR and we'll help get things moving.
+
+If you are GitBook staff, you'll need our NPM token in your local environment.
+
+```
+.env.local
+
+NPM_TOKEN_READONLY=xxx
+```
+
+and then reinstall dependencies.
+
 ## Contributing
 
 GitBook's rendering engine is fully open source and built on top of [Next.js](https://nextjs.org/). Head to our [contributing guide](https://github.com/GitbookIO/gitbook/blob/main/.github/CONTRIBUTING.md) to learn more about the workflow on adding your first Pull Request.

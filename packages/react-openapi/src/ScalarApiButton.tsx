@@ -16,7 +16,7 @@ export function ScalarApiButton({ method, path }: { method: string; path: string
             <button
                 className="scalar-activate-button"
                 onClick={() => {
-                    client?.open({ method, path, _source: 'gitbook' });
+                    client?.open({ method, path });
                     onOpenClient({ method, path });
                 }}
             >

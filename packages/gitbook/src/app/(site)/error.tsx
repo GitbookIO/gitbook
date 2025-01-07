@@ -1,6 +1,6 @@
 'use client';
 
-import { captureException } from '@sentry/nextjs';
+import { captureException, withScope } from '@sentry/nextjs';
 import React from 'react';
 
 import { Button } from '@/components/primitives/Button';
@@ -15,7 +15,12 @@ export default function ErrorPage(props: {
     const language = useLanguage();
 
     React.useEffect(() => {
-        captureException(error);
+        withScope((scope) => {
+            if ('_componentStack' in error && error._componentStack) {
+                scope.setExtra('componentStack', error._componentStack);
+            }
+            captureException(error);
+        });
     }, [error]);
 
     return (

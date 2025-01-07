@@ -11,14 +11,16 @@ export async function postPageFeedback(args: {
     visitorId: string;
     rating: PageFeedbackRating;
 }) {
-    const { organizationId, siteId, siteSpaceId } = getSiteContentPointer();
+    const { organizationId, siteId, siteSpaceId } = await getSiteContentPointer();
 
     assert(
         siteSpaceId,
         `No siteSpaceId in pointer. organizationId: ${organizationId}, siteId: ${siteId}, pageId: ${args.pageId}`,
     );
 
-    await api().client.orgs.createSitesPageFeedback(
+    const apiCtx = await api();
+
+    await apiCtx.client.orgs.createSitesPageFeedback(
         organizationId,
         siteId,
         siteSpaceId,

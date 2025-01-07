@@ -22,7 +22,7 @@ export function PagesList(props: {
     const { rootPages, pages, ancestors, context, style } = props;
 
     return (
-        <ul className={tcls('flex', 'flex-1', 'flex-col', 'gap-y-0.5', style)}>
+        <ul className={tcls('flex', 'flex-col', 'gap-y-0.5', style)}>
             {pages.map((page) => {
                 if (page.type === RevisionPageType.Computed) {
                     throw new Error(

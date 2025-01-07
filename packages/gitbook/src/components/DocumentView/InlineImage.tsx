@@ -22,6 +22,7 @@ export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
     }
 
     const isInLink = ancestorInlines.some((ancestor) => ancestor.type === 'link');
+    const sizes = await getImageSizes(size, src);
 
     return (
         /* Ensure images dont expand to the size of the container where this Image may be nested in. Now it's always nested in a size-restricted container */
@@ -32,7 +33,7 @@ export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
         >
             <Image
                 alt={inline.data.caption ?? ''}
-                sizes={await getImageSizes(size, src)}
+                sizes={sizes}
                 sources={{
                     light: {
                         src: src.href,

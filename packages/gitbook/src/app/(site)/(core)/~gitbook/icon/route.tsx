@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
     const options = getOptions(req.url);
     const size = SIZES[options.size];
 
-    const pointer = getSiteContentPointer();
+    const pointer = await getSiteContentPointer();
     const spaceId = pointer.spaceId;
 
     const [space, { customization }] = await Promise.all([

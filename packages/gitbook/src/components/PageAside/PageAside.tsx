@@ -13,7 +13,7 @@ import urlJoin from 'url-join';
 
 import { t, getSpaceLanguage } from '@/intl/server';
 import { getDocumentSections } from '@/lib/document';
-import { absoluteHref } from '@/lib/links';
+import { getAbsoluteHref } from '@/lib/links';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { getPDFUrlSearchParams } from '@/lib/urls';
@@ -44,7 +44,7 @@ function getTopOffset(props: { sectionsHeader: boolean; topHeader: boolean }) {
 /**
  * Aside listing the headings in the document.
  */
-export function PageAside(props: {
+export async function PageAside(props: {
     space: Space;
     site: Site | undefined;
     customization: CustomizationSettings | SiteCustomizationSettings;
@@ -68,6 +68,12 @@ export function PageAside(props: {
     const language = getSpaceLanguage(customization);
 
     const topOffset = getTopOffset(withHeaderOffset);
+    const pdfHref = await getAbsoluteHref(
+        `~gitbook/pdf?${getPDFUrlSearchParams({
+            page: page.id,
+            only: true,
+        }).toString()}`,
+    );
     return (
         <aside
             className={tcls(
@@ -195,12 +201,7 @@ export function PageAside(props: {
                     {customization.pdf.enabled ? (
                         <div>
                             <a
-                                href={absoluteHref(
-                                    `~gitbook/pdf?${getPDFUrlSearchParams({
-                                        page: page.id,
-                                        only: true,
-                                    }).toString()}`,
-                                )}
+                                href={pdfHref}
                                 className={tcls(
                                     'flex',
                                     'flex-row',

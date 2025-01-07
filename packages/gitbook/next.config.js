@@ -67,19 +67,15 @@ module.exports = withSentryConfig(
         },
     },
     {
-        silent: true,
         org: process.env.SENTRY_ORG,
         project: process.env.SENTRY_PROJECT,
-    },
-    {
+        authToken: process.env.SENTRY_AUTH_TOKEN,
+
+        silent: true,
         // Upload a larger set of source maps for prettier stack traces (increases build time)
         widenClientFileUpload: true,
-        transpileClientSDK: false,
         // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
         tunnelRoute: '/~gitbook/monitoring',
-        // Don't hide source maps from generated client bundles
-        hideSourceMaps: false,
         disableLogger: true,
-        automaticVercelMonitors: false,
     },
 );

@@ -7,16 +7,12 @@
         "turbo": "^2.1.2"
     },
     "packageManager": "bun@1.1.18",
-    "patchedDependencies": {
-        "@vercel/next@4.3.15": "patches/@vercel%2Fnext@4.3.15.patch",
-        "@cloudflare/next-on-pages@1.13.5": "patches/@cloudflare%2Fnext-on-pages@1.13.5.patch"
-    },
     "overrides": {
         "@codemirror/state": "6.4.1"
     },
     "private": true,
     "scripts": {
-        "dev": "turbo run dev",
+        "dev": "turbo run dev --ui=stream",
         "build": "turbo run build",
         "build:cloudflare": "turbo run build:cloudflare",
         "lint": "turbo run lint",
@@ -34,5 +30,9 @@
     },
     "workspaces": [
         "packages/*"
-    ]
+    ],
+    "patchedDependencies": {
+        "decode-named-character-reference@1.0.2": "patches/decode-named-character-reference@1.0.2.patch",
+        "@vercel/next@4.3.15": "patches/@vercel%2Fnext@4.3.15.patch"
+    }
 }
