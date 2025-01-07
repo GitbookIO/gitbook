@@ -6,7 +6,7 @@ import {
     HighlighterGeneric,
 } from 'shiki/core';
 import { loadWasm, createOnigurumaEngine } from 'shiki/engine/oniguruma';
-import { bundledLanguages } from 'shiki/langs';
+import { BundledLanguage, bundledLanguages } from 'shiki/langs';
 // @ts-ignore - onigWasm is a Wasm module
 import onigWasm from 'shiki/onig.wasm?module';
 
@@ -81,18 +81,35 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
     });
 }
 
+const syntaxAliases: Record<string, BundledLanguage> = {
+    // "Parser" language does not exist in Shiki, but it's used in GitBook
+    // The closest language is "Blade"
+    parser: 'blade',
+};
+
+function checkIsBundledLanguage(lang: string): lang is BundledLanguage {
+    return lang in bundledLanguages;
+}
+
 /**
  * Validate a language name.
  */
-function getLanguageForSyntax(syntax: string): keyof typeof bundledLanguages | null {
-    // @ts-ignore
-    const lang = bundledLanguages[syntax];
-    if (!lang) {
-        return null;
+function getLanguageForSyntax(syntax: string): BundledLanguage | null {
+    // Normalize the syntax to lowercase.
+    syntax = syntax.toLowerCase();
+
+    // Check if the syntax is a bundled language.
+    if (checkIsBundledLanguage(syntax)) {
+        return syntax;
     }
 
-    // @ts-ignore
-    return syntax;
+    // Check if there is a valid alias for the syntax.
+    const alias = syntaxAliases[syntax];
+    if (alias && checkIsBundledLanguage(alias)) {
+        return alias;
+    }
+
+    return null;
 }
 
 /**
