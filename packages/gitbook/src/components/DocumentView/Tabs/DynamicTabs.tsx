@@ -20,6 +20,7 @@ let globalTabsState: TabsState = (() => {
     const stored = localStorage.getItem('@gitbook/tabsState');
     return stored ? (JSON.parse(stored) as TabsState) : { activeIds: {}, activeTitles: [] };
 })();
+
 const listeners = new Set<() => void>();
 
 function useTabsState() {
@@ -30,13 +31,13 @@ function useTabsState() {
 
     const getSnapshot = useCallback(() => globalTabsState, []);
 
-    const setTabsState = (updater: (previous: TabsState) => TabsState) => {
+    const setTabsState = useCallback((updater: (previous: TabsState) => TabsState) => {
         globalTabsState = updater(globalTabsState);
         if (typeof localStorage !== 'undefined') {
             localStorage.setItem('@gitbook/tabsState', JSON.stringify(globalTabsState));
         }
         listeners.forEach((listener) => listener());
-    };
+    }, []);
     const state = React.useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
     return [state, setTabsState] as const;
 }
