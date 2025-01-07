@@ -74,10 +74,12 @@ export function Header(props: {
                             'gap-4',
                             'lg:gap-8',
                             'flex',
-                            'h-16',
                             'items-center',
                             'justify-between',
                             'w-full',
+                            'py-3',
+                            'sm:h-16',
+                            'page-no-toc:max-[400px]:flex-wrap',
                             CONTAINER_STYLE,
                         )}
                     >
@@ -94,6 +96,12 @@ export function Header(props: {
                             />
                             <HeaderLogo site={site} space={space} customization={customization} />
                         </div>
+
+                        {isMultiVariants && (
+                            <div className="hidden page-no-toc:flex">
+                                <SpacesDropdown space={space} spaces={spaces} />
+                            </div>
+                        )}
 
                         {customization.header.links.length > 0 && (
                             <HeaderLinks>
