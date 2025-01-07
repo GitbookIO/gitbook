@@ -128,7 +128,7 @@ export async function SpaceLayout(props: {
                             )
                         }
                         innerHeader={
-                            withVariants && <SpacesDropdown space={space} spaces={spaces} />
+                            withVariants && <SpacesDropdown space={space} spaces={spaces} className={tcls('w-full')} />
                         }
                         headerOffset={headerOffset}
                     />

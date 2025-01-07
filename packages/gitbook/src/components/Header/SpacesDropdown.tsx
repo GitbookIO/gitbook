@@ -10,6 +10,10 @@ export function SpacesDropdown(props: { space: Space; spaces: Space[]; className
 
     return (
         <Dropdown
+            className={tcls(
+                'group-hover/dropdown:invisible', // Prevent hover from opening the dropdown, as it's annoying in this context
+                'group-focus-within/dropdown:group-hover/dropdown:visible', // When the dropdown is already open, it should remain visible when hovered
+            )}
             button={(buttonProps) => (
                 <div
                     {...buttonProps}
@@ -18,33 +22,54 @@ export function SpacesDropdown(props: { space: Space; spaces: Space[]; className
                         'flex',
                         'flex-row',
                         'items-center',
+                        'transition-all',
+                        'hover:cursor-pointer',
+
+                        'px-3',
+                        'py-2',
                         'gap-2',
 
+                        'rounded-md',
                         'straight-corners:rounded-none',
-                        'rounded-2xl',
-                        'border-1',
-                        'shadow-[0_0_2px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.12)]',
-                        'dark:shadow-[0_1px_2px_rgba(0,0,0,0.5),0_0_1px_rgba(0,0,0,0.3)]',
-                        'hover:cursor-pointer',
+
                         'bg-light',
-                        'dark:bg-dark-3',
+                        'group-hover/dropdown:bg-light-1',
+                        'group-focus-within/dropdown:bg-light-1',
+                        'dark:bg-dark-1',
+                        'dark:group-hover/dropdown:bg-dark-3',
+                        'dark:group-focus-within/dropdown:bg-dark-3',
 
                         'text-sm',
                         'text-dark-4',
+                        'group-hover/dropdown:text-dark',
+                        'group-focus-within/dropdown:text-dark',
                         'dark:text-light-4',
+                        'dark:group-hover/dropdown:text-light',
+                        'dark:group-focus-within/dropdown:text-light',
+
+                        'ring-1',
+                        'ring-dark/2',
+                        'group-hover/dropdown:ring-dark/4',
+                        'group-focus-within/dropdown:ring-dark/4',
+                        'dark:ring-light/2',
+                        'dark:group-hover/dropdown:ring-light/4',
+                        'dark:group-focus-within/dropdown:ring-light/4',
 
                         'contrast-more:bg-light',
-                        'contrast-more:ring-1',
-                        'contrast-more:ring-dark',
-                        'dark:contrast-more:ring-light',
                         'dark:contrast-more:bg-dark',
+                        'contrast-more:ring-1',
+                        'contrast-more:group-hover/dropdown:ring-2',
+                        'contrast-more:ring-dark',
+                        'contrast-more:group-hover/dropdown:ring-dark',
+                        'contrast-more:group-focus-within/dropdown:ring-dark',
+                        'dark:contrast-more:ring-light',
+                        'dark:contrast-more:group-hover/dropdown:ring-light',
+                        'dark:contrast-more:group-focus-within/dropdown:ring-light',
 
-                        'px-3',
-                        'py-1.5',
                         className,
                     )}
                 >
-                    <span className="line-clamp-2">{space.title}</span>
+                    <span className={tcls('line-clamp-2', 'grow')}>{space.title}</span>
                     <DropdownChevron />
                 </div>
             )}
