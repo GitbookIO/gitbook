@@ -16,11 +16,7 @@ import { PagesList } from './PagesList';
 import { TOCScrollContainer } from './TOCScroller';
 import { Trademark } from './Trademark';
 
-function getTopOffset(props: {
-    sectionsHeader: boolean;
-    topHeader: boolean;
-    sidebarBackgroundFilled: boolean;
-}) {
+function getTopOffset(props: { sectionsHeader: boolean; topHeader: boolean }) {
     if (props.topHeader && props.sectionsHeader) {
         return 'lg:top-[6.75rem] lg:h-[calc(100vh_-_6.75rem)]';
     }
@@ -43,7 +39,6 @@ export function TableOfContents(props: {
     headerOffset: {
         sectionsHeader: boolean;
         topHeader: boolean;
-        sidebarBackgroundFilled: boolean;
     };
     innerHeader?: React.ReactNode; // Displayed outside the scrollable TOC, directly above the page list
 }) {
