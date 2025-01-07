@@ -77,7 +77,7 @@ export function Header(props: {
                             'items-center',
                             'justify-between',
                             'w-full',
-                            'py-3',
+                            'py-4',
                             'sm:h-16',
                             'page-no-toc:max-[400px]:flex-wrap',
                             CONTAINER_STYLE,
