@@ -2,7 +2,6 @@
 
 import { Icon } from '@gitbook/icons';
 import React from 'react';
-import { atom, useRecoilState } from 'recoil';
 
 import { Loading } from '@/components/primitives';
 import { useLanguage } from '@/intl/client';
@@ -14,9 +13,11 @@ import { tcls } from '@/lib/tailwind';
 
 import { AskAnswerResult, AskAnswerSource, streamAskQuestion } from './server-actions';
 import { useSearch, useSearchLink } from './useSearch';
+import { useTrackEvent } from '../Insights';
 import { Link } from '../primitives';
+import { useSearchAskContext } from './SearchAskContext';
 
-type SearchState =
+export type SearchAskState =
     | {
           type: 'answer';
           answer: AskAnswerResult;
@@ -29,64 +30,48 @@ type SearchState =
       };
 
 /**
-- * Store the state of the answer in a global state so that it can be
-- * accessed from anywhere to show a loading indicator.
-- */
-export const searchAskState = atom<SearchState | null>({
-    key: 'searchAskState',
-    default: null,
-});
-
-/**
  * Fetch and render the answers to a question.
  */
 export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: string }) {
     const { pointer, query } = props;
 
     const language = useLanguage();
+    const trackEvent = useTrackEvent();
     const [, setSearchState] = useSearch();
-    const [state, setState] = useRecoilState(searchAskState);
+    const [askState, setAskState] = useSearchAskContext();
     const { organizationId, siteId, siteSpaceId } = pointer;
 
     React.useEffect(() => {
         let cancelled = false;
 
-        setState({
-            type: 'loading',
-        });
+        setAskState({ type: 'loading' });
 
         (async () => {
-            const stream = iterateStreamResponse(
-                streamAskQuestion(organizationId, siteId, siteSpaceId ?? null, query),
-            );
+            trackEvent({
+                type: 'ask_question',
+                query,
+            });
 
-            setSearchState((prev) =>
-                prev
-                    ? {
-                          ...prev,
-                          ask: true,
-                          query,
-                      }
-                    : null,
-            );
+            const response = streamAskQuestion(organizationId, siteId, siteSpaceId ?? null, query);
+            const stream = iterateStreamResponse(response);
+
+            // When we pass in "ask" mode, the query could still be updated by the client
+            // we ensure that the query is up-to-date before starting the stream.
+            setSearchState((prev) => (prev ? { ...prev, query, ask: true } : null));
 
             for await (const chunk of stream) {
                 if (cancelled) {
                     return;
                 }
-                setState({
-                    type: 'answer',
-                    answer: chunk,
-                });
+
+                setAskState({ type: 'answer', answer: chunk });
             }
-        })().catch((error) => {
+        })().catch(() => {
             if (cancelled) {
                 return;
             }
 
-            setState({
-                type: 'error',
-            });
+            setAskState({ type: 'error' });
         });
 
         return () => {
@@ -96,13 +81,13 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
                 cancelled = true;
             }
         };
-    }, [organizationId, siteId, siteSpaceId, query]);
+    }, [organizationId, siteId, siteSpaceId, query, setAskState, setSearchState, trackEvent]);
 
     React.useEffect(() => {
         return () => {
-            setState(null);
+            setAskState(null);
         };
-    }, [setState]);
+    }, [setAskState]);
 
     const loading = (
         <div className={tcls('w-full', 'flex', 'items-center', 'justify-center')}>
@@ -112,15 +97,15 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
 
     return (
         <div className={tcls('max-h-[60vh]', 'overflow-y-auto')}>
-            {state?.type === 'answer' ? (
+            {askState?.type === 'answer' ? (
                 <React.Suspense fallback={loading}>
-                    <TransitionAnswerBody answer={state.answer} placeholder={loading} />
+                    <TransitionAnswerBody answer={askState.answer} placeholder={loading} />
                 </React.Suspense>
             ) : null}
-            {state?.type === 'error' ? (
+            {askState?.type === 'error' ? (
                 <div className={tcls('p-4')}>{t(language, 'search_ask_error')}</div>
             ) : null}
-            {state?.type === 'loading' ? loading : null}
+            {askState?.type === 'loading' ? loading : null}
         </div>
     );
 }

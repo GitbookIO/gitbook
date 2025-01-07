@@ -23,12 +23,12 @@ import { buildVersion } from '@/lib/build';
 import { createContentSecurityPolicyNonce, getContentSecurityPolicy } from '@/lib/csp';
 import { getURLLookupAlternatives, normalizeURL, setMiddlewareHeader } from '@/lib/middleware';
 import {
-    VisitorAuthCookieValue,
+    VisitorTokenLookup,
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
-    getVisitorAuthToken,
+    getVisitorToken,
     normalizeVisitorAuthURL,
-} from '@/lib/visitor-auth';
+} from '@/lib/visitor-token';
 
 import { waitUntil } from './lib/waitUntil';
 
@@ -44,6 +44,12 @@ type URLLookupMode =
      * This mode is useful when self-hosting a single space.
      */
     | 'single'
+    /**
+     * Mode when a site is being proxied on a different base URL.
+     * - x-gitbook-site-url is used to determine the site to serve.
+     * - host / x-forwarded-host / x-gitbook-host + x-gitbook-basepath is used to determine the base URL.
+     */
+    | 'proxy'
     /**
      * Spaces are located using the incoming URL (using forwarded host headers).
      * This mode is the default one when serving on the GitBook infrastructure.
@@ -74,13 +80,18 @@ export type LookupResult = PublishedContentWithCache & {
     apiEndpoint?: string;
     /** Cookies to store on the response */
     cookies?: LookupCookies;
+    /** Visitor authentication token */
+    visitorToken?: string;
 };
 
 /**
- * Middleware to lookup the space to render.
+ * Middleware to lookup the site to render.
  * It takes as input a request with an URL, and a set of headers:
  *   - x-gitbook-api: the API endpoint to use, if undefined, the default one is used
  *   - x-gitbook-basepath: base in the path that should be ignored for routing
+ *
+ * Once the site has been looked-up, the middleware passes the info to the rendering
+ * using a rewrite with a set of headers. This is the only way in next.js to do this (basically similar to AsyncLocalStorage).
  *
  * The middleware also takes care of persisting the visitor authentication state.
  */
@@ -106,7 +117,7 @@ export async function middleware(request: NextRequest) {
     let apiEndpoint = request.headers.get('x-gitbook-api') ?? DEFAULT_API_ENDPOINT;
     const originBasePath = request.headers.get('x-gitbook-basepath') ?? '';
 
-    const inputURL = stripURLBasePath(url, originBasePath);
+    const inputURL = mode === 'proxy' ? url : stripURLBasePath(url, originBasePath);
 
     const resolved = await withAPI(
         {
@@ -117,7 +128,7 @@ export async function middleware(request: NextRequest) {
             }),
             contextId: undefined,
         },
-        () => lookupSpaceForURL(mode, request, inputURL),
+        () => lookupSiteForURL(mode, request, inputURL),
     );
     if ('error' in resolved) {
         return new NextResponse(resolved.error.message, {
@@ -211,7 +222,10 @@ export async function middleware(request: NextRequest) {
     }
     headers.set('x-gitbook-mode', mode);
     headers.set('x-gitbook-origin-basepath', originBasePath);
-    headers.set('x-gitbook-basepath', joinPath(originBasePath, resolved.basePath));
+    headers.set(
+        'x-gitbook-basepath',
+        mode === 'proxy' ? originBasePath : joinPath(originBasePath, resolved.basePath),
+    );
     headers.set('x-gitbook-content-space', resolved.space);
     if ('site' in resolved) {
         headers.set('x-gitbook-content-organization', resolved.organization);
@@ -257,6 +271,10 @@ export async function middleware(request: NextRequest) {
         headers.set('x-gitbook-api', apiEndpoint);
     }
 
+    if (resolved.visitorToken) {
+        headers.set('x-gitbook-visitor-token', resolved.visitorToken);
+    }
+
     const target = new URL(rewritePathname, request.nextUrl.toString());
     target.search = url.search;
 
@@ -278,7 +296,11 @@ export async function middleware(request: NextRequest) {
     setMiddlewareHeader(response, 'referrer-policy', 'no-referrer-when-downgrade');
     setMiddlewareHeader(response, 'x-content-type-options', 'nosniff');
 
-    if (typeof resolved.cacheMaxAge === 'number') {
+    if (
+        typeof resolved.cacheMaxAge === 'number' &&
+        // When the request is authenticated, we don't want to cache the response on the server
+        !resolved.visitorToken
+    ) {
         const cacheControl = `public, max-age=0, s-maxage=${resolved.cacheMaxAge}, stale-if-error=0`;
 
         if (process.env.GITBOOK_OUTPUT_CACHE === 'true' && process.env.NODE_ENV !== 'development') {
@@ -288,7 +310,6 @@ export async function middleware(request: NextRequest) {
             setMiddlewareHeader(response, 'x-gitbook-cache-control', cacheControl);
         }
     }
-    // }
 
     if (resolved.cacheTags && resolved.cacheTags.length > 0) {
         const headerCacheTag = resolved.cacheTags.join(',');
@@ -302,7 +323,10 @@ export async function middleware(request: NextRequest) {
 /**
  * Compute the input URL the user is trying to access.
  */
-function getInputURL(request: NextRequest): { url: URL; mode: URLLookupMode } {
+function getInputURL(request: NextRequest): {
+    url: URL;
+    mode: URLLookupMode;
+} {
     const url = new URL(request.url);
     let mode: URLLookupMode =
         (process.env.GITBOOK_MODE as URLLookupMode | undefined) ?? 'multi-path';
@@ -332,27 +356,36 @@ function getInputURL(request: NextRequest): { url: URL; mode: URLLookupMode } {
         mode = 'multi-id';
     }
 
+    // When passing a x-gitbook-site-url header, this URL is used instead of the request URL
+    // to determine the site to serve.
+    const xGitbookSite = request.headers.get('x-gitbook-site-url');
+    if (xGitbookSite) {
+        mode = 'proxy';
+    }
+
     return { url, mode };
 }
 
-async function lookupSpaceForURL(
+async function lookupSiteForURL(
     mode: URLLookupMode,
     request: NextRequest,
     url: URL,
 ): Promise<LookupResult> {
     switch (mode) {
         case 'single': {
-            return await lookupSpaceInSingleMode(url);
+            return await lookupSiteInSingleMode(url);
         }
         case 'multi': {
-            return await lookupSpaceInMultiMode(request, url);
+            return await lookupSiteInMultiMode(request, url);
         }
         case 'multi-path': {
-            return await lookupSpaceInMultiPathMode(request, url);
+            return await lookupSiteInMultiPathMode(request, url);
         }
         case 'multi-id': {
             return await lookupSiteOrSpaceInMultiIdMode(request, url);
         }
+        case 'proxy':
+            return await lookupSiteInProxy(request, url);
         default:
             assertNever(mode);
     }
@@ -362,7 +395,7 @@ async function lookupSpaceForURL(
  * GITBOOK_MODE=single
  * When serving a single space, configured using GITBOOK_SPACE_ID and GITBOOK_TOKEN.
  */
-async function lookupSpaceInSingleMode(url: URL): Promise<LookupResult> {
+async function lookupSiteInSingleMode(url: URL): Promise<LookupResult> {
     const spaceId = process.env.GITBOOK_SPACE_ID;
     if (!spaceId) {
         throw new Error(
@@ -370,7 +403,8 @@ async function lookupSpaceInSingleMode(url: URL): Promise<LookupResult> {
         );
     }
 
-    const apiToken = getDefaultAPIToken(api().client.endpoint);
+    const apiCtx = await api();
+    const apiToken = getDefaultAPIToken(apiCtx.client.endpoint);
     if (!apiToken) {
         throw new Error(
             `Missing GITBOOK_TOKEN environment variable. It should be passed when using GITBOOK_MODE=single.`,
@@ -383,21 +417,41 @@ async function lookupSpaceInSingleMode(url: URL): Promise<LookupResult> {
         basePath: '',
         pathname: url.pathname,
         apiToken,
+        visitorToken: undefined,
     };
+}
+
+/**
+ * GITBOOK_MODE=proxy
+ * When proxying a site on a different base URL.
+ */
+async function lookupSiteInProxy(request: NextRequest, url: URL): Promise<LookupResult> {
+    const rawSiteUrl = request.headers.get('x-gitbook-site-url');
+    if (!rawSiteUrl) {
+        throw new Error(
+            `Missing x-gitbook-site-url header. It should be passed when using GITBOOK_MODE=proxy.`,
+        );
+    }
+
+    const siteUrl = new URL(rawSiteUrl);
+    siteUrl.pathname = joinPath(siteUrl.pathname, url.pathname);
+
+    return await lookupSiteInMultiMode(request, siteUrl);
 }
 
 /**
  * GITBOOK_MODE=multi
  * When serving multi spaces based on the current URL.
  */
-async function lookupSpaceInMultiMode(request: NextRequest, url: URL): Promise<LookupResult> {
-    const visitorAuthToken = getVisitorAuthToken(request, url);
-    const lookup = await lookupSpaceByAPI(url, visitorAuthToken);
+async function lookupSiteInMultiMode(request: NextRequest, url: URL): Promise<LookupResult> {
+    const visitorAuthToken = getVisitorToken(request, url);
+    const lookup = await lookupSiteByAPI(url, visitorAuthToken);
     return {
         ...lookup,
         ...('basePath' in lookup && visitorAuthToken
             ? getLookupResultForVisitorAuth(lookup.basePath, visitorAuthToken)
             : {}),
+        visitorToken: visitorAuthToken?.token,
     };
 }
 
@@ -489,8 +543,9 @@ async function lookupSiteOrSpaceInMultiIdMode(
     // invalidated when trying to preview the site with different visitor
     // attributes.
     const contextId = decoded.claims ? hash(decoded.claims) : undefined;
+    const apiCtx = await api();
     const gitbookAPI = new GitBookAPI({
-        endpoint: apiEndpoint ?? api().client.endpoint,
+        endpoint: apiEndpoint ?? apiCtx.client.endpoint,
         authToken: apiToken,
         userAgent: userAgent(),
     });
@@ -557,7 +612,7 @@ async function lookupSiteOrSpaceInMultiIdMode(
  * GITBOOK_MODE=multi-path
  * When serving multi spaces with the url passed in the path.
  */
-async function lookupSpaceInMultiPathMode(request: NextRequest, url: URL): Promise<LookupResult> {
+async function lookupSiteInMultiPathMode(request: NextRequest, url: URL): Promise<LookupResult> {
     // Skip useless requests
     if (
         url.pathname === '/favicon.ico' ||
@@ -594,9 +649,9 @@ async function lookupSpaceInMultiPathMode(request: NextRequest, url: URL): Promi
     const target = new URL(targetStr);
     target.search = url.search;
 
-    const visitorAuthToken = getVisitorAuthToken(request, target);
+    const visitorAuthToken = getVisitorToken(request, target);
 
-    const lookup = await lookupSpaceByAPI(target, visitorAuthToken);
+    const lookup = await lookupSiteByAPI(target, visitorAuthToken);
     if ('error' in lookup) {
         return lookup;
     }
@@ -625,6 +680,7 @@ async function lookupSpaceInMultiPathMode(request: NextRequest, url: URL): Promi
         ...('basePath' in lookup && visitorAuthToken
             ? getLookupResultForVisitorAuth(lookup.basePath, visitorAuthToken)
             : {}),
+        visitorToken: visitorAuthToken?.token,
     };
 }
 
@@ -632,9 +688,9 @@ async function lookupSpaceInMultiPathMode(request: NextRequest, url: URL): Promi
  * Lookup a space by its URL using the GitBook API.
  * To optimize caching, we try multiple lookup alternatives and return the first one that matches.
  */
-async function lookupSpaceByAPI(
+async function lookupSiteByAPI(
     lookupURL: URL,
-    visitorAuthToken: ReturnType<typeof getVisitorAuthToken>,
+    visitorTokenLookup: VisitorTokenLookup,
 ): Promise<LookupResult> {
     const url = stripURLSearch(lookupURL);
     const lookup = getURLLookupAlternatives(url);
@@ -643,14 +699,16 @@ async function lookupSpaceByAPI(
         `lookup content for url "${url.toString()}", with ${lookup.urls.length} alternatives`,
     );
 
+    // When the visitor auth token is pulled from the cookie, set redirectOnError when calling getPublishedContentByUrl to allow
+    // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
+    // For example when the VA backend signature has changed but the token stored in the cookie is not yet expired.
+    const redirectOnError = visitorTokenLookup?.source === 'visitor-auth-cookie';
+
     const result = await race(lookup.urls, async (alternative, { signal }) => {
         const data = await getPublishedContentByUrl(
             alternative.url,
-            typeof visitorAuthToken === 'undefined'
-                ? undefined
-                : typeof visitorAuthToken === 'string'
-                  ? visitorAuthToken
-                  : visitorAuthToken.token,
+            visitorTokenLookup?.token,
+            redirectOnError || undefined,
             {
                 signal,
             },
@@ -747,7 +805,7 @@ async function lookupSpaceByAPI(
  */
 function getLookupResultForVisitorAuth(
     basePath: string,
-    visitorAuthToken: string | VisitorAuthCookieValue,
+    visitorTokenLookup: VisitorTokenLookup,
 ): Partial<LookupResult> {
     return {
         // No caching for content served with visitor auth
@@ -755,19 +813,17 @@ function getLookupResultForVisitorAuth(
         cacheTags: [],
         cookies: {
             /**
-             * If the visitorAuthToken has been retrieved from a cookie, we set it back only
-             * if the basePath matches the current one. This is to avoid setting cookie for
-             * different base paths.
+             * If the visitor token has been retrieve from the URL, or if its a VA cookie and the basePath is the same, set it
+             * as a cookie on the response.
+             *
+             * Note that we do not re-store the gitbook-visitor-cookie in another cookie, to maintain a single source of truth.
              */
-            ...(typeof visitorAuthToken === 'string' || visitorAuthToken.basePath === basePath
+            ...(visitorTokenLookup?.source === 'url' ||
+            (visitorTokenLookup?.source === 'visitor-auth-cookie' &&
+                visitorTokenLookup.basePath === basePath)
                 ? {
                       [getVisitorAuthCookieName(basePath)]: {
-                          value: getVisitorAuthCookieValue(
-                              basePath,
-                              typeof visitorAuthToken === 'string'
-                                  ? visitorAuthToken
-                                  : visitorAuthToken.token,
-                          ),
+                          value: getVisitorAuthCookieValue(basePath, visitorTokenLookup.token),
                           options: {
                               httpOnly: true,
                               sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,

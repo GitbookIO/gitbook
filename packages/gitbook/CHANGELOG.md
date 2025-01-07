@@ -1,5 +1,45 @@
 # gitbook
 
+## 0.5.0
+
+### Minor Changes
+
+-   57cdd25: GitBook Open now supports Ask AI in sites. When asking a question to Ask AI, GitBook will use context from across your site sections and variants to provide the best answer.
+-   ca134c8: Fix an issue where the active site section indicator appeared above any dropdowns.
+-   d48926e: Fix an issue where the space dropdown was shown under the site sections in Safari.
+-   9fe8142: Fix an issue where Ask AI was erroring due to an object being passed as a param.
+-   d843e5e: Fix an issue where the space dropdown could appear behind the header.
+-   a2e5647: Fix the styling of site section tabs on smaller screens.
+
+### Patch Changes
+
+-   076dc48: Fix expandable block anchore resolution
+-   d9bb9f9: Fix an issue with the cookie banner buttons being non responsive
+-   23584c9: Update the site header with new styling, a new search button, and refactored layout
+-   664debc: Add support for tint color
+-   4d56f11: Update styling of search+ask modal
+-   061c0c1: Fix a regression in variant drop-down caused by missing z-index.
+-   2f76712: Add breadcrumbs above page title
+-   07cf835: Add scroll margin to the top when there are sections
+-   5d72b35: Smoother tab transition for sections
+-   7c71363: Don't adjust fallback font for mono font.
+-   7675c2c: Optimize performances by using new API endpoint for fetching site data.
+-   87eea73: Fix margin and image resolution of header logo
+-   aa2ed0f: Restyle hint blocks
+-   ffd3937: Fix security issue with image resizing that could be used for phishing
+-   2ce59d7: Fix - whitespace added to site section tabs with icons.
+-   c73e07d: Increase token max length to fix code not highlighted
+-   3b3d6e2: Add icons to sections
+-   1ed18c0: style: adds missing scalar css variables
+-   Updated dependencies [b7a5106]
+-   Updated dependencies [4771c78]
+-   Updated dependencies [ff50ac2]
+-   Updated dependencies [867481c]
+-   Updated dependencies [7ba67fd]
+-   Updated dependencies [a78c1ec]
+    -   @gitbook/cache-do@0.1.1
+    -   @gitbook/react-openapi@0.7.1
+
 ## 0.4.0
 
 ### Minor Changes

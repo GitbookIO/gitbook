@@ -9,7 +9,7 @@ import { getSiteContentPointer } from '@/lib/pointer';
 export default async function SiteRootLayout(props: { children: React.ReactNode }) {
     const { children } = props;
 
-    const pointer = getSiteContentPointer();
+    const pointer = await getSiteContentPointer();
     const { customization } = await getSiteData(pointer);
 
     return (

@@ -11,17 +11,17 @@ import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import { ContentTarget, SiteContentPointer, api } from '@/lib/api';
 import { hasFullWidthBlock, isNodeEmpty } from '@/lib/document';
+import { AncestorRevisionPage } from '@/lib/pages';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
-import { shouldTrackPageViews } from '@/lib/tracking';
 
 import { PageBodyBlankslate } from './PageBodyBlankslate';
 import { PageCover } from './PageCover';
 import { PageFooterNavigation } from './PageFooterNavigation';
 import { PageHeader } from './PageHeader';
 import { PreservePageLayout } from './PreservePageLayout';
-import { TrackPageView } from './TrackPageView';
 import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
+import { TrackPageViewEvent } from '../Insights';
 import { PageFeedbackForm } from '../PageFeedback';
 import { DateRelative } from '../primitives';
 
@@ -31,17 +31,18 @@ export function PageBody(props: {
     contentTarget: ContentTarget;
     customization: CustomizationSettings | SiteCustomizationSettings;
     page: RevisionPageDocument;
+    ancestors: AncestorRevisionPage[];
     document: JSONDocument | null;
     context: ContentRefContext;
     withPageFeedback: boolean;
 }) {
     const {
         space,
-        pointer,
         contentTarget,
         customization,
         context,
         page,
+        ancestors,
         document,
         withPageFeedback,
     } = props;
@@ -79,7 +80,7 @@ export function PageBody(props: {
                     <PageCover as="hero" page={page} cover={page.cover} context={context} />
                 ) : null}
 
-                <PageHeader page={page} pages={context.pages} />
+                <PageHeader page={page} ancestors={ancestors} pages={context.pages} />
                 {document && !isNodeEmpty(document) ? (
                     <React.Suspense
                         fallback={
@@ -143,14 +144,8 @@ export function PageBody(props: {
                     ) : null}
                 </div>
             </main>
-            {shouldTrackPageViews() ? (
-                <TrackPageView
-                    sitePointer={pointer}
-                    spaceId={space.id}
-                    pageId={page.id}
-                    apiHost={api().client.endpoint}
-                />
-            ) : null}
+
+            <TrackPageViewEvent pageId={page.id} revisionId={space.revision} />
         </>
     );
 }

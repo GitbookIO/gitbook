@@ -1,5 +1,4 @@
 import {
-    Collection,
     CustomizationHeaderPreset,
     CustomizationSettings,
     Site,
@@ -7,9 +6,8 @@ import {
     Space,
 } from '@gitbook/api';
 
-import { HeaderMobileMenu } from '@/components/Header/HeaderMobileMenu';
 import { Image } from '@/components/utils';
-import { absoluteHref } from '@/lib/links';
+import { getAbsoluteHref } from '@/lib/links';
 import { tcls } from '@/lib/tailwind';
 import { getContentTitle } from '@/lib/utils';
 
@@ -26,12 +24,13 @@ interface HeaderLogoProps {
  * Render the logo for a space using the customization settings.
  */
 
-export function HeaderLogo(props: HeaderLogoProps) {
+export async function HeaderLogo(props: HeaderLogoProps) {
     const { customization } = props;
+    const href = await getAbsoluteHref('');
 
     return (
         <Link
-            href={absoluteHref('')}
+            href={href}
             className={tcls('group/headerlogo', 'min-w-0', 'shrink', 'flex', 'items-center')}
         >
             {customization.header.logo ? (
@@ -50,10 +49,10 @@ export function HeaderLogo(props: HeaderLogoProps) {
                     sizes={[
                         {
                             media: '(max-width: 1024px)',
-                            width: 128,
+                            width: 160,
                         },
                         {
-                            width: 192,
+                            width: 260,
                         },
                     ]}
                     priority="high"
@@ -61,13 +60,14 @@ export function HeaderLogo(props: HeaderLogoProps) {
                         'rounded',
                         'straight-corners:rounded-sm',
                         'overflow-hidden',
-                        'object-contain',
-                        'object-left',
-                        'min-w-20',
+                        'shrink',
+                        'min-w-0',
                         'max-w-40',
                         'lg:max-w-64',
                         'max-h-10',
                         'lg:max-h-12',
+                        'h-full',
+                        'w-auto',
                     )}
                 />
             ) : (

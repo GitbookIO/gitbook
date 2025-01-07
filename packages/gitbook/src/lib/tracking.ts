@@ -1,14 +1,15 @@
 import { headers } from 'next/headers';
 
 /**
- * Return true if a space track page views.
+ * Return true if events should be tracked on the site.
  */
-export function shouldTrackPageViews(): boolean {
-    const headerSet = headers();
+export async function shouldTrackEvents(): Promise<boolean> {
+    const headersList = await headers();
 
     if (
-        process.env.GITBOOK_BLOCK_PAGE_VIEWS_TRACKING &&
-        !headerSet.has('x-gitbook-track-page-views')
+        process.env.NODE_ENV === 'development' ||
+        (process.env.GITBOOK_BLOCK_PAGE_VIEWS_TRACKING &&
+            !headersList.has('x-gitbook-track-page-views'))
     ) {
         return false;
     }

@@ -38,6 +38,8 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
                 '[&:is(h2)>div]:mt-0',
                 '[&:is(h3)>div]:mt-0',
                 '[&:is(h4)>div]:mt-0',
+                // Override the "mx-auto" class from UnwrappedBlocks
+                'mx-0',
             )}
             style="space-y-2 flex flex-col flex-1"
         />
@@ -135,7 +137,7 @@ function ListItemPrefix(props: { block: DocumentBlockListItem; children: React.R
             className={tcls(
                 textStyle.textSize,
                 textStyle.lineHeight,
-                'flex items-center justify-center mr-1 min-h-[1lh] min-w-6 text-dark/6 dark:text-light/5',
+                'flex items-center justify-center mr-1 min-h-[1lh] min-w-6 text-dark-4 dark:text-light-4',
             )}
         >
             {props.children}

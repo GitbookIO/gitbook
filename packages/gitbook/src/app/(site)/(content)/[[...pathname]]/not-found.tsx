@@ -1,11 +1,15 @@
+import { TrackPageViewEvent } from '@/components/Insights';
 import { getSpaceLanguage, t } from '@/intl/server';
-import { getSiteData } from '@/lib/api';
+import { getSiteData, getSpaceContentData } from '@/lib/api';
 import { getSiteContentPointer } from '@/lib/pointer';
 import { tcls } from '@/lib/tailwind';
 
 export default async function NotFound() {
-    const pointer = getSiteContentPointer();
-    const { customization } = await getSiteData(pointer);
+    const pointer = await getSiteContentPointer();
+    const [{ space }, { customization }] = await Promise.all([
+        getSpaceContentData(pointer, pointer.siteShareKey),
+        getSiteData(pointer),
+    ]);
 
     const language = getSpaceLanguage(customization);
 
@@ -19,6 +23,9 @@ export default async function NotFound() {
                 </h2>
                 <p className={tcls('text-base', 'mb-4')}>{t(language, 'notfound')}</p>
             </div>
+
+            {/* Track the page not found as a page view */}
+            <TrackPageViewEvent pageId={null} revisionId={space.revision} />
         </div>
     );
 }

@@ -1,6 +1,7 @@
 import {
     CustomizationHeaderPreset,
     CustomizationSettings,
+    CustomizationSidebarBackgroundStyle,
     Revision,
     RevisionPageDocument,
     RevisionPageGroup,
@@ -11,21 +12,25 @@ import {
 import React from 'react';
 
 import { Footer } from '@/components/Footer';
-import { CompactHeader, Header } from '@/components/Header';
+import { Header, HeaderLogo } from '@/components/Header';
 import { CONTAINER_STYLE } from '@/components/layout';
-import { ColorDebugger } from '@/components/primitives/ColorDebugger';
-import { SearchModal } from '@/components/Search';
+import { SearchButton, SearchModal } from '@/components/Search';
 import { TableOfContents } from '@/components/TableOfContents';
-import { ContentTarget, type SectionsList, SiteContentPointer } from '@/lib/api';
+import { getSpaceLanguage } from '@/intl/server';
+import { t } from '@/intl/translate';
+import { api, ContentTarget, type SectionsList, SiteContentPointer } from '@/lib/api';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
+import { shouldTrackEvents } from '@/lib/tracking';
+import { getCurrentVisitorToken } from '@/lib/visitor-token';
 
 import { SpacesDropdown } from '../Header/SpacesDropdown';
+import { InsightsProvider } from '../Insights';
 
 /**
  * Render the entire content of the space (header, table of contents, footer, and page content).
  */
-export function SpaceLayout(props: {
+export async function SpaceLayout(props: {
     content: SiteContentPointer;
     contentTarget: ContentTarget;
     space: Space;
@@ -61,14 +66,18 @@ export function SpaceLayout(props: {
 
     const withSections = Boolean(sections && sections.list.length > 0);
     const withVariants = Boolean(site && spaces.length > 1);
-    const headerOffset = {
-        sectionsHeader: withSections,
-        topHeader: withTopHeader,
-    };
+    const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
+    const apiHost = (await api()).client.endpoint;
+    const visitorAuthToken = await getCurrentVisitorToken();
+    const enabled = await shouldTrackEvents();
 
     return (
-        <>
-            {/* <ColorDebugger /> */}
+        <InsightsProvider
+            enabled={enabled}
+            apiHost={apiHost}
+            visitorAuthToken={visitorAuthToken}
+            {...content}
+        >
             <Header
                 withTopHeader={withTopHeader}
                 space={space}
@@ -100,12 +109,22 @@ export function SpaceLayout(props: {
                         context={contentRefContext}
                         header={
                             withTopHeader ? null : (
-                                <CompactHeader
-                                    space={space}
-                                    site={site}
-                                    spaces={spaces}
-                                    customization={customization}
-                                />
+                                <div
+                                    className={tcls(
+                                        'hidden',
+                                        'pr-4',
+                                        'lg:flex',
+                                        'flex-grow-0',
+                                        'flex-wrap',
+                                        'dark:shadow-light/1',
+                                    )}
+                                >
+                                    <HeaderLogo
+                                        site={site}
+                                        space={space}
+                                        customization={customization}
+                                    />
+                                </div>
                             )
                         }
                         innerHeader={
@@ -134,6 +153,6 @@ export function SpaceLayout(props: {
                     pointer={content}
                 />
             </React.Suspense>
-        </>
+        </InsightsProvider>
     );
 }

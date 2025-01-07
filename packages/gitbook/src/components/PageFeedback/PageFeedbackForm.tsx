@@ -5,9 +5,9 @@ import React from 'react';
 
 import { useLanguage } from '@/intl/client';
 import { t, tString } from '@/intl/translate';
-import { getVisitorId } from '@/lib/analytics';
 import { tcls } from '@/lib/tailwind';
 
+import { getVisitorId, useTrackEvent } from '../Insights';
 import { postPageFeedback } from './server-actions';
 
 /**
@@ -20,12 +20,20 @@ export function PageFeedbackForm(props: {
 }) {
     const { orientation = 'vertical', pageId, className } = props;
     const languages = useLanguage();
+    const trackEvent = useTrackEvent();
     const [submitted, setSubmitted] = React.useState(false);
 
     const onSubmit = async (rating: PageFeedbackRating) => {
         setSubmitted(true);
         const visitorId = await getVisitorId();
         await postPageFeedback({ pageId, visitorId, rating });
+
+        trackEvent({
+            type: 'page_post_feedback',
+            feedback: {
+                rating,
+            },
+        });
     };
 
     return (
@@ -39,9 +47,7 @@ export function PageFeedbackForm(props: {
                 className,
             )}
         >
-            <p className={tcls('text-sm', 'text-dark/6', 'dark:text-light/5')}>
-                {t(languages, 'was_this_helpful')}
-            </p>
+            <p className={tcls('text-sm')}>{t(languages, 'was_this_helpful')}</p>
             <div
                 className={tcls(
                     'inline-flex',
@@ -58,7 +64,7 @@ export function PageFeedbackForm(props: {
                 )}
             >
                 {submitted ? (
-                    <p className={tcls('text-sm', 'px-4', 'text-dark/7', 'dark:text-light/6')}>
+                    <p className={tcls('text-sm', 'px-4')}>
                         {t(languages, 'was_this_helpful_thank_you')}
                     </p>
                 ) : (
@@ -109,10 +115,10 @@ function RatingButton(props: { rating: number; label: string; onClick: () => voi
                 'h-8',
                 'w-8',
                 'rounded-sm',
-                'text-dark/6',
+                'text-dark/7',
                 'hover:bg-primary/4',
                 'hover:text-primary-600',
-                'dark:text-light/5',
+                'dark:text-light/7',
                 'dark:hover:text-primary-300',
                 'dark:hover:bg-primary-300/2',
             )}

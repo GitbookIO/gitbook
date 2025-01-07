@@ -40,7 +40,7 @@ interface FetchPlaceholderAdOptions {
 export async function renderAd(options: FetchAdOptions) {
     const mode = options.source === 'live' ? options.mode : 'classic';
 
-    const result = options.source === 'live' ? await fetchAd(options) : getPlaceholderAd();
+    const result = options.source === 'live' ? await fetchAd(options) : await getPlaceholderAd();
     if (!result || !result.ad.description || !result.ad.statlink) {
         return null;
     }
@@ -64,7 +64,7 @@ async function fetchAd({
     placement,
     ignore,
 }: FetchLiveAdOptions): Promise<{ ad: AdItem; ip: string } | null> {
-    const { ip, userAgent } = getUserAgentAndIp();
+    const { ip, userAgent } = await getUserAgentAndIp();
 
     const url = new URL(`https://srv.buysellads.com/ads/${zoneId}.json`);
     url.searchParams.set('segment', `placement:${placement}`);
@@ -86,8 +86,8 @@ async function fetchAd({
     return null;
 }
 
-function getPlaceholderAd(): { ad: AdItem; ip: string } {
-    const { ip } = getUserAgentAndIp();
+async function getPlaceholderAd(): Promise<{ ad: AdItem; ip: string }> {
+    const { ip } = await getUserAgentAndIp();
 
     return {
         ad: {
@@ -119,8 +119,8 @@ function getPlaceholderAd(): { ad: AdItem; ip: string } {
     };
 }
 
-function getUserAgentAndIp() {
-    const headersSet = headers();
+async function getUserAgentAndIp() {
+    const headersSet = await headers();
     const ip =
         headersSet.get('x-gitbook-ipv4') ??
         headersSet.get('x-gitbook-ip') ??

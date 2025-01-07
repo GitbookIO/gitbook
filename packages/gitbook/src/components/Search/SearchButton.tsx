@@ -8,6 +8,7 @@ import { useLanguage, tString } from '@/intl/client';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { useSearch } from './useSearch';
+import { useTrackEvent } from '../Insights';
 
 /**
  * Button to open the search modal.
@@ -17,12 +18,17 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
 
     const language = useLanguage();
     const [, setSearchState] = useSearch();
+    const trackEvent = useTrackEvent();
 
     const onClick = () => {
         setSearchState({
             ask: false,
             global: false,
             query: '',
+        });
+
+        trackEvent({
+            type: 'search_open',
         });
     };
 
@@ -41,8 +47,8 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'py-2',
                 'gap-2',
 
-                'bg-light',
-                'dark:bg-dark',
+                'bg-light-1',
+                'dark:bg-dark-1',
 
                 'ring-1',
                 'ring-dark/1',
@@ -52,8 +58,8 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'shadow-dark/4',
                 'dark:shadow-none',
 
-                'text-dark/6',
-                'dark:text-light/6',
+                'text-dark/7',
+                'dark:text-light-4/7',
 
                 'rounded-lg',
                 'straight-corners:rounded-sm',
@@ -128,11 +134,11 @@ const Shortcut = () => {
                 'md:inline',
                 'justify-end',
                 'text-xs',
-                'text-dark/6',
+                'text-dark/7',
                 'contrast-more:text-dark',
-                'dark:text-light/6',
-                'whitespace-nowrap',
+                'dark:text-light-4/7',
                 'contrast-more:dark:text-light',
+                'whitespace-nowrap',
                 `[font-feature-settings:"calt",_"case"]`,
             )}
         >

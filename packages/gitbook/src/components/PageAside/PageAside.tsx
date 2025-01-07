@@ -13,7 +13,7 @@ import urlJoin from 'url-join';
 
 import { t, getSpaceLanguage } from '@/intl/server';
 import { getDocumentSections } from '@/lib/document';
-import { absoluteHref } from '@/lib/links';
+import { getAbsoluteHref } from '@/lib/links';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { getPDFUrlSearchParams } from '@/lib/urls';
@@ -23,19 +23,21 @@ import { Ad } from '../Ads';
 import { PageFeedbackForm } from '../PageFeedback';
 
 function getTopOffset(props: { sectionsHeader: boolean; topHeader: boolean }) {
-    if (props.sectionsHeader && props.topHeader) {
-        return 'lg:max-h-[calc(100vh_-_8rem)] top-32 page-api-block:xl:max-2xl:top-32';
+    if (props.topHeader && props.sectionsHeader) {
+        return 'lg:top-[6.75rem] lg:max-h-[calc(100vh_-_6.75rem)]';
     }
-    if (props.sectionsHeader || props.topHeader) {
-        return 'lg:max-h-[calc(100vh_-_4rem)] top-16 page-api-block:xl:max-2xl:top-16';
+
+    if (props.topHeader) {
+        return 'lg:top-16 lg:max-h-[calc(100vh_-_3rem)]';
     }
-    return 'lg:max-h-screen top-0 page-api-block:xl:max-2xl:top-0';
+
+    return 'lg:top-0 lg:max-h-screen';
 }
 
 /**
  * Aside listing the headings in the document.
  */
-export function PageAside(props: {
+export async function PageAside(props: {
     space: Space;
     site: Site | undefined;
     customization: CustomizationSettings | SiteCustomizationSettings;
@@ -59,6 +61,12 @@ export function PageAside(props: {
     const language = getSpaceLanguage(customization);
 
     const topOffset = getTopOffset(withHeaderOffset);
+    const pdfHref = await getAbsoluteHref(
+        `~gitbook/pdf?${getPDFUrlSearchParams({
+            page: page.id,
+            only: true,
+        }).toString()}`,
+    );
     return (
         <aside
             className={tcls(
@@ -70,22 +78,32 @@ export function PageAside(props: {
                 'grow-0',
                 'shrink-0',
                 'sticky',
-                'py-8',
                 'break-anywhere', // To prevent long words in headings from breaking the layout
-                'lg:h-full',
-                'h-[100vh]',
-                'page-api-block:xl:max-2xl:z-[1]',
+
+                'text-dark/7',
+                'dark:text-light/7',
+                'contrast-more:text-dark',
+                'contrast-more:dark:text-light',
+
                 // When in api page mode, we display it as an overlay on non-large resolutions
-                'page-api-block:xl:max-2xl:backdrop-blur-md',
+                'page-api-block:xl:max-2xl:z-10',
                 'page-api-block:xl:max-2xl:fixed',
                 'page-api-block:xl:max-2xl:right-8',
                 'page-api-block:xl:max-2xl:w-56',
-                'page-api-block:xl:max-2xl:bg-light-2/9',
-                'page-api-block:xl:max-2xl:rounded',
+                'page-api-block:xl:max-2xl:bg-light-2',
+                'page-api-block:xl:max-2xl:bg-opacity-9',
+                'page-api-block:xl:max-2xl:contrast-more:bg-opacity-11',
+                'page-api-block:xl:max-2xl:backdrop-blur-lg',
+                'page-api-block:xl:max-2xl:border',
+                'page-api-block:xl:max-2xl:border-dark/2',
+                'page-api-block:xl:max-2xl:dark:border-light/2',
+                'page-api-block:xl:max-2xl:hover:shadow-lg',
+                'page-api-block:xl:max-2xl:hover:shadow-dark/2',
+                'page-api-block:xl:max-2xl:rounded-md',
                 'page-api-block:xl:max-2xl:h-auto',
-                'page-api-block:xl:max-2xl:py-0',
-                'page-api-block:xl:max-2xl:mt-3',
+                'page-api-block:xl:max-2xl:my-8',
                 'dark:page-api-block:xl:max-2xl:bg-dark-2/8',
+
                 topOffset,
             )}
         >
@@ -93,17 +111,28 @@ export function PageAside(props: {
                 className={tcls(
                     'hidden',
                     'page-api-block:xl:max-2xl:flex',
+                    'text-xs',
+                    'tracking-wide',
+                    'font-semibold',
+                    'uppercase',
+
                     'flex-row',
                     'items-center',
-                    'gap-3',
-                    'text-sm',
-                    'font-semibold',
-                    'px-2',
-                    'py-2',
+                    'gap-2',
+                    'p-2',
                 )}
             >
-                <Icon icon="bars" className={tcls('size-3')} />
+                <Icon icon="block-quote" className={tcls('size-3')} />
                 {t(language, 'on_this_page')}
+                <Icon
+                    icon="chevron-down"
+                    className={tcls(
+                        'size-3',
+                        'opacity-6',
+                        'ml-auto',
+                        'page-api-block:xl:max-2xl:group-hover/aside:hidden',
+                    )}
+                />
             </div>
             <div
                 className={tcls(
@@ -111,10 +140,12 @@ export function PageAside(props: {
                     'flex-1',
                     'flex',
                     'flex-col',
-                    'gap-4',
+                    'gap-6',
+                    'py-8',
                     '[&::-webkit-scrollbar]:bg-transparent',
                     '[&::-webkit-scrollbar-thumb]:bg-transparent',
 
+                    'page-api-block:xl:max-2xl:py-0',
                     // Hide it for api page, until hovered
                     'page-api-block:xl:max-2xl:hidden',
                     'page-api-block:xl:max-2xl:group-hover/aside:flex',
@@ -126,7 +157,19 @@ export function PageAside(props: {
                     </React.Suspense>
                 ) : null}
                 <div
-                    className={tcls('flex', 'flex-col', 'gap-3', 'page-api-block:xl:max-2xl:px-3')}
+                    className={tcls(
+                        'flex',
+                        'flex-col',
+                        'gap-3',
+                        'sidebar-list-default:px-3',
+                        'border-t',
+                        'first:border-none',
+                        'border-dark/2',
+                        'dark:border-light/2',
+                        'py-4',
+                        'first:pt-0',
+                        'page-api-block:xl:max-2xl:px-3',
+                    )}
                 >
                     {withPageFeedback ? (
                         <React.Suspense fallback={null}>
@@ -142,10 +185,8 @@ export function PageAside(props: {
                                     'flex-row',
                                     'items-center',
                                     'text-sm',
-                                    'text-dark/6',
                                     'hover:text-primary',
                                     'py-2',
-                                    'dark:text-light/5',
                                 )}
                             >
                                 <Icon
@@ -163,21 +204,14 @@ export function PageAside(props: {
                     {customization.pdf.enabled ? (
                         <div>
                             <a
-                                href={absoluteHref(
-                                    `~gitbook/pdf?${getPDFUrlSearchParams({
-                                        page: page.id,
-                                        only: true,
-                                    }).toString()}`,
-                                )}
+                                href={pdfHref}
                                 className={tcls(
                                     'flex',
                                     'flex-row',
                                     'items-center',
                                     'text-sm',
-                                    'text-dark/6',
                                     'hover:text-primary',
                                     'py-2',
-                                    'dark:text-light/5',
                                 )}
                             >
                                 <Icon icon="file-pdf" className={tcls('size-4', 'mr-1.5')} />
@@ -195,7 +229,7 @@ export function PageAside(props: {
                 spaceId={space.id}
                 siteAdsStatus={site?.ads && site.ads.status ? site.ads.status : undefined}
                 ignore={process.env.NODE_ENV !== 'production'}
-                style={tcls('mt-4')}
+                style={tcls(site?.ads && site.ads.status === SiteAdsStatus.Live && ['mt-4'])}
             />
         </aside>
     );

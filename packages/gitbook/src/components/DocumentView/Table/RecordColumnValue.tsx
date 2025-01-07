@@ -1,4 +1,4 @@
-import { ContentRef, DocumentBlockTable } from '@gitbook/api';
+import { ContentRef, ContentRefUser, DocumentBlockTable } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import assertNever from 'assert-never';
 
@@ -148,6 +148,17 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                 href={ref.href}
                                 target="_blank"
                                 style={['flex', 'flex-row', 'items-center', 'gap-2']}
+                                insights={
+                                    ref.file
+                                        ? {
+                                              target: {
+                                                  kind: 'file',
+                                                  file: ref.file.id,
+                                              },
+                                              position: 'content',
+                                          }
+                                        : undefined
+                                }
                             >
                                 {contentType === 'image' ? (
                                     <Image
@@ -178,8 +189,9 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                 </Tag>
             );
         case 'content-ref': {
-            const resolved = value
-                ? await context.resolveContentRef(value as ContentRef, {
+            const contentRef = value ? (value as ContentRef) : null;
+            const resolved = contentRef
+                ? await context.resolveContentRef(contentRef, {
                       resolveAnchorText: true,
                       iconStyle: ['mr-2', 'text-dark/6', 'dark:text-light/6'],
                   })
@@ -191,26 +203,51 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                 >
                     {resolved?.icon ?? null}
                     {resolved ? (
-                        <StyledLink href={resolved.href}>{resolved.text}</StyledLink>
+                        <StyledLink
+                            href={resolved.href}
+                            insights={
+                                contentRef
+                                    ? {
+                                          target: contentRef,
+                                          position: 'content',
+                                      }
+                                    : undefined
+                            }
+                        >
+                            {resolved.text}
+                        </StyledLink>
                     ) : null}
                 </Tag>
             );
         }
         case 'users': {
             const resolved = await Promise.all(
-                (value as string[]).map((userId) =>
-                    context.resolveContentRef({
+                (value as string[]).map(async (userId) => {
+                    const contentRef: ContentRefUser = {
                         kind: 'user',
                         user: userId,
-                    }),
-                ),
+                    };
+                    const resolved = await context.resolveContentRef(contentRef);
+                    if (!resolved) {
+                        return null;
+                    }
+
+                    return [contentRef, resolved] as const;
+                }),
             );
 
             return (
                 <Tag className={tcls('text-base')} aria-labelledby={ariaLabelledBy}>
-                    {resolved.filter(filterOutNullable).map((file, index) => (
-                        <StyledLink key={index} href={file.href}>
-                            {file.text}
+                    {resolved.filter(filterOutNullable).map(([contentRef, resolved], index) => (
+                        <StyledLink
+                            key={index}
+                            href={resolved.href}
+                            insights={{
+                                target: contentRef,
+                                position: 'content',
+                            }}
+                        >
+                            {resolved.text}
                         </StyledLink>
                     ))}
                 </Tag>

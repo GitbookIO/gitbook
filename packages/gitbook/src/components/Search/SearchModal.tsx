@@ -3,18 +3,18 @@
 import { Icon } from '@gitbook/icons';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { useRecoilValue } from 'recoil';
 
 import { tString, useLanguage } from '@/intl/client';
 import { SiteContentPointer } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
-import { SearchAskAnswer, searchAskState } from './SearchAskAnswer';
+import { SearchAskAnswer } from './SearchAskAnswer';
+import { SearchAskProvider, useSearchAskState } from './SearchAskContext';
 import { SearchResults, SearchResultsRef } from './SearchResults';
 import { SearchScopeToggle } from './SearchScopeToggle';
-import { SearchState, useSearch } from './useSearch';
+import { SearchState, UpdateSearchState, useSearch } from './useSearch';
 import { LoadingPane } from '../primitives/LoadingPane';
 
 interface SearchModalProps {
@@ -31,7 +31,8 @@ interface SearchModalProps {
  */
 export function SearchModal(props: SearchModalProps) {
     const [state, setSearchState] = useSearch();
-    const askState = useRecoilValue(searchAskState);
+    const searchAsk = useSearchAskState();
+    const [askState] = searchAsk;
     const router = useRouter();
 
     useHotkeys(
@@ -55,14 +56,6 @@ export function SearchModal(props: SearchModalProps) {
         };
     }, [isSearchOpened]);
 
-    // if (state === null) {
-    //     return null;
-    // }
-
-    const onChangeQuery = (newQuery: SearchState) => {
-        setSearchState(newQuery);
-    };
-
     const onClose = async (to?: string) => {
         await setSearchState(null);
         if (to) {
@@ -71,82 +64,84 @@ export function SearchModal(props: SearchModalProps) {
     };
 
     return (
-        <AnimatePresence>
-            {state !== null ? (
-                <motion.div
-                    initial={{
-                        opacity: 0,
-                    }}
-                    animate={{
-                        opacity: 1,
-                    }}
-                    exit={{
-                        opacity: 0,
-                    }}
-                    transition={{
-                        duration: 0.2,
-                        delay: 0.1,
-                    }}
-                    role="dialog"
-                    className={tcls(
-                        'fixed',
-                        'inset-0',
-                        'bg-dark/4',
-                        'backdrop-blur-2xl',
-                        'z-30',
-                        'px-4',
-                        'pt-4',
-                        'dark:bg-dark/8',
-                        'md:pt-[min(8vh,6rem)]',
-                    )}
-                    onClick={() => {
-                        onClose();
-                    }}
-                >
-                    <div className="scroll-nojump">
-                        <AnimatePresence>
-                            {askState?.type === 'loading' ? (
-                                <motion.div
-                                    key="loading"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 1 }}
-                                    className={tcls(
-                                        'w-screen',
-                                        'h-screen',
-                                        'fixed',
-                                        'inset-0',
-                                        'z-10',
-                                        'pointer-events-none',
-                                    )}
-                                >
-                                    <LoadingPane
-                                        gridStyle={['h-screen', 'aspect-auto', 'top-[-30%]']}
-                                        pulse
-                                        tile={96}
-                                        style={['grid']}
-                                    />
-                                </motion.div>
-                            ) : null}
-                        </AnimatePresence>
-                        <SearchModalBody
-                            {...props}
-                            state={state}
-                            onChangeQuery={onChangeQuery}
-                            onClose={onClose}
-                        />
-                    </div>
-                </motion.div>
-            ) : null}
-        </AnimatePresence>
+        <SearchAskProvider value={searchAsk}>
+            <AnimatePresence>
+                {state !== null ? (
+                    <motion.div
+                        initial={{
+                            opacity: 0,
+                        }}
+                        animate={{
+                            opacity: 1,
+                        }}
+                        exit={{
+                            opacity: 0,
+                        }}
+                        transition={{
+                            duration: 0.2,
+                            delay: 0.1,
+                        }}
+                        role="dialog"
+                        className={tcls(
+                            'fixed',
+                            'inset-0',
+                            'bg-dark/4',
+                            'backdrop-blur-2xl',
+                            'z-30',
+                            'px-4',
+                            'pt-4',
+                            'dark:bg-dark/8',
+                            'md:pt-[min(8vh,6rem)]',
+                        )}
+                        onClick={() => {
+                            onClose();
+                        }}
+                    >
+                        <div className="scroll-nojump">
+                            <AnimatePresence>
+                                {askState?.type === 'loading' ? (
+                                    <motion.div
+                                        key="loading"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        transition={{ duration: 1 }}
+                                        className={tcls(
+                                            'w-screen',
+                                            'h-screen',
+                                            'fixed',
+                                            'inset-0',
+                                            'z-10',
+                                            'pointer-events-none',
+                                        )}
+                                    >
+                                        <LoadingPane
+                                            gridStyle={['h-screen', 'aspect-auto', 'top-[-30%]']}
+                                            pulse
+                                            tile={96}
+                                            style={['grid']}
+                                        />
+                                    </motion.div>
+                                ) : null}
+                            </AnimatePresence>
+                            <SearchModalBody
+                                {...props}
+                                state={state}
+                                setSearchState={setSearchState}
+                                onClose={onClose}
+                            />
+                        </div>
+                    </motion.div>
+                ) : null}
+            </AnimatePresence>
+        </SearchAskProvider>
     );
 }
 
 function SearchModalBody(
     props: SearchModalProps & {
         state: SearchState;
-        onChangeQuery: (newQuery: SearchState) => void;
+        setSearchState: UpdateSearchState;
         onClose: (to?: string) => void;
     },
 ) {
@@ -158,7 +153,7 @@ function SearchModalBody(
         withAsk,
         isMultiVariants,
         state,
-        onChangeQuery,
+        setSearchState,
         onClose,
     } = props;
 
@@ -170,10 +165,21 @@ function SearchModalBody(
         inputRef.current?.focus();
     }, []);
 
+    React.useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                onClose();
+            }
+        };
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [onClose]);
+
     const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Escape') {
-            onClose();
-        } else if (event.key === 'ArrowUp') {
+        if (event.key === 'ArrowUp') {
             event.preventDefault();
             resultsRef.current?.moveUp();
         } else if (event.key === 'ArrowDown') {
@@ -186,11 +192,15 @@ function SearchModalBody(
     };
 
     const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        onChangeQuery({
+        setSearchState({
             ask: false, // When typing, we go back to the default search mode
             query: event.target.value,
             global: state.global,
         });
+    };
+
+    const onSwitchToAsk = () => {
+        setSearchState((state) => (state ? { ...state, ask: true } : null));
     };
 
     return (
@@ -304,13 +314,7 @@ function SearchModalBody(
                     global={isMultiVariants && state.global}
                     query={state.query}
                     withAsk={withAsk}
-                    onSwitchToAsk={() => {
-                        onChangeQuery({
-                            ask: true,
-                            query: state.query,
-                            global: state.global,
-                        });
-                    }}
+                    onSwitchToAsk={onSwitchToAsk}
                 ></SearchResults>
             ) : null}
             {state.query && state.ask && withAsk ? (

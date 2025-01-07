@@ -1,6 +1,6 @@
 import { DocumentBlockContentRef } from '@gitbook/api';
 
-import { Card, Emoji } from '@/components/primitives';
+import { Card } from '@/components/primitives';
 import { getSpaceCustomization, ignoreAPIError } from '@/lib/api';
 import { ResolvedContentRef } from '@/lib/references';
 
@@ -34,6 +34,10 @@ export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>
             href={resolved.href}
             title={resolved.text}
             style={style}
+            insights={{
+                target: block.data.ref,
+                position: 'content',
+            }}
         />
     );
 }
@@ -48,7 +52,7 @@ async function SpaceRefCard(
         return null;
     }
 
-    const { customization: spaceCustomization } = getSpaceCustomization(spaceId);
+    const { customization: spaceCustomization } = await getSpaceCustomization();
     const customFavicon = spaceCustomization?.favicon;
     const customEmoji = customFavicon && 'emoji' in customFavicon ? customFavicon.emoji : undefined;
     const customIcon = customFavicon && 'icon' in customFavicon ? customFavicon.icon : undefined;

@@ -6,7 +6,7 @@ import { useScrollActiveId } from '@/components/hooks';
 import { DocumentSection } from '@/lib/document';
 import { tcls } from '@/lib/tailwind';
 
-import { AnimatedLine } from './AnimatedLine';
+import { AsideSectionHighlight } from './AsideSectionHighlight';
 import { HEADER_HEIGHT_DESKTOP } from '../layout';
 
 /**
@@ -36,44 +36,88 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
     });
 
     return (
-        <ul className={tcls('border-l', 'border-dark/2', 'dark:border-light/1', 'pl-1')}>
+        <ul className={tcls('sidebar-list-line:border-l', 'border-dark/2', 'dark:border-light/1')}>
             {sections.map((section) => (
                 <motion.li
                     key={section.id}
-                    className={tcls('flex', 'flex-row', 'relative', 'h-fit')}
+                    className={tcls(
+                        'flex',
+                        'flex-row',
+                        'relative',
+                        'h-fit',
+                        'mt-2',
+                        section.depth > 1 && ['ml-3', 'my-0', 'sidebar-list-line:ml-0'],
+                    )}
                 >
-                    {activeId === section.id ? <AnimatedLine transition={springCurve} /> : null}
+                    {activeId === section.id ? (
+                        <AsideSectionHighlight
+                            transition={springCurve}
+                            className={tcls(
+                                section?.depth > 1
+                                    ? [
+                                          'sidebar-list-default:rounded-l-none',
+                                          'sidebar-list-line:rounded-l-none',
+                                          'sidebar-list-default:border-l',
+                                      ]
+                                    : [
+                                          'sidebar-list-default:ml-3',
+                                          'contrast-more:sidebar-list-default:ml-0',
+                                      ],
+                            )}
+                        />
+                    ) : null}
                     <a
                         href={`#${section.id}`}
                         className={tcls(
+                            'relative',
                             'flex',
                             'flex-row',
-                            'z-10',
-                            'w-full',
                             'items-baseline',
-                            'left-[-1px]',
-                            'relative',
+                            'z-10',
                             'text-sm',
+
+                            'w-full',
                             'py-1',
-                            'ps-3',
-                            'pe-2',
+                            'px-3',
+
                             'transition-all',
                             'duration-200',
-                            section.depth > 1 ? ['ps-6', 'opacity-8'] : null,
-                            activeId === section.id
-                                ? [
-                                      'text-primary',
-                                      'dark:text-primary-400',
-                                      '[&>span]:bg-primary-400',
-                                      'dark:[&>span]:bg-primary-600',
-                                      'dark:[&>span]:text-dark',
-                                  ]
-                                : [
-                                      'text-neutral-500',
-                                      'dark:text-neutral-400',
-                                      'hover:text-neutral-900',
-                                      'dark:hover:text-neutral-100',
-                                  ],
+
+                            'rounded-md',
+                            'straight-corners:rounded-none',
+                            'sidebar-list-line:rounded-l-none',
+
+                            'hover:bg-dark/1',
+                            'dark:hover:bg-light/1',
+                            'contrast-more:hover:ring-1',
+                            'contrast-more:hover:ring-inset',
+                            'contrast-more:hover:ring-current',
+
+                            section.depth > 1 && [
+                                'subitem',
+                                'sidebar-list-line:pl-6',
+                                'opacity-8',
+                                'contrast-more:opacity-11',
+
+                                'sidebar-list-default:rounded-l-none',
+                                'sidebar-list-default:border-l',
+                                'sidebar-list-default:border-dark/3',
+                                'dark:sidebar-list-default:border-light/3',
+                            ],
+
+                            activeId === section.id && [
+                                'text-primary',
+                                'hover:text-primary',
+                                'dark:text-primary-400',
+                                'dark:hover:text-primary-400',
+
+                                'contrast-more:font-semibold',
+
+                                'hover:bg-primary/3',
+                                'dark:hover:bg-primary-400/3',
+                                'sidebar-list-pill:hover:bg-transparent',
+                                'dark:sidebar-list-pill:hover:bg-transparent',
+                            ],
                         )}
                     >
                         {section.tag ? (

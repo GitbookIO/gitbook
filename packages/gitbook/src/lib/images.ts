@@ -1,10 +1,9 @@
 import 'server-only';
 
-import fnv1a from '@sindresorhus/fnv1a';
-
 import { noCacheFetchOptions } from '@/lib/cache/http';
 
-import { host, rootUrl } from './links';
+import { generateImageSignature } from './image-signatures';
+import { getRootUrl } from './links';
 import { getImageAPIUrl } from './urls';
 
 export interface CloudflareImageJsonFormat {
@@ -30,8 +29,6 @@ export interface CloudflareImageOptions {
     anim?: boolean;
     quality?: number;
 }
-
-export const imagesResizingSignVersion = '2';
 
 /**
  * Return true if images resizing is enabled.
@@ -87,17 +84,20 @@ interface ResizeImageOptions {
 /**
  * Create a function to get resized image URLs for a given image URL.
  */
-export function getResizedImageURLFactory(
+export async function getResizedImageURLFactory(
     input: string,
-): ((options: ResizeImageOptions) => string) | null {
+): Promise<((options: ResizeImageOptions) => string) | null> {
     if (!checkIsSizableImageURL(input)) {
         return null;
     }
 
-    const signature = generateSignature(input);
+    const [{ signature, version }, rootUrl] = await Promise.all([
+        generateImageSignature(input),
+        getRootUrl(),
+    ]);
 
     return (options) => {
-        const url = new URL('/~gitbook/image', rootUrl());
+        const url = new URL('/~gitbook/image', rootUrl);
         url.searchParams.set('url', getImageAPIUrl(input));
 
         if (options.width) {
@@ -114,7 +114,7 @@ export function getResizedImageURLFactory(
         }
 
         url.searchParams.set('sign', signature);
-        url.searchParams.set('sv', imagesResizingSignVersion);
+        url.searchParams.set('sv', version);
 
         return url.toString();
     };
@@ -124,19 +124,12 @@ export function getResizedImageURLFactory(
  * Create a new URL for an image with resized parameters.
  * The URL is signed and verified by the server.
  */
-export function getResizedImageURL(input: string, options: ResizeImageOptions): string {
-    const factory = getResizedImageURLFactory(input);
-    return factory?.(options) ?? input;
-}
-
-/**
- * Verify a signature of an image URL
- */
-export async function verifyImageSignature(
+export async function getResizedImageURL(
     input: string,
-    { signature }: { signature: string },
-): Promise<boolean> {
-    return generateSignature(input) === signature;
+    options: ResizeImageOptions,
+): Promise<string> {
+    const factory = await getResizedImageURLFactory(input);
+    return factory?.(options) ?? input;
 }
 
 /**
@@ -232,23 +225,4 @@ function stringifyOptions(options: CloudflareImageOptions): string {
     return Object.entries({ ...options }).reduce((rest, [key, value]) => {
         return `${rest}${rest ? ',' : ''}${key}=${value}`;
     }, '');
-}
-
-// Reused buffer for FNV-1a hashing
-const fnv1aUtf8Buffer = new Uint8Array(512);
-
-/**
- * Generate a signature for an image.
- * The signature is relative to the current site being rendered to avoid serving images from other sites on the same domain.
- */
-function generateSignature(input: string) {
-    const hostName = host();
-    const all = [
-        input,
-        hostName, // The hostname is used to avoid serving images from other sites on the same domain
-        process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY,
-    ]
-        .filter(Boolean)
-        .join(':');
-    return fnv1a(all, { utf8Buffer: fnv1aUtf8Buffer }).toString(16);
 }

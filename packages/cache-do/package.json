@@ -14,7 +14,7 @@
             "default": "./dist/api.js"
         }
     },
-    "version": "0.1.0",
+    "version": "0.1.1",
     "dependencies": {
         "@msgpack/msgpack": "^3.0.0-beta2",
         "lru_map": "^0.4.1"

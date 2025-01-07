@@ -28,7 +28,7 @@ import {
     parseSpacesFromSiteSpaces,
 } from './api';
 import { getBlockById, getBlockTitle } from './document';
-import { gitbookAppHref, pageHref, PageHrefContext } from './links';
+import { getGitbookAppHref, getPageHref, PageHrefContext } from './links';
 import { getPagePath, resolvePageId } from './pages';
 import { ClassValue } from './tailwind';
 
@@ -193,7 +193,7 @@ export async function resolveContentRef(
                 }
             } else {
                 // Page in the current content
-                href = pageHref(pages, page, linksContext, anchor);
+                href = await getPageHref(pages, page, linksContext, anchor);
             }
 
             return {
@@ -213,7 +213,7 @@ export async function resolveContentRef(
 
             if (!targetSpace) {
                 return {
-                    href: gitbookAppHref(`/s/${contentRef.space}`),
+                    href: getGitbookAppHref(`/s/${contentRef.space}`),
                     text: 'space',
                     active: false,
                 };
@@ -241,7 +241,9 @@ export async function resolveContentRef(
 
         case 'snippet': {
             return {
-                href: gitbookAppHref(`/o/${contentRef.organization}/snippet/${contentRef.snippet}`),
+                href: getGitbookAppHref(
+                    `/o/${contentRef.organization}/snippet/${contentRef.snippet}`,
+                ),
                 text: 'snippet',
                 active: false,
             };
@@ -251,7 +253,7 @@ export async function resolveContentRef(
             const collection = await ignoreAPIError(getCollection(contentRef.collection));
             if (!collection) {
                 return {
-                    href: gitbookAppHref(`/s/${contentRef.collection}`),
+                    href: getGitbookAppHref(`/s/${contentRef.collection}`),
                     text: 'collection',
                     active: false,
                 };
@@ -274,7 +276,7 @@ export async function resolveContentRef(
                 return null;
             }
             return {
-                href: gitbookAppHref(`/s/${space.id}`),
+                href: getGitbookAppHref(`/s/${space.id}`),
                 text: reusableContent.title,
                 active: false,
                 reusableContent,

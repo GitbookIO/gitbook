@@ -1,7 +1,7 @@
 import { RevisionPage, RevisionPageDocument, RevisionPageType } from '@gitbook/api';
 
 import { Card } from '@/components/primitives';
-import { pageHref } from '@/lib/links';
+import { getPageHref } from '@/lib/links';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
@@ -24,6 +24,41 @@ export async function PageBodyBlankslate(props: {
         return null;
     }
 
+    const pageElements = await Promise.all(
+        pages.map(async (child) => {
+            const icon = (
+                <PageIcon page={child} style={['text-base', 'text-dark/6', 'dark:text-light/6']} />
+            );
+
+            if (child.type === RevisionPageType.Computed) {
+                throw new Error(
+                    'Unexpected computed page, it should have been computed in the API',
+                );
+            } else if (child.type === RevisionPageType.Link) {
+                const resolved = await resolveContentRef(child.target, context);
+                if (!resolved) {
+                    return null;
+                }
+
+                return (
+                    <Card
+                        key={child.id}
+                        leadingIcon={icon}
+                        title={child.title}
+                        href={resolved.href}
+                        insights={{
+                            target: child.target,
+                            position: 'content',
+                        }}
+                    />
+                );
+            } else {
+                const href = await getPageHref(rootPages, child);
+                return <Card key={child.id} title={child.title} leadingIcon={icon} href={href} />;
+            }
+        }),
+    );
+
     return (
         <div
             className={tcls(
@@ -36,45 +71,7 @@ export async function PageBodyBlankslate(props: {
                 'sm:grid-cols-2',
             )}
         >
-            {await Promise.all(
-                pages.map(async (child) => {
-                    const icon = (
-                        <PageIcon
-                            page={child}
-                            style={['text-base', 'text-dark/6', 'dark:text-light/6']}
-                        />
-                    );
-
-                    if (child.type === RevisionPageType.Computed) {
-                        throw new Error(
-                            'Unexpected computed page, it should have been computed in the API',
-                        );
-                    } else if (child.type === RevisionPageType.Link) {
-                        const resolved = await resolveContentRef(child.target, context);
-                        if (!resolved) {
-                            return null;
-                        }
-
-                        return (
-                            <Card
-                                key={child.id}
-                                leadingIcon={icon}
-                                title={child.title}
-                                href={resolved.href}
-                            />
-                        );
-                    } else {
-                        return (
-                            <Card
-                                key={child.id}
-                                title={child.title}
-                                leadingIcon={icon}
-                                href={pageHref(rootPages, child)}
-                            />
-                        );
-                    }
-                }),
-            )}
+            {pageElements}
         </div>
     );
 }

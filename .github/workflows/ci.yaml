@@ -5,7 +5,7 @@ on:
         branches:
             - main
 env:
-    NPMRC_FONT_AWESOME_TOKEN: ${{ secrets.NPMRC_FONT_AWESOME_TOKEN }}
+    NPM_TOKEN_READONLY: ${{ secrets.NPM_TOKEN_READONLY }}
 jobs:
     deploy:
         name: Deploy to Cloudflare Pages
@@ -22,10 +22,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Setup bun
-              uses: oven-sh/setup-bun@v1
-              with:
-                  bun-version: 1.1.18
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:
@@ -102,10 +100,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Setup bun
-              uses: oven-sh/setup-bun@v1
-              with:
-                  bun-version: 1.1.18
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
             - name: Install dependencies
               run: bun install --frozen-lockfile
             - name: Setup Playwright
@@ -128,10 +124,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Setup bun
-              uses: oven-sh/setup-bun@v1
-              with:
-                  bun-version: 1.1.18
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:
@@ -147,10 +141,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Setup bun
-              uses: oven-sh/setup-bun@v1
-              with:
-                  bun-version: 1.1.18
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:
@@ -162,10 +154,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Setup bun
-              uses: oven-sh/setup-bun@v1
-              with:
-                  bun-version: 1.1.18
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:
@@ -177,10 +167,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Setup bun
-              uses: oven-sh/setup-bun@v1
-              with:
-                  bun-version: 1.1.18
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:
@@ -191,16 +179,14 @@ jobs:
         runs-on: ubuntu-latest
         name: Build (Open Source)
         env:
-            NPMRC_FONT_AWESOME_TOKEN: ''
+            NPM_TOKEN_READONLY: ''
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Setup bun
-              uses: oven-sh/setup-bun@v1
-              with:
-                  bun-version: 1.1.18
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
             - name: Install dependencies
-              run: bun install --frozen-lockfile
+              run: bun install
               env:
                   PUPPETEER_SKIP_DOWNLOAD: 1
             - run: bun run build
@@ -210,10 +196,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Setup bun
-              uses: oven-sh/setup-bun@v1
-              with:
-                  bun-version: 1.1.18
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:

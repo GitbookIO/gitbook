@@ -1,10 +1,45 @@
 'use client';
 
-import React from 'react';
-import { atom, selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
+import React, { useCallback, useMemo } from 'react';
 
 import { useHash, useIsMounted } from '@/components/hooks';
 import { ClassValue, tcls } from '@/lib/tailwind';
+
+interface TabsState {
+    activeIds: {
+        [tabsBlockId: string]: string;
+    };
+    activeTitles: string[];
+}
+
+let globalTabsState: TabsState = (() => {
+    if (typeof localStorage === 'undefined') {
+        return { activeIds: {}, activeTitles: [] };
+    }
+
+    const stored = localStorage.getItem('@gitbook/tabsState');
+    return stored ? (JSON.parse(stored) as TabsState) : { activeIds: {}, activeTitles: [] };
+})();
+const listeners = new Set<() => void>();
+
+function useTabsState() {
+    const subscribe = useCallback((callback: () => void) => {
+        listeners.add(callback);
+        return () => listeners.delete(callback);
+    }, []);
+
+    const getSnapshot = useCallback(() => globalTabsState, []);
+
+    const setTabsState = (updater: (previous: TabsState) => TabsState) => {
+        globalTabsState = updater(globalTabsState);
+        if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('@gitbook/tabsState', JSON.stringify(globalTabsState));
+        }
+        listeners.forEach((listener) => listener());
+    };
+    const state = React.useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+    return [state, setTabsState] as const;
+}
 
 // How many titles are remembered:
 const TITLES_MAX = 5;
@@ -14,7 +49,6 @@ export interface TabsItem {
     title: string;
 }
 
-// https://github.com/facebookexperimental/Recoil/issues/629#issuecomment-914273925
 type SelectorMapper<Type> = {
     [Property in keyof Type]: Type[Property];
 };
@@ -42,17 +76,20 @@ export function DynamicTabs(
     const { id, tabs, tabsBody, style } = props;
 
     const hash = useHash();
+    const [tabsState, setTabsState] = useTabsState();
+    const activeState = useMemo(() => {
+        const input = { id, tabs };
+        return (
+            getTabBySelection(input, tabsState) ?? getTabByTitle(input, tabsState) ?? input.tabs[0]
+        );
+    }, [id, tabs, tabsState]);
 
-    const activeState = useRecoilValue(tabsActiveSelector({ id, tabs }));
-
-    // To avoid issue with hydration, we only use the state from recoil (which is loaded from localstorage),
+    // To avoid issue with hydration, we only use the state from localStorage
     // once the component has been mounted.
     // Otherwise because of  the streaming/suspense approach, tabs can be first-rendered at different time
     // and get stuck into an inconsistent state.
     const mounted = useIsMounted();
     const active = mounted ? activeState : tabs[0];
-
-    const setTabsState = useSetRecoilState(tabsAtom);
 
     /**
      * When clicking to select a tab, we:
@@ -219,44 +256,6 @@ export function DynamicTabs(
         </div>
     );
 }
-
-const tabsAtom = atom<TabsState>({
-    key: 'tabsAtom',
-    default: {
-        activeIds: {},
-        activeTitles: [],
-    },
-    effects: [
-        // Persist the state to local storage
-        ({ trigger, setSelf, onSet }) => {
-            if (typeof localStorage === 'undefined') {
-                return;
-            }
-
-            const localStorageKey = '@gitbook/tabsState';
-            if (trigger === 'get') {
-                const stored = localStorage.getItem(localStorageKey);
-                if (stored) {
-                    setSelf(JSON.parse(stored));
-                }
-            }
-
-            onSet((newState) => {
-                localStorage.setItem(localStorageKey, JSON.stringify(newState));
-            });
-        },
-    ],
-});
-
-const tabsActiveSelector = selectorFamily<TabsItem, SelectorMapper<TabsInput>>({
-    key: 'tabsActiveSelector',
-    get:
-        (input) =>
-        ({ get }) => {
-            const state = get(tabsAtom);
-            return getTabBySelection(input, state) ?? getTabByTitle(input, state) ?? input.tabs[0];
-        },
-});
 
 /**
  * Get the ID for a tab button.
