@@ -3,15 +3,15 @@
 import { Icon } from '@gitbook/icons';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { useRecoilValue } from 'recoil';
 
 import { tString, useLanguage } from '@/intl/client';
 import { SiteContentPointer } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
-import { SearchAskAnswer, searchAskState } from './SearchAskAnswer';
+import { SearchAskAnswer } from './SearchAskAnswer';
+import { SearchAskProvider, useSearchAskState } from './SearchAskContext';
 import { SearchResults, SearchResultsRef } from './SearchResults';
 import { SearchScopeToggle } from './SearchScopeToggle';
 import { SearchState, UpdateSearchState, useSearch } from './useSearch';
@@ -31,7 +31,8 @@ interface SearchModalProps {
  */
 export function SearchModal(props: SearchModalProps) {
     const [state, setSearchState] = useSearch();
-    const askState = useRecoilValue(searchAskState);
+    const searchAsk = useSearchAskState();
+    const [askState] = searchAsk;
     const router = useRouter();
 
     useHotkeys(
@@ -63,75 +64,77 @@ export function SearchModal(props: SearchModalProps) {
     };
 
     return (
-        <AnimatePresence>
-            {state !== null ? (
-                <motion.div
-                    initial={{
-                        opacity: 0,
-                    }}
-                    animate={{
-                        opacity: 1,
-                    }}
-                    exit={{
-                        opacity: 0,
-                    }}
-                    transition={{
-                        duration: 0.2,
-                        delay: 0.1,
-                    }}
-                    role="dialog"
-                    className={tcls(
-                        'fixed',
-                        'inset-0',
-                        'bg-dark/4',
-                        'backdrop-blur-2xl',
-                        'z-30',
-                        'px-4',
-                        'pt-4',
-                        'dark:bg-dark/8',
-                        'md:pt-[min(8vh,6rem)]',
-                    )}
-                    onClick={() => {
-                        onClose();
-                    }}
-                >
-                    <div className="scroll-nojump">
-                        <AnimatePresence>
-                            {askState?.type === 'loading' ? (
-                                <motion.div
-                                    key="loading"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 1 }}
-                                    className={tcls(
-                                        'w-screen',
-                                        'h-screen',
-                                        'fixed',
-                                        'inset-0',
-                                        'z-10',
-                                        'pointer-events-none',
-                                    )}
-                                >
-                                    <LoadingPane
-                                        gridStyle={['h-screen', 'aspect-auto', 'top-[-30%]']}
-                                        pulse
-                                        tile={96}
-                                        style={['grid']}
-                                    />
-                                </motion.div>
-                            ) : null}
-                        </AnimatePresence>
-                        <SearchModalBody
-                            {...props}
-                            state={state}
-                            setSearchState={setSearchState}
-                            onClose={onClose}
-                        />
-                    </div>
-                </motion.div>
-            ) : null}
-        </AnimatePresence>
+        <SearchAskProvider value={searchAsk}>
+            <AnimatePresence>
+                {state !== null ? (
+                    <motion.div
+                        initial={{
+                            opacity: 0,
+                        }}
+                        animate={{
+                            opacity: 1,
+                        }}
+                        exit={{
+                            opacity: 0,
+                        }}
+                        transition={{
+                            duration: 0.2,
+                            delay: 0.1,
+                        }}
+                        role="dialog"
+                        className={tcls(
+                            'fixed',
+                            'inset-0',
+                            'bg-dark/4',
+                            'backdrop-blur-2xl',
+                            'z-30',
+                            'px-4',
+                            'pt-4',
+                            'dark:bg-dark/8',
+                            'md:pt-[min(8vh,6rem)]',
+                        )}
+                        onClick={() => {
+                            onClose();
+                        }}
+                    >
+                        <div className="scroll-nojump">
+                            <AnimatePresence>
+                                {askState?.type === 'loading' ? (
+                                    <motion.div
+                                        key="loading"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        transition={{ duration: 1 }}
+                                        className={tcls(
+                                            'w-screen',
+                                            'h-screen',
+                                            'fixed',
+                                            'inset-0',
+                                            'z-10',
+                                            'pointer-events-none',
+                                        )}
+                                    >
+                                        <LoadingPane
+                                            gridStyle={['h-screen', 'aspect-auto', 'top-[-30%]']}
+                                            pulse
+                                            tile={96}
+                                            style={['grid']}
+                                        />
+                                    </motion.div>
+                                ) : null}
+                            </AnimatePresence>
+                            <SearchModalBody
+                                {...props}
+                                state={state}
+                                setSearchState={setSearchState}
+                                onClose={onClose}
+                            />
+                        </div>
+                    </motion.div>
+                ) : null}
+            </AnimatePresence>
+        </SearchAskProvider>
     );
 }
 

@@ -5,10 +5,8 @@ import {
     createCssVariablesTheme,
     HighlighterGeneric,
 } from 'shiki/core';
-import { loadWasm, createOnigurumaEngine } from 'shiki/engine/oniguruma';
-import { bundledLanguages } from 'shiki/langs';
-// @ts-ignore - onigWasm is a Wasm module
-import onigWasm from 'shiki/onig.wasm?module';
+import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
+import { BundledLanguage, bundledLanguages } from 'shiki/langs';
 
 import { asyncMutexFunction, singleton } from '@/lib/async';
 import { getNodeText } from '@/lib/document';
@@ -81,18 +79,35 @@ export async function highlight(block: DocumentBlockCode): Promise<HighlightLine
     });
 }
 
+const syntaxAliases: Record<string, BundledLanguage> = {
+    // "Parser" language does not exist in Shiki, but it's used in GitBook
+    // The closest language is "Blade"
+    parser: 'blade',
+};
+
+function checkIsBundledLanguage(lang: string): lang is BundledLanguage {
+    return lang in bundledLanguages;
+}
+
 /**
  * Validate a language name.
  */
-function getLanguageForSyntax(syntax: string): keyof typeof bundledLanguages | null {
-    // @ts-ignore
-    const lang = bundledLanguages[syntax];
-    if (!lang) {
-        return null;
+function getLanguageForSyntax(syntax: string): BundledLanguage | null {
+    // Normalize the syntax to lowercase.
+    syntax = syntax.toLowerCase();
+
+    // Check if the syntax is a bundled language.
+    if (checkIsBundledLanguage(syntax)) {
+        return syntax;
     }
 
-    // @ts-ignore
-    return syntax;
+    // Check if there is a valid alias for the syntax.
+    const alias = syntaxAliases[syntax];
+    if (alias && checkIsBundledLanguage(alias)) {
+        return alias;
+    }
+
+    return null;
 }
 
 /**
@@ -299,7 +314,10 @@ function cleanupLine(line: string): string {
 const createHighlighter = createdBundledHighlighter<any, any>({
     langs: bundledLanguages,
     themes: {},
-    engine: () => createOnigurumaEngine(import('shiki/wasm')),
+    engine: () =>
+        createJavaScriptRegexEngine({
+            forgiving: true,
+        }),
 });
 
 /**
@@ -308,14 +326,6 @@ const createHighlighter = createdBundledHighlighter<any, any>({
  */
 const loadHighlighter = singleton(async () => {
     return await trace('highlighting.loadHighlighter', async () => {
-        if (typeof onigWasm !== 'string') {
-            // When running bun test, the import is a string, we ignore it and let the module
-            // loads it on its own.
-            //
-            // Otherwise for Vercel/Cloudflare, we need to load it ourselves.
-            await loadWasm((obj) => WebAssembly.instantiate(onigWasm, obj));
-        }
-
         const highlighter = await createHighlighter({
             themes: [createCssVariablesTheme()],
             langs: [],

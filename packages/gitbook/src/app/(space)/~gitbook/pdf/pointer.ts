@@ -8,7 +8,9 @@ import { getSiteContentPointer, getSpacePointer } from '@/lib/pointer';
  *
  * This function returns the pointer depending on the context.
  */
-export function getSiteOrSpacePointerForPDF(): SiteContentPointer | SpaceContentPointer {
+export async function getSiteOrSpacePointerForPDF(): Promise<
+    SiteContentPointer | SpaceContentPointer
+> {
     try {
         return getSiteContentPointer();
     } catch (error) {

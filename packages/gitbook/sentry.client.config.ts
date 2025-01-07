@@ -3,6 +3,15 @@ import {
     makeFetchTransport,
     defaultStackParser,
     getCurrentScope,
+    dedupeIntegration,
+    functionToStringIntegration,
+    inboundFiltersIntegration,
+    linkedErrorsIntegration,
+    breadcrumbsIntegration,
+    browserApiErrorsIntegration,
+    globalHandlersIntegration,
+    httpContextIntegration,
+    browserSessionIntegration,
 } from '@sentry/nextjs';
 
 const dsn = process.env.SENTRY_DSN;
@@ -12,7 +21,17 @@ if (dsn) {
     const client = new BrowserClient({
         debug: false,
         dsn,
-        integrations: [],
+        integrations: [
+            dedupeIntegration(),
+            functionToStringIntegration(),
+            inboundFiltersIntegration(),
+            linkedErrorsIntegration(),
+            breadcrumbsIntegration(),
+            browserApiErrorsIntegration(),
+            globalHandlersIntegration(),
+            httpContextIntegration(),
+            browserSessionIntegration(),
+        ],
         sampleRate: 0.1,
         enableTracing: false,
         beforeSendTransaction: () => {

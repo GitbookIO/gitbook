@@ -3,7 +3,7 @@ import 'server-only';
 import { noCacheFetchOptions } from '@/lib/cache/http';
 
 import { generateImageSignature } from './image-signatures';
-import { rootUrl } from './links';
+import { getRootUrl } from './links';
 import { getImageAPIUrl } from './urls';
 
 export interface CloudflareImageJsonFormat {
@@ -84,17 +84,20 @@ interface ResizeImageOptions {
 /**
  * Create a function to get resized image URLs for a given image URL.
  */
-export function getResizedImageURLFactory(
+export async function getResizedImageURLFactory(
     input: string,
-): ((options: ResizeImageOptions) => string) | null {
+): Promise<((options: ResizeImageOptions) => string) | null> {
     if (!checkIsSizableImageURL(input)) {
         return null;
     }
 
-    const { signature, version } = generateImageSignature(input);
+    const [{ signature, version }, rootUrl] = await Promise.all([
+        generateImageSignature(input),
+        getRootUrl(),
+    ]);
 
     return (options) => {
-        const url = new URL('/~gitbook/image', rootUrl());
+        const url = new URL('/~gitbook/image', rootUrl);
         url.searchParams.set('url', getImageAPIUrl(input));
 
         if (options.width) {
@@ -121,8 +124,11 @@ export function getResizedImageURLFactory(
  * Create a new URL for an image with resized parameters.
  * The URL is signed and verified by the server.
  */
-export function getResizedImageURL(input: string, options: ResizeImageOptions): string {
-    const factory = getResizedImageURLFactory(input);
+export async function getResizedImageURL(
+    input: string,
+    options: ResizeImageOptions,
+): Promise<string> {
+    const factory = await getResizedImageURLFactory(input);
     return factory?.(options) ?? input;
 }
 

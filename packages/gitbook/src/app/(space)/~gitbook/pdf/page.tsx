@@ -23,7 +23,7 @@ import {
     getSpaceContentData,
     getSiteData,
 } from '@/lib/api';
-import { pagePDFContainerId, PageHrefContext, absoluteHref } from '@/lib/links';
+import { getPagePDFContainerId, PageHrefContext, getAbsoluteHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -39,10 +39,10 @@ const DEFAULT_LIMIT = 100;
 export const runtime = 'edge';
 
 export async function generateMetadata(): Promise<Metadata> {
-    const pointer = getSiteOrSpacePointerForPDF();
+    const pointer = await getSiteOrSpacePointerForPDF();
     const [space, { customization }] = await Promise.all([
         getSpace(pointer.spaceId, 'siteId' in pointer ? pointer.siteShareKey : undefined),
-        'siteId' in pointer ? getSiteData(pointer) : getSpaceCustomization(pointer.spaceId),
+        'siteId' in pointer ? getSiteData(pointer) : getSpaceCustomization(),
     ]);
 
     return {
@@ -54,19 +54,21 @@ export async function generateMetadata(): Promise<Metadata> {
 /**
  * Render a space as a standalone HTML page that can be printed as a PDF.
  */
-export default async function PDFHTMLOutput(props: { searchParams: { [key: string]: string } }) {
-    const pointer = getSiteOrSpacePointerForPDF();
+export default async function PDFHTMLOutput(props: {
+    searchParams: Promise<{ [key: string]: string }>;
+}) {
+    const pointer = await getSiteOrSpacePointerForPDF();
 
-    const searchParams = new URLSearchParams(props.searchParams);
+    const searchParams = new URLSearchParams(await props.searchParams);
     const pdfParams = getPDFSearchParams(new URLSearchParams(searchParams));
 
     // Build current PDF URL and preserve all search params
-    let currentPDFUrl = absoluteHref('~gitbook/pdf', true);
+    let currentPDFUrl = await getAbsoluteHref('~gitbook/pdf', true);
     currentPDFUrl += '?' + searchParams.toString();
 
     // Load the content,
     const [{ customization }, { space, contentTarget, pages: rootPages }] = await Promise.all([
-        'siteId' in pointer ? getSiteData(pointer) : getSpaceCustomization(pointer.spaceId),
+        'siteId' in pointer ? getSiteData(pointer) : getSpaceCustomization(),
         getSpaceContentData(pointer, 'siteId' in pointer ? pointer.siteShareKey : undefined),
     ]);
     const language = getSpaceLanguage(customization);
@@ -74,7 +76,7 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
     // Compute the pages to render
     const { pages, total } = selectPages(rootPages, pdfParams);
     const pageIds = pages.map(
-        ({ page }) => [page.id, pagePDFContainerId(page)] as [string, string],
+        ({ page }) => [page.id, getPagePDFContainerId(page)] as [string, string],
     );
     const linksContext: PageHrefContext = {
         pdf: pages.map(({ page }) => page.id),
@@ -86,7 +88,7 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
                 <div className={tcls('fixed', 'left-12', 'top-12', 'print:hidden', 'z-50')}>
                     <a
                         title={tString(language, 'pdf_goback')}
-                        href={pdfParams.back ?? absoluteHref('')}
+                        href={pdfParams.back ?? (await getAbsoluteHref(''))}
                         className={tcls(
                             'flex',
                             'flex-row',
@@ -156,7 +158,7 @@ export default async function PDFHTMLOutput(props: { searchParams: { [key: strin
                     <React.Suspense
                         key={page.id}
                         fallback={
-                            <PrintPage id={pagePDFContainerId(page)}>
+                            <PrintPage id={getPagePDFContainerId(page)}>
                                 <p>Loading...</p>
                             </PrintPage>
                         }
@@ -201,7 +203,7 @@ async function PDFPageGroup(props: { space: Space; page: RevisionPageGroup }) {
     const { page } = props;
 
     return (
-        <PrintPage id={pagePDFContainerId(page)}>
+        <PrintPage id={getPagePDFContainerId(page)}>
             <div
                 className={tcls(
                     'break-before-page',
@@ -229,7 +231,7 @@ async function PDFPageDocument(props: {
     const document = page.documentId ? await getDocument(space.id, page.documentId) : null;
 
     return (
-        <PrintPage id={pagePDFContainerId(page)}>
+        <PrintPage id={getPagePDFContainerId(page)}>
             <h1 className={tcls('text-4xl', 'font-bold')}>{page.title}</h1>
             {page.description ? (
                 <p className={tcls('decoration-primary/6', 'mt-2', 'mb-3')}>{page.description}</p>
@@ -248,7 +250,7 @@ async function PDFPageDocument(props: {
                         },
                         contentRefContext: refContext,
                         resolveContentRef: (ref) => resolveContentRef(ref, refContext),
-                        getId: (id) => pagePDFContainerId(page, id),
+                        getId: (id) => getPagePDFContainerId(page, id),
                     }}
                 />
             ) : null}
