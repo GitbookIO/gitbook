@@ -166,7 +166,7 @@ export async function PageAside(props: {
                         'first:border-none',
                         'border-dark/2',
                         'dark:border-light/2',
-                        'pt-4',
+                        'py-4',
                         'first:pt-0',
                         'page-api-block:xl:max-2xl:px-3',
                     )}
