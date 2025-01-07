@@ -175,7 +175,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
         [moveBy, select],
     );
 
-    if (!results) {
+    if (!results || results.filter((result) => result.type !== 'question').length === 0) {
         if (query) {
             return (
                 <div className={tcls('flex', 'items-center', 'justify-center', 'py-8')}>
