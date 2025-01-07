@@ -87,15 +87,6 @@ export function InsightsProvider(props: InsightsProviderProps) {
     }>({});
 
     /**
-     * Get the visitor ID and store it in a ref.
-     */
-    React.useEffect(() => {
-        getVisitorId().then((visitorId) => {
-            visitorIdRef.current = visitorId;
-        });
-    }, []);
-
-    /**
      * Synchronously flush all the pending events.
      */
     const flushEventsSync = useEventCallback(() => {
@@ -194,13 +185,19 @@ export function InsightsProvider(props: InsightsProviderProps) {
         },
     );
 
-    // When the page is unloaded, flush all events
+    /**
+     * Get the visitor ID and store it in a ref.
+     */
     React.useEffect(() => {
-        window.addEventListener('beforeunload', flushEventsSync);
+        getVisitorId().then((visitorId) => {
+            visitorIdRef.current = visitorId;
+            // When the page is unloaded, flush all events, but only if the visitor ID is set
+            window.addEventListener('beforeunload', flushEventsSync);
+        });
         return () => {
             window.removeEventListener('beforeunload', flushEventsSync);
         };
-    }, [flushEventsSync]);
+    }, []);
 
     return (
         <InsightsContext.Provider value={trackEvent}>
