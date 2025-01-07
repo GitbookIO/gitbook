@@ -241,6 +241,9 @@ function sendEvents(args: {
         body: JSON.stringify({
             events,
         }),
+    }).catch((error) => {
+        // We don't want to throw when this fails.
+        console.error('Error sending events', error);
     });
 }
 
