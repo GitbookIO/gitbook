@@ -646,6 +646,13 @@ export const getDocument = cache({
 });
 
 /**
+ * Mimic the validation done on source server-side to reduce API usage.
+ */
+function validateSiteRedirectSource(source: string) {
+    return source.length <= 512 && /^\/[a-zA-Z0-9-_.\\/]+[a-zA-Z0-9-_.]$/.test(source);
+}
+
+/**
  * Resolve a site redirect by its source path.
  */
 export const getSiteRedirectBySource = cache({
@@ -662,6 +669,13 @@ export const getSiteRedirectBySource = cache({
         },
         options: CacheFunctionOptions,
     ) => {
+        // Validate the source to avoid unnecessary API calls.
+        if (!validateSiteRedirectSource(args.source)) {
+            return {
+                data: null,
+                ...cacheTtl_1day,
+            };
+        }
         try {
             const response = await api().client.orgs.getSiteRedirectBySource(
                 args.organizationId,
@@ -677,6 +691,15 @@ export const getSiteRedirectBySource = cache({
             );
             return cacheResponse(response, cacheTtl_1day);
         } catch (error) {
+            // 422 is returned when the source is invalid
+            // we don't want to throw but just return null
+            if ((error as GitBookAPIError).code === 422) {
+                return {
+                    data: null,
+                    ...cacheTtl_1day,
+                };
+            }
+
             if ((error as GitBookAPIError).code === 404) {
                 return {
                     data: null,
