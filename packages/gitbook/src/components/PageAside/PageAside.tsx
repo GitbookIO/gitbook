@@ -32,13 +32,6 @@ function getTopOffset(props: { sectionsHeader: boolean; topHeader: boolean }) {
     }
 
     return 'lg:top-0 lg:max-h-screen';
-    if (props.sectionsHeader && props.topHeader) {
-        return 'lg:max-h-[calc(100vh_-_8rem)] top-32 page-api-block:xl:max-2xl:top-32';
-    }
-    if (props.topHeader) {
-        return 'lg:max-h-[calc(100vh_-_6rem)] top-24 page-api-block:xl:max-2xl:top-24';
-    }
-    return 'lg:max-h-screen top-0 page-api-block:xl:max-2xl:top-0';
 }
 
 /**
@@ -85,10 +78,7 @@ export async function PageAside(props: {
                 'grow-0',
                 'shrink-0',
                 'sticky',
-                // withHeaderOffset.topHeader ? 'py-4' : 'py-8',
                 'break-anywhere', // To prevent long words in headings from breaking the layout
-                // 'lg:h-full',
-                // 'h-screen',
 
                 'text-dark/7',
                 'dark:text-light/7',
@@ -109,12 +99,8 @@ export async function PageAside(props: {
                 'page-api-block:xl:max-2xl:dark:border-light/2',
                 'page-api-block:xl:max-2xl:hover:shadow-lg',
                 'page-api-block:xl:max-2xl:hover:shadow-dark/2',
-
-                // 'page-api-block:xl:max-2xl:border',
-                // 'page-api-block:xl:max-2xl:border-dark/2',
                 'page-api-block:xl:max-2xl:rounded-md',
                 'page-api-block:xl:max-2xl:h-auto',
-                // 'page-api-block:xl:max-2xl:py-0',
                 'page-api-block:xl:max-2xl:my-8',
                 'dark:page-api-block:xl:max-2xl:bg-dark-2/8',
 
