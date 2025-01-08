@@ -4,8 +4,6 @@
 
 @layer base {
     :root {
-        /* See packages/gitbook/src/fonts/index.ts */
-        --font-emoji: 'Apple Color Emoji', var(--font-noto-color-emoji);
         --scrollbar-width: calc(100vw - 100%);
 
         --dark-base: 20 20 20;
@@ -193,10 +191,4 @@ html {
 }
 html.dark {
     color-scheme: dark light;
-}
-
-/* Emojis */
-
-[class*='emoji'] {
-    font-family: var(--font-emoji);
 }

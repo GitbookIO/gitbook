@@ -58,6 +58,11 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
             }
 
             const message = event.data;
+
+            if (!URL.canParse(event.origin)) {
+                return;
+            }
+
             const origin = new URL(event.origin);
 
             // For security reasons, only iframe from our integrations domains are allowed
