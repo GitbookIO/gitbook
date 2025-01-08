@@ -2,9 +2,10 @@
 
 import type * as api from '@gitbook/api';
 import { OpenAPIOperationContextProvider } from '@gitbook/react-openapi';
-import * as cookies from '@/lib/cookies';
 import * as React from 'react';
 import { useEventCallback, useDebounceCallback } from 'usehooks-ts';
+
+import * as cookies from '@/lib/cookies';
 
 import { getSession } from './sessions';
 import { getVisitorId } from './visitorId';
@@ -197,7 +198,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
         return () => {
             window.removeEventListener('beforeunload', flushEventsSync);
         };
-    }, []);
+    }, [flushEventsSync]);
 
     return (
         <InsightsContext.Provider value={trackEvent}>
@@ -264,7 +265,7 @@ function transformEvents(input: {
         visitorId: input.visitorId,
         userAgent: window.navigator.userAgent,
         language: window.navigator.language,
-        cookies: cookies.get(),
+        cookies: cookies.getAll(),
         referrer: document.referrer || null,
         visitorAuthToken: input.visitorAuthToken ?? null,
     };
