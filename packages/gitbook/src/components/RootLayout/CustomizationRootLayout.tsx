@@ -8,7 +8,6 @@ import {
 } from '@gitbook/api';
 import { IconsProvider, IconStyle } from '@gitbook/icons';
 import assertNever from 'assert-never';
-import Head from 'next/head';
 import colorContrast from 'postcss-color-contrast/js';
 import colors from 'tailwindcss/colors';
 
@@ -54,7 +53,7 @@ export async function CustomizationRootLayout(props: {
                 tintColor ? ' tint' : 'no-tint',
             )}
         >
-            <Head>
+            <head>
                 {customization.privacyPolicy.url ? (
                     <link rel="privacy-policy" href={customization.privacyPolicy.url} />
                 ) : null}
@@ -151,7 +150,7 @@ export async function CustomizationRootLayout(props: {
                         ${generateColorVariable('header-button-text', colorContrast(headerTheme.linkColor.dark as string, ['#000', '#fff']))}
                     }
                 `}</style>
-            </Head>
+            </head>
             <body
                 className={tcls(
                     fontNotoColorEmoji.className,
