@@ -33,7 +33,7 @@ if (dsn) {
             httpContextIntegration(),
             browserSessionIntegration(),
         ],
-        sampleRate: 0.1,
+        sampleRate: 0.5,
         enableTracing: false,
         beforeSendTransaction: () => {
             return null;
