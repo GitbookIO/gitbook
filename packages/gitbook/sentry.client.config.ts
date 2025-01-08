@@ -21,6 +21,7 @@ if (dsn) {
     const client = new BrowserClient({
         debug: false,
         dsn,
+        release: process.env.SENTRY_RELEASE,
         integrations: [
             dedupeIntegration(),
             functionToStringIntegration(),
