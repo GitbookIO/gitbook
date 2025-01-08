@@ -30,7 +30,7 @@ export function HeaderMobileMenu(props: Partial<React.ButtonHTMLAttributes<HTMLB
         }
     };
 
-    const windowRef = useRef(window);
+    const windowRef = useRef(typeof window === 'undefined' ? null : window);
     useScrollListener(() => {
         if (window.scrollY >= scrollDistance) {
             setHasScrolled(true);
