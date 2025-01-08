@@ -7,7 +7,7 @@ if (dsn) {
         dsn,
         release: process.env.SENTRY_RELEASE,
 
-        sampleRate: 0.1,
+        sampleRate: 0.5,
 
         // Disable tracing as it creates additional requests in an env where subrequests are limited.
         enableTracing: false,
