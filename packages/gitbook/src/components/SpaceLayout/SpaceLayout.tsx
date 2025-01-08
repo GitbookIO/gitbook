@@ -135,6 +135,7 @@ export async function SpaceLayout(props: {
                             )
                         }
                         innerHeader={
+                            // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
                             withVariants || !withTopHeader ? (
                                 <>
                                     {!withTopHeader && (
