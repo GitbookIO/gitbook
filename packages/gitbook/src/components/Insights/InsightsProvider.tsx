@@ -232,7 +232,7 @@ function sendEvents(args: {
     const url = new URL(apiHost);
     url.pathname = `/v1/orgs/${organizationId}/sites/${siteId}/insights/events`;
 
-    fetch(url, {
+    fetch(url.toString(), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
