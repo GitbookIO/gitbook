@@ -64,6 +64,12 @@ const config: Config = {
             fontFamily: {
                 sans: ['var(--font-content)'],
                 mono: ['var(--font-mono)'],
+                emoji: [
+                    'Apple Color Emoji',
+                    'Noto Color Emoji',
+                    '--font-noto-color-emoji',
+                    'sans-serif',
+                ],
                 var: ['var(--font-family)'],
             },
             colors: {
