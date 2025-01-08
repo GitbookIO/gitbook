@@ -1,6 +1,7 @@
 import {
     CustomizationHeaderPreset,
     CustomizationSettings,
+    CustomizationSidebarBackgroundStyle,
     Revision,
     RevisionPageDocument,
     RevisionPageGroup,
@@ -11,10 +12,12 @@ import {
 import React from 'react';
 
 import { Footer } from '@/components/Footer';
-import { CompactHeader, Header } from '@/components/Header';
+import { Header, HeaderLogo } from '@/components/Header';
 import { CONTAINER_STYLE } from '@/components/layout';
-import { SearchModal } from '@/components/Search';
+import { SearchButton, SearchModal } from '@/components/Search';
 import { TableOfContents } from '@/components/TableOfContents';
+import { getSpaceLanguage } from '@/intl/server';
+import { t } from '@/intl/translate';
 import { api, ContentTarget, type SectionsList, SiteContentPointer } from '@/lib/api';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -63,7 +66,13 @@ export async function SpaceLayout(props: {
 
     const withSections = Boolean(sections && sections.list.length > 0);
     const withVariants = Boolean(site && spaces.length > 1);
-    const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
+    const headerOffset = {
+        sectionsHeader: withSections,
+        topHeader: withTopHeader,
+        sidebarBackgroundFilled:
+            'sidebar' in customization.styling &&
+            customization.styling.sidebar.background === CustomizationSidebarBackgroundStyle.Filled,
+    };
     const apiHost = (await api()).client.endpoint;
     const visitorAuthToken = await getCurrentVisitorToken();
     const enabled = await shouldTrackEvents();
@@ -107,22 +116,67 @@ export async function SpaceLayout(props: {
                         context={contentRefContext}
                         header={
                             withTopHeader ? null : (
-                                <CompactHeader
-                                    space={space}
-                                    site={site}
-                                    spaces={spaces}
-                                    customization={customization}
-                                />
+                                <div
+                                    className={tcls(
+                                        'hidden',
+                                        'pr-4',
+                                        'lg:flex',
+                                        'flex-grow-0',
+                                        'flex-wrap',
+                                        'dark:shadow-light/1',
+                                    )}
+                                >
+                                    <HeaderLogo
+                                        site={site}
+                                        space={space}
+                                        customization={customization}
+                                    />
+                                </div>
                             )
                         }
                         innerHeader={
-                            withVariants && (
-                                <SpacesDropdown
-                                    className={withTopHeader && !sections ? 'sm:hidden' : undefined}
-                                    space={space}
-                                    spaces={spaces}
-                                />
-                            )
+                            // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
+                            withVariants || !withTopHeader ? (
+                                <>
+                                    {!withTopHeader && (
+                                        <div
+                                            className={tcls(
+                                                'hidden',
+                                                'lg:block',
+                                                'flex-shrink-0',
+                                                'grow-0',
+                                                'md:grow',
+                                                'sm:max-w-xs',
+                                                'lg:max-w-full',
+                                            )}
+                                        >
+                                            <React.Suspense fallback={null}>
+                                                <SearchButton>
+                                                    <span className={tcls('flex-1')}>
+                                                        {t(
+                                                            getSpaceLanguage(customization),
+                                                            customization.aiSearch.enabled
+                                                                ? 'search_or_ask'
+                                                                : 'search',
+                                                        )}
+                                                    </span>
+                                                </SearchButton>
+                                            </React.Suspense>
+                                        </div>
+                                    )}
+                                    {withVariants && (
+                                        <div
+                                            className={tcls(
+                                                withTopHeader && !sections
+                                                    ? 'sm:hidden'
+                                                    : ['sm:hidden', 'lg:flex'],
+                                            )}
+                                        >
+                                            <SpacesDropdown space={space} spaces={spaces} />
+                                        </div>
+                                    )}
+                                </>
+                            ) : null
                         }
                         headerOffset={headerOffset}
                     />

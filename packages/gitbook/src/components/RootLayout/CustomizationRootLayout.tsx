@@ -3,6 +3,8 @@ import {
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
     CustomizationSettings,
+    CustomizationSidebarBackgroundStyle,
+    CustomizationSidebarListStyle,
     CustomizationTint,
     SiteCustomizationSettings,
 } from '@gitbook/api';
@@ -36,8 +38,8 @@ export async function CustomizationRootLayout(props: {
 
     const headerTheme = generateHeaderTheme(customization);
     const language = getSpaceLanguage(customization);
-
     const tintColor = getTintColor(customization);
+    const sidebarStyles = getSidebarStyles(customization);
 
     return (
         <html
@@ -51,6 +53,8 @@ export async function CustomizationRootLayout(props: {
                     ? ' straight-corners'
                     : '',
                 tintColor ? ' tint' : 'no-tint',
+                sidebarStyles.background && ' sidebar-' + sidebarStyles.background,
+                sidebarStyles.list && ' sidebar-list-' + sidebarStyles.list,
             )}
         >
             <head>
@@ -185,7 +189,7 @@ export async function CustomizationRootLayout(props: {
  * Get the tint color from the customization settings.
  * If the tint color is not set or it is a space customization, it will return the default color.
  */
-export function getTintColor(
+function getTintColor(
     customization: CustomizationSettings | SiteCustomizationSettings,
 ): CustomizationTint['color'] | undefined {
     if ('tint' in customization.styling && customization.styling.tint) {
@@ -194,6 +198,26 @@ export function getTintColor(
             dark: customization.styling.tint?.color.dark ?? DEFAULT_TINT_COLOR,
         };
     }
+}
+
+/**
+ * Get the sidebar styles from the customization settings.
+ * If it is a space customization, it will return the default styles.
+ */
+function getSidebarStyles(
+    customization: CustomizationSettings | SiteCustomizationSettings,
+): SiteCustomizationSettings['styling']['sidebar'] {
+    if ('sidebar' in customization.styling) {
+        return {
+            background: customization.styling.sidebar.background,
+            list: customization.styling.sidebar.list,
+        };
+    }
+
+    return {
+        background: CustomizationSidebarBackgroundStyle.Default,
+        list: CustomizationSidebarListStyle.Default,
+    };
 }
 
 type ColorInput = string | Record<string, string>;

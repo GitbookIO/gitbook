@@ -26,8 +26,8 @@ function getTopOffset(props: { sectionsHeader: boolean; topHeader: boolean }) {
     if (props.sectionsHeader && props.topHeader) {
         return 'lg:max-h-[calc(100vh_-_8rem)] top-32 page-api-block:xl:max-2xl:top-32';
     }
-    if (props.sectionsHeader || props.topHeader) {
-        return 'lg:max-h-[calc(100vh_-_4rem)] top-16 page-api-block:xl:max-2xl:top-16';
+    if (props.topHeader) {
+        return 'lg:max-h-[calc(100vh_-_6rem)] top-24 page-api-block:xl:max-2xl:top-24';
     }
     return 'lg:max-h-screen top-0 page-api-block:xl:max-2xl:top-0';
 }
@@ -76,7 +76,7 @@ export async function PageAside(props: {
                 'grow-0',
                 'shrink-0',
                 'sticky',
-                'py-8',
+                withHeaderOffset.topHeader ? 'py-4' : 'py-8',
                 'break-anywhere', // To prevent long words in headings from breaking the layout
                 'lg:h-full',
                 'h-[100vh]',
@@ -117,7 +117,7 @@ export async function PageAside(props: {
                     'flex-1',
                     'flex',
                     'flex-col',
-                    'gap-4',
+                    'gap-6',
                     '[&::-webkit-scrollbar]:bg-transparent',
                     '[&::-webkit-scrollbar-thumb]:bg-transparent',
 
