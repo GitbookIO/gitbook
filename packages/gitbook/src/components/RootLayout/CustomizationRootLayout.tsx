@@ -25,10 +25,6 @@ import '@gitbook/icons/style.css';
 import './globals.css';
 
 const DEFAULT_TINT_COLOR = '#787878';
-const SIDEBAR_TINT_COLOR_LIGHT = '#FFFFFF';
-const SIDEBAR_TINT_COLOR_DARK = '#000000';
-const SIDEBAR_NO_TINT_COLOR_LIGHT = 'var(--light-2)';
-const SIDEBAR_NO_TINT_COLOR_DARK = 'var(--dark-2)';
 
 /**
  * Layout shared between the content and the PDF renderer.
