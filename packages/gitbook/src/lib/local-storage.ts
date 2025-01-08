@@ -1,3 +1,5 @@
+import { checkIsSecurityError } from './security-error';
+
 /**
  * Get an item from local storage safely.
  */
@@ -9,7 +11,7 @@ export function getItem<T>(key: string, defaultValue: T): T {
         }
         return defaultValue;
     } catch (error) {
-        if (error instanceof Error && error.name === 'SecurityError') {
+        if (checkIsSecurityError(error)) {
             return defaultValue;
         }
         throw error;
@@ -25,7 +27,7 @@ export function setItem(key: string, value: unknown) {
             localStorage.setItem(key, JSON.stringify(value));
         }
     } catch (error) {
-        if (error instanceof Error && error.name === 'SecurityError') {
+        if (checkIsSecurityError(error)) {
             return;
         }
         throw error;
