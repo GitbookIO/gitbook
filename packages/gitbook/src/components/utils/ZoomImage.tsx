@@ -63,7 +63,10 @@ export function ZoomImage(
             }
         };
 
-        mediaQueryList.addEventListener('change', onChange);
+        if ('addEventListener' in mediaQueryList) {
+            mediaQueryList.addEventListener('change', onChange);
+        }
+
         if (imgRef.current) {
             resizeObserver?.observe(imgRef.current);
         }
@@ -75,7 +78,9 @@ export function ZoomImage(
 
         return () => {
             resizeObserver?.disconnect();
-            mediaQueryList.removeEventListener('change', onChange);
+            if ('removeEventListener' in mediaQueryList) {
+                mediaQueryList.removeEventListener('change', onChange);
+            }
         };
     }, [imgRef, width]);
 
