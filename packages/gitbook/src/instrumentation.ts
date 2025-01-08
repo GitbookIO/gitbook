@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/cloudflare';
+import * as Sentry from '@sentry/nextjs';
 
 export async function register() {
     await import('../sentry.edge.config');

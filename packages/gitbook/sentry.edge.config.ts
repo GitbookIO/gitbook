@@ -1,8 +1,8 @@
-import { init } from '@sentry/nextjs';
+import * as Sentry from '@sentry/nextjs';
 
 const dsn = process.env.SENTRY_DSN;
 if (dsn) {
-    init({
+    Sentry.init({
         dsn,
         release: process.env.SENTRY_RELEASE,
 
