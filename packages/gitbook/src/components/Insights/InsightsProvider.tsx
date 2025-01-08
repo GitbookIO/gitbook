@@ -2,7 +2,7 @@
 
 import type * as api from '@gitbook/api';
 import { OpenAPIOperationContextProvider } from '@gitbook/react-openapi';
-import cookies from 'js-cookie';
+import * as cookies from '@/lib/cookies';
 import * as React from 'react';
 import { useEventCallback, useDebounceCallback } from 'usehooks-ts';
 
