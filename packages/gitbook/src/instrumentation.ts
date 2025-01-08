@@ -2,8 +2,7 @@ import * as Sentry from '@sentry/nextjs';
 import { Instrumentation } from 'next';
 
 export async function register() {
-    console.log('Instrumentation.register');
-    await import('../sentry.edge.config');
+    await import('./sentry');
 }
 
 export const onRequestError: Instrumentation.onRequestError = async (...args) => {
