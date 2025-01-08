@@ -11,7 +11,6 @@ import {
     browserApiErrorsIntegration,
     globalHandlersIntegration,
     httpContextIntegration,
-    browserSessionIntegration,
 } from '@sentry/nextjs';
 
 const dsn = process.env.SENTRY_DSN;
@@ -31,7 +30,6 @@ if (dsn) {
             browserApiErrorsIntegration(),
             globalHandlersIntegration(),
             httpContextIntegration(),
-            browserSessionIntegration(),
         ],
         sampleRate: 0.5,
         enableTracing: false,
