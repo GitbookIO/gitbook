@@ -2,10 +2,12 @@
 
 import { Icon } from '@gitbook/icons';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useLanguage, tString } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
+
+import { useScrollListener } from '../hooks/useScrollListener';
 
 const globalClassName = 'navigation-open';
 
@@ -28,25 +30,19 @@ export function HeaderMobileMenu(props: Partial<React.ButtonHTMLAttributes<HTMLB
         }
     };
 
-    const handleScroll = () => {
+    const windowRef = useRef(typeof window === 'undefined' ? null : window);
+    useScrollListener(() => {
         if (window.scrollY >= scrollDistance) {
             setHasScrolled(true);
         } else {
             setHasScrolled(false);
         }
-    };
+    }, windowRef);
 
     // Close the navigation when navigating to a page
     useEffect(() => {
         document.body.classList.remove(globalClassName);
     }, [pathname]);
-
-    useEffect(() => {
-        window.addEventListener('scroll', handleScroll);
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-        };
-    }, []);
 
     return (
         <button

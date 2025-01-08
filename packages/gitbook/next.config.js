@@ -4,6 +4,7 @@ module.exports = withSentryConfig(
     {
         env: {
             BUILD_VERSION: (process.env.GITHUB_SHA ?? '').slice(0, 7),
+            SENTRY_RELEASE: process.env.SENTRY_RELEASE ?? '',
             SENTRY_DSN: process.env.SENTRY_DSN ?? '',
             SENTRY_ENVIRONMENT: process.env.SENTRY_ENVIRONMENT ?? 'development',
             GITBOOK_ASSETS_PREFIX: process.env.GITBOOK_ASSETS_PREFIX,
@@ -67,11 +68,11 @@ module.exports = withSentryConfig(
         },
     },
     {
+        release: process.env.SENTRY_RELEASE,
         org: process.env.SENTRY_ORG,
         project: process.env.SENTRY_PROJECT,
         authToken: process.env.SENTRY_AUTH_TOKEN,
 
-        silent: true,
         // Upload a larger set of source maps for prettier stack traces (increases build time)
         widenClientFileUpload: true,
         // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
