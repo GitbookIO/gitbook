@@ -1,19 +1,24 @@
+'use client';
+
 import { useParams } from 'next/navigation';
 import React from 'react';
 
+function getHash(): string | null {
+    if (typeof window === 'undefined') {
+        return null;
+    }
+    return window.location.hash.slice(1);
+}
+
+/**
+ * Hook to get the current hash from the URL.
+ * @see https://github.com/vercel/next.js/discussions/49465
+ */
 export function useHash() {
     const params = useParams();
-    const [hash, setHash] = React.useState<string | null>(global.location?.hash?.slice(1) ?? null);
+    const [hash, setHash] = React.useState<string | null>(getHash);
     React.useEffect(() => {
-        function updateHash() {
-            setHash(global.location?.hash?.slice(1));
-        }
-        global.addEventListener('hashchange', updateHash);
-        updateHash();
-        return () => global.removeEventListener('hashchange', updateHash);
-        // With next.js, the hashchange event is not triggered when the hash changes
-        // Instead a hack is to use the `useParams` hook to listen to changes in the hash
-        // https://github.com/vercel/next.js/discussions/49465#discussioncomment-5845312
+        setHash(getHash());
     }, [params]);
     return hash;
 }
