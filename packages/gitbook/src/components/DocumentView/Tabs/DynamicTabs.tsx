@@ -3,6 +3,7 @@
 import React, { useCallback, useMemo } from 'react';
 
 import { useHash, useIsMounted } from '@/components/hooks';
+import * as storage from '@/lib/local-storage';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 interface TabsState {
@@ -12,15 +13,12 @@ interface TabsState {
     activeTitles: string[];
 }
 
-let globalTabsState: TabsState = (() => {
-    if (typeof localStorage === 'undefined') {
-        return { activeIds: {}, activeTitles: [] };
-    }
+const defaultTabsState: TabsState = {
+    activeIds: {},
+    activeTitles: [],
+};
 
-    const stored = localStorage.getItem('@gitbook/tabsState');
-    return stored ? (JSON.parse(stored) as TabsState) : { activeIds: {}, activeTitles: [] };
-})();
-
+let globalTabsState = storage.getItem('@gitbook/tabsState', defaultTabsState);
 const listeners = new Set<() => void>();
 
 function useTabsState() {
@@ -33,9 +31,7 @@ function useTabsState() {
 
     const setTabsState = useCallback((updater: (previous: TabsState) => TabsState) => {
         globalTabsState = updater(globalTabsState);
-        if (typeof localStorage !== 'undefined') {
-            localStorage.setItem('@gitbook/tabsState', JSON.stringify(globalTabsState));
-        }
+        storage.setItem('@gitbook/tabsState', globalTabsState);
         listeners.forEach((listener) => listener());
     }, []);
     const state = React.useSyncExternalStore(subscribe, getSnapshot, getSnapshot);

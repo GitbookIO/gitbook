@@ -18,6 +18,10 @@ export function useScrollActiveId(
     React.useEffect(() => {
         setActiveId(null);
 
+        if (typeof IntersectionObserver === 'undefined') {
+            return;
+        }
+
         const onObserve: IntersectionObserverCallback = (entries) => {
             /**
              * We need to keep track of all the sections that are intersecting

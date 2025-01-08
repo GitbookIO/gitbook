@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     const { pages: rootPages } = await getSpaceContentData(pointer, pointer.siteShareKey);
 
     const pages = flattenPages(rootPages, (page) => !page.hidden && isPageIndexable([], page));
-    const urls = Promise.all(
+    const urls = await Promise.all(
         pages.map(async ({ page, depth }) => {
             // Decay priority with depth
             const priority = Math.pow(2, -0.25 * depth);
