@@ -128,13 +128,32 @@ export async function SpaceLayout(props: {
                             )
                         }
                         innerHeader={
-                            withVariants && (
-                                <SpacesDropdown
-                                    space={space}
-                                    spaces={spaces}
-                                    className={tcls('w-full')}
-                                />
-                            )
+                            // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
+                            <>
+                                {!withTopHeader && (
+                                    <div className={tcls('hidden', 'lg:block')}>
+                                        <React.Suspense fallback={null}>
+                                            <SearchButton>
+                                                <span className={tcls('flex-1')}>
+                                                    {t(
+                                                        getSpaceLanguage(customization),
+                                                        customization.aiSearch.enabled
+                                                            ? 'search_or_ask'
+                                                            : 'search',
+                                                    )}
+                                                </span>
+                                            </SearchButton>
+                                        </React.Suspense>
+                                    </div>
+                                )}
+                                {withVariants && (
+                                    <SpacesDropdown
+                                        space={space}
+                                        spaces={spaces}
+                                        className={tcls('w-full')}
+                                    />
+                                )}
+                            </>
                         }
                         headerOffset={headerOffset}
                     />
