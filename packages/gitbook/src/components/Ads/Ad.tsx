@@ -44,6 +44,10 @@ export function Ad({
             return;
         }
 
+        if (typeof IntersectionObserver === 'undefined') {
+            return;
+        }
+
         const observer = new IntersectionObserver(
             ([entry]) => {
                 if (entry.isIntersecting) {
