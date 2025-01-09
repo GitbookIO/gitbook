@@ -84,7 +84,7 @@ export function Header(props: {
                             CONTAINER_STYLE,
                         )}
                     >
-                        <div className="flex max-w-full shrink min-w-0 gap-2 lg:gap-4 justify-start items-center">
+                        <div className="flex max-w-full page-no-toc:max-[400px]:w-full shrink min-w-0 gap-2 lg:gap-4 justify-start items-center">
                             <HeaderMobileMenu
                                 className={tcls(
                                     'lg:hidden',
@@ -99,7 +99,7 @@ export function Header(props: {
                         </div>
 
                         {isMultiVariants && (
-                            <div className="hidden page-no-toc:flex">
+                            <div className="hidden page-no-toc:flex mr-auto">
                                 <SpacesDropdown space={space} spaces={spaces} />
                             </div>
                         )}
