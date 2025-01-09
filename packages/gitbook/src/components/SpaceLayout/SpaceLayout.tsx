@@ -156,7 +156,10 @@ export async function SpaceLayout(props: {
                                     </div>
                                 )}
                                 {!withTopHeader && withSections && sections && (
-                                    <SiteSectionList {...sections} />
+                                    <SiteSectionList
+                                        className={tcls('hidden', 'lg:block')}
+                                        {...sections}
+                                    />
                                 )}
                                 {withVariants && (
                                     <SpacesDropdown
