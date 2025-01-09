@@ -11,18 +11,19 @@ import { useScrollListener } from '../hooks/useScrollListener';
 
 const globalClassName = 'navigation-open';
 
+const SCROLL_DISTANCE = 320;
+
 /**
  * Button to show/hide the table of content on mobile.
  */
 export function HeaderMobileMenu(props: Partial<React.ButtonHTMLAttributes<HTMLButtonElement>>) {
     const language = useLanguage();
-    const scrollDistance = 320;
 
     const pathname = usePathname();
-    const [hasScrolled, setHasScrolled] = useState(false);
+    const hasScrollRef = useRef(false);
 
     const toggleNavigation = () => {
-        if (!hasScrolled && document.body.classList.contains(globalClassName)) {
+        if (!hasScrollRef.current && document.body.classList.contains(globalClassName)) {
             document.body.classList.remove(globalClassName);
         } else {
             document.body.classList.add(globalClassName);
@@ -32,11 +33,7 @@ export function HeaderMobileMenu(props: Partial<React.ButtonHTMLAttributes<HTMLB
 
     const windowRef = useRef(typeof window === 'undefined' ? null : window);
     useScrollListener(() => {
-        if (window.scrollY >= scrollDistance) {
-            setHasScrolled(true);
-        } else {
-            setHasScrolled(false);
-        }
+        hasScrollRef.current = window.scrollY >= SCROLL_DISTANCE;
     }, windowRef);
 
     // Close the navigation when navigating to a page
