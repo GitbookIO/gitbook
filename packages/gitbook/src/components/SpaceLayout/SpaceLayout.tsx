@@ -84,7 +84,6 @@ export async function SpaceLayout(props: {
             visitorAuthToken={visitorAuthToken}
             {...content}
         >
-            {/* <ColorDebugger /> */}
             <Header
                 withTopHeader={withTopHeader}
                 space={space}
