@@ -14,8 +14,9 @@ import { HeaderLinks } from './HeaderLinks';
 import { HeaderLogo } from './HeaderLogo';
 import { SpacesDropdown } from './SpacesDropdown';
 import { SearchButton } from '../Search';
-import { SiteSectionTabs } from '../SiteSectionTabs';
+import { SiteSectionTabs } from '../SiteSections';
 import { HeaderMobileMenu } from './HeaderMobileMenu';
+
 /**
  * Render the header for the space.
  */

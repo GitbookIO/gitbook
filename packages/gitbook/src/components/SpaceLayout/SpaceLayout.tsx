@@ -27,6 +27,7 @@ import { shouldTrackEvents } from '@/lib/tracking';
 
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
+import { SiteSectionList } from '../SiteSections/SiteSectionList';
 
 /**
  * Render the entire content of the space (header, table of contents, footer, and page content).
@@ -57,7 +58,7 @@ export async function SpaceLayout(props: {
         children,
     } = props;
 
-    const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
+    const withTopHeader = false; //customization.header.preset !== CustomizationHeaderPreset.None;
 
     const contentRefContext: ContentRefContext = {
         siteContext: content,
