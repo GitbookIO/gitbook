@@ -1,4 +1,3 @@
-import './sentry';
 import { ContentAPITokenPayload, GitBookAPI } from '@gitbook/api';
 import { setTag, setContext } from '@sentry/nextjs';
 import assertNever from 'assert-never';
