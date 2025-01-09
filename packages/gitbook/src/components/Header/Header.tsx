@@ -80,11 +80,17 @@ export function Header(props: {
                             'py-3',
                             'min-h-16',
                             'sm:h-16',
-                            'page-no-toc:max-[400px]:flex-wrap',
+                            isMultiVariants && 'page-no-toc:max-[400px]:flex-wrap',
                             CONTAINER_STYLE,
                         )}
                     >
-                        <div className="flex max-w-full page-no-toc:max-[400px]:w-full shrink min-w-0 gap-2 lg:gap-4 justify-start items-center">
+                        <div
+                            className={tcls(
+                                'flex max-w-full',
+                                isMultiVariants && 'page-no-toc:max-[400px]:w-full',
+                                'shrink min-w-0 gap-2 lg:gap-4 justify-start items-center',
+                            )}
+                        >
                             <HeaderMobileMenu
                                 className={tcls(
                                     'lg:hidden',
