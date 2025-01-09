@@ -269,17 +269,25 @@ function ZoomImageModal(props: {
 }
 
 function startViewTransition(callback: () => void, onEnd?: () => void) {
-    // @ts-ignore
     if (document.startViewTransition) {
-        // @ts-ignore
-        const transition = document.startViewTransition(() => {
-            ReactDOM.flushSync(() => callback());
-        });
-        transition.finished.then(() => {
-            if (onEnd) {
-                onEnd();
+        try {
+            const transition = document.startViewTransition(() => {
+                ReactDOM.flushSync(() => callback());
+            });
+            transition.finished.then(() => {
+                if (onEnd) {
+                    onEnd();
+                }
+            });
+        } catch (error) {
+            // Safari can throw an error if another transition is already in progress
+            if (error instanceof Error && error.name === 'AbortError') {
+                callback();
+                onEnd?.();
+                return;
             }
-        });
+            throw error;
+        }
     } else {
         callback();
         onEnd?.();
