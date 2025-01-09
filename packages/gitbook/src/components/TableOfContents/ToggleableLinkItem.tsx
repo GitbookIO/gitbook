@@ -134,7 +134,7 @@ export function ToggleableLinkItem(
                     'hover:contrast-more:ring-dark',
                     'dark:contrast-more:hover:ring-light',
 
-                    'before:content-[]',
+                    'before:contents[]',
                     'before:absolute',
                     'before:inset-y-0',
                     'before:-left-px',

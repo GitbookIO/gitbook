@@ -169,6 +169,7 @@ export async function PageAside(props: {
                         'py-4',
                         'first:pt-0',
                         'page-api-block:xl:max-2xl:px-3',
+                        'empty:hidden',
                     )}
                 >
                     {withPageFeedback ? (
