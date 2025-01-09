@@ -53,22 +53,38 @@ export function SiteSectionList(props: {
                                             'px-3',
                                             'py-2',
                                             '-mx-3',
+
                                             'hover:bg-dark/1',
+                                            'contrast-more:hover:ring-1',
+                                            'contrast-more:hover:ring-dark',
                                             'dark:hover:bg-light/1',
-                                            'rounded-md',
-                                            'straight-corners:rounded-none',
-                                            'transition-colors',
-                                            'group/section-link',
+                                            'contrast-more:dark:hover:ring-light',
+
                                             'hover:text-dark/9',
                                             'dark:hover:text-light/9',
 
+                                            'rounded-md',
+                                            'straight-corners:rounded-none',
+                                            'transition-all',
+                                            'group/section-link',
+
                                             isActive && [
                                                 'text-primary',
-                                                'dark:text-primary-400',
                                                 'hover:text-primary',
+                                                'contrast-more:text-primary-700',
+                                                'contrast-more:hover:text-primary-700',
+                                                'contrast-more:font-semibold',
+
+                                                'dark:text-primary-400',
                                                 'dark:hover:text-primary-400',
+                                                'dark:contrast-more:text-primary-300',
+                                                'dark:contrast-more:hover:text-primary-300',
+
                                                 'hover:bg-primary/3',
+                                                'contrast-more:hover:ring-1',
+                                                'contrast-more:hover:ring-primary-700',
                                                 'dark:hover:bg-primary-400/3',
+                                                'contrast-more:dark:hover:ring-primary-300',
                                             ],
                                         )}
                                     >
@@ -94,7 +110,9 @@ export function SiteSectionList(props: {
                                                 'dark:ring-light/2',
 
                                                 'text-dark/6',
+                                                'contrast-more:text-dark',
                                                 'dark:text-light/6',
+                                                'contrast-more:dark:text-light',
 
                                                 'group-hover/section-link:scale-110',
                                                 'group-active/section-link:scale-90',
@@ -111,8 +129,14 @@ export function SiteSectionList(props: {
                                                     'shadow-md',
                                                     'shadow-primary-600/4',
 
-                                                    'text-primary',
+                                                    'contrast-more:ring-2',
+                                                    'contrast-more:ring-primary-700',
+                                                    'contrast-more:dark:ring-primary-300',
+
+                                                    'text-primary-600',
+                                                    'contrast-more:text-primary-700',
                                                     'dark:text-primary-400',
+                                                    'dark:contrast-more:text-primary-300',
                                                 ],
                                                 'text-lg',
                                             )}
