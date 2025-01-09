@@ -1,3 +1,4 @@
+import { captureException } from '@sentry/nextjs';
 import assertNever from 'assert-never';
 import React from 'react';
 
@@ -47,7 +48,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     },
     ref: React.Ref<SearchResultsRef>,
 ) {
-    const { children, query, pointer, spaceId, revisionId, global, withAsk, onSwitchToAsk } = props;
+    const { children, query, pointer, spaceId, revisionId, withAsk, global, onSwitchToAsk } = props;
 
     const language = useLanguage();
     const trackEvent = useTrackEvent();
@@ -62,6 +63,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     React.useEffect(() => {
         if (!query) {
             if (!withAsk) {
+                setResultsState({ results: [], fetching: false });
                 return;
             }
 
@@ -74,6 +76,16 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
             setResultsState({ results: [], fetching: true });
             getRecommendedQuestions(spaceId).then((questions) => {
+                if (!questions) {
+                    if (!cancelled) {
+                        setResultsState({ results: [], fetching: false });
+                    }
+                    captureException(
+                        new Error('questions is null, meaning the cache is probably corrupted'),
+                    );
+                    return;
+                }
+
                 const results = questions.map((question) => ({
                     type: 'recommended-question',
                     id: question,
@@ -208,7 +220,9 @@ export const SearchResults = React.forwardRef(function SearchResults(
         <div className={tcls('overflow-auto')}>
             {children}
             {results.length === 0 ? (
-                noResults
+                query ? (
+                    noResults
+                ) : null
             ) : (
                 <>
                     <div data-test="search-results">
