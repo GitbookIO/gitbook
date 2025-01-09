@@ -12,7 +12,7 @@ export async function getSiteOrSpacePointerForPDF(): Promise<
     SiteContentPointer | SpaceContentPointer
 > {
     try {
-        return getSiteContentPointer();
+        return await getSiteContentPointer();
     } catch (error) {
         return getSpacePointer();
     }
