@@ -1,6 +1,6 @@
 'use client';
 
-import cookies from 'js-cookie';
+import * as cookies from '@/lib/cookies';
 
 import { isCookiesTrackingDisabled } from './cookies';
 import { generateRandomId } from './utils';
