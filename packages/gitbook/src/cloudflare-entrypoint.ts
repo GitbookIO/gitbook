@@ -14,19 +14,17 @@ const exportedHandler = {
     },
 } satisfies ExportedHandler<{ ASSETS: Fetcher }>;
 
-const dsn = process.env.SENTRY_DSN;
-
 /**
  * We use a custom entrypoint until we can move to opennext (https://github.com/opennextjs/opennextjs-cloudflare/issues/92).
  * There is a bug in next-on-pages where headers can't be set on the response in the middleware for RSC requests (https://github.com/cloudflare/next-on-pages/issues/897).
  */
-export default dsn
-    ? withSentry(
-          () => ({
-              dsn,
-              tracesSampleRate: 0,
-          }),
-          // @ts-ignore
-          exportedHandler,
-      )
-    : exportedHandler;
+export default withSentry(
+    (env) => ({
+        dsn: env.SENTRY_DSN,
+        release: env.SENTRY_RELEASE,
+        environment: env.SENTRY_ENVIRONMENT,
+        tracesSampleRate: 0,
+    }),
+    // @ts-ignore
+    exportedHandler,
+);
