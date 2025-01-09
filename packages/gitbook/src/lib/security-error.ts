@@ -7,6 +7,7 @@ export function checkIsSecurityError(error: unknown): error is Error {
         // Safari
         (error.name === 'SecurityError' ||
             // Firefox
-            error.name === 'NS_ERROR_FAILURE')
+            error.name === 'NS_ERROR_FAILURE' ||
+            error.name === 'NS_ERROR_ABORT')
     );
 }
