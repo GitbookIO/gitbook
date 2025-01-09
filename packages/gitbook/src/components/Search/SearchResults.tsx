@@ -116,6 +116,14 @@ export const SearchResults = React.forwardRef(function SearchResults(
                     return;
                 }
 
+                if (!results) {
+                    setResultsState({ results: [], fetching: false });
+                    captureException(
+                        new Error('questions is null, meaning the cache is probably corrupted'),
+                    );
+                    return;
+                }
+
                 setResultsState({ results, fetching: false });
 
                 trackEvent({
@@ -131,7 +139,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
         }
     }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent]);
 
-    const results = React.useMemo(() => {
+    const results: ResultType[] = React.useMemo(() => {
         if (!withAsk) {
             return resultsState.results;
         }
@@ -142,7 +150,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
         if (!query) {
             // Reset the cursor when there's no query
             setCursor(null);
-        } else if (results && results.length > 0) {
+        } else if (results.length > 0) {
             // Auto-focus the first result
             setCursor(0);
         }
@@ -162,10 +170,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
     const moveBy = React.useCallback(
         (delta: number) => {
-            if (!results) {
-                return;
-            }
-
             setCursor((prev) => {
                 if (prev === null) {
                     return 0;
