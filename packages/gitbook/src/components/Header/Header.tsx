@@ -74,14 +74,23 @@ export function Header(props: {
                             'gap-4',
                             'lg:gap-8',
                             'flex',
-                            'h-16',
                             'items-center',
                             'justify-between',
                             'w-full',
+                            'py-3',
+                            'min-h-16',
+                            'sm:h-16',
+                            isMultiVariants && 'page-no-toc:max-[400px]:flex-wrap',
                             CONTAINER_STYLE,
                         )}
                     >
-                        <div className="flex max-w-full shrink min-w-0 gap-2 lg:gap-4 justify-start items-center">
+                        <div
+                            className={tcls(
+                                'flex max-w-full',
+                                isMultiVariants && 'page-no-toc:max-[400px]:w-full',
+                                'shrink min-w-0 gap-2 lg:gap-4 justify-start items-center',
+                            )}
+                        >
                             <HeaderMobileMenu
                                 className={tcls(
                                     'lg:hidden',
@@ -93,30 +102,13 @@ export function Header(props: {
                                 )}
                             />
                             <HeaderLogo site={site} space={space} customization={customization} />
-                            {!hasSiteSections && isMultiVariants ? (
-                                <div className="z-20 shrink hidden sm:block">
-                                    <SpacesDropdown
-                                        className={tcls(
-                                            !isCustomizationDefault &&
-                                                withTopHeader && [
-                                                    'bg-header-link/2',
-                                                    'dark:bg-header-link/2',
-                                                    'text-header-link/8',
-                                                    'dark:text-header-link/8',
-                                                    'ring-1',
-                                                    'ring-header-link/4',
-                                                    'dark:ring-header-link/4',
-                                                    'contrast-more:bg-header-background',
-                                                    'contrast-more:text-header-link',
-                                                    'contrast-more:ring-header-link',
-                                                ],
-                                        )}
-                                        space={space}
-                                        spaces={spaces}
-                                    />
-                                </div>
-                            ) : null}
                         </div>
+
+                        {isMultiVariants && (
+                            <div className="hidden page-no-toc:flex mr-auto">
+                                <SpacesDropdown space={space} spaces={spaces} />
+                            </div>
+                        )}
 
                         {customization.header.links.length > 0 && (
                             <HeaderLinks>

@@ -91,8 +91,9 @@ export function DropdownChevron() {
                 'opacity-6',
                 'size-3',
                 'ms-1',
-                'transition-transform',
-                'group-hover/dropdown:rotate-180',
+                'transition-all',
+                'group-hover/dropdown:opacity-11',
+                'group-focus-within/dropdown:rotate-180',
             )}
         />
     );
