@@ -97,9 +97,6 @@ export type LookupResult = PublishedContentWithCache & {
  * The middleware also takes care of persisting the visitor authentication state.
  */
 export async function middleware(request: NextRequest) {
-    // Instrumentation is not loaded correctly...
-    await import('./sentry');
-
     const { url, mode } = getInputURL(request);
 
     setTag('url', url.toString());
