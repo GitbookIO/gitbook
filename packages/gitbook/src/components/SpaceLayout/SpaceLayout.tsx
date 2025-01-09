@@ -155,6 +155,9 @@ export async function SpaceLayout(props: {
                                         </React.Suspense>
                                     </div>
                                 )}
+                                {!withTopHeader && withSections && sections && (
+                                    <SiteSectionList {...sections} />
+                                )}
                                 {withVariants && (
                                     <SpacesDropdown
                                         space={space}
