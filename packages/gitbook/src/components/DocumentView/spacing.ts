@@ -37,7 +37,7 @@ export function getBlockTextStyle(block: DocumentBlock): {
             };
         case 'heading-3':
             return {
-                textSize: 'text-base font-semibold',
+                textSize: 'text-xl font-semibold',
                 lineHeight: 'leading-snug',
                 marginTop: 'mt-[0.5em]',
             };
