@@ -55,7 +55,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     const [results, setResults] = React.useState<ResultType[] | null>(null);
     const [cursor, setCursor] = React.useState<number | null>(null);
     const refs = React.useRef<(null | HTMLAnchorElement)[]>([]);
-    const suggestedQuestionsRef = React.useRef<null | string[]>(null);
+    const suggestedQuestionsRef = React.useRef<null | ResultType[]>(null);
 
     React.useEffect(() => {
         if (!query) {
@@ -63,25 +63,27 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 return;
             }
 
+            if (suggestedQuestionsRef.current) {
+                setResults(suggestedQuestionsRef.current);
+                return;
+            }
+
             let cancelled = false;
 
-            (suggestedQuestionsRef.current
-                ? Promise.resolve(suggestedQuestionsRef.current)
-                : getRecommendedQuestions(spaceId)
-            ).then((questions) => {
-                suggestedQuestionsRef.current = questions;
+            getRecommendedQuestions(spaceId).then((questions) => {
+                const results = questions.map((question) => ({
+                    type: 'recommended-question',
+                    id: question,
+                    question: question,
+                })) satisfies ResultType[];
+
+                suggestedQuestionsRef.current = results;
 
                 if (cancelled) {
                     return;
                 }
 
-                setResults(
-                    questions.map((question) => ({
-                        type: 'recommended-question',
-                        id: question,
-                        question: question,
-                    })),
-                );
+                setResults(results);
             });
 
             return () => {
