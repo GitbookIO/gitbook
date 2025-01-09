@@ -58,7 +58,7 @@ export async function SpaceLayout(props: {
         children,
     } = props;
 
-    const withTopHeader = false; //customization.header.preset !== CustomizationHeaderPreset.None;
+    const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
     const contentRefContext: ContentRefContext = {
         siteContext: content,
