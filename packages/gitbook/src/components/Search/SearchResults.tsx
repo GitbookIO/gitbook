@@ -1,3 +1,4 @@
+import { captureException } from '@sentry/nextjs';
 import assertNever from 'assert-never';
 import React from 'react';
 
@@ -47,7 +48,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     },
     ref: React.Ref<SearchResultsRef>,
 ) {
-    const { children, query, pointer, spaceId, revisionId, global, withAsk, onSwitchToAsk } = props;
+    const { children, query, pointer, spaceId, revisionId, withAsk, global, onSwitchToAsk } = props;
 
     const language = useLanguage();
     const trackEvent = useTrackEvent();
@@ -62,6 +63,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     React.useEffect(() => {
         if (!query) {
             if (!withAsk) {
+                setResultsState({ results: [], fetching: false });
                 return;
             }
 
@@ -74,6 +76,16 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
             setResultsState({ results: [], fetching: true });
             getRecommendedQuestions(spaceId).then((questions) => {
+                if (!questions) {
+                    if (!cancelled) {
+                        setResultsState({ results: [], fetching: false });
+                    }
+                    captureException(
+                        new Error('questions is null, meaning the cache is probably corrupted'),
+                    );
+                    return;
+                }
+
                 const results = questions.map((question) => ({
                     type: 'recommended-question',
                     id: question,
@@ -104,6 +116,14 @@ export const SearchResults = React.forwardRef(function SearchResults(
                     return;
                 }
 
+                if (!results) {
+                    setResultsState({ results: [], fetching: false });
+                    captureException(
+                        new Error('questions is null, meaning the cache is probably corrupted'),
+                    );
+                    return;
+                }
+
                 setResultsState({ results, fetching: false });
 
                 trackEvent({
@@ -119,7 +139,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
         }
     }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent]);
 
-    const results = React.useMemo(() => {
+    const results: ResultType[] = React.useMemo(() => {
         if (!withAsk) {
             return resultsState.results;
         }
@@ -130,7 +150,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
         if (!query) {
             // Reset the cursor when there's no query
             setCursor(null);
-        } else if (results && results.length > 0) {
+        } else if (results.length > 0) {
             // Auto-focus the first result
             setCursor(0);
         }
@@ -150,10 +170,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
     const moveBy = React.useCallback(
         (delta: number) => {
-            if (!results) {
-                return;
-            }
-
             setCursor((prev) => {
                 if (prev === null) {
                     return 0;
@@ -208,7 +224,9 @@ export const SearchResults = React.forwardRef(function SearchResults(
         <div className={tcls('overflow-auto')}>
             {children}
             {results.length === 0 ? (
-                noResults
+                query ? (
+                    noResults
+                ) : null
             ) : (
                 <>
                     <div data-test="search-results">
