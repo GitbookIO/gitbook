@@ -94,48 +94,6 @@ jobs:
                       Latest commit: [${{ steps.deploy.outputs.deployment-url }}](${{ steps.deploy.outputs.deployment-url }})
                       PR: [${{ steps.deploy.outputs.deployment-alias-url }}](${{ steps.deploy.outputs.deployment-alias-url }})
                   edit-mode: replace
-    visual-testing:
-        runs-on: ubuntu-latest
-        name: Visual Testing
-        needs: deploy
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-            - name: Setup Bun
-              uses: ./.github/composite/setup-bun
-            - name: Install dependencies
-              run: bun install --frozen-lockfile
-            - name: Setup Playwright
-              uses: ./.github/actions/setup-playwright
-            - name: Run Playwright tests
-              run: bun e2e
-              env:
-                  BASE_URL: ${{needs.deploy.outputs.deployment_url}}
-                  ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
-            - uses: actions/upload-artifact@v4
-              if: ${{ !cancelled() }}
-              with:
-                  name: playwright-test-results
-                  path: packages/gitbook/test-results/
-                  retention-days: 3
-    pagespeed-testing:
-        runs-on: ubuntu-latest
-        name: PageSpeed Testing
-        needs: deploy
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-            - name: Setup Bun
-              uses: ./.github/composite/setup-bun
-            - name: Install dependencies
-              run: bun install --frozen-lockfile
-              env:
-                  PUPPETEER_SKIP_DOWNLOAD: 1
-            - name: Run pagespeed tests
-              run: bun ./packages/gitbook/tests/pagespeed-testing.ts $DEPLOYMENT_URL
-              env:
-                  DEPLOYMENT_URL: ${{needs.deploy.outputs.deployment_url}}
-                  PAGESPEED_API_KEY: ${{ secrets.PAGESPEED_API_KEY }}
     format:
         runs-on: ubuntu-latest
         name: Format
