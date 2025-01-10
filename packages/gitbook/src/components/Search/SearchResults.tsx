@@ -76,16 +76,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
             setResultsState({ results: [], fetching: true });
             getRecommendedQuestions(spaceId).then((questions) => {
-                if (!questions) {
-                    if (!cancelled) {
-                        setResultsState({ results: [], fetching: false });
-                    }
-                    captureException(
-                        new Error('questions is null, meaning the cache is probably corrupted'),
-                    );
-                    return;
-                }
-
                 const results = questions.map((question) => ({
                     type: 'recommended-question',
                     id: question,
@@ -113,14 +103,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
                     : searchSiteSpaceContent(query, pointer, revisionId));
 
                 if (cancelled) {
-                    return;
-                }
-
-                if (!results) {
-                    setResultsState({ results: [], fetching: false });
-                    captureException(
-                        new Error('questions is null, meaning the cache is probably corrupted'),
-                    );
                     return;
                 }
 

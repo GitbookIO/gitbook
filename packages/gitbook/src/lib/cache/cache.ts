@@ -142,7 +142,27 @@ export function cache<Args extends any[], Result>(
                     cacheBackends,
                     async (backend, { signal }) => {
                         const entry = await backend.get({ key, tag }, { signal });
-                        return entry ? ([entry, backend.name] as const) : null;
+
+                        if (!entry) {
+                            return null;
+                        }
+
+                        // Detect empty cache entries to avoid returning them.
+                        // Also log in Sentry to investigate what cache is returning empty entries.
+                        if (
+                            entry.data &&
+                            typeof entry.data === 'object' &&
+                            Object.keys(entry.data).length === 0
+                        ) {
+                            captureException(
+                                new Error(
+                                    `Cache entry ${key} from ${backendName} is an empty object`,
+                                ),
+                            );
+                            return null;
+                        }
+
+                        return [entry, backend.name] as const;
                     },
                     {
                         signal,
@@ -177,16 +197,6 @@ export function cache<Args extends any[], Result>(
 
             const [savedEntry, backendName] = result;
             span.setAttribute('cacheBackend', backendName);
-
-            if (
-                savedEntry.data &&
-                typeof savedEntry.data === 'object' &&
-                Object.keys(savedEntry.data).length === 0
-            ) {
-                captureException(
-                    new Error(`cache entry ${key} from ${backendName} is an empty object`),
-                );
-            }
 
             const cacheStatus: 'miss' | 'hit' = backendName === 'fetch' ? 'miss' : 'hit';
             span.setAttribute('cacheStatus', cacheStatus);
