@@ -211,7 +211,7 @@ export function Header(props: {
                         'overflow-x-auto hide-scroll',
                     )}
                 >
-                    <SiteSectionTabs {...sections} />
+                    <SiteSectionTabs sections={sections} />
                 </div>
             ) : null}
         </header>

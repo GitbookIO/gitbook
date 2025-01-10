@@ -4,25 +4,24 @@ import type { SiteSection } from '@gitbook/api';
 import { type IconName } from '@gitbook/icons';
 import React from 'react';
 
+import { SectionsList } from '@/lib/api';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { Link } from '../primitives';
 import { SectionIcon } from './SectionIcon';
-import { TOCScrollContainer, useScrollToActiveTOCItem } from '../TableOfContents/TOCScroller';
 import { useIsMounted } from '../hooks';
+import { TOCScrollContainer, useScrollToActiveTOCItem } from '../TableOfContents/TOCScroller';
 
 const MAX_ITEMS = 5; // If there are more sections than this, they'll be shown below the fold in a scrollview.
 
 /**
  * A list of items representing site sections for multi-section sites
  */
-export function SiteSectionList(props: {
-    list: SiteSection[];
-    section: SiteSection;
-    index: number;
-    className: ClassValue;
-}) {
-    const { list: sections, index: currentIndex, className } = props;
+export function SiteSectionList(props: { sections: SectionsList; className: ClassValue }) {
+    const {
+        sections: { list: sections, index: currentIndex },
+        className,
+    } = props;
 
     return (
         sections.length > 0 && (
@@ -31,7 +30,7 @@ export function SiteSectionList(props: {
                 className={tcls(
                     `text-dark/8 dark:text-light/8 text-sm
                     border-b border-dark/2 dark:border-light/2 -mx-5 relative
-                    before:absolute before:contents[] before:left-0 before:right-2 before:bottom-0 before:h-12 before:pointer-events-none before:bg-gradient-to-b from-transparent to-light`,
+                    before:absolute before:contents[] before:left-0 before:right-2 before:bottom-0 before:h-12 before:pointer-events-none before:bg-gradient-to-b from-transparent to-light dark:to-dark`,
                     className,
                 )}
             >
