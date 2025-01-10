@@ -144,13 +144,12 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
             return () => {
                 cancelled = true;
-            // clearTimeout(timeout);
+                // clearTimeout(timeout);
 
                 if (debounceTimeout.current) {
                     clearTimeout(debounceTimeout.current);
                     debounceTimeout.current = null;
                 }
-
             };
         }
     }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent, getCtx]);
