@@ -16,33 +16,7 @@ interface AdminToolbarProps {
     space: Space;
 }
 
-/**
- * Toolbar with information for the content admin when previewing a revision or change-request.
- */
-export function AdminToolbar(props: AdminToolbarProps) {
-    const { content } = props;
-
-    const toolbar = (() => {
-        if (content.changeRequestId) {
-            return (
-                <ChangeRequestToolbar
-                    spaceId={content.spaceId}
-                    changeRequestId={content.changeRequestId}
-                />
-            );
-        }
-
-        if (content.revisionId) {
-            return <RevisionToolbar spaceId={content.spaceId} revisionId={content.revisionId} />;
-        }
-
-        return null;
-    })();
-
-    if (!toolbar) {
-        return null;
-    }
-
+function ToolbarLayout(props: { children: React.ReactNode }) {
     return (
         <div
             className={tcls(
@@ -63,9 +37,30 @@ export function AdminToolbar(props: AdminToolbarProps) {
                 'backdrop-blur-sm',
             )}
         >
-            <React.Suspense fallback={null}>{toolbar}</React.Suspense>
+            <React.Suspense fallback={null}>{props.children}</React.Suspense>
         </div>
     );
+}
+
+/**
+ * Toolbar with information for the content admin when previewing a revision or change-request.
+ */
+export function AdminToolbar(props: AdminToolbarProps) {
+    const { content } = props;
+    if (content.changeRequestId) {
+        return (
+            <ChangeRequestToolbar
+                spaceId={content.spaceId}
+                changeRequestId={content.changeRequestId}
+            />
+        );
+    }
+
+    if (content.revisionId) {
+        return <RevisionToolbar spaceId={content.spaceId} revisionId={content.revisionId} />;
+    }
+
+    return null;
 }
 
 async function ChangeRequestToolbar(props: { spaceId: string; changeRequestId: string }) {
@@ -74,32 +69,38 @@ async function ChangeRequestToolbar(props: { spaceId: string; changeRequestId: s
 
     const changeRequest = await getChangeRequest(ctx, spaceId, changeRequestId);
 
+    if (!changeRequest) {
+        return null;
+    }
+
     return (
-        <Toolbar>
-            <ToolbarButton title="Open in application" href={changeRequest.urls.app}>
-                <Icon icon="code-branch" className="size-4" />
-            </ToolbarButton>
-            <ToolbarBody>
-                <p>
-                    #{changeRequest.number}: {changeRequest.subject ?? 'No subject'}
-                </p>
-                <p className="text-xs text-light/8 dark:text-light/8">
-                    Change request updated <DateRelative value={changeRequest.updatedAt} />
-                </p>
-            </ToolbarBody>
-            <ToolbarButtonGroups>
+        <ToolbarLayout>
+            <Toolbar>
                 <ToolbarButton title="Open in application" href={changeRequest.urls.app}>
-                    <Icon icon="arrow-up-right-from-square" className="size-4" />
+                    <Icon icon="code-branch" className="size-4" />
                 </ToolbarButton>
-                <RefreshChangeRequestButton
-                    ctx={ctx}
-                    spaceId={spaceId}
-                    changeRequestId={changeRequestId}
-                    revisionId={changeRequest.revision}
-                    updatedAt={new Date(changeRequest.updatedAt).getTime()}
-                />
-            </ToolbarButtonGroups>
-        </Toolbar>
+                <ToolbarBody>
+                    <p>
+                        #{changeRequest.number}: {changeRequest.subject ?? 'No subject'}
+                    </p>
+                    <p className="text-xs text-light/8 dark:text-light/8">
+                        Change request updated <DateRelative value={changeRequest.updatedAt} />
+                    </p>
+                </ToolbarBody>
+                <ToolbarButtonGroups>
+                    <ToolbarButton title="Open in application" href={changeRequest.urls.app}>
+                        <Icon icon="arrow-up-right-from-square" className="size-4" />
+                    </ToolbarButton>
+                    <RefreshChangeRequestButton
+                        ctx={ctx}
+                        spaceId={spaceId}
+                        changeRequestId={changeRequestId}
+                        revisionId={changeRequest.revision}
+                        updatedAt={new Date(changeRequest.updatedAt).getTime()}
+                    />
+                </ToolbarButtonGroups>
+            </Toolbar>
+        </ToolbarLayout>
     );
 }
 
@@ -112,31 +113,35 @@ async function RevisionToolbar(props: { spaceId: string; revisionId: string }) {
     });
 
     return (
-        <Toolbar>
-            <ToolbarButton title="Open in application" href={revision.urls.app}>
-                <Icon icon="code-commit" className="size-4" />
-            </ToolbarButton>
-            <ToolbarBody>
-                <p>
-                    Revision created <DateRelative value={revision.createdAt} />
-                </p>
-                {revision.git ? (
-                    <p className="text-xs text-light/8 dark:text-light/8">{revision.git.message}</p>
-                ) : null}
-            </ToolbarBody>
-            <ToolbarButtonGroups>
+        <ToolbarLayout>
+            <Toolbar>
                 <ToolbarButton title="Open in application" href={revision.urls.app}>
-                    <Icon icon="arrow-up-right-from-square" className="size-4" />
+                    <Icon icon="code-commit" className="size-4" />
                 </ToolbarButton>
-                {revision.git?.url ? (
-                    <ToolbarButton title="Open git commit" href={revision.git.url}>
-                        <Icon
-                            icon={revision.git.url.includes('github.com') ? 'github' : 'gitlab'}
-                            className="size-4"
-                        />
+                <ToolbarBody>
+                    <p>
+                        Revision created <DateRelative value={revision.createdAt} />
+                    </p>
+                    {revision.git ? (
+                        <p className="text-xs text-light/8 dark:text-light/8">
+                            {revision.git.message}
+                        </p>
+                    ) : null}
+                </ToolbarBody>
+                <ToolbarButtonGroups>
+                    <ToolbarButton title="Open in application" href={revision.urls.app}>
+                        <Icon icon="arrow-up-right-from-square" className="size-4" />
                     </ToolbarButton>
-                ) : null}
-            </ToolbarButtonGroups>
-        </Toolbar>
+                    {revision.git?.url ? (
+                        <ToolbarButton title="Open git commit" href={revision.git.url}>
+                            <Icon
+                                icon={revision.git.url.includes('github.com') ? 'github' : 'gitlab'}
+                                className="size-4"
+                            />
+                        </ToolbarButton>
+                    ) : null}
+                </ToolbarButtonGroups>
+            </Toolbar>
+        </ToolbarLayout>
     );
 }

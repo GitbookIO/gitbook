@@ -302,18 +302,28 @@ export const getChangeRequest = cache({
         changeRequestId: string,
         options: CacheFunctionOptions,
     ) => {
-        const response = await api(ctx).client.spaces.getChangeRequestById(
-            spaceId,
-            changeRequestId,
-            {
-                ...noCacheFetchOptions,
-                signal: options.signal,
-            },
-        );
-        return cacheResponse(response, {
-            ttl: 60 * 60,
-            revalidateBefore: 10 * 60,
-        });
+        try {
+            const response = await api(ctx).client.spaces.getChangeRequestById(
+                spaceId,
+                changeRequestId,
+                {
+                    ...noCacheFetchOptions,
+                    signal: options.signal,
+                },
+            );
+            return cacheResponse(response, {
+                ttl: 60 * 60,
+                revalidateBefore: 10 * 60,
+            });
+        } catch (error) {
+            if ((error as GitBookAPIError).code === 404) {
+                return {
+                    data: null,
+                };
+            }
+
+            throw error;
+        }
     },
 });
 
