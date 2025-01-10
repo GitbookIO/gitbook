@@ -6,9 +6,11 @@ import {
     Space,
 } from '@gitbook/api';
 import { Icon, IconName } from '@gitbook/icons';
+import { headers } from 'next/headers';
 import React from 'react';
 
 import { t, getSpaceLanguage } from '@/intl/server';
+import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { getPageHref } from '@/lib/links';
 import { resolvePrevNextPages } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
@@ -24,11 +26,12 @@ export async function PageFooterNavigation(props: {
     pages: Revision['pages'];
     page: RevisionPageDocument;
 }) {
+    const ctx = getGitBookContextFromHeaders(await headers());
     const { customization, pages, page } = props;
     const { previous, next } = resolvePrevNextPages(pages, page);
     const language = getSpaceLanguage(customization);
-    const previousHref = previous ? await getPageHref(pages, previous) : '';
-    const nextHref = next ? await getPageHref(pages, next) : '';
+    const previousHref = previous ? getPageHref(ctx, pages, previous) : '';
+    const nextHref = next ? getPageHref(ctx, pages, next) : '';
 
     return (
         <div

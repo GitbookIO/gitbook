@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import {
     CURRENT_SIGNATURE_VERSION,
     isSignatureVersion,
@@ -39,7 +40,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Verify the signature
-    const verified = await verifyImageSignature(url, { signature, version: signatureVersion });
+    const ctx = getGitBookContextFromHeaders(request.headers);
+    const verified = await verifyImageSignature(ctx, url, { signature, version: signatureVersion });
     if (!verified) {
         return new Response(`Invalid signature "${signature ?? ''}" for "${url}"`, { status: 400 });
     }

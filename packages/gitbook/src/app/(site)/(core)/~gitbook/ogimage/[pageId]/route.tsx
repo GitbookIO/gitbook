@@ -5,6 +5,7 @@ import { NextRequest } from 'next/server';
 import colorContrast from 'postcss-color-contrast/js';
 import React from 'react';
 
+import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { getAbsoluteHref } from '@/lib/links';
 import { tcls } from '@/lib/tailwind';
 import { getContentTitle } from '@/lib/utils';
@@ -17,7 +18,8 @@ export const runtime = 'edge';
  * Render the OpenGraph image for a space.
  */
 export async function GET(req: NextRequest, { params }: { params: Promise<PageIdParams> }) {
-    const { space, page, customization, site } = await fetchPageData(await params);
+    const ctx = getGitBookContextFromHeaders(req.headers);
+    const { space, page, customization, site } = await fetchPageData(ctx, await params);
 
     if (customization.socialPreview.url) {
         // If user configured a custom social preview, we redirect to it.
@@ -51,10 +53,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<PageId
         body: baseColors[useLightTheme ? 'dark' : 'light'], // Invert text on background
     };
 
-    const [gridWhite, gridBlack] = await Promise.all([
-        getAbsoluteHref('~gitbook/static/images/ogimage-grid-white.png', true),
-        getAbsoluteHref('~gitbook/static/images/ogimage-grid-black.png', true),
-    ]);
+    const gridWhite = getAbsoluteHref(ctx, '~gitbook/static/images/ogimage-grid-white.png', true);
+    const gridBlack = getAbsoluteHref(ctx, '~gitbook/static/images/ogimage-grid-black.png', true);
 
     let gridAsset = useLightTheme ? gridBlack : gridWhite;
 
@@ -92,7 +92,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<PageId
             break;
     }
 
-    const favicon = await (async () => {
+    const favicon = (() => {
         if ('icon' in customization.favicon)
             return (
                 <img
@@ -109,7 +109,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<PageId
                     {String.fromCodePoint(parseInt('0x' + customization.favicon.emoji))}
                 </span>
             );
-        const src = await getAbsoluteHref(
+        const src = getAbsoluteHref(
+            ctx,
             `~gitbook/icon?size=medium&theme=${customization.themes.default}`,
             true,
         );

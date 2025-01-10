@@ -1,5 +1,4 @@
 import {
-    Collection,
     ContentVisibility,
     RevisionPageDocument,
     RevisionPageGroup,
@@ -7,7 +6,8 @@ import {
     SiteVisibility,
     Space,
 } from '@gitbook/api';
-import { headers } from 'next/headers';
+
+import { GitBookContext } from './gitbook-context';
 
 /**
  * Return true if a page is indexable in search.
@@ -31,21 +31,16 @@ export function isPageIndexable(
 /**
  * Return true if a space should be indexed by search engines.
  */
-export async function isSpaceIndexable({ space, site }: { space: Space; site: Site | null }) {
-    const headersList = await headers();
-
-    if (
-        process.env.GITBOOK_BLOCK_SEARCH_INDEXATION &&
-        !headersList.has('x-gitbook-search-indexation')
-    ) {
+export function isSpaceIndexable(
+    ctx: GitBookContext,
+    { space, site }: { space: Space; site: Site | null },
+) {
+    if (process.env.GITBOOK_BLOCK_SEARCH_INDEXATION && !ctx.searchIndexation) {
         return false;
     }
 
     // Prevent indexation of preview of revisions / change-requests
-    if (
-        headersList.get('x-gitbook-content-revision') ||
-        headersList.get('x-gitbook-content-changerequest')
-    ) {
+    if (ctx.contentRevisionId || ctx.changeRequestId) {
         return false;
     }
 

@@ -1,15 +1,12 @@
-import { headers } from 'next/headers';
+import { GitBookContext } from './gitbook-context';
 
 /**
  * Return true if events should be tracked on the site.
  */
-export async function shouldTrackEvents(): Promise<boolean> {
-    const headersList = await headers();
-
+export function shouldTrackEvents(ctx: GitBookContext): boolean {
     if (
         process.env.NODE_ENV === 'development' ||
-        (process.env.GITBOOK_BLOCK_PAGE_VIEWS_TRACKING &&
-            !headersList.has('x-gitbook-track-page-views'))
+        (process.env.GITBOOK_BLOCK_PAGE_VIEWS_TRACKING && !ctx.trackPageViews)
     ) {
         return false;
     }

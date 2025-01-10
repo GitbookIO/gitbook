@@ -3,18 +3,17 @@ import { merge } from 'content-security-policy-merger';
 import { headers } from 'next/headers';
 
 import { assetsDomain } from './assets';
+import { GitBookContext } from './gitbook-context';
 import { filterOutNullable } from './typescript';
 /**
  * Get the current nonce for the current request.
  */
-export async function getContentSecurityPolicyNonce(): Promise<string> {
-    const headersList = await headers();
-    const nonce = headersList.get('x-nonce');
-    if (!nonce) {
+export function getContentSecurityPolicyNonce(ctx: GitBookContext): string {
+    if (!ctx.nonce) {
         throw new Error('No nonce found in headers');
     }
 
-    return nonce;
+    return ctx.nonce;
 }
 
 /**

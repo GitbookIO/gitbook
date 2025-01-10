@@ -1,7 +1,9 @@
 import { RevisionPage, RevisionPageDocument } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
+import { headers } from 'next/headers';
 import { Fragment } from 'react';
 
+import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { getPageHref } from '@/lib/links';
 import { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
@@ -14,6 +16,7 @@ export async function PageHeader(props: {
     ancestors: AncestorRevisionPage[];
     pages: RevisionPage[];
 }) {
+    const ctx = getGitBookContextFromHeaders(await headers());
     const { page, ancestors, pages } = props;
 
     if (!page.layout.title && !page.layout.description) {
@@ -22,7 +25,7 @@ export async function PageHeader(props: {
 
     const ancestorElements = await Promise.all(
         ancestors.map(async (breadcrumb, index) => {
-            const href = await getPageHref(pages, breadcrumb);
+            const href = await getPageHref(ctx, pages, breadcrumb);
             return (
                 <Fragment key={breadcrumb.id}>
                     <li key={breadcrumb.id}>

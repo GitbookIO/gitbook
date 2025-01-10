@@ -1,14 +1,18 @@
+import { headers } from 'next/headers';
+
 import { TrackPageViewEvent } from '@/components/Insights';
 import { getSpaceLanguage, t } from '@/intl/server';
 import { getSiteData, getSpaceContentData } from '@/lib/api';
+import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { getSiteContentPointer } from '@/lib/pointer';
 import { tcls } from '@/lib/tailwind';
 
 export default async function NotFound() {
-    const pointer = await getSiteContentPointer();
+    const ctx = getGitBookContextFromHeaders(await headers());
+    const pointer = getSiteContentPointer(ctx);
     const [{ space }, { customization }] = await Promise.all([
-        getSpaceContentData(pointer, pointer.siteShareKey),
-        getSiteData(pointer),
+        getSpaceContentData(ctx, pointer, pointer.siteShareKey),
+        getSiteData(ctx, pointer),
     ]);
 
     const language = getSpaceLanguage(customization);

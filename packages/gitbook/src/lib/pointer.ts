@@ -1,18 +1,11 @@
-import { headers } from 'next/headers';
-
 import { SiteContentPointer, SpaceContentPointer } from './api';
+import { GitBookContext } from './gitbook-context';
 
 /**
  * Get the current site content pointer from the headers
  */
-export async function getSiteContentPointer(): Promise<SiteContentPointer> {
-    const headersList = await headers();
-    const spaceId = headersList.get('x-gitbook-content-space');
-    const siteId = headersList.get('x-gitbook-content-site');
-    const organizationId = headersList.get('x-gitbook-content-organization');
-    const siteSpaceId = headersList.get('x-gitbook-content-site-space');
-    const siteSectionId = headersList.get('x-gitbook-content-site-section');
-    const siteShareKey = headersList.get('x-gitbook-content-site-share-key');
+export function getSiteContentPointer(ctx: GitBookContext): SiteContentPointer {
+    const { siteId, spaceId, organizationId, siteSectionId, siteSpaceId, siteShareKey } = ctx;
 
     if (!spaceId || !siteId || !organizationId) {
         throw new Error(
@@ -27,8 +20,8 @@ export async function getSiteContentPointer(): Promise<SiteContentPointer> {
         siteSpaceId: siteSpaceId ?? undefined,
         siteShareKey: siteShareKey ?? undefined,
         organizationId,
-        revisionId: headersList.get('x-gitbook-content-revision') ?? undefined,
-        changeRequestId: headersList.get('x-gitbook-content-changerequest') ?? undefined,
+        revisionId: ctx.contentRevisionId ?? undefined,
+        changeRequestId: ctx.changeRequestId ?? undefined,
     };
 
     return pointer;
@@ -38,9 +31,8 @@ export async function getSiteContentPointer(): Promise<SiteContentPointer> {
  * Get the current space pointer from the headers. This should be used when rendering
  * the space in an isolated context (e.g. PDF generation).
  */
-export async function getSpacePointer(): Promise<SpaceContentPointer> {
-    const headersList = await headers();
-    const spaceId = headersList.get('x-gitbook-content-space');
+export function getSpacePointer(ctx: GitBookContext): SpaceContentPointer {
+    const spaceId = ctx.spaceId;
     if (!spaceId) {
         throw new Error(
             'getSpacePointer is called outside the scope of a request processed by the middleware',
@@ -49,8 +41,8 @@ export async function getSpacePointer(): Promise<SpaceContentPointer> {
 
     const pointer: SpaceContentPointer = {
         spaceId,
-        revisionId: headersList.get('x-gitbook-content-revision') ?? undefined,
-        changeRequestId: headersList.get('x-gitbook-content-changerequest') ?? undefined,
+        revisionId: ctx.contentRevisionId ?? undefined,
+        changeRequestId: ctx.changeRequestId ?? undefined,
     };
 
     return pointer;

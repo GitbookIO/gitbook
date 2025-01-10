@@ -1,6 +1,8 @@
+import { headers } from 'next/headers';
 import * as React from 'react';
 
 import { hexToRgba } from '@/lib/colors';
+import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { getResizedImageURL } from '@/lib/images';
 import { tcls } from '@/lib/tailwind';
 
@@ -10,7 +12,8 @@ import { AdCover } from './types';
  * Cover rendering for an ad.
  */
 export async function AdCoverRendering({ ad }: { ad: AdCover }) {
-    const largeImage = await getResizedImageURL(ad.largeImage, { width: 128, dpr: 2 });
+    const ctx = getGitBookContextFromHeaders(await headers());
+    const largeImage = await getResizedImageURL(ctx, ad.largeImage, { width: 128, dpr: 2 });
 
     return (
         <a

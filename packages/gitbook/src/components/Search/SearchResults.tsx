@@ -1,9 +1,11 @@
-import { captureException } from '@sentry/nextjs';
+'use client';
 import assertNever from 'assert-never';
 import React from 'react';
+import { useEventCallback } from 'usehooks-ts';
 
 import { t, useLanguage } from '@/intl/client';
 import { SiteContentPointer } from '@/lib/api';
+import { GitBookContext } from '@/lib/gitbook-context';
 import { tcls } from '@/lib/tailwind';
 
 import { SearchPageResultItem } from './SearchPageResultItem';
@@ -37,6 +39,7 @@ type ResultType =
  */
 export const SearchResults = React.forwardRef(function SearchResults(
     props: {
+        ctx: GitBookContext;
         children?: React.ReactNode;
         query: string;
         spaceId: string;
@@ -48,7 +51,8 @@ export const SearchResults = React.forwardRef(function SearchResults(
     },
     ref: React.Ref<SearchResultsRef>,
 ) {
-    const { children, query, pointer, spaceId, revisionId, withAsk, global, onSwitchToAsk } = props;
+    const { ctx, children, query, pointer, spaceId, revisionId, withAsk, global, onSwitchToAsk } =
+        props;
 
     const language = useLanguage();
     const trackEvent = useTrackEvent();
@@ -59,6 +63,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     const [cursor, setCursor] = React.useState<number | null>(null);
     const refs = React.useRef<(null | HTMLAnchorElement)[]>([]);
     const suggestedQuestionsRef = React.useRef<null | ResultType[]>(null);
+    const getCtx = useEventCallback(() => ctx);
 
     React.useEffect(() => {
         if (!query) {
@@ -75,7 +80,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
             let cancelled = false;
 
             setResultsState({ results: [], fetching: true });
-            getRecommendedQuestions(spaceId).then((questions) => {
+            getRecommendedQuestions(getCtx(), spaceId).then((questions) => {
                 const results = questions.map((question) => ({
                     type: 'recommended-question',
                     id: question,
@@ -99,8 +104,8 @@ export const SearchResults = React.forwardRef(function SearchResults(
             let cancelled = false;
             const timeout = setTimeout(async () => {
                 const results = await (global
-                    ? searchAllSiteContent(query, pointer)
-                    : searchSiteSpaceContent(query, pointer, revisionId));
+                    ? searchAllSiteContent(getCtx(), query, pointer)
+                    : searchSiteSpaceContent(getCtx(), query, pointer, revisionId));
 
                 if (cancelled) {
                     return;
@@ -119,7 +124,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 clearTimeout(timeout);
             };
         }
-    }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent]);
+    }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent, getCtx]);
 
     const results: ResultType[] = React.useMemo(() => {
         if (!withAsk) {

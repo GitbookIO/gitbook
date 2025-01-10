@@ -1,5 +1,7 @@
 import { CustomizationContentLink, CustomizationFooterGroup } from '@gitbook/api';
+import { headers } from 'next/headers';
 
+import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
@@ -22,8 +24,9 @@ export function FooterLinksGroup(props: {
 }
 
 async function FooterLink(props: { link: CustomizationContentLink; context: ContentRefContext }) {
+    const ctx = getGitBookContextFromHeaders(await headers());
     const { link, context } = props;
-    const resolved = await resolveContentRef(link.to, context);
+    const resolved = await resolveContentRef(ctx, link.to, context);
 
     if (!resolved) {
         return null;

@@ -3,7 +3,7 @@ import 'server-only';
 import fnv1a from '@sindresorhus/fnv1a';
 import type { MaybePromise } from 'p-map';
 
-import { getHost } from './links';
+import { GitBookContext } from './gitbook-context';
 
 /**
  * GitBook has supported different version of image signing in the past. To maintain backwards
@@ -19,12 +19,14 @@ export const CURRENT_SIGNATURE_VERSION: SignatureVersion = '2';
 /**
  * A mapping of signature versions to signature functions.
  */
-const IMAGE_SIGNATURE_FUNCTIONS: Record<SignatureVersion, (input: string) => MaybePromise<string>> =
-    {
-        '0': generateSignatureV0,
-        '1': generateSignatureV1,
-        '2': generateSignatureV2,
-    };
+const IMAGE_SIGNATURE_FUNCTIONS: Record<
+    SignatureVersion,
+    (ctx: GitBookContext, input: string) => MaybePromise<string>
+> = {
+    '0': generateSignatureV0,
+    '1': generateSignatureV1,
+    '2': generateSignatureV2,
+};
 
 export function isSignatureVersion(input: string): input is SignatureVersion {
     return Object.keys(IMAGE_SIGNATURE_FUNCTIONS).includes(input);
@@ -34,11 +36,12 @@ export function isSignatureVersion(input: string): input is SignatureVersion {
  * Verify a signature of an image URL
  */
 export async function verifyImageSignature(
+    ctx: GitBookContext,
     input: string,
     { signature, version }: { signature: string; version: SignatureVersion },
 ): Promise<boolean> {
     const generator = IMAGE_SIGNATURE_FUNCTIONS[version];
-    const generated = await generator(input);
+    const generated = await generator(ctx, input);
     return generated === signature;
 }
 
@@ -48,11 +51,14 @@ export async function verifyImageSignature(
  * This function is sync. If you need to implement an async version of image signing, you'll need to change
  * ths signature of this fn and where it's used.
  */
-export async function generateImageSignature(input: string): Promise<{
+export function generateImageSignature(
+    ctx: GitBookContext,
+    input: string,
+): {
     signature: string;
     version: SignatureVersion;
-}> {
-    const result = await generateSignatureV2(input);
+} {
+    const result = generateSignatureV2(ctx, input);
     return { signature: result, version: CURRENT_SIGNATURE_VERSION };
 }
 
@@ -63,8 +69,8 @@ const fnv1aUtf8Buffer = new Uint8Array(512);
  * Generate a signature for an image.
  * The signature is relative to the current site being rendered to avoid serving images from other sites on the same domain.
  */
-async function generateSignatureV2(input: string): Promise<string> {
-    const hostName = await getHost();
+function generateSignatureV2(ctx: GitBookContext, input: string): string {
+    const hostName = ctx.host;
     const all = [
         input,
         hostName, // The hostname is used to avoid serving images from other sites on the same domain
@@ -83,7 +89,7 @@ const fnv1aUtf8BufferV1 = new Uint8Array(512);
  * When setting it in a URL, we use version '1' for the 'sv' querystring parameneter
  * to know that it was the algorithm that was used.
  */
-function generateSignatureV1(input: string): string {
+function generateSignatureV1(ctx: GitBookContext, input: string): string {
     const all = [input, process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY].filter(Boolean).join(':');
     return fnv1a(all, { utf8Buffer: fnv1aUtf8BufferV1 }).toString(16);
 }
@@ -93,7 +99,7 @@ function generateSignatureV1(input: string): string {
  * We still need it to validate older signatures that were generated without versioning
  * but still exist in previously generated and cached content.
  */
-async function generateSignatureV0(input: string): Promise<string> {
+async function generateSignatureV0(ctx: GitBookContext, input: string): Promise<string> {
     const all = [input, process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY].filter(Boolean).join(':');
     const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(all));
 

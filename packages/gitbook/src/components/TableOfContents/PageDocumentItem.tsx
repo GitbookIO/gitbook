@@ -1,5 +1,7 @@
 import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
+import { headers } from 'next/headers';
 
+import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { getPageHref } from '@/lib/links';
 import { getPagePath } from '@/lib/pages';
 import { ContentRefContext } from '@/lib/references';
@@ -15,8 +17,9 @@ export async function PageDocumentItem(props: {
     ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
     context: ContentRefContext;
 }) {
+    const ctx = getGitBookContextFromHeaders(await headers());
     const { rootPages, page, ancestors, context } = props;
-    const href = await getPageHref(rootPages, page);
+    const href = await getPageHref(ctx, rootPages, page);
 
     return (
         <li className={tcls('flex', 'flex-col')}>

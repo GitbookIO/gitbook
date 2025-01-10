@@ -8,6 +8,7 @@ import {
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import * as React from 'react';
 
@@ -23,6 +24,7 @@ import {
     getSpaceContentData,
     getSiteData,
 } from '@/lib/api';
+import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { getPagePDFContainerId, PageHrefContext, getAbsoluteHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
@@ -39,10 +41,11 @@ const DEFAULT_LIMIT = 100;
 export const runtime = 'edge';
 
 export async function generateMetadata(): Promise<Metadata> {
-    const pointer = await getSiteOrSpacePointerForPDF();
+    const ctx = getGitBookContextFromHeaders(await headers());
+    const pointer = getSiteOrSpacePointerForPDF(ctx);
     const [space, { customization }] = await Promise.all([
-        getSpace(pointer.spaceId, 'siteId' in pointer ? pointer.siteShareKey : undefined),
-        'siteId' in pointer ? getSiteData(pointer) : getSpaceCustomization(),
+        getSpace(ctx, pointer.spaceId, 'siteId' in pointer ? pointer.siteShareKey : undefined),
+        'siteId' in pointer ? getSiteData(ctx, pointer) : getSpaceCustomization(ctx),
     ]);
 
     return {
@@ -57,19 +60,20 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PDFHTMLOutput(props: {
     searchParams: Promise<{ [key: string]: string }>;
 }) {
-    const pointer = await getSiteOrSpacePointerForPDF();
+    const ctx = getGitBookContextFromHeaders(await headers());
+    const pointer = getSiteOrSpacePointerForPDF(ctx);
 
     const searchParams = new URLSearchParams(await props.searchParams);
     const pdfParams = getPDFSearchParams(new URLSearchParams(searchParams));
 
     // Build current PDF URL and preserve all search params
-    let currentPDFUrl = await getAbsoluteHref('~gitbook/pdf', true);
+    let currentPDFUrl = getAbsoluteHref(ctx, '~gitbook/pdf', true);
     currentPDFUrl += '?' + searchParams.toString();
 
     // Load the content,
     const [{ customization }, { space, contentTarget, pages: rootPages }] = await Promise.all([
-        'siteId' in pointer ? getSiteData(pointer) : getSpaceCustomization(),
-        getSpaceContentData(pointer, 'siteId' in pointer ? pointer.siteShareKey : undefined),
+        'siteId' in pointer ? getSiteData(ctx, pointer) : getSpaceCustomization(ctx),
+        getSpaceContentData(ctx, pointer, 'siteId' in pointer ? pointer.siteShareKey : undefined),
     ]);
     const language = getSpaceLanguage(customization);
 
@@ -88,7 +92,7 @@ export default async function PDFHTMLOutput(props: {
                 <div className={tcls('fixed', 'left-12', 'top-12', 'print:hidden', 'z-50')}>
                     <a
                         title={tString(language, 'pdf_goback')}
-                        href={pdfParams.back ?? (await getAbsoluteHref(''))}
+                        href={pdfParams.back ?? getAbsoluteHref(ctx, '')}
                         className={tcls(
                             'flex',
                             'flex-row',
@@ -226,9 +230,10 @@ async function PDFPageDocument(props: {
     page: RevisionPageDocument;
     refContext: ContentRefContext;
 }) {
+    const ctx = getGitBookContextFromHeaders(await headers());
     const { space, page, refContext } = props;
 
-    const document = page.documentId ? await getDocument(space.id, page.documentId) : null;
+    const document = page.documentId ? await getDocument(ctx, space.id, page.documentId) : null;
 
     return (
         <PrintPage id={getPagePDFContainerId(page)}>
@@ -249,7 +254,7 @@ async function PDFPageDocument(props: {
                             revisionId: refContext.revisionId,
                         },
                         contentRefContext: refContext,
-                        resolveContentRef: (ref) => resolveContentRef(ref, refContext),
+                        resolveContentRef: (ref) => resolveContentRef(ctx, ref, refContext),
                         getId: (id) => getPagePDFContainerId(page, id),
                     }}
                 />

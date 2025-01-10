@@ -5,6 +5,7 @@ import React from 'react';
 
 import { getSite, getSiteData, getSpace } from '@/lib/api';
 import { getEmojiForCode } from '@/lib/emojis';
+import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { getSiteContentPointer } from '@/lib/pointer';
 import { tcls } from '@/lib/tailwind';
 import { getContentTitle } from '@/lib/utils';
@@ -32,17 +33,18 @@ const SIZES = {
  * Render an icon for the space.
  */
 export async function GET(req: NextRequest) {
+    const ctx = getGitBookContextFromHeaders(req.headers);
     const options = getOptions(req.url);
     const size = SIZES[options.size];
 
-    const pointer = await getSiteContentPointer();
+    const pointer = getSiteContentPointer(ctx);
     const spaceId = pointer.spaceId;
 
     const [space, { customization }] = await Promise.all([
-        getSpace(spaceId, pointer.siteShareKey),
-        getSiteData(pointer),
+        getSpace(ctx, spaceId, pointer.siteShareKey),
+        getSiteData(ctx, pointer),
     ]);
-    const site = await getSite(pointer.organizationId, pointer.siteId);
+    const site = await getSite(ctx, pointer.organizationId, pointer.siteId);
     const contentTitle = getContentTitle(space, customization, site);
 
     return new ImageResponse(
