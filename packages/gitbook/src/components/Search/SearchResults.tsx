@@ -57,6 +57,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
     const language = useLanguage();
     const trackEvent = useTrackEvent();
+    const debounceTimeout = React.useRef<Timer | null>(null);
     const [resultsState, setResultsState] = React.useState<{
         results: ResultType[];
         fetching: boolean;
@@ -113,7 +114,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
         } else {
             setResultsState((prev) => ({ results: prev.results, fetching: true }));
             let cancelled = false;
-            const timeout = setTimeout(async () => {
+            debounceTimeout.current = setTimeout(async () => {
                 const results = await (global
                     ? searchAllSiteContent(getCtx(), query, pointer)
                     : searchSiteSpaceContent(getCtx(), query, pointer, revisionId));
@@ -143,7 +144,13 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
             return () => {
                 cancelled = true;
-                clearTimeout(timeout);
+            // clearTimeout(timeout);
+
+                if (debounceTimeout.current) {
+                    clearTimeout(debounceTimeout.current);
+                    debounceTimeout.current = null;
+                }
+
             };
         }
     }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent, getCtx]);
