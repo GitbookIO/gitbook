@@ -111,7 +111,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 cancelled = true;
             };
         } else {
-            console.log('CLAIRE', {query, global, pointer, spaceId, revisionId, withAsk, trackEvent, getCtx})
+            console.log('CLAIRE', window.location)
             setResultsState((prev) => ({ results: prev.results, fetching: true }));
             let cancelled = false;
             const timeout = setTimeout(async () => {
@@ -150,15 +150,11 @@ export const SearchResults = React.forwardRef(function SearchResults(
     }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent, getCtx]);
 
     const results: ResultType[] = React.useMemo(() => {
-        if(!resultsState.fetching) {
-            if (!withAsk) {
-                return resultsState.results;
-            }
-            return withQuestionResult(resultsState.results, query);
-        } else {
-            return [];
+        if (!withAsk) {
+            return resultsState.results;
         }
-    }, [resultsState.results, resultsState.fetching, query, withAsk]);
+        return withQuestionResult(resultsState.results, query);
+    }, [resultsState.results, query, withAsk]);
 
     React.useEffect(() => {
         if (!query) {
