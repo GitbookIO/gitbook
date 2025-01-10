@@ -111,8 +111,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 cancelled = true;
             };
         } else {
-            console.log('CLAIRE', window.location)
-            setResultsState((prev) => ({ results: prev.results, fetching: true }));
+            // setResultsState((prev) => ({ results: prev.results, fetching: true }));
             let cancelled = false;
             const timeout = setTimeout(async () => {
                 const results = await (global
@@ -147,8 +146,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 clearTimeout(timeout);
             };
         }
-    }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent]);
-    // }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent, getCtx]);
+    }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent, getCtx]);
 
     const results: ResultType[] = React.useMemo(() => {
         if (!withAsk) {
