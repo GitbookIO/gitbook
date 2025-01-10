@@ -147,7 +147,8 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 clearTimeout(timeout);
             };
         }
-    }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent, getCtx]);
+    }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent]);
+    // }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent, getCtx]);
 
     const results: ResultType[] = React.useMemo(() => {
         if (!withAsk) {
