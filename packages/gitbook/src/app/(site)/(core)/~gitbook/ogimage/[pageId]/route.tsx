@@ -26,16 +26,25 @@ export async function GET(req: NextRequest, { params }: { params: Promise<PageId
         redirect(customization.socialPreview.url);
     }
 
+    async function fetchFont(url: URL): Promise<ArrayBuffer> {
+        const result = await fetch(url.href, { cache: 'no-cache' });
+        if (result.status === 200) {
+            const arrayBuffer = await result.arrayBuffer();
+            return arrayBuffer;
+        }
+        throw new Error('Failed to fetch font');
+    }
+
     // TODO: Support all fonts available in GitBook
     // Right now this is impossible since next/font/google does not expose the cached font file
     // Another option would be to use the Satori prop `loadAdditionalAsset` [example](https://github.com/vercel/satori/blob/main/playground/pages/index.tsx),
     // but this prop isn't (yet) exposed through `ImageResponse`.
-    const interRegular = await fetch(
+    const interRegular = fetchFont(
         new URL('../../../../../../fonts/Inter/Inter-Regular.ttf', import.meta.url),
-    ).then((res) => res.arrayBuffer());
-    const interBold = await fetch(
+    );
+    const interBold = fetchFont(
         new URL('../../../../../../fonts/Inter/Inter-Bold.ttf', import.meta.url),
-    ).then((res) => res.arrayBuffer());
+    );
 
     const theme = customization.themes.default;
     const useLightTheme = theme === 'light';
@@ -203,13 +212,13 @@ export async function GET(req: NextRequest, { params }: { params: Promise<PageId
             fonts: [
                 {
                     name: 'Inter',
-                    data: interRegular,
+                    data: await interRegular,
                     weight: 400,
                     style: 'normal',
                 },
                 {
                     name: 'Inter',
-                    data: interBold,
+                    data: await interBold,
                     weight: 700,
                     style: 'normal',
                 },
