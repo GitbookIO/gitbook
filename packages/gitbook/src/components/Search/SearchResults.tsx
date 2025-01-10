@@ -36,7 +36,7 @@ type ResultType =
  * Fetch the results of the keyboard navigable elements to display for a query:
  *   - Recommended questions if no query is provided.
  *   - Search results if a query is provided.
- *      - If withAsk is true and the query is a question, add a question result.
+ *      - If withAsk is true, add a question result.
  */
 export const SearchResults = React.forwardRef(function SearchResults(
     props: {
@@ -299,7 +299,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                             }
                         })}
                     </div>
-                    {results.filter((result) => result.type === 'question').length > 0 && noResults}
+                    {!results.some((result) => result.type !== 'question') && noResults}
                 </>
             )}
         </div>
