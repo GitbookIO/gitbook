@@ -203,3 +203,21 @@ export const fonts: { [fontName in CustomizationFont]: { className: string } } =
     [CustomizationFont.Ubuntu]: ubuntu,
     [CustomizationFont.ABCFavorit]: abcFavorit,
 };
+
+export const googleFontsMap: { [fontName in CustomizationFont]: string } = {
+    [CustomizationFont.Inter]: 'Inter',
+    [CustomizationFont.FiraSans]: 'Fira Sans Extra Condensed',
+    [CustomizationFont.IBMPlexSerif]: 'IBM Plex Serif',
+    [CustomizationFont.Lato]: 'Lato',
+    [CustomizationFont.Merriweather]: 'Merriweather',
+    [CustomizationFont.NotoSans]: 'Noto Sans',
+    [CustomizationFont.OpenSans]: 'Open Sans',
+    [CustomizationFont.Overpass]: 'Overpass',
+    [CustomizationFont.Poppins]: 'Poppins',
+    [CustomizationFont.Raleway]: 'Raleway',
+    [CustomizationFont.Roboto]: 'Roboto',
+    [CustomizationFont.RobotoSlab]: 'Roboto Slab',
+    [CustomizationFont.SourceSansPro]: 'Source Sans 3',
+    [CustomizationFont.Ubuntu]: 'Ubuntu',
+    [CustomizationFont.ABCFavorit]: 'Inter',
+};
