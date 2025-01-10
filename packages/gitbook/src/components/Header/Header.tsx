@@ -14,8 +14,9 @@ import { HeaderLinks } from './HeaderLinks';
 import { HeaderLogo } from './HeaderLogo';
 import { SpacesDropdown } from './SpacesDropdown';
 import { SearchButton } from '../Search';
-import { SiteSectionTabs } from '../SiteSectionTabs';
+import { SiteSectionTabs } from '../SiteSections';
 import { HeaderMobileMenu } from './HeaderMobileMenu';
+
 /**
  * Render the header for the space.
  */
@@ -210,7 +211,7 @@ export function Header(props: {
                         'overflow-x-auto hide-scroll',
                     )}
                 >
-                    <SiteSectionTabs {...sections} />
+                    <SiteSectionTabs sections={sections} />
                 </div>
             ) : null}
         </header>

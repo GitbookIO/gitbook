@@ -4,20 +4,19 @@ import type { SiteSection } from '@gitbook/api';
 import type { IconName } from '@gitbook/icons';
 import React from 'react';
 
+import { SectionsList } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
-import { Link } from '../primitives';
 import { SectionIcon } from './SectionIcon';
+import { Link } from '../primitives';
 
 /**
  * A set of navigational tabs representing site sections for multi-section sites
  */
-export function SiteSectionTabs(props: {
-    list: SiteSection[];
-    section: SiteSection;
-    index: number;
-}) {
-    const { list: sections, index: currentIndex } = props;
+export function SiteSectionTabs(props: { sections: SectionsList }) {
+    const {
+        sections: { list: sections, index: currentIndex },
+    } = props;
 
     const currentTabRef = React.useRef<HTMLAnchorElement>(null);
     const navRef = React.useRef<HTMLDivElement>(null);
