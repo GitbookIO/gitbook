@@ -112,6 +112,13 @@ export const SearchResults = React.forwardRef(function SearchResults(
             };
         } else {
             // setResultsState((prev) => ({ results: prev.results, fetching: true }));
+            console.log('CLAIRE BEFORE', resultsState);
+            setResultsState((prev) => {
+                if (prev.fetching) return prev; // Prevent redundant updates
+                return { results: prev.results, fetching: true };
+            });
+            console.log('CLAIRE AFTER', resultsState);
+
             let cancelled = false;
             const timeout = setTimeout(async () => {
                 const results = await (global
@@ -139,7 +146,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                     type: 'search_type_query',
                     query,
                 });
-            }, 350);
+            }, 500);
 
             return () => {
                 cancelled = true;
