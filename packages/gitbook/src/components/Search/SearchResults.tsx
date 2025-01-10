@@ -146,7 +146,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                     type: 'search_type_query',
                     query,
                 });
-            }, 500);
+            }, 1000);
 
             return () => {
                 cancelled = true;
