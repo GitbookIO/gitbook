@@ -112,12 +112,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
             };
         } else {
             // setResultsState((prev) => ({ results: prev.results, fetching: true }));
-            console.log('CLAIRE BEFORE', resultsState);
-            setResultsState((prev) => {
-                if (prev.fetching) return prev; // Prevent redundant updates
-                return { results: prev.results, fetching: true };
-            });
-            console.log('CLAIRE AFTER', resultsState);
 
             let cancelled = false;
             const timeout = setTimeout(async () => {
