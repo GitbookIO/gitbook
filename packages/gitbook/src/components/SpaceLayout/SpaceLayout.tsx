@@ -27,6 +27,7 @@ import { shouldTrackEvents } from '@/lib/tracking';
 
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
+import { SiteSectionList } from '../SiteSections';
 
 /**
  * Render the entire content of the space (header, table of contents, footer, and page content).
@@ -153,6 +154,12 @@ export async function SpaceLayout(props: {
                                             </SearchButton>
                                         </React.Suspense>
                                     </div>
+                                )}
+                                {!withTopHeader && withSections && sections && (
+                                    <SiteSectionList
+                                        className={tcls('hidden', 'lg:block')}
+                                        sections={sections}
+                                    />
                                 )}
                                 {withVariants && (
                                     <SpacesDropdown
