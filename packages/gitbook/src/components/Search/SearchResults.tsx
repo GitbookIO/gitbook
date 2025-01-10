@@ -1,4 +1,5 @@
 'use client';
+import { captureException } from '@sentry/nextjs';
 import assertNever from 'assert-never';
 import React from 'react';
 import { useEventCallback } from 'usehooks-ts';
@@ -81,6 +82,16 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
             setResultsState({ results: [], fetching: true });
             getRecommendedQuestions(getCtx(), spaceId).then((questions) => {
+                if (!questions) {
+                    if (!cancelled) {
+                        setResultsState({ results: [], fetching: false });
+                    }
+                    captureException(
+                        new Error(`corrupt-cache: getRecommendedQuestions is ${questions}`),
+                    );
+                    return;
+                }
+
                 const results = questions.map((question) => ({
                     type: 'recommended-question',
                     id: question,
@@ -108,6 +119,17 @@ export const SearchResults = React.forwardRef(function SearchResults(
                     : searchSiteSpaceContent(getCtx(), query, pointer, revisionId));
 
                 if (cancelled) {
+                    return;
+                }
+
+                if (!results) {
+                    captureException(
+                        new Error(
+                            `corrupt-cache: ${global ? 'searchAllSiteContent' : 'searchSiteSpaceContent'} is ${results}`,
+                        ),
+                        { extra: { results } },
+                    );
+                    setResultsState({ results: [], fetching: false });
                     return;
                 }
 
