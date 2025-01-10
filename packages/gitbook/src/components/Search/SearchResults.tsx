@@ -21,7 +21,6 @@ import {
 import { useTrackEvent } from '../Insights';
 import { Loading } from '../primitives';
 
-
 export interface SearchResultsRef {
     moveUp(): void;
     moveDown(): void;
@@ -88,7 +87,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                         setResultsState({ results: [], fetching: false });
                     }
                     captureException(
-                        new Error(`corrupt-cache: getRecommendedQuestions is ${questions}`)
+                        new Error(`corrupt-cache: getRecommendedQuestions is ${questions}`),
                     );
                     return;
                 }
@@ -125,7 +124,9 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
                 if (!results) {
                     captureException(
-                        new Error(`corrupt-cache: ${global ? 'searchAllSiteContent' : 'searchSiteSpaceContent'} is ${results}`)
+                        new Error(
+                            `corrupt-cache: ${global ? 'searchAllSiteContent' : 'searchSiteSpaceContent'} is ${results}`,
+                        ),
                     );
                     setResultsState({ results: [], fetching: false });
                     return;
