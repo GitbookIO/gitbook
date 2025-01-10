@@ -290,6 +290,9 @@ export async function middleware(request: NextRequest) {
         resolved.cookies,
     );
 
+    // Add method so Cloudflare can use it for caching
+    setMiddlewareHeader(response, 'x-http-method', request.method);
+
     setMiddlewareHeader(response, 'x-gitbook-version', buildVersion());
 
     // Add Content Security Policy header
@@ -304,7 +307,11 @@ export async function middleware(request: NextRequest) {
         // When the request is authenticated, we don't want to cache the response on the server
         !resolved.visitorToken
     ) {
-        const cacheControl = `public, max-age=0, s-maxage=${resolved.cacheMaxAge}, stale-if-error=0`;
+        // For server-actions, we don't want to cache the response on the server
+        const cacheControl =
+            request.method === 'POST'
+                ? 'no-store'
+                : `public, max-age=0, s-maxage=${resolved.cacheMaxAge}, stale-if-error=0`;
 
         if (process.env.GITBOOK_OUTPUT_CACHE === 'true' && process.env.NODE_ENV !== 'development') {
             setMiddlewareHeader(response, 'cache-control', cacheControl);
