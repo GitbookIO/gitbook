@@ -193,7 +193,7 @@ export const getUserById = cache({
                 revalidateBefore: 60 * 60,
             });
         } catch (error) {
-            if ((error as GitBookAPIError).code === 404) {
+            if (checkHasErrorCode(error, 404)) {
                 return {
                     revalidateBefore: 60 * 60,
                     data: null,
@@ -291,6 +291,10 @@ export const getSpace = cache({
     },
 });
 
+function checkHasErrorCode(error: unknown, code: number) {
+    return error instanceof Error && 'code' in error && error.code === code;
+}
+
 /**
  * Get a change request by its ID.
  */
@@ -300,14 +304,28 @@ export const getChangeRequest = cache({
         getAPICacheTag({ tag: 'change-request', space: spaceId, changeRequest: changeRequestId }),
     get: async (spaceId: string, changeRequestId: string, options: CacheFunctionOptions) => {
         const apiCtx = await api();
-        const response = await apiCtx.client.spaces.getChangeRequestById(spaceId, changeRequestId, {
-            ...noCacheFetchOptions,
-            signal: options.signal,
-        });
-        return cacheResponse(response, {
-            ttl: 60 * 60,
-            revalidateBefore: 10 * 60,
-        });
+        try {
+            const response = await apiCtx.client.spaces.getChangeRequestById(
+                spaceId,
+                changeRequestId,
+                {
+                    ...noCacheFetchOptions,
+                    signal: options.signal,
+                },
+            );
+
+            return cacheResponse(response, {
+                ttl: 60 * 60,
+                revalidateBefore: 10 * 60,
+            });
+        } catch (error) {
+            if (checkHasErrorCode(error, 404)) {
+                return {
+                    data: null,
+                };
+            }
+            throw error;
+        }
     },
 });
 
@@ -426,7 +444,7 @@ export const getRevisionPageByPath = cache({
 
             return cacheResponse(response, cacheTtl_7days);
         } catch (error) {
-            if ((error as GitBookAPIError).code === 404) {
+            if (checkHasErrorCode(error, 404)) {
                 return {
                     data: null,
                     ...cacheTtl_7days,
@@ -711,14 +729,14 @@ export const getSiteRedirectBySource = cache({
         } catch (error) {
             // 422 is returned when the source is invalid
             // we don't want to throw but just return null
-            if ((error as GitBookAPIError).code === 422) {
+            if (checkHasErrorCode(error, 422)) {
                 return {
                     data: null,
                     ...cacheTtl_1day,
                 };
             }
 
-            if ((error as GitBookAPIError).code === 404) {
+            if (checkHasErrorCode(error, 404)) {
                 return {
                     data: null,
                     ...cacheTtl_1day,
