@@ -1,4 +1,5 @@
 'use client';
+import { captureException } from '@sentry/nextjs';
 import assertNever from 'assert-never';
 import React from 'react';
 import { useEventCallback } from 'usehooks-ts';
@@ -19,6 +20,7 @@ import {
 } from './server-actions';
 import { useTrackEvent } from '../Insights';
 import { Loading } from '../primitives';
+
 
 export interface SearchResultsRef {
     moveUp(): void;
@@ -85,6 +87,9 @@ export const SearchResults = React.forwardRef(function SearchResults(
                     if (!cancelled) {
                         setResultsState({ results: [], fetching: false });
                     }
+                    captureException(
+                        new Error(`corrupt-cache: getRecommendedQuestions is ${questions}`)
+                    );
                     return;
                 }
 
@@ -119,6 +124,9 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 }
 
                 if (!results) {
+                    captureException(
+                        new Error(`corrupt-cache: ${global ? 'searchAllSiteContent' : 'searchSiteSpaceContent'} is ${results}`)
+                    );
                     setResultsState({ results: [], fetching: false });
                     return;
                 }
