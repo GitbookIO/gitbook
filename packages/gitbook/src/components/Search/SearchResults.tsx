@@ -111,7 +111,8 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 cancelled = true;
             };
         } else {
-            setResultsState((prev) => ({ results: prev.results, fetching: true }));
+            // setResultsState((prev) => ({ results: prev.results, fetching: true }));
+
             let cancelled = false;
             const timeout = setTimeout(async () => {
                 const results = await (global
@@ -139,7 +140,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                     type: 'search_type_query',
                     query,
                 });
-            }, 350);
+            }, 1000);
 
             return () => {
                 cancelled = true;
