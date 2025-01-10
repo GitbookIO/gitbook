@@ -16,13 +16,17 @@ function useTOCScrollContainerRefContext() {
     return ctx;
 }
 
-export function TOCScrollContainer(props: { children: React.ReactNode; className?: ClassValue }) {
-    const { children, className } = props;
+export function TOCScrollContainer(props: {
+    children: React.ReactNode;
+    className?: ClassValue;
+    style?: React.CSSProperties;
+}) {
+    const { children, className, style } = props;
     const scrollContainerRef = React.createRef<HTMLDivElement>();
 
     return (
         <TOCScrollContainerRefContext.Provider value={scrollContainerRef}>
-            <div ref={scrollContainerRef} className={tcls(className)}>
+            <div ref={scrollContainerRef} className={tcls(className)} style={style}>
                 {children}
             </div>
         </TOCScrollContainerRefContext.Provider>
@@ -30,7 +34,7 @@ export function TOCScrollContainer(props: { children: React.ReactNode; className
 }
 
 // Offset to scroll the table of contents item by.
-const TOC_ITEM_OFFSET = 200;
+const TOC_ITEM_OFFSET = 100;
 
 /**
  * Scrolls the table of contents container to the page item when it becomes active
