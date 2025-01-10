@@ -2,7 +2,8 @@ import hash from 'object-hash';
 
 import { cacheBackends } from './backends';
 import { memoryCache } from './memory';
-import { CacheEntry } from './types';
+import { CacheBackend, CacheEntry } from './types';
+import { captureException } from '../../sentry';
 import { race, singletonMap } from '../async';
 import { TraceSpan, trace } from '../tracing';
 import { waitUntil } from '../waitUntil';
@@ -113,7 +114,7 @@ export function cache<Args extends any[], Result>(
 
                     // Write it to the cache
                     if (result.ttl && result.ttl > 0) {
-                        await waitUntil(setCacheEntry(cacheEntry));
+                        await waitUntil(setCacheEntry(cacheEntry, cacheBackends));
                     }
 
                     return cacheEntry;
@@ -141,7 +142,27 @@ export function cache<Args extends any[], Result>(
                     cacheBackends,
                     async (backend, { signal }) => {
                         const entry = await backend.get({ key, tag }, { signal });
-                        return entry ? ([entry, backend.name] as const) : null;
+
+                        if (!entry) {
+                            return null;
+                        }
+
+                        // Detect empty cache entries to avoid returning them.
+                        // Also log in Sentry to investigate what cache is returning empty entries.
+                        if (
+                            entry.data &&
+                            typeof entry.data === 'object' &&
+                            Object.keys(entry.data).length === 0
+                        ) {
+                            captureException(
+                                new Error(
+                                    `Cache entry ${key} from ${backendName} is an empty object`,
+                                ),
+                            );
+                            return null;
+                        }
+
+                        return [entry, backend.name] as const;
                     },
                     {
                         signal,
@@ -186,13 +207,12 @@ export function cache<Args extends any[], Result>(
             // done in the revalidate function above.
             if (fromBackend?.replication === 'global') {
                 await waitUntil(
-                    Promise.all(
-                        cacheBackends
-                            .filter(
-                                (backend) =>
-                                    backend.name !== backendName && backend.replication === 'local',
-                            )
-                            .map((backend) => backend.set(savedEntry)),
+                    setCacheEntry(
+                        savedEntry,
+                        cacheBackends.filter(
+                            (backend) =>
+                                backend.name !== backendName && backend.replication === 'local',
+                        ),
                     ),
                 );
             }
@@ -309,14 +329,15 @@ function hashValue(arg: any): string {
     return JSON.stringify(arg);
 }
 
-async function setCacheEntry(entry: CacheEntry) {
+async function setCacheEntry(entry: CacheEntry, backend: CacheBackend | CacheBackend[]) {
     return await trace(
         {
             operation: `cache.setCacheEntry`,
             name: entry.meta.key,
         },
         async () => {
-            await Promise.all(cacheBackends.map((backend) => backend.set(entry)));
+            const backends = Array.isArray(backend) ? backend : [backend];
+            await Promise.all(backends.map((backend) => backend.set(entry)));
         },
     );
 }

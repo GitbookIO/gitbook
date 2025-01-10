@@ -16,3 +16,5 @@ if (dsn) {
         },
     });
 }
+
+export * from '@sentry/nextjs';
