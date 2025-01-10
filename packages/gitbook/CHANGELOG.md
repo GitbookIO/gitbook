@@ -1,5 +1,85 @@
 # gitbook
 
+## 0.6.0
+
+### Minor Changes
+
+-   98245e5: Adapt code to pull token from customer backend generated custom cookies
+-   af3c6a9: Reintroduce a safety check around search whilst we continue investigating caching.
+-   08acea6: Investigate an issue causing caches to return empty objects instead of null/undefined.
+-   1138d59: Add support for sidebar background styles
+-   e86e51f: Fix an issue where the redirects of potentially malicious images were not going through.
+-   c71d159: Track events for site insights using the new dedicated API.
+-   eb7c22f: Revert scalar to 1.0.87 to mitigate an issue with ApiClientModalProvider
+-   ea1468c: Send redirectOnError param to getPublishedContent when token is pulled from cookie
+-   7ee9158: Restyle PageAside to use sidebar list styles
+-   1417279: Track clicks on links (header, footer, content) for site insights.
+-   8126a83: Improve readability of tables with hover style and vertical dividers
+-   db74ea3: Image optimization endpoint redirects to underlying image URL if the signature is not the latest.
+-   99579ac: Fix a vulnerability issue for images using an older version of the image signing parameter.
+-   e4e2f52: Track an event into site insights when visitor is opening the Scalar API client.
+
+### Patch Changes
+
+-   d876399: Fix UI search without ask AI enabled and fix error with questions not returned from API
+-   c30bc24: Fix empty sitemap
+-   6059efe: Fix search no results error showing while there are results
+-   c77142a: Log component stack in Sentry
+-   32aa1f9: Handle security issue with cookies on Safari
+-   c1e27cc: Fix pass Sentry release properly
+-   5ae1b88: Fix shrinking page icons
+-   665b6be: Ignore invalid API calls to `getSiteRedirectFromSource` API
+
+    To reduce the load on the API and also avoid errors.
+
+-   d66c184: Ignore errors from event flushing
+-   6088fa5: Simplify search results logic to investigate a bug
+-   09c7c30: Try to fix error on og image generation
+-   ae99f87: Improve emoji setup, align with GitBook app
+-   ecfdb97: Fix multiple bugs due to headers read in an anarchic way in the app.
+-   3a7210d: Fix zoom image view transition on Safari
+-   718a8a5: Position the variant picker in the ToC
+-   8276ba0: Make cookies access safer
+-   56c52e0: Handle Firefox security error on localStorage
+-   8af1abc: Improve contrast of search box placeholder
+-   82dc9c4: Simplify the `useHash` algo used.
+-   48ab59f: Improve colour contrast of list item decoration
+-   d2bc567: Set Sentry release
+-   37d13d8: Avoid error on fetch by passing a string URL
+-   46f63cb: Fix code format overriding inline link styles
+-   5950657: Fix emojis display
+-   5c87ec7: Implement a safer way to interact with localStorage.
+
+    If it's disabled on the browser it should not throw error.
+
+-   02d876e: Fix search UI behaviour
+-   f4a90de: Fix two issues where pages would crash due Recoil not behaving correctly in RSC.
+-   cbe6139: Fix dynamic tabs infinite loop
+-   0b6ddca: Fix variant selector contrast for non-default themes
+-   fde32e2: Force route handler to be dynamic to avoid errors
+-   300f7bf: Fix search loading state
+-   1c97536: Fix Sentry instrumentation
+-   b0bd871: Even safer localStorage
+-   b950a64: Avoid errors on legacy browsers
+-   6691492: Fix viewing PDF from space
+-   e8e64bf: Fix bullet list display on full size blocks
+-   16194c5: Vertical orientation for sections list on sites without header
+-   5dab70f: Fix "Parser" language syntax highlighting
+-   deb8c54: Upgrade Next.js to v15, upgrade Shiki and use JS RegExp engine
+-   a6f6591: Fix server actions cache compromised. Leading to some bugs on frontend.
+-   44a20fe: Improve smoothness of scroll listener
+-   6b50360: Fix view transition error on Safari
+-   741dd49: Bump `heading-3` font size to offset it from paragraphs
+-   5112e3e: Fix Sentry instrumentation server-side
+-   Updated dependencies [e4e2f52]
+-   Updated dependencies [eb7c22f]
+-   Updated dependencies [ea1468c]
+-   Updated dependencies [648f0e9]
+-   Updated dependencies [f92e906]
+-   Updated dependencies [fc7b16f]
+    -   @gitbook/react-openapi@0.8.0
+    -   @gitbook/react-contentkit@0.6.0
+
 ## 0.5.0
 
 ### Minor Changes
