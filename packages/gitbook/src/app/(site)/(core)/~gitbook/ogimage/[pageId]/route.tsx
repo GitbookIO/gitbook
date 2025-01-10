@@ -5,8 +5,10 @@ import { NextRequest } from 'next/server';
 import colorContrast from 'postcss-color-contrast/js';
 import React from 'react';
 
+import { googleFontsMap } from '@/fonts';
 import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { getAbsoluteHref } from '@/lib/links';
+import { filterOutNullable } from '@/lib/typescript';
 import { getContentTitle } from '@/lib/utils';
 
 import { PageIdParams, fetchPageData } from '../../../../fetch';
@@ -56,8 +58,33 @@ export async function GET(req: NextRequest, { params }: { params: Promise<PageId
                 : page.description
             : '';
 
-    // TODO: Support all fonts available in GitBook
-    const inter = loadGoogleFont('Inter', `${contentTitle}${pageTitle}${pageDescription}`);
+    const fontFamily = googleFontsMap[customization.styling.font] ?? 'Inter';
+
+    const regularText = pageDescription;
+    const boldText = `${contentTitle}${pageTitle}`;
+
+    const fonts = (
+        await Promise.all([
+            regularText
+                ? loadGoogleFont(`${fontFamily}:wght@400`, regularText).then((data) => ({
+                      name: fontFamily,
+                      data,
+                      style: 'normal' as const,
+                      weight: 400 as const,
+                  }))
+                : null,
+            boldText
+                ? loadGoogleFont(`${fontFamily}:wght@700`, `${contentTitle}${pageTitle}`).then(
+                      (data) => ({
+                          name: fontFamily,
+                          data,
+                          style: 'normal' as const,
+                          weight: 700 as const,
+                      }),
+                  )
+                : null,
+        ])
+    ).filter(filterOutNullable);
 
     const theme = customization.themes.default;
     const useLightTheme = theme === 'light';
@@ -115,6 +142,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<PageId
         (
             <div
                 tw={`justify-between p-20 relative w-full h-full flex flex-col bg-[${colors.background}] text-[${colors.body}]`}
+                style={{
+                    fontFamily,
+                }}
             >
                 {/* Gradient */}
                 <div
@@ -167,7 +197,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<PageId
                             );
                             return <img src={src} alt="Icon" width={40} height={40} tw="mr-4" />;
                         })()}
-                        <h3 tw="text-4xl my-0">{contentTitle}</h3>
+                        <h3 tw="text-4xl my-0 font-bold">{contentTitle}</h3>
                     </div>
                 )}
 
@@ -187,13 +217,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<PageId
         {
             width: 1200,
             height: 630,
-            fonts: [
-                {
-                    name: 'Inter',
-                    data: await inter,
-                    style: 'normal',
-                },
-            ],
+            fonts,
         },
     );
 }
