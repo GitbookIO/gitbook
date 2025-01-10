@@ -281,7 +281,10 @@ function startViewTransition(callback: () => void, onEnd?: () => void) {
             });
         } catch (error) {
             // Safari can throw an error if another transition is already in progress
-            if (error instanceof Error && error.name === 'AbortError') {
+            if (
+                error instanceof Error &&
+                (error.name === 'AbortError' || error.name === 'InvalidStateError')
+            ) {
                 callback();
                 onEnd?.();
                 return;
