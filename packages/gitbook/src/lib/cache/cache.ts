@@ -1,9 +1,9 @@
-import { captureException } from '@sentry/nextjs';
 import hash from 'object-hash';
 
 import { cacheBackends } from './backends';
 import { memoryCache } from './memory';
 import { CacheBackend, CacheEntry } from './types';
+import { captureException } from '../../sentry';
 import { race, singletonMap } from '../async';
 import { TraceSpan, trace } from '../tracing';
 import { waitUntil } from '../waitUntil';
