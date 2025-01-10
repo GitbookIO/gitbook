@@ -1,6 +1,7 @@
 'use server';
 
 import { RevisionPage, SearchAIAnswer, SearchPageResult, SiteSpace, Space } from '@gitbook/api';
+import { captureException } from '@sentry/nextjs';
 import * as React from 'react';
 import { assert } from 'ts-essentials';
 
@@ -233,6 +234,12 @@ export async function getRecommendedQuestions(
     spaceId: string,
 ): Promise<string[]> {
     const data = await api.getRecommendedQuestionsInSpace(ctx, spaceId);
+    if (!data.questions) {
+        captureException(new Error('Expected questions in getRecommendedQuestions'), {
+            extra: { data },
+        });
+        return [];
+    }
     return data.questions;
 }
 
