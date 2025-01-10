@@ -23,6 +23,7 @@ import { RocketLoaderDetector } from './RocketLoaderDetector';
 import { fetchContentData } from '../fetch';
 
 export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
 
 /**
  * Layout when rendering the content.

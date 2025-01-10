@@ -17,6 +17,7 @@ import { PageClientLayout } from './PageClientLayout';
 import { PagePathParams, fetchPageData, getPathnameParam, normalizePathname } from '../../fetch';
 
 export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
 
 type Props = {
     params: Promise<PagePathParams>;
