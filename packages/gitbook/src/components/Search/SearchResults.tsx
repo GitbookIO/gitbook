@@ -127,6 +127,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                         new Error(
                             `corrupt-cache: ${global ? 'searchAllSiteContent' : 'searchSiteSpaceContent'} is ${results}`,
                         ),
+                        { extra: { results } },
                     );
                     setResultsState({ results: [], fetching: false });
                     return;
