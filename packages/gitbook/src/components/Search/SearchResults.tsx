@@ -111,6 +111,8 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 cancelled = true;
             };
         } else {
+            setResultsState({ results: [], fetching: true });
+            // setResultsState((prev) => ({ results: prev.results, fetching: true }));
             let cancelled = false;
             const timeout = setTimeout(async () => {
                 const results = await (global
