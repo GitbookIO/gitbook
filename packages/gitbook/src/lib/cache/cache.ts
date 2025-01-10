@@ -1,3 +1,4 @@
+import { captureException } from '@sentry/nextjs';
 import hash from 'object-hash';
 
 import { cacheBackends } from './backends';
@@ -6,7 +7,6 @@ import { CacheBackend, CacheEntry } from './types';
 import { race, singletonMap } from '../async';
 import { TraceSpan, trace } from '../tracing';
 import { waitUntil } from '../waitUntil';
-import { captureException } from '@sentry/nextjs';
 
 export type CacheFunctionOptions = {
     signal: AbortSignal | undefined;
@@ -197,13 +197,12 @@ export function cache<Args extends any[], Result>(
             // done in the revalidate function above.
             if (fromBackend?.replication === 'global') {
                 await waitUntil(
-                    Promise.all(
-                        cacheBackends
-                            .filter(
-                                (backend) =>
-                                    backend.name !== backendName && backend.replication === 'local',
-                            )
-                            .map((backend) => setCacheEntry(savedEntry, backend)),
+                    setCacheEntry(
+                        savedEntry,
+                        cacheBackends.filter(
+                            (backend) =>
+                                backend.name !== backendName && backend.replication === 'local',
+                        ),
                     ),
                 );
             }
