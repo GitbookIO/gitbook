@@ -178,8 +178,14 @@ export function cache<Args extends any[], Result>(
             const [savedEntry, backendName] = result;
             span.setAttribute('cacheBackend', backendName);
 
-            if (savedEntry.data && typeof savedEntry.data === 'object' && Object.keys(savedEntry.data)) {
-                captureException(new Error(`cache entry ${key} from ${backendName} is an empty object`));
+            if (
+                savedEntry.data &&
+                typeof savedEntry.data === 'object' &&
+                Object.keys(savedEntry.data).length === 0
+            ) {
+                captureException(
+                    new Error(`cache entry ${key} from ${backendName} is an empty object`),
+                );
             }
 
             const cacheStatus: 'miss' | 'hit' = backendName === 'fetch' ? 'miss' : 'hit';
