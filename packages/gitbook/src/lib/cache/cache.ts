@@ -2,10 +2,11 @@ import hash from 'object-hash';
 
 import { cacheBackends } from './backends';
 import { memoryCache } from './memory';
-import { CacheEntry } from './types';
+import { CacheBackend, CacheEntry } from './types';
 import { race, singletonMap } from '../async';
 import { TraceSpan, trace } from '../tracing';
 import { waitUntil } from '../waitUntil';
+import { captureException } from '@sentry/nextjs';
 
 export type CacheFunctionOptions = {
     signal: AbortSignal | undefined;
@@ -113,7 +114,7 @@ export function cache<Args extends any[], Result>(
 
                     // Write it to the cache
                     if (result.ttl && result.ttl > 0) {
-                        await waitUntil(setCacheEntry(cacheEntry));
+                        await waitUntil(setCacheEntry(cacheEntry, cacheBackends));
                     }
 
                     return cacheEntry;
@@ -177,6 +178,10 @@ export function cache<Args extends any[], Result>(
             const [savedEntry, backendName] = result;
             span.setAttribute('cacheBackend', backendName);
 
+            if (savedEntry.data && typeof savedEntry.data === 'object' && Object.keys(savedEntry.data)) {
+                captureException(new Error(`cache entry ${key} from ${backendName} is an empty object`));
+            }
+
             const cacheStatus: 'miss' | 'hit' = backendName === 'fetch' ? 'miss' : 'hit';
             span.setAttribute('cacheStatus', cacheStatus);
 
@@ -192,7 +197,7 @@ export function cache<Args extends any[], Result>(
                                 (backend) =>
                                     backend.name !== backendName && backend.replication === 'local',
                             )
-                            .map((backend) => backend.set(savedEntry)),
+                            .map((backend) => setCacheEntry(savedEntry, backend)),
                     ),
                 );
             }
@@ -309,14 +314,15 @@ function hashValue(arg: any): string {
     return JSON.stringify(arg);
 }
 
-async function setCacheEntry(entry: CacheEntry) {
+async function setCacheEntry(entry: CacheEntry, backend: CacheBackend | CacheBackend[]) {
     return await trace(
         {
             operation: `cache.setCacheEntry`,
             name: entry.meta.key,
         },
         async () => {
-            await Promise.all(cacheBackends.map((backend) => backend.set(entry)));
+            const backends = Array.isArray(backend) ? backend : [backend];
+            await Promise.all(backends.map((backend) => backend.set(entry)));
         },
     );
 }
