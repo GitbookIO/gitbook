@@ -9,6 +9,7 @@ import {
     SiteCustomizationSettings,
     Space,
 } from '@gitbook/api';
+import { headers } from 'next/headers';
 import React from 'react';
 
 import { Footer } from '@/components/Footer';
@@ -19,10 +20,10 @@ import { TableOfContents } from '@/components/TableOfContents';
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import { api, ContentTarget, type SectionsList, SiteContentPointer } from '@/lib/api';
+import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { shouldTrackEvents } from '@/lib/tracking';
-import { getCurrentVisitorToken } from '@/lib/visitor-token';
 
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
@@ -42,6 +43,7 @@ export async function SpaceLayout(props: {
     ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
     children: React.ReactNode;
 }) {
+    const ctx = getGitBookContextFromHeaders(await headers());
     const {
         space,
         contentTarget,
@@ -73,9 +75,9 @@ export async function SpaceLayout(props: {
             'sidebar' in customization.styling &&
             customization.styling.sidebar.background === CustomizationSidebarBackgroundStyle.Filled,
     };
-    const apiHost = (await api()).client.endpoint;
-    const visitorAuthToken = await getCurrentVisitorToken();
-    const enabled = await shouldTrackEvents();
+    const apiHost = api(ctx).client.endpoint;
+    const visitorAuthToken = ctx.visitorToken;
+    const enabled = shouldTrackEvents(ctx);
 
     return (
         <InsightsProvider
@@ -176,6 +178,7 @@ export async function SpaceLayout(props: {
 
             <React.Suspense fallback={null}>
                 <SearchModal
+                    ctx={ctx}
                     spaceId={contentTarget.spaceId}
                     revisionId={contentTarget.revisionId}
                     spaceTitle={customization.title ?? space.title}

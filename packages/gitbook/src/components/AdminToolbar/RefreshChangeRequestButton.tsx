@@ -1,8 +1,10 @@
 'use client';
+
 import { Icon } from '@gitbook/icons';
 import React from 'react';
 
 import { useCheckForContentUpdate } from '@/components/AutoRefreshContent';
+import { GitBookContext } from '@/lib/gitbook-context';
 import { tcls } from '@/lib/tailwind';
 
 import { ToolbarButton } from './Toolbar';
@@ -14,6 +16,7 @@ const minInterval = 1000 * 30; // 5 minutes
  * Button to refresh the page if the content has been updated.
  */
 export function RefreshChangeRequestButton(props: {
+    ctx: GitBookContext;
     spaceId: string;
     changeRequestId: string;
     revisionId: string;

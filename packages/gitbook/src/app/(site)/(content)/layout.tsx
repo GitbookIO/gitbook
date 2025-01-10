@@ -13,6 +13,7 @@ import { api } from '@/lib/api';
 import { assetsDomain } from '@/lib/assets';
 import { buildVersion } from '@/lib/build';
 import { getContentSecurityPolicyNonce } from '@/lib/csp';
+import { GitBookContext, getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { getAbsoluteHref, getBaseUrl } from '@/lib/links';
 import { isSpaceIndexable } from '@/lib/seo';
 import { getContentTitle } from '@/lib/utils';
@@ -27,9 +28,10 @@ export const runtime = 'edge';
  * Layout when rendering the content.
  */
 export default async function ContentLayout(props: { children: React.ReactNode }) {
+    const ctx = getGitBookContextFromHeaders(await headers());
     const { children } = props;
 
-    const nonce = await getContentSecurityPolicyNonce();
+    const nonce = getContentSecurityPolicyNonce(ctx);
     const {
         content,
         space,
@@ -41,10 +43,9 @@ export default async function ContentLayout(props: { children: React.ReactNode }
         ancestors,
         scripts,
         sections,
-    } = await fetchContentData();
+    } = await fetchContentData(ctx);
 
-    const apiCtx = await api();
-    ReactDOM.preconnect(apiCtx.client.endpoint);
+    ReactDOM.preconnect(api(ctx).client.endpoint);
     if (assetsDomain) {
         ReactDOM.preconnect(assetsDomain);
     }
@@ -56,7 +57,7 @@ export default async function ContentLayout(props: { children: React.ReactNode }
         });
     });
 
-    const queryStringTheme = await getQueryStringTheme();
+    const queryStringTheme = getQueryStringTheme(ctx);
 
     return (
         <NuqsAdapter>
@@ -105,7 +106,8 @@ export default async function ContentLayout(props: { children: React.ReactNode }
 }
 
 export async function generateViewport(): Promise<Viewport> {
-    const { customization } = await fetchContentData();
+    const ctx = getGitBookContextFromHeaders(await headers());
+    const { customization } = await fetchContentData(ctx);
     return {
         colorScheme: customization.themes.toggeable
             ? customization.themes.default === CustomizationThemeMode.Dark
@@ -116,46 +118,43 @@ export async function generateViewport(): Promise<Viewport> {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-    const { space, site, customization } = await fetchContentData();
+    const ctx = getGitBookContextFromHeaders(await headers());
+    const { space, site, customization } = await fetchContentData(ctx);
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
 
     return {
         title: getContentTitle(space, customization, site),
         generator: `GitBook (${buildVersion()})`,
-        metadataBase: new URL(await getBaseUrl()),
+        metadataBase: new URL(getBaseUrl(ctx)),
         icons: {
             icon: [
                 {
                     url:
                         customIcon?.light ??
-                        (await getAbsoluteHref('~gitbook/icon?size=small&theme=light', true)),
+                        getAbsoluteHref(ctx, '~gitbook/icon?size=small&theme=light', true),
                     type: 'image/png',
                     media: '(prefers-color-scheme: light)',
                 },
                 {
                     url:
                         customIcon?.dark ??
-                        (await getAbsoluteHref('~gitbook/icon?size=small&theme=dark', true)),
+                        getAbsoluteHref(ctx, '~gitbook/icon?size=small&theme=dark', true),
                     type: 'image/png',
                     media: '(prefers-color-scheme: dark)',
                 },
             ],
         },
-        robots: (await isSpaceIndexable({ space, site })) ? 'index, follow' : 'noindex, nofollow',
+        robots: isSpaceIndexable(ctx, { space, site }) ? 'index, follow' : 'noindex, nofollow',
     };
 }
 
 /**
  * For preview, the theme can be set via query string (?theme=light).
  */
-async function getQueryStringTheme() {
-    const headersList = await headers();
-    const queryStringTheme = headersList.get('x-gitbook-theme');
-    if (!queryStringTheme) {
+function getQueryStringTheme(ctx: GitBookContext) {
+    if (!ctx.theme) {
         return null;
     }
 
-    return queryStringTheme === 'light'
-        ? CustomizationThemeMode.Light
-        : CustomizationThemeMode.Dark;
+    return ctx.theme === 'light' ? CustomizationThemeMode.Light : CustomizationThemeMode.Dark;
 }

@@ -8,6 +8,7 @@ import {
     getSiteData,
     getSiteRedirectBySource,
 } from '@/lib/api';
+import { GitBookContext } from '@/lib/gitbook-context';
 import { resolvePagePath, resolvePageId } from '@/lib/pages';
 import { getSiteContentPointer } from '@/lib/pointer';
 
@@ -22,13 +23,13 @@ export interface PageIdParams {
 /**
  * Fetch all the data needed to render the content layout.
  */
-export async function fetchContentData() {
-    const content = await getSiteContentPointer();
+export async function fetchContentData(ctx: GitBookContext) {
+    const content = getSiteContentPointer(ctx);
 
     const [{ space, contentTarget, pages }, { customization, site, sections, spaces, scripts }] =
         await Promise.all([
-            getSpaceContentData(content, content.siteShareKey),
-            getSiteData(content),
+            getSpaceContentData(ctx, content, content.siteShareKey),
+            getSiteData(ctx, content),
         ]);
 
     // we grab the space attached to the parent as it contains overriden customizations
@@ -53,10 +54,10 @@ export async function fetchContentData() {
  * Fetch all the data needed to render the content.
  * Optimized to fetch in parallel as much as possible.
  */
-export async function fetchPageData(params: PagePathParams | PageIdParams) {
-    const contentData = await fetchContentData();
+export async function fetchPageData(ctx: GitBookContext, params: PagePathParams | PageIdParams) {
+    const contentData = await fetchContentData(ctx);
 
-    const page = await resolvePage({
+    const page = await resolvePage(ctx, {
         organizationId: contentData.space.organization,
         siteId: contentData.site.id,
         spaceId: contentData.contentTarget.spaceId,
@@ -66,7 +67,7 @@ export async function fetchPageData(params: PagePathParams | PageIdParams) {
         params,
     });
     const document = page?.page.documentId
-        ? await getDocument(contentData.space.id, page.page.documentId)
+        ? await getDocument(ctx, contentData.space.id, page.page.documentId)
         : null;
 
     return {
@@ -80,15 +81,18 @@ export async function fetchPageData(params: PagePathParams | PageIdParams) {
  * Resolve a page from the params.
  * If the path can't be found, we try to resolve it from the API to handle redirects.
  */
-async function resolvePage(input: {
-    organizationId: string;
-    siteId: string;
-    spaceId: string;
-    revisionId: string;
-    shareKey: string | undefined;
-    pages: RevisionPage[];
-    params: PagePathParams | PageIdParams;
-}) {
+async function resolvePage(
+    ctx: GitBookContext,
+    input: {
+        organizationId: string;
+        siteId: string;
+        spaceId: string;
+        revisionId: string;
+        shareKey: string | undefined;
+        pages: RevisionPage[];
+        params: PagePathParams | PageIdParams;
+    },
+) {
     const { organizationId, siteId, spaceId, revisionId, pages, shareKey, params } = input;
 
     if ('pageId' in params) {
@@ -109,13 +113,13 @@ async function resolvePage(input: {
         // If page can't be found, we try with the API, in case we have a redirect at space level.
         // We use the raw pathname to handle special/malformed redirects setup by users in the GitSync.
         // The page rendering will take care of redirecting to a normalized pathname.
-        const resolved = await getRevisionPageByPath(spaceId, revisionId, rawPathname);
+        const resolved = await getRevisionPageByPath(ctx, spaceId, revisionId, rawPathname);
         if (resolved) {
             return resolvePageId(pages, resolved.id);
         }
 
         // If a page still can't be found, we try with the API, in case we have a redirect at site level.
-        const resolvedSiteRedirect = await getSiteRedirectBySource({
+        const resolvedSiteRedirect = await getSiteRedirectBySource(ctx, {
             organizationId,
             siteId,
             source: rawPathname.startsWith('/') ? rawPathname : `/${rawPathname}`,

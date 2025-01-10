@@ -2,6 +2,7 @@
 
 import { Icon } from '@gitbook/icons';
 import React from 'react';
+import { useEventCallback } from 'usehooks-ts';
 
 import { Loading } from '@/components/primitives';
 import { useLanguage } from '@/intl/client';
@@ -9,6 +10,7 @@ import { t } from '@/intl/translate';
 import { TranslationLanguage } from '@/intl/translations';
 import { iterateStreamResponse } from '@/lib/actions';
 import { SiteContentPointer } from '@/lib/api';
+import { GitBookContext } from '@/lib/gitbook-context';
 import { tcls } from '@/lib/tailwind';
 
 import { AskAnswerResult, AskAnswerSource, streamAskQuestion } from './server-actions';
@@ -32,14 +34,19 @@ export type SearchAskState =
 /**
  * Fetch and render the answers to a question.
  */
-export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: string }) {
-    const { pointer, query } = props;
+export function SearchAskAnswer(props: {
+    ctx: GitBookContext;
+    pointer: SiteContentPointer;
+    query: string;
+}) {
+    const { ctx, pointer, query } = props;
 
     const language = useLanguage();
     const trackEvent = useTrackEvent();
     const [, setSearchState] = useSearch();
     const [askState, setAskState] = useSearchAskContext();
     const { organizationId, siteId, siteSpaceId } = pointer;
+    const getCtx = useEventCallback(() => ctx);
 
     React.useEffect(() => {
         let cancelled = false;
@@ -52,7 +59,13 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
                 query,
             });
 
-            const response = streamAskQuestion(organizationId, siteId, siteSpaceId ?? null, query);
+            const response = streamAskQuestion(
+                getCtx(),
+                organizationId,
+                siteId,
+                siteSpaceId ?? null,
+                query,
+            );
             const stream = iterateStreamResponse(response);
 
             // When we pass in "ask" mode, the query could still be updated by the client
@@ -81,7 +94,16 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
                 cancelled = true;
             }
         };
-    }, [organizationId, siteId, siteSpaceId, query, setAskState, setSearchState, trackEvent]);
+    }, [
+        organizationId,
+        siteId,
+        siteSpaceId,
+        query,
+        setAskState,
+        setSearchState,
+        trackEvent,
+        getCtx,
+    ]);
 
     React.useEffect(() => {
         return () => {

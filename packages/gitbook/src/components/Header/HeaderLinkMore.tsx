@@ -6,8 +6,10 @@ import {
     SiteCustomizationSettings,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
+import { headers } from 'next/headers';
 import React from 'react';
 
+import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
@@ -67,9 +69,10 @@ async function MoreMenuLink(props: {
     context: ContentRefContext;
     link: CustomizationHeaderItem | CustomizationContentLink;
 }) {
+    const ctx = getGitBookContextFromHeaders(await headers());
     const { context, link } = props;
 
-    const target = link.to ? await resolveContentRef(link.to, context) : null;
+    const target = link.to ? await resolveContentRef(ctx, link.to, context) : null;
 
     return (
         <>

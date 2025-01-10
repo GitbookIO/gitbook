@@ -5,12 +5,14 @@ import {
     SiteCustomizationSettings,
     Space,
 } from '@gitbook/api';
+import { headers } from 'next/headers';
 import React from 'react';
 
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
-import { ContentTarget, SiteContentPointer, api } from '@/lib/api';
+import { ContentTarget, SiteContentPointer } from '@/lib/api';
 import { hasFullWidthBlock, isNodeEmpty } from '@/lib/document';
+import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { AncestorRevisionPage } from '@/lib/pages';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -25,7 +27,7 @@ import { TrackPageViewEvent } from '../Insights';
 import { PageFeedbackForm } from '../PageFeedback';
 import { DateRelative } from '../primitives';
 
-export function PageBody(props: {
+export async function PageBody(props: {
     space: Space;
     pointer: SiteContentPointer;
     contentTarget: ContentTarget;
@@ -36,6 +38,7 @@ export function PageBody(props: {
     context: ContentRefContext;
     withPageFeedback: boolean;
 }) {
+    const ctx = getGitBookContextFromHeaders(await headers());
     const {
         space,
         contentTarget,
@@ -99,7 +102,7 @@ export function PageBody(props: {
                                 content: contentTarget,
                                 contentRefContext: context,
                                 resolveContentRef: (ref, options) =>
-                                    resolveContentRef(ref, context, options),
+                                    resolveContentRef(ctx, ref, context, options),
                             }}
                         />
                     </React.Suspense>
@@ -140,7 +143,7 @@ export function PageBody(props: {
                         </p>
                     ) : null}
                     {withPageFeedback ? (
-                        <PageFeedbackForm orientation="horizontal" pageId={page.id} />
+                        <PageFeedbackForm ctx={ctx} orientation="horizontal" pageId={page.id} />
                     ) : null}
                 </div>
             </main>

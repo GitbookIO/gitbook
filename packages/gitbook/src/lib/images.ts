@@ -2,6 +2,7 @@ import 'server-only';
 
 import { noCacheFetchOptions } from '@/lib/cache/http';
 
+import { GitBookContext } from './gitbook-context';
 import { generateImageSignature } from './image-signatures';
 import { getRootUrl } from './links';
 import { getImageAPIUrl } from './urls';
@@ -84,17 +85,16 @@ interface ResizeImageOptions {
 /**
  * Create a function to get resized image URLs for a given image URL.
  */
-export async function getResizedImageURLFactory(
+export function getResizedImageURLFactory(
+    ctx: GitBookContext,
     input: string,
-): Promise<((options: ResizeImageOptions) => string) | null> {
+): ((options: ResizeImageOptions) => string) | null {
     if (!checkIsSizableImageURL(input)) {
         return null;
     }
 
-    const [{ signature, version }, rootUrl] = await Promise.all([
-        generateImageSignature(input),
-        getRootUrl(),
-    ]);
+    const { signature, version } = generateImageSignature(ctx, input);
+    const rootUrl = getRootUrl(ctx);
 
     return (options) => {
         const url = new URL('/~gitbook/image', rootUrl);
@@ -124,11 +124,12 @@ export async function getResizedImageURLFactory(
  * Create a new URL for an image with resized parameters.
  * The URL is signed and verified by the server.
  */
-export async function getResizedImageURL(
+export function getResizedImageURL(
+    ctx: GitBookContext,
     input: string,
     options: ResizeImageOptions,
-): Promise<string> {
-    const factory = await getResizedImageURLFactory(input);
+): string {
+    const factory = getResizedImageURLFactory(ctx, input);
     return factory?.(options) ?? input;
 }
 

@@ -7,7 +7,9 @@ import {
     ContentRef,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
+import { headers } from 'next/headers';
 
+import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
@@ -25,9 +27,10 @@ export async function HeaderLink(props: {
     link: CustomizationHeaderItem;
     customization: CustomizationSettings | SiteCustomizationSettings;
 }) {
+    const ctx = getGitBookContextFromHeaders(await headers());
     const { context, link, customization } = props;
 
-    const target = link.to ? await resolveContentRef(link.to, context) : null;
+    const target = link.to ? await resolveContentRef(ctx, link.to, context) : null;
     const headerPreset = customization.header.preset;
     const linkStyle = link.style ?? 'link';
 
@@ -207,9 +210,10 @@ async function SubHeaderLink(props: {
     context: ContentRefContext;
     link: CustomizationContentLink;
 }) {
+    const ctx = getGitBookContextFromHeaders(await headers());
     const { context, link } = props;
 
-    const target = await resolveContentRef(link.to, context);
+    const target = await resolveContentRef(ctx, link.to, context);
 
     if (!target) {
         return null;

@@ -1,6 +1,8 @@
 import { RevisionPage, RevisionPageDocument, RevisionPageType } from '@gitbook/api';
+import { headers } from 'next/headers';
 
 import { Card } from '@/components/primitives';
+import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { getPageHref } from '@/lib/links';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -15,6 +17,7 @@ export async function PageBodyBlankslate(props: {
     rootPages: RevisionPage[];
     context: ContentRefContext;
 }) {
+    const ctx = getGitBookContextFromHeaders(await headers());
     const { page, rootPages, context } = props;
 
     const pages = page.pages.filter((child) =>
@@ -35,7 +38,7 @@ export async function PageBodyBlankslate(props: {
                     'Unexpected computed page, it should have been computed in the API',
                 );
             } else if (child.type === RevisionPageType.Link) {
-                const resolved = await resolveContentRef(child.target, context);
+                const resolved = await resolveContentRef(ctx, child.target, context);
                 if (!resolved) {
                     return null;
                 }
@@ -53,7 +56,7 @@ export async function PageBodyBlankslate(props: {
                     />
                 );
             } else {
-                const href = await getPageHref(rootPages, child);
+                const href = getPageHref(ctx, rootPages, child);
                 return <Card key={child.id} title={child.title} leadingIcon={icon} href={href} />;
             }
         }),

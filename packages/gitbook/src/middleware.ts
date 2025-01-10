@@ -30,6 +30,7 @@ import {
     normalizeVisitorAuthURL,
 } from '@/lib/visitor-token';
 
+import { getGitBookContextFromHeaders, GitBookContext } from './lib/gitbook-context';
 import { waitUntil } from './lib/waitUntil';
 
 export const config = {
@@ -96,6 +97,7 @@ export type LookupResult = PublishedContentWithCache & {
  * The middleware also takes care of persisting the visitor authentication state.
  */
 export async function middleware(request: NextRequest) {
+    const ctx = getGitBookContextFromHeaders(request.headers);
     const { url, mode } = getInputURL(request);
 
     setTag('url', url.toString());
@@ -128,7 +130,7 @@ export async function middleware(request: NextRequest) {
             }),
             contextId: undefined,
         },
-        () => lookupSiteForURL(mode, request, inputURL),
+        () => lookupSiteForURL(ctx, mode, request, inputURL),
     );
     if ('error' in resolved) {
         return new NextResponse(resolved.error.message, {
@@ -182,7 +184,7 @@ export async function middleware(request: NextRequest) {
         async () => {
             const [siteData] = await Promise.all([
                 'site' in resolved
-                    ? getSiteData({
+                    ? getSiteData(ctx, {
                           organizationId: resolved.organization,
                           siteId: resolved.site,
                           siteSectionId: resolved.siteSection,
@@ -194,6 +196,7 @@ export async function middleware(request: NextRequest) {
                 // the cache will handle concurrent calls
                 waitUntil(
                     getSpaceContentData(
+                        ctx,
                         {
                             spaceId: resolved.space,
                             changeRequestId: resolved.changeRequest,
@@ -367,25 +370,26 @@ function getInputURL(request: NextRequest): {
 }
 
 async function lookupSiteForURL(
+    ctx: GitBookContext,
     mode: URLLookupMode,
     request: NextRequest,
     url: URL,
 ): Promise<LookupResult> {
     switch (mode) {
         case 'single': {
-            return await lookupSiteInSingleMode(url);
+            return lookupSiteInSingleMode(ctx, url);
         }
         case 'multi': {
-            return await lookupSiteInMultiMode(request, url);
+            return await lookupSiteInMultiMode(ctx, request, url);
         }
         case 'multi-path': {
-            return await lookupSiteInMultiPathMode(request, url);
+            return await lookupSiteInMultiPathMode(ctx, request, url);
         }
         case 'multi-id': {
-            return await lookupSiteOrSpaceInMultiIdMode(request, url);
+            return await lookupSiteOrSpaceInMultiIdMode(ctx, request, url);
         }
         case 'proxy':
-            return await lookupSiteInProxy(request, url);
+            return await lookupSiteInProxy(ctx, request, url);
         default:
             assertNever(mode);
     }
@@ -395,7 +399,7 @@ async function lookupSiteForURL(
  * GITBOOK_MODE=single
  * When serving a single space, configured using GITBOOK_SPACE_ID and GITBOOK_TOKEN.
  */
-async function lookupSiteInSingleMode(url: URL): Promise<LookupResult> {
+function lookupSiteInSingleMode(ctx: GitBookContext, url: URL): LookupResult {
     const spaceId = process.env.GITBOOK_SPACE_ID;
     if (!spaceId) {
         throw new Error(
@@ -403,8 +407,7 @@ async function lookupSiteInSingleMode(url: URL): Promise<LookupResult> {
         );
     }
 
-    const apiCtx = await api();
-    const apiToken = getDefaultAPIToken(apiCtx.client.endpoint);
+    const apiToken = getDefaultAPIToken(api(ctx).client.endpoint);
     if (!apiToken) {
         throw new Error(
             `Missing GITBOOK_TOKEN environment variable. It should be passed when using GITBOOK_MODE=single.`,
@@ -425,7 +428,11 @@ async function lookupSiteInSingleMode(url: URL): Promise<LookupResult> {
  * GITBOOK_MODE=proxy
  * When proxying a site on a different base URL.
  */
-async function lookupSiteInProxy(request: NextRequest, url: URL): Promise<LookupResult> {
+async function lookupSiteInProxy(
+    ctx: GitBookContext,
+    request: NextRequest,
+    url: URL,
+): Promise<LookupResult> {
     const rawSiteUrl = request.headers.get('x-gitbook-site-url');
     if (!rawSiteUrl) {
         throw new Error(
@@ -436,16 +443,20 @@ async function lookupSiteInProxy(request: NextRequest, url: URL): Promise<Lookup
     const siteUrl = new URL(rawSiteUrl);
     siteUrl.pathname = joinPath(siteUrl.pathname, url.pathname);
 
-    return await lookupSiteInMultiMode(request, siteUrl);
+    return await lookupSiteInMultiMode(ctx, request, siteUrl);
 }
 
 /**
  * GITBOOK_MODE=multi
  * When serving multi spaces based on the current URL.
  */
-async function lookupSiteInMultiMode(request: NextRequest, url: URL): Promise<LookupResult> {
+async function lookupSiteInMultiMode(
+    ctx: GitBookContext,
+    request: NextRequest,
+    url: URL,
+): Promise<LookupResult> {
     const visitorAuthToken = getVisitorToken(request, url);
-    const lookup = await lookupSiteByAPI(url, visitorAuthToken);
+    const lookup = await lookupSiteByAPI(ctx, url, visitorAuthToken);
     return {
         ...lookup,
         ...('basePath' in lookup && visitorAuthToken
@@ -465,6 +476,7 @@ async function lookupSiteInMultiMode(request: NextRequest, url: URL): Promise<Lo
  *   - /~space|~site/:id/~revisions/:revisionId/:path
  */
 async function lookupSiteOrSpaceInMultiIdMode(
+    ctx: GitBookContext,
     request: NextRequest,
     url: URL,
 ): Promise<LookupResult> {
@@ -543,9 +555,8 @@ async function lookupSiteOrSpaceInMultiIdMode(
     // invalidated when trying to preview the site with different visitor
     // attributes.
     const contextId = decoded.claims ? hash(decoded.claims) : undefined;
-    const apiCtx = await api();
     const gitbookAPI = new GitBookAPI({
-        endpoint: apiEndpoint ?? apiCtx.client.endpoint,
+        endpoint: apiEndpoint ?? api(ctx).client.endpoint,
         authToken: apiToken,
         userAgent: userAgent(),
     });
@@ -554,7 +565,7 @@ async function lookupSiteOrSpaceInMultiIdMode(
     // (the cache is not dependend on the auth token, so it could leak data)
     if (source.kind === 'space') {
         await withAPI({ client: gitbookAPI, contextId }, () =>
-            getSpace.revalidate(source.id, undefined),
+            getSpace.revalidate(ctx, source.id, undefined),
         );
     }
 
@@ -562,7 +573,7 @@ async function lookupSiteOrSpaceInMultiIdMode(
     // (the cache is not dependend on the auth token, so it could leak data)
     if (source.kind === 'site') {
         await withAPI({ client: gitbookAPI, contextId }, () =>
-            getPublishedContentSite.revalidate({
+            getPublishedContentSite.revalidate(ctx, {
                 organizationId: decoded.organization,
                 siteId: source.id,
                 siteShareKey: undefined,
@@ -612,7 +623,11 @@ async function lookupSiteOrSpaceInMultiIdMode(
  * GITBOOK_MODE=multi-path
  * When serving multi spaces with the url passed in the path.
  */
-async function lookupSiteInMultiPathMode(request: NextRequest, url: URL): Promise<LookupResult> {
+async function lookupSiteInMultiPathMode(
+    ctx: GitBookContext,
+    request: NextRequest,
+    url: URL,
+): Promise<LookupResult> {
     // Skip useless requests
     if (
         url.pathname === '/favicon.ico' ||
@@ -651,7 +666,7 @@ async function lookupSiteInMultiPathMode(request: NextRequest, url: URL): Promis
 
     const visitorAuthToken = getVisitorToken(request, target);
 
-    const lookup = await lookupSiteByAPI(target, visitorAuthToken);
+    const lookup = await lookupSiteByAPI(ctx, target, visitorAuthToken);
     if ('error' in lookup) {
         return lookup;
     }
@@ -689,6 +704,7 @@ async function lookupSiteInMultiPathMode(request: NextRequest, url: URL): Promis
  * To optimize caching, we try multiple lookup alternatives and return the first one that matches.
  */
 async function lookupSiteByAPI(
+    ctx: GitBookContext,
     lookupURL: URL,
     visitorTokenLookup: VisitorTokenLookup,
 ): Promise<LookupResult> {
@@ -706,6 +722,7 @@ async function lookupSiteByAPI(
 
     const result = await race(lookup.urls, async (alternative, { signal }) => {
         const data = await getPublishedContentByUrl(
+            ctx,
             alternative.url,
             visitorTokenLookup?.token,
             redirectOnError || undefined,

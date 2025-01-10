@@ -1,5 +1,8 @@
+import { headers } from 'next/headers';
+
 import { CustomizationRootLayout } from '@/components/RootLayout';
 import { getSiteData } from '@/lib/api';
+import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { getSiteContentPointer } from '@/lib/pointer';
 
 /**
@@ -8,9 +11,10 @@ import { getSiteContentPointer } from '@/lib/pointer';
  */
 export default async function SiteRootLayout(props: { children: React.ReactNode }) {
     const { children } = props;
+    const ctx = getGitBookContextFromHeaders(await headers());
 
-    const pointer = await getSiteContentPointer();
-    const { customization } = await getSiteData(pointer);
+    const pointer = getSiteContentPointer(ctx);
+    const { customization } = await getSiteData(ctx, pointer);
 
     return (
         <CustomizationRootLayout customization={customization}>{children}</CustomizationRootLayout>

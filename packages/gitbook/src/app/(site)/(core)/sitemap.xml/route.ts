@@ -3,6 +3,7 @@ import jsontoxml from 'jsontoxml';
 import { NextRequest } from 'next/server';
 
 import { getSpaceContentData } from '@/lib/api';
+import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { getAbsoluteHref } from '@/lib/links';
 import { getPagePath } from '@/lib/pages';
 import { getSiteContentPointer } from '@/lib/pointer';
@@ -14,33 +15,32 @@ export const runtime = 'edge';
  * Generate a sitemap.xml for the current space.
  */
 export async function GET(req: NextRequest) {
-    const pointer = await getSiteContentPointer();
-    const { pages: rootPages } = await getSpaceContentData(pointer, pointer.siteShareKey);
+    const ctx = getGitBookContextFromHeaders(req.headers);
+    const pointer = getSiteContentPointer(ctx);
+    const { pages: rootPages } = await getSpaceContentData(ctx, pointer, pointer.siteShareKey);
 
     const pages = flattenPages(rootPages, (page) => !page.hidden && isPageIndexable([], page));
-    const urls = await Promise.all(
-        pages.map(async ({ page, depth }) => {
-            // Decay priority with depth
-            const priority = Math.pow(2, -0.25 * depth);
-            // Normalize to keep 2 decimals
-            const normalizedPriority = Math.floor(100 * priority) / 100;
+    const urls = pages.map(({ page, depth }) => {
+        // Decay priority with depth
+        const priority = Math.pow(2, -0.25 * depth);
+        // Normalize to keep 2 decimals
+        const normalizedPriority = Math.floor(100 * priority) / 100;
 
-            const lastModified = page.updatedAt || page.createdAt;
+        const lastModified = page.updatedAt || page.createdAt;
 
-            return {
-                url: {
-                    loc: await getAbsoluteHref(getPagePath(rootPages, page), true),
-                    priority: normalizedPriority,
-                    ...(lastModified
-                        ? {
-                              // lastmod format is YYYY-MM-DD
-                              lastmod: new Date(lastModified).toISOString().split('T')[0],
-                          }
-                        : {}),
-                },
-            };
-        }),
-    );
+        return {
+            url: {
+                loc: getAbsoluteHref(ctx, getPagePath(rootPages, page), true),
+                priority: normalizedPriority,
+                ...(lastModified
+                    ? {
+                          // lastmod format is YYYY-MM-DD
+                          lastmod: new Date(lastModified).toISOString().split('T')[0],
+                      }
+                    : {}),
+            },
+        };
+    });
 
     const xml = jsontoxml(
         [

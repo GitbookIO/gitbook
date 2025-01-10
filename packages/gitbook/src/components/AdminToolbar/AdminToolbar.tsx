@@ -1,8 +1,10 @@
 import { Space } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
+import { headers } from 'next/headers';
 import React from 'react';
 
 import { getChangeRequest, getRevision, SiteContentPointer } from '@/lib/api';
+import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { tcls } from '@/lib/tailwind';
 
 import { RefreshChangeRequestButton } from './RefreshChangeRequestButton';
@@ -68,8 +70,9 @@ export function AdminToolbar(props: AdminToolbarProps) {
 
 async function ChangeRequestToolbar(props: { spaceId: string; changeRequestId: string }) {
     const { spaceId, changeRequestId } = props;
+    const ctx = getGitBookContextFromHeaders(await headers());
 
-    const changeRequest = await getChangeRequest(spaceId, changeRequestId);
+    const changeRequest = await getChangeRequest(ctx, spaceId, changeRequestId);
 
     return (
         <Toolbar>
@@ -89,6 +92,7 @@ async function ChangeRequestToolbar(props: { spaceId: string; changeRequestId: s
                     <Icon icon="arrow-up-right-from-square" className="size-4" />
                 </ToolbarButton>
                 <RefreshChangeRequestButton
+                    ctx={ctx}
                     spaceId={spaceId}
                     changeRequestId={changeRequestId}
                     revisionId={changeRequest.revision}
@@ -101,8 +105,9 @@ async function ChangeRequestToolbar(props: { spaceId: string; changeRequestId: s
 
 async function RevisionToolbar(props: { spaceId: string; revisionId: string }) {
     const { spaceId, revisionId } = props;
+    const ctx = getGitBookContextFromHeaders(await headers());
 
-    const revision = await getRevision(spaceId, revisionId, {
+    const revision = await getRevision(ctx, spaceId, revisionId, {
         metadata: true,
     });
 

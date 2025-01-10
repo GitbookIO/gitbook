@@ -1,6 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
+import { headers } from 'next/headers';
 import ReactDOM from 'react-dom';
 
+import { getGitBookContextFromHeaders, GitBookContext } from '@/lib/gitbook-context';
 import { checkIsHttpURL, getImageSize, getResizedImageURLFactory } from '@/lib/images';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
@@ -191,6 +193,8 @@ async function ImagePictureSized(
         } & ImageCommonProps
     >,
 ) {
+    const ctx = getGitBookContextFromHeaders(await headers());
+
     const {
         source,
         sizes,
@@ -210,7 +214,7 @@ async function ImagePictureSized(
         throw new Error('You must provide at least one size for the image.');
     }
 
-    const attrs = await getImageAttributes({ sizes, source, quality, resize });
+    const attrs = await getImageAttributes(ctx, { sizes, source, quality, resize });
     const canBeFetched = checkIsHttpURL(attrs.src);
     const fetchPriority = canBeFetched ? getFetchPriority(priority) : undefined;
     const loading = priority === 'lazy' ? 'lazy' : undefined;
@@ -243,12 +247,15 @@ async function ImagePictureSized(
  * Get the attributes for an image.
  * src, srcSet, sizes, width, height, etc.
  */
-async function getImageAttributes(params: {
-    sizes: ImageResponsiveSize[];
-    source: ImageSourceSized;
-    quality: number;
-    resize: boolean;
-}): Promise<{
+async function getImageAttributes(
+    ctx: GitBookContext,
+    params: {
+        sizes: ImageResponsiveSize[];
+        source: ImageSourceSized;
+        quality: number;
+        resize: boolean;
+    },
+): Promise<{
     src: string;
     srcSet?: string;
     sizes?: string;
@@ -258,7 +265,7 @@ async function getImageAttributes(params: {
     const { sizes, source, quality, resize } = params;
     let src = source.src;
 
-    const getURL = resize ? await getResizedImageURLFactory(source.src) : null;
+    const getURL = resize ? getResizedImageURLFactory(ctx, source.src) : null;
 
     if (!getURL) {
         return {
