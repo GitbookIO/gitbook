@@ -6,7 +6,6 @@ import colorContrast from 'postcss-color-contrast/js';
 import React from 'react';
 
 import { googleFontsMap } from '@/fonts';
-import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { getAbsoluteHref } from '@/lib/links';
 import { filterOutNullable } from '@/lib/typescript';
 import { getContentTitle } from '@/lib/utils';
@@ -57,8 +56,7 @@ async function loadGoogleFont(input: { fontFamily: string; text: string; weight:
  * Render the OpenGraph image for a space.
  */
 export async function GET(req: NextRequest, { params }: { params: Promise<PageIdParams> }) {
-    const ctx = getGitBookContextFromHeaders(req.headers);
-    const { space, page, customization, site } = await fetchPageData(ctx, await params);
+    const { space, page, customization, site } = await fetchPageData(await params);
 
     // If user configured a custom social preview, we redirect to it.
     if (customization.socialPreview.url) {
@@ -106,8 +104,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<PageId
         body: baseColors[useLightTheme ? 'dark' : 'light'], // Invert text on background
     };
 
-    const gridWhite = getAbsoluteHref(ctx, '~gitbook/static/images/ogimage-grid-white.png', true);
-    const gridBlack = getAbsoluteHref(ctx, '~gitbook/static/images/ogimage-grid-black.png', true);
+    const [gridWhite, gridBlack] = await Promise.all([
+        getAbsoluteHref('~gitbook/static/images/ogimage-grid-white.png', true),
+        getAbsoluteHref('~gitbook/static/images/ogimage-grid-black.png', true),
+    ]);
 
     let gridAsset = useLightTheme ? gridBlack : gridWhite;
 
@@ -145,6 +145,30 @@ export async function GET(req: NextRequest, { params }: { params: Promise<PageId
             break;
     }
 
+    const favicon = await (async () => {
+        if ('icon' in customization.favicon)
+            return (
+                <img
+                    src={customization.favicon.icon[theme]}
+                    width={40}
+                    height={40}
+                    tw="mr-4"
+                    alt="Icon"
+                />
+            );
+        if ('emoji' in customization.favicon)
+            return (
+                <span tw="text-4xl mr-4">
+                    {String.fromCodePoint(parseInt('0x' + customization.favicon.emoji))}
+                </span>
+            );
+        const src = await getAbsoluteHref(
+            `~gitbook/icon?size=medium&theme=${customization.themes.default}`,
+            true,
+        );
+        return <img src={src} alt="Icon" width={40} height={40} tw="mr-4" />;
+    })();
+
     return new ImageResponse(
         (
             <div
@@ -178,32 +202,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<PageId
                     />
                 ) : (
                     <div tw="flex">
-                        {(() => {
-                            if ('icon' in customization.favicon)
-                                return (
-                                    <img
-                                        src={customization.favicon.icon[theme]}
-                                        width={40}
-                                        height={40}
-                                        tw="mr-4"
-                                        alt="Icon"
-                                    />
-                                );
-                            if ('emoji' in customization.favicon)
-                                return (
-                                    <span tw="text-4xl mr-4">
-                                        {String.fromCodePoint(
-                                            parseInt('0x' + customization.favicon.emoji),
-                                        )}
-                                    </span>
-                                );
-                            const src = getAbsoluteHref(
-                                ctx,
-                                `~gitbook/icon?size=medium&theme=${customization.themes.default}`,
-                                true,
-                            );
-                            return <img src={src} alt="Icon" width={40} height={40} tw="mr-4" />;
-                        })()}
+                        {favicon}
                         <h3 tw="text-4xl my-0 font-bold">{contentTitle}</h3>
                     </div>
                 )}

@@ -1,8 +1,6 @@
 import { CustomizationThemedURL } from '@gitbook/api';
-import { headers } from 'next/headers';
 
 import { Image } from '@/components/utils';
-import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { getAbsoluteHref } from '@/lib/links';
 
 import { Emoji } from '../primitives';
@@ -16,7 +14,6 @@ export async function SpaceIcon(
         'sources'
     >,
 ) {
-    const ctx = getGitBookContextFromHeaders(await headers());
     const { icon, emoji, alt, ...imageProps } = props;
 
     if (emoji && !icon) {
@@ -40,16 +37,14 @@ export async function SpaceIcon(
                       }
                     : {
                           light: {
-                              src: getAbsoluteHref(
-                                  ctx,
+                              src: await getAbsoluteHref(
                                   '~gitbook/icon?size=medium&theme=light',
                                   true,
                               ),
                               size: { width: 256, height: 256 },
                           },
                           dark: {
-                              src: getAbsoluteHref(
-                                  ctx,
+                              src: await getAbsoluteHref(
                                   '~gitbook/icon?size=medium&theme=dark',
                                   true,
                               ),

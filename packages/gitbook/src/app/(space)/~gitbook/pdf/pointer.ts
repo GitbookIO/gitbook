@@ -1,5 +1,4 @@
 import { SiteContentPointer, SpaceContentPointer } from '@/lib/api';
-import { GitBookContext } from '@/lib/gitbook-context';
 import { getSiteContentPointer, getSpacePointer } from '@/lib/pointer';
 
 /**
@@ -9,12 +8,12 @@ import { getSiteContentPointer, getSpacePointer } from '@/lib/pointer';
  *
  * This function returns the pointer depending on the context.
  */
-export function getSiteOrSpacePointerForPDF(
-    ctx: GitBookContext,
-): SiteContentPointer | SpaceContentPointer {
+export async function getSiteOrSpacePointerForPDF(): Promise<
+    SiteContentPointer | SpaceContentPointer
+> {
     try {
-        return getSiteContentPointer(ctx);
+        return await getSiteContentPointer();
     } catch (error) {
-        return getSpacePointer(ctx);
+        return getSpacePointer();
     }
 }

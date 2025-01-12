@@ -1,12 +1,10 @@
 import { CustomizationHeaderPreset, CustomizationThemeMode } from '@gitbook/api';
 import { Metadata, Viewport } from 'next';
-import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import React from 'react';
 
 import { PageAside } from '@/components/PageAside';
 import { PageBody, PageCover } from '@/components/PageBody';
-import { getGitBookContextFromHeaders, GitBookContext } from '@/lib/gitbook-context';
 import { PageHrefContext, getAbsoluteHref, getPageHref } from '@/lib/links';
 import { getPagePath, resolveFirstDocument } from '@/lib/pages';
 import { ContentRefContext } from '@/lib/references';
@@ -19,21 +17,17 @@ import { PagePathParams, fetchPageData, getPathnameParam, normalizePathname } fr
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
-type Props = {
-    params: Promise<PagePathParams>;
-    searchParams: Promise<{ fallback?: string }>;
-};
-
 /**
  * Fetch and render a page.
  */
-export default async function Page(props: Props) {
-    const [headersList, params, searchParams] = await Promise.all([
-        headers(),
-        props.params,
-        props.searchParams,
-    ]);
-    const ctx = getGitBookContextFromHeaders(headersList);
+export default async function Page(props: {
+    params: Promise<PagePathParams>;
+    searchParams: Promise<{ fallback?: string }>;
+}) {
+    const { params: rawParams, searchParams: rawSearchParams } = props;
+
+    const params = await rawParams;
+    const searchParams = await rawSearchParams;
 
     const {
         content: contentPointer,
@@ -46,7 +40,7 @@ export default async function Page(props: Props) {
         page,
         ancestors,
         document,
-    } = await getPageDataWithFallback(ctx, {
+    } = await getPageDataWithFallback({
         pagePathParams: params,
         searchParams,
         redirectOnFallback: true,
@@ -59,12 +53,12 @@ export default async function Page(props: Props) {
         if (pathname !== rawPathname) {
             // If the pathname was not normalized, redirect to the normalized version
             // before trying to resolve the page again
-            redirect(getAbsoluteHref(ctx, pathname));
+            redirect(await getAbsoluteHref(pathname));
         } else {
             notFound();
         }
     } else if (getPagePath(pages, page) !== rawPathname) {
-        redirect(getPageHref(ctx, pages, page, linksContext));
+        redirect(await getPageHref(pages, page, linksContext));
     }
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
@@ -128,10 +122,12 @@ export default async function Page(props: Props) {
     );
 }
 
-export async function generateViewport(props: Props): Promise<Viewport> {
-    const [params, headersList] = await Promise.all([props.params, headers()]);
-    const ctx = getGitBookContextFromHeaders(headersList);
-    const { customization } = await fetchPageData(ctx, params);
+export async function generateViewport({
+    params,
+}: {
+    params: Promise<PagePathParams>;
+}): Promise<Viewport> {
+    const { customization } = await fetchPageData(await params);
     return {
         colorScheme: customization.themes.toggeable
             ? customization.themes.default === CustomizationThemeMode.Dark
@@ -141,20 +137,17 @@ export async function generateViewport(props: Props): Promise<Viewport> {
     };
 }
 
-export async function generateMetadata(props: Props): Promise<Metadata> {
-    const [params, searchParams, headersList] = await Promise.all([
-        props.params,
-        props.searchParams,
-        headers(),
-    ]);
-    const ctx = getGitBookContextFromHeaders(headersList);
-    const { space, pages, page, customization, site, ancestors } = await getPageDataWithFallback(
-        ctx,
-        {
-            pagePathParams: params,
-            searchParams: searchParams,
-        },
-    );
+export async function generateMetadata({
+    params,
+    searchParams,
+}: {
+    params: Promise<PagePathParams>;
+    searchParams: Promise<{ fallback?: string }>;
+}): Promise<Metadata> {
+    const { space, pages, page, customization, site, ancestors } = await getPageDataWithFallback({
+        pagePathParams: await params,
+        searchParams: await searchParams,
+    });
 
     if (!page) {
         notFound();
@@ -167,16 +160,17 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
         description: page.description ?? '',
         alternates: {
             // Trim trailing slashes in canonical URL to match the redirect behavior
-            canonical: getAbsoluteHref(ctx, getPagePath(pages, page), true).replace(/\/+$/, ''),
+            canonical: (await getAbsoluteHref(getPagePath(pages, page), true)).replace(/\/+$/, ''),
         },
         openGraph: {
             images: [
                 customization.socialPreview.url ??
-                    getAbsoluteHref(ctx, `~gitbook/ogimage/${page.id}`, true),
+                    (await getAbsoluteHref(`~gitbook/ogimage/${page.id}`, true)),
             ],
         },
         robots:
-            isSpaceIndexable(ctx, { space, site: site ?? null }) && isPageIndexable(ancestors, page)
+            (await isSpaceIndexable({ space, site: site ?? null })) &&
+            isPageIndexable(ancestors, page)
                 ? 'index, follow'
                 : 'noindex, nofollow',
     };
@@ -185,17 +179,14 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 /**
  * Fetches the page data matching the requested pathname and fallback to root page when page is not found.
  */
-async function getPageDataWithFallback(
-    ctx: GitBookContext,
-    args: {
-        pagePathParams: PagePathParams;
-        searchParams: { fallback?: string };
-        redirectOnFallback?: boolean;
-    },
-) {
+async function getPageDataWithFallback(args: {
+    pagePathParams: PagePathParams;
+    searchParams: { fallback?: string };
+    redirectOnFallback?: boolean;
+}) {
     const { pagePathParams, searchParams, redirectOnFallback = false } = args;
 
-    const { pages, page: targetPage, ...otherPageData } = await fetchPageData(ctx, pagePathParams);
+    const { pages, page: targetPage, ...otherPageData } = await fetchPageData(pagePathParams);
 
     let page = targetPage;
     const canFallback = !!searchParams.fallback;
@@ -203,7 +194,7 @@ async function getPageDataWithFallback(
         const rootPage = resolveFirstDocument(pages, []);
 
         if (redirectOnFallback && rootPage?.page) {
-            redirect(getPageHref(ctx, pages, rootPage?.page));
+            redirect(await getPageHref(pages, rootPage?.page));
         }
 
         page = rootPage?.page;

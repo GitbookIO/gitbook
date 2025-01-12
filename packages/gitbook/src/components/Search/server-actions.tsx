@@ -7,7 +7,6 @@ import { assert } from 'ts-essentials';
 
 import { streamResponse } from '@/lib/actions';
 import * as api from '@/lib/api';
-import { GitBookContext } from '@/lib/gitbook-context';
 import { getAbsoluteHref, getPageHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
 import { filterOutNullable } from '@/lib/typescript';
@@ -50,18 +49,15 @@ export interface AskAnswerResult {
 /**
  * Search for content in a site by scoping the search to all content, a specific spaces or current space.
  */
-async function searchSiteContent(
-    ctx: GitBookContext,
-    args: {
-        pointer: api.SiteContentPointer;
-        query: string;
-        scope:
-            | { mode: 'all' }
-            | { mode: 'current'; siteSpaceId: string }
-            | { mode: 'specific'; siteSpaceIds: string[] };
-        cacheBust?: string;
-    },
-): Promise<OrderedComputedResult[]> {
+async function searchSiteContent(args: {
+    pointer: api.SiteContentPointer;
+    query: string;
+    scope:
+        | { mode: 'all' }
+        | { mode: 'current'; siteSpaceId: string }
+        | { mode: 'specific'; siteSpaceIds: string[] };
+    cacheBust?: string;
+}): Promise<OrderedComputedResult[]> {
     const { pointer, scope, query, cacheBust } = args;
 
     if (query.length <= 1) {
@@ -74,8 +70,8 @@ async function searchSiteContent(
         (scope.mode === 'specific' && scope.siteSpaceIds.length > 1);
 
     const [searchResults, siteData] = await Promise.all([
-        api.searchSiteContent(ctx, pointer.organizationId, pointer.siteId, query, scope, cacheBust),
-        needsStructure ? api.getSiteData(ctx, pointer) : null,
+        api.searchSiteContent(pointer.organizationId, pointer.siteId, query, scope, cacheBust),
+        needsStructure ? api.getSiteData(pointer) : null,
     ]);
     const siteStructure = siteData?.structure;
 
@@ -98,31 +94,38 @@ async function searchSiteContent(
 
     if (siteSpaces) {
         // We are searching all of this Site's content
-        return searchResults.items
-            .map((spaceItem) => {
-                const siteSpace = siteSpaces.find(
-                    (siteSpace) => siteSpace.space.id === spaceItem.id,
-                );
+        return (
+            await Promise.all(
+                searchResults.items.map(async (spaceItem) => {
+                    const siteSpace = siteSpaces.find(
+                        (siteSpace) => siteSpace.space.id === spaceItem.id,
+                    );
 
-                return spaceItem.pages.map((item) => transformSitePageResult(ctx, item, siteSpace));
-            })
-            .flat(2);
+                    return Promise.all(
+                        spaceItem.pages.map((item) => transformSitePageResult(item, siteSpace)),
+                    );
+                }),
+            )
+        ).flat(2);
     }
 
-    return searchResults.items
-        .map((spaceItem) => spaceItem.pages.map((item) => transformPageResult(ctx, item)))
-        .flat(2);
+    return (
+        await Promise.all(
+            searchResults.items.map((spaceItem) => {
+                return Promise.all(spaceItem.pages.map((item) => transformPageResult(item)));
+            }),
+        )
+    ).flat(2);
 }
 
 /**
  * Server action to search content in the entire site.
  */
 export async function searchAllSiteContent(
-    ctx: GitBookContext,
     query: string,
     pointer: api.SiteContentPointer,
 ): Promise<OrderedComputedResult[]> {
-    return await searchSiteContent(ctx, {
+    return await searchSiteContent({
         pointer,
         query,
         scope: { mode: 'all' },
@@ -133,7 +136,6 @@ export async function searchAllSiteContent(
  * Server action to search content in a space.
  */
 export async function searchSiteSpaceContent(
-    ctx: GitBookContext,
     query: string,
     pointer: api.SiteContentPointer,
     revisionId: string,
@@ -141,7 +143,7 @@ export async function searchSiteSpaceContent(
     const siteSpaceId = pointer.siteSpaceId;
     assert(siteSpaceId, 'Expected siteSpaceId for searchSiteSpaceContent');
 
-    return await searchSiteContent(ctx, {
+    return await searchSiteContent({
         pointer,
         query,
         // If we have a siteSectionId that means its a sections site use `current` mode
@@ -158,13 +160,13 @@ export async function searchSiteSpaceContent(
  * Server action to ask a question in a space.
  */
 export const streamAskQuestion = streamResponse(async function* (
-    ctx: GitBookContext,
     organizationId: string,
     siteId: string,
     siteSpaceId: string | null,
     question: string,
 ) {
-    const stream = api.api(ctx).client.orgs.streamAskInSite(
+    const apiCtx = await api.api();
+    const stream = apiCtx.client.orgs.streamAskInSite(
         organizationId,
         siteId,
         {
@@ -198,9 +200,7 @@ export const streamAskQuestion = streamResponse(async function* (
                 if (!spacePromises.has(source.space)) {
                     spacePromises.set(
                         source.space,
-                        api.getRevisionPages(ctx, source.space, source.revision, {
-                            metadata: false,
-                        }),
+                        api.getRevisionPages(source.space, source.revision, { metadata: false }),
                     );
                 }
 
@@ -222,56 +222,48 @@ export const streamAskQuestion = streamResponse(async function* (
                 return map;
             }, new Map<string, RevisionPage[]>());
         });
-        yield transformAnswer(ctx, chunk.answer, pages);
+        yield await transformAnswer(chunk.answer, pages);
     }
 });
 
 /**
  * List suggested questions for a space.
  */
-export async function getRecommendedQuestions(
-    ctx: GitBookContext,
-    spaceId: string,
-): Promise<string[]> {
-    const data = await api.getRecommendedQuestionsInSpace(ctx, spaceId);
-    if (!data.questions) {
-        captureException(new Error('Expected questions in getRecommendedQuestions'), {
-            extra: { data },
-        });
-        return [];
-    }
+export async function getRecommendedQuestions(spaceId: string): Promise<string[]> {
+    const data = await api.getRecommendedQuestionsInSpace(spaceId);
     return data.questions;
 }
 
-function transformAnswer(
-    ctx: GitBookContext,
+async function transformAnswer(
     answer: SearchAIAnswer,
     spacePages: Map<string, RevisionPage[]>,
-): AskAnswerResult {
-    const sources = answer.sources
-        .map((source) => {
-            if (source.type !== 'page') {
-                return null;
-            }
+): Promise<AskAnswerResult> {
+    const sources = (
+        await Promise.all(
+            answer.sources.map(async (source) => {
+                if (source.type !== 'page') {
+                    return null;
+                }
 
-            const pages = spacePages.get(source.space);
+                const pages = spacePages.get(source.space);
 
-            if (!pages) {
-                return null;
-            }
+                if (!pages) {
+                    return null;
+                }
 
-            const page = resolvePageId(pages, source.page);
-            if (!page) {
-                return null;
-            }
+                const page = resolvePageId(pages, source.page);
+                if (!page) {
+                    return null;
+                }
 
-            return {
-                id: source.page,
-                title: page.page.title,
-                href: getPageHref(ctx, pages, page.page),
-            };
-        })
-        .filter(filterOutNullable);
+                return {
+                    id: source.page,
+                    title: page.page.title,
+                    href: await getPageHref(pages, page.page),
+                };
+            }),
+        )
+    ).filter(filterOutNullable);
 
     return {
         body:
@@ -292,19 +284,16 @@ function transformAnswer(
     };
 }
 
-function transformSectionsAndPage(
-    ctx: GitBookContext,
-    args: {
-        item: SearchPageResult;
-        space?: Space;
-        spaceURL?: string;
-    },
-): [ComputedPageResult, ComputedSectionResult[]] {
+async function transformSectionsAndPage(args: {
+    item: SearchPageResult;
+    space?: Space;
+    spaceURL?: string;
+}): Promise<[ComputedPageResult, ComputedSectionResult[]]> {
     const { item, space, spaceURL } = args;
 
     // Resolve a relative path to an absolute URL
     // if the search result is relative to another space, we use the space URL
-    const getURL = (path: string, spaceURL?: string) => {
+    const getURL = async (path: string, spaceURL?: string) => {
         if (spaceURL) {
             if (!spaceURL.endsWith('/')) {
                 spaceURL += '/';
@@ -314,36 +303,33 @@ function transformSectionsAndPage(
             }
             return spaceURL + path;
         } else {
-            return getAbsoluteHref(ctx, path);
+            return getAbsoluteHref(path);
         }
     };
 
-    const sections =
-        item.sections?.map<ComputedSectionResult>((section) => ({
+    const sections = await Promise.all(
+        item.sections?.map<Promise<ComputedSectionResult>>(async (section) => ({
             type: 'section',
             id: item.id + '/' + section.id,
             title: section.title,
-            href: getURL(section.path, spaceURL),
+            href: await getURL(section.path, spaceURL),
             body: section.body,
-        })) ?? [];
+        })) ?? [],
+    );
 
     const page: ComputedPageResult = {
         type: 'page',
         id: item.id,
         title: item.title,
-        href: getURL(item.path, spaceURL),
+        href: await getURL(item.path, spaceURL),
         spaceTitle: space?.title,
     };
 
     return [page, sections];
 }
 
-function transformSitePageResult(
-    ctx: GitBookContext,
-    item: SearchPageResult,
-    siteSpace?: SiteSpace,
-) {
-    const [page, sections] = transformSectionsAndPage(ctx, {
+async function transformSitePageResult(item: SearchPageResult, siteSpace?: SiteSpace) {
+    const [page, sections] = await transformSectionsAndPage({
         item,
         space: siteSpace?.space,
         spaceURL: siteSpace?.urls.published,
@@ -352,8 +338,8 @@ function transformSitePageResult(
     return [page, ...sections];
 }
 
-function transformPageResult(ctx: GitBookContext, item: SearchPageResult, space?: Space) {
-    const [page, sections] = transformSectionsAndPage(ctx, {
+async function transformPageResult(item: SearchPageResult, space?: Space) {
+    const [page, sections] = await transformSectionsAndPage({
         item,
         space,
         spaceURL: space?.urls.published ?? space?.urls.app,

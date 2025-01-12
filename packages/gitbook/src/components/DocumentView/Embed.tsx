@@ -5,7 +5,6 @@ import ReactDOM from 'react-dom';
 
 import { Card } from '@/components/primitives';
 import { getEmbedByUrlInSpace, getEmbedByUrl } from '@/lib/api';
-import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { tcls } from '@/lib/tailwind';
 
 import { BlockProps } from './Block';
@@ -13,15 +12,15 @@ import { Caption } from './Caption';
 import { IntegrationBlock } from './Integration';
 
 export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
-    const ctx = getGitBookContextFromHeaders(await headers());
     const { block, context, ...otherProps } = props;
-    const nonce = ctx.nonce || undefined;
+    const headersList = await headers();
+    const nonce = headersList.get('x-nonce') || undefined;
 
     ReactDOM.preload('https://cdn.iframe.ly/embed.js', { as: 'script', nonce });
 
     const embed = await (context.content
-        ? getEmbedByUrlInSpace(ctx, context.content.spaceId, block.data.url)
-        : getEmbedByUrl(ctx, block.data.url));
+        ? getEmbedByUrlInSpace(context.content.spaceId, block.data.url)
+        : getEmbedByUrl(block.data.url));
 
     return (
         <Caption {...props}>

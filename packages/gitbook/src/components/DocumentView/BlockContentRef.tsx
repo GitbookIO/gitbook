@@ -1,9 +1,7 @@
 import { DocumentBlockContentRef } from '@gitbook/api';
-import { headers } from 'next/headers';
 
 import { Card } from '@/components/primitives';
 import { getSpaceCustomization, ignoreAPIError } from '@/lib/api';
-import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { ResolvedContentRef } from '@/lib/references';
 
 import { BlockProps } from './Block';
@@ -54,9 +52,7 @@ async function SpaceRefCard(
         return null;
     }
 
-    const ctx = getGitBookContextFromHeaders(await headers());
-
-    const { customization: spaceCustomization } = await getSpaceCustomization(ctx);
+    const { customization: spaceCustomization } = await getSpaceCustomization();
     const customFavicon = spaceCustomization?.favicon;
     const customEmoji = customFavicon && 'emoji' in customFavicon ? customFavicon.emoji : undefined;
     const customIcon = customFavicon && 'icon' in customFavicon ? customFavicon.icon : undefined;

@@ -1,11 +1,9 @@
 'use client';
 
 import { SiteAds, SiteAdsStatus } from '@gitbook/api';
-import { headers } from 'next/headers';
 import * as React from 'react';
 
 import { t, useLanguage } from '@/intl/client';
-import { getIpAndUserAgentFromHeaders, IpAndUserAgent } from '@/lib/gitbook-context';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { renderAd } from './renderAd';
@@ -20,7 +18,6 @@ const PREVIEW_ZONE_ID = 'CVAIKKQM';
  * https://docs.buysellads.com/ad-serving-api
  */
 export function Ad({
-    ipAndUserAgent,
     zoneId,
     spaceId,
     placement,
@@ -29,7 +26,6 @@ export function Ad({
     style,
     mode = 'auto',
 }: {
-    ipAndUserAgent: IpAndUserAgent;
     zoneId: string | null;
     spaceId: string;
     placement: string;
@@ -96,7 +92,7 @@ export function Ad({
 
         (async () => {
             const result = showPlaceholderAd
-                ? await renderAd({ source: 'placeholder', ipAndUserAgent })
+                ? await renderAd({ source: 'placeholder' })
                 : realZoneId
                   ? await renderAd({
                         placement,
@@ -104,7 +100,6 @@ export function Ad({
                         zoneId: realZoneId,
                         mode,
                         source: 'live',
-                        ipAndUserAgent,
                     })
                   : undefined;
 
@@ -120,7 +115,7 @@ export function Ad({
         return () => {
             cancelled = true;
         };
-    }, [visible, zoneId, ignore, placement, mode, siteAdsStatus, ipAndUserAgent]);
+    }, [visible, zoneId, ignore, placement, mode, siteAdsStatus]);
 
     return (
         <div ref={containerRef} className={tcls(style)} data-visual-test="removed">

@@ -1,8 +1,6 @@
 import { RevisionPageDocument, RevisionPageDocumentCover } from '@gitbook/api';
-import { headers } from 'next/headers';
 
 import { Image, ImageSize } from '@/components/utils';
-import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
@@ -19,9 +17,8 @@ export async function PageCover(props: {
     cover: RevisionPageDocumentCover;
     context: ContentRefContext;
 }) {
-    const ctx = getGitBookContextFromHeaders(await headers());
     const { as, page, cover, context } = props;
-    const resolved = cover.ref ? await resolveContentRef(ctx, cover.ref, context) : null;
+    const resolved = cover.ref ? await resolveContentRef(cover.ref, context) : null;
 
     return (
         <div

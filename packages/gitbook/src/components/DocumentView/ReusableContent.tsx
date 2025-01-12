@@ -1,14 +1,11 @@
 import { DocumentBlockReusableContent } from '@gitbook/api';
-import { headers } from 'next/headers';
 
 import { getDocument } from '@/lib/api';
-import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 
 import { BlockProps } from './Block';
 import { UnwrappedBlocks } from './Blocks';
 
 export async function ReusableContent(props: BlockProps<DocumentBlockReusableContent>) {
-    const ctx = getGitBookContextFromHeaders(await headers());
     const { block, context, ancestorBlocks } = props;
 
     if (!context.content) {
@@ -20,11 +17,7 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
         return null;
     }
 
-    const document = await getDocument(
-        ctx,
-        context.content.spaceId,
-        resolved.reusableContent.document,
-    );
+    const document = await getDocument(context.content.spaceId, resolved.reusableContent.document);
 
     if (!document) {
         return null;
