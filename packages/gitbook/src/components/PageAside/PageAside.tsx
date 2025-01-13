@@ -30,7 +30,7 @@ function getTopOffset(props: { sectionsHeader: boolean; topHeader: boolean }) {
     }
 
     if (props.topHeader) {
-        return 'lg:top-16 lg:max-h-[calc(100vh_-_3rem)]';
+        return 'lg:top-16 lg:max-h-[calc(100vh_-_4rem)]';
     }
 
     return 'lg:top-0 lg:max-h-screen';
@@ -237,7 +237,7 @@ export async function PageAside(props: {
                 spaceId={space.id}
                 siteAdsStatus={site?.ads && site.ads.status ? site.ads.status : undefined}
                 ignore={process.env.NODE_ENV !== 'production'}
-                style={tcls(site?.ads && site.ads.status === SiteAdsStatus.Live && ['mt-4'])}
+                style={tcls(site?.ads && site.ads.status === SiteAdsStatus.Live && ['mb-4'])}
             />
         </aside>
     );
