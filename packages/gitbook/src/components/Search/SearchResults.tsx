@@ -66,106 +66,142 @@ export const SearchResults = React.forwardRef(function SearchResults(
     const suggestedQuestionsRef = React.useRef<null | ResultType[]>(null);
     const getCtx = useEventCallback(() => ctx);
 
-    const timeoutRef = React.useRef<Timer | null>(null);
+    const fetchResults = React.useCallback(async () => {
+        setResultsState((prev) => ({ ...prev, fetching: true }));
+
+        const results = await (global
+            ? searchAllSiteContent(getCtx(), query, pointer)
+            : searchSiteSpaceContent(getCtx(), query, pointer, revisionId));
+
+        if (!results) {
+            captureException(
+                new Error(
+                    `corrupt-cache: ${global ? 'searchAllSiteContent' : 'searchSiteSpaceContent'} is ${results}`,
+                ),
+                { extra: { results } },
+            );
+            setResultsState({ results: [], fetching: false });
+            return;
+        }
+
+        setResultsState({ results, fetching: false });
+
+        trackEvent({
+            type: 'search_type_query',
+            query,
+        });
+    }, [global, getCtx, pointer, query, revisionId, trackEvent]);
+
+    // const timeoutRef = React.useRef<Timer | null>(null);
 
     React.useEffect(() => {
-        if (!query) {
-            if (!withAsk) {
-                setResultsState({ results: [], fetching: false });
-                return;
-            }
-
-            if (suggestedQuestionsRef.current) {
-                setResultsState({ results: suggestedQuestionsRef.current, fetching: false });
-                return;
-            }
-
-            let cancelled = false;
-
-            setResultsState({ results: [], fetching: true });
-            getRecommendedQuestions(getCtx(), spaceId).then((questions) => {
-                if (!questions) {
-                    if (!cancelled) {
-                        setResultsState({ results: [], fetching: false });
-                    }
-                    captureException(
-                        new Error(`corrupt-cache: getRecommendedQuestions is ${questions}`),
-                    );
-                    return;
-                }
-
-                const results = questions.map((question) => ({
-                    type: 'recommended-question',
-                    id: question,
-                    question: question,
-                })) satisfies ResultType[];
-
-                suggestedQuestionsRef.current = results;
-
-                if (cancelled) {
-                    return;
-                }
-
-                setResultsState({ results, fetching: false });
-            });
-
-            return () => {
-                cancelled = true;
-            };
-        } else {
-            setResultsState((prev) => ({ results: prev.results, fetching: true }));
-
-            let cancelled = false;
-            timeoutRef.current = setTimeout(async () => {
-                // const timeout = setTimeout(async () => {
-                const results = await (global
-                    ? searchAllSiteContent(getCtx(), query, pointer)
-                    : searchSiteSpaceContent(getCtx(), query, pointer, revisionId));
-
-                if (cancelled) {
-                    return;
-                }
-
-                if (!results) {
-                    captureException(
-                        new Error(
-                            `corrupt-cache: ${global ? 'searchAllSiteContent' : 'searchSiteSpaceContent'} is ${results}`,
-                        ),
-                        { extra: { results } },
-                    );
-                    // setResultsState({ results: [], fetching: false });
-                    setResultsState((prev) => {
-                        if (prev.results.length === 0 && !prev.fetching) return prev;
-                        return { results: [], fetching: false };
-                    });
-                    return;
-                }
-
-                // setResultsState({ results, fetching: false });
-                setResultsState((prev) => {
-                    if (prev.results === results && !prev.fetching) return prev;
-                    return { results, fetching: false };
-                });
-
-                trackEvent({
-                    type: 'search_type_query',
-                    query,
-                });
+        if (query) {
+            const timeout = setTimeout(() => {
+                fetchResults();
             }, 1000);
 
-            // return () => {
-            //     cancelled = true;
-            //     clearTimeout(timeout);
-            // };
-            return () => {
-                cancelled = true;
-                if (timeoutRef.current) {
-                    clearTimeout(timeoutRef.current);
-                    timeoutRef.current = null;
-                }
-            };
+            return () => clearTimeout(timeout);
         }
-    }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent, getCtx]);
+    }, [query, fetchResults]);
+
+    // React.useEffect(() => {
+    //     if (!query) {
+    //         if (!withAsk) {
+    //             setResultsState({ results: [], fetching: false });
+    //             return;
+    //         }
+
+    //         if (suggestedQuestionsRef.current) {
+    //             setResultsState({ results: suggestedQuestionsRef.current, fetching: false });
+    //             return;
+    //         }
+
+    //         let cancelled = false;
+
+    //         setResultsState({ results: [], fetching: true });
+    //         getRecommendedQuestions(getCtx(), spaceId).then((questions) => {
+    //             if (!questions) {
+    //                 if (!cancelled) {
+    //                     setResultsState({ results: [], fetching: false });
+    //                 }
+    //                 captureException(
+    //                     new Error(`corrupt-cache: getRecommendedQuestions is ${questions}`),
+    //                 );
+    //                 return;
+    //             }
+
+    //             const results = questions.map((question) => ({
+    //                 type: 'recommended-question',
+    //                 id: question,
+    //                 question: question,
+    //             })) satisfies ResultType[];
+
+    //             suggestedQuestionsRef.current = results;
+
+    //             if (cancelled) {
+    //                 return;
+    //             }
+
+    //             setResultsState({ results, fetching: false });
+    //         });
+
+    //         return () => {
+    //             cancelled = true;
+    //         };
+    //     } else {
+    //         setResultsState((prev) => ({ results: prev.results, fetching: true }));
+
+    //         let cancelled = false;
+    //         timeoutRef.current = setTimeout(async () => {
+    //             // const timeout = setTimeout(async () => {
+    //             const results = await (global
+    //                 ? searchAllSiteContent(getCtx(), query, pointer)
+    //                 : searchSiteSpaceContent(getCtx(), query, pointer, revisionId));
+
+    //             if (cancelled) {
+    //                 return;
+    //             }
+
+    //             if (!results) {
+    //                 captureException(
+    //                     new Error(
+    //                         `corrupt-cache: ${global ? 'searchAllSiteContent' : 'searchSiteSpaceContent'} is ${results}`,
+    //                     ),
+    //                     { extra: { results } },
+    //                 );
+    //                 // setResultsState({ results: [], fetching: false });
+    //                 setResultsState((prev) => {
+    //                     if (prev.results.length === 0 && !prev.fetching) return prev;
+    //                     return { results: [], fetching: false };
+    //                 });
+    //                 return;
+    //             }
+
+    //             // setResultsState({ results, fetching: false });
+    //             setResultsState((prev) => {
+    //                 if (prev.results === results && !prev.fetching) return prev;
+    //                 return { results, fetching: false };
+    //             });
+
+    //             trackEvent({
+    //                 type: 'search_type_query',
+    //                 query,
+    //             });
+    //         }, 1000);
+
+    //         // return () => {
+    //         //     cancelled = true;
+    //         //     clearTimeout(timeout);
+    //         // };
+    //         return () => {
+    //             cancelled = true;
+    //             if (timeoutRef.current) {
+    //                 clearTimeout(timeoutRef.current);
+    //                 timeoutRef.current = null;
+    //             }
+    //         };
+    //     }
+    // }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent, getCtx]);
 
     const results: ResultType[] = React.useMemo(() => {
         if (!withAsk) {
