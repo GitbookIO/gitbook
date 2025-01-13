@@ -1,4 +1,9 @@
-import { ContentRef, ContentRefUser, DocumentBlockTable } from '@gitbook/api';
+import {
+    ContentRef,
+    ContentRefUser,
+    DocumentBlockTable,
+    SiteInsightsLinkPosition,
+} from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import assertNever from 'assert-never';
 
@@ -25,7 +30,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
         ariaLabelledBy?: string;
         record: TableRecordKV;
         column: string;
-        verticalAlignment: VerticalAlignment;
+        verticalAlignment?: VerticalAlignment;
     },
 ) {
     const {
@@ -36,7 +41,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
         record,
         column,
         context,
-        verticalAlignment,
+        verticalAlignment = 'center',
     } = props;
 
     const definition = block.data.definition[column];
@@ -166,7 +171,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                                   kind: 'file',
                                                   file: ref.file.id,
                                               },
-                                              position: 'content',
+                                              position: SiteInsightsLinkPosition.Content,
                                           }
                                         : undefined
                                 }
@@ -220,7 +225,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                 contentRef
                                     ? {
                                           target: contentRef,
-                                          position: 'content',
+                                          position: SiteInsightsLinkPosition.Content,
                                       }
                                     : undefined
                             }
@@ -255,7 +260,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                             href={resolved.href}
                             insights={{
                                 target: contentRef,
-                                position: 'content',
+                                position: SiteInsightsLinkPosition.Content,
                             }}
                         >
                             {resolved.text}

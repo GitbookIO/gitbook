@@ -5,6 +5,7 @@ import {
     SiteCustomizationSettings,
     CustomizationHeaderItem,
     ContentRef,
+    SiteInsightsLinkPosition,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 
@@ -146,7 +147,7 @@ function HeaderItemButton(
             )}
             insights={{
                 target: linkTarget,
-                position: 'header',
+                position: SiteInsightsLinkPosition.Header,
             }}
             {...rest}
         >
@@ -175,7 +176,7 @@ function HeaderItemLink(props: Omit<HeaderLinkNavItemProps, 'linkStyle'>) {
             className={getHeaderLinkClassName({ headerPreset })}
             insights={{
                 target: linkTarget,
-                position: 'header',
+                position: SiteInsightsLinkPosition.Header,
             }}
             {...rest}
         >
@@ -216,7 +217,10 @@ async function SubHeaderLink(props: {
     }
 
     return (
-        <DropdownMenuItem href={target.href} insights={{ target: link.to, position: 'header' }}>
+        <DropdownMenuItem
+            href={target.href}
+            insights={{ target: link.to, position: SiteInsightsLinkPosition.Header }}
+        >
             {link.title}
         </DropdownMenuItem>
     );

@@ -1,4 +1,4 @@
-import { ContentRef, DocumentTableViewCards } from '@gitbook/api';
+import { ContentRef, DocumentTableViewCards, SiteInsightsLinkPosition } from '@gitbook/api';
 import React from 'react';
 
 import { Link } from '@/components/primitives';
@@ -164,7 +164,7 @@ export async function RecordCard(
                 ])}
                 insights={{
                     target: targetRef,
-                    position: 'content',
+                    position: SiteInsightsLinkPosition.Content,
                 }}
             >
                 {body}

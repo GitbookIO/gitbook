@@ -3,6 +3,7 @@ import {
     Revision,
     RevisionPageDocument,
     SiteCustomizationSettings,
+    SiteInsightsLinkPosition,
     Space,
 } from '@gitbook/api';
 import { Icon, IconName } from '@gitbook/icons';
@@ -54,7 +55,7 @@ export async function PageFooterNavigation(props: {
                             kind: 'page',
                             page: previous.id,
                         },
-                        position: 'content',
+                        position: SiteInsightsLinkPosition.Content,
                     }}
                     reversed
                 />
@@ -70,7 +71,7 @@ export async function PageFooterNavigation(props: {
                             kind: 'page',
                             page: next.id,
                         },
-                        position: 'content',
+                        position: SiteInsightsLinkPosition.Content,
                     }}
                 />
             ) : null}

@@ -27,10 +27,7 @@ export function RecordRow(
                     autoSizedColumns,
                     fixedColumns,
                 });
-                const verticalAlignment = getColumnVerticalAlignment(
-                    block.data.definition[column],
-                    view,
-                );
+                const verticalAlignment = getColumnVerticalAlignment(block.data.definition[column]);
 
                 return (
                     <div
