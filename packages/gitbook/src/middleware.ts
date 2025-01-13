@@ -97,6 +97,7 @@ export type LookupResult = PublishedContentWithCache & {
  */
 export async function middleware(request: NextRequest) {
     const { url, mode } = getInputURL(request);
+    const isServerAction = request.headers.has('Next-Action');
 
     setTag('url', url.toString());
     setContext('request', {
@@ -284,7 +285,10 @@ export async function middleware(request: NextRequest) {
                 headers,
             },
         }),
-        resolved.cookies,
+        // A long-standing bug in Nextjs causes modifying cookies in Server Actions to refresh the page and cause root rerenders.
+        // https://github.com/vercel/next.js/issues/50163
+        // We don't set the cookies if we're in a server action.
+        isServerAction ? undefined : resolved.cookies,
     );
 
     // Add method so Cloudflare can use it for caching
@@ -299,17 +303,25 @@ export async function middleware(request: NextRequest) {
     setMiddlewareHeader(response, 'referrer-policy', 'no-referrer-when-downgrade');
     setMiddlewareHeader(response, 'x-content-type-options', 'nosniff');
 
-    if (
-        typeof resolved.cacheMaxAge === 'number' &&
-        // When the request is authenticated, we don't want to cache the response on the server
-        !resolved.visitorToken
-    ) {
-        // For server-actions, we don't want to cache the response on the server
-        const cacheControl =
-            request.method === 'POST'
-                ? 'no-store'
-                : `public, max-age=0, s-maxage=${resolved.cacheMaxAge}, stale-if-error=0`;
+    const cacheControl = (() => {
+        // For Server Actions, we don't want to cache the response on the server.
+        // We don't want to store responses either.
+        if (isServerAction) {
+            return 'no-cache, no-store';
+        }
 
+        // When the request is authenticated, we don't want to cache the response on the server.
+        // Allow storing so that revalidation still happens with server.
+        if (!resolved.visitorToken) {
+            return 'no-cache';
+        }
+
+        if (typeof resolved.cacheMaxAge === 'number') {
+            return `public, max-age=0, s-maxage=${resolved.cacheMaxAge}, stale-if-error=0`;
+        }
+    })();
+
+    if (cacheControl) {
         if (process.env.GITBOOK_OUTPUT_CACHE === 'true' && process.env.NODE_ENV !== 'development') {
             setMiddlewareHeader(response, 'cache-control', cacheControl);
             setMiddlewareHeader(response, 'Cloudflare-CDN-Cache-Control', cacheControl);
