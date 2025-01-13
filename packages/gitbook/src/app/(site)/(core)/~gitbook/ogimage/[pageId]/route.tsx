@@ -15,19 +15,42 @@ import { PageIdParams, fetchPageData } from '../../../../fetch';
 
 export const runtime = 'edge';
 
-async function loadGoogleFont(font: string, text: string) {
-    const url = `https://fonts.googleapis.com/css2?family=${font}&text=${encodeURIComponent(text)}`;
-    const css = await (await fetch(url)).text();
-    const resource = css.match(/src: url\((.+)\) format\('(opentype|truetype)'\)/);
+async function loadGoogleFont(input: { fontFamily: string; text: string; weight: 400 | 700 }) {
+    const { fontFamily, text, weight } = input;
 
-    if (resource) {
-        const response = await fetch(resource[1]);
-        if (response.status == 200) {
-            return await response.arrayBuffer();
+    if (!text.trim()) {
+        return null;
+    }
+
+    const url = new URL('https://fonts.googleapis.com/css2');
+    url.searchParams.set('family', `${fontFamily}:wght@${weight}`);
+    url.searchParams.set('text', text);
+
+    const result = await fetch(url.href);
+
+    if (!result.ok) {
+        return null;
+    }
+
+    const css = await result.text();
+    const resource = css.match(/src: url\((.+)\) format\('(opentype|truetype)'\)/);
+    const resourceUrl = resource ? resource[1] : null;
+
+    if (resourceUrl) {
+        const response = await fetch(resourceUrl);
+        if (response.ok) {
+            const data = await response.arrayBuffer();
+            return {
+                name: fontFamily,
+                data,
+                style: 'normal' as const,
+                weight,
+            };
         }
     }
 
-    throw new Error('failed to load font data');
+    // If for some reason we can't load the font, we'll just use the default one
+    return null;
 }
 
 /**
@@ -65,24 +88,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<PageId
 
     const fonts = (
         await Promise.all([
-            regularText
-                ? loadGoogleFont(`${fontFamily}:wght@400`, regularText).then((data) => ({
-                      name: fontFamily,
-                      data,
-                      style: 'normal' as const,
-                      weight: 400 as const,
-                  }))
-                : null,
-            boldText
-                ? loadGoogleFont(`${fontFamily}:wght@700`, `${contentTitle}${pageTitle}`).then(
-                      (data) => ({
-                          name: fontFamily,
-                          data,
-                          style: 'normal' as const,
-                          weight: 700 as const,
-                      }),
-                  )
-                : null,
+            loadGoogleFont({ fontFamily, text: regularText, weight: 400 }),
+            loadGoogleFont({ fontFamily, text: boldText, weight: 700 }),
         ])
     ).filter(filterOutNullable);
 
@@ -204,7 +211,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<PageId
                 {/* Title and description */}
                 <div tw="flex flex-col">
                     <h1
-                        tw={`text-8xl my-0 tracking-light leading-none text-left text-[${colors.title}] font-bold`}
+                        tw={`text-8xl my-0 tracking-tight leading-none text-left text-[${colors.title}] font-bold`}
                     >
                         {pageTitle}
                     </h1>
@@ -217,7 +224,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<PageId
         {
             width: 1200,
             height: 630,
-            fonts,
+            fonts: fonts.length ? fonts : undefined,
         },
     );
 }
