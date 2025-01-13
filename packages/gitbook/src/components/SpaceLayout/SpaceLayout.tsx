@@ -56,7 +56,6 @@ export async function SpaceLayout(props: {
         children,
     } = props;
 
-    console.log('Reloading SpaceLayout', { content, contentTarget });
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
     const contentRefContext: ContentRefContext = {
@@ -77,6 +76,8 @@ export async function SpaceLayout(props: {
     };
     const apiHost = (await api()).client.endpoint;
     const visitorAuthToken = await getCurrentVisitorToken();
+    console.log('loading SpaceLayout')
+    console.log('Auth...', visitorAuthToken);
     const enabled = await shouldTrackEvents();
 
     return (
