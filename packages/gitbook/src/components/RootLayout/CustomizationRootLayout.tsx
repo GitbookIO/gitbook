@@ -87,7 +87,7 @@ export async function CustomizationRootLayout(props: {
                             )
                         }
 
-                        ${generateColorVariable('tint-color', tintColor?.light ?? DEFAULT_TINT_COLOR)}
+                        ${generateColorVariable('tint-color', tintColor?.light ?? customization.styling.primaryColor.light ?? DEFAULT_TINT_COLOR)}
                         ${
                             // Generate the right contrast color for each shade of tint-color
                             generateColorVariable(
@@ -130,7 +130,7 @@ export async function CustomizationRootLayout(props: {
                             )
                         }
 
-                        ${generateColorVariable('tint-color', tintColor?.dark ?? DEFAULT_TINT_COLOR)}
+                        ${generateColorVariable('tint-color', tintColor?.dark ?? customization.styling.primaryColor.dark ?? DEFAULT_TINT_COLOR)}
                         ${
                             // Generate the right contrast color for each shade of tint-color
                             generateColorVariable(
