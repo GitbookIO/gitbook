@@ -677,6 +677,7 @@ const testCases: TestsCase[] = [
                 url: 'a/redirect/to/sso',
                 run: async (page) => {
                     await expect(page.locator('h1')).toHaveText('SSO');
+                    await waitForCookiesDialog(page);
                 },
             },
         ],
@@ -719,7 +720,10 @@ const testCases: TestsCase[] = [
                     );
                     return `first?jwt_token=${token}`;
                 })(),
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+                    await expect(page.locator('h1')).toHaveText('First');
+                },
             },
             {
                 name: 'Second',
