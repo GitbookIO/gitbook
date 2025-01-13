@@ -147,8 +147,9 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 clearTimeout(timeout);
             };
         }
-    // }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent, getCtx]);
-    }, [query, global, pointer, spaceId, revisionId, withAsk, getCtx]);
+        // }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent, getCtx]);
+    }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent]);
+    // Claire notes: it's not trackEvent
 
     const results: ResultType[] = React.useMemo(() => {
         if (!withAsk) {
