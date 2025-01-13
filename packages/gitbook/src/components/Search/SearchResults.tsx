@@ -127,7 +127,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 }
             };
         }
-    }, [query, global, pointer, spaceId, revisionId, withAsk]);
+    }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent]);
 
     React.useEffect(() => {
         if (!query) {
