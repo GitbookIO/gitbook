@@ -81,13 +81,27 @@ export const SearchResults = React.forwardRef(function SearchResults(
             let cancelled = false;
 
             getRecommendedQuestions(spaceId).then((questions) => {
+                if (!questions) {
+                    if (!cancelled) {
+                        setResults([]);
+                        setIsLoading(false);
+                    }
+                    captureException(
+                        new Error(`corrupt-cache: getRecommendedQuestions is ${questions}`),
+                    );
+                    return;
+                }
+
                 const results = questions.map((question) => ({
                     type: 'recommended-question',
                     id: question,
                     question: question,
                 })) satisfies ResultType[];
+
                 suggestedQuestionsRef.current = results;
+
                 if (cancelled) {
+                    setIsLoading(false);
                     return;
                 }
 
@@ -104,13 +118,30 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 setIsLoading(false);
             }
 
+            let cancelled = false;
+
             debounceTimeout.current = setTimeout(async () => {
                 const fetchedResults = await (global
                     ? searchAllSiteContent(query, pointer)
                     : searchSiteSpaceContent(query, pointer, revisionId));
 
-                setResults(withAsk ? withQuestionResult(fetchedResults, query) : fetchedResults);
+                if (cancelled) {
+                    return;
+                }
 
+                if (!results) {
+                    captureException(
+                        new Error(
+                            `corrupt-cache: ${global ? 'searchAllSiteContent' : 'searchSiteSpaceContent'} is ${results}`,
+                        ),
+                        { extra: { results } },
+                    );
+                    setResults([]);
+                    setIsLoading(false);
+                    return;
+                }
+
+                setResults(withAsk ? withQuestionResult(fetchedResults, query) : fetchedResults);
                 setIsLoading(false);
 
                 trackEvent({
@@ -120,6 +151,8 @@ export const SearchResults = React.forwardRef(function SearchResults(
             }, 350);
 
             return () => {
+                cancelled = true;
+
                 if (debounceTimeout.current) {
                     clearTimeout(debounceTimeout.current);
                     debounceTimeout.current = null;
