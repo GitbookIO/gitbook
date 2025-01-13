@@ -92,17 +92,72 @@ export const SearchResults = React.forwardRef(function SearchResults(
         });
     }, [global, getCtx, pointer, query, revisionId, trackEvent]);
 
-    // const timeoutRef = React.useRef<Timer | null>(null);
+    const timeoutRef = React.useRef<Timer | null>(null);
 
     React.useEffect(() => {
-        if (query) {
-            const timeout = setTimeout(() => {
+        if (!query) {
+            if (!withAsk) {
+                setResultsState({ results: [], fetching: false });
+                return;
+            }
+
+            if (suggestedQuestionsRef.current) {
+                setResultsState({ results: suggestedQuestionsRef.current, fetching: false });
+                return;
+            }
+
+            let cancelled = false;
+
+            setResultsState({ results: [], fetching: true });
+            getRecommendedQuestions(getCtx(), spaceId).then((questions) => {
+                if (!questions) {
+                    if (!cancelled) {
+                        setResultsState({ results: [], fetching: false });
+                    }
+                    captureException(
+                        new Error(`corrupt-cache: getRecommendedQuestions is ${questions}`),
+                    );
+                    return;
+                }
+
+                const results = questions.map((question) => ({
+                    type: 'recommended-question',
+                    id: question,
+                    question: question,
+                })) satisfies ResultType[];
+
+                suggestedQuestionsRef.current = results;
+
+                if (cancelled) {
+                    return;
+                }
+
+                setResultsState({ results, fetching: false });
+            });
+
+            return () => {
+                cancelled = true;
+            };
+        } else {
+            let cancelled = false;
+
+            timeoutRef.current = setTimeout(() => {
+                if (cancelled) {
+                    return;
+                }
+
                 fetchResults();
             }, 1000);
 
-            return () => clearTimeout(timeout);
+            return () => {
+                cancelled = true;
+                if (timeoutRef.current) {
+                    clearTimeout(timeoutRef.current);
+                    timeoutRef.current = null;
+                }
+            };
         }
-    }, [query, fetchResults]);
+    }, [query, fetchResults, global, pointer, spaceId, revisionId, withAsk, getCtx]);
 
     // React.useEffect(() => {
     //     if (!query) {
