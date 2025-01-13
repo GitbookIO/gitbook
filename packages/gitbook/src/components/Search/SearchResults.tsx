@@ -64,7 +64,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
     const timeoutRef = React.useRef<Timer | null>(null);
 
     const fetchResults = React.useCallback(async () => {
-        console.log('fetchResults is called', { query, global, pointer, revisionId });
         setResultsState((prev) => ({ results: prev.results, fetching: true }));
 
         const results = await (global
