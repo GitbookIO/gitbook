@@ -54,16 +54,25 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
     const language = useLanguage();
     const trackEvent = useTrackEvent();
+
     const debounceTimeout = React.useRef<Timer | null>(null);
     const [results, setResults] = React.useState<ResultType[]>([]);
     const [isLoading, setIsLoading] = React.useState(false);
-    // const [resultsState, setResultsState] = React.useState<{
-    //     results: ResultType[];
-    //     fetching: boolean;
-    // }>({ results: [], fetching: true });
+
     const [cursor, setCursor] = React.useState<number | null>(null);
     const refs = React.useRef<(null | HTMLAnchorElement)[]>([]);
     const suggestedQuestionsRef = React.useRef<null | ResultType[]>(null);
+
+const fetchResults = React.useCallback(
+    async (query: string, global: boolean, pointer?: any, revisionId?: any) => {
+        const fetchedResults = await (global
+            ? searchAllSiteContent(query, pointer)
+            : searchSiteSpaceContent(query, pointer, revisionId));
+
+        return fetchedResults || [];
+    },
+    []
+);
 
     React.useEffect(() => {
         setIsLoading(true);
@@ -107,17 +116,28 @@ export const SearchResults = React.forwardRef(function SearchResults(
             }
 
             debounceTimeout.current = setTimeout(async () => {
-                const fetchedResults = await (global
-                    ? searchAllSiteContent(query, pointer)
-                    : searchSiteSpaceContent(query, pointer, revisionId));
+                // const fetchedResults = await (global
+                //     ? searchAllSiteContent(query, pointer)
+                //     : searchSiteSpaceContent(query, pointer, revisionId));
 
-                setResults(withAsk ? withQuestionResult(fetchedResults, query) : fetchedResults);
+                // setResults(withAsk ? withQuestionResult(fetchedResults, query) : fetchedResults);
+                fetchResults(query, global, pointer, revisionId).then((fetchedResults) => {
+                    setResults(withAsk ? withQuestionResult(fetchedResults, query) : fetchedResults);
+                    setIsLoading(false);
+    
+                    // Track the event only when the query changes
+                    trackEvent({
+                        type: 'search_type_query',
+                        query,
+                    });
+                });
+
                 setIsLoading(false);
 
-                trackEvent({
-                    type: 'search_type_query',
-                    query,
-                });
+                // trackEvent({
+                //     type: 'search_type_query',
+                //     query,
+                // });
             }, 350);
 
             return () => {
