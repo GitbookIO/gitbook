@@ -850,9 +850,21 @@ export async function getSiteData(
     const spaces =
         siteSpaces ?? (sections ? parseSpacesFromSiteSpaces(sections.section.siteSpaces) : []);
 
-    const customization = await getActiveCustomizationSettings(
-        pointer.siteSpaceId ? customizations.siteSpaces[pointer.siteSpaceId] : customizations.site,
-    );
+    const settings = (() => {
+        if (pointer.siteSpaceId) {
+            const siteSpaceSettings = customizations.siteSpaces[pointer.siteSpaceId];
+            if (siteSpaceSettings) {
+                return siteSpaceSettings;
+            }
+            // We got the pointer from an API and customizations from another.
+            // It's possible that the two are unsynced leading to not found customizations for the space.
+            // It's better to fallback on customization of the site that displaying an error.
+            console.warn('Customization not found for site space', pointer.siteSpaceId);
+        }
+        return customizations.site;
+    })();
+
+    const customization = await getActiveCustomizationSettings(settings);
 
     return {
         customization,
