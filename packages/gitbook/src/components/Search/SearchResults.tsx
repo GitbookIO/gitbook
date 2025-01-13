@@ -63,6 +63,33 @@ export const SearchResults = React.forwardRef(function SearchResults(
     const suggestedQuestionsRef = React.useRef<null | ResultType[]>(null);
     const timeoutRef = React.useRef<Timer | null>(null);
 
+    const fetchResults = React.useCallback(async () => {
+        console.log('fetchResults is called', { query, global, pointer, revisionId });
+        setResultsState((prev) => ({ results: prev.results, fetching: true }));
+
+        const results = await (global
+            ? searchAllSiteContent(query, pointer)
+            : searchSiteSpaceContent(query, pointer, revisionId));
+
+        if (!results) {
+            captureException(
+                new Error(
+                    `corrupt-cache: ${global ? 'searchAllSiteContent' : 'searchSiteSpaceContent'} is ${results}`,
+                ),
+                { extra: { results } },
+            );
+            setResultsState({ results: [], fetching: false });
+            return;
+        }
+
+        setResultsState({ results, fetching: false });
+
+        trackEvent({
+            type: 'search_type_query',
+            query,
+        });
+    }, [query, global, pointer, revisionId, trackEvent]);
+
     React.useEffect(() => {
         if (!query) {
             if (!withAsk) {
@@ -108,34 +135,36 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 cancelled = true;
             };
         } else {
-            setResultsState((prev) => ({ results: prev.results, fetching: true }));
+            // setResultsState((prev) => ({ results: prev.results, fetching: true }));
+
             let cancelled = false;
+
             timeoutRef.current = setTimeout(async () => {
-                const results = await (global
-                    ? searchAllSiteContent(query, pointer)
-                    : searchSiteSpaceContent(query, pointer, revisionId));
+                // const results = await (global
+                //     ? searchAllSiteContent(query, pointer)
+                //     : searchSiteSpaceContent(query, pointer, revisionId));
 
                 if (cancelled) {
                     return;
                 }
+                fetchResults();
+                // if (!results) {
+                //     captureException(
+                //         new Error(
+                //             `corrupt-cache: ${global ? 'searchAllSiteContent' : 'searchSiteSpaceContent'} is ${results}`,
+                //         ),
+                //         { extra: { results } },
+                //     );
+                //     setResultsState({ results: [], fetching: false });
+                //     return;
+                // }
 
-                if (!results) {
-                    captureException(
-                        new Error(
-                            `corrupt-cache: ${global ? 'searchAllSiteContent' : 'searchSiteSpaceContent'} is ${results}`,
-                        ),
-                        { extra: { results } },
-                    );
-                    setResultsState({ results: [], fetching: false });
-                    return;
-                }
+                // setResultsState({ results, fetching: false });
 
-                setResultsState({ results, fetching: false });
-
-                trackEvent({
-                    type: 'search_type_query',
-                    query,
-                });
+                // trackEvent({
+                //     type: 'search_type_query',
+                //     query,
+                // });
             }, 1000);
 
             // return () => {
@@ -150,7 +179,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 }
             };
         }
-    }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent]);
+    }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent, fetchResults]);
 
     const results: ResultType[] = React.useMemo(() => {
         if (!withAsk) {
