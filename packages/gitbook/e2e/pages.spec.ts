@@ -1351,6 +1351,7 @@ for (const testCase of testCases) {
                     await testEntry.run(page);
                 }
                 if (testEntry.screenshot !== false) {
+                    await waitForIcons(page);
                     await argosScreenshot(page, `${testCase.name} - ${testEntry.name}`, {
                         viewports: ['macbook-16', 'macbook-13', 'iphone-x', 'ipad-2'],
                         argosCSS: `
@@ -1364,6 +1365,36 @@ for (const testCase of testCases) {
                 }
             });
         }
+    });
+}
+
+/**
+ * Wait for all icons present on the page to be loaded.
+ */
+async function waitForIcons(page: Page) {
+    await page.waitForFunction(async () => {
+        function loadImage(src: string) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = (error) => reject(new Error(`Failed to load image: ${src}`));
+                img.src = src;
+            });
+        }
+
+        const icons = Array.from(document.querySelectorAll('svg.gb-icon'));
+        await Promise.all(
+            icons.map(async (icon) => {
+                // url("https://ka-p.fontawesome.com/releases/v6.6.0/svgs/light/moon.svg?v=2&token=a463935e93")
+                const maskImage = window.getComputedStyle(icon).getPropertyValue('mask-image');
+                const urlMatch = maskImage.match(/url\("([^"]+)"\)/);
+                const url = urlMatch ? urlMatch[1] : null;
+                if (!url) {
+                    throw new Error('No mask-image');
+                }
+                await loadImage(url);
+            }),
+        );
     });
 }
 
