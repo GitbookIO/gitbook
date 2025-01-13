@@ -140,6 +140,7 @@ export async function searchSiteSpaceContent(
 ): Promise<OrderedComputedResult[]> {
     const siteSpaceId = pointer.siteSpaceId;
     assert(siteSpaceId, 'Expected siteSpaceId for searchSiteSpaceContent');
+    console.log(`server actions loaded with ${process.env.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY}`);
 
     return await searchSiteContent(ctx, {
         pointer,
