@@ -63,16 +63,23 @@ export const SearchResults = React.forwardRef(function SearchResults(
     const refs = React.useRef<(null | HTMLAnchorElement)[]>([]);
     const suggestedQuestionsRef = React.useRef<null | ResultType[]>(null);
 
-const fetchResults = React.useCallback(
-    async (query: string, global: boolean, pointer?: any, revisionId?: any) => {
-        const fetchedResults = await (global
-            ? searchAllSiteContent(query, pointer)
-            : searchSiteSpaceContent(query, pointer, revisionId));
+    const fetchResults = React.useCallback(
+        async (query: string, global: boolean, pointer?: any, revisionId?: any) => {
+            const fetchedResults = await (global
+                ? searchAllSiteContent(query, pointer)
+                : searchSiteSpaceContent(query, pointer, revisionId));
 
-        return fetchedResults || [];
-    },
-    []
-);
+                console.log('Fetching results...')
+            // Track the event only when the query changes
+            trackEvent({
+                type: 'search_type_query',
+                query,
+            });
+
+            return fetchedResults || [];
+        },
+        [trackEvent],
+    );
 
     React.useEffect(() => {
         setIsLoading(true);
@@ -122,14 +129,9 @@ const fetchResults = React.useCallback(
 
                 // setResults(withAsk ? withQuestionResult(fetchedResults, query) : fetchedResults);
                 fetchResults(query, global, pointer, revisionId).then((fetchedResults) => {
-                    setResults(withAsk ? withQuestionResult(fetchedResults, query) : fetchedResults);
-                    setIsLoading(false);
-    
-                    // Track the event only when the query changes
-                    trackEvent({
-                        type: 'search_type_query',
-                        query,
-                    });
+                    setResults(
+                        withAsk ? withQuestionResult(fetchedResults, query) : fetchedResults,
+                    );
                 });
 
                 setIsLoading(false);
@@ -147,7 +149,7 @@ const fetchResults = React.useCallback(
                 }
             };
         }
-    }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent]);
+    }, [query, global, pointer, spaceId, revisionId, withAsk, fetchResults]);
 
     React.useEffect(() => {
         if (!query) {
