@@ -350,7 +350,11 @@ const testCases: TestsCase[] = [
             {
                 name: 'Integration Blocks',
                 url: 'blocks/integrations',
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    const frame = page.frames()[0];
+                    await frame.waitForURL(new RegExp('https://integrations.gitbook.com.*', 'i'));
+                    await waitForCookiesDialog(page);
+                },
             },
             {
                 name: 'Tables',
