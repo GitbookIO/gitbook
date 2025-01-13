@@ -108,6 +108,7 @@ export async function PageAside(props: {
             )}
         >
             <div
+                data-visual-test="removed"
                 className={tcls(
                     'hidden',
                     'page-api-block:xl:max-2xl:flex',
