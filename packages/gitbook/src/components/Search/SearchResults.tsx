@@ -61,6 +61,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     const [cursor, setCursor] = React.useState<number | null>(null);
     const refs = React.useRef<(null | HTMLAnchorElement)[]>([]);
     const suggestedQuestionsRef = React.useRef<null | ResultType[]>(null);
+    const timeoutRef = React.useRef<Timer | null>(null);
 
     React.useEffect(() => {
         if (!query) {
@@ -109,7 +110,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
         } else {
             setResultsState((prev) => ({ results: prev.results, fetching: true }));
             let cancelled = false;
-            const timeout = setTimeout(async () => {
+            timeoutRef.current = setTimeout(async () => {
                 const results = await (global
                     ? searchAllSiteContent(query, pointer)
                     : searchSiteSpaceContent(query, pointer, revisionId));
@@ -135,11 +136,18 @@ export const SearchResults = React.forwardRef(function SearchResults(
                     type: 'search_type_query',
                     query,
                 });
-            }, 350);
+            }, 1000);
 
+            // return () => {
+            //     cancelled = true;
+            //     clearTimeout(timeout);
+            // };
             return () => {
                 cancelled = true;
-                clearTimeout(timeout);
+                if (timeoutRef.current) {
+                    clearTimeout(timeoutRef.current);
+                    timeoutRef.current = null;
+                }
             };
         }
     }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent]);
