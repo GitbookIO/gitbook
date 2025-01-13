@@ -65,12 +65,9 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
     const fetchResults = React.useCallback(
         async (query: string, global: boolean, pointer?: any, revisionId?: any) => {
-            // const fetchedResults = await (global
-            //     ? searchAllSiteContent(query, pointer)
-            //     : searchSiteSpaceContent(query, pointer, revisionId));
-            const fetchedResults = await searchSiteSpaceContent(query, pointer, revisionId);
-
-            console.log('Fetching site space results...');
+            const fetchedResults = await (global
+                ? searchAllSiteContent(query, pointer)
+                : searchSiteSpaceContent(query, pointer, revisionId));
 
             // Track the event only when the query changes
             trackEvent({

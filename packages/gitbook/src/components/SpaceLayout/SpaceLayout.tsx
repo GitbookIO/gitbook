@@ -56,6 +56,7 @@ export async function SpaceLayout(props: {
         children,
     } = props;
 
+    console.log('Reloading SpaceLayout', { content, contentTarget });
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
     const contentRefContext: ContentRefContext = {
