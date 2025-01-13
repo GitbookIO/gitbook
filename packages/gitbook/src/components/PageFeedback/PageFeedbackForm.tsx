@@ -116,11 +116,11 @@ function RatingButton(props: { rating: number; label: string; onClick: () => voi
                 'w-8',
                 'rounded-sm',
                 'text-dark/7',
-                'hover:bg-primary/4',
-                'hover:text-primary-600',
+                'hover:bg-tint/4',
+                'hover:text-tint-600',
                 'dark:text-light/7',
-                'dark:hover:text-primary-300',
-                'dark:hover:bg-primary-300/2',
+                'dark:hover:text-tint-300',
+                'dark:hover:bg-tint-300/2',
             )}
             aria-label={label}
             title={label}

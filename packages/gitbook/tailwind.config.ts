@@ -78,8 +78,8 @@ const config: Config = {
                 /** primary-color used to accent elements, these colors remain unchanged when toggling between the CustomizationBackground options**/
                 primary: generateVarShades('primary-color'),
                 'contrast-primary': generateVarShades('contrast-primary'),
-                tint: generateVarShades('primary-color'),
-                'contrast-tint': generateVarShades('contrast-primary'),
+                tint: generateVarShades('tint-color'),
+                'contrast-tint': generateVarShades('contrast-tint'),
 
                 'header-background': generateVarShades('header-background'),
                 'header-link': generateVarShades('header-link'),
