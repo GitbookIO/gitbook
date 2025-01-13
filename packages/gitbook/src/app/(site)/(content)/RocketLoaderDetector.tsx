@@ -4,7 +4,6 @@
  */
 export function RocketLoaderDetector(props: { nonce: string }) {
     const { nonce } = props;
-    console.log('RocketLoaderDetector called', { nonce });
 
     return (
         <script

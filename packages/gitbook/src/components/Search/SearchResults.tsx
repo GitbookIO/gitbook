@@ -54,145 +54,80 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
     const language = useLanguage();
     const trackEvent = useTrackEvent();
-    const [resultsState, setResultsState] = React.useState<{
-        results: ResultType[];
-        fetching: boolean;
-    }>({ results: [], fetching: true });
+    const debounceTimeout = React.useRef<Timer | null>(null);
+    const [results, setResults] = React.useState<ResultType[]>([]);
+    const [isLoading, setIsLoading] = React.useState(false);
+    // const [resultsState, setResultsState] = React.useState<{
+    //     results: ResultType[];
+    //     fetching: boolean;
+    // }>({ results: [], fetching: true });
     const [cursor, setCursor] = React.useState<number | null>(null);
     const refs = React.useRef<(null | HTMLAnchorElement)[]>([]);
     const suggestedQuestionsRef = React.useRef<null | ResultType[]>(null);
-    const timeoutRef = React.useRef<Timer | null>(null);
-
-    const fetchResults = React.useCallback(async () => {
-        setResultsState((prev) => ({ results: prev.results, fetching: true }));
-
-        const results = await (global
-            ? searchAllSiteContent(query, pointer)
-            : searchSiteSpaceContent(query, pointer, revisionId));
-
-        console.log('fetching results', {results})
-
-        if (!results) {
-            captureException(
-                new Error(
-                    `corrupt-cache: ${global ? 'searchAllSiteContent' : 'searchSiteSpaceContent'} is ${results}`,
-                ),
-                { extra: { results } },
-            );
-            setResultsState({ results: [], fetching: false });
-            return;
-        }
-
-        setResultsState({ results, fetching: false });
-
-        trackEvent({
-            type: 'search_type_query',
-            query,
-        });
-    }, [query, global, pointer, revisionId, trackEvent]);
 
     React.useEffect(() => {
+        setIsLoading(true);
+
         if (!query) {
             if (!withAsk) {
-                setResultsState({ results: [], fetching: false });
+                setIsLoading(false);
                 return;
             }
 
             if (suggestedQuestionsRef.current) {
-                setResultsState({ results: suggestedQuestionsRef.current, fetching: false });
+                setResults(suggestedQuestionsRef.current);
+                setIsLoading(false);
                 return;
             }
 
             let cancelled = false;
 
-            setResultsState({ results: [], fetching: true });
             getRecommendedQuestions(spaceId).then((questions) => {
-                if (!questions) {
-                    if (!cancelled) {
-                        setResultsState({ results: [], fetching: false });
-                    }
-                    captureException(
-                        new Error(`corrupt-cache: getRecommendedQuestions is ${questions}`),
-                    );
-                    return;
-                }
-
                 const results = questions.map((question) => ({
                     type: 'recommended-question',
                     id: question,
                     question: question,
                 })) satisfies ResultType[];
-
                 suggestedQuestionsRef.current = results;
-
                 if (cancelled) {
                     return;
                 }
 
-                setResultsState({ results, fetching: false });
+                setResults(results);
+                setIsLoading(false);
             });
 
             return () => {
                 cancelled = true;
             };
         } else {
-            // setResultsState((prev) => ({ results: prev.results, fetching: true }));
+            if (withAsk) {
+                setResults((prev) => withQuestionResult(prev, query));
+                setIsLoading(false);
+            }
 
-            let cancelled = false;
+            debounceTimeout.current = setTimeout(async () => {
+                const fetchedResults = await (global
+                    ? searchAllSiteContent(query, pointer)
+                    : searchSiteSpaceContent(query, pointer, revisionId));
 
-            timeoutRef.current = setTimeout(async () => {
-                // const results = await (global
-                //     ? searchAllSiteContent(query, pointer)
-                //     : searchSiteSpaceContent(query, pointer, revisionId));
+                setResults(withAsk ? withQuestionResult(fetchedResults, query) : fetchedResults);
+                setIsLoading(false);
 
-                console.log('cancelled 1', cancelled)
+                trackEvent({
+                    type: 'search_type_query',
+                    query,
+                });
+            }, 350);
 
-                if (cancelled) {
-                    return;
-                }
-
-                console.log('cancelled 2', cancelled)
-
-                fetchResults();
-                // if (!results) {
-                //     captureException(
-                //         new Error(
-                //             `corrupt-cache: ${global ? 'searchAllSiteContent' : 'searchSiteSpaceContent'} is ${results}`,
-                //         ),
-                //         { extra: { results } },
-                //     );
-                //     setResultsState({ results: [], fetching: false });
-                //     return;
-                // }
-
-                // setResultsState({ results, fetching: false });
-
-                // trackEvent({
-                //     type: 'search_type_query',
-                //     query,
-                // });
-            }, 1000);
-
-            // return () => {
-            //     cancelled = true;
-            //     clearTimeout(timeout);
-            // };
             return () => {
-                cancelled = true;
-                if (timeoutRef.current) {
-                    clearTimeout(timeoutRef.current);
-                    timeoutRef.current = null;
+                if (debounceTimeout.current) {
+                    clearTimeout(debounceTimeout.current);
+                    debounceTimeout.current = null;
                 }
             };
         }
-    }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent, fetchResults]);
-
-    const results: ResultType[] = React.useMemo(() => {
-        if (!withAsk) {
-            return resultsState.results;
-        }
-        return withQuestionResult(resultsState.results, query);
-    }, [resultsState.results, query, withAsk]);
+    }, [query, global, pointer, spaceId, revisionId, withAsk]);
 
     React.useEffect(() => {
         if (!query) {
@@ -251,7 +186,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
         [moveBy, select],
     );
 
-    if (resultsState.fetching) {
+    if (isLoading) {
         return (
             <div className={tcls('flex', 'items-center', 'justify-center', 'py-8')}>
                 <Loading className={tcls('w-6', 'text-primary')} />
