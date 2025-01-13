@@ -8,3 +8,6 @@ packages/icons/src/data/*.json
 
 # Build files
 dist/
+
+README.md
+CHANGELOG.md
