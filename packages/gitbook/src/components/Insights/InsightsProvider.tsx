@@ -192,22 +192,13 @@ export function InsightsProvider(props: InsightsProviderProps) {
     React.useEffect(() => {
         getVisitorId().then((visitorId) => {
             visitorIdRef.current = visitorId;
+            // When the page is unloaded, flush all events, but only if the visitor ID is set
+            window.addEventListener('beforeunload', flushEventsSync);
         });
-    }, []);
-
-    /**
-     * Get the visitor ID and store it in a ref.
-     */
-    // React.useEffect(() => {
-    //     getVisitorId().then((visitorId) => {
-    //         visitorIdRef.current = visitorId;
-    //         // When the page is unloaded, flush all events, but only if the visitor ID is set
-    //         window.addEventListener('beforeunload', flushEventsSync);
-    //     });
-    //     return () => {
-    //         window.removeEventListener('beforeunload', flushEventsSync);
-    //     };
-    // }, [flushEventsSync]);
+        return () => {
+            window.removeEventListener('beforeunload', flushEventsSync);
+        };
+    }, [flushEventsSync]);
 
     return (
         <InsightsContext.Provider value={trackEvent}>
