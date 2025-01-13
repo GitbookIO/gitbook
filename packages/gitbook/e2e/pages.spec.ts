@@ -726,7 +726,9 @@ const testCases: TestsCase[] = [
                 })(),
                 run: async (page) => {
                     await waitForCookiesDialog(page);
-                    await expect(page.locator('h1')).toHaveText('First');
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'first' }),
+                    ).toBeVisible();
                 },
             },
             {
