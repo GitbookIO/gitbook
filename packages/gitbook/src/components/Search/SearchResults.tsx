@@ -64,7 +64,10 @@ export const SearchResults = React.forwardRef(function SearchResults(
     const [cursor, setCursor] = React.useState<number | null>(null);
     const refs = React.useRef<(null | HTMLAnchorElement)[]>([]);
     const suggestedQuestionsRef = React.useRef<null | ResultType[]>(null);
-    const getCtx = useEventCallback(() => ctx);
+
+    // const getCtx = useEventCallback(() => ctx);
+    const memoizedCtx = React.useMemo(() => ctx, [ctx.apiToken, ctx.visitorToken]);
+    const getCtx = useEventCallback(() => memoizedCtx);
 
     const fetchResults = React.useCallback(async () => {
         setResultsState((prev) => ({ ...prev, fetching: true }));
