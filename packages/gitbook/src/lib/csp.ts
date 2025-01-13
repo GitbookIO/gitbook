@@ -10,7 +10,7 @@ import { filterOutNullable } from './typescript';
 export async function getContentSecurityPolicyNonce(): Promise<string> {
     const headersList = await headers();
     const nonce = headersList.get('x-nonce');
-    console.log('CSP Nonce called', { headers, nonce });
+
     if (!nonce) {
         throw new Error('No nonce found in headers');
     }
