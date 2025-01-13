@@ -129,12 +129,12 @@ export const SearchResults = React.forwardRef(function SearchResults(
                     return;
                 }
 
-                if (!results) {
+                if (!fetchedResults) {
                     captureException(
                         new Error(
-                            `corrupt-cache: ${global ? 'searchAllSiteContent' : 'searchSiteSpaceContent'} is ${results}`,
+                            `corrupt-cache: ${global ? 'searchAllSiteContent' : 'searchSiteSpaceContent'} is ${fetchedResults}`,
                         ),
-                        { extra: { results } },
+                        { extra: { results: fetchedResults } },
                     );
                     setResults([]);
                     setIsLoading(false);
