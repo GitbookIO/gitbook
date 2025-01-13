@@ -1,11 +1,9 @@
 import { ContentKitContext, DocumentBlockIntegration } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import { ContentKit, ContentKitOutput, ContentKitServerContext } from '@gitbook/react-contentkit';
-import { headers } from 'next/headers';
 
 import { ignoreAPIError, renderIntegrationUi } from '@/lib/api';
 import { INTEGRATIONS_HOST } from '@/lib/csp';
-import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { parseMarkdown } from '@/lib/markdown';
 import { tcls } from '@/lib/tailwind';
 
@@ -47,8 +45,6 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
         throw new Error('integration block requires a content.spaceId');
     }
 
-    const ctx = getGitBookContextFromHeaders(await headers());
-
     const contentKitContext: ContentKitContext = {
         type: 'document',
         spaceId: context.content.spaceId,
@@ -64,10 +60,9 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
     };
 
     const initialOutput = await ignoreAPIError(
-        renderIntegrationUi(ctx, block.data.integration, initialInput),
+        renderIntegrationUi(block.data.integration, initialInput),
         true,
     );
-
     if (!initialOutput || initialOutput.type === 'complete') {
         return null;
     }
@@ -81,7 +76,7 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
                 render={async (request) => {
                     'use server';
 
-                    const output = await renderIntegrationUi(ctx, block.data.integration, request);
+                    const output = await renderIntegrationUi(block.data.integration, request);
 
                     return {
                         children: <ContentKitOutput output={output} context={outputContext} />,

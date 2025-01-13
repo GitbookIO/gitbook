@@ -8,7 +8,6 @@ import {
 } from '@gitbook/api';
 import { headers } from 'next/headers';
 
-import { GitBookContext } from './gitbook-context';
 import { getPagePath } from './pages';
 
 export interface PageHrefContext {
@@ -23,8 +22,9 @@ export interface PageHrefContext {
  * Return the base path for the current request.
  * The value will start and finish with /
  */
-export function formatBasePath(headerBasePath: string | null): string {
-    let path = headerBasePath ?? '/';
+export async function getBasePath(): Promise<string> {
+    const headersList = await headers();
+    let path = headersList.get('x-gitbook-basepath') ?? '/';
 
     if (!path.startsWith('/')) {
         path = '/' + path;
@@ -38,14 +38,23 @@ export function formatBasePath(headerBasePath: string | null): string {
 }
 
 /**
+ * Return the current host for the current request.
+ */
+export async function getHost(): Promise<string> {
+    const headersList = await headers();
+    return headersList.get('x-gitbook-host') ?? headersList.get('host') ?? '';
+}
+
+/**
  * Return the root URL for the GitBook Open instance (not the content).
  * Use `baseUrl` to get the base URL for the current content.
  *
  * The URL will end with "/".
  */
-export function getRootUrl(ctx: GitBookContext): string {
-    const protocol = ctx.protocol;
-    let path = ctx.originBasePath;
+export async function getRootUrl(): Promise<string> {
+    const [headersList, host] = await Promise.all([headers(), getHost()]);
+    const protocol = headersList.get('x-forwarded-proto') ?? 'https';
+    let path = headersList.get('x-gitbook-origin-basepath') ?? '/';
 
     if (!path.startsWith('/')) {
         path = '/' + path;
@@ -55,26 +64,24 @@ export function getRootUrl(ctx: GitBookContext): string {
         path = path + '/';
     }
 
-    return `${protocol}://${ctx.host}${path}`;
+    return `${protocol}://${host}${path}`;
 }
 
 /**
  * Return the base URL for the current content.
  * The URL will end with "/".
  */
-export function getBaseUrl(ctx: GitBookContext): string {
-    return `${ctx.protocol}://${ctx.host}${ctx.basePath}`;
+export async function getBaseUrl(): Promise<string> {
+    const [headersList, host, basePath] = await Promise.all([headers(), getHost(), getBasePath()]);
+    const protocol = headersList.get('x-forwarded-proto') ?? 'https';
+    return `${protocol}://${host}${basePath}`;
 }
 
 /**
  * Create an absolute href in the current content.
  */
-export function getAbsoluteHref(
-    ctx: GitBookContext,
-    href: string,
-    withHost: boolean = false,
-): string {
-    const base = withHost ? getBaseUrl(ctx) : ctx.basePath;
+export async function getAbsoluteHref(href: string, withHost: boolean = false): Promise<string> {
+    const base = withHost ? await getBaseUrl() : await getBasePath();
     return `${base}${href.startsWith('/') ? href.slice(1) : href}`;
 }
 
@@ -91,14 +98,13 @@ export function getGitbookAppHref(pathname: string): string {
 /**
  * Create a link to a page path in the current space.
  */
-export function getPageHref(
-    ctx: GitBookContext,
+export async function getPageHref(
     rootPages: RevisionPage[],
     page: RevisionPageDocument | RevisionPageGroup,
     context: PageHrefContext = {},
     /** Anchor to link to in the page. */
     anchor?: string,
-): string {
+): Promise<string> {
     const { pdf } = context;
 
     if (pdf) {
@@ -114,7 +120,9 @@ export function getPageHref(
         }
     }
 
-    return getAbsoluteHref(ctx, getPagePath(rootPages, page)) + (anchor ? '#' + anchor : '');
+    const href =
+        (await getAbsoluteHref(getPagePath(rootPages, page))) + (anchor ? '#' + anchor : '');
+    return href;
 }
 
 /**

@@ -8,13 +8,11 @@ import {
     Space,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import { headers } from 'next/headers';
 import React from 'react';
 import urlJoin from 'url-join';
 
 import { t, getSpaceLanguage } from '@/intl/server';
 import { getDocumentSections } from '@/lib/document';
-import { getGitBookContextFromHeaders, getIpAndUserAgentFromHeaders } from '@/lib/gitbook-context';
 import { getAbsoluteHref } from '@/lib/links';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -50,9 +48,6 @@ export async function PageAside(props: {
     withFullPageCover: boolean;
     withPageFeedback: boolean;
 }) {
-    const headersList = await headers();
-    const ctx = getGitBookContextFromHeaders(headersList);
-    const ipAndUserAgent = getIpAndUserAgentFromHeaders(headersList);
     const {
         space,
         site,
@@ -66,8 +61,7 @@ export async function PageAside(props: {
     const language = getSpaceLanguage(customization);
 
     const topOffset = getTopOffset(withHeaderOffset);
-    const pdfHref = getAbsoluteHref(
-        ctx,
+    const pdfHref = await getAbsoluteHref(
         `~gitbook/pdf?${getPDFUrlSearchParams({
             page: page.id,
             only: true,
@@ -180,7 +174,7 @@ export async function PageAside(props: {
                 >
                     {withPageFeedback ? (
                         <React.Suspense fallback={null}>
-                            <PageFeedbackForm ctx={ctx} pageId={page.id} className={tcls('mt-2')} />
+                            <PageFeedbackForm pageId={page.id} className={tcls('mt-2')} />
                         </React.Suspense>
                     ) : null}
                     {customization.git.showEditLink && space.gitSync?.url && page.git ? (
@@ -229,7 +223,6 @@ export async function PageAside(props: {
                 </div>
             </div>
             <Ad
-                ipAndUserAgent={ipAndUserAgent}
                 zoneId={
                     site?.ads && site.ads.status === SiteAdsStatus.Live ? site.ads.zoneId : null
                 }
@@ -244,12 +237,9 @@ export async function PageAside(props: {
 }
 
 async function PageAsideSections(props: { document: JSONDocument; context: ContentRefContext }) {
-    const ctx = getGitBookContextFromHeaders(await headers());
     const { document, context } = props;
 
-    const sections = await getDocumentSections(document, (ref) =>
-        resolveContentRef(ctx, ref, context),
-    );
+    const sections = await getDocumentSections(document, (ref) => resolveContentRef(ref, context));
 
     return sections.length > 1 ? <ScrollSectionsList sections={sections} /> : null;
 }

@@ -5,10 +5,8 @@ import {
     SiteCustomizationSettings,
     Space,
 } from '@gitbook/api';
-import { headers } from 'next/headers';
 
 import { Image } from '@/components/utils';
-import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { getAbsoluteHref } from '@/lib/links';
 import { tcls } from '@/lib/tailwind';
 import { getContentTitle } from '@/lib/utils';
@@ -27,9 +25,8 @@ interface HeaderLogoProps {
  */
 
 export async function HeaderLogo(props: HeaderLogoProps) {
-    const ctx = getGitBookContextFromHeaders(await headers());
     const { customization } = props;
-    const href = getAbsoluteHref(ctx, '');
+    const href = await getAbsoluteHref('');
 
     return (
         <Link

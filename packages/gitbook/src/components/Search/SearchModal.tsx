@@ -8,7 +8,6 @@ import { useHotkeys } from 'react-hotkeys-hook';
 
 import { tString, useLanguage } from '@/intl/client';
 import { SiteContentPointer } from '@/lib/api';
-import { GitBookContext } from '@/lib/gitbook-context';
 import { tcls } from '@/lib/tailwind';
 
 import { SearchAskAnswer } from './SearchAskAnswer';
@@ -19,7 +18,6 @@ import { SearchState, UpdateSearchState, useSearch } from './useSearch';
 import { LoadingPane } from '../primitives/LoadingPane';
 
 interface SearchModalProps {
-    ctx: GitBookContext;
     spaceId: string;
     revisionId: string;
     spaceTitle: string;
@@ -310,7 +308,6 @@ function SearchModalBody(
             {!state.ask || !withAsk ? (
                 <SearchResults
                     ref={resultsRef}
-                    ctx={props.ctx}
                     pointer={pointer}
                     spaceId={spaceId}
                     revisionId={revisionId}
@@ -321,7 +318,7 @@ function SearchModalBody(
                 ></SearchResults>
             ) : null}
             {state.query && state.ask && withAsk ? (
-                <SearchAskAnswer ctx={props.ctx} pointer={pointer} query={state.query} />
+                <SearchAskAnswer pointer={pointer} query={state.query} />
             ) : null}
         </motion.div>
     );

@@ -1,19 +1,16 @@
 import { RevisionPageLink } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import { headers } from 'next/headers';
 
 import { Link } from '@/components/primitives';
-import { getGitBookContextFromHeaders } from '@/lib/gitbook-context';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { TOCPageIcon } from './TOCPageIcon';
 
 export async function PageLinkItem(props: { page: RevisionPageLink; context: ContentRefContext }) {
-    const ctx = getGitBookContextFromHeaders(await headers());
     const { page, context } = props;
 
-    const resolved = await resolveContentRef(ctx, page.target, context);
+    const resolved = await resolveContentRef(page.target, context);
 
     return (
         <li className={tcls('flex', 'flex-col')}>

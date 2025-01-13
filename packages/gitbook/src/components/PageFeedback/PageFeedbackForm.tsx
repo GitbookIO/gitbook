@@ -1,12 +1,10 @@
 'use client';
 
 import { PageFeedbackRating } from '@gitbook/api';
-import { headers } from 'next/headers';
 import React from 'react';
 
 import { useLanguage } from '@/intl/client';
 import { t, tString } from '@/intl/translate';
-import { getGitBookContextFromHeaders, GitBookContext } from '@/lib/gitbook-context';
 import { tcls } from '@/lib/tailwind';
 
 import { getVisitorId, useTrackEvent } from '../Insights';
@@ -16,12 +14,11 @@ import { postPageFeedback } from './server-actions';
  * Form to submit feedback on a page.
  */
 export function PageFeedbackForm(props: {
-    ctx: GitBookContext;
     orientation?: 'horizontal' | 'vertical';
     pageId: string;
     className?: string;
 }) {
-    const { ctx, orientation = 'vertical', pageId, className } = props;
+    const { orientation = 'vertical', pageId, className } = props;
     const languages = useLanguage();
     const trackEvent = useTrackEvent();
     const [submitted, setSubmitted] = React.useState(false);
@@ -29,7 +26,7 @@ export function PageFeedbackForm(props: {
     const onSubmit = async (rating: PageFeedbackRating) => {
         setSubmitted(true);
         const visitorId = await getVisitorId();
-        await postPageFeedback(ctx, { pageId, visitorId, rating });
+        await postPageFeedback({ pageId, visitorId, rating });
 
         trackEvent({
             type: 'page_post_feedback',

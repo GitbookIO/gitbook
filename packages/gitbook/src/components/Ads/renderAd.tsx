@@ -1,6 +1,6 @@
 'use server';
 
-import { IpAndUserAgent } from '@/lib/gitbook-context';
+import { headers } from 'next/headers';
 
 import { AdClassicRendering } from './AdClassicRendering';
 import { AdCoverRendering } from './AdCoverRendering';
@@ -23,8 +23,6 @@ interface FetchLiveAdOptions {
     placement: string;
     /** If true, we'll not track it as an impression */
     ignore: boolean;
-    /** IP and User-Agent to use for the request */
-    ipAndUserAgent: IpAndUserAgent;
 }
 
 interface FetchPlaceholderAdOptions {
@@ -32,8 +30,6 @@ interface FetchPlaceholderAdOptions {
      * Source of the ad (placeholder: static placeholder ad)
      */
     source: 'placeholder';
-    /** IP and User-Agent to use for the request */
-    ipAndUserAgent: IpAndUserAgent;
 }
 
 /**
@@ -44,8 +40,7 @@ interface FetchPlaceholderAdOptions {
 export async function renderAd(options: FetchAdOptions) {
     const mode = options.source === 'live' ? options.mode : 'classic';
 
-    const result =
-        options.source === 'live' ? await fetchAd(options) : await getPlaceholderAd(options);
+    const result = options.source === 'live' ? await fetchAd(options) : await getPlaceholderAd();
     if (!result || !result.ad.description || !result.ad.statlink) {
         return null;
     }
@@ -65,12 +60,12 @@ export async function renderAd(options: FetchAdOptions) {
 }
 
 async function fetchAd({
-    ipAndUserAgent,
     zoneId,
     placement,
     ignore,
 }: FetchLiveAdOptions): Promise<{ ad: AdItem; ip: string } | null> {
-    const { ip, userAgent } = ipAndUserAgent;
+    const { ip, userAgent } = await getUserAgentAndIp();
+
     const url = new URL(`https://srv.buysellads.com/ads/${zoneId}.json`);
     url.searchParams.set('segment', `placement:${placement}`);
     url.searchParams.set('v', 'true');
@@ -91,7 +86,9 @@ async function fetchAd({
     return null;
 }
 
-function getPlaceholderAd(options: FetchPlaceholderAdOptions): { ad: AdItem; ip: string } {
+async function getPlaceholderAd(): Promise<{ ad: AdItem; ip: string }> {
+    const { ip } = await getUserAgentAndIp();
+
     return {
         ad: {
             active: '1',
@@ -118,6 +115,20 @@ function getPlaceholderAd(options: FetchPlaceholderAdOptions): { ad: AdItem; ip:
             zoneid: '',
             zonekey: '',
         },
-        ip: options.ipAndUserAgent.ip,
+        ip,
     };
+}
+
+async function getUserAgentAndIp() {
+    const headersSet = await headers();
+    const ip =
+        headersSet.get('x-gitbook-ipv4') ??
+        headersSet.get('x-gitbook-ip') ??
+        headersSet.get('cf-pseudo-ipv4') ??
+        headersSet.get('cf-connecting-ip') ??
+        headersSet.get('x-forwarded-for') ??
+        '';
+    const userAgent = headersSet.get('user-agent') ?? '';
+
+    return { ip, userAgent };
 }

@@ -28,7 +28,6 @@ import {
     parseSpacesFromSiteSpaces,
 } from './api';
 import { getBlockById, getBlockTitle } from './document';
-import { GitBookContext } from './gitbook-context';
 import { getGitbookAppHref, getPageHref, PageHrefContext } from './links';
 import { getPagePath, resolvePageId } from './pages';
 import { ClassValue } from './tailwind';
@@ -101,7 +100,6 @@ export interface ResolveContentRefOptions {
  * Resolve a content reference to be rendered.
  */
 export async function resolveContentRef(
-    ctx: GitBookContext,
     contentRef: ContentRef,
     context: ContentRefContext,
     options: ResolveContentRefOptions = {},
@@ -119,7 +117,7 @@ export async function resolveContentRef(
         }
 
         case 'file': {
-            const file = await getRevisionFile(ctx, space.id, revisionId, contentRef.file);
+            const file = await getRevisionFile(space.id, revisionId, contentRef.file);
             if (file) {
                 return {
                     href: file.downloadURL,
@@ -135,7 +133,7 @@ export async function resolveContentRef(
         case 'anchor':
         case 'page': {
             if (contentRef.space && contentRef.space !== space.id) {
-                return resolveContentRefInSpace(ctx, contentRef.space, siteContext, contentRef);
+                return resolveContentRefInSpace(contentRef.space, siteContext, contentRef);
             }
 
             const resolvePageResult =
@@ -164,7 +162,7 @@ export async function resolveContentRef(
 
                 if (resolveAnchorText) {
                     const document = page.documentId
-                        ? await getDocument(ctx, space.id, page.documentId)
+                        ? await getDocument(space.id, page.documentId)
                         : null;
                     if (document) {
                         const block = getBlockById(document, anchor);
@@ -195,7 +193,7 @@ export async function resolveContentRef(
                 }
             } else {
                 // Page in the current content
-                href = await getPageHref(ctx, pages, page, linksContext, anchor);
+                href = await getPageHref(pages, page, linksContext, anchor);
             }
 
             return {
@@ -211,7 +209,7 @@ export async function resolveContentRef(
             const targetSpace =
                 contentRef.space === space.id
                     ? space
-                    : await getBestTargetSpace(ctx, contentRef.space, siteContext);
+                    : await getBestTargetSpace(contentRef.space, siteContext);
 
             if (!targetSpace) {
                 return {
@@ -229,7 +227,7 @@ export async function resolveContentRef(
         }
 
         case 'user': {
-            const user = await getUserById(ctx, contentRef.user);
+            const user = await getUserById(contentRef.user);
             if (user) {
                 return {
                     href: `mailto:${user.email}`,
@@ -252,7 +250,7 @@ export async function resolveContentRef(
         }
 
         case 'collection': {
-            const collection = await ignoreAPIError(getCollection(ctx, contentRef.collection));
+            const collection = await ignoreAPIError(getCollection(contentRef.collection));
             if (!collection) {
                 return {
                     href: getGitbookAppHref(`/s/${contentRef.collection}`),
@@ -270,7 +268,6 @@ export async function resolveContentRef(
 
         case 'reusable-content': {
             const reusableContent = await getReusableContent(
-                ctx,
                 space.id,
                 revisionId,
                 contentRef.reusableContent,
@@ -296,21 +293,16 @@ export async function resolveContentRef(
  * It will try to return the space in the site context if it exists to avoid cross-site links.
  */
 async function getBestTargetSpace(
-    ctx: GitBookContext,
     spaceId: string,
     siteContext: SiteContentPointer | null,
 ): Promise<Space | undefined> {
     const [fetchedSpace, publishedContentSite] = await Promise.all([
         ignoreAPIError(
-            getSpace(
-                ctx,
-                spaceId,
-                siteContext?.siteShareKey ? siteContext.siteShareKey : undefined,
-            ),
+            getSpace(spaceId, siteContext?.siteShareKey ? siteContext.siteShareKey : undefined),
         ),
         siteContext
             ? ignoreAPIError(
-                  getPublishedContentSite(ctx, {
+                  getPublishedContentSite({
                       organizationId: siteContext.organizationId,
                       siteId: siteContext.siteId,
                       siteShareKey: siteContext.siteShareKey,
@@ -341,7 +333,6 @@ async function getBestTargetSpace(
 }
 
 async function resolveContentRefInSpace(
-    ctx: GitBookContext,
     spaceId: string,
     siteContext: SiteContentPointer | null,
     contentRef: ContentRef,
@@ -351,8 +342,8 @@ async function resolveContentRefInSpace(
     };
 
     const [result, bestTargetSpace] = await Promise.all([
-        ignoreAPIError(getSpaceContentData(ctx, pointer, siteContext?.siteShareKey)),
-        getBestTargetSpace(ctx, spaceId, siteContext),
+        ignoreAPIError(getSpaceContentData(pointer, siteContext?.siteShareKey)),
+        getBestTargetSpace(spaceId, siteContext),
     ]);
     if (!result) {
         return null;
@@ -367,7 +358,7 @@ async function resolveContentRefInSpace(
         baseUrl += '/';
     }
 
-    const resolved = await resolveContentRef(ctx, contentRef, {
+    const resolved = await resolveContentRef(contentRef, {
         siteContext,
         space,
         revisionId: space.revision,
