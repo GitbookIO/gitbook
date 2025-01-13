@@ -24,6 +24,7 @@ export interface PageIdParams {
  */
 export async function fetchContentData() {
     const content = await getSiteContentPointer();
+    console.log('fetchContentData', {content});
 
     const [{ space, contentTarget, pages }, { customization, site, sections, spaces, scripts }] =
         await Promise.all([
