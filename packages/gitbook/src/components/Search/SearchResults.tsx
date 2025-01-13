@@ -66,6 +66,8 @@ export const SearchResults = React.forwardRef(function SearchResults(
     const suggestedQuestionsRef = React.useRef<null | ResultType[]>(null);
     const getCtx = useEventCallback(() => ctx);
 
+    const timeoutRef = React.useRef<Timer | null>(null);
+
     React.useEffect(() => {
         if (!query) {
             if (!withAsk) {
@@ -114,7 +116,8 @@ export const SearchResults = React.forwardRef(function SearchResults(
             setResultsState((prev) => ({ results: prev.results, fetching: true }));
 
             let cancelled = false;
-            const timeout = setTimeout(async () => {
+            timeoutRef.current = setTimeout(async () => {
+                // const timeout = setTimeout(async () => {
                 const results = await (global
                     ? searchAllSiteContent(getCtx(), query, pointer)
                     : searchSiteSpaceContent(getCtx(), query, pointer, revisionId));
@@ -130,11 +133,19 @@ export const SearchResults = React.forwardRef(function SearchResults(
                         ),
                         { extra: { results } },
                     );
-                    setResultsState({ results: [], fetching: false });
+                    // setResultsState({ results: [], fetching: false });
+                    setResultsState((prev) => {
+                        if (prev.results.length === 0 && !prev.fetching) return prev;
+                        return { results: [], fetching: false };
+                    });
                     return;
                 }
 
-                setResultsState({ results, fetching: false });
+                // setResultsState({ results, fetching: false });
+                setResultsState((prev) => {
+                    if (prev.results === results && !prev.fetching) return prev;
+                    return { results, fetching: false };
+                });
 
                 trackEvent({
                     type: 'search_type_query',
@@ -142,14 +153,19 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 });
             }, 1000);
 
+            // return () => {
+            //     cancelled = true;
+            //     clearTimeout(timeout);
+            // };
             return () => {
                 cancelled = true;
-                clearTimeout(timeout);
+                if (timeoutRef.current) {
+                    clearTimeout(timeoutRef.current);
+                    timeoutRef.current = null;
+                }
             };
         }
-        // }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent, getCtx]);
-    }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent]);
-    // Claire notes: it's not trackEvent
+    }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent, getCtx]);
 
     const results: ResultType[] = React.useMemo(() => {
         if (!withAsk) {
