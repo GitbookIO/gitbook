@@ -122,6 +122,7 @@ export async function searchAllSiteContent(
     query: string,
     pointer: api.SiteContentPointer,
 ): Promise<OrderedComputedResult[]> {
+    console.log(`server actions loaded with ${process.env.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY}`);
     return await searchSiteContent(ctx, {
         pointer,
         query,
@@ -165,6 +166,7 @@ export const streamAskQuestion = streamResponse(async function* (
     siteSpaceId: string | null,
     question: string,
 ) {
+    console.log(`server actions loaded with ${process.env.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY}`);
     const stream = api.api(ctx).client.orgs.streamAskInSite(
         organizationId,
         siteId,
@@ -234,6 +236,7 @@ export async function getRecommendedQuestions(
     ctx: GitBookContext,
     spaceId: string,
 ): Promise<string[]> {
+    console.log(`server actions loaded with ${process.env.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY}`);
     const data = await api.getRecommendedQuestionsInSpace(ctx, spaceId);
     if (!data.questions) {
         captureException(new Error('Expected questions in getRecommendedQuestions'), {
