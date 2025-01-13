@@ -105,12 +105,11 @@ export const SearchResults = React.forwardRef(function SearchResults(
             }
 
             debounceTimeout.current = setTimeout(async () => {
-                // const fetchedResults = await (global
-                //     ? searchAllSiteContent(query, pointer)
-                //     : searchSiteSpaceContent(query, pointer, revisionId));
+                const fetchedResults = await (global
+                    ? searchAllSiteContent(query, pointer)
+                    : searchSiteSpaceContent(query, pointer, revisionId));
 
-                // setResults(withAsk ? withQuestionResult(fetchedResults, query) : fetchedResults);
-                setResults((prev) => withQuestionResult(prev, query));
+                setResults(withAsk ? withQuestionResult(fetchedResults, query) : fetchedResults);
 
                 setIsLoading(false);
 

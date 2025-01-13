@@ -59,6 +59,8 @@ async function searchSiteContent(args: {
     cacheBust?: string;
 }): Promise<OrderedComputedResult[]> {
     const { pointer, scope, query, cacheBust } = args;
+    console.log('searchSiteContent called');
+    console.log('searchSiteContent', { pointer, scope, query, cacheBust });
 
     if (query.length <= 1) {
         return [];
