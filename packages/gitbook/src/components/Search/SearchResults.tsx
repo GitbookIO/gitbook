@@ -70,6 +70,8 @@ export const SearchResults = React.forwardRef(function SearchResults(
             ? searchAllSiteContent(query, pointer)
             : searchSiteSpaceContent(query, pointer, revisionId));
 
+        console.log('fetching results', {results})
+
         if (!results) {
             captureException(
                 new Error(
@@ -143,9 +145,14 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 //     ? searchAllSiteContent(query, pointer)
                 //     : searchSiteSpaceContent(query, pointer, revisionId));
 
+                console.log('cancelled 1', cancelled)
+
                 if (cancelled) {
                     return;
                 }
+
+                console.log('cancelled 2', cancelled)
+
                 fetchResults();
                 // if (!results) {
                 //     captureException(
