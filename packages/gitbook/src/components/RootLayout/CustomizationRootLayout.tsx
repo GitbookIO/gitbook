@@ -160,7 +160,6 @@ export async function CustomizationRootLayout(props: {
                     fontNotoColorEmoji.className,
                     `${fonts[customization.styling.font].className}`,
                     `${ibmPlexMono.variable}`,
-                    'antialiased',
                     'bg-light',
                     'dark:bg-dark',
                 )}

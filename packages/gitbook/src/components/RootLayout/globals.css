@@ -24,6 +24,8 @@
     }
     body {
         @apply text-dark dark:text-light;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
     }
     html {
         @apply gutter-stable;
@@ -52,6 +54,13 @@
     input,
     textarea {
         @apply outline-2 outline-primary/6;
+    }
+
+    code,
+    pre {
+        /* Don't apply antialiased to `code` and `pre` elements */
+        -webkit-font-smoothing: auto;
+        -moz-osx-font-smoothing: auto;
     }
 
     /*  Light mode */
