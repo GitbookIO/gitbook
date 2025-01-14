@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import type { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 import { NextResponse, NextRequest } from 'next/server';
 import hash from 'object-hash';
+import rison from 'rison';
 
 import {
     PublishedContentWithCache,
@@ -260,7 +261,10 @@ export async function middleware(request: NextRequest) {
 
     const customization = url.searchParams.get('customization');
     if (customization) {
-        headers.set('x-gitbook-customization', customization);
+        try {
+            rison.decode_object(customization);
+            headers.set('x-gitbook-customization', customization);
+        } catch {}
     }
 
     const theme = url.searchParams.get('theme');
