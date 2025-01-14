@@ -8,3 +8,4 @@ export * from './StyledLink';
 export * from './DateRelative';
 export * from './Emoji';
 export * from './LoadingPane';
+export * from './Popover';
