@@ -728,7 +728,12 @@ const testCases: TestsCase[] = [
                     );
                     return `first?jwt_token=${token}`;
                 })(),
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'first' }),
+                    ).toBeVisible();
+                },
+                screenshot: false,
             },
             {
                 name: 'Second',
@@ -745,7 +750,12 @@ const testCases: TestsCase[] = [
                     );
                     return `second?jwt_token=${token}`;
                 })(),
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'second' }),
+                    ).toBeVisible();
+                },
+                screenshot: false,
             },
         ],
     },
