@@ -30,6 +30,7 @@ export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
                         dangerouslySetInnerHTML={{
                             __html: embed.html,
                         }}
+                        data-visual-test="blackout"
                     />
                     <Script src="https://cdn.iframe.ly/embed.js" nonce={nonce} />
                 </>
