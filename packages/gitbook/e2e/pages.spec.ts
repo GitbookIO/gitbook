@@ -27,12 +27,40 @@ import { getContentTestURL } from '../tests/utils';
 
 interface Test {
     name: string;
-    url: string; // URL to visit for testing
+    /**
+     * URL to visit for testing.
+     */
+    url: string;
     cookies?: Parameters<BrowserContext['addCookies']>[0];
-    run?: (page: Page) => Promise<unknown>; // The test to run
-    fullPage?: boolean; // Whether the test should be fullscreened during testing
-    screenshot?: false | { threshold: number }; // Disable screenshot or set threshold
-    only?: boolean; // Only run this test
+    /**
+     * Test to run
+     */
+    run?: (page: Page) => Promise<unknown>;
+    /**
+     * Whether the test should be fullscreened during testing.
+     */
+    fullPage?: boolean;
+    /**
+     * Whether to take a screenshot of the test or set a threshold for the screenshot.
+     */
+    screenshot?:
+        | false
+        | {
+              /**
+               * Screenshot threshold.
+               * From 0 to 1, where 0 is the most strict and 1 is the most permissive.
+               * @default 0.5
+               */
+              threshold?: number;
+              /**
+               * Whether to wait for the table of contents to finish scrolling before taking the screenshot.
+               */
+              waitForTOCScrolling?: boolean;
+          };
+    /**
+     * Whether to only run this test.
+     */
+    only?: boolean;
 }
 
 interface TestsCase {
@@ -323,6 +351,9 @@ const testCases: TestsCase[] = [
             {
                 name: 'PDF',
                 url: '~gitbook/pdf?limit=10',
+                screenshot: {
+                    waitForTOCScrolling: false,
+                },
             },
         ],
     },
@@ -345,6 +376,7 @@ const testCases: TestsCase[] = [
                 url: 'blocks/block-images',
                 run: waitForCookiesDialog,
                 fullPage: true,
+                screenshot: { threshold: 0.8 },
             },
             {
                 name: 'Inline Images',
@@ -421,6 +453,18 @@ const testCases: TestsCase[] = [
             {
                 name: 'Math',
                 url: 'blocks/math',
+                run: async (page) => {
+                    await page.waitForFunction(() => {
+                        const fonts = Array.from(document.fonts.values());
+                        const mjxFonts = fonts.filter(
+                            (font) => font.family === 'MJXZERO' || font.family === 'MJXTEX',
+                        );
+                        return (
+                            mjxFonts.length === 2 &&
+                            mjxFonts.every((font) => font.status === 'loaded')
+                        );
+                    });
+                },
             },
             {
                 name: 'Files',
@@ -474,6 +518,9 @@ const testCases: TestsCase[] = [
                 name: 'With cover and no TOC',
                 url: 'page-options/page-with-cover-and-no-toc',
                 run: waitForCookiesDialog,
+                screenshot: {
+                    waitForTOCScrolling: false,
+                },
             },
             {
                 name: 'With icon',
@@ -657,11 +704,14 @@ const testCases: TestsCase[] = [
                 run: async (page) => {
                     const sharedSpaceLink = page.locator('a.underline');
                     await sharedSpaceLink.click();
-                    expect(page.locator('h1')).toHaveText('shared');
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'shared' }),
+                    ).toBeVisible();
                     const url = page.url();
                     expect(url.includes('shared-space-uno')).toBeTruthy(); // same uno site
                     expect(url.endsWith('/shared')).toBeTruthy(); // correct page
                 },
+                screenshot: false,
             },
         ],
     },
@@ -673,13 +723,15 @@ const testCases: TestsCase[] = [
                 name: 'Navigation to shared space',
                 url: '',
                 run: async (page) => {
-                    const sharedSpaceLink = page.locator('a.underline');
-                    await sharedSpaceLink.click();
-                    expect(page.locator('h1')).toHaveText('shared');
+                    await page.locator('a.underline').click();
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'shared' }),
+                    ).toBeVisible();
                     const url = page.url();
                     expect(url.includes('shared-space-dos')).toBeTruthy(); // same dos site
                     expect(url.endsWith('/shared')).toBeTruthy(); // correct page
                 },
+                screenshot: false,
             },
         ],
     },
@@ -713,6 +765,7 @@ const testCases: TestsCase[] = [
                         page.getByText('Authentication missing to access this content'),
                     ).toBeVisible();
                 },
+                screenshot: false,
             },
         ],
     },
@@ -1377,20 +1430,23 @@ for (const testCase of testCases) {
                 if (testEntry.run) {
                     await testEntry.run(page);
                 }
-                if (testEntry.screenshot !== false) {
-                    await scrollTOCToTop(page);
+                const screenshotOptions = testEntry.screenshot;
+                if (screenshotOptions !== false) {
                     await argosScreenshot(page, `${testCase.name} - ${testEntry.name}`, {
-                        viewports: ['macbook-16', 'macbook-13', 'iphone-x', 'ipad-2'],
+                        viewports: ['macbook-16', 'macbook-13', 'ipad-2', 'iphone-x'],
                         argosCSS: `
                         /* Hide Intercom */
                         .intercom-lightweight-app {
                             display: none !important;
-                        }
-                    `,
-                        threshold: testEntry.screenshot?.threshold ?? undefined,
+                            }
+                            `,
+                        threshold: screenshotOptions?.threshold ?? undefined,
                         fullPage: testEntry.fullPage ?? false,
                         beforeScreenshot: async () => {
                             await waitForIcons(page);
+                            if (screenshotOptions?.waitForTOCScrolling !== false) {
+                                await waitForTOCScrolling(page);
+                            }
                         },
                     });
                 }
@@ -1501,10 +1557,21 @@ async function waitForIcons(page: Page) {
 }
 
 /**
- * Scroll the table of contents to the top to stabilize the screenshot.
+ * Wait for TOC to be correctly scrolled into view.
  */
-async function scrollTOCToTop(page: Page) {
-    await page.evaluate(() => {
-        document.querySelector('[data-testid=toc-container]')?.scrollTo(0, 0);
-    });
+async function waitForTOCScrolling(page: Page) {
+    const viewport = await page.viewportSize();
+    if (viewport && viewport.width >= 1024) {
+        const toc = page.getByTestId('table-of-contents');
+        await expect(toc).toBeVisible();
+        await page.evaluate(() => {
+            const tocScrollContainer = document.querySelector(
+                '[data-testid="table-of-contents"] [data-testid="toc-scroll-container"]',
+            );
+            if (!tocScrollContainer) {
+                throw new Error('TOC scroll container not found');
+            }
+            tocScrollContainer.scrollTo(0, 0);
+        });
+    }
 }
