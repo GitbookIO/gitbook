@@ -877,6 +877,18 @@ export async function getSiteData(
 }
 
 /**
+ * Validate that the customization settings passed are valid.
+ */
+export function validateSerializedCustomization(raw: string): boolean {
+    try {
+        rison.decode_object(raw);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+/**
  * Get the customization settings for a space from the API.
  */
 export async function getSpaceCustomization(): Promise<{
