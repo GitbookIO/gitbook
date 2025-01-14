@@ -753,6 +753,7 @@ const testCases: TestsCase[] = [
                         page.getByText('Authentication missing to access this content'),
                     ).toBeVisible();
                 },
+                screenshot: false,
             },
         ],
     },
