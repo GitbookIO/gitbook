@@ -275,6 +275,13 @@ const testCases: TestsCase[] = [
             {
                 name: 'Search',
                 url: '?q=',
+                screenshot: false,
+                run: async (page) => {
+                    await expect(page.getByTestId('search-results')).toBeVisible();
+                    const allItems = await page.getByTestId('search-result-item').all();
+                    // Expect at least 3 questions
+                    await expect(allItems.length).toBeGreaterThan(2);
+                },
             },
             {
                 name: 'Search Results',
