@@ -24,6 +24,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
         <Link
             ref={ref}
             onClick={onClick}
+            data-testid="search-result-item"
             className={tcls(
                 'flex',
                 'px-4',

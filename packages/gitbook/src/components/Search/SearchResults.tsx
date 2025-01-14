@@ -217,10 +217,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     }
 
     const noResults = (
-        <div
-            data-test="search-noresults"
-            className={tcls('text', 'text-dark/8', 'p-8', 'text-center', 'dark:text-light/8')}
-        >
+        <div className={tcls('text', 'text-dark/8', 'p-8', 'text-center', 'dark:text-light/8')}>
             {t(language, 'search_no_results', query)}
         </div>
     );
@@ -234,7 +231,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 ) : null
             ) : (
                 <>
-                    <div data-test="search-results">
+                    <div data-testid="search-results">
                         {results.map((item, index) => {
                             switch (item.type) {
                                 case 'page': {

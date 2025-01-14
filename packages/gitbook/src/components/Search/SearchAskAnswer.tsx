@@ -141,7 +141,7 @@ function AnswerBody(props: { answer: AskAnswerResult }) {
     return (
         <>
             <div
-                data-test="search-ask-answer"
+                data-testid="search-ask-answer"
                 className={tcls(
                     'my-4',
                     'sm:mt-6',

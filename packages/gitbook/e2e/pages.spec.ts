@@ -95,19 +95,26 @@ const testCases: TestsCase[] = [
             {
                 name: 'Search',
                 url: '?q=',
+                screenshot: false,
+                run: async (page) => {
+                    await expect(page.getByTestId('search-results')).toBeVisible();
+                    const allItems = await page.getByTestId('search-result-item').all();
+                    // Expect at least 3 questions
+                    await expect(allItems.length).toBeGreaterThan(2);
+                },
             },
             {
                 name: 'Search Results',
                 url: '?q=gitbook',
                 run: async (page) => {
-                    await page.waitForSelector('[data-test="search-results"]');
+                    await expect(page.getByTestId('search-results')).toBeVisible();
                 },
             },
             {
                 name: 'AI Search',
                 url: '?q=What+is+GitBook%3F&ask=true',
                 run: async (page) => {
-                    await page.waitForSelector('[data-test="search-ask-answer"]');
+                    await expect(page.getByTestId('search-ask-answer')).toBeVisible();
                 },
                 screenshot: false,
             },
@@ -273,14 +280,14 @@ const testCases: TestsCase[] = [
                 name: 'Search Results',
                 url: '?q=gitbook',
                 run: async (page) => {
-                    await page.waitForSelector('[data-test="search-results"]');
+                    await expect(page.getByTestId('search-results')).toBeVisible();
                 },
             },
             {
                 name: 'AI Search',
                 url: '?q=What+is+GitBook%3F&ask=true',
                 run: async (page) => {
-                    await page.waitForSelector('[data-test="search-ask-answer"]');
+                    await expect(page.getByTestId('search-ask-answer')).toBeVisible();
                 },
                 screenshot: false,
             },
@@ -1348,6 +1355,7 @@ for (const testCase of testCases) {
                     await testEntry.run(page);
                 }
                 if (testEntry.screenshot !== false) {
+                    await scrollTOCToTop(page);
                     await argosScreenshot(page, `${testCase.name} - ${testEntry.name}`, {
                         viewports: ['macbook-16', 'macbook-13', 'iphone-x', 'ipad-2'],
                         argosCSS: `
@@ -1360,7 +1368,6 @@ for (const testCase of testCases) {
                         fullPage: testEntry.fullPage ?? false,
                         beforeScreenshot: async () => {
                             await waitForIcons(page);
-                            await scrollTOCToTop(page);
                         },
                     });
                 }
