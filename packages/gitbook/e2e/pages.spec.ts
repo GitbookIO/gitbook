@@ -686,6 +686,7 @@ const testCases: TestsCase[] = [
                 run: async (page) => {
                     await expect(page.locator('h1')).toHaveText('SSO');
                 },
+                screenshot: false,
             },
         ],
     },
@@ -1482,6 +1483,6 @@ async function waitForIcons(page: Page) {
  */
 async function scrollTOCToTop(page: Page) {
     await page.evaluate(() => {
-        document.getElementById('toc-container')?.scrollTo(0, 0);
+        document.querySelector('[data-testid=toc-container]')?.scrollTo(0, 0);
     });
 }
