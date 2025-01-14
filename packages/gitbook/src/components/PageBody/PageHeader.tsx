@@ -37,12 +37,14 @@ export async function PageHeader(props: {
                                 'uppercase',
                                 'flex',
                                 'items-center',
-                                'gap-1',
+                                'gap-1.5',
+                                'contrast-more:underline',
+                                'contrast-more:decoration-current',
                             )}
                         >
                             <PageIcon
                                 page={breadcrumb}
-                                style={tcls('size-4', 'text-base', 'leading-none')}
+                                style="size-4 flex items-center justify-center text-base leading-none"
                             />
                             {breadcrumb.title}
                         </StyledLink>
