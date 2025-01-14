@@ -1358,6 +1358,7 @@ for (const testCase of testCases) {
                         fullPage: testEntry.fullPage ?? false,
                         beforeScreenshot: async () => {
                             await waitForIcons(page);
+                            await scrollTOCToTop(page);
                         },
                     });
                 }
@@ -1464,5 +1465,14 @@ async function waitForIcons(page: Page) {
                 await loadImage(url);
             }),
         );
+    });
+}
+
+/**
+ * Scroll the table of contents to the top to stabilize the screenshot.
+ */
+async function scrollTOCToTop(page: Page) {
+    await page.evaluate(() => {
+        document.getElementById('toc-container')?.scrollTo(0, 0);
     });
 }

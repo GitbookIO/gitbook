@@ -26,7 +26,12 @@ export function TOCScrollContainer(props: {
 
     return (
         <TOCScrollContainerRefContext.Provider value={scrollContainerRef}>
-            <div ref={scrollContainerRef} className={tcls(className)} style={style}>
+            <div
+                ref={scrollContainerRef}
+                data-testid="toc-container"
+                className={tcls(className)}
+                style={style}
+            >
                 {children}
             </div>
         </TOCScrollContainerRefContext.Provider>
