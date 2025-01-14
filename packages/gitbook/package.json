@@ -67,7 +67,7 @@
         "usehooks-ts": "^3.1.0"
     },
     "devDependencies": {
-        "@argos-ci/playwright": "^2.0.0",
+        "@argos-ci/playwright": "^3.10.0",
         "@cloudflare/next-on-pages": "1.13.7",
         "@cloudflare/workers-types": "^4.20241230.0",
         "@playwright/test": "^1.42.1",
