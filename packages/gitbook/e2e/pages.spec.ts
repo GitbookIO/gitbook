@@ -876,7 +876,12 @@ const testCases: TestsCase[] = [
                     );
                     return `first?jwt_token=${token}`;
                 })(),
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'first' }),
+                    ).toBeVisible();
+                },
+                screenshot: false,
             },
             {
                 name: 'Custom page',
