@@ -129,7 +129,10 @@ function HeaderItemButton(
             size="medium"
             className={tcls(
                 {
-                    'button-primary': null,
+                    'button-primary':
+                        headerPreset != CustomizationHeaderPreset.Default &&
+                        `bg-header-link dark:bg-header-link hover:bg-header-link dark:hover:bg-header-link
+                        text-header-background dark:text-header-background hover:text-header-background dark:hover:text-header-background`,
                     'button-secondary': tcls(
                         headerPreset != CustomizationHeaderPreset.Default &&
                             `bg-header-link/2 dark:bg-header-link/2 hover:bg-header-link/3 dark:hover:bg-header-link/3 
