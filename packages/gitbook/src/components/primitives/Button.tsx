@@ -35,15 +35,6 @@ export function Button({
                   'dark:bg-primary-400',
                   'dark:text-contrast-primary-400',
                   'dark:hover:bg-primary',
-
-                  //   'shadow-sm',
-                  //   'shadow-dark/4',
-                  //   'bg-primary-600',
-                  //   'text-white',
-                  //   'hover:bg-primary-500',
-                  //   'dark:ring-light/3',
-                  //   'dark:bg-primary-600',
-                  //   'dark:hover:bg-primary-700',
               ]
             : // SECONDARY
               [
@@ -60,13 +51,6 @@ export function Button({
                   'contrast-more:dark:text-light',
                   'dark:hover:bg-light/2',
                   'dark:hover:text-light',
-                  // 'ring-dark/2',
-                  //   'bg-dark/1',
-                  //   'ring-transparent',
-                  //   'hover:bg-dark/3',
-                  //   'dark:bg-light/2',
-                  //   'dark:ring-light/1',
-                  //   'dark:hover:bg-light/3',
               ];
 
     const sizes = {
