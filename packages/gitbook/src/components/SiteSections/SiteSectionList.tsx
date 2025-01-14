@@ -30,7 +30,8 @@ export function SiteSectionList(props: { sections: SectionsList; className: Clas
                 className={tcls(
                     `text-dark/8 dark:text-light/8 text-sm
                     border-b border-dark/2 dark:border-light/2 -mx-5 relative
-                    before:absolute before:contents[] before:left-0 before:right-2 before:bottom-0 before:h-12 before:pointer-events-none before:bg-gradient-to-b from-transparent to-light dark:to-dark`,
+                    before:absolute before:contents[] before:left-0 before:right-2 before:bottom-0 before:h-12 before:pointer-events-none 
+                    before:bg-gradient-to-b from-transparent to-light dark:to-dark sidebar-filled:to-light-2 dark:sidebar-filled:to-dark-1 [html.tint.sidebar-filled_&]:to-light-1 dark:[html.tint.sidebar-filled_&]:to-dark-1`,
                     className,
                 )}
             >
