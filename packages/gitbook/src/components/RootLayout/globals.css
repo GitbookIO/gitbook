@@ -23,9 +23,7 @@
         @apply leading-relaxed;
     }
     body {
-        @apply text-dark dark:text-light;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
+        @apply text-dark dark:text-light antialiased;
     }
     html {
         @apply gutter-stable;
@@ -59,8 +57,7 @@
     code,
     pre {
         /* Don't apply antialiased to `code` and `pre` elements */
-        -webkit-font-smoothing: auto;
-        -moz-osx-font-smoothing: auto;
+        @apply subpixel-antialiased;
     }
 
     /*  Light mode */
