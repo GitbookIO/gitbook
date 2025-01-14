@@ -1,4 +1,8 @@
-import { CustomizationContentLink, CustomizationFooterGroup } from '@gitbook/api';
+import {
+    CustomizationContentLink,
+    CustomizationFooterGroup,
+    SiteInsightsLinkPosition,
+} from '@gitbook/api';
 
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -42,7 +46,7 @@ async function FooterLink(props: { link: CustomizationContentLink; context: Cont
             )}
             insights={{
                 target: link.to,
-                position: 'footer',
+                position: SiteInsightsLinkPosition.Footer,
             }}
         >
             {link.title}

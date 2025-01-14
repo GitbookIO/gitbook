@@ -20,3 +20,21 @@ export function getColumnAlignment(column: DocumentTableDefinition): 'left' | 'r
     }
     return 'left';
 }
+
+/**
+ * Get the vertical alignment for a column.
+ */
+export type VerticalAlignment = 'self-center' | 'self-end' | 'self-start';
+export function getColumnVerticalAlignment(column: DocumentTableDefinition): VerticalAlignment {
+    const verticalAlignment = 'verticalAlignment' in column ? column.verticalAlignment : 'center';
+
+    if (verticalAlignment === 'top') {
+        return 'self-start';
+    }
+
+    if (verticalAlignment === 'bottom') {
+        return 'self-end';
+    }
+
+    return 'self-center';
+}

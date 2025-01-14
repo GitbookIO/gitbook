@@ -1,4 +1,4 @@
-import { DocumentBlockContentRef } from '@gitbook/api';
+import { DocumentBlockContentRef, SiteInsightsLinkPosition } from '@gitbook/api';
 
 import { Card } from '@/components/primitives';
 import { getSpaceCustomization, ignoreAPIError } from '@/lib/api';
@@ -36,7 +36,7 @@ export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>
             style={style}
             insights={{
                 target: block.data.ref,
-                position: 'content',
+                position: SiteInsightsLinkPosition.Content,
             }}
         />
     );

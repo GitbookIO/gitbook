@@ -1,4 +1,9 @@
-import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
+import {
+    RevisionPage,
+    RevisionPageDocument,
+    RevisionPageGroup,
+    SiteInsightsLinkPosition,
+} from '@gitbook/api';
 
 import { getPageHref } from '@/lib/links';
 import { getPagePath } from '@/lib/pages';
@@ -28,7 +33,7 @@ export async function PageDocumentItem(props: {
                         kind: 'page',
                         page: page.id,
                     },
-                    position: 'sidebar',
+                    position: SiteInsightsLinkPosition.Sidebar,
                 }}
                 descendants={
                     page.pages && page.pages.length ? (
