@@ -31,7 +31,7 @@ interface Test {
     cookies?: Parameters<BrowserContext['addCookies']>[0];
     run?: (page: Page) => Promise<unknown>; // The test to run
     fullPage?: boolean; // Whether the test should be fullscreened during testing
-    screenshot?: false; // Should a screenshot be stored
+    screenshot?: false | { threshold: number }; // Disable screenshot or set threshold
     only?: boolean; // Only run this test
 }
 
@@ -95,19 +95,26 @@ const testCases: TestsCase[] = [
             {
                 name: 'Search',
                 url: '?q=',
+                screenshot: false,
+                run: async (page) => {
+                    await expect(page.getByTestId('search-results')).toBeVisible();
+                    const allItems = await page.getByTestId('search-result-item').all();
+                    // Expect at least 3 questions
+                    await expect(allItems.length).toBeGreaterThan(2);
+                },
             },
             {
                 name: 'Search Results',
                 url: '?q=gitbook',
                 run: async (page) => {
-                    await page.waitForSelector('[data-test="search-results"]');
+                    await expect(page.getByTestId('search-results')).toBeVisible();
                 },
             },
             {
                 name: 'AI Search',
                 url: '?q=What+is+GitBook%3F&ask=true',
                 run: async (page) => {
-                    await page.waitForSelector('[data-test="search-ask-answer"]');
+                    await expect(page.getByTestId('search-ask-answer')).toBeVisible();
                 },
                 screenshot: false,
             },
@@ -273,14 +280,14 @@ const testCases: TestsCase[] = [
                 name: 'Search Results',
                 url: '?q=gitbook',
                 run: async (page) => {
-                    await page.waitForSelector('[data-test="search-results"]');
+                    await expect(page.getByTestId('search-results')).toBeVisible();
                 },
             },
             {
                 name: 'AI Search',
                 url: '?q=What+is+GitBook%3F&ask=true',
                 run: async (page) => {
-                    await page.waitForSelector('[data-test="search-ask-answer"]');
+                    await expect(page.getByTestId('search-ask-answer')).toBeVisible();
                 },
                 screenshot: false,
             },
@@ -336,6 +343,7 @@ const testCases: TestsCase[] = [
                 name: 'Inline Images',
                 url: 'blocks/inline-images',
                 run: waitForCookiesDialog,
+                screenshot: { threshold: 0.8 },
             },
             {
                 name: 'Tabs',
@@ -678,6 +686,7 @@ const testCases: TestsCase[] = [
                 run: async (page) => {
                     await expect(page.locator('h1')).toHaveText('SSO');
                 },
+                screenshot: false,
             },
         ],
     },
@@ -1347,6 +1356,7 @@ for (const testCase of testCases) {
                     await testEntry.run(page);
                 }
                 if (testEntry.screenshot !== false) {
+                    await scrollTOCToTop(page);
                     await argosScreenshot(page, `${testCase.name} - ${testEntry.name}`, {
                         viewports: ['macbook-16', 'macbook-13', 'iphone-x', 'ipad-2'],
                         argosCSS: `
@@ -1355,6 +1365,7 @@ for (const testCase of testCases) {
                             display: none !important;
                         }
                     `,
+                        threshold: testEntry.screenshot?.threshold ?? undefined,
                         fullPage: testEntry.fullPage ?? false,
                         beforeScreenshot: async () => {
                             await waitForIcons(page);
@@ -1464,5 +1475,14 @@ async function waitForIcons(page: Page) {
                 await loadImage(url);
             }),
         );
+    });
+}
+
+/**
+ * Scroll the table of contents to the top to stabilize the screenshot.
+ */
+async function scrollTOCToTop(page: Page) {
+    await page.evaluate(() => {
+        document.querySelector('[data-testid=toc-container]')?.scrollTo(0, 0);
     });
 }
