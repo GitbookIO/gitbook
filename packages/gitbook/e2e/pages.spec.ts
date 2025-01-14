@@ -691,7 +691,9 @@ const testCases: TestsCase[] = [
                 run: async (page) => {
                     const sharedSpaceLink = page.locator('a.underline');
                     await sharedSpaceLink.click();
-                    expect(page.locator('h1')).toHaveText('shared');
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'shared' }),
+                    ).toBeVisible();
                     const url = page.url();
                     expect(url.includes('shared-space-uno')).toBeTruthy(); // same uno site
                     expect(url.endsWith('/shared')).toBeTruthy(); // correct page
@@ -708,9 +710,10 @@ const testCases: TestsCase[] = [
                 name: 'Navigation to shared space',
                 url: '',
                 run: async (page) => {
-                    const sharedSpaceLink = page.locator('a.underline');
-                    await sharedSpaceLink.click();
-                    expect(page.locator('h1')).toHaveText('shared');
+                    await page.locator('a.underline').click();
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'shared' }),
+                    ).toBeVisible();
                     const url = page.url();
                     expect(url.includes('shared-space-dos')).toBeTruthy(); // same dos site
                     expect(url.endsWith('/shared')).toBeTruthy(); // correct page
