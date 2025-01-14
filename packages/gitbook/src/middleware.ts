@@ -1,4 +1,4 @@
-import { ContentAPITokenPayload, GitBookAPI } from '@gitbook/api';
+import { ContentAPITokenPayload, CustomizationThemeMode, GitBookAPI } from '@gitbook/api';
 import { setTag, setContext } from '@sentry/nextjs';
 import assertNever from 'assert-never';
 import jwt from 'jsonwebtoken';
@@ -18,6 +18,7 @@ import {
     DEFAULT_API_ENDPOINT,
     getPublishedContentSite,
     getSiteData,
+    validateSerializedCustomization,
 } from '@/lib/api';
 import { race } from '@/lib/async';
 import { buildVersion } from '@/lib/build';
@@ -260,15 +261,12 @@ export async function middleware(request: NextRequest) {
     }
 
     const customization = url.searchParams.get('customization');
-    if (customization) {
-        try {
-            rison.decode_object(customization);
-            headers.set('x-gitbook-customization', customization);
-        } catch {}
+    if (customization && validateSerializedCustomization(customization)) {
+        headers.set('x-gitbook-customization', customization);
     }
 
     const theme = url.searchParams.get('theme');
-    if (theme === 'dark' || theme === 'light') {
+    if (theme === CustomizationThemeMode.Dark || theme === CustomizationThemeMode.Light) {
         headers.set('x-gitbook-theme', theme);
     }
 
