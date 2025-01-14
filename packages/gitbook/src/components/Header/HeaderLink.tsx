@@ -130,18 +130,17 @@ function HeaderItemButton(
             className={tcls(
                 {
                     'button-primary':
-                        headerPreset === CustomizationHeaderPreset.Custom ||
-                        headerPreset === CustomizationHeaderPreset.Bold
-                            ? tcls(
-                                  'bg-header-link-500 hover:bg-text-header-link-300 text-header-button-text',
-                                  'dark:bg-header-link-500 dark:hover:bg-text-header-link-300 dark:text-header-button-text',
-                              )
-                            : null,
+                        headerPreset != CustomizationHeaderPreset.Default &&
+                        `bg-header-link dark:bg-header-link hover:bg-header-link dark:hover:bg-header-link
+                        text-header-background dark:text-header-background hover:text-header-background dark:hover:text-header-background
+                        shadow-none hover:shadow-none`,
                     'button-secondary': tcls(
-                        'bg:transparent hover:bg-transparent',
-                        'dark:bg-transparent dark:hover:bg-transparent',
-                        'ring-header-link-500 hover:ring-header-link-300 text-header-link-500',
-                        'dark:ring-header-link-500 dark:hover:ring-header-link-300 dark:text-header-link-500',
+                        headerPreset != CustomizationHeaderPreset.Default &&
+                            `bg-header-link/2 dark:bg-header-link/2 hover:bg-header-link/3 dark:hover:bg-header-link/3 
+                            text-header-link dark:text-header-link hover:text-header-link dark:hover:text-header-link
+                            ring-header-link/4 dark:ring-header-link/4 hover:ring-header-link/5 dark:hover:ring-header-link/5
+                            contrast-more:ring-header-link contrast-more:bg-header-background contrast-more:text-header-link contrast-more:hover:ring-header-link
+                            shadow-none hover:shadow-none`,
                     ),
                 }[linkStyle],
             )}
@@ -161,6 +160,7 @@ function getHeaderLinkClassName(props: { headerPreset: CustomizationHeaderPreset
         'flex items-center shrink',
         'hover:text-header-link-400 dark:hover:text-light',
         'min-w-0',
+        'contrast-more:underline',
 
         props.headerPreset === CustomizationHeaderPreset.Default
             ? ['text-dark/8', 'dark:text-light/8']
