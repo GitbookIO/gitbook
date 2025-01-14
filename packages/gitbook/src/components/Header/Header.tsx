@@ -107,7 +107,26 @@ export function Header(props: {
 
                         {isMultiVariants && (
                             <div className="hidden page-no-toc:flex mr-auto">
-                                <SpacesDropdown space={space} spaces={spaces} />
+                                <SpacesDropdown
+                                    space={space}
+                                    spaces={spaces}
+                                    className={
+                                        !isCustomizationDefault
+                                            ? `bg-header-link/2 text-header-link ring-header-link/4 
+                                            dark:bg-header-link/2 dark:text-header-link dark:ring-header-link/4 
+                                            group-hover/dropdown:bg-header-link/3 group-hover/dropdown:text-header-link group-hover/dropdown:ring-header-link/6
+                                            dark:group-hover/dropdown:bg-header-link/3 dark:group-hover/dropdown:text-header-link dark:group-hover/dropdown:ring-header-link/6
+                                            group-focus-within/dropdown:bg-header-link/3 group-focus-within/dropdown:text-header-link group-focus-within/dropdown:ring-header-link/6
+                                            dark:group-focus-within/dropdown:bg-header-link/3 dark:group-focus-within/dropdown:text-header-link dark:group-focus-within/dropdown:ring-header-link/6
+                                            
+                                            contrast-more:bg-header-background contrast-more:text-header-link contrast-more:ring-header-link
+                                            contrast-more:group-hover/dropdown:text-header-link contrast-more:group-hover/dropdown:ring-header-link
+                                            contrast-more:dark:group-hover/dropdown:text-header-link contrast-more:dark:group-hover/dropdown:ring-header-link
+                                            contrast-more:group-focus-within/dropdown:text-header-link contrast-more:group-focus-within/dropdown:ring-header-link
+                                            contrast-more:dark:group-focus-within/dropdown:text-header-link contrast-more:dark:group-focus-within/dropdown:ring-header-link`
+                                            : ''
+                                    }
+                                />
                             </div>
                         )}
 
