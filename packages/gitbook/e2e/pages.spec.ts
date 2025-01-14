@@ -275,6 +275,13 @@ const testCases: TestsCase[] = [
             {
                 name: 'Search',
                 url: '?q=',
+                screenshot: false,
+                run: async (page) => {
+                    await expect(page.getByTestId('search-results')).toBeVisible();
+                    const allItems = await page.getByTestId('search-result-item').all();
+                    // Expect at least 3 questions
+                    await expect(allItems.length).toBeGreaterThan(2);
+                },
             },
             {
                 name: 'Search Results',
@@ -728,7 +735,12 @@ const testCases: TestsCase[] = [
                     );
                     return `first?jwt_token=${token}`;
                 })(),
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'first' }),
+                    ).toBeVisible();
+                },
+                screenshot: false,
             },
             {
                 name: 'Second',
@@ -745,7 +757,12 @@ const testCases: TestsCase[] = [
                     );
                     return `second?jwt_token=${token}`;
                 })(),
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'second' }),
+                    ).toBeVisible();
+                },
+                screenshot: false,
             },
         ],
     },
