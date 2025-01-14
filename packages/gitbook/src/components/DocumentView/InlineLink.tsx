@@ -1,4 +1,4 @@
-import { DocumentInlineLink } from '@gitbook/api';
+import { DocumentInlineLink, SiteInsightsLinkPosition } from '@gitbook/api';
 
 import { InlineProps } from './Inline';
 import { Inlines } from './Inlines';
@@ -28,7 +28,7 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
             className="underline underline-offset-2 text-primary hover:text-primary-700 transition-colors"
             insights={{
                 target: inline.data.ref,
-                position: 'content',
+                position: SiteInsightsLinkPosition.Content,
             }}
         >
             <Inlines

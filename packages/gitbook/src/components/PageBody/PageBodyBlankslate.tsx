@@ -1,4 +1,9 @@
-import { RevisionPage, RevisionPageDocument, RevisionPageType } from '@gitbook/api';
+import {
+    RevisionPage,
+    RevisionPageDocument,
+    RevisionPageType,
+    SiteInsightsLinkPosition,
+} from '@gitbook/api';
 
 import { Card } from '@/components/primitives';
 import { getPageHref } from '@/lib/links';
@@ -48,7 +53,7 @@ export async function PageBodyBlankslate(props: {
                         href={resolved.href}
                         insights={{
                             target: child.target,
-                            position: 'content',
+                            position: SiteInsightsLinkPosition.Content,
                         }}
                     />
                 );

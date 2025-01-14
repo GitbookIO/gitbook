@@ -1,4 +1,4 @@
-import { DocumentBlockFile } from '@gitbook/api';
+import { DocumentBlockFile, SiteInsightsLinkPosition } from '@gitbook/api';
 
 import { getSimplifiedContentType } from '@/lib/files';
 import { tcls } from '@/lib/tailwind';
@@ -27,7 +27,7 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
                 download={file.name}
                 insights={{
                     target: block.data.ref,
-                    position: 'content',
+                    position: SiteInsightsLinkPosition.Content,
                 }}
                 className={tcls(
                     'group/file',

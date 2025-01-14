@@ -21,54 +21,11 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
     const currentTabRef = React.useRef<HTMLAnchorElement>(null);
     const navRef = React.useRef<HTMLDivElement>(null);
 
-    const [tabDimensions, setTabDimensions] = React.useState<{
-        left: number;
-        width: number;
-    } | null>(null);
-
-    const updateTabDimensions = React.useCallback(() => {
-        if (currentTabRef.current && navRef.current) {
-            const rect = currentTabRef.current.getBoundingClientRect();
-            const navRect = navRef.current.getBoundingClientRect();
-
-            setTabDimensions({
-                left: rect.left - navRect.left,
-                width: rect.width,
-            });
-        }
-    }, []);
-
-    React.useEffect(() => {
-        if (currentIndex >= 0) {
-            updateTabDimensions();
-        }
-    }, [currentIndex, updateTabDimensions]);
-
-    React.useLayoutEffect(() => {
-        window.addEventListener('load', updateTabDimensions);
-        window.addEventListener('resize', updateTabDimensions);
-        () => {
-            window.removeEventListener('resize', updateTabDimensions);
-            window.removeEventListener('load', updateTabDimensions);
-        };
-    }, [updateTabDimensions]);
-
-    const opacity = tabDimensions ? 1 : 0.0;
-    const scale = (tabDimensions?.width ?? 0) * 0.01;
-    const startPos = `${tabDimensions?.left ?? 0}px`;
-
     return sections.length > 0 ? (
         <nav
             aria-label="Sections"
             ref={navRef}
             className="flex flex-nowrap items-center max-w-screen-2xl mx-auto page-full-width:max-w-full"
-            style={
-                {
-                    '--tab-opacity': `${opacity}`,
-                    '--tab-scale': `${scale}`,
-                    '--tab-start': `${startPos}`,
-                } as React.CSSProperties
-            }
         >
             <div className="flex flex-col bg-transparent">
                 {/* An element for the tabs which includes the page padding */}
@@ -101,31 +58,6 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
                         );
                     })}
                 </div>
-                {/* A container for a pseudo element for active tab indicator. A container is needed so we can set
-                    a relative position without breaking the z-index of other parts of the header. */}
-                <div
-                    className={tcls(
-                        'flex',
-                        'relative',
-                        'after:block',
-                        "after:content-['']",
-                        'after:origin-left',
-                        'after:absolute',
-                        'after:-bottom-px',
-                        'after:left-0',
-                        'after:opacity-[--tab-opacity]',
-                        'after:scale-x-[--tab-scale]',
-                        'after:[transition:_opacity_150ms_25ms,transform_150ms]',
-                        'after:motion-reduce:transition-none',
-                        'after:translate-x-[var(--tab-start)]',
-                        'after:will-change-transform',
-                        'after:h-0.5',
-                        'after:mb-px',
-                        'after:w-[100px]',
-                        'after:bg-primary',
-                        'dark:after:bg-primary-400',
-                    )}
-                />
             </div>
         </nav>
     ) : null;
@@ -142,7 +74,7 @@ const Tab = React.forwardRef<
     return (
         <Link
             className={tcls(
-                'group/tab px-3 py-1 my-2 rounded straight-corners:rounded-none transition-colors',
+                'group/tab relative px-3 py-1 my-2 rounded straight-corners:rounded-none transition-colors',
                 active && 'text-primary dark:text-primary-400',
                 !active &&
                     'text-dark/8 hover:bg-dark/1 hover:text-dark/9 dark:text-light/8 dark:hover:bg-light/2 dark:hover:text-light/9',
@@ -154,6 +86,9 @@ const Tab = React.forwardRef<
                 {icon}
                 {label}
             </span>
+            {active && (
+                <span className="inset-x-3 -bottom-2 h-0.5 absolute bg-primary dark:bg-primary-400" />
+            )}
         </Link>
     );
 });

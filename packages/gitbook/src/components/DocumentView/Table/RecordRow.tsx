@@ -1,9 +1,12 @@
 import { DocumentTableViewGrid } from '@gitbook/api';
 import React from 'react';
 
+import { tcls } from '@/lib/tailwind';
+
 import { RecordColumnValue } from './RecordColumnValue';
 import { TableRecordKV, TableViewProps } from './Table';
 import styles from './table.module.css';
+import { getColumnVerticalAlignment } from './utils';
 import { getColumnWidth } from './ViewGrid';
 
 export function RecordRow(
@@ -13,7 +16,7 @@ export function RecordRow(
         fixedColumns: string[];
     },
 ) {
-    const { view, autoSizedColumns, fixedColumns } = props;
+    const { view, autoSizedColumns, fixedColumns, block } = props;
 
     return (
         <div className={styles.row} role="row">
@@ -24,17 +27,23 @@ export function RecordRow(
                     autoSizedColumns,
                     fixedColumns,
                 });
+                const verticalAlignment = getColumnVerticalAlignment(block.data.definition[column]);
+
                 return (
                     <div
                         key={column}
                         role="cell"
-                        className={styles.cell}
+                        className={tcls(styles.cell)}
                         style={{
                             width: columnWidth,
                             minWidth: columnWidth || '100px',
                         }}
                     >
-                        <RecordColumnValue {...props} column={column} />
+                        <RecordColumnValue
+                            {...props}
+                            column={column}
+                            verticalAlignment={verticalAlignment}
+                        />
                     </div>
                 );
             })}
