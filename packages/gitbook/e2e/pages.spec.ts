@@ -453,6 +453,18 @@ const testCases: TestsCase[] = [
             {
                 name: 'Math',
                 url: 'blocks/math',
+                run: async (page) => {
+                    await page.waitForFunction(() => {
+                        const fonts = Array.from(document.fonts.values());
+                        const mjxFonts = fonts.filter(
+                            (font) => font.family === 'MJXZERO' || font.family === 'MJXTEX',
+                        );
+                        return (
+                            mjxFonts.length === 2 &&
+                            mjxFonts.every((font) => font.status === 'loaded')
+                        );
+                    });
+                },
             },
             {
                 name: 'Files',

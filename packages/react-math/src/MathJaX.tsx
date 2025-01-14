@@ -25,7 +25,7 @@ export default function MathJaXFormula(props: MathJaXFormulaProps) {
     const { formula, inline, className, mathJaxUrl } = props;
 
     // @ts-ignore - React.use doesn't seem define in typing
-    React.use(loadMathJaxScript(mathJaxUrl));
+    // React.use(loadMathJaxScript(mathJaxUrl));
     const [html, setHTML] = React.useState('');
 
     const containerRef = React.useRef<HTMLDivElement>(null);
