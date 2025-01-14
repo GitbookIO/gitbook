@@ -264,7 +264,7 @@ export async function middleware(request: NextRequest) {
     }
 
     const theme = url.searchParams.get('theme');
-    if (theme) {
+    if (theme === 'dark' || theme === 'light') {
         headers.set('x-gitbook-theme', theme);
     }
 
