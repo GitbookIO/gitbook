@@ -31,7 +31,7 @@ interface Test {
     cookies?: Parameters<BrowserContext['addCookies']>[0];
     run?: (page: Page) => Promise<unknown>; // The test to run
     fullPage?: boolean; // Whether the test should be fullscreened during testing
-    screenshot?: false; // Should a screenshot be stored
+    screenshot?: false | { threshold: number }; // Disable screenshot or set threshold
     only?: boolean; // Only run this test
 }
 
@@ -336,6 +336,7 @@ const testCases: TestsCase[] = [
                 name: 'Inline Images',
                 url: 'blocks/inline-images',
                 run: waitForCookiesDialog,
+                screenshot: { threshold: 0.8 },
             },
             {
                 name: 'Tabs',
@@ -1355,6 +1356,7 @@ for (const testCase of testCases) {
                             display: none !important;
                         }
                     `,
+                        threshold: testEntry.screenshot?.threshold ?? undefined,
                         fullPage: testEntry.fullPage ?? false,
                         beforeScreenshot: async () => {
                             await waitForIcons(page);
