@@ -32,8 +32,8 @@ export function Button({
                   'hover:text-light-1',
                   'hover:bg-primary-600',
 
-                  'dark:bg-primary-400',
-                  'dark:text-contrast-primary-400',
+                  'dark:bg-primary',
+                  'dark:text-contrast-primary',
                   'dark:hover:bg-primary',
               ]
             : // SECONDARY
