@@ -1,19 +1,18 @@
 import { SpaceIntegrationScript } from '@gitbook/api';
 import { merge } from 'content-security-policy-merger';
 import { headers } from 'next/headers';
+import { assert } from 'ts-essentials';
 
 import { assetsDomain } from './assets';
 import { filterOutNullable } from './typescript';
+
 /**
  * Get the current nonce for the current request.
  */
 export async function getContentSecurityPolicyNonce(): Promise<string> {
     const headersList = await headers();
     const nonce = headersList.get('x-nonce');
-    if (!nonce) {
-        throw new Error('No nonce found in headers');
-    }
-
+    assert(nonce, 'x-nonce should be set in the headers by the middleware');
     return nonce;
 }
 

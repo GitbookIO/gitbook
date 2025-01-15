@@ -5,6 +5,7 @@ import {
     RevisionPageGroup,
     RevisionPageType,
 } from '@gitbook/api';
+import { headers } from 'next/headers';
 
 export type AncestorRevisionPage = RevisionPageDocument | RevisionPageGroup;
 

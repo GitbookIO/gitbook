@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom';
 
 import { Card } from '@/components/primitives';
 import { getEmbedByUrlInSpace, getEmbedByUrl } from '@/lib/api';
+import { getContentSecurityPolicyNonce } from '@/lib/csp';
 import { tcls } from '@/lib/tailwind';
 
 import { BlockProps } from './Block';
@@ -13,8 +14,7 @@ import { IntegrationBlock } from './Integration';
 
 export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
     const { block, context, ...otherProps } = props;
-    const headersList = await headers();
-    const nonce = headersList.get('x-nonce') || undefined;
+    const nonce = await getContentSecurityPolicyNonce();
 
     ReactDOM.preload('https://cdn.iframe.ly/embed.js', { as: 'script', nonce });
 

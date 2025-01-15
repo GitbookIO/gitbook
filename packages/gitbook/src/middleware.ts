@@ -5,7 +5,6 @@ import jwt from 'jsonwebtoken';
 import type { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 import { NextResponse, NextRequest } from 'next/server';
 import hash from 'object-hash';
-import rison from 'rison';
 
 import {
     PublishedContentWithCache,
@@ -278,7 +277,7 @@ export async function middleware(request: NextRequest) {
         headers.set('x-gitbook-visitor-token', resolved.visitorToken);
     }
 
-    const target = new URL(rewritePathname, request.nextUrl.toString());
+    const target = new URL(joinPath('/middleware', rewritePathname), request.nextUrl.toString());
     target.search = url.search;
 
     const response = writeCookies(
