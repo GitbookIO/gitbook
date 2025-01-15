@@ -277,7 +277,7 @@ export async function middleware(request: NextRequest) {
         headers.set('x-gitbook-visitor-token', resolved.visitorToken);
     }
 
-    const target = new URL('/middleware' + rewritePathname, request.nextUrl.toString());
+    const target = new URL(joinPath('/middleware', rewritePathname), request.nextUrl.toString());
     target.search = url.search;
 
     const response = writeCookies(
