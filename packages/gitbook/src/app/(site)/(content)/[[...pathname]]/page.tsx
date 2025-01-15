@@ -1,12 +1,13 @@
 import { CustomizationHeaderPreset, CustomizationThemeMode } from '@gitbook/api';
 import { Metadata, Viewport } from 'next';
+import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import React from 'react';
 
 import { PageAside } from '@/components/PageAside';
 import { PageBody, PageCover } from '@/components/PageBody';
 import { PageHrefContext, getAbsoluteHref, getPageHref } from '@/lib/links';
-import { getPagePath, resolveFirstDocument } from '@/lib/pages';
+import { checkIsFromMiddleware, getPagePath, resolveFirstDocument } from '@/lib/pages';
 import { ContentRefContext } from '@/lib/references';
 import { isSpaceIndexable, isPageIndexable } from '@/lib/seo';
 import { getContentTitle } from '@/lib/utils';
@@ -24,6 +25,8 @@ export default async function Page(props: {
     params: Promise<PagePathParams>;
     searchParams: Promise<{ fallback?: string }>;
 }) {
+    await ensureIsFromMiddleware();
+
     const { params: rawParams, searchParams: rawSearchParams } = props;
 
     const params = await rawParams;
@@ -127,6 +130,7 @@ export async function generateViewport({
 }: {
     params: Promise<PagePathParams>;
 }): Promise<Viewport> {
+    await ensureIsFromMiddleware();
     const { customization } = await fetchPageData(await params);
     return {
         colorScheme: customization.themes.toggeable
@@ -144,6 +148,8 @@ export async function generateMetadata({
     params: Promise<PagePathParams>;
     searchParams: Promise<{ fallback?: string }>;
 }): Promise<Metadata> {
+    await ensureIsFromMiddleware();
+
     const { space, pages, page, customization, site, ancestors } = await getPageDataWithFallback({
         pagePathParams: await params,
         searchParams: await searchParams,
@@ -205,4 +211,16 @@ async function getPageDataWithFallback(args: {
         pages,
         page,
     };
+}
+
+/**
+ * Returns a page not found if the request is not from the middleware.
+ * Some pages can be
+ */
+async function ensureIsFromMiddleware() {
+    // To check if the request is from the middleware, we check if the x-gitbook-token is set in the headers.
+    const fromMiddleware = await checkIsFromMiddleware();
+    if (!fromMiddleware) {
+        notFound();
+    }
 }

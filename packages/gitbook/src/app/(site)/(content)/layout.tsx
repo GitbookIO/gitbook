@@ -14,6 +14,7 @@ import { assetsDomain } from '@/lib/assets';
 import { buildVersion } from '@/lib/build';
 import { getContentSecurityPolicyNonce } from '@/lib/csp';
 import { getAbsoluteHref, getBaseUrl } from '@/lib/links';
+import { checkIsFromMiddleware } from '@/lib/pages';
 import { isSpaceIndexable } from '@/lib/seo';
 import { getContentTitle } from '@/lib/utils';
 
@@ -29,6 +30,10 @@ export const dynamic = 'force-dynamic';
  */
 export default async function ContentLayout(props: { children: React.ReactNode }) {
     const { children } = props;
+    const fromMiddleware = await checkIsFromMiddleware();
+    if (!fromMiddleware) {
+        return props.children;
+    }
 
     const nonce = await getContentSecurityPolicyNonce();
     const {
@@ -106,6 +111,11 @@ export default async function ContentLayout(props: { children: React.ReactNode }
 }
 
 export async function generateViewport(): Promise<Viewport> {
+    const fromMiddleware = await checkIsFromMiddleware();
+    if (!fromMiddleware) {
+        return {};
+    }
+
     const { customization } = await fetchContentData();
     return {
         colorScheme: customization.themes.toggeable
@@ -117,6 +127,14 @@ export async function generateViewport(): Promise<Viewport> {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
+    const fromMiddleware = await checkIsFromMiddleware();
+    if (!fromMiddleware) {
+        return {
+            title: 'Not found',
+            robots: 'noindex, nofollow',
+        };
+    }
+
     const { space, site, customization } = await fetchContentData();
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
 

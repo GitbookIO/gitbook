@@ -1,4 +1,5 @@
 import { headers } from 'next/headers';
+import { assert } from 'ts-essentials';
 
 import { SiteContentPointer, SpaceContentPointer } from './api';
 
@@ -7,28 +8,34 @@ import { SiteContentPointer, SpaceContentPointer } from './api';
  */
 export async function getSiteContentPointer(): Promise<SiteContentPointer> {
     const headersList = await headers();
-    const spaceId = headersList.get('x-gitbook-content-space');
-    const siteId = headersList.get('x-gitbook-content-site');
-    const organizationId = headersList.get('x-gitbook-content-organization');
-    const siteSpaceId = headersList.get('x-gitbook-content-site-space');
-    const siteSectionId = headersList.get('x-gitbook-content-site-section');
-    const siteShareKey = headersList.get('x-gitbook-content-site-share-key');
 
-    if (!spaceId || !siteId || !organizationId) {
-        throw new Error(
-            'getSiteContentPointer is called outside the scope of a request processed by the middleware',
-        );
-    }
+    const spaceId = headersList.get('x-gitbook-content-space');
+    assert(spaceId, 'x-gitbook-content-space should be set in the headers by the middleware');
+
+    const siteId = headersList.get('x-gitbook-content-site');
+    assert(siteId, 'x-gitbook-content-site should be set in the headers by the middleware');
+
+    const organizationId = headersList.get('x-gitbook-content-organization');
+    assert(
+        organizationId,
+        'x-gitbook-content-organization should be set in the headers by the middleware',
+    );
+
+    const siteSectionId = headersList.get('x-gitbook-content-site-section') ?? undefined;
+    const siteSpaceId = headersList.get('x-gitbook-content-site-space') ?? undefined;
+    const siteShareKey = headersList.get('x-gitbook-content-site-share-key') ?? undefined;
+    const revisionId = headersList.get('x-gitbook-content-revision') ?? undefined;
+    const changeRequestId = headersList.get('x-gitbook-content-changerequest') ?? undefined;
 
     const pointer: SiteContentPointer = {
         siteId,
         spaceId,
-        siteSectionId: siteSectionId ?? undefined,
-        siteSpaceId: siteSpaceId ?? undefined,
-        siteShareKey: siteShareKey ?? undefined,
         organizationId,
-        revisionId: headersList.get('x-gitbook-content-revision') ?? undefined,
-        changeRequestId: headersList.get('x-gitbook-content-changerequest') ?? undefined,
+        siteSectionId,
+        siteSpaceId,
+        siteShareKey,
+        revisionId,
+        changeRequestId,
     };
 
     return pointer;
@@ -40,17 +47,17 @@ export async function getSiteContentPointer(): Promise<SiteContentPointer> {
  */
 export async function getSpacePointer(): Promise<SpaceContentPointer> {
     const headersList = await headers();
+
     const spaceId = headersList.get('x-gitbook-content-space');
-    if (!spaceId) {
-        throw new Error(
-            'getSpacePointer is called outside the scope of a request processed by the middleware',
-        );
-    }
+    assert(spaceId, 'x-gitbook-content-space should be set in the headers by the middleware');
+
+    const revisionId = headersList.get('x-gitbook-content-revision') ?? undefined;
+    const changeRequestId = headersList.get('x-gitbook-content-changerequest') ?? undefined;
 
     const pointer: SpaceContentPointer = {
         spaceId,
-        revisionId: headersList.get('x-gitbook-content-revision') ?? undefined,
-        changeRequestId: headersList.get('x-gitbook-content-changerequest') ?? undefined,
+        revisionId,
+        changeRequestId,
     };
 
     return pointer;

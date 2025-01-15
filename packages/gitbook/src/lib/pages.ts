@@ -5,6 +5,7 @@ import {
     RevisionPageGroup,
     RevisionPageType,
 } from '@gitbook/api';
+import { headers } from 'next/headers';
 
 export type AncestorRevisionPage = RevisionPageDocument | RevisionPageGroup;
 
@@ -183,4 +184,14 @@ function flattenPages(
     }
 
     return result;
+}
+
+/**
+ * Returns a page not found if the request is not from the middleware.
+ * Some pages can be
+ */
+export async function checkIsFromMiddleware() {
+    const headerList = await headers();
+    // To check if the request is from the middleware, we check if the x-gitbook-token is set in the headers.
+    return Boolean(headerList.get('x-gitbook-token'));
 }
