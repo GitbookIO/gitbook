@@ -209,7 +209,7 @@ export function Header(props: {
                         'scroll-nojump',
                         'w-full',
                         // Handle long section tabs, particularly on smaller screens.
-                        'overflow-x-auto hide-scroll',
+                        'hide-scroll',
                     )}
                 >
                     <SiteSectionTabs sections={sections} />
