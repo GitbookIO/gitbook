@@ -7,6 +7,8 @@ export interface PDFSearchParams {
     limit?: number;
     /** URL to redirect back to */
     back?: string;
+    from?: number;
+    to?: number;
 }
 
 /**
@@ -26,6 +28,12 @@ export function getPDFSearchParams(searchParams: URLSearchParams): PDFSearchPara
     }
     if (searchParams.has('back')) {
         params.back = searchParams.get('back') ?? '';
+    }
+    if (searchParams.has('from')) {
+        params.from = Number(searchParams.get('from'));
+    }
+    if (searchParams.has('to')) {
+        params.to = Number(searchParams.get('to'));
     }
 
     return params;

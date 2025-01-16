@@ -45,7 +45,7 @@ export async function trace<T>(
             } finally {
                 if (process.env.SILENT !== 'true') {
                     let end = now();
-                    console.log(`trace ${completeName} ${end - start}ms`, attributes);
+                    //console.log(`trace ${completeName} ${end - start}ms`, attributes);
                 }
             }
         },

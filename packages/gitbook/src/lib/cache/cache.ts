@@ -221,13 +221,13 @@ export function cache<Args extends any[], Result>(
 
             // Log
             if (process.env.SILENT !== 'true') {
-                console.log(
-                    `cache: ${key} ${cacheStatus}${
-                        cacheStatus === 'hit' ? ` on ${backendName}` : ''
-                    } in total ${totalDuration.toFixed(0)}ms, fetch in ${fetchDuration.toFixed(
-                        0,
-                    )}ms, read in ${readCacheDuration.toFixed(0)}ms`,
-                );
+                // //console.log(
+                //     `cache: ${key} ${cacheStatus}${
+                //         cacheStatus === 'hit' ? ` on ${backendName}` : ''
+                //     } in total ${totalDuration.toFixed(0)}ms, fetch in ${fetchDuration.toFixed(
+                //         0,
+                //     )}ms, read in ${readCacheDuration.toFixed(0)}ms`,
+                // );
             }
 
             if (savedEntry.meta.revalidatesAt && savedEntry.meta.revalidatesAt < Date.now()) {

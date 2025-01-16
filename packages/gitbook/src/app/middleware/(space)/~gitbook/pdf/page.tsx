@@ -59,10 +59,8 @@ export default async function PDFHTMLOutput(props: {
     searchParams: Promise<{ [key: string]: string }>;
 }) {
     const pointer = await getSiteOrSpacePointerForPDF();
-
     const searchParams = new URLSearchParams(await props.searchParams);
     const pdfParams = getPDFSearchParams(new URLSearchParams(searchParams));
-
     // Build current PDF URL and preserve all search params
     let currentPDFUrl = await getAbsoluteHref('~gitbook/pdf', true);
     currentPDFUrl += '?' + searchParams.toString();
@@ -324,6 +322,16 @@ function selectPages(
             }),
         ];
     };
+    const range = (entries: FlatPageEntry[]) => {
+        if(params.from !== undefined && params.to) {
+            const sliced = entries.slice(params.from, params.to +1);
+            return {
+                pages: sliced,
+                total: params.to - params.from + 1,
+            };
+        }
+        return limitTo(entries)
+    }
 
     const limitTo = (entries: FlatPageEntry[]) => {
         return {
@@ -332,7 +340,6 @@ function selectPages(
             total: entries.length,
         };
     };
-
     if (params.page) {
         const found = resolvePageId(rootPages, params.page);
         if (!found) {
@@ -357,5 +364,5 @@ function selectPages(
 
         return flattenPage(page, 0);
     });
-    return limitTo(allPages);
+    return range(allPages);
 }
