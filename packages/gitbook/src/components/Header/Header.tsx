@@ -208,6 +208,8 @@ export function Header(props: {
                     className={tcls(
                         'scroll-nojump',
                         'w-full',
+                        'overflow-x-clip',
+                        'overflow-y-visible',
                         // Handle long section tabs, particularly on smaller screens.
                         'hide-scroll',
                     )}
