@@ -1,5 +1,4 @@
 import * as gitbookAPI from '@gitbook/api';
-import { headers } from 'next/headers';
 import Script from 'next/script';
 import ReactDOM from 'react-dom';
 
@@ -32,7 +31,11 @@ export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
                         }}
                         data-visual-test="blackout"
                     />
-                    <Script src="https://cdn.iframe.ly/embed.js" nonce={nonce} />
+                    <Script
+                        strategy="lazyOnload"
+                        src="https://cdn.iframe.ly/embed.js"
+                        nonce={nonce}
+                    />
                 </>
             ) : embed.type === 'integration' ? (
                 <IntegrationBlock
