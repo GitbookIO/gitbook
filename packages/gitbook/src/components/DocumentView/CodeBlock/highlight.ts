@@ -96,6 +96,12 @@ function getLanguageForSyntax(syntax: string): BundledLanguage | null {
     // Normalize the syntax to lowercase.
     syntax = syntax.toLowerCase();
 
+    // Temporary disable highlighting for C/C++ code blocks
+    // @see https://github.com/shikijs/shiki/issues/893
+    if (syntax === 'cpp' || syntax === 'c') {
+        return null;
+    }
+
     // Check if the syntax is a bundled language.
     if (checkIsBundledLanguage(syntax)) {
         return syntax;
