@@ -84,6 +84,44 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
             return code;
         },
     },
+    {
+        id: 'http',
+        label: 'HTTP',
+        syntax: 'bash',
+        generate: ({ method, url, headers = {}, body }) => {
+            const urlObj = new URL(url);
+            const path = urlObj.pathname || '/';
+
+            if (body) {
+                // if we had a body add a content length header
+                const bodyContent = body ? JSON.stringify(body) : '';
+                headers = {
+                    ...headers,
+                    'Content-Length': Buffer.from(bodyContent).length.toString(),
+                };
+            }
+
+            if (!headers.hasOwnProperty('Accept')) {
+                headers.Accept = '*/*';
+            }
+
+            const headerString = headers
+                ? Object.entries(headers)
+                      .map(([key, value]) =>
+                          key.toLowerCase() !== 'host' ? `${key}: ${value}` : ``,
+                      )
+                      .join('\n') + '\n'
+                : '';
+
+            const bodyString = body ? `\n${JSON.stringify(body, null, 2)}` : '';
+
+            const httpRequest = `${method.toUpperCase()} ${decodeURI(path)} HTTP/1.1
+Host: ${urlObj.host}
+${headerString}${bodyString}`;
+
+            return httpRequest;
+        },
+    },
 ];
 
 function indent(code: string, spaces: number) {
