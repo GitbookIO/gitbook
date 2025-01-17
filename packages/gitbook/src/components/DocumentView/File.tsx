@@ -21,7 +21,7 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
     const contentType = getSimplifiedContentType(file.contentType);
 
     return (
-        <Caption {...props}>
+        <Caption {...props} withBorder>
             <Link
                 href={file.downloadURL}
                 download={file.name}

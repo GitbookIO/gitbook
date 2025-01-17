@@ -23,16 +23,16 @@ export function Caption(
         fit?: boolean;
         wrapperStyle?: ClassValue;
         block: DocumentBlockImage | DocumentBlockDrawing | DocumentBlockEmbed | DocumentBlockFile;
+        withBorder?: boolean;
     } & DocumentContextProps,
 ) {
-    const needsBorder = props.block.type === 'embed' || props.block.type === 'file';
-
     const {
         children,
         document,
         block,
         context,
         fit = false,
+        withBorder = false,
         wrapperStyle = [
             'relative',
             'overflow-hidden',
@@ -40,7 +40,7 @@ export function Caption(
             'after:absolute',
             'after:-inset-[0]',
             fit ? 'w-fit' : null,
-            needsBorder
+            withBorder
                 ? 'rounded straight-corners:rounded-none after:border-dark/2 after:border after:rounded straight-corners:after:rounded-none dark:after:border-light/1 dark:after:mix-blend-plus-lighter after:pointer-events-none'
                 : null,
         ],

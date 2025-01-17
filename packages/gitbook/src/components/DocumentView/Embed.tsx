@@ -22,7 +22,7 @@ export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
         : getEmbedByUrl(block.data.url));
 
     return (
-        <Caption {...props}>
+        <Caption {...props} withBorder>
             {embed.type === 'rich' ? (
                 <>
                     <div
