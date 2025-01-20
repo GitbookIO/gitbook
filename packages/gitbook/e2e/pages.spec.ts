@@ -384,11 +384,8 @@ const testCases: TestsCase[] = [
                 run: async (page) => {
                     await waitForCookiesDialog(page);
                     const zoomImage = page.getByTestId('zoom-image');
-                    if (!zoomImage) {
-                        throw new Error('Image block not found');
-                    }
                     await zoomImage.first().click();
-                    await page.waitForSelector('[data-testid="zoom-image-modal"]');
+                    await expect(page.getByTestId('zoom-image-modal')).toBeVisible();
                 },
                 fullPage: true,
                 screenshot: { threshold: 0.8 },
