@@ -388,7 +388,7 @@ const testCases: TestsCase[] = [
                         throw new Error('Image block not found');
                     }
                     await zoomImage.first().click();
-                    await page.waitForSelector('[data-testid="zoom-image-modal"]');
+                    await expect(page.getByTestId('zoom-image-modal')).toBeVisible();
                 },
                 fullPage: true,
                 screenshot: { threshold: 0.8 },
