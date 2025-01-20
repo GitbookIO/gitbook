@@ -6,6 +6,7 @@ import {
     DocumentMarkStrikethrough,
     DocumentText,
     DocumentTextMark,
+    DocumentMarkKeyboard,
 } from '@gitbook/api';
 import React from 'react';
 
@@ -47,6 +48,7 @@ const MARK_STYLES = {
     code: Code,
     strikethrough: Strikethrough,
     color: Color,
+    keyboard: Keyboard,
 };
 
 interface MarkedLeafProps<Mark extends DocumentTextMark> {
@@ -64,6 +66,14 @@ function Italic(props: MarkedLeafProps<DocumentMarkItalic>) {
 
 function Strikethrough(props: MarkedLeafProps<DocumentMarkStrikethrough>) {
     return <s className={tcls('line-through')}>{props.children}</s>;
+}
+
+function Keyboard(props: MarkedLeafProps<DocumentMarkKeyboard>) {
+    return (
+        <kbd className="rounded border px-1 font-mono shadow-[0_1px_0_0_theme(borderColor.DEFAULT)]">
+            {props.children}
+        </kbd>
+    );
 }
 
 function Code(props: MarkedLeafProps<DocumentMarkCode>) {
