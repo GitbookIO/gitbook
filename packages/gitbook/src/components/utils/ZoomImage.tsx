@@ -142,6 +142,7 @@ export function ZoomImage(
             ) : (
                 // When zooming, remove the image from the DOM to let the browser animates it with View Transition.
                 <img
+                    data-testid="zoom-image"
                     ref={imgRef}
                     {...props}
                     alt={alt ?? ''}
@@ -206,6 +207,7 @@ function ZoomImageModal(props: {
 
     return (
         <div
+            data-testid="zoom-image-modal"
             className={classNames(
                 styles.zoomModal,
                 tcls(

@@ -379,10 +379,35 @@ const testCases: TestsCase[] = [
                 screenshot: { threshold: 0.8 },
             },
             {
+                name: 'Images (with zoom)',
+                url: 'blocks/block-images',
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+                    const zoomImage = page.getByTestId('zoom-image');
+                    await zoomImage.first().click();
+                    await expect(page.getByTestId('zoom-image-modal')).toBeVisible();
+                },
+                fullPage: true,
+                screenshot: { threshold: 0.8 },
+            },
+            {
                 name: 'Inline Images',
                 url: 'blocks/inline-images',
-                run: waitForCookiesDialog,
-                screenshot: { threshold: 0.8 },
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+                    // Make the text invisible to fix flakiness due to the text position.
+                    await page.evaluate(() => {
+                        for (const p of document.querySelectorAll('p')) {
+                            if (
+                                p.textContent?.includes(
+                                    'This image has intrinsic 400px width, but renders as 300px:',
+                                )
+                            ) {
+                                p.style.color = 'transparent';
+                            }
+                        }
+                    });
+                },
             },
             {
                 name: 'Tabs',
