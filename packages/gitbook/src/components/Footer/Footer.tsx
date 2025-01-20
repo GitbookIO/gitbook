@@ -9,6 +9,8 @@ import { FooterLinksGroup } from './FooterLinksGroup';
 import { CONTAINER_STYLE } from '../layout';
 import { ThemeToggler } from '../ThemeToggler';
 
+const FOOTER_COLUMNS = 4;
+
 export function Footer(props: {
     space: Space;
     context: ContentRefContext;
@@ -17,125 +19,112 @@ export function Footer(props: {
     const { context, customization } = props;
 
     return (
-        <div
-            className={tcls(
-                'border-t',
-                'border-dark/2',
-                'bg-light-2',
-                'dark:border-light/2',
-                'dark:bg-dark-2',
-            )}
-        >
-            <div className={tcls('scroll-nojump')}>
+        <footer className="border-t border-dark/2 dark:border-light-2 scroll-nojump">
+            <div
+                className={tcls(
+                    CONTAINER_STYLE,
+                    'py-8',
+                    'gap-12',
+                    'flex',
+                    'flex-wrap',
+                    'items-start',
+                )}
+            >
+                {/* Footer Logo */}
+                <div className="basis-72 mr-auto order-1">
+                    {customization.footer.logo && (
+                        <Image
+                            alt="Logo"
+                            sources={{
+                                light: {
+                                    src: customization.footer.logo.light,
+                                },
+                                dark: customization.footer.logo.dark
+                                    ? {
+                                          src: customization.footer.logo.dark,
+                                      }
+                                    : null,
+                            }}
+                            priority="lazy"
+                            style={[
+                                'w-auto',
+                                'max-w-40',
+                                'lg:max-w-64',
+                                'max-h-12',
+                                'object-contain',
+                                'object-left',
+                                'rounded',
+                                'straight-corners:rounded-sm',
+                            ]}
+                            sizes={[
+                                {
+                                    width: 320,
+                                },
+                            ]}
+                        />
+                    )}
+                </div>
+
+                {/* Navigation Groups (split into equal columns) */}
+                {customization.footer.groups?.length > 0 && (
+                    <div className="flex grow max-w-3xl order-2">
+                        {partition(customization.footer.groups, FOOTER_COLUMNS).map(
+                            (column, columnIndex) => (
+                                <div key={columnIndex} className="flex w-full flex-col gap-10">
+                                    {column.map((group, groupIndex) => (
+                                        <FooterLinksGroup
+                                            key={groupIndex}
+                                            group={group}
+                                            context={context}
+                                        />
+                                    ))}
+                                </div>
+                            ),
+                        )}
+                    </div>
+                )}
+
+                {/* Mode Switcher */}
                 <div
                     className={tcls(
-                        'flex',
-                        'flex-col',
-                        CONTAINER_STYLE,
-
-                        'py-6',
-                        'gap-6',
-                        'md:flex-row',
-                        'md:gap-10',
-
-                        //override CONTAINER_STYLE px
-                        'px-0',
-                        'sm:px-0',
+                        'ml-auto',
+                        'order-3',
+                        context.page?.layout.outline == false ? 'basis-72' : 'basis-56',
                     )}
                 >
-                    {' '}
-                    {customization.footer.logo ? (
-                        <div
-                            className={tcls(
-                                'pt-8',
-                                'border-t',
-                                'border-dark/2',
-                                'dark:border-light/1',
-                                'px-4',
-                                'sm:px-6',
-                                'md:px-0',
-                                'md:pr-10',
-                                'md:border-r',
-                                'md:border-t-0',
-                                'md:pt-0',
-                            )}
-                        >
-                            <Image
-                                alt="Logo"
-                                sources={{
-                                    light: {
-                                        src: customization.footer.logo.light,
-                                    },
-                                    dark: customization.footer.logo.dark
-                                        ? {
-                                              src: customization.footer.logo.dark,
-                                          }
-                                        : null,
-                                }}
-                                priority="lazy"
-                                style={['h-auto', 'w-full', 'max-w-12', 'object-contain']}
-                                sizes={[
-                                    {
-                                        width: 320,
-                                    },
-                                ]}
-                            />
-                        </div>
-                    ) : null}
-                    <div
-                        className={tcls(
-                            'flex-1',
-                            'flex',
-                            'flex-col',
-                            'gap-6',
-                            'px-4',
-                            'sm:px-6',
-                            'md:px-0',
-                        )}
-                    >
-                        {customization.footer.logo || customization.footer.groups?.length > 0 ? (
-                            <div
-                                className={tcls(
-                                    'flex',
-                                    'flex-col',
-                                    'gap-10',
-                                    'sm:gap-20',
-                                    'sm:flex-row',
-                                    'items-start',
-                                    'flex-wrap',
-                                )}
-                            >
-                                {customization.footer.groups.map((group, index) => (
-                                    <FooterLinksGroup key={index} group={group} context={context} />
-                                ))}
-                            </div>
-                        ) : null}
-                        {customization.footer.copyright ? (
-                            <p className={tcls('text-xs', 'text-dark/7', 'dark:text-light/6')}>
-                                {customization.footer.copyright}
-                            </p>
-                        ) : null}
-                    </div>
-                    {customization.themes.toggeable ? (
-                        <div
-                            className={tcls(
-                                'flex',
-                                'flex-col',
-                                'items-start',
-                                'order-[-1]',
-                                'px-4',
-                                'sm:px-6',
-                                'md:px-0',
-                                'md:order-1',
-                            )}
-                        >
+                    {customization.themes.toggeable && (
+                        <div className="flex items-center justify-end row-start-1 -col-start-1">
                             <React.Suspense fallback={null}>
                                 <ThemeToggler />
                             </React.Suspense>
                         </div>
-                    ) : null}
+                    )}
                 </div>
+
+                {/* Legal */}
+                {customization.footer.copyright ? (
+                    <p
+                        className={tcls(
+                            'mx-auto grow text-xs text-dark/7 dark:text-light/6 order-4',
+                            customization.footer.groups.length == 0
+                                ? 'order-2 max-w-3xl self-center'
+                                : 'text-center w-full',
+                        )}
+                    >
+                        {customization.footer.copyright}
+                    </p>
+                ) : null}
             </div>
-        </div>
+        </footer>
+    );
+}
+
+function partition(array: any[], length: number) {
+    let rest = array.length % length;
+    let size = Math.floor(array.length / length);
+    let j = 0;
+
+    return Array.from({ length: Math.min(array.length, length) }, (_, i) =>
+        array.slice(j, (j += size + (i < rest ? 1 : 0))),
     );
 }
