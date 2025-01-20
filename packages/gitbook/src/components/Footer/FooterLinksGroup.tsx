@@ -47,7 +47,7 @@ async function FooterLink(props: { link: CustomizationContentLink; context: Cont
                 'text-dark/8',
                 'hover:text-primary',
                 'dark:text-light/8',
-                'dark:hover:text-primary',
+                'dark:hover:text-light',
             )}
             insights={{
                 target: link.to,

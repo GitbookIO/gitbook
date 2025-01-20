@@ -8,8 +8,10 @@ import { tcls } from '@/lib/tailwind';
 import { FooterLinksGroup } from './FooterLinksGroup';
 import { CONTAINER_STYLE } from '../layout';
 import { ThemeToggler } from '../ThemeToggler';
+import Link from 'next/link';
 
 const FOOTER_COLUMNS = 4;
+const DEFAULT_PRIVACY_POLICY_URL = 'https://policies.gitbook.com/privacy/cookies';
 
 export function Footer(props: {
     space: Space;
@@ -19,7 +21,7 @@ export function Footer(props: {
     const { context, customization } = props;
 
     return (
-        <footer className="border-t border-dark/2 dark:border-light-2 scroll-nojump">
+        <footer className="border-t border-dark/2 dark:border-light/2 scroll-nojump">
             <div
                 className={tcls(
                     CONTAINER_STYLE,
@@ -102,18 +104,16 @@ export function Footer(props: {
                 </div>
 
                 {/* Legal */}
-                {customization.footer.copyright ? (
-                    <p
-                        className={tcls(
-                            'mx-auto grow text-xs text-dark/7 dark:text-light/6 order-4',
-                            customization.footer.groups.length == 0
-                                ? 'order-2 max-w-3xl self-center'
-                                : 'text-center w-full',
-                        )}
-                    >
-                        {customization.footer.copyright}
-                    </p>
-                ) : null}
+                <div
+                    className={tcls(
+                        'mx-auto grow text-xs text-dark/7 dark:text-light/6 order-4 flex flex-col gap-2 empty:hidden',
+                        customization.footer.groups.length == 0
+                            ? 'order-2 max-w-3xl items-start self-center'
+                            : 'items-center text-center w-full',
+                    )}
+                >
+                    {customization.footer.copyright && <p>{customization.footer.copyright}</p>}
+                </div>
             </div>
         </footer>
     );

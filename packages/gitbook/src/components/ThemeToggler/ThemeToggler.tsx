@@ -27,18 +27,7 @@ export function ThemeToggler(props: {}) {
     };
 
     return (
-        <div
-            role="radiogroup"
-            className={tcls(
-                'flex',
-                'flex-row',
-                'rounded-full',
-                'straight-corners:rounded-sm',
-                'border',
-                'border-dark/3',
-                'dark:border-light/2',
-            )}
-        >
+        <div role="radiogroup" className="flex flex-row gap-2">
             <ThemeButton
                 active={mounted && theme === 'light'}
                 icon="sun-bright"
@@ -74,23 +63,24 @@ function ThemeButton(props: {
             role="radio"
             onClick={onClick}
             aria-label={title}
+            title={title}
             aria-checked={active}
             className={tcls(
-                'p-1',
-                'm-1',
-                'group',
-                'rounded-full',
-                'straight-corners:rounded-sm',
-                active ? ['bg-primary-600/4', 'dark:bg-primary-400/2'] : null,
-                'text-dark',
-                'dark:text-light/7',
+                'p-2',
+                'rounded',
+                'straight-corners:rounded-none',
+                'transition-colors',
+                'text-dark/8',
+                'dark:text-light/8',
+                'hover:bg-dark/1',
+                'dark:hover:bg-light/1',
+                active && ['bg-tint/2', 'hover:bg-tint/2', 'text-tint-600', 'dark:text-tint-400'],
             )}
         >
             <Icon
                 icon={icon}
                 className={tcls(
                     'size-4',
-                    active ? ['text-primary-600', 'dark:text-primary-400'] : null,
                 )}
             />
         </button>
