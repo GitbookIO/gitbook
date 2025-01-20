@@ -77,12 +77,7 @@ function ThemeButton(props: {
                 active && ['bg-tint/2', 'hover:bg-tint/2', 'text-tint-600', 'dark:text-tint-400'],
             )}
         >
-            <Icon
-                icon={icon}
-                className={tcls(
-                    'size-4',
-                )}
-            />
+            <Icon icon={icon} className={tcls('size-4')} />
         </button>
     );
 }

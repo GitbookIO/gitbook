@@ -8,10 +8,8 @@ import { tcls } from '@/lib/tailwind';
 import { FooterLinksGroup } from './FooterLinksGroup';
 import { CONTAINER_STYLE } from '../layout';
 import { ThemeToggler } from '../ThemeToggler';
-import Link from 'next/link';
 
 const FOOTER_COLUMNS = 4;
-const DEFAULT_PRIVACY_POLICY_URL = 'https://policies.gitbook.com/privacy/cookies';
 
 export function Footer(props: {
     space: Space;
