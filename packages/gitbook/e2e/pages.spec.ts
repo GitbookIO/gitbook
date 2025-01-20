@@ -384,9 +384,6 @@ const testCases: TestsCase[] = [
                 run: async (page) => {
                     await waitForCookiesDialog(page);
                     const zoomImage = page.getByTestId('zoom-image');
-                    if (!zoomImage) {
-                        throw new Error('Image block not found');
-                    }
                     await zoomImage.first().click();
                     await expect(page.getByTestId('zoom-image-modal')).toBeVisible();
                 },
