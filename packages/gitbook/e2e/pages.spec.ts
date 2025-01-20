@@ -379,6 +379,21 @@ const testCases: TestsCase[] = [
                 screenshot: { threshold: 0.8 },
             },
             {
+                name: 'Images (with zoom)',
+                url: 'blocks/block-images',
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+                    const zoomImage = page.getByTestId('zoom-image');
+                    if (!zoomImage) {
+                        throw new Error('Image block not found');
+                    }
+                    await zoomImage.first().click();
+                    await page.waitForSelector('[data-testid="zoom-image-modal"]');
+                },
+                fullPage: true,
+                screenshot: { threshold: 0.8 },
+            },
+            {
                 name: 'Inline Images',
                 url: 'blocks/inline-images',
                 run: waitForCookiesDialog,
