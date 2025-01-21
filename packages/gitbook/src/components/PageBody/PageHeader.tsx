@@ -73,7 +73,10 @@ export async function PageHeader(props: {
             )}
             {page.layout.title ? (
                 <h1 className={tcls('text-4xl', 'font-bold', 'flex', 'items-center', 'gap-4')}>
-                    <PageIcon page={page} style={['text-dark/6', 'dark:text-light/6', 'shrink-0']} />
+                    <PageIcon
+                        page={page}
+                        style={['text-dark/6', 'dark:text-light/6', 'shrink-0']}
+                    />
                     {page.title}
                 </h1>
             ) : null}
