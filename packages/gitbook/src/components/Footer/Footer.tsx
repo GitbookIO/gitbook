@@ -31,7 +31,7 @@ export function Footer(props: {
                 )}
             >
                 {/* Footer Logo */}
-                <div className="basis-72 mr-auto order-1">
+                <div className="basis-72 page-no-toc:lg:basis-56 mr-auto order-1 empty:hidden empty:lg:block page-no-toc:empty:lg:hidden page-no-toc:empty:xl:block">
                     {customization.footer.logo && (
                         <Image
                             alt="Logo"
@@ -65,10 +65,38 @@ export function Footer(props: {
                     )}
                 </div>
 
+                {/* Mode Switcher */}
+                <div
+                    className={tcls(
+                        'ml-auto',
+                        'order-2 lg:order-4',
+                        customization.footer.groups?.length < 3 &&
+                            customization.footer.logo == undefined &&
+                            'sm:order-4',
+                        'xl:basis-56',
+                    )}
+                >
+                    {customization.themes.toggeable && (
+                        <div className="flex items-center justify-end">
+                            <React.Suspense fallback={null}>
+                                <ThemeToggler />
+                            </React.Suspense>
+                        </div>
+                    )}
+                </div>
+
                 {/* Navigation Groups (split into equal columns) */}
                 {customization.footer.groups?.length > 0 && (
-                    <div className="flex grow max-w-3xl order-2">
-                        {partition(customization.footer.groups, FOOTER_COLUMNS).map(
+                    <div
+                        className={tcls(
+                            'flex mx-auto grow lg:max-w-3xl gap-6 order-3',
+                            'w-full lg:w-auto',
+                            customization.footer.groups?.length < 3 &&
+                                customization.footer.logo == undefined &&
+                                'sm:w-auto',
+                        )}
+                    >
+                        {partition(customization.footer.groups.flatMap(i=>[i,i]), FOOTER_COLUMNS).map(
                             (column, columnIndex) => (
                                 <div key={columnIndex} className="flex w-full flex-col gap-10">
                                     {column.map((group, groupIndex) => (
@@ -84,30 +112,15 @@ export function Footer(props: {
                     </div>
                 )}
 
-                {/* Mode Switcher */}
-                <div
-                    className={tcls(
-                        'ml-auto',
-                        'order-3',
-                        context.page?.layout.outline == false ? 'basis-72' : 'basis-56',
-                    )}
-                >
-                    {customization.themes.toggeable && (
-                        <div className="flex items-center justify-end row-start-1 -col-start-1">
-                            <React.Suspense fallback={null}>
-                                <ThemeToggler />
-                            </React.Suspense>
-                        </div>
-                    )}
-                </div>
-
                 {/* Legal */}
                 <div
                     className={tcls(
-                        'mx-auto grow text-xs text-dark/7 dark:text-light/6 order-4 flex flex-col gap-2 empty:hidden',
-                        customization.footer.groups.length == 0
-                            ? 'order-2 max-w-3xl items-start self-center'
-                            : 'items-center text-center w-full',
+                        'mx-auto w-full grow text-xs text-dark/7 dark:text-light/6 items-center text-center order-4 flex flex-col gap-2 empty:hidden',
+                        customization.footer.groups.length == 0 &&
+                            'order-2 lg:flex-1 lg:w-auto lg:items-start lg:max-w-3xl self-center lg:text-start',
+                        customization.footer.groups.length == 0 &&
+                            customization.footer.logo == undefined &&
+                            'sm:w-auto sm:flex-1 sm:items-start sm:max-w-3xl sm:text-start',
                     )}
                 >
                     {customization.footer.copyright && <p>{customization.footer.copyright}</p>}
