@@ -2,6 +2,7 @@ import { CustomizationSettings, SiteCustomizationSettings, Space } from '@gitboo
 import React from 'react';
 
 import { Image } from '@/components/utils';
+import { partition } from '@/lib/arrays';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
@@ -32,7 +33,7 @@ export function Footer(props: {
             >
                 {/* Footer Logo */}
                 <div className="shrink sm:basis-72 page-no-toc:lg:basis-56 mr-auto order-1 empty:hidden empty:lg:block page-no-toc:empty:lg:hidden page-no-toc:empty:xl:block">
-                    {customization.footer.logo && (
+                    {customization.footer.logo ? (
                         <Image
                             alt="Logo"
                             sources={{
@@ -62,7 +63,7 @@ export function Footer(props: {
                                 },
                             ]}
                         />
-                    )}
+                    ) : null}
                 </div>
 
                 {/* Mode Switcher */}
@@ -76,17 +77,17 @@ export function Footer(props: {
                         'xl:basis-56',
                     )}
                 >
-                    {customization.themes.toggeable && (
+                    {customization.themes.toggeable ? (
                         <div className="flex items-center justify-end">
                             <React.Suspense fallback={null}>
                                 <ThemeToggler />
                             </React.Suspense>
                         </div>
-                    )}
+                    ) : null}
                 </div>
 
                 {/* Navigation Groups (split into equal columns) */}
-                {customization.footer.groups?.length > 0 && (
+                {customization.footer.groups?.length > 0 ? (
                     <div
                         className={tcls(
                             'flex flex-col sm:flex-row mx-auto grow lg:max-w-3xl gap-10 sm:gap-6 order-3',
@@ -110,7 +111,7 @@ export function Footer(props: {
                             ),
                         )}
                     </div>
-                )}
+                ) : null}
 
                 {/* Legal */}
                 <div
@@ -123,19 +124,11 @@ export function Footer(props: {
                             'sm:w-auto sm:flex-1 sm:items-start sm:max-w-3xl sm:text-start',
                     )}
                 >
-                    {customization.footer.copyright && <p>{customization.footer.copyright}</p>}
+                    {customization.footer.copyright ? (
+                        <p>{customization.footer.copyright}</p>
+                    ) : null}
                 </div>
             </div>
         </footer>
-    );
-}
-
-function partition(array: any[], length: number) {
-    let rest = array.length % length;
-    let size = Math.floor(array.length / length);
-    let j = 0;
-
-    return Array.from({ length: Math.min(array.length, length) }, (_, i) =>
-        array.slice(j, (j += size + (i < rest ? 1 : 0))),
     );
 }
