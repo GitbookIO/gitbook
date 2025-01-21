@@ -35,14 +35,17 @@ export async function RecordCard(
                 'z-0',
                 'relative',
                 'grid',
-                'bg-light',
+                'bg-light-1',
+                'dark:bg-dark-1',
                 'w-[calc(100%+2px)]',
                 'h-[calc(100%+2px)]',
                 'inset-[-1px]',
                 'rounded-[7px]',
                 'straight-corners:rounded-none',
                 'overflow-hidden',
-                'dark:bg-dark',
+                '[&_.heading]:flip-heading-hash',
+                '[&_.blocks:first-child_.heading:first-child_div]:mt-0', // Remove margin on first heading in card
+                
                 cover
                     ? [
                           // On mobile, the cover is displayed on the left with 40% of the width
