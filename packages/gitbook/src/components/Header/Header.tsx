@@ -124,6 +124,7 @@ export function Header(props: {
                                           'max-w-lg',
                                           'lg:ml-[max(calc((100%-18rem-48rem-4rem)/2),1rem)]',
                                           'xl:ml-[max(calc((100%-18rem-48rem-14rem-4rem)/2),1rem)]',
+                                          'mr-auto',
                                           'page-no-toc:lg:ml-[max(calc((100%-18rem-48rem-18rem-4rem)/2),1rem)]',
                                           'order-last',
                                           'lg:order-[unset]',
