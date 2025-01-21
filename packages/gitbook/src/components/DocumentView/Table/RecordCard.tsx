@@ -45,7 +45,7 @@ export async function RecordCard(
                 'overflow-hidden',
                 '[&_.heading]:flip-heading-hash',
                 '[&_.blocks:first-child_.heading:first-child_div]:mt-0', // Remove margin on first heading in card
-                
+
                 cover
                     ? [
                           // On mobile, the cover is displayed on the left with 40% of the width
