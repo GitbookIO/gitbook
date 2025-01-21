@@ -31,7 +31,7 @@ export function Footer(props: {
                 )}
             >
                 {/* Footer Logo */}
-                <div className="basis-72 page-no-toc:lg:basis-56 mr-auto order-1 empty:hidden empty:lg:block page-no-toc:empty:lg:hidden page-no-toc:empty:xl:block">
+                <div className="shrink sm:basis-72 page-no-toc:lg:basis-56 mr-auto order-1 empty:hidden empty:lg:block page-no-toc:empty:lg:hidden page-no-toc:empty:xl:block">
                     {customization.footer.logo && (
                         <Image
                             alt="Logo"
@@ -89,7 +89,7 @@ export function Footer(props: {
                 {customization.footer.groups?.length > 0 && (
                     <div
                         className={tcls(
-                            'flex mx-auto grow lg:max-w-3xl gap-6 order-3',
+                            'flex flex-col sm:flex-row mx-auto grow lg:max-w-3xl gap-10 sm:gap-6 order-3',
                             'w-full lg:w-auto',
                             customization.footer.groups?.length < 3 &&
                                 customization.footer.logo == undefined &&
