@@ -57,7 +57,7 @@ export const Link = React.forwardRef(function Link(
     }
 
     return (
-        <NextLink ref={ref} {...props} onClick={onClick}>
+        <NextLink ref={ref} href={href} prefetch={prefetch} {...domProps} onClick={onClick}>
             {children}
         </NextLink>
     );
