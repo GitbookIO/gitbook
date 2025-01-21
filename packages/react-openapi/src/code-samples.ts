@@ -88,7 +88,41 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
         id: 'http',
         label: 'HTTP',
         syntax: 'bash',
-        generate: generateHTTPExample,
+        generate: ({ method, url, headers = {}, body }: CodeSampleInput) => {
+            const { host, path } = parseHostAndPath(url);
+
+            if (body) {
+                // if we had a body add a content length header
+                const bodyContent = body ? JSON.stringify(body) : '';
+                // handle unicode chars with a text encoder
+                const encoder = new TextEncoder();
+
+                headers = {
+                    ...headers,
+                    'Content-Length': encoder.encode(bodyContent).length.toString(),
+                };
+            }
+
+            if (!headers.hasOwnProperty('Accept')) {
+                headers.Accept = '*/*';
+            }
+
+            const headerString = headers
+                ? Object.entries(headers)
+                      .map(([key, value]) =>
+                          key.toLowerCase() !== 'host' ? `${key}: ${value}` : ``,
+                      )
+                      .join('\n') + '\n'
+                : '';
+
+            const bodyString = body ? `\n${JSON.stringify(body, null, 2)}` : '';
+
+            const httpRequest = `${method.toUpperCase()} ${decodeURI(path)} HTTP/1.1
+Host: ${host}
+${headerString}${bodyString}`;
+
+            return httpRequest;
+        },
     },
 ];
 
@@ -100,55 +134,23 @@ function indent(code: string, spaces: number) {
         .join('\n');
 }
 
-export function generateHTTPExample({ method, url, headers = {}, body }: CodeSampleInput) {
-    const { host, path } = (() => {
-        try {
-            const urlObj = new URL(url);
-            const path = urlObj.pathname || '/';
-            return { host: urlObj.host, path };
-        } catch (e) {
-            // If the URL was invalid do our best to parse the URL.
-            // Check for the protocol part and pull it off to grab the host
-            const fullUrl = url.match(/\/\//) ? url.split('//')[1] : url;
+export function parseHostAndPath(url: string) {
+    try {
+        const urlObj = new URL(url);
+        const path = urlObj.pathname || '/';
+        return { host: urlObj.host, path };
+    } catch (e) {
+        // If the URL was invalid do our best to parse the URL.
+        // Check for the protocol part and pull it off to grab the host
+        const fullUrl = url.match(/\/\//) ? url.split('//')[1] : url;
 
-            // separate paths from the first element (host)
-            const parts = fullUrl.split('/');
-            // pull off the host (mutates)
-            const host = parts.shift();
-            // add a leading slash and join the paths again
-            const path = '/' + parts.join('/');
+        // separate paths from the first element (host)
+        const parts = fullUrl.split('/');
+        // pull off the host (mutates)
+        const host = parts.shift();
+        // add a leading slash and join the paths again
+        const path = '/' + parts.join('/');
 
-            return { host, path };
-        }
-    })();
-
-    if (body) {
-        // if we had a body add a content length header
-        const bodyContent = body ? JSON.stringify(body) : '';
-        // handle unicode chars with a text encoder
-        const encoder = new TextEncoder();
-
-        headers = {
-            ...headers,
-            'Content-Length': encoder.encode(bodyContent).length.toString(),
-        };
+        return { host, path };
     }
-
-    if (!headers.hasOwnProperty('Accept')) {
-        headers.Accept = '*/*';
-    }
-
-    const headerString = headers
-        ? Object.entries(headers)
-              .map(([key, value]) => (key.toLowerCase() !== 'host' ? `${key}: ${value}` : ``))
-              .join('\n') + '\n'
-        : '';
-
-    const bodyString = body ? `\n${JSON.stringify(body, null, 2)}` : '';
-
-    const httpRequest = `${method.toUpperCase()} ${decodeURI(path)} HTTP/1.1
-Host: ${host}
-${headerString}${bodyString}`;
-
-    return httpRequest;
 }
