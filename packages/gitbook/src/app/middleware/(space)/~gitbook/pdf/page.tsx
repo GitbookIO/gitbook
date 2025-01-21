@@ -28,6 +28,7 @@ import { resolvePageId } from '@/lib/pages';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { PDFSearchParams, getPDFSearchParams } from '@/lib/urls';
+import { getContentTitle } from '@/lib/utils';
 
 import './pdf.css';
 import { PageControlButtons } from './PageControlButtons';
@@ -47,7 +48,7 @@ export async function generateMetadata(): Promise<Metadata> {
     ]);
 
     return {
-        title: customization.title ?? space.title,
+        title: getContentTitle(space, customization, null),
         robots: 'noindex, nofollow',
     };
 }
