@@ -17,6 +17,8 @@ import { SearchButton } from '../Search';
 import { SiteSectionTabs } from '../SiteSections';
 import { HeaderMobileMenu } from './HeaderMobileMenu';
 
+const MAX_HEADER_LINKS_FOR_BIG_SEARCHBAR = 4;
+
 /**
  * Render the header for the space.
  */
@@ -90,6 +92,10 @@ export function Header(props: {
                                 'flex max-w-full',
                                 isMultiVariants && 'page-no-toc:max-[400px]:w-full',
                                 'shrink min-w-0 gap-2 lg:gap-4 justify-start items-center',
+                                customization.header.links.length <=
+                                    MAX_HEADER_LINKS_FOR_BIG_SEARCHBAR
+                                    ? 'lg:basis-72'
+                                    : '',
                             )}
                         >
                             <HeaderMobileMenu
@@ -105,14 +111,37 @@ export function Header(props: {
                             <HeaderLogo site={site} space={space} customization={customization} />
                         </div>
 
-                        {isMultiVariants && (
-                            <div className="hidden page-no-toc:flex mr-auto">
-                                <SpacesDropdown
-                                    space={space}
-                                    spaces={spaces}
-                                    className={
-                                        !isCustomizationDefault
-                                            ? `bg-header-link/2 text-header-link ring-header-link/4 
+                        <div
+                            className={tcls(
+                                'flex',
+                                'gap-4',
+                                'md:min-w-56',
+                                'grow-0 shrink-0',
+                                customization.header.links.length <=
+                                    MAX_HEADER_LINKS_FOR_BIG_SEARCHBAR
+                                    ? [
+                                          'lg:grow',
+                                          'max-w-lg',
+                                          'lg:ml-[max(calc((100%-18rem-48rem-4rem)/2),1rem)]',
+                                          'xl:ml-[max(calc((100%-18rem-48rem-14rem-4rem)/2),1rem)]',
+                                          'page-no-toc:lg:ml-[max(calc((100%-18rem-48rem-18rem-4rem)/2),1rem)]',
+                                          'order-last',
+                                          'lg:order-[unset]',
+
+                                          //   isMultiVariants &&
+                                          //   'page-no-toc:order-last page-no-toc:ml-0 page-no-toc:grow-0',
+                                      ]
+                                    : ['order-last'],
+                            )}
+                        >
+                            {isMultiVariants && (
+                                <div className="hidden page-no-toc:flex mr-auto">
+                                    <SpacesDropdown
+                                        space={space}
+                                        spaces={spaces}
+                                        className={
+                                            !isCustomizationDefault
+                                                ? `bg-header-link/2 text-header-link ring-header-link/4 
                                             dark:bg-header-link/2 dark:text-header-link dark:ring-header-link/4 
                                             group-hover/dropdown:bg-header-link/3 group-hover/dropdown:text-header-link group-hover/dropdown:ring-header-link/6
                                             dark:group-hover/dropdown:bg-header-link/3 dark:group-hover/dropdown:text-header-link dark:group-hover/dropdown:ring-header-link/6
@@ -124,41 +153,12 @@ export function Header(props: {
                                             contrast-more:dark:group-hover/dropdown:text-header-link contrast-more:dark:group-hover/dropdown:ring-header-link
                                             contrast-more:group-focus-within/dropdown:text-header-link contrast-more:group-focus-within/dropdown:ring-header-link
                                             contrast-more:dark:group-focus-within/dropdown:text-header-link contrast-more:dark:group-focus-within/dropdown:ring-header-link`
-                                            : ''
-                                    }
-                                />
-                            </div>
-                        )}
-
-                        {customization.header.links.length > 0 && (
-                            <HeaderLinks>
-                                {customization.header.links.map((link, index) => {
-                                    return (
-                                        <HeaderLink
-                                            key={index}
-                                            link={link}
-                                            context={context}
-                                            customization={customization}
-                                        />
-                                    );
-                                })}
-                                <HeaderLinkMore
-                                    label={t(getSpaceLanguage(customization), 'more')}
-                                    links={customization.header.links}
-                                    context={context}
-                                    customization={customization}
-                                />
-                            </HeaderLinks>
-                        )}
-                        <div
-                            className={tcls(
-                                'flex',
-                                'md:min-w-56',
-                                'grow-0',
-                                'shrink-0',
-                                'justify-self-end',
+                                                : ''
+                                        }
+                                    />
+                                </div>
                             )}
-                        >
+
                             <Suspense fallback={null}>
                                 <SearchButton
                                     style={
@@ -218,6 +218,27 @@ export function Header(props: {
                                 </SearchButton>
                             </Suspense>
                         </div>
+
+                        {customization.header.links.length > 0 && (
+                            <HeaderLinks>
+                                {customization.header.links.map((link, index) => {
+                                    return (
+                                        <HeaderLink
+                                            key={index}
+                                            link={link}
+                                            context={context}
+                                            customization={customization}
+                                        />
+                                    );
+                                })}
+                                <HeaderLinkMore
+                                    label={t(getSpaceLanguage(customization), 'more')}
+                                    links={customization.header.links}
+                                    context={context}
+                                    customization={customization}
+                                />
+                            </HeaderLinks>
+                        )}
                     </div>
                 </div>
             </div>
