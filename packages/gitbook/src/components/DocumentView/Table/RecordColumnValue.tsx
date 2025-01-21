@@ -126,6 +126,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                     ancestorBlocks={[]}
                     nodes={fragment.nodes}
                     style={[
+                        'blocks',
                         'w-full',
                         'space-y-2',
                         'lg:space-y-3',
