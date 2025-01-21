@@ -96,7 +96,7 @@ export function Footer(props: {
                                 'sm:w-auto',
                         )}
                     >
-                        {partition(customization.footer.groups.flatMap(i=>[i,i]), FOOTER_COLUMNS).map(
+                        {partition(customization.footer.groups, FOOTER_COLUMNS).map(
                             (column, columnIndex) => (
                                 <div key={columnIndex} className="flex w-full flex-col gap-10">
                                     {column.map((group, groupIndex) => (
