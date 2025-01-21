@@ -72,7 +72,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'transition-all',
                 'hover:shadow-md',
                 'hover:scale-102',
-                'hover:ring-dark/2',
+                'hover:ring-dark/4',
                 'hover:text-dark/10',
                 'focus:shadow-md',
                 'focus:scale-102',
@@ -93,7 +93,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'dark:contrast-more:focus:ring-light',
 
                 'active:shadow-sm',
-                'active:scale-98',
+                'active:scale-100',
 
                 'md:justify-start',
                 'md:w-full',

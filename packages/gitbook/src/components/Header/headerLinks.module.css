@@ -21,7 +21,7 @@
         }
     }
 }
-@container headerlinks ( width < 250px ) {
+@container headerlinks ( width < 300px ) {
     .containerHeaderlinks > :nth-child(n + 2) {
         display: none;
     }
@@ -32,7 +32,7 @@
         }
     }
 }
-@container headerlinks ( width < 350px ) {
+@container headerlinks ( width < 400px ) {
     .containerHeaderlinks > :nth-child(n + 3) {
         display: none;
     }
@@ -43,7 +43,7 @@
         }
     }
 }
-@container headerlinks ( width < 450px ) {
+@container headerlinks ( width < 500px ) {
     .containerHeaderlinks > :nth-child(n + 4) {
         display: none;
     }
@@ -54,7 +54,7 @@
         }
     }
 }
-@container headerlinks ( width < 550px ) {
+@container headerlinks ( width < 600px ) {
     .containerHeaderlinks > :nth-child(n + 5) {
         display: none;
     }
@@ -65,7 +65,7 @@
         }
     }
 }
-@container headerlinks ( width < 650px ) {
+@container headerlinks ( width < 700px ) {
     .containerHeaderlinks > :nth-child(n + 6) {
         display: none;
     }
