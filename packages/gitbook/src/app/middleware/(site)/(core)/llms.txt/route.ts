@@ -1,0 +1,141 @@
+import { SiteSection, SiteSpace, SiteStructure } from '@gitbook/api';
+import assertNever from 'assert-never';
+import { Heading, ListItem, Paragraph, Root, RootContent } from 'mdast';
+import { toMarkdown } from 'mdast-util-to-markdown';
+import { NextRequest } from 'next/server';
+
+import { getPublishedContentSite, getRevisionPages } from '@/lib/api';
+import { getAbsoluteHref } from '@/lib/links';
+import { getPagePath } from '@/lib/pages';
+import { joinPath } from '@/lib/paths';
+import { checkIsRootPointer, getSiteContentPointer } from '@/lib/pointer';
+import { getIndexablePages } from '@/lib/sitemap';
+
+export const runtime = 'edge';
+
+/**
+ * Generate a sitemap.xml for the current space.
+ */
+export async function GET(req: NextRequest) {
+    const pointer = await getSiteContentPointer();
+
+    const { structure: siteStructure, site } = await getPublishedContentSite({
+        organizationId: pointer.organizationId,
+        siteId: pointer.siteId,
+        siteShareKey: pointer.siteShareKey,
+    });
+
+    // This sitemap is only available at root (/sitemap.xml).
+    if (!checkIsRootPointer(pointer, siteStructure)) {
+        return new Response('Not found', { status: 404 });
+    }
+
+    const tree: Root = {
+        type: 'root',
+        children: [
+            {
+                type: 'heading',
+                depth: 1,
+                children: [{ type: 'text', value: site.title }],
+            },
+            ...(await getNodesFromSiteStructure(siteStructure)),
+        ],
+    };
+
+    return new Response(toMarkdown(tree), {
+        headers: {
+            'Content-Type': 'text/plain; charset=utf-8',
+        },
+    });
+}
+
+/**
+ * Get Sitemap Nodes from site structure.
+ */
+async function getNodesFromSiteStructure(siteStructure: SiteStructure): Promise<RootContent[]> {
+    switch (siteStructure.type) {
+        case 'sections':
+            return getNodesFromSections(siteStructure.structure);
+        case 'siteSpaces':
+            return getNodesFromSiteSpaces(siteStructure.structure, { depth: 2 });
+        default:
+            assertNever(siteStructure);
+    }
+}
+
+/**
+ * Get Sitemap Nodes from site sections.
+ */
+async function getNodesFromSections(siteSections: SiteSection[]): Promise<RootContent[]> {
+    const all = await Promise.all(
+        siteSections.map(async (siteSection): Promise<RootContent[]> => {
+            const siteSpaceNodes = await getNodesFromSiteSpaces(siteSection.siteSpaces, {
+                depth: 3,
+            });
+            return [
+                {
+                    type: 'heading',
+                    depth: 2,
+                    children: [{ type: 'text', value: siteSection.title }],
+                },
+                ...siteSpaceNodes,
+            ];
+        }),
+    );
+    return all.flat();
+}
+
+/**
+ * Get Sitemap Nodes from site spaces.
+ */
+async function getNodesFromSiteSpaces(
+    siteSpaces: SiteSpace[],
+    options: { depth: Heading['depth'] },
+): Promise<RootContent[]> {
+    const all = await Promise.all(
+        siteSpaces.map(async (siteSpace): Promise<RootContent[]> => {
+            const siteSpaceUrl = siteSpace.urls.published;
+            if (!siteSpaceUrl) {
+                return [];
+            }
+            const rootPages = await getRevisionPages(siteSpace.space.id, siteSpace.space.revision, {
+                metadata: false,
+            });
+            const pages = getIndexablePages(rootPages);
+            const listChildren = await Promise.all(
+                pages.map(async ({ page }): Promise<ListItem> => {
+                    const url = await getAbsoluteHref(
+                        joinPath(new URL(siteSpaceUrl).pathname, getPagePath(rootPages, page)),
+                        true,
+                    );
+                    const children: Paragraph['children'] = [
+                        {
+                            type: 'link',
+                            url,
+                            children: [{ type: 'text', value: page.title }],
+                        },
+                    ];
+                    if (page.description) {
+                        children.push({ type: 'text', value: `: ${page.description}` });
+                    }
+                    return {
+                        type: 'listItem',
+                        children: [{ type: 'paragraph', children }],
+                    };
+                }),
+            );
+            return [
+                {
+                    type: 'heading',
+                    depth: options.depth,
+                    children: [{ type: 'text', value: siteSpace.title }],
+                },
+                {
+                    type: 'list',
+                    children: listChildren,
+                },
+            ];
+        }),
+    );
+    return all.flat();
+}
