@@ -156,7 +156,8 @@ export function Header(props: {
                                           'xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]',
                                           'lg:mr-auto',
                                           'page-no-toc:xl:ml-[max(calc((100%-18rem-48rem-18rem-3rem)/2),1.5rem)]',
-                                          isMultiVariants && 'page-no-toc:lg:ml-0 page-no-toc:xl:ml-0',
+                                          isMultiVariants &&
+                                              'page-no-toc:lg:ml-0 page-no-toc:xl:ml-0',
                                           'order-last',
                                           'lg:order-[unset]',
                                       ]

@@ -152,7 +152,9 @@ const Shortcut = () => {
             >
                 {operatingSystem === 'mac' ? '⌘' : 'Ctrl'}
             </kbd>
-            <kbd className="rounded border border-dark/2 dark:border-light/2 size-5 flex justify-center items-center">K</kbd>
+            <kbd className="rounded border border-dark/2 dark:border-light/2 size-5 flex justify-center items-center">
+                K
+            </kbd>
         </div>
     );
 };

@@ -59,7 +59,7 @@ export async function HeaderLink(props: {
                     );
                 }}
             >
-                <DropdownMenu >
+                <DropdownMenu>
                     {link.links.map((subLink, index) => (
                         <SubHeaderLink key={index} {...props} link={subLink} />
                     ))}
