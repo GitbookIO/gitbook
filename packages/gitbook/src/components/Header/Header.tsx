@@ -98,6 +98,7 @@ export function Header(props: {
                                     MAX_HEADER_LINKS_FOR_BIG_SEARCHBAR
                                     ? 'lg:basis-72'
                                     : '',
+                                isMultiVariants && 'page-no-toc:lg:basis-auto',
                             )}
                         >
                             <HeaderMobileMenu
@@ -113,36 +114,14 @@ export function Header(props: {
                             <HeaderLogo site={site} space={space} customization={customization} />
                         </div>
 
-                        <div
-                            className={tcls(
-                                'flex',
-                                'gap-4',
-                                'md:min-w-56',
-                                'grow-0 shrink-0',
-                                customization.header.links.length <=
-                                    MAX_HEADER_LINKS_FOR_BIG_SEARCHBAR
-                                    ? [
-                                          'lg:grow',
-                                          'lg:min-w-40',
-                                          'max-w-lg',
-                                          'lg:ml-[max(calc((100%-18rem-48rem-3rem)/2),1.5rem)]',
-                                          'xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]',
-                                          'lg:mr-auto',
-                                          'page-no-toc:lg:ml-[max(calc((100%-18rem-48rem-18rem-3rem)/2),1.5rem)]',
-                                          'order-last',
-                                          'lg:order-[unset]',
-                                      ]
-                                    : ['order-last'],
-                            )}
-                        >
-                            {isMultiVariants && (
-                                <div className="hidden page-no-toc:flex mr-auto">
-                                    <SpacesDropdown
-                                        space={space}
-                                        spaces={spaces}
-                                        className={
-                                            !isCustomizationDefault
-                                                ? `bg-header-link/2 text-header-link ring-header-link/4 
+                        {isMultiVariants && (
+                            <div className="hidden page-no-toc:flex mr-auto">
+                                <SpacesDropdown
+                                    space={space}
+                                    spaces={spaces}
+                                    className={
+                                        !isCustomizationDefault
+                                            ? `bg-header-link/2 text-header-link ring-header-link/4 
                                             dark:bg-header-link/2 dark:text-header-link dark:ring-header-link/4 
                                             group-hover/dropdown:bg-header-link/3 group-hover/dropdown:text-header-link group-hover/dropdown:ring-header-link/6
                                             dark:group-hover/dropdown:bg-header-link/3 dark:group-hover/dropdown:text-header-link dark:group-hover/dropdown:ring-header-link/6
@@ -154,12 +133,36 @@ export function Header(props: {
                                             contrast-more:dark:group-hover/dropdown:text-header-link contrast-more:dark:group-hover/dropdown:ring-header-link
                                             contrast-more:group-focus-within/dropdown:text-header-link contrast-more:group-focus-within/dropdown:ring-header-link
                                             contrast-more:dark:group-focus-within/dropdown:text-header-link contrast-more:dark:group-focus-within/dropdown:ring-header-link`
-                                                : ''
-                                        }
-                                    />
-                                </div>
-                            )}
+                                            : ''
+                                    }
+                                />
+                            </div>
+                        )}
 
+                        <div
+                            className={tcls(
+                                'flex',
+                                'gap-4',
+                                'md:min-w-56',
+                                'items-center',
+                                'grow-0 shrink-0',
+                                customization.header.links.length <=
+                                    MAX_HEADER_LINKS_FOR_BIG_SEARCHBAR
+                                    ? [
+                                          'lg:grow',
+                                          'lg:min-w-40',
+                                          'max-w-lg',
+                                          'lg:ml-[max(calc((100%-18rem-48rem-3rem)/2),1.5rem)]',
+                                          'xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]',
+                                          'lg:mr-auto',
+                                          'page-no-toc:xl:ml-[max(calc((100%-18rem-48rem-18rem-3rem)/2),1.5rem)]',
+                                          isMultiVariants && 'page-no-toc:lg:ml-0 page-no-toc:xl:ml-0',
+                                          'order-last',
+                                          'lg:order-[unset]',
+                                      ]
+                                    : ['order-last'],
+                            )}
+                        >
                             <Suspense fallback={null}>
                                 <SearchButton
                                     style={
