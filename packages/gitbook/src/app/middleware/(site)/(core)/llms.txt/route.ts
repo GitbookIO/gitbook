@@ -14,7 +14,7 @@ import { getIndexablePages } from '@/lib/sitemap';
 export const runtime = 'edge';
 
 /**
- * Generate a sitemap.xml for the current space.
+ * Generate a llms.txt file for the site.
  */
 export async function GET(req: NextRequest) {
     const pointer = await getSiteContentPointer();
@@ -25,9 +25,8 @@ export async function GET(req: NextRequest) {
         siteShareKey: pointer.siteShareKey,
     });
 
-    // This sitemap is only available at root (/sitemap.xml).
     if (!checkIsRootPointer(pointer, siteStructure)) {
-        return new Response('Not found', { status: 404 });
+        return new Response('llms.txt is only served from the root of the site', { status: 404 });
     }
 
     const tree: Root = {
@@ -50,7 +49,7 @@ export async function GET(req: NextRequest) {
 }
 
 /**
- * Get Sitemap Nodes from site structure.
+ * Get MDAST nodes from site structure.
  */
 async function getNodesFromSiteStructure(siteStructure: SiteStructure): Promise<RootContent[]> {
     switch (siteStructure.type) {
@@ -64,7 +63,7 @@ async function getNodesFromSiteStructure(siteStructure: SiteStructure): Promise<
 }
 
 /**
- * Get Sitemap Nodes from site sections.
+ * Get MDAST nodes from site sections.
  */
 async function getNodesFromSections(siteSections: SiteSection[]): Promise<RootContent[]> {
     const all = await Promise.all(
@@ -86,7 +85,7 @@ async function getNodesFromSections(siteSections: SiteSection[]): Promise<RootCo
 }
 
 /**
- * Get Sitemap Nodes from site spaces.
+ * Get MDAST nodes from site spaces.
  */
 async function getNodesFromSiteSpaces(
     siteSpaces: SiteSpace[],

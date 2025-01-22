@@ -22,7 +22,6 @@ export async function GET() {
         siteShareKey: pointer.siteShareKey,
     });
 
-    // This sitemap is only available at root (/sitemap.xml).
     if (!checkIsRootPointer(pointer, siteStructure)) {
         return new Response('Root sitemap is only served from the root of the site', {
             status: 404,
