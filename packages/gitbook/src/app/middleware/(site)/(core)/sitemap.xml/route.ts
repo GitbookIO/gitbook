@@ -1,57 +1,46 @@
-import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
+import { SiteSection, SiteSpace, SiteStructure } from '@gitbook/api';
+import assertNever from 'assert-never';
 import jsontoxml from 'jsontoxml';
-import { NextRequest } from 'next/server';
 
-import { getSpaceContentData } from '@/lib/api';
+import { getPublishedContentSite, SiteContentPointer } from '@/lib/api';
 import { getAbsoluteHref } from '@/lib/links';
-import { getPagePath } from '@/lib/pages';
-import { getSiteContentPointer } from '@/lib/pointer';
-import { isPageIndexable } from '@/lib/seo';
+import { joinPath } from '@/lib/paths';
+import { checkIsRootPointer, getSiteContentPointer } from '@/lib/pointer';
+import { filterOutNullable } from '@/lib/typescript';
 
 export const runtime = 'edge';
 
 /**
- * Generate a sitemap.xml for the current space.
+ * Generate a root sitemap that point to all sitemap-pages.xml.
  */
-export async function GET(req: NextRequest) {
+export async function GET() {
     const pointer = await getSiteContentPointer();
-    const { pages: rootPages } = await getSpaceContentData(pointer, pointer.siteShareKey);
 
-    const pages = flattenPages(rootPages, (page) => !page.hidden && isPageIndexable([], page));
-    const urls = await Promise.all(
-        pages.map(async ({ page, depth }) => {
-            // Decay priority with depth
-            const priority = Math.pow(2, -0.25 * depth);
-            // Normalize to keep 2 decimals
-            const normalizedPriority = Math.floor(100 * priority) / 100;
+    const { structure: siteStructure } = await getPublishedContentSite({
+        organizationId: pointer.organizationId,
+        siteId: pointer.siteId,
+        siteShareKey: pointer.siteShareKey,
+    });
 
-            const lastModified = page.updatedAt || page.createdAt;
+    // This sitemap is only available at root (/sitemap.xml).
+    if (!checkIsRootPointer(pointer, siteStructure)) {
+        return new Response('Root sitemap is only served from the root of the site', {
+            status: 404,
+        });
+    }
 
-            return {
-                url: {
-                    loc: await getAbsoluteHref(getPagePath(rootPages, page), true),
-                    priority: normalizedPriority,
-                    ...(lastModified
-                        ? {
-                              // lastmod format is YYYY-MM-DD
-                              lastmod: new Date(lastModified).toISOString().split('T')[0],
-                          }
-                        : {}),
-                },
-            };
-        }),
-    );
+    const urls = await getUrlsFromSiteStructure(siteStructure);
 
     const xml = jsontoxml(
         [
             {
-                name: 'urlset',
-                children: urls,
+                name: 'sitemapindex',
+                children: urls.map((url) => ({
+                    name: 'sitemap',
+                    children: [{ name: 'loc', text: url }],
+                })),
                 attrs: {
-                    'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
                     xmlns: 'http://www.sitemaps.org/schemas/sitemap/0.9',
-                    'xsi:schemaLocation':
-                        'http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd',
                 },
             },
         ],
@@ -68,30 +57,43 @@ export async function GET(req: NextRequest) {
     });
 }
 
-type FlatPageEntry = { page: RevisionPageDocument; depth: number };
+/**
+ * Get Sitemap URLs from site structure.
+ */
+async function getUrlsFromSiteStructure(siteStructure: SiteStructure): Promise<string[]> {
+    switch (siteStructure.type) {
+        case 'sections':
+            return getUrlsFromSiteSections(siteStructure.structure);
+        case 'siteSpaces':
+            return getUrlsFromSiteSpaces(siteStructure.structure);
+        default:
+            assertNever(siteStructure);
+    }
+}
 
-function flattenPages(
-    rootPags: RevisionPage[],
-    filter: (page: RevisionPageDocument | RevisionPageGroup) => boolean,
-): FlatPageEntry[] {
-    const flattenPage = (
-        page: RevisionPageDocument | RevisionPageGroup,
-        depth: number,
-    ): FlatPageEntry[] => {
-        const allowed = filter(page);
-        if (!allowed) {
-            return [];
-        }
-
-        return [
-            ...(page.type === 'document' ? [{ page, depth }] : []),
-            ...page.pages.flatMap((child) =>
-                child.type === 'document' ? flattenPage(child, depth + 1) : [],
-            ),
-        ];
-    };
-
-    return rootPags.flatMap((page) =>
-        page.type === 'group' || page.type === 'document' ? flattenPage(page, 0) : [],
+/**
+ * Get Sitemap URLs from site sections.
+ */
+async function getUrlsFromSiteSections(siteSections: SiteSection[]): Promise<string[]> {
+    const urls = await Promise.all(
+        siteSections.map(async (siteSection) => getUrlsFromSiteSpaces(siteSection.siteSpaces), []),
     );
+    return urls.flat();
+}
+
+/**
+ * Get Sitemap URLs from site spaces.
+ */
+async function getUrlsFromSiteSpaces(siteSpaces: SiteSpace[]): Promise<string[]> {
+    const urls = await Promise.all(
+        siteSpaces.map(async (siteSpace) => {
+            if (!siteSpace.urls.published) {
+                return null;
+            }
+            const url = new URL(siteSpace.urls.published);
+            url.pathname = joinPath(url.pathname, 'sitemap-pages.xml');
+            return url.toString();
+        }, []),
+    );
+    return urls.filter(filterOutNullable);
 }
