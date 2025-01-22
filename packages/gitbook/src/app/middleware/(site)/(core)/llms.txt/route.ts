@@ -41,11 +41,16 @@ export async function GET(req: NextRequest) {
         ],
     };
 
-    return new Response(toMarkdown(tree), {
-        headers: {
-            'Content-Type': 'text/plain; charset=utf-8',
+    return new Response(
+        toMarkdown(tree, {
+            bullet: '-',
+        }),
+        {
+            headers: {
+                'Content-Type': 'text/plain; charset=utf-8',
+            },
         },
-    });
+    );
 }
 
 /**
@@ -131,6 +136,7 @@ async function getNodesFromSiteSpaces(
                 },
                 {
                     type: 'list',
+                    spread: false,
                     children: listChildren,
                 },
             ];
