@@ -1,26 +1,33 @@
 import { SiteSection, SiteSpace, SiteStructure } from '@gitbook/api';
 import assertNever from 'assert-never';
 import jsontoxml from 'jsontoxml';
-import { NextRequest } from 'next/server';
 
-import { getPublishedContentSite } from '@/lib/api';
+import { getPublishedContentSite, SiteContentPointer } from '@/lib/api';
 import { getAbsoluteHref } from '@/lib/links';
 import { joinPath } from '@/lib/paths';
-import { getSiteContentPointer } from '@/lib/pointer';
+import { checkIsRootPointer, getSiteContentPointer } from '@/lib/pointer';
 import { filterOutNullable } from '@/lib/typescript';
 
 export const runtime = 'edge';
 
 /**
- * Generate a sitemap.xml for the current space.
+ * Generate a root sitemap that point to all sitemap-pages.xml.
  */
-export async function GET(req: NextRequest) {
+export async function GET() {
     const pointer = await getSiteContentPointer();
+
     const { structure: siteStructure } = await getPublishedContentSite({
         organizationId: pointer.organizationId,
         siteId: pointer.siteId,
         siteShareKey: pointer.siteShareKey,
     });
+
+    // This sitemap is only available at root (/sitemap.xml).
+    if (!checkIsRootPointer(pointer, siteStructure)) {
+        return new Response('Root sitemap is only served from the root of the site', {
+            status: 404,
+        });
+    }
 
     const urls = await getUrlsFromSiteStructure(siteStructure);
 
@@ -84,7 +91,8 @@ async function getUrlsFromSiteSpaces(siteSpaces: SiteSpace[]): Promise<string[]>
                 return null;
             }
             const url = new URL(siteSpace.urls.published);
-            return getAbsoluteHref(joinPath(url.pathname, 'sitemap-pages.xml'), true);
+            url.pathname = joinPath(url.pathname, 'sitemap-pages.xml');
+            return url.toString();
         }, []),
     );
     return urls.filter(filterOutNullable);

@@ -1,31 +1,25 @@
-import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 import jsontoxml from 'jsontoxml';
 
 import { getRevisionPages, getSpace } from '@/lib/api';
-import { getAbsoluteHref, getBasePath } from '@/lib/links';
+import { getAbsoluteHref } from '@/lib/links';
 import { getPagePath } from '@/lib/pages';
 import { getSiteContentPointer } from '@/lib/pointer';
-import { isPageIndexable } from '@/lib/seo';
+import { getIndexablePages } from '@/lib/sitemap';
 
 export const runtime = 'edge';
 
 /**
- * Generate a sitemap.xml for the current space.
+ * Generate a sitemap.xml for the current section / space.
  */
 export async function GET() {
     const pointer = await getSiteContentPointer();
 
-    const revisionId = await (async () => {
-        if (pointer.revisionId) {
-            return pointer.revisionId;
-        }
-        const space = await getSpace(pointer.spaceId, pointer.siteShareKey);
-        return space.revision;
-    })();
+    const revisionId =
+        pointer.revisionId ?? (await getSpace(pointer.spaceId, pointer.siteShareKey)).revision;
 
     const rootPages = await getRevisionPages(pointer.spaceId, revisionId, { metadata: false });
 
-    const pages = flattenPages(rootPages, (page) => !page.hidden && isPageIndexable([], page));
+    const pages = getIndexablePages(rootPages);
 
     const urls = await Promise.all(
         pages.map(async ({ page, depth }) => {
@@ -69,32 +63,4 @@ export async function GET() {
             'Content-Type': 'application/xml',
         },
     });
-}
-
-type FlatPageEntry = { page: RevisionPageDocument; depth: number };
-
-function flattenPages(
-    rootPags: RevisionPage[],
-    filter: (page: RevisionPageDocument | RevisionPageGroup) => boolean,
-): FlatPageEntry[] {
-    const flattenPage = (
-        page: RevisionPageDocument | RevisionPageGroup,
-        depth: number,
-    ): FlatPageEntry[] => {
-        const allowed = filter(page);
-        if (!allowed) {
-            return [];
-        }
-
-        return [
-            ...(page.type === 'document' ? [{ page, depth }] : []),
-            ...page.pages.flatMap((child) =>
-                child.type === 'document' ? flattenPage(child, depth + 1) : [],
-            ),
-        ];
-    };
-
-    return rootPags.flatMap((page) =>
-        page.type === 'group' || page.type === 'document' ? flattenPage(page, 0) : [],
-    );
 }

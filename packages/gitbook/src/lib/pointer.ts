@@ -1,3 +1,4 @@
+import { SiteStructure } from '@gitbook/api';
 import { headers } from 'next/headers';
 import { assert } from 'ts-essentials';
 
@@ -39,6 +40,33 @@ export async function getSiteContentPointer(): Promise<SiteContentPointer> {
     };
 
     return pointer;
+}
+
+/**
+ * Check if the pointer is the root one.
+ * Meaning we are on the default section / space.
+ */
+export function checkIsRootPointer(
+    pointer: SiteContentPointer,
+    siteStructure: SiteStructure,
+): boolean {
+    switch (siteStructure.type) {
+        case 'sections': {
+            return siteStructure.structure.some(
+                (structure) =>
+                    structure.default &&
+                    structure.id === pointer.siteSectionId &&
+                    structure.siteSpaces.some(
+                        (siteSpace) => siteSpace.default && siteSpace.id === pointer.siteSpaceId,
+                    ),
+            );
+        }
+        case 'siteSpaces': {
+            return siteStructure.structure.some(
+                (siteSpace) => siteSpace.default && siteSpace.id === pointer.siteSpaceId,
+            );
+        }
+    }
 }
 
 /**
