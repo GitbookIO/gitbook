@@ -37,8 +37,6 @@ export function Header(props: {
     const hasSiteSections = sections && sections.list.length > 1;
     const isMultiVariants = site && spaces.length > 1;
 
-    // customization.header.links = customization.header.links.slice(0,4);
-
     return (
         <header
             className={tcls(
