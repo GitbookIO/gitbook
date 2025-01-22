@@ -31,6 +31,7 @@ import {
     normalizeVisitorAuthURL,
 } from '@/lib/visitor-token';
 
+import { joinPath } from './lib/paths';
 import { waitUntil } from './lib/waitUntil';
 
 export const config = {
@@ -874,10 +875,6 @@ function getDefaultAPIToken(apiEndpoint: string): string | undefined {
     }
 
     return defaultToken;
-}
-
-function joinPath(...parts: string[]): string {
-    return parts.join('/').replace(/\/+/g, '/');
 }
 
 function stripBasePath(pathname: string, basePath: string): string {
