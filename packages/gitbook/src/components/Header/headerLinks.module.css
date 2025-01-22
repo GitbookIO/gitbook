@@ -1,7 +1,4 @@
-.containerHeaderlinks {
-    container-type: inline-size;
-    container-name: headerlinks;
-}
+
 
 .linkEllipsis {
     display: none;
@@ -9,6 +6,73 @@
         display: none;
     }
 }
+
+@media(max-width:1023px) {
+    .containerHeaderlinks {
+        container-type: inline-size;
+        container-name: headerlinks;
+    }
+}
+
+@media(max-width:1279px) {
+    .containerHeaderlinks > :nth-child(n + 5) {
+        display: none;
+    }
+    .containerHeaderlinks > :nth-child(n + 5) ~ .linkEllipsis {
+        display: flex;
+        & div > a:nth-of-type(n + 6) {
+            display: flex;
+        }
+    }
+}
+
+@media (max-width: 1535px) {
+    .containerHeaderlinks > :nth-child(n + 6) {
+        display: none;
+    }
+    .containerHeaderlinks > :nth-child(n + 6) ~ .linkEllipsis {
+        display: flex;
+        & div > a:nth-of-type(n + 6) {
+            display: flex;
+        }
+    }
+}
+
+/* @media (max-width: 1024px) {
+    .containerHeaderlinks > :nth-child(n + 4) {
+        display: none;
+    }
+    .containerHeaderlinks > :nth-child(n + 4) ~ .linkEllipsis {
+        display: flex;
+        & div > a:nth-of-type(n + 4) {
+            display: flex;
+        }
+    }
+}
+
+@media (max-width: 1280px) {
+    .containerHeaderlinks > :nth-child(n + 5) {
+        display: none;
+    }
+    .containerHeaderlinks > :nth-child(n + 5) ~ .linkEllipsis {
+        display: flex;
+        & div > a:nth-of-type(n + 5) {
+            display: flex;
+        }
+    }
+}
+
+@media (max-width: 1536px) {
+    .containerHeaderlinks > :nth-child(n + 6) {
+        display: none;
+    }
+    .containerHeaderlinks > :nth-child(n + 6) ~ .linkEllipsis {
+        display: flex;
+        & div > a:nth-of-type(n + 6) {
+            display: flex;
+        }
+    }
+} */
 
 @container headerlinks ( width < 150px ) {
     .containerHeaderlinks > :nth-child(n + 1) {

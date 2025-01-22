@@ -35,7 +35,7 @@ export async function HeaderLink(props: {
     if (link.links && link.links.length > 0) {
         return (
             <Dropdown
-                className="shrink"
+                className="shrink left-auto right-0"
                 button={(buttonProps) => {
                     if (!target || !link.to) {
                         return (
@@ -59,7 +59,7 @@ export async function HeaderLink(props: {
                     );
                 }}
             >
-                <DropdownMenu>
+                <DropdownMenu >
                     {link.links.map((subLink, index) => (
                         <SubHeaderLink key={index} {...props} link={subLink} />
                     ))}
@@ -159,7 +159,7 @@ function getHeaderLinkClassName(props: { headerPreset: CustomizationHeaderPreset
     return tcls(
         'flex items-center shrink',
         'hover:text-header-link-400 dark:hover:text-light',
-        'min-w-0',
+        'min-w-0 hover:min-w-max',
         'contrast-more:underline',
 
         props.headerPreset === CustomizationHeaderPreset.Default

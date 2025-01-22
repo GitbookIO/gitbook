@@ -37,6 +37,8 @@ export function Header(props: {
     const hasSiteSections = sections && sections.list.length > 1;
     const isMultiVariants = site && spaces.length > 1;
 
+    // customization.header.links = customization.header.links.slice(0,4);
+
     return (
         <header
             className={tcls(
@@ -54,7 +56,7 @@ export function Header(props: {
                 'dark:bg-dark',
                 withTopHeader ? null : 'lg:hidden',
                 'text-sm',
-                'bg-opacity-8',
+                'bg-opacity-9',
                 'dark:bg-opacity-9',
                 'backdrop-blur-lg',
                 'contrast-more:bg-opacity-11',
@@ -75,7 +77,7 @@ export function Header(props: {
                     <div
                         className={tcls(
                             'gap-4',
-                            'lg:gap-8',
+                            'lg:gap-6',
                             'flex',
                             'items-center',
                             'justify-between',
@@ -121,11 +123,12 @@ export function Header(props: {
                                     MAX_HEADER_LINKS_FOR_BIG_SEARCHBAR
                                     ? [
                                           'lg:grow',
+                                          'lg:min-w-40',
                                           'max-w-lg',
-                                          'lg:ml-[max(calc((100%-18rem-48rem-4rem)/2),1rem)]',
-                                          'xl:ml-[max(calc((100%-18rem-48rem-14rem-4rem)/2),1rem)]',
+                                          'lg:ml-[max(calc((100%-18rem-48rem-3rem)/2),1.5rem)]',
+                                          'xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]',
                                           'lg:mr-auto',
-                                          'page-no-toc:lg:ml-[max(calc((100%-18rem-48rem-18rem-4rem)/2),1rem)]',
+                                          'page-no-toc:lg:ml-[max(calc((100%-18rem-48rem-18rem-3rem)/2),1.5rem)]',
                                           'order-last',
                                           'lg:order-[unset]',
                                       ]
@@ -170,7 +173,9 @@ export function Header(props: {
                                                   'text-header-link/8',
                                                   'dark:text-header-link/8',
                                                   'hover:text-header-link',
+                                                  'focus:text-header-link',
                                                   'dark:hover:text-header-link',
+                                                  'dark:focus:text-header-link',
 
                                                   'ring-header-link/4',
                                                   'dark:ring-header-link/4',
@@ -180,7 +185,9 @@ export function Header(props: {
                                                   '[&_svg]:text-header-link/10',
                                                   'dark:[&_svg]:text-header-link/10',
                                                   '[&_.shortcut]:text-header-link/8',
+                                                  '[&_.shortcut_kbd]:border-header-link/2',
                                                   'dark:[&_.shortcut]:text-header-link/8',
+                                                  'dark:[&_.shortcut_kbd]:border-header-link/2',
 
                                                   'contrast-more:bg-header-background',
                                                   'contrast-more:text-header-link',
