@@ -1,3 +1,5 @@
+import { stringifyOpenAPI } from './stringifyOpenAPI';
+
 export interface CodeSampleInput {
     method: string;
     url: string;
@@ -24,11 +26,11 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
     method: '${method.toUpperCase()}',\n`;
 
             if (headers) {
-                code += indent(`headers: ${JSON.stringify(headers, null, 2)},\n`, 4);
+                code += indent(`headers: ${stringifyOpenAPI(headers, null, 2)},\n`, 4);
             }
 
             if (body) {
-                code += indent(`body: JSON.stringify(${JSON.stringify(body, null, 2)}),\n`, 4);
+                code += indent(`body: JSON.stringify(${stringifyOpenAPI(body, null, 2)}),\n`, 4);
             }
 
             code += `});\n`;
@@ -59,7 +61,7 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
             lines.push(`'${url}'`);
 
             if (body) {
-                lines.push(`-d '${JSON.stringify(body)}'`);
+                lines.push(`-d '${stringifyOpenAPI(body)}'`);
             }
 
             return lines.map((line, index) => (index > 0 ? indent(line, 2) : line)).join(separator);
@@ -74,10 +76,10 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
             code += `response = requests.${method.toLowerCase()}(\n`;
             code += indent(`"${url}",\n`, 4);
             if (headers) {
-                code += indent(`headers=${JSON.stringify(headers)},\n`, 4);
+                code += indent(`headers=${stringifyOpenAPI(headers)},\n`, 4);
             }
             if (body) {
-                code += indent(`json=${JSON.stringify(body)}\n`, 4);
+                code += indent(`json=${stringifyOpenAPI(body)}\n`, 4);
             }
             code += ')\n';
             code += `data = response.json()`;
@@ -93,7 +95,7 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
 
             if (body) {
                 // if we had a body add a content length header
-                const bodyContent = body ? JSON.stringify(body) : '';
+                const bodyContent = body ? stringifyOpenAPI(body) : '';
                 // handle unicode chars with a text encoder
                 const encoder = new TextEncoder();
 
@@ -115,7 +117,7 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
                       .join('\n') + '\n'
                 : '';
 
-            const bodyString = body ? `\n${JSON.stringify(body, null, 2)}` : '';
+            const bodyString = body ? `\n${stringifyOpenAPI(body, null, 2)}` : '';
 
             const httpRequest = `${method.toUpperCase()} ${decodeURI(path)} HTTP/1.1
 Host: ${host}

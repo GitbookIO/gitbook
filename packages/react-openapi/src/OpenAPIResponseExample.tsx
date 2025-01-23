@@ -4,6 +4,7 @@ import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { generateSchemaExample } from './generateSchemaExample';
 import { OpenAPIContextProps } from './types';
 import { createStateKey, noReference } from './utils';
+import { stringifyOpenAPI } from './stringifyOpenAPI';
 
 /**
  * Display an example of the response content.
@@ -63,7 +64,9 @@ export function OpenAPIResponseExample(props: {
                 body: (
                     <context.CodeBlock
                         code={
-                            typeof example === 'string' ? example : JSON.stringify(example, null, 2)
+                            typeof example === 'string'
+                                ? example
+                                : stringifyOpenAPI(example, null, 2)
                         }
                         syntax="json"
                     />
