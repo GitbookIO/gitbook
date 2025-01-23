@@ -5,10 +5,11 @@ import { captureException } from '@sentry/nextjs';
 import * as React from 'react';
 import { assert } from 'ts-essentials';
 
+import { fetchPageData } from '@/app/middleware/(site)/fetch';
 import { streamResponse } from '@/lib/actions';
 import * as api from '@/lib/api';
 import { getAbsoluteHref, getPageHref } from '@/lib/links';
-import { resolvePageId } from '@/lib/pages';
+import { AncestorRevisionPage, resolvePageId } from '@/lib/pages';
 import { filterOutNullable } from '@/lib/typescript';
 
 import { DocumentView } from '../DocumentView';
@@ -31,6 +32,8 @@ export interface ComputedPageResult {
 
     /** When part of a multi-spaces search, the title of the space */
     spaceTitle?: string;
+
+    ancestors: AncestorRevisionPage[];
 }
 
 export interface AskAnswerSource {
@@ -317,12 +320,15 @@ async function transformSectionsAndPage(args: {
         })) ?? [],
     );
 
+    const pageData = await fetchPageData({ pathname: [item.path] });
+
     const page: ComputedPageResult = {
         type: 'page',
         id: item.id,
         title: item.title,
         href: await getURL(item.path, spaceURL),
         spaceTitle: space?.title,
+        ancestors: pageData.ancestors,
     };
 
     return [page, sections];
