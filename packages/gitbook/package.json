@@ -69,6 +69,7 @@
     "devDependencies": {
         "@argos-ci/playwright": "^3.10.0",
         "@cloudflare/next-on-pages": "1.13.7",
+        "vercel": "^39.3.0",
         "@cloudflare/workers-types": "^4.20241230.0",
         "@playwright/test": "^1.49.1",
         "@types/js-cookie": "^3.0.6",
