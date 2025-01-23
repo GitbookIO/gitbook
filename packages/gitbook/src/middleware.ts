@@ -482,8 +482,8 @@ async function lookupSiteInMultiMode(request: NextRequest, url: URL): Promise<Lo
  *
  * The format of the path is:
  *   - /~space|~site/:id/:path
- *   - /~space|~site/:id/~changes/:changeId/:path
- *   - /~space|~site/:id/~revisions/:revisionId/:path
+ *   - /~space|~site/:id/~/changes/:changeId/:path
+ *   - /~space|~site/:id/~/revisions/:revisionId/:path
  */
 async function lookupSiteOrSpaceInMultiIdMode(
     request: NextRequest,
@@ -492,13 +492,17 @@ async function lookupSiteOrSpaceInMultiIdMode(
     const basePathParts: string[] = [];
     const pathSegments = url.pathname.slice(1).split('/');
 
-    const eatPathId = (prefix: string): string | undefined => {
-        if (pathSegments[0] !== prefix || pathSegments.length < 2) {
+    const eatPathId = (...prefixes: string[]): string | undefined => {
+        const match = prefixes.every((prefix, index) => pathSegments[index] === prefix);
+        if (!match || pathSegments.length < prefixes.length + 1) {
             return;
         }
 
-        const prefixSegment = pathSegments.shift();
-        basePathParts.push(prefixSegment!);
+        // Remove the prefix from the path segments
+        pathSegments.splice(0, prefixes.length);
+
+        // Add the prefix to the base path
+        basePathParts.push(...prefixes);
 
         const id = pathSegments.shift();
         basePathParts.push(id!);
@@ -524,8 +528,8 @@ async function lookupSiteOrSpaceInMultiIdMode(
     }
 
     // Extract the change request or revision ID from the path
-    const changeRequestId = eatPathId('~changes');
-    const revisionId = eatPathId('~revisions');
+    const changeRequestId = eatPathId('~', 'changes');
+    const revisionId = eatPathId('~', 'revisions');
 
     // Get the auth token from the URL query
     const AUTH_TOKEN_QUERY = 'token';
