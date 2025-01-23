@@ -1,5 +1,6 @@
 import { Space } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
+import { headers } from 'next/headers';
 import React from 'react';
 
 import { getChangeRequest, getRevision, SiteContentPointer } from '@/lib/api';
@@ -8,7 +9,6 @@ import { tcls } from '@/lib/tailwind';
 import { RefreshChangeRequestButton } from './RefreshChangeRequestButton';
 import { Toolbar, ToolbarBody, ToolbarButton, ToolbarButtonGroups } from './Toolbar';
 import { DateRelative } from '../primitives';
-import { headers } from 'next/headers';
 
 interface AdminToolbarProps {
     content: SiteContentPointer;
