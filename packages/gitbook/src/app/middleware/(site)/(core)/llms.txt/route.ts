@@ -61,7 +61,7 @@ async function getNodesFromSiteStructure(siteStructure: SiteStructure): Promise<
         case 'sections':
             return getNodesFromSections(siteStructure.structure);
         case 'siteSpaces':
-            return getNodesFromSiteSpaces(siteStructure.structure, { depth: 2 });
+            return getNodesFromSiteSpaces(siteStructure.structure, { heading: true });
         default:
             assertNever(siteStructure);
     }
@@ -74,7 +74,7 @@ async function getNodesFromSections(siteSections: SiteSection[]): Promise<RootCo
     const all = await Promise.all(
         siteSections.map(async (siteSection): Promise<RootContent[]> => {
             const siteSpaceNodes = await getNodesFromSiteSpaces(siteSection.siteSpaces, {
-                depth: 3,
+                heading: false,
             });
             return [
                 {
@@ -94,7 +94,12 @@ async function getNodesFromSections(siteSections: SiteSection[]): Promise<RootCo
  */
 async function getNodesFromSiteSpaces(
     siteSpaces: SiteSpace[],
-    options: { depth: Heading['depth'] },
+    options: {
+        /**
+         * Includes a heading for each site space.
+         */
+        heading?: boolean;
+    },
 ): Promise<RootContent[]> {
     const all = await Promise.all(
         siteSpaces.map(async (siteSpace): Promise<RootContent[]> => {
@@ -128,18 +133,20 @@ async function getNodesFromSiteSpaces(
                     };
                 }),
             );
-            return [
-                {
+            const nodes: RootContent[] = [];
+            if (options.heading) {
+                nodes.push({
                     type: 'heading',
-                    depth: options.depth,
+                    depth: 2,
                     children: [{ type: 'text', value: siteSpace.title }],
-                },
-                {
-                    type: 'list',
-                    spread: false,
-                    children: listChildren,
-                },
-            ];
+                });
+            }
+            nodes.push({
+                type: 'list',
+                spread: false,
+                children: listChildren,
+            });
+            return nodes;
         }),
     );
     return all.flat();
