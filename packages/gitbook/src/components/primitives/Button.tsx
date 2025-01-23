@@ -62,6 +62,7 @@ export function Button({
     const sizeClasses = sizes[size] || sizes.default;
 
     const domClassName = tcls(
+        'button',
         'inline-block',
         'rounded-md',
         'straight-corners:rounded-none',
