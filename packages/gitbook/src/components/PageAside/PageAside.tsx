@@ -137,6 +137,7 @@ export async function PageAside(props: {
             <div
                 className={tcls(
                     'overflow-auto',
+                    'overflow-x-visible',
                     'flex-1',
                     'flex',
                     'flex-col',
@@ -186,7 +187,7 @@ export async function PageAside(props: {
                                     'flex-row',
                                     'items-center',
                                     'text-sm',
-                                    'hover:text-primary',
+                                    'hover:text-tint',
                                     'py-2',
                                 )}
                             >
@@ -211,7 +212,7 @@ export async function PageAside(props: {
                                     'flex-row',
                                     'items-center',
                                     'text-sm',
-                                    'hover:text-primary',
+                                    'hover:text-tint',
                                     'py-2',
                                 )}
                             >

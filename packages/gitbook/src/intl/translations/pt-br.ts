@@ -28,6 +28,8 @@ export const pt_br = {
     was_this_helpful_neutral: 'Não sei',
     was_this_helpful_negative: 'Não',
     was_this_helpful_thank_you: 'Obrigado!',
+    was_this_helpful_comment: 'Gostaria de adicionar algo?',
+    submit: 'Enviar',
     annotation_button_label: 'Abrir anotação',
     code_copied: 'Copiado!',
     code_copy: 'Copiar',

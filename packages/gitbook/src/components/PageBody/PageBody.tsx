@@ -120,27 +120,30 @@ export function PageBody(props: {
                     className={tcls(
                         'flex',
                         'flex-row',
+                        'flex-wrap',
+                        'gap-4',
                         'items-center',
                         'mt-6',
                         'max-w-3xl',
                         'mx-auto',
                         'page-api-block:ml-0',
+                        'text-dark/7',
+                        'dark:text-light/7',
+                        'contrast-more:text-dark',
+                        'dark:contrast-more:text-light',
                     )}
                 >
                     {updatedAt ? (
-                        <p
-                            className={tcls(
-                                'flex-1',
-                                'text-sm',
-                                'text-dark/6',
-                                'dark:text-light/5',
-                            )}
-                        >
+                        <p className={tcls('text-sm mr-auto')}>
                             {t(language, 'page_last_modified', <DateRelative value={updatedAt} />)}
                         </p>
                     ) : null}
                     {withPageFeedback ? (
-                        <PageFeedbackForm orientation="horizontal" pageId={page.id} />
+                        <PageFeedbackForm
+                            className={page.layout.outline ? 'xl:hidden' : ''}
+                            orientation="horizontal"
+                            pageId={page.id}
+                        />
                     ) : null}
                 </div>
             </main>

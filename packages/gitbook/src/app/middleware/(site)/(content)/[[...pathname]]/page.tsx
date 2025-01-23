@@ -109,10 +109,7 @@ export default async function Page(props: {
                     page={page}
                     ancestors={ancestors}
                     document={document}
-                    withPageFeedback={
-                        // Display the page feedback in the page footer if the aside is not visible
-                        withPageFeedback && !page.layout.outline
-                    }
+                    withPageFeedback={withPageFeedback}
                 />
             </div>
             <React.Suspense fallback={null}>

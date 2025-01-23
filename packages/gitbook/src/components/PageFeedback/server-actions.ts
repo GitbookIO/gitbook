@@ -10,6 +10,7 @@ export async function postPageFeedback(args: {
     pageId: string;
     visitorId: string;
     rating: PageFeedbackRating;
+    comment?: string;
 }) {
     const { organizationId, siteId, siteSpaceId } = await getSiteContentPointer();
 
@@ -28,6 +29,7 @@ export async function postPageFeedback(args: {
         args.visitorId,
         {
             rating: args.rating,
+            // TODO @Samy: Add args.comment
         },
     );
 }
