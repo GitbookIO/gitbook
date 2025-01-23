@@ -7,7 +7,7 @@ export function stringifyOpenAPI(body: unknown, transformer?: null, indent?: num
     return JSON.stringify(
         body,
         (_key, value) => {
-            if (typeof value === 'object') {
+            if (value && !Array.isArray(value) && typeof value === 'object') {
                 // Extract out internal keys used in parsing
                 const { [SYMBOL_MARKDOWN_PARSED]: _, [SYMBOL_REF_RESOLVED]: __, ...rest } = value;
                 return rest;
