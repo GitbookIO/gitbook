@@ -494,7 +494,7 @@ async function lookupSiteOrSpaceInMultiIdMode(
 
     const eatPathId = (...prefixes: string[]): string | undefined => {
         const match = prefixes.every((prefix, index) => pathSegments[index] === prefix);
-        if (!match || pathSegments.length < (prefixes.length + 1)) {
+        if (!match || pathSegments.length < prefixes.length + 1) {
             return;
         }
 
