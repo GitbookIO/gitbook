@@ -176,7 +176,7 @@
 
 .openapi-schema-example,
 .openapi-schema-pattern {
-    @apply prose-sm mt-2 text-tint-strong;
+    @apply prose-sm mt-1 text-tint-strong;
 }
 
 /** Authentication */
