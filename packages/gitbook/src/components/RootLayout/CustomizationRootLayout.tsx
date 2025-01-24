@@ -15,7 +15,7 @@ import colors from 'tailwindcss/colors';
 import { fontNotoColorEmoji, fonts, ibmPlexMono } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
 import { getStaticFileURL } from '@/lib/assets';
-import { colorContrast, hexToRgb, shadesOfColor } from '@/lib/colors';
+import { colorContrast, colorScale, hexToRgb, shadesOfColor } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
 
 import { ClientContexts } from './ClientContexts';
@@ -163,6 +163,25 @@ export async function CustomizationRootLayout(props: {
                     'dark:bg-dark',
                 )}
             >
+                <div>
+                    Original color:{' '}
+                    <span style={{ color: customization.styling.primaryColor.light }}>
+                        {customization.styling.primaryColor.light}
+                    </span>
+                    <ul>
+                        {colorScale(customization.styling.primaryColor.light, true).map(
+                            (item, index) => (
+                                <li
+                                    className="list-item"
+                                    key={index}
+                                    style={{ backgroundColor: item.color, color: item.contrast }}
+                                >
+                                    {item.color}
+                                </li>
+                            ),
+                        )}
+                    </ul>
+                </div>
                 <IconsProvider
                     assetsURL={process.env.GITBOOK_ICONS_URL ?? getStaticFileURL('icons')}
                     assetsURLToken={process.env.GITBOOK_ICONS_TOKEN}
