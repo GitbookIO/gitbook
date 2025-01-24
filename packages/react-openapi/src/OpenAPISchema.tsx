@@ -102,9 +102,9 @@ export function OpenAPISchemaProperty(
                         />
                     ) : null}
                     {shouldDisplayExample(schema) ? (
-                        <span className="openapi-schema-example">
+                        <div className="openapi-schema-example">
                             Example: <code>{stringifyOpenAPI(schema.example)}</code>
-                        </span>
+                        </div>
                     ) : null}
                     {schema.pattern ? (
                         <div className="openapi-schema-pattern">
