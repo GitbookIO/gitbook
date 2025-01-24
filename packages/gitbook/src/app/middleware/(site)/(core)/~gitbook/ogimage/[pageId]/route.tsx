@@ -2,10 +2,10 @@ import { CustomizationHeaderPreset } from '@gitbook/api';
 import { redirect } from 'next/navigation';
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
-import colorContrast from 'postcss-color-contrast/js';
 import React from 'react';
 
 import { googleFontsMap } from '@/fonts';
+import { colorContrast } from '@/lib/colors';
 import { getAbsoluteHref } from '@/lib/links';
 import { filterOutNullable } from '@/lib/typescript';
 import { getContentTitle } from '@/lib/utils';

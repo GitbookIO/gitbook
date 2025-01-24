@@ -10,13 +10,12 @@ import {
 } from '@gitbook/api';
 import { IconsProvider, IconStyle } from '@gitbook/icons';
 import assertNever from 'assert-never';
-import colorContrast from 'postcss-color-contrast/js';
 import colors from 'tailwindcss/colors';
 
 import { fontNotoColorEmoji, fonts, ibmPlexMono } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
 import { getStaticFileURL } from '@/lib/assets';
-import { hexToRgb, shadesOfColor } from '@/lib/colors';
+import { colorContrast, hexToRgb, shadesOfColor } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
 
 import { ClientContexts } from './ClientContexts';
@@ -263,12 +262,10 @@ function generateHeaderTheme(customization: CustomizationSettings | SiteCustomiz
                     light: colorContrast(
                         tintColor?.light ?? customization.styling.primaryColor.light,
                         [colors.white, colors.black],
-                        'aaa',
                     ),
                     dark: colorContrast(
                         tintColor?.dark ?? customization.styling.primaryColor.dark,
                         [colors.white, colors.black],
-                        'aaa',
                     ),
                 },
             };
@@ -301,12 +298,12 @@ function generateHeaderTheme(customization: CustomizationSettings | SiteCustomiz
                     light:
                         customization.header.linkColor?.light ??
                         (tintColor?.light &&
-                            colorContrast(tintColor.light, [colors.white, colors.black], 'aaa')) ??
+                            colorContrast(tintColor.light, [colors.white, colors.black])) ??
                         customization.styling.primaryColor.light,
                     dark:
                         customization.header.linkColor?.dark ??
                         (tintColor?.dark &&
-                            colorContrast(tintColor.dark, [colors.white, colors.black], 'aaa')) ??
+                            colorContrast(tintColor.dark, [colors.white, colors.black])) ??
                         customization.styling.primaryColor.dark,
                 },
             };
