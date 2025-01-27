@@ -1,8 +1,14 @@
-import { CustomizationSettings, SiteCustomizationSettings, Space, SiteInsightsTrademarkPlacement } from '@gitbook/api';
+import {
+    CustomizationSettings,
+    SiteCustomizationSettings,
+    Space,
+    SiteInsightsTrademarkPlacement,
+} from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 
 import { t, getSpaceLanguage } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
+
 import { Link } from '../primitives';
 
 /**

@@ -136,7 +136,11 @@ export function TableOfContents(props: {
                         )}
                     />
                     {customization.trademark.enabled ? (
-                        <Trademark space={space} customization={customization} placement={SiteInsightsTrademarkPlacement.Sidebar} />
+                        <Trademark
+                            space={space}
+                            customization={customization}
+                            placement={SiteInsightsTrademarkPlacement.Sidebar}
+                        />
                     ) : null}
                 </TOCScrollContainer>
             </div>

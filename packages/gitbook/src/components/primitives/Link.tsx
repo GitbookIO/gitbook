@@ -13,7 +13,10 @@ type BaseLinkProps = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, keyof N
 
 export type LinkInsightsProps = {
     /** Event to track when the link is clicked. */
-    insights?: TrackEventInput<'ad_click'> | TrackEventInput<'link_click'>  | TrackEventInput<'trademark_click'>;
+    insights?:
+        | TrackEventInput<'ad_click'>
+        | TrackEventInput<'link_click'>
+        | TrackEventInput<'trademark_click'>;
 };
 
 export type LinkProps = Omit<BaseLinkProps, 'href'> &
