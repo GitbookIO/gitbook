@@ -104,6 +104,14 @@ const config: Config = {
                 pomegranate: generateShades('#f25b3a'),
                 periwinkle: generateShades('#acc6ee'),
             },
+            backgroundColor: {
+                'mark-blue': '#89C6DA4D',
+                'mark-purple': '#DAD4FF4D',
+                'mark-orange': '#FFDCBC4D',
+                'mark-red': '#FFCCCB4D',
+                'mark-yellow': '#FFF0854D',
+                'mark-green': '#91EABF4D',
+            },
             animation: {
                 present: 'present .5s ease-out both',
             },
