@@ -4,6 +4,7 @@ import {
     RevisionPageDocument,
     RevisionPageGroup,
     SiteCustomizationSettings,
+    SiteInsightsTrademarkPlacement,
     Space,
 } from '@gitbook/api';
 import React from 'react';
@@ -135,7 +136,7 @@ export function TableOfContents(props: {
                         )}
                     />
                     {customization.trademark.enabled ? (
-                        <Trademark space={space} customization={customization} />
+                        <Trademark space={space} customization={customization} placement={SiteInsightsTrademarkPlacement.Sidebar} />
                     ) : null}
                 </TOCScrollContainer>
             </div>

@@ -1,10 +1,9 @@
 'use client';
 
-import * as api from '@gitbook/api';
 import NextLink, { LinkProps as NextLinkProps } from 'next/link';
 import React from 'react';
 
-import { useTrackEvent, InsightsEventName, TrackEventInput } from '../Insights';
+import { useTrackEvent, TrackEventInput } from '../Insights';
 
 // Props from Next, which includes NextLinkProps and all the things anchor elements support.
 type BaseLinkProps = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, keyof NextLinkProps> &
@@ -14,7 +13,7 @@ type BaseLinkProps = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, keyof N
 
 export type LinkInsightsProps = {
     /** Event to track when the link is clicked. */
-    insights?: TrackEventInput<'ad_click'> | TrackEventInput<'link_click'>;
+    insights?: TrackEventInput<'ad_click'> | TrackEventInput<'link_click'>  | TrackEventInput<'trademark_click'>;
 };
 
 export type LinkProps = Omit<BaseLinkProps, 'href'> &

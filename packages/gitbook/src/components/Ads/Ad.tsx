@@ -14,6 +14,7 @@ import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { renderAd } from './renderAd';
 import { useTrackEvent } from '../Insights';
+import { Link } from '../primitives';
 
 /**
  * Zone ID provided by BuySellAds for the preview.
@@ -170,19 +171,17 @@ function AdSponsoredLink(props: { spaceId: string }) {
                 'dark:text-light/5',
             )}
         >
-            <a
+            <Link
                 target="_blank"
                 href={viaUrl.toString()}
                 className={tcls('hover:underline')}
-                onClick={() => {
-                    trackEvent({
-                        type: 'trademark_click',
-                        placement: SiteInsightsTrademarkPlacement.Ad,
-                    });
+                insights={{
+                    type: 'trademark_click',
+                    placement: SiteInsightsTrademarkPlacement.Ad,
                 }}
             >
                 {t(language, 'sponsored_via_gitbook')}
-            </a>
+            </Link>
         </p>
     );
 }

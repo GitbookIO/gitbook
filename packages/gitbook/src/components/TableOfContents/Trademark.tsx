@@ -1,8 +1,9 @@
-import { CustomizationSettings, SiteCustomizationSettings, Space } from '@gitbook/api';
+import { CustomizationSettings, SiteCustomizationSettings, Space, SiteInsightsTrademarkPlacement } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 
 import { t, getSpaceLanguage } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
+import { Link } from '../primitives';
 
 /**
  * Trademark link to the GitBook.
@@ -10,6 +11,7 @@ import { tcls } from '@/lib/tailwind';
 export function Trademark(props: {
     space: Space;
     customization: CustomizationSettings | SiteCustomizationSettings;
+    placement: SiteInsightsTrademarkPlacement;
 }) {
     return (
         <div
@@ -63,8 +65,9 @@ export function Trademark(props: {
 export function TrademarkLink(props: {
     space: Space;
     customization: CustomizationSettings | SiteCustomizationSettings;
+    placement: SiteInsightsTrademarkPlacement;
 }) {
-    const { space, customization } = props;
+    const { space, customization, placement } = props;
     const language = getSpaceLanguage(customization);
 
     const url = new URL('https://www.gitbook.com');
@@ -73,7 +76,7 @@ export function TrademarkLink(props: {
     url.searchParams.set('utm_campaign', space.id);
 
     return (
-        <a
+        <Link
             target="_blank"
             href={url.toString()}
             className={tcls(
@@ -104,9 +107,13 @@ export function TrademarkLink(props: {
                 'transition-colors',
                 'pointer-events-auto',
             )}
+            insights={{
+                type: 'trademark_click',
+                placement,
+            }}
         >
             <Icon icon="gitbook" className={tcls('size-5', 'mr-3')} />
             {t(language, 'powered_by_gitbook')}
-        </a>
+        </Link>
     );
 }
