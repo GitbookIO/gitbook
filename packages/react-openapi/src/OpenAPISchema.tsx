@@ -7,6 +7,7 @@ import { Markdown } from './Markdown';
 import { SYMBOL_REF_RESOLVED } from './resolveOpenAPIPath';
 import { OpenAPIClientContext } from './types';
 import { noReference } from './utils';
+import { stringifyOpenAPI } from './stringifyOpenAPI';
 
 type CircularRefsIds = Map<OpenAPIV3.SchemaObject, string>;
 
@@ -101,7 +102,7 @@ export function OpenAPISchemaProperty(
                     ) : null}
                     {shouldDisplayExample(schema) ? (
                         <span className="openapi-schema-example">
-                            Example: <code>{JSON.stringify(schema.example)}</code>
+                            Example: <code>{stringifyOpenAPI(schema.example)}</code>
                         </span>
                     ) : null}
                     {schema.pattern ? (

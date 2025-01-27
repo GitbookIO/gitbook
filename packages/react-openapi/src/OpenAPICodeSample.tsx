@@ -8,6 +8,7 @@ import { getServersURL } from './OpenAPIServerURL';
 import { ScalarApiButton } from './ScalarApiButton';
 import { OpenAPIContextProps } from './types';
 import { noReference } from './utils';
+import { stringifyOpenAPI } from './stringifyOpenAPI';
 
 /**
  * Display code samples to execute the operation.
@@ -34,7 +35,7 @@ export function OpenAPICodeSample(props: {
                 : undefined;
             if (example !== undefined) {
                 headersObject[param.name] =
-                    typeof example !== 'string' ? JSON.stringify(example) : example;
+                    typeof example !== 'string' ? stringifyOpenAPI(example) : example;
             }
         } else if (param.in === 'query' && param.required) {
             const example = param.schema
