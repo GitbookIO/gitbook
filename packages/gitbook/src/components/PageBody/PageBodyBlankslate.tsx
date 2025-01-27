@@ -52,8 +52,11 @@ export async function PageBodyBlankslate(props: {
                         title={child.title}
                         href={resolved.href}
                         insights={{
-                            target: child.target,
-                            position: SiteInsightsLinkPosition.Content,
+                            type: 'link_click',
+                            link: {
+                                target: child.target,
+                                position: SiteInsightsLinkPosition.Content,
+                            },
                         }}
                     />
                 );

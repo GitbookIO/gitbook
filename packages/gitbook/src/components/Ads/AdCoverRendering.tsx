@@ -5,8 +5,8 @@ import { hexToRgba } from '@/lib/colors';
 import { getResizedImageURL } from '@/lib/images';
 import { tcls } from '@/lib/tailwind';
 
-import { AdLink } from './AdLink';
 import { AdCover } from './types';
+import { Link } from '../primitives';
 
 /**
  * Cover rendering for an ad.
@@ -21,8 +21,17 @@ export async function AdCoverRendering({
     const largeImage = await getResizedImageURL(ad.largeImage, { width: 128, dpr: 2 });
 
     return (
-        <AdLink
-            insightsAd={insightsAd}
+        <Link
+            rel="sponsored noopener"
+            target="_blank"
+            insights={
+                insightsAd
+                    ? {
+                          type: 'ad_click',
+                          ad: insightsAd,
+                      }
+                    : undefined
+            }
             className={tcls(
                 'group/ad',
                 'relative',
@@ -113,6 +122,6 @@ export async function AdCoverRendering({
                     backgroundColor: hexToRgba(ad.backgroundColor, 0.8),
                 }}
             />
-        </AdLink>
+        </Link>
     );
 }

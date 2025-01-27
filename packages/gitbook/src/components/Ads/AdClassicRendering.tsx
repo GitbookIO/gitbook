@@ -4,8 +4,8 @@ import * as React from 'react';
 import { getResizedImageURL } from '@/lib/images';
 import { tcls } from '@/lib/tailwind';
 
-import { AdLink } from './AdLink';
 import { AdItem } from './types';
+import { Link } from '../primitives';
 
 /**
  * Classic rendering for an ad.
@@ -22,8 +22,17 @@ export async function AdClassicRendering({
     const logoSrc =
         'logo' in ad ? await getResizedImageURL(ad.logo, { width: 192 - 48, dpr: 2 }) : null;
     return (
-        <AdLink
-            insightsAd={insightsAd}
+        <Link
+            rel="sponsored noopener"
+            target="_blank"
+            insights={
+                insightsAd
+                    ? {
+                          type: 'ad_click',
+                          ad: insightsAd,
+                      }
+                    : undefined
+            }
             className={tcls(
                 'flex',
                 'flex-col',
@@ -54,6 +63,6 @@ export async function AdClassicRendering({
             <div className={tcls('flex', 'flex-col')}>
                 <div className={tcls('text-xs')}>{ad.description}</div>
             </div>
-        </AdLink>
+        </Link>
     );
 }

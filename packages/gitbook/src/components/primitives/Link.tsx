@@ -4,7 +4,7 @@ import * as api from '@gitbook/api';
 import NextLink, { LinkProps as NextLinkProps } from 'next/link';
 import React from 'react';
 
-import { useTrackEvent } from '../Insights';
+import { useTrackEvent, InsightsEventName, TrackEventInput } from '../Insights';
 
 // Props from Next, which includes NextLinkProps and all the things anchor elements support.
 type BaseLinkProps = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, keyof NextLinkProps> &
@@ -13,8 +13,8 @@ type BaseLinkProps = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, keyof N
     } & React.RefAttributes<HTMLAnchorElement>;
 
 export type LinkInsightsProps = {
-    /** Target of the link, for insights. */
-    insights?: api.SiteInsightsEventLinkClick['link'];
+    /** Event to track when the link is clicked. */
+    insights?: TrackEventInput<'ad_click'> | TrackEventInput<'link_click'>;
 };
 
 export type LinkProps = Omit<BaseLinkProps, 'href'> &
@@ -40,7 +40,7 @@ export const Link = React.forwardRef(function Link(
 
     const onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
         if (insights) {
-            trackEvent({ type: 'link_click', link: insights }, undefined, {
+            trackEvent(insights, undefined, {
                 immediate: isExternal,
             });
         }

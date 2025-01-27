@@ -166,8 +166,11 @@ export async function RecordCard(
                     'dark:hover:before:ring-light/4',
                 ])}
                 insights={{
-                    target: targetRef,
-                    position: SiteInsightsLinkPosition.Content,
+                    type: 'link_click',
+                    link: {
+                        target: targetRef,
+                        position: SiteInsightsLinkPosition.Content,
+                    },
                 }}
             >
                 {body}

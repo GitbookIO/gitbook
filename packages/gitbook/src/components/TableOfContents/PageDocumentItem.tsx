@@ -29,11 +29,14 @@ export async function PageDocumentItem(props: {
                 href={href}
                 pathname={getPagePath(rootPages, page)}
                 insights={{
-                    target: {
-                        kind: 'page',
-                        page: page.id,
+                    type: 'link_click',
+                    link: {
+                        target: {
+                            kind: 'page',
+                            page: page.id,
+                        },
+                        position: SiteInsightsLinkPosition.Sidebar,
                     },
-                    position: SiteInsightsLinkPosition.Sidebar,
                 }}
                 descendants={
                     page.pages && page.pages.length ? (

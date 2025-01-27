@@ -54,8 +54,11 @@ async function FooterLink(props: { link: CustomizationContentLink; context: Cont
                 'underline-offset-2',
             )}
             insights={{
-                target: link.to,
-                position: SiteInsightsLinkPosition.Footer,
+                type: 'link_click',
+                link: {
+                    target: link.to,
+                    position: SiteInsightsLinkPosition.Footer,
+                },
             }}
         >
             {link.title}
