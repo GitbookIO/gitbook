@@ -1,19 +1,22 @@
 import * as React from 'react';
 
+import { SiteInsightsAd } from '@gitbook/api';
 import { hexToRgba } from '@/lib/colors';
 import { getResizedImageURL } from '@/lib/images';
 import { tcls } from '@/lib/tailwind';
 
 import { AdCover } from './types';
+import { AdLink } from './AdLink';
 
 /**
  * Cover rendering for an ad.
  */
-export async function AdCoverRendering({ ad }: { ad: AdCover }) {
+export async function AdCoverRendering({ ad, insightsAd }: { ad: AdCover; insightsAd: SiteInsightsAd | null }) {
     const largeImage = await getResizedImageURL(ad.largeImage, { width: 128, dpr: 2 });
 
     return (
-        <a
+        <AdLink
+            insightsAd={insightsAd}
             className={tcls(
                 'group/ad',
                 'relative',
@@ -33,8 +36,6 @@ export async function AdCoverRendering({ ad }: { ad: AdCover }) {
             )}
             style={{ backgroundColor: ad.backgroundColor, color: ad.textColor ?? '#ffffff' }}
             href={ad.statlink}
-            rel="sponsored noopener"
-            target="_blank"
         >
             <div
                 className={tcls(
@@ -106,6 +107,6 @@ export async function AdCoverRendering({ ad }: { ad: AdCover }) {
                     backgroundColor: hexToRgba(ad.backgroundColor, 0.8),
                 }}
             />
-        </a>
+        </AdLink>
     );
 }
