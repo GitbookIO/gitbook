@@ -130,10 +130,10 @@ const textColorToStyle: { [color in DocumentMarkColor['data']['text']]: ClassVal
 
 const backgroundColorToStyle: { [color in DocumentMarkColor['data']['background']]: ClassValue } = {
     default: [],
-    blue: ['bg-blue-200', 'dark:bg-blue-900'],
-    red: ['bg-red-200', 'dark:bg-red-900'],
-    green: ['bg-green-200', 'dark:bg-green-900'],
-    yellow: ['bg-yellow-100', 'dark:bg-yellow-900'],
-    purple: ['bg-purple-200', 'dark:bg-purple-900'],
-    orange: ['bg-orange-200', 'dark:bg-orange-900'],
+    blue: ['bg-mark-blue'],
+    red: ['bg-mark-red'],
+    green: ['bg-mark-green'],
+    yellow: ['bg-mark-yellow'],
+    purple: ['bg-mark-purple'],
+    orange: ['bg-mark-orange'],
 };
