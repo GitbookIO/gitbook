@@ -1,16 +1,22 @@
+import { SiteInsightsAd } from '@gitbook/api';
 import * as React from 'react';
 
-import { SiteInsightsAd } from '@gitbook/api';
 import { getResizedImageURL } from '@/lib/images';
 import { tcls } from '@/lib/tailwind';
 
-import { AdItem } from './types';
 import { AdLink } from './AdLink';
+import { AdItem } from './types';
 
 /**
  * Classic rendering for an ad.
  */
-export async function AdClassicRendering({ ad, insightsAd }: { ad: AdItem; insightsAd: SiteInsightsAd | null }) {
+export async function AdClassicRendering({
+    ad,
+    insightsAd,
+}: {
+    ad: AdItem;
+    insightsAd: SiteInsightsAd | null;
+}) {
     const smallImgSrc =
         'smallImage' in ad ? await getResizedImageURL(ad.smallImage, { width: 192, dpr: 2 }) : null;
     const logoSrc =

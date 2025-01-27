@@ -1,17 +1,23 @@
+import { SiteInsightsAd } from '@gitbook/api';
 import * as React from 'react';
 
-import { SiteInsightsAd } from '@gitbook/api';
 import { hexToRgba } from '@/lib/colors';
 import { getResizedImageURL } from '@/lib/images';
 import { tcls } from '@/lib/tailwind';
 
-import { AdCover } from './types';
 import { AdLink } from './AdLink';
+import { AdCover } from './types';
 
 /**
  * Cover rendering for an ad.
  */
-export async function AdCoverRendering({ ad, insightsAd }: { ad: AdCover; insightsAd: SiteInsightsAd | null }) {
+export async function AdCoverRendering({
+    ad,
+    insightsAd,
+}: {
+    ad: AdCover;
+    insightsAd: SiteInsightsAd | null;
+}) {
     const largeImage = await getResizedImageURL(ad.largeImage, { width: 128, dpr: 2 });
 
     return (

@@ -1,6 +1,12 @@
 'use client';
 
-import { SiteAds, SiteAdsStatus, SiteInsightsAdPlacement, SiteInsightsAd, SiteInsightsTrademarkPlacement } from '@gitbook/api';
+import {
+    SiteAds,
+    SiteAdsStatus,
+    SiteInsightsAdPlacement,
+    SiteInsightsAd,
+    SiteInsightsTrademarkPlacement,
+} from '@gitbook/api';
 import * as React from 'react';
 
 import { t, useLanguage } from '@/intl/client';
@@ -37,7 +43,9 @@ export function Ad({
 }) {
     const containerRef = React.useRef<HTMLDivElement>(null);
     const [visible, setVisible] = React.useState(false);
-    const [ad, setAd] = React.useState<{ children: React.ReactNode; insightsAd: SiteInsightsAd | null } | undefined>(undefined);
+    const [ad, setAd] = React.useState<
+        { children: React.ReactNode; insightsAd: SiteInsightsAd | null } | undefined
+    >(undefined);
     const trackEvent = useTrackEvent();
 
     // Track display of the ad
@@ -45,7 +53,7 @@ export function Ad({
         if (ad?.insightsAd) {
             trackEvent({
                 type: 'ad_display',
-                ad: ad.insightsAd
+                ad: ad.insightsAd,
             });
         }
     }, [ad]);
@@ -141,9 +149,7 @@ export function Ad({
     );
 }
 
-function AdSponsoredLink(props: {
-    spaceId: string;
-}) {
+function AdSponsoredLink(props: { spaceId: string }) {
     const { spaceId } = props;
     const language = useLanguage();
     const trackEvent = useTrackEvent();
@@ -164,12 +170,15 @@ function AdSponsoredLink(props: {
                 'dark:text-light/5',
             )}
         >
-            <a target="_blank" href={viaUrl.toString()} className={tcls('hover:underline')}
+            <a
+                target="_blank"
+                href={viaUrl.toString()}
+                className={tcls('hover:underline')}
                 onClick={() => {
-                        trackEvent({
-                            type: 'trademark_click',
-                            placement: SiteInsightsTrademarkPlacement.Ad,
-                        });
+                    trackEvent({
+                        type: 'trademark_click',
+                        placement: SiteInsightsTrademarkPlacement.Ad,
+                    });
                 }}
             >
                 {t(language, 'sponsored_via_gitbook')}

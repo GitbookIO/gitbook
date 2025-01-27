@@ -1,7 +1,7 @@
 'use server';
 
-import { headers } from 'next/headers';
 import { SiteInsightsAd, SiteInsightsAdPlacement } from '@gitbook/api';
+import { headers } from 'next/headers';
 
 import { AdClassicRendering } from './AdClassicRendering';
 import { AdCoverRendering } from './AdCoverRendering';
@@ -48,11 +48,14 @@ export async function renderAd(options: FetchAdOptions) {
 
     const { ad } = result;
 
-    const insightsAd: SiteInsightsAd | null = options.source === 'live' ? {
-        placement: options.placement,
-        zoneId: options.zoneId,
-        domain: 'company' in ad ? ad.company : '',
-    } : null;
+    const insightsAd: SiteInsightsAd | null =
+        options.source === 'live'
+            ? {
+                  placement: options.placement,
+                  zoneId: options.zoneId,
+                  domain: 'company' in ad ? ad.company : '',
+              }
+            : null;
 
     return {
         children: (
