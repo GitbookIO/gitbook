@@ -4,6 +4,7 @@ import {
     RevisionPageDocument,
     RevisionPageGroup,
     SiteCustomizationSettings,
+    SiteInsightsTrademarkPlacement,
     Space,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
@@ -146,7 +147,11 @@ export default async function PDFHTMLOutput(props: {
                 limit={pdfParams.limit ?? DEFAULT_LIMIT}
                 trademark={
                     customization.trademark.enabled ? (
-                        <TrademarkLink space={space} customization={customization} />
+                        <TrademarkLink
+                            space={space}
+                            customization={customization}
+                            placement={SiteInsightsTrademarkPlacement.Footer}
+                        />
                     ) : null
                 }
             />
