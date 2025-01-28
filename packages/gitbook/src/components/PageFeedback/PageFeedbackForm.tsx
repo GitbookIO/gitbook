@@ -1,7 +1,7 @@
 'use client';
 
 import { PageFeedbackRating } from '@gitbook/api';
-import React from 'react';
+import React, { ButtonHTMLAttributes } from 'react';
 
 import { useLanguage } from '@/intl/client';
 import { t, tString } from '@/intl/translate';
@@ -9,6 +9,9 @@ import { tcls } from '@/lib/tailwind';
 
 import { getVisitorId, useTrackEvent } from '../Insights';
 import { postPageFeedback } from './server-actions';
+import { Button } from '../primitives';
+
+const MAX_COMMENT_LENGTH = 512;
 
 /**
  * Form to submit feedback on a page.
@@ -21,10 +24,13 @@ export function PageFeedbackForm(props: {
     const { orientation = 'vertical', pageId, className } = props;
     const languages = useLanguage();
     const trackEvent = useTrackEvent();
+    const inputRef = React.useRef<HTMLTextAreaElement>(null);
+    const [rating, setRating] = React.useState<PageFeedbackRating>();
+    const [comment, setComment] = React.useState('');
     const [submitted, setSubmitted] = React.useState(false);
 
-    const onSubmit = async (rating: PageFeedbackRating) => {
-        setSubmitted(true);
+    const onSubmitRating = async (rating: PageFeedbackRating) => {
+        setRating(rating);
         const visitorId = await getVisitorId();
         await postPageFeedback({ pageId, visitorId, rating });
 
@@ -36,92 +42,128 @@ export function PageFeedbackForm(props: {
         });
     };
 
+    const onSubmitComment = (rating: PageFeedbackRating, comment: string) => {
+        setSubmitted(true);
+
+        trackEvent({
+            type: 'page_post_feedback_comment',
+            feedback: {
+                rating,
+                comment,
+            },
+        });
+    };
+
+    // Focus the comment input when the rating is submitted
+    React.useEffect(() => {
+        if (!!rating) {
+            inputRef.current?.focus();
+        }
+    }, [rating]);
+
     return (
-        <div
-            className={tcls(
-                'flex',
-                orientation === 'vertical'
-                    ? ['flex-col', 'items-start']
-                    : ['flex-row', 'items-center'],
-                'gap-2',
-                className,
-            )}
-        >
-            <p className={tcls('text-sm')}>{t(languages, 'was_this_helpful')}</p>
-            <div
-                className={tcls(
-                    'inline-flex',
-                    'items-center',
-                    'justify-center',
-                    'flex-row',
-                    'rounded-full',
-                    'straight-corners:rounded-sm',
-                    'ring-1',
-                    'ring-inset',
-                    'ring-dark/2',
-                    'h-8',
-                    'dark:ring-light/1',
-                )}
-            >
-                {submitted ? (
-                    <p className={tcls('text-sm', 'px-4')}>
-                        {t(languages, 'was_this_helpful_thank_you')}
-                    </p>
-                ) : (
-                    <div
-                        className={tcls(
-                            'inline-flex',
-                            '[&>*:last-child]:rounded-r-full',
-                            '[&>*:first-child]:rounded-l-full',
-                            'straight-corners:[&>*:last-child]:rounded-none',
-                            'straight-corners:[&>*:first-child]:rounded-none',
-                        )}
-                    >
+        <div className={tcls('flex flex-col gap-3 text-sm', className)}>
+            <div className="flex flex-wrap items-center gap-2">
+                <p>{t(languages, 'was_this_helpful')}</p>
+                <div className="bg-light-1 dark:bg-dark-1 border border-dark/2 dark:border-light/2 contrast-more:border-dark dark:contrast-more:border-light rounded-full">
+                    <div className="flex">
                         <RatingButton
-                            rating={0}
+                            rating={PageFeedbackRating.Bad}
                             label={tString(languages, 'was_this_helpful_negative')}
-                            onClick={() => onSubmit(PageFeedbackRating.Bad)}
+                            onClick={() => onSubmitRating(PageFeedbackRating.Bad)}
+                            active={rating == PageFeedbackRating.Bad}
+                            disabled={rating !== undefined}
                         />
                         <RatingButton
-                            rating={1}
+                            rating={PageFeedbackRating.Ok}
                             label={tString(languages, 'was_this_helpful_neutral')}
-                            onClick={() => onSubmit(PageFeedbackRating.Ok)}
+                            onClick={() => onSubmitRating(PageFeedbackRating.Ok)}
+                            active={rating == PageFeedbackRating.Ok}
+                            disabled={rating !== undefined}
                         />
                         <RatingButton
-                            rating={2}
+                            rating={PageFeedbackRating.Good}
                             label={tString(languages, 'was_this_helpful_positive')}
-                            onClick={() => onSubmit(PageFeedbackRating.Good)}
+                            onClick={() => onSubmitRating(PageFeedbackRating.Good)}
+                            active={rating == PageFeedbackRating.Good}
+                            disabled={rating !== undefined}
                         />
                     </div>
-                )}
+                </div>
             </div>
+            {rating ? (
+                <div className="flex flex-col gap-2">
+                    {!submitted ? (
+                        <>
+                            <textarea
+                                ref={inputRef}
+                                name="comment"
+                                className="grow ring-1 ring-inset bg-light-1 dark:bg-dark-1 ring-dark/2 dark:ring-light/2 contrast-more:ring-dark dark:contrast-more:ring-light min-h-16 max-h-40 rounded straight-corners:rounded-none p-2 placeholder:text-sm placeholder:text-dark/6 dark:placeholder:text-light/6 contrast-more:placeholder:text-dark dark:contrast-more:placeholder:text-light"
+                                placeholder={tString(languages, 'was_this_helpful_comment')}
+                                aria-label={tString(languages, 'was_this_helpful_comment')}
+                                onChange={(e) => setComment(e.target.value)}
+                                value={comment}
+                                rows={3}
+                                maxLength={MAX_COMMENT_LENGTH}
+                            />
+                            <div className="flex gap-4 items-center justify-between">
+                                <Button
+                                    size="small"
+                                    onClick={() => onSubmitComment(rating, comment)}
+                                >
+                                    {t(languages, 'submit')}
+                                </Button>
+                                {comment.length > MAX_COMMENT_LENGTH * 0.8 ? (
+                                    <span
+                                        className={
+                                            comment.length == MAX_COMMENT_LENGTH
+                                                ? 'text-red-500'
+                                                : ''
+                                        }
+                                    >
+                                        {comment.length} / {MAX_COMMENT_LENGTH}
+                                    </span>
+                                ) : null}
+                            </div>
+                        </>
+                    ) : (
+                        <p>{t(languages, 'was_this_helpful_thank_you')}</p>
+                    )}
+                </div>
+            ) : null}
         </div>
     );
 }
 
-function RatingButton(props: { rating: number; label: string; onClick: () => void }) {
-    const { rating, label, onClick } = props;
+function RatingButton(
+    props: {
+        rating: PageFeedbackRating;
+        label: string;
+        onClick: () => void;
+        active: boolean;
+    } & ButtonHTMLAttributes<HTMLButtonElement>,
+) {
+    const { rating, label, onClick, active, ...attr } = props;
 
     const ratingIcon =
-        rating === 0 ? <Icon0 /> : rating === 1 ? <Icon1 /> : rating === 2 ? <Icon2 /> : null;
+        {
+            bad: <IconBad />,
+            ok: <IconOk />,
+            good: <IconGood />,
+        }[rating] ?? null;
 
     return (
         <button
             className={tcls(
-                'flex',
-                'flex-col',
-                'items-center',
-                'justify-center',
-                'h-8',
-                'w-8',
-                'rounded-sm',
-                'text-dark/7',
-                'hover:bg-tint/4',
-                'hover:text-tint-600',
-                'dark:text-light/7',
-                'dark:hover:text-tint-300',
-                'dark:hover:bg-tint-300/2',
+                'p-2 hover:text-tint dark:hover:text-tint-400 hover:bg-tint/2 first:pl-2.5 last:pr-2.5 first:rounded-l-full last:rounded-r-full',
+                'disabled:cursor-not-allowed disabled:hover:bg-inherit disabled:hover:text-inherit disabled:dark:hover:text-inherit',
+                'contrast-more:hover:ring-1 ring-tint',
+                active
+                    ? 'bg-tint/4 text-tint-700 dark:text-tint-300 disabled:hover:bg-tint/4 disabled:hover:text-tint-700 dark:disabled:hover:text-tint-300 contrast-more:ring-2 contrast-more:hover:ring-2'
+                    : 'disabled:opacity-7 disabled:contrast-more:ring-0',
             )}
+            type="button"
+            {...attr}
             aria-label={label}
             title={label}
             onClick={onClick}
@@ -131,9 +173,9 @@ function RatingButton(props: { rating: number; label: string; onClick: () => voi
     );
 }
 
-const Icon0 = () => (
+const IconBad = () => (
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="9" cy="9" r="9" fill="currentColor" fillOpacity="0.24" />
+        <circle cx="9" cy="9" r="9" fill="currentColor" fillOpacity="0.2" />
         <path
             fillRule="evenodd"
             clipRule="evenodd"
@@ -142,9 +184,9 @@ const Icon0 = () => (
         />
     </svg>
 );
-const Icon1 = () => (
+const IconOk = () => (
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="9" cy="9" r="9" fill="currentColor" fillOpacity="0.24" />
+        <circle cx="9" cy="9" r="9" fill="currentColor" fillOpacity="0.2" />
         <path
             fillRule="evenodd"
             clipRule="evenodd"
@@ -153,9 +195,9 @@ const Icon1 = () => (
         />
     </svg>
 );
-const Icon2 = () => (
+const IconGood = () => (
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="9" cy="9" r="9" fill="currentColor" fillOpacity="0.24" />
+        <circle cx="9" cy="9" r="9" fill="currentColor" fillOpacity="0.2" />
         <path
             fillRule="evenodd"
             clipRule="evenodd"
