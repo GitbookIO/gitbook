@@ -10,6 +10,43 @@ const dark = '#111111';
 const light = '#ffffff';
 const D65 = [95.047, 100.0, 108.883]; // Reference white (D65)
 
+export enum ColorCategory {
+    backgrounds = 'backgrounds',
+    components = 'components',
+    borders = 'borders',
+    accents = 'accents',
+    text = 'text',
+}
+
+type ColorSubScale = {
+    [key: string]: number;
+};
+
+export const scale: Record<ColorCategory, ColorSubScale> = {
+    [ColorCategory.backgrounds]: {
+        app: 1, // Base background
+        subtle: 2, // Accent background
+    },
+    [ColorCategory.components]: {
+        ui: 3, // Component background
+        'ui-hover': 4, // Component hover background
+        'ui-active': 5, // Component active background
+    },
+    [ColorCategory.borders]: {
+        subtle: 6, // Subtle borders, separators
+        DEFAULT: 7, // Element border, focus rings
+        hover: 8, // Element hover border
+    },
+    [ColorCategory.accents]: {
+        DEFAULT: 9, // Solid backgrounds
+        hover: 10, // Hovered solid backgrounds
+    },
+    [ColorCategory.text]: {
+        DEFAULT: 11, // Low-contrast text
+        strong: 12, // High-contrast text
+    },
+};
+
 /**
  * Convert a hex color to an RGB color.
  */
@@ -79,66 +116,26 @@ export function shadesOfColor(hex: string, halfShades = false) {
 
 /**
  * Generate a [Radix-like](https://www.radix-ui.com/colors/docs/palette-composition/understanding-the-scale) colour scale based of a hex colour.
- *
- * ### Backgrounds
- * 1. Base background
- * 2. Subtle background
- *
- * ### Element Backgrounds
- * 3. Element background
- * 4. Element Hover background
- * 5. Element Active background
- *
- * ### Borders
- * 6. Subtle borders, separators
- * 7. Element border, focus rings
- * 8. Element hover border
- *
- * ### Solid backgrounds
- * 9. Solid backgrounds – The true colour, if the mode allows it
- * 10. Hovered solid backgrounds
- *
- * ### Text
- * 11. Low-contrast text
- * 12. High-contrast text
  */
 export function colorScale(
     hex: string,
     {
-        withContrast = false,
         darkMode = false,
         background = darkMode ? dark : light,
         foreground = darkMode ? light : dark,
     }: {
-        withContrast?: boolean;
         darkMode?: boolean;
         background?: string;
         foreground?: string;
-    },
+    } = {},
 ) {
     const baseColor = rgbToOklch(hexToRgbArray(hex));
     const foregroundColor = rgbToOklch(hexToRgbArray(foreground));
     const backgroundColor = rgbToOklch(hexToRgbArray(background));
-    const referenceColor = rgbToOklch(hexToRgbArray(background));
-    const darkestL = Math.min(
-        rgbToOklch(hexToRgbArray(foreground)).L,
-        rgbToOklch(hexToRgbArray(background)).L,
-    );
-    const lightestL = Math.max(
-        rgbToOklch(hexToRgbArray(foreground)).L,
-        rgbToOklch(hexToRgbArray(background)).L,
-    );
 
-    /** Lightness value per step, used to generate the scale
-     * -1: 100% referenceDark
-     * 0: original colour
-     * 1: 100% referenceLight
-     */
-    // const mapping = [-0.95, -0.8, -0.7, -0.6, -0.5, -0.4, -0.2, -0.1, 0, 0.15, 0.6, 0.9];
-    // const mapping = [0.2, 0.5, 0.6, 0.65, 0.75, 0.8, 0.85, 0.9, 0.93, 0.95, 0.98, 0.99]; // L from 0-1
     const mapping = darkMode
         ? [0.9, 0.85, 0.75, 0.7, 0.65, 0.6, 0.55, 0.5, 0.45, 0.4, 0.25, 0.05]
-        : [0.99, 0.98, 0.95, 0.93, 0.9, 0.85, 0.8, 0.75, 0.65, 0.6, 0.5, 0.2]; // L from 0-1
+        : [0.99, 0.98, 0.95, 0.93, 0.9, 0.85, 0.8, 0.75, 0.65, 0.6, 0.5, 0.2];
 
     const result = [];
 
@@ -147,23 +144,18 @@ export function colorScale(
             backgroundColor.L * mapping[index] + foregroundColor.L * (1 - mapping[index]);
 
         // Mix in more of the background while maintaining chroma
-        const mixRatio = 1 - ((index + 1) / mapping.length); // Higher mixRatio means more background contribution
+        const mixRatio = 1 - (index + 1) / mapping.length; // Higher mixRatio means more background contribution
 
         const shade = {
             L: backgroundColor.L * mapping[index] + foregroundColor.L * (1 - mapping[index]), // Blend lightness
-            C: baseColor.C * (1-mixRatio),
+            C: baseColor.C * (1 - mixRatio),
             // C: baseColor.C * (1 - mixRatio), // Retain chromacity by scaling chroma down
             H: baseColor.H, // Maintain the hue from the base color
         };
 
         const hex = rgbArrayToHex(oklchToRgb(shade));
-        const contrast = withContrast ? colorContrast(hex, [foreground, background]) : undefined;
 
-        result.push({ color: hex, contrast: contrast });
-
-        if (withContrast) {
-            result;
-        }
+        result.push(hex);
     }
 
     return result;
@@ -368,8 +360,11 @@ export function dpsContrast(a: RGBColor, b: RGBColor) {
     return contrast < 7.5 ? 0 : contrast;
 }
 
-export function colorContrast(background: string, foreground: string[]) {
+export function colorContrast(background: string, foreground?: string[]) {
     const bg = hexToRgbArray(background);
+    if (!foreground) {
+        foreground = [light, dark];
+    }
 
     let best: { color?: RGBColor; contrast: number } = { color: undefined, contrast: 0 };
     foreground.forEach((color) => {
