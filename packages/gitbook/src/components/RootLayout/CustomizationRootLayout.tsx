@@ -67,10 +67,16 @@ export async function CustomizationRootLayout(props: {
                     }
                 >{`
                     :root {
+                    
                         ${generateColorVariable(
-                            'primary-color',
-                            customization.styling.primaryColor.light,
-                        )}
+                            'primary',
+                            Object.fromEntries(
+                                colorScale(customization.styling.primaryColor.light, {
+                                    withContrast: true,
+                                    darkMode: false,
+                                }).map((shade, index) => [index + 1, shade.color]),
+                            ),
+                            /*)}
                         ${
                             // Generate the right contrast color for each shade of primary-color
                             generateColorVariable(
@@ -150,7 +156,8 @@ export async function CustomizationRootLayout(props: {
                             headerTheme.backgroundColor.dark,
                         )}
                         ${generateColorVariable('header-link', headerTheme.linkColor.dark)}
-                        ${generateColorVariable('header-button-text', colorContrast(headerTheme.linkColor.dark as string, ['#000', '#fff']))}
+                        ${generateColorVariable('header-button-text', colorContrast(headerTheme.linkColor.dark as string, ['#000', '#fff'])*/
+                        )}
                     }
                 `}</style>
             </head>
@@ -163,14 +170,100 @@ export async function CustomizationRootLayout(props: {
                     'dark:bg-dark',
                 )}
             >
-                <div>
-                    Original color:{' '}
-                    <span style={{ color: customization.styling.primaryColor.light }}>
-                        {customization.styling.primaryColor.light}
-                    </span>
-                    <ul>
-                        {colorScale(customization.styling.primaryColor.light, true).map(
-                            (item, index) => (
+                <div className="flex gap-4">
+                    <div>
+                        Original color:{' '}
+                        <span style={{ color: customization.styling.primaryColor.light }}>
+                            {customization.styling.primaryColor.light}
+                        </span>
+                        <ol>
+                            {colorScale(customization.styling.primaryColor.light, {withContrast: true}).map(
+                                (item, index) => (
+                                    <li
+                                        className="list-item"
+                                        key={index}
+                                        style={{
+                                            backgroundColor: item.color,
+                                            color: item.contrast,
+                                        }}
+                                    >
+                                        {item.color}
+                                    </li>
+                                ),
+                            )}
+                        </ol>
+                    </div>
+                    <div>
+                        Original color:{' '}
+                        <span style={{ color: "#00ff00"}}>
+                            #00ff00
+                        </span>
+                        <ol>
+                            {colorScale('#00ff00', {withContrast: true}).map(
+                                (item, index) => (
+                                    <li
+                                        className="list-item"
+                                        key={index}
+                                        style={{
+                                            backgroundColor: item.color,
+                                            color: item.contrast,
+                                        }}
+                                    >
+                                        {item.color}
+                                    </li>
+                                ),
+                            )}
+                        </ol>
+                    </div>
+                    <div>
+                        Original color:{' '}
+                        <span style={{ color: "#F05A28"}}>
+                            #00ff00
+                        </span>
+                        <ol>
+                            {colorScale('#F05A28', {withContrast: true, darkMode: false}).map(
+                                (item, index) => (
+                                    <li
+                                        className="list-item"
+                                        key={index}
+                                        style={{
+                                            backgroundColor: item.color,
+                                            color: item.contrast,
+                                        }}
+                                    >
+                                        {item.color}
+                                    </li>
+                                ),
+                            )}
+                        </ol>
+                    </div>
+                    <div>
+                        Original color:{' '}
+                        <span style={{ color: "#c8a2c8"}}>
+                        #c8a2c8
+                        </span>
+                        <ol>
+                            {colorScale('#c8a2c8', {withContrast: true}).map(
+                                (item, index) => (
+                                    <li
+                                        className="list-item"
+                                        key={index}
+                                        style={{
+                                            backgroundColor: item.color,
+                                            color: item.contrast,
+                                        }}
+                                    >
+                                        {item.color}
+                                    </li>
+                                ),
+                            )}
+                        </ol>
+                    </div>
+                    <div>
+                        Original color:{' '}
+                        <span style={{ color: DEFAULT_TINT_COLOR }}>{DEFAULT_TINT_COLOR}</span>
+                        <ol>
+                            {colorScale(DEFAULT_TINT_COLOR, {withContrast: true}).map((item, index) => (
                                 <li
                                     className="list-item"
                                     key={index}
@@ -178,9 +271,112 @@ export async function CustomizationRootLayout(props: {
                                 >
                                     {item.color}
                                 </li>
-                            ),
-                        )}
-                    </ul>
+                            ))}
+                        </ol>
+                    </div>
+                    <div>
+                        Original color:{' '}
+                        <span style={{ color: customization.styling.primaryColor.dark }}>
+                            {customization.styling.primaryColor.dark}
+                        </span>
+                        <ol>
+                            {colorScale(customization.styling.primaryColor.dark, {withContrast: true, darkMode: true}).map(
+                                (item, index) => (
+                                    <li
+                                        className="list-item"
+                                        key={index}
+                                        style={{
+                                            backgroundColor: item.color,
+                                            color: item.contrast,
+                                        }}
+                                    >
+                                        {item.color}
+                                    </li>
+                                ),
+                            )}
+                        </ol>
+                    </div>
+                    <div>
+                        Original color:{' '}
+                        <span style={{ color: "#00ff00"}}>
+                            #00ff00
+                        </span>
+                        <ol>
+                            {colorScale('#00ff00', {withContrast: true, darkMode: true}).map(
+                                (item, index) => (
+                                    <li
+                                        className="list-item"
+                                        key={index}
+                                        style={{
+                                            backgroundColor: item.color,
+                                            color: item.contrast,
+                                        }}
+                                    >
+                                        {item.color}
+                                    </li>
+                                ),
+                            )}
+                        </ol>
+                    </div>
+                    <div>
+                        Original color:{' '}
+                        <span style={{ color: "#F05A28"}}>
+                            #00ff00
+                        </span>
+                        <ol>
+                            {colorScale('#F05A28', {withContrast: true, darkMode: true}).map(
+                                (item, index) => (
+                                    <li
+                                        className="list-item"
+                                        key={index}
+                                        style={{
+                                            backgroundColor: item.color,
+                                            color: item.contrast,
+                                        }}
+                                    >
+                                        {item.color}
+                                    </li>
+                                ),
+                            )}
+                        </ol>
+                    </div>
+                    <div>
+                        Original color:{' '}
+                        <span style={{ color: "#c8a2c8"}}>
+                        #c8a2c8
+                        </span>
+                        <ol>
+                            {colorScale('#c8a2c8', {withContrast: true, darkMode: true}).map(
+                                (item, index) => (
+                                    <li
+                                        className="list-item"
+                                        key={index}
+                                        style={{
+                                            backgroundColor: item.color,
+                                            color: item.contrast,
+                                        }}
+                                    >
+                                        {item.color}
+                                    </li>
+                                ),
+                            )}
+                        </ol>
+                    </div>
+                    <div>
+                        Original color:{' '}
+                        <span style={{ color: DEFAULT_TINT_COLOR }}>{DEFAULT_TINT_COLOR}</span>
+                        <ol>
+                            {colorScale(DEFAULT_TINT_COLOR, {withContrast: true, darkMode: true}).map((item, index) => (
+                                <li
+                                    className="list-item"
+                                    key={index}
+                                    style={{ backgroundColor: item.color, color: item.contrast }}
+                                >
+                                    {item.color}
+                                </li>
+                            ))}
+                        </ol>
+                    </div>
                 </div>
                 <IconsProvider
                     assetsURL={process.env.GITBOOK_ICONS_URL ?? getStaticFileURL('icons')}
@@ -238,9 +434,9 @@ function getSidebarStyles(
     };
 }
 
-type ColorInput = string | Record<string, string>;
-function generateColorVariable(name: string, color: ColorInput) {
-    const shades: Record<string, string> = typeof color === 'string' ? shadesOfColor(color) : color;
+type ColorInput = string;
+function generateColorVariable(name: string, shades: Record<string, string>) {
+    // const shades: Record<string, string> = typeof color === 'string' ? colorScale(color) : color;
 
     return Object.entries(shades)
         .map(([key, value]) => {

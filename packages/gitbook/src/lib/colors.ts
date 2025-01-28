@@ -3,10 +3,12 @@ type ColorShades = {
 };
 
 type RGBColor = [number, number, number];
-type LABColor = { L: number; A: number; B: number };
+type OKLABColor = { L: number; A: number; B: number };
+type OKLCHColor = { L: number; C: number; H: number };
 
-const black: RGBColor = [0, 0, 0];
-const white: RGBColor = [255, 255, 255];
+const dark = '#111111';
+const light = '#ffffff';
+const D65 = [95.047, 100.0, 108.883]; // Reference white (D65)
 
 /**
  * Convert a hex color to an RGB color.
@@ -33,7 +35,7 @@ export function hexToRgba(hex: string, alpha: number): string {
  * @returns {{[key: number]: string}}
  */
 export function shadesOfColor(hex: string, halfShades = false) {
-    const baseColor = hexToRgbArray(hex);
+    const baseColor = hex;
 
     const shades = [
         50,
@@ -66,10 +68,10 @@ export function shadesOfColor(hex: string, halfShades = false) {
         }
 
         const percentage = shadeIndex / 500;
-        const startColor = isDarkShade ? black : baseColor;
-        const endColor = isDarkShade ? baseColor : white;
+        const startColor = isDarkShade ? dark : baseColor;
+        const endColor = isDarkShade ? baseColor : light;
 
-        result[key] = getColor(percentage, startColor, endColor);
+        result[key] = getColor(percentage, hexToRgbArray(startColor), hexToRgbArray(endColor));
     });
 
     return result;
@@ -102,26 +104,60 @@ export function shadesOfColor(hex: string, halfShades = false) {
  */
 export function colorScale(
     hex: string,
-    withContrast: boolean = false,
-    dark = '#000000',
-    light = '#ffffff',
+    {
+        withContrast = false,
+        darkMode = false,
+        background = darkMode ? dark : light,
+        foreground = darkMode ? light : dark,
+    }: {
+        withContrast?: boolean;
+        darkMode?: boolean;
+        background?: string;
+        foreground?: string;
+    },
 ) {
-    const baseColor = rgbToLab65(hexToRgbArray(hex));
+    const baseColor = rgbToOklch(hexToRgbArray(hex));
+    const foregroundColor = rgbToOklch(hexToRgbArray(foreground));
+    const backgroundColor = rgbToOklch(hexToRgbArray(background));
+    const referenceColor = rgbToOklch(hexToRgbArray(background));
+    const darkestL = Math.min(
+        rgbToOklch(hexToRgbArray(foreground)).L,
+        rgbToOklch(hexToRgbArray(background)).L,
+    );
+    const lightestL = Math.max(
+        rgbToOklch(hexToRgbArray(foreground)).L,
+        rgbToOklch(hexToRgbArray(background)).L,
+    );
 
-    // Lightness value per step, used to generate the scale
-    const mapping = [-0.9, -0.8, -0.7, -0.6, -0.5, -0.4, -0.2, -0.1, 0, 0.2, 0.7, 0.9];
+    /** Lightness value per step, used to generate the scale
+     * -1: 100% referenceDark
+     * 0: original colour
+     * 1: 100% referenceLight
+     */
+    // const mapping = [-0.95, -0.8, -0.7, -0.6, -0.5, -0.4, -0.2, -0.1, 0, 0.15, 0.6, 0.9];
+    // const mapping = [0.2, 0.5, 0.6, 0.65, 0.75, 0.8, 0.85, 0.9, 0.93, 0.95, 0.98, 0.99]; // L from 0-1
+    const mapping = darkMode
+        ? [0.9, 0.85, 0.75, 0.7, 0.65, 0.6, 0.55, 0.5, 0.45, 0.4, 0.25, 0.05]
+        : [0.99, 0.98, 0.95, 0.93, 0.9, 0.85, 0.8, 0.75, 0.65, 0.6, 0.5, 0.2]; // L from 0-1
 
     const result = [];
 
-    for (let index = 0; index < 12; index++) {
-        // const L = mapping[index];
+    for (let index = 0; index < mapping.length; index++) {
+        const targetL =
+            backgroundColor.L * mapping[index] + foregroundColor.L * (1 - mapping[index]);
 
-        const mixColor =
-            mapping[index] < 0 ? rgbToLab65(hexToRgbArray(dark)) : rgbToLab65(hexToRgbArray(light));
-        const shade: LABColor = mixColors(baseColor, mixColor, Math.abs(mapping[index]));
+        // Mix in more of the background while maintaining chroma
+        const mixRatio = 1 - ((index + 1) / mapping.length); // Higher mixRatio means more background contribution
 
-        const hex = rgbArrayToHex(lab65ToRgb(shade));
-        const contrast = withContrast ? colorContrast(hex, [light, dark]) : undefined;
+        const shade = {
+            L: backgroundColor.L * mapping[index] + foregroundColor.L * (1 - mapping[index]), // Blend lightness
+            C: baseColor.C * (1-mixRatio),
+            // C: baseColor.C * (1 - mixRatio), // Retain chromacity by scaling chroma down
+            H: baseColor.H, // Maintain the hue from the base color
+        };
+
+        const hex = rgbArrayToHex(oklchToRgb(shade));
+        const contrast = withContrast ? colorContrast(hex, [foreground, background]) : undefined;
 
         result.push({ color: hex, contrast: contrast });
 
@@ -131,14 +167,6 @@ export function colorScale(
     }
 
     return result;
-}
-
-function mixColors(lab1: LABColor, lab2: LABColor, t: number): LABColor {
-    return {
-        L: lab1.L * (1 - t) + lab2.L * t,
-        A: lab1.A * (1 - t) + lab2.A * t,
-        B: lab1.B * (1 - t) + lab2.B * t,
-    };
 }
 
 /**
@@ -183,11 +211,7 @@ function rgbArrayToHex(rgb: RGBColor): string {
     );
 }
 
-function getColor(
-    percentage: number,
-    start: [number, number, number],
-    end: [number, number, number],
-) {
+function getColor(percentage: number, start: RGBColor, end: RGBColor) {
     const rgb = end.map((channel, index) => {
         return Math.round(channel + percentage * (start[index] - channel));
     });
@@ -195,80 +219,141 @@ function getColor(
     return rgbArrayToHex(rgb as RGBColor);
 }
 
-export function rgbToLab65([r, g, b]: RGBColor): LABColor {
-    // Normalize RGB values (0-255 to 0-1)
-    r = r / 255;
-    g = g / 255;
-    b = b / 255;
-
-    // Apply gamma correction (sRGB to linear RGB)
-    const linearize = (value: number) =>
-        value > 0.04045 ? Math.pow((value + 0.055) / 1.055, 2.4) : value / 12.92;
-
-    r = linearize(r);
-    g = linearize(g);
-    b = linearize(b);
-
-    // Convert linear RGB to XYZ using D65 matrix
-    const x = r * 0.4124564 + g * 0.3575761 + b * 0.1804375;
-    const y = r * 0.2126729 + g * 0.7151522 + b * 0.072175;
-    const z = r * 0.0193339 + g * 0.119192 + b * 0.9503041;
-
-    // Normalize for D65 illuminant
-    const Xn = 0.95047;
-    const Yn = 1.0;
-    const Zn = 1.08883;
-
-    const X = x / Xn;
-    const Y = y / Yn;
-    const Z = z / Zn;
-
-    // Convert XYZ to LAB
-    const f = (value: number) => (value > 0.008856 ? Math.cbrt(value) : (value * 903.3 + 16) / 116);
-
-    const fx = f(X);
-    const fy = f(Y);
-    const fz = f(Z);
-
-    const L = 116 * fy - 16;
-    const A = 500 * (fx - fy);
-    const B = 200 * (fy - fz);
-
-    return { L, A, B };
+// Utility constants and helper functions
+function rgbToLinear(rgb: RGBColor): [number, number, number] {
+    return rgb.map((v) => {
+        const scaled = v / 255;
+        return scaled <= 0.04045 ? scaled / 12.92 : Math.pow((scaled + 0.055) / 1.055, 2.4);
+    }) as [number, number, number];
 }
 
-function lab65ToRgb({ L, A, B }: LABColor): RGBColor {
-    // Convert LAB to XYZ
-    const Yn = 1.0;
-    const Xn = 0.95047;
-    const Zn = 1.08883;
+function linearToRgb(linear: [number, number, number]): RGBColor {
+    return linear.map((v) => {
+        const scaled = v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - 0.055;
+        return Math.round(Math.max(0, Math.min(1, scaled)) * 255);
+    }) as RGBColor;
+}
 
-    const fy = (L + 16) / 116;
-    const fx = A / 500 + fy;
-    const fz = fy - B / 200;
+function rgbToOklab(rgb: RGBColor): OKLABColor {
+    const [r, g, b] = rgbToLinear(rgb);
 
-    const fInv = (value: number) =>
-        value > 0.206893034 ? Math.pow(value, 3) : (value - 16 / 116) / 7.787;
+    const l = 0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b;
+    const m = 0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b;
+    const s = 0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b;
 
-    const X = Xn * fInv(fx);
-    const Y = Yn * fInv(fy);
-    const Z = Zn * fInv(fz);
+    const lRoot = Math.cbrt(l);
+    const mRoot = Math.cbrt(m);
+    const sRoot = Math.cbrt(s);
 
-    // Convert XYZ to linear RGB
-    const rLinear = X * 3.2404542 + Y * -1.5371385 + Z * -0.4985314;
-    const gLinear = X * -0.969266 + Y * 1.8760108 + Z * 0.041556;
-    const bLinear = X * 0.0556434 + Y * -0.2040259 + Z * 1.0572252;
+    return {
+        L: 0.2104542553 * lRoot + 0.793617785 * mRoot - 0.0040720468 * sRoot,
+        A: 1.9779984951 * lRoot - 2.428592205 * mRoot + 0.4505937099 * sRoot,
+        B: 0.0259040371 * lRoot + 0.7827717662 * mRoot - 0.808675766 * sRoot,
+    };
+}
 
-    // Convert linear RGB to sRGB
-    const gammaCorrect = (value: number) =>
-        value <= 0.0031308 ? 12.92 * value : 1.055 * Math.pow(value, 1 / 2.4) - 0.055;
+function oklabToRgb(oklab: OKLABColor): RGBColor {
+    const { L, A, B } = oklab;
 
-    const r = gammaCorrect(Math.max(0, Math.min(1, rLinear)));
-    const g = gammaCorrect(Math.max(0, Math.min(1, gLinear)));
-    const b = gammaCorrect(Math.max(0, Math.min(1, bLinear)));
+    const lRoot = L + 0.3963377774 * A + 0.2158037573 * B;
+    const mRoot = L - 0.1055613458 * A - 0.0638541728 * B;
+    const sRoot = L - 0.0894841775 * A - 1.291485548 * B;
 
-    // Convert to 0-255 range and round
-    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+    const l = lRoot ** 3;
+    const m = mRoot ** 3;
+    const s = sRoot ** 3;
+
+    const r = 4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s;
+    const g = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
+    const b = -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s;
+
+    return linearToRgb([r, g, b]);
+}
+
+function oklabToOklch(oklab: OKLABColor): OKLCHColor {
+    const { L, A, B } = oklab;
+    const C = Math.sqrt(A ** 2 + B ** 2);
+    const H = (Math.atan2(B, A) * 180) / Math.PI;
+    return { L, C, H: H < 0 ? H + 360 : H };
+}
+
+function oklchToOklab(oklch: OKLCHColor): OKLABColor {
+    const { L, C, H } = oklch;
+    const rad = (H * Math.PI) / 180;
+    return {
+        L,
+        A: C * Math.cos(rad),
+        B: C * Math.sin(rad),
+    };
+}
+
+function rgbToOklch(rgb: RGBColor): OKLCHColor {
+    return oklabToOklch(rgbToOklab(rgb));
+}
+
+function oklchToRgb(oklch: OKLCHColor): RGBColor {
+    return oklabToRgb(oklchToOklab(oklch));
+}
+
+function rgbToXyz(rgb: RGBColor): [number, number, number] {
+    const [r, g, b] = rgbToLinear(rgb);
+    return [
+        (r * 0.4124564 + g * 0.3575761 + b * 0.1804375) * 100,
+        (r * 0.2126729 + g * 0.7151522 + b * 0.072175) * 100,
+        (r * 0.0193339 + g * 0.119192 + b * 0.9503041) * 100,
+    ];
+}
+
+function xyzToRgb(xyz: [number, number, number]): RGBColor {
+    const [x, y, z] = xyz.map((v) => v / 100);
+
+    const r = x * 3.2404542 + y * -1.5371385 + z * -0.4985314;
+    const g = x * -0.969266 + y * 1.8760108 + z * 0.041556;
+    const b = x * 0.0556434 + y * -0.2040259 + z * 1.0572252;
+
+    const gammaCorrect = (v: number) =>
+        v > 0.0031308 ? 1.055 * Math.pow(v, 1 / 2.4) - 0.055 : 12.92 * v;
+
+    return [
+        Math.round(Math.max(0, Math.min(1, gammaCorrect(r))) * 255),
+        Math.round(Math.max(0, Math.min(1, gammaCorrect(g))) * 255),
+        Math.round(Math.max(0, Math.min(1, gammaCorrect(b))) * 255),
+    ];
+}
+
+function xyzToLab65(xyz: [number, number, number]): { L: number; A: number; B: number } {
+    const [x, y, z] = xyz.map((v, i) => {
+        const scaled = v / D65[i];
+        return scaled > 0.008856 ? Math.cbrt(scaled) : 7.787 * scaled + 16 / 116;
+    });
+
+    return {
+        L: 116 * y - 16,
+        A: 500 * (x - y),
+        B: 200 * (y - z),
+    };
+}
+
+function lab65ToXyz(lab: { L: number; A: number; B: number }): [number, number, number] {
+    const { L, A, B } = lab;
+    const y = (L + 16) / 116;
+    const x = y + A / 500;
+    const z = y - B / 200;
+
+    const xyz = [x, y, z].map((v, i) => {
+        const value = Math.pow(v, 3);
+        return value > 0.008856 ? value * D65[i] : ((v - 16 / 116) / 7.787) * D65[i];
+    });
+
+    return xyz as [number, number, number];
+}
+
+function lab65ToRgb(lab: { L: number; A: number; B: number }): RGBColor {
+    return linearToRgb(xyzToRgb(lab65ToXyz(lab)));
+}
+
+function rgbTolab65(rgb: RGBColor): { L: number; A: number; B: number } {
+    return xyzToLab65(rgbToXyz(rgb));
 }
 
 /*
@@ -278,7 +363,7 @@ function lab65ToRgb({ L, A, B }: LABColor): RGBColor {
 const PHI = 0.5 + Math.sqrt(1.25);
 
 export function dpsContrast(a: RGBColor, b: RGBColor) {
-    const dps = Math.abs(Math.pow(rgbToLab65(a).L, PHI) - Math.pow(rgbToLab65(b).L, PHI));
+    const dps = Math.abs(Math.pow(rgbTolab65(a).L, PHI) - Math.pow(rgbTolab65(b).L, PHI));
     const contrast = Math.pow(dps, 1 / PHI) * Math.SQRT2 - 40;
     return contrast < 7.5 ? 0 : contrast;
 }
