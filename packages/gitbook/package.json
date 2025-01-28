@@ -42,7 +42,7 @@
         "mathjax": "^3.2.2",
         "mdast-util-to-markdown": "^2.1.2",
         "memoizee": "^0.4.15",
-        "next": "14.2.15",
+        "next": "14.2.23",
         "next-themes": "^0.2.1",
         "nuqs": "^2.2.3",
         "object-hash": "^3.0.0",
@@ -70,6 +70,7 @@
     "devDependencies": {
         "@argos-ci/playwright": "^3.10.0",
         "@cloudflare/next-on-pages": "1.13.7",
+        "vercel": "^39.3.0",
         "@cloudflare/workers-types": "^4.20241230.0",
         "@playwright/test": "^1.49.1",
         "@types/js-cookie": "^3.0.6",

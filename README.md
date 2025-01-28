@@ -36,7 +36,7 @@ To run a local version of this project, please follow these simple steps.
 ### Prerequisites
 
 -   Node.js (Version: >=18.x)
--   Bun
+-   Bun (Version: >=1.2.0)
 
 ### Set up
 
