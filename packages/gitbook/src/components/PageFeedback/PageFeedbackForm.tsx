@@ -11,7 +11,7 @@ import { getVisitorId, useTrackEvent } from '../Insights';
 import { postPageFeedback } from './server-actions';
 import { Button } from '../primitives';
 
-const MAX_COMMENT_LENGTH = 256;
+const MAX_COMMENT_LENGTH = 512;
 
 /**
  * Form to submit feedback on a page.
@@ -24,6 +24,7 @@ export function PageFeedbackForm(props: {
     const { orientation = 'vertical', pageId, className } = props;
     const languages = useLanguage();
     const trackEvent = useTrackEvent();
+    const inputRef = React.useRef<HTMLTextAreaElement>(null);
     const [rating, setRating] = React.useState<PageFeedbackRating>();
     const [comment, setComment] = React.useState('');
     const [submitted, setSubmitted] = React.useState(false);
@@ -41,19 +42,24 @@ export function PageFeedbackForm(props: {
         });
     };
 
-    const onSubmitComment = async (rating: PageFeedbackRating, comment: string) => {
+    const onSubmitComment = (rating: PageFeedbackRating, comment: string) => {
         setSubmitted(true);
-        const visitorId = await getVisitorId();
-        await postPageFeedback({ pageId, visitorId, rating, comment });
 
         trackEvent({
-            type: 'page_post_feedback',
+            type: 'page_post_feedback_comment',
             feedback: {
                 rating,
-                // TODO @Samy: Add comment
+                comment,
             },
         });
     };
+
+    // Focus the comment input when the rating is submitted
+    React.useEffect(() => {
+        if (!!rating) {
+            inputRef.current?.focus();
+        }
+    }, [rating]);
 
     return (
         <div className={tcls('flex flex-col gap-3 text-sm', className)}>
@@ -90,6 +96,7 @@ export function PageFeedbackForm(props: {
                     {!submitted ? (
                         <>
                             <textarea
+                                ref={inputRef}
                                 name="comment"
                                 className="grow ring-1 ring-inset bg-light-1 dark:bg-dark-1 ring-dark/2 dark:ring-light/2 contrast-more:ring-dark dark:contrast-more:ring-light min-h-16 max-h-40 rounded straight-corners:rounded-none p-2 placeholder:text-sm placeholder:text-dark/6 dark:placeholder:text-light/6 contrast-more:placeholder:text-dark dark:contrast-more:placeholder:text-light"
                                 placeholder={tString(languages, 'was_this_helpful_comment')}
