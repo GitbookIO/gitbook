@@ -1,4 +1,9 @@
-import { ContentRef, ContentRefUser, DocumentBlockTable } from '@gitbook/api';
+import {
+    ContentRef,
+    ContentRefUser,
+    DocumentBlockTable,
+    SiteInsightsLinkPosition,
+} from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import assertNever from 'assert-never';
 
@@ -11,7 +16,7 @@ import { tcls } from '@/lib/tailwind';
 import { filterOutNullable } from '@/lib/typescript';
 
 import { TableRecordKV } from './Table';
-import { getColumnAlignment } from './utils';
+import { getColumnAlignment, VerticalAlignment } from './utils';
 import { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { FileIcon } from '../FileIcon';
@@ -25,9 +30,19 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
         ariaLabelledBy?: string;
         record: TableRecordKV;
         column: string;
+        verticalAlignment?: VerticalAlignment;
     },
 ) {
-    const { tag: Tag = 'div', ariaLabelledBy, block, document, record, column, context } = props;
+    const {
+        tag: Tag = 'div',
+        ariaLabelledBy,
+        block,
+        document,
+        record,
+        column,
+        context,
+        verticalAlignment = 'center',
+    } = props;
 
     const definition = block.data.definition[column];
     const value = record[1].values[column];
@@ -99,7 +114,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             // @ts-ignore
             const fragment = getNodeFragmentByName(block, value);
             if (!fragment) {
-                return <Tag className={tcls(['w-full'])}>{''}</Tag>;
+                return <Tag className={tcls(['w-full', verticalAlignment])}>{''}</Tag>;
             }
 
             const alignment = getColumnAlignment(definition);
@@ -111,10 +126,12 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                     ancestorBlocks={[]}
                     nodes={fragment.nodes}
                     style={[
+                        'blocks',
                         'w-full',
                         'space-y-2',
                         'lg:space-y-3',
                         'leading-normal',
+                        verticalAlignment,
                         alignment === 'right' ? 'text-right' : null,
                         alignment === 'center' ? 'text-center' : null,
                     ]}
@@ -151,11 +168,14 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                 insights={
                                     ref.file
                                         ? {
-                                              target: {
-                                                  kind: 'file',
-                                                  file: ref.file.id,
+                                              type: 'link_click',
+                                              link: {
+                                                  target: {
+                                                      kind: 'file',
+                                                      file: ref.file.id,
+                                                  },
+                                                  position: SiteInsightsLinkPosition.Content,
                                               },
-                                              position: 'content',
                                           }
                                         : undefined
                                 }
@@ -208,8 +228,11 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                             insights={
                                 contentRef
                                     ? {
-                                          target: contentRef,
-                                          position: 'content',
+                                          type: 'link_click',
+                                          link: {
+                                              target: contentRef,
+                                              position: SiteInsightsLinkPosition.Content,
+                                          },
                                       }
                                     : undefined
                             }
@@ -243,8 +266,11 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                             key={index}
                             href={resolved.href}
                             insights={{
-                                target: contentRef,
-                                position: 'content',
+                                type: 'link_click',
+                                link: {
+                                    target: contentRef,
+                                    position: SiteInsightsLinkPosition.Content,
+                                },
                             }}
                         >
                             {resolved.text}

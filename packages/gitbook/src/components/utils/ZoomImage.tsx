@@ -63,7 +63,10 @@ export function ZoomImage(
             }
         };
 
-        mediaQueryList.addEventListener('change', onChange);
+        if ('addEventListener' in mediaQueryList) {
+            mediaQueryList.addEventListener('change', onChange);
+        }
+
         if (imgRef.current) {
             resizeObserver?.observe(imgRef.current);
         }
@@ -75,7 +78,9 @@ export function ZoomImage(
 
         return () => {
             resizeObserver?.disconnect();
-            mediaQueryList.removeEventListener('change', onChange);
+            if ('removeEventListener' in mediaQueryList) {
+                mediaQueryList.removeEventListener('change', onChange);
+            }
         };
     }, [imgRef, width]);
 
@@ -137,6 +142,7 @@ export function ZoomImage(
             ) : (
                 // When zooming, remove the image from the DOM to let the browser animates it with View Transition.
                 <img
+                    data-testid="zoom-image"
                     ref={imgRef}
                     {...props}
                     alt={alt ?? ''}
@@ -201,6 +207,7 @@ function ZoomImageModal(props: {
 
     return (
         <div
+            data-testid="zoom-image-modal"
             className={classNames(
                 styles.zoomModal,
                 tcls(
@@ -264,17 +271,28 @@ function ZoomImageModal(props: {
 }
 
 function startViewTransition(callback: () => void, onEnd?: () => void) {
-    // @ts-ignore
     if (document.startViewTransition) {
-        // @ts-ignore
-        const transition = document.startViewTransition(() => {
-            ReactDOM.flushSync(() => callback());
-        });
-        transition.finished.then(() => {
-            if (onEnd) {
-                onEnd();
+        try {
+            const transition = document.startViewTransition(() => {
+                ReactDOM.flushSync(() => callback());
+            });
+            transition.finished.then(() => {
+                if (onEnd) {
+                    onEnd();
+                }
+            });
+        } catch (error) {
+            // Safari can throw an error if another transition is already in progress
+            if (
+                error instanceof Error &&
+                (error.name === 'AbortError' || error.name === 'InvalidStateError')
+            ) {
+                callback();
+                onEnd?.();
+                return;
             }
-        });
+            throw error;
+        }
     } else {
         callback();
         onEnd?.();

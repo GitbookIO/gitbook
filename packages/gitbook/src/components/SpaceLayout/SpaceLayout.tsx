@@ -1,6 +1,7 @@
 import {
     CustomizationHeaderPreset,
     CustomizationSettings,
+    CustomizationSidebarBackgroundStyle,
     Revision,
     RevisionPageDocument,
     RevisionPageGroup,
@@ -11,10 +12,12 @@ import {
 import React from 'react';
 
 import { Footer } from '@/components/Footer';
-import { CompactHeader, Header } from '@/components/Header';
+import { Header, HeaderLogo } from '@/components/Header';
 import { CONTAINER_STYLE } from '@/components/layout';
-import { SearchModal } from '@/components/Search';
+import { SearchButton, SearchModal } from '@/components/Search';
 import { TableOfContents } from '@/components/TableOfContents';
+import { getSpaceLanguage } from '@/intl/server';
+import { t } from '@/intl/translate';
 import { api, ContentTarget, type SectionsList, SiteContentPointer } from '@/lib/api';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -23,11 +26,12 @@ import { getCurrentVisitorToken } from '@/lib/visitor-token';
 
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
+import { SiteSectionList } from '../SiteSections';
 
 /**
  * Render the entire content of the space (header, table of contents, footer, and page content).
  */
-export function SpaceLayout(props: {
+export async function SpaceLayout(props: {
     content: SiteContentPointer;
     contentTarget: ContentTarget;
     space: Space;
@@ -63,16 +67,24 @@ export function SpaceLayout(props: {
 
     const withSections = Boolean(sections && sections.list.length > 0);
     const withVariants = Boolean(site && spaces.length > 1);
-    const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
+    const headerOffset = {
+        sectionsHeader: withSections,
+        topHeader: withTopHeader,
+        sidebarBackgroundFilled:
+            'sidebar' in customization.styling &&
+            customization.styling.sidebar.background === CustomizationSidebarBackgroundStyle.Filled,
+    };
+    const apiHost = (await api()).client.endpoint;
+    const visitorAuthToken = await getCurrentVisitorToken();
+    const enabled = await shouldTrackEvents();
 
     return (
         <InsightsProvider
-            enabled={shouldTrackEvents()}
-            apiHost={api().client.endpoint}
-            visitorAuthToken={getCurrentVisitorToken()}
+            enabled={enabled}
+            apiHost={apiHost}
+            visitorAuthToken={visitorAuthToken}
             {...content}
         >
-            {/* <ColorDebugger /> */}
             <Header
                 withTopHeader={withTopHeader}
                 space={space}
@@ -104,22 +116,57 @@ export function SpaceLayout(props: {
                         context={contentRefContext}
                         header={
                             withTopHeader ? null : (
-                                <CompactHeader
-                                    space={space}
-                                    site={site}
-                                    spaces={spaces}
-                                    customization={customization}
-                                />
+                                <div
+                                    className={tcls(
+                                        'hidden',
+                                        'pr-4',
+                                        'lg:flex',
+                                        'flex-grow-0',
+                                        'flex-wrap',
+                                        'dark:shadow-light/1',
+                                    )}
+                                >
+                                    <HeaderLogo
+                                        site={site}
+                                        space={space}
+                                        customization={customization}
+                                    />
+                                </div>
                             )
                         }
                         innerHeader={
-                            withVariants && (
-                                <SpacesDropdown
-                                    className={withTopHeader && !sections ? 'sm:hidden' : undefined}
-                                    space={space}
-                                    spaces={spaces}
-                                />
-                            )
+                            // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
+                            <>
+                                {!withTopHeader && (
+                                    <div className={tcls('hidden', 'lg:block')}>
+                                        <React.Suspense fallback={null}>
+                                            <SearchButton>
+                                                <span className={tcls('flex-1')}>
+                                                    {t(
+                                                        getSpaceLanguage(customization),
+                                                        customization.aiSearch.enabled
+                                                            ? 'search_or_ask'
+                                                            : 'search',
+                                                    )}
+                                                </span>
+                                            </SearchButton>
+                                        </React.Suspense>
+                                    </div>
+                                )}
+                                {!withTopHeader && withSections && sections && (
+                                    <SiteSectionList
+                                        className={tcls('hidden', 'lg:block')}
+                                        sections={sections}
+                                    />
+                                )}
+                                {withVariants && (
+                                    <SpacesDropdown
+                                        space={space}
+                                        spaces={spaces}
+                                        className={tcls('w-full')}
+                                    />
+                                )}
+                            </>
                         }
                         headerOffset={headerOffset}
                     />

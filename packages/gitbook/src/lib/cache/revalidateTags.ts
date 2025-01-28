@@ -60,7 +60,19 @@ export async function revalidateTags(tags: string[]): Promise<{
                     stats[entry.key].backends[backend.name] = { set: false };
                 });
 
-                await backend.del(unclearedEntries);
+                try {
+                    await backend.del(unclearedEntries);
+                } catch (error) {
+                    if (error instanceof Error && error.message === 'Too many subrequests.') {
+                        if (backend.replication === 'local') {
+                            console.warn(
+                                `Too many subrequests, skipping cache del for local backend ${backend.name}`,
+                            );
+                            return;
+                        }
+                    }
+                    throw error;
+                }
             }
         }),
     );

@@ -1,6 +1,11 @@
-import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
+import {
+    RevisionPage,
+    RevisionPageDocument,
+    RevisionPageGroup,
+    SiteInsightsLinkPosition,
+} from '@gitbook/api';
 
-import { pageHref } from '@/lib/links';
+import { getPageHref } from '@/lib/links';
 import { getPagePath } from '@/lib/pages';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -9,25 +14,29 @@ import { PagesList } from './PagesList';
 import { TOCPageIcon } from './TOCPageIcon';
 import { ToggleableLinkItem } from './ToggleableLinkItem';
 
-export function PageDocumentItem(props: {
+export async function PageDocumentItem(props: {
     rootPages: RevisionPage[];
     page: RevisionPageDocument;
     ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
     context: ContentRefContext;
 }) {
     const { rootPages, page, ancestors, context } = props;
+    const href = await getPageHref(rootPages, page);
 
     return (
         <li className={tcls('flex', 'flex-col')}>
             <ToggleableLinkItem
-                href={pageHref(rootPages, page)}
+                href={href}
                 pathname={getPagePath(rootPages, page)}
                 insights={{
-                    target: {
-                        kind: 'page',
-                        page: page.id,
+                    type: 'link_click',
+                    link: {
+                        target: {
+                            kind: 'page',
+                            page: page.id,
+                        },
+                        position: SiteInsightsLinkPosition.Sidebar,
                     },
-                    position: 'sidebar',
                 }}
                 descendants={
                     page.pages && page.pages.length ? (
@@ -35,11 +44,12 @@ export function PageDocumentItem(props: {
                             rootPages={rootPages}
                             pages={page.pages}
                             style={tcls(
-                                'ms-5',
+                                'ml-5',
                                 'my-2',
-                                'border-l',
                                 'border-dark/3',
                                 'dark:border-light/2',
+                                'sidebar-list-default:border-l',
+                                'sidebar-list-line:border-l',
                             )}
                             ancestors={ancestors}
                             context={context}

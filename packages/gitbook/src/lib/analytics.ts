@@ -1,6 +1,6 @@
 'use client';
 
-import cookies from 'js-cookie';
+import * as cookies from '@/lib/cookies';
 
 const VISITORID_COOKIE = '__session';
 const GRANTED_COOKIE = '__gitbook_cookie_granted';

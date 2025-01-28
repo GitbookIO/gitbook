@@ -1,6 +1,11 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-import { isSignatureVersion, SignatureVersion, verifyImageSignature } from '@/lib/image-signatures';
+import {
+    CURRENT_SIGNATURE_VERSION,
+    isSignatureVersion,
+    SignatureVersion,
+    verifyImageSignature,
+} from '@/lib/image-signatures';
 import { resizeImage, CloudflareImageOptions, checkIsSizableImageURL } from '@/lib/images';
 import { parseImageAPIURL } from '@/lib/urls';
 
@@ -37,6 +42,10 @@ export async function GET(request: NextRequest) {
     const verified = await verifyImageSignature(url, { signature, version: signatureVersion });
     if (!verified) {
         return new Response(`Invalid signature "${signature ?? ''}" for "${url}"`, { status: 400 });
+    }
+
+    if (signatureVersion !== CURRENT_SIGNATURE_VERSION) {
+        return NextResponse.redirect(url, 302);
     }
 
     // Cloudflare-specific options are in the cf object.
@@ -83,7 +92,7 @@ export async function GET(request: NextRequest) {
         return response;
     } catch (error) {
         // Redirect to the original image if resizing fails
-        return Response.redirect(url, 302);
+        return NextResponse.redirect(url, 302);
     }
 }
 

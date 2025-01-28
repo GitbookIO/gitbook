@@ -1,4 +1,4 @@
-import { RevisionPageLink } from '@gitbook/api';
+import { RevisionPageLink, SiteInsightsLinkPosition } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 
 import { Link } from '@/components/primitives';
@@ -21,23 +21,26 @@ export async function PageLinkItem(props: { page: RevisionPageLink; context: Con
                     'justify-start',
                     'items-center',
                     'gap-3',
-                    'pl-5',
-                    'pr-1.5',
-                    'py-1.5',
+                    'p-1.5',
+                    'pl-3',
                     'text-sm',
                     'transition-colors',
                     'duration-100',
                     'text-dark/8',
                     'rounded-md',
                     'straight-corners:rounded-none',
+                    'before:content-none',
                     'dark:text-light/7',
                     'font-normal',
                     'hover:bg-dark/1',
                     'dark:hover:bg-light/2',
                 )}
                 insights={{
-                    target: page.target,
-                    position: 'sidebar',
+                    type: 'link_click',
+                    link: {
+                        target: page.target,
+                        position: SiteInsightsLinkPosition.Sidebar,
+                    },
                 }}
             >
                 <TOCPageIcon page={page} />

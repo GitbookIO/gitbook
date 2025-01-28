@@ -27,12 +27,40 @@ import { getContentTestURL } from '../tests/utils';
 
 interface Test {
     name: string;
-    url: string; // URL to visit for testing
+    /**
+     * URL to visit for testing.
+     */
+    url: string;
     cookies?: Parameters<BrowserContext['addCookies']>[0];
-    run?: (page: Page) => Promise<unknown>; // The test to run
-    fullPage?: boolean; // Whether the test should be fullscreened during testing
-    screenshot?: false; // Should a screenshot be stored
-    only?: boolean; // Only run this test
+    /**
+     * Test to run
+     */
+    run?: (page: Page) => Promise<unknown>;
+    /**
+     * Whether the test should be fullscreened during testing.
+     */
+    fullPage?: boolean;
+    /**
+     * Whether to take a screenshot of the test or set a threshold for the screenshot.
+     */
+    screenshot?:
+        | false
+        | {
+              /**
+               * Screenshot threshold.
+               * From 0 to 1, where 0 is the most strict and 1 is the most permissive.
+               * @default 0.5
+               */
+              threshold?: number;
+              /**
+               * Whether to wait for the table of contents to finish scrolling before taking the screenshot.
+               */
+              waitForTOCScrolling?: boolean;
+          };
+    /**
+     * Whether to only run this test.
+     */
+    only?: boolean;
 }
 
 interface TestsCase {
@@ -58,6 +86,11 @@ const allThemePresets: CustomizationHeaderPreset[] = [
     CustomizationHeaderPreset.Bold,
     CustomizationHeaderPreset.Contrast,
     CustomizationHeaderPreset.Custom,
+];
+
+const allSidebarBackgroundStyles: CustomizationSidebarBackgroundStyle[] = [
+    CustomizationSidebarBackgroundStyle.Default,
+    CustomizationSidebarBackgroundStyle.Filled,
 ];
 
 async function waitForCookiesDialog(page: Page) {
@@ -90,19 +123,26 @@ const testCases: TestsCase[] = [
             {
                 name: 'Search',
                 url: '?q=',
+                screenshot: false,
+                run: async (page) => {
+                    await expect(page.getByTestId('search-results')).toBeVisible();
+                    const allItems = await page.getByTestId('search-result-item').all();
+                    // Expect at least 3 questions
+                    await expect(allItems.length).toBeGreaterThan(2);
+                },
             },
             {
                 name: 'Search Results',
                 url: '?q=gitbook',
                 run: async (page) => {
-                    await page.waitForSelector('[data-test="search-results"]');
+                    await expect(page.getByTestId('search-results')).toBeVisible();
                 },
             },
             {
                 name: 'AI Search',
                 url: '?q=What+is+GitBook%3F&ask=true',
                 run: async (page) => {
-                    await page.waitForSelector('[data-test="search-ask-answer"]');
+                    await expect(page.getByTestId('search-ask-answer')).toBeVisible();
                 },
                 screenshot: false,
             },
@@ -263,19 +303,26 @@ const testCases: TestsCase[] = [
             {
                 name: 'Search',
                 url: '?q=',
+                screenshot: false,
+                run: async (page) => {
+                    await expect(page.getByTestId('search-results')).toBeVisible();
+                    const allItems = await page.getByTestId('search-result-item').all();
+                    // Expect at least 3 questions
+                    await expect(allItems.length).toBeGreaterThan(2);
+                },
             },
             {
                 name: 'Search Results',
                 url: '?q=gitbook',
                 run: async (page) => {
-                    await page.waitForSelector('[data-test="search-results"]');
+                    await expect(page.getByTestId('search-results')).toBeVisible();
                 },
             },
             {
                 name: 'AI Search',
                 url: '?q=What+is+GitBook%3F&ask=true',
                 run: async (page) => {
-                    await page.waitForSelector('[data-test="search-ask-answer"]');
+                    await expect(page.getByTestId('search-ask-answer')).toBeVisible();
                 },
                 screenshot: false,
             },
@@ -304,6 +351,9 @@ const testCases: TestsCase[] = [
             {
                 name: 'PDF',
                 url: '~gitbook/pdf?limit=10',
+                screenshot: {
+                    waitForTOCScrolling: false,
+                },
             },
         ],
     },
@@ -326,11 +376,38 @@ const testCases: TestsCase[] = [
                 url: 'blocks/block-images',
                 run: waitForCookiesDialog,
                 fullPage: true,
+                screenshot: { threshold: 0.8 },
+            },
+            {
+                name: 'Images (with zoom)',
+                url: 'blocks/block-images',
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+                    const zoomImage = page.getByTestId('zoom-image');
+                    await zoomImage.first().click();
+                    await expect(page.getByTestId('zoom-image-modal')).toBeVisible();
+                },
+                fullPage: true,
+                screenshot: { threshold: 0.8 },
             },
             {
                 name: 'Inline Images',
                 url: 'blocks/inline-images',
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+                    // Make the text invisible to fix flakiness due to the text position.
+                    await page.evaluate(() => {
+                        for (const p of document.querySelectorAll('p')) {
+                            if (
+                                p.textContent?.includes(
+                                    'This image has intrinsic 400px width, but renders as 300px:',
+                                )
+                            ) {
+                                p.style.color = 'transparent';
+                            }
+                        }
+                    });
+                },
             },
             {
                 name: 'Tabs',
@@ -401,6 +478,18 @@ const testCases: TestsCase[] = [
             {
                 name: 'Math',
                 url: 'blocks/math',
+                run: async (page) => {
+                    await page.waitForFunction(() => {
+                        const fonts = Array.from(document.fonts.values());
+                        const mjxFonts = fonts.filter(
+                            (font) => font.family === 'MJXZERO' || font.family === 'MJXTEX',
+                        );
+                        return (
+                            mjxFonts.length === 2 &&
+                            mjxFonts.every((font) => font.status === 'loaded')
+                        );
+                    });
+                },
             },
             {
                 name: 'Files',
@@ -454,6 +543,9 @@ const testCases: TestsCase[] = [
                 name: 'With cover and no TOC',
                 url: 'page-options/page-with-cover-and-no-toc',
                 run: waitForCookiesDialog,
+                screenshot: {
+                    waitForTOCScrolling: false,
+                },
             },
             {
                 name: 'With icon',
@@ -545,40 +637,47 @@ const testCases: TestsCase[] = [
                 }),
                 run: waitForCookiesDialog,
             },
-            ...allThemePresets.flatMap((preset) => ({
-                name: `With tint - Preset ${preset} - Theme ${theme}`,
-                url: getCustomizationURL({
-                    styling: {
-                        tint: { color: { light: '#346DDB', dark: '#346DDB' } },
-                    },
-                    header: {
-                        preset,
-                        ...(preset === CustomizationHeaderPreset.Custom
-                            ? {
-                                  backgroundColor: { light: '#C62C68', dark: '#EF96B8' },
-                                  linkColor: { light: '#4DDE98', dark: '#0C693D' },
-                              }
-                            : {}),
-                        links: [
-                            {
-                                title: 'Secondary button',
-                                to: { kind: 'url', url: 'https://www.gitbook.com' },
-                                style: 'button-secondary',
+            // Theme-specific tests
+            ...allThemePresets.flatMap((preset) => [
+                ...allSidebarBackgroundStyles.flatMap((sidebarStyle) => ({
+                    name: `With tint - Preset ${preset} - Sidebar ${sidebarStyle} - Theme ${theme}`,
+                    url: getCustomizationURL({
+                        styling: {
+                            tint: { color: { light: '#346DDB', dark: '#346DDB' } },
+                            sidebar: {
+                                background: sidebarStyle,
+                                list: CustomizationSidebarListStyle.Default,
                             },
-                            {
-                                title: 'Primary button',
-                                to: { kind: 'url', url: 'https://www.gitbook.com' },
-                                style: 'button-primary',
-                            },
-                        ],
-                    },
-                    themes: {
-                        default: theme,
-                        toggeable: false,
-                    },
-                }),
-                run: waitForCookiesDialog,
-            })),
+                        },
+                        header: {
+                            preset,
+                            ...(preset === CustomizationHeaderPreset.Custom
+                                ? {
+                                      backgroundColor: { light: '#C62C68', dark: '#EF96B8' },
+                                      linkColor: { light: '#4DDE98', dark: '#0C693D' },
+                                  }
+                                : {}),
+                            links: [
+                                {
+                                    title: 'Secondary button',
+                                    to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                    style: 'button-secondary',
+                                },
+                                {
+                                    title: 'Primary button',
+                                    to: { kind: 'url', url: 'https://www.gitbook.com' },
+                                    style: 'button-primary',
+                                },
+                            ],
+                        },
+                        themes: {
+                            default: theme,
+                            toggeable: false,
+                        },
+                    }),
+                    run: waitForCookiesDialog,
+                })),
+            ]),
             {
                 name: `With tint - Legacy background match - Theme ${theme}`,
                 url: getCustomizationURL({
@@ -630,11 +729,14 @@ const testCases: TestsCase[] = [
                 run: async (page) => {
                     const sharedSpaceLink = page.locator('a.underline');
                     await sharedSpaceLink.click();
-                    expect(page.locator('h1')).toHaveText('shared');
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'shared' }),
+                    ).toBeVisible();
                     const url = page.url();
                     expect(url.includes('shared-space-uno')).toBeTruthy(); // same uno site
                     expect(url.endsWith('/shared')).toBeTruthy(); // correct page
                 },
+                screenshot: false,
             },
         ],
     },
@@ -646,13 +748,15 @@ const testCases: TestsCase[] = [
                 name: 'Navigation to shared space',
                 url: '',
                 run: async (page) => {
-                    const sharedSpaceLink = page.locator('a.underline');
-                    await sharedSpaceLink.click();
-                    expect(page.locator('h1')).toHaveText('shared');
+                    await page.locator('a.underline').click();
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'shared' }),
+                    ).toBeVisible();
                     const url = page.url();
                     expect(url.includes('shared-space-dos')).toBeTruthy(); // same dos site
                     expect(url.endsWith('/shared')).toBeTruthy(); // correct page
                 },
+                screenshot: false,
             },
         ],
     },
@@ -666,6 +770,7 @@ const testCases: TestsCase[] = [
                 run: async (page) => {
                     await expect(page.locator('h1')).toHaveText('SSO');
                 },
+                screenshot: false,
             },
         ],
     },
@@ -685,6 +790,7 @@ const testCases: TestsCase[] = [
                         page.getByText('Authentication missing to access this content'),
                     ).toBeVisible();
                 },
+                screenshot: false,
             },
         ],
     },
@@ -707,7 +813,12 @@ const testCases: TestsCase[] = [
                     );
                     return `first?jwt_token=${token}`;
                 })(),
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'first' }),
+                    ).toBeVisible();
+                },
+                screenshot: false,
             },
             {
                 name: 'Second',
@@ -724,7 +835,12 @@ const testCases: TestsCase[] = [
                     );
                     return `second?jwt_token=${token}`;
                 })(),
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'second' }),
+                    ).toBeVisible();
+                },
+                screenshot: false,
             },
         ],
     },
@@ -838,7 +954,12 @@ const testCases: TestsCase[] = [
                     );
                     return `first?jwt_token=${token}`;
                 })(),
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'first' }),
+                    ).toBeVisible();
+                },
+                screenshot: false,
             },
             {
                 name: 'Custom page',
@@ -1334,16 +1455,24 @@ for (const testCase of testCases) {
                 if (testEntry.run) {
                     await testEntry.run(page);
                 }
-                if (testEntry.screenshot !== false) {
+                const screenshotOptions = testEntry.screenshot;
+                if (screenshotOptions !== false) {
                     await argosScreenshot(page, `${testCase.name} - ${testEntry.name}`, {
-                        viewports: ['macbook-16', 'macbook-13', 'iphone-x', 'ipad-2'],
+                        viewports: ['macbook-16', 'macbook-13', 'ipad-2', 'iphone-x'],
                         argosCSS: `
                         /* Hide Intercom */
                         .intercom-lightweight-app {
                             display: none !important;
-                        }
-                    `,
+                            }
+                            `,
+                        threshold: screenshotOptions?.threshold ?? undefined,
                         fullPage: testEntry.fullPage ?? false,
+                        beforeScreenshot: async () => {
+                            await waitForIcons(page);
+                            if (screenshotOptions?.waitForTOCScrolling !== false) {
+                                await waitForTOCScrolling(page);
+                            }
+                        },
                     });
                 }
             });
@@ -1420,4 +1549,54 @@ function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettings>): s
     searchParams.set('customization', encoded);
 
     return `?${searchParams.toString()}`;
+}
+
+/**
+ * Wait for all icons present on the page to be loaded.
+ */
+async function waitForIcons(page: Page) {
+    await page.waitForFunction(async () => {
+        function loadImage(src: string) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = (error) => reject(new Error(`Failed to load image: ${src}`));
+                img.src = src;
+            });
+        }
+
+        const icons = Array.from(document.querySelectorAll('svg.gb-icon'));
+        await Promise.all(
+            icons.map(async (icon) => {
+                // url("https://ka-p.fontawesome.com/releases/v6.6.0/svgs/light/moon.svg?v=2&token=a463935e93")
+                const maskImage = window.getComputedStyle(icon).getPropertyValue('mask-image');
+                const urlMatch = maskImage.match(/url\("([^"]+)"\)/);
+                const url = urlMatch ? urlMatch[1] : null;
+                if (!url) {
+                    throw new Error('No mask-image');
+                }
+                await loadImage(url);
+            }),
+        );
+    });
+}
+
+/**
+ * Wait for TOC to be correctly scrolled into view.
+ */
+async function waitForTOCScrolling(page: Page) {
+    const viewport = await page.viewportSize();
+    if (viewport && viewport.width >= 1024) {
+        const toc = page.getByTestId('table-of-contents');
+        await expect(toc).toBeVisible();
+        await page.evaluate(() => {
+            const tocScrollContainer = document.querySelector(
+                '[data-testid="table-of-contents"] [data-testid="toc-scroll-container"]',
+            );
+            if (!tocScrollContainer) {
+                throw new Error('TOC scroll container not found');
+            }
+            tocScrollContainer.scrollTo(0, 0);
+        });
+    }
 }

@@ -28,7 +28,7 @@ export default function MathJaXFormula(props: MathJaXFormulaProps) {
     React.use(loadMathJaxScript(mathJaxUrl));
     const [html, setHTML] = React.useState('');
 
-    const containerRef = React.useRef<HTMLDivElement | HTMLSpanElement>(null);
+    const containerRef = React.useRef<HTMLDivElement>(null);
 
     // Typeset the formula
     React.useEffect(() => {
@@ -48,11 +48,16 @@ export default function MathJaXFormula(props: MathJaXFormulaProps) {
         };
     }, [inline, formula]);
 
-    return React.createElement(inline ? 'span' : 'div', {
-        className,
-        ref: containerRef,
-        dangerouslySetInnerHTML: { __html: html },
-    });
+    const Component = inline ? 'span' : 'div';
+
+    return (
+        <Component
+            ref={containerRef}
+            className={className}
+            aria-busy={!html ? true : undefined}
+            dangerouslySetInnerHTML={{ __html: html }}
+        />
+    );
 }
 
 let mathJaxPromise: Promise<void> | null = null;

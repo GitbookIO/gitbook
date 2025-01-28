@@ -2,14 +2,15 @@
 
 import type * as api from '@gitbook/api';
 import { OpenAPIOperationContextProvider } from '@gitbook/react-openapi';
-import cookies from 'js-cookie';
 import * as React from 'react';
 import { useEventCallback, useDebounceCallback } from 'usehooks-ts';
+
+import * as cookies from '@/lib/cookies';
 
 import { getSession } from './sessions';
 import { getVisitorId } from './visitorId';
 
-type SiteEventName = api.SiteInsightsEvent['type'];
+export type InsightsEventName = api.SiteInsightsEvent['type'];
 
 /**
  * Global context for all events in the session.
@@ -45,15 +46,14 @@ interface InsightsEventOptions {
 /**
  * Input data for an event.
  */
-type TrackEventInput<EventName extends SiteEventName> = { type: EventName } & Omit<
-    Extract<api.SiteInsightsEvent, { type: EventName }>,
-    'location' | 'session'
->;
+export type TrackEventInput<EventName extends InsightsEventName = InsightsEventName> = {
+    type: EventName;
+} & Omit<Extract<api.SiteInsightsEvent, { type: EventName }>, 'location' | 'session'>;
 
 /**
  * Callback to track an event.
  */
-type TrackEventCallback = <EventName extends SiteEventName>(
+type TrackEventCallback = <EventName extends InsightsEventName>(
     event: TrackEventInput<EventName>,
     ctx?: InsightsEventPageContext,
     options?: InsightsEventOptions,
@@ -79,21 +79,12 @@ export function InsightsProvider(props: InsightsProviderProps) {
         [pathname: string]:
             | {
                   url: string;
-                  events: TrackEventInput<SiteEventName>[];
+                  events: TrackEventInput<InsightsEventName>[];
                   context: InsightsEventContext;
                   pageContext?: InsightsEventPageContext;
               }
             | undefined;
     }>({});
-
-    /**
-     * Get the visitor ID and store it in a ref.
-     */
-    React.useEffect(() => {
-        getVisitorId().then((visitorId) => {
-            visitorIdRef.current = visitorId;
-        });
-    }, []);
 
     /**
      * Synchronously flush all the pending events.
@@ -160,7 +151,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
 
     const trackEvent: TrackEventCallback = useEventCallback(
         (
-            event: TrackEventInput<SiteEventName>,
+            event: TrackEventInput<InsightsEventName>,
             ctx?: InsightsEventPageContext,
             options?: InsightsEventOptions,
         ) => {
@@ -194,9 +185,15 @@ export function InsightsProvider(props: InsightsProviderProps) {
         },
     );
 
-    // When the page is unloaded, flush all events
+    /**
+     * Get the visitor ID and store it in a ref.
+     */
     React.useEffect(() => {
-        window.addEventListener('beforeunload', flushEventsSync);
+        getVisitorId().then((visitorId) => {
+            visitorIdRef.current = visitorId;
+            // When the page is unloaded, flush all events, but only if the visitor ID is set
+            window.addEventListener('beforeunload', flushEventsSync);
+        });
         return () => {
             window.removeEventListener('beforeunload', flushEventsSync);
         };
@@ -235,7 +232,7 @@ function sendEvents(args: {
     const url = new URL(apiHost);
     url.pathname = `/v1/orgs/${organizationId}/sites/${siteId}/insights/events`;
 
-    fetch(url, {
+    fetch(url.toString(), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -244,6 +241,9 @@ function sendEvents(args: {
         body: JSON.stringify({
             events,
         }),
+    }).catch((error) => {
+        // We don't want to throw when this fails.
+        console.error('Error sending events', error);
     });
 }
 
@@ -252,7 +252,7 @@ function sendEvents(args: {
  */
 function transformEvents(input: {
     url: string;
-    events: TrackEventInput<SiteEventName>[];
+    events: TrackEventInput<InsightsEventName>[];
     context: InsightsEventContext;
     pageContext: InsightsEventPageContext;
     visitorId: string;
@@ -264,7 +264,7 @@ function transformEvents(input: {
         visitorId: input.visitorId,
         userAgent: window.navigator.userAgent,
         language: window.navigator.language,
-        cookies: cookies.get(),
+        cookies: cookies.getAll(),
         referrer: document.referrer || null,
         visitorAuthToken: input.visitorAuthToken ?? null,
     };

@@ -1,16 +1,38 @@
+import { SiteInsightsAd } from '@gitbook/api';
 import * as React from 'react';
 
 import { getResizedImageURL } from '@/lib/images';
 import { tcls } from '@/lib/tailwind';
 
 import { AdItem } from './types';
+import { Link } from '../primitives';
 
 /**
  * Classic rendering for an ad.
  */
-export function AdClassicRendering({ ad }: { ad: AdItem }) {
+export async function AdClassicRendering({
+    ad,
+    insightsAd,
+}: {
+    ad: AdItem;
+    insightsAd: SiteInsightsAd | null;
+}) {
+    const smallImgSrc =
+        'smallImage' in ad ? await getResizedImageURL(ad.smallImage, { width: 192, dpr: 2 }) : null;
+    const logoSrc =
+        'logo' in ad ? await getResizedImageURL(ad.logo, { width: 192 - 48, dpr: 2 }) : null;
     return (
-        <a
+        <Link
+            rel="sponsored noopener"
+            target="_blank"
+            insights={
+                insightsAd
+                    ? {
+                          type: 'ad_click',
+                          ad: insightsAd,
+                      }
+                    : undefined
+            }
             className={tcls(
                 'flex',
                 'flex-col',
@@ -25,31 +47,22 @@ export function AdClassicRendering({ ad }: { ad: AdItem }) {
                 'p-4',
             )}
             href={ad.statlink}
-            rel="sponsored noopener"
-            target="_blank"
         >
-            {'smallImage' in ad ? (
+            {smallImgSrc && 'smallImage' in ad ? (
                 <div>
-                    <img
-                        alt="Ads logo"
-                        className={tcls('rounded-md')}
-                        src={getResizedImageURL(ad.smallImage, { width: 192, dpr: 2 })}
-                    />
+                    <img alt="Ads logo" className={tcls('rounded-md')} src={smallImgSrc} />
                 </div>
-            ) : (
+            ) : logoSrc && 'logo' in ad ? (
                 <div
                     className={tcls('px-6', 'py-4', 'rounded-md')}
                     style={{ backgroundColor: ad.backgroundColor }}
                 >
-                    <img
-                        alt="Ads logo"
-                        src={getResizedImageURL(ad.logo, { width: 192 - 48, dpr: 2 })}
-                    />
+                    <img alt="Ads logo" src={logoSrc} />
                 </div>
-            )}
+            ) : null}
             <div className={tcls('flex', 'flex-col')}>
                 <div className={tcls('text-xs')}>{ad.description}</div>
             </div>
-        </a>
+        </Link>
     );
 }

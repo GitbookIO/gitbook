@@ -23,6 +23,7 @@ export function Caption(
         fit?: boolean;
         wrapperStyle?: ClassValue;
         block: DocumentBlockImage | DocumentBlockDrawing | DocumentBlockEmbed | DocumentBlockFile;
+        withBorder?: boolean;
     } & DocumentContextProps,
 ) {
     const {
@@ -31,22 +32,18 @@ export function Caption(
         block,
         context,
         fit = false,
+        withBorder = false,
         wrapperStyle = [
             'relative',
             'overflow-hidden',
-            'rounded',
-            'straight-corners:rounded-none',
             'after:block',
             'after:absolute',
             'after:-inset-[0]',
-            'after:border-dark/2',
-            'after:border',
-            'after:rounded',
-            'straight-corners:after:rounded-none',
-            'dark:after:border-light/1',
-            'dark:after:mix-blend-plus-lighter',
             'after:pointer-events-none',
             fit ? 'w-fit' : null,
+            withBorder
+                ? 'rounded straight-corners:rounded-none after:border-dark/2 after:border after:rounded straight-corners:after:rounded-none dark:after:border-light/1 dark:after:mix-blend-plus-lighter after:pointer-events-none'
+                : null,
         ],
         style,
     } = props;

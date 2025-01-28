@@ -1,8 +1,15 @@
-import { CustomizationSettings, SiteCustomizationSettings, Space } from '@gitbook/api';
+import {
+    CustomizationSettings,
+    SiteCustomizationSettings,
+    Space,
+    SiteInsightsTrademarkPlacement,
+} from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 
 import { t, getSpaceLanguage } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
+
+import { Link } from '../primitives';
 
 /**
  * Trademark link to the GitBook.
@@ -10,6 +17,7 @@ import { tcls } from '@/lib/tailwind';
 export function Trademark(props: {
     space: Space;
     customization: CustomizationSettings | SiteCustomizationSettings;
+    placement: SiteInsightsTrademarkPlacement;
 }) {
     return (
         <div
@@ -17,38 +25,42 @@ export function Trademark(props: {
                 'relative',
                 'z-[2]',
                 'lg:absolute',
-                'bottom-0',
-                'right-0',
+                'mt-6',
+
                 'left-0',
-                'flex',
-                'flex-col',
+                'right-2',
+                'bottom-0',
+
                 'pointer-events-none',
-                'lg:-left-5',
+                'sidebar-filled:pl-2',
+                'sidebar-filled:pb-2',
+
+                'bg-light',
+                'sidebar-filled:bg-light-2',
+                '[html.tint.sidebar-filled_&]:bg-light-1',
+
+                'dark:bg-dark',
+                'dark:sidebar-filled:bg-dark-1',
+                'dark:[html.tint.sidebar-filled_&]:bg-dark-1',
+
+                'before:hidden',
+                'lg:before:block',
+                'before:content-[""]',
+                'before:absolute',
+                'before:inset-x-0',
+                'before:bottom-full',
+                'before:h-8',
+                'before:bg-gradient-to-b',
+                'before:from-transparent',
+                'before:to-light',
+                'sidebar-filled:before:to-light-2',
+                '[html.tint.sidebar-filled_&]:before:to-light-1',
+                'dark:before:to-dark',
+                'dark:sidebar-filled:before:to-dark-1',
+                'dark:[html.tint.sidebar-filled_&]:before:to-dark-1',
             )}
         >
-            <div
-                className={tcls(
-                    'text-sm',
-                    'text-dark/8',
-                    'pr-0',
-                    'pt-2',
-                    'pb-2',
-                    'mt-4',
-                    'mb-4',
-                    'bg-[size:250%_125%]',
-                    'bg-[position:50%_35%]',
-                    'bg-[radial-gradient(farthest-side_at_50%_-70%,_var(--tw-gradient-stops))] from-transparent from-60% to-light to-80%',
-                    'lg:pr-2',
-                    'lg:mt-0',
-                    'lg:mb-0',
-                    'lg:mr-2',
-                    'lg:pt-16',
-                    'dark:text-light/6',
-                    'dark:dark:to-dark',
-                )}
-            >
-                <TrademarkLink {...props} />
-            </div>
+            <TrademarkLink {...props} />
         </div>
     );
 }
@@ -59,8 +71,9 @@ export function Trademark(props: {
 export function TrademarkLink(props: {
     space: Space;
     customization: CustomizationSettings | SiteCustomizationSettings;
+    placement: SiteInsightsTrademarkPlacement;
 }) {
-    const { space, customization } = props;
+    const { space, customization, placement } = props;
     const language = getSpaceLanguage(customization);
 
     const url = new URL('https://www.gitbook.com');
@@ -69,38 +82,44 @@ export function TrademarkLink(props: {
     url.searchParams.set('utm_campaign', space.id);
 
     return (
-        <a
+        <Link
             target="_blank"
             href={url.toString()}
             className={tcls(
+                'text-sm',
                 'font-semibold',
-                'ring-1',
-                'ring-inset',
-                'ring-dark/2',
-                'pointer-events-auto',
-                'transition-colors',
+                'text-dark/8',
+                'dark:text-light/8',
+
                 'flex',
                 'flex-row',
                 'items-center',
-                'hover:bg-dark/1',
-                'bg-light',
-                'dark:bg-dark',
-                'px-4',
+                'px-5',
                 'py-4',
+                'sidebar-filled:px-3',
+
                 'rounded-lg',
                 'straight-corners:rounded-none',
-                'hover:backdrop-blur-sm',
-                'lg:ring-0',
-                'tracking-[-0.016em]',
+
+                'hover:bg-dark/1',
                 'dark:hover:bg-light/1',
+
+                'ring-2',
+                'lg:ring-1',
+                'ring-inset',
+                'ring-dark/2',
                 'dark:ring-light/1',
-                'border',
-                'border-dark/2',
-                'dark:border-light/2',
+
+                'transition-colors',
+                'pointer-events-auto',
             )}
+            insights={{
+                type: 'trademark_click',
+                placement,
+            }}
         >
             <Icon icon="gitbook" className={tcls('size-5', 'mr-3')} />
             {t(language, 'powered_by_gitbook')}
-        </a>
+        </Link>
     );
 }

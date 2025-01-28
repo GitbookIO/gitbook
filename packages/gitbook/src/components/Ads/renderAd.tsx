@@ -1,5 +1,6 @@
 'use server';
 
+import { SiteInsightsAd, SiteInsightsAdPlacement } from '@gitbook/api';
 import { headers } from 'next/headers';
 
 import { AdClassicRendering } from './AdClassicRendering';
@@ -20,7 +21,7 @@ interface FetchLiveAdOptions {
     /** Mode to render the Ad */
     mode: 'classic' | 'auto' | 'cover';
     /** Name of the placement for the ad */
-    placement: string;
+    placement: SiteInsightsAdPlacement;
     /** If true, we'll not track it as an impression */
     ignore: boolean;
 }
@@ -40,23 +41,35 @@ interface FetchPlaceholderAdOptions {
 export async function renderAd(options: FetchAdOptions) {
     const mode = options.source === 'live' ? options.mode : 'classic';
 
-    const result = options.source === 'live' ? await fetchAd(options) : getPlaceholderAd();
+    const result = options.source === 'live' ? await fetchAd(options) : await getPlaceholderAd();
     if (!result || !result.ad.description || !result.ad.statlink) {
         return null;
     }
 
     const { ad } = result;
 
-    return (
-        <>
-            {mode === 'classic' || !('callToAction' in ad) ? (
-                <AdClassicRendering ad={ad} />
-            ) : (
-                <AdCoverRendering ad={ad} />
-            )}
-            {ad.pixel ? <AdPixels rawPixel={ad.pixel} /> : null}
-        </>
-    );
+    const insightsAd: SiteInsightsAd | null =
+        options.source === 'live'
+            ? {
+                  placement: options.placement,
+                  zoneId: options.zoneId,
+                  domain: 'company' in ad ? ad.company : '',
+              }
+            : null;
+
+    return {
+        children: (
+            <>
+                {mode === 'classic' || !('callToAction' in ad) ? (
+                    <AdClassicRendering ad={ad} insightsAd={insightsAd} />
+                ) : (
+                    <AdCoverRendering ad={ad} insightsAd={insightsAd} />
+                )}
+                {ad.pixel ? <AdPixels rawPixel={ad.pixel} /> : null}
+            </>
+        ),
+        insightsAd,
+    };
 }
 
 async function fetchAd({
@@ -64,7 +77,7 @@ async function fetchAd({
     placement,
     ignore,
 }: FetchLiveAdOptions): Promise<{ ad: AdItem; ip: string } | null> {
-    const { ip, userAgent } = getUserAgentAndIp();
+    const { ip, userAgent } = await getUserAgentAndIp();
 
     const url = new URL(`https://srv.buysellads.com/ads/${zoneId}.json`);
     url.searchParams.set('segment', `placement:${placement}`);
@@ -86,8 +99,8 @@ async function fetchAd({
     return null;
 }
 
-function getPlaceholderAd(): { ad: AdItem; ip: string } {
-    const { ip } = getUserAgentAndIp();
+async function getPlaceholderAd(): Promise<{ ad: AdItem; ip: string }> {
+    const { ip } = await getUserAgentAndIp();
 
     return {
         ad: {
@@ -119,8 +132,8 @@ function getPlaceholderAd(): { ad: AdItem; ip: string } {
     };
 }
 
-function getUserAgentAndIp() {
-    const headersSet = headers();
+async function getUserAgentAndIp() {
+    const headersSet = await headers();
     const ip =
         headersSet.get('x-gitbook-ipv4') ??
         headersSet.get('x-gitbook-ip') ??

@@ -64,6 +64,12 @@ const config: Config = {
             fontFamily: {
                 sans: ['var(--font-content)'],
                 mono: ['var(--font-mono)'],
+                emoji: [
+                    'Apple Color Emoji',
+                    'Noto Color Emoji',
+                    '--font-noto-color-emoji',
+                    'sans-serif',
+                ],
                 var: ['var(--font-family)'],
             },
             colors: {
@@ -72,8 +78,8 @@ const config: Config = {
                 /** primary-color used to accent elements, these colors remain unchanged when toggling between the CustomizationBackground options**/
                 primary: generateVarShades('primary-color'),
                 'contrast-primary': generateVarShades('contrast-primary'),
-                tint: generateVarShades('primary-color'),
-                'contrast-tint': generateVarShades('contrast-primary'),
+                tint: generateVarShades('tint-color'),
+                'contrast-tint': generateVarShades('contrast-tint'),
 
                 'header-background': generateVarShades('header-background'),
                 'header-link': generateVarShades('header-link'),
@@ -228,19 +234,24 @@ const config: Config = {
             addVariant('space-header', 'body:has(header) &');
 
             /**
+             * Variant for sidebar styles
+             */
+            addVariant('sidebar-default', 'html.sidebar-default &');
+            addVariant('sidebar-filled', 'html.sidebar-filled &');
+            addVariant('sidebar-list-default', 'html.sidebar-list-default &');
+            addVariant('sidebar-list-pill', 'html.sidebar-list-pill &');
+            addVariant('sidebar-list-line', 'html.sidebar-list-line &');
+
+            /**
+             * Variant for tint colours
+             */
+            addVariant('tint', 'html.tint &');
+            addVariant('no-tint', 'html.no-tint &');
+
+            /**
              * Variant when the space is configured with straight corners.
              */
             addVariant('straight-corners', 'html.straight-corners &');
-
-            /**
-             * Variant when the space is configured with a theme matching background.
-             */
-            addVariant('tint', 'html.tint &');
-
-            /**
-             * Variant when the space is configured without a theme matching background.
-             */
-            addVariant('no-tint', 'html.no-tint &');
 
             /**
              * Variant when the page contains a block that will be rendered in full-width mode.

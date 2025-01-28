@@ -1,10 +1,10 @@
 import * as gitbookAPI from '@gitbook/api';
-import { headers } from 'next/headers';
 import Script from 'next/script';
 import ReactDOM from 'react-dom';
 
 import { Card } from '@/components/primitives';
 import { getEmbedByUrlInSpace, getEmbedByUrl } from '@/lib/api';
+import { getContentSecurityPolicyNonce } from '@/lib/csp';
 import { tcls } from '@/lib/tailwind';
 
 import { BlockProps } from './Block';
@@ -13,7 +13,7 @@ import { IntegrationBlock } from './Integration';
 
 export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
     const { block, context, ...otherProps } = props;
-    const nonce = headers().get('x-nonce') || undefined;
+    const nonce = await getContentSecurityPolicyNonce();
 
     ReactDOM.preload('https://cdn.iframe.ly/embed.js', { as: 'script', nonce });
 
@@ -22,15 +22,20 @@ export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
         : getEmbedByUrl(block.data.url));
 
     return (
-        <Caption {...props}>
+        <Caption {...props} withBorder>
             {embed.type === 'rich' ? (
                 <>
                     <div
                         dangerouslySetInnerHTML={{
                             __html: embed.html,
                         }}
+                        data-visual-test="blackout"
                     />
-                    <Script src="https://cdn.iframe.ly/embed.js" nonce={nonce} />
+                    <Script
+                        strategy="lazyOnload"
+                        src="https://cdn.iframe.ly/embed.js"
+                        nonce={nonce}
+                    />
                 </>
             ) : embed.type === 'integration' ? (
                 <IntegrationBlock

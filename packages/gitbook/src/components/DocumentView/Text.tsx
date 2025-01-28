@@ -6,6 +6,7 @@ import {
     DocumentMarkStrikethrough,
     DocumentText,
     DocumentTextMark,
+    DocumentMarkKeyboard,
 } from '@gitbook/api';
 import React from 'react';
 
@@ -47,6 +48,7 @@ const MARK_STYLES = {
     code: Code,
     strikethrough: Strikethrough,
     color: Color,
+    keyboard: Keyboard,
 };
 
 interface MarkedLeafProps<Mark extends DocumentTextMark> {
@@ -66,6 +68,14 @@ function Strikethrough(props: MarkedLeafProps<DocumentMarkStrikethrough>) {
     return <s className={tcls('line-through')}>{props.children}</s>;
 }
 
+function Keyboard(props: MarkedLeafProps<DocumentMarkKeyboard>) {
+    return (
+        <kbd className="rounded border px-1 font-mono shadow-[0_1px_0_0_theme(borderColor.DEFAULT)]">
+            {props.children}
+        </kbd>
+    );
+}
+
 function Code(props: MarkedLeafProps<DocumentMarkCode>) {
     return (
         <code
@@ -73,7 +83,6 @@ function Code(props: MarkedLeafProps<DocumentMarkCode>) {
                 'py-[1px]',
                 'px-1.5',
                 'min-w-[1.625rem]',
-                'inline-flex',
                 'justify-center',
                 'items-center',
                 'leading-normal',
@@ -82,10 +91,8 @@ function Code(props: MarkedLeafProps<DocumentMarkCode>) {
                 'ring-dark/1',
                 'bg-dark/[0.06]',
                 'rounded',
-                'text-dark/8',
                 'dark:ring-light/1',
                 'dark:bg-light/1',
-                'dark:text-light/7',
                 // Text size is proportional to the font-size of the parent element
                 'text-[.875em]',
                 // We ensure that the code is not making the parent bigger, especially in headings

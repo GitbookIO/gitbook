@@ -27,43 +27,72 @@ export function Button({
         variant === 'primary'
             ? //PRIMARY
               [
-                  'bg-primary-600',
-                  'text-white',
-                  'ring-dark/2',
-                  'hover:bg-primary-500',
-                  'dark:ring-light/3',
-                  'dark:bg-primary-600',
-                  'dark:hover:bg-primary-700',
+                  'bg-primary',
+                  'text-light', // TODO: Move to 'text-contrast-primary' once contrast calculation works better
+                  'hover:text-light-1',
+                  'hover:bg-primary-600',
+
+                  'dark:bg-primary',
+                  'dark:text-contrast-primary',
+                  'dark:hover:bg-primary',
               ]
             : // SECONDARY
               [
-                  'bg-dark/2',
-                  'ring-dark/1',
-                  'hover:bg-dark/3',
-                  'dark:bg-light/2',
-                  'dark:ring-light/1',
-                  'dark:hover:bg-light/3',
+                  'bg-light-1',
+                  'text-dark/8',
+                  'hover:text-primary',
+                  'contrast-more:bg-light',
+                  'contrast-more:text-dark',
+                  'contrast-more:hover:ring-primary',
+
+                  'dark:bg-light/1',
+                  'dark:text-light/8',
+                  'contrast-more:dark:bg-dark',
+                  'contrast-more:dark:text-light',
+                  'dark:hover:bg-light/2',
+                  'dark:hover:text-light',
               ];
 
     const sizes = {
         default: ['text-base', 'px-4', 'py-2'],
-        medium: ['text-sm', 'px-3', 'py-1'],
+        medium: ['text-sm', 'px-3', 'py-1.5'],
         small: ['text-xs', 'px-3 py-2'],
     };
 
     const sizeClasses = sizes[size] || sizes.default;
 
     const domClassName = tcls(
+        'button',
         'inline-block',
         'rounded-md',
         'straight-corners:rounded-none',
         'place-self-start',
+
         'ring-1',
-        'ring-inset',
+        'ring-dark/1',
+        'hover:ring-dark/2',
+        'dark:ring-light/2',
+        'dark:hover:ring-light/4',
+
+        'shadow-sm',
+        'shadow-dark/4',
+        'dark:shadow-dark/8',
+        'hover:shadow-md',
+        'active:shadow-none',
+
+        'contrast-more:ring-dark',
+        'contrast-more:hover:ring-2',
+        'contrast-more:hover:ring-dark',
+        'contrast-more:dark:ring-light',
+        'contrast-more:dark:hover:ring-light',
+
+        'hover:scale-105',
+        'active:scale-100',
+        'transition-all',
+
         'grow-0',
         'shrink-0',
         'truncate',
-        'transition-colors',
         variantClasses,
         sizeClasses,
         className,

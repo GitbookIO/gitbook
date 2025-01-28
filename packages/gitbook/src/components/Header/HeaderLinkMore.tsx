@@ -4,6 +4,7 @@ import {
     CustomizationHeaderPreset,
     CustomizationSettings,
     SiteCustomizationSettings,
+    SiteInsightsLinkPosition,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import React from 'react';
@@ -81,8 +82,11 @@ async function MoreMenuLink(props: {
                 insights={
                     link.to
                         ? {
-                              target: link.to,
-                              position: 'header',
+                              type: 'link_click',
+                              link: {
+                                  target: link.to,
+                                  position: SiteInsightsLinkPosition.Header,
+                              },
                           }
                         : undefined
                 }

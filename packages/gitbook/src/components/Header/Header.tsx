@@ -14,8 +14,9 @@ import { HeaderLinks } from './HeaderLinks';
 import { HeaderLogo } from './HeaderLogo';
 import { SpacesDropdown } from './SpacesDropdown';
 import { SearchButton } from '../Search';
-import { SiteSectionTabs } from '../SiteSectionTabs';
+import { SiteSectionTabs } from '../SiteSections';
 import { HeaderMobileMenu } from './HeaderMobileMenu';
+
 /**
  * Render the header for the space.
  */
@@ -74,14 +75,23 @@ export function Header(props: {
                             'gap-4',
                             'lg:gap-8',
                             'flex',
-                            'h-16',
                             'items-center',
                             'justify-between',
                             'w-full',
+                            'py-3',
+                            'min-h-16',
+                            'sm:h-16',
+                            isMultiVariants && 'page-no-toc:max-[400px]:flex-wrap',
                             CONTAINER_STYLE,
                         )}
                     >
-                        <div className="flex max-w-full shrink min-w-0 gap-2 lg:gap-4 justify-start items-center">
+                        <div
+                            className={tcls(
+                                'flex max-w-full',
+                                isMultiVariants && 'page-no-toc:max-[400px]:w-full',
+                                'shrink min-w-0 gap-2 lg:gap-4 justify-start items-center',
+                            )}
+                        >
                             <HeaderMobileMenu
                                 className={tcls(
                                     'lg:hidden',
@@ -93,30 +103,32 @@ export function Header(props: {
                                 )}
                             />
                             <HeaderLogo site={site} space={space} customization={customization} />
-                            {!hasSiteSections && isMultiVariants ? (
-                                <div className="z-20 shrink hidden sm:block">
-                                    <SpacesDropdown
-                                        className={tcls(
-                                            !isCustomizationDefault &&
-                                                withTopHeader && [
-                                                    'bg-header-link/2',
-                                                    'dark:bg-header-link/2',
-                                                    'text-header-link/8',
-                                                    'dark:text-header-link/8',
-                                                    'ring-1',
-                                                    'ring-header-link/4',
-                                                    'dark:ring-header-link/4',
-                                                    'contrast-more:bg-header-background',
-                                                    'contrast-more:text-header-link',
-                                                    'contrast-more:ring-header-link',
-                                                ],
-                                        )}
-                                        space={space}
-                                        spaces={spaces}
-                                    />
-                                </div>
-                            ) : null}
                         </div>
+
+                        {isMultiVariants && (
+                            <div className="hidden page-no-toc:flex mr-auto">
+                                <SpacesDropdown
+                                    space={space}
+                                    spaces={spaces}
+                                    className={
+                                        !isCustomizationDefault
+                                            ? `bg-header-link/2 text-header-link ring-header-link/4 
+                                            dark:bg-header-link/2 dark:text-header-link dark:ring-header-link/4 
+                                            group-hover/dropdown:bg-header-link/3 group-hover/dropdown:text-header-link group-hover/dropdown:ring-header-link/6
+                                            dark:group-hover/dropdown:bg-header-link/3 dark:group-hover/dropdown:text-header-link dark:group-hover/dropdown:ring-header-link/6
+                                            group-focus-within/dropdown:bg-header-link/3 group-focus-within/dropdown:text-header-link group-focus-within/dropdown:ring-header-link/6
+                                            dark:group-focus-within/dropdown:bg-header-link/3 dark:group-focus-within/dropdown:text-header-link dark:group-focus-within/dropdown:ring-header-link/6
+                                            
+                                            contrast-more:bg-header-background contrast-more:text-header-link contrast-more:ring-header-link
+                                            contrast-more:group-hover/dropdown:text-header-link contrast-more:group-hover/dropdown:ring-header-link
+                                            contrast-more:dark:group-hover/dropdown:text-header-link contrast-more:dark:group-hover/dropdown:ring-header-link
+                                            contrast-more:group-focus-within/dropdown:text-header-link contrast-more:group-focus-within/dropdown:ring-header-link
+                                            contrast-more:dark:group-focus-within/dropdown:text-header-link contrast-more:dark:group-focus-within/dropdown:ring-header-link`
+                                            : ''
+                                    }
+                                />
+                            </div>
+                        )}
 
                         {customization.header.links.length > 0 && (
                             <HeaderLinks>
@@ -218,7 +230,7 @@ export function Header(props: {
                         'overflow-x-auto hide-scroll',
                     )}
                 >
-                    <SiteSectionTabs {...sections} />
+                    <SiteSectionTabs sections={sections} />
                 </div>
             ) : null}
         </header>

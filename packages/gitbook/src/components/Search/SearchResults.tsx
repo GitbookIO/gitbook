@@ -1,3 +1,6 @@
+'use client';
+
+import { captureException } from '@sentry/nextjs';
 import assertNever from 'assert-never';
 import React from 'react';
 
@@ -32,7 +35,7 @@ type ResultType =
  * Fetch the results of the keyboard navigable elements to display for a query:
  *   - Recommended questions if no query is provided.
  *   - Search results if a query is provided.
- *      - If withAsk is true and the query is a question, add a question result.
+ *      - If withAsk is true, add a question result.
  */
 export const SearchResults = React.forwardRef(function SearchResults(
     props: {
@@ -47,57 +50,86 @@ export const SearchResults = React.forwardRef(function SearchResults(
     },
     ref: React.Ref<SearchResultsRef>,
 ) {
-    const { children, query, pointer, spaceId, revisionId, global, withAsk, onSwitchToAsk } = props;
+    const { children, query, pointer, spaceId, revisionId, withAsk, global, onSwitchToAsk } = props;
 
     const language = useLanguage();
     const trackEvent = useTrackEvent();
-    const debounceTimeout = React.useRef<Timer | null>(null);
-    const [results, setResults] = React.useState<ResultType[] | null>(null);
+    const [resultsState, setResultsState] = React.useState<{
+        results: ResultType[];
+        fetching: boolean;
+    }>({ results: [], fetching: true });
     const [cursor, setCursor] = React.useState<number | null>(null);
     const refs = React.useRef<(null | HTMLAnchorElement)[]>([]);
-    const suggestedQuestionsRef = React.useRef<null | string[]>(null);
+    const suggestedQuestionsRef = React.useRef<null | ResultType[]>(null);
 
     React.useEffect(() => {
         if (!query) {
             if (!withAsk) {
+                setResultsState({ results: [], fetching: false });
+                return;
+            }
+
+            if (suggestedQuestionsRef.current) {
+                setResultsState({ results: suggestedQuestionsRef.current, fetching: false });
                 return;
             }
 
             let cancelled = false;
 
-            (suggestedQuestionsRef.current
-                ? Promise.resolve(suggestedQuestionsRef.current)
-                : getRecommendedQuestions(spaceId)
-            ).then((questions) => {
-                suggestedQuestionsRef.current = questions;
+            setResultsState({ results: [], fetching: true });
+            getRecommendedQuestions(spaceId).then((questions) => {
+                if (!questions) {
+                    if (!cancelled) {
+                        setResultsState({ results: [], fetching: false });
+                    }
+                    captureException(
+                        new Error(`corrupt-cache: getRecommendedQuestions is ${questions}`),
+                    );
+                    return;
+                }
+
+                const results = questions.map((question) => ({
+                    type: 'recommended-question',
+                    id: question,
+                    question: question,
+                })) satisfies ResultType[];
+
+                suggestedQuestionsRef.current = results;
 
                 if (cancelled) {
                     return;
                 }
 
-                setResults(
-                    questions.map((question) => ({
-                        type: 'recommended-question',
-                        id: question,
-                        question: question,
-                    })),
-                );
+                setResultsState({ results, fetching: false });
             });
 
             return () => {
                 cancelled = true;
             };
         } else {
-            if (withAsk) {
-                setResults((prev) => withQuestionResult(prev, query));
-            }
-
-            debounceTimeout.current = setTimeout(async () => {
-                const fetchedResults = await (global
+            setResultsState((prev) => ({ results: prev.results, fetching: true }));
+            let cancelled = false;
+            const timeout = setTimeout(async () => {
+                const results = await (global
                     ? searchAllSiteContent(query, pointer)
                     : searchSiteSpaceContent(query, pointer, revisionId));
 
-                setResults(withAsk ? withQuestionResult(fetchedResults, query) : fetchedResults);
+                if (cancelled) {
+                    return;
+                }
+
+                if (!results) {
+                    captureException(
+                        new Error(
+                            `corrupt-cache: ${global ? 'searchAllSiteContent' : 'searchSiteSpaceContent'} is ${results}`,
+                        ),
+                        { extra: { results } },
+                    );
+                    setResultsState({ results: [], fetching: false });
+                    return;
+                }
+
+                setResultsState({ results, fetching: false });
 
                 trackEvent({
                     type: 'search_type_query',
@@ -106,19 +138,24 @@ export const SearchResults = React.forwardRef(function SearchResults(
             }, 350);
 
             return () => {
-                if (debounceTimeout.current) {
-                    clearTimeout(debounceTimeout.current);
-                    debounceTimeout.current = null;
-                }
+                cancelled = true;
+                clearTimeout(timeout);
             };
         }
-    }, [query, global, pointer, spaceId, revisionId, withAsk]);
+    }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent]);
+
+    const results: ResultType[] = React.useMemo(() => {
+        if (!withAsk) {
+            return resultsState.results;
+        }
+        return withQuestionResult(resultsState.results, query);
+    }, [resultsState.results, query, withAsk]);
 
     React.useEffect(() => {
         if (!query) {
             // Reset the cursor when there's no query
             setCursor(null);
-        } else if (results && results.length > 0) {
+        } else if (results.length > 0) {
             // Auto-focus the first result
             setCursor(0);
         }
@@ -138,10 +175,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
     const moveBy = React.useCallback(
         (delta: number) => {
-            if (!results) {
-                return;
-            }
-
             setCursor((prev) => {
                 if (prev === null) {
                     return 0;
@@ -175,96 +208,92 @@ export const SearchResults = React.forwardRef(function SearchResults(
         [moveBy, select],
     );
 
-    if (!results) {
-        if (query) {
-            return (
-                <div className={tcls('flex', 'items-center', 'justify-center', 'py-8')}>
-                    <Loading className={tcls('w-6', 'text-primary')} />
-                </div>
-            );
-        }
-
-        return null;
+    if (resultsState.fetching) {
+        return (
+            <div className={tcls('flex', 'items-center', 'justify-center', 'py-8')}>
+                <Loading className={tcls('w-6', 'text-primary')} />
+            </div>
+        );
     }
+
+    const noResults = (
+        <div className={tcls('text', 'text-dark/8', 'p-8', 'text-center', 'dark:text-light/8')}>
+            {t(language, 'search_no_results', query)}
+        </div>
+    );
 
     return (
         <div className={tcls('overflow-auto')}>
             {children}
             {results.length === 0 ? (
-                <div
-                    data-test="search-noresults"
-                    className={tcls(
-                        'text',
-                        'text-dark/8',
-                        'p-8',
-                        'text-center',
-                        'dark:text-light/8',
-                    )}
-                >
-                    {t(language, 'search_no_results', query)}
-                </div>
+                query ? (
+                    noResults
+                ) : null
             ) : (
-                <div data-test="search-results">
-                    {results.map((item, index) => {
-                        switch (item.type) {
-                            case 'page': {
-                                return (
-                                    <SearchPageResultItem
-                                        ref={(ref) => {
-                                            refs.current[index] = ref;
-                                        }}
-                                        key={item.id}
-                                        query={query}
-                                        item={item}
-                                        active={index === cursor}
-                                    />
-                                );
+                <>
+                    <div data-testid="search-results">
+                        {results.map((item, index) => {
+                            switch (item.type) {
+                                case 'page': {
+                                    return (
+                                        <SearchPageResultItem
+                                            ref={(ref) => {
+                                                refs.current[index] = ref;
+                                            }}
+                                            key={item.id}
+                                            query={query}
+                                            item={item}
+                                            active={index === cursor}
+                                        />
+                                    );
+                                }
+                                case 'question': {
+                                    return (
+                                        <SearchQuestionResultItem
+                                            ref={(ref) => {
+                                                refs.current[index] = ref;
+                                            }}
+                                            key={item.id}
+                                            question={query}
+                                            active={index === cursor}
+                                            onClick={onSwitchToAsk}
+                                        />
+                                    );
+                                }
+                                case 'recommended-question': {
+                                    return (
+                                        <SearchQuestionResultItem
+                                            ref={(ref) => {
+                                                refs.current[index] = ref;
+                                            }}
+                                            key={item.id}
+                                            question={item.question}
+                                            active={index === cursor}
+                                            onClick={onSwitchToAsk}
+                                            recommended
+                                        />
+                                    );
+                                }
+                                case 'section': {
+                                    return (
+                                        <SearchSectionResultItem
+                                            ref={(ref) => {
+                                                refs.current[index] = ref;
+                                            }}
+                                            key={item.id}
+                                            query={query}
+                                            item={item}
+                                            active={index === cursor}
+                                        />
+                                    );
+                                }
+                                default:
+                                    assertNever(item);
                             }
-                            case 'question': {
-                                return (
-                                    <SearchQuestionResultItem
-                                        ref={(ref) => {
-                                            refs.current[index] = ref;
-                                        }}
-                                        key={item.id}
-                                        question={query}
-                                        active={index === cursor}
-                                        onClick={onSwitchToAsk}
-                                    />
-                                );
-                            }
-                            case 'recommended-question': {
-                                return (
-                                    <SearchQuestionResultItem
-                                        ref={(ref) => {
-                                            refs.current[index] = ref;
-                                        }}
-                                        key={item.id}
-                                        question={item.question}
-                                        active={index === cursor}
-                                        onClick={onSwitchToAsk}
-                                        recommended
-                                    />
-                                );
-                            }
-                            case 'section': {
-                                return (
-                                    <SearchSectionResultItem
-                                        ref={(ref) => {
-                                            refs.current[index] = ref;
-                                        }}
-                                        key={item.id}
-                                        query={query}
-                                        item={item}
-                                        active={index === cursor}
-                                    />
-                                );
-                            }
-                            default:
-                                assertNever(item);
-                        }
-                    })}
-                </div>
+                        })}
+                    </div>
+                    {!results.some((result) => result.type !== 'question') && noResults}
+                </>
             )}
         </div>
     );
@@ -273,8 +302,8 @@ export const SearchResults = React.forwardRef(function SearchResults(
 /**
  * Add a "Ask <question>" item at the top of the results list.
  */
-function withQuestionResult(results: null | ResultType[], query: string): null | ResultType[] {
-    const without = results ? results.filter((result) => result.type !== 'question') : null;
+function withQuestionResult(results: ResultType[], query: string): ResultType[] {
+    const without = results.filter((result) => result.type !== 'question');
 
     if (query.length === 0) {
         return without;

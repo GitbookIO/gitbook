@@ -19,7 +19,8 @@
         },
         // Build the package for Cloudflare Pages
         "build:cloudflare": {
-            "dependsOn": ["^build", "generate"]
+            "dependsOn": ["^build", "generate"],
+            "env": ["NEXT_SERVER_ACTIONS_ENCRYPTION_KEY"]
         },
         // Check the package for type errors
         "typecheck": {

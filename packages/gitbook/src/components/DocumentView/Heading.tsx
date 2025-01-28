@@ -18,7 +18,10 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
     id = context.getId ? context.getId(id) : id;
 
     return (
-        <Tag id={id} className={tcls(textStyle.textSize, 'group', 'relative', 'grid', style)}>
+        <Tag
+            id={id}
+            className={tcls(textStyle.textSize, 'heading', 'group', 'relative', 'grid', style)}
+        >
             <div
                 className={tcls(
                     'grid',

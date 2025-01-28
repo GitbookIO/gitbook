@@ -1,4 +1,4 @@
-import { ContentAPITokenPayload, GitBookAPI } from '@gitbook/api';
+import { ContentAPITokenPayload, CustomizationThemeMode, GitBookAPI } from '@gitbook/api';
 import { setTag, setContext } from '@sentry/nextjs';
 import assertNever from 'assert-never';
 import jwt from 'jsonwebtoken';
@@ -17,6 +17,7 @@ import {
     DEFAULT_API_ENDPOINT,
     getPublishedContentSite,
     getSiteData,
+    validateSerializedCustomization,
 } from '@/lib/api';
 import { race } from '@/lib/async';
 import { buildVersion } from '@/lib/build';
@@ -30,6 +31,7 @@ import {
     normalizeVisitorAuthURL,
 } from '@/lib/visitor-token';
 
+import { joinPath } from './lib/paths';
 import { waitUntil } from './lib/waitUntil';
 
 export const config = {
@@ -97,6 +99,7 @@ export type LookupResult = PublishedContentWithCache & {
  */
 export async function middleware(request: NextRequest) {
     const { url, mode } = getInputURL(request);
+    const isServerAction = request.headers.has('Next-Action');
 
     setTag('url', url.toString());
     setContext('request', {
@@ -258,12 +261,12 @@ export async function middleware(request: NextRequest) {
     }
 
     const customization = url.searchParams.get('customization');
-    if (customization) {
+    if (customization && validateSerializedCustomization(customization)) {
         headers.set('x-gitbook-customization', customization);
     }
 
     const theme = url.searchParams.get('theme');
-    if (theme) {
+    if (theme === CustomizationThemeMode.Dark || theme === CustomizationThemeMode.Light) {
         headers.set('x-gitbook-theme', theme);
     }
 
@@ -275,7 +278,7 @@ export async function middleware(request: NextRequest) {
         headers.set('x-gitbook-visitor-token', resolved.visitorToken);
     }
 
-    const target = new URL(rewritePathname, request.nextUrl.toString());
+    const target = new URL(joinPath('/middleware', rewritePathname), request.nextUrl.toString());
     target.search = url.search;
 
     const response = writeCookies(
@@ -284,8 +287,14 @@ export async function middleware(request: NextRequest) {
                 headers,
             },
         }),
-        resolved.cookies,
+        // A long-standing bug in Nextjs causes modifying cookies in Server Actions to refresh the page and cause root rerenders.
+        // https://github.com/vercel/next.js/issues/50163
+        // We don't set the cookies if we're in a server action.
+        isServerAction ? undefined : resolved.cookies,
     );
+
+    // Add method so Cloudflare can use it for caching
+    setMiddlewareHeader(response, 'x-http-method', request.method);
 
     setMiddlewareHeader(response, 'x-gitbook-version', buildVersion());
 
@@ -296,13 +305,25 @@ export async function middleware(request: NextRequest) {
     setMiddlewareHeader(response, 'referrer-policy', 'no-referrer-when-downgrade');
     setMiddlewareHeader(response, 'x-content-type-options', 'nosniff');
 
-    if (
-        typeof resolved.cacheMaxAge === 'number' &&
-        // When the request is authenticated, we don't want to cache the response on the server
-        !resolved.visitorToken
-    ) {
-        const cacheControl = `public, max-age=0, s-maxage=${resolved.cacheMaxAge}, stale-if-error=0`;
+    const cacheControl = (() => {
+        // For Server Actions, we don't want to cache the response on the server.
+        // We don't want to store responses either.
+        if (isServerAction) {
+            return 'no-cache, no-store';
+        }
 
+        // When the request is authenticated, we don't want to cache the response on the server.
+        // Allow storing so that revalidation still happens with server.
+        if (!resolved.visitorToken) {
+            return 'no-cache';
+        }
+
+        if (typeof resolved.cacheMaxAge === 'number') {
+            return `public, max-age=0, s-maxage=${resolved.cacheMaxAge}, stale-if-error=0`;
+        }
+    })();
+
+    if (cacheControl) {
         if (process.env.GITBOOK_OUTPUT_CACHE === 'true' && process.env.NODE_ENV !== 'development') {
             setMiddlewareHeader(response, 'cache-control', cacheControl);
             setMiddlewareHeader(response, 'Cloudflare-CDN-Cache-Control', cacheControl);
@@ -403,7 +424,8 @@ async function lookupSiteInSingleMode(url: URL): Promise<LookupResult> {
         );
     }
 
-    const apiToken = getDefaultAPIToken(api().client.endpoint);
+    const apiCtx = await api();
+    const apiToken = getDefaultAPIToken(apiCtx.client.endpoint);
     if (!apiToken) {
         throw new Error(
             `Missing GITBOOK_TOKEN environment variable. It should be passed when using GITBOOK_MODE=single.`,
@@ -460,8 +482,8 @@ async function lookupSiteInMultiMode(request: NextRequest, url: URL): Promise<Lo
  *
  * The format of the path is:
  *   - /~space|~site/:id/:path
- *   - /~space|~site/:id/~changes/:changeId/:path
- *   - /~space|~site/:id/~revisions/:revisionId/:path
+ *   - /~space|~site/:id/~/changes/:changeId/:path
+ *   - /~space|~site/:id/~/revisions/:revisionId/:path
  */
 async function lookupSiteOrSpaceInMultiIdMode(
     request: NextRequest,
@@ -470,13 +492,17 @@ async function lookupSiteOrSpaceInMultiIdMode(
     const basePathParts: string[] = [];
     const pathSegments = url.pathname.slice(1).split('/');
 
-    const eatPathId = (prefix: string): string | undefined => {
-        if (pathSegments[0] !== prefix || pathSegments.length < 2) {
+    const eatPathId = (...prefixes: string[]): string | undefined => {
+        const match = prefixes.every((prefix, index) => pathSegments[index] === prefix);
+        if (!match || pathSegments.length < prefixes.length + 1) {
             return;
         }
 
-        const prefixSegment = pathSegments.shift();
-        basePathParts.push(prefixSegment!);
+        // Remove the prefix from the path segments
+        pathSegments.splice(0, prefixes.length);
+
+        // Add the prefix to the base path
+        basePathParts.push(...prefixes);
 
         const id = pathSegments.shift();
         basePathParts.push(id!);
@@ -502,8 +528,8 @@ async function lookupSiteOrSpaceInMultiIdMode(
     }
 
     // Extract the change request or revision ID from the path
-    const changeRequestId = eatPathId('~changes');
-    const revisionId = eatPathId('~revisions');
+    const changeRequestId = eatPathId('~', 'changes');
+    const revisionId = eatPathId('~', 'revisions');
 
     // Get the auth token from the URL query
     const AUTH_TOKEN_QUERY = 'token';
@@ -542,8 +568,9 @@ async function lookupSiteOrSpaceInMultiIdMode(
     // invalidated when trying to preview the site with different visitor
     // attributes.
     const contextId = decoded.claims ? hash(decoded.claims) : undefined;
+    const apiCtx = await api();
     const gitbookAPI = new GitBookAPI({
-        endpoint: apiEndpoint ?? api().client.endpoint,
+        endpoint: apiEndpoint ?? apiCtx.client.endpoint,
         authToken: apiToken,
         userAgent: userAgent(),
     });
@@ -852,10 +879,6 @@ function getDefaultAPIToken(apiEndpoint: string): string | undefined {
     }
 
     return defaultToken;
-}
-
-function joinPath(...parts: string[]): string {
-    return parts.join('/').replace(/\/+/g, '/');
 }
 
 function stripBasePath(pathname: string, basePath: string): string {

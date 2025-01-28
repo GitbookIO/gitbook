@@ -1,4 +1,4 @@
-import { DocumentInlineMention } from '@gitbook/api';
+import { DocumentInlineMention, SiteInsightsLinkPosition } from '@gitbook/api';
 
 import { StyledLink } from '@/components/primitives';
 
@@ -19,8 +19,11 @@ export async function Mention(props: InlineProps<DocumentInlineMention>) {
         <StyledLink
             href={resolved.href}
             insights={{
-                target: inline.data.ref,
-                position: 'content',
+                type: 'link_click',
+                link: {
+                    target: inline.data.ref,
+                    position: SiteInsightsLinkPosition.Content,
+                },
             }}
         >
             {resolved.text}

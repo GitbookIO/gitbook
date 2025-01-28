@@ -31,20 +31,20 @@ export function isPageIndexable(
 /**
  * Return true if a space should be indexed by search engines.
  */
-export function isSpaceIndexable({ space, site }: { space: Space; site: Site | null }) {
-    const headerSet = headers();
+export async function isSpaceIndexable({ space, site }: { space: Space; site: Site | null }) {
+    const headersList = await headers();
 
     if (
         process.env.GITBOOK_BLOCK_SEARCH_INDEXATION &&
-        !headerSet.has('x-gitbook-search-indexation')
+        !headersList.has('x-gitbook-search-indexation')
     ) {
         return false;
     }
 
     // Prevent indexation of preview of revisions / change-requests
     if (
-        headerSet.get('x-gitbook-content-revision') ||
-        headerSet.get('x-gitbook-content-changerequest')
+        headersList.get('x-gitbook-content-revision') ||
+        headersList.get('x-gitbook-content-changerequest')
     ) {
         return false;
     }

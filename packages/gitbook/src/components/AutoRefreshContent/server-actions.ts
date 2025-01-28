@@ -11,5 +11,8 @@ export async function hasContentBeenUpdated(props: {
     revisionId: string;
 }) {
     const changeRequest = await getChangeRequest.revalidate(props.spaceId, props.changeRequestId);
+    if (!changeRequest) {
+        return false;
+    }
     return changeRequest.revision !== props.revisionId;
 }
