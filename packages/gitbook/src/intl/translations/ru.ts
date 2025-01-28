@@ -30,6 +30,8 @@ export const ru = {
     was_this_helpful_neutral: 'Не уверен',
     was_this_helpful_negative: 'Нет',
     was_this_helpful_thank_you: 'Спасибо!',
+    was_this_helpful_comment: "Хотите что-нибудь добавить?",
+    submit: 'Предложить',
     annotation_button_label: 'Открыть аннотацию',
     code_copied: 'Скопировано!',
     code_copy: 'Копировать',
