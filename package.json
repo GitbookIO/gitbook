@@ -4,7 +4,7 @@
     "devDependencies": {
         "@changesets/cli": "^2.27.7",
         "prettier": "^3.0.3",
-        "turbo": "^2.1.2"
+        "turbo": "^2.3.4"
     },
     "packageManager": "bun@1.1.18",
     "overrides": {
