@@ -6,7 +6,7 @@
       "devDependencies": {
         "@changesets/cli": "^2.27.7",
         "prettier": "^3.0.3",
-        "turbo": "^2.1.2",
+        "turbo": "^2.3.4",
       },
     },
     "packages/cache-do": {
@@ -32,7 +32,7 @@
       "name": "gitbook",
       "version": "0.5.0",
       "dependencies": {
-        "@gitbook/api": "^0.88.1",
+        "@gitbook/api": "^0.89.0",
         "@gitbook/cache-do": "workspace:*",
         "@gitbook/emoji-codepoints": "workspace:*",
         "@gitbook/icons": "workspace:*",
@@ -145,7 +145,7 @@
       "name": "@gitbook/react-contentkit",
       "version": "0.5.1",
       "dependencies": {
-        "@gitbook/api": "^0.85.0",
+        "@gitbook/api": "^0.89.0",
         "assert-never": "^1.2.1",
         "classnames": "^2.5.1",
       },
@@ -425,7 +425,7 @@
 
     "@fortawesome/fontawesome-svg-core": ["@fortawesome/fontawesome-svg-core@6.6.0", "", { "dependencies": { "@fortawesome/fontawesome-common-types": "6.6.0" } }, "sha512-KHwPkCk6oRT4HADE7smhfsKudt9N/9lm6EJ5BVg0tD1yPA5hht837fB87F8pn15D8JfTqQOjhKTktwmLMiD7Kg=="],
 
-    "@gitbook/api": ["@gitbook/api@0.85.0", "", { "dependencies": { "event-iterator": "^2.0.0", "eventsource-parser": "^1.1.1" } }, "sha512-hhWFPxdX1zW8gQd7DYlf8R/LzaFWrC+jB9Lg4M4uz0Fcr5nrdbohufu1yMhGNNDTmo8qzv+fYyeTuoVJSV8G8A=="],
+    "@gitbook/api": ["@gitbook/api@0.89.0", "", { "dependencies": { "event-iterator": "^2.0.0", "eventsource-parser": "^3.0.0" } }, "sha512-htzPY5OrFrZz29ShhB535e/j0Z6BBRDmdc97qfprJKzUE4zTRv2L20ZZ0dYeSgNFTkSiVhsuv0sfd6njWfNk7w=="],
 
     "@gitbook/cache-do": ["@gitbook/cache-do@workspace:packages/cache-do"],
 
@@ -1475,7 +1475,7 @@
 
     "events-intercept": ["events-intercept@2.0.0", "", {}, "sha512-blk1va0zol9QOrdZt0rFXo5KMkNPVSp92Eju/Qz8THwKWKRKeE0T8Br/1aW6+Edkyq9xHYgYxn2QtOnUKPUp+Q=="],
 
-    "eventsource-parser": ["eventsource-parser@1.1.2", "", {}, "sha512-v0eOBUbiaFojBu2s2NPBfYUoRR9GjcDNvCXVaqEf5vVfpIAh9f8RCo4vXTP8c63QRKCFwoLpMpTdPwwhEKVgzA=="],
+    "eventsource-parser": ["eventsource-parser@3.0.0", "", {}, "sha512-T1C0XCUimhxVQzW4zFipdx0SficT651NnkR0ZSH3yQwh+mFMdLfgjABVi4YtMTtaL4s168593DaoaRLMqryavA=="],
 
     "execa": ["execa@3.2.0", "", { "dependencies": { "cross-spawn": "^7.0.0", "get-stream": "^5.0.0", "human-signals": "^1.1.1", "is-stream": "^2.0.0", "merge-stream": "^2.0.0", "npm-run-path": "^4.0.0", "onetime": "^5.1.0", "p-finally": "^2.0.0", "signal-exit": "^3.0.2", "strip-final-newline": "^2.0.0" } }, "sha512-kJJfVbI/lZE1PZYDI5VPxp8zXPO9rtxOkhpZ0jMKha56AI9y2gGVC6bkukStQf0ka5Rh15BA5m7cCCH4jmHqkw=="],
 
@@ -2619,19 +2619,19 @@
 
     "tslib": ["tslib@2.7.0", "", {}, "sha512-gLXCKdN1/j47AiHiOkJN69hJmcbGTHI0ImLmbYLHykhgeN0jVGola9yVjFgzCUklsZQMW55o+dW7IXv3RCXDzA=="],
 
-    "turbo": ["turbo@2.1.3", "", { "optionalDependencies": { "turbo-darwin-64": "2.1.3", "turbo-darwin-arm64": "2.1.3", "turbo-linux-64": "2.1.3", "turbo-linux-arm64": "2.1.3", "turbo-windows-64": "2.1.3", "turbo-windows-arm64": "2.1.3" }, "bin": { "turbo": "bin/turbo" } }, "sha512-lY0yj2GH2a2a3NExZ3rGe+rHUVeFE2aXuRAue57n+08E7Z7N7YCmynju0kPC1grAQzERmoLpKrmzmWd+PNiADw=="],
+    "turbo": ["turbo@2.3.4", "", { "optionalDependencies": { "turbo-darwin-64": "2.3.4", "turbo-darwin-arm64": "2.3.4", "turbo-linux-64": "2.3.4", "turbo-linux-arm64": "2.3.4", "turbo-windows-64": "2.3.4", "turbo-windows-arm64": "2.3.4" }, "bin": { "turbo": "bin/turbo" } }, "sha512-1kiLO5C0Okh5ay1DbHsxkPsw9Sjsbjzm6cF85CpWjR0BIyBFNDbKqtUyqGADRS1dbbZoQanJZVj4MS5kk8J42Q=="],
 
-    "turbo-darwin-64": ["turbo-darwin-64@2.1.3", "", { "os": "darwin", "cpu": "x64" }, "sha512-ouJOm0g0YyoBuhmikEujVCBGo3Zr0lbSOWFIsQtWUTItC88F2w2byhjtsYGPXQwMlTbXwmoBU2lOCfWNkeEwHQ=="],
+    "turbo-darwin-64": ["turbo-darwin-64@2.3.4", "", { "os": "darwin", "cpu": "x64" }, "sha512-uOi/cUIGQI7uakZygH+cZQ5D4w+aMLlVCN2KTGot+cmefatps2ZmRRufuHrEM0Rl63opdKD8/JIu+54s25qkfg=="],
 
-    "turbo-darwin-arm64": ["turbo-darwin-arm64@2.1.3", "", { "os": "darwin", "cpu": "arm64" }, "sha512-j2FOJsK4LAOtHQlb3Oom0yWB/Vi0nF1ljInr311mVzHoFAJRZtfW2fRvdZRb/lBUwjSp8be58qWHzANIcrA0OA=="],
+    "turbo-darwin-arm64": ["turbo-darwin-arm64@2.3.4", "", { "os": "darwin", "cpu": "arm64" }, "sha512-IIM1Lq5R+EGMtM1YFGl4x8Xkr0MWb4HvyU8N4LNoQ1Be5aycrOE+VVfH+cDg/Q4csn+8bxCOxhRp5KmUflrVTQ=="],
 
-    "turbo-linux-64": ["turbo-linux-64@2.1.3", "", { "os": "linux", "cpu": "x64" }, "sha512-ubRHkI1gSel7H7wsmxKK8C9UlLWqg/2dkCC88LFupaK6TKgvBKqDqA0Z1M9C/escK0Jsle2k0H8bybV9OYIl4Q=="],
+    "turbo-linux-64": ["turbo-linux-64@2.3.4", "", { "os": "linux", "cpu": "x64" }, "sha512-1aD2EfR7NfjFXNH3mYU5gybLJEFi2IGOoKwoPLchAFRQ6OEJQj201/oNo9CDL75IIrQo64/NpEgVyZtoPlfhfA=="],
 
-    "turbo-linux-arm64": ["turbo-linux-arm64@2.1.3", "", { "os": "linux", "cpu": "arm64" }, "sha512-LffUL+e5wv7BtD6DgnM2kKOlDkMo2eRjhbAjVnrCD3wi2ug0tl6NDzajnHHjtaMyOnIf4AvzSKdLWsBxafGBQA=="],
+    "turbo-linux-arm64": ["turbo-linux-arm64@2.3.4", "", { "os": "linux", "cpu": "arm64" }, "sha512-MxTpdKwxCaA5IlybPxgGLu54fT2svdqTIxRd0TQmpRJIjM0s4kbM+7YiLk0mOh6dGqlWPUsxz/A0Mkn8Xr5o7Q=="],
 
-    "turbo-windows-64": ["turbo-windows-64@2.1.3", "", { "os": "win32", "cpu": "x64" }, "sha512-S9SvcZZoaq5jKr6kA6eF7/xgQhVn8Vh7PVy5lono9zybvhyL4eY++y2PaLToIgL8G9IcbLmgOC73ExNjFBg9XQ=="],
+    "turbo-windows-64": ["turbo-windows-64@2.3.4", "", { "os": "win32", "cpu": "x64" }, "sha512-yyCrWqcRGu1AOOlrYzRnizEtdkqi+qKP0MW9dbk9OsMDXaOI5jlWtTY/AtWMkLw/czVJ7yS9Ex1vi9DB6YsFvw=="],
 
-    "turbo-windows-arm64": ["turbo-windows-arm64@2.1.3", "", { "os": "win32", "cpu": "arm64" }, "sha512-twlEo8lRrGbrR6T/ZklUIquW3IlFCEtywklgVA81aIrSBm56+GEVpSrHhIlsx1hiYeSNrs+GpDwZGe+V7fvEVQ=="],
+    "turbo-windows-arm64": ["turbo-windows-arm64@2.3.4", "", { "os": "win32", "cpu": "arm64" }, "sha512-PggC3qH+njPfn1PDVwKrQvvQby8X09ufbqZ2Ha4uSu+5TvPorHHkAbZVHKYj2Y+tvVzxRzi4Sv6NdHXBS9Be5w=="],
 
     "type": ["type@2.7.3", "", {}, "sha512-8j+1QmAbPvLZow5Qpi6NCaN8FB60p/6x8/vfNqOk/hC+HuvFZhL4+WfekuhQLiqFZXOgQdrs3B+XxEmCc6b3FQ=="],
 
@@ -3163,8 +3163,6 @@
 
     "fs-minipass/minipass": ["minipass@2.9.0", "", { "dependencies": { "safe-buffer": "^5.1.2", "yallist": "^3.0.0" } }, "sha512-wxfUjg9WebH+CUDX/CdbRlh5SmfZiy/hpkxaRI16Y9W56Pa75sWgd/rvFilSgrauD9NyFymP/+JFV3KwzIsJeg=="],
 
-    "gitbook/@gitbook/api": ["@gitbook/api@0.88.1", "", { "dependencies": { "event-iterator": "^2.0.0", "eventsource-parser": "^3.0.0" } }, "sha512-u+xzuWKbuTe25VTEiFEcZ49Jst8QCVrc6R7MycU4HnS3KKazuCk8gA30JU/JKINkUElMmPLsTOQPY3ZAYvPkVQ=="],
-
     "glob/minimatch": ["minimatch@9.0.5", "", { "dependencies": { "brace-expansion": "^2.0.1" } }, "sha512-G6T0ZX48xgozx7587koeX9Ys2NYy6Gmv//P89sEte9V9whIapMNF4idKxnW2QtCcLiTWlb/wfCabAtAFWhhBow=="],
 
     "google-auth-library/jws": ["jws@4.0.0", "", { "dependencies": { "jwa": "^2.0.0", "safe-buffer": "^5.0.1" } }, "sha512-KDncfTmOZoOMTFG4mBlG0qUIOlc03fmzH+ru6RgYVZhPkyiy/92Owlt/8UEN+a4TXR1FQetfIpJE8ApdvdVxTg=="],
@@ -3508,8 +3506,6 @@
     "codemirror/@codemirror/language/@lezer/common": ["@lezer/common@1.2.2", "", {}, "sha512-Z+R3hN6kXbgBWAuejUNPihylAL1Z5CaFqnIe0nTX8Ej+XlIy3EGtXxn6WtLMO+os2hRkQvm2yvaGMYliUzlJaw=="],
 
     "eslint/ajv/json-schema-traverse": ["json-schema-traverse@0.4.1", "", {}, "sha512-xbbCH5dCYU5T8LcEhhuh7HJ88HXuW3qsI3Y0zOZFKfZEHcpWiHU/Jxzk629Brsab/mMiHQti9wMP+845RPe3Vg=="],
-
-    "gitbook/@gitbook/api/eventsource-parser": ["eventsource-parser@3.0.0", "", {}, "sha512-T1C0XCUimhxVQzW4zFipdx0SficT651NnkR0ZSH3yQwh+mFMdLfgjABVi4YtMTtaL4s168593DaoaRLMqryavA=="],
 
     "glob/minimatch/brace-expansion": ["brace-expansion@2.0.1", "", { "dependencies": { "balanced-match": "^1.0.0" } }, "sha512-XnAIvQ8eM+kC6aULx6wuQiwVsnzsi9d3WxzV3FpWTGA19F621kwdbsAcFKXgKUHZWsy+mY6iL1sHTxWEFCytDA=="],
 

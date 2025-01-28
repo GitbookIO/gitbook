@@ -82,8 +82,11 @@ async function MoreMenuLink(props: {
                 insights={
                     link.to
                         ? {
-                              target: link.to,
-                              position: SiteInsightsLinkPosition.Header,
+                              type: 'link_click',
+                              link: {
+                                  target: link.to,
+                                  position: SiteInsightsLinkPosition.Header,
+                              },
                           }
                         : undefined
                 }

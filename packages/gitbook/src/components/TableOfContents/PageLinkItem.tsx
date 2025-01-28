@@ -36,8 +36,11 @@ export async function PageLinkItem(props: { page: RevisionPageLink; context: Con
                     'dark:hover:bg-light/2',
                 )}
                 insights={{
-                    target: page.target,
-                    position: SiteInsightsLinkPosition.Sidebar,
+                    type: 'link_click',
+                    link: {
+                        target: page.target,
+                        position: SiteInsightsLinkPosition.Sidebar,
+                    },
                 }}
             >
                 <TOCPageIcon page={page} />

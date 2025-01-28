@@ -10,7 +10,7 @@ import * as cookies from '@/lib/cookies';
 import { getSession } from './sessions';
 import { getVisitorId } from './visitorId';
 
-type SiteEventName = api.SiteInsightsEvent['type'];
+export type InsightsEventName = api.SiteInsightsEvent['type'];
 
 /**
  * Global context for all events in the session.
@@ -46,15 +46,14 @@ interface InsightsEventOptions {
 /**
  * Input data for an event.
  */
-type TrackEventInput<EventName extends SiteEventName> = { type: EventName } & Omit<
-    Extract<api.SiteInsightsEvent, { type: EventName }>,
-    'location' | 'session'
->;
+export type TrackEventInput<EventName extends InsightsEventName = InsightsEventName> = {
+    type: EventName;
+} & Omit<Extract<api.SiteInsightsEvent, { type: EventName }>, 'location' | 'session'>;
 
 /**
  * Callback to track an event.
  */
-type TrackEventCallback = <EventName extends SiteEventName>(
+type TrackEventCallback = <EventName extends InsightsEventName>(
     event: TrackEventInput<EventName>,
     ctx?: InsightsEventPageContext,
     options?: InsightsEventOptions,
@@ -80,7 +79,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
         [pathname: string]:
             | {
                   url: string;
-                  events: TrackEventInput<SiteEventName>[];
+                  events: TrackEventInput<InsightsEventName>[];
                   context: InsightsEventContext;
                   pageContext?: InsightsEventPageContext;
               }
@@ -152,7 +151,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
 
     const trackEvent: TrackEventCallback = useEventCallback(
         (
-            event: TrackEventInput<SiteEventName>,
+            event: TrackEventInput<InsightsEventName>,
             ctx?: InsightsEventPageContext,
             options?: InsightsEventOptions,
         ) => {
@@ -253,7 +252,7 @@ function sendEvents(args: {
  */
 function transformEvents(input: {
     url: string;
-    events: TrackEventInput<SiteEventName>[];
+    events: TrackEventInput<InsightsEventName>[];
     context: InsightsEventContext;
     pageContext: InsightsEventPageContext;
     visitorId: string;

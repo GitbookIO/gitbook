@@ -26,8 +26,11 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
                 href={file.downloadURL}
                 download={file.name}
                 insights={{
-                    target: block.data.ref,
-                    position: SiteInsightsLinkPosition.Content,
+                    type: 'link_click',
+                    link: {
+                        target: block.data.ref,
+                        position: SiteInsightsLinkPosition.Content,
+                    },
                 }}
                 className={tcls(
                     'group/file',

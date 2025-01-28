@@ -168,11 +168,14 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                 insights={
                                     ref.file
                                         ? {
-                                              target: {
-                                                  kind: 'file',
-                                                  file: ref.file.id,
+                                              type: 'link_click',
+                                              link: {
+                                                  target: {
+                                                      kind: 'file',
+                                                      file: ref.file.id,
+                                                  },
+                                                  position: SiteInsightsLinkPosition.Content,
                                               },
-                                              position: SiteInsightsLinkPosition.Content,
                                           }
                                         : undefined
                                 }
@@ -225,8 +228,11 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                             insights={
                                 contentRef
                                     ? {
-                                          target: contentRef,
-                                          position: SiteInsightsLinkPosition.Content,
+                                          type: 'link_click',
+                                          link: {
+                                              target: contentRef,
+                                              position: SiteInsightsLinkPosition.Content,
+                                          },
                                       }
                                     : undefined
                             }
@@ -260,8 +266,11 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                             key={index}
                             href={resolved.href}
                             insights={{
-                                target: contentRef,
-                                position: SiteInsightsLinkPosition.Content,
+                                type: 'link_click',
+                                link: {
+                                    target: contentRef,
+                                    position: SiteInsightsLinkPosition.Content,
+                                },
                             }}
                         >
                             {resolved.text}

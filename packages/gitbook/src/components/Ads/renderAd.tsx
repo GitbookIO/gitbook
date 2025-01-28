@@ -1,5 +1,6 @@
 'use server';
 
+import { SiteInsightsAd, SiteInsightsAdPlacement } from '@gitbook/api';
 import { headers } from 'next/headers';
 
 import { AdClassicRendering } from './AdClassicRendering';
@@ -20,7 +21,7 @@ interface FetchLiveAdOptions {
     /** Mode to render the Ad */
     mode: 'classic' | 'auto' | 'cover';
     /** Name of the placement for the ad */
-    placement: string;
+    placement: SiteInsightsAdPlacement;
     /** If true, we'll not track it as an impression */
     ignore: boolean;
 }
@@ -47,16 +48,28 @@ export async function renderAd(options: FetchAdOptions) {
 
     const { ad } = result;
 
-    return (
-        <>
-            {mode === 'classic' || !('callToAction' in ad) ? (
-                <AdClassicRendering ad={ad} />
-            ) : (
-                <AdCoverRendering ad={ad} />
-            )}
-            {ad.pixel ? <AdPixels rawPixel={ad.pixel} /> : null}
-        </>
-    );
+    const insightsAd: SiteInsightsAd | null =
+        options.source === 'live'
+            ? {
+                  placement: options.placement,
+                  zoneId: options.zoneId,
+                  domain: 'company' in ad ? ad.company : '',
+              }
+            : null;
+
+    return {
+        children: (
+            <>
+                {mode === 'classic' || !('callToAction' in ad) ? (
+                    <AdClassicRendering ad={ad} insightsAd={insightsAd} />
+                ) : (
+                    <AdCoverRendering ad={ad} insightsAd={insightsAd} />
+                )}
+                {ad.pixel ? <AdPixels rawPixel={ad.pixel} /> : null}
+            </>
+        ),
+        insightsAd,
+    };
 }
 
 async function fetchAd({
