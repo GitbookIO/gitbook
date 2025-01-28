@@ -51,11 +51,14 @@ export async function PageFooterNavigation(props: {
                     title={previous.title}
                     href={previousHref}
                     insights={{
-                        target: {
-                            kind: 'page',
-                            page: previous.id,
+                        type: 'link_click',
+                        link: {
+                            target: {
+                                kind: 'page',
+                                page: previous.id,
+                            },
+                            position: SiteInsightsLinkPosition.Content,
                         },
-                        position: SiteInsightsLinkPosition.Content,
                     }}
                     reversed
                 />
@@ -67,11 +70,14 @@ export async function PageFooterNavigation(props: {
                     title={next.title}
                     href={nextHref}
                     insights={{
-                        target: {
-                            kind: 'page',
-                            page: next.id,
+                        type: 'link_click',
+                        link: {
+                            target: {
+                                kind: 'page',
+                                page: next.id,
+                            },
+                            position: SiteInsightsLinkPosition.Content,
                         },
-                        position: SiteInsightsLinkPosition.Content,
                     }}
                 />
             ) : null}

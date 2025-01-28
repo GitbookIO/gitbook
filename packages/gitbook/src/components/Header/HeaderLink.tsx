@@ -145,8 +145,11 @@ function HeaderItemButton(
                 }[linkStyle],
             )}
             insights={{
-                target: linkTarget,
-                position: SiteInsightsLinkPosition.Header,
+                type: 'link_click',
+                link: {
+                    target: linkTarget,
+                    position: SiteInsightsLinkPosition.Header,
+                },
             }}
             {...rest}
         >
@@ -175,8 +178,11 @@ function HeaderItemLink(props: Omit<HeaderLinkNavItemProps, 'linkStyle'>) {
             href={href}
             className={getHeaderLinkClassName({ headerPreset })}
             insights={{
-                target: linkTarget,
-                position: SiteInsightsLinkPosition.Header,
+                type: 'link_click',
+                link: {
+                    target: linkTarget,
+                    position: SiteInsightsLinkPosition.Header,
+                },
             }}
             {...rest}
         >
@@ -219,7 +225,13 @@ async function SubHeaderLink(props: {
     return (
         <DropdownMenuItem
             href={target.href}
-            insights={{ target: link.to, position: SiteInsightsLinkPosition.Header }}
+            insights={{
+                type: 'link_click',
+                link: {
+                    target: link.to,
+                    position: SiteInsightsLinkPosition.Header,
+                },
+            }}
         >
             {link.title}
         </DropdownMenuItem>

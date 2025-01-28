@@ -16,7 +16,7 @@
         "clean": "rm -rf ./.next && rm -rf ./public/~gitbook/static"
     },
     "dependencies": {
-        "@gitbook/api": "^0.88.1",
+        "@gitbook/api": "^0.89.0",
         "@gitbook/cache-do": "workspace:*",
         "@gitbook/emoji-codepoints": "workspace:*",
         "@gitbook/icons": "workspace:*",
@@ -40,8 +40,9 @@
         "jsontoxml": "^1.0.1",
         "katex": "^0.16.9",
         "mathjax": "^3.2.2",
+        "mdast-util-to-markdown": "^2.1.2",
         "memoizee": "^0.4.15",
-        "next": "14.2.15",
+        "next": "14.2.23",
         "next-themes": "^0.2.1",
         "nuqs": "^2.2.3",
         "object-hash": "^3.0.0",
@@ -69,11 +70,13 @@
     "devDependencies": {
         "@argos-ci/playwright": "^3.10.0",
         "@cloudflare/next-on-pages": "1.13.7",
+        "vercel": "^39.3.0",
         "@cloudflare/workers-types": "^4.20241230.0",
         "@playwright/test": "^1.49.1",
         "@types/js-cookie": "^3.0.6",
         "@types/jsontoxml": "^1.0.5",
         "@types/jsonwebtoken": "^9.0.6",
+        "@types/mdast": "^4.0.4",
         "@types/node": "^20",
         "@types/object-hash": "^3.0.6",
         "@types/parse-cache-control": "^1.0.4",

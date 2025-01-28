@@ -1,12 +1,20 @@
 'use client';
 
-import { SiteAds, SiteAdsStatus } from '@gitbook/api';
+import {
+    SiteAds,
+    SiteAdsStatus,
+    SiteInsightsAdPlacement,
+    SiteInsightsAd,
+    SiteInsightsTrademarkPlacement,
+} from '@gitbook/api';
 import * as React from 'react';
 
 import { t, useLanguage } from '@/intl/client';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { renderAd } from './renderAd';
+import { useTrackEvent } from '../Insights';
+import { Link } from '../primitives';
 
 /**
  * Zone ID provided by BuySellAds for the preview.
@@ -28,7 +36,7 @@ export function Ad({
 }: {
     zoneId: string | null;
     spaceId: string;
-    placement: string;
+    placement: SiteInsightsAdPlacement;
     ignore: boolean;
     style?: ClassValue;
     siteAdsStatus?: SiteAds['status'];
@@ -36,7 +44,20 @@ export function Ad({
 }) {
     const containerRef = React.useRef<HTMLDivElement>(null);
     const [visible, setVisible] = React.useState(false);
-    const [ad, setAd] = React.useState<React.ReactNode | undefined>(undefined);
+    const [ad, setAd] = React.useState<
+        { children: React.ReactNode; insightsAd: SiteInsightsAd | null } | undefined
+    >(undefined);
+    const trackEvent = useTrackEvent();
+
+    // Track display of the ad
+    React.useEffect(() => {
+        if (ad?.insightsAd) {
+            trackEvent({
+                type: 'ad_display',
+                ad: ad.insightsAd,
+            });
+        }
+    }, [ad]);
 
     // Observe the container visibility
     React.useEffect(() => {
@@ -121,7 +142,7 @@ export function Ad({
         <div ref={containerRef} className={tcls(style)} data-visual-test="removed">
             {ad ? (
                 <>
-                    {ad}
+                    {ad.children}
                     <AdSponsoredLink spaceId={spaceId} />
                 </>
             ) : null}
@@ -132,6 +153,7 @@ export function Ad({
 function AdSponsoredLink(props: { spaceId: string }) {
     const { spaceId } = props;
     const language = useLanguage();
+    const trackEvent = useTrackEvent();
 
     const viaUrl = new URL('https://www.gitbook.com');
     viaUrl.searchParams.set('utm_source', 'content');
@@ -149,9 +171,17 @@ function AdSponsoredLink(props: { spaceId: string }) {
                 'dark:text-light/5',
             )}
         >
-            <a target="_blank" href={viaUrl.toString()} className={tcls('hover:underline')}>
+            <Link
+                target="_blank"
+                href={viaUrl.toString()}
+                className={tcls('hover:underline')}
+                insights={{
+                    type: 'trademark_click',
+                    placement: SiteInsightsTrademarkPlacement.Ad,
+                }}
+            >
                 {t(language, 'sponsored_via_gitbook')}
-            </a>
+            </Link>
         </p>
     );
 }

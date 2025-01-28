@@ -35,8 +35,11 @@ export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>
             title={resolved.text}
             style={style}
             insights={{
-                target: block.data.ref,
-                position: SiteInsightsLinkPosition.Content,
+                type: 'link_click',
+                link: {
+                    target: block.data.ref,
+                    position: SiteInsightsLinkPosition.Content,
+                },
             }}
         />
     );

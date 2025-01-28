@@ -1,6 +1,6 @@
 import { OpenAPIFetcher } from './types';
 
-const SYMBOL_MARKDOWN_PARSED = '__$markdownParsed';
+export const SYMBOL_MARKDOWN_PARSED = '__$markdownParsed';
 export const SYMBOL_REF_RESOLVED = '__$refResolved';
 
 /**

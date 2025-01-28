@@ -5,6 +5,7 @@ import {
     Site,
     SiteAdsStatus,
     SiteCustomizationSettings,
+    SiteInsightsAdPlacement,
     Space,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
@@ -227,7 +228,7 @@ export async function PageAside(props: {
                 zoneId={
                     site?.ads && site.ads.status === SiteAdsStatus.Live ? site.ads.zoneId : null
                 }
-                placement="page.aside"
+                placement={SiteInsightsAdPlacement.Aside}
                 spaceId={space.id}
                 siteAdsStatus={site?.ads && site.ads.status ? site.ads.status : undefined}
                 ignore={process.env.NODE_ENV !== 'production'}

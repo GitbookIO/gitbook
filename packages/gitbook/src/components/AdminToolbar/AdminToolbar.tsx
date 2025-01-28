@@ -1,5 +1,6 @@
 import { Space } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
+import { headers } from 'next/headers';
 import React from 'react';
 
 import { getChangeRequest, getRevision, SiteContentPointer } from '@/lib/api';
@@ -43,8 +44,15 @@ function ToolbarLayout(props: { children: React.ReactNode }) {
 /**
  * Toolbar with information for the content admin when previewing a revision or change-request.
  */
-export function AdminToolbar(props: AdminToolbarProps) {
+export async function AdminToolbar(props: AdminToolbarProps) {
     const { content } = props;
+    const mode = await headers().get('x-gitbook-mode');
+
+    if (mode === 'multi-id') {
+        // We don't show the admin toolbar in multi-id mode, as it's used for previewing in the dashboard.
+        return null;
+    }
+
     if (content.changeRequestId) {
         return (
             <ChangeRequestToolbar
