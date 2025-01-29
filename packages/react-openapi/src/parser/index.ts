@@ -7,7 +7,11 @@ import { parseOpenAPIV3 } from './v3';
  * It will also convert Swagger 2.0 to OpenAPI 3.0.
  * It can throw an `OpenAPIParseError` if the document is invalid.
  */
-export async function parseOpenAPI(input: { value: string; url: string }) {
+export async function parseOpenAPI(input: {
+    value: string;
+    url: string;
+    parseMarkdown: (input: string) => Promise<string>;
+}) {
     try {
         return await parseOpenAPIV3(input);
     } catch (error) {

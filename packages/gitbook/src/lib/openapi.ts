@@ -66,12 +66,11 @@ const fetcher: OpenAPIFetcher = {
             }
 
             const text = await response.text();
-            const data = await parseOpenAPI({ url, value: text });
+            const data = await parseOpenAPI({ url, value: text, parseMarkdown });
             return {
                 ...parseCacheResponse(response),
                 data,
             };
         },
     }),
-    parseMarkdown,
 };

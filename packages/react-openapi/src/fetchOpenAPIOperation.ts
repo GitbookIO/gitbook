@@ -15,11 +15,6 @@ export interface OpenAPIFetcher {
         | OpenAPIV3_1.Document<OpenAPICustomSpecProperties>
         | OpenAPIV3.Document<OpenAPICustomSpecProperties>
     >;
-
-    /**
-     * Parse markdown to the react element to render.
-     */
-    parseMarkdown?: (input: string) => Promise<string>;
 }
 
 export interface OpenAPIOperationData extends OpenAPICustomSpecProperties {
@@ -55,14 +50,6 @@ export async function fetchOpenAPIOperation(
 
     if (!operation) {
         return null;
-    }
-
-    // Parse description in markdown
-    const { parseMarkdown } = fetcher;
-    if (parseMarkdown) {
-        console.time(`${input.path} ${input.method} - parseDescriptions`);
-        operation = await parseDescriptions({ specification: operation, parseMarkdown });
-        console.timeEnd(`${input.path} ${input.method} - parseDescriptions`);
     }
 
     // Resolve common parameters

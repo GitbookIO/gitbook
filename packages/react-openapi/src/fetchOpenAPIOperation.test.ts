@@ -6,7 +6,7 @@ import { parseOpenAPI } from './parser';
 const fetcher: OpenAPIFetcher = {
     fetch: async (url) => {
         const response = await fetch(url);
-        return parseOpenAPI({ value: await response.text(), url });
+        return parseOpenAPI({ value: await response.text(), url, parseMarkdown: async (v) => v });
     },
 };
 
