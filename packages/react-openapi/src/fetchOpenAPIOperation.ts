@@ -1,10 +1,11 @@
 import { toJSON, fromJSON } from 'flatted';
-import { OpenAPIV3 } from 'openapi-types';
 import YAML from 'yaml';
 import swagger2openapi, { ConvertOutputOptions } from 'swagger2openapi';
 
-import { resolveOpenAPIPath } from './resolveOpenAPIPath';
 import { OpenAPIFetcher } from './types';
+import { dereference, validate, traverse, AnyObject } from '@scalar/openapi-parser';
+import { OpenAPI, OpenAPIV2, OpenAPIV3, OpenAPIV3_1 } from '@scalar/openapi-types';
+import { noReference } from './utils';
 
 export interface OpenAPIOperationData extends OpenAPICustomSpecProperties {
     path: string;
@@ -14,7 +15,7 @@ export interface OpenAPIOperationData extends OpenAPICustomSpecProperties {
     servers: OpenAPIV3.ServerObject[];
 
     /** Spec of the operation */
-    operation: OpenAPIV3.OperationObject & OpenAPICustomOperationProperties;
+    operation: OpenAPI.Operation & OpenAPICustomOperationProperties;
 
     /** Securities that should be used for this operation */
     securities: [string, OpenAPIV3.SecuritySchemeObject][];
@@ -79,56 +80,51 @@ export async function fetchOpenAPIOperation(
 ): Promise<OpenAPIOperationData | null> {
     const fetcher = cacheFetcher(rawFetcher);
 
-    let operation = await resolveOpenAPIPath<OpenAPIV3.OperationObject>(
-        input.url,
-        ['paths', input.path, input.method],
-        fetcher,
-    );
+    const specData = await fetcher.fetch(input.url);
+
+    const { valid } = await validate(specData);
+
+    // Spec is invalid, we stop here.
+    if (!valid) {
+        return null;
+    }
+
+    const { schema } = await dereference(specData);
+
+    // No schema, we stop here.
+    if (!schema) {
+        return null;
+    }
+
+    let operation = getOperationByPathAndMethod(schema, input.path, input.method);
 
     if (!operation) {
         return null;
     }
 
-    const specData = await fetcher.fetch(input.url);
-
-    // Resolve common parameters
-    const commonParameters = await resolveOpenAPIPath<OpenAPIV3.ParameterObject[]>(
-        input.url,
-        ['paths', input.path, 'parameters'],
-        fetcher,
-    );
-    if (commonParameters) {
-        operation = {
-            ...operation,
-            parameters: [...commonParameters, ...(operation.parameters ?? [])],
-        };
+    // Parse description in markdown
+    const { parseMarkdown } = fetcher;
+    if (parseMarkdown) {
+        operation = await parseDescriptions(operation, parseMarkdown);
     }
 
-    // Resolve servers
-    const servers = await resolveOpenAPIPath<OpenAPIV3.ServerObject[]>(
-        input.url,
-        ['servers'],
-        fetcher,
-    );
+    const servers: OpenAPIV3.ServerObject[] = 'servers' in schema ? (schema.servers ?? []) : [];
+    const security: OpenAPIV3.SecurityRequirementObject[] = operation.security ?? [];
 
     // Resolve securities
     const securities: OpenAPIOperationData['securities'] = [];
-    for (const security of operation.security ?? []) {
-        const securityKey = Object.keys(security)[0];
-
-        const securityScheme = await resolveOpenAPIPath<OpenAPIV3.SecuritySchemeObject>(
-            input.url,
-            ['components', 'securitySchemes', securityKey],
-            fetcher,
-        );
-
+    for (const entry of security) {
+        const securityKey = Object.keys(entry)[0];
+        const securityScheme = (schema as OpenAPIV3.Document).components?.securitySchemes?.[
+            securityKey
+        ];
         if (securityScheme) {
-            securities.push([securityKey, securityScheme]);
+            securities.push([securityKey, noReference(securityScheme)]);
         }
     }
 
     return {
-        servers: servers ?? [],
+        servers,
         operation,
         method: input.method,
         path: input.path,
@@ -140,6 +136,51 @@ export async function fetchOpenAPIOperation(
                 ? specData['x-hideTryItPanel']
                 : undefined,
     };
+}
+
+type PathItemObject = Record<
+    string,
+    OpenAPIV2.PathItemObject | OpenAPIV3.PathItemObject | OpenAPIV3_1.PathItemObject
+>;
+
+async function parseDescriptions<T extends AnyObject>(
+    spec: T,
+    parseMarkdown: (input: string) => Promise<string>,
+): Promise<T> {
+    const promises: Record<string, Promise<string>> = {};
+    const results: Record<string, string> = {};
+    traverse(spec, (obj) => {
+        if ('description' in obj && typeof obj.description === 'string') {
+            promises[obj.description] = parseMarkdown(obj.description);
+        }
+        return obj;
+    });
+    await Promise.all(
+        Object.entries(promises).map(async ([key, promise]) => {
+            results[key] = await promise;
+        }),
+    );
+    return traverse(spec, (obj) => {
+        if ('description' in obj && typeof obj.description === 'string') {
+            obj.description = results[obj.description];
+        }
+        return obj;
+    }) as T;
+}
+
+/**
+ * Get an operation by its path and method.
+ */
+function getOperationByPathAndMethod(schema: OpenAPI.Document, path: string, method: string) {
+    const normalizedMethod = method.toLowerCase();
+    const pathObject = schema.paths?.[path] as PathItemObject;
+    if (!pathObject) {
+        return null;
+    }
+    if (!pathObject[normalizedMethod]) {
+        return null;
+    }
+    return pathObject[normalizedMethod] as OpenAPI.Operation;
 }
 
 function cacheFetcher(fetcher: OpenAPIFetcher): OpenAPIFetcher {

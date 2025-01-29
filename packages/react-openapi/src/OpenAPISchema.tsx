@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { OpenAPIV3 } from 'openapi-types';
+import { OpenAPIV3 } from '@scalar/openapi-types';
 import React, { useId } from 'react';
 
 import { InteractiveSection } from './InteractiveSection';
@@ -362,7 +362,7 @@ function getSchemaTitle(
     }
 
     // Try using the discriminator
-    if (discriminator && schema.properties) {
+    if (discriminator?.propertyName && schema.properties) {
         const discriminatorProperty = noReference(schema.properties[discriminator.propertyName]);
         if (discriminatorProperty) {
             if (discriminatorProperty.enum) {

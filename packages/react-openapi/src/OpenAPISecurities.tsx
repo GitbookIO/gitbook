@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { OpenAPIV3 } from 'openapi-types';
+import { OpenAPIV3 } from '@scalar/openapi-types';
 import { OpenAPIClientContext } from './types';
 import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';

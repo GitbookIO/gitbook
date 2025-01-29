@@ -57,7 +57,7 @@ export function OpenAPIOperation(props: {
                 </div>
                 <div className={classNames('openapi-columns')}>
                     <div className={classNames('openapi-column-spec')}>
-                        <OpenAPISpec rawData={toJSON(data)} context={clientContext} />
+                        <OpenAPISpec data={data} context={clientContext} />
                     </div>
                     <div className={classNames('openapi-column-preview')}>
                         <div className={classNames('openapi-column-preview-body')}>

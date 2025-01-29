@@ -9,6 +9,7 @@ import { ScalarApiButton } from './ScalarApiButton';
 import { OpenAPIContextProps } from './types';
 import { noReference } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
+import { OpenAPIV3 } from '@scalar/openapi-types';
 
 /**
  * Display code samples to execute the operation.
@@ -50,8 +51,11 @@ export function OpenAPICodeSample(props: {
         }
     });
 
-    const requestBody = noReference(data.operation.requestBody);
-    const requestBodyContent = requestBody ? Object.entries(requestBody.content)[0] : undefined;
+    const requestBody = noReference((data.operation as OpenAPIV3.OperationObject).requestBody);
+    const requestBodyContentEntries = requestBody?.content
+        ? Object.entries(requestBody.content)
+        : undefined;
+    const requestBodyContent = requestBodyContentEntries?.[0];
 
     const input: CodeSampleInput = {
         url:
