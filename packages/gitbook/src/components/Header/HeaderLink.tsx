@@ -161,13 +161,12 @@ function HeaderItemButton(
 function getHeaderLinkClassName(props: { headerPreset: CustomizationHeaderPreset }) {
     return tcls(
         'flex items-center shrink',
-        'hover:text-header-link-400',
         'min-w-0',
         'contrast-more:underline',
 
         props.headerPreset === CustomizationHeaderPreset.Default
             ? ['text-gray']
-            : ['text-header-link-500 hover:text-header-link-400'],
+            : ['text-header-link'],
     );
 }
 

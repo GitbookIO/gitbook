@@ -142,7 +142,7 @@ export async function RecordCard(
         'before:h-full',
         'before:rounded-[inherit]',
         'before:ring-1',
-        'before:ring-gray-subtle',
+        'before:ring-gray-12/2', // TODO @Zeno: Improve ring overlay
         'before:z-10',
         'before:relative',
     ] as ClassValue;
@@ -151,7 +151,7 @@ export async function RecordCard(
         return (
             <Link
                 href={target.href}
-                className={tcls(style, 'hover:before:ring-gray-hover')}
+                className={tcls(style, 'hover:before:ring-gray-12/5')}
                 insights={{
                     type: 'link_click',
                     link: {

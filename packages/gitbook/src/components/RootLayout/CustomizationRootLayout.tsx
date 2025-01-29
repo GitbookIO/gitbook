@@ -79,11 +79,11 @@ export async function CustomizationRootLayout(props: {
 
                         --gray-original: ${hexToRgb(DEFAULT_TINT_COLOR)};
                         ${generateColorVariable('gray', Object.fromEntries(colorScale(DEFAULT_TINT_COLOR).map((shade, index) => [index + 1, shade])))}
-                        --contrast-tint-original: ${hexToRgb(colorContrast(DEFAULT_TINT_COLOR))};
+                        --contrast-gray-original: ${hexToRgb(colorContrast(DEFAULT_TINT_COLOR))};
                         ${generateColorVariable('contrast-gray', Object.fromEntries(colorScale(DEFAULT_TINT_COLOR).map((shade, index) => [index + 1, colorContrast(shade)])))}
 
-                        --header-backround: ${headerTheme.backgroundColor.light}
-                        --header-link: ${headerTheme.linkColor.light}
+                        --header-background: ${hexToRgb(headerTheme.backgroundColor.light)};
+                        --header-link: ${hexToRgb(headerTheme.linkColor.light)};
                     }
 
                     .dark {
@@ -99,11 +99,11 @@ export async function CustomizationRootLayout(props: {
 
                         --gray-original: ${hexToRgb(DEFAULT_TINT_COLOR)};
                         ${generateColorVariable('gray', Object.fromEntries(colorScale(DEFAULT_TINT_COLOR, { darkMode: true }).map((shade, index) => [index + 1, shade])))}
-                        --contrast-tint-original: ${hexToRgb(colorContrast(DEFAULT_TINT_COLOR))};
+                        --contrast-gray-original: ${hexToRgb(colorContrast(DEFAULT_TINT_COLOR))};
                         ${generateColorVariable('contrast-gray', Object.fromEntries(colorScale(DEFAULT_TINT_COLOR, { darkMode: true }).map((shade, index) => [index + 1, colorContrast(shade)])))}
 
-                        --header-backround: ${headerTheme.backgroundColor.light}
-                        --header-link: ${headerTheme.linkColor.light}
+                        --header-background: ${hexToRgb(headerTheme.backgroundColor.dark)};
+                        --header-link: ${hexToRgb(headerTheme.linkColor.dark)};   
                     }
                 `}</style>
             </head>

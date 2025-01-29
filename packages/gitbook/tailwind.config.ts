@@ -100,8 +100,8 @@ const config: Config = {
                 gray: generateVarShades('gray'),
                 'contrast-gray': generateVarShades('contrast-gray'),
 
-                'header-background': generateVarShades('header-background', undefined, true),
-                'header-link': generateVarShades('header-link', undefined, true),
+                'header-background': 'rgb(var(--header-background))',
+                'header-link': 'rgb(var(--header-link))',
 
                 light: {
                     1: `color-mix(in srgb, var(--light-1), transparent calc(100% - 100% * <alpha-value>))`, //1 99%
