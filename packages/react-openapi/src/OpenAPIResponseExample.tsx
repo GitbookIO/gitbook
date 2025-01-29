@@ -5,7 +5,8 @@ import { OpenAPIContextProps } from './types';
 import { noReference } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { OpenAPIV3 } from '@scalar/openapi-types';
-import { OpenAPITabs } from './OpenAPITabs';
+import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
+import { InteractiveSection } from './InteractiveSection';
 
 /**
  * Display an example of the response content.
@@ -88,6 +89,7 @@ export function OpenAPIResponseExample(props: {
             return {
                 key: key,
                 label: key,
+                description: responseObject.description,
                 body: (
                     <context.CodeBlock
                         code={
@@ -100,15 +102,25 @@ export function OpenAPIResponseExample(props: {
                 ),
             };
         })
-        .filter((val): val is { key: string; label: string; body: any } => Boolean(val));
+        .filter((val): val is { key: string; label: string; body: any; description: string } =>
+            Boolean(val),
+        );
 
     if (examples.length === 0) {
         return null;
     }
 
     return (
-        <div className="openapi-response-example">
-            <OpenAPITabs tabs={examples} />
-        </div>
+        // <div className="openapi-response-example">
+        //     <OpenAPITabs tabs={examples} />
+        // </div>
+        <OpenAPITabs>
+            <InteractiveSection
+                header={<OpenAPITabsList tabs={examples} />}
+                className="openapi-response-example"
+            >
+                <OpenAPITabsPanels tabs={examples} />
+            </InteractiveSection>
+        </OpenAPITabs>
     );
 }

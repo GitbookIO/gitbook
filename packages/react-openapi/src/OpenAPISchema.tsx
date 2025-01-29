@@ -7,10 +7,11 @@ import { Markdown } from './Markdown';
 import { OpenAPIClientContext } from './types';
 import { checkIsReference, noReference } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
+import { OpenAPISchemaName } from './OpenAPISchemaName';
 
 type CircularRefsIds = Map<OpenAPIV3.SchemaObject, string>;
 
-interface OpenAPISchemaPropertyEntry {
+export interface OpenAPISchemaPropertyEntry {
     propertyName?: string;
     required?: boolean;
     schema: OpenAPIV3.SchemaObject;
@@ -84,19 +85,11 @@ export function OpenAPISchemaProperty(
             }))}
             header={
                 <div className={classNames('openapi-schema-presentation')}>
-                    <div className={classNames('openapi-schema-name')}>
-                        {propertyName ? (
-                            <span className={classNames('openapi-schema-propertyname')}>
-                                {propertyName}
-                            </span>
-                        ) : null}
-                        <span className={classNames('openapi-schema-type')}>
-                            {getSchemaTitle(schema)}
-                        </span>
-                        {required ? (
-                            <span className={classNames('openapi-schema-required')}>required</span>
-                        ) : null}
-                    </div>
+                    <OpenAPISchemaName
+                        type={getSchemaTitle(schema)}
+                        propertyName={propertyName}
+                        required={required}
+                    />
                     {schema.description ? (
                         <Markdown
                             source={schema.description}
@@ -362,7 +355,7 @@ function flattenAlternatives(
     }, [] as OpenAPIV3.SchemaObject[]);
 }
 
-function getSchemaTitle(
+export function getSchemaTitle(
     schema: OpenAPIV3.SchemaObject,
 
     /** If the title is inferred in a oneOf with discriminator, we can use it to optimize the title */
@@ -390,7 +383,7 @@ function getSchemaTitle(
         type = 'enum';
         // check array AND schema.items as this is sometimes null despite what the type indicates
     } else if (schema.type === 'array' && !!schema.items) {
-        type = `array of ${getSchemaTitle(noReference(schema.items))}`;
+        type = `${getSchemaTitle(noReference(schema.items))}[]`;
     } else if (schema.type || schema.properties) {
         type = schema.type ?? 'object';
 
