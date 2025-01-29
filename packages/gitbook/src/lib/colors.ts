@@ -136,8 +136,8 @@ export function colorScale(
 
     const mapping = darkMode
         ? // bgs     |components      |borders         |solid     |text
-          [1.0, 0.95, 0.92, 0.9, 0.87, 0.85, 0.8, 0.75, 0.5, 0.45, 0.25, 0]
-        : [1.0, 0.98, 0.97, 0.95, 0.93, 0.9, 0.85, 0.8, 0.5, 0.45, 0.4, 0];
+          [1, 0.95, 0.92, 0.9, 0.87, 0.85, 0.8, 0.75, 0.5, 0.45, 0.25, 0]
+        : [1, 0.98, 0.97, 0.95, 0.93, 0.9, 0.85, 0.8, 0.5, 0.45, 0.4, 0];
 
     const result = [];
 
@@ -152,11 +152,11 @@ export function colorScale(
         }
 
         // Mix in more of the background while maintaining chroma
-        const mixRatio = index >= 8 ? 0 : 1 - (index + 1) / mapping.length; // Higher mixRatio means more background contribution
+        const mixRatio = index >= 8 ? 1 : (index + 1) / mapping.length; // Higher mixRatio means more background contribution
 
         const shade = {
             L: targetL, // Blend lightness
-            C: baseColor.C * (1 - mixRatio),
+            C: baseColor.C * mixRatio,
             H: baseColor.H, // Maintain the hue from the base color
         };
 

@@ -36,7 +36,8 @@ export function Trademark(props: {
                 'sidebar-filled:pb-2',
 
                 'bg-gray-base',
-                'sidebar-filled:bg-gray-subtle',
+                'tint:bg-tint-base',
+                'sidebar-filled:bg-tint-subtle',
                 '[html.tint.sidebar-filled_&]:bg-gray-base',
 
                 'before:hidden',
@@ -49,7 +50,8 @@ export function Trademark(props: {
                 'before:bg-gradient-to-b',
                 'before:from-transparent',
                 'before:to-gray-base',
-                'sidebar-filled:before:to-gray-subtle',
+                'tint:before:to-tint-base',
+                'sidebar-filled:before:to-tint-subtle',
                 '[html.tint.sidebar-filled_&]:before:to-gray-base',
             )}
         >

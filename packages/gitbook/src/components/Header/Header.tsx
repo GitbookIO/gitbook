@@ -49,6 +49,7 @@ export function Header(props: {
                 'shadow-[0px_1px_0px]',
                 'shadow-gray-12/2',
                 'bg-gray-base/9', // TODO @Zeno: Fix tint display
+                'tint:bg-tint-base/9',
                 'contrast-more:bg-gray-base',
                 withTopHeader ? null : 'lg:hidden',
                 'text-sm',

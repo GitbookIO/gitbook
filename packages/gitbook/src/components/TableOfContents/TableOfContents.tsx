@@ -92,8 +92,9 @@ export function TableOfContents(props: {
                     'flex-col',
                     'flex-grow',
 
-                    'sidebar-filled:bg-gray-subtle',
-                    '[html.tint.sidebar-filled_&]:bg-tint-base',
+                    'sidebar-filled:bg-tint-subtle',
+                    '[html.tint.sidebar-filled_&]:bg-white',
+                    'dark:[html.tint.sidebar-filled_&]:bg-black/2',
 
                     'sidebar-filled:rounded-xl',
                     'straight-corners:rounded-none',

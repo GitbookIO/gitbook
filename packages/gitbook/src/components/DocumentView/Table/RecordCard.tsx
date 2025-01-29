@@ -142,7 +142,7 @@ export async function RecordCard(
         'before:h-full',
         'before:rounded-[inherit]',
         'before:ring-1',
-        'before:ring-gray-12/2', // TODO @Zeno: Improve ring overlay
+        'before:ring-gray-12/2',
         'before:z-10',
         'before:relative',
     ] as ClassValue;

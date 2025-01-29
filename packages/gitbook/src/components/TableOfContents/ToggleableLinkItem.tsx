@@ -119,7 +119,7 @@ export function ToggleableLinkItem(
                     'text-balance',
                     'text-gray',
                     'hover:text-gray-strong',
-                    'hover:bg-gray',
+                    'hover:bg-gray-12/1',
                     'hover:before:bg-gray',
                     'contrast-more:text-gray-strong',
 
@@ -144,13 +144,13 @@ export function ToggleableLinkItem(
 
                         'before:bg-tint-solid',
                         'text-tint',
-                        'sidebar-list-pill:bg-tint',
+                        'sidebar-list-pill:bg-tint-solid/3',
                         'sidebar-list-pill:text-tint',
 
-                        'hover:bg-tint',
+                        'hover:bg-tint-solid-hover/3',
                         'hover:text-tint',
                         'hover:before:bg-tint-solid-hover',
-                        'sidebar-list-pill:hover:bg-tint-hover',
+                        'sidebar-list-pill:hover:bg-tint-solid-hover/4',
 
                         'contrast-more:text-tint-strong',
                         'contrast-more:hover:text-tint-strong',

@@ -51,8 +51,8 @@ export async function CustomizationRootLayout(props: {
                 customization.styling.corners === CustomizationCorners.Straight
                     ? ' straight-corners'
                     : '',
-                tintColor ? ' tint' : 'no-tint', // TODO @Zeno: Fix tint display
-                sidebarStyles.background && ' sidebar-' + sidebarStyles.background,
+                'tint', //tintColor ? ' tint' : 'no-tint', // TODO @Zeno: Fix tint display
+                'sidebar-filled', sidebarStyles.background && ' sidebar-' + sidebarStyles.background,
                 sidebarStyles.list && ' sidebar-list-' + sidebarStyles.list,
             )}
         >
@@ -76,6 +76,8 @@ export async function CustomizationRootLayout(props: {
                         ${generateColorVariable('tint', Object.fromEntries(colorScale(tintColor?.light ?? customization.styling.primaryColor.light ?? DEFAULT_TINT_COLOR).map((shade, index) => [index + 1, shade])))}
                         --contrast-tint-original: ${hexToRgb(colorContrast(tintColor?.light ?? customization.styling.primaryColor.light ?? DEFAULT_TINT_COLOR))};
                         ${generateColorVariable('contrast-tint', Object.fromEntries(colorScale(tintColor?.light ?? customization.styling.primaryColor.light ?? DEFAULT_TINT_COLOR).map((shade, index) => [index + 1, colorContrast(shade)])))}
+
+                        // TODO @Zeno: Replace tint & gray with 1 variable that gets filled up with tint if needed
 
                         --gray-original: ${hexToRgb(DEFAULT_TINT_COLOR)};
                         ${generateColorVariable('gray', Object.fromEntries(colorScale(DEFAULT_TINT_COLOR).map((shade, index) => [index + 1, shade])))}
@@ -113,6 +115,7 @@ export async function CustomizationRootLayout(props: {
                     `${fonts[customization.styling.font].className}`,
                     `${ibmPlexMono.variable}`,
                     'bg-gray-base',
+                    'tint:bg-tint-base',
                 )}
             >
                 <details className='text-center'>
