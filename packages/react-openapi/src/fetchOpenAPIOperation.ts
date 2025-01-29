@@ -108,6 +108,15 @@ export async function fetchOpenAPIOperation(
         operation = await parseDescriptions(operation, parseMarkdown);
     }
 
+    // Resolve common parameters
+    const commonParameters = getPathObjectParameter(schema, input.path);
+    if (commonParameters) {
+        operation = {
+            ...operation,
+            parameters: [...commonParameters, ...(operation.parameters ?? [])],
+        };
+    }
+
     const servers: OpenAPIV3.ServerObject[] = 'servers' in schema ? (schema.servers ?? []) : [];
     const security: OpenAPIV3.SecurityRequirementObject[] = operation.security ?? [];
 
@@ -169,14 +178,38 @@ async function parseDescriptions<T extends AnyObject>(
 }
 
 /**
+ * Get a path object from its path.
+ */
+function getPathObject(schema: OpenAPI.Document, path: string) {
+    if (schema.paths?.[path]) {
+        return schema.paths[path] as PathItemObject;
+    }
+    return null;
+}
+
+/**
+ * Resolve parameters from a path in an OpenAPI schema.
+ */
+function getPathObjectParameter(
+    schema: OpenAPI.Document,
+    path: string,
+): OpenAPIV3.ParameterObject[] | null {
+    const pathObject = getPathObject(schema, path) as OpenAPIV3.PathItemObject | null;
+    if (pathObject?.parameters) {
+        return pathObject.parameters.map(noReference);
+    }
+    return null;
+}
+
+/**
  * Get an operation by its path and method.
  */
 function getOperationByPathAndMethod(schema: OpenAPI.Document, path: string, method: string) {
-    const normalizedMethod = method.toLowerCase();
-    const pathObject = schema.paths?.[path] as PathItemObject;
+    const pathObject = getPathObject(schema, path);
     if (!pathObject) {
         return null;
     }
+    const normalizedMethod = method.toLowerCase();
     if (!pathObject[normalizedMethod]) {
         return null;
     }
