@@ -45,13 +45,12 @@ export async function fetchOpenAPIOperation(
         throw new Error(`Invalid OpenAPI spec: ${input.url}`);
     }
 
-    let { schema } = await dereference(specData);
+    const schema = await deferenceSchema(specData);
 
     // No schema, we stop here.
     if (!schema) {
         throw new Error(`Schema undefined following the dereference operation: ${input.url}`);
     }
-    schema = schema as OpenAPIV3_1.Document;
 
     let operation = getOperationByPathAndMethod(schema, input.path, input.method);
 
@@ -100,6 +99,15 @@ export async function fetchOpenAPIOperation(
                 ? specData['x-hideTryItPanel']
                 : undefined,
     };
+}
+
+async function deferenceSchema<T extends OpenAPIV3_1.Document>(schema: T): Promise<T | null> {
+    const result = await dereference(schema);
+    if (result.schema) {
+        return result.schema as T;
+    }
+    // Dereference will return the same type as the input
+    return null;
 }
 
 async function parseDescriptions<T extends AnyObject>(

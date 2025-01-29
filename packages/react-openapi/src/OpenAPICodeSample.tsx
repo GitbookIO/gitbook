@@ -51,7 +51,7 @@ export function OpenAPICodeSample(props: {
         }
     });
 
-    const requestBody = noReference((data.operation as OpenAPIV3.OperationObject).requestBody);
+    const requestBody = noReference(data.operation.requestBody);
     const requestBodyContentEntries = requestBody?.content
         ? Object.entries(requestBody.content)
         : undefined;
