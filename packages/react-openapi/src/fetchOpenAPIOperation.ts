@@ -1,9 +1,10 @@
 import { toJSON, fromJSON } from 'flatted';
 
 import { OpenAPICustomSpecProperties } from './parser';
-import { traverse, AnyObject } from '@scalar/openapi-parser';
 import { OpenAPIV3, OpenAPIV3_1 } from '@scalar/openapi-types';
 import { noReference } from './utils';
+import { traverse } from './parser/traverse';
+import { AnyObject } from '@scalar/openapi-parser';
 
 export interface OpenAPIFetcher {
     /**
