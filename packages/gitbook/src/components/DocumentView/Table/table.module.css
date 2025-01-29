@@ -6,6 +6,8 @@
     }
 }
 
+/* TODO @Zeno: Fix table colors */
+
 /* Apply styles to the Table if scrollbar exists */
 .tableWrapper {
     animation: detect-scroll linear;

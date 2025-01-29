@@ -26,14 +26,17 @@ function ToolbarLayout(props: { children: React.ReactNode }) {
                 'transform',
                 '-translate-x-1/2',
                 'rounded-full',
-                'bg-dark-1/9',
+
+                'bg-gray-12/9',
+                'dark:bg-gray-1/9',
+                
                 'shadow-lg',
                 'min-h-10',
                 'min-w-40',
                 'p-2',
                 'max-w-md',
-                'border-dark-1',
-                'backdrop-blur-sm',
+                'border-gray-12/1',
+                'backdrop-blur-md',
             )}
         >
             <React.Suspense fallback={null}>{props.children}</React.Suspense>
@@ -88,7 +91,7 @@ async function ChangeRequestToolbar(props: { spaceId: string; changeRequestId: s
                     <p>
                         #{changeRequest.number}: {changeRequest.subject ?? 'No subject'}
                     </p>
-                    <p className="text-xs text-light/8 dark:text-light/8">
+                    <p className="text-xs text-gray-2 dark:text-gray-11">
                         Change request updated <DateRelative value={changeRequest.updatedAt} />
                     </p>
                 </ToolbarBody>
@@ -126,7 +129,7 @@ async function RevisionToolbar(props: { spaceId: string; revisionId: string }) {
                         Revision created <DateRelative value={revision.createdAt} />
                     </p>
                     {revision.git ? (
-                        <p className="text-xs text-light/8 dark:text-light/8">
+                        <p className="text-xs text-gray-2 dark:text-gray-11">
                             {revision.git.message}
                         </p>
                     ) : null}

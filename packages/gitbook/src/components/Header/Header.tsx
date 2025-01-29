@@ -46,10 +46,9 @@ export function Header(props: {
                 'z-10',
                 'w-full',
                 'flex-none',
-                'shadow-thinbottom',
-                'shadow-gray-12/1',
-                'bg-gray-base/9',
-                'tint:bg-tint-base/9',
+                'shadow-[0px_1px_0px]',
+                'shadow-gray-12/2',
+                'bg-gray-base/9', // TODO @Zeno: Fix tint display
                 'contrast-more:bg-gray-base',
                 withTopHeader ? null : 'lg:hidden',
                 'text-sm',
@@ -61,8 +60,8 @@ export function Header(props: {
                     !isCustomizationDefault &&
                         withTopHeader && [
                             'bg-header-background',
-                            'shadow-thinbottom',
-                            'shadow-gray-12/1',
+                            'shadow-[0px_1px_0px]',
+                            'shadow-gray-12/2',
                         ],
                 )}
             >

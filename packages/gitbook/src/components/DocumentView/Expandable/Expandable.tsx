@@ -70,7 +70,6 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                         'right-4',
                         'flex',
                         'items-center',
-                        'dark:text-light/3',
                         'dark:shadow-none',
                         'dark:ring-0',
                     )}

@@ -88,19 +88,19 @@ export async function CustomizationRootLayout(props: {
 
                     .dark {
                         --primary-original: ${hexToRgb(customization.styling.primaryColor.dark)};
-                        ${generateColorVariable('primary', Object.fromEntries(colorScale(customization.styling.primaryColor.dark, {darkMode: true}).map((shade, index) => [index + 1, shade])))}
+                        ${generateColorVariable('primary', Object.fromEntries(colorScale(customization.styling.primaryColor.dark, { darkMode: true }).map((shade, index) => [index + 1, shade])))}
                         --contrast-primary-original: ${hexToRgb(colorContrast(customization.styling.primaryColor.dark))};
-                        ${generateColorVariable('contrast-primary', Object.fromEntries(colorScale(customization.styling.primaryColor.dark, {darkMode: true}).map((shade, index) => [index + 1, colorContrast(shade)])))}
+                        ${generateColorVariable('contrast-primary', Object.fromEntries(colorScale(customization.styling.primaryColor.dark, { darkMode: true }).map((shade, index) => [index + 1, colorContrast(shade)])))}
 
                         --tint-original: ${hexToRgb(tintColor?.dark ?? customization.styling.primaryColor.dark ?? DEFAULT_TINT_COLOR)};
-                        ${generateColorVariable('tint', Object.fromEntries(colorScale(tintColor?.dark ?? customization.styling.primaryColor.dark ?? DEFAULT_TINT_COLOR, {darkMode: true}).map((shade, index) => [index + 1, shade])))}
+                        ${generateColorVariable('tint', Object.fromEntries(colorScale(tintColor?.dark ?? customization.styling.primaryColor.dark ?? DEFAULT_TINT_COLOR, { darkMode: true }).map((shade, index) => [index + 1, shade])))}
                         --contrast-tint-original: ${hexToRgb(colorContrast(tintColor?.dark ?? customization.styling.primaryColor.dark ?? DEFAULT_TINT_COLOR))};
-                        ${generateColorVariable('contrast-tint', Object.fromEntries(colorScale(tintColor?.dark ?? customization.styling.primaryColor.dark ?? DEFAULT_TINT_COLOR, {darkMode: true}).map((shade, index) => [index + 1, colorContrast(shade)])))}
+                        ${generateColorVariable('contrast-tint', Object.fromEntries(colorScale(tintColor?.dark ?? customization.styling.primaryColor.dark ?? DEFAULT_TINT_COLOR, { darkMode: true }).map((shade, index) => [index + 1, colorContrast(shade)])))}
 
                         --gray-original: ${hexToRgb(DEFAULT_TINT_COLOR)};
-                        ${generateColorVariable('gray', Object.fromEntries(colorScale(DEFAULT_TINT_COLOR, {darkMode: true}).map((shade, index) => [index + 1, shade])))}
+                        ${generateColorVariable('gray', Object.fromEntries(colorScale(DEFAULT_TINT_COLOR, { darkMode: true }).map((shade, index) => [index + 1, shade])))}
                         --contrast-tint-original: ${hexToRgb(colorContrast(DEFAULT_TINT_COLOR))};
-                        ${generateColorVariable('contrast-gray', Object.fromEntries(colorScale(DEFAULT_TINT_COLOR, {darkMode: true}).map((shade, index) => [index + 1, colorContrast(shade)])))}
+                        ${generateColorVariable('contrast-gray', Object.fromEntries(colorScale(DEFAULT_TINT_COLOR, { darkMode: true }).map((shade, index) => [index + 1, colorContrast(shade)])))}
 
                         --header-backround: ${headerTheme.backgroundColor.light}
                         --header-link: ${headerTheme.linkColor.light}
@@ -115,88 +115,93 @@ export async function CustomizationRootLayout(props: {
                     'bg-gray-base',
                 )}
             >
-                <div className="flex gap-4">
-                    <div>
-                        Light original:{' '}
-                        <span style={{ color: customization.styling.primaryColor.light }}>
-                            {customization.styling.primaryColor.light}
-                        </span>
-                        <ol>
-                            {colorScale(customization.styling.primaryColor.light).map((color, index) => (
-                                <li
-                                    className="list-item"
-                                    key={index}
-                                    style={{
-                                        backgroundColor: color,
-                                        color: colorContrast(color)
-                                    }}
-                                >
-                                    {color}
-                                </li>
-                            ))}
-                        </ol>
+                <details className='text-center'>
+                    <summary>Color palette</summary>
+                    <div className="flex justify-center gap-4">
+                        <div>
+                            Light original:{' '}
+                            <span style={{ color: customization.styling.primaryColor.light }}>
+                                {customization.styling.primaryColor.light}
+                            </span>
+                            <ol>
+                                {colorScale(customization.styling.primaryColor.light).map(
+                                    (color, index) => (
+                                        <li
+                                            className="list-item"
+                                            key={index}
+                                            style={{
+                                                backgroundColor: color,
+                                                color: colorContrast(color),
+                                            }}
+                                        >
+                                            {color}
+                                        </li>
+                                    ),
+                                )}
+                            </ol>
+                        </div>
+                        <div>
+                            Dark original:{' '}
+                            <span style={{ color: customization.styling.primaryColor.dark }}>
+                                {customization.styling.primaryColor.dark}
+                            </span>
+                            <ol>
+                                {colorScale(customization.styling.primaryColor.dark, {
+                                    darkMode: true,
+                                }).map((color, index) => (
+                                    <li
+                                        className="list-item"
+                                        key={index}
+                                        style={{
+                                            backgroundColor: color,
+                                            color: colorContrast(color),
+                                        }}
+                                    >
+                                        {color}
+                                    </li>
+                                ))}
+                            </ol>
+                        </div>
+                        <div>
+                            Light gray:{' '}
+                            <span style={{ color: DEFAULT_TINT_COLOR }}>{DEFAULT_TINT_COLOR}</span>
+                            <ol>
+                                {colorScale(DEFAULT_TINT_COLOR).map((color, index) => (
+                                    <li
+                                        className="list-item"
+                                        key={index}
+                                        style={{
+                                            backgroundColor: color,
+                                            color: colorContrast(color),
+                                        }}
+                                    >
+                                        {color}
+                                    </li>
+                                ))}
+                            </ol>
+                        </div>
+                        <div>
+                            Dark gray:{' '}
+                            <span style={{ color: DEFAULT_TINT_COLOR }}>{DEFAULT_TINT_COLOR}</span>
+                            <ol>
+                                {colorScale(DEFAULT_TINT_COLOR, { darkMode: true }).map(
+                                    (color, index) => (
+                                        <li
+                                            className="list-item"
+                                            key={index}
+                                            style={{
+                                                backgroundColor: color,
+                                                color: colorContrast(color),
+                                            }}
+                                        >
+                                            {color}
+                                        </li>
+                                    ),
+                                )}
+                            </ol>
+                        </div>
                     </div>
-                    <div>
-                        Dark original:{' '}
-                        <span style={{ color: customization.styling.primaryColor.dark }}>
-                            {customization.styling.primaryColor.dark}
-                        </span>
-                        <ol>
-                            {colorScale(customization.styling.primaryColor.dark, {darkMode: true}).map((color, index) => (
-                                <li
-                                    className="list-item"
-                                    key={index}
-                                    style={{
-                                        backgroundColor: color,
-                                        color: colorContrast(color)
-                                    }}
-                                >
-                                    {color}
-                                </li>
-                            ))}
-                        </ol>
-                    </div>
-                    <div>
-                        Light gray:{' '}
-                        <span style={{ color: DEFAULT_TINT_COLOR }}>
-                            {DEFAULT_TINT_COLOR}
-                        </span>
-                        <ol>
-                            {colorScale(DEFAULT_TINT_COLOR).map((color, index) => (
-                                <li
-                                    className="list-item"
-                                    key={index}
-                                    style={{
-                                        backgroundColor: color,
-                                        color: colorContrast(color)
-                                    }}
-                                >
-                                    {color}
-                                </li>
-                            ))}
-                        </ol>
-                    </div>
-                    <div>
-                        Dark gray:{' '}
-                        <span style={{ color: DEFAULT_TINT_COLOR }}>
-                            {DEFAULT_TINT_COLOR}
-                        </span>
-                        <ol>
-                            {colorScale(DEFAULT_TINT_COLOR, {darkMode: true}).map((color, index) => (
-                                <li
-                                    className="list-item"
-                                    key={index}
-                                    style={{
-                                        backgroundColor: color,
-                                        color: colorContrast(color)
-                                    }}
-                                >
-                                    {color}
-                                </li>
-                            ))}
-                        </ol>
-                    </div>
-                </div>
+                </details>
                 <IconsProvider
                     assetsURL={process.env.GITBOOK_ICONS_URL ?? getStaticFileURL('icons')}
                     assetsURLToken={process.env.GITBOOK_ICONS_TOKEN}
