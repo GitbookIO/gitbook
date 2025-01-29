@@ -34,7 +34,7 @@ export function OpenAPICodeSample(props: {
             const example = param.schema
                 ? generateSchemaExample(noReference(param.schema))
                 : undefined;
-            if (example !== undefined) {
+            if (example !== undefined && param.name) {
                 headersObject[param.name] =
                     typeof example !== 'string' ? stringifyOpenAPI(example) : example;
             }
@@ -42,7 +42,7 @@ export function OpenAPICodeSample(props: {
             const example = param.schema
                 ? generateSchemaExample(noReference(param.schema))
                 : undefined;
-            if (example !== undefined) {
+            if (example !== undefined && param.name) {
                 searchParams.append(
                     param.name,
                     String(Array.isArray(example) ? example[0] : example),

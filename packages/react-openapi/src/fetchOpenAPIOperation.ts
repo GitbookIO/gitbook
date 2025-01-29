@@ -2,14 +2,7 @@ import { toJSON, fromJSON } from 'flatted';
 import YAML from 'yaml';
 import swagger2openapi, { ConvertOutputOptions } from 'swagger2openapi';
 
-import {
-    OpenAPICustomSpecProperties,
-    OpenAPIFetcher,
-    OpenAPIV3XDocument,
-    OpenAPIV3XOperationObject,
-    OpenAPIV3XSecuritySchemeObject,
-    OpenAPIV3XServerObject,
-} from './types';
+import { OpenAPICustomSpecProperties, OpenAPIFetcher } from './types';
 import { dereference, validate, traverse, AnyObject } from '@scalar/openapi-parser';
 import { OpenAPIV3, OpenAPIV3_1 } from '@scalar/openapi-types';
 import { noReference } from './utils';
@@ -19,13 +12,13 @@ export interface OpenAPIOperationData extends OpenAPICustomSpecProperties {
     method: string;
 
     /** Servers to be used for this operation */
-    servers: OpenAPIV3XServerObject[];
+    servers: OpenAPIV3_1.ServerObject[];
 
     /** Spec of the operation */
-    operation: OpenAPIV3XOperationObject;
+    operation: OpenAPIV3.OperationObject;
 
     /** Securities that should be used for this operation */
-    securities: [string, OpenAPIV3XSecuritySchemeObject][];
+    securities: [string, OpenAPIV3_1.SecuritySchemeObject][];
 }
 
 export { toJSON, fromJSON };
@@ -58,7 +51,7 @@ export async function fetchOpenAPIOperation(
     if (!schema) {
         throw new Error(`Schema undefined following the dereference operation: ${input.url}`);
     }
-    schema = schema as OpenAPIV3XDocument;
+    schema = schema as OpenAPIV3_1.Document;
 
     let operation = getOperationByPathAndMethod(schema, input.path, input.method);
 
@@ -81,8 +74,8 @@ export async function fetchOpenAPIOperation(
         };
     }
 
-    const servers: OpenAPIV3XServerObject[] = 'servers' in schema ? (schema.servers ?? []) : [];
-    const security: OpenAPIV3XSecuritySchemeObject[] = operation.security ?? schema.security ?? [];
+    const servers = 'servers' in schema ? (schema.servers ?? []) : [];
+    const security = operation.security ?? schema.security ?? [];
 
     // Resolve securities
     const securities: OpenAPIOperationData['securities'] = [];
@@ -134,12 +127,13 @@ async function parseDescriptions<T extends AnyObject>(
     }) as T;
 }
 
-type PathObject = OpenAPIV3.PathItemObject | OpenAPIV3_1.PathItemObject;
-
 /**
  * Get a path object from its path.
  */
-function getPathObject(schema: OpenAPIV3XDocument, path: string): PathObject | null {
+function getPathObject(
+    schema: OpenAPIV3_1.Document,
+    path: string,
+): OpenAPIV3_1.PathItemObject | null {
     if (schema.paths?.[path]) {
         return schema.paths[path];
     }
@@ -150,10 +144,10 @@ function getPathObject(schema: OpenAPIV3XDocument, path: string): PathObject | n
  * Resolve parameters from a path in an OpenAPI schema.
  */
 function getPathObjectParameter(
-    schema: OpenAPIV3XDocument,
+    schema: OpenAPIV3_1.Document,
     path: string,
-): (OpenAPIV3.ParameterObject | OpenAPIV3_1.ParameterObject)[] | null {
-    const pathObject = getPathObject(schema, path) as OpenAPIV3.PathItemObject | null;
+): OpenAPIV3_1.ParameterObject[] | null {
+    const pathObject = getPathObject(schema, path);
     if (pathObject?.parameters) {
         return pathObject.parameters.map(noReference);
     }
@@ -163,7 +157,12 @@ function getPathObjectParameter(
 /**
  * Get an operation by its path and method.
  */
-function getOperationByPathAndMethod(schema: OpenAPIV3XDocument, path: string, method: string) {
+function getOperationByPathAndMethod(
+    schema: OpenAPIV3_1.Document,
+    path: string,
+    method: string,
+): OpenAPIV3.OperationObject | null {
+    // Types are buffy for OpenAPIV3_1.OperationObject, so we use v3
     const pathObject = getPathObject(schema, path);
     if (!pathObject) {
         return null;
@@ -172,7 +171,7 @@ function getOperationByPathAndMethod(schema: OpenAPIV3XDocument, path: string, m
     if (!pathObject[normalizedMethod]) {
         return null;
     }
-    return pathObject[normalizedMethod as OpenAPIV3.HttpMethods];
+    return pathObject[normalizedMethod];
 }
 
 function cacheFetcher(fetcher: OpenAPIFetcher): OpenAPIFetcher {
@@ -197,7 +196,7 @@ function cacheFetcher(fetcher: OpenAPIFetcher): OpenAPIFetcher {
  * It will also convert Swagger 2.0 to OpenAPI 3.0.
  * It can throw an `OpenAPIFetchError` if the document is invalid.
  */
-export async function parseOpenAPIV3(url: string, text: string): Promise<OpenAPIV3XDocument> {
+export async function parseOpenAPIV3(url: string, text: string): Promise<OpenAPIV3_1.Document> {
     // Parse the JSON or YAML
     let data: unknown;
 

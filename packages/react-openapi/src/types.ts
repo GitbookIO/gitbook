@@ -1,8 +1,6 @@
-import { OpenAPIV3, OpenAPIV3_1 } from '@scalar/openapi-types';
+import { OpenAPIV3_1 } from '@scalar/openapi-types';
 
 export type IconComponent = React.ComponentType<{ className?: string }>;
-
-export type OpenAPIV3XDocument = OpenAPIV3.Document | OpenAPIV3_1.Document;
 
 /**
  * Custom properties that can be defined at the entire spec level.
@@ -48,14 +46,6 @@ export interface OpenAPICustomCodeSample {
     source: string;
 }
 
-export type OpenAPIV3XServerObject = OpenAPIV3.ServerObject | OpenAPIV3_1.ServerObject;
-export type OpenAPIV3XSecuritySchemeObject =
-    | OpenAPIV3.SecuritySchemeObject
-    | OpenAPIV3_1.SecuritySchemeObject;
-export type OpenAPIV3XOperationObject =
-    | OpenAPIV3.OperationObject<OpenAPICustomOperationProperties>
-    | OpenAPIV3_1.OperationObject<OpenAPICustomOperationProperties>;
-
 export interface OpenAPIContextProps extends OpenAPIClientContext {
     CodeBlock: React.ComponentType<{ code: string; syntax: string }>;
 
@@ -86,7 +76,7 @@ export interface OpenAPIFetcher {
     /**
      * Fetch an OpenAPI file by its URL. It should return a fully parsed OpenAPI v3 document.
      */
-    fetch: (url: string) => Promise<OpenAPIV3XDocument>;
+    fetch: (url: string) => Promise<OpenAPIV3_1.Document>;
 
     /**
      * Parse markdown to the react element to render.
