@@ -33,21 +33,22 @@ export function OpenAPIOperation(props: {
             </h2>
             <div className={classNames('openapi-columns')}>
                 <div className={classNames('openapi-column-spec')}>
-                    <div className="openapi-intro">
-                        {operation.description ? (
+                    {operation.description ? (
+                        <div className="openapi-intro">
                             <Markdown
                                 className="openapi-description"
                                 source={operation.description}
                             />
-                        ) : null}
-                    </div>
+                        </div>
+                    ) : null}
                     <OpenAPISpec data={data} context={clientContext} />
                 </div>
-                <div className={classNames('openapi-column-preview')}>
-                    <div className={classNames('openapi-column-preview-body')}>
-                        <OpenAPICodeSample {...props} />
-                        <OpenAPIResponseExample {...props} />
-                    </div>
+                <OpenAPISpec data={data} context={clientContext} />
+            </div>
+            <div className={classNames('openapi-column-preview')}>
+                <div className={classNames('openapi-column-preview-body')}>
+                    <OpenAPICodeSample {...props} />
+                    <OpenAPIResponseExample {...props} />
                 </div>
             </div>
         </div>

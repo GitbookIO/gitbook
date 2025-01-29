@@ -162,13 +162,10 @@ function getSecurityHeaders(securities: OpenAPIOperationData['securities']): {
     [key: string]: string;
 } {
     const security = securities[0];
-    console.log({ securities });
 
     if (!security) {
         return {};
     }
-
-    console.log({ securities });
 
     switch (security[1].type) {
         case 'http': {
