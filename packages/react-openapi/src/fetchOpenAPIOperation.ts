@@ -86,14 +86,14 @@ export async function fetchOpenAPIOperation(
 
     // Spec is invalid, we stop here.
     if (!valid) {
-        return null;
+        throw new Error(`Invalid OpenAPI spec: ${input.url}`);
     }
 
     const { schema } = await dereference(specData);
 
     // No schema, we stop here.
     if (!schema) {
-        return null;
+        throw new Error(`Schema undefined following the dereference operation: ${input.url}`);
     }
 
     let operation = getOperationByPathAndMethod(schema, input.path, input.method);
