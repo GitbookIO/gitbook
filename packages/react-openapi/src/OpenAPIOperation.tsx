@@ -2,7 +2,7 @@ import * as React from 'react';
 import classNames from 'classnames';
 import { ApiClientModalProvider } from '@scalar/api-client-react';
 
-import { OpenAPIOperationData, toJSON } from './fetchOpenAPIOperation';
+import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { Markdown } from './Markdown';
 import { OpenAPICodeSample } from './OpenAPICodeSample';
 import { OpenAPIResponseExample } from './OpenAPIResponseExample';
