@@ -9,7 +9,6 @@ import { ScalarApiButton } from './ScalarApiButton';
 import { OpenAPIContextProps } from './types';
 import { noReference } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
-import { OpenAPIV3 } from '@scalar/openapi-types';
 
 /**
  * Display code samples to execute the operation.

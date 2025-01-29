@@ -4,13 +4,13 @@ import { createStateKey, noReference } from './utils';
 import { OpenAPIResponse } from './OpenAPIResponse';
 import { OpenAPIClientContext } from './types';
 import { InteractiveSection } from './InteractiveSection';
-import { OpenAPIV3, OpenAPIV2, OpenAPIV3_1 } from '@scalar/openapi-types';
+import { OpenAPIV3, OpenAPIV3_1 } from '@scalar/openapi-types';
 
 /**
  * Display an interactive response body.
  */
 export function OpenAPIResponses(props: {
-    responses: OpenAPIV3_1.ResponsesObject;
+    responses: OpenAPIV3.ResponsesObject | OpenAPIV3_1.ResponsesObject;
     context: OpenAPIClientContext;
 }) {
     const { responses, context } = props;

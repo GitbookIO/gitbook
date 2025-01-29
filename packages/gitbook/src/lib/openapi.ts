@@ -3,8 +3,8 @@ import {
     OpenAPIOperationData,
     fetchOpenAPIOperation,
     OpenAPIFetcher,
-    parseOpenAPIV3,
-    OpenAPIFetchError,
+    parseOpenAPI,
+    OpenAPIParseError,
 } from '@gitbook/react-openapi';
 
 import { cache, parseCacheResponse, noCacheFetchOptions, CacheFunctionOptions } from '@/lib/cache';
@@ -20,7 +20,7 @@ export async function fetchOpenAPIBlock(
     resolveContentRef: (ref: ContentRef) => Promise<ResolvedContentRef | null>,
 ): Promise<
     | { data: OpenAPIOperationData | null; specUrl: string | null; error?: undefined }
-    | { error: OpenAPIFetchError; data?: undefined; specUrl?: undefined }
+    | { error: OpenAPIParseError; data?: undefined; specUrl?: undefined }
 > {
     const resolved = block.data.ref ? await resolveContentRef(block.data.ref) : null;
     if (!resolved || !block.data.path || !block.data.method) {
@@ -39,7 +39,7 @@ export async function fetchOpenAPIBlock(
 
         return { data, specUrl: resolved.href };
     } catch (error) {
-        if (error instanceof OpenAPIFetchError) {
+        if (error instanceof OpenAPIParseError) {
             return { error };
         }
 
@@ -66,7 +66,7 @@ const fetcher: OpenAPIFetcher = {
             }
 
             const text = await response.text();
-            const data = await parseOpenAPIV3(url, text);
+            const data = await parseOpenAPI({ url, value: text });
             return {
                 ...parseCacheResponse(response),
                 data,
