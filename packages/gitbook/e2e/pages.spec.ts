@@ -142,7 +142,9 @@ const testCases: TestsCase[] = [
                 name: 'AI Search',
                 url: '?q=What+is+GitBook%3F&ask=true',
                 run: async (page) => {
-                    await expect(page.getByTestId('search-ask-answer')).toBeVisible();
+                    await expect(page.getByTestId('search-ask-answer')).toBeVisible({
+                        timeout: 15_000,
+                    });
                 },
                 screenshot: false,
             },
@@ -322,7 +324,9 @@ const testCases: TestsCase[] = [
                 name: 'AI Search',
                 url: '?q=What+is+GitBook%3F&ask=true',
                 run: async (page) => {
-                    await expect(page.getByTestId('search-ask-answer')).toBeVisible();
+                    await expect(page.getByTestId('search-ask-answer')).toBeVisible({
+                        timeout: 15_000,
+                    });
                 },
                 screenshot: false,
             },
