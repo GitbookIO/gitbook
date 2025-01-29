@@ -76,7 +76,7 @@ export interface OpenAPIFetcher {
     /**
      * Fetch an OpenAPI file by its URL. It should return a fully parsed OpenAPI v3 document.
      */
-    fetch: (url: string) => Promise<OpenAPIV3_1.Document>;
+    fetch: (url: string) => Promise<OpenAPIV3_1.Document<OpenAPICustomSpecProperties>>;
 
     /**
      * Parse markdown to the react element to render.

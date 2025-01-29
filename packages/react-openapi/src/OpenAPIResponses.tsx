@@ -10,7 +10,7 @@ import { OpenAPIV3, OpenAPIV2, OpenAPIV3_1 } from '@scalar/openapi-types';
  * Display an interactive response body.
  */
 export function OpenAPIResponses(props: {
-    responses: OpenAPIV2.ResponsesObject | OpenAPIV3.ResponsesObject | OpenAPIV3_1.ResponsesObject;
+    responses: OpenAPIV3_1.ResponsesObject;
     context: OpenAPIClientContext;
 }) {
     const { responses, context } = props;

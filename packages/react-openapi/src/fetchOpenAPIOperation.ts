@@ -4,7 +4,7 @@ import swagger2openapi, { ConvertOutputOptions } from 'swagger2openapi';
 
 import { OpenAPICustomSpecProperties, OpenAPIFetcher } from './types';
 import { dereference, validate, traverse, AnyObject } from '@scalar/openapi-parser';
-import { OpenAPIV3, OpenAPIV3_1 } from '@scalar/openapi-types';
+import { OpenAPI, OpenAPIV2, OpenAPIV3, OpenAPIV3_1 } from '@scalar/openapi-types';
 import { noReference } from './utils';
 
 export interface OpenAPIOperationData extends OpenAPICustomSpecProperties {
@@ -36,21 +36,7 @@ export async function fetchOpenAPIOperation(
 ): Promise<OpenAPIOperationData | null> {
     const fetcher = cacheFetcher(rawFetcher);
 
-    const specData = await fetcher.fetch(input.url);
-
-    const { valid } = await validate(specData);
-
-    // Spec is invalid, we stop here.
-    if (!valid) {
-        throw new Error(`Invalid OpenAPI spec: ${input.url}`);
-    }
-
-    const schema = await deferenceSchema(specData);
-
-    // No schema, we stop here.
-    if (!schema) {
-        throw new Error(`Schema undefined following the dereference operation: ${input.url}`);
-    }
+    const schema = await fetcher.fetch(input.url);
 
     let operation = getOperationByPathAndMethod(schema, input.path, input.method);
 
@@ -93,20 +79,23 @@ export async function fetchOpenAPIOperation(
         path: input.path,
         securities,
         'x-codeSamples':
-            typeof specData['x-codeSamples'] === 'boolean' ? specData['x-codeSamples'] : undefined,
+            typeof schema['x-codeSamples'] === 'boolean' ? schema['x-codeSamples'] : undefined,
         'x-hideTryItPanel':
-            typeof specData['x-hideTryItPanel'] === 'boolean'
-                ? specData['x-hideTryItPanel']
+            typeof schema['x-hideTryItPanel'] === 'boolean'
+                ? schema['x-hideTryItPanel']
                 : undefined,
     };
 }
 
+/**
+ * Dereference a schema, resolving all references.
+ */
 async function deferenceSchema<T extends OpenAPIV3_1.Document>(schema: T): Promise<T | null> {
     const result = await dereference(schema);
     if (result.schema) {
+        // Dereference will return the same type as the input
         return result.schema as T;
     }
-    // Dereference will return the same type as the input
     return null;
 }
 
@@ -204,58 +193,65 @@ function cacheFetcher(fetcher: OpenAPIFetcher): OpenAPIFetcher {
  * It will also convert Swagger 2.0 to OpenAPI 3.0.
  * It can throw an `OpenAPIFetchError` if the document is invalid.
  */
-export async function parseOpenAPIV3(url: string, text: string): Promise<OpenAPIV3_1.Document> {
-    // Parse the JSON or YAML
-    let data: unknown;
+export async function parseOpenAPIV3(
+    url: string,
+    text: string,
+): Promise<OpenAPIV3_1.Document<OpenAPICustomSpecProperties>> {
+    const validationResult = await validate(text);
 
-    // Try with JSON
-    try {
-        data = JSON.parse(text);
-    } catch (jsonError) {
-        try {
-            // Try with YAML
-            data = YAML.parse(text);
-        } catch (yamlError) {
-            if (yamlError instanceof Error && yamlError.name.startsWith('YAML')) {
-                throw new OpenAPIFetchError('Failed to parse YAML: ' + yamlError.message, url);
-            } else {
-                throw yamlError;
-            }
-        }
+    // Spec is invalid, we stop here.
+    if (!validationResult.valid || !validationResult.schema) {
+        throw new Error(`Invalid OpenAPI spec: ${url}`);
     }
 
-    // Convert Swagger 2.0 to OpenAPI 3.0
-    // @ts-ignore
-    if (data && data.swagger) {
-        try {
-            // Convert Swagger 2.0 to OpenAPI 3.0
-            // @ts-ignore
-            const result = (await swagger2openapi.convertObj(data, {
-                resolve: false,
-                resolveInternal: false,
-                laxDefaults: true,
-                laxurls: true,
-                lint: false,
-                prevalidate: false,
-                anchors: true,
-                patch: true,
-            })) as ConvertOutputOptions;
+    let { schema } = validationResult;
 
-            data = result.openapi;
-        } catch (error) {
-            if ((error as Error).name === 'S2OError') {
-                throw new OpenAPIFetchError(
-                    'Failed to convert Swagger 2.0 to OpenAPI 3.0: ' + (error as Error).message,
-                    url,
-                );
-            } else {
-                throw error;
+    const v3Schema = await (async () => {
+        // Convert Swagger 2.0 to OpenAPI 3.0
+        if (checkIsOpenAPIV2(schema)) {
+            try {
+                // @ts-expect-error Types are incompatible between the two libraries
+                const result = (await swagger2openapi.convertObj(schema, {
+                    resolve: false,
+                    resolveInternal: false,
+                    laxDefaults: true,
+                    laxurls: true,
+                    lint: false,
+                    prevalidate: false,
+                    anchors: true,
+                    patch: true,
+                })) as ConvertOutputOptions;
+
+                return result.openapi as OpenAPIV3_1.Document<OpenAPICustomSpecProperties>;
+            } catch (error) {
+                if ((error as Error).name === 'S2OError') {
+                    throw new OpenAPIFetchError(
+                        'Failed to convert Swagger 2.0 to OpenAPI 3.0: ' + (error as Error).message,
+                        url,
+                    );
+                } else {
+                    throw error;
+                }
             }
         }
+        return schema as OpenAPIV3_1.Document<OpenAPICustomSpecProperties>;
+    })();
+
+    const v3UnrefSchema = await deferenceSchema(v3Schema);
+
+    // No schema, we stop here.
+    if (!v3UnrefSchema) {
+        throw new Error(`Schema undefined following the dereference operation: ${url}`);
     }
 
-    // @ts-ignore
-    return data;
+    return v3UnrefSchema;
+}
+
+/**
+ * Check if the schema is an OpenAPI v2 schema.
+ */
+function checkIsOpenAPIV2(schema: OpenAPI.Document): schema is OpenAPIV2.Document {
+    return Boolean('swagger' in schema && schema.swagger);
 }
 
 export class OpenAPIFetchError extends Error {
