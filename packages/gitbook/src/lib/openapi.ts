@@ -49,7 +49,7 @@ export async function fetchOpenAPIBlock(
 
 const fetcher: OpenAPIFetcher = {
     fetch: cache({
-        name: 'openapi.fetch',
+        name: 'openapi.fetch.v2',
         get: async (url: string, options: CacheFunctionOptions) => {
             // Wrap the raw string to prevent invalid URLs from being passed to fetch.
             // This can happen if the URL has whitespace, which is currently handled differently by Cloudflare's implementation of fetch:
