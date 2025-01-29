@@ -28,30 +28,19 @@ export function OpenAPIOperation(props: {
 
     return (
         <div className={classNames('openapi-operation', className)}>
-            <div className="openapi-intro">
-                <h2 className="openapi-summary" id={context.id}>
-                    {operation.summary}
-                </h2>
-                {operation.description ? (
-                    <Markdown className="openapi-description" source={operation.description} />
-                ) : null}
-                <div className="openapi-target">
-                    <span
-                        className={classNames(
-                            'openapi-method',
-                            `openapi-method-${method.toLowerCase()}`,
-                        )}
-                    >
-                        {method.toUpperCase()}
-                    </span>
-                    <span className="openapi-url">
-                        <OpenAPIServerURL servers={servers} />
-                        {path}
-                    </span>
-                </div>
-            </div>
+            <h2 className="openapi-summary" id={context.id}>
+                {operation.summary}
+            </h2>
             <div className={classNames('openapi-columns')}>
                 <div className={classNames('openapi-column-spec')}>
+                    <div className="openapi-intro">
+                        {operation.description ? (
+                            <Markdown
+                                className="openapi-description"
+                                source={operation.description}
+                            />
+                        ) : null}
+                    </div>
                     <OpenAPISpec data={data} context={clientContext} />
                 </div>
                 <div className={classNames('openapi-column-preview')}>

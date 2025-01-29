@@ -86,12 +86,12 @@ export function OpenAPISchemaProperty(
                                 {propertyName}
                             </span>
                         ) : null}
-                        {required ? (
-                            <span className={classNames('openapi-schema-required')}>*</span>
-                        ) : null}
                         <span className={classNames('openapi-schema-type')}>
                             {getSchemaTitle(schema)}
                         </span>
+                        {required ? (
+                            <span className={classNames('openapi-schema-required')}>required</span>
+                        ) : null}
                     </div>
                     {schema.description ? (
                         <Markdown
@@ -100,9 +100,9 @@ export function OpenAPISchemaProperty(
                         />
                     ) : null}
                     {shouldDisplayExample(schema) ? (
-                        <span className="openapi-schema-example">
+                        <div className="openapi-schema-example">
                             Example: <code>{stringifyOpenAPI(schema.example)}</code>
-                        </span>
+                        </div>
                     ) : null}
                     {schema.pattern ? (
                         <div className="openapi-schema-pattern">
@@ -231,9 +231,15 @@ export function OpenAPISchemaEnum(props: { enumValues: any[] }) {
 
     return (
         <div className="openapi-schema-enum">
-            {enumValues.map((value, index) => (
-                <span key={index} className="openapi-schema-enum-value">{`${value}`}</span>
-            ))}
+            <span>
+                Options:{' '}
+                {enumValues.map((value, index) => (
+                    <span key={index} className="openapi-schema-enum-value">
+                        <code>{`${value}`}</code>
+                        {index < enumValues.length - 1 ? ', ' : ''}
+                    </span>
+                ))}
+            </span>
         </div>
     );
 }

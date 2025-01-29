@@ -20,12 +20,8 @@ export function OpenAPISecurities(props: {
 
     return (
         <InteractiveSection
-            header="Authorization"
+            header="Authorizations"
             className="openapi-securities"
-            toggeable
-            defaultOpened={false}
-            toggleCloseIcon={context.icons.chevronDown}
-            toggleOpenIcon={context.icons.chevronRight}
             tabs={securities.map(([key, security]) => {
                 return {
                     key: key,
@@ -57,7 +53,19 @@ function getLabelForType(security: OpenAPIV3_1.SecuritySchemeObject): string {
             }
 
             if (security.scheme == 'bearer') {
-                return `Bearer Token ${security.bearerFormat ? `(${security.bearerFormat})` : ''}`;
+                return (
+                    <div className="openapi-schema-presentation">
+                        <div className="openapi-schema-name">
+                            <span className="openapi-schema-propertyname">Authorization</span>
+                            <span className="openapi-schema-type">string</span>
+                            <span className="openapi-schema-required">required</span>
+                        </div>
+                        <Markdown
+                            source={`Bearer authentication header of the form Bearer <token>.`}
+                            className="openapi-schema-description"
+                        />
+                    </div>
+                );
             }
 
             return 'HTTP';

@@ -1,7 +1,7 @@
 .openapi-operation {
     content-visibility: auto;
     contain-intrinsic-height: 600px;
-    @apply flex-1 flex flex-col gap-6;
+    @apply flex-1 flex flex-col gap-4;
 }
 
 .openapi-columns {
@@ -11,7 +11,7 @@
 /** Intro */
 
 .openapi-intro {
-    @apply flex flex-col gap-3 max-w-3xl;
+    @apply flex flex-col -mb-6 gap-3 max-w-3xl;
 }
 
 .openapi-summary {
@@ -19,13 +19,51 @@
 }
 
 .openapi-description.openapi-markdown {
-    @apply prose-base;
+    @apply prose-sm text-[0.9375em] prose-p:!my-3;
+}
+
+.openapi-markdown blockquote {
+    @apply !ps-3;
+}
+
+.openapi-markdown blockquote > * {
+    @apply not-italic;
+}
+
+.openapi-markdown blockquote > p {
+    @apply before:content-none after:content-none font-normal;
+}
+
+.openapi-markdown code {
+    @apply py-px
+    px-1
+    min-w-[1.625rem]
+    w-fit
+    justify-center
+    items-center
+    ring-1
+    ring-inset
+    ring-dark/1
+    bg-dark/[0.06]
+    rounded
+    dark:ring-light/1
+    dark:bg-light/1
+    dark:!text-light-4
+    text-sm
+    leading-[calc(max(1.20em,1.25rem))]
+    before:!content-none
+    font-medium
+    after:!content-none;
+}
+
+.openapi-markdown pre code {
+    @apply dark:!bg-transparent dark:!ring-transparent;
 }
 
 /** Method tag */
 
 .openapi-method {
-    @apply rounded font-mono font-bold text-[11.5px] px-1 py-0.5 mr-2 text-dark-1/8 leading-tight align-middle inline-flex ring-1 ring-inset ring-dark-1/1 dark:ring-light-1/1 whitespace-nowrap;
+    @apply rounded uppercase font-mono font-bold text-[11.5px] px-1 py-0.5 mr-2 text-dark-1/8 leading-tight align-middle inline-flex ring-1 ring-inset ring-dark-1/1 dark:ring-light-1/1 whitespace-nowrap;
 }
 
 .openapi-method-get {
@@ -67,7 +105,7 @@
 /** Columns */
 
 .openapi-column-spec {
-    @apply flex flex-col flex-1 gap-4 max-w-3xl;
+    @apply flex flex-col flex-1 gap-8 max-w-3xl;
 }
 
 .openapi-column-preview {
@@ -93,7 +131,7 @@
 }
 
 .openapi-schema-properties .openapi-schema {
-    @apply border-b px-3 py-2 border-dark/1 dark:border-light/1;
+    /* @apply ; */
 }
 
 .openapi-schema-properties .openapi-schema:last-child {
@@ -111,19 +149,19 @@
 .openapi-schema-name {
     /* To make double click on the property name select only the name,
     we disable selection on the parent and re-enable it on the children. */
-    @apply select-none;
+    @apply select-none flex gap-2.5 items-baseline text-sm mb-1;
 }
 
 .openapi-schema-propertyname {
-    @apply select-all font-medium text-base text-dark/10 dark:text-light/10;
+    @apply select-all font-semibold font-mono text-dark dark:text-light;
 }
 
 .openapi-schema-required {
-    @apply font-normal text-yellow-600;
+    @apply font-normal text-amber-600;
 }
 
 .openapi-schema-type {
-    @apply font-mono ml-3 text-base text-dark-4/8 dark:text-light-4 select-text;
+    @apply text-dark-4/8 dark:text-light-4 select-text font-normal;
 }
 
 .openapi-schema-type:only-child {
@@ -155,11 +193,12 @@
 }
 
 .openapi-schema-enum {
-    @apply flex flex-row flex-wrap mt-1;
+    @apply flex flex-row text-sm flex-wrap mt-1 text-dark-4/8 dark:text-light-3;
 }
 
 .openapi-schema-enum-value {
-    @apply font-mono text-xs px-1.5 py-1 border border-light-4 ml-[-1px] mt-[-1px] text-dark/8 dark:text-light/8 dark:border-dark-4;
+    @apply text-sm;
+    /* @apply font-mono text-xs px-1.5 py-1 border border-light-4 ml-[-1px] mt-[-1px] text-dark/8 dark:text-light/8 dark:border-dark-4; */
 }
 
 .openapi-schema-enum-value:first-child {
@@ -171,34 +210,61 @@
 }
 
 .openapi-schema-description.openapi-markdown {
-    @apply prose-sm;
+    @apply prose-sm text-dark-4/8 dark:text-light-3 font-normal mt-3 select-text;
+}
+
+.openapi-schema-description.openapi-markdown code {
+    font-weight: inherit !important;
+    @apply text-xs;
+}
+
+.openapi-schema-description.openapi-markdown pre {
+    @apply w-fit;
 }
 
 .openapi-schema-example,
 .openapi-schema-pattern {
-    @apply prose-sm mt-2 text-dark/10 dark:text-light/10;
+    @apply prose-sm mt-3 text-dark-4/8 dark:text-light-3;
+}
+
+.openapi-schema-example code,
+.openapi-schema-pattern code,
+.openapi-schema-enum-value code {
+    @apply py-px
+    px-1
+    min-w-[1.625rem]
+    w-fit
+    justify-center
+    items-center
+    ring-1
+    ring-inset
+    ring-dark/1
+    bg-dark/[0.06]
+    rounded
+    dark:ring-light/1
+    dark:bg-light/1
+    text-dark dark:text-light
+    leading-[calc(max(1.20em,1.25rem))]
+    before:!content-none
+    text-xs
+    after:!content-none;
 }
 
 /** Authentication */
 
 .openapi-securities {
-    @apply border rounded border-dark/2 dark:border-light/2;
 }
 
 .openapi-securities-header {
-    @apply px-3 py-2;
-}
-
-.openapi-securities.openapi-securities-closed:hover {
-    @apply border-dark/3 dark:border-light/3 cursor-pointer;
+    @apply py-2 border-b border-dark/2 dark:border-light/2 mb-2;
 }
 
 .openapi-securities-header-content {
-    @apply font-semibold text-base text-dark-2 dark:text-light-4;
+    @apply font-medium text-[15px] text-dark-2 dark:text-light;
 }
 
 .openapi-securities-body {
-    @apply mx-3 mb-2 flex flex-col gap-2;
+    @apply flex flex-col gap-2;
 }
 
 .openapi-securities-description.openapi-markdown {
@@ -212,28 +278,23 @@
 /** Parameters */
 
 .openapi-parameters {
-    @apply border rounded border-dark/2 dark:border-light/2;
-}
-
-.openapi-parameters.openapi-parameters-closed:hover {
-    @apply border-dark/3 dark:border-light/3 cursor-pointer;
 }
 
 .openapi-parameters-header {
-    @apply px-3 py-2;
+    @apply py-2 border-b border-dark/2 dark:border-light/2 mb-2;
 }
 
 .openapi-parameters-header-content {
-    @apply font-semibold text-base text-dark-2 dark:text-light-4;
+    @apply font-medium text-[15px] text-dark-2 dark:text-light;
 }
 
 /** Request body */
 .openapi-requestbody {
-    @apply border rounded border-dark/2 dark:border-light/2;
+    /* @apply border rounded border-dark/2 dark:border-light/2; */
 }
 
 .openapi-requestbody-header {
-    @apply px-3 py-2;
+    @apply py-1 border-b;
 }
 
 .openapi-requestbody-header-content {
@@ -254,11 +315,12 @@
 
 /** Responses */
 .openapi-responses {
-    @apply border rounded border-dark/2 dark:border-light/2;
+    /* @apply border rounded border-dark/2 dark:border-light/2; */
 }
 
 .openapi-responses-header {
-    @apply px-3 py-2;
+    /* @apply px-3 py-2; */
+    @apply border-b py-2;
 }
 
 .openapi-responses-body {
@@ -266,7 +328,7 @@
 }
 
 .openapi-responses-header-content {
-    @apply font-semibold text-dark-2 dark:text-light-4;
+    @apply font-medium text-dark-2 dark:text-light-4;
 }
 
 /** Response */
@@ -295,11 +357,23 @@
 }
 
 .openapi-codesample-header {
-    @apply flex flex-row items-center px-3 py-2;
+    @apply flex flex-row items-center px-3 py-2 border-b border-dark/2 dark:border-light/2;
 }
 
 .openapi-codesample-title {
-    @apply flex-1 font-semibold text-base;
+    @apply flex-1 font-normal text-sm text-dark/8 dark:text-light-4;
+}
+
+.openapi-codesample-title em {
+    @apply not-italic text-dark dark:text-light;
+}
+
+.openapi-codesample-body {
+    @apply py-2;
+}
+
+.openapi-codesample-overlay {
+    @apply flex flex-row items-center py-2 px-3 justify-end border-t border-dark/2 dark:border-light/2;
 }
 
 /** Response example */
@@ -332,7 +406,7 @@
 }
 
 .openapi-section-header-content {
-    @apply flex-1;
+    @apply flex-1 text-base;
 }
 
 .openapi-section-header-controls {
@@ -354,13 +428,13 @@
 
 /** Markdown */
 .openapi-markdown {
-    @apply prose dark:prose-invert max-w-none whitespace-normal;
+    @apply prose prose-zinc prose-p:!my-3 dark:prose-invert max-w-none whitespace-normal;
 }
 
 .openapi-markdown > *:first-child {
-    @apply mt-0;
+    @apply !mt-0;
 }
 
 .openapi-markdown > *:last-child {
-    @apply mb-0;
+    @apply !mb-0;
 }

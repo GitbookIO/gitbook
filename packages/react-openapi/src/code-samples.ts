@@ -16,6 +16,34 @@ interface CodeSampleGenerator {
 
 export const codeSampleGenerators: CodeSampleGenerator[] = [
     {
+        id: 'curl',
+        label: 'Curl',
+        syntax: 'bash',
+        generate: ({ method, url, headers, body }) => {
+            const separator = ' \\\n';
+
+            const lines: string[] = ['curl -L'];
+
+            if (method.toUpperCase() !== 'GET') {
+                lines.push(`--request ${method.toUpperCase()}`);
+            }
+
+            lines.push(`--url '${url}'`);
+
+            if (headers) {
+                Object.entries(headers).forEach(([key, value]) => {
+                    lines.push(`--header '${key}: ${value}'`);
+                });
+            }
+
+            if (body && Object.keys(body).length > 0) {
+                lines.push(`--data '${stringifyOpenAPI(body)}'`);
+            }
+
+            return lines.map((line, index) => (index > 0 ? indent(line, 2) : line)).join(separator);
+        },
+    },
+    {
         id: 'javascript',
         label: 'JavaScript',
         syntax: 'javascript',
@@ -37,34 +65,6 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
             code += `const data = await response.json();`;
 
             return code;
-        },
-    },
-    {
-        id: 'curl',
-        label: 'Curl',
-        syntax: 'bash',
-        generate: ({ method, url, headers, body }) => {
-            const separator = ' \\\n';
-
-            const lines: string[] = ['curl -L'];
-
-            if (method.toUpperCase() !== 'GET') {
-                lines.push(`-X ${method.toUpperCase()}`);
-            }
-
-            if (headers) {
-                Object.entries(headers).forEach(([key, value]) => {
-                    lines.push(`-H '${key}: ${value}'`);
-                });
-            }
-
-            lines.push(`'${url}'`);
-
-            if (body) {
-                lines.push(`-d '${stringifyOpenAPI(body)}'`);
-            }
-
-            return lines.map((line, index) => (index > 0 ? indent(line, 2) : line)).join(separator);
         },
     },
     {
