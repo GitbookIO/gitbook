@@ -201,7 +201,7 @@ export async function parseOpenAPIV3(
 
     // Spec is invalid, we stop here.
     if (!validationResult.valid || !validationResult.schema) {
-        throw new Error(`Invalid OpenAPI spec: ${url}`);
+        throw new OpenAPIFetchError('Invalid OpenAPI document', url);
     }
 
     let { schema } = validationResult;
@@ -241,7 +241,7 @@ export async function parseOpenAPIV3(
 
     // No schema, we stop here.
     if (!v3UnrefSchema) {
-        throw new Error(`Schema undefined following the dereference operation: ${url}`);
+        throw new OpenAPIFetchError('Failed to dereference OpenAPI document', url);
     }
 
     return v3UnrefSchema;
