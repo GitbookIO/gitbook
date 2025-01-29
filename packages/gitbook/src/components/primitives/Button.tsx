@@ -35,7 +35,7 @@ export function Button({
             : // SECONDARY
               [
                   'bg-gray-base',
-                  'text-gray-strong',
+                  'text-gray',
                   'hover:text-primary',
                   'contrast-more:bg-gray-subtle',
                   'contrast-more:hover:ring-primary',
@@ -65,11 +65,9 @@ export function Button({
         'hover:shadow-md',
         'active:shadow-none',
 
-        'contrast-more:ring-dark',
+        'contrast-more:ring-gray-12',
         'contrast-more:hover:ring-2',
-        'contrast-more:hover:ring-dark',
-        'contrast-more:dark:ring-light',
-        'contrast-more:dark:hover:ring-light',
+        'contrast-more:hover:ring-gray-12',
 
         'hover:scale-105',
         'active:scale-100',

@@ -127,10 +127,8 @@ export function PageBody(props: {
                         'max-w-3xl',
                         'mx-auto',
                         'page-api-block:ml-0',
-                        'text-dark/7',
-                        'dark:text-light/7',
-                        'contrast-more:text-dark',
-                        'dark:contrast-more:text-light',
+                        'text-gray',
+                        'contrast-more:text-gray-strong',
                     )}
                 >
                     {updatedAt ? (

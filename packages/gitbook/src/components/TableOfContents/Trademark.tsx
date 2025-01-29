@@ -35,13 +35,9 @@ export function Trademark(props: {
                 'sidebar-filled:pl-2',
                 'sidebar-filled:pb-2',
 
-                'bg-light',
-                'sidebar-filled:bg-light-2',
-                '[html.tint.sidebar-filled_&]:bg-light-1',
-
-                'dark:bg-dark',
-                'dark:sidebar-filled:bg-dark-1',
-                'dark:[html.tint.sidebar-filled_&]:bg-dark-1',
+                'bg-gray-base',
+                'sidebar-filled:bg-gray-subtle',
+                '[html.tint.sidebar-filled_&]:bg-gray-base',
 
                 'before:hidden',
                 'lg:before:block',
@@ -52,12 +48,9 @@ export function Trademark(props: {
                 'before:h-8',
                 'before:bg-gradient-to-b',
                 'before:from-transparent',
-                'before:to-light',
-                'sidebar-filled:before:to-light-2',
-                '[html.tint.sidebar-filled_&]:before:to-light-1',
-                'dark:before:to-dark',
-                'dark:sidebar-filled:before:to-dark-1',
-                'dark:[html.tint.sidebar-filled_&]:before:to-dark-1',
+                'before:to-gray-base',
+                'sidebar-filled:before:to-gray-subtle',
+                '[html.tint.sidebar-filled_&]:before:to-gray-base',
             )}
         >
             <TrademarkLink {...props} />
@@ -88,8 +81,7 @@ export function TrademarkLink(props: {
             className={tcls(
                 'text-sm',
                 'font-semibold',
-                'text-dark/8',
-                'dark:text-light/8',
+                'text-gray',
 
                 'flex',
                 'flex-row',
@@ -101,14 +93,13 @@ export function TrademarkLink(props: {
                 'rounded-lg',
                 'straight-corners:rounded-none',
 
-                'hover:bg-dark/1',
-                'dark:hover:bg-light/1',
+                'hover:bg-gray',
+                'hover:text-gray-strong',
 
                 'ring-2',
                 'lg:ring-1',
                 'ring-inset',
-                'ring-dark/2',
-                'dark:ring-light/1',
+                'ring-gray-subtle',
 
                 'transition-colors',
                 'pointer-events-auto',

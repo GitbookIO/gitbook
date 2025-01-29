@@ -120,12 +120,12 @@ export function ToggleableLinkItem(
                     'text-gray',
                     'hover:text-gray-strong',
                     'hover:bg-gray',
-                    'hover:before:bg-gray-hover',
+                    'hover:before:bg-gray',
                     'contrast-more:text-gray-strong',
 
-                    'hover:contrast-more:text-dark',
+                    'hover:contrast-more:text-gray-strong',
                     'hover:contrast-more:ring-1',
-                    'hover:contrast-more:ring-dark',
+                    'hover:contrast-more:ring-gray-12',
 
                     'before:contents[]',
                     'before:absolute',
@@ -178,10 +178,8 @@ export function ToggleableLinkItem(
                             'after:-left-1',
                             'after:w-7',
                             'after:h-7',
-                            'hover:bg-dark/2',
+                            'hover:bg-gray-active',
                             'hover:text-current',
-                            'dark:hover:bg-light/2',
-                            'dark:hover:text-current',
                             isActive ? ['hover:bg-tint-hover'] : [],
                         )}
                         onClick={(event) => {

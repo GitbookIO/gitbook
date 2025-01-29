@@ -166,7 +166,7 @@ function getHeaderLinkClassName(props: { headerPreset: CustomizationHeaderPreset
         'contrast-more:underline',
 
         props.headerPreset === CustomizationHeaderPreset.Default
-            ? ['text-dark/8', 'dark:text-light/8']
+            ? ['text-gray']
             : ['text-header-link-500 hover:text-header-link-400'],
     );
 }

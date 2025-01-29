@@ -147,8 +147,7 @@ function AnswerBody(props: { answer: AskAnswerResult }) {
                     'sm:mt-6',
                     'px-4',
                     'sm:px-12',
-                    'text-dark/9',
-                    'dark:text-light/8',
+                    'text-gray-strong',
                 )}
             >
                 {answer.body ?? t(language, 'search_ask_no_answer')}
@@ -185,12 +184,9 @@ function AnswerFollowupQuestions(props: { followupQuestions: string[] }) {
                         'py-2',
                         'rounded',
                         'straight-corners:rounded-none',
-                        'text-dark/7',
-                        'dark:text-light/8',
-                        'hover:bg-dark-4/2',
-                        'dark:hover:bg-light-4/2',
-                        'focus-within:bg-dark-4/2',
-                        'dark:focus-within:bg-light-4/2',
+                        'text-gray',
+                        'hover:bg-gray-hover',
+                        'focus-within:bg-gray-hover',
                     )}
                     {...getSearchLinkProps({
                         query: question,
@@ -203,8 +199,7 @@ function AnswerFollowupQuestions(props: { followupQuestions: string[] }) {
                             'size-4',
                             'shrink-0',
                             'mr-2',
-                            'text-dark/5',
-                            'dark:text-light/5',
+                            'text-gray-subtle',
                         )}
                     />
                     <span>{question}</span>
@@ -232,8 +227,7 @@ function AnswerSources(props: {
                 'py-4',
                 'px-4',
                 'border-t',
-                'border-dark/2',
-                'dark:border-light/1',
+                'border-subtle',
             )}
         >
             <span>
@@ -258,10 +252,9 @@ function AnswerSources(props: {
                         <Icon
                             icon="arrow-up-right"
                             className={tcls(
-                                'text-dark/6',
+                                'text-gray-subtle',
                                 'size-4',
                                 'shrink-0',
-                                'dark:text-light/6',
                             )}
                         />
                         {source.title}

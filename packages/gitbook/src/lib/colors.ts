@@ -42,6 +42,7 @@ export const scale: Record<ColorCategory, ColorSubScale> = {
         'solid-hover': 10, // Hovered solid backgrounds
     },
     [ColorCategory.text]: {
+        subtle: 9, // Very low-contrast text — WARNING: this contrast does not meet accessiblity guidelines. Always include a mitigating contrast-more check for users who need it.
         DEFAULT: 11, // Low-contrast text
         strong: 12, // High-contrast text
     },
@@ -135,8 +136,8 @@ export function colorScale(
 
     const mapping = darkMode
         ? // bgs     |components      |borders         |solid     |text
-          [1.0, 0.95, 0.92, 0.9, 0.87, 0.85, 0.8, 0.75, 0.5, 0.45, 0.25, 0.05]
-        : [1.0, 0.98, 0.95, 0.93, 0.91, 0.9, 0.85, 0.8, 0.5, 0.45, 0.4, 0.2];
+          [1.0, 0.95, 0.92, 0.9, 0.87, 0.85, 0.8, 0.75, 0.5, 0.45, 0.25, 0]
+        : [1.0, 0.98, 0.97, 0.95, 0.93, 0.9, 0.85, 0.8, 0.5, 0.45, 0.4, 0];
 
     const result = [];
 

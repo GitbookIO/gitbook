@@ -100,8 +100,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
 
                                 'sidebar-list-default:rounded-l-none',
                                 'sidebar-list-default:border-l',
-                                'sidebar-list-default:border-dark/3',
-                                'dark:sidebar-list-default:border-light/3',
+                                'sidebar-list-default:border-gray',
                             ],
 
                             activeId === section.id && [

@@ -65,10 +65,8 @@ export function Dropdown<E extends HTMLElement>(props: {
                         'shadow-1xs',
                         'overflow-auto',
                         'ring-1',
-                        'ring-dark/1',
-                        'ring-opacity-8',
+                        'ring-gray-subtle',
                         'focus:outline-none',
-                        'dark:ring-light/2',
                     )}
                 >
                     {children}
@@ -141,7 +139,7 @@ export function DropdownMenuItem(
     return (
         <div
             className={tcls(
-                'text-xs px-3 py-1 font-medium text-dark/8 dark:text-light/8',
+                'text-xs px-3 py-1 font-medium text-gray',
                 className,
             )}
         >

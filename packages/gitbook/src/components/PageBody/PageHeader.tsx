@@ -52,7 +52,7 @@ export async function PageHeader(props: {
                     {index != ancestors.length - 1 && (
                         <Icon
                             icon="chevron-right"
-                            className={tcls('size-3', 'text-light-4', 'dark:text-dark-4')}
+                            className={tcls('size-3', 'text-gray-subtle')}
                         />
                     )}
                 </Fragment>
@@ -75,13 +75,13 @@ export async function PageHeader(props: {
                 <h1 className={tcls('text-4xl', 'font-bold', 'flex', 'items-center', 'gap-4')}>
                     <PageIcon
                         page={page}
-                        style={['text-dark/6', 'dark:text-light/6', 'shrink-0']}
+                        style={['text-gray-subtle   ', 'shrink-0']}
                     />
                     {page.title}
                 </h1>
             ) : null}
             {page.description && page.layout.description ? (
-                <p className={tcls('text-lg', 'text-dark-4', 'dark:text-light-4')}>
+                <p className={tcls('text-lg', 'text-gray')}>
                     {page.description}
                 </p>
             ) : null}

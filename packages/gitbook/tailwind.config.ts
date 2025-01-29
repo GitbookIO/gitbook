@@ -30,7 +30,7 @@ function generateVarShades(varName: string, filter: ColorCategory[] = [], old = 
                 if (filter.length > 0) {
                     result[key] = `rgb(var(--${varName}-${value}))`;
                 } else {
-                    result[value] = `rgb(var(--${varName}-${key}))`;
+                    result[value] = `rgb(var(--${varName}-${value}))`;
                 }
             });
         }

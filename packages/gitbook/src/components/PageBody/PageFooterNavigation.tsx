@@ -42,6 +42,7 @@ export async function PageFooterNavigation(props: {
                 'max-w-3xl',
                 'mx-auto',
                 'page-api-block:ml-0',
+                'text-gray',
             )}
         >
             {previous ? (
@@ -125,8 +126,7 @@ function NavigationCard(
                 <span className={tcls('text-xs')}>{label}</span>
                 <span
                     className={tcls(
-                        'text-dark',
-                        'dark:text-light/6',
+                        'text-gray',
                         'group-hover:text-primary',
                         'line-clamp-2',
                     )}
@@ -139,9 +139,9 @@ function NavigationCard(
                 className={tcls(
                     'hidden',
                     'size-4',
-                    'text-dark/5',
+                    'text-gray-subtle',
+                    'contrast-more:text-gray-strong',
                     'group-hover:text-primary',
-                    'dark:text-light/4',
                     'md:block',
                 )}
             />

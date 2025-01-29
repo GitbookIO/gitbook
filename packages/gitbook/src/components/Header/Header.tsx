@@ -47,16 +47,13 @@ export function Header(props: {
                 'w-full',
                 'flex-none',
                 'shadow-thinbottom',
-                'dark:shadow-light/2',
-                'bg-light',
-                'dark:bg-dark',
+                'shadow-gray-12/1',
+                'bg-gray-base/9',
+                'tint:bg-tint-base/9',
+                'contrast-more:bg-gray-base',
                 withTopHeader ? null : 'lg:hidden',
                 'text-sm',
-                'bg-opacity-9',
-                'dark:bg-opacity-9',
                 'backdrop-blur-lg',
-                'contrast-more:bg-opacity-11',
-                'contrast-more:dark:bg-opacity-11',
             )}
         >
             <div
@@ -65,7 +62,7 @@ export function Header(props: {
                         withTopHeader && [
                             'bg-header-background',
                             'shadow-thinbottom',
-                            'dark:shadow-light/2',
+                            'shadow-gray-12/1',
                         ],
                 )}
             >
@@ -98,7 +95,7 @@ export function Header(props: {
                                     '-ml-2',
                                     customization.header.preset ===
                                         CustomizationHeaderPreset.Default
-                                        ? ['text-dark', 'dark:text-light']
+                                        ? ['text-gray-strong']
                                         : 'text-header-link',
                                 )}
                             />

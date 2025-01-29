@@ -39,8 +39,6 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
                     'items-center',
                     'px-5',
                     'py-3',
-                    'hover:text-primary-600',
-                    'dark:hover:text-primary-300',
                 )}
             >
                 <div
@@ -53,8 +51,7 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
                         'items-center',
                         'gap-1',
                         'border-r',
-                        'border-dark/2',
-                        'dark:border-light/2',
+                        'border-gray-subtle',
                     )}
                 >
                     <div>
@@ -66,10 +63,8 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
                     <div
                         className={tcls(
                             'text-xs',
-                            'text-dark-4/8',
-                            'group-hover/file:text-dark',
-                            'dark:text-light-4/7',
-                            'dark:group-hover/file:text-light',
+                            'text-gray',
+                            'group-hover/file:text-gray-strong',
                         )}
                     >
                         {getHumanFileSize(file.size)}

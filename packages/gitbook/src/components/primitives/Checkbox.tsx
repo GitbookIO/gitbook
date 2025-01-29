@@ -34,7 +34,7 @@ export const Checkbox = React.forwardRef<
             'data-[state=checked]:bg-primary-solid',
             'data-[state=checked]:text-contrast-primary',
             'contrast-more:data-[state=checked]:bg-primary-solid-hover',
-            'contrast-more:ring-dark',
+            'contrast-more:ring-gray-12',
             { small: 'size-4', medium: 'size-5' }[size],
             className,
         )}

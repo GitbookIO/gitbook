@@ -38,12 +38,9 @@ export function PageGroupItem(props: {
 
                     'bg-gradient-to-b',
                     'from-70%', // We want the fade to start past the header, this is a good approximation.
-                    'from-light',
-                    'sidebar-filled:from-light-2',
-                    '[html.tint.sidebar-filled_&]:from-light-1',
-                    'dark:from-dark',
-                    'dark:sidebar-filled:from-dark-1',
-                    'dark:[html.tint.sidebar-filled_&]:from-dark-1',
+                    'from-gray-base',
+                    'sidebar-filled:from-gray-subtle',
+                    '[html.tint.sidebar-filled_&]:from-gray-base',
                     'to-transparent',
                 )}
             >

@@ -14,13 +14,11 @@ export function Quote(props: BlockProps<DocumentBlockQuote>) {
             ancestorBlocks={[...ancestorBlocks, block]}
             style={[
                 style,
-                'text-dark/7',
+                'text-gray',
                 'border-l-2',
                 'pl-6',
                 'py-3',
-                'border-dark/2',
-                'dark:text-light/7',
-                'dark:border-light/2',
+                'border-gray',
                 'space-y-4',
             ]}
         />

@@ -35,8 +35,7 @@ export async function RecordCard(
                 'z-0',
                 'relative',
                 'grid',
-                'bg-light-1',
-                'dark:bg-dark-1',
+                'bg-gray-base',
                 'w-[calc(100%+2px)]',
                 'h-[calc(100%+2px)]',
                 'inset-[-1px]',
@@ -93,14 +92,8 @@ export async function RecordCard(
                     'p-4',
                     'text-sm',
                     target
-                        ? [
-                              'transition-colors',
-                              'text-dark/8',
-                              'dark:text-light/8',
-                              'group-hover:text-dark/10',
-                              'dark:group-hover:text-light/10',
-                          ]
-                        : ['text-dark/10', 'dark:text-light/10'],
+                        ? ['transition-colors', 'text-gray', 'group-hover:text-gray-strong']
+                        : ['text-gray-strong'],
                 )}
             >
                 {view.columns.map((column) => {
@@ -114,10 +107,7 @@ export async function RecordCard(
                         const ariaLabelledBy = `${block.key}-${column}-title`;
                         return (
                             <div key={column} className="flex flex-col gap-1">
-                                <div
-                                    id={ariaLabelledBy}
-                                    className="text-sm text-dark/8 dark:text-light/8"
-                                >
+                                <div id={ariaLabelledBy} className="text-sm text-gray">
                                     {definition.title}
                                 </div>
                                 <RecordColumnValue
@@ -139,11 +129,12 @@ export async function RecordCard(
         'group',
         'grid',
         'shadow-1xs',
-        'shadow-dark/[0.02]',
+        'shadow-gray-9/1',
         'rounded-md',
         'straight-corners:rounded-none',
         'dark:shadow-transparent',
         'z-0',
+
         'before:pointer-events-none',
         'before:grid-area-1-1',
         'before:transition-shadow',
@@ -151,20 +142,16 @@ export async function RecordCard(
         'before:h-full',
         'before:rounded-[inherit]',
         'before:ring-1',
-        'before:ring-dark/2',
+        'before:ring-gray-subtle',
         'before:z-10',
         'before:relative',
-        'before:dark:ring-light/2',
     ] as ClassValue;
 
     if (target && targetRef) {
         return (
             <Link
                 href={target.href}
-                className={tcls(style, [
-                    'hover:before:ring-dark/4',
-                    'dark:hover:before:ring-light/4',
-                ])}
+                className={tcls(style, 'hover:before:ring-gray-hover')}
                 insights={{
                     type: 'link_click',
                     link: {

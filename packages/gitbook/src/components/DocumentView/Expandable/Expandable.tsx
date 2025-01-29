@@ -36,10 +36,9 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                     'list-none',
                     'select-none',
                     'transition-colors',
-                    'group-hover/expandable:text-dark-4/7',
-                    'group-open:text-dark-3/7',
-                    'dark:group-open:text-light-3/7',
-                    'dark:group-hover/expandable:text-light-3/7',
+                    'text-gray',
+                    'group-hover/expandable:text-gray-strong',
+                    'group-open/expandable:text-gray-strong',
                     '[&::-webkit-details-marker]:hidden',
                 )}
             >
@@ -52,7 +51,7 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                         'mb-1',
                         'transition-transform',
                         'shrink-0',
-                        'group-open:rotate-90',
+                        'group-open/expandable:rotate-90',
                     )}
                 />
                 <Inlines
@@ -83,8 +82,8 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                             'size-3',
                             'transition-colors',
                             'text-transparent',
-                            'group-hover:text-dark/6',
-                            'dark:group-hover:text-light/5',
+                            'group-hover/expandable:text-gray-subtle',
+                            'contrast-more:group-hover/expandable:text-gray-strong',
                         )}
                     />
                 </a>

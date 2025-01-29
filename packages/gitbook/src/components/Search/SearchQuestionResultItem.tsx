@@ -51,7 +51,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                     'shrink-0',
                     'mt-1.5',
                     'mr-4',
-                    active ? ['text-primary'] : ['text-dark/5', 'dark:text-light/5'],
+                    active ? ['text-primary'] : ['text-gray-subtle'],
                 )}
             />
             <div className="w-full">
@@ -60,7 +60,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                 ) : (
                     <>
                         <div className="font-medium">{t(language, 'search_ask', [question])}</div>
-                        <div className={tcls('text-sm', 'text-dark/8', 'dark:text-light/8')}>
+                        <div className={tcls('text-sm', 'text-gray')}>
                             {t(language, 'search_ask_description')}
                         </div>
                     </>
@@ -72,7 +72,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                     'rounded',
                     'self-center',
                     'straight-corners:rounded-none',
-                    active ? ['bg-primary', 'text-contrast-primary'] : ['opacity-6'],
+                    active ? ['bg-primary-solid', 'text-contrast-primary-solid'] : ['opacity-6'],
                 )}
             >
                 <Icon

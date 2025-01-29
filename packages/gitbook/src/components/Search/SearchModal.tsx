@@ -84,12 +84,12 @@ export function SearchModal(props: SearchModalProps) {
                         className={tcls(
                             'fixed',
                             'inset-0',
-                            'bg-dark/4',
+                            'bg-gray-12/4',
+                            'dark:bg-gray-1/6',
                             'backdrop-blur-2xl',
                             'z-30',
                             'px-4',
                             'pt-4',
-                            'dark:bg-dark/8',
                             'md:pt-[min(8vh,6rem)]',
                         )}
                         onClick={() => {
@@ -235,7 +235,7 @@ function SearchModalBody(
                 'rounded-lg',
                 'straight-corners:rounded-sm',
                 'ring-1',
-                'ring-dark/1',
+                'ring-gray-hover',
                 'shadow-2xl',
                 'overflow-hidden',
                 'dark:ring-inset',
@@ -251,14 +251,13 @@ function SearchModalBody(
                     'flex-row',
                     'items-start',
                     state.query !== null ? 'border-b' : null,
-                    'border-dark/2',
-                    'dark:border-light/2',
+                    'border-gray-subtle',
                 )}
             >
                 <div className={tcls('p-2', 'pl-4', 'pt-4')}>
                     <Icon
                         icon="magnifying-glass"
-                        className={tcls('size-4', 'text-dark/4', 'dark:text-light/5')}
+                        className={tcls('size-4', 'text-gray-subtle')}
                     />
                 </div>
                 <div
@@ -278,8 +277,8 @@ function SearchModalBody(
                         onKeyDown={onKeyDown}
                         onChange={onChange}
                         className={tcls(
-                            'text-dark',
-                            'placeholder:text-dark/7',
+                            'text-gray-strong',
+                            'placeholder:text-gray',
                             'flex',
                             'resize-none',
                             'flex-1',
@@ -288,8 +287,6 @@ function SearchModalBody(
                             'focus:outline-none',
                             'bg-transparent',
                             'whitespace-pre-line',
-                            'dark:text-light',
-                            'dark:placeholder:text-light/7',
                         )}
                         placeholder={tString(
                             language,

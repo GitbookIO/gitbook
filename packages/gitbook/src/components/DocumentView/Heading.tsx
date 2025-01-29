@@ -45,7 +45,6 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                         'inline-flex',
                         'h-full',
                         'items-start',
-                        'dark:text-light/3',
                         'dark:shadow-none',
                         'dark:ring-0',
                         textStyle.lineHeight,
@@ -58,8 +57,8 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                             'h-[1lh]',
                             'transition-colors',
                             'text-transparent',
-                            'group-hover:text-dark/6',
-                            'dark:group-hover:text-light/5',
+                            'group-hover:text-gray-subtle',
+                            'contrast-more:group-hover:text-gray-strong',
                             'lg:w-4',
                         )}
                     />

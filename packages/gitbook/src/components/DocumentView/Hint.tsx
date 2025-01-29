@@ -62,20 +62,16 @@ const HINT_STYLES: {
 } = {
     info: {
         icon: 'circle-info',
-        iconColor: ['text-primary'],
+        iconColor: ['text-tint'],
         bodyColor: [
             '[&_a]:text-primary',
             '[&_a:hover]:text-primary-strong',
         ],
         style: [
-            'bg-dark-1/1',
-            'border-dark/3',
-            'dark:bg-light/1',
-            'dark:border-light/3',
-            '[&_.can-override-bg]:bg-dark-1/2',
-            '[&_.can-override-text]:text-dark',
-            'dark:[&_.can-override-bg]:bg-light/2',
-            'dark:[&_.can-override-text]:text-light',
+            'bg-gray',
+            'border-gray',
+            '[&_.can-override-bg]:bg-gray-active',
+            '[&_.can-override-text]:text-gray-strong',
         ],
     },
     warning: {

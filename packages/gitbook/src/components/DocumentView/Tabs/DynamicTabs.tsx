@@ -144,11 +144,10 @@ export function DynamicTabs(
                 'straight-corners:rounded-sm',
                 'ring-1',
                 'ring-inset',
-                'ring-dark/3',
+                'ring-gray-subtle',
                 'flex',
                 'overflow-hidden',
                 'flex-col',
-                'dark:ring-light/2',
                 style,
             )}
         >
@@ -160,10 +159,9 @@ export function DynamicTabs(
                     'flex-row',
                     'self-stretch',
                     'after:flex-[1]',
-                    'after:bg-dark-2/1',
+                    'after:bg-gray-12/1',
                     // if last tab is selected, apply rounded to :after element
                     '[&:has(button.active-tab:last-of-type):after]:rounded-bl-md',
-                    'dark:after:bg-dark-1/5',
                 )}
             >
                 {tabs.map((tab) => (
@@ -195,27 +193,21 @@ export function DynamicTabs(
                             'relative',
 
                             'after:transition-colors',
-                            'after:group-hover/tabs:border-transparent',
+                            // 'after:group-hover/tabs:border-transparent',
                             'after:border-r',
                             'after:absolute',
                             'after:left-[unset]',
                             'after:right-0',
-                            'after:border-dark/4',
+                            'after:border-gray',
                             'after:top-[15%]',
                             'after:h-[70%]',
                             'after:w-[1px]',
 
                             'last:after:border-transparent',
 
-                            'text-dark-2/7',
-                            'bg-dark-2/1',
-                            'dark:bg-dark-1/5',
-                            'hover:text-dark-2',
-
-                            'dark:text-light-3/8',
-
-                            'dark:after:border-light/2',
-                            'dark:hover:text-light-3',
+                            'text-gray',
+                            'bg-gray-12/1',
+                            'hover:text-gray-strong',
 
                             'truncate',
                             'max-w-full',
@@ -224,10 +216,8 @@ export function DynamicTabs(
                                 ? [
                                       'shrink-0',
                                       'active-tab',
-                                      'text-dark-2',
+                                      'text-gray-strong',
                                       'bg-transparent',
-                                      'dark:text-light',
-                                      'dark:bg-transparent',
                                       'after:[&.active-tab]:border-transparent',
                                       'after:[:has(+_&.active-tab)]:border-transparent',
                                       'after:[:has(&_+)]:border-transparent',

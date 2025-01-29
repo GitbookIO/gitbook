@@ -23,7 +23,7 @@
         @apply leading-relaxed;
     }
     body {
-        @apply text-dark dark:text-light antialiased;
+        @apply text-gray-strong antialiased;
     }
     html {
         @apply gutter-stable;
@@ -62,35 +62,22 @@
 
     /*  Light mode */
     ::-webkit-scrollbar {
-        @apply bg-dark/1;
+        @apply bg-gray-subtle;
         width: 8px;
         height: 8px;
     }
 
     ::-webkit-scrollbar-thumb {
-        @apply bg-dark/4;
+        @apply bg-gray;
         border-radius: 8px;
     }
 
     ::-webkit-scrollbar-thumb:hover {
-        @apply bg-dark/5;
-    }
-
-    /*  Dark mode */
-    .dark ::-webkit-scrollbar {
-        @apply bg-light/1;
-    }
-
-    .dark ::-webkit-scrollbar-thumb {
-        @apply bg-light/3;
-    }
-
-    .dark ::-webkit-scrollbar-thumb:hover {
-        @apply bg-light/4;
+        @apply bg-gray-hover;
     }
 
     /*  Inverted theme light mode */
-    .inverted-theme-scroll::-webkit-scrollbar {
+    /* .inverted-theme-scroll::-webkit-scrollbar {
         @apply bg-transparent;
     }
 
@@ -100,7 +87,7 @@
 
     .inverted-theme-scroll::-webkit-scrollbar-thumb:hover {
         @apply bg-dark/6;
-    }
+    } */
 
     .flip-heading-hash {
         @apply [&:is(h1,h2,h3,h4)]:content-start;

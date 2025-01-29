@@ -51,7 +51,7 @@ export async function CustomizationRootLayout(props: {
                 customization.styling.corners === CustomizationCorners.Straight
                     ? ' straight-corners'
                     : '',
-                tintColor ? ' tint' : 'no-tint',
+                tintColor ? ' tint' : 'no-tint', // TODO @Zeno: Fix tint display
                 sidebarStyles.background && ' sidebar-' + sidebarStyles.background,
                 sidebarStyles.list && ' sidebar-list-' + sidebarStyles.list,
             )}

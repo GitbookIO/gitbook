@@ -137,7 +137,7 @@ function ListItemPrefix(props: { block: DocumentBlockListItem; children: React.R
             className={tcls(
                 textStyle.textSize,
                 textStyle.lineHeight,
-                'flex items-center justify-center mr-1 min-h-[1lh] min-w-6 text-dark-4 dark:text-light-4',
+                'flex items-center justify-center mr-1 min-h-[1lh] min-w-6 text-gray',
             )}
         >
             {props.children}

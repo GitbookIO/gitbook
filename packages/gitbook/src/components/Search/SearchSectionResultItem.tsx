@@ -28,10 +28,8 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                 'pl-6',
                 'sm:pl-12',
                 'pr-4',
-                'text-dark/8',
-                'dark:text-light/8',
-                'hover:bg-dark/1',
-                'dark:hover:bg-light/1',
+                'text-gray',
+                'hover:bg-gray-hover',
                 'font-normal',
                 'py-2',
                 'group',
@@ -52,8 +50,7 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                     'flex-1',
                     'overflow-hidden',
                     'flex-col',
-                    'border-dark/2',
-                    'dark:border-light/2',
+                    'border-gray-subtle',
                 )}
             >
                 {item.title ? (
@@ -72,8 +69,8 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                     'p-2',
                     'rounded',
                     'straight-corners:rounded-none',
-                    'bg-primary',
-                    'text-contrast-primary',
+                    'bg-primary-solid',
+                    'text-contrast-primary-solid',
                     'hidden',
                     'sm:block',
                     active ? ['opacity-11', 'block'] : ['opacity-0'],

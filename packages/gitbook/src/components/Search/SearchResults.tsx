@@ -230,7 +230,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     }
 
     const noResults = (
-        <div className={tcls('text', 'text-dark/8', 'p-8', 'text-center', 'dark:text-light/8')}>
+        <div className={tcls('text', 'text-gray', 'p-8', 'text-center')}>
             {t(language, 'search_no_results', query)}
         </div>
     );

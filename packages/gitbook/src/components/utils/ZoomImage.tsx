@@ -217,8 +217,8 @@ function ZoomImageModal(props: {
                     'flex',
                     'items-center',
                     'justify-center',
-                    'bg-light',
-                    'dark:bg-dark',
+                    'bg-gray-base/4',
+                    'backdrop-blur-2xl',
                     'p-8',
                 ),
             )}
@@ -232,8 +232,7 @@ function ZoomImageModal(props: {
                     'max-w-full',
                     'max-h-full',
                     'object-contain',
-                    'bg-light',
-                    'dark:bg-dark',
+                    'bg-gray-base',
                 )}
             />
 
@@ -248,19 +247,17 @@ function ZoomImageModal(props: {
                     'items-center',
                     'justify-center',
                     'text-sm',
-                    'text-dark/6',
-                    'dark:text-light/5',
-                    'hover:text-primary',
+                    'text-gray',
+                    'hover:text-tint',
+                    'hover:bg-tint',
+                    'hover:border-tint',
                     'p-4',
-                    'dark:text-light/5',
                     'rounded-full',
-                    'bg-white',
-                    'dark:bg-dark/3',
+                    'bg-gray',
+                    'border',
+                    'border-gray',
                     'shadow-sm',
                     'hover:shadow-md',
-                    'border-slate-300',
-                    'dark:border-dark/2',
-                    'border',
                 )}
                 onClick={onClose}
             >
