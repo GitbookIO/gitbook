@@ -4,7 +4,7 @@ import { CodeSampleInput, codeSampleGenerators } from './code-samples';
 import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { generateMediaTypeExample, generateSchemaExample } from './generateSchemaExample';
 import { InteractiveSection } from './InteractiveSection';
-import { getServersURL } from './OpenAPIServerURL';
+import { getServersURL, OpenAPIServerURL } from './OpenAPIServerURL';
 import { ScalarApiButton } from './ScalarApiButton';
 import { OpenAPIContextProps } from './types';
 import { noReference } from './utils';
@@ -19,6 +19,7 @@ export function OpenAPICodeSample(props: {
     context: OpenAPIContextProps;
 }) {
     const { data, context } = props;
+    const { method, path } = data;
 
     const searchParams = new URLSearchParams();
     const headersObject: { [k: string]: string } = {};
@@ -112,13 +113,30 @@ export function OpenAPICodeSample(props: {
     const codeSamplesDisabled =
         data['x-codeSamples'] === false || data.operation['x-codeSamples'] === false;
     const samples = customCodeSamples ?? (!codeSamplesDisabled ? autoCodeSamples : []);
+
     if (samples.length === 0) {
         return null;
     }
 
+    const formatPath = (path: string) => {
+        const regex = /\{(\w+)\}/g; // Matches placeholders like {tailnetId}, {userId}, etc.
+        const parts: (string | JSX.Element)[] = [];
+        let lastIndex = 0;
+
+        path.replace(regex, (match, key, offset) => {
+            parts.push(path.slice(lastIndex, offset)); // Push text before the placeholder
+            parts.push(<em key={key}>{`{${key}}`}</em>); // Replace placeholder with <em> tag
+            lastIndex = offset + match.length;
+            return match;
+        });
+
+        parts.push(path.slice(lastIndex)); // Push remaining text after the last placeholder
+
+        return <span>{parts}</span>;
+    };
+
     return (
         <InteractiveSection
-            header="Request"
             className="openapi-codesample"
             tabs={samples}
             overlay={
@@ -130,6 +148,12 @@ export function OpenAPICodeSample(props: {
                     />
                 )
             }
+            header={
+                <>
+                    <span className={`openapi-method openapi-method-${method}`}>{method}</span>
+                    <span className="openapi-codesample-title">{formatPath(path)}</span>
+                </>
+            }
         />
     );
 }
@@ -138,9 +162,13 @@ function getSecurityHeaders(securities: OpenAPIOperationData['securities']): {
     [key: string]: string;
 } {
     const security = securities[0];
+    console.log({ securities });
+
     if (!security) {
         return {};
     }
+
+    console.log({ securities });
 
     switch (security[1].type) {
         case 'http': {

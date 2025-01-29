@@ -36,9 +36,6 @@ export function OpenAPISpec(props: { data: OpenAPIOperationData; context: OpenAP
                 <InteractiveSection
                     key={group.key}
                     className="openapi-parameters"
-                    toggeable
-                    toggleOpenIcon={context.icons.chevronRight}
-                    toggleCloseIcon={context.icons.chevronDown}
                     header={group.label}
                     defaultOpened={group.key === 'path' || context.defaultInteractiveOpened}
                 >
@@ -85,20 +82,22 @@ function groupParameters(parameters: OpenAPI.Parameters): Array<{
         parameters: OpenAPI.Parameters;
     }> = [];
 
-    parameters.forEach((parameter) => {
-        const key = parameter.in;
-        const label = getParameterGroupName(parameter.in);
-        const group = groups.find((group) => group.key === key);
-        if (group) {
-            group.parameters.push(parameter);
-        } else {
-            groups.push({
-                key,
-                label,
-                parameters: [parameter],
-            });
-        }
-    });
+    parameters
+        .filter((parameter) => parameter.in)
+        .forEach((parameter) => {
+            const key = parameter.in;
+            const label = getParameterGroupName(parameter.in);
+            const group = groups.find((group) => group.key === key);
+            if (group) {
+                group.parameters.push(parameter);
+            } else {
+                groups.push({
+                    key,
+                    label,
+                    parameters: [parameter],
+                });
+            }
+        });
 
     groups.sort((a, b) => sorted.indexOf(a.key) - sorted.indexOf(b.key));
 

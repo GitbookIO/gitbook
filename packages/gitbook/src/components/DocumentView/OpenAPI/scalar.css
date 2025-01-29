@@ -263,7 +263,6 @@
 }
 .scalar-activate {
     width: fit-content;
-    margin: 0px 0.75rem 0.75rem auto;
     line-height: 24px;
     font-size: 0.75rem;
     cursor: pointer;
