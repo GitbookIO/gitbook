@@ -118,7 +118,8 @@ export async function fetchOpenAPIOperation(
     }
 
     const servers: OpenAPIV3.ServerObject[] = 'servers' in schema ? (schema.servers ?? []) : [];
-    const security: OpenAPIV3.SecurityRequirementObject[] = operation.security ?? [];
+    const security: OpenAPIV3.SecurityRequirementObject[] =
+        operation.security ?? schema.security ?? [];
 
     // Resolve securities
     const securities: OpenAPIOperationData['securities'] = [];
