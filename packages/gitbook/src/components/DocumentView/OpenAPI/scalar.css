@@ -43,7 +43,7 @@
     --scalar-color-green: #0a6355;
     --scalar-color-red: #dc1b19;
     --scalar-color-yellow: #ffc90d;
-    --scalar-color-blue: rgb(var(--primary-color-500, 52 109 219));
+    --scalar-color-blue: rgb(var(--primary-9, 52 109 219));
     --scalar-color-orange: #ff8d4d;
     --scalar-color-purple: #8250df;
 
@@ -103,7 +103,7 @@
     --scalar-color-green: #56b6c2;
     --scalar-color-red: rgb(245 124 97);
     --scalar-color-yellow: #edbe20;
-    --scalar-color-blue: rgb(var(--primary-color-400, 93 138 226));
+    --scalar-color-blue: rgb(var(--primary-9, 93 138 226));
     --scalar-color-orange: #d19a66;
     --scalar-color-purple: #5203d1;
 

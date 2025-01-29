@@ -22,42 +22,22 @@
     @apply relative grid w-full overflow-x-auto overflow-y-hidden mx-auto border-dark/3;
 }
 
-:global(.dark) .tableWrapper {
-    @apply border-tint-50;
-}
-
 .columnHeader {
-    @apply text-sm font-medium py-2 px-4 text-tint-900;
-}
-
-:global(.dark) .columnHeader {
-    @apply text-white;
+    @apply text-sm font-medium py-2 px-4 text-tint-strong;
 }
 
 .row {
-    @apply flex border-tint-700/2 hover:bg-tint-700/2 transition-colors;
-}
-
-:global(.dark) .row {
-    @apply border-tint-300/3;
+    @apply flex border-tint/6 hover:bg-tint/2 transition-colors;
 }
 
 .rowGroup {
-    @apply flex flex-col border rounded-lg bg-tint-800/1 border-tint-700/2 mb-1;
-}
-
-:global(.dark) .rowGroup {
-    @apply bg-tint-300/2 border-tint-300/3;
+    @apply flex flex-col border rounded-lg bg-tint/2 border-tint/6 mb-1;
 }
 
 .cell {
-    @apply flex-1 flex align-middle border-tint-700/2 py-2 px-3 h-full text-sm relative;
+    @apply flex-1 flex align-middle border-tint/6 py-2 px-3 h-full text-sm relative;
 }
 
 .cell:not(:last-child) {
     @apply border-r;
-}
-
-:global(.dark) .cell {
-    @apply border-tint-300/3;
 }

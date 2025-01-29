@@ -345,7 +345,7 @@
 
 .openapi-section-toggle:focus-visible,
 .openapi-section-toggle:focus-visible {
-    @apply text-primary-500;
+    @apply text-primary;
 }
 
 .openapi-section-toggle svg {

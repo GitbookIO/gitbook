@@ -18,7 +18,7 @@ function generateVarShades(varName: string, filter: ColorCategory[] = [], old = 
                 acc[shade] = `rgb(var(--${varName}-${shade}))`;
                 return acc;
             },
-            { DEFAULT: `rgb(var(--${varName}-DEFAULT))` } as Record<string, string>,
+            { DEFAULT: 'rgb(255 0 0)' } as Record<string, string>, // `rgb(var(--${varName}-DEFAULT))` } as Record<string, string>,
         );
     }
 
@@ -35,6 +35,7 @@ function generateVarShades(varName: string, filter: ColorCategory[] = [], old = 
             });
         }
     });
+    result['original'] = `rgb(var(--${varName}-original))`
 
     return result;
 }
@@ -92,12 +93,12 @@ const config: Config = {
             },
             colors: {
                 // Dynamic colors matching the customization settings
-                primary: generateVarShades('primary', undefined, true),
-                'contrast-primary': generateVarShades('contrast-primary', undefined, true),
-                tint: generateVarShades('tint', undefined, true),
-                'contrast-tint': generateVarShades('contrast-tint', undefined, true),
-                gray: generateVarShades('gray', undefined, true),
-                'contrast-gray': generateVarShades('contrast-gray', undefined, true),
+                primary: generateVarShades('primary'),
+                'contrast-primary': generateVarShades('contrast-primary'),
+                tint: generateVarShades('tint'),
+                'contrast-tint': generateVarShades('contrast-tint'),
+                gray: generateVarShades('gray'),
+                'contrast-gray': generateVarShades('contrast-gray'),
 
                 'header-background': generateVarShades('header-background', undefined, true),
                 'header-link': generateVarShades('header-link', undefined, true),
@@ -144,18 +145,58 @@ const config: Config = {
                     ColorCategory.accents,
                 ]),
             },
+            gradientColorStops: {
+                primary: generateVarShades('primary', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.components,
+                    ColorCategory.accents,
+                ]),
+                tint: generateVarShades('tint', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.components,
+                    ColorCategory.accents,
+                ]),
+                gray: generateVarShades('gray', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.components,
+                    ColorCategory.accents,
+                ]),
+            },
             borderColor: {
+                primary: generateVarShades('primary', [ColorCategory.borders]),
+                tint: generateVarShades('tint', [ColorCategory.borders]),
+                gray: generateVarShades('gray', [ColorCategory.borders]),
+            },
+            ringColor: {
+                primary: generateVarShades('primary', [ColorCategory.borders]),
+                tint: generateVarShades('tint', [ColorCategory.borders]),
+                gray: generateVarShades('gray', [ColorCategory.borders]),
+            },
+            outlineColor: {
+                primary: generateVarShades('primary', [ColorCategory.borders]),
+                tint: generateVarShades('tint', [ColorCategory.borders]),
+                gray: generateVarShades('gray', [ColorCategory.borders]),
+            },
+            boxShadowColor: {
                 primary: generateVarShades('primary', [ColorCategory.borders]),
                 tint: generateVarShades('tint', [ColorCategory.borders]),
                 gray: generateVarShades('gray', [ColorCategory.borders]),
             },
             textColor: {
                 primary: generateVarShades('primary', [ColorCategory.text]),
-                'contrast-primary': generateVarShades('contrast-primary', [ColorCategory.text]),
+                'contrast-primary': generateVarShades('contrast-primary', [ColorCategory.backgrounds, ColorCategory.accents]),
                 tint: generateVarShades('tint', [ColorCategory.text]),
-                'contrast-tint': generateVarShades('contrast-tint', [ColorCategory.text]),
+                'contrast-tint': generateVarShades('contrast-tint', [ColorCategory.backgrounds, ColorCategory.accents]),
                 gray: generateVarShades('gray', [ColorCategory.text]),
-                'contrast-gray': generateVarShades('contrast-gray', [ColorCategory.text]),
+                'contrast-gray': generateVarShades('contrast-gray', [ColorCategory.backgrounds, ColorCategory.accents]),
+            },
+            textDecorationColor: {
+                primary: generateVarShades('primary', [ColorCategory.text]),
+                'contrast-primary': generateVarShades('contrast-primary', [ColorCategory.backgrounds, ColorCategory.accents]),
+                tint: generateVarShades('tint', [ColorCategory.text]),
+                'contrast-tint': generateVarShades('contrast-tint', [ColorCategory.backgrounds, ColorCategory.accents]),
+                gray: generateVarShades('gray', [ColorCategory.text]),
+                'contrast-gray': generateVarShades('contrast-gray', [ColorCategory.backgrounds, ColorCategory.accents]),
             },
             animation: {
                 present: 'present .5s ease-out both',

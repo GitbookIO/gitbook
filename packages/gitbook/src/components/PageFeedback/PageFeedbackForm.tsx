@@ -65,7 +65,7 @@ export function PageFeedbackForm(props: {
         <div className={tcls('flex flex-col gap-3 text-sm', className)}>
             <div className="flex flex-wrap items-center gap-2">
                 <p>{t(languages, 'was_this_helpful')}</p>
-                <div className="bg-light-1 dark:bg-dark-1 border border-dark/2 dark:border-light/2 contrast-more:border-dark dark:contrast-more:border-light rounded-full">
+                <div className="bg-gray-base border border-gray-subtle contrast-more:border-gray-12 rounded-full">
                     <div className="flex">
                         <RatingButton
                             rating={PageFeedbackRating.Bad}
@@ -98,7 +98,7 @@ export function PageFeedbackForm(props: {
                             <textarea
                                 ref={inputRef}
                                 name="comment"
-                                className="grow ring-1 ring-inset bg-light-1 dark:bg-dark-1 ring-dark/2 dark:ring-light/2 contrast-more:ring-dark dark:contrast-more:ring-light min-h-16 max-h-40 rounded straight-corners:rounded-none p-2 placeholder:text-sm placeholder:text-dark/6 dark:placeholder:text-light/6 contrast-more:placeholder:text-dark dark:contrast-more:placeholder:text-light"
+                                className="grow ring-1 ring-inset bg-gray-base ring-gray- contrast-more:ring-gray-12 min-h-16 max-h-40 rounded straight-corners:rounded-none p-2 placeholder:text-sm placeholder:text-gray contrast-more:placeholder:text-gray-strong"
                                 placeholder={tString(languages, 'was_this_helpful_comment')}
                                 aria-label={tString(languages, 'was_this_helpful_comment')}
                                 onChange={(e) => setComment(e.target.value)}

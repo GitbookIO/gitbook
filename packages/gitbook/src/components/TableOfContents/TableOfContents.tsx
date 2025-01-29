@@ -78,8 +78,7 @@ export function TableOfContents(props: {
                 'gap-4',
 
                 'navigation-open:border-b',
-                'border-dark/2',
-                'dark:border-light/2',
+                'border-gray-subtle',
             )}
         >
             {header && header}
@@ -131,8 +130,7 @@ export function TableOfContents(props: {
                         context={context}
                         style={tcls(
                             'sidebar-list-line:border-l',
-                            'border-dark/3',
-                            'dark:border-light/2',
+                            'border-gray-subtle',
                         )}
                     />
                     {customization.trademark.enabled ? (

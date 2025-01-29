@@ -16,7 +16,7 @@ export function StyledLink(props: Omit<LinkProps, 'style'> & { style?: ClassValu
                 'underline-offset-2',
                 'decoration-primary/6',
                 'text-primary',
-                'hover:text-primary-700',
+                'hover:text-primary-strong',
                 'transition-colors',
                 style,
             )}

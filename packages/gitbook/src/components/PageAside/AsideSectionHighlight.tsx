@@ -22,7 +22,6 @@ export function AsideSectionHighlight({
                 'border-tint',
                 'sidebar-list-line:border-l-2',
 
-                'dark:border-tint-400',
                 'inset-0',
                 'pointer-events-none',
                 'absolute',
@@ -33,12 +32,10 @@ export function AsideSectionHighlight({
                 'straight-corners:rounded-none',
                 'sidebar-list-line:rounded-l-none',
 
-                'sidebar-list-pill:bg-tint/3',
-                'dark:sidebar-list-pill:bg-tint-400/3',
+                'sidebar-list-pill:bg-tint',
 
                 'contrast-more:border',
-                'contrast-more:bg-tint/3',
-                'dark:contrast-more:bg-tint-400/3',
+                'contrast-more:bg-tint',
                 className,
             ])}
             transition={prefersReducedMotion ? { duration: 0 } : transition}

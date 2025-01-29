@@ -67,19 +67,19 @@ export async function CustomizationRootLayout(props: {
                     }
                 >{`
                     :root {
-                        --primary-DEFAULT: ${hexToRgb(customization.styling.primaryColor.light)};
+                        --primary-original: ${hexToRgb(customization.styling.primaryColor.light)};
                         ${generateColorVariable('primary', Object.fromEntries(colorScale(customization.styling.primaryColor.light).map((shade, index) => [index + 1, shade])))}
-                        --contrast-primary-DEFAULT: ${hexToRgb(colorContrast(customization.styling.primaryColor.light))};
+                        --contrast-primary-original: ${hexToRgb(colorContrast(customization.styling.primaryColor.light))};
                         ${generateColorVariable('contrast-primary', Object.fromEntries(colorScale(customization.styling.primaryColor.light).map((shade, index) => [index + 1, colorContrast(shade)])))}
 
-                        --tint-DEFAULT: ${hexToRgb(tintColor?.light ?? customization.styling.primaryColor.light ?? DEFAULT_TINT_COLOR)};
+                        --tint-original: ${hexToRgb(tintColor?.light ?? customization.styling.primaryColor.light ?? DEFAULT_TINT_COLOR)};
                         ${generateColorVariable('tint', Object.fromEntries(colorScale(tintColor?.light ?? customization.styling.primaryColor.light ?? DEFAULT_TINT_COLOR).map((shade, index) => [index + 1, shade])))}
-                        --contrast-tint-DEFAULT: ${hexToRgb(colorContrast(tintColor?.light ?? customization.styling.primaryColor.light ?? DEFAULT_TINT_COLOR))};
+                        --contrast-tint-original: ${hexToRgb(colorContrast(tintColor?.light ?? customization.styling.primaryColor.light ?? DEFAULT_TINT_COLOR))};
                         ${generateColorVariable('contrast-tint', Object.fromEntries(colorScale(tintColor?.light ?? customization.styling.primaryColor.light ?? DEFAULT_TINT_COLOR).map((shade, index) => [index + 1, colorContrast(shade)])))}
 
-                        --gray-DEFAULT: ${hexToRgb(DEFAULT_TINT_COLOR)};
+                        --gray-original: ${hexToRgb(DEFAULT_TINT_COLOR)};
                         ${generateColorVariable('gray', Object.fromEntries(colorScale(DEFAULT_TINT_COLOR).map((shade, index) => [index + 1, shade])))}
-                        --contrast-tint-DEFAULT: ${hexToRgb(colorContrast(DEFAULT_TINT_COLOR))};
+                        --contrast-tint-original: ${hexToRgb(colorContrast(DEFAULT_TINT_COLOR))};
                         ${generateColorVariable('contrast-gray', Object.fromEntries(colorScale(DEFAULT_TINT_COLOR).map((shade, index) => [index + 1, colorContrast(shade)])))}
 
                         --header-backround: ${headerTheme.backgroundColor.light}
@@ -87,19 +87,19 @@ export async function CustomizationRootLayout(props: {
                     }
 
                     .dark {
-                        --primary-DEFAULT: ${hexToRgb(customization.styling.primaryColor.dark)};
+                        --primary-original: ${hexToRgb(customization.styling.primaryColor.dark)};
                         ${generateColorVariable('primary', Object.fromEntries(colorScale(customization.styling.primaryColor.dark, {darkMode: true}).map((shade, index) => [index + 1, shade])))}
-                        --contrast-primary-DEFAULT: ${hexToRgb(colorContrast(customization.styling.primaryColor.dark))};
+                        --contrast-primary-original: ${hexToRgb(colorContrast(customization.styling.primaryColor.dark))};
                         ${generateColorVariable('contrast-primary', Object.fromEntries(colorScale(customization.styling.primaryColor.dark, {darkMode: true}).map((shade, index) => [index + 1, colorContrast(shade)])))}
 
-                        --tint-DEFAULT: ${hexToRgb(tintColor?.dark ?? customization.styling.primaryColor.dark ?? DEFAULT_TINT_COLOR)};
+                        --tint-original: ${hexToRgb(tintColor?.dark ?? customization.styling.primaryColor.dark ?? DEFAULT_TINT_COLOR)};
                         ${generateColorVariable('tint', Object.fromEntries(colorScale(tintColor?.dark ?? customization.styling.primaryColor.dark ?? DEFAULT_TINT_COLOR, {darkMode: true}).map((shade, index) => [index + 1, shade])))}
-                        --contrast-tint-DEFAULT: ${hexToRgb(colorContrast(tintColor?.dark ?? customization.styling.primaryColor.dark ?? DEFAULT_TINT_COLOR))};
+                        --contrast-tint-original: ${hexToRgb(colorContrast(tintColor?.dark ?? customization.styling.primaryColor.dark ?? DEFAULT_TINT_COLOR))};
                         ${generateColorVariable('contrast-tint', Object.fromEntries(colorScale(tintColor?.dark ?? customization.styling.primaryColor.dark ?? DEFAULT_TINT_COLOR, {darkMode: true}).map((shade, index) => [index + 1, colorContrast(shade)])))}
 
-                        --gray-DEFAULT: ${hexToRgb(DEFAULT_TINT_COLOR)};
+                        --gray-original: ${hexToRgb(DEFAULT_TINT_COLOR)};
                         ${generateColorVariable('gray', Object.fromEntries(colorScale(DEFAULT_TINT_COLOR, {darkMode: true}).map((shade, index) => [index + 1, shade])))}
-                        --contrast-tint-DEFAULT: ${hexToRgb(colorContrast(DEFAULT_TINT_COLOR))};
+                        --contrast-tint-original: ${hexToRgb(colorContrast(DEFAULT_TINT_COLOR))};
                         ${generateColorVariable('contrast-gray', Object.fromEntries(colorScale(DEFAULT_TINT_COLOR, {darkMode: true}).map((shade, index) => [index + 1, colorContrast(shade)])))}
 
                         --header-backround: ${headerTheme.backgroundColor.light}
@@ -112,10 +112,91 @@ export async function CustomizationRootLayout(props: {
                     fontNotoColorEmoji.className,
                     `${fonts[customization.styling.font].className}`,
                     `${ibmPlexMono.variable}`,
-                    'bg-light',
-                    'dark:bg-dark',
+                    'bg-gray-base',
                 )}
             >
+                <div className="flex gap-4">
+                    <div>
+                        Light original:{' '}
+                        <span style={{ color: customization.styling.primaryColor.light }}>
+                            {customization.styling.primaryColor.light}
+                        </span>
+                        <ol>
+                            {colorScale(customization.styling.primaryColor.light).map((color, index) => (
+                                <li
+                                    className="list-item"
+                                    key={index}
+                                    style={{
+                                        backgroundColor: color,
+                                        color: colorContrast(color)
+                                    }}
+                                >
+                                    {color}
+                                </li>
+                            ))}
+                        </ol>
+                    </div>
+                    <div>
+                        Dark original:{' '}
+                        <span style={{ color: customization.styling.primaryColor.dark }}>
+                            {customization.styling.primaryColor.dark}
+                        </span>
+                        <ol>
+                            {colorScale(customization.styling.primaryColor.dark, {darkMode: true}).map((color, index) => (
+                                <li
+                                    className="list-item"
+                                    key={index}
+                                    style={{
+                                        backgroundColor: color,
+                                        color: colorContrast(color)
+                                    }}
+                                >
+                                    {color}
+                                </li>
+                            ))}
+                        </ol>
+                    </div>
+                    <div>
+                        Light gray:{' '}
+                        <span style={{ color: DEFAULT_TINT_COLOR }}>
+                            {DEFAULT_TINT_COLOR}
+                        </span>
+                        <ol>
+                            {colorScale(DEFAULT_TINT_COLOR).map((color, index) => (
+                                <li
+                                    className="list-item"
+                                    key={index}
+                                    style={{
+                                        backgroundColor: color,
+                                        color: colorContrast(color)
+                                    }}
+                                >
+                                    {color}
+                                </li>
+                            ))}
+                        </ol>
+                    </div>
+                    <div>
+                        Dark gray:{' '}
+                        <span style={{ color: DEFAULT_TINT_COLOR }}>
+                            {DEFAULT_TINT_COLOR}
+                        </span>
+                        <ol>
+                            {colorScale(DEFAULT_TINT_COLOR, {darkMode: true}).map((color, index) => (
+                                <li
+                                    className="list-item"
+                                    key={index}
+                                    style={{
+                                        backgroundColor: color,
+                                        color: colorContrast(color)
+                                    }}
+                                >
+                                    {color}
+                                </li>
+                            ))}
+                        </ol>
+                    </div>
+                </div>
                 <IconsProvider
                     assetsURL={process.env.GITBOOK_ICONS_URL ?? getStaticFileURL('icons')}
                     assetsURLToken={process.env.GITBOOK_ICONS_TOKEN}

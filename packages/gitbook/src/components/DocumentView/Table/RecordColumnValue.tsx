@@ -76,8 +76,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                         icon="star"
                                         className={tcls(
                                             'size-[15px]',
-                                            'text-primary-700/5',
-                                            'dark:text-primary-300/5',
+                                            'text-primary/5',
                                         )}
                                     />
                                 ))}
@@ -301,10 +300,8 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                         'rounded',
                                         'py-1',
                                         'px-2',
-                                        'bg-primary-300/4',
-                                        'text-primary-800',
-                                        'dark:bg-primary-400/3',
-                                        'dark:text-primary-200',
+                                        'bg-primary',
+                                        'text-primary-strong',
                                     )}
                                 >
                                     {option.label}

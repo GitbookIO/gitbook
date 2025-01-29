@@ -24,13 +24,13 @@ type ColorSubScale = {
 
 export const scale: Record<ColorCategory, ColorSubScale> = {
     [ColorCategory.backgrounds]: {
-        app: 1, // Base background
+        base: 1, // Base background
         subtle: 2, // Accent background
     },
     [ColorCategory.components]: {
-        ui: 3, // Component background
-        'ui-hover': 4, // Component hover background
-        'ui-active': 5, // Component active background
+        DEFAULT: 3, // Component background
+        hover: 4, // Component hover background
+        active: 5, // Component active background
     },
     [ColorCategory.borders]: {
         subtle: 6, // Subtle borders, separators
@@ -38,8 +38,8 @@ export const scale: Record<ColorCategory, ColorSubScale> = {
         hover: 8, // Element hover border
     },
     [ColorCategory.accents]: {
-        DEFAULT: 9, // Solid backgrounds
-        hover: 10, // Hovered solid backgrounds
+        solid: 9, // Solid backgrounds
+        'solid-hover': 10, // Hovered solid backgrounds
     },
     [ColorCategory.text]: {
         DEFAULT: 11, // Low-contrast text
@@ -134,8 +134,9 @@ export function colorScale(
     const backgroundColor = rgbToOklch(hexToRgbArray(background));
 
     const mapping = darkMode
-        ? [0.9, 0.85, 0.75, 0.7, 0.65, 0.6, 0.55, 0.5, 0.45, 0.4, 0.25, 0.05]
-        : [0.99, 0.98, 0.95, 0.93, 0.9, 0.85, 0.8, 0.75, 0.65, 0.6, 0.5, 0.2];
+        ? // bgs     |components      |borders         |solid     |text
+          [1.0, 0.95, 0.92, 0.9, 0.87, 0.85, 0.8, 0.75, 0.5, 0.45, 0.25, 0.05]
+        : [1.0, 0.98, 0.95, 0.93, 0.91, 0.9, 0.85, 0.8, 0.5, 0.45, 0.4, 0.2];
 
     const result = [];
 
@@ -143,19 +144,24 @@ export function colorScale(
         const targetL =
             backgroundColor.L * mapping[index] + foregroundColor.L * (1 - mapping[index]);
 
+        if (index == 8 && Math.abs(baseColor.L - targetL) < 0.2) {
+            // Original colour is close enough to target, so let's use the original colour as step 9.
+            result.push(hex);
+            continue;
+        }
+
         // Mix in more of the background while maintaining chroma
-        const mixRatio = 1 - (index + 1) / mapping.length; // Higher mixRatio means more background contribution
+        const mixRatio = index >= 8 ? 0 : 1 - (index + 1) / mapping.length; // Higher mixRatio means more background contribution
 
         const shade = {
-            L: backgroundColor.L * mapping[index] + foregroundColor.L * (1 - mapping[index]), // Blend lightness
+            L: targetL, // Blend lightness
             C: baseColor.C * (1 - mixRatio),
-            // C: baseColor.C * (1 - mixRatio), // Retain chromacity by scaling chroma down
             H: baseColor.H, // Maintain the hue from the base color
         };
 
-        const hex = rgbArrayToHex(oklchToRgb(shade));
+        const newHex = rgbArrayToHex(oklchToRgb(shade));
 
-        result.push(hex);
+        result.push(newHex);
     }
 
     return result;

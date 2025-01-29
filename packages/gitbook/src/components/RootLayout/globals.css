@@ -51,7 +51,7 @@
     button,
     input,
     textarea {
-        @apply outline-2 outline-primary/6;
+        @apply outline-2 outline-primary;
     }
 
     code,

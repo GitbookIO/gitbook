@@ -37,12 +37,9 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                 'group',
                 active && [
                     'is-active',
-                    'bg-primary-50',
-                    'text-contrast-primary-50',
-                    'dark:bg-primary-800',
-                    'dark:text-contrast-primary-800',
-                    'hover:bg-primary-100/8',
-                    'dark:hover:bg-primary-700/7',
+                    'bg-primary',
+                    'text-contrast-primary',
+                    'hover:bg-primary-hover',
                 ],
             )}
         >

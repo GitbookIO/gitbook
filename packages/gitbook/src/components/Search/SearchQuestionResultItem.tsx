@@ -28,19 +28,15 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
             className={tcls(
                 'flex',
                 'px-4',
-                recommended ? ['py-2', 'text-dark/7', 'dark:text-light/8'] : 'py-4',
-                'hover:bg-dark/1',
-                'dark:hover:bg-light/1',
+                recommended ? ['py-2', 'text-gray'] : 'py-4',
+                'hover:bg-gray-hover',
                 'first:mt-0',
                 'last:pb-3',
                 active && [
                     'is-active',
-                    'bg-primary-50',
-                    'text-contrast-primary-50',
-                    'dark:bg-primary-800',
-                    'dark:text-contrast-primary-800',
-                    'hover:bg-primary-100/8',
-                    'dark:hover:bg-primary-700/7',
+                    'bg-primary',
+                    'text-contrast-primary',
+                    'hover:bg-primary-hover',
                 ],
             )}
             {...getLinkProp({

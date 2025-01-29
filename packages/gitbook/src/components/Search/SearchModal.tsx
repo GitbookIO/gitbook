@@ -227,7 +227,7 @@ function SearchModalBody(
                 'relative',
                 'flex',
                 'flex-col',
-                'bg-white',
+                'bg-gray-base',
                 'max-w-prose',
                 'mx-auto',
                 'max-h-[70dvh]',
@@ -239,8 +239,7 @@ function SearchModalBody(
                 'shadow-2xl',
                 'overflow-hidden',
                 'dark:ring-inset',
-                'dark:bg-dark-3',
-                'dark:ring-light/2',
+                'dark:ring-gray',
             )}
             onClick={(event) => {
                 event.stopPropagation();

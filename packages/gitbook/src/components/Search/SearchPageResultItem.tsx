@@ -28,23 +28,18 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                 'items-center',
                 'p-4',
                 'border-t',
-                'border-dark/2',
-                'dark:border-light/1',
+                'border-gray-subtle',
                 'first:border-none',
                 'text-base',
                 'font-medium',
-                'hover:bg-dark/1',
-                'dark:hover:bg-light/1',
+                'hover:bg-gray-hover',
                 'group',
                 active
                     ? [
                           'is-active',
-                          'bg-primary-50',
-                          'text-contrast-primary-50',
-                          'dark:bg-primary-800',
-                          'dark:text-contrast-primary-800',
-                          'hover:bg-primary-100/8',
-                          'dark:hover:bg-primary-700/7',
+                          'bg-primary',
+                          'text-contrast-primary',
+                          'hover:bg-primary-hover',
                       ]
                     : null,
             )}

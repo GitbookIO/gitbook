@@ -27,17 +27,13 @@ export async function Card(
                 'items-center',
                 'gap-4',
                 'ring-1',
-                'ring-dark/3',
+                'ring-gray-subtle',
                 'rounded',
                 'straight-corners:rounded-none',
                 'px-5',
                 'py-3',
                 'transition-shadow',
-                'hover:ring-primary/6',
-                'hover:ring-primary/8',
-                'dark:ring-light/2',
-                'dark:hover:text-light',
-                'dark:hover:ring-primary-300/4',
+                'hover:ring-primary-hover',
                 style,
             )}
             insights={insights}
@@ -45,11 +41,7 @@ export async function Card(
             {leadingIcon}
             <span className={tcls('flex', 'flex-col', 'flex-1')}>
                 {preTitle ? (
-                    <span
-                        className={tcls('uppercase', 'text-xs', 'text-dark/7', 'dark:text-light/6')}
-                    >
-                        {preTitle}
-                    </span>
+                    <span className={tcls('uppercase', 'text-xs', 'text-gray')}>{preTitle}</span>
                 ) : null}
 
                 <span
@@ -59,20 +51,17 @@ export async function Card(
                 </span>
 
                 {postTitle ? (
-                    <span className={tcls('text-xs', 'text-dark/7', 'dark:text-light/6')}>
-                        {postTitle}
-                    </span>
+                    <span className={tcls('text-xs', 'text-gray')}>{postTitle}</span>
                 ) : null}
             </span>
             <Icon
                 icon="chevron-right"
                 className={tcls(
                     'size-3',
-                    'text-dark/7',
+                    'text-gray',
                     'transition-all',
                     'group-hover:translate-x-0.5',
-                    'group-hover:text-primary/8',
-                    'dark:text-light/6',
+                    'group-hover:text-primary',
                 )}
             />
         </Link>

@@ -248,10 +248,9 @@ function AnswerSources(props: {
                             'flex-wrap',
                             'gap-1',
                             'items-center',
-                            'text-dark/7',
+                            'text-gray',
                             'hover:underline',
-                            'focus-within:text-primary-700',
-                            'dark:text-light/8',
+                            'focus-within:text-primary',
                         )}
                         href={source.href}
                         prefetch={false}

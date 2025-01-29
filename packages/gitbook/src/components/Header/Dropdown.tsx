@@ -58,7 +58,7 @@ export function Dropdown<E extends HTMLElement>(props: {
                     className={tcls(
                         'mt-2',
                         'w-full',
-                        'bg-light',
+                        'bg-gray-base',
                         'rounded-lg',
                         'straight-corners:rounded-sm',
                         'p-2',
@@ -68,7 +68,6 @@ export function Dropdown<E extends HTMLElement>(props: {
                         'ring-dark/1',
                         'ring-opacity-8',
                         'focus:outline-none',
-                        'dark:bg-dark',
                         'dark:ring-light/2',
                     )}
                 >
@@ -129,8 +128,8 @@ export function DropdownMenuItem(
                 insights={insights}
                 className={tcls(
                     'px-3 py-1 text-sm rounded straight-corners:rounded-sm',
-                    active ? 'bg-primary/3 dark:bg-light/2 text-primary-600' : null,
-                    'hover:bg-dark/2 dark:hover:bg-light/2',
+                    active ? 'bg-primary text-primary-strong' : null,
+                    'hover:bg-gray-hover',
                     className,
                 )}
             >
