@@ -6,7 +6,7 @@ type RGBColor = [number, number, number];
 type OKLABColor = { L: number; A: number; B: number };
 type OKLCHColor = { L: number; C: number; H: number };
 
-const dark = '#111111';
+const dark = '#1d1d1d';
 const light = '#ffffff';
 const D65 = [95.047, 100.0, 108.883]; // Reference white (D65)
 
@@ -303,23 +303,6 @@ function rgbToXyz(rgb: RGBColor): [number, number, number] {
     ];
 }
 
-function xyzToRgb(xyz: [number, number, number]): RGBColor {
-    const [x, y, z] = xyz.map((v) => v / 100);
-
-    const r = x * 3.2404542 + y * -1.5371385 + z * -0.4985314;
-    const g = x * -0.969266 + y * 1.8760108 + z * 0.041556;
-    const b = x * 0.0556434 + y * -0.2040259 + z * 1.0572252;
-
-    const gammaCorrect = (v: number) =>
-        v > 0.0031308 ? 1.055 * Math.pow(v, 1 / 2.4) - 0.055 : 12.92 * v;
-
-    return [
-        Math.round(Math.max(0, Math.min(1, gammaCorrect(r))) * 255),
-        Math.round(Math.max(0, Math.min(1, gammaCorrect(g))) * 255),
-        Math.round(Math.max(0, Math.min(1, gammaCorrect(b))) * 255),
-    ];
-}
-
 function xyzToLab65(xyz: [number, number, number]): { L: number; A: number; B: number } {
     const [x, y, z] = xyz.map((v, i) => {
         const scaled = v / D65[i];
@@ -331,24 +314,6 @@ function xyzToLab65(xyz: [number, number, number]): { L: number; A: number; B: n
         A: 500 * (x - y),
         B: 200 * (y - z),
     };
-}
-
-function lab65ToXyz(lab: { L: number; A: number; B: number }): [number, number, number] {
-    const { L, A, B } = lab;
-    const y = (L + 16) / 116;
-    const x = y + A / 500;
-    const z = y - B / 200;
-
-    const xyz = [x, y, z].map((v, i) => {
-        const value = Math.pow(v, 3);
-        return value > 0.008856 ? value * D65[i] : ((v - 16 / 116) / 7.787) * D65[i];
-    });
-
-    return xyz as [number, number, number];
-}
-
-function lab65ToRgb(lab: { L: number; A: number; B: number }): RGBColor {
-    return linearToRgb(xyzToRgb(lab65ToXyz(lab)));
 }
 
 function rgbTolab65(rgb: RGBColor): { L: number; A: number; B: number } {
