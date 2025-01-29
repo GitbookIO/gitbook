@@ -42,6 +42,11 @@ export function OpenAPIResponseExample(props: {
         .map((response) => {
             const responseObject = noReference(response[1]);
 
+            // TODO: unnecessary with https://github.com/GitbookIO/gitbook/pull/2780
+            if (!responseObject) {
+                return null;
+            }
+
             const schema = noReference(
                 (
                     responseObject.content?.['application/json'] ??
