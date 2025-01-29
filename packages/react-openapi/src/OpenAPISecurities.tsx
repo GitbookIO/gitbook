@@ -4,6 +4,7 @@ import { OpenAPIClientContext } from './types';
 import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
 import { OpenAPIOperationData } from './fetchOpenAPIOperation';
+import { OpenAPISchemaName } from './OpenAPISchemaName';
 
 /**
  * Present securities authorization that can be used for this operation.
@@ -46,7 +47,11 @@ export function OpenAPISecurities(props: {
 function getLabelForType(security: OpenAPIV3_1.SecuritySchemeObject): string {
     switch (security.type) {
         case 'apiKey':
-            return 'API Key';
+            return (
+                <div className="openapi-schema-presentation">
+                    <OpenAPISchemaName propertyName="apiKey" type="string" required />
+                </div>
+            );
         case 'http':
             if (security.scheme === 'basic') {
                 return 'Basic Auth';
@@ -55,15 +60,8 @@ function getLabelForType(security: OpenAPIV3_1.SecuritySchemeObject): string {
             if (security.scheme == 'bearer') {
                 return (
                     <div className="openapi-schema-presentation">
-                        <div className="openapi-schema-name">
-                            <span className="openapi-schema-propertyname">Authorization</span>
-                            <span className="openapi-schema-type">string</span>
-                            <span className="openapi-schema-required">required</span>
-                        </div>
-                        <Markdown
-                            source={`Bearer authentication header of the form Bearer <token>.`}
-                            className="openapi-schema-description"
-                        />
+                        <OpenAPISchemaName propertyName="Authorization" type="string" required />
+                        <div className="openapi-schema-description openapi-markdown">{`Bearer authentication header of the form Bearer <token>.`}</div>
                     </div>
                 );
             }

@@ -11,7 +11,7 @@
 /** Intro */
 
 .openapi-intro {
-    @apply flex flex-col -mb-6 gap-3 max-w-3xl;
+    @apply flex flex-col gap-3 max-w-3xl;
 }
 
 .openapi-summary {
@@ -134,6 +134,10 @@
     @apply mt-6;
 }
 
+.openapi-schema-properties .openapi-schema:first-child {
+    @apply mt-3;
+}
+
 .openapi-schema-properties .openapi-schema:last-child {
     @apply border-b-0;
 }
@@ -161,7 +165,7 @@
 }
 
 .openapi-schema-type {
-    @apply text-dark-4/8 dark:text-light-4 select-text font-normal;
+    @apply text-dark-4/8 dark:text-light-4 select-text font-normal font-mono;
 }
 
 .openapi-schema-type:only-child {
@@ -210,7 +214,7 @@
 }
 
 .openapi-schema-description.openapi-markdown {
-    @apply prose-sm text-dark-4/8 mt-2 dark:text-light-3 font-normal select-text;
+    @apply prose-sm text-dark-4/8 mt-2 dark:text-light-3 font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 .openapi-schema-description.openapi-markdown code {
@@ -260,7 +264,7 @@
 }
 
 .openapi-securities-header-content {
-    @apply font-medium text-[15px] text-dark-2 dark:text-light;
+    @apply font-medium text-dark-2 dark:text-light;
 }
 
 .openapi-securities-body {
@@ -285,7 +289,7 @@
 }
 
 .openapi-parameters-header-content {
-    @apply font-medium text-[15px] text-dark-2 dark:text-light;
+    @apply font-medium text-dark-2 dark:text-light;
 }
 
 /** Request body */
@@ -294,11 +298,11 @@
 }
 
 .openapi-requestbody-header {
-    @apply py-1 border-b;
+    @apply py-2 border-b border-dark/2 dark:border-light/2 mb-2;
 }
 
 .openapi-requestbody-header-content {
-    @apply font-semibold text-base text-dark-2 dark:text-light-4;
+    @apply font-medium text-dark-2 dark:text-light-4;
 }
 
 .openapi-requestbody-description.openapi-markdown {
@@ -315,12 +319,10 @@
 
 /** Responses */
 .openapi-responses {
-    /* @apply border rounded border-dark/2 dark:border-light/2; */
 }
 
 .openapi-responses-header {
-    /* @apply px-3 py-2; */
-    @apply border-b py-2;
+    @apply py-2 border-b border-dark/2 dark:border-light/2 mb-2;
 }
 
 .openapi-responses-body {
@@ -387,11 +389,10 @@
 }
 
 .openapi-response-example-header {
-    @apply flex flex-row items-center px-3 py-2;
 }
 
 .openapi-response-example-title {
-    @apply flex-1 font-semibold text-base;
+    @apply flex-1 font-semibold text-sm;
 }
 
 /** Common */
@@ -410,7 +411,7 @@
 }
 
 .openapi-section-header-content {
-    @apply flex-1 text-base;
+    @apply flex-1 text-[0.938em];
 }
 
 .openapi-section-header-controls {
@@ -421,7 +422,6 @@
     @apply flex items-center justify-end size-6 text-dark/6 dark:text-light/6;
 }
 
-.openapi-section-toggle:focus-visible,
 .openapi-section-toggle:focus-visible {
     @apply text-primary-500;
 }
@@ -455,9 +455,13 @@
 }
 
 .openapi-operation .react-aria-Tab[aria-selected='true'] {
-    @apply text-primary font-semibold after:absolute after:-bottom-2.5 after:left-0 after:w-full after:h-px after:bg-primary after:transition-all;
+    @apply text-primary after:absolute after:-bottom-2.5 after:left-0 after:w-full after:h-px after:bg-primary after:transition-all;
 }
 
 .openapi-operation .react-aria-TabPanel {
     @apply flex-1 text-sm focus-visible:outline-none;
+}
+
+.openapi-tabs-footer {
+    @apply px-3 py-2.5 border-t border-dark/2 dark:border-light/2 text-xs text-dark/7 dark:text-light/7;
 }
