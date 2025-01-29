@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { OpenAPIV3 } from '@scalar/openapi-types';
-import { OpenAPIClientContext } from './types';
+import { OpenAPIClientContext, OpenAPIV3XSecuritySchemeObject } from './types';
 import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
 import { OpenAPIOperationData } from './fetchOpenAPIOperation';
@@ -47,7 +47,7 @@ export function OpenAPISecurities(props: {
     );
 }
 
-function getLabelForType(security: OpenAPIV3.SecuritySchemeObject) {
+function getLabelForType(security: OpenAPIV3XSecuritySchemeObject) {
     switch (security.type) {
         case 'apiKey':
             return 'API Key';

@@ -2,9 +2,16 @@ import { toJSON, fromJSON } from 'flatted';
 import YAML from 'yaml';
 import swagger2openapi, { ConvertOutputOptions } from 'swagger2openapi';
 
-import { OpenAPIFetcher } from './types';
+import {
+    OpenAPICustomSpecProperties,
+    OpenAPIFetcher,
+    OpenAPIV3XDocument,
+    OpenAPIV3XOperationObject,
+    OpenAPIV3XSecuritySchemeObject,
+    OpenAPIV3XServerObject,
+} from './types';
 import { dereference, validate, traverse, AnyObject } from '@scalar/openapi-parser';
-import { OpenAPI, OpenAPIV2, OpenAPIV3, OpenAPIV3_1 } from '@scalar/openapi-types';
+import { OpenAPIV3, OpenAPIV3_1 } from '@scalar/openapi-types';
 import { noReference } from './utils';
 
 export interface OpenAPIOperationData extends OpenAPICustomSpecProperties {
@@ -12,57 +19,13 @@ export interface OpenAPIOperationData extends OpenAPICustomSpecProperties {
     method: string;
 
     /** Servers to be used for this operation */
-    servers: OpenAPIV3.ServerObject[];
+    servers: OpenAPIV3XServerObject[];
 
     /** Spec of the operation */
-    operation: OpenAPI.Operation & OpenAPICustomOperationProperties;
+    operation: OpenAPIV3XOperationObject;
 
     /** Securities that should be used for this operation */
-    securities: [string, OpenAPIV3.SecuritySchemeObject][];
-}
-
-/**
- * Custom properties that can be defined at the entire spec level.
- */
-export interface OpenAPICustomSpecProperties {
-    /**
-     * If `true`, code samples will not be displayed.
-     * This option can be used to hide code samples for the entire spec.
-     */
-    'x-codeSamples'?: boolean;
-
-    /**
-     * If `true`, the "Try it" button will not be displayed.
-     * This option can be used to hide code samples for the entire spec.
-     */
-    'x-hideTryItPanel'?: boolean;
-}
-
-/**
- * Custom properties that can be defined at the operation level.
- * These properties are not part of the OpenAPI spec.
- */
-export interface OpenAPICustomOperationProperties {
-    'x-code-samples'?: OpenAPICustomCodeSample[];
-    'x-codeSamples'?: OpenAPICustomCodeSample[] | false;
-    'x-custom-examples'?: OpenAPICustomCodeSample[];
-
-    /**
-     * If `true`, the "Try it" button will not be displayed.
-     * https://redocly.com/docs/api-reference-docs/specification-extensions/x-hidetryitpanel/
-     */
-    'x-hideTryItPanel'?: boolean;
-}
-
-/**
- * Custom code samples that can be defined at the operation level.
- * It follows the spec defined by Redocly.
- * https://redocly.com/docs/api-reference-docs/specification-extensions/x-code-samples/
- */
-export interface OpenAPICustomCodeSample {
-    lang: string;
-    label: string;
-    source: string;
+    securities: [string, OpenAPIV3XSecuritySchemeObject][];
 }
 
 export { toJSON, fromJSON };
@@ -89,12 +52,13 @@ export async function fetchOpenAPIOperation(
         throw new Error(`Invalid OpenAPI spec: ${input.url}`);
     }
 
-    const { schema } = await dereference(specData);
+    let { schema } = await dereference(specData);
 
     // No schema, we stop here.
     if (!schema) {
         throw new Error(`Schema undefined following the dereference operation: ${input.url}`);
     }
+    schema = schema as OpenAPIV3XDocument;
 
     let operation = getOperationByPathAndMethod(schema, input.path, input.method);
 
@@ -117,17 +81,14 @@ export async function fetchOpenAPIOperation(
         };
     }
 
-    const servers: OpenAPIV3.ServerObject[] = 'servers' in schema ? (schema.servers ?? []) : [];
-    const security: OpenAPIV3.SecurityRequirementObject[] =
-        operation.security ?? schema.security ?? [];
+    const servers: OpenAPIV3XServerObject[] = 'servers' in schema ? (schema.servers ?? []) : [];
+    const security: OpenAPIV3XSecuritySchemeObject[] = operation.security ?? schema.security ?? [];
 
     // Resolve securities
     const securities: OpenAPIOperationData['securities'] = [];
     for (const entry of security) {
         const securityKey = Object.keys(entry)[0];
-        const securityScheme = (schema as OpenAPIV3.Document).components?.securitySchemes?.[
-            securityKey
-        ];
+        const securityScheme = schema.components?.securitySchemes?.[securityKey];
         if (securityScheme) {
             securities.push([securityKey, noReference(securityScheme)]);
         }
@@ -147,11 +108,6 @@ export async function fetchOpenAPIOperation(
                 : undefined,
     };
 }
-
-type PathItemObject = Record<
-    string,
-    OpenAPIV2.PathItemObject | OpenAPIV3.PathItemObject | OpenAPIV3_1.PathItemObject
->;
 
 async function parseDescriptions<T extends AnyObject>(
     spec: T,
@@ -178,12 +134,14 @@ async function parseDescriptions<T extends AnyObject>(
     }) as T;
 }
 
+type PathObject = OpenAPIV3.PathItemObject | OpenAPIV3_1.PathItemObject;
+
 /**
  * Get a path object from its path.
  */
-function getPathObject(schema: OpenAPI.Document, path: string) {
+function getPathObject(schema: OpenAPIV3XDocument, path: string): PathObject | null {
     if (schema.paths?.[path]) {
-        return schema.paths[path] as PathItemObject;
+        return schema.paths[path];
     }
     return null;
 }
@@ -192,9 +150,9 @@ function getPathObject(schema: OpenAPI.Document, path: string) {
  * Resolve parameters from a path in an OpenAPI schema.
  */
 function getPathObjectParameter(
-    schema: OpenAPI.Document,
+    schema: OpenAPIV3XDocument,
     path: string,
-): OpenAPIV3.ParameterObject[] | null {
+): (OpenAPIV3.ParameterObject | OpenAPIV3_1.ParameterObject)[] | null {
     const pathObject = getPathObject(schema, path) as OpenAPIV3.PathItemObject | null;
     if (pathObject?.parameters) {
         return pathObject.parameters.map(noReference);
@@ -205,7 +163,7 @@ function getPathObjectParameter(
 /**
  * Get an operation by its path and method.
  */
-function getOperationByPathAndMethod(schema: OpenAPI.Document, path: string, method: string) {
+function getOperationByPathAndMethod(schema: OpenAPIV3XDocument, path: string, method: string) {
     const pathObject = getPathObject(schema, path);
     if (!pathObject) {
         return null;
@@ -214,7 +172,7 @@ function getOperationByPathAndMethod(schema: OpenAPI.Document, path: string, met
     if (!pathObject[normalizedMethod]) {
         return null;
     }
-    return pathObject[normalizedMethod] as OpenAPI.Operation;
+    return pathObject[normalizedMethod as OpenAPIV3.HttpMethods];
 }
 
 function cacheFetcher(fetcher: OpenAPIFetcher): OpenAPIFetcher {
@@ -239,7 +197,7 @@ function cacheFetcher(fetcher: OpenAPIFetcher): OpenAPIFetcher {
  * It will also convert Swagger 2.0 to OpenAPI 3.0.
  * It can throw an `OpenAPIFetchError` if the document is invalid.
  */
-export async function parseOpenAPIV3(url: string, text: string): Promise<OpenAPIV3.Document> {
+export async function parseOpenAPIV3(url: string, text: string): Promise<OpenAPIV3XDocument> {
     // Parse the JSON or YAML
     let data: unknown;
 
