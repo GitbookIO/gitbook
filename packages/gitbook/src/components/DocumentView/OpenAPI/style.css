@@ -19,7 +19,7 @@
 }
 
 .openapi-description.openapi-markdown {
-    @apply prose-sm text-[0.9375em] prose-p:!my-3;
+    @apply prose-sm;
 }
 
 .openapi-markdown blockquote {
@@ -117,7 +117,7 @@
 }
 
 .openapi-column-preview pre {
-    @apply max-h-60 print-mode:max-h-none;
+    @apply max-h-96 print-mode:max-h-none;
 }
 
 /** Schemas */
@@ -131,7 +131,7 @@
 }
 
 .openapi-schema-properties .openapi-schema {
-    /* @apply ; */
+    @apply mt-6;
 }
 
 .openapi-schema-properties .openapi-schema:last-child {
@@ -210,7 +210,7 @@
 }
 
 .openapi-schema-description.openapi-markdown {
-    @apply prose-sm text-dark-4/8 dark:text-light-3 font-normal mt-3 select-text;
+    @apply prose-sm text-dark-4/8 mt-2 dark:text-light-3 font-normal select-text;
 }
 
 .openapi-schema-description.openapi-markdown code {
@@ -224,7 +224,7 @@
 
 .openapi-schema-example,
 .openapi-schema-pattern {
-    @apply prose-sm mt-3 text-tint-strong;
+    @apply prose-sm mt-2 text-tint-strong;
 }
 
 .openapi-schema-example code,
@@ -360,8 +360,12 @@
     @apply flex flex-row items-center px-3 py-2 border-b border-dark/2 dark:border-light/2;
 }
 
+.openapi-codesample-header-content {
+    @apply flex flex-row items-center h-fit;
+}
+
 .openapi-codesample-title {
-    @apply flex-1 font-normal text-sm text-dark/8 dark:text-light-4;
+    @apply flex-1 font-normal text-sm text-dark/7 dark:text-light-4;
 }
 
 .openapi-codesample-title em {
@@ -402,7 +406,7 @@
 }
 
 .openapi-section-header {
-    @apply flex flex-row items-start;
+    @apply flex flex-row items-center;
 }
 
 .openapi-section-header-content {
@@ -428,7 +432,7 @@
 
 /** Markdown */
 .openapi-markdown {
-    @apply prose text-tint-strong prose-p:!my-3 dark:prose-invert max-w-none whitespace-normal;
+    @apply prosetext-tint-strong prose-p:!my-2 dark:prose-invert max-w-none whitespace-normal;
 }
 
 .openapi-markdown > *:first-child {
@@ -437,4 +441,23 @@
 
 .openapi-markdown > *:last-child {
     @apply !mb-0;
+}
+
+.openapi-tabs {
+}
+
+.openapi-operation .react-aria-TabList {
+    @apply flex flex-row gap-3 py-2 px-3 border-b border-dark/2 dark:border-light/2;
+}
+
+.openapi-operation .react-aria-Tab {
+    @apply hover:bg-light-3 dark:hover:bg-dark-3 hover:text-primary cursor-pointer transition-all relative text-sm text-dark/7 px-1 dark:text-light/7 border border-transparent rounded;
+}
+
+.openapi-operation .react-aria-Tab[aria-selected='true'] {
+    @apply text-primary font-semibold after:absolute after:-bottom-2.5 after:left-0 after:w-full after:h-px after:bg-primary after:transition-all;
+}
+
+.openapi-operation .react-aria-TabPanel {
+    @apply flex-1 text-sm focus-visible:outline-none;
 }

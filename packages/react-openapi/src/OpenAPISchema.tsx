@@ -180,7 +180,7 @@ export function OpenAPIRootSchema(props: {
     // Avoid recursing infinitely, and instead render a link to the parent schema
     const properties = getSchemaProperties(schema);
 
-    if (properties && properties.length > 0) {
+    if (properties && properties.length > 0 && schema.type !== 'array') {
         return <OpenAPISchemaProperties properties={properties} context={context} />;
     }
 
