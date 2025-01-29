@@ -4,7 +4,6 @@ import React, { useId } from 'react';
 
 import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
-import { SYMBOL_REF_RESOLVED } from './resolveOpenAPIPath';
 import { OpenAPIClientContext } from './types';
 import { noReference } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
@@ -393,10 +392,6 @@ function getSchemaTitle(
         type = 'all of';
     } else if ('not' in schema) {
         type = 'not';
-    }
-
-    if (SYMBOL_REF_RESOLVED in schema) {
-        type = `${schema[SYMBOL_REF_RESOLVED]} (${type})`;
     }
 
     if (schema.nullable) {
