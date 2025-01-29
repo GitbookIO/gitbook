@@ -98,7 +98,7 @@ export function PageFeedbackForm(props: {
                             <textarea
                                 ref={inputRef}
                                 name="comment"
-                                className="grow ring-1 ring-inset bg-gray-base ring-gray- contrast-more:ring-gray-12 min-h-16 max-h-40 rounded straight-corners:rounded-none p-2 placeholder:text-sm placeholder:text-gray contrast-more:placeholder:text-gray-strong"
+                                className="grow ring-1 ring-inset bg-gray-base ring-gray contrast-more:ring-gray-12 min-h-16 max-h-40 rounded straight-corners:rounded-none p-2 placeholder:text-sm placeholder:text-gray contrast-more:placeholder:text-gray-strong"
                                 placeholder={tString(languages, 'was_this_helpful_comment')}
                                 aria-label={tString(languages, 'was_this_helpful_comment')}
                                 onChange={(e) => setComment(e.target.value)}
@@ -155,11 +155,11 @@ function RatingButton(
     return (
         <button
             className={tcls(
-                'p-2 hover:text-tint dark:hover:text-tint-400 hover:bg-tint/2 first:pl-2.5 last:pr-2.5 first:rounded-l-full last:rounded-r-full',
+                'p-2 hover:text-tint hover:bg-tint-hover hover:text-tint-strong first:pl-2.5 last:pr-2.5 first:rounded-l-full last:rounded-r-full',
                 'disabled:cursor-not-allowed disabled:hover:bg-inherit disabled:hover:text-inherit disabled:dark:hover:text-inherit',
                 'contrast-more:hover:ring-1 ring-tint',
                 active
-                    ? 'bg-tint/4 text-tint-700 dark:text-tint-300 disabled:hover:bg-tint/4 disabled:hover:text-tint-700 dark:disabled:hover:text-tint-300 contrast-more:ring-2 contrast-more:hover:ring-2'
+                    ? 'bg-tint-active text-tint-strong disabled:hover:bg-tint-active disabled:hover:text-tint-strong contrast-more:ring-2 contrast-more:hover:ring-2'
                     : 'disabled:opacity-7 disabled:contrast-more:ring-0',
             )}
             type="button"

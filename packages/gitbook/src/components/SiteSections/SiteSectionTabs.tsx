@@ -87,7 +87,7 @@ const Tab = React.forwardRef<
                 {label}
             </span>
             {active && (
-                <span className="inset-x-3 -bottom-2 h-0.5 absolute bg-primary-solid" />
+                <span className="inset-x-3 -bottom-2 h-0.5 absolute bg-primary-11" />
             )}
         </Link>
     );
