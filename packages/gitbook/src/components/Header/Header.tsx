@@ -203,9 +203,7 @@ export function Header(props: {
                     </div>
                 </div>
             </div>
-            {sections ? (
-                <SiteSectionTabs sections={sections} />
-            ) : null}
+            {sections ? <SiteSectionTabs sections={sections} /> : null}
         </header>
     );
 }

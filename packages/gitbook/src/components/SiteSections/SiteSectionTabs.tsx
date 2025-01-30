@@ -54,34 +54,83 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
             onValueChange={setValue}
             className="w-full relative z-10 flex flex-nowrap items-center max-w-screen-2xl mx-auto page-full-width:max-w-full"
         >
-            <div className="w-full hide-scroll overflow-x-scroll overflow-y-hidden pb-4 -mb-4" /* Positive padding / negative margin allows the navigation menu indicator to show in a scroll view */>
-            <NavigationMenu.List className="center m-0 flex list-none bg-transparent px-1 sm:px-3 md:px-5 gap-2">
-                {sectionsAndGroups.map((sectionOrGroup) => {
-                    const { id, title, icon } = sectionOrGroup;
-                    const isGroup = sectionOrGroup.object === 'site-section-group';
-                    const isActiveGroup =
-                        isGroup &&
-                        Boolean(sectionOrGroup.sections.find((s) => s.id === currentSection.id));
-                    const isActive = isActiveGroup || id === currentSection.id;
-                    return (
-                        <NavigationMenu.Item key={id} value={id}>
-                            {isGroup ? (
-                                <>
-                                    <NavigationMenu.Trigger
-                                        ref={(node) =>
-                                            onNodeUpdate(node, id, sectionOrGroup.sections.length)
-                                        }
-                                        asChild
-                                    >
-                                        <button
+            <div
+                className="w-full hide-scroll overflow-x-scroll overflow-y-hidden pb-4 -mb-4" /* Positive padding / negative margin allows the navigation menu indicator to show in a scroll view */
+            >
+                <NavigationMenu.List className="center m-0 flex list-none bg-transparent px-1 sm:px-3 md:px-5 gap-2">
+                    {sectionsAndGroups.map((sectionOrGroup) => {
+                        const { id, title, icon } = sectionOrGroup;
+                        const isGroup = sectionOrGroup.object === 'site-section-group';
+                        const isActiveGroup =
+                            isGroup &&
+                            Boolean(
+                                sectionOrGroup.sections.find((s) => s.id === currentSection.id),
+                            );
+                        const isActive = isActiveGroup || id === currentSection.id;
+                        return (
+                            <NavigationMenu.Item key={id} value={id}>
+                                {isGroup ? (
+                                    <>
+                                        <NavigationMenu.Trigger
+                                            ref={(node) =>
+                                                onNodeUpdate(
+                                                    node,
+                                                    id,
+                                                    sectionOrGroup.sections.length,
+                                                )
+                                            }
+                                            asChild
+                                        >
+                                            <button
+                                                className={tcls(
+                                                    'relative group flex select-none items-center justify-between rounded straight-corners:rounded-none transition-colors px-3 py-1 my-2',
+                                                    isActive
+                                                        ? 'text-primary dark:text-primary-400'
+                                                        : 'text-dark/8 hover:bg-dark/1 hover:text-dark/9 dark:text-light/8 dark:hover:bg-light/2 dark:hover:text-light/9',
+                                                )}
+                                            >
+                                                <span className="flex gap-2 items-center w-full truncate">
+                                                    {icon ? (
+                                                        <SectionIcon
+                                                            isActive={isActive}
+                                                            icon={icon as IconName}
+                                                        />
+                                                    ) : null}
+                                                    {title}
+                                                </span>
+                                                {isActive ? (
+                                                    <span className="inset-x-3 -bottom-2 h-0.5 absolute bg-primary dark:bg-primary-400" />
+                                                ) : null}
+                                                <Icon
+                                                    aria-hidden
+                                                    icon="chevron-down"
+                                                    className="shrink-0 size-3 opacity-6 ms-1 transition-all group-data-[state=open]:rotate-180"
+                                                />
+                                            </button>
+                                        </NavigationMenu.Trigger>
+                                        <NavigationMenu.Content className="absolute z-20 left-0 top-0 w-full md:w-max data-[motion=from-end]:motion-safe:animate-enterFromRight data-[motion=from-start]:motion-safe:animate-enterFromLeft data-[motion=to-end]:motion-safe:animate-exitToRight data-[motion=to-start]:motion-safe:animate-exitToLeft">
+                                            <SectionGroupTileList
+                                                sections={sectionOrGroup.sections as SiteSection[]}
+                                                currentSection={currentSection}
+                                            />
+                                        </NavigationMenu.Content>
+                                    </>
+                                ) : (
+                                    <NavigationMenu.Link asChild>
+                                        <Link
                                             className={tcls(
-                                                'relative group flex select-none items-center justify-between rounded straight-corners:rounded-none transition-colors px-3 py-1 my-2',
+                                                'relative group flex select-none items-center justify-between rounded straight-corners:rounded-none px-3 py-1 my-2',
                                                 isActive
                                                     ? 'text-primary dark:text-primary-400'
                                                     : 'text-dark/8 hover:bg-dark/1 hover:text-dark/9 dark:text-light/8 dark:hover:bg-light/2 dark:hover:text-light/9',
                                             )}
+                                            href={sectionOrGroup.urls.published ?? ''}
                                         >
-                                            <span className="flex gap-2 items-center w-full truncate">
+                                            <span
+                                                className={tcls(
+                                                    'flex gap-2 items-center w-full truncate',
+                                                )}
+                                            >
                                                 {icon ? (
                                                     <SectionIcon
                                                         isActive={isActive}
@@ -93,60 +142,19 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
                                             {isActive ? (
                                                 <span className="inset-x-3 -bottom-2 h-0.5 absolute bg-primary dark:bg-primary-400" />
                                             ) : null}
-                                            <Icon
-                                                aria-hidden
-                                                icon="chevron-down"
-                                                className="shrink-0 size-3 opacity-6 ms-1 transition-all group-data-[state=open]:rotate-180"
-                                            />
-                                        </button>
-                                    </NavigationMenu.Trigger>
-                                    <NavigationMenu.Content className="absolute z-20 left-0 top-0 w-full md:w-max data-[motion=from-end]:motion-safe:animate-enterFromRight data-[motion=from-start]:motion-safe:animate-enterFromLeft data-[motion=to-end]:motion-safe:animate-exitToRight data-[motion=to-start]:motion-safe:animate-exitToLeft">
-                                        <SectionGroupTileList
-                                            sections={sectionOrGroup.sections as SiteSection[]}
-                                            currentSection={currentSection}
-                                        />
-                                    </NavigationMenu.Content>
-                                </>
-                            ) : (
-                                <NavigationMenu.Link asChild>
-                                    <Link
-                                        className={tcls(
-                                            'relative group flex select-none items-center justify-between rounded straight-corners:rounded-none px-3 py-1 my-2',
-                                            isActive
-                                                ? 'text-primary dark:text-primary-400'
-                                                : 'text-dark/8 hover:bg-dark/1 hover:text-dark/9 dark:text-light/8 dark:hover:bg-light/2 dark:hover:text-light/9',
-                                        )}
-                                        href={sectionOrGroup.urls.published ?? ''}
-                                    >
-                                        <span
-                                            className={tcls(
-                                                'flex gap-2 items-center w-full truncate',
-                                            )}
-                                        >
-                                            {icon ? (
-                                                <SectionIcon
-                                                    isActive={isActive}
-                                                    icon={icon as IconName}
-                                                />
-                                            ) : null}
-                                            {title}
-                                        </span>
-                                        {isActive ? (
-                                            <span className="inset-x-3 -bottom-2 h-0.5 absolute bg-primary dark:bg-primary-400" />
-                                        ) : null}
-                                    </Link>
-                                </NavigationMenu.Link>
-                            )}
-                        </NavigationMenu.Item>
-                    );
-                })}
-                <NavigationMenu.Indicator
-                    className="top-full z-0 flex h-3 items-end justify-center motion-safe:transition-[width,_transform] data-[state=hidden]:motion-safe:animate-fadeOut data-[state=visible]:motion-safe:animate-fadeIn"
-                    aria-hidden
-                >
-                    <div className="bg-light dark:bg-dark shadow-1xs shadow-dark/1 dark:shadow-dark/4 relative top-[70%] size-3 rotate-[225deg] rounded-tl-sm" />
-                </NavigationMenu.Indicator>
-            </NavigationMenu.List>
+                                        </Link>
+                                    </NavigationMenu.Link>
+                                )}
+                            </NavigationMenu.Item>
+                        );
+                    })}
+                    <NavigationMenu.Indicator
+                        className="top-full z-0 flex h-3 items-end justify-center motion-safe:transition-[width,_transform] data-[state=hidden]:motion-safe:animate-fadeOut data-[state=visible]:motion-safe:animate-fadeIn"
+                        aria-hidden
+                    >
+                        <div className="bg-light dark:bg-dark shadow-1xs shadow-dark/1 dark:shadow-dark/4 relative top-[70%] size-3 rotate-[225deg] rounded-tl-sm" />
+                    </NavigationMenu.Indicator>
+                </NavigationMenu.List>
             </div>
             <div
                 className="absolute mx-4 top-full flex transition-transform duration-200 ease-in-out"

@@ -39,13 +39,17 @@ export function SiteSectionList(props: { sections: SectionsList; className: Clas
                     style={{ maxHeight: `${MAX_ITEMS * 3 + 2}rem` }}
                     className="overflow-y-auto px-2 pb-6 gutter-stable"
                 >
-                    {sectionsAndGroups.flatMap(item => item.object === 'site-section-group' ? item.sections : item).map((section, index) => (
-                        <SiteSectionListItem
-                            section={section}
-                            isActive={section.id === currentSection.id}
-                            key={section.id}
-                        />
-                    ))}
+                    {sectionsAndGroups
+                        .flatMap((item) =>
+                            item.object === 'site-section-group' ? item.sections : item,
+                        )
+                        .map((section, index) => (
+                            <SiteSectionListItem
+                                section={section}
+                                isActive={section.id === currentSection.id}
+                                key={section.id}
+                            />
+                        ))}
                 </TOCScrollContainer>
             </nav>
         )
