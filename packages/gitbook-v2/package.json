@@ -1,0 +1,14 @@
+{
+    "name": "gitbook-v2",
+    "dependencies": {
+        "next": "canary",
+        "react": "^19.0.0",
+        "react-dom": "^19.0.0",
+        "@gitbook/api": "^0.89.0"
+    },
+    "scripts": {
+        "dev": "next",
+        "build": "next build",
+        "start": "next start"
+    }
+}
