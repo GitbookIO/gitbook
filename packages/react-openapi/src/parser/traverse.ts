@@ -15,8 +15,6 @@ export function traverse(
         return specification;
     }
 
-    seen.add(specification);
-
     for (const [key, value] of Object.entries(specification)) {
         const currentPath = [...path, key];
         if (Array.isArray(value)) {
