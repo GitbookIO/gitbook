@@ -204,18 +204,7 @@ export function Header(props: {
                 </div>
             </div>
             {sections ? (
-                <div
-                    className={tcls(
-                        'scroll-nojump',
-                        'w-full',
-                        'overflow-x-clip',
-                        'overflow-y-visible',
-                        // Handle long section tabs, particularly on smaller screens.
-                        'hide-scroll',
-                    )}
-                >
-                    <SiteSectionTabs sections={sections} />
-                </div>
+                <SiteSectionTabs sections={sections} />
             ) : null}
         </header>
     );

@@ -13,12 +13,7 @@ import { SectionIcon } from './SectionIcon';
 
 const VIEWPORT_ITEM_WIDTH = 240; /* width of the tile (w-60) */
 
-//TODO section nav - handle overflow (scrolling) and truncate?
 //TODO get section group working with vertical section list
-
-//TOOD section description
-//TODO move sectionsAndGroups calculation to middleware?
-//TODO get section groups from the API
 //TODO tidy up the components!
 
 /**
@@ -26,7 +21,7 @@ const VIEWPORT_ITEM_WIDTH = 240; /* width of the tile (w-60) */
  */
 export function SiteSectionTabs(props: { sections: SectionsList }) {
     const {
-        sections: { list: sections, index: currentIndex, section: currentSection },
+        sections: { list: sectionsAndGroups, section: currentSection },
     } = props;
     const [value, setValue] = React.useState<string | null>();
     const [offset, setOffset] = React.useState<number | null>(null);
@@ -53,37 +48,13 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
             setOffset(null);
         }
     };
-
-    const sectionsAndGroups: (SiteSection | SiteSectionGroup)[] = React.useMemo(() => {
-        const result: (SiteSection | SiteSectionGroup)[] = [];
-        for (const section of sections) {
-            if (section.sectionGroup) {
-                const existingGroup = result
-                    .filter((group) => group.object === 'site-section-group')
-                    .find((group) => group.id === section.sectionGroup);
-                if (existingGroup) {
-                    existingGroup.sections.push(section);
-                } else {
-                    result.push({
-                        object: 'site-section-group',
-                        id: section.sectionGroup,
-                        title: 'Test Group',
-                        sections: [section],
-                    });
-                }
-            } else {
-                result.push(section);
-            }
-        }
-        return result;
-    }, [sections]);
-
     return sectionsAndGroups.length > 0 ? (
         <NavigationMenu.Root
             aria-label="Sections"
             onValueChange={setValue}
-            className="relative z-10 flex flex-nowrap items-center max-w-screen-2xl mx-auto page-full-width:max-w-full"
+            className="w-full relative z-10 flex flex-nowrap items-center max-w-screen-2xl mx-auto page-full-width:max-w-full"
         >
+            <div className="w-full hide-scroll overflow-x-scroll overflow-y-hidden pb-4 -mb-4" /* Positive padding / negative margin allows the navigation menu indicator to show in a scroll view */>
             <NavigationMenu.List className="center m-0 flex list-none bg-transparent px-1 sm:px-3 md:px-5 gap-2">
                 {sectionsAndGroups.map((sectionOrGroup) => {
                     const { id, title, icon } = sectionOrGroup;
@@ -176,6 +147,7 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
                     <div className="bg-light dark:bg-dark shadow-1xs shadow-dark/1 dark:shadow-dark/4 relative top-[70%] size-3 rotate-[225deg] rounded-tl-sm" />
                 </NavigationMenu.Indicator>
             </NavigationMenu.List>
+            </div>
             <div
                 className="absolute mx-4 top-full flex transition-transform duration-200 ease-in-out"
                 style={{

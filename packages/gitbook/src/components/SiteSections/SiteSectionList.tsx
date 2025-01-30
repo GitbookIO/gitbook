@@ -19,12 +19,12 @@ const MAX_ITEMS = 5; // If there are more sections than this, they'll be shown b
  */
 export function SiteSectionList(props: { sections: SectionsList; className: ClassValue }) {
     const {
-        sections: { list: sections, index: currentIndex },
+        sections: { list: sectionsAndGroups, section: currentSection },
         className,
     } = props;
 
     return (
-        sections.length > 0 && (
+        sectionsAndGroups.length > 0 && (
             <nav
                 aria-label="Sections"
                 className={tcls(
@@ -39,10 +39,10 @@ export function SiteSectionList(props: { sections: SectionsList; className: Clas
                     style={{ maxHeight: `${MAX_ITEMS * 3 + 2}rem` }}
                     className="overflow-y-auto px-2 pb-6 gutter-stable"
                 >
-                    {sections.map((section, index) => (
+                    {sectionsAndGroups.flatMap(item => item.object === 'site-section-group' ? item.sections : item).map((section, index) => (
                         <SiteSectionListItem
                             section={section}
-                            isActive={index === currentIndex}
+                            isActive={section.id === currentSection.id}
                             key={section.id}
                         />
                     ))}
