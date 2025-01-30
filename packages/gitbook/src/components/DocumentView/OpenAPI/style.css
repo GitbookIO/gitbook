@@ -322,7 +322,7 @@
 }
 
 .openapi-responses-header {
-    @apply py-2 border-b border-dark/2 dark:border-light/2 mb-2 max-w-full flex-1;
+    @apply py-2 border-b border-dark/2 dark:border-light/2 max-w-full flex-1;
 }
 
 .openapi-responses-body {
@@ -335,11 +335,15 @@
 
 /** Response */
 .openapi-response-description.openapi-markdown {
-    @apply px-3 prose-sm;
+    @apply prose-sm text-xs text-dark/8 dark:text-light/8 px-0;
 }
 
-.openapi-response-description:last-child {
-    @apply mb-3;
+.openapi-response-statuscode {
+    @apply tabular-nums text-sm font-mono font-medium;
+}
+
+.openapi-response-content-type {
+    @apply text-xs text-dark/8 dark:text-light/8 ml-auto;
 }
 
 .openapi-responsebody-header,
@@ -468,4 +472,48 @@
 
 .openapi-tabs-footer {
     @apply px-3 py-2.5 border-t border-dark/2 dark:border-light/2 text-xs text-dark/7 dark:text-light/7;
+}
+
+.openapi-disclosure {
+    @apply border-b border-dark/2 dark:border-light/2;
+}
+
+.openapi-disclosure-trigger {
+    @apply flex items-center w-full flex-1 gap-2.5 py-2 outline-none;
+}
+
+.openapi-disclosure:last-of-type .openapi-disclosure-trigger {
+    @apply border-b-0;
+}
+
+.openapi-disclosure-trigger > svg {
+    @apply size-2.5 text-dark/8 dark:text-light/8 transition-transform;
+}
+
+.openapi-disclosure-panel {
+    @apply pb-2;
+}
+
+.openapi-disclosure-trigger[aria-expanded='true'] > svg {
+    @apply rotate-90;
+}
+
+.openapi-schema-properties-disclosure-trigger {
+    @apply border border-dark/2 dark:border-light/2 px-2.5 py-1.5 text-xs transition-all dark:text-light/7 text-dark/7 flex flex-row items-center gap-1.5;
+}
+
+.openapi-schema-properties-disclosure svg {
+    @apply size-3;
+}
+
+.openapi-schema-properties-disclosure-trigger[aria-expanded='true'] {
+    @apply rounded-md w-full border-b rounded-b-none;
+}
+
+.openapi-schema-properties-disclosure-trigger[aria-expanded='false'] {
+    @apply rounded-full w-fit hover:text-dark dark:hover:text-light;
+}
+
+.openapi-schema-properties-disclosure-panel {
+    @apply border-b border-x border-dark/2 rounded-b-md dark:border-light/2 p-2;
 }

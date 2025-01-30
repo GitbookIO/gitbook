@@ -8,6 +8,7 @@ import { OpenAPIClientContext } from './types';
 import { checkIsReference, noReference } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
+import { OpenAPISchemaObject } from './OpenAPISchemaObject';
 
 type CircularRefsIds = Map<OpenAPIV3.SchemaObject, string>;
 
@@ -60,14 +61,38 @@ export function OpenAPISchemaProperty(
         );
     };
 
+    if ((properties && properties.length > 1) || schema.type === 'object') {
+        return (
+            <>
+                <OpenAPISchemaName
+                    type={getSchemaTitle(schema)}
+                    propertyName={propertyName}
+                    required={required}
+                />
+                {schema.description ? (
+                    <Markdown source={schema.description} className="openapi-schema-description" />
+                ) : null}
+                <OpenAPISchemaObject context={context}>
+                    {properties && properties.length > 0 ? (
+                        <OpenAPISchemaProperties
+                            properties={properties}
+                            circularRefs={circularRefs}
+                            context={context}
+                        />
+                    ) : null}
+                </OpenAPISchemaObject>
+            </>
+        );
+    }
+
+    if (schema.type === 'array' && properties && properties.length === 1) {
+        return <OpenAPISchemaProperty context={context} schema={schema} />;
+    }
+
     return (
         <InteractiveSection
             id={id}
             className={classNames('openapi-schema', className)}
-            toggeable={!!properties || !!alternatives}
-            defaultOpened={!!context.defaultInteractiveOpened}
-            toggleOpenIcon={context.icons.chevronRight}
-            toggleCloseIcon={context.icons.chevronDown}
             tabs={alternatives?.[0].map((alternative, index) => ({
                 key: `${index}`,
                 label: getSchemaTitle(alternative, alternatives[1]),
@@ -174,7 +199,7 @@ export function OpenAPIRootSchema(props: {
     // Avoid recursing infinitely, and instead render a link to the parent schema
     const properties = getSchemaProperties(schema);
 
-    if (properties && properties.length > 0 && schema.type !== 'array') {
+    if (properties && properties.length > 0) {
         return <OpenAPISchemaProperties properties={properties} context={context} />;
     }
 
