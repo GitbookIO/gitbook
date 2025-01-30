@@ -4,7 +4,7 @@ import { getNodeFragmentByType } from '@/lib/document';
 
 import { BlockProps } from '../Block';
 import { ClientCodeBlock } from './ClientCodeBlock';
-import { getInlines, RichInlineIndexed } from './highlight';
+import { getInlines, RenderedInline } from './highlight';
 import { Blocks } from '../Blocks';
 import { ServerCodeBlock } from './ServerCodeBlock';
 
@@ -14,7 +14,7 @@ import { ServerCodeBlock } from './ServerCodeBlock';
 export function CodeBlock(props: BlockProps<DocumentBlockCode>) {
     const { block, document, style, context, isEstimatedOffscreen } = props;
     const inlines = getInlines(block);
-    const richInlines: RichInlineIndexed[] = inlines.map((inline, index) => {
+    const richInlines: RenderedInline[] = inlines.map((inline, index) => {
         const body = (() => {
             const fragment = getNodeFragmentByType(inline.inline, 'annotation-body');
             if (!fragment) {
@@ -32,7 +32,7 @@ export function CodeBlock(props: BlockProps<DocumentBlockCode>) {
             );
         })();
 
-        return { ...inline, body };
+        return { inline, body };
     });
 
     if (isEstimatedOffscreen) {

@@ -28,7 +28,8 @@ export type InlineIndexed = { inline: any; start: number; end: number };
 
 type PositionedToken = ThemedToken & { start: number; end: number };
 
-export type RichInlineIndexed = InlineIndexed & {
+export type RenderedInline = {
+    inline: InlineIndexed;
     body: React.ReactNode;
 };
 
@@ -37,7 +38,7 @@ export type RichInlineIndexed = InlineIndexed & {
  */
 export async function highlight(
     block: DocumentBlockCode,
-    inlines: RichInlineIndexed[],
+    inlines: RenderedInline[],
 ): Promise<HighlightLine[]> {
     const langName = block.data.syntax ? getLanguageForSyntax(block.data.syntax) : null;
     if (!langName) {
@@ -136,7 +137,7 @@ export function getInlines(block: DocumentBlockCode) {
  */
 export function plainHighlighting(
     block: DocumentBlockCode,
-    inlines?: RichInlineIndexed[],
+    inlines?: RenderedInline[],
 ): HighlightLine[] {
     const inlinesCopy = Array.from(inlines ?? []);
     return block.nodes.map((lineBlock) => {
@@ -172,7 +173,7 @@ export function plainHighlighting(
 
 function matchTokenAndInlines(
     eat: () => PositionedToken | null,
-    allInlines: RichInlineIndexed[],
+    allInlines: RenderedInline[],
 ): HighlightToken[] {
     const initialToken = eat();
     if (!initialToken) {
@@ -180,7 +181,7 @@ function matchTokenAndInlines(
     }
 
     const inlines = allInlines.filter(
-        (inline) => inline.start >= initialToken.start && inline.start < initialToken.end,
+        ({ inline }) => inline.start >= initialToken.start && inline.start < initialToken.end,
     );
     let token = initialToken;
     const result: HighlightToken[] = [];
@@ -196,7 +197,7 @@ function matchTokenAndInlines(
             return;
         }
 
-        const [before, afterBefore] = splitPositionedTokenAt(token, inline.start);
+        const [before, afterBefore] = splitPositionedTokenAt(token, inline.inline.start);
         if (before) {
             result.push({
                 type: 'shiki',
@@ -211,7 +212,7 @@ function matchTokenAndInlines(
         const children: HighlightToken[] = [];
 
         // If shiki token finished before the end of the annotation or the annotation contains multiple tokens
-        while (token.end < inline.end) {
+        while (token.end < inline.inline.end) {
             children.push({
                 type: 'shiki',
                 token: token,
@@ -224,7 +225,7 @@ function matchTokenAndInlines(
             token = next;
         }
 
-        const [inside, after] = splitPositionedTokenAt(token, inline.end);
+        const [inside, after] = splitPositionedTokenAt(token, inline.inline.end);
         if (!inside) {
             throw new Error(`expect inside to not be empty`);
         }

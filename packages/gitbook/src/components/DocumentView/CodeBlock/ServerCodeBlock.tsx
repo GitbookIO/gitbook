@@ -1,12 +1,12 @@
 import { DocumentBlockCode } from '@gitbook/api';
 
-import { highlight, RichInlineIndexed } from './highlight';
+import { highlight, RenderedInline } from './highlight';
 import type { BlockProps } from '../Block';
 import './theme.css';
 import { ClientCodeBlockRenderer } from './CodeBlockRenderer';
 
 type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'document' | 'style'> & {
-    inlines: RichInlineIndexed[];
+    inlines: RenderedInline[];
 };
 
 /**
