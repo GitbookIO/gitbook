@@ -10,7 +10,7 @@ import React from 'react';
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import { ContentTarget, SiteContentPointer, api } from '@/lib/api';
-import { hasFullWidthBlock, isNodeEmpty } from '@/lib/document';
+import { hasFullWidthBlock, isNodeEmpty } from '@/lib/document-util';
 import { AncestorRevisionPage } from '@/lib/pages';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';

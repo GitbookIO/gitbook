@@ -6,7 +6,7 @@ import {
     JSONDocument,
 } from '@gitbook/api';
 
-import { getNodeFragmentByName, isNodeEmpty } from '@/lib/document';
+import { getNodeFragmentByName, isNodeEmpty } from '@/lib/document-util';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { DocumentContextProps } from './DocumentView';

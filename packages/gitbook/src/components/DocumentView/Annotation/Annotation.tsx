@@ -1,13 +1,13 @@
 import { DocumentInlineAnnotation } from '@gitbook/api';
 
-import { getNodeFragmentByType } from '@/lib/document';
+import { getNodeFragmentByType } from '@/lib/document-util';
 
 import { AnnotationPopover } from './AnnotationPopover';
 import { Blocks } from '../Blocks';
 import { InlineProps } from '../Inline';
 import { Inlines } from '../Inlines';
 
-export async function Annotation(props: InlineProps<DocumentInlineAnnotation>) {
+export function Annotation(props: InlineProps<DocumentInlineAnnotation>) {
     const { inline, context, document, children } = props;
 
     const fragment = getNodeFragmentByType(inline, 'annotation-body');
