@@ -5,7 +5,7 @@ import type { BlockProps } from '../Block';
 import './theme.css';
 import { ClientCodeBlockRenderer } from './CodeBlockRenderer';
 
-type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'document' | 'style'> & {
+type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> & {
     inlines: RenderedInline[];
 };
 
@@ -13,9 +13,7 @@ type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'document'
  * Render a code-block server-side.
  */
 export async function ServerCodeBlock(props: ClientBlockProps) {
-    const { block, document, style, inlines } = props;
+    const { block, style, inlines } = props;
     const lines = await highlight(block, inlines);
-    return (
-        <ClientCodeBlockRenderer block={block} document={document} style={style} lines={lines} />
-    );
+    return <ClientCodeBlockRenderer block={block} style={style} lines={lines} />;
 }

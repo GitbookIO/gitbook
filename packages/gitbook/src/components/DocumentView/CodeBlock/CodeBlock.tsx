@@ -36,17 +36,8 @@ export function CodeBlock(props: BlockProps<DocumentBlockCode>) {
     });
 
     if (isEstimatedOffscreen) {
-        return (
-            <ClientCodeBlock
-                block={block}
-                document={document}
-                style={style}
-                inlines={richInlines}
-            />
-        );
+        return <ClientCodeBlock block={block} style={style} inlines={richInlines} />;
     }
 
-    return (
-        <ServerCodeBlock block={block} document={document} style={style} inlines={richInlines} />
-    );
+    return <ServerCodeBlock block={block} style={style} inlines={richInlines} />;
 }

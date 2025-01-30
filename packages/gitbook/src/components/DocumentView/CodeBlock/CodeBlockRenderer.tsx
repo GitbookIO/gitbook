@@ -9,10 +9,7 @@ import { BlockProps } from '../Block';
 import './theme.css';
 import './CodeBlockRenderer.css';
 
-type CodeBlockRendererProps = Pick<
-    BlockProps<DocumentBlockCode>,
-    'block' | 'document' | 'style'
-> & {
+type CodeBlockRendererProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> & {
     lines: HighlightLine[];
 };
 
@@ -20,7 +17,7 @@ type CodeBlockRendererProps = Pick<
  * The logic of rendering a code block from lines.
  */
 export function ClientCodeBlockRenderer(props: CodeBlockRendererProps) {
-    const { block, document, style, lines } = props;
+    const { block, style, lines } = props;
 
     const id = block.key!;
 
@@ -115,7 +112,6 @@ export function ClientCodeBlockRenderer(props: CodeBlockRendererProps) {
                     {lines.map((line, index) => (
                         <CodeHighlightLine
                             block={block}
-                            document={document}
                             key={index}
                             line={line}
                             lineIndex={index + 1}
@@ -132,14 +128,13 @@ export function ClientCodeBlockRenderer(props: CodeBlockRendererProps) {
 
 function CodeHighlightLine(props: {
     block: DocumentBlockCode;
-    document: JSONDocument;
     line: HighlightLine;
     lineIndex: number;
     isLast: boolean;
     withLineNumbers: boolean;
     withWrap: boolean;
 }) {
-    const { document, line, isLast, withLineNumbers } = props;
+    const { line, isLast, withLineNumbers } = props;
     return (
         <span className={tcls('highlight-line', line.highlighted && 'highlighted')}>
             {withLineNumbers ? (
@@ -149,7 +144,7 @@ function CodeHighlightLine(props: {
             ) : null}
 
             <span className="highlight-line-content">
-                <CodeHighlightTokens tokens={line.tokens} document={document} />
+                <CodeHighlightTokens tokens={line.tokens} />
                 {isLast ? null : !withLineNumbers && line.tokens.length === 0 && 0 ? (
                     <span className="ew">{'\u200B'}</span>
                 ) : (
@@ -160,25 +155,25 @@ function CodeHighlightLine(props: {
     );
 }
 
-function CodeHighlightTokens(props: { tokens: HighlightToken[]; document: JSONDocument }) {
-    const { tokens, document } = props;
+function CodeHighlightTokens(props: { tokens: HighlightToken[] }) {
+    const { tokens } = props;
 
     return (
         <>
             {tokens.map((token, index) => (
-                <CodeHighlightToken key={index} token={token} document={document} />
+                <CodeHighlightToken key={index} token={token} />
             ))}
         </>
     );
 }
 
-function CodeHighlightToken(props: { token: HighlightToken; document: JSONDocument }) {
-    const { token, document } = props;
+function CodeHighlightToken(props: { token: HighlightToken }) {
+    const { token } = props;
 
     if (token.type === 'annotation') {
         return (
             <AnnotationPopover body={token.body}>
-                <CodeHighlightTokens tokens={token.children} document={document} />
+                <CodeHighlightTokens tokens={token.children} />
             </AnnotationPopover>
         );
     }

@@ -10,7 +10,7 @@ import { ClientCodeBlockRenderer } from './CodeBlockRenderer';
 import { highlightAction } from './highlight-action';
 import { plainHighlight } from './plain-highlight';
 
-type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'document' | 'style'> & {
+type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> & {
     inlines: RenderedInline[];
 };
 
@@ -19,12 +19,10 @@ type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'document'
  * It allows us to defer some load to avoid blocking the rendering of the whole page with block highlighting.
  */
 export function ClientCodeBlock(props: ClientBlockProps) {
-    const { block, document, style, inlines } = props;
+    const { block, style, inlines } = props;
     const [lines, setLines] = useState<HighlightLine[]>(() => plainHighlight(block));
     useEffect(() => {
         highlightAction(block, inlines).then(setLines);
     }, [block, inlines]);
-    return (
-        <ClientCodeBlockRenderer block={block} document={document} style={style} lines={lines} />
-    );
+    return <ClientCodeBlockRenderer block={block} style={style} lines={lines} />;
 }
