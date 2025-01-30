@@ -28,11 +28,11 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                 'items-center',
                 'p-4',
                 'border-t',
-                'border-gray-subtle',
+                'border-tint-subtle',
                 'first:border-none',
                 'text-base',
                 'font-medium',
-                'hover:bg-gray-hover',
+                'hover:bg-tint-hover',
                 'group',
                 active
                     ? [
@@ -47,7 +47,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
             <div className="size-4">
                 <Icon
                     icon="file-lines"
-                    className={tcls('size-4', active ? 'text-primary' : 'text-gray-subtle')}
+                    className={tcls('size-4', active ? 'text-primary' : 'text-tint-subtle')}
                 />
             </div>
             <div className={tcls('flex', 'flex-col', 'w-full')}>

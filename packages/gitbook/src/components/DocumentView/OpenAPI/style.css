@@ -25,7 +25,7 @@
 /** Method tag */
 
 .openapi-method {
-    @apply rounded font-mono font-bold text-[11.5px] px-1 py-0.5 mr-2 text-gray-12/8 leading-tight align-middle inline-flex ring-1 ring-inset ring-gray-12/1 dark:ring-gray-1/1 whitespace-nowrap;
+    @apply rounded font-mono font-bold text-[11.5px] px-1 py-0.5 mr-2 text-tint-12/8 leading-tight align-middle inline-flex ring-1 ring-inset ring-tint-12/1 dark:ring-tint-1/1 whitespace-nowrap;
 }
 
 .openapi-method-get {
@@ -51,17 +51,17 @@
 .openapi-method-head,
 .openapi-method-options,
 .openapi-method-trace {
-    @apply bg-gray;
+    @apply bg-tint;
 }
 
 /** URL */
 
 .openapi-url {
-    @apply font-mono text-sm text-gray;
+    @apply font-mono text-sm text-tint;
 }
 
 .openapi-url-var {
-    @apply text-gray underline underline-offset-2 decoration-gray-subtle;
+    @apply text-tint underline underline-offset-2 decoration-tint-subtle;
 }
 
 /** Columns */
@@ -89,11 +89,11 @@
 }
 
 .openapi-schema .openapi-schema-properties {
-    @apply border rounded border-gray;
+    @apply border rounded border-tint;
 }
 
 .openapi-schema-properties .openapi-schema {
-    @apply border-b px-3 py-2 border-gray-subtle;
+    @apply border-b px-3 py-2 border-tint-subtle;
 }
 
 .openapi-schema-properties .openapi-schema:last-child {
@@ -115,7 +115,7 @@
 }
 
 .openapi-schema-propertyname {
-    @apply select-all font-medium text-base text-gray-strong;
+    @apply select-all font-medium text-base text-tint-strong;
 }
 
 .openapi-schema-required {
@@ -123,7 +123,7 @@
 }
 
 .openapi-schema-type {
-    @apply font-mono ml-3 text-sm text-gray select-text;
+    @apply font-mono ml-3 text-sm text-tint select-text;
 }
 
 .openapi-schema-type:only-child {
@@ -143,7 +143,7 @@
 }
 
 .openapi-schema-circular {
-    @apply text-xs text-gray;
+    @apply text-xs text-tint;
 }
 
 .openapi-schema-circular a {
@@ -159,7 +159,7 @@
 }
 
 .openapi-schema-enum-value {
-    @apply font-mono text-xs px-1.5 py-1 border border-gray-subtle -ml-px -mt-px text-gray;
+    @apply font-mono text-xs px-1.5 py-1 border border-tint-subtle -ml-px -mt-px text-tint;
 }
 
 .openapi-schema-enum-value:first-child {
@@ -176,13 +176,13 @@
 
 .openapi-schema-example,
 .openapi-schema-pattern {
-    @apply prose-sm mt-2 text-gray-strong;
+    @apply prose-sm mt-2 text-tint-strong;
 }
 
 /** Authentication */
 
 .openapi-securities {
-    @apply border rounded border-gray-subtle;
+    @apply border rounded border-tint-subtle;
 }
 
 .openapi-securities-header {
@@ -190,11 +190,11 @@
 }
 
 .openapi-securities.openapi-securities-closed:hover {
-    @apply border-gray-hover cursor-pointer;
+    @apply border-tint-hover cursor-pointer;
 }
 
 .openapi-securities-header-content {
-    @apply font-semibold text-base text-gray-strong;
+    @apply font-semibold text-base text-tint-strong;
 }
 
 .openapi-securities-body {
@@ -206,17 +206,17 @@
 }
 
 .openapi-securities-label {
-    @apply font-medium text-sm text-gray-strong;
+    @apply font-medium text-sm text-tint-strong;
 }
 
 /** Parameters */
 
 .openapi-parameters {
-    @apply border rounded border-gray-subtle;
+    @apply border rounded border-tint-subtle;
 }
 
 .openapi-parameters.openapi-parameters-closed:hover {
-    @apply border-gray-hover cursor-pointer;
+    @apply border-tint-hover cursor-pointer;
 }
 
 .openapi-parameters-header {
@@ -224,12 +224,12 @@
 }
 
 .openapi-parameters-header-content {
-    @apply font-semibold text-base text-gray-strong;
+    @apply font-semibold text-base text-tint-strong;
 }
 
 /** Request body */
 .openapi-requestbody {
-    @apply border rounded border-gray-subtle;
+    @apply border rounded border-tint-subtle;
 }
 
 .openapi-requestbody-header {
@@ -237,7 +237,7 @@
 }
 
 .openapi-requestbody-header-content {
-    @apply font-semibold text-base text-gray-strong;
+    @apply font-semibold text-base text-tint-strong;
 }
 
 .openapi-requestbody-description.openapi-markdown {
@@ -254,7 +254,7 @@
 
 /** Responses */
 .openapi-responses {
-    @apply border rounded border-gray-subtle;
+    @apply border rounded border-tint-subtle;
 }
 
 .openapi-responses-header {
@@ -266,7 +266,7 @@
 }
 
 .openapi-responses-header-content {
-    @apply font-semibold text-gray-strong;
+    @apply font-semibold text-tint-strong;
 }
 
 /** Response */
@@ -285,13 +285,13 @@
 
 .openapi-responsebody-header-content,
 .openapi-responseheaders-header-content {
-    @apply text-base text-gray;
+    @apply text-base text-tint;
 }
 
 /** Code sample */
 
 .openapi-codesample {
-    @apply border rounded bg-gray border-gray-subtle;
+    @apply border rounded bg-tint border-tint-subtle;
 }
 
 .openapi-codesample-header {
@@ -305,7 +305,7 @@
 /** Response example */
 
 .openapi-response-example {
-    @apply border rounded bg-gray border-gray-subtle;
+    @apply border rounded bg-tint border-tint-subtle;
 }
 
 .openapi-response-example-header {
@@ -319,7 +319,7 @@
 /** Common */
 
 .openapi-select {
-    @apply max-w-48 rounded font-mono text-xs leading-6 px-1 py-0.5 border border-gray bg-gray;
+    @apply max-w-48 rounded font-mono text-xs leading-6 px-1 py-0.5 border border-tint bg-tint;
 }
 
 /** Section */
@@ -340,7 +340,7 @@
 }
 
 .openapi-section-toggle {
-    @apply flex items-center justify-end size-6 text-gray-subtle contrast-more:text-gray-strong;
+    @apply flex items-center justify-end size-6 text-tint-subtle contrast-more:text-tint-strong;
 }
 
 .openapi-section-toggle:focus-visible,

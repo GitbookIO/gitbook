@@ -97,8 +97,8 @@ const config: Config = {
                 'contrast-primary': generateVarShades('contrast-primary'),
                 tint: generateVarShades('tint'),
                 'contrast-tint': generateVarShades('contrast-tint'),
-                gray: generateVarShades('gray'),
-                'contrast-gray': generateVarShades('contrast-gray'),
+                neutral: generateVarShades('neutral'),
+                'contrast-neutral': generateVarShades('contrast-neutral'),
 
                 'header-background': 'rgb(var(--header-background))',
                 'header-link': 'rgb(var(--header-link))',
@@ -139,7 +139,7 @@ const config: Config = {
                     ColorCategory.components,
                     ColorCategory.accents,
                 ]),
-                gray: generateVarShades('gray', [
+                neutral: generateVarShades('neutral', [
                     ColorCategory.backgrounds,
                     ColorCategory.components,
                     ColorCategory.accents,
@@ -156,7 +156,7 @@ const config: Config = {
                     ColorCategory.components,
                     ColorCategory.accents,
                 ]),
-                gray: generateVarShades('gray', [
+                neutral: generateVarShades('neutral', [
                     ColorCategory.backgrounds,
                     ColorCategory.components,
                     ColorCategory.accents,
@@ -165,38 +165,38 @@ const config: Config = {
             borderColor: {
                 primary: generateVarShades('primary', [ColorCategory.borders]),
                 tint: generateVarShades('tint', [ColorCategory.borders]),
-                gray: generateVarShades('gray', [ColorCategory.borders]),
+                neutral: generateVarShades('neutral', [ColorCategory.borders]),
             },
             ringColor: {
                 primary: generateVarShades('primary', [ColorCategory.borders]),
                 tint: generateVarShades('tint', [ColorCategory.borders]),
-                gray: generateVarShades('gray', [ColorCategory.borders]),
+                neutral: generateVarShades('neutral', [ColorCategory.borders]),
             },
             outlineColor: {
                 primary: generateVarShades('primary', [ColorCategory.borders]),
                 tint: generateVarShades('tint', [ColorCategory.borders]),
-                gray: generateVarShades('gray', [ColorCategory.borders]),
+                neutral: generateVarShades('neutral', [ColorCategory.borders]),
             },
             boxShadowColor: {
                 primary: generateVarShades('primary', [ColorCategory.borders]),
                 tint: generateVarShades('tint', [ColorCategory.borders]),
-                gray: generateVarShades('gray', [ColorCategory.borders]),
+                neutral: generateVarShades('neutral', [ColorCategory.borders]),
             },
             textColor: {
                 primary: generateVarShades('primary', [ColorCategory.text]),
                 'contrast-primary': generateVarShades('contrast-primary', [ColorCategory.backgrounds, ColorCategory.accents]),
                 tint: generateVarShades('tint', [ColorCategory.text]),
                 'contrast-tint': generateVarShades('contrast-tint', [ColorCategory.backgrounds, ColorCategory.accents]),
-                gray: generateVarShades('gray', [ColorCategory.text]),
-                'contrast-gray': generateVarShades('contrast-gray', [ColorCategory.backgrounds, ColorCategory.accents]),
+                neutral: generateVarShades('neutral', [ColorCategory.text]),
+                'contrast-neutral': generateVarShades('contrast-neutral', [ColorCategory.backgrounds, ColorCategory.accents]),
             },
             textDecorationColor: {
                 primary: generateVarShades('primary', [ColorCategory.text]),
                 'contrast-primary': generateVarShades('contrast-primary', [ColorCategory.backgrounds, ColorCategory.accents]),
                 tint: generateVarShades('tint', [ColorCategory.text]),
                 'contrast-tint': generateVarShades('contrast-tint', [ColorCategory.backgrounds, ColorCategory.accents]),
-                gray: generateVarShades('gray', [ColorCategory.text]),
-                'contrast-gray': generateVarShades('contrast-gray', [ColorCategory.backgrounds, ColorCategory.accents]),
+                neutral: generateVarShades('neutral', [ColorCategory.text]),
+                'contrast-neutral': generateVarShades('contrast-neutral', [ColorCategory.backgrounds, ColorCategory.accents]),
             },
             animation: {
                 present: 'present .5s ease-out both',

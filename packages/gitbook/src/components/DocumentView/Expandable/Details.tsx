@@ -51,7 +51,7 @@ export function Details(props: {
                 // 'to-transparent',
                 'border',
                 'border-b-0',
-                'border-gray-subtle',
+                'border-tint-subtle',
                 //all
                 '[&]:mt-[0px]',
                 //select first child
@@ -65,7 +65,7 @@ export function Details(props: {
                 '[&:not(:has(+_&))]:rounded-b-lg',
                 '[&:not(:has(+_&))]:border-b',
 
-                // 'open:to-gray-12/1',
+                // 'open:to-tint-12/1',
             )}
         >
             {children}

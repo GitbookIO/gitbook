@@ -42,7 +42,7 @@ export function Caption(
             'after:pointer-events-none',
             fit ? 'w-fit' : null,
             withBorder
-                ? 'rounded straight-corners:rounded-none after:border-gray-subtle after:border after:rounded straight-corners:after:rounded-none dark:after:mix-blend-plus-lighter after:pointer-events-none'
+                ? 'rounded straight-corners:rounded-none after:border-tint-subtle after:border after:rounded straight-corners:after:rounded-none dark:after:mix-blend-plus-lighter after:pointer-events-none'
                 : null,
         ],
         style,
@@ -67,7 +67,7 @@ export function Caption(
                     'text-sm',
                     'text-center',
                     'mt-2',
-                    'text-gray',
+                    'text-tint',
                 )}
             >
                 <Inlines

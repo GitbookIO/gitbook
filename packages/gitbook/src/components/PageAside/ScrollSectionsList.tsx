@@ -36,7 +36,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
     });
 
     return (
-        <ul className={tcls('sidebar-list-line:border-l', 'border-gray')}>
+        <ul className={tcls('sidebar-list-line:border-l', 'border-tint')}>
             {sections.map((section) => (
                 <motion.li
                     key={section.id}
@@ -87,7 +87,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                             'straight-corners:rounded-none',
                             'sidebar-list-line:rounded-l-none',
 
-                            'hover:bg-gray',
+                            'hover:bg-tint',
                             'contrast-more:hover:ring-1',
                             'contrast-more:hover:ring-inset',
                             'contrast-more:hover:ring-current',
@@ -100,7 +100,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
 
                                 'sidebar-list-default:rounded-l-none',
                                 'sidebar-list-default:border-l',
-                                'sidebar-list-default:border-gray',
+                                'sidebar-list-default:border-tint',
                             ],
 
                             activeId === section.id && [

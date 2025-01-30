@@ -26,7 +26,7 @@ export const Checkbox = React.forwardRef<
             'rounded-sm',
             'straight-corners:rounded-none',
             'ring-1',
-            'ring-gray', // TODO @Zeno: Make transparent
+            'ring-tint', // TODO @Zeno: Make transparent
             'ring-inset',
             'flex',
             'items-center',
@@ -34,7 +34,7 @@ export const Checkbox = React.forwardRef<
             'data-[state=checked]:bg-primary-solid',
             'data-[state=checked]:text-contrast-primary',
             'contrast-more:data-[state=checked]:bg-primary-solid-hover',
-            'contrast-more:ring-gray-12',
+            'contrast-more:ring-tint-12',
             { small: 'size-4', medium: 'size-5' }[size],
             className,
         )}

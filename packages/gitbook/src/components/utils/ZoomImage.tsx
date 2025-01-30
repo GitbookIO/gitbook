@@ -217,7 +217,7 @@ function ZoomImageModal(props: {
                     'flex',
                     'items-center',
                     'justify-center',
-                    'bg-gray-base/4',
+                    'bg-tint-base/4',
                     'backdrop-blur-2xl',
                     'p-8',
                 ),
@@ -232,7 +232,7 @@ function ZoomImageModal(props: {
                     'max-w-full',
                     'max-h-full',
                     'object-contain',
-                    'bg-gray-base',
+                    'bg-tint-base',
                 )}
             />
 
@@ -247,15 +247,15 @@ function ZoomImageModal(props: {
                     'items-center',
                     'justify-center',
                     'text-sm',
-                    'text-gray',
+                    'text-tint',
                     'hover:text-tint',
                     'hover:bg-tint',
                     'hover:border-tint',
                     'p-4',
                     'rounded-full',
-                    'bg-gray',
+                    'bg-tint',
                     'border',
-                    'border-gray',
+                    'border-tint',
                     'shadow-sm',
                     'hover:shadow-md',
                 )}

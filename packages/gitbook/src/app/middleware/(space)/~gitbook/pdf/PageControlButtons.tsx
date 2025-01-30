@@ -133,7 +133,7 @@ export function PageControlButtons(props: {
                         'items-center',
                         'justify-center',
                         'text-lg',
-                        'text-gray',
+                        'text-tint',
                         'px-6',
                         'py-2',
                         'bg-slate-100',

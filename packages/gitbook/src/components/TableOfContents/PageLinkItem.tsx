@@ -26,12 +26,13 @@ export async function PageLinkItem(props: { page: RevisionPageLink; context: Con
                     'text-sm',
                     'transition-colors',
                     'duration-100',
-                    'text-gray',
+                    'text-neutral',
                     'rounded-md',
                     'straight-corners:rounded-none',
                     'before:content-none',
                     'font-normal',
-                    'hover:bg-gray',
+                    'hover:bg-tint',
+                    'hover:text-tint-strong',
                 )}
                 insights={{
                     type: 'link_click',

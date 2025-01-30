@@ -147,7 +147,7 @@ function AnswerBody(props: { answer: AskAnswerResult }) {
                     'sm:mt-6',
                     'px-4',
                     'sm:px-12',
-                    'text-gray-strong',
+                    'text-tint-strong',
                 )}
             >
                 {answer.body ?? t(language, 'search_ask_no_answer')}
@@ -184,9 +184,9 @@ function AnswerFollowupQuestions(props: { followupQuestions: string[] }) {
                         'py-2',
                         'rounded',
                         'straight-corners:rounded-none',
-                        'text-gray',
-                        'hover:bg-gray-hover',
-                        'focus-within:bg-gray-hover',
+                        'text-tint',
+                        'hover:bg-tint-hover',
+                        'focus-within:bg-tint-hover',
                     )}
                     {...getSearchLinkProps({
                         query: question,
@@ -199,7 +199,7 @@ function AnswerFollowupQuestions(props: { followupQuestions: string[] }) {
                             'size-4',
                             'shrink-0',
                             'mr-2',
-                            'text-gray-subtle',
+                            'text-tint-subtle',
                         )}
                     />
                     <span>{question}</span>
@@ -242,7 +242,7 @@ function AnswerSources(props: {
                             'flex-wrap',
                             'gap-1',
                             'items-center',
-                            'text-gray',
+                            'text-tint',
                             'hover:underline',
                             'focus-within:text-primary',
                         )}
@@ -252,7 +252,7 @@ function AnswerSources(props: {
                         <Icon
                             icon="arrow-up-right"
                             className={tcls(
-                                'text-gray-subtle',
+                                'text-tint-subtle',
                                 'size-4',
                                 'shrink-0',
                             )}

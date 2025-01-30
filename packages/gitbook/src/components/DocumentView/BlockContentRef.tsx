@@ -12,7 +12,7 @@ export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>
 
     const resolved = await context.resolveContentRef(block.data.ref, {
         resolveAnchorText: true,
-        iconStyle: ['text-xl', 'text-gray'],
+        iconStyle: ['text-xl', 'text-tint'],
     });
 
     if (!resolved) {

@@ -28,10 +28,10 @@ export function SiteSectionList(props: { sections: SectionsList; className: Clas
             <nav
                 aria-label="Sections"
                 className={tcls(
-                    `text-gray text-sm
-                    border-b border-gray-subtle -mx-5 relative
+                    `text-tint text-sm
+                    border-b border-tint-subtle -mx-5 relative
                     before:absolute before:contents[] before:left-0 before:right-2 before:bottom-0 before:h-12 before:pointer-events-none 
-                    before:bg-gradient-to-b from-transparent to-gray-base`, // TODO @Zeno: Bring back sidebar styles here...
+                    before:bg-gradient-to-b from-transparent to-tint-base`, // TODO @Zeno: Bring back sidebar styles here...
                     className,
                 )}
             >
@@ -67,8 +67,8 @@ export function SiteSectionListItem(props: { section: SiteSection; isActive: boo
             ref={linkRef}
             aria-current={isActive && 'page'}
             className={`flex flex-row items-center gap-3 px-3 py-2
-            hover:bg-gray-hover contrast-more:hover:ring-1 contrast-more:hover:ring-gray
-            hover:text-gray-strong
+            hover:bg-tint-hover contrast-more:hover:ring-1 contrast-more:hover:ring-tint
+            hover:text-tint-strong
             rounded-md straight-corners:rounded-none transition-all group/section-link 
             ${
                 isActive
@@ -81,10 +81,10 @@ export function SiteSectionListItem(props: { section: SiteSection; isActive: boo
             <div
                 className={tcls(
                     `size-8 flex items-center justify-center
-                    bg-gray-subtle shadow-sm shadow-gray
+                    bg-tint-subtle shadow-sm shadow-tint
                     dark:shadow-none rounded-md straight-corners:rounded-none leading-none
-                    ring-1 ring-gray-subtle
-                    text-gray contrast-more:text-gray-strong
+                    ring-1 ring-tint-subtle
+                    text-tint contrast-more:text-tint-strong
                     group-hover/section-link:scale-110 group-active/section-link:scale-90 group-active/section-link:shadow-none
                     transition-transform text-lg`,
                     isActive

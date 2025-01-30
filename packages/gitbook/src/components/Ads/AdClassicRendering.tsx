@@ -37,9 +37,9 @@ export async function AdClassicRendering({
                 'flex',
                 'flex-col',
                 'gap-4',
-                'bg-gray',
-                'text-gray',
-                'hover:text-gray-strong',
+                'bg-tint',
+                'text-tint',
+                'hover:text-tint-strong',
                 'rounded-lg',
                 'p-4',
             )}

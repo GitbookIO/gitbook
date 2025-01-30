@@ -28,8 +28,8 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                 'pl-6',
                 'sm:pl-12',
                 'pr-4',
-                'text-gray',
-                'hover:bg-gray-hover',
+                'text-tint',
+                'hover:bg-tint-hover',
                 'font-normal',
                 'py-2',
                 'group',
@@ -50,7 +50,7 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                     'flex-1',
                     'overflow-hidden',
                     'flex-col',
-                    'border-gray-subtle',
+                    'border-tint-subtle',
                 )}
             >
                 {item.title ? (

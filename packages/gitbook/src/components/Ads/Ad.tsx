@@ -139,7 +139,7 @@ function AdSponsoredLink(props: { spaceId: string }) {
                 'mr-2',
                 'text-xs',
                 'text-right',
-                'text-gray-subtle',
+                'text-tint-subtle',
             )}
         >
             <Link

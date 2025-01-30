@@ -35,7 +35,7 @@ export async function RecordCard(
                 'z-0',
                 'relative',
                 'grid',
-                'bg-gray-base',
+                'bg-tint-base',
                 'w-[calc(100%+2px)]',
                 'h-[calc(100%+2px)]',
                 'inset-[-1px]',
@@ -92,8 +92,8 @@ export async function RecordCard(
                     'p-4',
                     'text-sm',
                     target
-                        ? ['transition-colors', 'text-gray', 'group-hover:text-gray-strong']
-                        : ['text-gray-strong'],
+                        ? ['transition-colors', 'text-tint', 'group-hover:text-tint-strong']
+                        : ['text-tint-strong'],
                 )}
             >
                 {view.columns.map((column) => {
@@ -107,7 +107,7 @@ export async function RecordCard(
                         const ariaLabelledBy = `${block.key}-${column}-title`;
                         return (
                             <div key={column} className="flex flex-col gap-1">
-                                <div id={ariaLabelledBy} className="text-sm text-gray">
+                                <div id={ariaLabelledBy} className="text-sm text-tint">
                                     {definition.title}
                                 </div>
                                 <RecordColumnValue
@@ -129,7 +129,7 @@ export async function RecordCard(
         'group',
         'grid',
         'shadow-1xs',
-        'shadow-gray-9/1',
+        'shadow-tint-9/1',
         'rounded-md',
         'straight-corners:rounded-none',
         'dark:shadow-transparent',
@@ -142,7 +142,7 @@ export async function RecordCard(
         'before:h-full',
         'before:rounded-[inherit]',
         'before:ring-1',
-        'before:ring-gray-12/2',
+        'before:ring-tint-12/2',
         'before:z-10',
         'before:relative',
     ] as ClassValue;
@@ -151,7 +151,7 @@ export async function RecordCard(
         return (
             <Link
                 href={target.href}
-                className={tcls(style, 'hover:before:ring-gray-12/5')}
+                className={tcls(style, 'hover:before:ring-tint-12/5')}
                 insights={{
                     type: 'link_click',
                     link: {

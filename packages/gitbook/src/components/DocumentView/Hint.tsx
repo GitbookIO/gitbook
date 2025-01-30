@@ -62,16 +62,16 @@ const HINT_STYLES: {
 } = {
     info: {
         icon: 'circle-info',
-        iconColor: ['text-tint'],
+        iconColor: ['text-primary'],
         bodyColor: [
             '[&_a]:text-primary',
             '[&_a:hover]:text-primary-strong',
         ],
         style: [
-            'bg-gray',
-            'border-gray',
-            '[&_.can-override-bg]:bg-gray-active',
-            '[&_.can-override-text]:text-gray-strong',
+            'bg-tint',
+            'border-tint',
+            '[&_.can-override-bg]:bg-tint-active',
+            '[&_.can-override-text]:text-tint-strong',
         ],
     },
     warning: {

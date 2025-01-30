@@ -51,7 +51,7 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
                         'items-center',
                         'gap-1',
                         'border-r',
-                        'border-gray-subtle',
+                        'border-tint-subtle',
                     )}
                 >
                     <div>
@@ -63,8 +63,8 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
                     <div
                         className={tcls(
                             'text-xs',
-                            'text-gray',
-                            'group-hover/file:text-gray-strong',
+                            'text-tint',
+                            'group-hover/file:text-tint-strong',
                         )}
                     >
                         {getHumanFileSize(file.size)}

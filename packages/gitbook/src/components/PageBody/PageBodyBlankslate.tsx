@@ -32,7 +32,7 @@ export async function PageBodyBlankslate(props: {
     const pageElements = await Promise.all(
         pages.map(async (child) => {
             const icon = (
-                <PageIcon page={child} style={['text-base', 'text-gray']} />
+                <PageIcon page={child} style={['text-base', 'text-tint']} />
             );
 
             if (child.type === RevisionPageType.Computed) {

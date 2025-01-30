@@ -19,8 +19,8 @@ export function Toolbar(props: { children: React.ReactNode }) {
                 'py-1',
                 'rounded-full',
                 'truncate',
-                'text-gray-1',
-                'dark:text-gray-12',
+                'text-tint-1',
+                'dark:text-tint-12',
             )}
         >
             {children}
@@ -51,10 +51,10 @@ export function ToolbarButton(props: React.HTMLProps<HTMLAnchorElement>) {
                 'text-sm',
                 'rounded-full',
                 'truncate',
-                'text-gray-1', // Equal to text-gray-strong in dark mode
-                'dark:text-gray-12', // Equal to text-gray-strong in dark mode
-                'hover:bg-gray-12',
-                'dark:hover:bg-gray-1',
+                'text-tint-1', // Equal to text-tint-strong in dark mode
+                'dark:text-tint-12', // Equal to text-tint-strong in dark mode
+                'hover:bg-tint-12',
+                'dark:hover:bg-tint-1',
                 'hover:shadow-lg',
                 'cursor-pointer',
             )}

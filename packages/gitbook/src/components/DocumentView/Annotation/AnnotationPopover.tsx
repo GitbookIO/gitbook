@@ -31,13 +31,13 @@ export function AnnotationPopover(props: { children: React.ReactNode; body: Reac
                     className={tcls(
                         'text-sm',
                         'max-w-[280px]',
-                        'bg-gray',
+                        'bg-tint',
                         'ring-1',
-                        'ring-gray',
+                        'ring-tint',
                         'rounded',
                         'shadow-1xs',
-                        'shadow-gray-12/1',
-                        'dark:shadow-gray-1/2',
+                        'shadow-tint-12/1',
+                        'dark:shadow-tint-1/2',
                         'p-3',
                         '[&_p]:leading-snug',
                         '-outline-offset-2',
@@ -54,8 +54,8 @@ export function AnnotationPopover(props: { children: React.ReactNode; body: Reac
                             className={tcls(
                                 'relative',
                                 'z-[2]',
-                                'fill-gray-3', // Same as bg-gray
-                                'stroke-gray-7', // Same as ring-gray
+                                'fill-tint-3', // Same as bg-tint
+                                'stroke-tint-7', // Same as ring-tint
                                 '[paint-order:stroke_fill]',
                             )}
                             fill="none"

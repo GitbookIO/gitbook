@@ -58,14 +58,14 @@ export function Dropdown<E extends HTMLElement>(props: {
                     className={tcls(
                         'mt-2',
                         'w-full',
-                        'bg-gray-base',
+                        'bg-tint-base',
                         'rounded-lg',
                         'straight-corners:rounded-sm',
                         'p-2',
                         'shadow-1xs',
                         'overflow-auto',
                         'ring-1',
-                        'ring-gray-subtle',
+                        'ring-tint-subtle',
                         'focus:outline-none',
                     )}
                 >
@@ -127,7 +127,7 @@ export function DropdownMenuItem(
                 className={tcls(
                     'px-3 py-1 text-sm rounded straight-corners:rounded-sm',
                     active ? 'bg-primary text-primary-strong' : null,
-                    'hover:bg-gray-hover',
+                    'hover:bg-tint-hover',
                     className,
                 )}
             >
@@ -139,7 +139,7 @@ export function DropdownMenuItem(
     return (
         <div
             className={tcls(
-                'text-xs px-3 py-1 font-medium text-gray',
+                'text-xs px-3 py-1 font-medium text-tint',
                 className,
             )}
         >

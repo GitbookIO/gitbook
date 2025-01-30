@@ -84,8 +84,8 @@ export function SearchModal(props: SearchModalProps) {
                         className={tcls(
                             'fixed',
                             'inset-0',
-                            'bg-gray-12/4',
-                            'dark:bg-gray-1/6',
+                            'bg-tint-12/4',
+                            'dark:bg-tint-1/6',
                             'backdrop-blur-2xl',
                             'z-30',
                             'px-4',
@@ -227,7 +227,7 @@ function SearchModalBody(
                 'relative',
                 'flex',
                 'flex-col',
-                'bg-gray-base',
+                'bg-tint-base',
                 'max-w-prose',
                 'mx-auto',
                 'max-h-[70dvh]',
@@ -235,11 +235,11 @@ function SearchModalBody(
                 'rounded-lg',
                 'straight-corners:rounded-sm',
                 'ring-1',
-                'ring-gray-hover',
+                'ring-tint-hover',
                 'shadow-2xl',
                 'overflow-hidden',
                 'dark:ring-inset',
-                'dark:ring-gray',
+                'dark:ring-tint',
             )}
             onClick={(event) => {
                 event.stopPropagation();
@@ -251,13 +251,13 @@ function SearchModalBody(
                     'flex-row',
                     'items-start',
                     state.query !== null ? 'border-b' : null,
-                    'border-gray-subtle',
+                    'border-tint-subtle',
                 )}
             >
                 <div className={tcls('p-2', 'pl-4', 'pt-4')}>
                     <Icon
                         icon="magnifying-glass"
-                        className={tcls('size-4', 'text-gray-subtle')}
+                        className={tcls('size-4', 'text-tint-subtle')}
                     />
                 </div>
                 <div
@@ -277,8 +277,8 @@ function SearchModalBody(
                         onKeyDown={onKeyDown}
                         onChange={onChange}
                         className={tcls(
-                            'text-gray-strong',
-                            'placeholder:text-gray',
+                            'text-tint-strong',
+                            'placeholder:text-tint',
                             'flex',
                             'resize-none',
                             'flex-1',

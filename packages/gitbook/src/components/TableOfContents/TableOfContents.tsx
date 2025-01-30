@@ -93,8 +93,7 @@ export function TableOfContents(props: {
                     'flex-grow',
 
                     'sidebar-filled:bg-tint-subtle',
-                    '[html.tint.sidebar-filled_&]:bg-white',
-                    'dark:[html.tint.sidebar-filled_&]:bg-black/2',
+                    '[html.tint.sidebar-filled_&]:bg-tint-base',
 
                     'sidebar-filled:rounded-xl',
                     'straight-corners:rounded-none',
@@ -127,7 +126,7 @@ export function TableOfContents(props: {
                         pages={pages}
                         ancestors={ancestors}
                         context={context}
-                        style={tcls('sidebar-list-line:border-l', 'border-gray-subtle')}
+                        style={tcls('sidebar-list-line:border-l', 'border-tint-subtle')}
                     />
                     {customization.trademark.enabled ? (
                         <Trademark

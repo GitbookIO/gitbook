@@ -13,8 +13,8 @@ export function TOCPageIcon({ page }: { page: RevisionPage }) {
             page={page}
             style={tcls(
                 'text-base',
-                'text-gray/7',
-                'group-aria-current-page/toclink:text-tint',
+                'text-tint/7',
+                'group-aria-current-page/toclink:text-primary',
                 'shrink-0',
             )}
         />

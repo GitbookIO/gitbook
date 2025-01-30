@@ -35,10 +35,9 @@ export function Trademark(props: {
                 'sidebar-filled:pl-2',
                 'sidebar-filled:pb-2',
 
-                'bg-gray-base',
-                'tint:bg-tint-base',
+                'bg-tint-base',
                 'sidebar-filled:bg-tint-subtle',
-                '[html.tint.sidebar-filled_&]:bg-gray-base',
+                '[html.tint.sidebar-filled_&]:bg-tint-base',
 
                 'before:hidden',
                 'lg:before:block',
@@ -49,10 +48,9 @@ export function Trademark(props: {
                 'before:h-8',
                 'before:bg-gradient-to-b',
                 'before:from-transparent',
-                'before:to-gray-base',
-                'tint:before:to-tint-base',
+                'before:to-tint-base',
                 'sidebar-filled:before:to-tint-subtle',
-                '[html.tint.sidebar-filled_&]:before:to-gray-base',
+                '[html.tint.sidebar-filled_&]:before:to-tint-base',
             )}
         >
             <TrademarkLink {...props} />
@@ -83,7 +81,7 @@ export function TrademarkLink(props: {
             className={tcls(
                 'text-sm',
                 'font-semibold',
-                'text-gray',
+                'text-tint',
 
                 'flex',
                 'flex-row',
@@ -95,13 +93,13 @@ export function TrademarkLink(props: {
                 'rounded-lg',
                 'straight-corners:rounded-none',
 
-                'hover:bg-gray',
-                'hover:text-gray-strong',
+                'hover:bg-tint',
+                'hover:text-tint-strong',
 
                 'ring-2',
                 'lg:ring-1',
                 'ring-inset',
-                'ring-gray-subtle',
+                'ring-tint-subtle',
 
                 'transition-colors',
                 'pointer-events-auto',

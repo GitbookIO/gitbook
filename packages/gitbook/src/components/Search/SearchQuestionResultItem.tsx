@@ -28,8 +28,8 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
             className={tcls(
                 'flex',
                 'px-4',
-                recommended ? ['py-2', 'text-gray'] : 'py-4',
-                'hover:bg-gray-hover',
+                recommended ? ['py-2', 'text-tint'] : 'py-4',
+                'hover:bg-tint-hover',
                 'first:mt-0',
                 'last:pb-3',
                 active && [
@@ -51,7 +51,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                     'shrink-0',
                     'mt-1.5',
                     'mr-4',
-                    active ? ['text-primary'] : ['text-gray-subtle'],
+                    active ? ['text-primary'] : ['text-tint-subtle'],
                 )}
             />
             <div className="w-full">
@@ -60,7 +60,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                 ) : (
                     <>
                         <div className="font-medium">{t(language, 'search_ask', [question])}</div>
-                        <div className={tcls('text-sm', 'text-gray')}>
+                        <div className={tcls('text-sm', 'text-tint')}>
                             {t(language, 'search_ask_description')}
                         </div>
                     </>

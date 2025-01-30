@@ -127,8 +127,8 @@ export function PageBody(props: {
                         'max-w-3xl',
                         'mx-auto',
                         'page-api-block:ml-0',
-                        'text-gray',
-                        'contrast-more:text-gray-strong',
+                        'text-tint',
+                        'contrast-more:text-tint-strong',
                     )}
                 >
                     {updatedAt ? (

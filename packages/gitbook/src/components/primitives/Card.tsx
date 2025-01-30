@@ -27,7 +27,7 @@ export async function Card(
                 'items-center',
                 'gap-4',
                 'ring-1',
-                'ring-gray-subtle',
+                'ring-tint-subtle',
                 'rounded',
                 'straight-corners:rounded-none',
                 'px-5',
@@ -41,7 +41,7 @@ export async function Card(
             {leadingIcon}
             <span className={tcls('flex', 'flex-col', 'flex-1')}>
                 {preTitle ? (
-                    <span className={tcls('uppercase', 'text-xs', 'text-gray')}>{preTitle}</span>
+                    <span className={tcls('uppercase', 'text-xs', 'text-tint')}>{preTitle}</span>
                 ) : null}
 
                 <span
@@ -51,14 +51,14 @@ export async function Card(
                 </span>
 
                 {postTitle ? (
-                    <span className={tcls('text-xs', 'text-gray')}>{postTitle}</span>
+                    <span className={tcls('text-xs', 'text-tint')}>{postTitle}</span>
                 ) : null}
             </span>
             <Icon
                 icon="chevron-right"
                 className={tcls(
                     'size-3',
-                    'text-gray',
+                    'text-tint',
                     'transition-all',
                     'group-hover:translate-x-0.5',
                     'group-hover:text-primary',

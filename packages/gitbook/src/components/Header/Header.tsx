@@ -47,10 +47,11 @@ export function Header(props: {
                 'w-full',
                 'flex-none',
                 'shadow-[0px_1px_0px]',
-                'shadow-gray-12/2',
-                'bg-gray-base/9', // TODO @Zeno: Fix tint display
+                'shadow-tint-12/2',
+                'bg-tint-base/9', // TODO @Zeno: Fix tint display
                 'tint:bg-tint-base/9',
-                'contrast-more:bg-gray-base',
+                '[html.tint.sidebar-filled_&]:bg-tint-subtle/9',
+                'contrast-more:bg-tint-base',
                 withTopHeader ? null : 'lg:hidden',
                 'text-sm',
                 'backdrop-blur-lg',
@@ -62,7 +63,7 @@ export function Header(props: {
                         withTopHeader && [
                             'bg-header-background',
                             'shadow-[0px_1px_0px]',
-                            'shadow-gray-12/2',
+                            'shadow-tint-12/2',
                         ],
                 )}
             >
@@ -95,7 +96,7 @@ export function Header(props: {
                                     '-ml-2',
                                     customization.header.preset ===
                                         CustomizationHeaderPreset.Default
-                                        ? ['text-gray-strong']
+                                        ? ['text-tint-strong']
                                         : 'text-header-link',
                                 )}
                             />

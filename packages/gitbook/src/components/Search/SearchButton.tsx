@@ -47,37 +47,37 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'py-2',
                 'gap-2',
 
-                'bg-gray-base',
+                'bg-tint-base',
 
                 'ring-1',
-                'ring-gray-subtle',
+                'ring-tint-subtle',
 
                 'shadow-sm',
-                'shadow-gray-12/3',
+                'shadow-tint-12/3',
                 'dark:shadow-none',
 
-                'text-gray',
+                'text-tint',
 
                 'rounded-lg',
                 'straight-corners:rounded-sm',
 
-                'contrast-more:ring-gray-12',
-                'contrast-more:text-gray-strong',
+                'contrast-more:ring-tint-12',
+                'contrast-more:text-tint-strong',
 
                 'transition-all',
                 'hover:shadow-md',
                 'hover:scale-102',
-                'hover:ring-gray-hover',
-                'hover:text-gray-strong',
+                'hover:ring-tint-hover',
+                'hover:text-tint-strong',
                 'focus:shadow-md',
                 'focus:scale-102',
-                'focus:ring-gray-hover',
-                'focus:text-gray-strong',
+                'focus:ring-tint-hover',
+                'focus:text-tint-strong',
 
                 'contrast-more:hover:ring-2',
-                'contrast-more:hover:ring-gray-12',
+                'contrast-more:hover:ring-tint-12',
                 'contrast-more:focus:ring-2',
-                'contrast-more:focus:ring-gray-12',
+                'contrast-more:focus:ring-tint-12',
 
                 'active:shadow-sm',
                 'active:scale-98',
@@ -89,7 +89,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
         >
             <Icon
                 icon="magnifying-glass"
-                className={tcls('text-gray-subtle', 'shrink-0', 'size-4')}
+                className={tcls('text-tint-subtle', 'shrink-0', 'size-4')}
             />
             <div className={tcls('w-full', 'hidden', 'md:block', 'text-left')}>{children}</div>
             <Shortcut />
@@ -121,8 +121,8 @@ const Shortcut = () => {
                 'md:inline',
                 'justify-end',
                 'text-xs',
-                'text-gray',
-                'contrast-more:text-gray-strong',
+                'text-tint',
+                'contrast-more:text-tint-strong',
                 'whitespace-nowrap',
                 `[font-feature-settings:"calt",_"case"]`,
             )}

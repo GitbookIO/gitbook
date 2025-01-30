@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
     return new ImageResponse(
         (
             <div
-                tw={tcls(options.theme === 'light' ? 'bg-white' : 'bg-gray-900', size.boxStyle)}
+                tw={tcls(options.theme === 'light' ? 'bg-white' : 'bg-tint-900', size.boxStyle)}
                 style={{
                     width: '100%',
                     height: '100%',
@@ -62,7 +62,7 @@ export async function GET(req: NextRequest) {
                         size.textSize,
                         'font-bold',
                         'tracking-tight',
-                        options.theme === 'light' ? 'text-gray-900' : 'text-white',
+                        options.theme === 'light' ? 'text-tint-900' : 'text-white',
                     )}
                 >
                     {'emoji' in customization.favicon

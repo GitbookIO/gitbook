@@ -7,5 +7,5 @@ import { BlockProps } from './Block';
 export function Divider(props: BlockProps<DocumentBlockDivider>) {
     const { style } = props;
 
-    return <hr className={tcls(style, 'border-gray-subtle')} />;
+    return <hr className={tcls(style, 'border-tint-subtle')} />;
 }

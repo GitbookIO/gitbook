@@ -21,7 +21,7 @@
     --border-width-if-cant-scroll: 0;
     border-width: var(--border-width-if-can-scroll, var(--border-width-if-cant-scroll));
 
-    @apply relative grid w-full overflow-x-auto overflow-y-hidden mx-auto border-gray-subtle;
+    @apply relative grid w-full overflow-x-auto overflow-y-hidden mx-auto border-tint-subtle;
 }
 
 .columnHeader {

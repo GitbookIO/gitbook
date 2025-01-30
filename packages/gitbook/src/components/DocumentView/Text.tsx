@@ -88,8 +88,8 @@ function Code(props: MarkedLeafProps<DocumentMarkCode>) {
                 'leading-normal',
                 'ring-1',
                 'ring-inset',
-                'ring-gray',
-                'bg-gray',
+                'ring-tint',
+                'bg-tint',
                 'rounded',
                 // Text size is proportional to the font-size of the parent element
                 'text-[.875em]',

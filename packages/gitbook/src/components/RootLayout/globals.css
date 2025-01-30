@@ -23,7 +23,7 @@
         @apply leading-relaxed;
     }
     body {
-        @apply text-gray-strong antialiased;
+        @apply text-tint-strong antialiased;
     }
     html {
         @apply gutter-stable;
@@ -62,18 +62,18 @@
 
     /*  Light mode */
     ::-webkit-scrollbar {
-        @apply bg-gray-subtle;
+        @apply bg-tint-subtle;
         width: 8px;
         height: 8px;
     }
 
     ::-webkit-scrollbar-thumb {
-        @apply bg-gray;
+        @apply bg-tint;
         border-radius: 8px;
     }
 
     ::-webkit-scrollbar-thumb:hover {
-        @apply bg-gray-hover;
+        @apply bg-tint-hover;
     }
 
     /*  Inverted theme light mode */

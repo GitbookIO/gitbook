@@ -44,11 +44,11 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
             className={tcls(
                 'fixed',
                 'z-10',
-                'bg-gray-base',
+                'bg-tint-base',
                 'rounded',
                 'straight-corners:rounded-none',
                 'ring-1',
-                'ring-gray-subtle',
+                'ring-tint-subtle',
                 'shadow-1xs',
                 'p-4',
                 'pr-8',
@@ -86,7 +86,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                     'justify-center',
                     'items-center',
                     'rounded-sm',
-                    'hover:bg-gray-hover',
+                    'hover:bg-tint-hover',
                 )}
                 title={tString(language, 'cookies_close')}
             >
