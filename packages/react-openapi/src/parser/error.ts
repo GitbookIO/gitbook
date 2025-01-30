@@ -4,7 +4,7 @@ export class OpenAPIParseError extends Error {
     constructor(
         message: string,
         public readonly url: string,
-        public readonly code?: 'invalid-spec' | 'v2-spec',
+        public readonly code?: 'invalid-spec' | 'v2-spec' | 'failed-dereference',
     ) {
         super(message);
     }

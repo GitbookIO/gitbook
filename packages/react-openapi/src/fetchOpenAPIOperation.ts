@@ -1,9 +1,9 @@
 import { toJSON, fromJSON } from 'flatted';
 
-import { OpenAPICustomSpecProperties } from './parser';
-import { OpenAPIV3, OpenAPIV3_1 } from '@scalar/openapi-types';
+import { OpenAPICustomSpecProperties, OpenAPIParseError } from './parser';
+import { OpenAPI, OpenAPIV3, OpenAPIV3_1 } from '@scalar/openapi-types';
 import { noReference } from './utils';
-import { parseDescriptions } from './parser/markdown';
+import { dereference } from '@scalar/openapi-parser';
 
 export interface OpenAPIFetcher {
     /**
@@ -44,7 +44,8 @@ export async function fetchOpenAPIOperation(
     },
     fetcher: OpenAPIFetcher,
 ): Promise<OpenAPIOperationData | null> {
-    const schema = await fetcher.fetch(input.url);
+    const refSchema = await fetcher.fetch(input.url);
+    const schema = await memoDereferenceSchema(refSchema, input.url);
 
     let operation = getOperationByPathAndMethod(schema, input.path, input.method);
 
@@ -87,6 +88,38 @@ export async function fetchOpenAPIOperation(
                 ? schema['x-hideTryItPanel']
                 : undefined,
     };
+}
+
+const dereferenceSchemaCache = new WeakMap<OpenAPI.Document, Promise<OpenAPI.Document>>();
+
+/**
+ * Memoized version of `dereferenceSchema`.
+ */
+function memoDereferenceSchema<T extends OpenAPI.Document>(schema: T, url: string): Promise<T> {
+    if (dereferenceSchemaCache.has(schema)) {
+        return dereferenceSchemaCache.get(schema) as Promise<T>;
+    }
+
+    const promise = dereferenceSchema(schema, url);
+    dereferenceSchemaCache.set(schema, promise);
+    return promise;
+}
+
+/**
+ * Dereference an OpenAPI schema.
+ */
+async function dereferenceSchema<T extends OpenAPI.Document>(schema: T, url: string): Promise<T> {
+    const derefResult = await dereference(schema);
+
+    if (!derefResult.schema) {
+        throw new OpenAPIParseError(
+            'Failed to dereference OpenAPI document',
+            url,
+            'failed-dereference',
+        );
+    }
+
+    return derefResult.schema as T;
 }
 
 /**

@@ -1,5 +1,5 @@
 import { OpenAPICustomSpecProperties } from './types';
-import { AnyApiDefinitionFormat, dereference } from '@scalar/openapi-parser';
+import { AnyApiDefinitionFormat, validate } from '@scalar/openapi-parser';
 import { OpenAPIV3, OpenAPIV3_1 } from '@scalar/openapi-types';
 import { OpenAPIParseError } from './error';
 import { parseDescriptions } from './markdown';
@@ -18,10 +18,10 @@ export async function parseOpenAPIV3(input: {
     | OpenAPIV3_1.Document<OpenAPICustomSpecProperties>
 > {
     const { value, url } = input;
-    const result = await dereference(value);
+    const result = await validate(value);
 
     // Spec is invalid, we stop here.
-    if (!result.schema) {
+    if (!result.specification) {
         throw new OpenAPIParseError('Invalid OpenAPI document', url, 'invalid-spec');
     }
 
@@ -29,16 +29,16 @@ export async function parseOpenAPIV3(input: {
         throw new OpenAPIParseError('Only OpenAPI v3 is supported', url, 'v2-spec');
     }
 
-    const schema = await parseDescriptions({
-        specification: result.schema,
+    const specification = await parseDescriptions({
+        specification: result.specification,
         parseMarkdown: input.parseMarkdown,
     });
 
     switch (result.version) {
         case '3.0':
-            return schema as OpenAPIV3.Document<OpenAPICustomSpecProperties>;
+            return specification as OpenAPIV3.Document<OpenAPICustomSpecProperties>;
         case '3.1':
         default:
-            return schema as OpenAPIV3_1.Document<OpenAPICustomSpecProperties>;
+            return specification as OpenAPIV3_1.Document<OpenAPICustomSpecProperties>;
     }
 }
