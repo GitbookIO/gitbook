@@ -6,8 +6,6 @@
     }
 }
 
-/* TODO @Zeno: Fix table colors */
-
 /* Apply styles to the Table if scrollbar exists */
 .tableWrapper {
     animation: detect-scroll linear;
@@ -29,15 +27,15 @@
 }
 
 .row {
-    @apply flex border-tint/6 hover:bg-tint/2 transition-colors;
+    @apply flex border-tint-subtle hover:bg-tint-hover transition-colors;
 }
 
 .rowGroup {
-    @apply flex flex-col border rounded-lg bg-tint/2 border-tint/6 mb-1;
+    @apply flex flex-col border rounded-lg bg-tint border-tint-subtle mb-1;
 }
 
 .cell {
-    @apply flex-1 flex align-middle border-tint/6 py-2 px-3 h-full text-sm relative;
+    @apply flex-1 flex align-middle border-tint-subtle py-2 px-3 h-full text-sm relative;
 }
 
 .cell:not(:last-child) {
