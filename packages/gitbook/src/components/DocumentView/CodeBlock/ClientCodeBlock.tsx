@@ -15,7 +15,8 @@ type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'document'
 };
 
 /**
- * Render a code-block client-side.
+ * Render a code-block client-side by calling a server actions to highlight the code.
+ * It allows us to defer some load to avoid blocking the rendering of the whole page with block highlighting.
  */
 export function ClientCodeBlock(props: ClientBlockProps) {
     const { block, document, style, inlines } = props;
