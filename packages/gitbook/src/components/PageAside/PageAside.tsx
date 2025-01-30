@@ -25,11 +25,11 @@ import { PageFeedbackForm } from '../PageFeedback';
 
 function getTopOffset(props: { sectionsHeader: boolean; topHeader: boolean }) {
     if (props.topHeader && props.sectionsHeader) {
-        return 'lg:top-[6.75rem] lg:max-h-[calc(100vh_-_6.75rem)]';
+        return 'lg:top-[calc(100vh_-_6.75rem)] lg:max-h-[calc(100vh_-_6.75rem)]';
     }
 
     if (props.topHeader) {
-        return 'lg:top-16 lg:max-h-[calc(100vh_-_4rem)]';
+        return 'lg:top-[calc(100vh_-_4rem)] lg:max-h-[calc(100vh_-_4rem)]';
     }
 
     return 'lg:top-0 lg:max-h-screen';
