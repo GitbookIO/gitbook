@@ -17,6 +17,11 @@
             "dependsOn": ["^build", "generate"],
             "outputs": [".next/**", "!.next/cache/**", "dist"]
         },
+        // Build the package for v2
+        "build:v2": {
+            "dependsOn": ["^build:v2", "^build", "generate"],
+            "outputs": [".next/**", "!.next/cache/**", "dist"]
+        },
         // Build the package for Cloudflare Pages
         "build:cloudflare": {
             "dependsOn": ["^build", "generate"],

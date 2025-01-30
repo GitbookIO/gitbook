@@ -95,6 +95,54 @@ jobs:
                       Latest commit: [${{ steps.deploy.outputs.deployment-url }}](${{ steps.deploy.outputs.deployment-url }})
                       PR: [${{ steps.deploy.outputs.deployment-alias-url }}](${{ steps.deploy.outputs.deployment-alias-url }})
                   edit-mode: replace
+    deploy-vercel:
+        name: Deploy v2 to Vercel
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            deployments: write
+            issues: write
+            pull-requests: write
+            checks: write
+            statuses: write
+        outputs:
+            deployment_url: ${{ steps.deploy.outputs.deployment-url }}
+        env:
+            VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+            VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+              env:
+                  PUPPETEER_SKIP_DOWNLOAD: 1
+            - name: Sets env vars for production
+              run: |
+                  echo "VERCEL_ENVIRONMENT=production" >> $GITHUB_ENV
+                  echo "SENTRY_ENVIRONMENT=production" >> $GITHUB_ENV
+                  echo "GITBOOK_ASSETS_PREFIX=https://static.gitbook.com" >> $GITHUB_ENV
+              if: startsWith(github.ref, 'refs/heads/main')
+            - name: Sets env vars for preview
+              run: |
+                  echo "VERCEL_ENVIRONMENT=preview" >> $GITHUB_ENV
+                  echo "SENTRY_ENVIRONMENT=preview" >> $GITHUB_ENV
+              if: 1 && !startsWith(github.ref, 'refs/heads/main')
+            - name: Pull Vercel Environment Information
+              run: bun run vercel pull --yes --environment=$VERCEL_ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }}
+            - name: Build Project Artifacts
+              run: bun run vercel build --token=${{ secrets.VERCEL_TOKEN }}
+              env:
+                SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+                NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
+                SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+                SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
+                SENTRY_DSN: ${{ vars.SENTRY_DSN }}
+                SENTRY_RELEASE: ${{ github.sha }}
+            - name: Deploy Project Artifacts to Vercel
+              run: bun run vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
     visual-testing:
         runs-on: ubuntu-latest
         name: Visual Testing

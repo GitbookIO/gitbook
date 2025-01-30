@@ -7,8 +7,9 @@
         "@gitbook/api": "^0.89.0"
     },
     "scripts": {
-        "dev": "next",
+        "dev:v2": "next",
         "build": "next build",
+        "build:v2": "next build",
         "start": "next start"
     }
 }
