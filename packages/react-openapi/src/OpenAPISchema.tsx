@@ -59,6 +59,7 @@ export function OpenAPISchemaProperty(
                 Object.keys(schema.example).length > 0)
         );
     };
+
     return (
         <InteractiveSection
             id={id}

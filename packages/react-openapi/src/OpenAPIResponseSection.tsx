@@ -17,7 +17,7 @@ export function OpenAPIResponse(props: {
     const { response, context } = props;
     const content = Object.entries(response.content ?? {});
     const headers = Object.entries(response.headers ?? {}).map(
-        ([name, header]) => [name, noReference(header) ?? {}] as const,
+        ([name, header]) => [name, noReference(header) ?? {}] as [string, OpenAPIV3.HeaderObject],
     );
 
     if (content.length === 0 && !response.description && headers.length === 0) {
