@@ -7,6 +7,7 @@ import type { HighlightLine, RichInlineIndexed } from './highlight';
 import type { BlockProps } from '../Block';
 import './theme.css';
 import { ClientCodeBlockRenderer } from './CodeBlockRenderer';
+import { highlightAction } from './highlight-action';
 import { plainHighlight } from './plain-highlight';
 
 type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'document' | 'style'> & {
@@ -20,7 +21,7 @@ export function ClientCodeBlock(props: ClientBlockProps) {
     const { block, document, style, inlines } = props;
     const [lines, setLines] = useState<HighlightLine[]>(() => plainHighlight(block));
     useEffect(() => {
-        import('./highlight').then(({ highlight }) => highlight(block, inlines).then(setLines));
+        highlightAction(block, inlines).then(setLines);
     }, [block, inlines]);
     return (
         <ClientCodeBlockRenderer block={block} document={document} style={style} lines={lines} />
