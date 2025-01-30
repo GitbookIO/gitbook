@@ -55,6 +55,7 @@ export function OpenAPISchemaProperty(
             typeof schema.example === 'boolean'
         );
     };
+
     return (
         <InteractiveSection
             id={id}

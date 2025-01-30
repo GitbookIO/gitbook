@@ -5,7 +5,7 @@
 }
 
 .openapi-columns {
-    @apply flex flex-col md:flex-row gap-6 print-mode:flex-col;
+    @apply flex flex-col md:flex-row gap-6 print-mode:flex-col justify-stretch;
 }
 
 /** Intro */
@@ -105,7 +105,7 @@
 /** Columns */
 
 .openapi-column-spec {
-    @apply flex flex-col flex-1 gap-8 max-w-3xl;
+    @apply flex flex-col gap-8 flex-1 max-w-3xl overflow-hidden;
 }
 
 .openapi-column-preview {
@@ -217,13 +217,13 @@
     @apply prose-sm text-dark-4/8 mt-2 dark:text-light-3 font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
-.openapi-schema-description.openapi-markdown code {
+.openapi-schema-description.openapi-markdown pre code {
     font-weight: inherit !important;
-    @apply text-xs;
+    @apply text-xs w-fit;
 }
 
 .openapi-schema-description.openapi-markdown pre {
-    @apply w-fit;
+    @apply flex-1 truncate w-auto overflow-x-scroll;
 }
 
 .openapi-schema-example,
@@ -260,7 +260,7 @@
 }
 
 .openapi-securities-header {
-    @apply py-2 border-b border-dark/2 dark:border-light/2 mb-2;
+    @apply py-2 border-b border-dark/2 dark:border-light/2 mb-2 max-w-full flex-1;
 }
 
 .openapi-securities-header-content {
@@ -285,7 +285,7 @@
 }
 
 .openapi-parameters-header {
-    @apply py-2 border-b border-dark/2 dark:border-light/2 mb-2;
+    @apply py-2 border-b border-dark/2 dark:border-light/2 mb-2 max-w-full flex-1;
 }
 
 .openapi-parameters-header-content {
@@ -298,7 +298,7 @@
 }
 
 .openapi-requestbody-header {
-    @apply py-2 border-b border-dark/2 dark:border-light/2 mb-2;
+    @apply py-2 border-b border-dark/2 dark:border-light/2 mb-2 max-w-full flex-1;
 }
 
 .openapi-requestbody-header-content {
@@ -322,7 +322,7 @@
 }
 
 .openapi-responses-header {
-    @apply py-2 border-b border-dark/2 dark:border-light/2 mb-2;
+    @apply py-2 border-b border-dark/2 dark:border-light/2 mb-2 max-w-full flex-1;
 }
 
 .openapi-responses-body {

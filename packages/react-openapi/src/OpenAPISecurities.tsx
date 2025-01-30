@@ -29,7 +29,9 @@ export function OpenAPISecurities(props: {
                     label: key,
                     body: (
                         <>
-                            <p className="openapi-securities-label">{getLabelForType(security)}</p>
+                            <div className="openapi-securities-label">
+                                {getLabelForType(security)}
+                            </div>
                             {security.description ? (
                                 <Markdown
                                     source={security.description}
@@ -44,7 +46,7 @@ export function OpenAPISecurities(props: {
     );
 }
 
-function getLabelForType(security: OpenAPIV3_1.SecuritySchemeObject): string {
+function getLabelForType(security: OpenAPIV3_1.SecuritySchemeObject) {
     switch (security.type) {
         case 'apiKey':
             return (
