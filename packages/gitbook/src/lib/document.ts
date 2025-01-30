@@ -4,7 +4,6 @@ import type {
     DocumentFragment,
     JSONDocument,
     DocumentBlock,
-    ContentRef,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 

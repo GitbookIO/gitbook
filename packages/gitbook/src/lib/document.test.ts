@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 
-import { getBlockTitle, isNodeEmpty } from './document-util';
+import { getBlockTitle, isNodeEmpty } from './document';
 
 describe('isNodeEmpty', () => {
     it('should return true for a document with an empty paragraph', () => {

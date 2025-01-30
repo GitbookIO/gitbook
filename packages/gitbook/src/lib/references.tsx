@@ -27,7 +27,7 @@ import {
     ignoreAPIError,
     parseSpacesFromSiteSpaces,
 } from './api';
-import { getBlockById, getBlockTitle } from './document-util';
+import { getBlockById, getBlockTitle } from './document';
 import { getGitbookAppHref, getPageHref, PageHrefContext } from './links';
 import { getPagePath, resolvePageId } from './pages';
 import { ClassValue } from './tailwind';

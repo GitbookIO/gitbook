@@ -1,6 +1,6 @@
 import { DocumentBlockCode } from '@gitbook/api';
 
-import { getNodeText } from '@/lib/document-util';
+import { getNodeText } from '@/lib/document';
 
 import type { HighlightLine, HighlightToken, RichInlineIndexed } from './highlight';
 

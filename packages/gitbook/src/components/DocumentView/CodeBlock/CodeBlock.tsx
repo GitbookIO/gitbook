@@ -1,6 +1,6 @@
 import type { DocumentBlockCode } from '@gitbook/api';
 
-import { getNodeFragmentByType } from '@/lib/document-util';
+import { getNodeFragmentByType } from '@/lib/document';
 
 import { BlockProps } from '../Block';
 import { ClientCodeBlock } from './ClientCodeBlock';

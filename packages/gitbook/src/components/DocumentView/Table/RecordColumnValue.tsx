@@ -10,7 +10,7 @@ import assertNever from 'assert-never';
 import { Checkbox } from '@/components/primitives';
 import { StyledLink } from '@/components/primitives';
 import { Image } from '@/components/utils';
-import { getNodeFragmentByName } from '@/lib/document-util';
+import { getNodeFragmentByName } from '@/lib/document';
 import { getSimplifiedContentType } from '@/lib/files';
 import { tcls } from '@/lib/tailwind';
 import { filterOutNullable } from '@/lib/typescript';

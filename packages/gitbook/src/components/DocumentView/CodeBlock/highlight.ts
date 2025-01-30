@@ -9,7 +9,7 @@ import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
 import { BundledLanguage, bundledLanguages } from 'shiki/langs';
 
 import { asyncMutexFunction, singleton } from '@/lib/async';
-import { getNodeText } from '@/lib/document-util';
+import { getNodeText } from '@/lib/document';
 import { trace } from '@/lib/tracing';
 
 import { plainHighlight } from './plain-highlight';

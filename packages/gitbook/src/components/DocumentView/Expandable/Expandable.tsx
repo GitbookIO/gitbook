@@ -1,7 +1,7 @@
 import { DocumentBlockExpandable } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 
-import { getNodeFragmentByType } from '@/lib/document-util';
+import { getNodeFragmentByType } from '@/lib/document';
 import { tcls } from '@/lib/tailwind';
 
 import { Details } from './Details';

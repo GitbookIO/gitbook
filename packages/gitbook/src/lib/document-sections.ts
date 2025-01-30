@@ -1,6 +1,6 @@
 import { JSONDocument, ContentRef } from '@gitbook/api';
 
-import { getNodeText } from './document-util';
+import { getNodeText } from './document';
 import { fetchOpenAPIBlock } from './openapi';
 import { ResolvedContentRef } from './references';
 

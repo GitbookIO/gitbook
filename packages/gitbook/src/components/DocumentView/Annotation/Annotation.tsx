@@ -1,6 +1,6 @@
 import { DocumentInlineAnnotation } from '@gitbook/api';
 
-import { getNodeFragmentByType } from '@/lib/document-util';
+import { getNodeFragmentByType } from '@/lib/document';
 
 import { AnnotationPopover } from './AnnotationPopover';
 import { Blocks } from '../Blocks';
