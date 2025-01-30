@@ -17,6 +17,7 @@
         "dev": "turbo run dev --ui=stream",
         "build": "turbo run build",
         "build:cloudflare": "turbo run build:cloudflare",
+        "clean-deps": "rm -rf node_modules && rm -rf packages/*/node_modules",
         "lint": "turbo run lint",
         "lint:fix": "turbo run lint -- --fix",
         "typecheck": "turbo run typecheck",
