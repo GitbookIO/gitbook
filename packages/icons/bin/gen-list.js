@@ -1,5 +1,4 @@
 import fs from 'fs/promises';
-import { existsSync } from 'fs';
 import path from 'path';
 import url from 'url';
 
