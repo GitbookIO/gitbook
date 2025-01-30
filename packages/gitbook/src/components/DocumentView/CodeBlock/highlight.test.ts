@@ -1,18 +1,9 @@
-import type { DocumentBlockCode } from '@gitbook/api';
 import { it, expect } from 'bun:test';
 
-import { getInlines, highlight, RenderedInline } from './highlight';
-
-async function highlightWithInlines(block: DocumentBlockCode) {
-    const inlines: RenderedInline[] = getInlines(block).map((inline) => ({
-        inline,
-        body: null,
-    }));
-    return highlight(block, inlines);
-}
+import { highlight } from './highlight';
 
 it('should parse plain code', async () => {
-    const tokens = await highlightWithInlines({
+    const tokens = await highlight({
         object: 'block',
         type: 'code',
         data: {},
@@ -47,35 +38,32 @@ it('should parse plain code', async () => {
 it('should parse different code in parallel', async () => {
     await Promise.all(
         ['shell', 'scss', 'markdown', 'less', 'scss', 'css', 'scss', 'yaml'].map(async (syntax) =>
-            highlight(
-                {
-                    object: 'block',
-                    type: 'code',
-                    data: {
-                        syntax: syntax,
-                    },
-                    nodes: [
-                        {
-                            object: 'block',
-                            type: 'code-line',
-                            data: {},
-                            nodes: [
-                                {
-                                    object: 'text',
-                                    leaves: [{ object: 'leaf', marks: [], text: 'Hello world' }],
-                                },
-                            ],
-                        },
-                    ],
+            highlight({
+                object: 'block',
+                type: 'code',
+                data: {
+                    syntax: syntax,
                 },
-                [],
-            ),
+                nodes: [
+                    {
+                        object: 'block',
+                        type: 'code-line',
+                        data: {},
+                        nodes: [
+                            {
+                                object: 'text',
+                                leaves: [{ object: 'leaf', marks: [], text: 'Hello world' }],
+                            },
+                        ],
+                    },
+                ],
+            }),
         ),
     );
 });
 
 it('should parse a multilines plain code', async () => {
-    const tokens = await highlightWithInlines({
+    const tokens = await highlight({
         object: 'block',
         type: 'code',
         data: {},
@@ -150,7 +138,7 @@ it('should parse a multilines plain code', async () => {
 });
 
 it('should parse code with an inline on a single line', async () => {
-    const tokens = await highlightWithInlines({
+    const tokens = await highlight({
         object: 'block',
         type: 'code',
         data: {
@@ -204,8 +192,10 @@ it('should parse code with an inline on a single line', async () => {
                     },
                 },
                 {
-                    type: 'annotation',
-                    body: null,
+                    type: 'inline',
+                    inline: {
+                        type: 'annotation',
+                    },
                     children: [
                         {
                             type: 'shiki',
@@ -239,7 +229,7 @@ it('should parse code with an inline on a single line', async () => {
 });
 
 it('should parse code with an inline on a multiple line', async () => {
-    const tokens = await highlightWithInlines({
+    const tokens = await highlight({
         object: 'block',
         type: 'code',
         data: {
@@ -320,8 +310,10 @@ it('should parse code with an inline on a multiple line', async () => {
                     },
                 },
                 {
-                    type: 'annotation',
-                    body: null,
+                    type: 'inline',
+                    inline: {
+                        type: 'annotation',
+                    },
                     children: [
                         {
                             type: 'shiki',
@@ -355,8 +347,10 @@ it('should parse code with an inline on a multiple line', async () => {
                     },
                 },
                 {
-                    type: 'annotation',
-                    body: null,
+                    type: 'inline',
+                    inline: {
+                        type: 'annotation',
+                    },
                     children: [
                         {
                             type: 'shiki',
@@ -390,7 +384,7 @@ it('should parse code with an inline on a multiple line', async () => {
 });
 
 it('should support code token finishing before the end of the annotation', async () => {
-    const tokens = await highlightWithInlines({
+    const tokens = await highlight({
         object: 'block',
         type: 'code',
         isVoid: false,
@@ -476,8 +470,10 @@ it('should support code token finishing before the end of the annotation', async
                     },
                 },
                 {
-                    type: 'annotation',
-                    body: null,
+                    type: 'inline',
+                    inline: {
+                        type: 'annotation',
+                    },
                     children: [
                         {
                             type: 'shiki',
@@ -511,7 +507,7 @@ it('should support code token finishing before the end of the annotation', async
 });
 
 it('should support multiple code tokens in an annotation', async () => {
-    const tokens = await highlightWithInlines({
+    const tokens = await highlight({
         object: 'block',
         type: 'code',
         isVoid: false,
@@ -619,8 +615,11 @@ it('should support multiple code tokens in an annotation', async () => {
                     },
                 },
                 {
-                    type: 'annotation',
-                    body: null,
+                    type: 'inline',
+                    inline: {
+                        object: 'inline',
+                        type: 'annotation',
+                    },
                     children: [
                         {
                             type: 'shiki',
@@ -654,7 +653,7 @@ it('should support multiple code tokens in an annotation', async () => {
 });
 
 it('should handle \\r', async () => {
-    const tokens = await highlightWithInlines({
+    const tokens = await highlight({
         object: 'block',
         type: 'code',
         data: {

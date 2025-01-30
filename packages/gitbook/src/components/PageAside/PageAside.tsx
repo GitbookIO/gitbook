@@ -13,7 +13,7 @@ import React from 'react';
 import urlJoin from 'url-join';
 
 import { t, getSpaceLanguage } from '@/intl/server';
-import { getDocumentSections } from '@/lib/document-sections';
+import { getDocumentSections } from '@/lib/document';
 import { getAbsoluteHref } from '@/lib/links';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';

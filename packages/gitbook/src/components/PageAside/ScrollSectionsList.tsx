@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import React from 'react';
 
 import { useScrollActiveId } from '@/components/hooks';
-import type { DocumentSection } from '@/lib/document-sections';
+import { DocumentSection } from '@/lib/document';
 import { tcls } from '@/lib/tailwind';
 
 import { AsideSectionHighlight } from './AsideSectionHighlight';
