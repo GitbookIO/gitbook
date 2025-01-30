@@ -111,14 +111,11 @@ export function TableOfContents(props: {
 
                         'overflow-y-auto',
                         'lg:gutter-stable',
-                        // 'group-hover:[&::-webkit-scrollbar]:bg-dark/1',
-                        // 'group-hover:[&::-webkit-scrollbar-thumb]:bg-dark/3',
-                        // '[&::-webkit-scrollbar]:bg-transparent',
-                        // '[&::-webkit-scrollbar-thumb]:bg-transparent',
-                        // 'dark:[&::-webkit-scrollbar]:bg-transparent',
-                        // 'dark:[&::-webkit-scrollbar-thumb]:bg-transparent',
-                        // 'dark:group-hover:[&::-webkit-scrollbar]:bg-light/1',
-                        // 'dark:group-hover:[&::-webkit-scrollbar-thumb]:bg-light/3',
+                        '[&::-webkit-scrollbar]:bg-transparent',
+                        '[&::-webkit-scrollbar-thumb]:bg-transparent',
+                        'group-hover:[&::-webkit-scrollbar]:bg-tint-subtle',
+                        'group-hover:[&::-webkit-scrollbar-thumb]:bg-tint-7',
+                        'group-hover:[&::-webkit-scrollbar-thumb:hover]:bg-tint-8',
                     )}
                 >
                     <PagesList

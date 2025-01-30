@@ -68,26 +68,13 @@
     }
 
     ::-webkit-scrollbar-thumb {
-        @apply bg-tint;
+        @apply bg-tint-7;
         border-radius: 8px;
     }
 
     ::-webkit-scrollbar-thumb:hover {
-        @apply bg-tint-hover;
+        @apply bg-tint-8;
     }
-
-    /*  Inverted theme light mode */
-    /* .inverted-theme-scroll::-webkit-scrollbar {
-        @apply bg-transparent;
-    }
-
-    .inverted-theme-scroll::-webkit-scrollbar-thumb {
-        @apply bg-dark/5;
-    }
-
-    .inverted-theme-scroll::-webkit-scrollbar-thumb:hover {
-        @apply bg-dark/6;
-    } */
 
     .flip-heading-hash {
         @apply [&:is(h1,h2,h3,h4)]:content-start;

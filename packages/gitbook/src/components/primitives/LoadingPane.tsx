@@ -84,17 +84,6 @@ export const LoadingPane = (props: {
                         gridStyle,
                     )}
                 ></div>
-                {/*                 <div
-                    className={tcls(
-                        'w-full',
-                        'h-[inherit]',
-                        'grid-area-1-1',
-                        'bg-light',
-                        'dark:bg-dark',
-                        '[mask-position:50%_0%]',
-                        tileStyle,
-                    )}
-                ></div> */}
             </div>
         </div>
     );
