@@ -6,8 +6,8 @@ import { CopyCodeButton } from './CopyCodeButton';
 import type { HighlightLine, HighlightToken } from './highlight';
 import { AnnotationPopover } from '../Annotation/AnnotationPopover';
 import { BlockProps } from '../Block';
-
 import './theme.css';
+import './CodeBlockRenderer.css';
 
 type CodeBlockRendererProps = Pick<
     BlockProps<DocumentBlockCode>,
@@ -34,17 +34,8 @@ export function ClientCodeBlockRenderer(props: CodeBlockRendererProps) {
     ];
 
     return (
-        <div className={tcls('group/codeblock', 'grid', 'grid-flow-col', style)}>
-            <div
-                className={tcls(
-                    'flex',
-                    'items-center',
-                    'justify-start',
-                    '[grid-area:1/1]',
-                    'text-sm',
-                    'gap-2',
-                )}
-            >
+        <div className={tcls('group/codeblock grid grid-flow-col', style)}>
+            <div className="flex items-center justify-start [grid-area:1/1] text-sm gap-2">
                 {title ? (
                     <div
                         className={tcls(
@@ -150,82 +141,14 @@ function CodeHighlightLine(props: {
 }) {
     const { document, line, isLast, withLineNumbers } = props;
     return (
-        <span
-            className={tcls(
-                'grid',
-                '[grid-template-columns:subgrid]',
-                'col-span-2',
-                'relative',
-                'ring-1',
-                'ring-transparent',
-                'hover:ring-dark-4/5',
-                'hover:z-[1]',
-                'dark:hover:ring-light-4/4',
-                'rounded',
-                //first child
-                '[&.highlighted:first-child]:rounded-t-md',
-                '[&.highlighted:first-child>*]:mt-1',
-                //last child
-                '[&.highlighted:last-child]:rounded-b-md',
-                '[&.highlighted:last-child>*]:mb-1',
-                //is only child, dont hover effect line
-                '[&:only-child]:hover:ring-transparent',
-                //select all highlighted
-                '[&.highlighted]:rounded-none',
-                //select first in group
-                '[&:not(.highlighted)_+_.highlighted]:rounded-t-md',
-                '[&:not(.highlighted)_+_.highlighted>*]:mt-1',
-                //select last in group
-                '[&.highlighted:has(+:not(.highlighted))]:rounded-b-md',
-                '[&.highlighted:has(+:not(.highlighted))>*]:mb-1',
-                //select if highlight is singular in group
-                '[&:not(.highlighted)_+_.highlighted:has(+:not(.highlighted))]:rounded-md',
-
-                line.highlighted ? ['highlighted', 'bg-light-3', 'dark:bg-dark-3'] : null,
-            )}
-        >
+        <span className={tcls('highlight-line', line.highlighted && 'highlighted')}>
             {withLineNumbers ? (
                 <span
-                    className={tcls(
-                        'text-sm',
-                        'text-right',
-                        'pr-3.5',
-                        'rounded-l',
-                        'pl-2',
-                        'sticky',
-                        'left-[-3px]',
-                        'bg-gradient-to-r',
-                        'from-80%',
-                        'from-light-2',
-                        'to-transparent',
-                        'dark:from-dark-2',
-                        'dark:to-transparent',
-                        withLineNumbers
-                            ? [
-                                  'before:text-dark/5',
-                                  'before:content-[counter(line)]',
-                                  '[counter-increment:line]',
-                                  'dark:before:text-light/4',
-
-                                  line.highlighted
-                                      ? [
-                                            'before:text-dark/6',
-                                            'dark:before:text-light/8',
-                                            'bg-gradient-to-r',
-                                            'from-80%',
-                                            'from-light-3',
-                                            'to-transparent',
-                                            'dark:from-dark-3',
-                                            'dark:to-transparent',
-                                        ]
-                                      : null,
-                              ]
-                            : [],
-                    )}
+                    className={tcls('highlight-line-number', line.highlighted && 'highlighted')}
                 ></span>
             ) : null}
 
-            <span className={tcls('ml-3', 'block', 'text-sm')}>
+            <span className="highlight-line-content">
                 <CodeHighlightTokens tokens={line.tokens} document={document} />
                 {isLast ? null : !withLineNumbers && line.tokens.length === 0 && 0 ? (
                     <span className="ew">{'\u200B'}</span>
