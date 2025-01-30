@@ -12,8 +12,6 @@ import { asyncMutexFunction, singleton } from '@/lib/async';
 import { getNodeText } from '@/lib/document';
 import { trace } from '@/lib/tracing';
 
-import { plainHighlight } from './plain-highlight';
-
 export type HighlightLine = {
     highlighted: boolean;
     tokens: HighlightToken[];
@@ -22,31 +20,28 @@ export type HighlightLine = {
 export type HighlightToken =
     | { type: 'plain'; content: string }
     | { type: 'shiki'; token: ThemedToken }
-    | { type: 'annotation'; body: React.ReactNode; children: HighlightToken[] };
+    | { type: 'inline'; inline: DocumentInlineAnnotation; children: HighlightToken[] };
 
-export type InlineIndexed = { inline: any; start: number; end: number };
+type InlineIndexed = { inline: any; start: number; end: number };
 
 type PositionedToken = ThemedToken & { start: number; end: number };
-
-export type RenderedInline = {
-    inline: InlineIndexed;
-    body: React.ReactNode;
-};
 
 /**
  * Highlight a code block while preserving inline elements.
  */
-export async function highlight(
-    block: DocumentBlockCode,
-    inlines: RenderedInline[],
-): Promise<HighlightLine[]> {
+export async function highlight(block: DocumentBlockCode): Promise<HighlightLine[]> {
     const langName = block.data.syntax ? getLanguageForSyntax(block.data.syntax) : null;
     if (!langName) {
         // Language not found, fallback to plain highlighting
-        return plainHighlight(block, inlines);
+        return plainHighlighting(block);
     }
 
-    const code = getPlainCodeBlock(block);
+    const inlines: InlineIndexed[] = [];
+    const code = getPlainCodeBlock(block, inlines);
+
+    inlines.sort((a, b) => {
+        return a.start - b.start;
+    });
 
     const highlighter = await loadHighlighter();
     await loadHighlighterLanguage(highlighter, langName);
@@ -121,25 +116,10 @@ function getLanguageForSyntax(syntax: string): BundledLanguage | null {
     return null;
 }
 
-export function getInlines(block: DocumentBlockCode) {
-    const inlines: InlineIndexed[] = [];
-    getPlainCodeBlock(block, inlines);
-
-    inlines.sort((a, b) => {
-        return a.start - b.start;
-    });
-
-    return inlines;
-}
-
 /**
  * Parse a code block without highlighting it.
  */
-export function plainHighlighting(
-    block: DocumentBlockCode,
-    inlines?: RenderedInline[],
-): HighlightLine[] {
-    const inlinesCopy = Array.from(inlines ?? []);
+export function plainHighlighting(block: DocumentBlockCode): HighlightLine[] {
     return block.nodes.map((lineBlock) => {
         const tokens: HighlightToken[] = [];
 
@@ -150,10 +130,9 @@ export function plainHighlighting(
                     content: getNodeText(node),
                 });
             } else {
-                const inline = inlinesCopy.shift();
                 tokens.push({
-                    type: 'annotation',
-                    body: inline?.body ?? null,
+                    type: 'inline',
+                    inline: node,
                     children: [
                         {
                             type: 'plain',
@@ -173,7 +152,7 @@ export function plainHighlighting(
 
 function matchTokenAndInlines(
     eat: () => PositionedToken | null,
-    allInlines: RenderedInline[],
+    allInlines: InlineIndexed[],
 ): HighlightToken[] {
     const initialToken = eat();
     if (!initialToken) {
@@ -181,7 +160,7 @@ function matchTokenAndInlines(
     }
 
     const inlines = allInlines.filter(
-        ({ inline }) => inline.start >= initialToken.start && inline.start < initialToken.end,
+        (inline) => inline.start >= initialToken.start && inline.start < initialToken.end,
     );
     let token = initialToken;
     const result: HighlightToken[] = [];
@@ -197,7 +176,7 @@ function matchTokenAndInlines(
             return;
         }
 
-        const [before, afterBefore] = splitPositionedTokenAt(token, inline.inline.start);
+        const [before, afterBefore] = splitPositionedTokenAt(token, inline.start);
         if (before) {
             result.push({
                 type: 'shiki',
@@ -212,7 +191,7 @@ function matchTokenAndInlines(
         const children: HighlightToken[] = [];
 
         // If shiki token finished before the end of the annotation or the annotation contains multiple tokens
-        while (token.end < inline.inline.end) {
+        while (token.end < inline.end) {
             children.push({
                 type: 'shiki',
                 token: token,
@@ -225,7 +204,7 @@ function matchTokenAndInlines(
             token = next;
         }
 
-        const [inside, after] = splitPositionedTokenAt(token, inline.inline.end);
+        const [inside, after] = splitPositionedTokenAt(token, inline.end);
         if (!inside) {
             throw new Error(`expect inside to not be empty`);
         }
@@ -236,8 +215,8 @@ function matchTokenAndInlines(
         });
 
         result.push({
-            type: 'annotation',
-            body: inline.body,
+            type: 'inline',
+            inline: inline.inline,
             children,
         });
 
@@ -251,11 +230,11 @@ function matchTokenAndInlines(
     return result;
 }
 
-function getPlainCodeBlock(code: DocumentBlockCode, inlines?: InlineIndexed[]): string {
+function getPlainCodeBlock(code: DocumentBlockCode, inlines: InlineIndexed[]): string {
     let content = '';
 
     code.nodes.forEach((node, index) => {
-        const lineContent = getPlainCodeBlockLine(node, content.length, inlines);
+        const lineContent = getPlainCodeBlockLine(node, inlines, content.length);
         content += lineContent;
 
         if (index < code.nodes.length - 1) {
@@ -268,8 +247,8 @@ function getPlainCodeBlock(code: DocumentBlockCode, inlines?: InlineIndexed[]): 
 
 function getPlainCodeBlockLine(
     parent: DocumentBlockCodeLine | DocumentInlineAnnotation,
+    inlines: InlineIndexed[],
     index: number,
-    inlines?: InlineIndexed[],
 ): string {
     let content = '';
 
@@ -278,16 +257,14 @@ function getPlainCodeBlockLine(
             content += cleanupLine(node.leaves.map((leaf) => leaf.text).join(''));
         } else {
             const start = index + content.length;
-            content += getPlainCodeBlockLine(node, index + content.length, inlines);
+            content += getPlainCodeBlockLine(node, inlines, index + content.length);
             const end = index + content.length;
 
-            if (inlines) {
-                inlines.push({
-                    inline: node,
-                    start,
-                    end,
-                });
-            }
+            inlines.push({
+                inline: node,
+                start,
+                end,
+            });
         }
     }
 
@@ -364,8 +341,7 @@ const loadHighlighter = singleton(async () => {
 });
 
 const loadLanguagesMutex = asyncMutexFunction();
-
-const loadHighlighterLanguage = async function loadHighlighterLanguage(
+async function loadHighlighterLanguage(
     highlighter: HighlighterGeneric<any, any>,
     lang: keyof typeof bundledLanguages,
 ) {
@@ -379,4 +355,4 @@ const loadHighlighterLanguage = async function loadHighlighterLanguage(
             async () => await highlighter.loadLanguage(lang),
         );
     });
-};
+}
