@@ -5,17 +5,10 @@ import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { unified } from 'unified';
 
-const cache: Record<string, Promise<string>> = {};
-
 /**
  * Parse markdown and output HTML.
  */
 export async function parseMarkdown(markdown: string): Promise<string> {
-    // @ts-expect-error no-index-check
-    if (cache[markdown]) {
-        return cache[markdown];
-    }
-
     const promise = unified()
         .use(remarkParse)
         .use(remarkGfm)
@@ -25,6 +18,5 @@ export async function parseMarkdown(markdown: string): Promise<string> {
         .process(markdown)
         .then((file) => file.toString());
 
-    cache[markdown] = promise;
     return promise;
 }
