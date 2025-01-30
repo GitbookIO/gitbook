@@ -53,7 +53,8 @@ export function PlainCodeBlock(props: { code: string; syntax: string }) {
             }}
             block={block}
             ancestorBlocks={[]}
-            isEstimatedOffscreen={false}
+            // We optimize perf by default
+            isEstimatedOffscreen
         />
     );
 }

@@ -1,15 +1,11 @@
-import {
+import type {
     DocumentText,
     DocumentInline,
     DocumentFragment,
     JSONDocument,
     DocumentBlock,
-    ContentRef,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
-
-import { fetchOpenAPIBlock } from './openapi';
-import { ResolvedContentRef } from './references';
 
 export interface DocumentSection {
     id: string;
@@ -32,47 +28,6 @@ export function hasFullWidthBlock(document: JSONDocument): boolean {
     }
 
     return false;
-}
-
-/**
- * Extract a list of sections from a document.
- */
-export async function getDocumentSections(
-    document: JSONDocument,
-    resolveContentRef: (ref: ContentRef) => Promise<ResolvedContentRef | null>,
-): Promise<DocumentSection[]> {
-    const sections: DocumentSection[] = [];
-    let depth = 0;
-
-    for (const block of document.nodes) {
-        if ((block.type === 'heading-1' || block.type === 'heading-2') && block.meta?.id) {
-            if (block.type === 'heading-1') {
-                depth = 1;
-            }
-            const title = getNodeText(block);
-            const id = block.meta.id;
-
-            sections.push({
-                id,
-                title,
-                depth: block.type === 'heading-1' ? 1 : depth > 0 ? 2 : 1,
-            });
-        }
-
-        if (block.type === 'swagger' && block.meta?.id) {
-            const { data: operation } = await fetchOpenAPIBlock(block, resolveContentRef);
-            if (operation) {
-                sections.push({
-                    id: block.meta.id,
-                    tag: operation.method.toUpperCase(),
-                    title: operation.operation.summary ?? operation.path,
-                    depth: 1,
-                });
-            }
-        }
-    }
-
-    return sections;
 }
 
 /**
