@@ -1,29 +1,22 @@
 .highlight-line {
     @apply grid [grid-template-columns:subgrid] col-span-2 relative ring-1 ring-transparent hover:ring-dark-4/5 hover:z-[1] dark:hover:ring-light-4/4 rounded;
-    /* is only child, dont hover effect line */
     @apply only:hover:ring-transparent;
 
     &.highlighted {
         @apply bg-light-3 dark:bg-dark-3;
-        /* first child */
         @apply first:rounded-t-md *:first:mt-1;
-        /* last child */
-        @apply last:rounded-b-md *:first:mb-1;
-        /* select all highlighted */
+        @apply last:rounded-b-md *:last:mb-1;
         @apply rounded-none;
     }
 
-    /* select first in group */
-    &.highlighted + .highlighted {
+    &:not(.highlighted) + .highlighted {
         @apply rounded-t-md *:mt-1;
     }
 
-    /* select last in group */
     &.highlighted:has(+ :not(.highlighted)) {
-        @apply rounded-b-md *:mt-1;
+        @apply rounded-b-md *:mb-1;
     }
 
-    /* select if highlight is singular in group */
     &:not(.highlighted) + .highlighted:has(+ :not(.highlighted)) {
         @apply rounded-md;
     }
