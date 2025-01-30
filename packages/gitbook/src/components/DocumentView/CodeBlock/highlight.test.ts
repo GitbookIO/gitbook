@@ -1,11 +1,11 @@
 import type { DocumentBlockCode } from '@gitbook/api';
 import { it, expect } from 'bun:test';
 
-import { getInlines, highlight } from './highlight';
+import { getInlines, highlight, RenderedInline } from './highlight';
 
 async function highlightWithInlines(block: DocumentBlockCode) {
-    const inlines = getInlines(block).map((inline, index) => ({
-        ...inline,
+    const inlines: RenderedInline[] = getInlines(block).map((inline) => ({
+        inline,
         body: null,
     }));
     return highlight(block, inlines);
