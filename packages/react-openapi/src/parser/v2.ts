@@ -13,11 +13,12 @@ import { AnyApiDefinitionFormat } from '@scalar/openapi-parser';
 export async function convertOpenAPIV2ToOpenAPIV3(input: {
     value: AnyApiDefinitionFormat;
     url: string;
+    parseMarkdown: (input: string) => Promise<string>;
 }): Promise<
     | OpenAPIV3_1.Document<OpenAPICustomSpecProperties>
     | OpenAPIV3.Document<OpenAPICustomSpecProperties>
 > {
-    const { value, url } = input;
+    const { value, url, parseMarkdown } = input;
     // In this case we want the raw value to be able to convert it.
     const schema = typeof value === 'string' ? rawParseOpenAPI({ value, url }) : value;
     try {
@@ -33,7 +34,7 @@ export async function convertOpenAPIV2ToOpenAPIV3(input: {
             patch: true,
         })) as ConvertOutputOptions;
 
-        return parseOpenAPIV3({ url, value: convertResult.openapi });
+        return parseOpenAPIV3({ url, value: convertResult.openapi, parseMarkdown });
     } catch (error) {
         if (error instanceof Error && error.name === 'S2OError') {
             throw new OpenAPIParseError(

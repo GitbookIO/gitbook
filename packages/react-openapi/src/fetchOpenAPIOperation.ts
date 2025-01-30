@@ -3,8 +3,7 @@ import { toJSON, fromJSON } from 'flatted';
 import { OpenAPICustomSpecProperties } from './parser';
 import { OpenAPIV3, OpenAPIV3_1 } from '@scalar/openapi-types';
 import { noReference } from './utils';
-import { traverse } from './parser/traverse';
-import { AnyObject } from '@scalar/openapi-parser';
+import { parseDescriptions } from './parser/markdown';
 
 export interface OpenAPIFetcher {
     /**
@@ -16,11 +15,6 @@ export interface OpenAPIFetcher {
         | OpenAPIV3_1.Document<OpenAPICustomSpecProperties>
         | OpenAPIV3.Document<OpenAPICustomSpecProperties>
     >;
-
-    /**
-     * Parse markdown to the react element to render.
-     */
-    parseMarkdown?: (input: string) => Promise<string>;
 }
 
 export interface OpenAPIOperationData extends OpenAPICustomSpecProperties {
@@ -48,22 +42,14 @@ export async function fetchOpenAPIOperation(
         path: string;
         method: string;
     },
-    rawFetcher: OpenAPIFetcher,
+    fetcher: OpenAPIFetcher,
 ): Promise<OpenAPIOperationData | null> {
-    const fetcher = cacheFetcher(rawFetcher);
-
     const schema = await fetcher.fetch(input.url);
 
     let operation = getOperationByPathAndMethod(schema, input.path, input.method);
 
     if (!operation) {
         return null;
-    }
-
-    // Parse description in markdown
-    const { parseMarkdown } = fetcher;
-    if (parseMarkdown) {
-        operation = await parseDescriptions(operation, parseMarkdown);
     }
 
     // Resolve common parameters
@@ -101,31 +87,6 @@ export async function fetchOpenAPIOperation(
                 ? schema['x-hideTryItPanel']
                 : undefined,
     };
-}
-
-async function parseDescriptions<T extends AnyObject>(
-    spec: T,
-    parseMarkdown: (input: string) => Promise<string>,
-): Promise<T> {
-    const promises: Record<string, Promise<string>> = {};
-    const results: Record<string, string> = {};
-    traverse(spec, (obj) => {
-        if ('description' in obj && typeof obj.description === 'string') {
-            promises[obj.description] = parseMarkdown(obj.description);
-        }
-        return obj;
-    });
-    await Promise.all(
-        Object.entries(promises).map(async ([key, promise]) => {
-            results[key] = await promise;
-        }),
-    );
-    return traverse(spec, (obj) => {
-        if ('description' in obj && typeof obj.description === 'string') {
-            obj.description = results[obj.description];
-        }
-        return obj;
-    }) as T;
 }
 
 /**
@@ -175,21 +136,4 @@ function getOperationByPathAndMethod(
         return null;
     }
     return pathObject[normalizedMethod];
-}
-
-function cacheFetcher(fetcher: OpenAPIFetcher): OpenAPIFetcher {
-    const cache = new Map<string, Promise<any>>();
-
-    return {
-        async fetch(url) {
-            if (cache.has(url)) {
-                return cache.get(url);
-            }
-
-            const promise = fetcher.fetch(url);
-            cache.set(url, promise);
-            return promise;
-        },
-        parseMarkdown: fetcher.parseMarkdown,
-    };
 }

@@ -17,12 +17,10 @@ import './scalar.css';
  * Render an OpenAPI block.
  */
 export async function OpenAPI(props: BlockProps<DocumentBlockOpenAPI>) {
-    const { block, style } = props;
+    const { style } = props;
     return (
         <div className={tcls('w-full', 'flex', 'flex-row', style, 'max-w-full')}>
-            <React.Suspense fallback={<OpenAPIFallback />}>
-                <OpenAPIBody {...props} />
-            </React.Suspense>
+            <OpenAPIBody {...props} />
         </div>
     );
 }
