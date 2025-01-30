@@ -222,7 +222,7 @@
     @apply text-xs max-w-full overflow-x-scroll !py-0;
 }
 
-.openapi-schema-description.openapi-markdown pre {
+.openapi-schema-description.openapi-markdown pre:has(code) {
     @apply flex-1 truncate overflow-hidden flex flex-row w-fit h-fit items-center;
 }
 
@@ -389,6 +389,10 @@
 }
 
 .openapi-response-example-header {
+    @apply flex-1 w-full;
+}
+.openapi-response-example-header-content {
+    @apply flex-1 w-full;
 }
 
 .openapi-response-example-title {
@@ -447,7 +451,7 @@
 }
 
 .openapi-operation .react-aria-TabList {
-    @apply flex flex-row gap-3 py-2 px-3 border-b border-dark/2 dark:border-light/2;
+    @apply flex flex-row gap-3 py-2 px-3 border-b border-dark/2 dark:border-light/2 w-full;
 }
 
 .openapi-operation .react-aria-Tab {
