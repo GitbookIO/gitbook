@@ -219,11 +219,11 @@
 
 .openapi-schema-description.openapi-markdown pre code {
     font-weight: inherit !important;
-    @apply text-xs w-fit;
+    @apply text-xs max-w-full overflow-x-scroll !py-0;
 }
 
 .openapi-schema-description.openapi-markdown pre {
-    @apply flex-1 truncate w-auto overflow-x-scroll;
+    @apply flex-1 truncate overflow-hidden flex flex-row w-fit h-fit items-center;
 }
 
 .openapi-schema-example,
@@ -411,7 +411,7 @@
 }
 
 .openapi-section-header-content {
-    @apply flex-1 text-[0.938em];
+    @apply flex-1 text-[0.938em] flex w-full overflow-hidden;
 }
 
 .openapi-section-header-controls {
