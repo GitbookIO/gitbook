@@ -7,7 +7,7 @@ import {
     OpenAPIParseError,
 } from '@gitbook/react-openapi';
 
-import { cache, parseCacheResponse, noCacheFetchOptions, CacheFunctionOptions } from '@/lib/cache';
+import { cache, noCacheFetchOptions, CacheFunctionOptions } from '@/lib/cache';
 
 import { parseMarkdown } from './markdown';
 import { ResolvedContentRef } from './references';
@@ -68,7 +68,10 @@ const fetcher: OpenAPIFetcher = {
             const text = await response.text();
             const data = await parseOpenAPI({ url, value: text, parseMarkdown });
             return {
-                ...parseCacheResponse(response),
+                // Cache for 4 hours
+                ttl: 24 * 60 * 60,
+                // Revalidate every 2 hours
+                revalidateBefore: 22 * 60 * 60,
                 data,
             };
         },
