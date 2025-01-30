@@ -137,7 +137,9 @@ export async function PageAside(props: {
             </div>
             <div
                 className={tcls(
-                    'overflow-auto',
+                    topOffset,
+                    'sticky',
+                    'overflow-y-auto',
                     'overflow-x-visible',
                     'flex-1',
                     'flex',
