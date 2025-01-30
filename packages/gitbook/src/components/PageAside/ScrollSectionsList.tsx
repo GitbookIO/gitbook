@@ -53,11 +53,11 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                         <AsideSectionHighlight
                             transition={springCurve}
                             className={tcls(
+                                'sidebar-list-default:hidden',
                                 section?.depth > 1
                                     ? [
                                           'sidebar-list-default:rounded-l-none',
                                           'sidebar-list-line:rounded-l-none',
-                                          'sidebar-list-default:border-l',
                                       ]
                                     : [
                                           'sidebar-list-default:ml-3',
@@ -112,6 +112,8 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                                 'dark:hover:text-tint-400',
 
                                 'contrast-more:font-semibold',
+
+                                'sidebar-list-default:border-tint',
 
                                 'hover:bg-tint/3',
                                 'dark:hover:bg-tint-400/3',
