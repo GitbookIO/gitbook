@@ -1,7 +1,7 @@
 import * as Popover from '@radix-ui/react-popover';
+import { SVGProps } from 'react';
 
 import { tcls } from '@/lib/tailwind';
-import { SVGProps } from 'react';
 
 export const PopoverContent = ({
     children,
