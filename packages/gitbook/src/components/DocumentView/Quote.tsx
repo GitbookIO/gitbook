@@ -12,15 +12,7 @@ export function Quote(props: BlockProps<DocumentBlockQuote>) {
             tag="blockquote"
             nodes={block.nodes}
             ancestorBlocks={[...ancestorBlocks, block]}
-            style={[
-                style,
-                'text-tint',
-                'border-l-2',
-                'pl-6',
-                'py-3',
-                'border-tint',
-                'space-y-4',
-            ]}
+            style={[style, 'text-tint', 'border-l-2', 'pl-6', 'py-3', 'border-tint', 'space-y-4']}
         />
     );
 }

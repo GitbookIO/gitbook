@@ -74,10 +74,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                     <Icon
                                         key={i}
                                         icon="star"
-                                        className={tcls(
-                                            'size-[15px]',
-                                            'text-primary/5',
-                                        )}
+                                        className={tcls('size-[15px]', 'text-primary/5')}
                                     />
                                 ))}
                             </span>

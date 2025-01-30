@@ -125,11 +125,7 @@ function NavigationCard(
             <span className={tcls('flex', 'flex-col', 'flex-1', reversed ? 'text-right' : null)}>
                 <span className={tcls('text-xs')}>{label}</span>
                 <span
-                    className={tcls(
-                        'text-tint-strong',
-                        'group-hover:text-primary',
-                        'line-clamp-2',
-                    )}
+                    className={tcls('text-tint-strong', 'group-hover:text-primary', 'line-clamp-2')}
                 >
                     {title}
                 </span>

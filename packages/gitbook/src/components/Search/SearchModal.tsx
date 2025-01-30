@@ -255,10 +255,7 @@ function SearchModalBody(
                 )}
             >
                 <div className={tcls('p-2', 'pl-4', 'pt-4')}>
-                    <Icon
-                        icon="magnifying-glass"
-                        className={tcls('size-4', 'text-tint-subtle')}
-                    />
+                    <Icon icon="magnifying-glass" className={tcls('size-4', 'text-tint-subtle')} />
                 </div>
                 <div
                     className={tcls(

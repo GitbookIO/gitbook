@@ -137,13 +137,6 @@ export function DropdownMenuItem(
     }
 
     return (
-        <div
-            className={tcls(
-                'text-xs px-3 py-1 font-medium text-tint',
-                className,
-            )}
-        >
-            {children}
-        </div>
+        <div className={tcls('text-xs px-3 py-1 font-medium text-tint', className)}>{children}</div>
     );
 }

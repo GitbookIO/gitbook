@@ -35,12 +35,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                 'hover:bg-tint-hover',
                 'group',
                 active
-                    ? [
-                          'is-active',
-                          'bg-primary',
-                          'text-contrast-primary',
-                          'hover:bg-primary-hover',
-                      ]
+                    ? ['is-active', 'bg-primary', 'text-contrast-primary', 'hover:bg-primary-hover']
                     : null,
             )}
         >

@@ -35,7 +35,7 @@ function generateVarShades(varName: string, filter: ColorCategory[] = [], old = 
             });
         }
     });
-    result['original'] = `rgb(var(--${varName}-original))`
+    result['original'] = `rgb(var(--${varName}-original))`;
 
     return result;
 }
@@ -184,19 +184,37 @@ const config: Config = {
             },
             textColor: {
                 primary: generateVarShades('primary', [ColorCategory.text]),
-                'contrast-primary': generateVarShades('contrast-primary', [ColorCategory.backgrounds, ColorCategory.accents]),
+                'contrast-primary': generateVarShades('contrast-primary', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.accents,
+                ]),
                 tint: generateVarShades('tint', [ColorCategory.text]),
-                'contrast-tint': generateVarShades('contrast-tint', [ColorCategory.backgrounds, ColorCategory.accents]),
+                'contrast-tint': generateVarShades('contrast-tint', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.accents,
+                ]),
                 neutral: generateVarShades('neutral', [ColorCategory.text]),
-                'contrast-neutral': generateVarShades('contrast-neutral', [ColorCategory.backgrounds, ColorCategory.accents]),
+                'contrast-neutral': generateVarShades('contrast-neutral', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.accents,
+                ]),
             },
             textDecorationColor: {
                 primary: generateVarShades('primary', [ColorCategory.text]),
-                'contrast-primary': generateVarShades('contrast-primary', [ColorCategory.backgrounds, ColorCategory.accents]),
+                'contrast-primary': generateVarShades('contrast-primary', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.accents,
+                ]),
                 tint: generateVarShades('tint', [ColorCategory.text]),
-                'contrast-tint': generateVarShades('contrast-tint', [ColorCategory.backgrounds, ColorCategory.accents]),
+                'contrast-tint': generateVarShades('contrast-tint', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.accents,
+                ]),
                 neutral: generateVarShades('neutral', [ColorCategory.text]),
-                'contrast-neutral': generateVarShades('contrast-neutral', [ColorCategory.backgrounds, ColorCategory.accents]),
+                'contrast-neutral': generateVarShades('contrast-neutral', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.accents,
+                ]),
             },
             animation: {
                 present: 'present .5s ease-out both',

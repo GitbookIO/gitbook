@@ -76,8 +76,7 @@ const Tab = React.forwardRef<
             className={tcls(
                 'group/tab relative px-3 py-1 my-2 rounded straight-corners:rounded-none transition-colors',
                 active && 'text-primary',
-                !active &&
-                    'text-tint hover:bg-tint-hover hover:text-tint-strong',
+                !active && 'text-tint hover:bg-tint-hover hover:text-tint-strong',
             )}
             role="tab"
             href={href}
@@ -86,9 +85,7 @@ const Tab = React.forwardRef<
                 {icon}
                 {label}
             </span>
-            {active && (
-                <span className="inset-x-3 -bottom-2 h-0.5 absolute bg-primary-11" />
-            )}
+            {active && <span className="inset-x-3 -bottom-2 h-0.5 absolute bg-primary-11" />}
         </Link>
     );
 });

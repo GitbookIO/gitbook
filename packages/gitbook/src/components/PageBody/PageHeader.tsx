@@ -50,10 +50,7 @@ export async function PageHeader(props: {
                         </StyledLink>
                     </li>
                     {index != ancestors.length - 1 && (
-                        <Icon
-                            icon="chevron-right"
-                            className={tcls('size-3', 'text-tint-subtle')}
-                        />
+                        <Icon icon="chevron-right" className={tcls('size-3', 'text-tint-subtle')} />
                     )}
                 </Fragment>
             );
@@ -73,17 +70,12 @@ export async function PageHeader(props: {
             )}
             {page.layout.title ? (
                 <h1 className={tcls('text-4xl', 'font-bold', 'flex', 'items-center', 'gap-4')}>
-                    <PageIcon
-                        page={page}
-                        style={['text-tint-subtle   ', 'shrink-0']}
-                    />
+                    <PageIcon page={page} style={['text-tint-subtle   ', 'shrink-0']} />
                     {page.title}
                 </h1>
             ) : null}
             {page.description && page.layout.description ? (
-                <p className={tcls('text-lg', 'text-tint')}>
-                    {page.description}
-                </p>
+                <p className={tcls('text-lg', 'text-tint')}>{page.description}</p>
             ) : null}
         </header>
     );

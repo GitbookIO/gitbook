@@ -32,14 +32,7 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
                         position: SiteInsightsLinkPosition.Content,
                     },
                 }}
-                className={tcls(
-                    'group/file',
-                    'flex',
-                    'flex-row',
-                    'items-center',
-                    'px-5',
-                    'py-3',
-                )}
+                className={tcls('group/file', 'flex', 'flex-row', 'items-center', 'px-5', 'py-3')}
             >
                 <div
                     className={tcls(

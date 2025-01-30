@@ -63,10 +63,7 @@ const HINT_STYLES: {
     info: {
         icon: 'circle-info',
         iconColor: ['text-primary'],
-        bodyColor: [
-            '[&_a]:text-primary',
-            '[&_a:hover]:text-primary-strong',
-        ],
+        bodyColor: ['[&_a]:text-primary', '[&_a:hover]:text-primary-strong'],
         style: [
             'bg-tint',
             'border-tint',

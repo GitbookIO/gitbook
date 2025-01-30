@@ -29,7 +29,7 @@ function ToolbarLayout(props: { children: React.ReactNode }) {
 
                 'bg-tint-12/9',
                 'dark:bg-tint-1/9',
-                
+
                 'shadow-lg',
                 'min-h-10',
                 'min-w-40',

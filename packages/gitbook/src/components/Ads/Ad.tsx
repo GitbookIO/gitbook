@@ -133,15 +133,7 @@ function AdSponsoredLink(props: { spaceId: string }) {
     viaUrl.searchParams.set('utm_campaign', spaceId);
 
     return (
-        <p
-            className={tcls(
-                'mt-2',
-                'mr-2',
-                'text-xs',
-                'text-right',
-                'text-tint-subtle',
-            )}
-        >
+        <p className={tcls('mt-2', 'mr-2', 'text-xs', 'text-right', 'text-tint-subtle')}>
             <Link
                 target="_blank"
                 href={viaUrl.toString()}

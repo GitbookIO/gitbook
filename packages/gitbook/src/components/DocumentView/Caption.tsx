@@ -62,14 +62,7 @@ export function Caption(
     return (
         <picture className={tcls('relative', style)}>
             <div className={tcls(wrapperStyle, 'mx-auto')}>{children}</div>
-            <figcaption
-                className={tcls(
-                    'text-sm',
-                    'text-center',
-                    'mt-2',
-                    'text-tint',
-                )}
-            >
+            <figcaption className={tcls('text-sm', 'text-center', 'mt-2', 'text-tint')}>
                 <Inlines
                     nodes={captionParagraph.nodes}
                     document={document}

@@ -228,12 +228,7 @@ function ZoomImageModal(props: {
                 src={src}
                 alt={alt}
                 crossOrigin={crossOrigin}
-                className={tcls(
-                    'max-w-full',
-                    'max-h-full',
-                    'object-contain',
-                    'bg-tint-base',
-                )}
+                className={tcls('max-w-full', 'max-h-full', 'object-contain', 'bg-tint-base')}
             />
 
             <button

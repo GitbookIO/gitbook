@@ -33,11 +33,7 @@ export function HeaderLinkMore(props: {
         <button
             className={tcls(
                 isCustomizationDefault
-                    ? [
-                          'text-tint',
-                          'hover:text-primary',
-                          'dark:hover:text-primary',
-                      ]
+                    ? ['text-tint', 'hover:text-primary', 'dark:hover:text-primary']
                     : ['text-header-link', 'hover:text-header-link/8'],
                 'flex',
                 'gap-1',

@@ -142,13 +142,7 @@ function AnswerBody(props: { answer: AskAnswerResult }) {
         <>
             <div
                 data-testid="search-ask-answer"
-                className={tcls(
-                    'my-4',
-                    'sm:mt-6',
-                    'px-4',
-                    'sm:px-12',
-                    'text-tint-strong',
-                )}
+                className={tcls('my-4', 'sm:mt-6', 'px-4', 'sm:px-12', 'text-tint-strong')}
             >
                 {answer.body ?? t(language, 'search_ask_no_answer')}
                 {answer.followupQuestions.length > 0 ? (
@@ -195,12 +189,7 @@ function AnswerFollowupQuestions(props: { followupQuestions: string[] }) {
                 >
                     <Icon
                         icon="magnifying-glass"
-                        className={tcls(
-                            'size-4',
-                            'shrink-0',
-                            'mr-2',
-                            'text-tint-subtle',
-                        )}
+                        className={tcls('size-4', 'shrink-0', 'mr-2', 'text-tint-subtle')}
                     />
                     <span>{question}</span>
                 </Link>
@@ -251,11 +240,7 @@ function AnswerSources(props: {
                     >
                         <Icon
                             icon="arrow-up-right"
-                            className={tcls(
-                                'text-tint-subtle',
-                                'size-4',
-                                'shrink-0',
-                            )}
+                            className={tcls('text-tint-subtle', 'size-4', 'shrink-0')}
                         />
                         {source.title}
                     </Link>
