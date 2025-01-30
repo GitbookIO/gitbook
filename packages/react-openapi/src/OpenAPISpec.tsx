@@ -37,7 +37,6 @@ export function OpenAPISpec(props: { data: OpenAPIOperationData; context: OpenAP
                     key={group.key}
                     className="openapi-parameters"
                     header={group.label}
-                    defaultOpened={group.key === 'path' || context.defaultInteractiveOpened}
                 >
                     <OpenAPISchemaProperties
                         properties={group.parameters.map((parameter) => ({

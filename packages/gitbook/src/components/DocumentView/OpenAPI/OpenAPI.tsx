@@ -51,6 +51,7 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockOpenAPI>) {
                 icons: {
                     chevronDown: <Icon icon="chevron-down" />,
                     chevronRight: <Icon icon="chevron-right" />,
+                    plus: <Icon icon="plus" />,
                 },
                 CodeBlock: PlainCodeBlock,
                 defaultInteractiveOpened: context.mode === 'print',

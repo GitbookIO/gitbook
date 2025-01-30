@@ -26,10 +26,6 @@ export function OpenAPIResponse(props: {
 
     return (
         <>
-            {response.description ? (
-                <Markdown source={response.description} className="openapi-response-description" />
-            ) : null}
-
             {headers.length > 0 ? (
                 <InteractiveSection
                     toggeable
@@ -50,22 +46,16 @@ export function OpenAPIResponse(props: {
                 </InteractiveSection>
             ) : null}
             {content.length > 0 ? (
-                <InteractiveSection
-                    header="Body"
-                    className={classNames('openapi-responsebody')}
-                    tabs={content.map(([contentType, mediaType]) => {
-                        return {
-                            key: contentType,
-                            label: contentType,
-                            body: (
-                                <OpenAPIRootSchema
-                                    schema={noReference(mediaType.schema) ?? {}}
-                                    context={context}
-                                />
-                            ),
-                        };
-                    })}
-                />
+                <div className={classNames('openapi-responsebody')}>
+                    <OpenAPISchemaProperties
+                        properties={content.map(([contentType, mediaType]) => ({
+                            propertyName: mediaType.schema?.title ?? '',
+                            schema: noReference(mediaType.schema) ?? {},
+                            required: mediaType.schema?.required,
+                        }))}
+                        context={context}
+                    />
+                </div>
             ) : null}
         </>
     );
