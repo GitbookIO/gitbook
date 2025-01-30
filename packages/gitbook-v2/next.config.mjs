@@ -5,7 +5,10 @@
  */
 const nextConfig = {
     experimental: {
-        dynamicIO: true,
+        useCache: true,
+
+        // We can't use dynamicIO because it doesn't accept reading params in the root layout
+        // dynamicIO: true,
     },
 }
    

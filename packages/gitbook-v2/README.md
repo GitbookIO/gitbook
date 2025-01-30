@@ -82,3 +82,8 @@ Development:
 
 - Vercel
 - Cloudflare with Opennext-js
+
+# Potential issues
+
+- Impossible to use route params in root layout (https://github.com/vercel/next.js/discussions/71927)
+
