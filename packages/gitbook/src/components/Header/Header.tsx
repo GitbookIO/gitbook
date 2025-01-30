@@ -48,8 +48,7 @@ export function Header(props: {
                 'flex-none',
                 'shadow-[0px_1px_0px]',
                 'shadow-tint-12/2',
-                'bg-tint-base/9', // TODO @Zeno: Fix tint display
-                'tint:bg-tint-base/9',
+                'bg-tint-base/9',
                 '[html.tint.sidebar-filled_&]:bg-tint-subtle/9',
                 'contrast-more:bg-tint-base',
                 withTopHeader ? null : 'lg:hidden',

@@ -65,6 +65,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'contrast-more:text-tint-strong',
 
                 'transition-all',
+                'hover:bg-tint-subtle',
                 'hover:shadow-md',
                 'hover:scale-102',
                 'hover:ring-tint-hover',

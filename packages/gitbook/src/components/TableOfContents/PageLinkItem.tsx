@@ -26,7 +26,7 @@ export async function PageLinkItem(props: { page: RevisionPageLink; context: Con
                     'text-sm',
                     'transition-colors',
                     'duration-100',
-                    'text-neutral',
+                    'text-tint-strong/7',
                     'rounded-md',
                     'straight-corners:rounded-none',
                     'before:content-none',

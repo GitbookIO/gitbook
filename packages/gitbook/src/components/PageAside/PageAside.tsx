@@ -183,7 +183,7 @@ export async function PageAside(props: {
                                     'flex-row',
                                     'items-center',
                                     'text-sm',
-                                    'hover:text-tint',
+                                    'hover:text-tint-strong',
                                     'py-2',
                                 )}
                             >
@@ -208,7 +208,7 @@ export async function PageAside(props: {
                                     'flex-row',
                                     'items-center',
                                     'text-sm',
-                                    'hover:text-tint',
+                                    'hover:text-tint-strong',
                                     'py-2',
                                 )}
                             >

@@ -46,6 +46,7 @@ async function FooterLink(props: { link: CustomizationContentLink; context: Cont
                 'font-normal',
                 'text-tint',
                 'hover:text-primary',
+                'tint:hover:text-tint-strong',
                 'contrast-more:underline',
                 'contrast-more:text-tint-strong',
                 'underline-offset-2',

@@ -78,7 +78,7 @@ export function TableOfContents(props: {
                 'gap-4',
 
                 'navigation-open:border-b',
-                'border-gray-subtle',
+                'border-tint-subtle',
             )}
         >
             {header && header}

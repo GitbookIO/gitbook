@@ -165,7 +165,7 @@ function getHeaderLinkClassName(props: { headerPreset: CustomizationHeaderPreset
         'contrast-more:underline',
 
         props.headerPreset === CustomizationHeaderPreset.Default
-            ? ['text-tint']
+            ? ['text-tint', 'hover:text-primary', 'tint:hover:text-tint-strong']
             : ['text-header-link'],
     );
 }

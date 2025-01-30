@@ -36,7 +36,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
     });
 
     return (
-        <ul className={tcls('sidebar-list-line:border-l', 'border-tint')}>
+        <ul className={tcls('sidebar-list-line:border-l', 'border-tint-subtle')}>
             {sections.map((section) => (
                 <motion.li
                     key={section.id}
@@ -87,7 +87,8 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                             'straight-corners:rounded-none',
                             'sidebar-list-line:rounded-l-none',
 
-                            'hover:bg-tint',
+                            'hover:bg-tint-hover',
+                            'hover:text-tint-strong',
                             'contrast-more:hover:ring-1',
                             'contrast-more:hover:ring-inset',
                             'contrast-more:hover:ring-current',
@@ -104,9 +105,10 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                             ],
 
                             activeId === section.id && [
-                                'text-tint',
-                                'hover:text-tint-strong',
-                                'hover:bg-tint-hover',
+                                'text-primary',
+                                'hover:text-primary-strong',
+                                'hover:bg-primary-hover',
+                                'tint:font-semibold',
                                 'contrast-more:font-semibold',
 
                                 'sidebar-list-default:border-tint',

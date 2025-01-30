@@ -126,7 +126,7 @@ function NavigationCard(
                 <span className={tcls('text-xs')}>{label}</span>
                 <span
                     className={tcls(
-                        'text-tint',
+                        'text-tint-strong',
                         'group-hover:text-primary',
                         'line-clamp-2',
                     )}

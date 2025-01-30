@@ -354,7 +354,7 @@
 
 /** Markdown */
 .openapi-markdown {
-    @apply prose dark:prose-invert max-w-none whitespace-normal;
+    @apply prose dark:prose-invert text-tint-strong max-w-none whitespace-normal;
 }
 
 .openapi-markdown > *:first-child {

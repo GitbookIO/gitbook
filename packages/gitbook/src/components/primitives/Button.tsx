@@ -31,11 +31,14 @@ export function Button({
                   'text-contrast-primary-solid',
                   'hover:bg-primary-solid-hover',
                   'hover:text-contrast-primary-solid-hover',
+                  'ring-primary-10',
+                  'hover:ring-primary-11',
               ]
             : // SECONDARY
               [
-                  'bg-tint-base',
+                  'bg-tint',
                   'text-tint',
+                  'hover:bg-tint-hover',
                   'hover:text-primary',
                   'contrast-more:bg-tint-subtle',
                   'contrast-more:hover:ring-primary',
@@ -57,11 +60,12 @@ export function Button({
         'place-self-start',
 
         'ring-1',
-        'ring-tint/5',
-        'hover:ring-hover',
+        'ring-tint',
+        'hover:ring-tint-hover',
 
         'shadow-sm',
-        'shadow-tint-subtle',
+        'shadow-tint',
+        'dark:shadow-tint-1',
         'hover:shadow-md',
         'active:shadow-none',
 

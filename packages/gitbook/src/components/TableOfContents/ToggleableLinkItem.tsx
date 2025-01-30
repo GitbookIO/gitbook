@@ -117,7 +117,7 @@ export function ToggleableLinkItem(
                     'text-sm',
                     'font-normal',
                     'text-balance',
-                    'text-neutral',
+                    'text-tint-strong/7',
                     'hover:text-tint-strong',
                     'hover:bg-tint-hover',
                     'contrast-more:text-tint-strong',
