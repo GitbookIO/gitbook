@@ -19,7 +19,7 @@ type CodeBlockRendererProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'sty
 /**
  * The logic of rendering a code block from lines.
  */
-export function ClientCodeBlockRenderer(props: CodeBlockRendererProps) {
+export function CodeBlockRenderer(props: CodeBlockRendererProps) {
     const { block, style, lines } = props;
 
     const id = useId();
