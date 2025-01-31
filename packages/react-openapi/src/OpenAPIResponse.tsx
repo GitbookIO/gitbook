@@ -1,6 +1,6 @@
 import * as React from 'react';
 import classNames from 'classnames';
-import { OpenAPIV3 } from 'openapi-types';
+import { OpenAPIV3 } from '@scalar/openapi-types';
 import { OpenAPIRootSchema, OpenAPISchemaProperties } from './OpenAPISchema';
 import { noReference } from './utils';
 import { OpenAPIClientContext } from './types';

@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import classNames from 'classnames';
-import { OpenAPIV3 } from 'openapi-types';
+import { OpenAPIV3 } from '@scalar/openapi-types';
 
 /**
  * Interactive component to show the value of a server variable and let the user change it.

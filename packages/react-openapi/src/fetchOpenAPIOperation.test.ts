@@ -1,12 +1,12 @@
 import { it, expect } from 'bun:test';
 
-import { fetchOpenAPIOperation, parseOpenAPIV3 } from './fetchOpenAPIOperation';
-import { OpenAPIFetcher } from './types';
+import { fetchOpenAPIOperation, OpenAPIFetcher } from './fetchOpenAPIOperation';
+import { parseOpenAPI } from './parser';
 
 const fetcher: OpenAPIFetcher = {
     fetch: async (url) => {
         const response = await fetch(url);
-        return parseOpenAPIV3(url, await response.text());
+        return parseOpenAPI({ value: await response.text(), url, parseMarkdown: async (v) => v });
     },
 };
 

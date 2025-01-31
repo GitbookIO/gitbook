@@ -1,8 +1,7 @@
 import * as React from 'react';
 import classNames from 'classnames';
-import { ApiClientModalProvider } from '@scalar/api-client-react';
 
-import { OpenAPIOperationData, toJSON } from './fetchOpenAPIOperation';
+import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { Markdown } from './Markdown';
 import { OpenAPICodeSample } from './OpenAPICodeSample';
 import { OpenAPIResponseExample } from './OpenAPIResponseExample';
@@ -28,45 +27,40 @@ export function OpenAPIOperation(props: {
     };
 
     return (
-        <ApiClientModalProvider
-            configuration={{ spec: { url: context.specUrl } }}
-            initialRequest={{ path: data.path, method: data.method }}
-        >
-            <div className={classNames('openapi-operation', className)}>
-                <div className="openapi-intro">
-                    <h2 className="openapi-summary" id={context.id}>
-                        {operation.summary}
-                    </h2>
-                    {operation.description ? (
-                        <Markdown className="openapi-description" source={operation.description} />
-                    ) : null}
-                    <div className="openapi-target">
-                        <span
-                            className={classNames(
-                                'openapi-method',
-                                `openapi-method-${method.toLowerCase()}`,
-                            )}
-                        >
-                            {method.toUpperCase()}
-                        </span>
-                        <span className="openapi-url">
-                            <OpenAPIServerURL servers={servers} />
-                            {path}
-                        </span>
-                    </div>
+        <div className={classNames('openapi-operation', className)}>
+            <div className="openapi-intro">
+                <h2 className="openapi-summary" id={context.id}>
+                    {operation.summary}
+                </h2>
+                {operation.description ? (
+                    <Markdown className="openapi-description" source={operation.description} />
+                ) : null}
+                <div className="openapi-target">
+                    <span
+                        className={classNames(
+                            'openapi-method',
+                            `openapi-method-${method.toLowerCase()}`,
+                        )}
+                    >
+                        {method.toUpperCase()}
+                    </span>
+                    <span className="openapi-url">
+                        <OpenAPIServerURL servers={servers} />
+                        {path}
+                    </span>
                 </div>
-                <div className={classNames('openapi-columns')}>
-                    <div className={classNames('openapi-column-spec')}>
-                        <OpenAPISpec rawData={toJSON(data)} context={clientContext} />
-                    </div>
-                    <div className={classNames('openapi-column-preview')}>
-                        <div className={classNames('openapi-column-preview-body')}>
-                            <OpenAPICodeSample {...props} />
-                            <OpenAPIResponseExample {...props} />
-                        </div>
+            </div>
+            <div className={classNames('openapi-columns')}>
+                <div className={classNames('openapi-column-spec')}>
+                    <OpenAPISpec data={data} context={clientContext} />
+                </div>
+                <div className={classNames('openapi-column-preview')}>
+                    <div className={classNames('openapi-column-preview-body')}>
+                        <OpenAPICodeSample {...props} />
+                        <OpenAPIResponseExample {...props} />
                     </div>
                 </div>
             </div>
-        </ApiClientModalProvider>
+        </div>
     );
 }

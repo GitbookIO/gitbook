@@ -1,10 +1,21 @@
 import { toJSON, fromJSON } from 'flatted';
-import { OpenAPIV3 } from 'openapi-types';
-import YAML from 'yaml';
-import swagger2openapi, { ConvertOutputOptions } from 'swagger2openapi';
 
-import { resolveOpenAPIPath } from './resolveOpenAPIPath';
-import { OpenAPIFetcher } from './types';
+import { OpenAPICustomSpecProperties, OpenAPIParseError } from './parser';
+import { OpenAPI, OpenAPIV3, OpenAPIV3_1 } from '@scalar/openapi-types';
+import { noReference } from './utils';
+import { dereference } from '@scalar/openapi-parser';
+
+export interface OpenAPIFetcher {
+    /**
+     * Fetch an OpenAPI file by its URL. It should return a fully parsed OpenAPI v3 document.
+     */
+    fetch: (
+        url: string,
+    ) => Promise<
+        | OpenAPIV3_1.Document<OpenAPICustomSpecProperties>
+        | OpenAPIV3.Document<OpenAPICustomSpecProperties>
+    >;
+}
 
 export interface OpenAPIOperationData extends OpenAPICustomSpecProperties {
     path: string;
@@ -14,54 +25,10 @@ export interface OpenAPIOperationData extends OpenAPICustomSpecProperties {
     servers: OpenAPIV3.ServerObject[];
 
     /** Spec of the operation */
-    operation: OpenAPIV3.OperationObject & OpenAPICustomOperationProperties;
+    operation: OpenAPIV3.OperationObject;
 
     /** Securities that should be used for this operation */
     securities: [string, OpenAPIV3.SecuritySchemeObject][];
-}
-
-/**
- * Custom properties that can be defined at the entire spec level.
- */
-export interface OpenAPICustomSpecProperties {
-    /**
-     * If `true`, code samples will not be displayed.
-     * This option can be used to hide code samples for the entire spec.
-     */
-    'x-codeSamples'?: boolean;
-
-    /**
-     * If `true`, the "Try it" button will not be displayed.
-     * This option can be used to hide code samples for the entire spec.
-     */
-    'x-hideTryItPanel'?: boolean;
-}
-
-/**
- * Custom properties that can be defined at the operation level.
- * These properties are not part of the OpenAPI spec.
- */
-export interface OpenAPICustomOperationProperties {
-    'x-code-samples'?: OpenAPICustomCodeSample[];
-    'x-codeSamples'?: OpenAPICustomCodeSample[] | false;
-    'x-custom-examples'?: OpenAPICustomCodeSample[];
-
-    /**
-     * If `true`, the "Try it" button will not be displayed.
-     * https://redocly.com/docs/api-reference-docs/specification-extensions/x-hidetryitpanel/
-     */
-    'x-hideTryItPanel'?: boolean;
-}
-
-/**
- * Custom code samples that can be defined at the operation level.
- * It follows the spec defined by Redocly.
- * https://redocly.com/docs/api-reference-docs/specification-extensions/x-code-samples/
- */
-export interface OpenAPICustomCodeSample {
-    lang: string;
-    label: string;
-    source: string;
 }
 
 export { toJSON, fromJSON };
@@ -75,28 +42,19 @@ export async function fetchOpenAPIOperation(
         path: string;
         method: string;
     },
-    rawFetcher: OpenAPIFetcher,
+    fetcher: OpenAPIFetcher,
 ): Promise<OpenAPIOperationData | null> {
-    const fetcher = cacheFetcher(rawFetcher);
+    const refSchema = await fetcher.fetch(input.url);
+    const schema = await memoDereferenceSchema(refSchema, input.url);
 
-    let operation = await resolveOpenAPIPath<OpenAPIV3.OperationObject>(
-        input.url,
-        ['paths', input.path, input.method],
-        fetcher,
-    );
+    let operation = getOperationByPathAndMethod(schema, input.path, input.method);
 
     if (!operation) {
         return null;
     }
 
-    const specData = await fetcher.fetch(input.url);
-
     // Resolve common parameters
-    const commonParameters = await resolveOpenAPIPath<OpenAPIV3.ParameterObject[]>(
-        input.url,
-        ['paths', input.path, 'parameters'],
-        fetcher,
-    );
+    const commonParameters = getPathObjectParameter(schema, input.path);
     if (commonParameters) {
         operation = {
             ...operation,
@@ -104,127 +62,111 @@ export async function fetchOpenAPIOperation(
         };
     }
 
-    // Resolve servers
-    const servers = await resolveOpenAPIPath<OpenAPIV3.ServerObject[]>(
-        input.url,
-        ['servers'],
-        fetcher,
-    );
+    const servers = 'servers' in schema ? (schema.servers ?? []) : [];
+    const security = operation.security ?? schema.security ?? [];
 
     // Resolve securities
     const securities: OpenAPIOperationData['securities'] = [];
-    for (const security of operation.security ?? []) {
-        const securityKey = Object.keys(security)[0];
-
-        const securityScheme = await resolveOpenAPIPath<OpenAPIV3.SecuritySchemeObject>(
-            input.url,
-            ['components', 'securitySchemes', securityKey],
-            fetcher,
-        );
-
+    for (const entry of security) {
+        const securityKey = Object.keys(entry)[0];
+        const securityScheme = schema.components?.securitySchemes?.[securityKey];
         if (securityScheme) {
-            securities.push([securityKey, securityScheme]);
+            securities.push([securityKey, noReference(securityScheme)]);
         }
     }
 
     return {
-        servers: servers ?? [],
+        servers,
         operation,
         method: input.method,
         path: input.path,
         securities,
         'x-codeSamples':
-            typeof specData['x-codeSamples'] === 'boolean' ? specData['x-codeSamples'] : undefined,
+            typeof schema['x-codeSamples'] === 'boolean' ? schema['x-codeSamples'] : undefined,
         'x-hideTryItPanel':
-            typeof specData['x-hideTryItPanel'] === 'boolean'
-                ? specData['x-hideTryItPanel']
+            typeof schema['x-hideTryItPanel'] === 'boolean'
+                ? schema['x-hideTryItPanel']
                 : undefined,
     };
 }
 
-function cacheFetcher(fetcher: OpenAPIFetcher): OpenAPIFetcher {
-    const cache = new Map<string, Promise<any>>();
+const dereferenceSchemaCache = new WeakMap<OpenAPI.Document, Promise<OpenAPI.Document>>();
 
-    return {
-        async fetch(url) {
-            if (cache.has(url)) {
-                return cache.get(url);
-            }
+/**
+ * Memoized version of `dereferenceSchema`.
+ */
+function memoDereferenceSchema<T extends OpenAPI.Document>(schema: T, url: string): Promise<T> {
+    if (dereferenceSchemaCache.has(schema)) {
+        return dereferenceSchemaCache.get(schema) as Promise<T>;
+    }
 
-            const promise = fetcher.fetch(url);
-            cache.set(url, promise);
-            return promise;
-        },
-        parseMarkdown: fetcher.parseMarkdown,
-    };
+    const promise = dereferenceSchema(schema, url);
+    dereferenceSchemaCache.set(schema, promise);
+    return promise;
 }
 
 /**
- * Parse a raw string into an OpenAPI document.
- * It will also convert Swagger 2.0 to OpenAPI 3.0.
- * It can throw an `OpenAPIFetchError` if the document is invalid.
+ * Dereference an OpenAPI schema.
  */
-export async function parseOpenAPIV3(url: string, text: string): Promise<OpenAPIV3.Document> {
-    // Parse the JSON or YAML
-    let data: unknown;
+async function dereferenceSchema<T extends OpenAPI.Document>(schema: T, url: string): Promise<T> {
+    const derefResult = await dereference(schema);
 
-    // Try with JSON
-    try {
-        data = JSON.parse(text);
-    } catch (jsonError) {
-        try {
-            // Try with YAML
-            data = YAML.parse(text);
-        } catch (yamlError) {
-            if (yamlError instanceof Error && yamlError.name.startsWith('YAML')) {
-                throw new OpenAPIFetchError('Failed to parse YAML: ' + yamlError.message, url);
-            } else {
-                throw yamlError;
-            }
-        }
+    if (!derefResult.schema) {
+        throw new OpenAPIParseError(
+            'Failed to dereference OpenAPI document',
+            url,
+            'failed-dereference',
+        );
     }
 
-    // Convert Swagger 2.0 to OpenAPI 3.0
-    // @ts-ignore
-    if (data && data.swagger) {
-        try {
-            // Convert Swagger 2.0 to OpenAPI 3.0
-            // @ts-ignore
-            const result = (await swagger2openapi.convertObj(data, {
-                resolve: false,
-                resolveInternal: false,
-                laxDefaults: true,
-                laxurls: true,
-                lint: false,
-                prevalidate: false,
-                anchors: true,
-                patch: true,
-            })) as ConvertOutputOptions;
-
-            data = result.openapi;
-        } catch (error) {
-            if ((error as Error).name === 'S2OError') {
-                throw new OpenAPIFetchError(
-                    'Failed to convert Swagger 2.0 to OpenAPI 3.0: ' + (error as Error).message,
-                    url,
-                );
-            } else {
-                throw error;
-            }
-        }
-    }
-
-    // @ts-ignore
-    return data;
+    return derefResult.schema as T;
 }
 
-export class OpenAPIFetchError extends Error {
-    public name = 'OpenAPIFetchError';
-
-    constructor(
-        message: string,
-        public readonly url: string,
-    ) {
-        super(message);
+/**
+ * Get a path object from its path.
+ */
+function getPathObject(
+    schema: OpenAPIV3.Document | OpenAPIV3_1.Document,
+    path: string,
+): OpenAPIV3.PathItemObject | OpenAPIV3_1.PathItemObject | null {
+    if (schema.paths?.[path]) {
+        return schema.paths[path];
     }
+    return null;
+}
+
+/**
+ * Resolve parameters from a path in an OpenAPI schema.
+ */
+function getPathObjectParameter(
+    schema: OpenAPIV3.Document | OpenAPIV3_1.Document,
+    path: string,
+): OpenAPIV3.ParameterObject[] | OpenAPIV3_1.ParameterObject[] | null {
+    const pathObject = getPathObject(schema, path);
+    if (pathObject?.parameters) {
+        return pathObject.parameters.map(noReference) as
+            | OpenAPIV3.ParameterObject[]
+            | OpenAPIV3_1.ParameterObject[];
+    }
+    return null;
+}
+
+/**
+ * Get an operation by its path and method.
+ */
+function getOperationByPathAndMethod(
+    schema: OpenAPIV3.Document | OpenAPIV3_1.Document,
+    path: string,
+    method: string,
+): OpenAPIV3.OperationObject | null {
+    // Types are buffy for OpenAPIV3_1.OperationObject, so we use v3
+    const pathObject = getPathObject(schema, path);
+    if (!pathObject) {
+        return null;
+    }
+    const normalizedMethod = method.toLowerCase();
+    if (!pathObject[normalizedMethod]) {
+        return null;
+    }
+    return pathObject[normalizedMethod];
 }

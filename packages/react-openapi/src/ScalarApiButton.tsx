@@ -1,23 +1,33 @@
 'use client';
 
-import { useApiClientModal } from '@scalar/api-client-react';
-import React from 'react';
+import { ApiClientModalProvider, useApiClientModal } from '@scalar/api-client-react';
+import React, { useImperativeHandle, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
 import { useOpenAPIOperationContext } from './OpenAPIOperationContext';
+import { useEventCallback } from 'usehooks-ts';
 
 /**
  * Button which launches the Scalar API Client
  */
-export function ScalarApiButton({ method, path }: { method: string; path: string }) {
-    const client = useApiClientModal();
-    const { onOpenClient } = useOpenAPIOperationContext();
+export function ScalarApiButton({
+    method,
+    path,
+    specUrl,
+}: {
+    method: string;
+    path: string;
+    specUrl: string;
+}) {
+    const [isOpen, setIsOpen] = React.useState(false);
+    const controllerRef = useRef<ScalarModalControllerRef>(null);
     return (
         <div className="scalar scalar-activate">
             <button
                 className="scalar-activate-button"
                 onClick={() => {
-                    client?.open({ method, path });
-                    onOpenClient({ method, path });
+                    controllerRef.current?.openClient?.();
+                    setIsOpen(true);
                 }}
             >
                 <svg xmlns="http://www.w3.org/2000/svg" width="10" height="12" fill="none">
@@ -29,6 +39,68 @@ export function ScalarApiButton({ method, path }: { method: string; path: string
                 </svg>
                 Test it
             </button>
+
+            {isOpen &&
+                createPortal(
+                    <ScalarModal
+                        controllerRef={controllerRef}
+                        method={method}
+                        path={path}
+                        specUrl={specUrl}
+                    />,
+                    document.body,
+                )}
         </div>
     );
+}
+
+function ScalarModal(props: {
+    method: string;
+    path: string;
+    specUrl: string;
+    controllerRef: React.Ref<ScalarModalControllerRef>;
+}) {
+    return (
+        <ApiClientModalProvider
+            configuration={{ spec: { url: props.specUrl } }}
+            initialRequest={{ path: props.path, method: props.method }}
+        >
+            <ScalarModalController
+                method={props.method}
+                path={props.path}
+                controllerRef={props.controllerRef}
+            />
+        </ApiClientModalProvider>
+    );
+}
+
+type ScalarModalControllerRef = {
+    openClient: (() => void) | undefined;
+};
+
+function ScalarModalController(props: {
+    method: string;
+    path: string;
+    controllerRef: React.Ref<ScalarModalControllerRef>;
+}) {
+    const client = useApiClientModal();
+    const openClient = client?.open;
+    useImperativeHandle(
+        props.controllerRef,
+        () => ({ openClient: openClient ? () => openClient() : undefined }),
+        [openClient],
+    );
+
+    // Open the client when the component is mounted.
+    const { onOpenClient } = useOpenAPIOperationContext();
+    const trackOpening = useEventCallback(() => {
+        onOpenClient({ method: props.method, path: props.path });
+    });
+    React.useEffect(() => {
+        if (openClient) {
+            openClient();
+            trackOpening();
+        }
+    }, [openClient]);
+    return null;
 }

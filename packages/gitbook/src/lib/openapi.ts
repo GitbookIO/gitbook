@@ -3,11 +3,11 @@ import {
     OpenAPIOperationData,
     fetchOpenAPIOperation,
     OpenAPIFetcher,
-    parseOpenAPIV3,
-    OpenAPIFetchError,
+    parseOpenAPI,
+    OpenAPIParseError,
 } from '@gitbook/react-openapi';
 
-import { cache, parseCacheResponse, noCacheFetchOptions, CacheFunctionOptions } from '@/lib/cache';
+import { cache, noCacheFetchOptions, CacheFunctionOptions } from '@/lib/cache';
 
 import { parseMarkdown } from './markdown';
 import { ResolvedContentRef } from './references';
@@ -20,7 +20,7 @@ export async function fetchOpenAPIBlock(
     resolveContentRef: (ref: ContentRef) => Promise<ResolvedContentRef | null>,
 ): Promise<
     | { data: OpenAPIOperationData | null; specUrl: string | null; error?: undefined }
-    | { error: OpenAPIFetchError; data?: undefined; specUrl?: undefined }
+    | { error: OpenAPIParseError; data?: undefined; specUrl?: undefined }
 > {
     const resolved = block.data.ref ? await resolveContentRef(block.data.ref) : null;
     if (!resolved || !block.data.path || !block.data.method) {
@@ -39,7 +39,7 @@ export async function fetchOpenAPIBlock(
 
         return { data, specUrl: resolved.href };
     } catch (error) {
-        if (error instanceof OpenAPIFetchError) {
+        if (error instanceof OpenAPIParseError) {
             return { error };
         }
 
@@ -49,7 +49,7 @@ export async function fetchOpenAPIBlock(
 
 const fetcher: OpenAPIFetcher = {
     fetch: cache({
-        name: 'openapi.fetch',
+        name: 'openapi.fetch.v4',
         get: async (url: string, options: CacheFunctionOptions) => {
             // Wrap the raw string to prevent invalid URLs from being passed to fetch.
             // This can happen if the URL has whitespace, which is currently handled differently by Cloudflare's implementation of fetch:
@@ -66,12 +66,14 @@ const fetcher: OpenAPIFetcher = {
             }
 
             const text = await response.text();
-            const data = await parseOpenAPIV3(url, text);
+            const data = await parseOpenAPI({ url, value: text, parseMarkdown });
             return {
-                ...parseCacheResponse(response),
+                // Cache for 4 hours
+                ttl: 24 * 60 * 60,
+                // Revalidate every 2 hours
+                revalidateBefore: 22 * 60 * 60,
                 data,
             };
         },
     }),
-    parseMarkdown,
 };

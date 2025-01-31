@@ -9,13 +9,14 @@ import { unified } from 'unified';
  * Parse markdown and output HTML.
  */
 export async function parseMarkdown(markdown: string): Promise<string> {
-    const file = await unified()
+    const promise = unified()
         .use(remarkParse)
         .use(remarkGfm)
         .use(remarkRehype)
         .use(rehypeSanitize)
         .use(rehypeStringify)
-        .process(markdown);
+        .process(markdown)
+        .then((file) => file.toString());
 
-    return file.toString();
+    return promise;
 }

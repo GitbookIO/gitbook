@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { OpenAPIV3 } from 'openapi-types';
+import { OpenAPIV3, OpenAPIV2, OpenAPI } from '@scalar/openapi-types';
 
 import { OpenAPIOperationData, fromJSON } from './fetchOpenAPIOperation';
 import { InteractiveSection } from './InteractiveSection';
@@ -18,13 +18,13 @@ import { noReference } from './utils';
  * We use a client component as rendering recursive JSON schema in the server is expensive
  * (the entire schema is rendered at once, while the client component only renders the visible part)
  */
-export function OpenAPISpec(props: { rawData: any; context: OpenAPIClientContext }) {
-    const { rawData, context } = props;
+export function OpenAPISpec(props: { data: OpenAPIOperationData; context: OpenAPIClientContext }) {
+    const { data, context } = props;
 
-    const parsedData = fromJSON(rawData) as OpenAPIOperationData;
-    const { operation, securities } = parsedData;
+    const { operation, securities } = data;
 
-    const parameterGroups = groupParameters((operation.parameters || []).map(noReference));
+    const parameters = operation.parameters ?? [];
+    const parameterGroups = groupParameters(parameters);
 
     return (
         <>
@@ -72,17 +72,17 @@ export function OpenAPISpec(props: { rawData: any; context: OpenAPIClientContext
     );
 }
 
-function groupParameters(parameters: OpenAPIV3.ParameterObject[]): Array<{
+function groupParameters(parameters: OpenAPI.Parameters): Array<{
     key: string;
     label: string;
-    parameters: OpenAPIV3.ParameterObject[];
+    parameters: OpenAPI.Parameters;
 }> {
     const sorted = ['path', 'query', 'header'];
 
     const groups: Array<{
         key: string;
         label: string;
-        parameters: OpenAPIV3.ParameterObject[];
+        parameters: OpenAPI.Parameters;
     }> = [];
 
     parameters.forEach((parameter) => {

@@ -1,6 +1,6 @@
 import { it, describe, expect } from 'bun:test';
 import { getSchemaAlternatives } from './OpenAPISchema';
-import { OpenAPIV3 } from 'openapi-types';
+import { OpenAPIV3 } from '@scalar/openapi-types';
 
 describe('getSchemaAlternatives', () => {
     it('should flatten oneOf', () => {

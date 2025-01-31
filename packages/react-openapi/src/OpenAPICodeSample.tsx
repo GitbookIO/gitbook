@@ -33,7 +33,7 @@ export function OpenAPICodeSample(props: {
             const example = param.schema
                 ? generateSchemaExample(noReference(param.schema))
                 : undefined;
-            if (example !== undefined) {
+            if (example !== undefined && param.name) {
                 headersObject[param.name] =
                     typeof example !== 'string' ? stringifyOpenAPI(example) : example;
             }
@@ -41,7 +41,7 @@ export function OpenAPICodeSample(props: {
             const example = param.schema
                 ? generateSchemaExample(noReference(param.schema))
                 : undefined;
-            if (example !== undefined) {
+            if (example !== undefined && param.name) {
                 searchParams.append(
                     param.name,
                     String(Array.isArray(example) ? example[0] : example),
@@ -51,7 +51,10 @@ export function OpenAPICodeSample(props: {
     });
 
     const requestBody = noReference(data.operation.requestBody);
-    const requestBodyContent = requestBody ? Object.entries(requestBody.content)[0] : undefined;
+    const requestBodyContentEntries = requestBody?.content
+        ? Object.entries(requestBody.content)
+        : undefined;
+    const requestBodyContent = requestBodyContentEntries?.[0];
 
     const input: CodeSampleInput = {
         url:
@@ -120,7 +123,11 @@ export function OpenAPICodeSample(props: {
             tabs={samples}
             overlay={
                 data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'] ? null : (
-                    <ScalarApiButton method={data.method} path={data.path} />
+                    <ScalarApiButton
+                        method={data.method}
+                        path={data.path}
+                        specUrl={context.specUrl}
+                    />
                 )
             }
         />
