@@ -32,7 +32,6 @@ export function ToggleableLinkItem(
     const hasActiveDescendant =
         hasDescendants && (isActive || activeSegment.startsWith(pathname + '/'));
 
-
     const [isVisible, setIsVisible] = React.useState(hasActiveDescendant);
 
     // Update the visibility of the children, if we are navigating to a descendant.
@@ -44,7 +43,7 @@ export function ToggleableLinkItem(
         setIsVisible((prev) => prev || hasActiveDescendant);
     }, [hasActiveDescendant, hasDescendants]);
 
-    const {show, hide, scope} = useToggleAnimation({ hasDescendants, isVisible });
+    const { show, hide, scope } = useToggleAnimation({ hasDescendants, isVisible });
 
     const linkRef = React.createRef<HTMLAnchorElement>();
     useScrollToActiveTOCItem({ linkRef, isActive });

@@ -1,7 +1,7 @@
-import { stagger, useAnimate } from "framer-motion";
-import React from "react";
+import { stagger, useAnimate } from 'framer-motion';
+import React from 'react';
 
-import { useIsMounted } from ".";
+import { useIsMounted } from '.';
 
 const show = {
     opacity: 1,
@@ -19,7 +19,13 @@ const hide = {
 
 const staggerMenuItems = stagger(0.02, { ease: (p) => Math.pow(p, 2) });
 
-export function useToggleAnimation({ hasDescendants, isVisible }: { hasDescendants: boolean; isVisible: boolean }) {
+export function useToggleAnimation({
+    hasDescendants,
+    isVisible,
+}: {
+    hasDescendants: boolean;
+    isVisible: boolean;
+}) {
     const isMounted = useIsMounted();
     const [scope, animate] = useAnimate();
 

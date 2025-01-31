@@ -10,7 +10,7 @@ import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { Link } from '../primitives';
 import { SectionIcon } from './SectionIcon';
-import { useIsMounted,  useToggleAnimation,  } from '../hooks';
+import { useIsMounted, useToggleAnimation } from '../hooks';
 import { TOCScrollContainer, useScrollToActiveTOCItem } from '../TableOfContents/TOCScroller';
 
 const MAX_ITEMS = 5; // If there are more sections than this, they'll be shown below the fold in a scrollview.
@@ -145,7 +145,7 @@ export function SiteSectionGroupItem(props: {
         setIsVisible((prev) => prev || isActiveGroup);
     }, [isActiveGroup, hasDescendants]);
 
-    const {show, hide, scope} = useToggleAnimation({ hasDescendants, isVisible });
+    const { show, hide, scope } = useToggleAnimation({ hasDescendants, isVisible });
 
     return (
         <>
