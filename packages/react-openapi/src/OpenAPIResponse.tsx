@@ -1,11 +1,10 @@
 import * as React from 'react';
 import classNames from 'classnames';
 import { OpenAPIV3 } from '@scalar/openapi-types';
-import { OpenAPIRootSchema, OpenAPISchemaProperties } from './OpenAPISchema';
+import { OpenAPISchemaProperties } from './OpenAPISchema';
 import { noReference } from './utils';
 import { OpenAPIClientContext } from './types';
-import { InteractiveSection } from './InteractiveSection';
-import { Markdown } from './Markdown';
+import { OpenAPISchemaObject } from './OpenAPISchemaObject';
 
 /**
  * Display an interactive response body.
@@ -25,16 +24,9 @@ export function OpenAPIResponse(props: {
     }
 
     return (
-        <>
+        <div className="openapi-response-body">
             {headers.length > 0 ? (
-                <InteractiveSection
-                    toggeable
-                    defaultOpened={!!context.defaultInteractiveOpened}
-                    toggleCloseIcon={context.icons.chevronDown}
-                    toggleOpenIcon={context.icons.chevronRight}
-                    header="Headers"
-                    className={classNames('openapi-responseheaders')}
-                >
+                <OpenAPISchemaObject context={context} label={'Headers'}>
                     <OpenAPISchemaProperties
                         properties={headers.map(([name, header]) => ({
                             propertyName: name,
@@ -43,7 +35,7 @@ export function OpenAPIResponse(props: {
                         }))}
                         context={context}
                     />
-                </InteractiveSection>
+                </OpenAPISchemaObject>
             ) : null}
             {content.length > 0 ? (
                 <div className={classNames('openapi-responsebody')}>
@@ -51,12 +43,12 @@ export function OpenAPIResponse(props: {
                         properties={content.map(([contentType, mediaType]) => ({
                             propertyName: mediaType.schema?.title ?? '',
                             schema: noReference(mediaType.schema) ?? {},
-                            required: mediaType.schema?.required,
+                            // required: mediaType.schema?.required,
                         }))}
                         context={context}
                     />
                 </div>
             ) : null}
-        </>
+        </div>
     );
 }

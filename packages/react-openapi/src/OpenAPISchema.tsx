@@ -35,6 +35,7 @@ export function OpenAPISchemaProperty(
         circularRefs: parentCircularRefs = new Map<OpenAPIV3.SchemaObject, string>(),
         context,
         className,
+        required,
     } = props;
 
     const id = useId();
@@ -50,8 +51,12 @@ export function OpenAPISchemaProperty(
 
     if ((properties && !!properties.length) || schema.type === 'object') {
         return (
-            <>
-                <OpenAPISchemaName type={getSchemaTitle(schema)} propertyName={propertyName} />
+            <div className="openapi-schema-presentation">
+                <OpenAPISchemaName
+                    type={getSchemaTitle(schema)}
+                    propertyName={propertyName}
+                    required={required}
+                />
                 {schema.description ? (
                     <Markdown source={schema.description} className="openapi-schema-description" />
                 ) : null}
@@ -64,7 +69,7 @@ export function OpenAPISchemaProperty(
                         />
                     ) : null}
                 </OpenAPISchemaObject>
-            </>
+            </div>
         );
     }
 

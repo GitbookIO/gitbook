@@ -26,6 +26,8 @@ export function OpenAPIOperation(props: {
         blockKey: context.blockKey,
     };
 
+    const trimmedDescription = operation.description?.trim();
+
     return (
         <div className={classNames('openapi-operation', className)}>
             <h2 className="openapi-summary" id={context.id}>
@@ -33,12 +35,9 @@ export function OpenAPIOperation(props: {
             </h2>
             <div className={classNames('openapi-columns')}>
                 <div className={classNames('openapi-column-spec')}>
-                    {operation.description ? (
+                    {trimmedDescription ? (
                         <div className="openapi-intro">
-                            <Markdown
-                                className="openapi-description"
-                                source={operation.description}
-                            />
+                            <Markdown className="openapi-description" source={trimmedDescription} />
                         </div>
                     ) : null}
                     <OpenAPISpec data={data} context={clientContext} />

@@ -126,16 +126,12 @@
     @apply mx-3 mb-3 mt-2;
 }
 
-.openapi-schema .openapi-schema-properties {
-    @apply border rounded border-dark/2 dark:border-light/2;
+.openapi-schema-properties {
+    @apply flex flex-col;
 }
 
-.openapi-schema-properties .openapi-schema {
-    @apply mt-6;
-}
-
-.openapi-schema-properties .openapi-schema:first-child {
-    @apply mt-3;
+.openapi-section-body .openapi-schema-properties {
+    @apply gap-6;
 }
 
 .openapi-schema-properties .openapi-schema:last-child {
@@ -150,10 +146,14 @@
     @apply mt-3;
 }
 
+.openapi-schema-presentation {
+    @apply flex flex-col gap-2;
+}
+
 .openapi-schema-name {
     /* To make double click on the property name select only the name,
     we disable selection on the parent and re-enable it on the children. */
-    @apply select-none flex gap-2.5 items-baseline text-sm mb-1;
+    @apply select-none flex gap-2.5 items-baseline text-sm;
 }
 
 .openapi-schema-propertyname {
@@ -214,7 +214,7 @@
 }
 
 .openapi-schema-description.openapi-markdown {
-    @apply prose-sm text-dark-4/8 mt-2 dark:text-light-3 font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply prose-sm text-dark-4/8 dark:text-light-3 font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 .openapi-schema-description.openapi-markdown pre code {
@@ -228,7 +228,7 @@
 
 .openapi-schema-example,
 .openapi-schema-pattern {
-    @apply prose-sm mt-2 text-dark-4/8 dark:text-light-3;
+    @apply prose-sm text-dark-4/8 dark:text-light-3;
 }
 
 .openapi-schema-example code,
@@ -272,7 +272,7 @@
 }
 
 .openapi-securities-description.openapi-markdown {
-    @apply prose-sm;
+    @apply prose-sm text-dark-4/8 dark:text-light-3 font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 .openapi-securities-label {
@@ -306,15 +306,7 @@
 }
 
 .openapi-requestbody-description.openapi-markdown {
-    @apply px-3 prose-sm;
-}
-
-.openapi-requestbody-description.openapi-markdown {
-    @apply px-3 prose-sm;
-}
-
-.openapi-requestbody-description.openapi-markdown {
-    @apply px-3 prose-sm;
+    @apply prose-sm text-dark-4/8 dark:text-light-3 font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 /** Responses */
@@ -326,7 +318,7 @@
 }
 
 .openapi-responses-body {
-    @apply flex flex-col gap-3;
+    @apply flex flex-col gap-2;
 }
 
 .openapi-responses-header-content {
@@ -334,16 +326,36 @@
 }
 
 /** Response */
+.openapi-response-tab-content {
+    @apply truncate max-w-full flex items-center gap-2;
+}
+
 .openapi-response-description.openapi-markdown {
-    @apply prose-sm text-xs text-dark/8 dark:text-light/8 px-0;
+    @apply prose-sm text-[0.8125em] text-left text-dark/8 dark:text-light/8 px-0 truncate;
+}
+
+.openapi-response-description p {
+    @apply truncate max-w-full pr-1;
 }
 
 .openapi-response-statuscode {
-    @apply tabular-nums text-sm font-mono font-medium;
+    @apply tabular-nums text-sm font-mono shrink-0 font-medium;
 }
 
 .openapi-response-content-type {
-    @apply text-xs text-dark/8 dark:text-light/8 ml-auto;
+    @apply text-xs text-dark/8 dark:text-light/8 ml-auto shrink-0;
+}
+
+.openapi-response-body {
+    @apply flex flex-col gap-4;
+}
+
+.openapi-responsebody .openapi-schema-properties {
+    @apply gap-2;
+}
+
+.openapi-responsebody .openapi-schema-name {
+    @apply mb-0;
 }
 
 .openapi-responsebody-header,
@@ -371,7 +383,7 @@
 }
 
 .openapi-codesample-title {
-    @apply flex-1 font-normal text-sm text-dark/7 dark:text-light-4;
+    @apply flex-1 font-normal text-sm text-dark/7 dark:text-light-4 truncate;
 }
 
 .openapi-codesample-title em {
@@ -406,7 +418,7 @@
 /** Common */
 
 .openapi-select {
-    @apply max-w-48 rounded font-mono text-xs leading-6 px-1 py-0.5 border border-dark-2/2 bg-light-2 dark:bg-dark-2 dark:border-light/1;
+    @apply max-w-60 rounded font-mono text-xs leading-6 px-1 py-0.5 border border-dark-2/2 bg-light-2 dark:bg-dark-2 dark:border-light/1;
 }
 
 /** Section */
@@ -476,10 +488,11 @@
 }
 
 .openapi-disclosure-group-trigger {
-    @apply flex items-center w-full flex-1 overflow-visible gap-2.5 py-2 relative -outline-offset-1;
+    @apply flex items-center truncate shrink w-full flex-1 gap-2.5 py-2 relative -outline-offset-1;
 }
 
-.openapi-disclosure:last-of-type .openapi-disclosure-group-trigger {
+.openapi-disclosure-group:only-child,
+.openapi-disclosure-group:last-child {
     @apply border-b-0;
 }
 
@@ -488,23 +501,19 @@
 }
 
 .openapi-disclosure-group-icon {
-    @apply absolute -left-2.5 top-1/2 transform -translate-y-1/2 z-50;
+    @apply absolute -left-2.5 top-1/2 transform -translate-y-1/2 z-[9999];
 }
 
 .openapi-disclosure-group-panel {
-    @apply pb-2;
+    @apply pb-2.5;
 }
 
 .openapi-disclosure-group-trigger[aria-expanded='true'] > svg {
     @apply rotate-90;
 }
 
-.openapi-disclosure {
-    @apply mt-3;
-}
-
 .openapi-disclosure-trigger {
-    @apply transition-all rounded-2xl border border-dark/2 dark:border-light/2 px-2.5 py-1.5 text-xs transition-all dark:text-light/7 text-dark/7 flex flex-row items-center gap-1.5 -outline-offset-1;
+    @apply transition-all rounded-2xl border border-dark/2 dark:border-light/2 px-2.5 py-1 text-[0.8125em] transition-all dark:text-light/7 text-dark/7 flex flex-row items-center gap-1.5 -outline-offset-1;
 }
 
 .openapi-disclosure svg {

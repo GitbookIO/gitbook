@@ -6,9 +6,10 @@ import { useDisclosureState } from 'react-stately';
 interface Props {
     context: OpenAPIClientContext;
     children: React.ReactNode;
+    label?: string;
 }
 
-export function OpenAPISchemaObject({ context, children }: Props): JSX.Element {
+export function OpenAPISchemaObject({ context, children, label }: Props): JSX.Element {
     let state = useDisclosureState({});
     let panelRef = React.useRef<HTMLDivElement | null>(null);
     let triggerRef = React.useRef<HTMLButtonElement | null>(null);
@@ -30,7 +31,9 @@ export function OpenAPISchemaObject({ context, children }: Props): JSX.Element {
                 }}
             >
                 {context.icons.plus}
-                <span>{state.isExpanded ? 'Hide' : 'Show'} child attributes</span>
+                <span>
+                    {`${state.isExpanded ? 'Hide' : 'Show'} ${label ? label : `child attributes`}`}
+                </span>
             </button>
 
             {state.isExpanded && (

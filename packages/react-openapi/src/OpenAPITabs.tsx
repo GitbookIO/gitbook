@@ -35,7 +35,11 @@ function OpenAPITabs(props: React.PropsWithChildren<TabsProps & { items: Tab[] }
 
     return (
         <OpenAPITabsContext.Provider value={contextValue}>
-            <Tabs onSelectionChange={setSelectedKey} selectedKey={selectedKey}>
+            <Tabs
+                className="openapi-tabs"
+                onSelectionChange={setSelectedKey}
+                selectedKey={selectedKey}
+            >
                 {children}
             </Tabs>
         </OpenAPITabsContext.Provider>

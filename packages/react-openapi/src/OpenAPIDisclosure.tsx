@@ -39,7 +39,7 @@ export function OpenAPIDisclosureGroup(props: DisclosureGroupProps & Props) {
     let state = useDisclosureGroupState(props);
 
     return (
-        <div className="group">
+        <div>
             <DisclosureGroupStateContext.Provider value={state}>
                 {groups.map((group) => (
                     <DisclosureItem icon={icon} key={group.id} group={group} />
