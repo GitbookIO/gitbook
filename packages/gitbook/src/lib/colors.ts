@@ -22,30 +22,62 @@ type ColorSubScale = {
     [key: string]: number;
 };
 
+/**
+ * Main color scale object.
+ *
+ * Each `ColorCategory` can be in/excluded in Tailwind's utility classes generation.
+ * Each subitem maps a semantic name within that category to a step in the scale.
+ */
 export const scale: Record<ColorCategory, ColorSubScale> = {
     [ColorCategory.backgrounds]: {
-        base: 1, // Base background
-        subtle: 2, // Accent background
+        /** Base background */
+        base: 1,
+        /** Accent background */
+        subtle: 2,
     },
     [ColorCategory.components]: {
-        DEFAULT: 3, // Component background
-        hover: 4, // Component hover background
-        active: 5, // Component active background
+        /** Component background */
+        DEFAULT: 3,
+        /** Component hover background */
+        hover: 4,
+        /** Component active background */
+        active: 5,
     },
     [ColorCategory.borders]: {
-        subtle: 6, // Subtle borders, separators
-        DEFAULT: 7, // Element border, focus rings
-        hover: 8, // Element hover border
+        /** Subtle borders, separators */
+        subtle: 6,
+        /** Element border, focus rings */
+        DEFAULT: 7,
+        /** Element hover border */
+        hover: 8,
     },
     [ColorCategory.accents]: {
-        solid: 9, // Solid backgrounds
-        'solid-hover': 10, // Hovered solid backgrounds
+        /** Solid backgrounds */
+        solid: 9,
+        /** Hovered solid backgrounds */
+        'solid-hover': 10,
     },
     [ColorCategory.text]: {
-        subtle: 9, // Very low-contrast text — WARNING: this contrast does not meet accessiblity guidelines. Always check if you need to include a mitigating contrast-more style for users who need it.
-        DEFAULT: 11, // Low-contrast text
-        strong: 12, // High-contrast text
+        /** Very low-contrast text
+         * Caution: this contrast does not meet accessiblity guidelines.
+         * Always check if you need to include a mitigating contrast-more style for users who need it. */
+        subtle: 9,
+        /** Low-contrast text */
+        DEFAULT: 11,
+        /** High-contrast text */
+        strong: 12,
     },
+};
+
+/**
+ * The mix of foreground and background for every step in a colour scale.
+ * 0: 100% of the background color's luminosity, white in light mode
+ * 1: 100% of the foreground color's luminosity, black in light mode
+ */
+export const colorMixMapping = {
+    // bgs          |components      |borders         |solid     |text
+    light: [0, 0.02, 0.03, 0.05, 0.07, 0.1, 0.15, 0.2, 0.5, 0.55, 0.6, 1],
+    dark: [0, 0.05, 0.08, 0.1, 0.13, 0.15, 0.2, 0.25, 0.5, 0.55, 0.75, 1],
 };
 
 /**
@@ -117,6 +149,13 @@ export function shadesOfColor(hex: string, halfShades = false) {
 
 /**
  * Generate a [Radix-like](https://www.radix-ui.com/colors/docs/palette-composition/understanding-the-scale) colour scale based of a hex colour.
+ * @param {string} hex The hex code to generate shades from
+ * @param {object} options
+ * @param {boolean} options.darkMode If set to `true`, inverts the scale (so 1 is black instead of white) and uses `colorMixMapping.dark` with different mix ratios per step.
+ * @param {string} options.foreground Define a custom foreground color to use. If left undefined, the global `light`/`dark` values (in `colors.ts`) will be used.
+ * @param {string} options.background Define a custom foreground color to use. If left undefined, the global `light`/`dark` values (in `colors.ts`) will be used.
+ * @param {string} options.mix If set to a hex code, this color will be additionally mixed into the generated scale according to `options.mixRatio`.
+ * @param {number} options.mixRatio Define a custom mix ratio to mix the `mix` color with. If left undefined, the default `mixRatio` will be used.
  */
 export function colorScale(
     hex: string,
@@ -146,16 +185,13 @@ export function colorScale(
         baseColor.H = mixColor.H;
     }
 
-    const mapping = darkMode
-        ? // bgs   |components      |borders         |solid     |text
-          [1, 0.95, 0.92, 0.9, 0.87, 0.85, 0.8, 0.75, 0.5, 0.45, 0.25, 0]
-        : [1, 0.98, 0.97, 0.95, 0.93, 0.9, 0.85, 0.8, 0.5, 0.45, 0.4, 0];
+    const mapping = darkMode ? colorMixMapping.dark : colorMixMapping.light;
 
     const result = [];
 
     for (let index = 0; index < mapping.length; index++) {
         const targetL =
-            backgroundColor.L * mapping[index] + foregroundColor.L * (1 - mapping[index]);
+            foregroundColor.L * mapping[index] + backgroundColor.L * (1 - mapping[index]);
 
         if (index == 8 && !mix && Math.abs(baseColor.L - targetL) < 0.2) {
             // Original colour is close enough to target, so let's use the original colour as step 9.

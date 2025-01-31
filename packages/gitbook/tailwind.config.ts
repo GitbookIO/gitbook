@@ -82,11 +82,20 @@ const config: Config = {
             },
             colors: {
                 // Dynamic colors matching the customization settings
+
+                /** Scale based on the primary color, used for links and interactive elements. */
                 primary: generateVarShades('primary'),
+                /** Contrasting foreground color that can be used on top of `primary`. Black or white depending on shade. */
                 'contrast-primary': generateVarShades('contrast-primary'),
+
+                /** The main color scale for non-interactive elements. Will either be a (slightly tinted) gray scale or a user-set value through Customisation. */
                 tint: generateVarShades('tint'),
+                /** Contrasting foreground color that can be used on top of `tint`. Black or white depending on shade. */
                 'contrast-tint': generateVarShades('contrast-tint'),
+
+                /** Will always be a neutral gray scale, without any tinting or overrides. Use only when `tint` somehow clashes. */
                 neutral: generateVarShades('neutral'),
+                /** Contrasting foreground color that can be used on top of `neutral`. Black or white depending on shade. */
                 'contrast-neutral': generateVarShades('contrast-neutral'),
 
                 'header-background': 'rgb(var(--header-background))',
