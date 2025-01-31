@@ -1,4 +1,5 @@
 import { DocumentBlockCode, DocumentBlockCodeLine, DocumentInlineAnnotation } from '@gitbook/api';
+import memoize from 'memoizee';
 import {
     createdBundledHighlighter,
     ThemedToken,
@@ -8,7 +9,6 @@ import {
 import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
 import { BundledLanguage, bundledLanguages } from 'shiki/langs';
 
-import { asyncMutexFunction, singleton } from '@/lib/async';
 import { getNodeText } from '@/lib/document';
 import { trace } from '@/lib/tracing';
 
@@ -353,7 +353,7 @@ const createHighlighter = createdBundledHighlighter<any, any>({
  * Load the highlighter, only once, and reuse it.
  * It makes sure to handle concurrent calls.
  */
-const loadHighlighter = singleton(async () => {
+const loadHighlighter = memoize(async () => {
     return await trace('highlighting.loadHighlighter', async () => {
         const highlighter = await createHighlighter({
             themes: [createCssVariablesTheme()],
@@ -363,20 +363,16 @@ const loadHighlighter = singleton(async () => {
     });
 });
 
-const loadLanguagesMutex = asyncMutexFunction();
-
-const loadHighlighterLanguage = async function loadHighlighterLanguage(
+const loadHighlighterLanguage = memoize(async function loadHighlighterLanguage(
     highlighter: HighlighterGeneric<any, any>,
     lang: keyof typeof bundledLanguages,
 ) {
-    await loadLanguagesMutex.runBlocking(async () => {
-        if (highlighter.getLoadedLanguages().includes(lang)) {
-            return;
-        }
+    if (highlighter.getLoadedLanguages().includes(lang)) {
+        return;
+    }
 
-        await trace(
-            `highlighting.loadLanguage(${lang})`,
-            async () => await highlighter.loadLanguage(lang),
-        );
-    });
-};
+    await trace(
+        `highlighting.loadLanguage(${lang})`,
+        async () => await highlighter.loadLanguage(lang),
+    );
+});
