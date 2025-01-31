@@ -26,7 +26,7 @@ export function CodeBlock(props: BlockProps<DocumentBlockCode>) {
                     ancestorBlocks={[]}
                     context={context}
                     nodes={fragment.nodes}
-                    style={['space-y-4']}
+                    style="space-y-4"
                 />
             );
         })();

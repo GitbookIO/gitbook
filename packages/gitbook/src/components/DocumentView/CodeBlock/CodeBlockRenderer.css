@@ -1,6 +1,7 @@
 .highlight-line {
     @apply grid [grid-template-columns:subgrid] col-span-2 relative ring-1 ring-transparent hover:ring-dark-4/5 hover:z-[1] dark:hover:ring-light-4/4 rounded;
     @apply only:hover:ring-transparent;
+    @apply [counter-increment:line];
 
     &.highlighted {
         @apply bg-light-3 dark:bg-dark-3;
@@ -20,17 +21,17 @@
     &:not(.highlighted) + .highlighted:has(+ :not(.highlighted)) {
         @apply rounded-md;
     }
+}
 
-    > .highlight-line-number {
-        @apply text-sm text-right pr-3.5 rounded-l pl-2 sticky left-[-3px] bg-gradient-to-r from-80% from-light-2 to-transparent dark:from-dark-2 dark:to-transparent;
-        @apply before:text-dark/5 before:content-[counter(line)] [counter-increment:line] dark:before:text-light/4;
-    }
+.highlight-line-number {
+    @apply text-sm text-right pr-3.5 rounded-l pl-2 sticky left-[-3px] bg-gradient-to-r from-80% from-light-2 to-transparent dark:from-dark-2 dark:to-transparent;
+    @apply before:text-dark/5 before:content-[counter(line)] dark:before:text-light/4;
 
-    &.highlighted > .highlight-line-number {
+    .highlight-line.highlighted > & {
         @apply before:text-dark/6 dark:before:text-light/8 bg-gradient-to-r from-80% from-light-3 to-transparent dark:from-dark-3 dark:to-transparent;
     }
+}
 
-    > .highlight-line-content {
-        @apply ml-3 block text-sm;
-    }
+.highlight-line-content {
+    @apply ml-3 block text-sm;
 }

@@ -76,10 +76,10 @@ function CodeHighlightLine(props: {
     const { line, isLast, withLineNumbers } = props;
     return (
         <span className={tcls('highlight-line', line.highlighted && 'highlighted')}>
-            {withLineNumbers ? <span className="highlight-line-number" /> : null}
+            {withLineNumbers && <span className="highlight-line-number" />}
             <span className="highlight-line-content">
                 <CodeHighlightTokens tokens={line.tokens} />
-                {isLast ? null : '\n'}
+                {!isLast && '\n'}
             </span>
         </span>
     );
