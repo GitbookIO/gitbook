@@ -150,7 +150,7 @@ export default async function PDFHTMLOutput(props: {
                         <TrademarkLink
                             space={space}
                             customization={customization}
-                            placement={SiteInsightsTrademarkPlacement.Footer}
+                            placement={SiteInsightsTrademarkPlacement.Pdf}
                         />
                     ) : null
                 }
