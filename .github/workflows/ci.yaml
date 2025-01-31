@@ -186,7 +186,7 @@ jobs:
     comment-deployments:
         runs-on: ubuntu-latest
         name: Comment Deployments
-        if: 1 && !startsWith(github.ref, 'refs/heads/main')
+        if: always() && !startsWith(github.ref, 'refs/heads/main')
         needs:
             - deploy
             - deploy-v2-vercel
@@ -210,13 +210,26 @@ jobs:
                   comment-id: ${{ steps.fc.outputs.comment-id }}
                   issue-number: ${{ github.event.pull_request.number }}
                   body: |
-                      **Main Preview**
-                      - Latest commit: [${{ needs.deploy.outputs.deployment-url }}](${{ needs.deploy.outputs.deployment-url }})
-                      - PR: [${{ needs.deploy.outputs.deployment-alias-url }}](${{ needs.deploy.outputs.deployment-alias-url }})
+                      ### Version 1 (production)
+                      
+                      | Version | URL | Status |
+                      | --- | --- | --- |
+                      | Latest commit | [${{ needs.deploy.outputs.deployment-url }}](${{ needs.deploy.outputs.deployment-url }}) | ${{ needs.deploy.result == 'success' && '✅' || '❌' }} |
+                      | PR | [${{ needs.deploy.outputs.deployment-alias-url }}](${{ needs.deploy.outputs.deployment-alias-url }}) | ${{ needs.deploy.result == 'success' && '✅' || '❌' }} |
 
-                      **Experimental Version 2**
-                      - Vercel: [${{ needs.deploy-v2-vercel.outputs.deployment-url }}](${{ needs.deploy-v2-vercel.outputs.deployment-url }})
-                      - Cloudflare: [${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}](${{ needs.deploy-v2-cloudflare.outputs.deployment-url }})
+                      ### Version 2 (experimental)
+
+                      | Version | URL | Status |
+                      | --- | --- | --- |
+                      | Vercel | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}](${{ needs.deploy-v2-vercel.outputs.deployment-url }}) | ${{ needs.deploy-v2-vercel.result == 'success' && '✅' || '❌' }} |
+                      | Cloudflare | [${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}](${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}) | ${{ needs.deploy-v2-cloudflare.result == 'success' && '✅' || '❌' }} |
+
+                      ### Test content
+
+                      | Site | v1 | v2 |
+                      | --- | --- | --- |
+                      | GitBook | [${{ needs.deploy.outputs.deployment-url }}/docs.gitbook.com](${{ needs.deploy.outputs.deployment-url }}/docs.gitbook.com) | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}/static/url/docs.gitbook.com](${{ needs.deploy-v2-vercel.outputs.deployment-url }}/static/url/docs.gitbook.com) |
+                      | E2E | [${{ needs.deploy.outputs.deployment-url }}/gitbook-open-e2e-sites.gitbook.io/gitbook-doc](${{ needs.deploy.outputs.deployment-url }}/gitbook-open-e2e-sites.gitbook.io/gitbook-doc) | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}/gitbook-open-e2e-sites.gitbook.io/gitbook-doc](${{ needs.deploy-v2-vercel.outputs.deployment-url }}/gitbook-open-e2e-sites.gitbook.io/gitbook-doc) |
                   edit-mode: replace
     visual-testing:
         runs-on: ubuntu-latest
