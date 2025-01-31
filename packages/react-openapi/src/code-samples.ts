@@ -17,7 +17,7 @@ interface CodeSampleGenerator {
 export const codeSampleGenerators: CodeSampleGenerator[] = [
     {
         id: 'curl',
-        label: 'Curl',
+        label: 'cURL',
         syntax: 'bash',
         generate: ({ method, url, headers, body }) => {
             const separator = ' \\\n';
