@@ -6,10 +6,16 @@
         "react-dom": "^19.0.0",
         "@gitbook/api": "^0.89.0"
     },
+    "devDependencies": {
+        "@opennextjs/cloudflare": "^0.4.3"
+    },
     "scripts": {
         "dev:v2": "next",
         "build": "next build",
         "build:v2": "next build",
-        "start": "next start"
+        "start": "next start",
+        "build:v2:cloudflare": "opennextjs-cloudflare",
+        "dev:v2:cloudflare": "wrangler dev --port 8771",
+        "deploy:v2:cloudflare": "npm run build:v2:cloudflare && wrangler deploy"
     }
 }

@@ -1,6 +1,30 @@
 # GitBook V2
 
-# Middleware:
+This package contains the code for an experiment new version of the GitBook renderer.
+
+The goals of this new version are:
+
+- Optimize rendering to leverage Next.js ISR and static rendering
+- Leverage Node.js runtime and bigger instances to render bigger content
+- Evaluate Vercel and Cloudflare deployment options
+
+## Deployment
+
+#### Vercel
+
+The new version is deployed automatically to Vercel using a Github Action on every push.
+
+#### Cloudflare with Opennext-js
+
+The new version is deployed automatically to Cloudflare using a Github Action on every push.
+
+## Potential issues
+
+- [ ] We can't use `dynamicIO` because our root layout needs to fetch the params (https://github.com/vercel/next.js/discussions/71927)
+
+## Structure
+
+#### Middleware:
 
 Goals:
 - Route between dynamic and static routes
@@ -10,7 +34,7 @@ Goals:
 - High performances:
   - It should not rely on data fetching
 
-# URLs to support:
+#### URLs to support:
 
 Content URLs:
 
@@ -67,7 +91,7 @@ Development:
 
 - `localhost:3000/sites/site_abc/page`
 
-# Routes:
+#### Routes:
 
 - Content
     - [ ] `/static/url/[[...url]]/page.tsx`
@@ -77,13 +101,3 @@ Development:
 - PDF export
     - [ ] `/dynamic/pdf/[[...url]]/page.tsx`
     - [ ] `/spaces/[space]/pdf/page.tsx`
-
-# Deployment
-
-- Vercel
-- Cloudflare with Opennext-js
-
-# Potential issues
-
-- Impossible to use route params in root layout (https://github.com/vercel/next.js/discussions/71927)
-

@@ -3,3 +3,6 @@
 
 # vercel
 .vercel
+
+# cloudflare
+.open-next

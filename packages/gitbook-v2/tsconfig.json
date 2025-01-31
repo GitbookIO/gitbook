@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
+    "target": "esnext",
     "lib": [
       "dom",
       "dom.iterable",
@@ -13,7 +13,7 @@
     "incremental": true,
     "module": "esnext",
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -23,7 +23,8 @@
       }
     ],
     "paths": {
-        "@/*": ["./src/*"]
+        "@/*": ["./src/*"],
+        "@v1/*": ["../gitbook/src/*"]
     },
   },
   "include": [
