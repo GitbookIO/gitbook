@@ -75,6 +75,8 @@ const HINT_STYLES: {
         icon: 'circle-exclamation',
         iconColor: ['text-amber-500', 'dark:text-orange-400'], // Darker shades of orange-* mismatch with lighter shades, so in light mode we use amber text on top of orange bg.
         bodyColor: [
+            'text-orange-950',
+            'dark:text-orange-50',
             '[&_a]:text-orange-800',
             '[&_a:hover]:text-orange-900',
             'dark:[&_a]:text-orange-400',
@@ -91,6 +93,8 @@ const HINT_STYLES: {
         icon: 'triangle-exclamation',
         iconColor: ['text-red-500', 'dark:text-red-400'],
         bodyColor: [
+            'text-red-950',
+            'dark:text-red-50',
             '[&_a]:text-red-800',
             '[&_a:hover]:text-red-900',
             'dark:[&_a]:text-red-400',
@@ -106,6 +110,8 @@ const HINT_STYLES: {
         icon: 'circle-check',
         iconColor: ['text-green-500', 'dark:text-green-400'],
         bodyColor: [
+            'text-green-950',
+            'dark:text-green-50',
             '[&_a]:text-green-800',
             '[&_a:hover]:text-green-900',
             'dark:[&_a]:text-green-400',

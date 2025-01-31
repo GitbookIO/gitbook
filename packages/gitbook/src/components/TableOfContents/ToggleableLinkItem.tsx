@@ -143,7 +143,7 @@ export function ToggleableLinkItem(
 
                         'before:bg-primary-solid',
                         'text-primary',
-                        'sidebar-list-pill:bg-primary-solid/4',
+                        'sidebar-list-pill:bg-primary',
                         'sidebar-list-pill:text-primary',
 
                         'hover:bg-primary-hover',
