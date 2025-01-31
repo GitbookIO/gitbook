@@ -73,9 +73,30 @@ export function OpenAPISchemaProperty(
         );
     }
 
-    // if (schema.type === 'array' && properties && properties.length === 1) {
-    //     <OpenAPISchemaPresentation {...props} />;
-    // }
+    if (alternatives?.[0]?.length) {
+        return (
+            <div className="openapi-schema-presentation">
+                <OpenAPISchemaName
+                    type={getSchemaTitle(schema)}
+                    propertyName={propertyName}
+                    required={required}
+                />
+                {schema.description ? (
+                    <Markdown source={schema.description} className="openapi-schema-description" />
+                ) : null}
+                {alternatives[0].map((alternative, index) => (
+                    <OpenAPISchemaObject context={context}>
+                        <OpenAPISchemaProperty
+                            propertyName={getSchemaTitle(alternative, alternatives[1])}
+                            schema={alternative}
+                            circularRefs={circularRefs}
+                            context={context}
+                        />
+                    </OpenAPISchemaObject>
+                ))}
+            </div>
+        );
+    }
 
     return (
         <InteractiveSection
@@ -109,9 +130,6 @@ export function OpenAPISchemaProperty(
                             circularRefs={circularRefs}
                             context={context}
                         />
-                    ) : null}
-                    {schema.enum && schema.enum.length > 0 ? (
-                        <OpenAPISchemaEnum enumValues={schema.enum} />
                     ) : null}
                     {parentCircularRef ? (
                         <OpenAPISchemaCircularRef id={parentCircularRef} schema={schema} />
@@ -254,13 +272,16 @@ function OpenAPISchemaPresentation(props: OpenAPISchemaPropertyEntry) {
             ) : null}
             {shouldDisplayExample(schema) ? (
                 <div className="openapi-schema-example">
-                    Example: <code>{stringifyOpenAPI(schema.example)}</code>
+                    Example <code>{stringifyOpenAPI(schema.example)}</code>
                 </div>
             ) : null}
             {schema.pattern ? (
                 <div className="openapi-schema-pattern">
-                    Pattern: <code>{schema.pattern}</code>
+                    Pattern <code>{schema.pattern}</code>
                 </div>
+            ) : null}
+            {schema.enum && schema.enum.length > 0 ? (
+                <OpenAPISchemaEnum enumValues={schema.enum} />
             ) : null}
         </div>
     );

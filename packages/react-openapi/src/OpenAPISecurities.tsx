@@ -65,7 +65,7 @@ function getLabelForType(security: OpenAPIV3_1.SecuritySchemeObject) {
                         {/** Show a default description if none is provided */}
                         {!security.description ? (
                             <Markdown
-                                source={`Bearer authentication header of the form Bearer ${`\<token\>`}.`}
+                                source={`Bearer authentication header of the form Bearer ${`&lt;token&gt;`}.`}
                                 className="openapi-securities-description"
                             />
                         ) : null}

@@ -193,7 +193,7 @@
 }
 
 .openapi-schema-enum {
-    @apply flex flex-row text-sm flex-wrap mt-1 text-dark-4/8 dark:text-light-3;
+    @apply flex flex-row text-sm flex-wrap text-dark-4/8 dark:text-light-3;
 }
 
 .openapi-schema-enum-value {
