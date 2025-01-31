@@ -17,6 +17,16 @@
             "dependsOn": ["^build", "generate"],
             "outputs": [".next/**", "!.next/cache/**", "dist"]
         },
+        // Build the package for v2
+        "build:v2": {
+            "dependsOn": ["^build:v2", "^build", "generate"],
+            "outputs": [".next/**", "!.next/cache/**", "dist"]
+        },
+        // Build the package for v2 (cloudflare)
+        "build:v2:cloudflare": {
+            "dependsOn": ["^build:v2:cloudflare", "^build:v2", "generate"],
+            "outputs": [".next/**", "!.next/cache/**", "dist", ".open-next/**"]
+        },
         // Build the package for Cloudflare Pages
         "build:cloudflare": {
             "dependsOn": ["^build", "generate"],
@@ -41,6 +51,12 @@
         },
         // Start the package in development mode
         "dev": {
+            "persistent": true,
+            "cache": false,
+            "dependsOn": ["generate"]
+        },
+        // Start the package in development mode for v2
+        "dev:v2": {
             "persistent": true,
             "cache": false,
             "dependsOn": ["generate"]

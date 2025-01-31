@@ -7,7 +7,7 @@ import { Blocks } from '../Blocks';
 import { InlineProps } from '../Inline';
 import { Inlines } from '../Inlines';
 
-export function Annotation(props: InlineProps<DocumentInlineAnnotation>) {
+export async function Annotation(props: InlineProps<DocumentInlineAnnotation>) {
     const { inline, context, document, children } = props;
 
     const fragment = getNodeFragmentByType(inline, 'annotation-body');
