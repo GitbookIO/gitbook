@@ -1102,22 +1102,6 @@ export const searchSiteContent = cache({
 });
 
 /**
- * Get a list of recommended questions in a space.
- */
-export const getRecommendedQuestionsInSpace = cache({
-    name: 'api.getRecommendedQuestionsInSpace',
-    tag: (spaceId) => getAPICacheTag({ tag: 'space', space: spaceId }),
-    get: async (spaceId: string, options: CacheFunctionOptions) => {
-        const apiCtx = await api();
-        const response = await apiCtx.client.spaces.getRecommendedQuestionsInSpace(spaceId, {
-            ...noCacheFetchOptions,
-            signal: options.signal,
-        });
-        return cacheResponse(response);
-    },
-});
-
-/**
  * Render an integration contentkit UI
  */
 export const renderIntegrationUi = cache({
