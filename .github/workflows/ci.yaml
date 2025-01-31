@@ -202,7 +202,7 @@ jobs:
               with:
                   issue-number: ${{ github.event.pull_request.number }}
                   comment-author: 'github-actions[bot]'
-                  body-includes: GitBook Preview
+                  body-includes: 'Summary of the deployments'
 
             - name: Create or update GitHub comment
               uses: peter-evans/create-or-update-comment@v4
@@ -210,6 +210,8 @@ jobs:
                   comment-id: ${{ steps.fc.outputs.comment-id }}
                   issue-number: ${{ github.event.pull_request.number }}
                   body: |
+                      Summary of the deployments:
+
                       ### Version 1 (production)
 
                       | Version | URL | Status |
