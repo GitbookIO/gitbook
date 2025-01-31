@@ -91,7 +91,6 @@ export async function CustomizationRootLayout(props: {
                     `${fonts[customization.styling.font].className}`,
                     `${ibmPlexMono.variable}`,
                     'bg-tint-base',
-                    'tint:bg-tint-base',
                     '[html.tint.sidebar-filled_&]:bg-tint-subtle', // TODO: Replace this with theme-muted:bg-tint-subtle once themes are available
                 )}
             >

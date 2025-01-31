@@ -77,7 +77,7 @@ export const scale: Record<ColorCategory, ColorSubScale> = {
 export const colorMixMapping = {
     // bgs          |components      |borders         |solid     |text
     light: [0, 0.02, 0.03, 0.05, 0.07, 0.1, 0.15, 0.2, 0.5, 0.55, 0.6, 1],
-    dark: [0, 0.05, 0.08, 0.1, 0.13, 0.15, 0.2, 0.25, 0.5, 0.55, 0.75, 1],
+    dark: [0, 0.03, 0.08, 0.1, 0.13, 0.15, 0.2, 0.25, 0.5, 0.55, 0.75, 1],
 };
 
 /**
@@ -199,7 +199,7 @@ export function colorScale(
             continue;
         }
 
-        const chromaRatio = index >= 8 ? 1 : (index + 1) / mapping.length; // Higher chromaRatio means less background contribution, the color becomes more vibrant
+        const chromaRatio = index < 8 ? (index + 1) * 0.05 : 1;
 
         const shade = {
             L: targetL, // Blend lightness
