@@ -105,7 +105,7 @@
 /** Columns */
 
 .openapi-column-spec {
-    @apply flex flex-col gap-6 flex-1 max-w-3xl;
+    @apply flex flex-col gap-4 flex-1 max-w-3xl;
 }
 
 .openapi-column-preview {
@@ -131,7 +131,7 @@
 }
 
 .openapi-section-body .openapi-schema-properties {
-    @apply gap-4;
+    @apply divide-y;
 }
 
 .openapi-schema-properties .openapi-schema:last-child {
@@ -147,7 +147,7 @@
 }
 
 .openapi-schema-presentation {
-    @apply flex flex-col gap-2;
+    @apply flex flex-col gap-2 py-3;
 }
 
 .openapi-schema-name {
@@ -260,7 +260,7 @@
 }
 
 .openapi-securities-header {
-    @apply py-2 border-b border-dark/2 dark:border-light/2 mb-2 max-w-full flex-1;
+    @apply py-2 border-b border-dark/2 dark:border-light/2 max-w-full flex-1;
 }
 
 .openapi-securities-header-content {
@@ -285,7 +285,7 @@
 }
 
 .openapi-parameters-header {
-    @apply py-2 border-b border-dark/2 dark:border-light/2 mb-2 max-w-full flex-1;
+    @apply py-2 border-b border-dark/2 dark:border-light/2 max-w-full flex-1;
 }
 
 .openapi-parameters-header-content {
@@ -298,7 +298,7 @@
 }
 
 .openapi-requestbody-header {
-    @apply py-2 border-b border-dark/2 dark:border-light/2 mb-2 max-w-full flex-1;
+    @apply py-2 border-b border-dark/2 dark:border-light/2 max-w-full flex-1;
 }
 
 .openapi-requestbody-header-content {
@@ -350,12 +350,12 @@
     @apply flex flex-col gap-4;
 }
 
-.openapi-responsebody .openapi-schema-properties {
-    @apply gap-4;
-}
-
 .openapi-responsebody .openapi-schema-name {
     @apply mb-0;
+}
+
+.openapi-responsebody .openapi-schema-presentation {
+    @apply py-0;
 }
 
 .openapi-responsebody-header,
@@ -513,11 +513,11 @@
 }
 
 .openapi-disclosure-trigger {
-    @apply transition-all rounded-2xl border border-dark/2 dark:border-light/2 px-2.5 py-1 text-[0.8125em] dark:text-light/7 text-dark/7 flex flex-row items-center gap-1.5 -outline-offset-1;
+    @apply transition-all hover:text-dark dark:hover:text-light rounded-2xl border border-dark/2 dark:border-light/2 px-1.5 py-0.5 text-[0.8125em] dark:text-light/7 text-dark/7 flex flex-row items-center gap-1.5 -outline-offset-1;
 }
 
 .openapi-disclosure svg {
-    @apply size-3 transition-all duration-300;
+    @apply size-2.5 transition-all duration-300;
 }
 
 .openapi-disclosure-trigger[aria-expanded='true'] svg {
@@ -529,11 +529,15 @@
 }
 
 .openapi-disclosure-trigger[aria-expanded='false'] {
-    @apply w-auto hover:text-dark dark:hover:text-light;
+    @apply w-auto;
 }
 
 .openapi-disclosure-panel[aria-hidden='false'] {
-    @apply border-b border-x border-dark/2 rounded-b-lg dark:border-light/2 p-2;
+    @apply border-b border-x border-dark/2 rounded-b-lg dark:border-light/2;
+}
+
+.openapi-disclosure-panel .openapi-schema-presentation {
+    @apply p-2;
 }
 
 .openapi-disclosure .openapi-schema-properties .openapi-schema:only-child,
