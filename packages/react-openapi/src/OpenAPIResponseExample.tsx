@@ -5,6 +5,7 @@ import { generateSchemaExample } from './generateSchemaExample';
 import { OpenAPIContextProps } from './types';
 import { createStateKey, noReference } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
+import { OpenAPIV3 } from '@scalar/openapi-types';
 
 /**
  * Display an example of the response content.
@@ -39,39 +40,60 @@ export function OpenAPIResponseExample(props: {
     });
 
     const examples = responses
-        .map((response) => {
-            const responseObject = noReference(response[1]);
+        .map(([key, value]) => {
+            const responseObject = noReference(value);
+            const mediaTypeObject = (() => {
+                if (!responseObject.content) {
+                    return null;
+                }
+                return (
+                    responseObject.content['application/json'] ??
+                    responseObject.content[Object.keys(responseObject.content)[0]]
+                );
+            })();
 
-            // TODO: unnecessary with https://github.com/GitbookIO/gitbook/pull/2780
-            if (!responseObject) {
+            if (!mediaTypeObject) {
                 return null;
             }
 
-            const schema = noReference(
-                (
-                    responseObject.content?.['application/json'] ??
-                    responseObject.content?.[Object.keys(responseObject.content)[0]]
-                )?.schema,
+            const example: OpenAPIV3.ExampleObject | null = noReference(
+                (() => {
+                    const { examples, example } = mediaTypeObject;
+                    if (examples) {
+                        const firstKey = Object.keys(examples)[0];
+                        // @TODO handle multiple examples
+                        const firstExample = noReference(examples[firstKey]);
+                        if (firstExample) {
+                            return firstExample;
+                        }
+                    }
+
+                    if (example) {
+                        return { value: example };
+                    }
+
+                    const schema = noReference(mediaTypeObject.schema);
+                    if (!schema) {
+                        return null;
+                    }
+
+                    return { value: generateSchemaExample(schema) };
+                })(),
             );
 
-            if (!schema) {
-                return null;
-            }
-
-            const example = generateSchemaExample(schema);
-            if (example === undefined) {
+            if (!example?.value) {
                 return null;
             }
 
             return {
-                key: `${response[0]}`,
-                label: `${response[0]}`,
+                key: key,
+                label: key,
                 body: (
                     <context.CodeBlock
                         code={
-                            typeof example === 'string'
-                                ? example
-                                : stringifyOpenAPI(example, null, 2)
+                            typeof example.value === 'string'
+                                ? example.value
+                                : stringifyOpenAPI(example.value, null, 2)
                         }
                         syntax="json"
                     />
