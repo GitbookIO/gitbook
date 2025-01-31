@@ -231,13 +231,10 @@ export const streamAskQuestion = streamResponse(async function* (
  */
 export const streamRecommendedQuestions = streamResponse(async function* (
     organizationId: string,
-    siteId: string
+    siteId: string,
 ) {
     const apiCtx = await api.api();
-    const stream = apiCtx.client.orgs.streamRecommendedQuestionsInSite(
-        organizationId,
-        siteId
-    );
+    const stream = apiCtx.client.orgs.streamRecommendedQuestionsInSite(organizationId, siteId);
 
     for await (const chunk of stream) {
         console.log('got question', chunk);

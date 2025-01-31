@@ -5,6 +5,7 @@ import assertNever from 'assert-never';
 import React from 'react';
 
 import { t, useLanguage } from '@/intl/client';
+import { iterateStreamResponse } from '@/lib/actions';
 import { SiteContentPointer } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
@@ -19,7 +20,6 @@ import {
 } from './server-actions';
 import { useTrackEvent } from '../Insights';
 import { Loading } from '../primitives';
-import { iterateStreamResponse } from '@/lib/actions';
 
 export interface SearchResultsRef {
     moveUp(): void;
@@ -36,7 +36,7 @@ type ResultType =
  * We cache the recommended questions globally to avoid calling the API multiple times
  * when re-opening the search modal.
  */
-let cachedRecommendedQuestions: null | (ResultType[]) = null;
+let cachedRecommendedQuestions: null | ResultType[] = null;
 
 /**
  * Fetch the results of the keyboard navigable elements to display for a query:
@@ -96,7 +96,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 const response = streamRecommendedQuestions(pointer.organizationId, pointer.siteId);
                 const stream = iterateStreamResponse(response);
 
-                for await (const { question} of stream) {
+                for await (const { question } of stream) {
                     if (questions.has(question)) {
                         continue;
                     }
@@ -110,7 +110,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                     cachedRecommendedQuestions = recommendedQuestions;
 
                     if (!cancelled) {
-                        setResultsState({ results: [ ...recommendedQuestions ], fetching: false });
+                        setResultsState({ results: [...recommendedQuestions], fetching: false });
                     }
                 }
             }, 100);
