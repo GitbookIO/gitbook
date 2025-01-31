@@ -121,7 +121,7 @@ export function InteractiveSection(props: {
                         event.stopPropagation();
                     }}
                 >
-                    {tabs.length ? (
+                    {tabs.length > 1 ? (
                         <select
                             className={classNames(
                                 'openapi-section-select',

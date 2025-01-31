@@ -16,9 +16,21 @@ export function OpenAPIRequestBody(props: {
 }) {
     const { requestBody, context } = props;
 
+    const hasMultipleContentTypes = Object.keys(requestBody.content ?? {}).length > 1;
+
     return (
         <InteractiveSection
-            header="Body"
+            header={
+                <div>
+                    <span>Body</span>
+                    {requestBody.description ? (
+                        <Markdown
+                            source={requestBody.description}
+                            className="openapi-requestbody-description"
+                        />
+                    ) : null}
+                </div>
+            }
             className="openapi-requestbody"
             tabs={Object.entries(requestBody.content ?? {}).map(
                 ([contentType, mediaTypeObject]) => {
@@ -34,14 +46,6 @@ export function OpenAPIRequestBody(props: {
                     };
                 },
             )}
-            defaultOpened={context.defaultInteractiveOpened}
-        >
-            {requestBody.description ? (
-                <Markdown
-                    source={requestBody.description}
-                    className="openapi-requestbody-description"
-                />
-            ) : null}
-        </InteractiveSection>
+        />
     );
 }

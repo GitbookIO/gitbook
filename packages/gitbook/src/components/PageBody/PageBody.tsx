@@ -91,8 +91,13 @@ export function PageBody(props: {
                     >
                         <DocumentView
                             document={document}
-                            style={['[&>*+*]:mt-5', 'grid', 'page-api-block:[&>*+*]:mt-12']}
-                            blockStyle={['page-api-block:ml-0']}
+                            style={['[&>*+*]:mt-5', 'grid']}
+                            blockStyle={[
+                                'page-api-block:ml-0',
+                                'page-api-block:mb-12',
+                                'last:page-api-block:mb-5',
+                                'only:page-api-block:mb-5',
+                            ]}
                             context={{
                                 mode: 'default',
                                 content: contentTarget,

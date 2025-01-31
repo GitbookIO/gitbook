@@ -34,7 +34,10 @@ export function OpenAPIResponses(props: {
                         return {
                             id: statusCode,
                             label: (
-                                <>
+                                <div
+                                    className="openapi-response-tab-content"
+                                    key={`response-${statusCode}`}
+                                >
                                     <span className="openapi-response-statuscode">
                                         {statusCode}
                                     </span>
@@ -45,16 +48,22 @@ export function OpenAPIResponses(props: {
                                         />
                                     ) : null}
 
-                                    {content.length
+                                    {/* {content.length
                                         ? content.map(([contentType, mediaType]) => (
                                               <span className="openapi-response-content-type">
                                                   {contentType}
                                               </span>
                                           ))
-                                        : null}
-                                </>
+                                        : null} */}
+                                </div>
                             ),
-                            body: <OpenAPIResponse response={response} context={context} />,
+                            body: (
+                                <OpenAPIResponse
+                                    key={`body-${statusCode}`}
+                                    response={response}
+                                    context={context}
+                                />
+                            ),
                         };
                     },
                 )}

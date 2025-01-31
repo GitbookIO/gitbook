@@ -28,17 +28,16 @@ export function OpenAPISecurities(props: {
                     key: key,
                     label: key,
                     body: (
-                        <>
-                            <div className="openapi-securities-label">
-                                {getLabelForType(security)}
-                            </div>
+                        <div className="openapi-schema-presentation">
+                            {getLabelForType(security)}
+
                             {security.description ? (
                                 <Markdown
                                     source={security.description}
                                     className="openapi-securities-description"
                                 />
                             ) : null}
-                        </>
+                        </div>
                     ),
                 };
             })}
@@ -50,9 +49,9 @@ function getLabelForType(security: OpenAPIV3_1.SecuritySchemeObject) {
     switch (security.type) {
         case 'apiKey':
             return (
-                <div className="openapi-schema-presentation">
+                <>
                     <OpenAPISchemaName propertyName="apiKey" type="string" required />
-                </div>
+                </>
             );
         case 'http':
             if (security.scheme === 'basic') {
@@ -61,10 +60,16 @@ function getLabelForType(security: OpenAPIV3_1.SecuritySchemeObject) {
 
             if (security.scheme == 'bearer') {
                 return (
-                    <div className="openapi-schema-presentation">
+                    <>
                         <OpenAPISchemaName propertyName="Authorization" type="string" required />
-                        <div className="openapi-schema-description openapi-markdown">{`Bearer authentication header of the form Bearer <token>.`}</div>
-                    </div>
+                        {/** Show a default description if none is provided */}
+                        {!security.description ? (
+                            <Markdown
+                                source={`Bearer authentication header of the form Bearer ${`\<token\>`}.`}
+                                className="openapi-securities-description"
+                            />
+                        ) : null}
+                    </>
                 );
             }
 
