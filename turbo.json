@@ -55,6 +55,12 @@
             "cache": false,
             "dependsOn": ["generate"]
         },
+        // Start the package in development mode for v2
+        "dev:v2": {
+            "persistent": true,
+            "cache": false,
+            "dependsOn": ["generate"]
+        },
         // Script run when the package is deployed
         "release": {
             "dependsOn": ["^release", "build"],
