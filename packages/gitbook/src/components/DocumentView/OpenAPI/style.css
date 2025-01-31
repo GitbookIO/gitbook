@@ -5,7 +5,7 @@
 }
 
 .openapi-columns {
-    @apply flex flex-col md:flex-row gap-6 print-mode:flex-col justify-stretch;
+    @apply grid grid-cols-1 md:grid-cols-2 gap-6 print-mode:grid-cols-1 justify-stretch;
 }
 
 /** Intro */
@@ -105,7 +105,7 @@
 /** Columns */
 
 .openapi-column-spec {
-    @apply flex flex-col gap-8 flex-1 max-w-3xl overflow-hidden;
+    @apply flex flex-col gap-8 flex-1 max-w-3xl;
 }
 
 .openapi-column-preview {
@@ -379,7 +379,7 @@
 }
 
 .openapi-codesample-body {
-    @apply py-2;
+    /* @apply py-2; */
 }
 
 .openapi-codesample-overlay {
@@ -451,22 +451,19 @@
     @apply !mb-0;
 }
 
-.openapi-tabs {
-}
-
-.openapi-operation .react-aria-TabList {
+.openapi-operation .openapi-tabs-list {
     @apply flex flex-row gap-3 py-2 px-3 border-b border-dark/2 dark:border-light/2 w-full;
 }
 
-.openapi-operation .react-aria-Tab {
+.openapi-operation .openapi-tabs-tab {
     @apply hover:bg-light-3 dark:hover:bg-dark-3 hover:text-primary cursor-pointer transition-all relative text-sm text-dark/7 px-1 dark:text-light/7 border border-transparent rounded;
 }
 
-.openapi-operation .react-aria-Tab[aria-selected='true'] {
+.openapi-operation .openapi-tabs-tab[aria-selected='true'] {
     @apply text-primary after:absolute after:-bottom-2.5 after:left-0 after:w-full after:h-px after:bg-primary after:transition-all;
 }
 
-.openapi-operation .react-aria-TabPanel {
+.openapi-operation .openapi-tabs-panel {
     @apply flex-1 text-sm focus-visible:outline-none;
 }
 
@@ -474,46 +471,63 @@
     @apply px-3 py-2.5 border-t border-dark/2 dark:border-light/2 text-xs text-dark/7 dark:text-light/7;
 }
 
-.openapi-disclosure {
+.openapi-disclosure-group {
     @apply border-b border-dark/2 dark:border-light/2;
 }
 
-.openapi-disclosure-trigger {
-    @apply flex items-center w-full flex-1 gap-2.5 py-2 outline-none;
+.openapi-disclosure-group-trigger {
+    @apply flex items-center w-full flex-1 overflow-visible gap-2.5 py-2 relative -outline-offset-1;
 }
 
-.openapi-disclosure:last-of-type .openapi-disclosure-trigger {
+.openapi-disclosure:last-of-type .openapi-disclosure-group-trigger {
     @apply border-b-0;
 }
 
-.openapi-disclosure-trigger > svg {
+.openapi-disclosure-group-icon > svg {
     @apply size-2.5 text-dark/8 dark:text-light/8 transition-transform;
 }
 
-.openapi-disclosure-panel {
+.openapi-disclosure-group-icon {
+    @apply absolute -left-2.5 top-1/2 transform -translate-y-1/2 z-50;
+}
+
+.openapi-disclosure-group-panel {
     @apply pb-2;
 }
 
-.openapi-disclosure-trigger[aria-expanded='true'] > svg {
+.openapi-disclosure-group-trigger[aria-expanded='true'] > svg {
     @apply rotate-90;
 }
 
-.openapi-schema-properties-disclosure-trigger {
-    @apply border border-dark/2 dark:border-light/2 px-2.5 py-1.5 text-xs transition-all dark:text-light/7 text-dark/7 flex flex-row items-center gap-1.5;
+.openapi-disclosure {
+    @apply mt-3;
 }
 
-.openapi-schema-properties-disclosure svg {
-    @apply size-3;
+.openapi-disclosure-trigger {
+    @apply transition-all rounded-2xl border border-dark/2 dark:border-light/2 px-2.5 py-1.5 text-xs transition-all dark:text-light/7 text-dark/7 flex flex-row items-center gap-1.5 -outline-offset-1;
 }
 
-.openapi-schema-properties-disclosure-trigger[aria-expanded='true'] {
-    @apply rounded-md w-full border-b rounded-b-none;
+.openapi-disclosure svg {
+    @apply size-3 transition-all duration-300;
 }
 
-.openapi-schema-properties-disclosure-trigger[aria-expanded='false'] {
-    @apply rounded-full w-fit hover:text-dark dark:hover:text-light;
+.openapi-disclosure-trigger[aria-expanded='true'] svg {
+    @apply rotate-45;
 }
 
-.openapi-schema-properties-disclosure-panel {
-    @apply border-b border-x border-dark/2 rounded-b-md dark:border-light/2 p-2;
+.openapi-disclosure-trigger[aria-expanded='true'] {
+    @apply w-full rounded-lg border-b rounded-b-none;
+}
+
+.openapi-disclosure-trigger[aria-expanded='false'] {
+    @apply w-auto hover:text-dark dark:hover:text-light;
+}
+
+.openapi-disclosure-panel[aria-hidden='false'] {
+    @apply border-b border-x border-dark/2 rounded-b-lg dark:border-light/2 p-2;
+}
+
+.openapi-disclosure .openapi-schema-properties .openapi-schema:only-child,
+.openapi-disclosure .openapi-schema-properties .openapi-schema:only-child .openapi-schema-name {
+    @apply !m-0;
 }

@@ -31,7 +31,6 @@ export function OpenAPISchemaProperty(
 ) {
     const {
         propertyName,
-        required,
         schema,
         circularRefs: parentCircularRefs = new Map<OpenAPIV3.SchemaObject, string>(),
         context,
@@ -49,26 +48,10 @@ export function OpenAPISchemaProperty(
         ? null
         : getSchemaAlternatives(schema, new Set(circularRefs.keys()));
 
-    const shouldDisplayExample = (schema: OpenAPIV3.SchemaObject): boolean => {
-        return (
-            typeof schema.example === 'string' ||
-            typeof schema.example === 'number' ||
-            typeof schema.example === 'boolean' ||
-            (Array.isArray(schema.example) && schema.example.length > 0) ||
-            (typeof schema.example === 'object' &&
-                schema.example !== null &&
-                Object.keys(schema.example).length > 0)
-        );
-    };
-
-    if ((properties && properties.length > 1) || schema.type === 'object') {
+    if ((properties && !!properties.length) || schema.type === 'object') {
         return (
             <>
-                <OpenAPISchemaName
-                    type={getSchemaTitle(schema)}
-                    propertyName={propertyName}
-                    required={required}
-                />
+                <OpenAPISchemaName type={getSchemaTitle(schema)} propertyName={propertyName} />
                 {schema.description ? (
                     <Markdown source={schema.description} className="openapi-schema-description" />
                 ) : null}
@@ -85,9 +68,9 @@ export function OpenAPISchemaProperty(
         );
     }
 
-    if (schema.type === 'array' && properties && properties.length === 1) {
-        return <OpenAPISchemaProperty context={context} schema={schema} />;
-    }
+    // if (schema.type === 'array' && properties && properties.length === 1) {
+    //     <OpenAPISchemaPresentation {...props} />;
+    // }
 
     return (
         <InteractiveSection
@@ -109,31 +92,7 @@ export function OpenAPISchemaProperty(
                     />
                 ),
             }))}
-            header={
-                <div className={classNames('openapi-schema-presentation')}>
-                    <OpenAPISchemaName
-                        type={getSchemaTitle(schema)}
-                        propertyName={propertyName}
-                        required={required}
-                    />
-                    {schema.description ? (
-                        <Markdown
-                            source={schema.description}
-                            className="openapi-schema-description"
-                        />
-                    ) : null}
-                    {shouldDisplayExample(schema) ? (
-                        <div className="openapi-schema-example">
-                            Example: <code>{stringifyOpenAPI(schema.example)}</code>
-                        </div>
-                    ) : null}
-                    {schema.pattern ? (
-                        <div className="openapi-schema-pattern">
-                            Pattern: <code>{schema.pattern}</code>
-                        </div>
-                    ) : null}
-                </div>
-            }
+            header={<OpenAPISchemaPresentation {...props} />}
         >
             {(properties && properties.length > 0) ||
             (schema.enum && schema.enum.length > 0) ||
@@ -263,6 +222,41 @@ export function OpenAPISchemaEnum(props: { enumValues: any[] }) {
                     </span>
                 ))}
             </span>
+        </div>
+    );
+}
+
+function OpenAPISchemaPresentation(props: OpenAPISchemaPropertyEntry) {
+    const { schema, propertyName, required } = props;
+
+    const shouldDisplayExample = (schema: OpenAPIV3.SchemaObject): boolean => {
+        return (
+            typeof schema.example === 'string' ||
+            typeof schema.example === 'number' ||
+            typeof schema.example === 'boolean'
+        );
+    };
+
+    return (
+        <div className={classNames('openapi-schema-presentation')}>
+            <OpenAPISchemaName
+                type={getSchemaTitle(schema)}
+                propertyName={propertyName}
+                required={required}
+            />
+            {schema.description ? (
+                <Markdown source={schema.description} className="openapi-schema-description" />
+            ) : null}
+            {shouldDisplayExample(schema) ? (
+                <div className="openapi-schema-example">
+                    Example: <code>{stringifyOpenAPI(schema.example)}</code>
+                </div>
+            ) : null}
+            {schema.pattern ? (
+                <div className="openapi-schema-pattern">
+                    Pattern: <code>{schema.pattern}</code>
+                </div>
+            ) : null}
         </div>
     );
 }

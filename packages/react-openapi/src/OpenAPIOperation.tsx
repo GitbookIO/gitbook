@@ -43,12 +43,11 @@ export function OpenAPIOperation(props: {
                     ) : null}
                     <OpenAPISpec data={data} context={clientContext} />
                 </div>
-                <OpenAPISpec data={data} context={clientContext} />
-            </div>
-            <div className={classNames('openapi-column-preview')}>
-                <div className={classNames('openapi-column-preview-body')}>
-                    <OpenAPICodeSample {...props} />
-                    <OpenAPIResponseExample {...props} />
+                <div className={classNames('openapi-column-preview')}>
+                    <div className={classNames('openapi-column-preview-body')}>
+                        <OpenAPICodeSample {...props} />
+                        <OpenAPIResponseExample {...props} />
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,6 +1,7 @@
 import React from 'react';
-import { Button, Disclosure, DisclosurePanel, Key } from 'react-aria-components';
 import { OpenAPIClientContext, OpenAPIContextProps } from './types';
+import { mergeProps, useButton, useDisclosure, useFocusRing } from 'react-aria';
+import { useDisclosureState } from 'react-stately';
 
 interface Props {
     context: OpenAPIClientContext;
@@ -8,18 +9,35 @@ interface Props {
 }
 
 export function OpenAPISchemaObject({ context, children }: Props): JSX.Element {
-    const [expanded, setExpanded] = React.useState<boolean>();
+    let state = useDisclosureState({});
+    let panelRef = React.useRef<HTMLDivElement | null>(null);
+    let triggerRef = React.useRef<HTMLButtonElement | null>(null);
+    let { buttonProps: triggerProps, panelProps } = useDisclosure({}, state, panelRef);
+    let { buttonProps } = useButton(triggerProps, triggerRef);
+    let { isFocusVisible, focusProps } = useFocusRing();
 
     return (
-        <Disclosure onExpandedChange={setExpanded} className="openapi-schema-properties-disclosure">
-            <Button slot="trigger" className="openapi-schema-properties-disclosure-trigger">
+        <div className="openapi-disclosure">
+            <button
+                ref={triggerRef}
+                {...mergeProps(buttonProps, focusProps)}
+                slot="trigger"
+                className="openapi-disclosure-trigger"
+                style={{
+                    outline: isFocusVisible
+                        ? '2px solid rgb(var(--primary-color-500) / 0.4)'
+                        : 'none',
+                }}
+            >
                 {context.icons.plus}
-                <span>Show child attributes</span>
-            </Button>
+                <span>{state.isExpanded ? 'Hide' : 'Show'} child attributes</span>
+            </button>
 
-            <DisclosurePanel className="openapi-schema-properties-disclosure-panel">
-                {children}
-            </DisclosurePanel>
-        </Disclosure>
+            {state.isExpanded && (
+                <div ref={panelRef} {...panelProps} className="openapi-disclosure-panel">
+                    {children}
+                </div>
+            )}
+        </div>
     );
 }

@@ -25,13 +25,14 @@ export function OpenAPIResponses(props: {
             className={classNames('openapi-responses')}
         >
             <OpenAPIDisclosureGroup
+                allowsMultipleExpanded
                 icon={context.icons.chevronRight}
                 groups={Object.entries(responses).map(
                     ([statusCode, response]: [string, OpenAPIV3.ResponseObject]) => {
                         const content = Object.entries(response.content ?? {});
 
                         return {
-                            key: statusCode,
+                            id: statusCode,
                             label: (
                                 <>
                                     <span className="openapi-response-statuscode">
