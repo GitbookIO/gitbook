@@ -23,8 +23,10 @@ export function ClientCodeBlock(props: ClientBlockProps) {
     const blockRef = useRef<HTMLDivElement>(null);
     const [lines, setLines] = useState<HighlightLine[]>(() => plainHighlight(block, []));
 
-    // We preload the highlighter as soon as possible during the first render.
-    preloadHighlight(block);
+    // Preload the highlighter when the block is mounted.
+    useEffect(() => {
+        import('./highlight').then(({ preloadHighlight }) => preloadHighlight(block));
+    }, [block]);
 
     // Check if the block is in the viewport to start highlighting it.
     const hasBeenInViewport = useHasBeenInViewport(blockRef, {
@@ -35,9 +37,13 @@ export function ClientCodeBlock(props: ClientBlockProps) {
     useEffect(() => {
         if (hasBeenInViewport) {
             let canceled = false;
-            lazyHighlight(block, inlines).then((lines) => {
-                if (!canceled) {
-                    setLines(lines);
+            import('./highlight').then(({ highlight }) => {
+                // We use requestIdleCallback to avoid blocking the main thread
+                // when scrolling.
+                if (typeof requestIdleCallback === 'function') {
+                    requestIdleCallback(() => highlight(block, inlines).then(setLines));
+                } else {
+                    highlight(block, inlines).then(setLines);
                 }
             });
             return () => {
@@ -47,36 +53,4 @@ export function ClientCodeBlock(props: ClientBlockProps) {
     }, [hasBeenInViewport, block, inlines]);
 
     return <CodeBlockRenderer ref={blockRef} block={block} style={style} lines={lines} />;
-}
-
-const IS_SERVER = typeof window === 'undefined';
-
-const preloaded = new WeakSet<DocumentBlockCode>();
-/**
- * Preload the highlighter.
- */
-function preloadHighlight(block: DocumentBlockCode) {
-    if (IS_SERVER) {
-        return;
-    }
-
-    if (preloaded.has(block)) {
-        return;
-    }
-    preloaded.add(block);
-    import('./highlight').then(({ preloadHighlight }) => preloadHighlight(block)).catch(() => {});
-}
-
-/**
- * Highlight a block in a lazy way, highlighter is loaded asynchronously.
- */
-async function lazyHighlight(...args: Parameters<(typeof import('./highlight'))['highlight']>) {
-    const { highlight } = await import('./highlight');
-    // We use requestIdleCallback to avoid blocking the main thread when scrolling for example.
-    if (typeof requestIdleCallback === 'function') {
-        return new Promise<HighlightLine[]>((resolve, reject) => {
-            requestIdleCallback(() => highlight(...args).then(resolve, reject));
-        });
-    }
-    return highlight(...args);
 }
