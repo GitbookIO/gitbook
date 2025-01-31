@@ -157,7 +157,7 @@ export function colorScale(
         const targetL =
             backgroundColor.L * mapping[index] + foregroundColor.L * (1 - mapping[index]);
 
-        if (index == 8 && Math.abs(baseColor.L - targetL) < 0.2) {
+        if (index == 8 && !mix && Math.abs(baseColor.L - targetL) < 0.2) {
             // Original colour is close enough to target, so let's use the original colour as step 9.
             result.push(hex);
             continue;

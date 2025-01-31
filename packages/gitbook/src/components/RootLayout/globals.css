@@ -5,21 +5,6 @@
 @layer base {
     :root {
         --scrollbar-width: calc(100vw - 100%);
-
-        --dark-base: 20 20 20;
-        --light-base: 251 251 251;
-
-        --light-1: color-mix(in srgb, rgb(var(--tint-color-600)), rgb(var(--light-base)) 99%);
-        --light-DEFAULT: color-mix(in srgb, rgb(var(--tint-color-700)), rgb(var(--light-base)) 96%);
-        --light-2: color-mix(in srgb, rgb(var(--tint-color-700)), rgb(var(--light-base)) 94%);
-        --light-3: color-mix(in srgb, rgb(var(--tint-color-800)), rgb(var(--light-base)) 88%);
-        --light-4: color-mix(in srgb, rgb(var(--tint-color-800)), rgb(var(--light-base)) 72%);
-
-        --dark-1: color-mix(in srgb, rgb(var(--tint-color-400)), rgb(var(--dark-base)) 96%);
-        --dark-DEFAULT: color-mix(in srgb, rgb(var(--tint-color-300)), rgb(var(--dark-base)) 94%);
-        --dark-2: color-mix(in srgb, rgb(var(--tint-color-300)), rgb(var(--dark-base)) 92%);
-        --dark-3: color-mix(in srgb, rgb(var(--tint-color-200)), rgb(var(--dark-base)) 91%);
-        --dark-4: color-mix(in srgb, rgb(var(--tint-color-200)), rgb(var(--dark-base)) 64%);
         @apply leading-relaxed;
     }
     body {
@@ -28,23 +13,15 @@
     html {
         @apply gutter-stable;
     }
-    html:is(.no-tint) {
-        --light-base: 255 255 255;
-        --light-DEFAULT: color-mix(
-            in srgb,
-            rgb(var(--tint-color-500)),
-            rgb(var(--light-base)) 100%
-        );
-    }
     h1 {
-        @apply tracking-[-0.025em] text-dark dark:text-light text-balance;
+        @apply tracking-[-0.025em] text-tint-strong text-balance;
     }
     h2,
     h3,
     h4,
     h5,
     h6 {
-        @apply tracking-[-0.0125em] text-dark dark:text-light;
+        @apply tracking-[-0.0125em] text-tint-strong;
     }
 
     a,
