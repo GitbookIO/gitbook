@@ -163,7 +163,11 @@ export function InteractiveSection(props: {
                     {selectedTab?.body}
                 </div>
             ) : null}
-            {overlay}
+            {overlay ? (
+                <div className={classNames('openapi-section-overlay', `${className}-overlay`)}>
+                    {overlay}
+                </div>
+            ) : null}
         </div>
     );
 }

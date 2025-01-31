@@ -111,15 +111,9 @@ export function OpenAPIResponseExample(props: {
     }
 
     return (
-        // <div className="openapi-response-example">
-        //     <OpenAPITabs tabs={examples} />
-        // </div>
-        <OpenAPITabs>
-            <InteractiveSection
-                header={<OpenAPITabsList tabs={examples} />}
-                className="openapi-response-example"
-            >
-                <OpenAPITabsPanels tabs={examples} />
+        <OpenAPITabs items={examples}>
+            <InteractiveSection header={<OpenAPITabsList />} className="openapi-response-example">
+                <OpenAPITabsPanels />
             </InteractiveSection>
         </OpenAPITabs>
     );

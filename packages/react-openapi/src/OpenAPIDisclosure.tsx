@@ -10,41 +10,106 @@ import React from 'react';
 
 interface Props {
     groups: {
-        key: string;
+        id: string;
         label: string | React.ReactNode;
         body: React.ReactNode;
     }[];
     icon?: React.ReactNode;
 }
 
-export function OpenAPIDisclosureGroup({ groups, icon }: Props) {
-    const [expanded, setExpanded] = React.useState<Set<Key>>();
+type DisclosureGroup = {
+    id: string;
+    label: string | React.ReactNode;
+    body: React.ReactNode;
+};
+
+import { mergeProps, useButton, useDisclosure, useFocusRing, useId } from 'react-aria';
+import {
+    DisclosureGroupProps,
+    DisclosureGroupState,
+    useDisclosureGroupState,
+    useDisclosureState,
+} from 'react-stately';
+
+const DisclosureGroupStateContext = React.createContext<DisclosureGroupState | null>(null);
+
+export function OpenAPIDisclosureGroup(props: DisclosureGroupProps & Props) {
+    const { icon, groups } = props;
+
+    let state = useDisclosureGroupState(props);
 
     return (
-        <DisclosureGroup
-            onExpandedChange={setExpanded}
-            expandedKeys={expanded}
-            allowsMultipleExpanded
-            className="openapi-disclosure-group"
-        >
-            {groups.map((group) => (
-                <Disclosure id={group.key} className="openapi-disclosure" key={group.key}>
-                    <Button slot="trigger" className="openapi-disclosure-trigger">
+        <div className="group">
+            <DisclosureGroupStateContext.Provider value={state}>
+                {groups.map((group) => (
+                    <DisclosureItem icon={icon} key={group.id} group={group} />
+                ))}
+            </DisclosureGroupStateContext.Provider>
+        </div>
+    );
+}
+
+function DisclosureItem(props: { group: DisclosureGroup; icon?: React.ReactNode }) {
+    const { icon, group } = props;
+
+    let defaultId = useId();
+    const id = group.id || defaultId;
+    let groupState = React.useContext(DisclosureGroupStateContext);
+    let isExpanded = groupState?.expandedKeys.has(id) || false;
+    let state = useDisclosureState({
+        isExpanded,
+        onExpandedChange(isExpanded) {
+            if (groupState) {
+                groupState.toggleKey(id);
+            }
+        },
+    });
+
+    let panelRef = React.useRef<HTMLDivElement | null>(null);
+    let triggerRef = React.useRef<HTMLButtonElement | null>(null);
+    let isDisabled = groupState?.isDisabled || false;
+    let { buttonProps: triggerProps, panelProps } = useDisclosure(
+        {
+            ...props,
+            isExpanded,
+            isDisabled,
+        },
+        state,
+        panelRef,
+    );
+    let { buttonProps } = useButton(triggerProps, triggerRef);
+    let { isFocusVisible, focusProps } = useFocusRing();
+
+    return (
+        <div className="openapi-disclosure-group">
+            <h3>
+                <button
+                    slot="trigger"
+                    ref={triggerRef}
+                    {...mergeProps(buttonProps, focusProps)}
+                    style={{
+                        outline: isFocusVisible
+                            ? '2px solid rgb(var(--primary-color-500)/0.4)'
+                            : 'none',
+                    }}
+                    className="openapi-disclosure-group-trigger"
+                >
+                    <div className="openapi-disclosure-group-icon">
                         {icon || (
-                            <svg viewBox="0 0 24 24" className="openapi-disclosure-icon">
+                            <svg viewBox="0 0 24 24" className="openapi-disclosure-group-icon">
                                 <path d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                             </svg>
                         )}
-                        {group.label}
-                    </Button>
+                    </div>
+                    {group.label}
+                </button>
+            </h3>
 
-                    {expanded?.has(group.key) && (
-                        <DisclosurePanel className="openapi-disclosure-panel">
-                            {group.body}
-                        </DisclosurePanel>
-                    )}
-                </Disclosure>
-            ))}
-        </DisclosureGroup>
+            {state.isExpanded && (
+                <div className="openapi-disclosure-group-panel" ref={panelRef} {...panelProps}>
+                    {group.body}
+                </div>
+            )}
+        </div>
     );
 }

@@ -182,6 +182,7 @@
         "@scalar/openapi-types": "^0.1.6",
         "classnames": "^2.5.1",
         "flatted": "^3.2.9",
+        "react-aria": "^3.37.0",
         "react-aria-components": "^1.6.0",
         "swagger2openapi": "^7.0.8",
         "usehooks-ts": "^3.1.0",
