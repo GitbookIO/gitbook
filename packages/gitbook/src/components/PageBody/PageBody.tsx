@@ -95,9 +95,9 @@ export function PageBody(props: {
                             style={['[&>*+*]:mt-5', 'grid']}
                             blockStyle={[
                                 'page-api-block:ml-0',
-                                'page-api-block:mb-12',
-                                'last:page-api-block:mb-5',
-                                'only:page-api-block:mb-5',
+                                'page-api-block:[.openapi-operation]:mb-12',
+                                'last:page-api-block:[.openapi-operation]::mb-5',
+                                'only:page-api-block:[.openapi-operation]:mb-5',
                             ]}
                             context={{
                                 mode: 'default',
