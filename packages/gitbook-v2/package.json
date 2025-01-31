@@ -1,0 +1,21 @@
+{
+    "name": "gitbook-v2",
+    "version": "0.0.0",
+    "dependencies": {
+        "next": "canary",
+        "react": "^19.0.0",
+        "react-dom": "^19.0.0",
+        "@gitbook/api": "^0.89.0"
+    },
+    "devDependencies": {
+        "@opennextjs/cloudflare": "^0.4.3"
+    },
+    "scripts": {
+        "dev:v2": "next",
+        "build": "next build",
+        "build:v2": "next build",
+        "start": "next start",
+        "build:v2:cloudflare": "opennextjs-cloudflare",
+        "dev:v2:cloudflare": "wrangler dev --port 8771"
+    }
+}

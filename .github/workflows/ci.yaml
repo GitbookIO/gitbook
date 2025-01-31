@@ -18,7 +18,8 @@ jobs:
             checks: write
             statuses: write
         outputs:
-            deployment_url: ${{ steps.deploy.outputs.deployment-url }}
+            deployment-url: ${{ steps.deploy.outputs.deployment-url }}
+            deployment-alias-url: ${{ steps.deploy.outputs.deployment-alias-url }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -38,7 +39,7 @@ jobs:
                   echo "SENTRY_ENVIRONMENT=preview" >> $GITHUB_ENV
               if: 1 && !startsWith(github.ref, 'refs/heads/main')
             - name: Build Next.js with next-on-pages
-              run: bun run build:cloudflare
+              run: bun run turbo build:cloudflare
               env:
                   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
                   NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
@@ -74,26 +75,163 @@ jobs:
                     -H "Accept: application/vnd.github.v3+json" \
                     -d '{"state": "success", "target_url": "${{ steps.deploy.outputs.deployment-url }}", "description": "Deployed Preview URL for commit", "context": "cloudflare/preview"}' \
                     https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}
-
+    deploy-v2-vercel:
+        name: Deploy v2 to Vercel
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            deployments: write
+            issues: write
+            pull-requests: write
+            checks: write
+            statuses: write
+        outputs:
+            deployment-url: ${{ steps.deploy.outputs.deployment-url }}
+        env:
+            VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+            VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+              env:
+                  PUPPETEER_SKIP_DOWNLOAD: 1
+            - name: Sets env vars for production
+              run: |
+                  echo "VERCEL_ENVIRONMENT=production" >> $GITHUB_ENV
+                  echo "SENTRY_ENVIRONMENT=production" >> $GITHUB_ENV
+                  echo "GITBOOK_ASSETS_PREFIX=https://static.gitbook.com" >> $GITHUB_ENV
+              if: startsWith(github.ref, 'refs/heads/main')
+            - name: Sets env vars for preview
+              run: |
+                  echo "VERCEL_ENVIRONMENT=preview" >> $GITHUB_ENV
+                  echo "SENTRY_ENVIRONMENT=preview" >> $GITHUB_ENV
+              if: 1 && !startsWith(github.ref, 'refs/heads/main')
+            - name: Pull Vercel Environment Information
+              run: bun run vercel pull --yes --environment=$VERCEL_ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }}
+            - name: Build Project Artifacts
+              run: bun run vercel build --token=${{ secrets.VERCEL_TOKEN }}
+              env:
+                  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+                  NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
+                  SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+                  SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
+                  SENTRY_DSN: ${{ vars.SENTRY_DSN }}
+                  SENTRY_RELEASE: ${{ github.sha }}
+            - name: Deploy Project Artifacts to Vercel
+              id: deploy
+              run: |
+                  DEPLOYMENT_URL=$(bun run vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+                  echo "deployment-url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
+            - name: Outputs
+              run: |
+                  echo "URL: ${{ steps.deploy.outputs.deployment-url }}"
+    deploy-v2-cloudflare:
+        name: Deploy v2 to Cloudflare Worker
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            deployments: write
+            issues: write
+            pull-requests: write
+            checks: write
+            statuses: write
+        outputs:
+            deployment-url: ${{ steps.deploy.outputs.deployment-url }}
+        env:
+            VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+            VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+              env:
+                  PUPPETEER_SKIP_DOWNLOAD: 1
+            - name: Sets env vars for production
+              run: |
+                  echo "SENTRY_ENVIRONMENT=production" >> $GITHUB_ENV
+                  echo "GITBOOK_ASSETS_PREFIX=https://static.gitbook.com" >> $GITHUB_ENV
+              if: startsWith(github.ref, 'refs/heads/main')
+            - name: Sets env vars for preview
+              run: |
+                  echo "SENTRY_ENVIRONMENT=preview" >> $GITHUB_ENV
+              if: 1 && !startsWith(github.ref, 'refs/heads/main')
+            - name: Build worker
+              run: bun run turbo build:v2:cloudflare
+              env:
+                  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+                  NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
+                  SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+                  SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
+                  SENTRY_DSN: ${{ vars.SENTRY_DSN }}
+                  SENTRY_RELEASE: ${{ github.sha }}
+            - id: deploy
+              name: Deploy to Cloudflare
+              uses: cloudflare/wrangler-action@v3.11.0
+              with:
+                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+                  workingDirectory: ./
+                  wranglerVersion: '3.82.0'
+                  command: versions upload --config ./packages/gitbook-v2/wrangler.toml
+            - name: Outputs
+              run: |
+                  echo "URL: ${{ steps.deploy.outputs.deployment-url }}"
+    comment-deployments:
+        runs-on: ubuntu-latest
+        name: Comment Deployments
+        if: always() && !startsWith(github.ref, 'refs/heads/main')
+        needs:
+            - deploy
+            - deploy-v2-vercel
+            - deploy-v2-cloudflare
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
             - name: Find GitHub Comment
               uses: peter-evans/find-comment@v3
               id: fc
-              if: 1 && !startsWith(github.ref, 'refs/heads/main')
               with:
                   issue-number: ${{ github.event.pull_request.number }}
                   comment-author: 'github-actions[bot]'
-                  body-includes: GitBook Preview
+                  body-includes: 'Summary of the deployments'
 
             - name: Create or update GitHub comment
               uses: peter-evans/create-or-update-comment@v4
-              if: 1 && !startsWith(github.ref, 'refs/heads/main')
               with:
                   comment-id: ${{ steps.fc.outputs.comment-id }}
                   issue-number: ${{ github.event.pull_request.number }}
                   body: |
-                      **GitBook Preview**
-                      Latest commit: [${{ steps.deploy.outputs.deployment-url }}](${{ steps.deploy.outputs.deployment-url }})
-                      PR: [${{ steps.deploy.outputs.deployment-alias-url }}](${{ steps.deploy.outputs.deployment-alias-url }})
+                      Summary of the deployments:
+
+                      ### Version 1 (production)
+
+                      | Version | URL | Status |
+                      | --- | --- | --- |
+                      | Latest commit | [${{ needs.deploy.outputs.deployment-url }}](${{ needs.deploy.outputs.deployment-url }}) | ${{ needs.deploy.result == 'success' && '✅' || '❌' }} |
+                      | PR | [${{ needs.deploy.outputs.deployment-alias-url }}](${{ needs.deploy.outputs.deployment-alias-url }}) | ${{ needs.deploy.result == 'success' && '✅' || '❌' }} |
+
+                      ### Version 2 (experimental)
+
+                      | Version | URL | Status |
+                      | --- | --- | --- |
+                      | Vercel | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}](${{ needs.deploy-v2-vercel.outputs.deployment-url }}) | ${{ needs.deploy-v2-vercel.result == 'success' && '✅' || '❌' }} |
+                      | Cloudflare | [${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}](${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}) | ${{ needs.deploy-v2-cloudflare.result == 'success' && '✅' || '❌' }} |
+
+                      ### Test content
+
+                      | Site | v1 | v2 |
+                      | --- | --- | --- |
+                      | GitBook | [${{ needs.deploy.outputs.deployment-url }}/docs.gitbook.com](${{ needs.deploy.outputs.deployment-url }}/docs.gitbook.com) | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}/static/url/docs.gitbook.com](${{ needs.deploy-v2-vercel.outputs.deployment-url }}/static/url/docs.gitbook.com) |
+                      | E2E | [${{ needs.deploy.outputs.deployment-url }}/gitbook.gitbook.io/test-gitbook-open](${{ needs.deploy.outputs.deployment-url }}/gitbook.gitbook.io/test-gitbook-open) | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}/static/url/gitbook.gitbook.io/test-gitbook-open](${{ needs.deploy-v2-vercel.outputs.deployment-url }}/static/url/gitbook.gitbook.io/test-gitbook-open) |
                   edit-mode: replace
     visual-testing:
         runs-on: ubuntu-latest
@@ -111,7 +249,7 @@ jobs:
             - name: Run Playwright tests
               run: bun e2e
               env:
-                  BASE_URL: ${{needs.deploy.outputs.deployment_url}}
+                  BASE_URL: ${{needs.deploy.outputs.deployment-url}}
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
             - uses: actions/upload-artifact@v4
               if: ${{ !cancelled() }}
@@ -135,7 +273,7 @@ jobs:
             - name: Run pagespeed tests
               run: bun ./packages/gitbook/tests/pagespeed-testing.ts $DEPLOYMENT_URL
               env:
-                  DEPLOYMENT_URL: ${{needs.deploy.outputs.deployment_url}}
+                  DEPLOYMENT_URL: ${{needs.deploy.outputs.deployment-url}}
                   PAGESPEED_API_KEY: ${{ secrets.PAGESPEED_API_KEY }}
     format:
         runs-on: ubuntu-latest
