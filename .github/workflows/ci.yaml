@@ -147,7 +147,7 @@ jobs:
                 DEPLOYMENT_URL=$(bun run vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
                 echo "deployment-url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
     deploy-v2-cloudflare:
-        name: Deploy v2 to Cloudflare
+        name: Deploy v2 to Cloudflare Worker
         runs-on: ubuntu-latest
         permissions:
             contents: read
@@ -180,7 +180,7 @@ jobs:
                   echo "SENTRY_ENVIRONMENT=preview" >> $GITHUB_ENV
               if: 1 && !startsWith(github.ref, 'refs/heads/main')
             - name: Build worker
-              run: bun run build:v2:cloudflare
+              run: bun run turbo build:v2:cloudflare
               env:
                 SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
                 NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
