@@ -11,7 +11,10 @@ export async function SiteContentLayout({
     children: React.ReactNode;
 }) {
     const { api } = context;
-    const { data: publishedSite } = await api.orgs.getPublishedContentSite(context.organizationId, context.siteId);
+    const { data: publishedSite } = await api.orgs.getPublishedContentSite(
+        context.organizationId,
+        context.siteId,
+    );
 
     return (
         <html lang="en">

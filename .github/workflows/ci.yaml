@@ -211,7 +211,7 @@ jobs:
                   issue-number: ${{ github.event.pull_request.number }}
                   body: |
                       ### Version 1 (production)
-                      
+
                       | Version | URL | Status |
                       | --- | --- | --- |
                       | Latest commit | [${{ needs.deploy.outputs.deployment-url }}](${{ needs.deploy.outputs.deployment-url }}) | ${{ needs.deploy.result == 'success' && '✅' || '❌' }} |
