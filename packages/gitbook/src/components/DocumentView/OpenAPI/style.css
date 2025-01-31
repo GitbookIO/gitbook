@@ -19,7 +19,7 @@
 }
 
 .openapi-description.openapi-markdown {
-    @apply prose-sm;
+    @apply prose-base;
 }
 
 .openapi-markdown blockquote {
@@ -157,15 +157,15 @@
 }
 
 .openapi-schema-propertyname {
-    @apply select-all font-semibold font-mono text-dark dark:text-light;
+    @apply select-all font-medium font-mono text-dark dark:text-light;
 }
 
 .openapi-schema-required {
-    @apply font-normal text-amber-600;
+    @apply font-normal text-amber-600 text-[13px];
 }
 
 .openapi-schema-type {
-    @apply text-dark-4/8 dark:text-light-4 select-text font-normal font-mono;
+    @apply text-dark-4/8 dark:text-light-4 select-text text-[13px] font-normal font-mono;
 }
 
 .openapi-schema-type:only-child {
@@ -178,10 +178,6 @@
 
 .openapi-schema-intro {
     @apply flex-1;
-}
-
-.openapi-schema-body {
-    @apply mt-2;
 }
 
 .openapi-schema-circular {
@@ -202,7 +198,6 @@
 
 .openapi-schema-enum-value {
     @apply text-sm;
-    /* @apply font-mono text-xs px-1.5 py-1 border border-light-4 ml-[-1px] mt-[-1px] text-dark/8 dark:text-light/8 dark:border-dark-4; */
 }
 
 .openapi-schema-enum-value:first-child {
@@ -264,7 +259,7 @@
 }
 
 .openapi-securities-header-content {
-    @apply font-medium text-dark-2 dark:text-light;
+    @apply font-medium text-dark-2 text-base dark:text-light;
 }
 
 .openapi-securities-body {
@@ -289,7 +284,7 @@
 }
 
 .openapi-parameters-header-content {
-    @apply font-medium text-dark-2 dark:text-light;
+    @apply font-medium text-dark-2 text-base dark:text-light;
 }
 
 /** Request body */
@@ -302,7 +297,7 @@
 }
 
 .openapi-requestbody-header-content {
-    @apply font-medium text-dark-2 dark:text-light-4;
+    @apply font-medium text-dark-2 text-base dark:text-light;
 }
 
 .openapi-requestbody-description.openapi-markdown {
@@ -322,7 +317,7 @@
 }
 
 .openapi-responses-header-content {
-    @apply font-medium text-dark-2 dark:text-light-4;
+    @apply font-medium text-dark-2 text-base dark:text-light;
 }
 
 /** Response */
@@ -331,7 +326,7 @@
 }
 
 .openapi-response-description.openapi-markdown {
-    @apply prose-sm text-[0.8125em] text-left text-dark/8 dark:text-light/8 px-0 truncate;
+    @apply prose-sm text-[13px] text-left text-dark/8 dark:text-light/8 px-0 truncate;
 }
 
 .openapi-response-description p {
@@ -383,7 +378,7 @@
 }
 
 .openapi-codesample-title {
-    @apply flex-1 font-normal text-sm text-dark/7 dark:text-light-4 truncate;
+    @apply flex-1 font-medium text-sm font-mono text-dark/8 dark:text-light/8 truncate;
 }
 
 .openapi-codesample-title em {
@@ -411,10 +406,6 @@
     @apply flex-1 w-full;
 }
 
-.openapi-response-example-title {
-    @apply flex-1 font-semibold text-sm;
-}
-
 /** Common */
 
 .openapi-select {
@@ -431,7 +422,7 @@
 }
 
 .openapi-section-header-content {
-    @apply flex-1 text-[0.938em] flex w-full overflow-hidden;
+    @apply flex-1 text-base flex w-full overflow-hidden;
 }
 
 .openapi-section-header-controls {
@@ -468,7 +459,7 @@
 }
 
 .openapi-operation .openapi-tabs-tab {
-    @apply hover:bg-light-3 dark:hover:bg-dark-3 hover:text-primary cursor-pointer transition-all relative text-sm text-dark/7 px-1 dark:text-light/7 border border-transparent rounded;
+    @apply hover:bg-light-3 font-mono tabular-nums dark:hover:bg-dark-3 hover:text-primary cursor-pointer transition-all relative text-sm text-dark/7 px-1 dark:text-light/7 border border-transparent rounded;
 }
 
 .openapi-operation .openapi-tabs-tab[aria-selected='true'] {
@@ -513,7 +504,7 @@
 }
 
 .openapi-disclosure-trigger {
-    @apply transition-all hover:text-dark dark:hover:text-light rounded-2xl border border-dark/2 dark:border-light/2 px-1.5 py-0.5 text-[0.8125em] dark:text-light/7 text-dark/7 flex flex-row items-center gap-1.5 -outline-offset-1;
+    @apply transition-all hover:text-dark dark:hover:text-light rounded-2xl border border-dark/2 dark:border-light/2 px-1.5 py-0.5 text-[13px] dark:text-light/7 text-dark/7 flex flex-row items-center gap-1.5 -outline-offset-1;
 }
 
 .openapi-disclosure svg {
@@ -543,4 +534,8 @@
 .openapi-disclosure .openapi-schema-properties .openapi-schema:only-child,
 .openapi-disclosure .openapi-schema-properties .openapi-schema:only-child .openapi-schema-name {
     @apply !m-0;
+}
+
+.openapi-disclosure .openapi-schema-properties .openapi-schema-enum {
+    @apply p-2 pt-0 mt-0;
 }
