@@ -18,7 +18,8 @@ jobs:
             checks: write
             statuses: write
         outputs:
-            deployment_url: ${{ steps.deploy.outputs.deployment-url }}
+            deployment-url: ${{ steps.deploy.outputs.deployment-url }}
+            deployment-alias-url: ${{ steps.deploy.outputs.deployment-alias-url }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -74,27 +75,6 @@ jobs:
                     -H "Accept: application/vnd.github.v3+json" \
                     -d '{"state": "success", "target_url": "${{ steps.deploy.outputs.deployment-url }}", "description": "Deployed Preview URL for commit", "context": "cloudflare/preview"}' \
                     https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}
-
-            - name: Find GitHub Comment
-              uses: peter-evans/find-comment@v3
-              id: fc
-              if: 1 && !startsWith(github.ref, 'refs/heads/main')
-              with:
-                  issue-number: ${{ github.event.pull_request.number }}
-                  comment-author: 'github-actions[bot]'
-                  body-includes: GitBook Preview
-
-            - name: Create or update GitHub comment
-              uses: peter-evans/create-or-update-comment@v4
-              if: 1 && !startsWith(github.ref, 'refs/heads/main')
-              with:
-                  comment-id: ${{ steps.fc.outputs.comment-id }}
-                  issue-number: ${{ github.event.pull_request.number }}
-                  body: |
-                      **GitBook Preview**
-                      Latest commit: [${{ steps.deploy.outputs.deployment-url }}](${{ steps.deploy.outputs.deployment-url }})
-                      PR: [${{ steps.deploy.outputs.deployment-alias-url }}](${{ steps.deploy.outputs.deployment-alias-url }})
-                  edit-mode: replace
     deploy-v2-vercel:
         name: Deploy v2 to Vercel
         runs-on: ubuntu-latest
@@ -106,7 +86,7 @@ jobs:
             checks: write
             statuses: write
         outputs:
-            deployment_url: ${{ steps.deploy.outputs.deployment-url }}
+            deployment-url: ${{ steps.deploy.outputs.deployment-url }}
         env:
             VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
             VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -160,7 +140,7 @@ jobs:
             checks: write
             statuses: write
         outputs:
-            deployment_url: ${{ steps.deploy.outputs.deployment-url }}
+            deployment-url: ${{ steps.deploy.outputs.deployment-url }}
         env:
             VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
             VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -203,7 +183,41 @@ jobs:
             - name: Outputs
               run: |
                     echo "URL: ${{ steps.deploy.outputs.deployment-url }}"
-                    echo "Alias URL: ${{ steps.deploy.outputs.deployment-alias-url }}"
+    comment-deployments:
+        runs-on: ubuntu-latest
+        name: Comment Deployments
+        if: 1 && !startsWith(github.ref, 'refs/heads/main')
+        needs:
+            - deploy
+            - deploy-v2-vercel
+            - deploy-v2-cloudflare
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
+            - name: Find GitHub Comment
+              uses: peter-evans/find-comment@v3
+              id: fc
+              with:
+                  issue-number: ${{ github.event.pull_request.number }}
+                  comment-author: 'github-actions[bot]'
+                  body-includes: GitBook Preview
+
+            - name: Create or update GitHub comment
+              uses: peter-evans/create-or-update-comment@v4
+              with:
+                  comment-id: ${{ steps.fc.outputs.comment-id }}
+                  issue-number: ${{ github.event.pull_request.number }}
+                  body: |
+                      **Main Preview**
+                      Latest commit: [${{ jobs.deploy.outputs.deployment-url }}](${{ jobs.deploy.outputs.deployment-url }})
+                      PR: [${{ jobs.deploy.outputs.deployment-alias-url }}](${{ jobs.deploy.outputs.deployment-alias-url }})
+
+                      **Experimental Version 2**
+                      Vercel: [${{ jobs.deploy-v2-vercel.outputs.deployment-url }}](${{ jobs.deploy-v2-vercel.outputs.deployment-url }})
+                      Cloudflare: [${{ jobs.deploy-v2-cloudflare.outputs.deployment-url }}](${{ jobs.deploy-v2-cloudflare.outputs.deployment-url }})
+                  edit-mode: replace
     visual-testing:
         runs-on: ubuntu-latest
         name: Visual Testing
@@ -220,7 +234,7 @@ jobs:
             - name: Run Playwright tests
               run: bun e2e
               env:
-                  BASE_URL: ${{needs.deploy.outputs.deployment_url}}
+                  BASE_URL: ${{needs.deploy.outputs.deployment-url}}
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
             - uses: actions/upload-artifact@v4
               if: ${{ !cancelled() }}
@@ -244,7 +258,7 @@ jobs:
             - name: Run pagespeed tests
               run: bun ./packages/gitbook/tests/pagespeed-testing.ts $DEPLOYMENT_URL
               env:
-                  DEPLOYMENT_URL: ${{needs.deploy.outputs.deployment_url}}
+                  DEPLOYMENT_URL: ${{needs.deploy.outputs.deployment-url}}
                   PAGESPEED_API_KEY: ${{ secrets.PAGESPEED_API_KEY }}
     format:
         runs-on: ubuntu-latest
