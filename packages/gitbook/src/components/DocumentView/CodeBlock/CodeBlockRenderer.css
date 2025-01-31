@@ -20,17 +20,17 @@
     &:not(.highlighted) + .highlighted:has(+ :not(.highlighted)) {
         @apply rounded-md;
     }
-}
 
-.highlight-line-number {
-    @apply text-sm text-right pr-3.5 rounded-l pl-2 sticky left-[-3px] bg-gradient-to-r from-80% from-light-2 to-transparent dark:from-dark-2 dark:to-transparent;
-    @apply before:text-dark/5 before:content-[counter(line)] [counter-increment:line] dark:before:text-light/4;
+    > .highlight-line-number {
+        @apply text-sm text-right pr-3.5 rounded-l pl-2 sticky left-[-3px] bg-gradient-to-r from-80% from-light-2 to-transparent dark:from-dark-2 dark:to-transparent;
+        @apply before:text-dark/5 before:content-[counter(line)] [counter-increment:line] dark:before:text-light/4;
+    }
 
-    &.highlighted {
+    &.highlighted > .highlight-line-number {
         @apply before:text-dark/6 dark:before:text-light/8 bg-gradient-to-r from-80% from-light-3 to-transparent dark:from-dark-3 dark:to-transparent;
     }
-}
 
-.highlight-line-content {
-    @apply ml-3 block text-sm;
+    > .highlight-line-content {
+        @apply ml-3 block text-sm;
+    }
 }
