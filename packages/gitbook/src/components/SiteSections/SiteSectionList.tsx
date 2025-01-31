@@ -65,7 +65,11 @@ export function SiteSectionList(props: { sections: SectionsList; className: Clas
     );
 }
 
-export function SiteSectionListItem(props: { section: SiteSection; isActive: boolean; className?: string; }) {
+export function SiteSectionListItem(props: {
+    section: SiteSection;
+    isActive: boolean;
+    className?: string;
+}) {
     const { section, isActive, className, ...otherProps } = props;
 
     const isMounted = useIsMounted();
@@ -80,7 +84,7 @@ export function SiteSectionListItem(props: { section: SiteSection; isActive: boo
             ref={linkRef}
             aria-current={isActive && 'page'}
             className={tcls(
-                tcls(`flex flex-row items-center gap-3 px-3 py-2
+                `flex flex-row items-center gap-3 px-3 py-2
             hover:bg-tint-hover contrast-more:hover:ring-1 contrast-more:hover:ring-tint
             hover:text-tint-strong
             rounded-md straight-corners:rounded-none transition-all group/section-link`,
@@ -88,7 +92,8 @@ export function SiteSectionListItem(props: { section: SiteSection; isActive: boo
                     ? `text-primary hover:text-primary-strong contrast-more:text-primary-strong font-semibold
                 hover:bg-primary-hover contrast-more:hover:ring-1 contrast-more:hover:ring-primary-hover`
                     : null,
-            ), className)}
+                className,
+            )}
             {...otherProps}
         >
             <div
@@ -207,8 +212,8 @@ export function SiteSectionGroupItem(props: {
                     : null
             }`}
             >
-                            <div
-                className={`shrink-0 size-8 flex items-center justify-center
+                <div
+                    className={`shrink-0 size-8 flex items-center justify-center
                     bg-light-1 dark:bg-dark-1 shadow-sm shadow-dark/4
                     dark:shadow-none rounded-md straight-corners:rounded-none leading-none
                     ring-1 ring-dark/1 dark:ring-light/2
@@ -224,15 +229,15 @@ export function SiteSectionGroupItem(props: {
                         text-primary-600 contrast-more:text-primary-700 dark:text-primary-400 dark:contrast-more:text-primary-300`
                             : null
                     }`}
-            >
-                {group.icon ? (
-                    <SectionIcon icon={group.icon as IconName} isActive={isActiveGroup} />
-                ) : (
-                    <span className={`opacity-8 text-sm ${isActiveGroup && 'opacity-10'}`}>
-                        {group.title.substring(0, 2)}
-                    </span>
-                )}
-            </div>
+                >
+                    {group.icon ? (
+                        <SectionIcon icon={group.icon as IconName} isActive={isActiveGroup} />
+                    ) : (
+                        <span className={`opacity-8 text-sm ${isActiveGroup && 'opacity-10'}`}>
+                            {group.title.substring(0, 2)}
+                        </span>
+                    )}
+                </div>
                 {group.title}
                 <span
                     className={tcls(
