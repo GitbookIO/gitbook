@@ -13,9 +13,6 @@ import { SectionIcon } from './SectionIcon';
 
 const VIEWPORT_ITEM_WIDTH = 240; /* width of the tile (w-60) */
 
-//TODO get section group working with vertical section list
-//TODO tidy up the components!
-
 /**
  * A set of navigational links representing site sections for multi-section sites
  */
