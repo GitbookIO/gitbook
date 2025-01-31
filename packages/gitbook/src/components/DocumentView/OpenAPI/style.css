@@ -131,7 +131,7 @@
 }
 
 .openapi-section-body .openapi-schema-properties {
-    @apply divide-y;
+    @apply divide-y divide-dark/2 dark:divide-light/2;
 }
 
 .openapi-schema-properties .openapi-schema:last-child {
