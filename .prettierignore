@@ -1,5 +1,6 @@
 .next
 .vercel
+.open-next
 
 # Generated
 packages/emoji-codepoints/index.ts

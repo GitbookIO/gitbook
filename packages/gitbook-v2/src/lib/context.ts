@@ -47,7 +47,10 @@ export async function createDynamicSiteContext(url: string[]): Promise<GitBookSi
 /**
  * Fetch the context of a site for a given URL and a base context.
  */
-async function fetchSiteContext(urlParts: string[], baseContext: GitBookContext): Promise<GitBookSiteContext> {
+async function fetchSiteContext(
+    urlParts: string[],
+    baseContext: GitBookContext,
+): Promise<GitBookSiteContext> {
     const { api } = baseContext;
     const url = getURLFromParams(urlParts);
     const { data } = await api.urls.getPublishedContentByUrl({

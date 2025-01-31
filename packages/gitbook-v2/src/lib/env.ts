@@ -1,5 +1,3 @@
-
-
 /**
  * Default GitBook API URL endpoint.
  */
