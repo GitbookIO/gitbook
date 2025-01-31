@@ -139,9 +139,10 @@ export function colorScale(
     const foregroundColor = rgbToOklch(hexToRgbArray(foreground));
     const backgroundColor = rgbToOklch(hexToRgbArray(background));
 
-    if(mixColor) { // If defined, we mix in a (tiny) bit of the mix color with the base color.
-        baseColor.L = (mixColor.L * mixRatio) + (baseColor.L * (1-mixRatio));
-        baseColor.C = (mixColor.C * mixRatio) + (baseColor.C * (1-mixRatio));
+    if (mixColor) {
+        // If defined, we mix in a (tiny) bit of the mix color with the base color.
+        baseColor.L = mixColor.L * mixRatio + baseColor.L * (1 - mixRatio);
+        baseColor.C = mixColor.C * mixRatio + baseColor.C * (1 - mixRatio);
         baseColor.H = mixColor.H;
     }
 
