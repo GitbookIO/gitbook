@@ -1,6 +1,6 @@
 import type { DocumentBlockCode } from '@gitbook/api';
 import assertNever from 'assert-never';
-import { useId } from 'react';
+import { forwardRef, useId } from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
@@ -19,7 +19,10 @@ type CodeBlockRendererProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'sty
 /**
  * The logic of rendering a code block from lines.
  */
-export function CodeBlockRenderer(props: CodeBlockRendererProps) {
+export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
+    props: CodeBlockRendererProps,
+    ref: React.ForwardedRef<HTMLDivElement>,
+) {
     const { block, style, lines } = props;
 
     const id = useId();
@@ -28,7 +31,7 @@ export function CodeBlockRenderer(props: CodeBlockRendererProps) {
     const title = block.data.title;
 
     return (
-        <div className={tcls('group/codeblock grid grid-flow-col', style)}>
+        <div ref={ref} className={tcls('group/codeblock grid grid-flow-col', style)}>
             <div className="flex items-center justify-start [grid-area:1/1] text-sm gap-2">
                 {title ? (
                     <div className="text-xs tracking-wide text-dark/7 leading-none inline-flex items-center justify-center bg-light-2 rounded-t straight-corners:rounded-t-s px-3 py-2 dark:bg-dark-2 dark:text-light/7">
@@ -66,7 +69,7 @@ export function CodeBlockRenderer(props: CodeBlockRendererProps) {
             </pre>
         </div>
     );
-}
+});
 
 function CodeHighlightLine(props: {
     line: HighlightLine;

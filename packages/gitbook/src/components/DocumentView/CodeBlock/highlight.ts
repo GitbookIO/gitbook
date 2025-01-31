@@ -43,13 +43,26 @@ const highlighter = createSingletonShorthands(
 );
 
 /**
+ * Preload the highlighter for a code block.
+ */
+export async function preloadHighlight(block: DocumentBlockCode) {
+    const langName = getBlockLang(block);
+    if (langName) {
+        await highlighter.getSingletonHighlighter({
+            langs: [langName],
+            themes: [theme],
+        });
+    }
+}
+
+/**
  * Highlight a code block while preserving inline elements.
  */
 export async function highlight(
     block: DocumentBlockCode,
     inlines: RenderedInline[],
 ): Promise<HighlightLine[]> {
-    const langName = block.data.syntax ? getLanguageForSyntax(block.data.syntax) : null;
+    const langName = getBlockLang(block);
     if (!langName) {
         // Language not found, fallback to plain highlighting
         return plainHighlight(block, inlines);
@@ -89,6 +102,13 @@ export async function highlight(
             tokens: result,
         };
     });
+}
+
+/**
+ * Get the language of a code block.
+ */
+function getBlockLang(block: DocumentBlockCode): string | null {
+    return block.data.syntax ? getLanguageForSyntax(block.data.syntax) : null;
 }
 
 const syntaxAliases: Record<string, BundledLanguage> = {

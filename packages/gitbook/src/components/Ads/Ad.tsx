@@ -13,6 +13,7 @@ import { t, useLanguage } from '@/intl/client';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { renderAd } from './renderAd';
+import { useHasBeenInViewport } from '../hooks/useHasBeenInViewport';
 import { useTrackEvent } from '../Insights';
 import { Link } from '../primitives';
 
@@ -43,7 +44,6 @@ export function Ad({
     mode?: 'classic' | 'auto' | 'cover';
 }) {
     const containerRef = React.useRef<HTMLDivElement>(null);
-    const [visible, setVisible] = React.useState(false);
     const [ad, setAd] = React.useState<
         { children: React.ReactNode; insightsAd: SiteInsightsAd | null } | undefined
     >(undefined);
@@ -57,42 +57,14 @@ export function Ad({
                 ad: ad.insightsAd,
             });
         }
-    }, [ad]);
+    }, [ad, trackEvent]);
 
-    // Observe the container visibility
-    React.useEffect(() => {
-        if (!containerRef.current) {
-            return;
-        }
-
-        if (typeof IntersectionObserver === 'undefined') {
-            return;
-        }
-
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting) {
-                    setVisible(true);
-                }
-            },
-            {
-                root: null,
-                rootMargin: '0px',
-                threshold: 0.1,
-            },
-        );
-
-        observer.observe(containerRef.current);
-
-        return () => {
-            observer.disconnect();
-        };
-    }, []);
+    const hasBeenInViewport = useHasBeenInViewport(containerRef, { threshold: 0.1 });
 
     // When the container is visible,
     // track an impression on the ad and fetch it
     React.useEffect(() => {
-        if (!visible) {
+        if (!hasBeenInViewport) {
             return;
         }
 
@@ -136,7 +108,7 @@ export function Ad({
         return () => {
             cancelled = true;
         };
-    }, [visible, zoneId, ignore, placement, mode, siteAdsStatus]);
+    }, [hasBeenInViewport, zoneId, ignore, placement, mode, siteAdsStatus]);
 
     return (
         <div ref={containerRef} className={tcls(style)} data-visual-test="removed">
