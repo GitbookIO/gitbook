@@ -5,7 +5,7 @@
         "next": "canary",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
-        "@gitbook/api": "^0.89.0"
+        "@gitbook/api": "^0.90.0"
     },
     "devDependencies": {
         "@opennextjs/cloudflare": "^0.4.3"
