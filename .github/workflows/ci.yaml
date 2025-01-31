@@ -95,7 +95,7 @@ jobs:
                       Latest commit: [${{ steps.deploy.outputs.deployment-url }}](${{ steps.deploy.outputs.deployment-url }})
                       PR: [${{ steps.deploy.outputs.deployment-alias-url }}](${{ steps.deploy.outputs.deployment-alias-url }})
                   edit-mode: replace
-    deploy-vercel:
+    deploy-v2-vercel:
         name: Deploy v2 to Vercel
         runs-on: ubuntu-latest
         permissions:
@@ -142,7 +142,65 @@ jobs:
                 SENTRY_DSN: ${{ vars.SENTRY_DSN }}
                 SENTRY_RELEASE: ${{ github.sha }}
             - name: Deploy Project Artifacts to Vercel
-              run: bun run vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+              id: deploy
+              run: |
+                DEPLOYMENT_URL=$(bun run vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+                echo "deployment-url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
+    deploy-v2-cloudflare:
+        name: Deploy v2 to Cloudflare
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            deployments: write
+            issues: write
+            pull-requests: write
+            checks: write
+            statuses: write
+        outputs:
+            deployment_url: ${{ steps.deploy.outputs.deployment-url }}
+        env:
+            VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+            VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+              env:
+                  PUPPETEER_SKIP_DOWNLOAD: 1
+            - name: Sets env vars for production
+              run: |
+                  echo "SENTRY_ENVIRONMENT=production" >> $GITHUB_ENV
+                  echo "GITBOOK_ASSETS_PREFIX=https://static.gitbook.com" >> $GITHUB_ENV
+              if: startsWith(github.ref, 'refs/heads/main')
+            - name: Sets env vars for preview
+              run: |
+                  echo "SENTRY_ENVIRONMENT=preview" >> $GITHUB_ENV
+              if: 1 && !startsWith(github.ref, 'refs/heads/main')
+            - name: Build worker
+              run: bun run build:v2:cloudflare
+              env:
+                SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+                NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
+                SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+                SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
+                SENTRY_DSN: ${{ vars.SENTRY_DSN }}
+                SENTRY_RELEASE: ${{ github.sha }}
+            - id: deploy
+              name: Deploy to Cloudflare
+              uses: cloudflare/wrangler-action@v3.11.0
+              with:
+                    apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                    accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+                    workingDirectory: ./
+                    wranglerVersion: '3.82.0'
+                    command: versions upload --config ./packages/gitbook-v2/wrangler.toml
+            - name: Outputs
+              run: |
+                    echo "URL: ${{ steps.deploy.outputs.deployment-url }}"
+                    echo "Alias URL: ${{ steps.deploy.outputs.deployment-alias-url }}"
     visual-testing:
         runs-on: ubuntu-latest
         name: Visual Testing
