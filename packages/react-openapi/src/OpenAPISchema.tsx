@@ -272,7 +272,12 @@ function OpenAPISchemaPresentation(props: OpenAPISchemaPropertyEntry) {
             ) : null}
             {shouldDisplayExample(schema) ? (
                 <div className="openapi-schema-example">
-                    Example <code>{stringifyOpenAPI(schema.example)}</code>
+                    Example{' '}
+                    <code>
+                        {typeof schema.example === 'string'
+                            ? schema.example
+                            : stringifyOpenAPI(schema.example)}
+                    </code>
                 </div>
             ) : null}
             {schema.pattern ? (
