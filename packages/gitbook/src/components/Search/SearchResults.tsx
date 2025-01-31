@@ -5,6 +5,7 @@ import assertNever from 'assert-never';
 import React from 'react';
 
 import { t, useLanguage } from '@/intl/client';
+import { iterateStreamResponse } from '@/lib/actions';
 import { SiteContentPointer } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
@@ -12,10 +13,10 @@ import { SearchPageResultItem } from './SearchPageResultItem';
 import { SearchQuestionResultItem } from './SearchQuestionResultItem';
 import { SearchSectionResultItem } from './SearchSectionResultItem';
 import {
-    getRecommendedQuestions,
     OrderedComputedResult,
     searchSiteSpaceContent,
     searchAllSiteContent,
+    streamRecommendedQuestions,
 } from './server-actions';
 import { useTrackEvent } from '../Insights';
 import { Loading } from '../primitives';
@@ -32,6 +33,12 @@ type ResultType =
     | { type: 'recommended-question'; id: string; question: string };
 
 /**
+ * We cache the recommended questions globally to avoid calling the API multiple times
+ * when re-opening the search modal.
+ */
+let cachedRecommendedQuestions: null | ResultType[] = null;
+
+/**
  * Fetch the results of the keyboard navigable elements to display for a query:
  *   - Recommended questions if no query is provided.
  *   - Search results if a query is provided.
@@ -41,7 +48,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
     props: {
         children?: React.ReactNode;
         query: string;
-        spaceId: string;
         revisionId: string;
         global: boolean;
         withAsk: boolean;
@@ -50,7 +56,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     },
     ref: React.Ref<SearchResultsRef>,
 ) {
-    const { children, query, pointer, spaceId, revisionId, withAsk, global, onSwitchToAsk } = props;
+    const { children, query, pointer, revisionId, withAsk, global, onSwitchToAsk } = props;
 
     const language = useLanguage();
     const trackEvent = useTrackEvent();
@@ -60,7 +66,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
     }>({ results: [], fetching: true });
     const [cursor, setCursor] = React.useState<number | null>(null);
     const refs = React.useRef<(null | HTMLAnchorElement)[]>([]);
-    const suggestedQuestionsRef = React.useRef<null | ResultType[]>(null);
 
     React.useEffect(() => {
         if (!query) {
@@ -69,42 +74,50 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 return;
             }
 
-            if (suggestedQuestionsRef.current) {
-                setResultsState({ results: suggestedQuestionsRef.current, fetching: false });
+            if (cachedRecommendedQuestions) {
+                setResultsState({ results: cachedRecommendedQuestions, fetching: false });
                 return;
             }
 
             let cancelled = false;
 
             setResultsState({ results: [], fetching: true });
-            getRecommendedQuestions(spaceId).then((questions) => {
-                if (!questions) {
-                    if (!cancelled) {
-                        setResultsState({ results: [], fetching: false });
-                    }
-                    captureException(
-                        new Error(`corrupt-cache: getRecommendedQuestions is ${questions}`),
-                    );
-                    return;
-                }
 
-                const results = questions.map((question) => ({
-                    type: 'recommended-question',
-                    id: question,
-                    question: question,
-                })) satisfies ResultType[];
+            // We currently have a bug where the same question can be returned multiple times.
+            // This is a workaround to avoid that.
+            const questions = new Set<string>();
+            const recommendedQuestions: ResultType[] = [];
 
-                suggestedQuestionsRef.current = results;
-
+            const timeout = setTimeout(async () => {
                 if (cancelled) {
                     return;
                 }
 
-                setResultsState({ results, fetching: false });
-            });
+                const response = streamRecommendedQuestions(pointer.organizationId, pointer.siteId);
+                const stream = iterateStreamResponse(response);
+
+                for await (const { question } of stream) {
+                    if (questions.has(question)) {
+                        continue;
+                    }
+
+                    questions.add(question);
+                    recommendedQuestions.push({
+                        type: 'recommended-question',
+                        id: question,
+                        question,
+                    });
+                    cachedRecommendedQuestions = recommendedQuestions;
+
+                    if (!cancelled) {
+                        setResultsState({ results: [...recommendedQuestions], fetching: false });
+                    }
+                }
+            }, 100);
 
             return () => {
                 cancelled = true;
+                clearTimeout(timeout);
             };
         } else {
             setResultsState((prev) => ({ results: prev.results, fetching: true }));
@@ -142,7 +155,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 clearTimeout(timeout);
             };
         }
-    }, [query, global, pointer, spaceId, revisionId, withAsk, trackEvent]);
+    }, [query, global, pointer, revisionId, withAsk, trackEvent]);
 
     const results: ResultType[] = React.useMemo(() => {
         if (!withAsk) {

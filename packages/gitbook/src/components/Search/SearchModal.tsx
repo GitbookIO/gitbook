@@ -18,7 +18,6 @@ import { SearchState, UpdateSearchState, useSearch } from './useSearch';
 import { LoadingPane } from '../primitives/LoadingPane';
 
 interface SearchModalProps {
-    spaceId: string;
     revisionId: string;
     spaceTitle: string;
     isMultiVariants: boolean;
@@ -147,7 +146,6 @@ function SearchModalBody(
 ) {
     const {
         pointer,
-        spaceId,
         revisionId,
         spaceTitle,
         withAsk,
@@ -309,7 +307,6 @@ function SearchModalBody(
                 <SearchResults
                     ref={resultsRef}
                     pointer={pointer}
-                    spaceId={spaceId}
                     revisionId={revisionId}
                     global={isMultiVariants && state.global}
                     query={state.query}

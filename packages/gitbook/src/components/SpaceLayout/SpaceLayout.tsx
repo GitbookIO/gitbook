@@ -183,7 +183,6 @@ export async function SpaceLayout(props: {
 
             <React.Suspense fallback={null}>
                 <SearchModal
-                    spaceId={contentTarget.spaceId}
                     revisionId={contentTarget.revisionId}
                     spaceTitle={customization.title ?? space.title}
                     withAsk={customization.aiSearch.enabled}

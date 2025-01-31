@@ -227,12 +227,20 @@ export const streamAskQuestion = streamResponse(async function* (
 });
 
 /**
- * List suggested questions for a space.
+ * Stream a list of suggested questions for the site.
  */
-export async function getRecommendedQuestions(spaceId: string): Promise<string[]> {
-    const data = await api.getRecommendedQuestionsInSpace(spaceId);
-    return data.questions;
-}
+export const streamRecommendedQuestions = streamResponse(async function* (
+    organizationId: string,
+    siteId: string,
+) {
+    const apiCtx = await api.api();
+    const stream = apiCtx.client.orgs.streamRecommendedQuestionsInSite(organizationId, siteId);
+
+    for await (const chunk of stream) {
+        console.log('got question', chunk);
+        yield chunk;
+    }
+});
 
 async function transformAnswer(
     answer: SearchAIAnswer,
