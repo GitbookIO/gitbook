@@ -21,6 +21,7 @@ The new version is deployed automatically to Cloudflare using a Github Action on
 ## Potential issues
 
 - [ ] We can't use `dynamicIO` because our root layout needs to fetch the params (https://github.com/vercel/next.js/discussions/71927)
+- [ ] How to do `nonce` for static resources when we can't use `headers()` (dynamic API) (https://nextjs.org/docs/app/building-your-application/configuring/content-security-policy)
 
 ## Structure
 
