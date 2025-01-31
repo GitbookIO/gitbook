@@ -11,17 +11,7 @@ export const opacities = [0, 4, 8, 12, 16, 24, 40, 64, 72, 88, 96, 100];
 /**
  * Generate a Tailwind color shades from a variable.
  */
-function generateVarShades(varName: string, filter: ColorCategory[] = [], old = false) {
-    if (old) {
-        return shades.reduce(
-            (acc, shade) => {
-                acc[shade] = `rgb(var(--${varName}-${shade}))`;
-                return acc;
-            },
-            { DEFAULT: 'rgb(255 0 0)' } as Record<string, string>, // `rgb(var(--${varName}-DEFAULT))` } as Record<string, string>,
-        );
-    }
-
+function generateVarShades(varName: string, filter: ColorCategory[] = []) {
     const result: { [key: string]: string } = {};
 
     Object.entries(scale).forEach(([categoryName, category]) => {
@@ -35,7 +25,6 @@ function generateVarShades(varName: string, filter: ColorCategory[] = [], old = 
             });
         }
     });
-    result['original'] = `rgb(var(--${varName}-original))`;
 
     return result;
 }

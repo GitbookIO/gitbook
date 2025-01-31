@@ -67,28 +67,18 @@ export async function CustomizationRootLayout(props: {
                     }
                 >{`
                     :root {
-                        ${generateColorVariable('primary', Object.fromEntries(colorScale(customization.styling.primaryColor.light).map((shade, index) => [index + 1, shade])))}
-                        ${generateColorVariable('contrast-primary', Object.fromEntries(colorScale(customization.styling.primaryColor.light).map((shade, index) => [index + 1, colorContrast(shade)])))}
-
-                        ${generateColorVariable('tint', Object.fromEntries(colorScale(tintColor ? (tintColor?.light ?? customization.styling.primaryColor.light ?? DEFAULT_TINT_COLOR) : DEFAULT_TINT_COLOR, { mix: !tintColor ? customization.styling.primaryColor.light : undefined }).map((shade, index) => [index + 1, shade])))}
-                        ${generateColorVariable('contrast-tint', Object.fromEntries(colorScale(tintColor ? (tintColor?.light ?? customization.styling.primaryColor.light ?? DEFAULT_TINT_COLOR) : DEFAULT_TINT_COLOR, { mix: !tintColor ? customization.styling.primaryColor.light : undefined }).map((shade, index) => [index + 1, colorContrast(shade)])))}
-
-                        ${generateColorVariable('neutral', Object.fromEntries(colorScale(DEFAULT_TINT_COLOR).map((shade, index) => [index + 1, shade])))}
-                        ${generateColorVariable('contrast-neutral', Object.fromEntries(colorScale(DEFAULT_TINT_COLOR).map((shade, index) => [index + 1, colorContrast(shade)])))}
+                        ${generateColorVariable('primary', customization.styling.primaryColor.light)}
+                        ${generateColorVariable('tint', tintColor ? (tintColor?.light ?? customization.styling.primaryColor.light ?? DEFAULT_TINT_COLOR) : DEFAULT_TINT_COLOR, { mix: !tintColor ? customization.styling.primaryColor.light : undefined })}
+                        ${generateColorVariable('neutral', DEFAULT_TINT_COLOR)}
 
                         --header-background: ${hexToRgb(headerTheme.backgroundColor.light)};
                         --header-link: ${hexToRgb(headerTheme.linkColor.light)};
                     }
 
                     .dark {
-                        ${generateColorVariable('primary', Object.fromEntries(colorScale(customization.styling.primaryColor.dark, { darkMode: true }).map((shade, index) => [index + 1, shade])))}
-                        ${generateColorVariable('contrast-primary', Object.fromEntries(colorScale(customization.styling.primaryColor.dark, { darkMode: true }).map((shade, index) => [index + 1, colorContrast(shade)])))}
-
-                        ${generateColorVariable('tint', Object.fromEntries(colorScale(tintColor ? (tintColor?.dark ?? customization.styling.primaryColor.dark ?? DEFAULT_TINT_COLOR) : DEFAULT_TINT_COLOR, { darkMode: true, mix: !tintColor ? customization.styling.primaryColor.light : undefined }).map((shade, index) => [index + 1, shade])))}
-                        ${generateColorVariable('contrast-tint', Object.fromEntries(colorScale(tintColor ? (tintColor?.dark ?? customization.styling.primaryColor.dark ?? DEFAULT_TINT_COLOR) : DEFAULT_TINT_COLOR, { darkMode: true, mix: !tintColor ? customization.styling.primaryColor.light : undefined }).map((shade, index) => [index + 1, colorContrast(shade)])))}
-
-                        ${generateColorVariable('neutral', Object.fromEntries(colorScale(DEFAULT_TINT_COLOR, { darkMode: true }).map((shade, index) => [index + 1, shade])))}
-                        ${generateColorVariable('contrast-neutral', Object.fromEntries(colorScale(DEFAULT_TINT_COLOR, { darkMode: true }).map((shade, index) => [index + 1, colorContrast(shade)])))}
+                        ${generateColorVariable('primary', customization.styling.primaryColor.dark, { darkMode: true })}
+                        ${generateColorVariable('tint', tintColor ? (tintColor?.dark ?? customization.styling.primaryColor.dark ?? DEFAULT_TINT_COLOR) : DEFAULT_TINT_COLOR, { darkMode: true, mix: !tintColor ? customization.styling.primaryColor.dark : undefined })}
+                        ${generateColorVariable('neutral', DEFAULT_TINT_COLOR, { darkMode: true })}
 
                         --header-background: ${hexToRgb(headerTheme.backgroundColor.dark)};
                         --header-link: ${hexToRgb(headerTheme.linkColor.dark)};   
@@ -162,17 +152,31 @@ function getSidebarStyles(
 }
 
 type ColorInput = string;
-function generateColorVariable(name: string, color: ColorInput | Record<string, string>) {
+function generateColorVariable(
+    name: string,
+    color: ColorInput | Record<string, string>,
+    {
+        withContrast = true,
+        ...options // Pass any options along to the colorScale() function
+    }: {
+        withContrast?: boolean;
+        [key: string]: any;
+    } = {},
+) {
     const shades: Record<string, string> =
         typeof color === 'string'
-            ? Object.fromEntries(colorScale(color).map((shade, index) => [index + 1, shade]))
+            ? Object.fromEntries(
+                  colorScale(color, options).map((shade, index) => [index + 1, shade]),
+              )
             : color;
 
     return Object.entries(shades)
         .map(([key, value]) => {
-            // Check the original hex value
-            const rgbValue = hexToRgb(value);
-            return `--${name}-${key}: ${rgbValue};`;
+            const rgbValue = hexToRgb(value); // Check the original hex value
+            const contrastValue = withContrast ? hexToRgb(colorContrast(value)) : undefined; // Add contrast if needed
+            return `--${name}-${key}: ${rgbValue}; ${
+                contrastValue ? `--contrast-${name}-${key}: ${contrastValue};` : ''
+            }`;
         })
         .join('\n');
 }
