@@ -115,17 +115,17 @@ jobs:
             - name: Build Project Artifacts
               run: bun run vercel build --token=${{ secrets.VERCEL_TOKEN }}
               env:
-                SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-                NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
-                SENTRY_ORG: ${{ vars.SENTRY_ORG }}
-                SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
-                SENTRY_DSN: ${{ vars.SENTRY_DSN }}
-                SENTRY_RELEASE: ${{ github.sha }}
+                  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+                  NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
+                  SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+                  SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
+                  SENTRY_DSN: ${{ vars.SENTRY_DSN }}
+                  SENTRY_RELEASE: ${{ github.sha }}
             - name: Deploy Project Artifacts to Vercel
               id: deploy
               run: |
-                DEPLOYMENT_URL=$(bun run vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
-                echo "deployment-url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
+                  DEPLOYMENT_URL=$(bun run vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+                  echo "deployment-url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
             - name: Outputs
               run: |
                   echo "URL: ${{ steps.deploy.outputs.deployment-url }}"
@@ -165,24 +165,24 @@ jobs:
             - name: Build worker
               run: bun run turbo build:v2:cloudflare
               env:
-                SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-                NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
-                SENTRY_ORG: ${{ vars.SENTRY_ORG }}
-                SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
-                SENTRY_DSN: ${{ vars.SENTRY_DSN }}
-                SENTRY_RELEASE: ${{ github.sha }}
+                  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+                  NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
+                  SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+                  SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
+                  SENTRY_DSN: ${{ vars.SENTRY_DSN }}
+                  SENTRY_RELEASE: ${{ github.sha }}
             - id: deploy
               name: Deploy to Cloudflare
               uses: cloudflare/wrangler-action@v3.11.0
               with:
-                    apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-                    accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                    workingDirectory: ./
-                    wranglerVersion: '3.82.0'
-                    command: versions upload --config ./packages/gitbook-v2/wrangler.toml
+                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+                  workingDirectory: ./
+                  wranglerVersion: '3.82.0'
+                  command: versions upload --config ./packages/gitbook-v2/wrangler.toml
             - name: Outputs
               run: |
-                    echo "URL: ${{ steps.deploy.outputs.deployment-url }}"
+                  echo "URL: ${{ steps.deploy.outputs.deployment-url }}"
     comment-deployments:
         runs-on: ubuntu-latest
         name: Comment Deployments
