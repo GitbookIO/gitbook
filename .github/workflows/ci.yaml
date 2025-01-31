@@ -146,6 +146,9 @@ jobs:
               run: |
                 DEPLOYMENT_URL=$(bun run vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
                 echo "deployment-url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
+            - name: Outputs
+              run: |
+                  echo "URL: ${{ steps.deploy.outputs.deployment-url }}"
     deploy-v2-cloudflare:
         name: Deploy v2 to Cloudflare Worker
         runs-on: ubuntu-latest
