@@ -1,11 +1,10 @@
 'use client';
 
-import { DocumentBlockCode } from '@gitbook/api';
+import type { DocumentBlockCode } from '@gitbook/api';
 import { useEffect, useState } from 'react';
 
 import type { HighlightLine, RenderedInline } from './highlight';
 import type { BlockProps } from '../Block';
-import './theme.css';
 import { ClientCodeBlockRenderer } from './CodeBlockRenderer';
 import { plainHighlight } from './plain-highlight';
 
@@ -19,7 +18,7 @@ type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> &
  */
 export function ClientCodeBlock(props: ClientBlockProps) {
     const { block, style, inlines } = props;
-    const [lines, setLines] = useState<HighlightLine[]>(() => plainHighlight(block));
+    const [lines, setLines] = useState<HighlightLine[]>(() => plainHighlight(block, []));
     useEffect(() => {
         import('./highlight').then(({ highlight }) => highlight(block, inlines).then(setLines));
     }, [block, inlines]);

@@ -1,16 +1,12 @@
 import { DocumentBlockCode, DocumentBlockCodeLine, DocumentInlineAnnotation } from '@gitbook/api';
-import memoize from 'memoizee';
 import {
     createdBundledHighlighter,
     ThemedToken,
     createCssVariablesTheme,
-    HighlighterGeneric,
+    createSingletonShorthands,
 } from 'shiki/core';
 import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
 import { BundledLanguage, bundledLanguages } from 'shiki/langs';
-
-import { getNodeText } from '@/lib/document';
-import { trace } from '@/lib/tracing';
 
 import { plainHighlight } from './plain-highlight';
 
@@ -33,6 +29,19 @@ export type RenderedInline = {
     body: React.ReactNode;
 };
 
+const theme = createCssVariablesTheme();
+
+const highlighter = createSingletonShorthands(
+    createdBundledHighlighter<any, any>({
+        langs: bundledLanguages,
+        themes: {},
+        engine: () =>
+            createJavaScriptRegexEngine({
+                forgiving: true,
+            }),
+    }),
+);
+
 /**
  * Highlight a code block while preserving inline elements.
  */
@@ -48,11 +57,9 @@ export async function highlight(
 
     const code = getPlainCodeBlock(block);
 
-    const highlighter = await loadHighlighter();
-    await loadHighlighterLanguage(highlighter, langName);
-
-    const lines = highlighter.codeToTokensBase(code, {
+    const lines = await highlighter.codeToTokensBase(code, {
         lang: langName,
+        theme,
         tokenizeMaxLineLength: 400,
     });
 
@@ -78,7 +85,7 @@ export async function highlight(
         currentIndex += 1; // for the \n
 
         return {
-            highlighted: !!lineBlock.data.highlighted,
+            highlighted: Boolean(lineBlock.data.highlighted),
             tokens: result,
         };
     });
@@ -125,50 +132,9 @@ export function getInlines(block: DocumentBlockCode) {
     const inlines: InlineIndexed[] = [];
     getPlainCodeBlock(block, inlines);
 
-    inlines.sort((a, b) => {
-        return a.start - b.start;
-    });
+    inlines.sort((a, b) => a.start - b.start);
 
     return inlines;
-}
-
-/**
- * Parse a code block without highlighting it.
- */
-export function plainHighlighting(
-    block: DocumentBlockCode,
-    inlines?: RenderedInline[],
-): HighlightLine[] {
-    const inlinesCopy = Array.from(inlines ?? []);
-    return block.nodes.map((lineBlock) => {
-        const tokens: HighlightToken[] = [];
-
-        for (const node of lineBlock.nodes) {
-            if (node.object === 'text') {
-                tokens.push({
-                    type: 'plain',
-                    content: getNodeText(node),
-                });
-            } else {
-                const inline = inlinesCopy.shift();
-                tokens.push({
-                    type: 'annotation',
-                    body: inline?.body ?? null,
-                    children: [
-                        {
-                            type: 'plain',
-                            content: getNodeText(node),
-                        },
-                    ],
-                });
-            }
-        }
-
-        return {
-            highlighted: !!lineBlock.data.highlighted,
-            tokens,
-        };
-    });
 }
 
 function matchTokenAndInlines(
@@ -339,40 +305,3 @@ function isEmptyPositionedToken(token: PositionedToken): boolean {
 function cleanupLine(line: string): string {
     return line.replace(/\r/g, '');
 }
-
-const createHighlighter = createdBundledHighlighter<any, any>({
-    langs: bundledLanguages,
-    themes: {},
-    engine: () =>
-        createJavaScriptRegexEngine({
-            forgiving: true,
-        }),
-});
-
-/**
- * Load the highlighter, only once, and reuse it.
- * It makes sure to handle concurrent calls.
- */
-const loadHighlighter = memoize(async () => {
-    return await trace('highlighting.loadHighlighter', async () => {
-        const highlighter = await createHighlighter({
-            themes: [createCssVariablesTheme()],
-            langs: [],
-        });
-        return highlighter;
-    });
-});
-
-const loadHighlighterLanguage = memoize(async function loadHighlighterLanguage(
-    highlighter: HighlighterGeneric<any, any>,
-    lang: keyof typeof bundledLanguages,
-) {
-    if (highlighter.getLoadedLanguages().includes(lang)) {
-        return;
-    }
-
-    await trace(
-        `highlighting.loadLanguage(${lang})`,
-        async () => await highlighter.loadLanguage(lang),
-    );
-});

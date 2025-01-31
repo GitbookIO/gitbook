@@ -9,35 +9,32 @@ import type { HighlightLine, HighlightToken, RenderedInline } from './highlight'
  */
 export function plainHighlight(
     block: DocumentBlockCode,
-    inlines?: RenderedInline[],
+    inlines: RenderedInline[],
 ): HighlightLine[] {
-    const inlinesCopy = Array.from(inlines ?? []);
+    const inlinesCopy = Array.from(inlines);
     return block.nodes.map((lineBlock) => {
-        const tokens: HighlightToken[] = [];
-
-        for (const node of lineBlock.nodes) {
+        const tokens: HighlightToken[] = lineBlock.nodes.map((node) => {
             if (node.object === 'text') {
-                tokens.push({
+                return {
                     type: 'plain',
                     content: getNodeText(node),
-                });
-            } else {
-                const inline = inlinesCopy.shift();
-                tokens.push({
-                    type: 'annotation',
-                    body: inline?.body ?? null,
-                    children: [
-                        {
-                            type: 'plain',
-                            content: getNodeText(node),
-                        },
-                    ],
-                });
+                };
             }
-        }
+            const inline = inlinesCopy.shift();
+            return {
+                type: 'annotation',
+                body: inline?.body ?? null,
+                children: [
+                    {
+                        type: 'plain',
+                        content: getNodeText(node),
+                    },
+                ],
+            };
+        });
 
         return {
-            highlighted: !!lineBlock.data.highlighted,
+            highlighted: Boolean(lineBlock.data.highlighted),
             tokens,
         };
     });
