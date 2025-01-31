@@ -31,8 +31,7 @@ export function Button({
                   'text-contrast-primary-solid',
                   'hover:bg-primary-solid-hover',
                   'hover:text-contrast-primary-solid-hover',
-                  'ring-primary-10',
-                  'hover:ring-primary-11',
+                  'ring-0'
               ]
             : // SECONDARY
               [

@@ -42,7 +42,7 @@ export const scale: Record<ColorCategory, ColorSubScale> = {
         'solid-hover': 10, // Hovered solid backgrounds
     },
     [ColorCategory.text]: {
-        subtle: 9, // Very low-contrast text — WARNING: this contrast does not meet accessiblity guidelines. Always include a mitigating contrast-more check for users who need it.
+        subtle: 9, // Very low-contrast text — WARNING: this contrast does not meet accessiblity guidelines. Always check if you need to include a mitigating contrast-more style for users who need it.
         DEFAULT: 11, // Low-contrast text
         strong: 12, // High-contrast text
     },
@@ -124,15 +124,26 @@ export function colorScale(
         darkMode = false,
         background = darkMode ? dark : light,
         foreground = darkMode ? light : dark,
+        mix,
+        mixRatio = 0.2,
     }: {
         darkMode?: boolean;
         background?: string;
         foreground?: string;
+        mix?: string;
+        mixRatio?: number;
     } = {},
 ) {
-    const baseColor = rgbToOklch(hexToRgbArray(hex));
+    let baseColor = rgbToOklch(hexToRgbArray(hex));
+    const mixColor = mix ? rgbToOklch(hexToRgbArray(mix)) : null;
     const foregroundColor = rgbToOklch(hexToRgbArray(foreground));
     const backgroundColor = rgbToOklch(hexToRgbArray(background));
+
+    if(mixColor) { // If defined, we mix in a (tiny) bit of the mix color with the base color.
+        baseColor.L = (mixColor.L * mixRatio) + (baseColor.L * (1-mixRatio));
+        baseColor.C = (mixColor.C * mixRatio) + (baseColor.C * (1-mixRatio));
+        baseColor.H = mixColor.H;
+    }
 
     const mapping = darkMode
         ? // bgs     |components      |borders         |solid     |text
@@ -151,12 +162,11 @@ export function colorScale(
             continue;
         }
 
-        // Mix in more of the background while maintaining chroma
-        const mixRatio = index >= 8 ? 1 : (index + 1) / mapping.length; // Higher mixRatio means more background contribution
+        const chromaRatio = index >= 8 ? 1 : (index + 1) / mapping.length; // Higher chromaRatio means less background contribution, the color becomes more vibrant
 
         const shade = {
             L: targetL, // Blend lightness
-            C: baseColor.C * mixRatio,
+            C: baseColor.C * chromaRatio,
             H: baseColor.H, // Maintain the hue from the base color
         };
 

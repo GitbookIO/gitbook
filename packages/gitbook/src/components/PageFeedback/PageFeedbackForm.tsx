@@ -155,11 +155,11 @@ function RatingButton(
     return (
         <button
             className={tcls(
-                'p-2 hover:text-tint hover:bg-tint-hover hover:text-tint-strong first:pl-2.5 last:pr-2.5 first:rounded-l-full last:rounded-r-full',
+                'p-2 hover:bg-primary-hover hover:text-primary-strong first:pl-2.5 last:pr-2.5 first:rounded-l-full last:rounded-r-full',
                 'disabled:cursor-not-allowed disabled:hover:bg-inherit disabled:hover:text-inherit disabled:dark:hover:text-inherit',
                 'contrast-more:hover:ring-1 ring-tint',
                 active
-                    ? 'bg-tint-active text-tint-strong disabled:hover:bg-tint-active disabled:hover:text-tint-strong contrast-more:ring-2 contrast-more:hover:ring-2'
+                    ? 'bg-primary-active text-primary-strong disabled:hover:bg-primary-active disabled:hover:text-primary-strong contrast-more:ring-2 contrast-more:hover:ring-2'
                     : 'disabled:opacity-7 disabled:contrast-more:ring-0',
             )}
             type="button"

@@ -50,7 +50,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'bg-tint-base',
 
                 'ring-1',
-                'ring-tint-subtle',
+                'ring-tint-12/2',
 
                 'shadow-sm',
                 'shadow-tint-12/3',

@@ -77,12 +77,12 @@ function ThemeButton(props: {
                 'contrast-more:focus:ring-2',
                 'ring-tint',
                 active && [
-                    'bg-tint',
-                    'hover:bg-tint',
-                    'text-tint',
-                    'contrast-more:text-tint-strong',
+                    'bg-primary',
+                    'hover:bg-primary',
+                    'text-primary-strong',
+                    'contrast-more:text-primary-strong',
                     'contrast-more:ring-1',
-                    'ring-tint',
+                    'ring-primary',
                 ],
             )}
         >
