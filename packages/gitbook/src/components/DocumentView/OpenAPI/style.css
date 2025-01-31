@@ -105,7 +105,7 @@
 /** Columns */
 
 .openapi-column-spec {
-    @apply flex flex-col gap-8 flex-1 max-w-3xl;
+    @apply flex flex-col gap-6 flex-1 max-w-3xl;
 }
 
 .openapi-column-preview {
@@ -131,7 +131,7 @@
 }
 
 .openapi-section-body .openapi-schema-properties {
-    @apply gap-6;
+    @apply gap-4;
 }
 
 .openapi-schema-properties .openapi-schema:last-child {
@@ -513,7 +513,7 @@
 }
 
 .openapi-disclosure-trigger {
-    @apply transition-all rounded-2xl border border-dark/2 dark:border-light/2 px-2.5 py-1 text-[0.8125em] transition-all dark:text-light/7 text-dark/7 flex flex-row items-center gap-1.5 -outline-offset-1;
+    @apply transition-all rounded-2xl border border-dark/2 dark:border-light/2 px-2.5 py-1 text-[0.8125em] dark:text-light/7 text-dark/7 flex flex-row items-center gap-1.5 -outline-offset-1;
 }
 
 .openapi-disclosure svg {
