@@ -2,7 +2,7 @@
 
 import type { SiteSection, SiteSectionGroup } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
-import { motion, stagger, useAnimate } from 'framer-motion';
+import { motion } from 'framer-motion';
 import React from 'react';
 
 import { SectionsList } from '@/lib/api';
@@ -10,7 +10,7 @@ import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { Link } from '../primitives';
 import { SectionIcon } from './SectionIcon';
-import { useIsMounted } from '../hooks';
+import { useIsMounted,  useToggleAnimation,  } from '../hooks';
 import { TOCScrollContainer, useScrollToActiveTOCItem } from '../TableOfContents/TOCScroller';
 
 const MAX_ITEMS = 5; // If there are more sections than this, they'll be shown below the fold in a scrollview.
@@ -126,33 +126,15 @@ export function SiteSectionListItem(props: {
     );
 }
 
-const show = {
-    opacity: 1,
-    height: 'auto',
-    display: 'block',
-};
-
-const hide = {
-    opacity: 0,
-    height: 0,
-    transitionEnd: {
-        display: 'none',
-    },
-};
-
-const staggerMenuItems = stagger(0.02, { ease: (p) => Math.pow(p, 2) });
-
 export function SiteSectionGroupItem(props: {
     group: SiteSectionGroup;
     currentSection: SiteSection;
 }) {
     const { group, currentSection } = props;
-    const [scope, animate] = useAnimate();
+
     const hasDescendants = group.sections.length > 0;
     const isActiveGroup = group.sections.some((section) => section.id === currentSection.id);
     const [isVisible, setIsVisible] = React.useState(isActiveGroup);
-
-    const isMounted = useIsMounted();
 
     // Update the visibility of the children, if we are navigating to a descendant.
     React.useEffect(() => {
@@ -163,34 +145,7 @@ export function SiteSectionGroupItem(props: {
         setIsVisible((prev) => prev || isActiveGroup);
     }, [isActiveGroup, hasDescendants]);
 
-    // Animate the visibility of the children
-    // only after the initial state.
-    React.useEffect(() => {
-        if (!isMounted || !hasDescendants) {
-            return;
-        }
-        try {
-            animate(scope.current, isVisible ? show : hide, {
-                duration: 0.1,
-            });
-
-            const selector = '& > ul > li';
-            if (isVisible)
-                animate(
-                    selector,
-                    { opacity: 1 },
-                    {
-                        delay: staggerMenuItems,
-                    },
-                );
-            else {
-                animate(selector, { opacity: 0 });
-            }
-        } catch (error) {
-            // The selector can crash in some browsers, we ignore it as the animation is not critical.
-            console.error(error);
-        }
-    }, [isVisible, isMounted, hasDescendants, animate, scope]);
+    const {show, hide, scope} = useToggleAnimation({ hasDescendants, isVisible });
 
     return (
         <>
