@@ -4,11 +4,12 @@ import { CodeSampleInput, codeSampleGenerators } from './code-samples';
 import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { generateMediaTypeExample, generateSchemaExample } from './generateSchemaExample';
 import { InteractiveSection } from './InteractiveSection';
-import { getServersURL, OpenAPIServerURL } from './OpenAPIServerURL';
+import { getServersURL } from './OpenAPIServerURL';
 import { ScalarApiButton } from './ScalarApiButton';
 import { OpenAPIContextProps } from './types';
 import { noReference } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
+import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
 
 /**
  * Display code samples to execute the operation.
@@ -19,7 +20,6 @@ export function OpenAPICodeSample(props: {
     context: OpenAPIContextProps;
 }) {
     const { data, context } = props;
-    const { method, path } = data;
 
     const searchParams = new URLSearchParams();
     const headersObject: { [k: string]: string } = {};
@@ -118,43 +118,24 @@ export function OpenAPICodeSample(props: {
         return null;
     }
 
-    const formatPath = (path: string) => {
-        const regex = /\{(\w+)\}/g; // Matches placeholders like {tailnetId}, {userId}, etc.
-        const parts: (string | JSX.Element)[] = [];
-        let lastIndex = 0;
-
-        path.replace(regex, (match, key, offset) => {
-            parts.push(path.slice(lastIndex, offset)); // Push text before the placeholder
-            parts.push(<em key={key}>{`{${key}}`}</em>); // Replace placeholder with <em> tag
-            lastIndex = offset + match.length;
-            return match;
-        });
-
-        parts.push(path.slice(lastIndex)); // Push remaining text after the last placeholder
-
-        return <span>{parts}</span>;
-    };
-
     return (
-        <InteractiveSection
-            className="openapi-codesample"
-            tabs={samples}
-            overlay={
-                data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'] ? null : (
-                    <ScalarApiButton
-                        method={data.method}
-                        path={data.path}
-                        specUrl={context.specUrl}
-                    />
-                )
-            }
-            header={
-                <>
-                    <span className={`openapi-method openapi-method-${method}`}>{method}</span>
-                    <span className="openapi-codesample-title">{formatPath(path)}</span>
-                </>
-            }
-        />
+        <OpenAPITabs items={samples}>
+            <InteractiveSection
+                overlay={
+                    data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'] ? null : (
+                        <ScalarApiButton
+                            method={data.method}
+                            path={data.path}
+                            specUrl={context.specUrl}
+                        />
+                    )
+                }
+                header={<OpenAPITabsList />}
+                className="openapi-codesample"
+            >
+                <OpenAPITabsPanels />
+            </InteractiveSection>
+        </OpenAPITabs>
     );
 }
 

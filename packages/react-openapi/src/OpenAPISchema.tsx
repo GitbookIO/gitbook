@@ -8,7 +8,7 @@ import { OpenAPIClientContext } from './types';
 import { noReference } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
-import { OpenAPISchemaObject } from './OpenAPISchemaObject';
+import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 
 type CircularRefsIds = Map<OpenAPIV3.SchemaObject, string>;
 
@@ -60,7 +60,7 @@ export function OpenAPISchemaProperty(
                 {schema.description ? (
                     <Markdown source={schema.description} className="openapi-schema-description" />
                 ) : null}
-                <OpenAPISchemaObject context={context}>
+                <OpenAPIDisclosure context={context}>
                     {properties && properties.length > 0 ? (
                         <OpenAPISchemaProperties
                             properties={properties}
@@ -68,7 +68,7 @@ export function OpenAPISchemaProperty(
                             context={context}
                         />
                     ) : null}
-                </OpenAPISchemaObject>
+                </OpenAPIDisclosure>
             </div>
         );
     }
@@ -85,14 +85,14 @@ export function OpenAPISchemaProperty(
                     <Markdown source={schema.description} className="openapi-schema-description" />
                 ) : null}
                 {alternatives[0].map((alternative, index) => (
-                    <OpenAPISchemaObject key={`${index}-${alternative.title}`} context={context}>
+                    <OpenAPIDisclosure key={`${index}-${alternative.title}`} context={context}>
                         <OpenAPISchemaProperty
                             propertyName={getSchemaTitle(alternative, alternatives[1])}
                             schema={alternative}
                             circularRefs={circularRefs}
                             context={context}
                         />
-                    </OpenAPISchemaObject>
+                    </OpenAPIDisclosure>
                 ))}
             </div>
         );

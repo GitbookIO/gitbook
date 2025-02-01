@@ -4,7 +4,7 @@ import { OpenAPIV3 } from '@scalar/openapi-types';
 import { OpenAPISchemaProperties } from './OpenAPISchema';
 import { noReference } from './utils';
 import { OpenAPIClientContext } from './types';
-import { OpenAPISchemaObject } from './OpenAPISchemaObject';
+import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 
 /**
  * Display an interactive response body.
@@ -26,7 +26,7 @@ export function OpenAPIResponse(props: {
     return (
         <div className="openapi-response-body">
             {headers.length > 0 ? (
-                <OpenAPISchemaObject context={context} label={'Headers'}>
+                <OpenAPIDisclosure context={context} label={'Headers'}>
                     <OpenAPISchemaProperties
                         properties={headers.map(([name, header]) => ({
                             propertyName: name,
@@ -35,7 +35,7 @@ export function OpenAPIResponse(props: {
                         }))}
                         context={context}
                     />
-                </OpenAPISchemaObject>
+                </OpenAPIDisclosure>
             ) : null}
             {content.length > 0 ? (
                 <div className={classNames('openapi-responsebody')}>

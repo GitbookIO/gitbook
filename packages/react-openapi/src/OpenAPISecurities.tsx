@@ -5,7 +5,7 @@ import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
 import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
-import { OpenAPIDisclosureGroup } from './OpenAPIDisclosure';
+import { OpenAPIDisclosureGroup } from './OpenAPIDisclosureGroup';
 
 /**
  * Present securities authorization that can be used for this operation.
