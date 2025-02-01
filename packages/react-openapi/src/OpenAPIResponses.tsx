@@ -5,7 +5,7 @@ import { OpenAPIResponse } from './OpenAPIResponse';
 import { OpenAPIClientContext } from './types';
 import { InteractiveSection } from './InteractiveSection';
 import { OpenAPIV3, OpenAPIV3_1 } from '@scalar/openapi-types';
-import { OpenAPIDisclosureGroup } from './OpenAPIDisclosure';
+import { OpenAPIDisclosureGroup } from './OpenAPIDisclosureGroup';
 import { Markdown } from './Markdown';
 import { OpenAPIRootSchema } from './OpenAPISchema';
 
