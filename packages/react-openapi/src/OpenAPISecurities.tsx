@@ -32,15 +32,17 @@ export function OpenAPISecurities(props: {
                     key: key,
                     label: key,
                     body: (
-                        <div className="openapi-schema-presentation">
-                            {getLabelForType(security)}
+                        <div className="openapi-schema-body">
+                            <div className="openapi-schema-presentation">
+                                {getLabelForType(security)}
 
-                            {security.description ? (
-                                <Markdown
-                                    source={security.description}
-                                    className="openapi-securities-description"
-                                />
-                            ) : null}
+                                {security.description ? (
+                                    <Markdown
+                                        source={security.description}
+                                        className="openapi-securities-description"
+                                    />
+                                ) : null}
+                            </div>
                         </div>
                     ),
                 };

@@ -13,7 +13,7 @@ import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 type CircularRefsIds = Map<OpenAPIV3.SchemaObject, string>;
 
 export interface OpenAPISchemaPropertyEntry {
-    propertyName?: string;
+    propertyName?: string | JSX.Element;
     required?: boolean;
     schema: OpenAPIV3.SchemaObject;
 }
@@ -51,15 +51,8 @@ export function OpenAPISchemaProperty(
 
     if ((properties && !!properties.length) || schema.type === 'object') {
         return (
-            <div className="openapi-schema-presentation">
-                <OpenAPISchemaName
-                    type={getSchemaTitle(schema)}
-                    propertyName={propertyName}
-                    required={required}
-                />
-                {schema.description ? (
-                    <Markdown source={schema.description} className="openapi-schema-description" />
-                ) : null}
+            <InteractiveSection id={id} className={classNames('openapi-schema', className)}>
+                <OpenAPISchemaPresentation {...props} />
                 <OpenAPIDisclosure context={context}>
                     {properties && properties.length > 0 ? (
                         <OpenAPISchemaProperties
@@ -69,21 +62,14 @@ export function OpenAPISchemaProperty(
                         />
                     ) : null}
                 </OpenAPIDisclosure>
-            </div>
+            </InteractiveSection>
         );
     }
 
     if (alternatives?.[0]?.length) {
         return (
-            <div className="openapi-schema-presentation">
-                <OpenAPISchemaName
-                    type={getSchemaTitle(schema)}
-                    propertyName={propertyName}
-                    required={required}
-                />
-                {schema.description ? (
-                    <Markdown source={schema.description} className="openapi-schema-description" />
-                ) : null}
+            <InteractiveSection id={id} className={classNames('openapi-schema', className)}>
+                <OpenAPISchemaPresentation {...props} />
                 {alternatives[0].map((alternative, index) => (
                     <OpenAPIDisclosure key={`${index}-${alternative.title}`} context={context}>
                         <OpenAPISchemaProperty
@@ -94,7 +80,7 @@ export function OpenAPISchemaProperty(
                         />
                     </OpenAPIDisclosure>
                 ))}
-            </div>
+            </InteractiveSection>
         );
     }
 
@@ -102,24 +88,25 @@ export function OpenAPISchemaProperty(
         <InteractiveSection
             id={id}
             className={classNames('openapi-schema', className)}
-            tabs={alternatives?.[0].map((alternative, index) => ({
-                key: `${index}`,
-                label: getSchemaTitle(alternative, alternatives[1]),
-                body: circularRefs.has(alternative) ? (
-                    <OpenAPISchemaCircularRef
-                        id={circularRefs.get(alternative)!}
-                        schema={alternative}
-                    />
-                ) : (
-                    <OpenAPISchemaAlternative
-                        schema={alternative}
-                        circularRefs={circularRefs}
-                        context={context}
-                    />
-                ),
-            }))}
-            header={<OpenAPISchemaPresentation {...props} />}
+            // tabs={alternatives?.[0].map((alternative, index) => ({
+            //     key: `${index}`,
+            //     label: getSchemaTitle(alternative, alternatives[1]),
+            //     body: circularRefs.has(alternative) ? (
+            //         <OpenAPISchemaCircularRef
+            //             id={circularRefs.get(alternative)!}
+            //             schema={alternative}
+            //         />
+            //     ) : (
+            //         <OpenAPISchemaAlternative
+            //             schema={alternative}
+            //             circularRefs={circularRefs}
+            //             context={context}
+            //         />
+            //     ),
+            // }))}
+            // header={<OpenAPISchemaPresentation {...props} />}
         >
+            <OpenAPISchemaPresentation {...props} />
             {(properties && properties.length > 0) ||
             (schema.enum && schema.enum.length > 0) ||
             parentCircularRef ? (
@@ -159,7 +146,7 @@ export function OpenAPISchemaProperties(props: {
         <div id={id} className={classNames('openapi-schema-properties')}>
             {properties.map((property) => (
                 <OpenAPISchemaProperty
-                    key={property.propertyName}
+                    key={property.propertyName?.toString()}
                     circularRefs={circularRefs}
                     {...property}
                     context={context}
@@ -249,7 +236,7 @@ export function OpenAPISchemaEnum(props: { enumValues: any[] }) {
     );
 }
 
-function OpenAPISchemaPresentation(props: OpenAPISchemaPropertyEntry) {
+export function OpenAPISchemaPresentation(props: OpenAPISchemaPropertyEntry) {
     const { schema, propertyName, required } = props;
 
     const shouldDisplayExample = (schema: OpenAPIV3.SchemaObject): boolean => {
