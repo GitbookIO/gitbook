@@ -1,11 +1,10 @@
-import * as React from 'react';
+import React from 'react';
 
 import { CodeSampleInput, codeSampleGenerators } from './code-samples';
 import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { generateMediaTypeExample, generateSchemaExample } from './generateSchemaExample';
 import { InteractiveSection } from './InteractiveSection';
 import { getServersURL } from './OpenAPIServerURL';
-import { ScalarApiButton } from './ScalarApiButton';
 import { OpenAPIContextProps } from './types';
 import { noReference } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
@@ -120,19 +119,7 @@ export function OpenAPICodeSample(props: {
 
     return (
         <OpenAPITabs items={samples}>
-            <InteractiveSection
-                overlay={
-                    data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'] ? null : (
-                        <ScalarApiButton
-                            method={data.method}
-                            path={data.path}
-                            specUrl={context.specUrl}
-                        />
-                    )
-                }
-                header={<OpenAPITabsList />}
-                className="openapi-codesample"
-            >
+            <InteractiveSection header={<OpenAPITabsList />} className="openapi-codesample">
                 <OpenAPITabsPanels />
             </InteractiveSection>
         </OpenAPITabs>

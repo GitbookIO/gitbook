@@ -20,17 +20,7 @@ export function OpenAPIRequestBody(props: {
 
     return (
         <InteractiveSection
-            header={
-                <div>
-                    <span>Body</span>
-                    {requestBody.description ? (
-                        <Markdown
-                            source={requestBody.description}
-                            className="openapi-requestbody-description"
-                        />
-                    ) : null}
-                </div>
-            }
+            header="Body"
             className="openapi-requestbody"
             tabs={Object.entries(requestBody.content ?? {}).map(
                 ([contentType, mediaTypeObject]) => {
