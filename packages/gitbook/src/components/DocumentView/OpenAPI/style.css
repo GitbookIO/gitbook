@@ -1,3 +1,4 @@
+/* Layout Components */
 .openapi-operation {
     content-visibility: auto;
     contain-intrinsic-height: 600px;
@@ -8,8 +9,7 @@
     @apply grid grid-cols-1 lg:grid-cols-2 gap-6 print-mode:grid-cols-1 justify-stretch;
 }
 
-/** Intro */
-
+/* Introduction */
 .openapi-intro {
     @apply flex flex-col gap-3 max-w-3xl;
 }
@@ -22,6 +22,9 @@
     @apply prose-base;
 }
 
+
+
+/* Markdown Elements */
 .openapi-markdown blockquote {
     @apply !ps-3;
 }
@@ -35,33 +38,28 @@
 }
 
 .openapi-markdown code {
-    @apply py-px
-    px-1
-    min-w-[1.625rem]
-    w-fit
-    justify-center
-    items-center
-    ring-1
-    ring-inset
-    ring-dark/1
-    bg-dark/[0.06]
-    rounded
-    dark:ring-light/1
-    dark:bg-light/1
-    dark:!text-light-4
-    text-sm
-    leading-[calc(max(1.20em,1.25rem))]
-    before:!content-none
-    font-medium
-    after:!content-none;
+    @apply py-px px-1 min-w-[1.625rem] w-fit justify-center items-center ring-1 ring-inset ring-dark/1 bg-dark/[0.06] rounded dark:ring-light/1 dark:bg-light/1 dark:!text-light-4 text-sm leading-[calc(max(1.20em,1.25rem))] before:!content-none font-medium after:!content-none;
 }
 
 .openapi-markdown pre code {
     @apply dark:!bg-transparent dark:!ring-transparent;
 }
 
-/** Method tag */
 
+/* Markdown Base */
+.openapi-markdown {
+    @apply prose text-tint-strong prose-p:!my-2 dark:prose-invert max-w-none whitespace-normal;
+}
+
+.openapi-markdown > *:first-child {
+    @apply !mt-0;
+}
+
+.openapi-markdown > *:last-child {
+    @apply !mb-0;
+}
+
+/* Method Tags */
 .openapi-method {
     @apply rounded uppercase font-mono font-bold text-[11.5px] px-1 py-0.5 mr-2 text-tint-12/8 leading-tight align-middle inline-flex ring-1 ring-inset ring-tint-12/1 dark:ring-tint-1/1 whitespace-nowrap;
 }
@@ -92,8 +90,7 @@
     @apply bg-tint;
 }
 
-/** URL */
-
+/* URL */
 .openapi-url {
     @apply font-mono text-sm text-tint;
 }
@@ -102,8 +99,7 @@
     @apply text-tint underline underline-offset-2 decoration-tint-subtle;
 }
 
-/** Columns */
-
+/* Column Layout */
 .openapi-column-spec {
     @apply flex flex-col gap-4 flex-1 max-w-3xl;
 }
@@ -120,8 +116,7 @@
     @apply max-h-96 print-mode:max-h-none;
 }
 
-/** Schemas */
-
+/* Schema Structure */
 .openapi-schema-root {
     @apply mx-3 mb-3 mt-2;
 }
@@ -146,6 +141,7 @@
     @apply mt-3;
 }
 
+/* Schema Presentation */
 .openapi-schema-presentation {
     @apply flex flex-col gap-1.5 py-3;
 }
@@ -172,6 +168,7 @@
     @apply ml-0;
 }
 
+/* Schema Header */
 .openapi-schema-header {
     @apply flex flex-row items-center;
 }
@@ -192,6 +189,7 @@
     @apply text-base;
 }
 
+/* Schema Enum */
 .openapi-schema-enum {
     @apply flex flex-row text-sm flex-wrap text-dark/7 dark:text-light/7;
 }
@@ -208,6 +206,7 @@
     @apply rounded-r;
 }
 
+/* Schema Description */
 .openapi-schema-description.openapi-markdown {
     @apply prose-sm text-dark/7 dark:text-light/7 !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
@@ -221,6 +220,7 @@
     @apply flex-1 truncate overflow-hidden flex flex-row w-fit h-fit items-center;
 }
 
+/* Schema Examples */
 .openapi-schema-example,
 .openapi-schema-pattern {
     @apply prose-sm text-tint-strong;
@@ -229,31 +229,10 @@
 .openapi-schema-example code,
 .openapi-schema-pattern code,
 .openapi-schema-enum-value code {
-    @apply py-px
-    px-1
-    min-w-[1.625rem]
-    w-fit
-    justify-center
-    items-center
-    ring-1
-    ring-inset
-    ring-dark/1
-    bg-dark/[0.06]
-    rounded
-    dark:ring-light/1
-    dark:bg-light/1
-    text-dark dark:text-light
-    leading-[calc(max(1.20em,1.25rem))]
-    before:!content-none
-    text-xs
-    after:!content-none;
+    @apply py-px px-1 min-w-[1.625rem] w-fit justify-center items-center ring-1 ring-inset ring-dark/1 bg-dark/[0.06] rounded dark:ring-light/1 dark:bg-light/1 text-dark dark:text-light leading-[calc(max(1.20em,1.25rem))] before:!content-none text-xs after:!content-none;
 }
 
-/** Authentication */
-
-.openapi-securities {
-}
-
+/* Authentication */
 .openapi-securities-header {
     @apply py-2 border-b border-tint-subtle max-w-full flex-1;
 }
@@ -274,11 +253,7 @@
     @apply font-medium text-sm text-tint-strong;
 }
 
-/** Parameters */
-
-.openapi-parameters {
-}
-
+/* Parameters */
 .openapi-parameters-header {
     @apply py-2 border-b border-tint-subtle max-w-full flex-1;
 }
@@ -287,11 +262,7 @@
     @apply font-medium text-tint-strong text-base;
 }
 
-/** Request body */
-.openapi-requestbody {
-    /* @apply border rounded border-dark/2 dark:border-light/2; */
-}
-
+/* Request Body */
 .openapi-requestbody-header {
     @apply py-2 border-b border-dark/2 dark:border-light/2 max-w-full flex-1;
 }
@@ -304,10 +275,7 @@
     @apply prose-sm text-dark/7 dark:text-light/7 !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
-/** Responses */
-.openapi-responses {
-}
-
+/* Responses */
 .openapi-responses-header {
     @apply py-2 border-b border-dark/2 dark:border-light/2 max-w-full flex-1;
 }
@@ -316,7 +284,6 @@
     @apply font-medium text-tint-strong text-base;
 }
 
-/** Response */
 .openapi-response-tab-content {
     @apply overflow-hidden max-w-full flex items-center gap-2;
 }
@@ -341,6 +308,7 @@
     @apply flex flex-col gap-4;
 }
 
+/* Response Body and Headers */
 .openapi-responsebody .openapi-schema-name {
     @apply mb-0;
 }
@@ -359,8 +327,7 @@
     @apply text-base text-tint;
 }
 
-/** Code sample */
-
+/* Code Sample */
 .openapi-codesample {
     @apply border rounded bg-tint border-tint-subtle;
 }
@@ -381,38 +348,21 @@
     @apply not-italic text-dark dark:text-light;
 }
 
-.openapi-codesample-body {
-    /* @apply py-2; */
-}
-
 .openapi-codesample-overlay {
     @apply flex flex-row items-center py-2 px-3 justify-end border-t border-dark/2 dark:border-light/2;
 }
 
-/** Response example */
-
+/* Response Example */
 .openapi-response-example {
     @apply border rounded bg-tint border-tint-subtle;
 }
 
-.openapi-response-example-header {
-    @apply flex-1 w-full;
-}
-.openapi-response-example-header-content {
-    @apply flex-1 w-full;
-}
-
-/** Common */
-
+/* Common Elements */
 .openapi-select {
     @apply max-w-60 rounded font-mono text-xs leading-6 px-1 py-0.5 border border-tint bg-tint;
 }
 
-/** Section */
-
-.openapi-section {
-}
-
+/* Section Components */
 .openapi-section-header {
     @apply flex flex-row items-center;
 }
@@ -453,32 +403,22 @@
     @apply size-3;
 }
 
-/** Markdown */
-.openapi-markdown {
-    @apply prosetext-tint-strong prose-p:!my-2 dark:prose-invert max-w-none whitespace-normal;
-}
-
-.openapi-markdown > *:first-child {
-    @apply !mt-0;
-}
-
-.openapi-markdown > *:last-child {
-    @apply !mb-0;
-}
 
 .openapi-operation .openapi-tabs-list {
+/* Tabs */
+.openapi-tabs-list {
     @apply flex flex-row gap-3 py-1.5 px-2.5 border-b border-dark/2 dark:border-light/2 w-full;
 }
 
-.openapi-operation .openapi-tabs-tab {
+.openapi-tabs-tab {
     @apply hover:bg-light-3 font-mono tabular-nums dark:hover:bg-dark-3 hover:text-primary cursor-pointer transition-all relative text-[13px] text-dark/7 px-1 dark:text-light/7 border border-transparent rounded;
 }
 
-.openapi-operation .openapi-tabs-tab[aria-selected='true'] {
+.openapi-tabs-tab[aria-selected='true'] {
     @apply text-primary after:absolute after:-bottom-2 after:left-0 after:w-full after:h-px after:bg-primary after:transition-all;
 }
 
-.openapi-operation .openapi-tabs-panel {
+.openapi-tabs-panel {
     @apply flex-1 text-sm focus-visible:outline-none;
 }
 
@@ -486,6 +426,7 @@
     @apply px-3 py-2.5 border-t border-dark/2 dark:border-light/2 text-xs text-dark/7 dark:text-light/7;
 }
 
+/* Disclosure group */
 .openapi-disclosure-group {
     @apply border-b border-dark/2 relative dark:border-light/2;
 }
@@ -515,6 +456,7 @@
     @apply rotate-90;
 }
 
+/* Disclosure */
 .openapi-disclosure-trigger {
     @apply transition-all duration-300 hover:text-dark dark:hover:text-light rounded-2xl border border-dark/2 dark:border-light/2 px-2 py-0.5 text-[13px] dark:text-light/7 text-dark/7 flex flex-row items-center gap-1.5 -outline-offset-1;
 }
