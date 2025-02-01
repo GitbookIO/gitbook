@@ -13,11 +13,12 @@ export function OpenAPIPath(props: {
     return (
         <div className="openapi-path">
             <div className={`openapi-method openapi-method-${method}`}>{method}</div>
-            <h1 className="openapi-path-title">{formatPath(path)}</h1>
+            <div className="openapi-path-title">
+                <p>{formatPath(path)}</p>
+                {/* <button className="openapi-path-copy">Copy</button> */}
+            </div>
             {data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'] ? null : (
-                <div className="openapi-path-footer">
-                    <ScalarApiButton method={method} path={path} specUrl={specUrl} />
-                </div>
+                <ScalarApiButton method={method} path={path} specUrl={specUrl} />
             )}
         </div>
     );

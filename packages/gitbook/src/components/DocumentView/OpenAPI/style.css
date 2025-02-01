@@ -350,7 +350,7 @@
 
 /* Path */
 .openapi-path {
-    @apply flex items-center bg-light text-sm gap-1.5 border rounded-md border-dark/2 dark:border-light/2 p-2;
+    @apply flex items-center bg-light text-sm gap-2 p-2 border rounded-md border-dark/2 dark:border-light/2;
 }
 
 .openapi-path .openapi-method {
@@ -358,8 +358,22 @@
 }
 
 .openapi-path-title {
-    @apply flex-1 font-normal font-mono text-dark dark:text-light truncate overflow-y-auto;
+    @apply flex-1 relative font-normal w-fit whitespace-nowrap overflow-x-auto font-mono text-dark dark:text-light;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
+
+.openapi-path-title::-webkit-scrollbar {
+    display: none;
+}
+
+/* .openapi-path-copy {
+    @apply absolute opacity-0 h-fit right-0 top-1/2 -translate-y-1/2 bg-light dark:bg-dark border rounded-md border-dark/2 dark:border-light/2 px-1.5 py-0;
+}
+
+.openapi-path-title:hover .openapi-path-copy {
+    @apply opacity-11;
+} */
 
 .openapi-path-title em {
     @apply not-italic text-primary font-medium;
