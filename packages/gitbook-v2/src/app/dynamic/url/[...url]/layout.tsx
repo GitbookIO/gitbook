@@ -1,5 +1,5 @@
-import { SiteContentLayout } from '@/components/routes/SiteContentLayout';
-import { createDynamicSiteContext } from '@/lib/context';
+import { SiteContentLayout } from '@v2/components/routes/SiteContentLayout';
+import { createDynamicSiteContext } from '@v2/lib/context';
 
 export default async function RootLayout({
     params,

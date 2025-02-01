@@ -1,7 +1,7 @@
 import { unstable_cacheTag as cacheTag } from 'next/cache';
-import { createStaticSiteContext } from '@/lib/context';
-import { getSiteCacheTag } from '@/lib/cache';
-import { SiteContentPage } from '@/components/routes/SiteContentPage';
+import { createStaticSiteContext } from '@v2/lib/context';
+import { getSiteCacheTag } from '@v2/lib/cache';
+import { SiteContentPage } from '@v2/components/routes/SiteContentPage';
 
 export default async function Page({ params }: { params: Promise<{ url: string[] }> }) {
     'use cache';

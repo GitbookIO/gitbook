@@ -1,11 +1,10 @@
 'use client';
 
+import clsx from 'clsx';
+
 import { Icon } from '@gitbook/icons';
-import classNames from 'classnames';
 import React from 'react';
 import ReactDOM from 'react-dom';
-
-import { tcls } from '@/lib/tailwind';
 
 import styles from './ZoomImage.module.css';
 
@@ -166,7 +165,7 @@ export function ZoomImage(
                             startViewTransition(change);
                         });
                     }}
-                    className={classNames(
+                    className={clsx(
                         props.className,
                         zoomable ? styles.zoomImg : null,
                         active ? styles.zoomImageActive : null,
@@ -208,19 +207,9 @@ function ZoomImageModal(props: {
     return (
         <div
             data-testid="zoom-image-modal"
-            className={classNames(
+            className={clsx(
                 styles.zoomModal,
-                tcls(
-                    'fixed',
-                    'inset-0',
-                    'z-50',
-                    'flex',
-                    'items-center',
-                    'justify-center',
-                    'bg-light',
-                    'dark:bg-dark',
-                    'p-8',
-                ),
+                'fixed inset-0 z-50 flex items-center justify-center bg-light dark:bg-dark p-8',
             )}
             onClick={onClose}
         >
@@ -228,43 +217,15 @@ function ZoomImageModal(props: {
                 src={src}
                 alt={alt}
                 crossOrigin={crossOrigin}
-                className={tcls(
-                    'max-w-full',
-                    'max-h-full',
-                    'object-contain',
-                    'bg-light',
-                    'dark:bg-dark',
-                )}
+                className="max-w-full max-h-full object-contain bg-light dark:bg-dark"
             />
 
             <button
                 ref={buttonRef}
-                className={tcls(
-                    'absolute',
-                    'top-5',
-                    'right-5',
-                    'flex',
-                    'flex-row',
-                    'items-center',
-                    'justify-center',
-                    'text-sm',
-                    'text-dark/6',
-                    'dark:text-light/5',
-                    'hover:text-primary',
-                    'p-4',
-                    'dark:text-light/5',
-                    'rounded-full',
-                    'bg-white',
-                    'dark:bg-dark/3',
-                    'shadow-sm',
-                    'hover:shadow-md',
-                    'border-slate-300',
-                    'dark:border-dark/2',
-                    'border',
-                )}
+                className="absolute top-5 right-5 flex flex-row items-center justify-center text-sm text-dark/6 dark:text-light/5 hover:text-primary p-4 dark:text-light/5 rounded-full bg-white dark:bg-dark/3 shadow-sm hover:shadow-md border-slate-300 dark:border-dark/2 border dark:text-light/5 hover:text-primary p-4 dark:text-light/5 rounded-full bg-white dark:bg-dark/3 shadow-sm hover:shadow-md border-slate-300 dark:border-dark/2 border"
                 onClick={onClose}
             >
-                <Icon icon="compress-wide" className={tcls('size-5')} />
+                <Icon icon="compress-wide" className="size-5" />
             </button>
         </div>
     );
