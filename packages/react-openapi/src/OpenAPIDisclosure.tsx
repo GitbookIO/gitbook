@@ -39,13 +39,11 @@ export function OpenAPIDisclosureGroup(props: DisclosureGroupProps & Props) {
     let state = useDisclosureGroupState(props);
 
     return (
-        <div>
-            <DisclosureGroupStateContext.Provider value={state}>
-                {groups.map((group) => (
-                    <DisclosureItem icon={icon} key={group.id} group={group} />
-                ))}
-            </DisclosureGroupStateContext.Provider>
-        </div>
+        <DisclosureGroupStateContext.Provider value={state}>
+            {groups.map((group) => (
+                <DisclosureItem icon={icon} key={group.id} group={group} />
+            ))}
+        </DisclosureGroupStateContext.Provider>
     );
 }
 
@@ -82,28 +80,26 @@ function DisclosureItem(props: { group: DisclosureGroup; icon?: React.ReactNode 
 
     return (
         <div className="openapi-disclosure-group">
-            <h3>
-                <button
-                    slot="trigger"
-                    ref={triggerRef}
-                    {...mergeProps(buttonProps, focusProps)}
-                    style={{
-                        outline: isFocusVisible
-                            ? '2px solid rgb(var(--primary-color-500)/0.4)'
-                            : 'none',
-                    }}
-                    className="openapi-disclosure-group-trigger"
-                >
-                    <div className="openapi-disclosure-group-icon">
-                        {icon || (
-                            <svg viewBox="0 0 24 24" className="openapi-disclosure-group-icon">
-                                <path d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                            </svg>
-                        )}
-                    </div>
-                    {group.label}
-                </button>
-            </h3>
+            <button
+                slot="trigger"
+                ref={triggerRef}
+                {...mergeProps(buttonProps, focusProps)}
+                style={{
+                    outline: isFocusVisible
+                        ? '2px solid rgb(var(--primary-color-500)/0.4)'
+                        : 'none',
+                }}
+                className="openapi-disclosure-group-trigger"
+            >
+                <div className="openapi-disclosure-group-icon">
+                    {icon || (
+                        <svg viewBox="0 0 24 24" className="openapi-disclosure-group-icon">
+                            <path d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                        </svg>
+                    )}
+                </div>
+                {group.label}
+            </button>
 
             {state.isExpanded && (
                 <div className="openapi-disclosure-group-panel" ref={panelRef} {...panelProps}>

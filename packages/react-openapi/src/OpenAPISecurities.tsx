@@ -5,6 +5,7 @@ import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
 import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
+import { OpenAPIDisclosureGroup } from './OpenAPIDisclosure';
 
 /**
  * Present securities authorization that can be used for this operation.
@@ -22,6 +23,9 @@ export function OpenAPISecurities(props: {
     return (
         <InteractiveSection
             header="Authorizations"
+            toggeable
+            defaultOpened={false}
+            toggleIcon={context.icons.chevronRight}
             className="openapi-securities"
             tabs={securities.map(([key, security]) => {
                 return {
