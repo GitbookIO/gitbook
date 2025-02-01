@@ -52,7 +52,7 @@ export function InteractiveSection(props: {
     /** Default tab to have opened */
     defaultTab?: string;
     /** Content of the header */
-    header: React.ReactNode;
+    header?: React.ReactNode;
     /** Body of the section */
     children?: React.ReactNode;
     /** Children to display within the container */
@@ -94,68 +94,73 @@ export function InteractiveSection(props: {
                 toggeable ? `${className}-${opened ? 'opened' : 'closed'}` : null,
             )}
         >
-            <div
-                onClick={() => {
-                    if (toggeable) {
-                        setOpened(!opened);
-                    }
-                }}
-                className={classNames('openapi-section-header', `${className}-header`)}
-            >
+            {header ? (
                 <div
-                    className={classNames(
-                        'openapi-section-header-content',
-                        `${className}-header-content`,
-                    )}
-                >
-                    {(children || selectedTab?.body) && toggeable ? (
-                        <button
-                            className={classNames('openapi-section-toggle', `${className}-toggle`)}
-                            onClick={() => setOpened(!opened)}
-                            aria-expanded={opened}
-                        >
-                            {toggleIcon}
-                        </button>
-                    ) : null}
-                    {header}
-                </div>
-                <div
-                    className={classNames(
-                        'openapi-section-header-controls',
-                        `${className}-header-controls`,
-                    )}
-                    onClick={(event) => {
-                        event.stopPropagation();
+                    onClick={() => {
+                        if (toggeable) {
+                            setOpened(!opened);
+                        }
                     }}
+                    className={classNames('openapi-section-header', `${className}-header`)}
                 >
-                    {tabs.length > 1 ? (
-                        <select
-                            className={classNames(
-                                'openapi-section-select',
-                                'openapi-select',
-                                `${className}-tabs-select`,
-                            )}
-                            value={selectedTab.key}
-                            onChange={(event) => {
-                                setSelectedTab(event.target.value);
-                                if (stateKey) {
-                                    setSyncedTabs((state) => ({
-                                        ...state,
-                                        [stateKey]: event.target.value,
-                                    }));
-                                }
-                                setOpened(true);
-                            }}
-                        >
-                            {tabs.map((tab) => (
-                                <option key={tab.key} value={tab.key}>
-                                    {tab.label}
-                                </option>
-                            ))}
-                        </select>
-                    ) : null}
+                    <div
+                        className={classNames(
+                            'openapi-section-header-content',
+                            `${className}-header-content`,
+                        )}
+                    >
+                        {(children || selectedTab?.body) && toggeable ? (
+                            <button
+                                className={classNames(
+                                    'openapi-section-toggle',
+                                    `${className}-toggle`,
+                                )}
+                                onClick={() => setOpened(!opened)}
+                                aria-expanded={opened}
+                            >
+                                {toggleIcon}
+                            </button>
+                        ) : null}
+                        {header}
+                    </div>
+                    <div
+                        className={classNames(
+                            'openapi-section-header-controls',
+                            `${className}-header-controls`,
+                        )}
+                        onClick={(event) => {
+                            event.stopPropagation();
+                        }}
+                    >
+                        {tabs.length > 1 ? (
+                            <select
+                                className={classNames(
+                                    'openapi-section-select',
+                                    'openapi-select',
+                                    `${className}-tabs-select`,
+                                )}
+                                value={selectedTab.key}
+                                onChange={(event) => {
+                                    setSelectedTab(event.target.value);
+                                    if (stateKey) {
+                                        setSyncedTabs((state) => ({
+                                            ...state,
+                                            [stateKey]: event.target.value,
+                                        }));
+                                    }
+                                    setOpened(true);
+                                }}
+                            >
+                                {tabs.map((tab) => (
+                                    <option key={tab.key} value={tab.key}>
+                                        {tab.label}
+                                    </option>
+                                ))}
+                            </select>
+                        ) : null}
+                    </div>
                 </div>
-            </div>
+            ) : null}
             {(!toggeable || opened) && (children || selectedTab?.body) ? (
                 <div className={classNames('openapi-section-body', `${className}-body`)}>
                     {children}

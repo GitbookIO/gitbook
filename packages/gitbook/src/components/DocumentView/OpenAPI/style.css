@@ -19,7 +19,7 @@
 }
 
 .openapi-description.openapi-markdown {
-    @apply prose-base;
+    @apply prose-sm text-[15px];
 }
 
 .openapi-description.openapi-markdown code {
@@ -129,6 +129,10 @@
     @apply flex flex-col;
 }
 
+.openapi-schema-body {
+    @apply py-2.5 flex flex-col gap-2;
+}
+
 .openapi-section-body .openapi-schema-properties {
     @apply divide-y divide-dark/2 dark:divide-light/2;
 }
@@ -147,10 +151,10 @@
 
 /* Schema Presentation */
 .openapi-schema-presentation {
-    @apply flex flex-col gap-1.5 py-3 font-normal;
+    @apply flex flex-col gap-2 font-normal;
 }
 
-.openapi-schema-presentation:last-child {
+.openapi-schema-properties:last-child {
     @apply pb-0;
 }
 
@@ -245,8 +249,9 @@
     @apply py-2 border-b border-tint-subtle max-w-full flex-1;
 }
 
-.openapi-securities-header-content {
-}
+/* .openapi-securities-header:has(.openapi-section-toggle[aria-expanded='true']) {
+    @apply border-dark/2 dark:border-light/2;
+} */
 
 .openapi-securities-body {
     @apply flex flex-col gap-2;
@@ -345,11 +350,11 @@
 
 /* Path */
 .openapi-path {
-    @apply flex items-center bg-light text-sm gap-1 border rounded-md border-dark/2 dark:border-light/2 p-2;
+    @apply flex items-center bg-light text-sm gap-1.5 border rounded-md border-dark/2 dark:border-light/2 p-2;
 }
 
 .openapi-path .openapi-method {
-    @apply text-sm;
+    @apply text-[13px] m-0 px-1;
 }
 
 .openapi-path-title {
@@ -474,7 +479,7 @@
 
 /* Disclosure */
 .openapi-disclosure-trigger {
-    @apply transition-all mt-1 duration-300 hover:text-dark dark:hover:text-light rounded-2xl border border-dark/2 dark:border-light/2 px-2 py-1 text-[13px] dark:text-light/7 text-dark/7 flex flex-row items-center gap-1.5 -outline-offset-1;
+    @apply transition-all duration-300 hover:text-dark dark:hover:text-light rounded-2xl border border-dark/2 dark:border-light/2 px-2.5 py-1 text-[13px] dark:text-light/7 text-dark/7 flex flex-row items-center gap-1.5 -outline-offset-1;
 }
 
 .openapi-disclosure svg {
@@ -497,7 +502,7 @@
     @apply border-b border-x border-dark/2 rounded-b-lg dark:border-light/2;
 }
 
-.openapi-disclosure-panel .openapi-schema-presentation {
+.openapi-disclosure-panel .openapi-schema-body {
     @apply p-2.5;
 }
 

@@ -4,7 +4,7 @@ import React from 'react';
 import { OpenAPISchemaPropertyEntry } from './OpenAPISchema';
 
 interface OpenAPISchemaNameProps {
-    propertyName?: string;
+    propertyName?: string | JSX.Element;
     required?: boolean;
     type: string;
 }
