@@ -22,7 +22,9 @@
     @apply prose-base;
 }
 
-
+.openapi-description.openapi-markdown code {
+    @apply prose-sm;
+}
 
 /* Markdown Elements */
 .openapi-markdown blockquote {
@@ -38,7 +40,7 @@
 }
 
 .openapi-markdown code {
-    @apply py-px px-1 min-w-[1.625rem] w-fit justify-center items-center ring-1 ring-inset ring-dark/1 bg-dark/[0.06] rounded dark:ring-light/1 dark:bg-light/1 dark:!text-light-4 text-sm leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
+    @apply py-px px-1 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-dark/1 bg-dark/[0.06] rounded dark:ring-light/1 dark:bg-light/1 dark:!text-light-4 text-sm leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
 }
 
 .openapi-markdown pre code {
@@ -103,7 +105,7 @@
 
 /* Column Layout */
 .openapi-column-spec {
-    @apply flex flex-col gap-10 flex-1 max-w-3xl;
+    @apply flex flex-col gap-8 flex-1 max-w-3xl;
 }
 
 .openapi-column-preview {
@@ -148,6 +150,10 @@
     @apply flex flex-col gap-1.5 py-3 font-normal;
 }
 
+.openapi-schema-presentation:last-child {
+    @apply pb-0;
+}
+
 .openapi-schema-name {
     /* To make double click on the property name select only the name,
     we disable selection on the parent and re-enable it on the children. */
@@ -155,7 +161,7 @@
 }
 
 .openapi-schema-propertyname {
-    @apply select-all font-medium font-mono text-tint-strong;
+    @apply select-all font-mono font-normal text-tint-strong;
 }
 
 .openapi-schema-required {
@@ -240,7 +246,6 @@
 }
 
 .openapi-securities-header-content {
-    @apply font-medium text-tint-strong text-base;
 }
 
 .openapi-securities-body {
@@ -288,7 +293,7 @@
 }
 
 .openapi-response-description.openapi-markdown {
-    @apply prose-sm truncate text-dark/7 dark:text-light/7 !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply prose-sm text-[13px] truncate text-dark/7 dark:text-light/7 !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 .openapi-response-description p {
@@ -296,7 +301,7 @@
 }
 
 .openapi-response-statuscode {
-    @apply tabular-nums text-sm font-mono shrink-0;
+    @apply tabular-nums text-sm font-normal font-mono shrink-0;
 }
 
 .openapi-response-content-type {
@@ -323,7 +328,6 @@
 
 .openapi-responsebody-header-content,
 .openapi-responseheaders-header-content {
-    @apply text-base text-tint;
 }
 
 /* Code Sample */
@@ -341,15 +345,23 @@
 
 /* Path */
 .openapi-path {
-    @apply flex items-center gap-1 border rounded-md border-dark/2 dark:border-light/2 p-2;
+    @apply flex items-center bg-light text-sm gap-1 border rounded-md border-dark/2 dark:border-light/2 p-2;
+}
+
+.openapi-path .openapi-method {
+    @apply text-sm;
 }
 
 .openapi-path-title {
-    @apply flex-1 font-medium text-sm font-mono text-dark dark:text-light truncate;
+    @apply flex-1 font-normal font-mono text-dark dark:text-light truncate overflow-y-auto;
 }
 
 .openapi-path-title em {
-    @apply not-italic text-primary font-semibold;
+    @apply not-italic text-primary font-medium;
+}
+
+.openapi-path-separator {
+    @apply text-dark/7 dark:text-light/7;
 }
 
 .openapi-path-overlay {
@@ -372,7 +384,7 @@
 }
 
 .openapi-section-header-content {
-    @apply flex-1 text-base gap-1.5 flex w-full font-medium text-dark-2 dark:text-light;
+    @apply flex-1 text-base gap-1.5 flex w-full font-medium text-dark dark:text-light;
 }
 
 .openapi-section-header-controls {
@@ -415,7 +427,7 @@
 }
 
 .openapi-tabs-tab {
-    @apply hover:bg-light-3 font-mono tabular-nums dark:hover:bg-dark-3 hover:text-primary cursor-pointer transition-all relative text-[13px] text-dark/7 px-1 dark:text-light/7 border border-transparent rounded;
+    @apply hover:bg-light-3 font-mono font-normal tabular-nums dark:hover:bg-dark-3 hover:text-primary cursor-pointer transition-all relative text-[13px] text-dark/7 px-1 dark:text-light/7 border border-transparent rounded;
 }
 
 .openapi-tabs-tab[aria-selected='true'] {
@@ -462,7 +474,7 @@
 
 /* Disclosure */
 .openapi-disclosure-trigger {
-    @apply transition-all duration-300 hover:text-dark dark:hover:text-light rounded-2xl border border-dark/2 dark:border-light/2 px-2 py-0.5 text-[13px] dark:text-light/7 text-dark/7 flex flex-row items-center gap-1.5 -outline-offset-1;
+    @apply transition-all mt-1 duration-300 hover:text-dark dark:hover:text-light rounded-2xl border border-dark/2 dark:border-light/2 px-2 py-1 text-[13px] dark:text-light/7 text-dark/7 flex flex-row items-center gap-1.5 -outline-offset-1;
 }
 
 .openapi-disclosure svg {
@@ -486,7 +498,7 @@
 }
 
 .openapi-disclosure-panel .openapi-schema-presentation {
-    @apply p-2;
+    @apply p-2.5;
 }
 
 .openapi-disclosure .openapi-schema-properties .openapi-schema:only-child,
