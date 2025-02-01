@@ -8,6 +8,7 @@ import { OpenAPIResponseExample } from './OpenAPIResponseExample';
 import { OpenAPIServerURL } from './OpenAPIServerURL';
 import { OpenAPISpec } from './OpenAPISpec';
 import { OpenAPIClientContext, OpenAPIContextProps } from './types';
+import { OpenAPIPath } from './OpenAPIPath';
 
 /**
  * Display an interactive OpenAPI operation.
@@ -18,7 +19,7 @@ export function OpenAPIOperation(props: {
     context: OpenAPIContextProps;
 }) {
     const { className, data, context } = props;
-    const { operation, servers, method, path } = data;
+    const { operation } = data;
 
     const clientContext: OpenAPIClientContext = {
         defaultInteractiveOpened: context.defaultInteractiveOpened,
@@ -40,6 +41,7 @@ export function OpenAPIOperation(props: {
                             <Markdown className="openapi-description" source={trimmedDescription} />
                         </div>
                     ) : null}
+                    <OpenAPIPath data={data} context={context} />
                     <OpenAPISpec data={data} context={clientContext} />
                 </div>
                 <div className={classNames('openapi-column-preview')}>

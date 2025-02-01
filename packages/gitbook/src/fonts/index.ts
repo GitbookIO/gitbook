@@ -38,10 +38,11 @@ const inter = Inter({
     preload: false,
     display: 'swap',
     fallback: ['system-ui', 'arial'],
+    weight: ['400', '500', '600', '700'],
 });
 
 export const ibmPlexMono = IBM_Plex_Mono({
-    weight: ['400', '600'],
+    weight: ['400', '500', '600', '700'],
     variable: '--font-mono',
     style: 'normal',
     display: 'swap',

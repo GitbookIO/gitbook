@@ -1,6 +1,15 @@
 import { OpenAPIOperationData } from './fetchOpenAPIOperation';
+import { ScalarApiButton } from './ScalarApiButton';
+import { OpenAPIContextProps } from './types';
 
-export function OpenAPIPath(props: { data: OpenAPIOperationData }): JSX.Element {
+export function OpenAPIPath(props: {
+    data: OpenAPIOperationData;
+    context: OpenAPIContextProps;
+}): JSX.Element {
+    const { data, context } = props;
+    const { method, path } = data;
+    const { specUrl } = context;
+
     const formatPath = (path: string) => {
         const regex = /\{(\w+)\}/g; // Matches placeholders like {tailnetId}, {userId}, etc.
         const parts: (string | JSX.Element)[] = [];
@@ -18,5 +27,15 @@ export function OpenAPIPath(props: { data: OpenAPIOperationData }): JSX.Element 
         return <span>{parts}</span>;
     };
 
-    return <></>;
+    return (
+        <div className="openapi-path">
+            <div className={`openapi-method openapi-method-${method}`}>{method}</div>
+            <h1 className="openapi-path-title">{formatPath(path)}</h1>
+            {data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'] ? null : (
+                <div className="openapi-path-footer">
+                    <ScalarApiButton method={method} path={path} specUrl={specUrl} />
+                </div>
+            )}
+        </div>
+    );
 }
