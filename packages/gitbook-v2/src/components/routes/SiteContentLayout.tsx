@@ -1,4 +1,4 @@
-import { GitBookSiteContext } from '@/lib/context';
+import { GitBookSiteContext } from '@v2/lib/context';
 
 /**
  * Layout component to render the site content.
