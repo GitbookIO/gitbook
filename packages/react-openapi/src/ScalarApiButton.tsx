@@ -24,7 +24,7 @@ export function ScalarApiButton({
     return (
         <div className="scalar scalar-activate">
             <button
-                className="scalar-activate-button"
+                className="scalar-activate-button button"
                 onClick={() => {
                     controllerRef.current?.openClient?.();
                     setIsOpen(true);
