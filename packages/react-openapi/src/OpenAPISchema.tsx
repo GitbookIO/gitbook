@@ -85,7 +85,7 @@ export function OpenAPISchemaProperty(
                     <Markdown source={schema.description} className="openapi-schema-description" />
                 ) : null}
                 {alternatives[0].map((alternative, index) => (
-                    <OpenAPISchemaObject context={context}>
+                    <OpenAPISchemaObject key={`${index}-${alternative.title}`} context={context}>
                         <OpenAPISchemaProperty
                             propertyName={getSchemaTitle(alternative, alternatives[1])}
                             schema={alternative}
@@ -237,7 +237,7 @@ export function OpenAPISchemaEnum(props: { enumValues: any[] }) {
     return (
         <div className="openapi-schema-enum">
             <span>
-                Options:{' '}
+                Options{' '}
                 {enumValues.map((value, index) => (
                     <span key={index} className="openapi-schema-enum-value">
                         <code>{`${value}`}</code>
@@ -436,7 +436,7 @@ export function getSchemaTitle(
         type = schema.type ?? 'object';
 
         if (schema.format) {
-            type += ` (${schema.format})`;
+            type += ` ${schema.format}`;
         }
     } else if ('anyOf' in schema) {
         type = 'any of';

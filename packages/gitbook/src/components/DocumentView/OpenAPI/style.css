@@ -1,11 +1,11 @@
 .openapi-operation {
     content-visibility: auto;
     contain-intrinsic-height: 600px;
-    @apply flex-1 flex flex-col gap-4;
+    @apply flex-1 flex flex-col gap-4 mb-14;
 }
 
 .openapi-columns {
-    @apply grid grid-cols-1 md:grid-cols-2 gap-6 print-mode:grid-cols-1 justify-stretch;
+    @apply grid grid-cols-1 lg:grid-cols-2 gap-6 print-mode:grid-cols-1 justify-stretch;
 }
 
 /** Intro */
@@ -31,7 +31,7 @@
 }
 
 .openapi-markdown blockquote > p {
-    @apply before:content-none after:content-none font-normal;
+    @apply before:content-none after:content-none !font-normal;
 }
 
 .openapi-markdown code {
@@ -147,7 +147,7 @@
 }
 
 .openapi-schema-presentation {
-    @apply flex flex-col gap-2 py-3;
+    @apply flex flex-col gap-1.5 py-3;
 }
 
 .openapi-schema-name {
@@ -161,11 +161,11 @@
 }
 
 .openapi-schema-required {
-    @apply font-normal text-amber-600 text-[13px];
+    @apply text-amber-600 text-[13px];
 }
 
 .openapi-schema-type {
-    @apply text-dark-4/8 dark:text-light-4 select-text text-[13px] font-normal font-mono;
+    @apply text-dark/8 dark:text-light/8 select-text text-[13px] font-mono;
 }
 
 .openapi-schema-type:only-child {
@@ -193,7 +193,7 @@
 }
 
 .openapi-schema-enum {
-    @apply flex flex-row text-sm flex-wrap text-dark-4/8 dark:text-light-3;
+    @apply flex flex-row text-sm flex-wrap text-dark/7 dark:text-light/7;
 }
 
 .openapi-schema-enum-value {
@@ -209,7 +209,7 @@
 }
 
 .openapi-schema-description.openapi-markdown {
-    @apply prose-sm text-dark-4/8 dark:text-light-3 font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply prose-sm text-dark/7 dark:text-light/7 !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 .openapi-schema-description.openapi-markdown pre code {
@@ -223,7 +223,7 @@
 
 .openapi-schema-example,
 .openapi-schema-pattern {
-    @apply prose-sm text-dark-4/8 dark:text-light-3;
+    @apply prose-sm text-dark/7 dark:text-light/7;
 }
 
 .openapi-schema-example code,
@@ -267,7 +267,7 @@
 }
 
 .openapi-securities-description.openapi-markdown {
-    @apply prose-sm text-dark-4/8 dark:text-light-3 font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply prose-sm text-dark/7 dark:text-light/7 !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 .openapi-securities-label {
@@ -301,7 +301,7 @@
 }
 
 .openapi-requestbody-description.openapi-markdown {
-    @apply prose-sm text-dark-4/8 dark:text-light-3 font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply prose-sm text-dark/7 dark:text-light/7 !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 /** Responses */
@@ -312,21 +312,17 @@
     @apply py-2 border-b border-dark/2 dark:border-light/2 max-w-full flex-1;
 }
 
-.openapi-responses-body {
-    @apply flex flex-col gap-2;
-}
-
 .openapi-responses-header-content {
     @apply font-medium text-dark-2 text-base dark:text-light;
 }
 
 /** Response */
 .openapi-response-tab-content {
-    @apply truncate max-w-full flex items-center gap-2;
+    @apply overflow-hidden max-w-full flex items-center gap-2;
 }
 
 .openapi-response-description.openapi-markdown {
-    @apply prose-sm text-[13px] text-left text-dark/8 dark:text-light/8 px-0 truncate;
+    @apply prose-sm truncate text-dark/7 dark:text-light/7 !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 .openapi-response-description p {
@@ -422,15 +418,31 @@
 }
 
 .openapi-section-header-content {
-    @apply flex-1 text-base flex w-full overflow-hidden;
+    @apply flex-1 text-base gap-1.5 flex w-full;
 }
 
 .openapi-section-header-controls {
     @apply flex flex-row items-center gap-2;
 }
 
+.openapi-section-header-content:has(.openapi-section-toggle) {
+    @apply cursor-pointer;
+}
+
+.openapi-section-header-content:hover .openapi-section-toggle {
+    @apply text-dark dark:text-light;
+}
+
 .openapi-section-toggle {
-    @apply flex items-center justify-end size-6 text-dark/6 dark:text-light/6;
+    @apply text-dark/6 dark:text-light/6;
+}
+
+.openapi-section-toggle > svg {
+    @apply transition-all;
+}
+
+.openapi-section-toggle[aria-expanded='true'] > svg {
+    @apply rotate-90;
 }
 
 .openapi-section-toggle:focus-visible {
@@ -475,11 +487,11 @@
 }
 
 .openapi-disclosure-group {
-    @apply border-b border-dark/2 dark:border-light/2;
+    @apply border-b border-dark/2 relative dark:border-light/2;
 }
 
 .openapi-disclosure-group-trigger {
-    @apply flex items-center truncate shrink w-full flex-1 gap-2.5 py-2 relative -outline-offset-1;
+    @apply flex items-center w-full flex-1 gap-2.5 py-2 -outline-offset-1;
 }
 
 .openapi-disclosure-group:only-child,
@@ -488,23 +500,23 @@
 }
 
 .openapi-disclosure-group-icon > svg {
-    @apply size-2.5 text-dark/8 dark:text-light/8 transition-transform;
+    @apply size-2.5 text-dark/6 dark:text-light/6 transition-transform;
 }
 
-.openapi-disclosure-group-icon {
-    @apply absolute -left-2.5 top-1/2 transform -translate-y-1/2 z-[9999];
+.openapi-disclosure-group-trigger:hover > .openapi-disclosure-group-icon svg {
+    @apply size-2.5 text-dark dark:text-light transition-transform;
 }
 
 .openapi-disclosure-group-panel {
     @apply pb-2.5;
 }
 
-.openapi-disclosure-group-trigger[aria-expanded='true'] > svg {
+.openapi-disclosure-group-trigger[aria-expanded='true'] > .openapi-disclosure-group-icon > svg {
     @apply rotate-90;
 }
 
 .openapi-disclosure-trigger {
-    @apply transition-all hover:text-dark dark:hover:text-light rounded-2xl border border-dark/2 dark:border-light/2 px-1.5 py-0.5 text-[13px] dark:text-light/7 text-dark/7 flex flex-row items-center gap-1.5 -outline-offset-1;
+    @apply transition-all duration-300 hover:text-dark dark:hover:text-light rounded-2xl border border-dark/2 dark:border-light/2 px-2 py-0.5 text-[13px] dark:text-light/7 text-dark/7 flex flex-row items-center gap-1.5 -outline-offset-1;
 }
 
 .openapi-disclosure svg {
@@ -537,5 +549,5 @@
 }
 
 .openapi-disclosure .openapi-schema-properties .openapi-schema-enum {
-    @apply p-2 pt-0 mt-0;
+    @apply pt-0 mt-0;
 }

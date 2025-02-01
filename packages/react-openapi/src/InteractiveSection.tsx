@@ -45,9 +45,8 @@ export function InteractiveSection(props: {
     toggeable?: boolean;
     /** Default state of the toggle */
     defaultOpened?: boolean;
-    /** Icons to display for the toggle */
-    toggleOpenIcon?: React.ReactNode;
-    toggleCloseIcon?: React.ReactNode;
+    /** Icon to display for the toggle */
+    toggleIcon?: React.ReactNode;
     /** Tabs of content to display */
     tabs?: Array<InteractiveSectionTab>;
     /** Default tab to have opened */
@@ -71,8 +70,7 @@ export function InteractiveSection(props: {
         header,
         children,
         overlay,
-        toggleOpenIcon = '▶',
-        toggleCloseIcon = '▼',
+        toggleIcon = '▶',
         stateKey,
     } = props;
     const [syncedTabs, setSyncedTabs] = useSyncedTabsGlobalState();
@@ -110,6 +108,15 @@ export function InteractiveSection(props: {
                         `${className}-header-content`,
                     )}
                 >
+                    {(children || selectedTab?.body) && toggeable ? (
+                        <button
+                            className={classNames('openapi-section-toggle', `${className}-toggle`)}
+                            onClick={() => setOpened(!opened)}
+                            aria-expanded={opened}
+                        >
+                            {toggleIcon}
+                        </button>
+                    ) : null}
                     {header}
                 </div>
                 <div
@@ -146,14 +153,6 @@ export function InteractiveSection(props: {
                                 </option>
                             ))}
                         </select>
-                    ) : null}
-                    {(children || selectedTab?.body) && toggeable ? (
-                        <button
-                            className={classNames('openapi-section-toggle', `${className}-toggle`)}
-                            onClick={() => setOpened(!opened)}
-                        >
-                            {opened ? toggleCloseIcon : toggleOpenIcon}
-                        </button>
                     ) : null}
                 </div>
             </div>
