@@ -2,16 +2,7 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { GitBookAPI } from '@gitbook/api';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
-
-/**
- * Generic context about rendering content.
- */
-export interface GitBookContext {
-    /**
-     * API client to fetch data from GitBook.
-     */
-    api: GitBookAPI;
-}
+import { GitBookContext } from '@/lib/v2/context';
 
 /**
  * Context when rendering a site.
@@ -29,9 +20,34 @@ export interface GitBookSiteContext extends GitBookContext {
 }
 
 /**
+ * Context when rendering a space in a site.
+ */
+export interface GitBookSiteSpaceContext extends GitBookSiteContext {
+    /**
+     * ID of the space.
+     */
+    spaceId: string;
+
+    /**
+     * ID of the site section.
+     */
+    siteSectionId: string | undefined;
+
+    /**
+     * ID of the site space.
+     */
+    siteSpaceId: string;
+
+    /**
+     * Share key of the site.
+     */
+    siteShareKey: string | undefined;
+}
+
+/**
  * Create a site context, when rendering a static page.
  */
-export async function createStaticSiteContext(url: string[]): Promise<GitBookSiteContext> {
+export async function createStaticSiteContext(url: string[]): Promise<GitBookSiteSpaceContext> {
     const context = createStaticContext();
     return fetchSiteContext(url, context);
 }
@@ -39,7 +55,7 @@ export async function createStaticSiteContext(url: string[]): Promise<GitBookSit
 /**
  * Create a site context, when rendering a dynamic page.
  */
-export async function createDynamicSiteContext(url: string[]): Promise<GitBookSiteContext> {
+export async function createDynamicSiteContext(url: string[]): Promise<GitBookSiteSpaceContext> {
     const context = await createDynamicContext();
     return fetchSiteContext(url, context);
 }
@@ -50,7 +66,7 @@ export async function createDynamicSiteContext(url: string[]): Promise<GitBookSi
 async function fetchSiteContext(
     urlParts: string[],
     baseContext: GitBookContext,
-): Promise<GitBookSiteContext> {
+): Promise<GitBookSiteSpaceContext> {
     const { api } = baseContext;
     const url = getURLFromParams(urlParts);
     const { data } = await api.urls.getPublishedContentByUrl({
@@ -70,6 +86,9 @@ async function fetchSiteContext(
         }),
         siteId: data.site,
         organizationId: data.organization,
+        siteSectionId: data.siteSection,
+        siteSpaceId: data.siteSpace,
+        spaceId: data.space,
     };
 }
 
@@ -83,9 +102,7 @@ function createStaticContext(): GitBookContext {
         userAgent: GITBOOK_USER_AGENT,
     });
 
-    return {
-        api,
-    };
+    return createContextFromClient(api);
 }
 
 /**
@@ -101,8 +118,36 @@ async function createDynamicContext(): Promise<GitBookContext> {
         userAgent: GITBOOK_USER_AGENT,
     });
 
+    return createContextFromClient(api);
+}
+
+function createContextFromClient(api: GitBookAPI): GitBookContext {
     return {
         api,
+        getLink: (pathname: string) => pathname,
+        getPublishedContentSite: async (organizationId: string, siteId: string) => {
+            const { data } = await api.orgs.getPublishedContentSite(organizationId, siteId);
+            return data;
+        },
+        getRevisionFile: async (spaceId: string, revisionId: string, file: string) => {
+            throw new Error('Not implemented');
+        },
+        getUserById: async (userId: string) => {
+            const { data } = await api.users.getUserById(userId);
+            return data;
+        },
+        getSpaceById: async (spaceId: string, shareKey: string | undefined) => {
+            const { data } = await api.spaces.getSpaceById(spaceId, { shareKey });
+            return data;
+        },
+        getCollection: async (collectionId: string) => {
+            const { data } = await api.collections.getCollectionById(collectionId);
+            return data;
+        },
+        getReusableContent: async (spaceId: string, revisionId: string, reusableContentId: string) => {
+            const { data } = await api.spaces.getReusableContentInRevisionById(spaceId, revisionId, reusableContentId);
+            return data;
+        },
     };
 }
 

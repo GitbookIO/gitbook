@@ -20,7 +20,7 @@
         ],
         "paths": {
             "@v2/*": ["./src/*"],
-            "@v1/*": ["../gitbook/src/*"]
+            "@/*": ["../gitbook/src/*"]
         }
     },
     "include": ["next-env.d.ts", ".next/types/**/*.ts", "**/*.ts", "**/*.tsx"],

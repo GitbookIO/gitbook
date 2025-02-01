@@ -5,7 +5,7 @@ import { checkIsHttpURL, getImageSize, getResizedImageURLFactory } from '@/lib/i
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { PolymorphicComponentProp } from './types';
-import { ZoomImage } from './ZoomImage';
+import { ZoomImage } from '@v2/components/images/ZoomImage';
 
 export type ImageSize = { width: number; height: number };
 
