@@ -67,24 +67,24 @@
 
 .openapi-method-get {
     /* @apply bg-[hsl(215,54%,86%)] dark:bg-[hsla(215,54%,45%,0.24)] dark:text-[hsl(215,54%,86%)]; */
-    @apply bg-green-100 text-green-800 dark:bg-green-500 dark:text-green-300;
+    @apply bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100;
 }
 
 .openapi-method-post {
     /* @apply bg-[hsl(120,25%,80%)] dark:bg-[hsla(120,54%,32%,0.24)] dark:text-[hsl(120,25%,80%)]; */
-    @apply bg-amber-100 text-amber-800 dark:bg-amber-500 dark:text-amber-300;
+    @apply bg-amber-100 text-amber-800 dark:bg-amber-800 dark:text-amber-100;
 }
 
 .openapi-method-put {
-    @apply bg-blue-100 text-blue-800 dark:bg-blue-500 dark:text-blue-300;
+    @apply bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100;
 }
 
 .openapi-method-patch {
-    @apply bg-purple-100 text-purple-800 dark:bg-purple-500 dark:text-purple-300;
+    @apply bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100;
 }
 
 .openapi-method-delete {
-    @apply bg-pomegranate-100 text-pomegranate-800 dark:bg-pomegranate-500 dark:text-pomegranate-300;
+    @apply bg-pomegranate-100 text-pomegranate-800 dark:bg-pomegranate-800 dark:text-pomegranate-100;
 }
 
 .openapi-method-head,
@@ -353,7 +353,7 @@
 
 /* Path */
 .openapi-path {
-    @apply flex items-center bg-light text-sm gap-2 p-2 border rounded-md border-dark/2 dark:border-light/2;
+    @apply flex items-center bg-light text-sm gap-2 p-2 border rounded-md border-dark/2 dark:border-light/2 dark:bg-dark;
 }
 
 .openapi-path .openapi-method {
