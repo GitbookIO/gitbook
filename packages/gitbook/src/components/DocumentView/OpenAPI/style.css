@@ -325,6 +325,10 @@
     @apply py-0;
 }
 
+.openapi-responsebody .openapi-schema-body {
+    @apply pt-0;
+}
+
 .openapi-responsebody-header,
 .openapi-responseheaders-header {
     @apply px-3 py-1;
