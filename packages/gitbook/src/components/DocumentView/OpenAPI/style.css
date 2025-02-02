@@ -303,7 +303,14 @@
 }
 
 .openapi-response-description.openapi-markdown {
-    @apply prose-sm text-[13px] truncate text-dark/7 dark:text-light/7 !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply prose-sm text-[13px] relative text-dark/7 dark:text-light/7 !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply overflow-x-auto whitespace-pre;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.openapi-response-description.openapi-markdown::-webkit-scrollbar {
+    display: none;
 }
 
 .openapi-response-description p {
@@ -474,7 +481,8 @@
 }
 
 .openapi-disclosure-group-trigger {
-    @apply flex items-center w-full flex-1 gap-2.5 py-2 -outline-offset-1;
+    @apply flex items-center relative w-full flex-1 gap-2.5 py-2 -outline-offset-1;
+    /* @apply after:w-4 after:bg-gradient-to-l after:from-light to-transparent after:absolute after:right-0 after:top-0 after:h-full; */
 }
 
 .openapi-disclosure-group-trigger:disabled {
