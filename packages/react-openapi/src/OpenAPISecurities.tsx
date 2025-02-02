@@ -54,11 +54,7 @@ export function OpenAPISecurities(props: {
 function getLabelForType(security: OpenAPIV3_1.SecuritySchemeObject) {
     switch (security.type) {
         case 'apiKey':
-            return (
-                <>
-                    <OpenAPISchemaName propertyName="apiKey" type="string" required />
-                </>
-            );
+            return <OpenAPISchemaName propertyName="apiKey" type="string" required />;
         case 'http':
             if (security.scheme === 'basic') {
                 return 'Basic Auth';
@@ -79,11 +75,11 @@ function getLabelForType(security: OpenAPIV3_1.SecuritySchemeObject) {
                 );
             }
 
-            return 'HTTP';
+            return <OpenAPISchemaName propertyName="HTTP" required />;
         case 'oauth2':
-            return 'OAuth2';
+            return <OpenAPISchemaName propertyName="OAuth2" required />;
         case 'openIdConnect':
-            return 'OpenID Connect';
+            return <OpenAPISchemaName propertyName="OpenID Connect" required />;
         default:
             // @ts-ignore
             return security.type;

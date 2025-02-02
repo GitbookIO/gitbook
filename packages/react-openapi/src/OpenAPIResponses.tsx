@@ -30,6 +30,9 @@ export function OpenAPIResponses(props: {
                 groups={Object.entries(responses).map(
                     ([statusCode, response]: [string, OpenAPIV3.ResponseObject]) => {
                         const content = Object.entries(response.content ?? {});
+                        const headers = Object.entries(response.headers ?? {}).map(
+                            ([name, header]) => [name, noReference(header) ?? {}] as const,
+                        );
 
                         return {
                             id: statusCode,
@@ -47,23 +50,16 @@ export function OpenAPIResponses(props: {
                                             className="openapi-response-description"
                                         />
                                     ) : null}
-
-                                    {/* {content.length
-                                        ? content.map(([contentType, mediaType]) => (
-                                              <span className="openapi-response-content-type">
-                                                  {contentType}
-                                              </span>
-                                          ))
-                                        : null} */}
                                 </div>
                             ),
-                            body: (
-                                <OpenAPIResponse
-                                    key={`body-${statusCode}`}
-                                    response={response}
-                                    context={context}
-                                />
-                            ),
+                            body:
+                                !!headers.length || !!content.length ? (
+                                    <OpenAPIResponse
+                                        key={`body-${statusCode}`}
+                                        response={response}
+                                        context={context}
+                                    />
+                                ) : undefined,
                         };
                     },
                 )}

@@ -40,7 +40,7 @@
 }
 
 .openapi-markdown code {
-    @apply py-px px-1 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-dark/1 bg-dark/[0.06] rounded dark:ring-light/1 dark:bg-light/1 dark:!text-light-4 text-sm leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
+    @apply py-px px-1 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-dark/1 bg-dark/[0.06] rounded dark:ring-light/1 dark:bg-light/1 dark:text-light text-sm leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
 }
 
 .openapi-markdown pre code {
@@ -68,24 +68,24 @@
 
 .openapi-method-get {
     /* @apply bg-[hsl(215,54%,86%)] dark:bg-[hsla(215,54%,45%,0.24)] dark:text-[hsl(215,54%,86%)]; */
-    @apply bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100;
+    @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100;
 }
 
 .openapi-method-post {
     /* @apply bg-[hsl(120,25%,80%)] dark:bg-[hsla(120,54%,32%,0.24)] dark:text-[hsl(120,25%,80%)]; */
-    @apply bg-amber-100 text-amber-800 dark:bg-amber-800 dark:text-amber-100;
+    @apply bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100;
 }
 
 .openapi-method-put {
-    @apply bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100;
+    @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100;
 }
 
 .openapi-method-patch {
-    @apply bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100;
+    @apply bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100;
 }
 
 .openapi-method-delete {
-    @apply bg-pomegranate-100 text-pomegranate-800 dark:bg-pomegranate-800 dark:text-pomegranate-100;
+    @apply bg-pomegranate-100 text-pomegranate-800 dark:bg-pomegranate-900 dark:text-pomegranate-100;
 }
 
 .openapi-method-head,
@@ -220,16 +220,22 @@
 
 /* Schema Description */
 .openapi-schema-description.openapi-markdown {
-    @apply prose-sm text-dark/7 dark:text-light/7 !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply prose-sm text-dark/7 dark:text-light/7 overflow-hidden !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
+}
+
+.openapi-schema-description.openapi-markdown pre:has(code) {
+    @apply overflow-x-auto flex-1 w-fit max-w-full h-fit whitespace-pre;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.openapi-schema-description.openapi-markdown pre::-webkit-scrollbar {
+    display: none;
 }
 
 .openapi-schema-description.openapi-markdown pre code {
     font-weight: inherit !important;
-    @apply text-xs max-w-full overflow-x-scroll !py-0;
-}
-
-.openapi-schema-description.openapi-markdown pre:has(code) {
-    @apply flex-1 truncate overflow-hidden flex flex-row w-fit h-fit items-center;
+    @apply text-xs !py-0;
 }
 
 /* Schema Examples */
@@ -362,7 +368,7 @@
 }
 
 .openapi-path-title {
-    @apply flex-1 relative font-normal w-fit whitespace-nowrap overflow-x-auto font-mono text-dark dark:text-light;
+    @apply flex-1 relative font-normal whitespace-nowrap overflow-x-auto font-mono text-dark dark:text-light;
     scrollbar-width: none;
     -ms-overflow-style: none;
 }
@@ -472,6 +478,10 @@
 
 .openapi-disclosure-group-trigger {
     @apply flex items-center w-full flex-1 gap-2.5 py-2 -outline-offset-1;
+}
+
+.openapi-disclosure-group-trigger:disabled {
+    @apply cursor-default !pl-5;
 }
 
 .openapi-disclosure-group:only-child,

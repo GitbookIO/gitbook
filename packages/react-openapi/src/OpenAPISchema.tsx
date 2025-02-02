@@ -30,12 +30,10 @@ export function OpenAPISchemaProperty(
     },
 ) {
     const {
-        propertyName,
         schema,
         circularRefs: parentCircularRefs = new Map<OpenAPIV3.SchemaObject, string>(),
         context,
         className,
-        required,
     } = props;
 
     const id = useId();
@@ -85,27 +83,7 @@ export function OpenAPISchemaProperty(
     }
 
     return (
-        <InteractiveSection
-            id={id}
-            className={classNames('openapi-schema', className)}
-            // tabs={alternatives?.[0].map((alternative, index) => ({
-            //     key: `${index}`,
-            //     label: getSchemaTitle(alternative, alternatives[1]),
-            //     body: circularRefs.has(alternative) ? (
-            //         <OpenAPISchemaCircularRef
-            //             id={circularRefs.get(alternative)!}
-            //             schema={alternative}
-            //         />
-            //     ) : (
-            //         <OpenAPISchemaAlternative
-            //             schema={alternative}
-            //             circularRefs={circularRefs}
-            //             context={context}
-            //         />
-            //     ),
-            // }))}
-            // header={<OpenAPISchemaPresentation {...props} />}
-        >
+        <InteractiveSection id={id} className={classNames('openapi-schema', className)}>
             <OpenAPISchemaPresentation {...props} />
             {(properties && properties.length > 0) ||
             (schema.enum && schema.enum.length > 0) ||
