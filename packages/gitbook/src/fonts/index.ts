@@ -34,11 +34,11 @@ export const fontNotoColorEmoji = Noto_Color_Emoji({
  */
 
 const inter = Inter({
+    weight: ['400', '500', '600', '700'],
     variable: '--font-content',
     preload: false,
     display: 'swap',
     fallback: ['system-ui', 'arial'],
-    weight: ['400', '500', '600', '700'],
 });
 
 export const ibmPlexMono = IBM_Plex_Mono({
@@ -60,7 +60,7 @@ const firaSans = Fira_Sans_Extra_Condensed({
 });
 
 const ibmPlexSerif = IBM_Plex_Serif({
-    weight: ['400', '500', '700'],
+    weight: ['400', '500', '600', '700'],
     variable: '--font-content',
     preload: false,
     display: 'swap',
@@ -84,7 +84,7 @@ const merriweather = Merriweather({
 });
 
 const notoSans = Noto_Sans({
-    weight: ['400', '500', '700', '800'],
+    weight: ['400', '500', '600', '700'],
     variable: '--font-content',
     preload: false,
     display: 'swap',
@@ -92,7 +92,7 @@ const notoSans = Noto_Sans({
 });
 
 const openSans = Open_Sans({
-    weight: ['400', '600', '700', '800'],
+    weight: ['400', '500', '600', '700'],
     variable: '--font-content',
     preload: false,
     display: 'swap',
@@ -100,6 +100,7 @@ const openSans = Open_Sans({
 });
 
 const overpass = Overpass({
+    weight: ['400', '500', '600', '700'],
     variable: '--font-content',
     preload: false,
     display: 'swap',
@@ -131,7 +132,7 @@ const roboto = Roboto({
 });
 
 const robotoSlab = Roboto_Slab({
-    weight: ['400', '500', '700'],
+    weight: ['400', '500', '600', '700'],
     variable: '--font-content',
     preload: false,
     display: 'swap',
@@ -139,7 +140,7 @@ const robotoSlab = Roboto_Slab({
 });
 
 const sourceSansPro = Source_Sans_3({
-    weight: ['400', '600', '700'],
+    weight: ['400', '500', '600', '700'],
     variable: '--font-content',
     preload: false,
     display: 'swap',

@@ -267,13 +267,12 @@
     font-size: 0.75rem;
     cursor: pointer;
     font-size: 0.875rem;
-    font-weight: 600;
     display: flex;
     align-items: center;
     gap: 6px;
 }
 .scalar-activate-button {
-    @apply flex gap-1.5 items-center bg-primary text-light hover:text-light-1 hover:bg-primary-600 dark:bg-primary dark:text-contrast-primary dark:hover:bg-primary rounded-md straight-corners:rounded-none place-self-start;
+    @apply flex gap-1.5 font-semibold items-center bg-primary text-light hover:text-light-1 hover:bg-primary-600 dark:bg-primary dark:text-contrast-primary dark:hover:bg-primary rounded-md straight-corners:rounded-none place-self-start;
     @apply ring-1 ring-dark/1 hover:ring-dark/2 dark:ring-light/2 dark:hover:ring-light/4;
     @apply shadow-sm shadow-dark/4 dark:shadow-dark/8 hover:shadow-md active:shadow-none;
     @apply contrast-more:ring-dark contrast-more:hover:ring-2 contrast-more:hover:ring-dark contrast-more:dark:ring-light contrast-more:dark:hover:ring-light;
