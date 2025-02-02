@@ -1,11 +1,4 @@
-import {
-    Button,
-    Disclosure,
-    DisclosureGroup,
-    DisclosurePanel,
-    Heading,
-    Key,
-} from 'react-aria-components';
+import { DisclosureGroup } from 'react-aria-components';
 import React from 'react';
 
 interface Props {
@@ -20,7 +13,7 @@ interface Props {
 type DisclosureGroup = {
     id: string;
     label: string | React.ReactNode;
-    body: React.ReactNode;
+    body?: React.ReactNode;
 };
 
 import { mergeProps, useButton, useDisclosure, useFocusRing, useId } from 'react-aria';
@@ -65,7 +58,7 @@ function DisclosureItem(props: { group: DisclosureGroup; icon?: React.ReactNode 
 
     let panelRef = React.useRef<HTMLDivElement | null>(null);
     let triggerRef = React.useRef<HTMLButtonElement | null>(null);
-    let isDisabled = groupState?.isDisabled || false;
+    let isDisabled = groupState?.isDisabled || !group.body || false;
     let { buttonProps: triggerProps, panelProps } = useDisclosure(
         {
             ...props,
@@ -84,6 +77,7 @@ function DisclosureItem(props: { group: DisclosureGroup; icon?: React.ReactNode 
                 slot="trigger"
                 ref={triggerRef}
                 {...mergeProps(buttonProps, focusProps)}
+                disabled={isDisabled}
                 style={{
                     outline: isFocusVisible
                         ? '2px solid rgb(var(--primary-color-500)/0.4)'
@@ -91,17 +85,19 @@ function DisclosureItem(props: { group: DisclosureGroup; icon?: React.ReactNode 
                 }}
                 className="openapi-disclosure-group-trigger"
             >
-                <div className="openapi-disclosure-group-icon">
-                    {icon || (
-                        <svg viewBox="0 0 24 24" className="openapi-disclosure-group-icon">
-                            <path d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                        </svg>
-                    )}
-                </div>
+                {!!group.body ? (
+                    <div className="openapi-disclosure-group-icon">
+                        {icon || (
+                            <svg viewBox="0 0 24 24" className="openapi-disclosure-group-icon">
+                                <path d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                            </svg>
+                        )}
+                    </div>
+                ) : null}
                 {group.label}
             </button>
 
-            {state.isExpanded && (
+            {state.isExpanded && !!group.body && (
                 <div className="openapi-disclosure-group-panel" ref={panelRef} {...panelProps}>
                     {group.body}
                 </div>
