@@ -202,7 +202,7 @@
 
 /* Schema Enum */
 .openapi-schema-enum {
-    @apply flex flex-row text-sm flex-wrap text-dark/7 dark:text-light/7;
+    @apply flex flex-row text-sm leading-relaxed flex-wrap text-dark/7 dark:text-light/7;
 }
 
 .openapi-schema-enum-value {
