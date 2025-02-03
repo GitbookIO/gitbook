@@ -2,6 +2,8 @@
 
 import classNames from 'classnames';
 import React, { useCallback } from 'react';
+import { mergeProps, useButton, useDisclosure, useFocusRing } from 'react-aria';
+import { useDisclosureState } from 'react-stately';
 
 interface InteractiveSectionTab {
     key: string;
@@ -78,11 +80,18 @@ export function InteractiveSection(props: {
         stateKey && stateKey in syncedTabs
             ? tabs.find((tab) => tab.key === syncedTabs[stateKey])
             : undefined;
-
-    const [opened, setOpened] = React.useState(defaultOpened);
     const [selectedTabKey, setSelectedTab] = React.useState(tabFromState?.key ?? defaultTab);
     const selectedTab: InteractiveSectionTab | undefined =
         tabFromState ?? tabs.find((tab) => tab.key === selectedTabKey) ?? tabs[0];
+
+    const state = useDisclosureState({
+        defaultExpanded: defaultOpened,
+    });
+    const panelRef = React.useRef<HTMLDivElement | null>(null);
+    const triggerRef = React.useRef<HTMLButtonElement | null>(null);
+    const { buttonProps: triggerProps, panelProps } = useDisclosure({}, state, panelRef);
+    const { buttonProps } = useButton(triggerProps, triggerRef);
+    const { isFocusVisible, focusProps } = useFocusRing();
 
     return (
         <div
@@ -91,14 +100,14 @@ export function InteractiveSection(props: {
                 'openapi-section',
                 toggeable ? 'openapi-section-toggeable' : null,
                 className,
-                toggeable ? `${className}-${opened ? 'opened' : 'closed'}` : null,
+                toggeable ? `${className}-${state.isExpanded ? 'opened' : 'closed'}` : null,
             )}
         >
             {header ? (
                 <div
                     onClick={() => {
                         if (toggeable) {
-                            setOpened(!opened);
+                            state.toggle();
                         }
                     }}
                     className={classNames('openapi-section-header', `${className}-header`)}
@@ -111,12 +120,17 @@ export function InteractiveSection(props: {
                     >
                         {(children || selectedTab?.body) && toggeable ? (
                             <button
+                                {...mergeProps(buttonProps, focusProps)}
+                                ref={triggerRef}
                                 className={classNames(
                                     'openapi-section-toggle',
                                     `${className}-toggle`,
                                 )}
-                                onClick={() => setOpened(!opened)}
-                                aria-expanded={opened}
+                                style={{
+                                    outline: isFocusVisible
+                                        ? '2px solid rgb(var(--primary-color-500) / 0.4)'
+                                        : 'none',
+                                }}
                             >
                                 {toggleIcon}
                             </button>
@@ -148,7 +162,7 @@ export function InteractiveSection(props: {
                                             [stateKey]: event.target.value,
                                         }));
                                     }
-                                    setOpened(true);
+                                    state.expand();
                                 }}
                             >
                                 {tabs.map((tab) => (
@@ -161,8 +175,12 @@ export function InteractiveSection(props: {
                     </div>
                 </div>
             ) : null}
-            {(!toggeable || opened) && (children || selectedTab?.body) ? (
-                <div className={classNames('openapi-section-body', `${className}-body`)}>
+            {(!toggeable || state.isExpanded) && (children || selectedTab?.body) ? (
+                <div
+                    ref={panelRef}
+                    {...panelProps}
+                    className={classNames('openapi-section-body', `${className}-body`)}
+                >
                     {children}
                     {selectedTab?.body}
                 </div>

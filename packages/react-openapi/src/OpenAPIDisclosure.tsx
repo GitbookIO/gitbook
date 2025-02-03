@@ -10,12 +10,12 @@ interface Props {
 }
 
 export function OpenAPIDisclosure({ context, children, label }: Props): JSX.Element {
-    let state = useDisclosureState({});
-    let panelRef = React.useRef<HTMLDivElement | null>(null);
-    let triggerRef = React.useRef<HTMLButtonElement | null>(null);
-    let { buttonProps: triggerProps, panelProps } = useDisclosure({}, state, panelRef);
-    let { buttonProps } = useButton(triggerProps, triggerRef);
-    let { isFocusVisible, focusProps } = useFocusRing();
+    const state = useDisclosureState({});
+    const panelRef = React.useRef<HTMLDivElement | null>(null);
+    const triggerRef = React.useRef<HTMLButtonElement | null>(null);
+    const { buttonProps: triggerProps, panelProps } = useDisclosure({}, state, panelRef);
+    const { buttonProps } = useButton(triggerProps, triggerRef);
+    const { isFocusVisible, focusProps } = useFocusRing();
 
     return (
         <div className="openapi-disclosure">
