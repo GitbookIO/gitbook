@@ -32,16 +32,7 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
                         position: SiteInsightsLinkPosition.Content,
                     },
                 }}
-                className={tcls(
-                    'group/file',
-                    'flex',
-                    'flex-row',
-                    'items-center',
-                    'px-5',
-                    'py-3',
-                    'hover:text-primary-600',
-                    'dark:hover:text-primary-300',
-                )}
+                className={tcls('group/file', 'flex', 'flex-row', 'items-center', 'px-5', 'py-3')}
             >
                 <div
                     className={tcls(
@@ -53,8 +44,7 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
                         'items-center',
                         'gap-1',
                         'border-r',
-                        'border-dark/2',
-                        'dark:border-light/2',
+                        'border-tint-subtle',
                     )}
                 >
                     <div>
@@ -66,10 +56,8 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
                     <div
                         className={tcls(
                             'text-xs',
-                            'text-dark-4/8',
-                            'group-hover/file:text-dark',
-                            'dark:text-light-4/7',
-                            'dark:group-hover/file:text-light',
+                            'text-tint',
+                            'group-hover/file:text-tint-strong',
                         )}
                     >
                         {getHumanFileSize(file.size)}

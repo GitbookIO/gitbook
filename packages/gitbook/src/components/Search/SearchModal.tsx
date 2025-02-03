@@ -84,12 +84,12 @@ export function SearchModal(props: SearchModalProps) {
                         className={tcls(
                             'fixed',
                             'inset-0',
-                            'bg-dark/4',
+                            'bg-tint-12/4',
+                            'dark:bg-tint-1/6',
                             'backdrop-blur-2xl',
                             'z-30',
                             'px-4',
                             'pt-4',
-                            'dark:bg-dark/8',
                             'md:pt-[min(8vh,6rem)]',
                         )}
                         onClick={() => {
@@ -227,7 +227,7 @@ function SearchModalBody(
                 'relative',
                 'flex',
                 'flex-col',
-                'bg-white',
+                'bg-tint-base',
                 'max-w-prose',
                 'mx-auto',
                 'max-h-[70dvh]',
@@ -235,12 +235,11 @@ function SearchModalBody(
                 'rounded-lg',
                 'straight-corners:rounded-sm',
                 'ring-1',
-                'ring-dark/1',
+                'ring-tint-hover',
                 'shadow-2xl',
                 'overflow-hidden',
                 'dark:ring-inset',
-                'dark:bg-dark-3',
-                'dark:ring-light/2',
+                'dark:ring-tint',
             )}
             onClick={(event) => {
                 event.stopPropagation();
@@ -252,15 +251,11 @@ function SearchModalBody(
                     'flex-row',
                     'items-start',
                     state.query !== null ? 'border-b' : null,
-                    'border-dark/2',
-                    'dark:border-light/2',
+                    'border-tint-subtle',
                 )}
             >
                 <div className={tcls('p-2', 'pl-4', 'pt-4')}>
-                    <Icon
-                        icon="magnifying-glass"
-                        className={tcls('size-4', 'text-dark/4', 'dark:text-light/5')}
-                    />
+                    <Icon icon="magnifying-glass" className={tcls('size-4', 'text-tint-subtle')} />
                 </div>
                 <div
                     className={tcls(
@@ -279,8 +274,8 @@ function SearchModalBody(
                         onKeyDown={onKeyDown}
                         onChange={onChange}
                         className={tcls(
-                            'text-dark',
-                            'placeholder:text-dark/7',
+                            'text-tint-strong',
+                            'placeholder:text-tint',
                             'flex',
                             'resize-none',
                             'flex-1',
@@ -289,8 +284,6 @@ function SearchModalBody(
                             'focus:outline-none',
                             'bg-transparent',
                             'whitespace-pre-line',
-                            'dark:text-light',
-                            'dark:placeholder:text-light/7',
                         )}
                         placeholder={tString(
                             language,

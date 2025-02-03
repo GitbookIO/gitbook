@@ -81,29 +81,25 @@ export async function PageAside(props: {
                 'sticky',
                 'break-anywhere', // To prevent long words in headings from breaking the layout
 
-                'text-dark/7',
-                'dark:text-light/7',
-                'contrast-more:text-dark',
-                'contrast-more:dark:text-light',
+                'text-tint',
+                'contrast-more:text-tint-strong',
 
                 // When in api page mode, we display it as an overlay on non-large resolutions
                 'page-api-block:xl:max-2xl:z-10',
                 'page-api-block:xl:max-2xl:fixed',
                 'page-api-block:xl:max-2xl:right-8',
                 'page-api-block:xl:max-2xl:w-56',
-                'page-api-block:xl:max-2xl:bg-light-2',
-                'page-api-block:xl:max-2xl:bg-opacity-9',
-                'page-api-block:xl:max-2xl:contrast-more:bg-opacity-11',
+                'page-api-block:xl:max-2xl:bg-tint/9',
+                'page-api-block:xl:max-2xl:contrast-more:bg-tint',
                 'page-api-block:xl:max-2xl:backdrop-blur-lg',
                 'page-api-block:xl:max-2xl:border',
-                'page-api-block:xl:max-2xl:border-dark/2',
-                'page-api-block:xl:max-2xl:dark:border-light/2',
+                'page-api-block:xl:max-2xl:border-tint',
                 'page-api-block:xl:max-2xl:hover:shadow-lg',
-                'page-api-block:xl:max-2xl:hover:shadow-dark/2',
+                'page-api-block:xl:max-2xl:hover:shadow-tint-12/1',
+                'page-api-block:xl:max-2xl:dark:hover:shadow-tint-1/1',
                 'page-api-block:xl:max-2xl:rounded-md',
                 'page-api-block:xl:max-2xl:h-auto',
                 'page-api-block:xl:max-2xl:my-8',
-                'dark:page-api-block:xl:max-2xl:bg-dark-2/8',
 
                 topOffset,
             )}
@@ -166,8 +162,7 @@ export async function PageAside(props: {
                         'sidebar-list-default:px-3',
                         'border-t',
                         'first:border-none',
-                        'border-dark/2',
-                        'dark:border-light/2',
+                        'border-tint-subtle',
                         'py-4',
                         'first:pt-0',
                         'page-api-block:xl:max-2xl:px-3',
@@ -188,7 +183,7 @@ export async function PageAside(props: {
                                     'flex-row',
                                     'items-center',
                                     'text-sm',
-                                    'hover:text-tint',
+                                    'hover:text-tint-strong',
                                     'py-2',
                                 )}
                             >
@@ -213,7 +208,7 @@ export async function PageAside(props: {
                                     'flex-row',
                                     'items-center',
                                     'text-sm',
-                                    'hover:text-tint',
+                                    'hover:text-tint-strong',
                                     'py-2',
                                 )}
                             >

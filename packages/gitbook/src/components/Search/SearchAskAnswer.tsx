@@ -142,14 +142,7 @@ function AnswerBody(props: { answer: AskAnswerResult }) {
         <>
             <div
                 data-testid="search-ask-answer"
-                className={tcls(
-                    'my-4',
-                    'sm:mt-6',
-                    'px-4',
-                    'sm:px-12',
-                    'text-dark/9',
-                    'dark:text-light/8',
-                )}
+                className={tcls('my-4', 'sm:mt-6', 'px-4', 'sm:px-12', 'text-tint-strong')}
             >
                 {answer.body ?? t(language, 'search_ask_no_answer')}
                 {answer.followupQuestions.length > 0 ? (
@@ -185,12 +178,9 @@ function AnswerFollowupQuestions(props: { followupQuestions: string[] }) {
                         'py-2',
                         'rounded',
                         'straight-corners:rounded-none',
-                        'text-dark/7',
-                        'dark:text-light/8',
-                        'hover:bg-dark-4/2',
-                        'dark:hover:bg-light-4/2',
-                        'focus-within:bg-dark-4/2',
-                        'dark:focus-within:bg-light-4/2',
+                        'text-tint',
+                        'hover:bg-tint-hover',
+                        'focus-within:bg-tint-hover',
                     )}
                     {...getSearchLinkProps({
                         query: question,
@@ -199,13 +189,7 @@ function AnswerFollowupQuestions(props: { followupQuestions: string[] }) {
                 >
                     <Icon
                         icon="magnifying-glass"
-                        className={tcls(
-                            'size-4',
-                            'shrink-0',
-                            'mr-2',
-                            'text-dark/5',
-                            'dark:text-light/5',
-                        )}
+                        className={tcls('size-4', 'shrink-0', 'mr-2', 'text-tint-subtle')}
                     />
                     <span>{question}</span>
                 </Link>
@@ -232,8 +216,7 @@ function AnswerSources(props: {
                 'py-4',
                 'px-4',
                 'border-t',
-                'border-dark/2',
-                'dark:border-light/1',
+                'border-subtle',
             )}
         >
             <span>
@@ -248,22 +231,16 @@ function AnswerSources(props: {
                             'flex-wrap',
                             'gap-1',
                             'items-center',
-                            'text-dark/7',
+                            'text-tint',
                             'hover:underline',
-                            'focus-within:text-primary-700',
-                            'dark:text-light/8',
+                            'focus-within:text-primary',
                         )}
                         href={source.href}
                         prefetch={false}
                     >
                         <Icon
                             icon="arrow-up-right"
-                            className={tcls(
-                                'text-dark/6',
-                                'size-4',
-                                'shrink-0',
-                                'dark:text-light/6',
-                            )}
+                            className={tcls('text-tint-subtle', 'size-4', 'shrink-0')}
                         />
                         {source.title}
                     </Link>

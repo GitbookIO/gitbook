@@ -3,7 +3,7 @@ import typography from '@tailwindcss/typography';
 import type { Config } from 'tailwindcss';
 import plugin from 'tailwindcss/plugin';
 
-import { hexToRgb, shadesOfColor } from './src/lib/colors';
+import { ColorCategory, hexToRgb, scale, shadesOfColor } from './src/lib/colors';
 
 export const shades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
 export const opacities = [0, 4, 8, 12, 16, 24, 40, 64, 72, 88, 96, 100];
@@ -11,14 +11,22 @@ export const opacities = [0, 4, 8, 12, 16, 24, 40, 64, 72, 88, 96, 100];
 /**
  * Generate a Tailwind color shades from a variable.
  */
-function generateVarShades(varName: string) {
-    return shades.reduce(
-        (acc, shade) => {
-            acc[shade] = `rgb(var(--${varName}-${shade}) / <alpha-value>)`;
-            return acc;
-        },
-        { DEFAULT: `rgb(var(--${varName}-500) / <alpha-value>)` } as Record<string, string>,
-    );
+function generateVarShades(varName: string, filter: ColorCategory[] = []) {
+    const result: { [key: string]: string } = {};
+
+    Object.entries(scale).forEach(([categoryName, category]) => {
+        if (filter.length === 0 || filter.includes(categoryName as ColorCategory)) {
+            Object.entries(category).forEach(([key, value]) => {
+                if (filter.length > 0) {
+                    result[key] = `rgb(var(--${varName}-${value}))`;
+                } else {
+                    result[value] = `rgb(var(--${varName}-${value}))`;
+                }
+            });
+        }
+    });
+
+    return result;
 }
 
 /**
@@ -75,30 +83,23 @@ const config: Config = {
             colors: {
                 // Dynamic colors matching the customization settings
 
-                /** primary-color used to accent elements, these colors remain unchanged when toggling between the CustomizationBackground options**/
-                primary: generateVarShades('primary-color'),
+                /** Scale based on the primary color, used for links and interactive elements. */
+                primary: generateVarShades('primary'),
+                /** Contrasting foreground color that can be used on top of `primary`. Black or white depending on shade. */
                 'contrast-primary': generateVarShades('contrast-primary'),
-                tint: generateVarShades('tint-color'),
+
+                /** The main color scale for non-interactive elements. Will either be a (slightly tinted) gray scale or a user-set value through Customisation. */
+                tint: generateVarShades('tint'),
+                /** Contrasting foreground color that can be used on top of `tint`. Black or white depending on shade. */
                 'contrast-tint': generateVarShades('contrast-tint'),
 
-                'header-background': generateVarShades('header-background'),
-                'header-link': generateVarShades('header-link'),
-                'header-button-text': generateVarShades('header-button-text'),
+                /** Will always be a neutral gray scale, without any tinting or overrides. Use only when `tint` somehow clashes. */
+                neutral: generateVarShades('neutral'),
+                /** Contrasting foreground color that can be used on top of `neutral`. Black or white depending on shade. */
+                'contrast-neutral': generateVarShades('contrast-neutral'),
 
-                light: {
-                    1: `color-mix(in srgb, var(--light-1), transparent calc(100% - 100% * <alpha-value>))`, //1 99%
-                    DEFAULT: `color-mix(in srgb, var(--light-DEFAULT), transparent calc(100% - 100% * <alpha-value>))`, //(default) 96%
-                    2: `color-mix(in srgb, var(--light-2), transparent calc(100% - 100% * <alpha-value>))`, //2 92%
-                    3: `color-mix(in srgb, var(--light-3), transparent calc(100% - 100% * <alpha-value>))`, //4 82%
-                    4: `color-mix(in srgb, var(--light-4), transparent calc(100% - 100% * <alpha-value>))`, //5 64%
-                },
-                dark: {
-                    1: `color-mix(in srgb, var(--dark-1), transparent calc(100% - 100% * <alpha-value>))`, //1 99%
-                    DEFAULT: `color-mix(in srgb, var(--dark-DEFAULT), transparent calc(100% - 100% * <alpha-value>))`, //(default) 96%
-                    2: `color-mix(in srgb, var(--dark-2), transparent calc(100% - 100% * <alpha-value>))`, //2 92%
-                    3: `color-mix(in srgb, var(--dark-3), transparent calc(100% - 100% * <alpha-value>))`, //4 82%
-                    4: `color-mix(in srgb, var(--dark-4), transparent calc(100% - 100% * <alpha-value>))`, //5 64%
-                },
+                'header-background': 'rgb(var(--header-background))',
+                'header-link': 'rgb(var(--header-link))',
                 yellow: generateShades('#f4e28d'),
                 teal: generateShades('#3f89a1'),
                 pomegranate: generateShades('#f25b3a'),
@@ -111,6 +112,92 @@ const config: Config = {
                 'mark-red': '#FFCCCB4D',
                 'mark-yellow': '#FFF0854D',
                 'mark-green': '#91EABF4D',
+                primary: generateVarShades('primary', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.components,
+                    ColorCategory.accents,
+                ]),
+                tint: generateVarShades('tint', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.components,
+                    ColorCategory.accents,
+                ]),
+                neutral: generateVarShades('neutral', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.components,
+                    ColorCategory.accents,
+                ]),
+            },
+            gradientColorStops: {
+                primary: generateVarShades('primary', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.components,
+                    ColorCategory.accents,
+                ]),
+                tint: generateVarShades('tint', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.components,
+                    ColorCategory.accents,
+                ]),
+                neutral: generateVarShades('neutral', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.components,
+                    ColorCategory.accents,
+                ]),
+            },
+            borderColor: {
+                primary: generateVarShades('primary', [ColorCategory.borders]),
+                tint: generateVarShades('tint', [ColorCategory.borders]),
+                neutral: generateVarShades('neutral', [ColorCategory.borders]),
+            },
+            ringColor: {
+                primary: generateVarShades('primary', [ColorCategory.borders]),
+                tint: generateVarShades('tint', [ColorCategory.borders]),
+                neutral: generateVarShades('neutral', [ColorCategory.borders]),
+            },
+            outlineColor: {
+                primary: generateVarShades('primary', [ColorCategory.borders]),
+                tint: generateVarShades('tint', [ColorCategory.borders]),
+                neutral: generateVarShades('neutral', [ColorCategory.borders]),
+            },
+            boxShadowColor: {
+                primary: generateVarShades('primary', [ColorCategory.borders]),
+                tint: generateVarShades('tint', [ColorCategory.borders]),
+                neutral: generateVarShades('neutral', [ColorCategory.borders]),
+            },
+            textColor: {
+                primary: generateVarShades('primary', [ColorCategory.text]),
+                'contrast-primary': generateVarShades('contrast-primary', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.accents,
+                ]),
+                tint: generateVarShades('tint', [ColorCategory.text]),
+                'contrast-tint': generateVarShades('contrast-tint', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.accents,
+                ]),
+                neutral: generateVarShades('neutral', [ColorCategory.text]),
+                'contrast-neutral': generateVarShades('contrast-neutral', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.accents,
+                ]),
+            },
+            textDecorationColor: {
+                primary: generateVarShades('primary', [ColorCategory.text]),
+                'contrast-primary': generateVarShades('contrast-primary', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.accents,
+                ]),
+                tint: generateVarShades('tint', [ColorCategory.text]),
+                'contrast-tint': generateVarShades('contrast-tint', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.accents,
+                ]),
+                neutral: generateVarShades('neutral', [ColorCategory.text]),
+                'contrast-neutral': generateVarShades('contrast-neutral', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.accents,
+                ]),
             },
             animation: {
                 present: 'present .5s ease-out both',

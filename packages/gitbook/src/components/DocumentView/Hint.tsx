@@ -62,28 +62,21 @@ const HINT_STYLES: {
 } = {
     info: {
         icon: 'circle-info',
-        iconColor: ['text-primary-500', 'dark:text-primary-400'],
-        bodyColor: [
-            '[&_a]:text-primary-500',
-            '[&_a:hover]:text-primary-600',
-            'dark:[&_a]:text-primary-400',
-            'dark:[&_a:hover]:text-primary-300',
-        ],
+        iconColor: ['text-primary'],
+        bodyColor: ['[&_a]:text-primary', '[&_a:hover]:text-primary-strong'],
         style: [
-            'bg-dark-1/1',
-            'border-dark/3',
-            'dark:bg-light/1',
-            'dark:border-light/3',
-            '[&_.can-override-bg]:bg-dark-1/2',
-            '[&_.can-override-text]:text-dark',
-            'dark:[&_.can-override-bg]:bg-light/2',
-            'dark:[&_.can-override-text]:text-light',
+            'bg-tint',
+            'border-tint',
+            '[&_.can-override-bg]:bg-tint-active',
+            '[&_.can-override-text]:text-tint-strong',
         ],
     },
     warning: {
         icon: 'circle-exclamation',
         iconColor: ['text-amber-500', 'dark:text-orange-400'], // Darker shades of orange-* mismatch with lighter shades, so in light mode we use amber text on top of orange bg.
         bodyColor: [
+            'text-orange-950',
+            'dark:text-orange-50',
             '[&_a]:text-orange-800',
             '[&_a:hover]:text-orange-900',
             'dark:[&_a]:text-orange-400',
@@ -100,6 +93,8 @@ const HINT_STYLES: {
         icon: 'triangle-exclamation',
         iconColor: ['text-red-500', 'dark:text-red-400'],
         bodyColor: [
+            'text-red-950',
+            'dark:text-red-50',
             '[&_a]:text-red-800',
             '[&_a:hover]:text-red-900',
             'dark:[&_a]:text-red-400',
@@ -115,6 +110,8 @@ const HINT_STYLES: {
         icon: 'circle-check',
         iconColor: ['text-green-500', 'dark:text-green-400'],
         bodyColor: [
+            'text-green-950',
+            'dark:text-green-50',
             '[&_a]:text-green-800',
             '[&_a:hover]:text-green-900',
             'dark:[&_a]:text-green-400',

@@ -46,8 +46,7 @@ export async function PageDocumentItem(props: {
                             style={tcls(
                                 'ml-5',
                                 'my-2',
-                                'border-dark/3',
-                                'dark:border-light/2',
+                                'border-tint-subtle',
                                 'sidebar-list-default:border-l',
                                 'sidebar-list-line:border-l',
                             )}

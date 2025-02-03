@@ -20,7 +20,7 @@ export function Footer(props: {
     const { context, customization } = props;
 
     return (
-        <footer className="border-t border-dark/2 dark:border-light/2 scroll-nojump">
+        <footer className="border-t border-tint-subtle scroll-nojump">
             <div
                 className={tcls(
                     CONTAINER_STYLE,
@@ -116,7 +116,7 @@ export function Footer(props: {
                 {/* Legal */}
                 <div
                     className={tcls(
-                        'mx-auto w-full grow text-xs text-dark/7 dark:text-light/6 items-center text-center order-4 flex flex-col gap-2 empty:hidden',
+                        'mx-auto w-full grow text-xs text-tint items-center text-center order-4 flex flex-col gap-2 empty:hidden',
                         customization.footer.groups.length == 0 &&
                             'order-2 lg:flex-1 lg:w-auto lg:items-start lg:max-w-3xl self-center lg:text-start',
                         customization.footer.groups.length == 0 &&

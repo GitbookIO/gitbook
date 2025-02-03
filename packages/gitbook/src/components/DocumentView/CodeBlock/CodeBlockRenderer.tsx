@@ -34,18 +34,18 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
         <div ref={ref} className={tcls('group/codeblock grid grid-flow-col', style)}>
             <div className="flex items-center justify-start [grid-area:1/1] text-sm gap-2">
                 {title ? (
-                    <div className="text-xs tracking-wide text-dark/7 leading-none inline-flex items-center justify-center bg-light-2 rounded-t straight-corners:rounded-t-s px-3 py-2 dark:bg-dark-2 dark:text-light/7">
+                    <div className="text-xs tracking-wide text-tint leading-none inline-flex items-center justify-center bg-tint rounded-t straight-corners:rounded-t-s px-3 py-2">
                         {title}
                     </div>
                 ) : null}
             </div>
             <CopyCodeButton
                 codeId={id}
-                style="group-hover/codeblock:opacity-[1] transition-opacity duration-75 opacity-0 text-xs [grid-area:2/1] z-[2] justify-self-end backdrop-blur-md leading-none self-start ring-1 ring-dark/2 text-dark/7 bg-transparent rounded-md mr-2 mt-2 p-1 hover:ring-dark/3 dark:ring-light/2 dark:text-light/7 dark:hover:ring-light/3"
+                style="group-hover/codeblock:opacity-[1] transition-opacity duration-75 opacity-0 text-xs [grid-area:2/1] z-[2] justify-self-end backdrop-blur-md leading-none self-start ring-1 ring-tint text-tint bg-transparent rounded-md mr-2 mt-2 p-1 hover:ring-tint-hover"
             />
             <pre
                 className={tcls(
-                    '[grid-area:2/1] relative overflow-auto bg-light-2 dark:bg-dark-2 dark:border-dark-4 hide-scroll',
+                    '[grid-area:2/1] relative overflow-auto bg-tint ring-tint-subtle hide-scroll',
                     'rounded-md straight-corners:rounded-sm',
                     title && 'rounded-ss-none',
                 )}

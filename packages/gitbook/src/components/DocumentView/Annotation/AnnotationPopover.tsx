@@ -31,38 +31,32 @@ export function AnnotationPopover(props: { children: React.ReactNode; body: Reac
                     className={tcls(
                         'text-sm',
                         'max-w-[280px]',
-                        'bg-light',
+                        'bg-tint',
                         'ring-1',
-                        'ring-dark/2',
+                        'ring-tint',
                         'rounded',
                         'shadow-1xs',
-                        'shadow-dark/1',
+                        'shadow-tint-12/1',
+                        'dark:shadow-tint-1/2',
                         'p-3',
                         '[&_p]:leading-snug',
-                        'dark:bg-dark',
-                        'dark:ring-light/2',
-                        'dark:shadow-dark/4',
                         '-outline-offset-2',
                         'outline-2',
                         'outline-primary/8',
                         'z-20',
                     )}
-                    sideOffset={5}
+                    sideOffset={4}
                 >
                     {body}
                     <Popover.Arrow asChild>
                         <svg
-                            width="100%"
                             viewBox="0 0 8 5"
-                            preserveAspectRatio="xMaxYMid meet"
                             className={tcls(
                                 'relative',
                                 'z-[2]',
-                                'fill-light',
-                                'stroke-dark/2',
+                                'fill-tint-3', // Same as bg-tint
+                                'stroke-tint-7', // Same as ring-tint
                                 '[paint-order:stroke_fill]',
-                                'dark:fill-dark',
-                                'dark:stroke-light/2',
                             )}
                             fill="none"
                             xmlns="http://www.w3.org/2000/svg"

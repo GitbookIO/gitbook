@@ -33,12 +33,7 @@ export function HeaderLinkMore(props: {
         <button
             className={tcls(
                 isCustomizationDefault
-                    ? [
-                          'text-dark/8',
-                          'dark:text-light/8',
-                          'hover:text-primary',
-                          'dark:hover:text-primary',
-                      ]
+                    ? ['text-tint', 'hover:text-primary', 'dark:hover:text-primary']
                     : ['text-header-link', 'hover:text-header-link/8'],
                 'flex',
                 'gap-1',
@@ -75,7 +70,7 @@ async function MoreMenuLink(props: {
     return (
         <>
             {'links' in link && link.links.length > 0 && (
-                <hr className="first:hidden border-t border-light-3 dark:border-dark-3 my-1 -mx-2" />
+                <hr className="first:hidden border-t border-tint my-1 -mx-2" />
             )}
             <DropdownMenuItem
                 href={target?.href ?? null}

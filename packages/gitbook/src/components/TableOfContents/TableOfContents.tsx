@@ -78,8 +78,7 @@ export function TableOfContents(props: {
                 'gap-4',
 
                 'navigation-open:border-b',
-                'border-dark/2',
-                'dark:border-light/2',
+                'border-tint-subtle',
             )}
         >
             {header && header}
@@ -93,10 +92,8 @@ export function TableOfContents(props: {
                     'flex-col',
                     'flex-grow',
 
-                    'sidebar-filled:bg-light-2',
-                    '[html.tint.sidebar-filled_&]:bg-light-1',
-                    'dark:sidebar-filled:bg-dark-1',
-                    'dark:[html.tint.sidebar-filled_&]:bg-dark-1',
+                    'sidebar-filled:bg-tint-subtle',
+                    '[html.tint.sidebar-filled_&]:bg-tint-base',
 
                     'sidebar-filled:rounded-xl',
                     'straight-corners:rounded-none',
@@ -114,14 +111,11 @@ export function TableOfContents(props: {
 
                         'overflow-y-auto',
                         'lg:gutter-stable',
-                        'group-hover:[&::-webkit-scrollbar]:bg-dark/1',
-                        'group-hover:[&::-webkit-scrollbar-thumb]:bg-dark/3',
                         '[&::-webkit-scrollbar]:bg-transparent',
                         '[&::-webkit-scrollbar-thumb]:bg-transparent',
-                        'dark:[&::-webkit-scrollbar]:bg-transparent',
-                        'dark:[&::-webkit-scrollbar-thumb]:bg-transparent',
-                        'dark:group-hover:[&::-webkit-scrollbar]:bg-light/1',
-                        'dark:group-hover:[&::-webkit-scrollbar-thumb]:bg-light/3',
+                        'group-hover:[&::-webkit-scrollbar]:bg-tint-subtle',
+                        'group-hover:[&::-webkit-scrollbar-thumb]:bg-tint-7',
+                        'group-hover:[&::-webkit-scrollbar-thumb:hover]:bg-tint-8',
                     )}
                 >
                     <PagesList
@@ -129,11 +123,7 @@ export function TableOfContents(props: {
                         pages={pages}
                         ancestors={ancestors}
                         context={context}
-                        style={tcls(
-                            'sidebar-list-line:border-l',
-                            'border-dark/3',
-                            'dark:border-light/2',
-                        )}
+                        style={tcls('sidebar-list-line:border-l', 'border-tint-subtle')}
                     />
                     {customization.trademark.enabled ? (
                         <Trademark

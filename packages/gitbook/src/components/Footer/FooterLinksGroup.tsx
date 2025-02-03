@@ -44,13 +44,11 @@ async function FooterLink(props: { link: CustomizationContentLink; context: Cont
             href={resolved.href}
             className={tcls(
                 'font-normal',
-                'text-dark/8',
+                'text-tint',
                 'hover:text-primary',
-                'dark:text-light/8',
-                'dark:hover:text-light',
+                'tint:hover:text-tint-strong',
                 'contrast-more:underline',
-                'contrast-more:text-dark',
-                'contrast-more:dark:text-light',
+                'contrast-more:text-tint-strong',
                 'underline-offset-2',
             )}
             insights={{

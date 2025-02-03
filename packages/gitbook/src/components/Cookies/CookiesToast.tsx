@@ -44,11 +44,11 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
             className={tcls(
                 'fixed',
                 'z-10',
-                'bg-white',
+                'bg-tint-base',
                 'rounded',
                 'straight-corners:rounded-none',
                 'ring-1',
-                'ring-dark/2',
+                'ring-tint-subtle',
                 'shadow-1xs',
                 'p-4',
                 'pr-8',
@@ -58,8 +58,6 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                 'max-w-md',
                 'text-balance',
                 'sm:left-auto',
-                'dark:ring-light/2',
-                'dark:bg-dark',
             )}
         >
             <p id={describedById} className={tcls('text-sm')}>
@@ -68,7 +66,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                     'cookies_prompt',
                     <a
                         href={privacyPolicy}
-                        className={tcls('text-primary-500', 'hover:text-primary-600', 'underline')}
+                        className={tcls('text-primary', 'hover:text-primary-strong', 'underline')}
                     >
                         {t(language, 'cookies_prompt_privacy')}
                     </a>,
@@ -88,8 +86,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                     'justify-center',
                     'items-center',
                     'rounded-sm',
-                    'hover:bg-dark/2',
-                    'dark:hover:bg-light/1',
+                    'hover:bg-tint-hover',
                 )}
                 title={tString(language, 'cookies_close')}
             >

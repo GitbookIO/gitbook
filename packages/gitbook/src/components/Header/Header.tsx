@@ -46,17 +46,14 @@ export function Header(props: {
                 'z-10',
                 'w-full',
                 'flex-none',
-                'shadow-thinbottom',
-                'dark:shadow-light/2',
-                'bg-light',
-                'dark:bg-dark',
+                'shadow-[0px_1px_0px]',
+                'shadow-tint-12/2',
+                'bg-tint-base/9',
+                '[html.tint.sidebar-filled_&]:bg-tint-subtle/9',
+                'contrast-more:bg-tint-base',
                 withTopHeader ? null : 'lg:hidden',
                 'text-sm',
-                'bg-opacity-9',
-                'dark:bg-opacity-9',
                 'backdrop-blur-lg',
-                'contrast-more:bg-opacity-11',
-                'contrast-more:dark:bg-opacity-11',
             )}
         >
             <div
@@ -64,8 +61,8 @@ export function Header(props: {
                     !isCustomizationDefault &&
                         withTopHeader && [
                             'bg-header-background',
-                            'shadow-thinbottom',
-                            'dark:shadow-light/2',
+                            'shadow-[0px_1px_0px]',
+                            'shadow-tint-12/2',
                         ],
                 )}
             >
@@ -98,7 +95,7 @@ export function Header(props: {
                                     '-ml-2',
                                     customization.header.preset ===
                                         CustomizationHeaderPreset.Default
-                                        ? ['text-dark', 'dark:text-light']
+                                        ? ['text-tint-strong']
                                         : 'text-header-link',
                                 )}
                             />
@@ -165,24 +162,16 @@ export function Header(props: {
                                         !isCustomizationDefault && withTopHeader
                                             ? [
                                                   'bg-header-link/2',
-                                                  'dark:bg-header-link/2',
                                                   'hover:bg-header-link/3',
-                                                  'dark:hover:bg-header-link/3',
 
                                                   'text-header-link/8',
-                                                  'dark:text-header-link/8',
                                                   'hover:text-header-link',
-                                                  'dark:hover:text-header-link',
 
                                                   'ring-header-link/4',
-                                                  'dark:ring-header-link/4',
                                                   'hover:ring-header-link/5',
-                                                  'dark:hover:ring-header-link/5',
 
                                                   '[&_svg]:text-header-link/10',
-                                                  'dark:[&_svg]:text-header-link/10',
                                                   '[&_.shortcut]:text-header-link/8',
-                                                  'dark:[&_.shortcut]:text-header-link/8',
 
                                                   'contrast-more:bg-header-background',
                                                   'contrast-more:text-header-link',
@@ -192,16 +181,9 @@ export function Header(props: {
                                                   'contrast-more:focus:text-header-link',
                                                   'contrast-more:focus:bg-header-background',
                                                   'contrast-more:focus:ring-header-link',
-                                                  'dark:contrast-more:bg-header-background',
-                                                  'dark:contrast-more:text-header-link',
-                                                  'dark:contrast-more:ring-header-link',
-                                                  'dark:contrast-more:hover:bg-header-background',
-                                                  'dark:contrast-more:hover:ring-header-link',
-                                                  'dark:contrast-more:focus:text-header-link',
-                                                  'dark:contrast-more:focus:bg-header-background',
-                                                  'dark:contrast-more:focus:ring-header-link',
 
                                                   'shadow-none',
+                                                  'hover:shadow-none',
                                               ]
                                             : null
                                     }

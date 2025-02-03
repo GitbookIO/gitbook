@@ -28,10 +28,10 @@ export function SiteSectionList(props: { sections: SectionsList; className: Clas
             <nav
                 aria-label="Sections"
                 className={tcls(
-                    `text-dark/8 dark:text-light/8 text-sm
-                    border-b border-dark/2 dark:border-light/2 -mx-5 relative
+                    `text-tint text-sm
+                    border-b border-tint-subtle -mx-5 relative
                     before:absolute before:contents[] before:left-0 before:right-2 before:bottom-0 before:h-12 before:pointer-events-none 
-                    before:bg-gradient-to-b from-transparent to-light dark:to-dark sidebar-filled:to-light-2 dark:sidebar-filled:to-dark-1 [html.tint.sidebar-filled_&]:to-light-1 dark:[html.tint.sidebar-filled_&]:to-dark-1`,
+                    before:bg-gradient-to-b from-transparent to-tint-base sidebar-filled:to-tint-subtle [html.tint.sidebar-filled_&]:to-tint-base`,
                     className,
                 )}
             >
@@ -66,36 +66,34 @@ export function SiteSectionListItem(props: { section: SiteSection; isActive: boo
             href={section.urls.published ?? ''}
             ref={linkRef}
             aria-current={isActive && 'page'}
-            className={`flex flex-row items-center gap-3 px-3 py-2
-            hover:bg-dark/1 contrast-more:hover:ring-1 contrast-more:hover:ring-dark dark:hover:bg-light/1 contrast-more:dark:hover:ring-light
-            hover:text-dark/9 dark:hover:text-light/9
-            rounded-md straight-corners:rounded-none transition-all group/section-link 
-            ${
+            className={tcls(
+                `flex flex-row items-center gap-3 px-3 py-2
+            hover:bg-tint-hover contrast-more:hover:ring-1 contrast-more:hover:ring-tint
+            hover:text-tint-strong
+            rounded-md straight-corners:rounded-none transition-all group/section-link`,
                 isActive
-                    ? `text-primary hover:text-primary contrast-more:text-primary-700 contrast-more:hover:text-primary-700 contrast-more:font-semibold
-                dark:text-primary-400 dark:hover:text-primary-400 dark:contrast-more:text-primary-300 dark:contrast-more:hover:text-primary-300 
-                hover:bg-primary/3 contrast-more:hover:ring-1 contrast-more:hover:ring-primary-700 dark:hover:bg-primary-400/3 contrast-more:dark:hover:ring-primary-300`
-                    : null
-            }`}
+                    ? `text-primary hover:text-primary-strong contrast-more:text-primary-strong font-semibold
+                hover:bg-primary-hover contrast-more:hover:ring-1 contrast-more:hover:ring-primary-hover`
+                    : null,
+            )}
             {...otherProps}
         >
             <div
-                className={`size-8 flex items-center justify-center
-                    bg-light-1 dark:bg-dark-1 shadow-sm shadow-dark/4
+                className={tcls(
+                    `size-8 flex items-center justify-center
+                    bg-tint-subtle shadow-sm shadow-tint
                     dark:shadow-none rounded-md straight-corners:rounded-none leading-none
-                    ring-1 ring-dark/1 dark:ring-light/2
-                    text-dark/6 contrast-more:text-dark dark:text-light/6 contrast-more:dark:text-light
-                    group-hover/section-link:scale-110 group-active/section-link:scale-90 group-active/section-link:shadow-none
-                    transition-transform text-lg
-                    ${
-                        isActive
-                            ? `bg-primary-50 dark:bg-primary-900
-                        ring-primary-600/6 dark:ring-primary-400/6
-                        shadow-md shadow-primary-600/4
-                        contrast-more:ring-2 contrast-more:ring-primary-700 contrast-more:dark:ring-primary-300
-                        text-primary-600 contrast-more:text-primary-700 dark:text-primary-400 dark:contrast-more:text-primary-300`
-                            : null
-                    }`}
+                    ring-1 ring-tint-subtle
+                    text-tint contrast-more:text-tint-strong
+                    group-hover/section-link:scale-110 group-active/section-link:scale-90 group-active/section-link:shadow-none group-hover/section-link:ring-tint-hover
+                    transition-transform text-lg`,
+                    isActive
+                        ? `bg-primary ring-primary group-hover/section-link:ring-primary-hover,
+                        shadow-md shadow-primary
+                        contrast-more:ring-2 contrast-more:ring-primary
+                        text-primary contrast-more:text-primary-strong tint:bg-primary-solid tint:text-contrast-primary-solid`
+                        : null,
+                )}
             >
                 {section.icon ? (
                     <SectionIcon icon={section.icon as IconName} isActive={isActive} />

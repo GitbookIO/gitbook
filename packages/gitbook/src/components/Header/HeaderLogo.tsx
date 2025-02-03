@@ -105,7 +105,7 @@ function LogoFallback(props: HeaderLogoProps) {
                     'lg:text-lg/tight',
                     customization.header.preset === CustomizationHeaderPreset.Default ||
                         customization.header.preset === CustomizationHeaderPreset.None
-                        ? ['text-dark', 'dark:text-light']
+                        ? 'text-tint-strong'
                         : 'text-header-link',
                 )}
             >

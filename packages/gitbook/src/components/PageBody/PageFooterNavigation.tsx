@@ -42,6 +42,7 @@ export async function PageFooterNavigation(props: {
                 'max-w-3xl',
                 'mx-auto',
                 'page-api-block:ml-0',
+                'text-tint',
             )}
         >
             {previous ? (
@@ -112,13 +113,11 @@ function NavigationCard(
                 reversed ? null : 'pr-4',
                 reversed ? 'pl-4' : null,
                 'border',
-                'border-dark/3',
+                'border-tint-subtle',
                 'rounded',
                 'straight-corners:rounded-none',
-                'hover:border-primary/6',
-                'dark:border-light/2',
+                'hover:border-primary',
                 'text-pretty',
-                'dark:hover:border-primary-300/4',
                 'md:p-4',
                 'md:text-base',
             )}
@@ -126,12 +125,7 @@ function NavigationCard(
             <span className={tcls('flex', 'flex-col', 'flex-1', reversed ? 'text-right' : null)}>
                 <span className={tcls('text-xs')}>{label}</span>
                 <span
-                    className={tcls(
-                        'text-dark',
-                        'dark:text-light/6',
-                        'group-hover:text-primary',
-                        'line-clamp-2',
-                    )}
+                    className={tcls('text-tint-strong', 'group-hover:text-primary', 'line-clamp-2')}
                 >
                     {title}
                 </span>
@@ -141,9 +135,9 @@ function NavigationCard(
                 className={tcls(
                     'hidden',
                     'size-4',
-                    'text-dark/5',
+                    'text-tint-subtle',
+                    'contrast-more:text-tint-strong',
                     'group-hover:text-primary',
-                    'dark:text-light/4',
                     'md:block',
                 )}
             />

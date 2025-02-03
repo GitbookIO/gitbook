@@ -3,9 +3,82 @@ type ColorShades = {
 };
 
 type RGBColor = [number, number, number];
+type OKLABColor = { L: number; A: number; B: number };
+type OKLCHColor = { L: number; C: number; H: number };
 
-const black: RGBColor = [0, 0, 0];
-const white: RGBColor = [255, 255, 255];
+const dark = '#1d1d1d';
+const light = '#ffffff';
+const D65 = [95.047, 100.0, 108.883]; // Reference white (D65)
+
+export enum ColorCategory {
+    backgrounds = 'backgrounds',
+    components = 'components',
+    borders = 'borders',
+    accents = 'accents',
+    text = 'text',
+}
+
+type ColorSubScale = {
+    [key: string]: number;
+};
+
+/**
+ * Main color scale object.
+ *
+ * Each `ColorCategory` can be in/excluded in Tailwind's utility classes generation.
+ * Each subitem maps a semantic name within that category to a step in the scale.
+ */
+export const scale: Record<ColorCategory, ColorSubScale> = {
+    [ColorCategory.backgrounds]: {
+        /** Base background */
+        base: 1,
+        /** Accent background */
+        subtle: 2,
+    },
+    [ColorCategory.components]: {
+        /** Component background */
+        DEFAULT: 3,
+        /** Component hover background */
+        hover: 4,
+        /** Component active background */
+        active: 5,
+    },
+    [ColorCategory.borders]: {
+        /** Subtle borders, separators */
+        subtle: 6,
+        /** Element border, focus rings */
+        DEFAULT: 7,
+        /** Element hover border */
+        hover: 8,
+    },
+    [ColorCategory.accents]: {
+        /** Solid backgrounds */
+        solid: 9,
+        /** Hovered solid backgrounds */
+        'solid-hover': 10,
+    },
+    [ColorCategory.text]: {
+        /** Very low-contrast text
+         * Caution: this contrast does not meet accessiblity guidelines.
+         * Always check if you need to include a mitigating contrast-more style for users who need it. */
+        subtle: 9,
+        /** Low-contrast text */
+        DEFAULT: 11,
+        /** High-contrast text */
+        strong: 12,
+    },
+};
+
+/**
+ * The mix of foreground and background for every step in a colour scale.
+ * 0: 100% of the background color's luminosity, white in light mode
+ * 1: 100% of the foreground color's luminosity, black in light mode
+ */
+export const colorMixMapping = {
+    // bgs          |components      |borders         |solid     |text
+    light: [0, 0.02, 0.03, 0.05, 0.07, 0.1, 0.15, 0.2, 0.5, 0.55, 0.6, 1],
+    dark: [0, 0.03, 0.08, 0.1, 0.13, 0.15, 0.2, 0.25, 0.5, 0.55, 0.75, 1],
+};
 
 /**
  * Convert a hex color to an RGB color.
@@ -32,7 +105,7 @@ export function hexToRgba(hex: string, alpha: number): string {
  * @returns {{[key: number]: string}}
  */
 export function shadesOfColor(hex: string, halfShades = false) {
-    const baseColor = hexToRgbArray(hex);
+    const baseColor = hex;
 
     const shades = [
         50,
@@ -65,11 +138,79 @@ export function shadesOfColor(hex: string, halfShades = false) {
         }
 
         const percentage = shadeIndex / 500;
-        const startColor = isDarkShade ? black : baseColor;
-        const endColor = isDarkShade ? baseColor : white;
+        const startColor = isDarkShade ? dark : baseColor;
+        const endColor = isDarkShade ? baseColor : light;
 
-        result[key] = getColor(percentage, startColor, endColor);
+        result[key] = getColor(percentage, hexToRgbArray(startColor), hexToRgbArray(endColor));
     });
+
+    return result;
+}
+
+/**
+ * Generate a [Radix-like](https://www.radix-ui.com/colors/docs/palette-composition/understanding-the-scale) colour scale based of a hex colour.
+ * @param {string} hex The hex code to generate shades from
+ * @param {object} options
+ * @param {boolean} options.darkMode If set to `true`, inverts the scale (so 1 is black instead of white) and uses `colorMixMapping.dark` with different mix ratios per step.
+ * @param {string} options.foreground Define a custom foreground color to use. If left undefined, the global `light`/`dark` values (in `colors.ts`) will be used.
+ * @param {string} options.background Define a custom foreground color to use. If left undefined, the global `light`/`dark` values (in `colors.ts`) will be used.
+ * @param {string} options.mix If set to a hex code, this color will be additionally mixed into the generated scale according to `options.mixRatio`.
+ * @param {number} options.mixRatio Define a custom mix ratio to mix the `mix` color with. If left undefined, the default `mixRatio` will be used.
+ */
+export function colorScale(
+    hex: string,
+    {
+        darkMode = false,
+        background = darkMode ? dark : light,
+        foreground = darkMode ? light : dark,
+        mix,
+        mixRatio = 0.2,
+    }: {
+        darkMode?: boolean;
+        background?: string;
+        foreground?: string;
+        mix?: string;
+        mixRatio?: number;
+    } = {},
+) {
+    let baseColor = rgbToOklch(hexToRgbArray(hex));
+    const mixColor = mix ? rgbToOklch(hexToRgbArray(mix)) : null;
+    const foregroundColor = rgbToOklch(hexToRgbArray(foreground));
+    const backgroundColor = rgbToOklch(hexToRgbArray(background));
+
+    if (mixColor) {
+        // If defined, we mix in a (tiny) bit of the mix color with the base color.
+        baseColor.L = mixColor.L * mixRatio + baseColor.L * (1 - mixRatio);
+        baseColor.C = mixColor.C * mixRatio + baseColor.C * (1 - mixRatio);
+        baseColor.H = mixColor.H;
+    }
+
+    const mapping = darkMode ? colorMixMapping.dark : colorMixMapping.light;
+
+    const result = [];
+
+    for (let index = 0; index < mapping.length; index++) {
+        const targetL =
+            foregroundColor.L * mapping[index] + backgroundColor.L * (1 - mapping[index]);
+
+        if (index == 8 && !mix && Math.abs(baseColor.L - targetL) < 0.2) {
+            // Original colour is close enough to target, so let's use the original colour as step 9.
+            result.push(hex);
+            continue;
+        }
+
+        const chromaRatio = index < 8 ? (index + 1) * 0.05 : 1;
+
+        const shade = {
+            L: targetL, // Blend lightness
+            C: baseColor.C * chromaRatio,
+            H: baseColor.H, // Maintain the hue from the base color
+        };
+
+        const newHex = rgbArrayToHex(oklchToRgb(shade));
+
+        result.push(newHex);
+    }
 
     return result;
 }
@@ -116,14 +257,144 @@ function rgbArrayToHex(rgb: RGBColor): string {
     );
 }
 
-function getColor(
-    percentage: number,
-    start: [number, number, number],
-    end: [number, number, number],
-) {
+function getColor(percentage: number, start: RGBColor, end: RGBColor) {
     const rgb = end.map((channel, index) => {
         return Math.round(channel + percentage * (start[index] - channel));
     });
 
     return rgbArrayToHex(rgb as RGBColor);
+}
+
+// Utility constants and helper functions
+function rgbToLinear(rgb: RGBColor): [number, number, number] {
+    return rgb.map((v) => {
+        const scaled = v / 255;
+        return scaled <= 0.04045 ? scaled / 12.92 : Math.pow((scaled + 0.055) / 1.055, 2.4);
+    }) as [number, number, number];
+}
+
+function linearToRgb(linear: [number, number, number]): RGBColor {
+    return linear.map((v) => {
+        const scaled = v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - 0.055;
+        return Math.round(Math.max(0, Math.min(1, scaled)) * 255);
+    }) as RGBColor;
+}
+
+function rgbToOklab(rgb: RGBColor): OKLABColor {
+    const [r, g, b] = rgbToLinear(rgb);
+
+    const l = 0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b;
+    const m = 0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b;
+    const s = 0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b;
+
+    const lRoot = Math.cbrt(l);
+    const mRoot = Math.cbrt(m);
+    const sRoot = Math.cbrt(s);
+
+    return {
+        L: 0.2104542553 * lRoot + 0.793617785 * mRoot - 0.0040720468 * sRoot,
+        A: 1.9779984951 * lRoot - 2.428592205 * mRoot + 0.4505937099 * sRoot,
+        B: 0.0259040371 * lRoot + 0.7827717662 * mRoot - 0.808675766 * sRoot,
+    };
+}
+
+function oklabToRgb(oklab: OKLABColor): RGBColor {
+    const { L, A, B } = oklab;
+
+    const lRoot = L + 0.3963377774 * A + 0.2158037573 * B;
+    const mRoot = L - 0.1055613458 * A - 0.0638541728 * B;
+    const sRoot = L - 0.0894841775 * A - 1.291485548 * B;
+
+    const l = lRoot ** 3;
+    const m = mRoot ** 3;
+    const s = sRoot ** 3;
+
+    const r = 4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s;
+    const g = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
+    const b = -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s;
+
+    return linearToRgb([r, g, b]);
+}
+
+function oklabToOklch(oklab: OKLABColor): OKLCHColor {
+    const { L, A, B } = oklab;
+    const C = Math.sqrt(A ** 2 + B ** 2);
+    const H = (Math.atan2(B, A) * 180) / Math.PI;
+    return { L, C, H: H < 0 ? H + 360 : H };
+}
+
+function oklchToOklab(oklch: OKLCHColor): OKLABColor {
+    const { L, C, H } = oklch;
+    const rad = (H * Math.PI) / 180;
+    return {
+        L,
+        A: C * Math.cos(rad),
+        B: C * Math.sin(rad),
+    };
+}
+
+function rgbToOklch(rgb: RGBColor): OKLCHColor {
+    return oklabToOklch(rgbToOklab(rgb));
+}
+
+function oklchToRgb(oklch: OKLCHColor): RGBColor {
+    return oklabToRgb(oklchToOklab(oklch));
+}
+
+function rgbToXyz(rgb: RGBColor): [number, number, number] {
+    const [r, g, b] = rgbToLinear(rgb);
+    return [
+        (r * 0.4124564 + g * 0.3575761 + b * 0.1804375) * 100,
+        (r * 0.2126729 + g * 0.7151522 + b * 0.072175) * 100,
+        (r * 0.0193339 + g * 0.119192 + b * 0.9503041) * 100,
+    ];
+}
+
+function xyzToLab65(xyz: [number, number, number]): { L: number; A: number; B: number } {
+    const [x, y, z] = xyz.map((v, i) => {
+        const scaled = v / D65[i];
+        return scaled > 0.008856 ? Math.cbrt(scaled) : 7.787 * scaled + 16 / 116;
+    });
+
+    return {
+        L: 116 * y - 16,
+        A: 500 * (x - y),
+        B: 200 * (y - z),
+    };
+}
+
+function rgbTolab65(rgb: RGBColor): { L: number; A: number; B: number } {
+    return xyzToLab65(rgbToXyz(rgb));
+}
+
+/*
+  Delta Phi Star perceptual lightness contrast by Andrew Somers:
+  https://github.com/Myndex/deltaphistar 
+*/
+const PHI = 0.5 + Math.sqrt(1.25);
+
+export function dpsContrast(a: RGBColor, b: RGBColor) {
+    const dps = Math.abs(Math.pow(rgbTolab65(a).L, PHI) - Math.pow(rgbTolab65(b).L, PHI));
+    const contrast = Math.pow(dps, 1 / PHI) * Math.SQRT2 - 40;
+    return contrast < 7.5 ? 0 : contrast;
+}
+
+export function colorContrast(background: string, foreground?: string[]) {
+    const bg = hexToRgbArray(background);
+    if (!foreground) {
+        foreground = [light, dark];
+    }
+
+    let best: { color?: RGBColor; contrast: number } = { color: undefined, contrast: 0 };
+    foreground.forEach((color) => {
+        const c = hexToRgbArray(color);
+
+        const contrast = dpsContrast(c, bg);
+        if (contrast > best.contrast) {
+            best.color = c;
+            best.contrast = contrast;
+        }
+    });
+
+    return best.color ? rgbArrayToHex(best.color) : foreground[0];
 }

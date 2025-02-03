@@ -36,7 +36,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
     });
 
     return (
-        <ul className={tcls('sidebar-list-line:border-l', 'border-dark/2', 'dark:border-light/1')}>
+        <ul className={tcls('sidebar-list-line:border-l', 'border-tint-subtle')}>
             {sections.map((section) => (
                 <motion.li
                     key={section.id}
@@ -87,8 +87,8 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                             'straight-corners:rounded-none',
                             'sidebar-list-line:rounded-l-none',
 
-                            'hover:bg-dark/1',
-                            'dark:hover:bg-light/1',
+                            'hover:bg-tint-hover',
+                            'hover:text-tint-strong',
                             'contrast-more:hover:ring-1',
                             'contrast-more:hover:ring-inset',
                             'contrast-more:hover:ring-current',
@@ -101,24 +101,18 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
 
                                 'sidebar-list-default:rounded-l-none',
                                 'sidebar-list-default:border-l',
-                                'sidebar-list-default:border-dark/3',
-                                'dark:sidebar-list-default:border-light/3',
+                                'sidebar-list-default:border-tint',
                             ],
 
                             activeId === section.id && [
-                                'text-tint',
-                                'hover:text-tint',
-                                'dark:text-tint-400',
-                                'dark:hover:text-tint-400',
-
+                                'text-primary',
+                                'hover:text-primary-strong',
+                                'hover:bg-primary-hover',
+                                'tint:font-semibold',
                                 'contrast-more:font-semibold',
 
                                 'sidebar-list-default:border-tint',
-
-                                'hover:bg-tint/3',
-                                'dark:hover:bg-tint-400/3',
                                 'sidebar-list-pill:hover:bg-transparent',
-                                'dark:sidebar-list-pill:hover:bg-transparent',
                             ],
                         )}
                     >

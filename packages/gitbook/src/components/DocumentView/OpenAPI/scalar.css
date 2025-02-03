@@ -6,7 +6,7 @@
     --scalar-color-1: color-mix(
         in srgb,
         rgb(var(--tint-color-300, 180 180 180)),
-        rgb(var(--dark-base, 23 23 23)) 96%
+        rgb(var(--tint-12, 23 23 23)) 96%
     );
     --scalar-color-2: color-mix(
         in srgb,
@@ -20,7 +20,7 @@
     );
     --scalar-color-accent: #007d9c;
 
-    --scalar-background-1: rgb(var(--light-base, 255 255 255));
+    --scalar-background-1: rgb(var(--tint-1, 255 255 255));
     --scalar-background-2: color-mix(
         in srgb,
         rgb(var(--tint-color-800, 30 30 30)),
@@ -43,7 +43,7 @@
     --scalar-color-green: #0a6355;
     --scalar-color-red: #dc1b19;
     --scalar-color-yellow: #ffc90d;
-    --scalar-color-blue: rgb(var(--primary-color-500, 52 109 219));
+    --scalar-color-blue: rgb(var(--primary-9, 52 109 219));
     --scalar-color-orange: #ff8d4d;
     --scalar-color-purple: #8250df;
 
@@ -59,7 +59,7 @@
         #eeeeed 0px 0 0 1px;
 
     --scalar-selection-background: rgba(96, 175, 255, 0.4);
-    --scalar-selection-color: rgb(var(--dark-base, 22 22 22));
+    --scalar-selection-color: rgb(var(--tint-12, 22 22 22));
 }
 .dark .scalar-modal-layout,
 .dark .scalar-app,
@@ -67,7 +67,7 @@
     --scalar-color-1: color-mix(
         in srgb,
         rgb(var(--tint-color-700, 70 70 70)),
-        rgb(var(--light-base, 255 255 255)) 100%
+        rgb(var(--tint-12, 255 255 255)) 100%
     );
     --scalar-color-2: color-mix(
         in srgb,
@@ -81,7 +81,7 @@
     );
     --scalar-color-accent: #50b7e0;
 
-    --scalar-background-1: rgb(var(--dark-base, 22 22 22));
+    --scalar-background-1: rgb(var(--tint-1, 22 22 22));
     --scalar-background-2: color-mix(
         in srgb,
         rgb(var(--tint-color-200, 200 200 200)),
@@ -103,7 +103,7 @@
     --scalar-color-green: #56b6c2;
     --scalar-color-red: rgb(245 124 97);
     --scalar-color-yellow: #edbe20;
-    --scalar-color-blue: rgb(var(--primary-color-400, 93 138 226));
+    --scalar-color-blue: rgb(var(--primary-9, 93 138 226));
     --scalar-color-orange: #d19a66;
     --scalar-color-purple: #5203d1;
 
@@ -119,7 +119,7 @@
         0 0 0 1px rgba(255, 255, 255, 0.1);
 
     --scalar-selection-background: rgba(96, 175, 255, 0.4);
-    --scalar-selection-color: rgb(var(--light-base, 255 255 255));
+    --scalar-selection-color: rgb(var(--tint-12, 255 255 255));
 }
 .scalar-modal-layout,
 .scalar-app,

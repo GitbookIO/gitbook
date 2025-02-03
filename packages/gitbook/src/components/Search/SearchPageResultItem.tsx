@@ -28,31 +28,21 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                 'items-center',
                 'p-4',
                 'border-t',
-                'border-dark/2',
-                'dark:border-light/1',
+                'border-tint-subtle',
                 'first:border-none',
                 'text-base',
                 'font-medium',
-                'hover:bg-dark/1',
-                'dark:hover:bg-light/1',
+                'hover:bg-tint-hover',
                 'group',
                 active
-                    ? [
-                          'is-active',
-                          'bg-primary-50',
-                          'text-contrast-primary-50',
-                          'dark:bg-primary-800',
-                          'dark:text-contrast-primary-800',
-                          'hover:bg-primary-100/8',
-                          'dark:hover:bg-primary-700/7',
-                      ]
+                    ? ['is-active', 'bg-primary', 'text-contrast-primary', 'hover:bg-primary-hover']
                     : null,
             )}
         >
             <div className="size-4">
                 <Icon
                     icon="file-lines"
-                    className={tcls('size-4', active ? 'text-primary' : 'opacity-5')}
+                    className={tcls('size-4', active ? 'text-primary' : 'text-tint-subtle')}
                 />
             </div>
             <div className={tcls('flex', 'flex-col', 'w-full')}>
@@ -77,7 +67,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                     'p-2',
                     'rounded',
                     'straight-corners:rounded-none',
-                    active ? ['bg-primary', 'text-contrast-primary'] : ['opacity-6'],
+                    active ? ['bg-primary-solid', 'text-contrast-primary-solid'] : ['opacity-6'],
                 )}
             >
                 <Icon

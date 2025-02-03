@@ -65,7 +65,7 @@ export function PageFeedbackForm(props: {
         <div className={tcls('flex flex-col gap-3 text-sm', className)}>
             <div className="flex flex-wrap items-center gap-2">
                 <p>{t(languages, 'was_this_helpful')}</p>
-                <div className="bg-light-1 dark:bg-dark-1 border border-dark/2 dark:border-light/2 contrast-more:border-dark dark:contrast-more:border-light rounded-full">
+                <div className="bg-tint-base border border-tint-subtle contrast-more:border-tint-12 rounded-full">
                     <div className="flex">
                         <RatingButton
                             rating={PageFeedbackRating.Bad}
@@ -98,7 +98,7 @@ export function PageFeedbackForm(props: {
                             <textarea
                                 ref={inputRef}
                                 name="comment"
-                                className="grow ring-1 ring-inset bg-light-1 dark:bg-dark-1 ring-dark/2 dark:ring-light/2 contrast-more:ring-dark dark:contrast-more:ring-light min-h-16 max-h-40 rounded straight-corners:rounded-none p-2 placeholder:text-sm placeholder:text-dark/6 dark:placeholder:text-light/6 contrast-more:placeholder:text-dark dark:contrast-more:placeholder:text-light"
+                                className="grow ring-1 ring-inset bg-tint-base ring-tint contrast-more:ring-tint-12 min-h-16 max-h-40 rounded straight-corners:rounded-none p-2 placeholder:text-sm placeholder:text-tint contrast-more:placeholder:text-tint-strong"
                                 placeholder={tString(languages, 'was_this_helpful_comment')}
                                 aria-label={tString(languages, 'was_this_helpful_comment')}
                                 onChange={(e) => setComment(e.target.value)}
@@ -155,11 +155,11 @@ function RatingButton(
     return (
         <button
             className={tcls(
-                'p-2 hover:text-tint dark:hover:text-tint-400 hover:bg-tint/2 first:pl-2.5 last:pr-2.5 first:rounded-l-full last:rounded-r-full',
+                'p-2 hover:bg-primary-hover hover:text-primary-strong first:pl-2.5 last:pr-2.5 first:rounded-l-full last:rounded-r-full',
                 'disabled:cursor-not-allowed disabled:hover:bg-inherit disabled:hover:text-inherit disabled:dark:hover:text-inherit',
                 'contrast-more:hover:ring-1 ring-tint',
                 active
-                    ? 'bg-tint/4 text-tint-700 dark:text-tint-300 disabled:hover:bg-tint/4 disabled:hover:text-tint-700 dark:disabled:hover:text-tint-300 contrast-more:ring-2 contrast-more:hover:ring-2'
+                    ? 'bg-primary-active text-primary-strong disabled:hover:bg-primary-active disabled:hover:text-primary-strong contrast-more:ring-2 contrast-more:hover:ring-2'
                     : 'disabled:opacity-7 disabled:contrast-more:ring-0',
             )}
             type="button"

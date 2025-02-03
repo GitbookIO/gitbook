@@ -19,10 +19,10 @@ export function AsideSectionHighlight({
             layout
             layoutId="sections-line"
             className={tcls([
-                'border-tint',
+                'border-primary',
+                'tint:border-primary-11',
                 'sidebar-list-line:border-l-2',
 
-                'dark:border-tint-400',
                 'inset-0',
                 'pointer-events-none',
                 'absolute',
@@ -33,12 +33,11 @@ export function AsideSectionHighlight({
                 'straight-corners:rounded-none',
                 'sidebar-list-line:rounded-l-none',
 
-                'sidebar-list-pill:bg-tint/3',
-                'dark:sidebar-list-pill:bg-tint-400/3',
+                'sidebar-list-pill:bg-primary',
+                '[html.tint.sidebar-list-pill_&]:bg-primary-hover',
 
                 'contrast-more:border',
-                'contrast-more:bg-tint/3',
-                'dark:contrast-more:bg-tint-400/3',
+                'contrast-more:bg-primary',
                 className,
             ])}
             transition={prefersReducedMotion ? { duration: 0 } : transition}
