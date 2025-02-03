@@ -51,7 +51,9 @@ export function OpenAPISchemaProperty(
         return (
             typeof schema.example === 'string' ||
             typeof schema.example === 'number' ||
-            typeof schema.example === 'boolean'
+            typeof schema.example === 'boolean' ||
+            (Array.isArray(schema.example) && schema.example.length > 0) ||
+            (typeof schema.example === 'object' && Object.keys(schema.example).length > 0)
         );
     };
     return (
@@ -100,9 +102,9 @@ export function OpenAPISchemaProperty(
                         />
                     ) : null}
                     {shouldDisplayExample(schema) ? (
-                        <span className="openapi-schema-example">
+                        <div className="openapi-schema-example">
                             Example: <code>{stringifyOpenAPI(schema.example)}</code>
-                        </span>
+                        </div>
                     ) : null}
                     {schema.pattern ? (
                         <div className="openapi-schema-pattern">
