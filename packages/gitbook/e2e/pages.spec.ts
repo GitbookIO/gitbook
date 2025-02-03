@@ -1,13 +1,17 @@
 import { argosScreenshot } from '@argos-ci/playwright';
 import {
     CustomizationBackground,
+    CustomizationContentLink,
     CustomizationCorners,
     CustomizationFont,
+    CustomizationHeaderItem,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
     CustomizationLocale,
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
+    CustomizationTheme,
+    CustomizationThemedColor,
     CustomizationThemeMode,
     SiteCustomizationSettings,
 } from '@gitbook/api';
@@ -81,7 +85,26 @@ const allThemeModes: CustomizationThemeMode[] = [
     CustomizationThemeMode.Dark,
 ];
 
-const allThemePresets: CustomizationHeaderPreset[] = [
+const allTintColors: Array<{
+    label: string;
+    value: CustomizationThemedColor | undefined;
+}> = [
+    {
+        label: 'Off',
+        value: undefined,
+    },
+    { label: 'Primary', value: { light: '#346DDB', dark: '#346DDB' } },
+    { label: 'Custom', value: { light: '#C62C68', dark: '#EF96B8' } },
+];
+
+const allThemes: CustomizationTheme[] = [
+    CustomizationTheme.Clean,
+    CustomizationTheme.Muted,
+    CustomizationTheme.Bold,
+    CustomizationTheme.Gradient,
+];
+
+const allDeprecatedThemePresets: CustomizationHeaderPreset[] = [
     CustomizationHeaderPreset.Default,
     CustomizationHeaderPreset.Bold,
     CustomizationHeaderPreset.Contrast,
@@ -91,6 +114,23 @@ const allThemePresets: CustomizationHeaderPreset[] = [
 const allSidebarBackgroundStyles: CustomizationSidebarBackgroundStyle[] = [
     CustomizationSidebarBackgroundStyle.Default,
     CustomizationSidebarBackgroundStyle.Filled,
+];
+
+// Common customization settings
+
+const headerLinks: CustomizationHeaderItem[] = [
+    {
+        title: 'Secondary button',
+        to: { kind: 'url', url: 'https://www.gitbook.com' },
+        style: 'button-secondary',
+        links: [],
+    },
+    {
+        title: 'Primary button',
+        to: { kind: 'url', url: 'https://www.gitbook.com' },
+        style: 'button-primary',
+        links: [],
+    },
 ];
 
 async function waitForCookiesDialog(page: Page) {
@@ -561,23 +601,23 @@ const testCases: TestsCase[] = [
     {
         name: 'Customization',
         baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
-        tests: allThemeModes.flatMap((theme) => [
+        tests: allThemeModes.flatMap((themeMode) => [
             {
-                name: `Without header - Theme ${theme}`,
+                name: `Without header - Theme mode ${themeMode}`,
                 url: getCustomizationURL({
                     header: {
                         preset: CustomizationHeaderPreset.None,
                         links: [],
                     },
                     themes: {
-                        default: theme,
+                        default: themeMode,
                         toggeable: false,
                     },
                 }),
                 run: waitForCookiesDialog,
             },
             {
-                name: `With duotone icons - Theme ${theme}`,
+                name: `With duotone icons - Theme mode ${themeMode}`,
                 url:
                     'page-options/page-with-icon' +
                     getCustomizationURL({
@@ -585,66 +625,69 @@ const testCases: TestsCase[] = [
                             icons: CustomizationIconsStyle.Duotone,
                         },
                         themes: {
-                            default: theme,
+                            default: themeMode,
                             toggeable: false,
                         },
                     }),
                 run: waitForCookiesDialog,
             },
             {
-                name: `With header buttons - Theme ${theme}`,
+                name: `With header buttons - Theme mode ${themeMode}`,
                 url: getCustomizationURL({
                     header: {
                         preset: CustomizationHeaderPreset.Default,
-                        links: [
-                            {
-                                title: 'Secondary button',
-                                to: { kind: 'url', url: 'https://www.gitbook.com' },
-                                style: 'button-secondary',
-                            },
-                            {
-                                title: 'Primary button',
-                                to: { kind: 'url', url: 'https://www.gitbook.com' },
-                                style: 'button-primary',
-                            },
-                        ],
+                        links: headerLinks,
                     },
                     themes: {
-                        default: theme,
+                        default: themeMode,
                         toggeable: false,
                     },
                 }),
                 run: waitForCookiesDialog,
             },
             {
-                name: `Without tint - Default preset - Theme ${theme}`,
+                name: `Without tint - Default preset - Theme mode ${themeMode}`,
                 url: getCustomizationURL({
                     header: {
                         preset: CustomizationHeaderPreset.Default,
-                        links: [
-                            {
-                                title: 'Secondary button',
-                                to: { kind: 'url', url: 'https://www.gitbook.com' },
-                                style: 'button-secondary',
-                            },
-                            {
-                                title: 'Primary button',
-                                to: { kind: 'url', url: 'https://www.gitbook.com' },
-                                style: 'button-primary',
-                            },
-                        ],
+                        links: headerLinks,
                     },
                     themes: {
-                        default: theme,
+                        default: themeMode,
                         toggeable: false,
                     },
                 }),
                 run: waitForCookiesDialog,
             },
-            // Theme-specific tests
-            ...allThemePresets.flatMap((preset) => [
+            // New site themes
+            ...allThemes.flatMap((theme) => [
+                ...allTintColors.flatMap((tint) => [
+                    ...allSidebarBackgroundStyles.flatMap((sidebarStyle) => ({
+                        name: `Theme: ${theme} - Tint ${tint.label} - Sidebar ${sidebarStyle} - Mode ${theme}`,
+                        url: getCustomizationURL({
+                            styling: {
+                                theme,
+                                tint: { color: tint.value },
+                                sidebar: {
+                                    background: sidebarStyle,
+                                    list: CustomizationSidebarListStyle.Default,
+                                },
+                            },
+                            header: {
+                                links: headerLinks,
+                            },
+                            themes: {
+                                default: themeMode,
+                                toggeable: false,
+                            },
+                        }),
+                    })),
+                ]),
+            ]),
+            // Deprecated header themes
+            ...allDeprecatedThemePresets.flatMap((preset) => [
                 ...allSidebarBackgroundStyles.flatMap((sidebarStyle) => ({
-                    name: `With tint - Preset ${preset} - Sidebar ${sidebarStyle} - Theme ${theme}`,
+                    name: `With tint - Preset ${preset} - Sidebar ${sidebarStyle} - Theme mode ${themeMode}`,
                     url: getCustomizationURL({
                         styling: {
                             tint: { color: { light: '#346DDB', dark: '#346DDB' } },
@@ -661,21 +704,10 @@ const testCases: TestsCase[] = [
                                       linkColor: { light: '#4DDE98', dark: '#0C693D' },
                                   }
                                 : {}),
-                            links: [
-                                {
-                                    title: 'Secondary button',
-                                    to: { kind: 'url', url: 'https://www.gitbook.com' },
-                                    style: 'button-secondary',
-                                },
-                                {
-                                    title: 'Primary button',
-                                    to: { kind: 'url', url: 'https://www.gitbook.com' },
-                                    style: 'button-primary',
-                                },
-                            ],
+                            links: headerLinks,
                         },
                         themes: {
-                            default: theme,
+                            default: themeMode,
                             toggeable: false,
                         },
                     }),
@@ -683,28 +715,17 @@ const testCases: TestsCase[] = [
                 })),
             ]),
             {
-                name: `With tint - Legacy background match - Theme ${theme}`,
+                name: `With tint - Legacy background match - Theme mode ${themeMode}`,
                 url: getCustomizationURL({
                     styling: {
                         background: CustomizationBackground.Match,
                     },
                     header: {
                         preset: CustomizationHeaderPreset.Default,
-                        links: [
-                            {
-                                title: 'Secondary button',
-                                to: { kind: 'url', url: 'https://www.gitbook.com' },
-                                style: 'button-secondary',
-                            },
-                            {
-                                title: 'Primary button',
-                                to: { kind: 'url', url: 'https://www.gitbook.com' },
-                                style: 'button-primary',
-                            },
-                        ],
+                        links: headerLinks,
                     },
                     themes: {
-                        default: theme,
+                        default: themeMode,
                         toggeable: false,
                     },
                 }),
