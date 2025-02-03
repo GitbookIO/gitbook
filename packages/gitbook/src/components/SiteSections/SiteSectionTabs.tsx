@@ -12,7 +12,7 @@ import { tcls } from '@/lib/tailwind';
 import { SectionIcon } from './SectionIcon';
 
 const VIEWPORT_ITEM_WIDTH = 240; /* width of the tile (w-60) */
-
+const MIN_ITEMS_FOR_COLS = 4; /* number of items to switch to 2 columns */
 /**
  * A set of navigational links representing site sections for multi-section sites
  */
@@ -28,12 +28,13 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
         itemValue: string,
         size: number = 0,
     ) => {
-        const halfViewportWidth = (size === 1 ? VIEWPORT_ITEM_WIDTH : 2 * VIEWPORT_ITEM_WIDTH) / 2;
-        const viewportFreeZone = 10 /* buffer */ + 8 /* padding */ + halfViewportWidth;
         const windowWidth = window.innerWidth;
         if (windowWidth < 768) {
             setOffset(0);
         } else if (trigger && value === itemValue) {
+            const viewportWidth = size < MIN_ITEMS_FOR_COLS ? VIEWPORT_ITEM_WIDTH : VIEWPORT_ITEM_WIDTH * 2;
+            const halfViewportWidth = viewportWidth / 2;
+            const viewportFreeZone = 10 /* buffer */ + 8 /* padding */ + halfViewportWidth;
             const triggerOffsetRight = trigger.offsetLeft + trigger.offsetWidth / 2;
             setOffset(
                 Math.min(
@@ -45,6 +46,7 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
             setOffset(null);
         }
     };
+
     return sectionsAndGroups.length > 0 ? (
         <NavigationMenu.Root
             aria-label="Sections"
@@ -132,6 +134,9 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
     ) : null;
 }
 
+/**
+ * A tab representing a section
+ */
 const SectionTab = React.forwardRef(function SectionTab(props: { isActive: boolean; title: string; icon?: IconName; url: string }, ref: React.Ref<HTMLAnchorElement>) {
     const { isActive, title, icon, url, ...rest } = props;
     return (
@@ -144,7 +149,7 @@ const SectionTab = React.forwardRef(function SectionTab(props: { isActive: boole
             )}
             href={url}
         >
-            <span className={tcls('flex gap-2 items-center w-full truncate')}>
+            <span className='flex gap-2 items-center w-full truncate'>
                 {icon ? <SectionIcon isActive={isActive} icon={icon} /> : null}
                 {title}
             </span>
@@ -153,6 +158,9 @@ const SectionTab = React.forwardRef(function SectionTab(props: { isActive: boole
     );
 });
 
+/**
+ * A tab representing a section group
+ */
 const SectionGroupTab = React.forwardRef(function SectionGroupTab(props: { isActive: boolean; title: string; icon?: IconName }, ref: React.Ref<HTMLButtonElement>) {
     const { isActive, title, icon, ...rest } = props;
     return (
@@ -194,7 +202,7 @@ function SectionGroupTileList(props: { sections: SiteSection[]; currentSection: 
         <ul
             className={tcls(
                 'grid w-full md:w-max p-2 sm:grid-cols-1',
-                sections.length === 1 ? 'md:grid-cols-1' : 'md:grid-cols-2',
+                sections.length < MIN_ITEMS_FOR_COLS ? 'md:grid-cols-1' : 'md:grid-cols-2',
             )}
         >
             {sections.map((section) => (
