@@ -13,6 +13,7 @@
         "@scalar/api-client-react": "1.0.87",
         "@scalar/openapi-parser": "^0.10.4",
         "@scalar/openapi-types": "^0.1.6",
+        "@scalar/oas-utils": "^0.2.101",
         "classnames": "^2.5.1",
         "flatted": "^3.2.9",
         "swagger2openapi": "^7.0.8",
