@@ -167,7 +167,8 @@ export function SiteSectionGroupItem(props: {
             }`}
             >
                 <div
-                    className={tcls(`shrink-0 size-8 flex items-center justify-center
+                    className={tcls(
+                        `shrink-0 size-8 flex items-center justify-center
                     bg-tint-subtle shadow-sm shadow-tint
                     dark:shadow-none rounded-md straight-corners:rounded-none leading-none
                     ring-1 ring-tint-subtle
@@ -179,7 +180,7 @@ export function SiteSectionGroupItem(props: {
                         shadow-md shadow-primary
                         contrast-more:ring-2 contrast-more:ring-primary
                         text-primary contrast-more:text-primary-strong tint:bg-primary-solid tint:text-contrast-primary-solid`
-                            : null
+                            : null,
                     )}
                 >
                     {group.icon ? (

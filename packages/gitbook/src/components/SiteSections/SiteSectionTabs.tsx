@@ -78,32 +78,11 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
                                             }
                                             asChild
                                         >
-                                            <button
-                                                className={tcls(
-                                                    'relative group flex select-none items-center justify-between rounded straight-corners:rounded-none transition-colors px-3 py-1 my-2',
-                                                    isActive
-                                                        ? 'text-primary'
-                                                        : 'text-tint hover:bg-tint-hover hover:text-tint-strong',
-                                                )}
-                                            >
-                                                <span className="flex gap-2 items-center w-full truncate">
-                                                    {icon ? (
-                                                        <SectionIcon
-                                                            isActive={isActive}
-                                                            icon={icon as IconName}
-                                                        />
-                                                    ) : null}
-                                                    {title}
-                                                </span>
-                                                {isActive ? (
-                                                   <ActiveTabIndicator />
-                                                ) : null}
-                                                <Icon
-                                                    aria-hidden
-                                                    icon="chevron-down"
-                                                    className="shrink-0 size-3 opacity-6 ms-1 transition-all group-data-[state=open]:rotate-180"
-                                                />
-                                            </button>
+                                            <SectionGroupTab
+                                                isActive={isActive}
+                                                title={title}
+                                                icon={icon as IconName}
+                                            />
                                         </NavigationMenu.Trigger>
                                         <NavigationMenu.Content className="absolute z-20 left-0 top-0 w-full md:w-max data-[motion=from-end]:motion-safe:animate-enterFromRight data-[motion=from-start]:motion-safe:animate-enterFromLeft data-[motion=to-end]:motion-safe:animate-exitToRight data-[motion=to-start]:motion-safe:animate-exitToLeft">
                                             <SectionGroupTileList
@@ -114,30 +93,12 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
                                     </>
                                 ) : (
                                     <NavigationMenu.Link asChild>
-                                        <Link
-                                            className={tcls(
-                                                'relative group flex select-none items-center justify-between rounded straight-corners:rounded-none px-3 py-1 my-2',
-                                                isActive
-                                                    ? 'text-primary'
-                                                    : 'text-tint hover:bg-tint-hover hover:text-tint-strong',
-                                            )}
-                                            href={sectionOrGroup.urls.published ?? ''}
-                                        >
-                                            <span
-                                                className={tcls('flex gap-2 items-center w-full truncate')}
-                                            >
-                                                {icon ? (
-                                                    <SectionIcon
-                                                        isActive={isActive}
-                                                        icon={icon as IconName}
-                                                    />
-                                                ) : null}
-                                                {title}
-                                            </span>
-                                            {isActive ? (
-                                                <ActiveTabIndicator />
-                                            ) : null}
-                                        </Link>
+                                        <SectionTab
+                                            url={sectionOrGroup.urls.published ?? ''}
+                                            isActive={isActive}
+                                            title={title}
+                                            icon={icon ? (icon as IconName) : undefined}
+                                        />
                                     </NavigationMenu.Link>
                                 )}
                             </NavigationMenu.Item>
@@ -167,10 +128,59 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
                     }}
                 />
             </div>
-            </NavigationMenu.Root>
+        </NavigationMenu.Root>
     ) : null;
 }
 
+const SectionTab = React.forwardRef(function SectionTab(props: { isActive: boolean; title: string; icon?: IconName; url: string }, ref: React.Ref<HTMLAnchorElement>) {
+    const { isActive, title, icon, url, ...rest } = props;
+    return (
+        <Link
+            ref={ref}
+            {...rest}
+            className={tcls(
+                'relative group flex select-none items-center justify-between rounded straight-corners:rounded-none px-3 py-1 my-2',
+                isActive ? 'text-primary' : 'text-tint hover:bg-tint-hover hover:text-tint-strong',
+            )}
+            href={url}
+        >
+            <span className={tcls('flex gap-2 items-center w-full truncate')}>
+                {icon ? <SectionIcon isActive={isActive} icon={icon} /> : null}
+                {title}
+            </span>
+            {isActive ? <ActiveTabIndicator /> : null}
+        </Link>
+    );
+});
+
+const SectionGroupTab = React.forwardRef(function SectionGroupTab(props: { isActive: boolean; title: string; icon?: IconName }, ref: React.Ref<HTMLButtonElement>) {
+    const { isActive, title, icon, ...rest } = props;
+    return (
+        <button
+            ref={ref}
+            {...rest}
+            className={tcls(
+                'relative group flex select-none items-center justify-between rounded straight-corners:rounded-none transition-colors px-3 py-1 my-2',
+                isActive ? 'text-primary' : 'text-tint hover:bg-tint-hover hover:text-tint-strong',
+            )}
+        >
+            <span className="flex gap-2 items-center w-full truncate">
+                {icon ? <SectionIcon isActive={isActive} icon={icon as IconName} /> : null}
+                {title}
+            </span>
+            {isActive ? <ActiveTabIndicator /> : null}
+            <Icon
+                aria-hidden
+                icon="chevron-down"
+                className="shrink-0 size-3 opacity-6 ms-1 transition-all group-data-[state=open]:rotate-180"
+            />
+        </button>
+    );
+});
+
+/**
+ * Horizontal line indicating the active tab
+ */
 function ActiveTabIndicator() {
     return <span className="inset-x-3 -bottom-2 h-0.5 absolute bg-primary-11" />;
 }
