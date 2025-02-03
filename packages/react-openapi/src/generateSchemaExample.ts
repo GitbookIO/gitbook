@@ -14,7 +14,21 @@ export function generateSchemaExample(
     } = {},
 ): JSONValue | undefined {
     return getExampleFromSchema(schema, {
+        emptyString: 'text',
         omitEmptyAndOptionalProperties: options.onlyRequired,
+        variables: {
+            'date-time': new Date().toISOString(),
+            date: new Date().toISOString().split('T')[0],
+            email: 'name@gmail.com',
+            hostname: 'example.com',
+            ipv4: '0.0.0.0',
+            ipv6: '2001:0db8:85a3:0000:0000:8a2e:0370:7334',
+            uri: 'https://example.com',
+            uuid: '123e4567-e89b-12d3-a456-426614174000',
+            binary: 'binary',
+            byte: 'Ynl0ZXM=',
+            password: 'password',
+        },
     });
 }
 
