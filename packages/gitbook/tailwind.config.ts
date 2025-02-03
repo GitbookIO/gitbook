@@ -18,9 +18,9 @@ function generateVarShades(varName: string, filter: ColorCategory[] = []) {
         if (filter.length === 0 || filter.includes(categoryName as ColorCategory)) {
             Object.entries(category).forEach(([key, value]) => {
                 if (filter.length > 0) {
-                    result[key] = `rgb(var(--${varName}-${value}))`;
+                    result[key] = `oklch(var(--${varName}-${value}) / <alpha-value>)`;
                 } else {
-                    result[value] = `rgb(var(--${varName}-${value}))`;
+                    result[value] = `oklch(var(--${varName}-${value}) / <alpha-value>)`;
                 }
             });
         }

@@ -15,7 +15,7 @@ import colors from 'tailwindcss/colors';
 import { fontNotoColorEmoji, fonts, ibmPlexMono } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
 import { getStaticFileURL } from '@/lib/assets';
-import { colorContrast, colorScale, hexToRgb, shadesOfColor } from '@/lib/colors';
+import { colorContrast, colorScale, hexToOklch, hexToRgb } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
 
 import { ClientContexts } from './ClientContexts';
@@ -171,10 +171,9 @@ function generateColorVariable(
 
     return Object.entries(shades)
         .map(([key, value]) => {
-            const rgbValue = hexToRgb(value); // Check the original hex value
-            const contrastValue = withContrast ? hexToRgb(colorContrast(value)) : undefined; // Add contrast if needed
-            return `--${name}-${key}: ${rgbValue}; ${
-                contrastValue ? `--contrast-${name}-${key}: ${contrastValue};` : ''
+            const contrastValue = withContrast ? colorContrast(value) : undefined; // Add contrast if needed
+            return `--${name}-${key}: ${hexToOklch(value)}; ${
+                contrastValue ? `--contrast-${name}-${key}: ${hexToOklch(contrastValue)};` : ''
             }`;
         })
         .join('\n');

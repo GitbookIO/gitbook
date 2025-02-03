@@ -89,6 +89,11 @@ export function hexToRgb(hex: string): string {
     return `${r} ${g} ${b}`;
 }
 
+export function hexToOklch(hex: string): string {
+    const { L, C, H } = rgbToOklch(hexToRgbArray(hex));
+    return `${L.toFixed(3)} ${C.toFixed(3)} ${H.toFixed(3)}`;
+}
+
 /**
  * Convert a hex color to a RGBA color.
  */
