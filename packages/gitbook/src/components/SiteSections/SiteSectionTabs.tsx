@@ -1,6 +1,6 @@
 'use client';
 
-import type { SiteSection, SiteSectionGroup } from '@gitbook/api';
+import type { SiteSection } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import React from 'react';
@@ -82,8 +82,8 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
                                                 className={tcls(
                                                     'relative group flex select-none items-center justify-between rounded straight-corners:rounded-none transition-colors px-3 py-1 my-2',
                                                     isActive
-                                                        ? 'text-primary dark:text-primary-400'
-                                                        : 'text-dark/8 hover:bg-dark/1 hover:text-dark/9 dark:text-light/8 dark:hover:bg-light/2 dark:hover:text-light/9',
+                                                        ? 'text-primary'
+                                                        : 'text-tint hover:bg-tint-hover hover:text-tint-strong',
                                                 )}
                                             >
                                                 <span className="flex gap-2 items-center w-full truncate">
@@ -96,7 +96,7 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
                                                     {title}
                                                 </span>
                                                 {isActive ? (
-                                                    <span className="inset-x-3 -bottom-2 h-0.5 absolute bg-primary dark:bg-primary-400" />
+                                                   <ActiveTabIndicator />
                                                 ) : null}
                                                 <Icon
                                                     aria-hidden
@@ -118,15 +118,13 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
                                             className={tcls(
                                                 'relative group flex select-none items-center justify-between rounded straight-corners:rounded-none px-3 py-1 my-2',
                                                 isActive
-                                                    ? 'text-primary dark:text-primary-400'
-                                                    : 'text-dark/8 hover:bg-dark/1 hover:text-dark/9 dark:text-light/8 dark:hover:bg-light/2 dark:hover:text-light/9',
+                                                    ? 'text-primary'
+                                                    : 'text-tint hover:bg-tint-hover hover:text-tint-strong',
                                             )}
                                             href={sectionOrGroup.urls.published ?? ''}
                                         >
                                             <span
-                                                className={tcls(
-                                                    'flex gap-2 items-center w-full truncate',
-                                                )}
+                                                className={tcls('flex gap-2 items-center w-full truncate')}
                                             >
                                                 {icon ? (
                                                     <SectionIcon
@@ -137,7 +135,7 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
                                                 {title}
                                             </span>
                                             {isActive ? (
-                                                <span className="inset-x-3 -bottom-2 h-0.5 absolute bg-primary dark:bg-primary-400" />
+                                                <ActiveTabIndicator />
                                             ) : null}
                                         </Link>
                                     </NavigationMenu.Link>
@@ -149,7 +147,7 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
                         className="top-full z-0 flex h-3 items-end justify-center motion-safe:transition-[width,_transform] data-[state=hidden]:motion-safe:animate-fadeOut data-[state=visible]:motion-safe:animate-fadeIn"
                         aria-hidden
                     >
-                        <div className="bg-light dark:bg-dark shadow-1xs shadow-dark/1 dark:shadow-dark/4 relative top-[70%] size-3 rotate-[225deg] rounded-tl-sm" />
+                        <div className="bg-tint shadow-1xs shadow-dark/1 dark:shadow-dark/4 relative top-[70%] size-3 rotate-[225deg] rounded-tl-sm" />
                     </NavigationMenu.Indicator>
                 </NavigationMenu.List>
             </div>
@@ -161,7 +159,7 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
                 }}
             >
                 <NavigationMenu.Viewport
-                    className="bg-light dark:bg-dark rounded straight-corners:rounded-none shadow-1xs shadow-dark/1 dark:shadow-dark/4 relative mt-3 w-[calc(100vw_-_2rem)] md:w-[var(--radix-navigation-menu-viewport-width)] h-[var(--radix-navigation-menu-viewport-height)] origin-[top_center] overflow-hidden motion-safe:transition-[width,_height,_transform] duration-300 data-[state=closed]:motion-safe:animate-scaleOut data-[state=open]:motion-safe:animate-scaleIn"
+                    className="bg-tint rounded straight-corners:rounded-none shadow-1xs shadow-dark/1 dark:shadow-dark/4 relative mt-3 w-[calc(100vw_-_2rem)] md:w-[var(--radix-navigation-menu-viewport-width)] h-[var(--radix-navigation-menu-viewport-height)] origin-[top_center] overflow-hidden motion-safe:transition-[width,_height,_transform] duration-300 data-[state=closed]:motion-safe:animate-scaleOut data-[state=open]:motion-safe:animate-scaleIn"
                     style={{
                         translate: offset
                             ? '-50% 0'
@@ -171,6 +169,33 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
             </div>
             </NavigationMenu.Root>
     ) : null;
+}
+
+function ActiveTabIndicator() {
+    return <span className="inset-x-3 -bottom-2 h-0.5 absolute bg-primary-11" />;
+}
+
+/**
+ * A list of section tiles grouped in the dropdown for a section group
+ */
+function SectionGroupTileList(props: { sections: SiteSection[]; currentSection: SiteSection }) {
+    const { sections, currentSection } = props;
+    return (
+        <ul
+            className={tcls(
+                'grid w-full md:w-max p-2 sm:grid-cols-1',
+                sections.length === 1 ? 'md:grid-cols-1' : 'md:grid-cols-2',
+            )}
+        >
+            {sections.map((section) => (
+                <SectionGroupTile
+                    key={section.id}
+                    section={section}
+                    isActive={section.id === currentSection.id}
+                />
+            ))}
+        </ul>
+    );
 }
 
 /**
@@ -184,10 +209,10 @@ function SectionGroupTile(props: { section: SiteSection; isActive: boolean }) {
             <Link
                 href={urls.published ?? ''}
                 className={tcls(
-                    'flex flex-col p-3 gap-2 rounded w-full min-h-12 select-none hover:bg-primary/1 focus:bg-primary/1 dark:hover:bg-primary/1 dark:focus:bg-primary/1',
+                    'flex flex-col p-3 gap-2 rounded w-full min-h-12 select-none transition-colors hover:bg-tint-hover',
                     isActive
-                        ? 'text-primary dark:text-primary-400'
-                        : 'text-dark/8 hover:text-dark/9 dark:text-light/8 dark:hover:text-light/9',
+                        ? 'text-primary hover:text-primary-strong focus:text-primary-strong'
+                        : 'text-tint hover:text-tint-strong focus:text-tint-strong',
                 )}
             >
                 <div className="flex gap-2 items-center w-full font-medium light:text-dark dark:text-light">
