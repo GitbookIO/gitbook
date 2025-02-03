@@ -32,7 +32,8 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
         if (windowWidth < 768) {
             setOffset(0);
         } else if (trigger && value === itemValue) {
-            const viewportWidth = size < MIN_ITEMS_FOR_COLS ? VIEWPORT_ITEM_WIDTH : VIEWPORT_ITEM_WIDTH * 2;
+            const viewportWidth =
+                size < MIN_ITEMS_FOR_COLS ? VIEWPORT_ITEM_WIDTH : VIEWPORT_ITEM_WIDTH * 2;
             const halfViewportWidth = viewportWidth / 2;
             const viewportFreeZone = 10 /* buffer */ + 8 /* padding */ + halfViewportWidth;
             const triggerOffsetRight = trigger.offsetLeft + trigger.offsetWidth / 2;
@@ -137,7 +138,10 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
 /**
  * A tab representing a section
  */
-const SectionTab = React.forwardRef(function SectionTab(props: { isActive: boolean; title: string; icon?: IconName; url: string }, ref: React.Ref<HTMLAnchorElement>) {
+const SectionTab = React.forwardRef(function SectionTab(
+    props: { isActive: boolean; title: string; icon?: IconName; url: string },
+    ref: React.Ref<HTMLAnchorElement>,
+) {
     const { isActive, title, icon, url, ...rest } = props;
     return (
         <Link
@@ -149,7 +153,7 @@ const SectionTab = React.forwardRef(function SectionTab(props: { isActive: boole
             )}
             href={url}
         >
-            <span className='flex gap-2 items-center w-full truncate'>
+            <span className="flex gap-2 items-center w-full truncate">
                 {icon ? <SectionIcon isActive={isActive} icon={icon} /> : null}
                 {title}
             </span>
@@ -161,7 +165,10 @@ const SectionTab = React.forwardRef(function SectionTab(props: { isActive: boole
 /**
  * A tab representing a section group
  */
-const SectionGroupTab = React.forwardRef(function SectionGroupTab(props: { isActive: boolean; title: string; icon?: IconName }, ref: React.Ref<HTMLButtonElement>) {
+const SectionGroupTab = React.forwardRef(function SectionGroupTab(
+    props: { isActive: boolean; title: string; icon?: IconName },
+    ref: React.Ref<HTMLButtonElement>,
+) {
     const { isActive, title, icon, ...rest } = props;
     return (
         <button
