@@ -475,7 +475,7 @@
 }
 
 .openapi-tabs-footer {
-    @apply px-3 py-2.5 border-t border-dark/2 dark:border-light/2 text-xs text-dark/7 dark:text-light/7;
+    @apply px-3 py-2.5 border-t border-dark/2 dark:border-light/2 text-[13px] text-dark/7 dark:text-light/7;
 }
 
 /* Disclosure group */
