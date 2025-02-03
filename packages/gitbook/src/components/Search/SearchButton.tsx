@@ -72,7 +72,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'transition-all',
                 'hover:shadow-md',
                 'hover:scale-102',
-                'hover:ring-dark/2',
+                'hover:ring-dark/4',
                 'hover:text-dark/10',
                 'focus:shadow-md',
                 'focus:scale-102',
@@ -93,7 +93,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'dark:contrast-more:focus:ring-light',
 
                 'active:shadow-sm',
-                'active:scale-98',
+                'active:scale-100',
 
                 'md:justify-start',
                 'md:w-full',
@@ -131,18 +131,30 @@ const Shortcut = () => {
             className={tcls(
                 'shortcut',
                 'hidden',
-                'md:inline',
+                'md:flex',
                 'justify-end',
                 'text-xs',
+                'font-mono',
                 'text-dark/7',
+                'leading-none',
                 'contrast-more:text-dark',
                 'dark:text-light-4/7',
                 'contrast-more:dark:text-light',
                 'whitespace-nowrap',
                 `[font-feature-settings:"calt",_"case"]`,
+                'gap-0.5',
+                'shrink-0',
+                '-mr-1',
             )}
         >
-            {operatingSystem === 'mac' ? '⌘' : 'Ctrl +'} K
+            <kbd
+                className={`rounded border border-dark/2 dark:border-light/2 px-1 min-w-5 h-5 flex justify-center items-center ${operatingSystem === 'mac' ? 'text-sm' : ''}`}
+            >
+                {operatingSystem === 'mac' ? '⌘' : 'Ctrl'}
+            </kbd>
+            <kbd className="rounded border border-dark/2 dark:border-light/2 size-5 flex justify-center items-center">
+                K
+            </kbd>
         </div>
     );
 };
