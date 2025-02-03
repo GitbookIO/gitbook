@@ -46,6 +46,8 @@ export function OpenAPISpec(props: { data: OpenAPIOperationData; context: OpenAP
                                 // we use display it if the schema doesn't override it
                                 description: parameter.description,
                                 example: parameter.example,
+                                // Deprecated can be defined at the parameter level
+                                deprecated: parameter.deprecated,
                                 ...(noReference(parameter.schema) ?? {}),
                             },
                             required: parameter.required,

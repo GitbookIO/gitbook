@@ -231,7 +231,16 @@ export function OpenAPISchemaPresentation(props: OpenAPISchemaPropertyEntry) {
                 type={getSchemaTitle(schema)}
                 propertyName={propertyName}
                 required={required}
+                deprecated={schema.deprecated}
             />
+            {schema['x-deprecated-sunset'] ? (
+                <div className="openapi-deprecated-sunset openapi-schema-description openapi-markdown">
+                    Sunsetting on{' '}
+                    <span className="openapi-deprecated-sunset-date">
+                        {schema['x-deprecated-sunset']}
+                    </span>
+                </div>
+            ) : null}
             {schema.description ? (
                 <Markdown source={schema.description} className="openapi-schema-description" />
             ) : null}
@@ -294,9 +303,6 @@ function getSchemaProperties(schema: OpenAPIV3.SchemaObject): null | OpenAPISche
         if (schema.properties) {
             Object.entries(schema.properties).forEach(([propertyName, rawPropertySchema]) => {
                 const propertySchema = noReference(rawPropertySchema);
-                if (propertySchema.deprecated) {
-                    return;
-                }
 
                 result.push({
                     propertyName,
