@@ -31,7 +31,7 @@ export function SiteSectionList(props: { sections: SectionsList; className: Clas
                     `text-tint text-sm
                     border-b border-tint-subtle -mx-5 relative
                     before:absolute before:contents[] before:left-0 before:right-2 before:bottom-0 before:h-12 before:pointer-events-none 
-                    before:bg-gradient-to-b from-transparent to-tint-base`, // TODO @Zeno: Bring back sidebar styles here...
+                    before:bg-gradient-to-b from-transparent to-tint-base sidebar-filled:to-tint-subtle [html.tint.sidebar-filled_&]:to-tint-base`,
                     className,
                 )}
             >
@@ -66,16 +66,16 @@ export function SiteSectionListItem(props: { section: SiteSection; isActive: boo
             href={section.urls.published ?? ''}
             ref={linkRef}
             aria-current={isActive && 'page'}
-            className={`flex flex-row items-center gap-3 px-3 py-2
+            className={tcls(
+                `flex flex-row items-center gap-3 px-3 py-2
             hover:bg-tint-hover contrast-more:hover:ring-1 contrast-more:hover:ring-tint
             hover:text-tint-strong
-            rounded-md straight-corners:rounded-none transition-all group/section-link 
-            ${
+            rounded-md straight-corners:rounded-none transition-all group/section-link`,
                 isActive
-                    ? `text-primary hover:text-primary-strong contrast-more:text-primary-strong contrast-more:font-semibold
+                    ? `text-primary hover:text-primary-strong contrast-more:text-primary-strong font-semibold
                 hover:bg-primary-hover contrast-more:hover:ring-1 contrast-more:hover:ring-primary-hover`
-                    : null
-            }`}
+                    : null,
+            )}
             {...otherProps}
         >
             <div
@@ -85,13 +85,13 @@ export function SiteSectionListItem(props: { section: SiteSection; isActive: boo
                     dark:shadow-none rounded-md straight-corners:rounded-none leading-none
                     ring-1 ring-tint-subtle
                     text-tint contrast-more:text-tint-strong
-                    group-hover/section-link:scale-110 group-active/section-link:scale-90 group-active/section-link:shadow-none
+                    group-hover/section-link:scale-110 group-active/section-link:scale-90 group-active/section-link:shadow-none group-hover/section-link:ring-tint-hover
                     transition-transform text-lg`,
                     isActive
-                        ? `bg-primary-subtle ring-primary-subtle
+                        ? `bg-primary ring-primary group-hover/section-link:ring-primary-hover,
                         shadow-md shadow-primary
                         contrast-more:ring-2 contrast-more:ring-primary
-                        text-primary contrast-more:text-primary-strong`
+                        text-primary contrast-more:text-primary-strong tint:bg-primary-solid tint:text-contrast-primary-solid`
                         : null,
                 )}
             >

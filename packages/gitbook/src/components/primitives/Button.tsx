@@ -32,6 +32,7 @@ export function Button({
                   'hover:bg-primary-solid-hover',
                   'hover:text-contrast-primary-solid-hover',
                   'ring-0',
+                  'contrast-more:ring-1',
               ]
             : // SECONDARY
               [
@@ -40,7 +41,6 @@ export function Button({
                   'hover:bg-tint-hover',
                   'hover:text-primary',
                   'contrast-more:bg-tint-subtle',
-                  'contrast-more:hover:ring-primary',
               ];
 
     const sizes = {

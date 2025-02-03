@@ -45,10 +45,7 @@ export function Details(props: {
             className={tcls(
                 className,
                 'group/expandable',
-                'bg-transparent',
-                // 'bg-gradient-to-t',
-                // 'from-transparent',
-                // 'to-transparent',
+                'bg-tint-base',
                 'border',
                 'border-b-0',
                 'border-tint-subtle',
@@ -64,8 +61,6 @@ export function Details(props: {
                 '[&:not(:has(+_&))]:mb-5',
                 '[&:not(:has(+_&))]:rounded-b-lg',
                 '[&:not(:has(+_&))]:border-b',
-
-                // 'open:to-tint-12/1',
             )}
         >
             {children}

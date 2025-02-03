@@ -193,7 +193,6 @@ export function DynamicTabs(
                             'relative',
 
                             'after:transition-colors',
-                            // 'after:group-hover/tabs:border-transparent',
                             'after:border-r',
                             'after:absolute',
                             'after:left-[unset]',
