@@ -151,7 +151,7 @@
 
 /* Schema Presentation */
 .openapi-schema-presentation {
-    @apply flex flex-col gap-2 font-normal;
+    @apply flex flex-col gap-1.5 font-normal;
 }
 
 .openapi-schema-properties:last-child {
@@ -304,7 +304,7 @@
 }
 
 .openapi-response-description.openapi-markdown {
-    @apply prose-sm text-[13px] relative text-dark/7 dark:text-light/7 !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply prose-sm text-[13px] leading-none relative text-dark/7 dark:text-light/7 !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
     @apply overflow-x-auto whitespace-pre;
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -498,11 +498,11 @@
 }
 
 .openapi-disclosure-group-icon > svg {
-    @apply size-2.5 text-dark/6 dark:text-light/6 transition-transform;
+    @apply size-3 text-dark/6 dark:text-light/6 transition-transform;
 }
 
 .openapi-disclosure-group-trigger:hover > .openapi-disclosure-group-icon svg {
-    @apply size-2.5 text-dark dark:text-light transition-transform;
+    @apply text-dark dark:text-light transition-transform;
 }
 
 .openapi-disclosure-group-panel {
@@ -519,7 +519,7 @@
 }
 
 .openapi-disclosure svg {
-    @apply size-2.5 transition-all duration-300;
+    @apply size-3 transition-all duration-300;
 }
 
 .openapi-disclosure-trigger[aria-expanded='true'] svg {

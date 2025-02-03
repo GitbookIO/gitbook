@@ -29,7 +29,7 @@ const DisclosureGroupStateContext = React.createContext<DisclosureGroupState | n
 export function OpenAPIDisclosureGroup(props: DisclosureGroupProps & Props) {
     const { icon, groups } = props;
 
-    let state = useDisclosureGroupState(props);
+    const state = useDisclosureGroupState(props);
 
     return (
         <DisclosureGroupStateContext.Provider value={state}>
@@ -43,11 +43,11 @@ export function OpenAPIDisclosureGroup(props: DisclosureGroupProps & Props) {
 function DisclosureItem(props: { group: DisclosureGroup; icon?: React.ReactNode }) {
     const { icon, group } = props;
 
-    let defaultId = useId();
+    const defaultId = useId();
     const id = group.id || defaultId;
-    let groupState = React.useContext(DisclosureGroupStateContext);
-    let isExpanded = groupState?.expandedKeys.has(id) || false;
-    let state = useDisclosureState({
+    const groupState = React.useContext(DisclosureGroupStateContext);
+    const isExpanded = groupState?.expandedKeys.has(id) || false;
+    const state = useDisclosureState({
         isExpanded,
         onExpandedChange() {
             if (groupState) {
@@ -56,10 +56,10 @@ function DisclosureItem(props: { group: DisclosureGroup; icon?: React.ReactNode 
         },
     });
 
-    let panelRef = React.useRef<HTMLDivElement | null>(null);
-    let triggerRef = React.useRef<HTMLButtonElement | null>(null);
-    let isDisabled = groupState?.isDisabled || !group.body || false;
-    let { buttonProps: triggerProps, panelProps } = useDisclosure(
+    const panelRef = React.useRef<HTMLDivElement | null>(null);
+    const triggerRef = React.useRef<HTMLButtonElement | null>(null);
+    const isDisabled = groupState?.isDisabled || !group.body || false;
+    const { buttonProps: triggerProps, panelProps } = useDisclosure(
         {
             ...props,
             isExpanded,
@@ -68,8 +68,8 @@ function DisclosureItem(props: { group: DisclosureGroup; icon?: React.ReactNode 
         state,
         panelRef,
     );
-    let { buttonProps } = useButton(triggerProps, triggerRef);
-    let { isFocusVisible, focusProps } = useFocusRing();
+    const { buttonProps } = useButton(triggerProps, triggerRef);
+    const { isFocusVisible, focusProps } = useFocusRing();
 
     return (
         <div className="openapi-disclosure-group">
