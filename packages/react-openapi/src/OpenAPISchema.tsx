@@ -235,7 +235,7 @@ export function OpenAPISchemaPresentation(props: OpenAPISchemaPropertyEntry) {
             />
             {schema['x-deprecated-sunset'] ? (
                 <div className="openapi-deprecated-sunset openapi-schema-description openapi-markdown">
-                    Sunsetting on{' '}
+                    Sunset date:{' '}
                     <span className="openapi-deprecated-sunset-date">
                         {schema['x-deprecated-sunset']}
                     </span>
@@ -246,7 +246,7 @@ export function OpenAPISchemaPresentation(props: OpenAPISchemaPropertyEntry) {
             ) : null}
             {shouldDisplayExample(schema) ? (
                 <div className="openapi-schema-example">
-                    Example{' '}
+                    Example:{' '}
                     <code>
                         {typeof schema.example === 'string'
                             ? schema.example
@@ -256,7 +256,7 @@ export function OpenAPISchemaPresentation(props: OpenAPISchemaPropertyEntry) {
             ) : null}
             {schema.pattern ? (
                 <div className="openapi-schema-pattern">
-                    Pattern <code>{schema.pattern}</code>
+                    Pattern: <code>{schema.pattern}</code>
                 </div>
             ) : null}
             {schema.enum && schema.enum.length > 0 ? (

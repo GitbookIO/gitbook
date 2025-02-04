@@ -45,6 +45,7 @@ export function OpenAPIOperation(props: {
                             <span className="openapi-deprecated-sunset-date">
                                 {operation['x-deprecated-sunset']}
                             </span>
+                            {`.`}
                         </div>
                     ) : null}
                     {trimmedDescription ? (
