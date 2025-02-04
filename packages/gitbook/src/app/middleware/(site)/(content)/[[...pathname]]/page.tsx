@@ -86,20 +86,18 @@ export default async function Page(props: {
                 <PageCover as="full" page={page} cover={page.cover} context={contentRefContext} />
             ) : null}
             {/* We use a flex row reverse to render the aside first because the page is streamed. */}
-            <div className="flex flex-row-reverse justify-end">
-                {page.layout.outline ? (
-                    <PageAside
-                        space={space}
-                        site={site}
-                        customization={customization}
-                        page={page}
-                        document={document}
-                        withHeaderOffset={headerOffset}
-                        withFullPageCover={withFullPageCover}
-                        withPageFeedback={withPageFeedback}
-                        context={contentRefContext}
-                    />
-                ) : null}
+            <div className="flex flex-row-reverse justify-end grow">
+                <PageAside
+                    space={space}
+                    site={site}
+                    customization={customization}
+                    page={page}
+                    document={document}
+                    withHeaderOffset={headerOffset}
+                    withFullPageCover={withFullPageCover}
+                    withPageFeedback={withPageFeedback}
+                    context={contentRefContext}
+                />
                 <PageBody
                     space={space}
                     pointer={contentPointer}

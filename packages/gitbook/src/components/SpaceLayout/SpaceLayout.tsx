@@ -174,8 +174,7 @@ export async function SpaceLayout(props: {
                 </div>
             </div>
 
-            {customization.themes.toggeable ||
-            customization.footer.copyright ||
+            {customization.footer.copyright ||
             customization.footer.logo ||
             customization.footer.groups?.length ? (
                 <Footer space={space} context={contentRefContext} customization={customization} />
