@@ -11,7 +11,6 @@ import {
 } from '@gitbook/api';
 import { IconsProvider, IconStyle } from '@gitbook/icons';
 import assertNever from 'assert-never';
-import colors from 'tailwindcss/colors';
 
 import { fontNotoColorEmoji, fonts, ibmPlexMono } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
@@ -20,8 +19,10 @@ import {
     colorContrast,
     colorScale,
     type ColorScaleOptions,
+    DARK_BASE,
     DEFAULT_TINT_COLOR,
     hexToRgb,
+    LIGHT_BASE,
     shadesOfColor,
 } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
@@ -224,8 +225,8 @@ function generateHeaderTheme(customization: CustomizationSettings | SiteCustomiz
         case CustomizationHeaderPreset.Default: {
             return {
                 backgroundColor: {
-                    light: colors.white,
-                    dark: colors.black,
+                    light: LIGHT_BASE,
+                    dark: DARK_BASE,
                 },
                 linkColor: {
                     light: customization.styling.primaryColor.light,
@@ -242,11 +243,11 @@ function generateHeaderTheme(customization: CustomizationSettings | SiteCustomiz
                 linkColor: {
                     light: colorContrast(
                         tintColor?.light ?? customization.styling.primaryColor.light,
-                        [colors.white, colors.black],
+                        [LIGHT_BASE, DARK_BASE],
                     ),
                     dark: colorContrast(
                         tintColor?.dark ?? customization.styling.primaryColor.dark,
-                        [colors.white, colors.black],
+                        [LIGHT_BASE, DARK_BASE],
                     ),
                 },
             };
@@ -254,12 +255,12 @@ function generateHeaderTheme(customization: CustomizationSettings | SiteCustomiz
         case CustomizationHeaderPreset.Contrast: {
             return {
                 backgroundColor: {
-                    light: colors.black,
-                    dark: colors.white,
+                    light: DARK_BASE,
+                    dark: LIGHT_BASE,
                 },
                 linkColor: {
-                    light: colors.white,
-                    dark: colors.black,
+                    light: LIGHT_BASE,
+                    dark: DARK_BASE,
                 },
             };
         }
@@ -269,22 +270,20 @@ function generateHeaderTheme(customization: CustomizationSettings | SiteCustomiz
                     light:
                         customization.header.backgroundColor?.light ??
                         tintColor?.light ??
-                        colors.white,
+                        LIGHT_BASE,
                     dark:
-                        customization.header.backgroundColor?.dark ??
-                        tintColor?.dark ??
-                        colors.black,
+                        customization.header.backgroundColor?.dark ?? tintColor?.dark ?? DARK_BASE,
                 },
                 linkColor: {
                     light:
                         customization.header.linkColor?.light ??
                         (tintColor?.light &&
-                            colorContrast(tintColor.light, [colors.white, colors.black])) ??
+                            colorContrast(tintColor.light, [LIGHT_BASE, DARK_BASE])) ??
                         customization.styling.primaryColor.light,
                     dark:
                         customization.header.linkColor?.dark ??
                         (tintColor?.dark &&
-                            colorContrast(tintColor.dark, [colors.white, colors.black])) ??
+                            colorContrast(tintColor.dark, [LIGHT_BASE, DARK_BASE])) ??
                         customization.styling.primaryColor.dark,
                 },
             };
