@@ -23,7 +23,22 @@ export function Footer(props: {
         <>
             <hr className="border-t border-tint-subtle" />
             <div className="scroll-nojump">
-                <footer className={tcls(CONTAINER_STYLE, 'px-4', 'mx-auto', 'flex', 'gap-12')}>
+                <footer
+                    className={tcls(
+                        CONTAINER_STYLE,
+                        'px-4',
+                        'mx-auto',
+                        'flex',
+                        'gap-12',
+                        // If the footer only contains a mode toggle, we only show it on smaller screens
+                        customization.themes.toggeable &&
+                            !customization.footer.copyright &&
+                            !customization.footer.logo &&
+                            customization.footer.groups?.length == 0
+                            ? 'xl:hidden'
+                            : null,
+                    )}
+                >
                     <div className="hidden lg:block basis-72 page-no-toc:hidden" />
                     <div
                         className={tcls(

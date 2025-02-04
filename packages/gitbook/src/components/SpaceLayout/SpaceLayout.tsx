@@ -94,87 +94,86 @@ export async function SpaceLayout(props: {
                 context={contentRefContext}
                 customization={customization}
             />
-            <div className={tcls('scroll-nojump')}>
-                <div
-                    className={tcls(
-                        'flex',
-                        'flex-col',
-                        'lg:flex-row',
-                        CONTAINER_STYLE,
+            <div
+                className={tcls(
+                    'flex',
+                    'flex-col',
+                    'lg:flex-row',
+                    CONTAINER_STYLE,
 
-                        // Ensure the footer is display below the viewport even if the content is not enough
-                        `min-h-[calc(100vh-64px)]`,
-                        withTopHeader ? null : 'lg:min-h-screen',
-                    )}
-                >
-                    <TableOfContents
-                        space={space}
-                        customization={customization}
-                        content={content}
-                        pages={pages}
-                        ancestors={ancestors}
-                        context={contentRefContext}
-                        header={
-                            withTopHeader ? null : (
-                                <div
-                                    className={tcls(
-                                        'hidden',
-                                        'pr-4',
-                                        'lg:flex',
-                                        'flex-grow-0',
-                                        'flex-wrap',
-                                        'dark:shadow-light/1',
-                                    )}
-                                >
-                                    <HeaderLogo
-                                        site={site}
-                                        space={space}
-                                        customization={customization}
-                                    />
+                    // Ensure the footer is display below the viewport even if the content is not enough
+                    `min-h-[calc(100vh-64px)]`,
+                    withTopHeader ? null : 'lg:min-h-screen',
+                )}
+            >
+                <TableOfContents
+                    space={space}
+                    customization={customization}
+                    content={content}
+                    pages={pages}
+                    ancestors={ancestors}
+                    context={contentRefContext}
+                    header={
+                        withTopHeader ? null : (
+                            <div
+                                className={tcls(
+                                    'hidden',
+                                    'pr-4',
+                                    'lg:flex',
+                                    'flex-grow-0',
+                                    'flex-wrap',
+                                    'dark:shadow-light/1',
+                                )}
+                            >
+                                <HeaderLogo
+                                    site={site}
+                                    space={space}
+                                    customization={customization}
+                                />
+                            </div>
+                        )
+                    }
+                    innerHeader={
+                        // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
+                        <>
+                            {!withTopHeader && (
+                                <div className={tcls('hidden', 'lg:block')}>
+                                    <React.Suspense fallback={null}>
+                                        <SearchButton>
+                                            <span className={tcls('flex-1')}>
+                                                {t(
+                                                    getSpaceLanguage(customization),
+                                                    customization.aiSearch.enabled
+                                                        ? 'search_or_ask'
+                                                        : 'search',
+                                                )}
+                                            </span>
+                                        </SearchButton>
+                                    </React.Suspense>
                                 </div>
-                            )
-                        }
-                        innerHeader={
-                            // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
-                            <>
-                                {!withTopHeader && (
-                                    <div className={tcls('hidden', 'lg:block')}>
-                                        <React.Suspense fallback={null}>
-                                            <SearchButton>
-                                                <span className={tcls('flex-1')}>
-                                                    {t(
-                                                        getSpaceLanguage(customization),
-                                                        customization.aiSearch.enabled
-                                                            ? 'search_or_ask'
-                                                            : 'search',
-                                                    )}
-                                                </span>
-                                            </SearchButton>
-                                        </React.Suspense>
-                                    </div>
-                                )}
-                                {!withTopHeader && withSections && sections && (
-                                    <SiteSectionList
-                                        className={tcls('hidden', 'lg:block')}
-                                        sections={sections}
-                                    />
-                                )}
-                                {withVariants && (
-                                    <SpacesDropdown
-                                        space={space}
-                                        spaces={spaces}
-                                        className={tcls('w-full')}
-                                    />
-                                )}
-                            </>
-                        }
-                        headerOffset={headerOffset}
-                    />
-                    <div className={tcls('flex-1', 'flex', 'flex-col')}>{children}</div>
-                </div>
+                            )}
+                            {!withTopHeader && withSections && sections && (
+                                <SiteSectionList
+                                    className={tcls('hidden', 'lg:block')}
+                                    sections={sections}
+                                />
+                            )}
+                            {withVariants && (
+                                <SpacesDropdown
+                                    space={space}
+                                    spaces={spaces}
+                                    className={tcls('w-full')}
+                                />
+                            )}
+                        </>
+                    }
+                    headerOffset={headerOffset}
+                />
+                <div className={tcls('flex-1', 'flex', 'flex-col')}>{children}</div>
             </div>
 
-            {customization.footer.copyright ||
+            {customization.themes.toggeable ||
+            customization.footer.copyright ||
             customization.footer.logo ||
             customization.footer.groups?.length ? (
                 <Footer space={space} context={contentRefContext} customization={customization} />
