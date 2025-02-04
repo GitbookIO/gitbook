@@ -155,6 +155,7 @@ export async function PageAside(props: {
                             'flex',
                             'flex-col',
                             'shrink',
+                            'pb-12',
 
                             'sticky',
                             topOffset,
@@ -243,10 +244,15 @@ export async function PageAside(props: {
                     </div>
                 </>
             ) : null}
-            <div className="mb-4 mt-auto flex flex-col page-api-block:xl:max-2xl:mb-0 page-api-block:xl:max-2xl:hidden page-api-block:xl:max-2xl:group-hover/aside:flex">
+            <div
+                className={tcls(
+                    'pb-4 sticky bottom-0 bg-tint-base [html.tint.sidebar-filled_&]:bg-tint-subtle z-10 mt-auto flex flex-col page-api-block:xl:max-2xl:pb-0 page-api-block:xl:max-2xl:hidden page-api-block:xl:max-2xl:group-hover/aside:flex',
+                    'page-api-block:xl:max-2xl:bg-transparent',
+                )}
+            >
                 {/* Mode Switcher */}
                 {customization.themes.toggeable ? (
-                    <div className="flex items-center justify-end">
+                    <div className="flex items-center justify-end mt-4">
                         <React.Suspense fallback={null}>
                             <ThemeToggler />
                         </React.Suspense>
