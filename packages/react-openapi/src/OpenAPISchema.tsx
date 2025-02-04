@@ -53,7 +53,9 @@ export function OpenAPISchemaProperty(
             typeof schema.example === 'number' ||
             typeof schema.example === 'boolean' ||
             (Array.isArray(schema.example) && schema.example.length > 0) ||
-            (typeof schema.example === 'object' && Object.keys(schema.example).length > 0)
+            (typeof schema.example === 'object' &&
+                schema.example !== null &&
+                Object.keys(schema.example).length > 0)
         );
     };
     return (
