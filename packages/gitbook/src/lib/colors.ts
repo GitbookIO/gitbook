@@ -124,12 +124,12 @@ export function shadesOfColor(hex: string, halfShades = false) {
 
     const result: ColorShades = {};
 
-    shades.forEach((shade) => {
+    for (const shade of shades) {
         const key = shade.toString();
 
         if (shade === 500) {
             result[key] = hex;
-            return;
+            continue;
         }
 
         let shadeIndex = shade;
@@ -143,20 +143,32 @@ export function shadesOfColor(hex: string, halfShades = false) {
         const endColor = isDarkShade ? baseColor : LIGHT_BASE;
 
         result[key] = getColor(percentage, hexToRgbArray(startColor), hexToRgbArray(endColor));
-    });
+    }
 
     return result;
 }
+
+export type ColorScaleOptions = {
+    /** If set to `true`, inverts the scale (so 1 is black instead of white) and uses `colorMixMapping.dark` with different mix ratios per step. */
+    darkMode?: boolean;
+
+    /** Define a custom foreground color to use. If left undefined, the global `light`/`dark` values (in `colors.ts`) will be used. */
+    background?: string;
+
+    /** Define a custom foreground color to use. If left undefined, the global `light`/`dark` values (in `colors.ts`) will be used. */
+    foreground?: string;
+
+    /** If set to a hex code, this color will be additionally mixed into the generated scale according to `options.mixRatio`. */
+    mix?: string;
+
+    /** Define a custom mix ratio to mix the `mix` color with. If left undefined, the default `mixRatio` will be used. */
+    mixRatio?: number;
+};
 
 /**
  * Generate a [Radix-like](https://www.radix-ui.com/colors/docs/palette-composition/understanding-the-scale) colour scale based of a hex colour.
  * @param {string} hex The hex code to generate shades from
  * @param {object} options
- * @param {boolean} options.darkMode If set to `true`, inverts the scale (so 1 is black instead of white) and uses `colorMixMapping.dark` with different mix ratios per step.
- * @param {string} options.foreground Define a custom foreground color to use. If left undefined, the global `light`/`dark` values (in `colors.ts`) will be used.
- * @param {string} options.background Define a custom foreground color to use. If left undefined, the global `light`/`dark` values (in `colors.ts`) will be used.
- * @param {string} options.mix If set to a hex code, this color will be additionally mixed into the generated scale according to `options.mixRatio`.
- * @param {number} options.mixRatio Define a custom mix ratio to mix the `mix` color with. If left undefined, the default `mixRatio` will be used.
  */
 export function colorScale(
     hex: string,
@@ -166,15 +178,9 @@ export function colorScale(
         foreground = darkMode ? LIGHT_BASE : DARK_BASE,
         mix,
         mixRatio = 0.2,
-    }: {
-        darkMode?: boolean;
-        background?: string;
-        foreground?: string;
-        mix?: string;
-        mixRatio?: number;
-    } = {},
+    }: ColorScaleOptions = {},
 ) {
-    let baseColor = rgbToOklch(hexToRgbArray(hex));
+    const baseColor = rgbToOklch(hexToRgbArray(hex));
     const mixColor = mix ? rgbToOklch(hexToRgbArray(mix)) : null;
     const foregroundColor = rgbToOklch(hexToRgbArray(foreground));
     const backgroundColor = rgbToOklch(hexToRgbArray(background));
@@ -194,7 +200,7 @@ export function colorScale(
         const targetL =
             foregroundColor.L * mapping[index] + backgroundColor.L * (1 - mapping[index]);
 
-        if (index == 8 && !mix && Math.abs(baseColor.L - targetL) < 0.2) {
+        if (index === 8 && !mix && Math.abs(baseColor.L - targetL) < 0.2) {
             // Original colour is close enough to target, so let's use the original colour as step 9.
             result.push(hex);
             continue;
@@ -222,16 +228,16 @@ export function colorScale(
 function hexToRgbArray(hex: string): RGBColor {
     const originalHex = hex;
 
-    hex = hex.replace('#', '');
-    if (hex.length === 3) hex = hex + hex;
+    let value = hex.replace('#', '');
+    if (hex.length === 3) value = value + value;
 
-    const r = hex.substring(0, 2);
-    const g = hex.substring(2, 4);
-    const b = hex.substring(4, 6);
+    const r = value.substring(0, 2);
+    const g = value.substring(2, 4);
+    const b = value.substring(4, 6);
 
     const rgb = [r, g, b].map((channel) => {
         try {
-            const channelInt = parseInt(channel, 16);
+            const channelInt = Number.parseInt(channel, 16);
             if (channelInt < 0 || channelInt > 255) throw new Error();
             return channelInt;
         } catch {
@@ -246,16 +252,13 @@ function hexToRgbArray(hex: string): RGBColor {
  * Convert a RGB color set to a hex color.
  */
 function rgbArrayToHex(rgb: RGBColor): string {
-    return (
-        '#' +
-        rgb
-            .map((channel) => {
-                const component = channel.toString(16);
-                if (component.length === 1) return '0' + component;
-                return component;
-            })
-            .join('')
-    );
+    return `#${rgb
+        .map((channel) => {
+            const component = channel.toString(16);
+            if (component.length === 1) return `0${component}`;
+            return component;
+        })
+        .join('')}`;
 }
 
 function getColor(percentage: number, start: RGBColor, end: RGBColor) {
@@ -270,13 +273,13 @@ function getColor(percentage: number, start: RGBColor, end: RGBColor) {
 function rgbToLinear(rgb: RGBColor): [number, number, number] {
     return rgb.map((v) => {
         const scaled = v / 255;
-        return scaled <= 0.04045 ? scaled / 12.92 : Math.pow((scaled + 0.055) / 1.055, 2.4);
+        return scaled <= 0.04045 ? scaled / 12.92 : ((scaled + 0.055) / 1.055) ** 2.4;
     }) as [number, number, number];
 }
 
 function linearToRgb(linear: [number, number, number]): RGBColor {
     return linear.map((v) => {
-        const scaled = v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - 0.055;
+        const scaled = v <= 0.0031308 ? 12.92 * v : 1.055 * v ** (1 / 2.4) - 0.055;
         return Math.round(Math.max(0, Math.min(1, scaled)) * 255);
     }) as RGBColor;
 }
@@ -375,19 +378,16 @@ function rgbTolab65(rgb: RGBColor): { L: number; A: number; B: number } {
 const PHI = 0.5 + Math.sqrt(1.25);
 
 export function dpsContrast(a: RGBColor, b: RGBColor) {
-    const dps = Math.abs(Math.pow(rgbTolab65(a).L, PHI) - Math.pow(rgbTolab65(b).L, PHI));
-    const contrast = Math.pow(dps, 1 / PHI) * Math.SQRT2 - 40;
+    const dps = Math.abs(rgbTolab65(a).L ** PHI - rgbTolab65(b).L ** PHI);
+    const contrast = dps ** (1 / PHI) * Math.SQRT2 - 40;
     return contrast < 7.5 ? 0 : contrast;
 }
 
-export function colorContrast(background: string, foreground?: string[]) {
+export function colorContrast(background: string, foreground: string[] = [LIGHT_BASE, DARK_BASE]) {
     const bg = hexToRgbArray(background);
-    if (!foreground) {
-        foreground = [LIGHT_BASE, DARK_BASE];
-    }
 
-    let best: { color?: RGBColor; contrast: number } = { color: undefined, contrast: 0 };
-    foreground.forEach((color) => {
+    const best: { color?: RGBColor; contrast: number } = { color: undefined, contrast: 0 };
+    for (const color of foreground) {
         const c = hexToRgbArray(color);
 
         const contrast = dpsContrast(c, bg);
@@ -395,7 +395,7 @@ export function colorContrast(background: string, foreground?: string[]) {
             best.color = c;
             best.contrast = contrast;
         }
-    });
+    }
 
     return best.color ? rgbArrayToHex(best.color) : foreground[0];
 }

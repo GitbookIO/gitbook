@@ -2,12 +2,12 @@ import {
     CustomizationCorners,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
-    CustomizationSettings,
+    type CustomizationSettings,
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
-    CustomizationThemedColor,
-    CustomizationTint,
-    SiteCustomizationSettings,
+    type CustomizationThemedColor,
+    type CustomizationTint,
+    type SiteCustomizationSettings,
 } from '@gitbook/api';
 import { IconsProvider, IconStyle } from '@gitbook/icons';
 import assertNever from 'assert-never';
@@ -19,6 +19,7 @@ import { getStaticFileURL } from '@/lib/assets';
 import {
     colorContrast,
     colorScale,
+    type ColorScaleOptions,
     DEFAULT_TINT_COLOR,
     hexToRgb,
     shadesOfColor,
@@ -58,8 +59,8 @@ export async function CustomizationRootLayout(props: {
                     ? ' straight-corners'
                     : '',
                 tintColor ? ' tint' : 'no-tint',
-                sidebarStyles.background && ' sidebar-' + sidebarStyles.background,
-                sidebarStyles.list && ' sidebar-list-' + sidebarStyles.list,
+                sidebarStyles.background && ` sidebar-${sidebarStyles.background}`,
+                sidebarStyles.list && ` sidebar-list-${sidebarStyles.list}`,
             )}
         >
             <head>
@@ -153,8 +154,8 @@ function getMixColor(
 
     return {
         color: {
-            light: tintColor.light == primaryColor.light ? DEFAULT_TINT_COLOR : undefined,
-            dark: tintColor.dark == primaryColor.dark ? DEFAULT_TINT_COLOR : undefined,
+            light: tintColor.light === primaryColor.light ? DEFAULT_TINT_COLOR : undefined,
+            dark: tintColor.dark === primaryColor.dark ? DEFAULT_TINT_COLOR : undefined,
         },
         ratio: {
             light: 0.4,
@@ -190,9 +191,8 @@ function generateColorVariable(
     {
         withContrast = true,
         ...options // Pass any options along to the colorScale() function
-    }: {
+    }: ColorScaleOptions & {
         withContrast?: boolean;
-        [key: string]: any;
     } = {},
 ) {
     const shades: Record<string, string> =
