@@ -153,6 +153,28 @@ function getSecurityHeaders(securities: OpenAPIOperationData['securities']): {
                 Authorization: scheme + ' ' + (security[1].bearerFormat ?? '<token>'),
             };
         }
+        case 'apiKey': {
+            if (security[1].in !== 'header') return {};
+
+            const name = security[1].name ?? 'Authorization';
+            let scheme = security[0];
+
+            switch (scheme) {
+                case 'bearerAuth':
+                    scheme = 'Bearer';
+                    break;
+                case 'token':
+                    scheme = 'Token';
+                    break;
+                case 'basic':
+                    scheme = 'Basic';
+                    break;
+            }
+
+            return {
+                [name]: scheme + ' ' + '<apiKey>',
+            };
+        }
         default: {
             return {};
         }
