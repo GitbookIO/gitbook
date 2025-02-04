@@ -801,7 +801,7 @@ export const getPublishedContentSite = cache({
     },
 });
 
-export type SectionsList = { list: (SiteSectionGroup | SiteSection)[]; section: SiteSection };
+export type SectionsList = { list: (SiteSectionGroup | SiteSection)[]; current: SiteSection };
 
 /**
  * Parse the site spaces into a list of spaces with their title and urls.
@@ -830,7 +830,7 @@ function parseSiteSectionsList(
     );
     const section = sections.find((section) => section.id === siteSectionId);
     assert(section, 'A section must be defined when there are multiple sections');
-    return { list: sectionsAndGroups, section } satisfies SectionsList;
+    return { list: sectionsAndGroups, current: section } satisfies SectionsList;
 }
 
 /**
@@ -874,7 +874,7 @@ export async function getSiteData(
             ? parseSiteSectionsList(pointer.siteSectionId, siteSectionsAndGroups)
             : null;
     const spaces =
-        siteSpaces ?? (sections ? parseSpacesFromSiteSpaces(sections.section.siteSpaces) : []);
+        siteSpaces ?? (sections ? parseSpacesFromSiteSpaces(sections.current.siteSpaces) : []);
 
     const settings = (() => {
         if (pointer.siteSpaceId) {

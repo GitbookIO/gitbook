@@ -20,7 +20,7 @@ const MAX_ITEMS = 5; // If there are more sections than this, they'll be shown b
  */
 export function SiteSectionList(props: { sections: SectionsList; className: ClassValue }) {
     const {
-        sections: { list: sectionsAndGroups, section: currentSection },
+        sections: { list: sectionsAndGroups, current: currentSection },
         className,
     } = props;
 

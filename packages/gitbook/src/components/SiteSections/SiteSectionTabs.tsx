@@ -18,7 +18,7 @@ const MIN_ITEMS_FOR_COLS = 4; /* number of items to switch to 2 columns */
  */
 export function SiteSectionTabs(props: { sections: SectionsList }) {
     const {
-        sections: { list: sectionsAndGroups, section: currentSection },
+        sections: { list: sectionsAndGroups, current: currentSection },
     } = props;
     const [value, setValue] = React.useState<string | null>();
     const [offset, setOffset] = React.useState<number | null>(null);
