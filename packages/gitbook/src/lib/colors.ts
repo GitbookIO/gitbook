@@ -6,8 +6,9 @@ type RGBColor = [number, number, number];
 type OKLABColor = { L: number; A: number; B: number };
 type OKLCHColor = { L: number; C: number; H: number };
 
-const dark = '#1d1d1d';
-const light = '#ffffff';
+export const DARK_BASE = '#1d1d1d';
+export const LIGHT_BASE = '#ffffff';
+export const DEFAULT_TINT_COLOR = '#787878';
 const D65 = [95.047, 100.0, 108.883]; // Reference white (D65)
 
 export enum ColorCategory {
@@ -138,8 +139,8 @@ export function shadesOfColor(hex: string, halfShades = false) {
         }
 
         const percentage = shadeIndex / 500;
-        const startColor = isDarkShade ? dark : baseColor;
-        const endColor = isDarkShade ? baseColor : light;
+        const startColor = isDarkShade ? DARK_BASE : baseColor;
+        const endColor = isDarkShade ? baseColor : LIGHT_BASE;
 
         result[key] = getColor(percentage, hexToRgbArray(startColor), hexToRgbArray(endColor));
     });
@@ -161,8 +162,8 @@ export function colorScale(
     hex: string,
     {
         darkMode = false,
-        background = darkMode ? dark : light,
-        foreground = darkMode ? light : dark,
+        background = darkMode ? DARK_BASE : LIGHT_BASE,
+        foreground = darkMode ? LIGHT_BASE : DARK_BASE,
         mix,
         mixRatio = 0.2,
     }: {
@@ -182,7 +183,7 @@ export function colorScale(
         // If defined, we mix in a (tiny) bit of the mix color with the base color.
         baseColor.L = mixColor.L * mixRatio + baseColor.L * (1 - mixRatio);
         baseColor.C = mixColor.C * mixRatio + baseColor.C * (1 - mixRatio);
-        baseColor.H = mixColor.H;
+        baseColor.H = mix === DEFAULT_TINT_COLOR ? baseColor.H : mixColor.H;
     }
 
     const mapping = darkMode ? colorMixMapping.dark : colorMixMapping.light;
@@ -382,7 +383,7 @@ export function dpsContrast(a: RGBColor, b: RGBColor) {
 export function colorContrast(background: string, foreground?: string[]) {
     const bg = hexToRgbArray(background);
     if (!foreground) {
-        foreground = [light, dark];
+        foreground = [LIGHT_BASE, DARK_BASE];
     }
 
     let best: { color?: RGBColor; contrast: number } = { color: undefined, contrast: 0 };

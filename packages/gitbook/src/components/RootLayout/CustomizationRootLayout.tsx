@@ -5,6 +5,7 @@ import {
     CustomizationSettings,
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
+    CustomizationThemedColor,
     CustomizationTint,
     SiteCustomizationSettings,
 } from '@gitbook/api';
@@ -15,15 +16,19 @@ import colors from 'tailwindcss/colors';
 import { fontNotoColorEmoji, fonts, ibmPlexMono } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
 import { getStaticFileURL } from '@/lib/assets';
-import { colorContrast, colorScale, hexToRgb, shadesOfColor } from '@/lib/colors';
+import {
+    colorContrast,
+    colorScale,
+    DEFAULT_TINT_COLOR,
+    hexToRgb,
+    shadesOfColor,
+} from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
 
 import { ClientContexts } from './ClientContexts';
 
 import '@gitbook/icons/style.css';
 import './globals.css';
-
-const DEFAULT_TINT_COLOR = '#787878';
 
 /**
  * Layout shared between the content and the PDF renderer.
@@ -38,6 +43,7 @@ export async function CustomizationRootLayout(props: {
     const headerTheme = generateHeaderTheme(customization);
     const language = getSpaceLanguage(customization);
     const tintColor = getTintColor(customization);
+    const mixColor = getMixColor(customization.styling.primaryColor, tintColor);
     const sidebarStyles = getSidebarStyles(customization);
 
     return (
@@ -68,7 +74,7 @@ export async function CustomizationRootLayout(props: {
                 >{`
                     :root {
                         ${generateColorVariable('primary', customization.styling.primaryColor.light)}
-                        ${generateColorVariable('tint', tintColor ? (tintColor?.light ?? customization.styling.primaryColor.light ?? DEFAULT_TINT_COLOR) : DEFAULT_TINT_COLOR, { mix: !tintColor ? customization.styling.primaryColor.light : undefined })}
+                        ${generateColorVariable('tint', tintColor ? tintColor.light : DEFAULT_TINT_COLOR, { mix: mixColor?.color.light, mixRatio: mixColor?.ratio?.light })}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR)}
 
                         --header-background: ${hexToRgb(headerTheme.backgroundColor.light)};
@@ -77,7 +83,7 @@ export async function CustomizationRootLayout(props: {
 
                     .dark {
                         ${generateColorVariable('primary', customization.styling.primaryColor.dark, { darkMode: true })}
-                        ${generateColorVariable('tint', tintColor ? (tintColor?.dark ?? customization.styling.primaryColor.dark ?? DEFAULT_TINT_COLOR) : DEFAULT_TINT_COLOR, { darkMode: true, mix: !tintColor ? customization.styling.primaryColor.dark : undefined })}
+                        ${generateColorVariable('tint', tintColor ? tintColor.dark : DEFAULT_TINT_COLOR, { darkMode: true, mix: mixColor?.color.light, mixRatio: mixColor?.ratio?.light })}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR, { darkMode: true })}
 
                         --header-background: ${hexToRgb(headerTheme.backgroundColor.dark)};
@@ -128,6 +134,33 @@ function getTintColor(
             dark: customization.styling.tint?.color.dark ?? DEFAULT_TINT_COLOR,
         };
     }
+}
+
+function getMixColor(
+    primaryColor: CustomizationThemedColor,
+    tintColor: CustomizationTint['color'] | undefined,
+):
+    | {
+          color: { light: string | undefined; dark: string | undefined };
+          ratio?: { light: number; dark: number };
+      }
+    | undefined {
+    if (!tintColor) {
+        return {
+            color: primaryColor,
+        };
+    }
+
+    return {
+        color: {
+            light: tintColor.light == primaryColor.light ? DEFAULT_TINT_COLOR : undefined,
+            dark: tintColor.dark == primaryColor.dark ? DEFAULT_TINT_COLOR : undefined,
+        },
+        ratio: {
+            light: 0.4,
+            dark: 0.4,
+        },
+    };
 }
 
 /**
