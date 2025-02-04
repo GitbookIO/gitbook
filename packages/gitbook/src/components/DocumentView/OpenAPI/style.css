@@ -15,7 +15,23 @@
 }
 
 .openapi-summary {
+    @apply flex flex-col items-start justify-start gap-2;
+}
+
+.openapi-summary-title {
     @apply font-semibold text-xl;
+}
+
+.openapi-summary-title[data-deprecated='true'] {
+    @apply line-through;
+}
+
+.openapi-deprecated {
+    @apply py-0.5 px-1.5 min-w-[1.625rem] font-normal justify-center items-center ring-1 ring-inset ring-dark/1 bg-dark/[0.06] rounded-full dark:ring-light/1 dark:bg-light/1 dark:text-light text-sm leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
+}
+
+.openapi-deprecated-sunset-date {
+    @apply font-semibold font-mono;
 }
 
 .openapi-description.openapi-markdown {
@@ -164,8 +180,16 @@
     @apply select-none flex gap-2.5 items-baseline text-sm;
 }
 
+.openapi-schema-name .openapi-deprecated {
+    @apply text-xs;
+}
+
 .openapi-schema-propertyname {
     @apply select-all font-mono font-normal text-tint-strong;
+}
+
+.openapi-schema-propertyname[data-deprecated='true'] {
+    @apply line-through opacity-9;
 }
 
 .openapi-schema-required {
@@ -378,6 +402,10 @@
     @apply flex-1 relative font-normal whitespace-nowrap overflow-x-auto font-mono text-dark dark:text-light;
     scrollbar-width: none;
     -ms-overflow-style: none;
+}
+
+.openapi-path-title[data-deprecated='true'] {
+    @apply line-through;
 }
 
 .openapi-path-title::-webkit-scrollbar {

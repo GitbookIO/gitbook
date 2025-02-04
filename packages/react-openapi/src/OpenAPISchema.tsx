@@ -231,13 +231,22 @@ export function OpenAPISchemaPresentation(props: OpenAPISchemaPropertyEntry) {
                 type={getSchemaTitle(schema)}
                 propertyName={propertyName}
                 required={required}
+                deprecated={schema.deprecated}
             />
+            {schema['x-deprecated-sunset'] ? (
+                <div className="openapi-deprecated-sunset openapi-schema-description openapi-markdown">
+                    Sunset date:{' '}
+                    <span className="openapi-deprecated-sunset-date">
+                        {schema['x-deprecated-sunset']}
+                    </span>
+                </div>
+            ) : null}
             {schema.description ? (
                 <Markdown source={schema.description} className="openapi-schema-description" />
             ) : null}
             {shouldDisplayExample(schema) ? (
                 <div className="openapi-schema-example">
-                    Example{' '}
+                    Example:{' '}
                     <code>
                         {typeof schema.example === 'string'
                             ? schema.example
@@ -247,7 +256,7 @@ export function OpenAPISchemaPresentation(props: OpenAPISchemaPropertyEntry) {
             ) : null}
             {schema.pattern ? (
                 <div className="openapi-schema-pattern">
-                    Pattern <code>{schema.pattern}</code>
+                    Pattern: <code>{schema.pattern}</code>
                 </div>
             ) : null}
             {schema.enum && schema.enum.length > 0 ? (
@@ -297,9 +306,6 @@ function getSchemaProperties(schema: OpenAPIV3.SchemaObject): null | OpenAPISche
                 const propertySchema: OpenAPIV3.SchemaObject = isReference
                     ? { propertyName }
                     : rawPropertySchema;
-                if (propertySchema.deprecated) {
-                    return;
-                }
 
                 result.push({
                     propertyName,

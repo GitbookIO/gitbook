@@ -13,9 +13,8 @@ export function OpenAPIPath(props: {
     return (
         <div className="openapi-path">
             <div className={`openapi-method openapi-method-${method}`}>{method}</div>
-            <div className="openapi-path-title">
+            <div className="openapi-path-title" data-deprecated={data.operation.deprecated}>
                 <p>{formatPath(path)}</p>
-                {/* <button className="openapi-path-copy">Copy</button> */}
             </div>
             {data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'] ? null : (
                 <ScalarApiButton method={method} path={path} specUrl={specUrl} />

@@ -43,7 +43,6 @@ export function OpenAPIResponse(props: {
                         properties={content.map(([contentType, mediaType]) => ({
                             propertyName: mediaType.schema?.title ?? '',
                             schema: noReference(mediaType.schema) ?? {},
-                            // required: mediaType.schema?.required,
                         }))}
                         context={context}
                     />
