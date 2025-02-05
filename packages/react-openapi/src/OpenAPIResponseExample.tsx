@@ -3,7 +3,7 @@ import { InteractiveSection } from './InteractiveSection';
 import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { generateSchemaExample } from './generateSchemaExample';
 import { OpenAPIContextProps } from './types';
-import { createStateKey, noReference } from './utils';
+import { checkIsReference, createStateKey, noReference } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { OpenAPIV3 } from '@scalar/openapi-types';
 
@@ -56,7 +56,7 @@ export function OpenAPIResponseExample(props: {
                 return null;
             }
 
-            const example: OpenAPIV3.ExampleObject | null = noReference(
+            const example: OpenAPIV3.ExampleObject | null = handleUnresolvedReference(
                 (() => {
                     const { examples, example } = mediaTypeObject;
                     if (examples) {
@@ -114,4 +114,15 @@ export function OpenAPIResponseExample(props: {
             tabs={examples}
         />
     );
+}
+
+function handleUnresolvedReference(input: OpenAPIV3.ExampleObject | null): OpenAPIV3.ExampleObject {
+    const isReference = checkIsReference(input?.value);
+
+    if (isReference || input === null) {
+        // If we find a reference that wasn't resolved or needed to be resolved externally, render an empty object
+        return { value: {} };
+    }
+
+    return input;
 }

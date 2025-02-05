@@ -59,7 +59,7 @@ export function OpenAPIResponse(props: {
                             label: contentType,
                             body: (
                                 <OpenAPIRootSchema
-                                    schema={handleReferences(mediaType.schema) ?? {}}
+                                    schema={handleUnresolvedReference(mediaType.schema) ?? {}}
                                     context={context}
                                 />
                             ),
@@ -71,7 +71,7 @@ export function OpenAPIResponse(props: {
     );
 }
 
-function handleReferences(
+function handleUnresolvedReference(
     input: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject | undefined,
 ): OpenAPIV3.SchemaObject {
     const isReference = checkIsReference(input);
