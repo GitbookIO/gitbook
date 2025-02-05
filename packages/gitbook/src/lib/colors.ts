@@ -160,10 +160,10 @@ export type ColorScaleOptions = {
 
     mix?: {
         /** If set to a hex code, this color will be additionally mixed into the generated scale according to `mix.ratio`. */
-        color?: string;
+        color: string;
 
         /** Define a custom mix ratio to mix the `mix` color with. If left undefined, the default ratio will be used. */
-        ratio?: number;
+        ratio: number;
     };
 };
 
@@ -178,17 +178,15 @@ export function colorScale(
         darkMode = false,
         background = darkMode ? DARK_BASE : LIGHT_BASE,
         foreground = darkMode ? LIGHT_BASE : DARK_BASE,
-        mix = {
-            ratio: 0.2,
-        },
+        mix,
     }: ColorScaleOptions = {},
 ) {
     const baseColor = rgbToOklch(hexToRgbArray(hex));
-    const mixColor = mix.color ? rgbToOklch(hexToRgbArray(mix.color)) : null;
+    const mixColor = mix?.color ? rgbToOklch(hexToRgbArray(mix.color)) : null;
     const foregroundColor = rgbToOklch(hexToRgbArray(foreground));
     const backgroundColor = rgbToOklch(hexToRgbArray(background));
 
-    if (mixColor && mix.ratio) {
+    if (mixColor && mix?.ratio) {
         // If defined, we mix in a (tiny) bit of the mix color with the base color.
         baseColor.L = mixColor.L * mix.ratio + baseColor.L * (1 - mix.ratio);
         baseColor.C = mixColor.C * mix.ratio + baseColor.C * (1 - mix.ratio);
