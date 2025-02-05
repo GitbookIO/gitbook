@@ -69,8 +69,8 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
                         const isActive = isActiveGroup || id === currentSection.id;
                         return (
                             <NavigationMenu.Item key={id} value={id}>
-                                {isGroup ? (
-                                    <>
+                                {isGroup ? 
+                                    sectionOrGroup.sections.length > 0 ? (<>
                                         <NavigationMenu.Trigger
                                             ref={(node) =>
                                                 onNodeUpdate(
@@ -93,8 +93,8 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
                                                 currentSection={currentSection}
                                             />
                                         </NavigationMenu.Content>
-                                    </>
-                                ) : (
+                                    </>) : null
+                                 : (
                                     <NavigationMenu.Link asChild>
                                         <SectionTab
                                             url={sectionOrGroup.urls.published ?? ''}
