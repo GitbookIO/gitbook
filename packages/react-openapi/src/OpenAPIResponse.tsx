@@ -7,18 +7,6 @@ import { OpenAPIClientContext } from './types';
 import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
 
-const handleReferences = (
-    input: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject | undefined,
-): OpenAPIV3.SchemaObject => {
-    const isReference = checkIsReference(input);
-
-    if (isReference || input === undefined) {
-        return {};
-    }
-
-    return input;
-};
-
 /**
  * Display an interactive response body.
  */
@@ -81,4 +69,17 @@ export function OpenAPIResponse(props: {
             ) : null}
         </>
     );
+}
+
+function handleReferences(
+    input: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject | undefined,
+): OpenAPIV3.SchemaObject {
+    const isReference = checkIsReference(input);
+
+    if (isReference || input === undefined) {
+        // If we find a reference that wasn't resolved or needed to be resolved externally, do not try to render it
+        return {};
+    }
+
+    return input;
 }
