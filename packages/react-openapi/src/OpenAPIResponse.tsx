@@ -59,7 +59,7 @@ export function OpenAPIResponse(props: {
                             label: contentType,
                             body: (
                                 <OpenAPIRootSchema
-                                    schema={handleUnresolvedReference(mediaType.schema) ?? {}}
+                                    schema={handleUnresolvedReference(mediaType.schema)}
                                     context={context}
                                 />
                             ),
