@@ -9,6 +9,7 @@ export interface DocumentSection {
     tag?: string;
     title: string;
     depth: number;
+    deprecated?: boolean;
 }
 
 /**
@@ -23,6 +24,7 @@ export async function getDocumentSections(
 
     for (const block of document.nodes) {
         if ((block.type === 'heading-1' || block.type === 'heading-2') && block.meta?.id) {
+            console.log(block);
             if (block.type === 'heading-1') {
                 depth = 1;
             }
@@ -44,6 +46,7 @@ export async function getDocumentSections(
                     tag: operation.method.toUpperCase(),
                     title: operation.operation.summary ?? operation.path,
                     depth: 1,
+                    deprecated: operation.operation.deprecated,
                 });
             }
         }
