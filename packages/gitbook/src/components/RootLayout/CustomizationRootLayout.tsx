@@ -164,8 +164,8 @@ function getTintMixColor(
             dark: DEFAULT_TINT_COLOR,
         },
         ratio: {
-            light: tintColor.light === primaryColor.light ? 0.4 : 0,
-            dark: tintColor.dark === primaryColor.dark ? 0.4 : 0,
+            light: tintColor.light.toUpperCase() === primaryColor.light.toUpperCase() ? 0.4 : 0,
+            dark: tintColor.dark.toUpperCase() === primaryColor.dark.toUpperCase() ? 0.4 : 0,
         },
     };
 }
