@@ -22,7 +22,7 @@ export default async function NotFound() {
                 'items-center',
                 'justify-center',
                 'py-9',
-                'min-h-[calc(100vh-64px)] sm:min-h-fit',
+                'min-h-[calc(100vh-64px)] lg:min-h-fit',
             )}
         >
             <div className={tcls('max-w-80')}>
