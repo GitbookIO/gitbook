@@ -149,7 +149,7 @@ export async function PageAside(props: {
                     </div>
                     <div
                         className={tcls(
-                            'overflow-auto',
+                            'overflow-y-auto',
                             'overflow-x-visible',
 
                             'flex',
