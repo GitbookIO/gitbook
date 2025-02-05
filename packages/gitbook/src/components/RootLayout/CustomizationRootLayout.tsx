@@ -143,7 +143,7 @@ function getTintMixColor(
     tintColor: CustomizationTint['color'] | undefined,
 ): {
     color: { light: string | undefined; dark: string | undefined };
-    ratio?: { light: number; dark: number };
+    ratio?: { light?: number; dark?: number };
 } {
     if (!tintColor) {
         return {
@@ -157,8 +157,8 @@ function getTintMixColor(
             dark: tintColor.dark === primaryColor.dark ? DEFAULT_TINT_COLOR : undefined,
         },
         ratio: {
-            light: tintColor.light === primaryColor.light ? 0.4 : 0.2,
-            dark: tintColor.dark === primaryColor.dark ? 0.4 : 0.2,
+            light: tintColor.light === primaryColor.light ? 0.4 : undefined, // Undefined to use mix's default ratio
+            dark: tintColor.dark === primaryColor.dark ? 0.4 : undefined, // Undefined to use mix's default ratio
         },
     };
 }

@@ -159,7 +159,7 @@ export type ColorScaleOptions = {
     foreground?: string;
 
     mix?: {
-        /** If set to a hex code, this color will be additionally mixed into the generated scale according to `options.mixRatio`. */
+        /** If set to a hex code, this color will be additionally mixed into the generated scale according to `mix.ratio`. */
         color?: string;
 
         /** Define a custom mix ratio to mix the `mix` color with. If left undefined, the default ratio will be used. */
@@ -179,7 +179,6 @@ export function colorScale(
         background = darkMode ? DARK_BASE : LIGHT_BASE,
         foreground = darkMode ? LIGHT_BASE : DARK_BASE,
         mix = {
-            color: undefined,
             ratio: 0.2,
         },
     }: ColorScaleOptions = {},
