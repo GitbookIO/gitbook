@@ -60,7 +60,7 @@
 }
 
 .openapi-markdown pre code {
-    @apply dark:!bg-transparent dark:!ring-transparent;
+    @apply bg-transparent ring-transparent;
 }
 
 /* Markdown Base */
@@ -149,7 +149,7 @@
 }
 
 .openapi-section-body .openapi-schema-properties {
-    @apply divide-y divide-tint-2;
+    @apply divide-y divide-tint-subtle;
 }
 
 .openapi-schema-properties .openapi-schema:last-child {
@@ -264,13 +264,13 @@
 /* Schema Examples */
 .openapi-schema-example,
 .openapi-schema-pattern {
-    @apply prose-sm text-tint-strong;
+    @apply prose-sm text-tint;
 }
 
 .openapi-schema-example code,
 .openapi-schema-pattern code,
 .openapi-schema-enum-value code {
-    @apply py-px px-1 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded   text-sm leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
+    @apply py-px px-1 min-w-[1.625rem] text-tint-strong font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded text-xs leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
 }
 
 /* Authentication */
@@ -327,10 +327,7 @@
 }
 
 .openapi-response-description.openapi-markdown {
-    @apply prose-sm text-[13px] leading-none relative text-tint !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
-    @apply overflow-x-auto whitespace-pre;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    @apply prose-sm text-[13px] h-fit relative text-tint !font-normal truncate select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 .openapi-response-description.openapi-markdown::-webkit-scrollbar {
@@ -338,7 +335,7 @@
 }
 
 .openapi-response-description p {
-    @apply truncate max-w-full pr-1;
+    @apply truncate max-w-full inline pr-1;
 }
 
 .openapi-response-statuscode {
@@ -488,11 +485,11 @@
 }
 
 .openapi-tabs-tab {
-    @apply hover:bg-tint-3 font-mono font-normal tabular-nums hover:text-primary cursor-pointer transition-all relative text-[13px] text-tint px-1 border border-transparent rounded;
+    @apply hover:bg-primary-hover font-mono font-normal tabular-nums hover:text-primary cursor-pointer transition-all relative text-[13px] text-tint px-1 border border-transparent rounded;
 }
 
 .openapi-tabs-tab[aria-selected='true'] {
-    @apply text-primary after:absolute after:-bottom-2 after:left-0 after:w-full after:h-px after:bg-primary after:transition-all;
+    @apply text-primary after:absolute after:-bottom-2 after:left-0 after:w-full after:h-px after:bg-primary-solid after:transition-all;
 }
 
 .openapi-tabs-panel {
@@ -500,7 +497,7 @@
 }
 
 .openapi-tabs-footer {
-    @apply px-3 py-2.5 border-t border-tint-subtle text-[13px] text-tint;
+    @apply px-3 py-2 pt-2.5 border-t border-tint-subtle text-[13px] text-tint;
 }
 
 /* Disclosure group */
@@ -522,11 +519,11 @@
 }
 
 .openapi-disclosure-group-icon > svg {
-    @apply size-3 text-tint-subtle transition-transform;
+    @apply size-3 text-tint-subtle transition-all duration-300;
 }
 
 .openapi-disclosure-group-trigger:hover > .openapi-disclosure-group-icon svg {
-    @apply text-tint-strong transition-colors duration-300;
+    @apply text-tint-strong;
 }
 
 .openapi-disclosure-group-panel {
@@ -543,7 +540,7 @@
 }
 
 .openapi-disclosure svg {
-    @apply size-3;
+    @apply size-3 transition-transform duration-300;
 }
 
 .openapi-disclosure-trigger[aria-expanded='true'] svg {
