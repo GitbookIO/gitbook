@@ -56,56 +56,29 @@ export function ToggleableLinkItem(
                 insights={insights}
                 {...(isActive ? { 'aria-current': 'page' } : {})}
                 className={tcls(
-                    'group/toclink',
-                    'relative',
-                    'transition-colors',
-
-                    'flex',
-                    'flex-row',
-                    'justify-between',
-
-                    'p-1.5',
-                    'pl-3',
-                    'rounded-md',
-                    'straight-corners:rounded-none',
-
-                    'text-sm',
-                    'font-normal',
-                    'text-balance',
-                    'text-tint-strong/7',
-                    'hover:text-tint-strong',
-                    'hover:bg-tint-hover',
-                    'contrast-more:text-tint-strong',
-
-                    'hover:contrast-more:text-tint-strong',
-                    'hover:contrast-more:ring-1',
-                    'hover:contrast-more:ring-tint-12',
-
-                    'before:contents[]',
-                    'before:absolute',
-                    'before:inset-y-0',
-                    'before:-left-px',
-
-                    '[&+div_a]:pl-5',
-                    'sidebar-list-line:before:w-px',
-                    'sidebar-list-default:[&+div_a]:before:w-px',
-                    'sidebar-list-default:[&+div_a]:rounded-l-none',
-                    'sidebar-list-line:rounded-l-none',
+                    'group/toclink relative transition-colors',
+                    'flex flex-row justify-between',
+                    'p-1.5 pl-3 rounded-md straight-corners:rounded-none',
+                    'text-sm font-normal text-balance text-tint-strong/7 hover:text-tint-strong hover:bg-tint-hover contrast-more:text-tint-strong',
+                    'hover:contrast-more:text-tint-strong hover:contrast-more:ring-1 hover:contrast-more:ring-tint-12',
+                    'before:contents[] before:absolute before:inset-y-0 before:-left-px',
+                    '[&+div_a]:pl-5 sidebar-list-line:before:w-px sidebar-list-default:[&+div_a]:before:w-px sidebar-list-default:[&+div_a]:rounded-l-none sidebar-list-line:rounded-l-none',
 
                     isActive && [
                         'font-semibold',
                         'sidebar-list-line:before:w-0.5',
 
                         'before:bg-primary-solid',
-                        'text-primary',
+                        'text-primary-subtle',
+                        'contrast-more:text-primary',
                         'sidebar-list-pill:bg-primary',
-                        'sidebar-list-pill:text-primary',
 
                         'hover:bg-primary-hover',
-                        'hover:text-primary-strong',
+                        'hover:text-primary',
                         'hover:before:bg-primary-solid-hover',
+                        'sidebar-list-pill:hover:bg-primary-hover',
 
-                        'contrast-more:text-primary-strong',
+                        'contrast-more:text-primary',
                         'contrast-more:hover:text-primary-strong',
                         'contrast-more:bg-primary',
                         'contrast-more:ring-1',
