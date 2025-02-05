@@ -5,7 +5,7 @@ import React, { useId } from 'react';
 import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
 import { OpenAPIClientContext } from './types';
-import { noReference } from './utils';
+import { checkIsReference, noReference } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 
 type CircularRefsIds = Map<OpenAPIV3.SchemaObject, string>;
@@ -278,31 +278,19 @@ function getSchemaProperties(schema: OpenAPIV3.SchemaObject): null | OpenAPISche
 
         if (schema.properties) {
             Object.entries(schema.properties).forEach(([propertyName, rawPropertySchema]) => {
-                try {
-                    const propertySchema = noReference(rawPropertySchema);
-                    if (propertySchema.deprecated) {
-                        return;
-                    }
-
-                    result.push({
-                        propertyName,
-                        required: Array.isArray(schema.required)
-                            ? schema.required.includes(propertyName)
-                            : undefined,
-                        schema: propertySchema,
-                    });
-                } catch (e) {
-                    // handle any errors that might come from noReference and display as "any" type
-                    result.push({
-                        propertyName,
-                        required: Array.isArray(schema.required)
-                            ? schema.required.includes(propertyName)
-                            : undefined,
-                        schema: { propertyName },
-                    });
-
+                const isReference = checkIsReference(rawPropertySchema);
+                const propertySchema = isReference ? { propertyName } : rawPropertySchema;
+                if (propertySchema.deprecated) {
                     return;
                 }
+
+                result.push({
+                    propertyName,
+                    required: Array.isArray(schema.required)
+                        ? schema.required.includes(propertyName)
+                        : undefined,
+                    schema: propertySchema,
+                });
             });
         }
 

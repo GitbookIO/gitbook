@@ -8,7 +8,7 @@ export function noReference<T>(input: T | OpenAPIV3.ReferenceObject): T {
     return input;
 }
 
-function checkIsReference(input: unknown): input is OpenAPIV3.ReferenceObject {
+export function checkIsReference(input: unknown): input is OpenAPIV3.ReferenceObject {
     return typeof input === 'object' && !!input && '$ref' in input;
 }
 
