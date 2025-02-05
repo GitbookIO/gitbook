@@ -27,7 +27,7 @@
 }
 
 .openapi-deprecated {
-    @apply py-0.5 px-1.5 min-w-[1.625rem] font-normal justify-center items-center ring-1 ring-inset ring-dark/1 bg-dark/[0.06] rounded-full dark:ring-light/1 dark:bg-light/1 dark:text-light text-sm leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
+    /* @apply py-0.5 px-1.5 min-w-[1.625rem] font-normal justify-center items-center ring-1 ring-inset ring-dark/1 bg-dark/[0.06] rounded-full dark:ring-light/1 dark:bg-light/1 dark:text-light text-sm leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none; */
 }
 
 .openapi-deprecated-sunset-date {
@@ -56,13 +56,12 @@
 }
 
 .openapi-markdown code {
-    @apply py-px px-1 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-dark/1 bg-dark/[0.06] rounded dark:ring-light/1 dark:bg-light/1 dark:text-light text-sm leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
+    @apply py-px px-1 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded   text-sm leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
 }
 
 .openapi-markdown pre code {
     @apply dark:!bg-transparent dark:!ring-transparent;
 }
-
 
 /* Markdown Base */
 .openapi-markdown {
@@ -150,7 +149,7 @@
 }
 
 .openapi-section-body .openapi-schema-properties {
-    @apply divide-y divide-dark/2 dark:divide-light/2;
+    @apply divide-y divide-tint-2;
 }
 
 .openapi-schema-properties .openapi-schema:last-child {
@@ -227,7 +226,7 @@
 
 /* Schema Enum */
 .openapi-schema-enum {
-    @apply flex flex-row text-sm leading-relaxed flex-wrap text-dark/7 dark:text-light/7;
+    @apply flex flex-row text-sm leading-relaxed flex-wrap text-tint;
 }
 
 .openapi-schema-enum-value {
@@ -244,7 +243,7 @@
 
 /* Schema Description */
 .openapi-schema-description.openapi-markdown {
-    @apply prose-sm text-dark/7 dark:text-light/7 overflow-hidden !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply prose-sm text-tint overflow-hidden !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 .openapi-schema-description.openapi-markdown pre:has(code) {
@@ -271,7 +270,7 @@
 .openapi-schema-example code,
 .openapi-schema-pattern code,
 .openapi-schema-enum-value code {
-    @apply py-px px-1 min-w-[1.625rem] w-fit justify-center items-center ring-1 ring-inset ring-dark/1 bg-dark/[0.06] rounded dark:ring-light/1 dark:bg-light/1 text-dark dark:text-light leading-[calc(max(1.20em,1.25rem))] before:!content-none text-xs after:!content-none;
+    @apply py-px px-1 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded   text-sm leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
 }
 
 /* Authentication */
@@ -280,7 +279,7 @@
 }
 
 /* .openapi-securities-header:has(.openapi-section-toggle[aria-expanded='true']) {
-    @apply border-dark/2 dark:border-light/2;
+    @apply border-tint-subtle;
 } */
 
 .openapi-securities-body {
@@ -288,7 +287,7 @@
 }
 
 .openapi-securities-description.openapi-markdown {
-    @apply prose-sm text-dark/7 dark:text-light/7 !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply prose-sm text-tint !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 .openapi-securities-label {
@@ -305,19 +304,19 @@
 
 /* Request Body */
 .openapi-requestbody-header {
-    @apply py-2 border-b border-dark/2 dark:border-light/2 max-w-full flex-1;
+    @apply py-2 border-b border-tint-subtle max-w-full flex-1;
 }
 
 .openapi-requestbody-header-content {
 }
 
 .openapi-requestbody-description.openapi-markdown {
-    @apply prose-sm text-dark/7 dark:text-light/7 !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply prose-sm text-tint !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 /* Responses */
 .openapi-responses-header {
-    @apply py-2 border-b border-dark/2 dark:border-light/2 max-w-full flex-1;
+    @apply py-2 border-b border-tint-subtle max-w-full flex-1;
 }
 
 .openapi-responses-header-content {
@@ -328,7 +327,7 @@
 }
 
 .openapi-response-description.openapi-markdown {
-    @apply prose-sm text-[13px] leading-none relative text-dark/7 dark:text-light/7 !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply prose-sm text-[13px] leading-none relative text-tint !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
     @apply overflow-x-auto whitespace-pre;
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -347,7 +346,7 @@
 }
 
 .openapi-response-content-type {
-    @apply text-xs text-dark/8 dark:text-light/8 ml-auto shrink-0;
+    @apply text-xs text-tint-8 ml-auto shrink-0;
 }
 
 .openapi-response-body {
@@ -391,7 +390,7 @@
 
 /* Path */
 .openapi-path {
-    @apply flex items-center bg-light text-sm gap-2 p-2 border rounded-md border-dark/2 dark:border-light/2 dark:bg-dark;
+    @apply flex items-center bg-tint-base text-sm gap-2 p-2 border rounded-md border-tint-subtle;
 }
 
 .openapi-path .openapi-method {
@@ -399,7 +398,7 @@
 }
 
 .openapi-path-title {
-    @apply flex-1 relative font-normal whitespace-nowrap overflow-x-auto font-mono text-dark dark:text-light;
+    @apply flex-1 relative font-normal whitespace-nowrap overflow-x-auto font-mono text-tint-strong;
     scrollbar-width: none;
     -ms-overflow-style: none;
 }
@@ -413,7 +412,7 @@
 }
 
 /* .openapi-path-copy {
-    @apply absolute opacity-0 h-fit right-0 top-1/2 -translate-y-1/2 bg-light dark:bg-dark border rounded-md border-dark/2 dark:border-light/2 px-1.5 py-0;
+    @apply absolute opacity-0 h-fit right-0 top-1/2 -translate-y-1/2 bg-light dark:bg-dark border rounded-md border-tint-subtle px-1.5 py-0;
 }
 
 .openapi-path-title:hover .openapi-path-copy {
@@ -425,11 +424,11 @@
 }
 
 .openapi-path-separator {
-    @apply text-dark/7 dark:text-light/7;
+    @apply text-tint;
 }
 
 .openapi-path-overlay {
-    @apply flex flex-row items-center py-2 px-3 justify-end border-t border-dark/2 dark:border-light/2;
+    @apply flex flex-row items-center py-2 px-3 justify-end border-t border-tint-subtle;
 }
 
 /* Response Example */
@@ -439,7 +438,7 @@
 
 /* Common Elements */
 .openapi-select {
-    @apply max-w-60 rounded font-mono text-xs leading-6 px-1 py-0.5 border border-tint bg-tint;
+    @apply max-w-60 rounded font-mono text-xs leading-6 px-1 py-0.5 border border-tint-subtle bg-tint;
 }
 
 /* Section Components */
@@ -448,7 +447,7 @@
 }
 
 .openapi-section-header-content {
-    @apply flex-1 text-base gap-1.5 flex w-full font-medium text-dark dark:text-light;
+    @apply flex-1 text-base gap-1.5 flex w-full font-medium text-tint-strong;
 }
 
 .openapi-section-header-controls {
@@ -460,7 +459,7 @@
 }
 
 .openapi-section-header-content:hover .openapi-section-toggle {
-    @apply text-dark dark:text-light;
+    @apply text-tint;
 }
 
 .openapi-section-toggle {
@@ -483,15 +482,13 @@
     @apply size-3;
 }
 
-
-.openapi-operation .openapi-tabs-list {
 /* Tabs */
 .openapi-tabs-list {
-    @apply flex flex-row gap-3 py-1.5 px-2.5 border-b border-dark/2 dark:border-light/2 w-full;
+    @apply flex flex-row gap-3 py-1.5 px-2.5 border-b border-tint-subtle w-full;
 }
 
 .openapi-tabs-tab {
-    @apply hover:bg-light-3 font-mono font-normal tabular-nums dark:hover:bg-dark-3 hover:text-primary cursor-pointer transition-all relative text-[13px] text-dark/7 px-1 dark:text-light/7 border border-transparent rounded;
+    @apply hover:bg-tint-3 font-mono font-normal tabular-nums hover:text-primary cursor-pointer transition-all relative text-[13px] text-tint px-1 border border-transparent rounded;
 }
 
 .openapi-tabs-tab[aria-selected='true'] {
@@ -503,17 +500,16 @@
 }
 
 .openapi-tabs-footer {
-    @apply px-3 py-2.5 border-t border-dark/2 dark:border-light/2 text-[13px] text-dark/7 dark:text-light/7;
+    @apply px-3 py-2.5 border-t border-tint-subtle text-[13px] text-tint;
 }
 
 /* Disclosure group */
 .openapi-disclosure-group {
-    @apply border-b border-dark/2 relative dark:border-light/2;
+    @apply border-b border-tint-subtle relative;
 }
 
 .openapi-disclosure-group-trigger {
     @apply flex items-center relative w-full flex-1 gap-2.5 py-2 -outline-offset-1;
-    /* @apply after:w-4 after:bg-gradient-to-l after:from-light to-transparent after:absolute after:right-0 after:top-0 after:h-full; */
 }
 
 .openapi-disclosure-group-trigger:disabled {
@@ -526,11 +522,11 @@
 }
 
 .openapi-disclosure-group-icon > svg {
-    @apply size-3 text-dark/6 dark:text-light/6 transition-transform;
+    @apply size-3 text-tint-subtle transition-transform;
 }
 
 .openapi-disclosure-group-trigger:hover > .openapi-disclosure-group-icon svg {
-    @apply text-dark dark:text-light transition-transform;
+    @apply text-tint-strong transition-colors duration-300;
 }
 
 .openapi-disclosure-group-panel {
@@ -543,11 +539,11 @@
 
 /* Disclosure */
 .openapi-disclosure-trigger {
-    @apply transition-all duration-300 hover:text-dark dark:hover:text-light rounded-2xl border border-dark/2 dark:border-light/2 px-2.5 py-1 text-[13px] dark:text-light/7 text-dark/7 flex flex-row items-center gap-1.5 -outline-offset-1;
+    @apply transition-all duration-300 hover:text-tint-strong rounded-2xl border border-tint-subtle px-2.5 py-1 text-[13px] text-tint flex flex-row items-center gap-1.5 -outline-offset-1;
 }
 
 .openapi-disclosure svg {
-    @apply size-3 transition-all duration-300;
+    @apply size-3;
 }
 
 .openapi-disclosure-trigger[aria-expanded='true'] svg {
@@ -563,7 +559,7 @@
 }
 
 .openapi-disclosure-panel[aria-hidden='false'] {
-    @apply border-b border-x border-dark/2 rounded-b-lg dark:border-light/2;
+    @apply border-b border-x border-tint-subtle rounded-b-lg;
 }
 
 .openapi-disclosure-panel .openapi-schema-body {
