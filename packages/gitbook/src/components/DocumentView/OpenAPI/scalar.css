@@ -272,7 +272,7 @@
     gap: 6px;
 }
 .scalar-activate-button {
-    @apply flex gap-1.5 font-semibold items-center;
+    @apply flex gap-1.5 items-center;
     @apply bg-primary-solid text-contrast-primary-solid hover:bg-primary-solid-hover hover:text-contrast-primary-solid-hover contrast-more:ring-1 rounded-md straight-corners:rounded-none place-self-start;
     @apply ring-1 ring-tint hover:ring-tint-hover;
     @apply shadow-sm shadow-tint dark:shadow-tint-1 hover:shadow-md active:shadow-none;
