@@ -78,6 +78,12 @@ export async function SpaceLayout(props: {
     const visitorAuthToken = await getCurrentVisitorToken();
     const enabled = await shouldTrackEvents();
 
+    const withFooter =
+        customization.themes.toggeable ||
+        customization.footer.copyright ||
+        customization.footer.logo ||
+        customization.footer.groups?.length;
+
     return (
         <InsightsProvider
             enabled={enabled}
@@ -102,7 +108,7 @@ export async function SpaceLayout(props: {
                     CONTAINER_STYLE,
 
                     // Ensure the footer is display below the viewport even if the content is not enough
-                    `min-h-[calc(100vh-64px)]`,
+                    withFooter && 'min-h-[calc(100vh-64px)]',
                     withTopHeader ? null : 'lg:min-h-screen',
                 )}
             >
@@ -172,10 +178,7 @@ export async function SpaceLayout(props: {
                 <div className={tcls('flex-1', 'flex', 'flex-col')}>{children}</div>
             </div>
 
-            {customization.themes.toggeable ||
-            customization.footer.copyright ||
-            customization.footer.logo ||
-            customization.footer.groups?.length ? (
+            {withFooter ? (
                 <Footer space={space} context={contentRefContext} customization={customization} />
             ) : null}
 

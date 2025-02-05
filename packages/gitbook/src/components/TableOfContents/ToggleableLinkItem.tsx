@@ -5,27 +5,11 @@ import { motion, stagger, useAnimate } from 'framer-motion';
 import { useSelectedLayoutSegment } from 'next/navigation';
 import React from 'react';
 
-import { ClassValue, tcls } from '@/lib/tailwind';
+import { tcls } from '@/lib/tailwind';
 
 import { useScrollToActiveTOCItem } from './TOCScroller';
-import { useIsMounted } from '../hooks';
+import { useToggleAnimation } from '../hooks';
 import { Link, LinkInsightsProps } from '../primitives';
-
-const show = {
-    opacity: 1,
-    height: 'auto',
-    display: 'block',
-};
-
-const hide = {
-    opacity: 0,
-    height: 0,
-    transitionEnd: {
-        display: 'none',
-    },
-};
-
-const staggerMenuItems = stagger(0.02, { ease: (p) => Math.pow(p, 2) });
 
 /**
  * Client component for a page document to toggle its children and be marked as active.
@@ -48,9 +32,7 @@ export function ToggleableLinkItem(
     const hasActiveDescendant =
         hasDescendants && (isActive || activeSegment.startsWith(pathname + '/'));
 
-    const [scope, animate] = useAnimate();
     const [isVisible, setIsVisible] = React.useState(hasActiveDescendant);
-    const isMounted = useIsMounted();
 
     // Update the visibility of the children, if we are navigating to a descendant.
     React.useEffect(() => {
@@ -61,34 +43,7 @@ export function ToggleableLinkItem(
         setIsVisible((prev) => prev || hasActiveDescendant);
     }, [hasActiveDescendant, hasDescendants]);
 
-    // Animate the visibility of the children
-    // only after the initial state.
-    React.useEffect(() => {
-        if (!isMounted || !hasDescendants) {
-            return;
-        }
-        try {
-            animate(scope.current, isVisible ? show : hide, {
-                duration: 0.1,
-            });
-
-            const selector = '& > ul > li';
-            if (isVisible)
-                animate(
-                    selector,
-                    { opacity: 1 },
-                    {
-                        delay: staggerMenuItems,
-                    },
-                );
-            else {
-                animate(selector, { opacity: 0 });
-            }
-        } catch (error) {
-            // The selector can crash in some browsers, we ignore it as the animation is not critical.
-            console.error(error);
-        }
-    }, [isVisible, isMounted, hasDescendants, animate, scope]);
+    const { show, hide, scope } = useToggleAnimation({ hasDescendants, isVisible });
 
     const linkRef = React.createRef<HTMLAnchorElement>();
     useScrollToActiveTOCItem({ linkRef, isActive });
@@ -101,56 +56,29 @@ export function ToggleableLinkItem(
                 insights={insights}
                 {...(isActive ? { 'aria-current': 'page' } : {})}
                 className={tcls(
-                    'group/toclink',
-                    'relative',
-                    'transition-colors',
-
-                    'flex',
-                    'flex-row',
-                    'justify-between',
-
-                    'p-1.5',
-                    'pl-3',
-                    'rounded-md',
-                    'straight-corners:rounded-none',
-
-                    'text-sm',
-                    'font-normal',
-                    'text-balance',
-                    'text-tint-strong/7',
-                    'hover:text-tint-strong',
-                    'hover:bg-tint-hover',
-                    'contrast-more:text-tint-strong',
-
-                    'hover:contrast-more:text-tint-strong',
-                    'hover:contrast-more:ring-1',
-                    'hover:contrast-more:ring-tint-12',
-
-                    'before:contents[]',
-                    'before:absolute',
-                    'before:inset-y-0',
-                    'before:-left-px',
-
-                    '[&+div_a]:pl-5',
-                    'sidebar-list-line:before:w-px',
-                    'sidebar-list-default:[&+div_a]:before:w-px',
-                    'sidebar-list-default:[&+div_a]:rounded-l-none',
-                    'sidebar-list-line:rounded-l-none',
+                    'group/toclink relative transition-colors',
+                    'flex flex-row justify-between',
+                    'p-1.5 pl-3 rounded-md straight-corners:rounded-none',
+                    'text-sm font-normal text-balance text-tint-strong/7 hover:text-tint-strong hover:bg-tint-hover contrast-more:text-tint-strong',
+                    'hover:contrast-more:text-tint-strong hover:contrast-more:ring-1 hover:contrast-more:ring-tint-12',
+                    'before:contents[] before:absolute before:inset-y-0 before:-left-px',
+                    '[&+div_a]:pl-5 sidebar-list-line:before:w-px sidebar-list-default:[&+div_a]:before:w-px sidebar-list-default:[&+div_a]:rounded-l-none sidebar-list-line:rounded-l-none',
 
                     isActive && [
                         'font-semibold',
                         'sidebar-list-line:before:w-0.5',
 
                         'before:bg-primary-solid',
-                        'text-primary',
+                        'text-primary-subtle',
+                        'contrast-more:text-primary',
                         'sidebar-list-pill:bg-primary',
-                        'sidebar-list-pill:text-primary',
 
                         'hover:bg-primary-hover',
-                        'hover:text-primary-strong',
+                        'hover:text-primary',
                         'hover:before:bg-primary-solid-hover',
+                        'sidebar-list-pill:hover:bg-primary-hover',
 
-                        'contrast-more:text-primary-strong',
+                        'contrast-more:text-primary',
                         'contrast-more:hover:text-primary-strong',
                         'contrast-more:bg-primary',
                         'contrast-more:ring-1',

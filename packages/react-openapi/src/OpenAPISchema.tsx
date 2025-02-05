@@ -5,7 +5,7 @@ import React, { useId } from 'react';
 import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
 import { OpenAPIClientContext } from './types';
-import { noReference } from './utils';
+import { checkIsReference, noReference } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 
 type CircularRefsIds = Map<OpenAPIV3.SchemaObject, string>;
@@ -53,7 +53,9 @@ export function OpenAPISchemaProperty(
             typeof schema.example === 'number' ||
             typeof schema.example === 'boolean' ||
             (Array.isArray(schema.example) && schema.example.length > 0) ||
-            (typeof schema.example === 'object' && Object.keys(schema.example).length > 0)
+            (typeof schema.example === 'object' &&
+                schema.example !== null &&
+                Object.keys(schema.example).length > 0)
         );
     };
     return (
@@ -276,7 +278,10 @@ function getSchemaProperties(schema: OpenAPIV3.SchemaObject): null | OpenAPISche
 
         if (schema.properties) {
             Object.entries(schema.properties).forEach(([propertyName, rawPropertySchema]) => {
-                const propertySchema = noReference(rawPropertySchema);
+                const isReference = checkIsReference(rawPropertySchema);
+                const propertySchema: OpenAPIV3.SchemaObject = isReference
+                    ? { propertyName }
+                    : rawPropertySchema;
                 if (propertySchema.deprecated) {
                     return;
                 }

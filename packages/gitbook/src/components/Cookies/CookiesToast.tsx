@@ -66,7 +66,13 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                     'cookies_prompt',
                     <a
                         href={privacyPolicy}
-                        className={tcls('text-primary', 'hover:text-primary-strong', 'underline')}
+                        className={tcls(
+                            'text-primary-subtle',
+                            'hover:text-primary',
+                            'contrast-more:text-primary',
+                            'contrast-more:hover:text-primary-strong',
+                            'underline',
+                        )}
                     >
                         {t(language, 'cookies_prompt_privacy')}
                     </a>,
