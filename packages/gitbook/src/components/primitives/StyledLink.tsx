@@ -15,8 +15,10 @@ export function StyledLink(props: Omit<LinkProps, 'style'> & { style?: ClassValu
                 'underline',
                 'underline-offset-2',
                 'decoration-primary/6',
-                'text-primary',
-                'hover:text-primary-strong',
+                'text-primary-subtle',
+                'hover:text-primary',
+                'contrast-more:text-primary',
+                'contrast-more:hover:text-primary-strong',
                 'transition-colors',
                 style,
             )}

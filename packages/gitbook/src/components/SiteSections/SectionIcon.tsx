@@ -13,7 +13,7 @@ export function SectionIcon(props: { icon: IconName; isActive: boolean }) {
         <Icon
             icon={icon}
             className={tcls(
-                'size-[1em] text-inherit opacity-8',
+                'size-[1em] shrink-0 text-inherit opacity-8',
                 isActive && 'text-inherit opacity-10',
             )}
         />
