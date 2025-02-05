@@ -45,7 +45,7 @@ export async function CustomizationRootLayout(props: {
     const headerTheme = generateHeaderTheme(customization);
     const language = getSpaceLanguage(customization);
     const tintColor = getTintColor(customization);
-    const mixColor = getMixColor(customization.styling.primaryColor, tintColor);
+    const mixColor = getTintMixColor(customization.styling.primaryColor, tintColor);
     const sidebarStyles = getSidebarStyles(customization);
 
     return (
@@ -76,7 +76,7 @@ export async function CustomizationRootLayout(props: {
                 >{`
                     :root {
                         ${generateColorVariable('primary', customization.styling.primaryColor.light)}
-                        ${generateColorVariable('tint', tintColor ? tintColor.light : DEFAULT_TINT_COLOR, { mix: mixColor?.color.light, mixRatio: mixColor?.ratio?.light })}
+                        ${generateColorVariable('tint', tintColor ? tintColor.light : DEFAULT_TINT_COLOR, { mix: mixColor.color.light, mixRatio: mixColor.ratio?.light })}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR)}
 
                         --header-background: ${hexToRgb(headerTheme.backgroundColor.light)};
@@ -85,7 +85,7 @@ export async function CustomizationRootLayout(props: {
 
                     .dark {
                         ${generateColorVariable('primary', customization.styling.primaryColor.dark, { darkMode: true })}
-                        ${generateColorVariable('tint', tintColor ? tintColor.dark : DEFAULT_TINT_COLOR, { darkMode: true, mix: mixColor?.color.light, mixRatio: mixColor?.ratio?.light })}
+                        ${generateColorVariable('tint', tintColor ? tintColor.dark : DEFAULT_TINT_COLOR, { darkMode: true, mix: mixColor?.color.dark, mixRatio: mixColor?.ratio?.dark })}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR, { darkMode: true })}
 
                         --header-background: ${hexToRgb(headerTheme.backgroundColor.dark)};
@@ -138,15 +138,14 @@ function getTintColor(
     }
 }
 
-function getMixColor(
+function getTintMixColor(
     primaryColor: CustomizationThemedColor,
     tintColor: CustomizationTint['color'] | undefined,
-):
-    | {
-          color: { light: string | undefined; dark: string | undefined };
-          ratio?: { light: number; dark: number };
-      }
-    | undefined {
+): {
+    color: { light: string | undefined; dark: string | undefined };
+    ratio?: { light: number; dark: number };
+} {
+
     if (!tintColor) {
         return {
             color: primaryColor,

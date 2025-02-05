@@ -152,7 +152,7 @@ export type ColorScaleOptions = {
     /** If set to `true`, inverts the scale (so 1 is black instead of white) and uses `colorMixMapping.dark` with different mix ratios per step. */
     darkMode?: boolean;
 
-    /** Define a custom foreground color to use. If left undefined, the global `light`/`dark` values (in `colors.ts`) will be used. */
+    /** Define a custom background color to use. If left undefined, the global `light`/`dark` values (in `colors.ts`) will be used. */
     background?: string;
 
     /** Define a custom foreground color to use. If left undefined, the global `light`/`dark` values (in `colors.ts`) will be used. */
