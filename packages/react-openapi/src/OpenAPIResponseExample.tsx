@@ -56,7 +56,7 @@ export function OpenAPIResponseExample(props: {
                 return null;
             }
 
-            const example: OpenAPIV3.ExampleObject | null = handleUnresolvedReference(
+            const example = handleUnresolvedReference(
                 (() => {
                     const { examples, example } = mediaTypeObject;
                     if (examples) {
