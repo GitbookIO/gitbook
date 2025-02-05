@@ -521,11 +521,11 @@
 }
 
 .openapi-disclosure-group-header {
-    @apply flex flex-row items-center justify-between;
+    @apply flex flex-row items-center justify-between gap-3;
 }
 
 .openapi-disclosure-group-trigger {
-    @apply flex items-center relative w-full flex-1 gap-2.5 py-2 -outline-offset-1;
+    @apply flex items-center relative flex-1 gap-2.5 py-2 truncate -outline-offset-1;
 }
 
 .openapi-disclosure-group-trigger:disabled {
@@ -559,11 +559,11 @@
 
 .openapi-disclosure-group:hover .openapi-disclosure-group-mediatype,
 .openapi-disclosure-group[aria-expanded='true'] .openapi-disclosure-group-mediatype {
-    @apply opacity-11;
+    @apply opacity-11 flex;
 }
 
 .openapi-disclosure-group-mediatype {
-    @apply opacity-0 transition-opacity duration-200 flex;
+    @apply opacity-0 hidden transition-all duration-200 shrink-0;
 }
 
 .openapi-disclosure-group-mediatype > span {
