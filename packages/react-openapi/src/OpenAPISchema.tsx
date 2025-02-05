@@ -279,7 +279,9 @@ function getSchemaProperties(schema: OpenAPIV3.SchemaObject): null | OpenAPISche
         if (schema.properties) {
             Object.entries(schema.properties).forEach(([propertyName, rawPropertySchema]) => {
                 const isReference = checkIsReference(rawPropertySchema);
-                const propertySchema = isReference ? { propertyName } : rawPropertySchema;
+                const propertySchema: OpenAPIV3.SchemaObject = isReference
+                    ? { propertyName }
+                    : rawPropertySchema;
                 if (propertySchema.deprecated) {
                     return;
                 }
