@@ -1,7 +1,7 @@
 import * as React from 'react';
 import classNames from 'classnames';
 import { OpenAPIV3 } from '@scalar/openapi-types';
-import { OpenAPISchemaProperties } from './OpenAPISchema';
+import { OpenAPIRootSchema, OpenAPISchemaProperties } from './OpenAPISchema';
 import { noReference } from './utils';
 import { OpenAPIClientContext } from './types';
 import { OpenAPIDisclosure } from './OpenAPIDisclosure';
@@ -45,7 +45,7 @@ export function OpenAPIResponse(props: {
                     properties={[
                         {
                             schema: noReference(mediaType.schema) ?? {},
-                            required: false,
+                            showRequired: false,
                         },
                     ]}
                     context={context}

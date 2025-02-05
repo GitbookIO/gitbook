@@ -16,6 +16,10 @@ export interface OpenAPISchemaPropertyEntry {
     propertyName?: string;
     required?: boolean;
     schema: OpenAPIV3.SchemaObject;
+    /** Whether to show the required label
+     * @default true
+     */
+    showRequired?: boolean;
 }
 
 /**
@@ -31,6 +35,7 @@ export function OpenAPISchemaProperty(
 ) {
     const {
         schema,
+        propertyName,
         circularRefs: parentCircularRefs = new Map<OpenAPIV3.SchemaObject, string>(),
         context,
         className,
@@ -47,7 +52,8 @@ export function OpenAPISchemaProperty(
         ? null
         : getSchemaAlternatives(schema, new Set(circularRefs.keys()));
 
-    if (isEmptySchema(schema)) {
+    // If the schema is empty and there is no property name, we don't render anything
+    if (isEmptySchema(schema) && !propertyName) {
         return null;
     }
 
@@ -55,7 +61,7 @@ export function OpenAPISchemaProperty(
         return (
             <InteractiveSection id={id} className={classNames('openapi-schema', className)}>
                 <OpenAPISchemaPresentation {...props} />
-                <OpenAPIDisclosure context={context} label={schema.title ?? undefined}>
+                <OpenAPIDisclosure context={context}>
                     {properties && properties.length > 0 ? (
                         <OpenAPISchemaProperties
                             properties={properties}
@@ -70,17 +76,27 @@ export function OpenAPISchemaProperty(
 
     if (alternatives?.[0]?.length) {
         return (
+            // <InteractiveSection id={id} className={classNames('openapi-schema', className)}>
+            //     <OpenAPISchemaPresentation {...props} />
+            //     {alternatives[0].map((alternative, index) => (
+            //         <OpenAPIDisclosure key={`${index}-${alternative.title}`} context={context}>
+            //             <OpenAPISchemaProperty
+            //                 propertyName={getSchemaTitle(alternative, alternatives[1])}
+            //                 schema={alternative}
+            //                 circularRefs={circularRefs}
+            //                 context={context}
+            //             />
+            //         </OpenAPIDisclosure>
+            //     ))}
+            // </InteractiveSection>
             <InteractiveSection id={id} className={classNames('openapi-schema', className)}>
                 <OpenAPISchemaPresentation {...props} />
                 {alternatives[0].map((alternative, index) => (
-                    <OpenAPIDisclosure key={`${index}-${alternative.title}`} context={context}>
-                        <OpenAPISchemaProperty
-                            propertyName={getSchemaTitle(alternative, alternatives[1])}
-                            schema={alternative}
-                            circularRefs={circularRefs}
-                            context={context}
-                        />
-                    </OpenAPIDisclosure>
+                    <OpenAPISchemaAlternative
+                        schema={alternative}
+                        circularRefs={circularRefs}
+                        context={context}
+                    />
                 ))}
             </InteractiveSection>
         );
@@ -174,12 +190,14 @@ function OpenAPISchemaAlternative(props: {
     const subProperties = getSchemaProperties(schema);
 
     return (
-        <OpenAPISchemaProperties
-            id={id}
-            properties={subProperties ?? [{ schema }]}
-            circularRefs={subProperties ? new Map(circularRefs).set(schema, id) : circularRefs}
-            context={context}
-        />
+        <OpenAPIDisclosure context={context}>
+            <OpenAPISchemaProperties
+                id={id}
+                properties={subProperties ?? [{ schema }]}
+                circularRefs={subProperties ? new Map(circularRefs).set(schema, id) : circularRefs}
+                context={context}
+            />
+        </OpenAPIDisclosure>
     );
 }
 
@@ -219,7 +237,7 @@ export function OpenAPISchemaEnum(props: { enumValues: any[] }) {
 }
 
 export function OpenAPISchemaPresentation(props: OpenAPISchemaPropertyEntry) {
-    const { schema, propertyName, required } = props;
+    const { schema, propertyName, required, showRequired = true } = props;
 
     const shouldDisplayExample = (schema: OpenAPIV3.SchemaObject): boolean => {
         return (
@@ -234,7 +252,7 @@ export function OpenAPISchemaPresentation(props: OpenAPISchemaPropertyEntry) {
             <OpenAPISchemaName
                 type={getSchemaTitle(schema)}
                 propertyName={propertyName}
-                required={required}
+                required={showRequired ? required : undefined}
                 deprecated={schema.deprecated}
             />
             {schema['x-deprecated-sunset'] ? (
@@ -387,10 +405,11 @@ export function getSchemaTitle(
     /** If the title is inferred in a oneOf with discriminator, we can use it to optimize the title */
     discriminator?: OpenAPIV3.DiscriminatorObject,
 ): string {
-    if (schema.title) {
-        // If the schema has a title, use it
-        return schema.title;
-    }
+    //TODO: uncomment this once models are available
+    // if (schema.title) {
+    //     // If the schema has a title, use it
+    //     return schema.title;
+    // }
 
     // Try using the discriminator
     if (discriminator?.propertyName && schema.properties) {
@@ -400,19 +419,6 @@ export function getSchemaTitle(
                 return discriminatorProperty.enum.map((value) => value.toString()).join(' | ');
             }
         }
-    }
-
-    // If the schema is empty, return an empty string
-    if (
-        !schema.type &&
-        !schema.enum &&
-        !schema.properties &&
-        !schema.allOf &&
-        !schema.anyOf &&
-        !schema.oneOf &&
-        !schema.not
-    ) {
-        return '';
     }
 
     // Otherwise try to infer a nice title
@@ -451,7 +457,7 @@ export function getSchemaTitle(
  */
 function isEmptySchema(schema: OpenAPIV3.SchemaObject): boolean {
     return (
-        (!schema.properties || !schema.properties.length) &&
+        !schema.properties &&
         !schema.description &&
         !schema.title &&
         !schema.type &&

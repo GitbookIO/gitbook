@@ -137,7 +137,7 @@
 
 /* Schema Structure */
 .openapi-schema-root {
-    @apply mx-3 mb-3 mt-2;
+    @apply mt-2;
 }
 
 .openapi-schema-properties {
@@ -606,4 +606,8 @@
 
 .openapi-disclosure .openapi-schema-properties .openapi-schema-enum {
     @apply pt-0 mt-0;
+}
+
+.openapi-section-body.openapi-schema.openapi-schema-root-body {
+    @apply space-y-2.5;
 }
