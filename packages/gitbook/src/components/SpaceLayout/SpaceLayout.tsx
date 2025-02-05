@@ -120,7 +120,7 @@ export async function SpaceLayout(props: {
                                     'hidden',
                                     'pr-4',
                                     'lg:flex',
-                                    'flex-grow-0',
+                                    'grow-0',
                                     'flex-wrap',
                                     'dark:shadow-light/1',
                                 )}
