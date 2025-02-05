@@ -17,6 +17,7 @@ import {
     Space,
     SiteSection,
     PublishedSiteContent,
+    SiteSectionGroup,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 import { headers } from 'next/headers';
@@ -800,7 +801,7 @@ export const getPublishedContentSite = cache({
     },
 });
 
-export type SectionsList = { list: SiteSection[]; section: SiteSection; index: number };
+export type SectionsList = { list: (SiteSectionGroup | SiteSection)[]; current: SiteSection };
 
 /**
  * Parse the site spaces into a list of spaces with their title and urls.
@@ -820,10 +821,16 @@ export function parseSpacesFromSiteSpaces(siteSpaces: SiteSpace[]) {
     return Object.values(spaces);
 }
 
-function parseSiteSectionsList(siteSectionId: string, sections: SiteSection[]) {
+function parseSiteSectionsList(
+    siteSectionId: string,
+    sectionsAndGroups: (SiteSectionGroup | SiteSection)[],
+) {
+    const sections = sectionsAndGroups.flatMap((item) =>
+        item.object === 'site-section-group' ? item.sections : item,
+    );
     const section = sections.find((section) => section.id === siteSectionId);
     assert(section, 'A section must be defined when there are multiple sections');
-    return { list: sections, section, index: sections.indexOf(section) } satisfies SectionsList;
+    return { list: sectionsAndGroups, current: section } satisfies SectionsList;
 }
 
 /**
@@ -847,10 +854,11 @@ export async function getSiteData(
         siteShareKey: pointer.siteShareKey,
     });
 
-    const siteSections =
+    const siteSectionsAndGroups =
         siteStructure.type === 'sections' && siteStructure.structure
             ? siteStructure.structure
             : null;
+
     const siteSpaces =
         siteStructure.type === 'siteSpaces' && siteStructure.structure
             ? parseSpacesFromSiteSpaces(siteStructure.structure)
@@ -862,11 +870,11 @@ export async function getSiteData(
     };
 
     const sections =
-        pointer.siteSectionId && siteSections
-            ? parseSiteSectionsList(pointer.siteSectionId, siteSections)
+        pointer.siteSectionId && siteSectionsAndGroups
+            ? parseSiteSectionsList(pointer.siteSectionId, siteSectionsAndGroups)
             : null;
     const spaces =
-        siteSpaces ?? (sections ? parseSpacesFromSiteSpaces(sections.section.siteSpaces) : []);
+        siteSpaces ?? (sections ? parseSpacesFromSiteSpaces(sections.current.siteSpaces) : []);
 
     const settings = (() => {
         if (pointer.siteSpaceId) {

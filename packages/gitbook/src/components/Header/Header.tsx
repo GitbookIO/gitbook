@@ -32,7 +32,6 @@ export function Header(props: {
     const { context, space, site, spaces, sections, customization, withTopHeader } = props;
     const isCustomizationDefault =
         customization.header.preset === CustomizationHeaderPreset.Default;
-    const hasSiteSections = sections && sections.list.length > 1;
     const isMultiVariants = site && spaces.length > 1;
 
     return (
@@ -203,18 +202,7 @@ export function Header(props: {
                     </div>
                 </div>
             </div>
-            {sections ? (
-                <div
-                    className={tcls(
-                        'scroll-nojump',
-                        'w-full',
-                        // Handle long section tabs, particularly on smaller screens.
-                        'overflow-x-auto hide-scroll',
-                    )}
-                >
-                    <SiteSectionTabs sections={sections} />
-                </div>
-            ) : null}
+            {sections ? <SiteSectionTabs sections={sections} /> : null}
         </header>
     );
 }

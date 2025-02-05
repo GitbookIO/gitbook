@@ -105,14 +105,16 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                             ],
 
                             activeId === section.id && [
-                                'text-primary',
-                                'hover:text-primary-strong',
+                                'text-primary-subtle',
+                                'hover:text-primary',
+                                'contrast-more:text-primary',
+                                'contrast-more:hover:text-primary-strong',
                                 'hover:bg-primary-hover',
                                 'tint:font-semibold',
                                 'contrast-more:font-semibold',
 
                                 'sidebar-list-default:border-tint',
-                                'sidebar-list-pill:hover:bg-transparent',
+                                'sidebar-list-pill:hover:bg-primary-hover',
                             ],
                         )}
                     >
