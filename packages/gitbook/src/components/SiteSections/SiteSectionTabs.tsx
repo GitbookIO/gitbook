@@ -250,7 +250,7 @@ function SectionGroupTile(props: { section: SiteSection; isActive: boolean }) {
                     {icon ? <SectionIcon isActive={false} icon={icon as IconName} /> : null}
                     <span className="truncate min-w-0">{title}</span>
                 </div>
-                <p className="text min-h-[2lh]">{/* TODO - add section description */}</p>
+                <p className="text-tint-subtle min-h-[2lh]">{section.description}</p>
             </Link>
         </li>
     );
