@@ -13,7 +13,7 @@ import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 type CircularRefsIds = Map<OpenAPIV3.SchemaObject, string>;
 
 export interface OpenAPISchemaPropertyEntry {
-    propertyName?: string | JSX.Element;
+    propertyName?: string;
     required?: boolean;
     schema: OpenAPIV3.SchemaObject;
 }
@@ -47,11 +47,15 @@ export function OpenAPISchemaProperty(
         ? null
         : getSchemaAlternatives(schema, new Set(circularRefs.keys()));
 
+    if (isEmptySchema(schema)) {
+        return null;
+    }
+
     if ((properties && !!properties.length) || schema.type === 'object') {
         return (
             <InteractiveSection id={id} className={classNames('openapi-schema', className)}>
                 <OpenAPISchemaPresentation {...props} />
-                <OpenAPIDisclosure context={context}>
+                <OpenAPIDisclosure context={context} label={schema.title ?? undefined}>
                     {properties && properties.length > 0 ? (
                         <OpenAPISchemaProperties
                             properties={properties}
@@ -124,7 +128,7 @@ export function OpenAPISchemaProperties(props: {
         <div id={id} className={classNames('openapi-schema-properties')}>
             {properties.map((property) => (
                 <OpenAPISchemaProperty
-                    key={property.propertyName?.toString()}
+                    key={property.propertyName}
                     circularRefs={circularRefs}
                     {...property}
                     context={context}
@@ -398,6 +402,19 @@ export function getSchemaTitle(
         }
     }
 
+    // If the schema is empty, return an empty string
+    if (
+        !schema.type &&
+        !schema.enum &&
+        !schema.properties &&
+        !schema.allOf &&
+        !schema.anyOf &&
+        !schema.oneOf &&
+        !schema.not
+    ) {
+        return '';
+    }
+
     // Otherwise try to infer a nice title
     let type = 'any';
 
@@ -427,4 +444,21 @@ export function getSchemaTitle(
     }
 
     return type;
+}
+
+/** Check if the schema is empty
+ * eg. no properties, no description, no title, no type, no enum, no allOf, no anyOf, no oneOf, no not
+ */
+function isEmptySchema(schema: OpenAPIV3.SchemaObject): boolean {
+    return (
+        (!schema.properties || !schema.properties.length) &&
+        !schema.description &&
+        !schema.title &&
+        !schema.type &&
+        !schema.enum &&
+        !schema.allOf &&
+        !schema.anyOf &&
+        !schema.oneOf &&
+        !schema.not
+    );
 }

@@ -27,7 +27,10 @@ function useOpenAPITabsContext() {
     return context;
 }
 
-function OpenAPITabs(props: React.PropsWithChildren<TabsProps & { items: Tab[] }>) {
+/**
+ * The OpenAPI Tabs wrapper component.
+ */
+export function OpenAPITabs(props: React.PropsWithChildren<TabsProps & { items: Tab[] }>) {
     const { children, items } = props;
     const [selectedKey, setSelectedKey] = React.useState(items[0].key);
 
@@ -46,7 +49,12 @@ function OpenAPITabs(props: React.PropsWithChildren<TabsProps & { items: Tab[] }
     );
 }
 
-function OpenAPITabsList() {
+/**
+ * The OpenAPI Tabs list component.
+ * This component should be used as a child of the OpenAPITabs component.
+ * It renders the list of tabs.
+ */
+export function OpenAPITabsList() {
     const { items } = useOpenAPITabsContext();
 
     return (
@@ -69,7 +77,12 @@ function OpenAPITabsList() {
     );
 }
 
-function OpenAPITabsPanels() {
+/**
+ * The OpenAPI Tabs panels component.
+ * This component should be used as a child of the OpenAPITabs component.
+ * It renders the content of the selected tab.
+ */
+export function OpenAPITabsPanels() {
     const { selectedKey, items } = useOpenAPITabsContext();
 
     const tab = useMemo(() => items.find((tab) => tab.key === selectedKey), [items, selectedKey]);
@@ -91,5 +104,3 @@ function OpenAPITabsPanels() {
         </TabPanel>
     );
 }
-
-export { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels };

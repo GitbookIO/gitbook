@@ -358,7 +358,7 @@
 }
 
 .openapi-response-body {
-    @apply flex flex-col gap-4;
+    @apply flex flex-col gap-3;
 }
 
 /* Response Body and Headers */

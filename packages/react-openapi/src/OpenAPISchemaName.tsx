@@ -1,7 +1,5 @@
-import classNames from 'classnames';
-import { OpenAPIV3 } from 'openapi-types';
 import React from 'react';
-import { OpenAPISchemaPropertyEntry } from './OpenAPISchema';
+import classNames from 'classnames';
 
 interface OpenAPISchemaNameProps {
     propertyName?: string | JSX.Element;
@@ -10,6 +8,10 @@ interface OpenAPISchemaNameProps {
     deprecated?: boolean;
 }
 
+/**
+ * Display the schema name row.
+ * It includes the property name, type, required and deprecated status.
+ */
 export function OpenAPISchemaName(props: OpenAPISchemaNameProps): JSX.Element {
     const { type, propertyName, required, deprecated } = props;
 

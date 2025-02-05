@@ -5,7 +5,6 @@ import { OpenAPIRootSchema } from './OpenAPISchema';
 import { noReference } from './utils';
 import { OpenAPIClientContext } from './types';
 import { InteractiveSection } from './InteractiveSection';
-import { Markdown } from './Markdown';
 
 /**
  * Display an interactive request body.
@@ -15,8 +14,6 @@ export function OpenAPIRequestBody(props: {
     context: OpenAPIClientContext;
 }) {
     const { requestBody, context } = props;
-
-    const hasMultipleContentTypes = Object.keys(requestBody.content ?? {}).length > 1;
 
     return (
         <InteractiveSection

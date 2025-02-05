@@ -2,6 +2,9 @@ import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { ScalarApiButton } from './ScalarApiButton';
 import { OpenAPIContextProps } from './types';
 
+/**
+ * Display the path of an operation.
+ */
 export function OpenAPIPath(props: {
     data: OpenAPIOperationData;
     context: OpenAPIContextProps;

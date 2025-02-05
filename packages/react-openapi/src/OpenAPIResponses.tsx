@@ -31,9 +31,6 @@ export function OpenAPIResponses(props: {
                 groups={Object.entries(responses).map(
                     ([statusCode, response]: [string, OpenAPIV3.ResponseObject]) => {
                         const content = Object.entries(response.content ?? {});
-                        const headers = Object.entries(response.headers ?? {}).map(
-                            ([name, header]) => [name, noReference(header) ?? {}] as const,
-                        );
 
                         return {
                             id: statusCode,
@@ -58,6 +55,7 @@ export function OpenAPIResponses(props: {
                                 label: contentType,
                                 body: (
                                     <OpenAPIResponse
+                                        key={`$response-${statusCode}-${contentType}`}
                                         response={response}
                                         mediaType={mediaType}
                                         context={context}

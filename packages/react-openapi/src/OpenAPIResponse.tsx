@@ -41,6 +41,7 @@ export function OpenAPIResponse(props: {
 
             <div className={classNames('openapi-responsebody')}>
                 <OpenAPISchemaProperties
+                    id={`response-${context.blockKey}`}
                     properties={[
                         {
                             schema: noReference(mediaType.schema) ?? {},

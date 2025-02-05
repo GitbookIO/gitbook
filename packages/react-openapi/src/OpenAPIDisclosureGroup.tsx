@@ -1,4 +1,3 @@
-import { DisclosureGroup } from 'react-aria-components';
 import React from 'react';
 
 interface Props {
@@ -27,6 +26,9 @@ import classNames from 'classnames';
 
 const DisclosureGroupStateContext = React.createContext<DisclosureGroupState | null>(null);
 
+/**
+ * Display an interactive OpenAPI disclosure group.
+ */
 export function OpenAPIDisclosureGroup(props: DisclosureGroupProps & Props) {
     const { icon, groups } = props;
 

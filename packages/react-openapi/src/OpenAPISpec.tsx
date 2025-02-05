@@ -1,7 +1,6 @@
 'use client';
 
-import * as React from 'react';
-import { OpenAPIV3, OpenAPIV2, OpenAPI } from '@scalar/openapi-types';
+import { OpenAPI } from '@scalar/openapi-types';
 
 import { OpenAPIOperationData, fromJSON } from './fetchOpenAPIOperation';
 import { InteractiveSection } from './InteractiveSection';

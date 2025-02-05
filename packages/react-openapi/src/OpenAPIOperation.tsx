@@ -5,7 +5,6 @@ import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { Markdown } from './Markdown';
 import { OpenAPICodeSample } from './OpenAPICodeSample';
 import { OpenAPIResponseExample } from './OpenAPIResponseExample';
-import { OpenAPIServerURL } from './OpenAPIServerURL';
 import { OpenAPISpec } from './OpenAPISpec';
 import { OpenAPIClientContext, OpenAPIContextProps } from './types';
 import { OpenAPIPath } from './OpenAPIPath';

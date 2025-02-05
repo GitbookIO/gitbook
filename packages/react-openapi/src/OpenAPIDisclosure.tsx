@@ -1,5 +1,5 @@
 import React from 'react';
-import { OpenAPIClientContext, OpenAPIContextProps } from './types';
+import { OpenAPIClientContext } from './types';
 import { mergeProps, useButton, useDisclosure, useFocusRing } from 'react-aria';
 import { useDisclosureState } from 'react-stately';
 
@@ -9,6 +9,10 @@ interface Props {
     label?: string;
 }
 
+/**
+ * Display an interactive OpenAPI disclosure.
+ * The label is optional and defaults to "child attributes".
+ */
 export function OpenAPIDisclosure({ context, children, label }: Props): JSX.Element {
     const state = useDisclosureState({});
     const panelRef = React.useRef<HTMLDivElement | null>(null);
