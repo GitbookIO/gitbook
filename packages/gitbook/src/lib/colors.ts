@@ -186,7 +186,7 @@ export function colorScale(
     const foregroundColor = rgbToOklch(hexToRgbArray(foreground));
     const backgroundColor = rgbToOklch(hexToRgbArray(background));
 
-    if (mixColor && mix?.ratio) {
+    if (mixColor && mix?.ratio && mix.ratio > 0) {
         // If defined, we mix in a (tiny) bit of the mix color with the base color.
         baseColor.L = mixColor.L * mix.ratio + baseColor.L * (1 - mix.ratio);
         baseColor.C = mixColor.C * mix.ratio + baseColor.C * (1 - mix.ratio);

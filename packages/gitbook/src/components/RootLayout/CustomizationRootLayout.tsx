@@ -141,12 +141,10 @@ function getTintColor(
 function getTintMixColor(
     primaryColor: CustomizationThemedColor,
     tintColor: CustomizationTint['color'] | undefined,
-):
-    | {
-          color: CustomizationThemedColor;
-          ratio: { light: number; dark: number };
-      }
-    | undefined {
+): {
+    color: CustomizationThemedColor;
+    ratio: { light: number; dark: number };
+} {
     if (!tintColor) {
         // Mix in a bit of the primary colour into neutral, to match with primary nicely.
         return {
@@ -158,19 +156,18 @@ function getTintMixColor(
         };
     }
 
-    if (tintColor === primaryColor) {
-        // Mix in neutral into the tint colour to offset it from the primary, and to make the effect less intense.
-        return {
-            color: {
-                light: DEFAULT_TINT_COLOR,
-                dark: DEFAULT_TINT_COLOR,
-            },
-            ratio: {
-                light: 0.4,
-                dark: 0.4,
-            },
-        };
-    }
+    // Mix in neutral into the tint colour to offset it from the primary, and to make the effect less intense.
+    // If the tint colour differs from the primary colour, we use the tint colour fully without mixing.
+    return {
+        color: {
+            light: DEFAULT_TINT_COLOR,
+            dark: DEFAULT_TINT_COLOR,
+        },
+        ratio: {
+            light: tintColor.light === primaryColor.light ? 0.4 : 0,
+            dark: tintColor.dark === primaryColor.dark ? 0.4 : 0,
+        },
+    };
 }
 
 /**
