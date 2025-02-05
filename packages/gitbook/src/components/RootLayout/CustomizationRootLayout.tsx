@@ -76,7 +76,7 @@ export async function CustomizationRootLayout(props: {
                 >{`
                     :root {
                         ${generateColorVariable('primary', customization.styling.primaryColor.light)}
-                        ${generateColorVariable('tint', tintColor ? tintColor.light : DEFAULT_TINT_COLOR, { mix: { color: mixColor.color.light, ratio: mixColor.ratio?.light } })}
+                        ${generateColorVariable('tint', tintColor ? tintColor.light : DEFAULT_TINT_COLOR, { mix: mixColor && { color: mixColor.color.light, ratio: mixColor.ratio.light } })}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR)}
 
                         --header-background: ${hexToRgb(headerTheme.backgroundColor.light)};
@@ -85,7 +85,7 @@ export async function CustomizationRootLayout(props: {
 
                     .dark {
                         ${generateColorVariable('primary', customization.styling.primaryColor.dark, { darkMode: true })}
-                        ${generateColorVariable('tint', tintColor ? tintColor.dark : DEFAULT_TINT_COLOR, { darkMode: true, mix: { color: mixColor?.color.dark, ratio: mixColor?.ratio?.dark } })}
+                        ${generateColorVariable('tint', tintColor ? tintColor.dark : DEFAULT_TINT_COLOR, { darkMode: true, mix: mixColor && { color: mixColor?.color.dark, ratio: mixColor.ratio.dark } })}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR, { darkMode: true })}
 
                         --header-background: ${hexToRgb(headerTheme.backgroundColor.dark)};
@@ -141,10 +141,12 @@ function getTintColor(
 function getTintMixColor(
     primaryColor: CustomizationThemedColor,
     tintColor: CustomizationTint['color'] | undefined,
-): {
-    color: { light: string | undefined; dark: string | undefined };
-    ratio?: { light?: number; dark?: number };
-} {
+):
+    | {
+          color: CustomizationThemedColor;
+          ratio: { light: number; dark: number };
+      }
+    | undefined {
     if (!tintColor) {
         // Mix in a bit of the primary colour into neutral, to match with primary nicely.
         return {
@@ -169,17 +171,6 @@ function getTintMixColor(
             },
         };
     }
-
-    return {
-        color: {
-            light: tintColor.light === primaryColor.light ? DEFAULT_TINT_COLOR : undefined,
-            dark: tintColor.dark === primaryColor.dark ? DEFAULT_TINT_COLOR : undefined,
-        },
-        ratio: {
-            light: tintColor.light === primaryColor.light ? 0.4 : 0.2,
-            dark: tintColor.dark === primaryColor.dark ? 0.4 : 0.2,
-        },
-    };
 }
 
 /**
