@@ -2,10 +2,22 @@ import * as React from 'react';
 import classNames from 'classnames';
 import { OpenAPIV3 } from '@scalar/openapi-types';
 import { OpenAPIRootSchema, OpenAPISchemaProperties } from './OpenAPISchema';
-import { noReference } from './utils';
+import { checkIsReference, noReference } from './utils';
 import { OpenAPIClientContext } from './types';
 import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
+
+const handleReferences = (
+    input: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject | undefined,
+): OpenAPIV3.SchemaObject => {
+    const isReference = checkIsReference(input);
+
+    if (isReference || input === undefined) {
+        return {};
+    }
+
+    return input;
+};
 
 /**
  * Display an interactive response body.
@@ -59,7 +71,7 @@ export function OpenAPIResponse(props: {
                             label: contentType,
                             body: (
                                 <OpenAPIRootSchema
-                                    schema={noReference(mediaType.schema) ?? {}}
+                                    schema={handleReferences(mediaType.schema) ?? {}}
                                     context={context}
                                 />
                             ),
