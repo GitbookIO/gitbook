@@ -116,12 +116,14 @@ export function OpenAPIResponseExample(props: {
     );
 }
 
-function handleUnresolvedReference(input: OpenAPIV3.ExampleObject | null): OpenAPIV3.ExampleObject {
+function handleUnresolvedReference(
+    input: OpenAPIV3.ExampleObject | null,
+): OpenAPIV3.ExampleObject | null {
     const isReference = checkIsReference(input?.value);
 
-    if (isReference || input === null) {
-        // If we find a reference that wasn't resolved or needed to be resolved externally, render an empty object
-        return { value: {} };
+    if (isReference) {
+        // If we find a reference that wasn't resolved or needed to be resolved externally, don't try to render it
+        return null;
     }
 
     return input;
