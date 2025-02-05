@@ -2,28 +2,35 @@ import {
     CustomizationCorners,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
-    CustomizationSettings,
+    type CustomizationSettings,
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
-    CustomizationTint,
-    SiteCustomizationSettings,
+    type CustomizationThemedColor,
+    type CustomizationTint,
+    type SiteCustomizationSettings,
 } from '@gitbook/api';
 import { IconsProvider, IconStyle } from '@gitbook/icons';
 import assertNever from 'assert-never';
-import colors from 'tailwindcss/colors';
 
 import { fontNotoColorEmoji, fonts, ibmPlexMono } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
 import { getStaticFileURL } from '@/lib/assets';
-import { colorContrast, colorScale, hexToRgb, shadesOfColor } from '@/lib/colors';
+import {
+    colorContrast,
+    colorScale,
+    type ColorScaleOptions,
+    DARK_BASE,
+    DEFAULT_TINT_COLOR,
+    hexToRgb,
+    LIGHT_BASE,
+    shadesOfColor,
+} from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
 
 import { ClientContexts } from './ClientContexts';
 
 import '@gitbook/icons/style.css';
 import './globals.css';
-
-const DEFAULT_TINT_COLOR = '#787878';
 
 /**
  * Layout shared between the content and the PDF renderer.
@@ -38,6 +45,7 @@ export async function CustomizationRootLayout(props: {
     const headerTheme = generateHeaderTheme(customization);
     const language = getSpaceLanguage(customization);
     const tintColor = getTintColor(customization);
+    const mixColor = getTintMixColor(customization.styling.primaryColor, tintColor);
     const sidebarStyles = getSidebarStyles(customization);
 
     return (
@@ -52,8 +60,8 @@ export async function CustomizationRootLayout(props: {
                     ? ' straight-corners'
                     : '',
                 tintColor ? ' tint' : 'no-tint',
-                sidebarStyles.background && ' sidebar-' + sidebarStyles.background,
-                sidebarStyles.list && ' sidebar-list-' + sidebarStyles.list,
+                sidebarStyles.background && ` sidebar-${sidebarStyles.background}`,
+                sidebarStyles.list && ` sidebar-list-${sidebarStyles.list}`,
             )}
         >
             <head>
@@ -68,7 +76,7 @@ export async function CustomizationRootLayout(props: {
                 >{`
                     :root {
                         ${generateColorVariable('primary', customization.styling.primaryColor.light)}
-                        ${generateColorVariable('tint', tintColor ? (tintColor?.light ?? customization.styling.primaryColor.light ?? DEFAULT_TINT_COLOR) : DEFAULT_TINT_COLOR, { mix: !tintColor ? customization.styling.primaryColor.light : undefined })}
+                        ${generateColorVariable('tint', tintColor ? tintColor.light : DEFAULT_TINT_COLOR, { mix: mixColor && { color: mixColor.color.light, ratio: mixColor.ratio.light } })}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR)}
 
                         --header-background: ${hexToRgb(headerTheme.backgroundColor.light)};
@@ -77,7 +85,7 @@ export async function CustomizationRootLayout(props: {
 
                     .dark {
                         ${generateColorVariable('primary', customization.styling.primaryColor.dark, { darkMode: true })}
-                        ${generateColorVariable('tint', tintColor ? (tintColor?.dark ?? customization.styling.primaryColor.dark ?? DEFAULT_TINT_COLOR) : DEFAULT_TINT_COLOR, { darkMode: true, mix: !tintColor ? customization.styling.primaryColor.dark : undefined })}
+                        ${generateColorVariable('tint', tintColor ? tintColor.dark : DEFAULT_TINT_COLOR, { darkMode: true, mix: mixColor && { color: mixColor?.color.dark, ratio: mixColor.ratio.dark } })}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR, { darkMode: true })}
 
                         --header-background: ${hexToRgb(headerTheme.backgroundColor.dark)};
@@ -130,6 +138,38 @@ function getTintColor(
     }
 }
 
+function getTintMixColor(
+    primaryColor: CustomizationThemedColor,
+    tintColor: CustomizationTint['color'] | undefined,
+): {
+    color: CustomizationThemedColor;
+    ratio: { light: number; dark: number };
+} {
+    if (!tintColor) {
+        // Mix in a bit of the primary colour into neutral, to match with primary nicely.
+        return {
+            color: primaryColor,
+            ratio: {
+                light: 0.2,
+                dark: 0.1,
+            },
+        };
+    }
+
+    // Mix in neutral into the tint colour to offset it from the primary, and to make the effect less intense.
+    // If the tint colour differs from the primary colour, we use the tint colour fully without mixing.
+    return {
+        color: {
+            light: DEFAULT_TINT_COLOR,
+            dark: DEFAULT_TINT_COLOR,
+        },
+        ratio: {
+            light: tintColor.light.toUpperCase() === primaryColor.light.toUpperCase() ? 0.4 : 0,
+            dark: tintColor.dark.toUpperCase() === primaryColor.dark.toUpperCase() ? 0.4 : 0,
+        },
+    };
+}
+
 /**
  * Get the sidebar styles from the customization settings.
  * If it is a space customization, it will return the default styles.
@@ -157,9 +197,8 @@ function generateColorVariable(
     {
         withContrast = true,
         ...options // Pass any options along to the colorScale() function
-    }: {
+    }: ColorScaleOptions & {
         withContrast?: boolean;
-        [key: string]: any;
     } = {},
 ) {
     const shades: Record<string, string> =
@@ -191,8 +230,8 @@ function generateHeaderTheme(customization: CustomizationSettings | SiteCustomiz
         case CustomizationHeaderPreset.Default: {
             return {
                 backgroundColor: {
-                    light: colors.white,
-                    dark: colors.black,
+                    light: LIGHT_BASE,
+                    dark: DARK_BASE,
                 },
                 linkColor: {
                     light: customization.styling.primaryColor.light,
@@ -209,11 +248,11 @@ function generateHeaderTheme(customization: CustomizationSettings | SiteCustomiz
                 linkColor: {
                     light: colorContrast(
                         tintColor?.light ?? customization.styling.primaryColor.light,
-                        [colors.white, colors.black],
+                        [LIGHT_BASE, DARK_BASE],
                     ),
                     dark: colorContrast(
                         tintColor?.dark ?? customization.styling.primaryColor.dark,
-                        [colors.white, colors.black],
+                        [LIGHT_BASE, DARK_BASE],
                     ),
                 },
             };
@@ -221,12 +260,12 @@ function generateHeaderTheme(customization: CustomizationSettings | SiteCustomiz
         case CustomizationHeaderPreset.Contrast: {
             return {
                 backgroundColor: {
-                    light: colors.black,
-                    dark: colors.white,
+                    light: DARK_BASE,
+                    dark: LIGHT_BASE,
                 },
                 linkColor: {
-                    light: colors.white,
-                    dark: colors.black,
+                    light: LIGHT_BASE,
+                    dark: DARK_BASE,
                 },
             };
         }
@@ -236,22 +275,20 @@ function generateHeaderTheme(customization: CustomizationSettings | SiteCustomiz
                     light:
                         customization.header.backgroundColor?.light ??
                         tintColor?.light ??
-                        colors.white,
+                        LIGHT_BASE,
                     dark:
-                        customization.header.backgroundColor?.dark ??
-                        tintColor?.dark ??
-                        colors.black,
+                        customization.header.backgroundColor?.dark ?? tintColor?.dark ?? DARK_BASE,
                 },
                 linkColor: {
                     light:
                         customization.header.linkColor?.light ??
                         (tintColor?.light &&
-                            colorContrast(tintColor.light, [colors.white, colors.black])) ??
+                            colorContrast(tintColor.light, [LIGHT_BASE, DARK_BASE])) ??
                         customization.styling.primaryColor.light,
                     dark:
                         customization.header.linkColor?.dark ??
                         (tintColor?.dark &&
-                            colorContrast(tintColor.dark, [colors.white, colors.black])) ??
+                            colorContrast(tintColor.dark, [LIGHT_BASE, DARK_BASE])) ??
                         customization.styling.primaryColor.dark,
                 },
             };
