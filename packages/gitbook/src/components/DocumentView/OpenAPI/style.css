@@ -27,7 +27,7 @@
 }
 
 .openapi-deprecated {
-    /* @apply py-0.5 px-1.5 min-w-[1.625rem] font-normal justify-center items-center ring-1 ring-inset ring-dark/1 bg-dark/[0.06] rounded-full dark:ring-light/1 dark:bg-light/1 dark:text-light text-sm leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none; */
+    @apply py-0.5 px-1.5 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded-full text-sm leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
 }
 
 .openapi-deprecated-sunset-date {
@@ -150,6 +150,21 @@
 
 .openapi-section-body .openapi-schema-properties {
     @apply divide-y divide-tint-subtle;
+}
+
+.openapi-disclosure-group-panel
+    > .openapi-schema-properties
+    > *:first-child
+    > .openapi-schema-body {
+    @apply pt-0;
+}
+
+.openapi-responsebody > .openapi-schema-properties > *:last-child > .openapi-schema-body {
+    @apply pb-0;
+}
+
+.openapi-responsebody > .openapi-schema-properties > *:only-child > .openapi-schema-body {
+    @apply py-0;
 }
 
 .openapi-schema-properties .openapi-schema:last-child {
@@ -278,10 +293,6 @@
     @apply py-2 border-b border-tint-subtle max-w-full flex-1;
 }
 
-/* .openapi-securities-header:has(.openapi-section-toggle[aria-expanded='true']) {
-    @apply border-tint-subtle;
-} */
-
 .openapi-securities-body {
     @apply flex flex-col gap-2;
 }
@@ -323,11 +334,11 @@
 }
 
 .openapi-response-tab-content {
-    @apply overflow-hidden max-w-full flex items-center gap-2;
+    @apply overflow-hidden max-w-full flex items-baseline gap-2;
 }
 
 .openapi-response-description.openapi-markdown {
-    @apply prose-sm text-[13px] h-fit relative text-tint !font-normal truncate select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply prose-sm text-[13px] h-auto relative leading-[18px] text-tint !font-normal truncate select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 .openapi-response-description.openapi-markdown::-webkit-scrollbar {
@@ -357,10 +368,6 @@
 
 .openapi-responsebody .openapi-schema-presentation {
     @apply py-0;
-}
-
-.openapi-responsebody .openapi-schema-body {
-    @apply pt-0;
 }
 
 .openapi-responsebody-header,
@@ -438,6 +445,14 @@
     @apply max-w-60 rounded font-mono text-xs leading-6 px-1 py-0.5 border border-tint-subtle bg-tint;
 }
 
+.openapi-select {
+    min-width: fit-content;
+    max-width: fit-content;
+}
+.openapi-select:focus {
+    width: auto;
+}
+
 /* Section Components */
 .openapi-section-header {
     @apply flex flex-row items-center;
@@ -505,17 +520,25 @@
     @apply border-b border-tint-subtle relative;
 }
 
+.openapi-disclosure-group-header {
+    @apply flex flex-row items-center justify-between;
+}
+
 .openapi-disclosure-group-trigger {
     @apply flex items-center relative w-full flex-1 gap-2.5 py-2 -outline-offset-1;
 }
 
 .openapi-disclosure-group-trigger:disabled {
-    @apply cursor-default !pl-5;
+    @apply cursor-default;
 }
 
 .openapi-disclosure-group:only-child,
 .openapi-disclosure-group:last-child {
     @apply border-b-0;
+}
+
+.openapi-disclosure-group-trigger:disabled .openapi-disclosure-group-icon {
+    @apply invisible;
 }
 
 .openapi-disclosure-group-icon > svg {
@@ -532,6 +555,19 @@
 
 .openapi-disclosure-group-trigger[aria-expanded='true'] > .openapi-disclosure-group-icon > svg {
     @apply rotate-90;
+}
+
+.openapi-disclosure-group:hover .openapi-disclosure-group-mediatype,
+.openapi-disclosure-group[aria-expanded='true'] .openapi-disclosure-group-mediatype {
+    @apply opacity-11;
+}
+
+.openapi-disclosure-group-mediatype {
+    @apply opacity-0 transition-opacity duration-200 flex;
+}
+
+.openapi-disclosure-group-mediatype > span {
+    @apply text-xs text-tint-subtle;
 }
 
 /* Disclosure */
