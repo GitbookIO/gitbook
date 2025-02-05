@@ -68,7 +68,6 @@ export function PageBody(props: {
                         'page-api-block:max-w-[1654px]',
                         'page-api-block:mx-auto',
 
-                        page.layout.outline ? null : 'xl:mr-56',
                         page.layout.tableOfContents ? null : 'xl:ml-56',
                     ) +
                     (asFullWidth ? ' page-full-width' : '') +
