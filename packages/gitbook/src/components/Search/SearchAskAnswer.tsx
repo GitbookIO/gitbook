@@ -91,7 +91,7 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
 
     const loading = (
         <div className={tcls('w-full', 'flex', 'items-center', 'justify-center')}>
-            <Loading className={tcls('w-6', 'py-8', 'text-primary')} />
+            <Loading className={tcls('w-6', 'py-8', 'text-primary-subtle')} />
         </div>
     );
 

@@ -89,7 +89,7 @@ export function SiteSectionListItem(props: {
             hover:text-tint-strong
             rounded-md straight-corners:rounded-none transition-all group/section-link`,
                 isActive
-                    ? `text-primary hover:text-primary-strong contrast-more:text-primary-strong font-semibold
+                    ? `text-primary-subtle hover:text-primary contrast-more:text-primary contrast-more:hover:text-primary-strong font-semibold
                 hover:bg-primary-hover contrast-more:hover:ring-1 contrast-more:hover:ring-primary-hover`
                     : null,
                 className,
@@ -109,7 +109,7 @@ export function SiteSectionListItem(props: {
                         ? `bg-primary ring-primary group-hover/section-link:ring-primary-hover,
                         shadow-md shadow-primary
                         contrast-more:ring-2 contrast-more:ring-primary
-                        text-primary contrast-more:text-primary-strong tint:bg-primary-solid tint:text-contrast-primary-solid`
+                        text-primary-subtle contrast-more:text-primary tint:bg-primary-solid tint:text-contrast-primary-solid`
                         : null,
                 )}
             >

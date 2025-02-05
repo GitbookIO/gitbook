@@ -149,7 +149,7 @@ const SectionTab = React.forwardRef(function SectionTab(
             {...rest}
             className={tcls(
                 'relative group flex select-none items-center justify-between rounded straight-corners:rounded-none px-3 py-1 my-2',
-                isActive ? 'text-primary' : 'text-tint hover:bg-tint-hover hover:text-tint-strong',
+                isActive ? 'text-primary-subtle' : 'text-tint hover:bg-tint-hover hover:text-tint-strong',
             )}
             href={url}
         >
@@ -176,7 +176,7 @@ const SectionGroupTab = React.forwardRef(function SectionGroupTab(
             {...rest}
             className={tcls(
                 'relative group flex select-none items-center justify-between rounded straight-corners:rounded-none transition-colors px-3 py-1 my-2',
-                isActive ? 'text-primary' : 'text-tint hover:bg-tint-hover hover:text-tint-strong',
+                isActive ? 'text-primary-subtle' : 'text-tint hover:bg-tint-hover hover:text-tint-strong',
             )}
         >
             <span className="flex gap-2 items-center w-full truncate">
@@ -197,7 +197,7 @@ const SectionGroupTab = React.forwardRef(function SectionGroupTab(
  * Horizontal line indicating the active tab
  */
 function ActiveTabIndicator() {
-    return <span className="inset-x-3 -bottom-2 h-0.5 absolute bg-primary-11" />;
+    return <span className="inset-x-3 -bottom-2 h-0.5 absolute bg-primary-9 contrast-more:bg-primary-11" />;
 }
 
 /**
