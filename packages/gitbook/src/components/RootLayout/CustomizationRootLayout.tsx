@@ -76,7 +76,7 @@ export async function CustomizationRootLayout(props: {
                 >{`
                     :root {
                         ${generateColorVariable('primary', customization.styling.primaryColor.light)}
-                        ${generateColorVariable('tint', tintColor ? tintColor.light : DEFAULT_TINT_COLOR, { mix: mixColor.color.light, mixRatio: mixColor.ratio?.light })}
+                        ${generateColorVariable('tint', tintColor ? tintColor.light : DEFAULT_TINT_COLOR, { mix: { color: mixColor.color.light, ratio: mixColor.ratio?.light } })}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR)}
 
                         --header-background: ${hexToRgb(headerTheme.backgroundColor.light)};
@@ -85,7 +85,7 @@ export async function CustomizationRootLayout(props: {
 
                     .dark {
                         ${generateColorVariable('primary', customization.styling.primaryColor.dark, { darkMode: true })}
-                        ${generateColorVariable('tint', tintColor ? tintColor.dark : DEFAULT_TINT_COLOR, { darkMode: true, mix: mixColor?.color.dark, mixRatio: mixColor?.ratio?.dark })}
+                        ${generateColorVariable('tint', tintColor ? tintColor.dark : DEFAULT_TINT_COLOR, { darkMode: true, mix: { color: mixColor?.color.dark, ratio: mixColor?.ratio?.dark } })}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR, { darkMode: true })}
 
                         --header-background: ${hexToRgb(headerTheme.backgroundColor.dark)};
@@ -145,7 +145,6 @@ function getTintMixColor(
     color: { light: string | undefined; dark: string | undefined };
     ratio?: { light: number; dark: number };
 } {
-
     if (!tintColor) {
         return {
             color: primaryColor,
@@ -158,8 +157,8 @@ function getTintMixColor(
             dark: tintColor.dark === primaryColor.dark ? DEFAULT_TINT_COLOR : undefined,
         },
         ratio: {
-            light: 0.4,
-            dark: 0.4,
+            light: tintColor.light === primaryColor.light ? 0.4 : 0.2,
+            dark: tintColor.dark === primaryColor.dark ? 0.4 : 0.2,
         },
     };
 }
