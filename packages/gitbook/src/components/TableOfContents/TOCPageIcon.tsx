@@ -14,7 +14,8 @@ export function TOCPageIcon({ page }: { page: RevisionPage }) {
             style={tcls(
                 'text-base',
                 'text-tint-strong/6',
-                'group-aria-current-page/toclink:text-primary',
+                'group-aria-current-page/toclink:text-primary-subtle',
+                'contrast-more:group-aria-current-page/toclink:text-primary',
                 'shrink-0',
             )}
         />
