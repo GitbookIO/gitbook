@@ -1,7 +1,6 @@
 'use server';
 
 import { RevisionPage, SearchAIAnswer, SearchPageResult, SiteSpace, Space } from '@gitbook/api';
-import { captureException } from '@sentry/nextjs';
 import * as React from 'react';
 import { assert } from 'ts-essentials';
 
@@ -10,6 +9,7 @@ import * as api from '@/lib/api';
 import { getAbsoluteHref, getPageHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
 import { filterOutNullable } from '@/lib/typescript';
+import { getSiteStructureSections } from '@/lib/utils';
 
 import { DocumentView } from '../DocumentView';
 
@@ -78,7 +78,7 @@ async function searchSiteContent(args: {
     const siteSpaces = siteStructure
         ? siteStructure.type === 'siteSpaces'
             ? siteStructure.structure
-            : siteStructure.structure.reduce<SiteSpace[]>((prev, section) => {
+            : getSiteStructureSections(siteStructure).reduce<SiteSpace[]>((prev, section) => {
                   const sectionSiteSpaces = section.siteSpaces.map((siteSpace) => ({
                       ...siteSpace,
                       space: {

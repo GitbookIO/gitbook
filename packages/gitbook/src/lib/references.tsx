@@ -1,6 +1,5 @@
 import {
     ContentRef,
-    ContentRefSpace,
     Revision,
     RevisionFile,
     RevisionPageDocument,
@@ -31,6 +30,7 @@ import { getBlockById, getBlockTitle } from './document';
 import { getGitbookAppHref, getPageHref, PageHrefContext } from './links';
 import { getPagePath, resolvePageId } from './pages';
 import { ClassValue } from './tailwind';
+import { getSiteStructureSections } from './utils';
 
 export interface ResolvedContentRef {
     /** Text to render in the content ref */
@@ -317,10 +317,13 @@ async function getBestTargetSpace(
         const siteSpaces =
             publishedContentSite.structure.type === 'siteSpaces'
                 ? publishedContentSite.structure.structure
-                : publishedContentSite.structure.structure.reduce<SiteSpace[]>((acc, section) => {
-                      acc.push(...section.siteSpaces);
-                      return acc;
-                  }, []);
+                : getSiteStructureSections(publishedContentSite.structure).reduce<SiteSpace[]>(
+                      (acc, section) => {
+                          acc.push(...section.siteSpaces);
+                          return acc;
+                      },
+                      [],
+                  );
         const spaces = parseSpacesFromSiteSpaces(siteSpaces);
         const foundSpace = spaces.find((space) => space.id === spaceId);
         if (foundSpace) {

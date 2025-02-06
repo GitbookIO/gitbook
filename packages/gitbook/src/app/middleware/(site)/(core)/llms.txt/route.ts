@@ -1,6 +1,6 @@
 import { SiteSection, SiteSpace, SiteStructure } from '@gitbook/api';
 import assertNever from 'assert-never';
-import { Heading, ListItem, Paragraph, Root, RootContent } from 'mdast';
+import { ListItem, Paragraph, Root, RootContent } from 'mdast';
 import { toMarkdown } from 'mdast-util-to-markdown';
 import { NextRequest } from 'next/server';
 
@@ -10,6 +10,7 @@ import { getPagePath } from '@/lib/pages';
 import { joinPath } from '@/lib/paths';
 import { checkIsRootPointer, getSiteContentPointer } from '@/lib/pointer';
 import { getIndexablePages } from '@/lib/sitemap';
+import { getSiteStructureSections } from '@/lib/utils';
 
 export const runtime = 'edge';
 
@@ -59,7 +60,7 @@ export async function GET(req: NextRequest) {
 async function getNodesFromSiteStructure(siteStructure: SiteStructure): Promise<RootContent[]> {
     switch (siteStructure.type) {
         case 'sections':
-            return getNodesFromSections(siteStructure.structure);
+            return getNodesFromSections(getSiteStructureSections(siteStructure));
         case 'siteSpaces':
             return getNodesFromSiteSpaces(siteStructure.structure, { heading: true });
         default:

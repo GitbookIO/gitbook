@@ -72,3 +72,11 @@ export function defaultCustomizationForSpace(): api.CustomizationSettings {
         inherit: false,
     };
 }
+
+export function getSiteStructureSections(siteStructure: api.SiteStructure) {
+    return siteStructure.type === 'sections'
+        ? siteStructure.structure.flatMap((item) =>
+              item.object === 'site-section-group' ? item.sections : item,
+          )
+        : [];
+}
