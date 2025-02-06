@@ -2,11 +2,11 @@ import { SiteSection, SiteSpace, SiteStructure } from '@gitbook/api';
 import assertNever from 'assert-never';
 import jsontoxml from 'jsontoxml';
 
-import { getPublishedContentSite, SiteContentPointer } from '@/lib/api';
-import { getAbsoluteHref } from '@/lib/links';
+import { getPublishedContentSite } from '@/lib/api';
 import { joinPath } from '@/lib/paths';
 import { checkIsRootPointer, getSiteContentPointer } from '@/lib/pointer';
 import { filterOutNullable } from '@/lib/typescript';
+import { getSiteStructureSections } from '@/lib/utils';
 
 export const runtime = 'edge';
 
@@ -62,7 +62,7 @@ export async function GET() {
 async function getUrlsFromSiteStructure(siteStructure: SiteStructure): Promise<string[]> {
     switch (siteStructure.type) {
         case 'sections':
-            return getUrlsFromSiteSections(siteStructure.structure);
+            return getUrlsFromSiteSections(getSiteStructureSections(siteStructure));
         case 'siteSpaces':
             return getUrlsFromSiteSpaces(siteStructure.structure);
         default:
