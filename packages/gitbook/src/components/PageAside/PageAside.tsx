@@ -24,30 +24,6 @@ import { Ad } from '../Ads';
 import { PageFeedbackForm } from '../PageFeedback';
 import { ThemeToggler } from '../ThemeToggler';
 
-function getTopOffset(props: { sectionsHeader: boolean; topHeader: boolean }) {
-    if (props.topHeader && props.sectionsHeader) {
-        return 'lg:top-[6.75rem]';
-    }
-
-    if (props.topHeader) {
-        return 'lg:top-16';
-    }
-
-    return 'lg:top-0';
-}
-
-function getMaxHeight(props: { sectionsHeader: boolean; topHeader: boolean }) {
-    if (props.topHeader && props.sectionsHeader) {
-        return 'lg:max-h-[calc(100vh_-_6.75rem)]';
-    }
-
-    if (props.topHeader) {
-        return 'lg:max-h-[calc(100vh_-_4rem)]';
-    }
-
-    return 'lg:max-h-screen';
-}
-
 /**
  * Aside listing the headings in the document.
  */
@@ -62,20 +38,9 @@ export async function PageAside(props: {
     withFullPageCover: boolean;
     withPageFeedback: boolean;
 }) {
-    const {
-        space,
-        site,
-        page,
-        document,
-        customization,
-        withHeaderOffset,
-        withPageFeedback,
-        context,
-    } = props;
+    const { space, site, page, document, customization, withPageFeedback, context } = props;
     const language = getSpaceLanguage(customization);
 
-    const topOffset = getTopOffset(withHeaderOffset);
-    const maxHeight = getMaxHeight(withHeaderOffset);
     const pdfHref = await getAbsoluteHref(
         `~gitbook/pdf?${getPDFUrlSearchParams({
             page: page.id,
@@ -97,8 +62,17 @@ export async function PageAside(props: {
                 'text-tint',
                 'contrast-more:text-tint-strong',
                 'sticky',
-                topOffset,
-                maxHeight,
+                // Without header
+                'lg:top:0',
+                'lg:max-h-screen',
+
+                // With header
+                'site-header:lg:top-16',
+                'site-header:lg:max-h-[calc(100vh_-_4rem)]',
+
+                // With header & sections
+                'site-header-sections:lg:top-[6.75rem]',
+                'site-header-sections:lg:max-h-[calc(100vh_-_6.75rem)]',
 
                 // When in api page mode, we display it as an overlay on non-large resolutions
                 'page-api-block:xl:max-2xl:z-10',
@@ -158,7 +132,9 @@ export async function PageAside(props: {
                             'pb-12',
 
                             'sticky',
-                            topOffset,
+                            'lg:top:0',
+                            'site-header:lg:top-16',
+                            'site-header-sections:lg:top-[6.75rem]',
 
                             'gap-6',
                             'pt-8',
