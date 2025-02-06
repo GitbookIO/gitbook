@@ -1,8 +1,7 @@
-import * as React from 'react';
 import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { generateSchemaExample } from './generateSchemaExample';
 import { OpenAPIContextProps } from './types';
-import { noReference } from './utils';
+import { checkIsReference, noReference } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { OpenAPIV3 } from '@scalar/openapi-types';
 import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
@@ -62,7 +61,7 @@ export function OpenAPIResponseExample(props: {
                 };
             }
 
-            const example: OpenAPIV3.ExampleObject | null = noReference(
+            const example = handleUnresolvedReference(
                 (() => {
                     const { examples, example } = mediaTypeObject;
                     if (examples) {
@@ -128,4 +127,17 @@ function OpenAPIEmptyResponseExample() {
             <p>No body</p>
         </pre>
     );
+}
+
+function handleUnresolvedReference(
+    input: OpenAPIV3.ExampleObject | null,
+): OpenAPIV3.ExampleObject | null {
+    const isReference = checkIsReference(input?.value);
+
+    if (isReference) {
+        // If we find a reference that wasn't resolved or needed to be resolved externally, render out the URL
+        return { value: input.value.$ref };
+    }
+
+    return input;
 }
