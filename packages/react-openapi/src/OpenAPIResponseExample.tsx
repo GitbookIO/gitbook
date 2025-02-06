@@ -122,8 +122,8 @@ function handleUnresolvedReference(
     const isReference = checkIsReference(input?.value);
 
     if (isReference) {
-        // If we find a reference that wasn't resolved or needed to be resolved externally, don't try to render it
-        return null;
+        // If we find a reference that wasn't resolved or needed to be resolved externally, render out the URL
+        return { value: `See: ${input.value.$ref}` };
     }
 
     return input;

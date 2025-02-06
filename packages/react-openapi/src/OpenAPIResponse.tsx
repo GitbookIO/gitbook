@@ -77,7 +77,8 @@ function handleUnresolvedReference(
     const isReference = checkIsReference(input);
 
     if (isReference || input === undefined) {
-        // If we find a reference that wasn't resolved or needed to be resolved externally, do not try to render it
+        // If we find a reference that wasn't resolved or needed to be resolved externally, do not try to render it.
+        // Instead we render `any`
         return {};
     }
 
