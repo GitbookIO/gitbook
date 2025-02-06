@@ -24,7 +24,6 @@ export async function getDocumentSections(
 
     for (const block of document.nodes) {
         if ((block.type === 'heading-1' || block.type === 'heading-2') && block.meta?.id) {
-            console.log(block);
             if (block.type === 'heading-1') {
                 depth = 1;
             }
