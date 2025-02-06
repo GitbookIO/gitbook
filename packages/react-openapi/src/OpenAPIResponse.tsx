@@ -1,8 +1,7 @@
-import * as React from 'react';
 import classNames from 'classnames';
 import { OpenAPIV3 } from '@scalar/openapi-types';
-import { OpenAPIRootSchema, OpenAPISchemaProperties } from './OpenAPISchema';
-import { noReference } from './utils';
+import { OpenAPISchemaProperties } from './OpenAPISchema';
+import { checkIsReference, noReference } from './utils';
 import { OpenAPIClientContext } from './types';
 import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 
@@ -38,13 +37,12 @@ export function OpenAPIResponse(props: {
                     />
                 </OpenAPIDisclosure>
             ) : null}
-
             <div className={classNames('openapi-responsebody')}>
                 <OpenAPISchemaProperties
                     id={`response-${context.blockKey}`}
                     properties={[
                         {
-                            schema: noReference(mediaType.schema) ?? {},
+                            schema: handleUnresolvedReference(mediaType.schema) ?? {},
                         },
                     ]}
                     context={context}
@@ -52,4 +50,18 @@ export function OpenAPIResponse(props: {
             </div>
         </div>
     );
+}
+
+function handleUnresolvedReference(
+    input: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject | undefined,
+): OpenAPIV3.SchemaObject {
+    const isReference = checkIsReference(input);
+
+    if (isReference || input === undefined) {
+        // If we find a reference that wasn't resolved or needed to be resolved externally, do not try to render it.
+        // Instead we render `any`
+        return {};
+    }
+
+    return input;
 }
