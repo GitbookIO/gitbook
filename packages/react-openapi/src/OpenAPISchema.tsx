@@ -71,19 +71,6 @@ export function OpenAPISchemaProperty(
 
     if (alternatives?.[0]?.length) {
         return (
-            // <InteractiveSection id={id} className={classNames('openapi-schema', className)}>
-            //     <OpenAPISchemaPresentation {...props} />
-            //     {alternatives[0].map((alternative, index) => (
-            //         <OpenAPIDisclosure key={`${index}-${alternative.title}`} context={context}>
-            //             <OpenAPISchemaProperty
-            //                 propertyName={getSchemaTitle(alternative, alternatives[1])}
-            //                 schema={alternative}
-            //                 circularRefs={circularRefs}
-            //                 context={context}
-            //             />
-            //         </OpenAPIDisclosure>
-            //     ))}
-            // </InteractiveSection>
             <InteractiveSection id={id} className={classNames('openapi-schema', className)}>
                 <OpenAPISchemaPresentation {...props} />
                 {alternatives[0].map((alternative, index) => (
@@ -238,7 +225,11 @@ export function OpenAPISchemaPresentation(props: OpenAPISchemaPropertyEntry) {
         return (
             typeof schema.example === 'string' ||
             typeof schema.example === 'number' ||
-            typeof schema.example === 'boolean'
+            typeof schema.example === 'boolean' ||
+            (Array.isArray(schema.example) && schema.example.length > 0) ||
+            (typeof schema.example === 'object' &&
+                schema.example !== null &&
+                Object.keys(schema.example).length > 0)
         );
     };
 
