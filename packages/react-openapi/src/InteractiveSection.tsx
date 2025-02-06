@@ -2,6 +2,8 @@
 
 import classNames from 'classnames';
 import React, { useCallback } from 'react';
+import { mergeProps, useButton, useDisclosure, useFocusRing } from 'react-aria';
+import { useDisclosureState } from 'react-stately';
 
 interface InteractiveSectionTab {
     key: string;
@@ -45,15 +47,14 @@ export function InteractiveSection(props: {
     toggeable?: boolean;
     /** Default state of the toggle */
     defaultOpened?: boolean;
-    /** Icons to display for the toggle */
-    toggleOpenIcon?: React.ReactNode;
-    toggleCloseIcon?: React.ReactNode;
+    /** Icon to display for the toggle */
+    toggleIcon?: React.ReactNode;
     /** Tabs of content to display */
     tabs?: Array<InteractiveSectionTab>;
     /** Default tab to have opened */
     defaultTab?: string;
     /** Content of the header */
-    header: React.ReactNode;
+    header?: React.ReactNode;
     /** Body of the section */
     children?: React.ReactNode;
     /** Children to display within the container */
@@ -71,8 +72,7 @@ export function InteractiveSection(props: {
         header,
         children,
         overlay,
-        toggleOpenIcon = '▶',
-        toggleCloseIcon = '▼',
+        toggleIcon = '▶',
         stateKey,
     } = props;
     const [syncedTabs, setSyncedTabs] = useSyncedTabsGlobalState();
@@ -80,11 +80,18 @@ export function InteractiveSection(props: {
         stateKey && stateKey in syncedTabs
             ? tabs.find((tab) => tab.key === syncedTabs[stateKey])
             : undefined;
-
-    const [opened, setOpened] = React.useState(defaultOpened);
     const [selectedTabKey, setSelectedTab] = React.useState(tabFromState?.key ?? defaultTab);
     const selectedTab: InteractiveSectionTab | undefined =
         tabFromState ?? tabs.find((tab) => tab.key === selectedTabKey) ?? tabs[0];
+
+    const state = useDisclosureState({
+        defaultExpanded: defaultOpened,
+    });
+    const panelRef = React.useRef<HTMLDivElement | null>(null);
+    const triggerRef = React.useRef<HTMLButtonElement | null>(null);
+    const { buttonProps: triggerProps, panelProps } = useDisclosure({}, state, panelRef);
+    const { buttonProps } = useButton(triggerProps, triggerRef);
+    const { isFocusVisible, focusProps } = useFocusRing();
 
     return (
         <div
@@ -93,77 +100,96 @@ export function InteractiveSection(props: {
                 'openapi-section',
                 toggeable ? 'openapi-section-toggeable' : null,
                 className,
-                toggeable ? `${className}-${opened ? 'opened' : 'closed'}` : null,
+                toggeable ? `${className}-${state.isExpanded ? 'opened' : 'closed'}` : null,
             )}
         >
-            <div
-                onClick={() => {
-                    if (toggeable) {
-                        setOpened(!opened);
-                    }
-                }}
-                className={classNames('openapi-section-header', `${className}-header`)}
-            >
+            {header ? (
                 <div
-                    className={classNames(
-                        'openapi-section-header-content',
-                        `${className}-header-content`,
-                    )}
-                >
-                    {header}
-                </div>
-                <div
-                    className={classNames(
-                        'openapi-section-header-controls',
-                        `${className}-header-controls`,
-                    )}
-                    onClick={(event) => {
-                        event.stopPropagation();
+                    onClick={() => {
+                        if (toggeable) {
+                            state.toggle();
+                        }
                     }}
+                    className={classNames('openapi-section-header', `${className}-header`)}
                 >
-                    {tabs.length ? (
-                        <select
-                            className={classNames(
-                                'openapi-section-select',
-                                'openapi-select',
-                                `${className}-tabs-select`,
-                            )}
-                            value={selectedTab.key}
-                            onChange={(event) => {
-                                setSelectedTab(event.target.value);
-                                if (stateKey) {
-                                    setSyncedTabs((state) => ({
-                                        ...state,
-                                        [stateKey]: event.target.value,
-                                    }));
-                                }
-                                setOpened(true);
-                            }}
-                        >
-                            {tabs.map((tab) => (
-                                <option key={tab.key} value={tab.key}>
-                                    {tab.label}
-                                </option>
-                            ))}
-                        </select>
-                    ) : null}
-                    {(children || selectedTab?.body) && toggeable ? (
-                        <button
-                            className={classNames('openapi-section-toggle', `${className}-toggle`)}
-                            onClick={() => setOpened(!opened)}
-                        >
-                            {opened ? toggleCloseIcon : toggleOpenIcon}
-                        </button>
-                    ) : null}
+                    <div
+                        className={classNames(
+                            'openapi-section-header-content',
+                            `${className}-header-content`,
+                        )}
+                    >
+                        {(children || selectedTab?.body) && toggeable ? (
+                            <button
+                                {...mergeProps(buttonProps, focusProps)}
+                                ref={triggerRef}
+                                className={classNames(
+                                    'openapi-section-toggle',
+                                    `${className}-toggle`,
+                                )}
+                                style={{
+                                    outline: isFocusVisible
+                                        ? '2px solid rgb(var(--primary-color-500) / 0.4)'
+                                        : 'none',
+                                }}
+                            >
+                                {toggleIcon}
+                            </button>
+                        ) : null}
+                        {header}
+                    </div>
+                    <div
+                        className={classNames(
+                            'openapi-section-header-controls',
+                            `${className}-header-controls`,
+                        )}
+                        onClick={(event) => {
+                            event.stopPropagation();
+                        }}
+                    >
+                        {tabs.length > 1 ? (
+                            <select
+                                className={classNames(
+                                    'openapi-section-select',
+                                    'openapi-select',
+                                    `${className}-tabs-select`,
+                                )}
+                                value={selectedTab.key}
+                                onChange={(event) => {
+                                    setSelectedTab(event.target.value);
+                                    if (stateKey) {
+                                        setSyncedTabs((state) => ({
+                                            ...state,
+                                            [stateKey]: event.target.value,
+                                        }));
+                                    }
+                                    state.expand();
+                                }}
+                            >
+                                {tabs.map((tab) => (
+                                    <option key={tab.key} value={tab.key}>
+                                        {tab.label}
+                                    </option>
+                                ))}
+                            </select>
+                        ) : null}
+                    </div>
                 </div>
-            </div>
-            {(!toggeable || opened) && (children || selectedTab?.body) ? (
-                <div className={classNames('openapi-section-body', `${className}-body`)}>
+            ) : null}
+            {(!toggeable || state.isExpanded) && (children || selectedTab?.body) ? (
+                <div
+                    ref={panelRef}
+                    {...panelProps}
+                    className={classNames('openapi-section-body', `${className}-body`)}
+                >
                     {children}
                     {selectedTab?.body}
                 </div>
             ) : null}
-            {overlay}
+            {overlay ? (
+                <div className={classNames('openapi-section-overlay', `${className}-overlay`)}>
+                    {overlay}
+                </div>
+            ) : null}
         </div>
     );
 }

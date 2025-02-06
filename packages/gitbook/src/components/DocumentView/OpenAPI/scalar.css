@@ -263,32 +263,23 @@
 }
 .scalar-activate {
     width: fit-content;
-    margin: 0px 0.75rem 0.75rem auto;
     line-height: 24px;
     font-size: 0.75rem;
     cursor: pointer;
     font-size: 0.875rem;
-    font-weight: 600;
     display: flex;
     align-items: center;
     gap: 6px;
 }
 .scalar-activate-button {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-    color: var(--scalar-color-blue);
-    appearance: none;
-    outline: none;
-    border: none;
-    background: transparent;
-}
-.scalar-activate-button {
-    padding: 0 0.5rem;
-}
-.scalar-activate:hover .scalar-activate-button {
-    background: var(--scalar-background-3);
-    border-radius: 3px;
+    @apply flex gap-1.5 items-center;
+    @apply bg-primary-solid text-contrast-primary-solid hover:bg-primary-solid-hover hover:text-contrast-primary-solid-hover contrast-more:ring-1 rounded-md straight-corners:rounded-none place-self-start;
+    @apply ring-1 ring-tint hover:ring-tint-hover;
+    @apply shadow-sm shadow-tint dark:shadow-tint-1 hover:shadow-md active:shadow-none;
+    @apply contrast-more:ring-tint-12 contrast-more:hover:ring-2 contrast-more:hover:ring-tint-12;
+    @apply hover:scale-105 active:scale-100 transition-all;
+    @apply grow-0 shrink-0 truncate;
+    @apply text-sm px-2.5 py-1;
 }
 
 .scalar-app-loading {

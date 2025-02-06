@@ -1,4 +1,3 @@
-import * as React from 'react';
 import classNames from 'classnames';
 
 export function Markdown(props: { source: string; className?: string }) {

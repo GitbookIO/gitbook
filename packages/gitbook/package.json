@@ -29,7 +29,7 @@
         "@sentry/nextjs": "8.35.0",
         "@sindresorhus/fnv1a": "^3.1.0",
         "@tailwindcss/container-queries": "^0.1.1",
-        "@tailwindcss/typography": "^0.5.10",
+        "@tailwindcss/typography": "^0.5.16",
         "@upstash/redis": "^1.27.1",
         "ajv": "^8.12.0",
         "assert-never": "^1.2.1",

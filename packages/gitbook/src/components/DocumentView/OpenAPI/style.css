@@ -1,51 +1,106 @@
+/* Layout Components */
 .openapi-operation {
     content-visibility: auto;
     contain-intrinsic-height: 600px;
-    @apply flex-1 flex flex-col gap-6;
+    @apply flex-1 flex flex-col gap-4 mb-14;
 }
 
 .openapi-columns {
-    @apply flex flex-col md:flex-row gap-6 print-mode:flex-col;
+    @apply grid grid-cols-1 lg:grid-cols-2 gap-6 print-mode:grid-cols-1 justify-stretch;
 }
 
-/** Intro */
-
+/* Introduction */
 .openapi-intro {
-    @apply flex flex-col gap-3 max-w-3xl;
+    @apply flex flex-col gap-3;
 }
 
 .openapi-summary {
+    @apply flex flex-col items-start justify-start gap-2;
+}
+
+.openapi-summary-title {
     @apply font-semibold text-xl;
 }
 
-.openapi-description.openapi-markdown {
-    @apply prose-base;
+.openapi-summary-title[data-deprecated='true'] {
+    @apply line-through;
 }
 
-/** Method tag */
+.openapi-deprecated {
+    @apply py-0.5 px-1.5 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded-full text-sm leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
+}
 
+.openapi-deprecated-sunset-date {
+    @apply font-semibold font-mono;
+}
+
+.openapi-description.openapi-markdown {
+    @apply prose-sm text-[15px];
+}
+
+.openapi-description.openapi-markdown code {
+    @apply prose-sm;
+}
+
+/* Markdown Elements */
+.openapi-markdown blockquote {
+    @apply !ps-3;
+}
+
+.openapi-markdown blockquote > * {
+    @apply not-italic;
+}
+
+.openapi-markdown blockquote > p {
+    @apply before:content-none after:content-none !font-normal;
+}
+
+.openapi-markdown code {
+    @apply py-px px-1 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded   text-sm leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
+}
+
+.openapi-markdown pre code {
+    @apply bg-transparent ring-transparent;
+}
+
+/* Markdown Base */
+.openapi-markdown {
+    @apply prose text-tint-strong prose-p:!my-2 dark:prose-invert max-w-none whitespace-normal;
+}
+
+.openapi-markdown > *:first-child {
+    @apply !mt-0;
+}
+
+.openapi-markdown > *:last-child {
+    @apply !mb-0;
+}
+
+/* Method Tags */
 .openapi-method {
-    @apply rounded font-mono font-bold text-[11.5px] px-1 py-0.5 mr-2 text-tint-12/8 leading-tight align-middle inline-flex ring-1 ring-inset ring-tint-12/1 dark:ring-tint-1/1 whitespace-nowrap;
+    @apply rounded uppercase font-mono font-bold text-xs px-1 py-0.5 mr-2 text-tint-12/8 leading-tight align-middle inline-flex ring-1 ring-inset ring-tint-12/1 dark:ring-tint-1/1 whitespace-nowrap;
 }
 
 .openapi-method-get {
-    @apply bg-[hsl(215,54%,86%)] dark:bg-[hsla(215,54%,45%,0.24)] dark:text-[hsl(215,54%,86%)];
+    /* @apply bg-[hsl(215,54%,86%)] dark:bg-[hsla(215,54%,45%,0.24)] dark:text-[hsl(215,54%,86%)]; */
+    @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100;
 }
 
 .openapi-method-post {
-    @apply bg-[hsl(120,25%,80%)] dark:bg-[hsla(120,54%,32%,0.24)] dark:text-[hsl(120,25%,80%)];
+    /* @apply bg-[hsl(120,25%,80%)] dark:bg-[hsla(120,54%,32%,0.24)] dark:text-[hsl(120,25%,80%)]; */
+    @apply bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100;
 }
 
 .openapi-method-put {
-    @apply bg-yellow dark:bg-yellow-600/5 dark:text-yellow;
+    @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100;
 }
 
 .openapi-method-patch {
-    @apply bg-teal-300 dark:bg-teal-600/5 dark:text-teal-300;
+    @apply bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100;
 }
 
 .openapi-method-delete {
-    @apply bg-pomegranate-200 dark:bg-pomegranate-500/5 dark:text-pomegranate-200;
+    @apply bg-pomegranate-100 text-pomegranate-800 dark:bg-pomegranate-900 dark:text-pomegranate-100;
 }
 
 .openapi-method-head,
@@ -54,8 +109,7 @@
     @apply bg-tint;
 }
 
-/** URL */
-
+/* URL */
 .openapi-url {
     @apply font-mono text-sm text-tint;
 }
@@ -64,14 +118,13 @@
     @apply text-tint underline underline-offset-2 decoration-tint-subtle;
 }
 
-/** Columns */
-
+/* Column Layout */
 .openapi-column-spec {
-    @apply flex flex-col flex-1 gap-4 max-w-3xl;
+    @apply flex flex-col gap-8 flex-1;
 }
 
 .openapi-column-preview {
-    @apply flex flex-col flex-1 max-w-3xl;
+    @apply flex flex-col flex-1;
 }
 
 .openapi-column-preview-body {
@@ -79,21 +132,39 @@
 }
 
 .openapi-column-preview pre {
-    @apply max-h-60 print-mode:max-h-none;
+    @apply max-h-96 print-mode:max-h-none;
 }
 
-/** Schemas */
-
+/* Schema Structure */
 .openapi-schema-root {
-    @apply mx-3 mb-3 mt-2;
+    @apply mt-2;
 }
 
-.openapi-schema .openapi-schema-properties {
-    @apply border rounded border-tint;
+.openapi-schema-properties {
+    @apply flex flex-col;
 }
 
-.openapi-schema-properties .openapi-schema {
-    @apply border-b px-3 py-2 border-tint-subtle;
+.openapi-schema-body {
+    @apply py-2.5 flex flex-col gap-2;
+}
+
+.openapi-section-body .openapi-schema-properties {
+    @apply divide-y divide-tint-subtle;
+}
+
+.openapi-disclosure-group-panel
+    > .openapi-schema-properties
+    > *:first-child
+    > .openapi-schema-body {
+    @apply pt-0;
+}
+
+.openapi-responsebody > .openapi-schema-properties > *:last-child > .openapi-schema-body {
+    @apply pb-0;
+}
+
+.openapi-responsebody > .openapi-schema-properties > *:only-child > .openapi-schema-body {
+    @apply py-0;
 }
 
 .openapi-schema-properties .openapi-schema:last-child {
@@ -108,38 +179,52 @@
     @apply mt-3;
 }
 
+/* Schema Presentation */
+.openapi-schema-presentation {
+    @apply flex flex-col gap-1.5 font-normal;
+}
+
+.openapi-schema-properties:last-child {
+    @apply pb-0;
+}
+
 .openapi-schema-name {
     /* To make double click on the property name select only the name,
     we disable selection on the parent and re-enable it on the children. */
-    @apply select-none;
+    @apply select-none flex gap-2.5 items-baseline text-sm;
+}
+
+.openapi-schema-name .openapi-deprecated {
+    @apply text-xs;
 }
 
 .openapi-schema-propertyname {
-    @apply select-all font-medium text-base text-tint-strong;
+    @apply select-all font-mono font-normal text-tint-strong;
+}
+
+.openapi-schema-propertyname[data-deprecated='true'] {
+    @apply line-through opacity-9;
 }
 
 .openapi-schema-required {
-    @apply font-normal text-yellow-600;
+    @apply text-amber-600 text-[13px];
 }
 
 .openapi-schema-type {
-    @apply font-mono ml-3 text-sm text-tint select-text;
+    @apply text-tint select-text text-[13px] font-mono;
 }
 
 .openapi-schema-type:only-child {
     @apply ml-0;
 }
 
+/* Schema Header */
 .openapi-schema-header {
     @apply flex flex-row items-center;
 }
 
 .openapi-schema-intro {
     @apply flex-1;
-}
-
-.openapi-schema-body {
-    @apply mt-2;
 }
 
 .openapi-schema-circular {
@@ -154,12 +239,13 @@
     @apply text-base;
 }
 
+/* Schema Enum */
 .openapi-schema-enum {
-    @apply flex flex-row flex-wrap mt-1;
+    @apply flex flex-row text-sm leading-relaxed flex-wrap text-tint;
 }
 
 .openapi-schema-enum-value {
-    @apply font-mono text-xs px-1.5 py-1 border border-tint-subtle -ml-px -mt-px text-tint;
+    @apply text-sm;
 }
 
 .openapi-schema-enum-value:first-child {
@@ -170,112 +256,118 @@
     @apply rounded-r;
 }
 
+/* Schema Description */
 .openapi-schema-description.openapi-markdown {
-    @apply prose-sm;
+    @apply prose-sm text-tint overflow-hidden !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
+.openapi-schema-description.openapi-markdown pre:has(code) {
+    @apply overflow-x-auto flex-1 w-fit max-w-full h-fit whitespace-pre;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.openapi-schema-description.openapi-markdown pre::-webkit-scrollbar {
+    display: none;
+}
+
+.openapi-schema-description.openapi-markdown pre code {
+    font-weight: inherit !important;
+    @apply text-xs !py-0;
+}
+
+/* Schema Examples */
 .openapi-schema-example,
 .openapi-schema-pattern {
-    @apply prose-sm mt-1 text-tint-strong;
+    @apply prose-sm text-tint;
 }
 
-/** Authentication */
-
-.openapi-securities {
-    @apply border rounded border-tint-subtle;
+.openapi-schema-example code,
+.openapi-schema-pattern code,
+.openapi-schema-enum-value code {
+    @apply py-px px-1 min-w-[1.625rem] text-tint-strong font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded text-xs leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
 }
 
+/* Authentication */
 .openapi-securities-header {
-    @apply px-3 py-2;
-}
-
-.openapi-securities.openapi-securities-closed:hover {
-    @apply border-tint-hover cursor-pointer;
-}
-
-.openapi-securities-header-content {
-    @apply font-semibold text-base text-tint-strong;
+    @apply py-2 border-b border-tint-subtle max-w-full flex-1;
 }
 
 .openapi-securities-body {
-    @apply mx-3 mb-2 flex flex-col gap-2;
+    @apply flex flex-col gap-2;
 }
 
 .openapi-securities-description.openapi-markdown {
-    @apply prose-sm;
+    @apply prose-sm text-tint !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 .openapi-securities-label {
     @apply font-medium text-sm text-tint-strong;
 }
 
-/** Parameters */
-
-.openapi-parameters {
-    @apply border rounded border-tint-subtle;
-}
-
-.openapi-parameters.openapi-parameters-closed:hover {
-    @apply border-tint-hover cursor-pointer;
-}
-
+/* Parameters */
 .openapi-parameters-header {
-    @apply px-3 py-2;
+    @apply py-2 border-b border-tint-subtle max-w-full flex-1;
 }
 
 .openapi-parameters-header-content {
-    @apply font-semibold text-base text-tint-strong;
 }
 
-/** Request body */
-.openapi-requestbody {
-    @apply border rounded border-tint-subtle;
-}
-
+/* Request Body */
 .openapi-requestbody-header {
-    @apply px-3 py-2;
+    @apply py-2 border-b border-tint-subtle max-w-full flex-1;
 }
 
 .openapi-requestbody-header-content {
-    @apply font-semibold text-base text-tint-strong;
 }
 
 .openapi-requestbody-description.openapi-markdown {
-    @apply px-3 prose-sm;
+    @apply prose-sm text-tint !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
-.openapi-requestbody-description.openapi-markdown {
-    @apply px-3 prose-sm;
-}
-
-.openapi-requestbody-description.openapi-markdown {
-    @apply px-3 prose-sm;
-}
-
-/** Responses */
-.openapi-responses {
-    @apply border rounded border-tint-subtle;
-}
-
+/* Responses */
 .openapi-responses-header {
-    @apply px-3 py-2;
-}
-
-.openapi-responses-body {
-    @apply flex flex-col gap-3;
+    @apply py-2 border-b border-tint-subtle max-w-full flex-1;
 }
 
 .openapi-responses-header-content {
-    @apply font-semibold text-tint-strong;
 }
 
-/** Response */
+.openapi-response-tab-content {
+    @apply overflow-hidden max-w-full flex items-baseline gap-2;
+}
+
 .openapi-response-description.openapi-markdown {
-    @apply px-3 prose-sm;
+    @apply prose-sm text-[13px] h-auto relative leading-[18px] text-tint !font-normal truncate select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
-.openapi-response-description:last-child {
-    @apply mb-3;
+.openapi-response-description.openapi-markdown::-webkit-scrollbar {
+    display: none;
+}
+
+.openapi-response-description p {
+    @apply truncate max-w-full inline pr-1;
+}
+
+.openapi-response-statuscode {
+    @apply tabular-nums text-sm font-normal font-mono shrink-0;
+}
+
+.openapi-response-content-type {
+    @apply text-xs text-tint-8 ml-auto shrink-0;
+}
+
+.openapi-response-body {
+    @apply flex flex-col gap-3;
+}
+
+/* Response Body and Headers */
+.openapi-responsebody .openapi-schema-name {
+    @apply mb-0;
+}
+
+.openapi-responsebody .openapi-schema-presentation {
+    @apply py-0;
 }
 
 .openapi-responsebody-header,
@@ -285,65 +377,119 @@
 
 .openapi-responsebody-header-content,
 .openapi-responseheaders-header-content {
-    @apply text-base text-tint;
 }
 
-/** Code sample */
-
+/* Code Sample */
 .openapi-codesample {
     @apply border rounded bg-tint border-tint-subtle;
 }
 
 .openapi-codesample-header {
-    @apply flex flex-row items-center px-3 py-2;
+    @apply flex flex-row items-center;
 }
 
-.openapi-codesample-title {
-    @apply flex-1 font-semibold text-base;
+.openapi-codesample-header-content {
+    @apply flex flex-row items-center h-fit;
 }
 
-/** Response example */
+/* Path */
+.openapi-path {
+    @apply flex items-center bg-tint-base text-sm gap-2 p-2 border rounded-md border-tint-subtle;
+}
 
+.openapi-path .openapi-method {
+    @apply text-[13px] m-0 px-1;
+}
+
+.openapi-path-title {
+    @apply flex-1 relative font-normal whitespace-nowrap overflow-x-auto font-mono text-tint-strong;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.openapi-path-title[data-deprecated='true'] {
+    @apply line-through;
+}
+
+.openapi-path-title::-webkit-scrollbar {
+    display: none;
+}
+
+/* .openapi-path-copy {
+    @apply absolute opacity-0 h-fit right-0 top-1/2 -translate-y-1/2 bg-light dark:bg-dark border rounded-md border-tint-subtle px-1.5 py-0;
+}
+
+.openapi-path-title:hover .openapi-path-copy {
+    @apply opacity-11;
+} */
+
+.openapi-path-title em {
+    @apply not-italic text-primary font-medium;
+}
+
+.openapi-path-separator {
+    @apply text-tint;
+}
+
+.openapi-path-overlay {
+    @apply flex flex-row items-center py-2 px-3 justify-end border-t border-tint-subtle;
+}
+
+/* Response Example */
 .openapi-response-example {
     @apply border rounded bg-tint border-tint-subtle;
 }
 
-.openapi-response-example-header {
-    @apply flex flex-row items-center px-3 py-2;
+.openapi-response-example-empty {
+    @apply relative text-tint bg-tint min-h-20 flex flex-col justify-center items-center;
 }
 
-.openapi-response-example-title {
-    @apply flex-1 font-semibold text-base;
+/* Common Elements */
+.openapi-select {
+    @apply max-w-60 rounded font-mono text-xs leading-6 px-1 py-0.5 border border-tint-subtle bg-tint;
 }
-
-/** Common */
 
 .openapi-select {
-    @apply max-w-48 rounded font-mono text-xs leading-6 px-1 py-0.5 border border-tint bg-tint;
+    min-width: fit-content;
+    max-width: fit-content;
+}
+.openapi-select:focus {
+    width: auto;
 }
 
-/** Section */
-
-.openapi-section {
-}
-
+/* Section Components */
 .openapi-section-header {
-    @apply flex flex-row items-start;
+    @apply flex flex-row items-center;
 }
 
 .openapi-section-header-content {
-    @apply flex-1;
+    @apply flex-1 text-base gap-1.5 flex w-full font-medium text-tint-strong;
 }
 
 .openapi-section-header-controls {
     @apply flex flex-row items-center gap-2;
 }
 
-.openapi-section-toggle {
-    @apply flex items-center justify-end size-6 text-tint-subtle contrast-more:text-tint-strong;
+.openapi-section-header-content:has(.openapi-section-toggle) {
+    @apply cursor-pointer;
 }
 
-.openapi-section-toggle:focus-visible,
+.openapi-section-header-content:hover .openapi-section-toggle {
+    @apply text-tint;
+}
+
+.openapi-section-toggle {
+    @apply text-tint-subtle contrast-more:text-tint-strong;
+}
+
+.openapi-section-toggle > svg {
+    @apply transition-all;
+}
+
+.openapi-section-toggle[aria-expanded='true'] > svg {
+    @apply rotate-90;
+}
+
 .openapi-section-toggle:focus-visible {
     @apply text-primary;
 }
@@ -352,15 +498,120 @@
     @apply size-3;
 }
 
-/** Markdown */
-.openapi-markdown {
-    @apply prose dark:prose-invert text-tint-strong max-w-none whitespace-normal;
+/* Tabs */
+.openapi-tabs-list {
+    @apply flex flex-row gap-3 py-1.5 px-2.5 border-b border-tint-subtle w-full;
 }
 
-.openapi-markdown > *:first-child {
-    @apply mt-0;
+.openapi-tabs-tab {
+    @apply hover:bg-primary-hover font-mono font-normal tabular-nums hover:text-primary cursor-pointer transition-all relative text-[13px] text-tint px-1 border border-transparent rounded;
 }
 
-.openapi-markdown > *:last-child {
-    @apply mb-0;
+.openapi-tabs-tab[aria-selected='true'] {
+    @apply text-primary after:absolute after:-bottom-2 after:left-0 after:w-full after:h-px after:bg-primary-solid after:transition-all;
+}
+
+.openapi-tabs-panel {
+    @apply flex-1 text-sm focus-visible:outline-none;
+}
+
+.openapi-tabs-footer {
+    @apply px-3 py-2 pt-2.5 border-t border-tint-subtle text-[13px] text-tint;
+}
+
+/* Disclosure group */
+.openapi-disclosure-group {
+    @apply border-b border-tint-subtle relative;
+}
+
+.openapi-disclosure-group-header {
+    @apply flex flex-row items-center justify-between gap-3;
+}
+
+.openapi-disclosure-group-trigger {
+    @apply flex items-center relative flex-1 gap-2.5 py-2 truncate -outline-offset-1;
+}
+
+.openapi-disclosure-group-trigger:disabled {
+    @apply cursor-default;
+}
+
+.openapi-disclosure-group:only-child,
+.openapi-disclosure-group:last-child {
+    @apply border-b-0;
+}
+
+.openapi-disclosure-group-trigger:disabled .openapi-disclosure-group-icon {
+    @apply invisible;
+}
+
+.openapi-disclosure-group-icon > svg {
+    @apply size-3 text-tint-subtle transition-all duration-300;
+}
+
+.openapi-disclosure-group-trigger:hover > .openapi-disclosure-group-icon svg {
+    @apply text-tint-strong;
+}
+
+.openapi-disclosure-group-panel {
+    @apply pb-2.5;
+}
+
+.openapi-disclosure-group-trigger[aria-expanded='true'] > .openapi-disclosure-group-icon > svg {
+    @apply rotate-90;
+}
+
+.openapi-disclosure-group:hover .openapi-disclosure-group-mediatype,
+.openapi-disclosure-group[aria-expanded='true'] .openapi-disclosure-group-mediatype {
+    @apply opacity-11 flex;
+}
+
+.openapi-disclosure-group-mediatype {
+    @apply opacity-0 hidden transition-all duration-200 shrink-0;
+}
+
+.openapi-disclosure-group-mediatype > span {
+    @apply text-xs text-tint-subtle;
+}
+
+/* Disclosure */
+.openapi-disclosure-trigger {
+    @apply transition-all duration-300 hover:text-tint-strong rounded-2xl border border-tint-subtle px-2.5 py-1 text-[13px] text-tint flex flex-row items-center gap-1.5 -outline-offset-1;
+}
+
+.openapi-disclosure svg {
+    @apply size-3 transition-transform duration-300;
+}
+
+.openapi-disclosure-trigger[aria-expanded='true'] svg {
+    @apply rotate-45;
+}
+
+.openapi-disclosure-trigger[aria-expanded='true'] {
+    @apply w-full rounded-lg border-b rounded-b-none;
+}
+
+.openapi-disclosure-trigger[aria-expanded='false'] {
+    @apply w-auto;
+}
+
+.openapi-disclosure-panel[aria-hidden='false'] {
+    @apply border-b border-x border-tint-subtle rounded-b-lg;
+}
+
+.openapi-disclosure-panel .openapi-schema-body {
+    @apply p-2.5;
+}
+
+.openapi-disclosure .openapi-schema-properties .openapi-schema:only-child,
+.openapi-disclosure .openapi-schema-properties .openapi-schema:only-child .openapi-schema-name {
+    @apply !m-0;
+}
+
+.openapi-disclosure .openapi-schema-properties .openapi-schema-enum {
+    @apply pt-0 mt-0;
+}
+
+.openapi-section-body.openapi-schema.openapi-schema-root-body {
+    @apply space-y-2.5;
 }
