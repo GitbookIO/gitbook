@@ -52,11 +52,6 @@ export function OpenAPISchemaProperty(
         ? null
         : getSchemaAlternatives(schema, new Set(circularRefs.keys()));
 
-    // If the schema is empty and there is no property name, we don't render anything
-    if (isEmptySchema(schema) && !propertyName) {
-        return null;
-    }
-
     if ((properties && !!properties.length) || schema.type === 'object') {
         return (
             <InteractiveSection id={id} className={classNames('openapi-schema', className)}>
@@ -406,10 +401,10 @@ export function getSchemaTitle(
     discriminator?: OpenAPIV3.DiscriminatorObject,
 ): string {
     //TODO: uncomment this once models are available
-    // if (schema.title) {
-    //     // If the schema has a title, use it
-    //     return schema.title;
-    // }
+    if (schema.title) {
+        // If the schema has a title, use it
+        return schema.title;
+    }
 
     // Try using the discriminator
     if (discriminator?.propertyName && schema.properties) {
@@ -450,21 +445,4 @@ export function getSchemaTitle(
     }
 
     return type;
-}
-
-/** Check if the schema is empty
- * eg. no properties, no description, no title, no type, no enum, no allOf, no anyOf, no oneOf, no not
- */
-function isEmptySchema(schema: OpenAPIV3.SchemaObject): boolean {
-    return (
-        !schema.properties &&
-        !schema.description &&
-        !schema.title &&
-        !schema.type &&
-        !schema.enum &&
-        !schema.allOf &&
-        !schema.anyOf &&
-        !schema.oneOf &&
-        !schema.not
-    );
 }
