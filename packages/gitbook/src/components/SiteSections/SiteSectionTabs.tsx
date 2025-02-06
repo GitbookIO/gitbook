@@ -69,32 +69,36 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
                         const isActive = isActiveGroup || id === currentSection.id;
                         return (
                             <NavigationMenu.Item key={id} value={id}>
-                                {isGroup ? 
-                                    sectionOrGroup.sections.length > 0 ? (<>
-                                        <NavigationMenu.Trigger
-                                            ref={(node) =>
-                                                onNodeUpdate(
-                                                    node,
-                                                    id,
-                                                    sectionOrGroup.sections.length,
-                                                )
-                                            }
-                                            asChild
-                                        >
-                                            <SectionGroupTab
-                                                isActive={isActive}
-                                                title={title}
-                                                icon={icon as IconName}
-                                            />
-                                        </NavigationMenu.Trigger>
-                                        <NavigationMenu.Content className="absolute z-20 left-0 top-0 w-full md:w-max data-[motion=from-end]:motion-safe:animate-enterFromRight data-[motion=from-start]:motion-safe:animate-enterFromLeft data-[motion=to-end]:motion-safe:animate-exitToRight data-[motion=to-start]:motion-safe:animate-exitToLeft">
-                                            <SectionGroupTileList
-                                                sections={sectionOrGroup.sections as SiteSection[]}
-                                                currentSection={currentSection}
-                                            />
-                                        </NavigationMenu.Content>
-                                    </>) : null
-                                 : (
+                                {isGroup ? (
+                                    sectionOrGroup.sections.length > 0 ? (
+                                        <>
+                                            <NavigationMenu.Trigger
+                                                ref={(node) =>
+                                                    onNodeUpdate(
+                                                        node,
+                                                        id,
+                                                        sectionOrGroup.sections.length,
+                                                    )
+                                                }
+                                                asChild
+                                            >
+                                                <SectionGroupTab
+                                                    isActive={isActive}
+                                                    title={title}
+                                                    icon={icon as IconName}
+                                                />
+                                            </NavigationMenu.Trigger>
+                                            <NavigationMenu.Content className="absolute z-20 left-0 top-0 w-full md:w-max data-[motion=from-end]:motion-safe:animate-enterFromRight data-[motion=from-start]:motion-safe:animate-enterFromLeft data-[motion=to-end]:motion-safe:animate-exitToRight data-[motion=to-start]:motion-safe:animate-exitToLeft">
+                                                <SectionGroupTileList
+                                                    sections={
+                                                        sectionOrGroup.sections as SiteSection[]
+                                                    }
+                                                    currentSection={currentSection}
+                                                />
+                                            </NavigationMenu.Content>
+                                        </>
+                                    ) : null
+                                ) : (
                                     <NavigationMenu.Link asChild>
                                         <SectionTab
                                             url={sectionOrGroup.urls.published ?? ''}
