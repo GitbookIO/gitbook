@@ -1,7 +1,7 @@
 import { LoadPlugin, isJson, isYaml, ERRORS } from '@scalar/openapi-parser';
 import fs from 'fs';
 
-import { dirname, join } from './path';
+import { dirname, join } from './polyfills/path';
 
 export const readFiles: (prefix?: string) => LoadPlugin = (prefix?: string) => {
     return {

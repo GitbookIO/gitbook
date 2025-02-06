@@ -304,13 +304,13 @@ function getSchemaProperties(schema: OpenAPIV3.SchemaObject): null | OpenAPISche
         const result: OpenAPISchemaPropertyEntry[] = [];
 
         if (schema.properties) {
-            Object.entries(schema.properties).forEach(([propertyName, rawPropertySchema]) => {
+            Object.entries(schema.properties).forEach(([propertyName, propertySchema]) => {
                 result.push({
                     propertyName,
                     required: Array.isArray(schema.required)
                         ? schema.required.includes(propertyName)
                         : undefined,
-                    schema: rawPropertySchema,
+                    schema: propertySchema,
                 });
             });
         }

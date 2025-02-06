@@ -24,8 +24,7 @@ export function OpenAPICodeSample(props: {
     const searchParams = new URLSearchParams();
     const headersObject: { [k: string]: string } = {};
 
-    data.operation.parameters?.forEach((rawParam) => {
-        const param = rawParam;
+    data.operation.parameters?.forEach((param) => {
         if (!param) {
             return;
         }
@@ -148,7 +147,7 @@ function getSecurityHeaders(securities: OpenAPIOperationData['securities']): {
         case 'apiKey': {
             if (security[1].in !== 'header') return {};
 
-            const name = security?.[1].name ?? 'Authorization';
+            const name = security[1].name ?? 'Authorization';
             let scheme = security[0];
 
             switch (scheme) {
