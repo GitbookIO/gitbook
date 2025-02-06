@@ -17,18 +17,6 @@ import { PagesList } from './PagesList';
 import { TOCScrollContainer } from './TOCScroller';
 import { Trademark } from './Trademark';
 
-function getTopOffset(props: { sectionsHeader: boolean; topHeader: boolean }) {
-    if (props.topHeader && props.sectionsHeader) {
-        return 'lg:top-[6.75rem] lg:h-[calc(100vh_-_6.75rem)]';
-    }
-
-    if (props.topHeader) {
-        return 'lg:top-16 lg:h-[calc(100vh_-_4rem)]';
-    }
-
-    return 'lg:top-0 lg:h-screen';
-}
-
 export function TableOfContents(props: {
     space: Space;
     customization: CustomizationSettings | SiteCustomizationSettings;
@@ -46,8 +34,6 @@ export function TableOfContents(props: {
     const { innerHeader, space, customization, pages, ancestors, header, context, headerOffset } =
         props;
 
-    const topOffset = getTopOffset(headerOffset);
-
     return (
         <aside // Sidebar container, responsible for setting the right dimensions and position for the sidebar.
             data-testid="table-of-contents"
@@ -61,11 +47,19 @@ export function TableOfContents(props: {
                 'lg:basis-72',
 
                 'relative',
-                'lg:sticky',
-                'top-0',
-                'h-screen',
-                topOffset,
                 'z-[1]',
+                'lg:sticky',
+                // Without header
+                'lg:top-0',
+                'lg:h-screen',
+
+                // With header
+                'site-header:lg:top-16',
+                'site-header:lg:h-[calc(100vh_-_4rem)]',
+
+                // With header and sections
+                'site-header-sections:lg:top-[6.75rem]',
+                'site-header-sections:lg:h-[calc(100vh_-_6.75rem)]',
 
                 'pt-6',
                 'pb-4',

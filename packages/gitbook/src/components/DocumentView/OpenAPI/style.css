@@ -128,7 +128,7 @@
 }
 
 .openapi-column-preview-body {
-    @apply flex flex-col gap-4 sticky top-4 space-header:top-20 page-api-block:xl:max-2xl:top-32 print-mode:static;
+    @apply flex flex-col gap-4 sticky top-4 site-header:top-20 site-header-sections:top-32 page-api-block:xl:max-2xl:top-32 print-mode:static;
 }
 
 .openapi-column-preview pre {

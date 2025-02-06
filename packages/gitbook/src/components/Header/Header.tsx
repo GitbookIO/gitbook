@@ -36,6 +36,7 @@ export function Header(props: {
 
     return (
         <header
+            id="site-header"
             className={tcls(
                 'flex',
                 'flex-col',
@@ -50,7 +51,7 @@ export function Header(props: {
                 'bg-tint-base/9',
                 '[html.tint.sidebar-filled_&]:bg-tint-subtle/9',
                 'contrast-more:bg-tint-base',
-                withTopHeader ? null : 'lg:hidden',
+                withTopHeader ? null : 'lg:hidden mobile-only',
                 'text-sm',
                 'backdrop-blur-lg',
             )}
