@@ -123,7 +123,7 @@ function handleUnresolvedReference(
 
     if (isReference) {
         // If we find a reference that wasn't resolved or needed to be resolved externally, render out the URL
-        return { value: `See: ${input.value.$ref}` };
+        return { value: input.value.$ref };
     }
 
     return input;
