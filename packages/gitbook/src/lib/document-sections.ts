@@ -9,6 +9,7 @@ export interface DocumentSection {
     tag?: string;
     title: string;
     depth: number;
+    deprecated?: boolean;
 }
 
 /**
@@ -44,6 +45,7 @@ export async function getDocumentSections(
                     tag: operation.method.toUpperCase(),
                     title: operation.operation.summary ?? operation.path,
                     depth: 1,
+                    deprecated: operation.operation.deprecated,
                 });
             }
         }

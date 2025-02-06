@@ -4,6 +4,7 @@ import { OpenAPIClientContext } from './types';
 import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
 import { OpenAPIOperationData } from './fetchOpenAPIOperation';
+import { OpenAPISchemaName } from './OpenAPISchemaName';
 
 /**
  * Present securities authorization that can be used for this operation.
@@ -20,26 +21,28 @@ export function OpenAPISecurities(props: {
 
     return (
         <InteractiveSection
-            header="Authorization"
-            className="openapi-securities"
+            header="Authorizations"
             toggeable
             defaultOpened={false}
-            toggleCloseIcon={context.icons.chevronDown}
-            toggleOpenIcon={context.icons.chevronRight}
+            toggleIcon={context.icons.chevronRight}
+            className="openapi-securities"
             tabs={securities.map(([key, security]) => {
                 return {
                     key: key,
                     label: key,
                     body: (
-                        <>
-                            <p className="openapi-securities-label">{getLabelForType(security)}</p>
-                            {security.description ? (
-                                <Markdown
-                                    source={security.description}
-                                    className="openapi-securities-description"
-                                />
-                            ) : null}
-                        </>
+                        <div className="openapi-schema-body">
+                            <div className="openapi-schema-presentation">
+                                {getLabelForType(security)}
+
+                                {security.description ? (
+                                    <Markdown
+                                        source={security.description}
+                                        className="openapi-securities-description"
+                                    />
+                                ) : null}
+                            </div>
+                        </div>
                     ),
                 };
             })}
@@ -47,24 +50,35 @@ export function OpenAPISecurities(props: {
     );
 }
 
-function getLabelForType(security: OpenAPIV3_1.SecuritySchemeObject): string {
+function getLabelForType(security: OpenAPIV3_1.SecuritySchemeObject) {
     switch (security.type) {
         case 'apiKey':
-            return 'API Key';
+            return <OpenAPISchemaName propertyName="apiKey" type="string" required />;
         case 'http':
             if (security.scheme === 'basic') {
                 return 'Basic Auth';
             }
 
             if (security.scheme == 'bearer') {
-                return `Bearer Token ${security.bearerFormat ? `(${security.bearerFormat})` : ''}`;
+                return (
+                    <>
+                        <OpenAPISchemaName propertyName="Authorization" type="string" required />
+                        {/** Show a default description if none is provided */}
+                        {!security.description ? (
+                            <Markdown
+                                source={`Bearer authentication header of the form Bearer ${`&lt;token&gt;`}.`}
+                                className="openapi-securities-description"
+                            />
+                        ) : null}
+                    </>
+                );
             }
 
-            return 'HTTP';
+            return <OpenAPISchemaName propertyName="HTTP" required />;
         case 'oauth2':
-            return 'OAuth2';
+            return <OpenAPISchemaName propertyName="OAuth2" required />;
         case 'openIdConnect':
-            return 'OpenID Connect';
+            return <OpenAPISchemaName propertyName="OpenID Connect" required />;
         default:
             // @ts-ignore
             return security.type;

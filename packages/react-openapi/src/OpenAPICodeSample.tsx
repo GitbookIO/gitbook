@@ -1,14 +1,14 @@
-import * as React from 'react';
+import React from 'react';
 
 import { CodeSampleInput, codeSampleGenerators } from './code-samples';
 import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { generateMediaTypeExample, generateSchemaExample } from './generateSchemaExample';
 import { InteractiveSection } from './InteractiveSection';
 import { getServersURL } from './OpenAPIServerURL';
-import { ScalarApiButton } from './ScalarApiButton';
 import { OpenAPIContextProps } from './types';
 import { noReference } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
+import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
 
 /**
  * Display code samples to execute the operation.
@@ -112,25 +112,17 @@ export function OpenAPICodeSample(props: {
     const codeSamplesDisabled =
         data['x-codeSamples'] === false || data.operation['x-codeSamples'] === false;
     const samples = customCodeSamples ?? (!codeSamplesDisabled ? autoCodeSamples : []);
+
     if (samples.length === 0) {
         return null;
     }
 
     return (
-        <InteractiveSection
-            header="Request"
-            className="openapi-codesample"
-            tabs={samples}
-            overlay={
-                data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'] ? null : (
-                    <ScalarApiButton
-                        method={data.method}
-                        path={data.path}
-                        specUrl={context.specUrl}
-                    />
-                )
-            }
-        />
+        <OpenAPITabs items={samples}>
+            <InteractiveSection header={<OpenAPITabsList />} className="openapi-codesample">
+                <OpenAPITabsPanels />
+            </InteractiveSection>
+        </OpenAPITabs>
     );
 }
 
@@ -138,6 +130,7 @@ function getSecurityHeaders(securities: OpenAPIOperationData['securities']): {
     [key: string]: string;
 } {
     const security = securities[0];
+
     if (!security) {
         return {};
     }

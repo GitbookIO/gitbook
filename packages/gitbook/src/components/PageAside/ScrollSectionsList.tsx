@@ -126,7 +126,17 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                             </span>
                         ) : null}
 
-                        {section.title}
+                        <span
+                            className={tcls(
+                                section.deprecated && [
+                                    'line-through',
+                                    'opacity-50',
+                                    'contrast-more:opacity-60',
+                                ],
+                            )}
+                        >
+                            {section.title}
+                        </span>
                     </a>
                 </motion.li>
             ))}

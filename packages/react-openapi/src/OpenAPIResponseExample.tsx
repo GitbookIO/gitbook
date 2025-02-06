@@ -1,11 +1,11 @@
-import * as React from 'react';
-import { InteractiveSection } from './InteractiveSection';
 import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { generateSchemaExample } from './generateSchemaExample';
 import { OpenAPIContextProps } from './types';
-import { checkIsReference, createStateKey, noReference } from './utils';
+import { checkIsReference, noReference } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { OpenAPIV3 } from '@scalar/openapi-types';
+import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
+import { InteractiveSection } from './InteractiveSection';
 
 /**
  * Display an example of the response content.
@@ -53,7 +53,12 @@ export function OpenAPIResponseExample(props: {
             })();
 
             if (!mediaTypeObject) {
-                return null;
+                return {
+                    key: key,
+                    label: key,
+                    description: responseObject.description,
+                    body: <OpenAPIEmptyResponseExample />,
+                };
             }
 
             const example = handleUnresolvedReference(
@@ -81,14 +86,11 @@ export function OpenAPIResponseExample(props: {
                 })(),
             );
 
-            if (!example?.value) {
-                return null;
-            }
-
             return {
                 key: key,
                 label: key,
-                body: (
+                description: responseObject.description,
+                body: example?.value ? (
                     <context.CodeBlock
                         code={
                             typeof example.value === 'string'
@@ -97,22 +99,33 @@ export function OpenAPIResponseExample(props: {
                         }
                         syntax="json"
                     />
+                ) : (
+                    <OpenAPIEmptyResponseExample />
                 ),
             };
         })
-        .filter((val): val is { key: string; label: string; body: any } => Boolean(val));
+        .filter((val): val is { key: string; label: string; body: any; description: string } =>
+            Boolean(val),
+        );
 
     if (examples.length === 0) {
         return null;
     }
 
     return (
-        <InteractiveSection
-            stateKey={createStateKey('response', context.blockKey)}
-            header="Response"
-            className="openapi-response-example"
-            tabs={examples}
-        />
+        <OpenAPITabs items={examples}>
+            <InteractiveSection header={<OpenAPITabsList />} className="openapi-response-example">
+                <OpenAPITabsPanels />
+            </InteractiveSection>
+        </OpenAPITabs>
+    );
+}
+
+function OpenAPIEmptyResponseExample() {
+    return (
+        <pre className="openapi-response-example-empty">
+            <p>No body</p>
+        </pre>
     );
 }
 

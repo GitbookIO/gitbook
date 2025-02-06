@@ -1,7 +1,6 @@
 'use client';
 
-import * as React from 'react';
-import { OpenAPIV3, OpenAPIV2, OpenAPI } from '@scalar/openapi-types';
+import { OpenAPI } from '@scalar/openapi-types';
 
 import { OpenAPIOperationData, fromJSON } from './fetchOpenAPIOperation';
 import { InteractiveSection } from './InteractiveSection';
@@ -36,11 +35,7 @@ export function OpenAPISpec(props: { data: OpenAPIOperationData; context: OpenAP
                 <InteractiveSection
                     key={group.key}
                     className="openapi-parameters"
-                    toggeable
-                    toggleOpenIcon={context.icons.chevronRight}
-                    toggleCloseIcon={context.icons.chevronDown}
                     header={group.label}
-                    defaultOpened={group.key === 'path' || context.defaultInteractiveOpened}
                 >
                     <OpenAPISchemaProperties
                         properties={group.parameters.map((parameter) => ({
@@ -50,6 +45,8 @@ export function OpenAPISpec(props: { data: OpenAPIOperationData; context: OpenAP
                                 // we use display it if the schema doesn't override it
                                 description: parameter.description,
                                 example: parameter.example,
+                                // Deprecated can be defined at the parameter level
+                                deprecated: parameter.deprecated,
                                 ...(noReference(parameter.schema) ?? {}),
                             },
                             required: parameter.required,
@@ -85,20 +82,22 @@ function groupParameters(parameters: OpenAPI.Parameters): Array<{
         parameters: OpenAPI.Parameters;
     }> = [];
 
-    parameters.forEach((parameter) => {
-        const key = parameter.in;
-        const label = getParameterGroupName(parameter.in);
-        const group = groups.find((group) => group.key === key);
-        if (group) {
-            group.parameters.push(parameter);
-        } else {
-            groups.push({
-                key,
-                label,
-                parameters: [parameter],
-            });
-        }
-    });
+    parameters
+        .filter((parameter) => parameter.in)
+        .forEach((parameter) => {
+            const key = parameter.in;
+            const label = getParameterGroupName(parameter.in);
+            const group = groups.find((group) => group.key === key);
+            if (group) {
+                group.parameters.push(parameter);
+            } else {
+                groups.push({
+                    key,
+                    label,
+                    parameters: [parameter],
+                });
+            }
+        });
 
     groups.sort((a, b) => sorted.indexOf(a.key) - sorted.indexOf(b.key));
 

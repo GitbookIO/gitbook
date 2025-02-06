@@ -5,7 +5,6 @@ import { OpenAPIRootSchema } from './OpenAPISchema';
 import { noReference } from './utils';
 import { OpenAPIClientContext } from './types';
 import { InteractiveSection } from './InteractiveSection';
-import { Markdown } from './Markdown';
 
 /**
  * Display an interactive request body.
@@ -34,14 +33,6 @@ export function OpenAPIRequestBody(props: {
                     };
                 },
             )}
-            defaultOpened={context.defaultInteractiveOpened}
-        >
-            {requestBody.description ? (
-                <Markdown
-                    source={requestBody.description}
-                    className="openapi-requestbody-description"
-                />
-            ) : null}
-        </InteractiveSection>
+        />
     );
 }

@@ -5,6 +5,10 @@ import { OpenAPIResponse } from './OpenAPIResponse';
 import { OpenAPIClientContext } from './types';
 import { InteractiveSection } from './InteractiveSection';
 import { OpenAPIV3, OpenAPIV3_1 } from '@scalar/openapi-types';
+import { OpenAPIDisclosureGroup } from './OpenAPIDisclosureGroup';
+import { Markdown } from './Markdown';
+import { OpenAPIRootSchema, OpenAPISchemaProperties, OpenAPISchemaProperty } from './OpenAPISchema';
+import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 
 /**
  * Display an interactive response body.
@@ -18,15 +22,50 @@ export function OpenAPIResponses(props: {
     return (
         <InteractiveSection
             stateKey={createStateKey('response', context.blockKey)}
-            header="Response"
+            header="Responses"
             className={classNames('openapi-responses')}
-            tabs={Object.entries(responses).map(([statusCode, response]) => {
-                return {
-                    key: statusCode,
-                    label: statusCode,
-                    body: <OpenAPIResponse response={noReference(response)} context={context} />,
-                };
-            })}
-        />
+        >
+            <OpenAPIDisclosureGroup
+                allowsMultipleExpanded
+                icon={context.icons.chevronRight}
+                groups={Object.entries(responses).map(
+                    ([statusCode, response]: [string, OpenAPIV3.ResponseObject]) => {
+                        const content = Object.entries(response.content ?? {});
+
+                        return {
+                            id: statusCode,
+                            label: (
+                                <div
+                                    className="openapi-response-tab-content"
+                                    key={`response-${statusCode}`}
+                                >
+                                    <span className="openapi-response-statuscode">
+                                        {statusCode}
+                                    </span>
+                                    {response.description ? (
+                                        <Markdown
+                                            source={response.description}
+                                            className="openapi-response-description"
+                                        />
+                                    ) : null}
+                                </div>
+                            ),
+                            tabs: content.map(([contentType, mediaType]) => ({
+                                id: contentType,
+                                label: contentType,
+                                body: (
+                                    <OpenAPIResponse
+                                        key={`$response-${statusCode}-${contentType}`}
+                                        response={response}
+                                        mediaType={mediaType}
+                                        context={context}
+                                    />
+                                ),
+                            })),
+                        };
+                    },
+                )}
+            />
+        </InteractiveSection>
     );
 }
