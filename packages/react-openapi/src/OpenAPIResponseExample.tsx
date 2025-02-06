@@ -54,7 +54,12 @@ export function OpenAPIResponseExample(props: {
             })();
 
             if (!mediaTypeObject) {
-                return null;
+                return {
+                    key: key,
+                    label: key,
+                    description: responseObject.description,
+                    body: <OpenAPIEmptyResponseExample />,
+                };
             }
 
             const example: OpenAPIV3.ExampleObject | null = noReference(
@@ -82,15 +87,11 @@ export function OpenAPIResponseExample(props: {
                 })(),
             );
 
-            if (!example?.value) {
-                return null;
-            }
-
             return {
                 key: key,
                 label: key,
                 description: responseObject.description,
-                body: (
+                body: example?.value ? (
                     <context.CodeBlock
                         code={
                             typeof example.value === 'string'
@@ -99,6 +100,8 @@ export function OpenAPIResponseExample(props: {
                         }
                         syntax="json"
                     />
+                ) : (
+                    <OpenAPIEmptyResponseExample />
                 ),
             };
         })
@@ -116,5 +119,13 @@ export function OpenAPIResponseExample(props: {
                 <OpenAPITabsPanels />
             </InteractiveSection>
         </OpenAPITabs>
+    );
+}
+
+function OpenAPIEmptyResponseExample() {
+    return (
+        <pre className="openapi-response-example-empty">
+            <p>No body</p>
+        </pre>
     );
 }

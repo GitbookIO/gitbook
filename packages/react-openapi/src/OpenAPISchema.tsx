@@ -386,7 +386,6 @@ export function getSchemaTitle(
     /** If the title is inferred in a oneOf with discriminator, we can use it to optimize the title */
     discriminator?: OpenAPIV3.DiscriminatorObject,
 ): string {
-    //TODO: uncomment this once models are available
     if (schema.title) {
         // If the schema has a title, use it
         return schema.title;
