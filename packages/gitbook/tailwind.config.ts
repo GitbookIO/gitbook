@@ -362,8 +362,8 @@ const config: Config = {
             /**
              * Variant when a header is displayed.
              */
-            addVariant('site-header', 'body:has(header) &');
-            addVariant('site-header-sections', 'body:has(header > nav) &');
+            addVariant('site-header', 'body:has(#site-header) &');
+            addVariant('site-header-sections', 'body:has(#site-header > nav) &');
 
             /**
              * Variant for sidebar styles

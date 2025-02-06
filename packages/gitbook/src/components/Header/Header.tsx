@@ -36,6 +36,7 @@ export function Header(props: {
 
     return (
         <header
+            id="site-header"
             className={tcls(
                 'flex',
                 'flex-col',
