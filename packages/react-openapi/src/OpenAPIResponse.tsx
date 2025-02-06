@@ -45,7 +45,6 @@ export function OpenAPIResponse(props: {
                     properties={[
                         {
                             schema: noReference(mediaType.schema) ?? {},
-                            showRequired: false,
                         },
                     ]}
                     context={context}

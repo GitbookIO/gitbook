@@ -11,7 +11,7 @@
 
 /* Introduction */
 .openapi-intro {
-    @apply flex flex-col gap-3 max-w-3xl;
+    @apply flex flex-col gap-3;
 }
 
 .openapi-summary {
@@ -120,11 +120,11 @@
 
 /* Column Layout */
 .openapi-column-spec {
-    @apply flex flex-col gap-8 flex-1 max-w-3xl;
+    @apply flex flex-col gap-8 flex-1;
 }
 
 .openapi-column-preview {
-    @apply flex flex-col flex-1 max-w-3xl;
+    @apply flex flex-col flex-1;
 }
 
 .openapi-column-preview-body {

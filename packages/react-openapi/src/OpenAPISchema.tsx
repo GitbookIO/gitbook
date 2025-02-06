@@ -16,10 +16,6 @@ export interface OpenAPISchemaPropertyEntry {
     propertyName?: string;
     required?: boolean;
     schema: OpenAPIV3.SchemaObject;
-    /** Whether to show the required label
-     * @default true
-     */
-    showRequired?: boolean;
 }
 
 /**
@@ -35,7 +31,6 @@ export function OpenAPISchemaProperty(
 ) {
     const {
         schema,
-        propertyName,
         circularRefs: parentCircularRefs = new Map<OpenAPIV3.SchemaObject, string>(),
         context,
         className,
@@ -219,7 +214,7 @@ export function OpenAPISchemaEnum(props: { enumValues: any[] }) {
 }
 
 export function OpenAPISchemaPresentation(props: OpenAPISchemaPropertyEntry) {
-    const { schema, propertyName, required, showRequired = true } = props;
+    const { schema, propertyName, required } = props;
 
     const shouldDisplayExample = (schema: OpenAPIV3.SchemaObject): boolean => {
         return (
@@ -238,7 +233,7 @@ export function OpenAPISchemaPresentation(props: OpenAPISchemaPropertyEntry) {
             <OpenAPISchemaName
                 type={getSchemaTitle(schema)}
                 propertyName={propertyName}
-                required={showRequired ? required : undefined}
+                required={required}
                 deprecated={schema.deprecated}
             />
             {schema['x-deprecated-sunset'] ? (
