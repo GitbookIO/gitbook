@@ -3,8 +3,7 @@ import { toJSON, fromJSON } from 'flatted';
 import { OpenAPICustomSpecProperties, OpenAPIParseError } from './parser';
 import { OpenAPI, OpenAPIV3, OpenAPIV3_1 } from '@scalar/openapi-types';
 import { dereference, load } from '@scalar/openapi-parser';
-import { fetchUrls } from '@scalar/openapi-parser/plugins/fetch-urls';
-import { readFiles } from './parser/readFiles';
+import { fetchUrls } from './parser/fetchUrls';
 import { checkIsReference } from './utils';
 
 export interface OpenAPIFetcher {
@@ -53,7 +52,7 @@ export async function fetchOpenAPIOperation(
 
     // Load the schema and fetch any external references
     const { filesystem } = await load(refSchema, {
-        plugins: [fetchUrls(), readFiles(prefix)],
+        plugins: [fetchUrls({ prefix })],
     });
 
     const schema = (await memoDereferenceSchema(filesystem, input.url)) as OpenAPIV3.Document;
@@ -152,10 +151,13 @@ function getPathObject(
 function getPathObjectParameter(
     schema: OpenAPIV3.Document | OpenAPIV3_1.Document,
     path: string,
-): OpenAPIV3.ParameterObject[] | OpenAPIV3_1.ParameterObject[] | null {
+):
+    | (OpenAPIV3.ReferenceObject | OpenAPIV3.ParameterObject)[]
+    | (OpenAPIV3.ParameterObject | OpenAPIV3_1.ReferenceObject)[]
+    | null {
     const pathObject = getPathObject(schema, path);
     if (pathObject?.parameters) {
-        return pathObject.parameters as OpenAPIV3.ParameterObject[] | OpenAPIV3_1.ParameterObject[];
+        return pathObject.parameters;
     }
     return null;
 }
