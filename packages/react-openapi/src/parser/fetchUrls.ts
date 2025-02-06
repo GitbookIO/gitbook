@@ -69,8 +69,11 @@ export const fetchUrls: (customConfiguration?: {
     };
 };
 
-function isRelativePath(value: string) {
-    return value.startsWith('/') || value.startsWith('./') || value.startsWith('../');
+function isRelativePath(path: string): boolean {
+    // Exclude external URLs
+    const externalUrlPattern = /^(https?:\/\/|www\.|data:)/;
+
+    return !externalUrlPattern.test(path);
 }
 
 function getReferenceUrl(value: string, prefix?: string) {
