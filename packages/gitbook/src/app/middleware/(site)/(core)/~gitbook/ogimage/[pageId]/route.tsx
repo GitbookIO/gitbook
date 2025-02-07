@@ -111,7 +111,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<PageId
 
     let gridAsset = useLightTheme ? gridBlack : gridWhite;
 
-    switch (customization.header.preset) { // TODO @Zeno: Start using themes in ogimage
+    switch (
+        customization.header.preset // TODO @Zeno: Start using themes in ogimage
+    ) {
         case CustomizationHeaderPreset.Custom:
             colors = {
                 background: customization.header.backgroundColor?.[theme] || colors.background,

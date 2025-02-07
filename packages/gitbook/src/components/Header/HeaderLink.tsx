@@ -166,7 +166,7 @@ function getHeaderLinkClassName(props: { headerPreset: CustomizationHeaderPreset
         'tint:hover:text-tint-strong',
 
         'theme-bold:text-header-link',
-        'theme-bold:hover:text-header-link'
+        'theme-bold:hover:text-header-link',
     );
 }
 
