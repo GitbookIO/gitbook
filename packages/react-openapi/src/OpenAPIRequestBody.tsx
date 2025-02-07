@@ -2,18 +2,22 @@ import * as React from 'react';
 
 import { OpenAPIV3 } from '@scalar/openapi-types';
 import { OpenAPIRootSchema } from './OpenAPISchema';
-import { noReference } from './utils';
 import { OpenAPIClientContext } from './types';
 import { InteractiveSection } from './InteractiveSection';
+import { checkIsReference } from './utils';
 
 /**
  * Display an interactive request body.
  */
 export function OpenAPIRequestBody(props: {
-    requestBody: OpenAPIV3.RequestBodyObject;
+    requestBody: OpenAPIV3.RequestBodyObject | OpenAPIV3.ReferenceObject;
     context: OpenAPIClientContext;
 }) {
     const { requestBody, context } = props;
+
+    if (checkIsReference(requestBody)) {
+        return null;
+    }
 
     return (
         <InteractiveSection
@@ -26,7 +30,7 @@ export function OpenAPIRequestBody(props: {
                         label: contentType,
                         body: (
                             <OpenAPIRootSchema
-                                schema={noReference(mediaTypeObject.schema) ?? {}}
+                                schema={mediaTypeObject.schema ?? {}}
                                 context={context}
                             />
                         ),
