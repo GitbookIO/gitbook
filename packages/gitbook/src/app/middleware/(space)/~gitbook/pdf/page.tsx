@@ -232,7 +232,7 @@ async function PDFPageDocument(props: {
     refContext: ContentRefContext;
 }) {
     const { space, page, refContext } = props;
-    const document =  await getPageDocument(space.id, page);
+    const document = await getPageDocument(space.id, page);
 
     return (
         <PrintPage id={getPagePDFContainerId(page)}>

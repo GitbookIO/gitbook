@@ -683,14 +683,17 @@ export const getDocument = cache({
     timeout: 20 * 1000,
 });
 
-
 /**
  * Get a computed document.
  */
 export const getComputedDocument = cache({
     name: 'api.getComputedDocument',
     tag: (spaceId, source) =>
-        getAPICacheTag({ tag: 'computed-document', space: spaceId, integration: source.integration }),
+        getAPICacheTag({
+            tag: 'computed-document',
+            space: spaceId,
+            integration: source.integration,
+        }),
     getKeySuffix: getAPIContextId,
     get: async (spaceId: string, source: ComputedContentSource, options: CacheFunctionOptions) => {
         const apiCtx = await api();
@@ -723,7 +726,6 @@ export async function getPageDocument(spaceId: string, page: RevisionPageDocumen
 
     return null;
 }
-
 
 /**
  * Mimic the validation done on source server-side to reduce API usage.
@@ -1249,16 +1251,16 @@ export function getAPICacheTag(
           }
         // Immutable data related to a document
         | {
-            tag: 'document';
-            space: string;
-            document: string;
-        }
+              tag: 'document';
+              space: string;
+              document: string;
+          }
         // Immutable data related to a computed document
         | {
-            tag: 'computed-document';
-            space: string;
-            integration: string;
-        }
+              tag: 'computed-document';
+              space: string;
+              integration: string;
+          }
         // All data related to the URL of a content
         | {
               tag: 'url';
