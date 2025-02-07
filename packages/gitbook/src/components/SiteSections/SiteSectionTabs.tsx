@@ -119,7 +119,7 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
                         );
                     })}
                     <NavigationMenu.Indicator
-                        className="top-full z-0 flex h-3 items-end justify-center motion-safe:transition-[width,_transform] data-[state=hidden]:motion-safe:animate-fadeOut data-[state=visible]:motion-safe:animate-fadeIn"
+                        className="top-full z-0 flex h-3 items-end justify-center duration-150 motion-safe:transition-[width,_transform] data-[state=hidden]:motion-safe:animate-fadeOut data-[state=visible]:motion-safe:animate-fadeIn"
                         aria-hidden
                     >
                         <div className="bg-tint shadow-1xs shadow-dark/1 dark:shadow-dark/4 relative top-[70%] size-3 rotate-[225deg] rounded-tl-sm" />
