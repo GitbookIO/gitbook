@@ -1,5 +1,4 @@
 import { OpenAPIV3 } from '@scalar/openapi-types';
-import { noReference } from './utils';
 import { getExampleFromSchema } from '@scalar/oas-utils/spec-getters';
 
 type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue };
@@ -48,12 +47,12 @@ export function generateMediaTypeExample(
     if (mediaType.examples) {
         const example = mediaType.examples[Object.keys(mediaType.examples)[0]];
         if (example) {
-            return noReference(example).value;
+            return example.value;
         }
     }
 
     if (mediaType.schema) {
-        return generateSchemaExample(noReference(mediaType.schema), options);
+        return generateSchemaExample(mediaType.schema, options);
     }
 
     return undefined;

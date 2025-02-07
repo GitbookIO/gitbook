@@ -6,9 +6,10 @@ import { generateMediaTypeExample, generateSchemaExample } from './generateSchem
 import { InteractiveSection } from './InteractiveSection';
 import { getServersURL } from './OpenAPIServerURL';
 import { OpenAPIContextProps } from './types';
-import { noReference } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
+import { OpenAPIV3 } from '@scalar/openapi-types';
+import { checkIsReference } from './utils';
 
 /**
  * Display code samples to execute the operation.
@@ -23,24 +24,19 @@ export function OpenAPICodeSample(props: {
     const searchParams = new URLSearchParams();
     const headersObject: { [k: string]: string } = {};
 
-    data.operation.parameters?.forEach((rawParam) => {
-        const param = noReference(rawParam);
+    data.operation.parameters?.forEach((param) => {
         if (!param) {
             return;
         }
 
         if (param.in === 'header' && param.required) {
-            const example = param.schema
-                ? generateSchemaExample(noReference(param.schema))
-                : undefined;
+            const example = param.schema ? generateSchemaExample(param.schema) : undefined;
             if (example !== undefined && param.name) {
                 headersObject[param.name] =
                     typeof example !== 'string' ? stringifyOpenAPI(example) : example;
             }
         } else if (param.in === 'query' && param.required) {
-            const example = param.schema
-                ? generateSchemaExample(noReference(param.schema))
-                : undefined;
+            const example = param.schema ? generateSchemaExample(param.schema) : undefined;
             if (example !== undefined && param.name) {
                 searchParams.append(
                     param.name,
@@ -50,7 +46,9 @@ export function OpenAPICodeSample(props: {
         }
     });
 
-    const requestBody = noReference(data.operation.requestBody);
+    const requestBody = !checkIsReference(data.operation.requestBody)
+        ? data.operation.requestBody
+        : undefined;
     const requestBodyContentEntries = requestBody?.content
         ? Object.entries(requestBody.content)
         : undefined;
