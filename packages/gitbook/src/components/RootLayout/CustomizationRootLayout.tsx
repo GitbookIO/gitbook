@@ -42,7 +42,6 @@ export async function CustomizationRootLayout(props: {
 }) {
     const { customization, children } = props;
 
-    const headerTheme = generateHeaderTheme(customization);
     const language = getSpaceLanguage(customization);
     const tintColor = getTintColor(customization);
     const mixColor = getTintMixColor(customization.styling.primaryColor, tintColor);
@@ -258,86 +257,6 @@ function generateColorVariable(
             }`;
         })
         .join('\n');
-}
-
-function generateHeaderTheme(customization: CustomizationSettings | SiteCustomizationSettings): {
-    backgroundColor: { light: ColorInput; dark: ColorInput };
-    linkColor: { light: ColorInput; dark: ColorInput };
-} {
-    const tintColor = getTintColor(customization);
-
-    switch (customization.header.preset) {
-        case CustomizationHeaderPreset.None:
-        case CustomizationHeaderPreset.Default: {
-            return {
-                backgroundColor: {
-                    light: LIGHT_BASE,
-                    dark: DARK_BASE,
-                },
-                linkColor: {
-                    light: customization.styling.primaryColor.light,
-                    dark: customization.styling.primaryColor.dark,
-                },
-            };
-        }
-        case CustomizationHeaderPreset.Bold: {
-            return {
-                backgroundColor: {
-                    light: tintColor?.light ?? customization.styling.primaryColor.light,
-                    dark: tintColor?.dark ?? customization.styling.primaryColor.dark,
-                },
-                linkColor: {
-                    light: colorContrast(
-                        tintColor?.light ?? customization.styling.primaryColor.light,
-                        [LIGHT_BASE, DARK_BASE],
-                    ),
-                    dark: colorContrast(
-                        tintColor?.dark ?? customization.styling.primaryColor.dark,
-                        [LIGHT_BASE, DARK_BASE],
-                    ),
-                },
-            };
-        }
-        case CustomizationHeaderPreset.Contrast: {
-            return {
-                backgroundColor: {
-                    light: DARK_BASE,
-                    dark: LIGHT_BASE,
-                },
-                linkColor: {
-                    light: LIGHT_BASE,
-                    dark: DARK_BASE,
-                },
-            };
-        }
-        case CustomizationHeaderPreset.Custom: {
-            return {
-                backgroundColor: {
-                    light:
-                        customization.header.backgroundColor?.light ??
-                        tintColor?.light ??
-                        LIGHT_BASE,
-                    dark:
-                        customization.header.backgroundColor?.dark ?? tintColor?.dark ?? DARK_BASE,
-                },
-                linkColor: {
-                    light:
-                        customization.header.linkColor?.light ??
-                        (tintColor?.light &&
-                            colorContrast(tintColor.light, [LIGHT_BASE, DARK_BASE])) ??
-                        customization.styling.primaryColor.light,
-                    dark:
-                        customization.header.linkColor?.dark ??
-                        (tintColor?.dark &&
-                            colorContrast(tintColor.dark, [LIGHT_BASE, DARK_BASE])) ??
-                        customization.styling.primaryColor.dark,
-                },
-            };
-        }
-        default: {
-            assertNever(customization.header.preset);
-        }
-    }
 }
 
 const apiToIconsStyles: {
