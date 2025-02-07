@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Key, Tab, TabList, TabPanel, Tabs, TabsProps } from 'react-aria-components';
 import { Markdown } from './Markdown';
 import { useSyncedTabsGlobalState } from './useSyncedTabsGlobalState';

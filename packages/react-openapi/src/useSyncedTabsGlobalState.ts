@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 
 let globalState: Record<string, string> = {};
