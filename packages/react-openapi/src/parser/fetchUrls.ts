@@ -71,7 +71,7 @@ export const fetchUrls: (customConfiguration?: {
 
 function isRelativePath(path: string): boolean {
     // Exclude external URLs
-    const externalUrlPattern = /^(https?:\/\/|www\.|data:)/;
+    const externalUrlPattern = /^(https?:\/\/|www\.|data:|#\/)/;
 
     return !externalUrlPattern.test(path);
 }
