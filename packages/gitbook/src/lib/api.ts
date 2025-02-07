@@ -19,6 +19,7 @@ import {
     PublishedSiteContent,
     SiteSectionGroup,
     ComputedContentSource,
+    RevisionPageDocument,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 import { headers } from 'next/headers';
@@ -709,6 +710,19 @@ export const getComputedDocument = cache({
     // and it can take more than 10s...
     timeout: 20 * 1000,
 });
+
+/**
+ * Get the document for a page.
+ */
+export async function getPageDocument(spaceId: string, page: RevisionPageDocument) {
+    if (page.documentId) {
+        return getDocument(spaceId, page.documentId);
+    } else if (page.computed) {
+        return getComputedDocument(spaceId, page.computed);
+    }
+
+    return null;
+}
 
 
 /**
