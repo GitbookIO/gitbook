@@ -1,15 +1,38 @@
 'use client';
 
 import classNames from 'classnames';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { mergeProps, useButton, useDisclosure, useFocusRing } from 'react-aria';
 import { useDisclosureState } from 'react-stately';
-import { useSyncedTabsGlobalState } from './useSyncedTabsGlobalState';
 
 interface InteractiveSectionTab {
     key: string;
     label: string;
     body: React.ReactNode;
+}
+
+let globalState: Record<string, string> = {};
+const listeners = new Set<() => void>();
+
+function useSyncedTabsGlobalState() {
+    const subscribe = useCallback((callback: () => void) => {
+        listeners.add(callback);
+        return () => listeners.delete(callback);
+    }, []);
+
+    const getSnapshot = useCallback(() => globalState, []);
+
+    const setSyncedTabs = useCallback(
+        (updater: (tabs: Record<string, string>) => Record<string, string>) => {
+            globalState = updater(globalState);
+            listeners.forEach((listener) => listener());
+        },
+        [],
+    );
+
+    const tabs = React.useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+
+    return [tabs, setSyncedTabs] as const;
 }
 
 /**

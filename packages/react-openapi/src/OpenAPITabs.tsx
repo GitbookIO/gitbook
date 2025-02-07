@@ -3,7 +3,6 @@
 import React, { useMemo } from 'react';
 import { Key, Tab, TabList, TabPanel, Tabs, TabsProps } from 'react-aria-components';
 import { Markdown } from './Markdown';
-import { useSyncedTabsGlobalState } from './useSyncedTabsGlobalState';
 
 export type Tab = {
     key: Key;
@@ -14,7 +13,8 @@ export type Tab = {
 
 type OpenAPITabsContextData = {
     items: Tab[];
-    selectedTab: Tab;
+    selectedKey: Key;
+    setSelectedKey: (key: Key) => void;
 };
 
 const OpenAPITabsContext = React.createContext<OpenAPITabsContextData | null>(null);
@@ -30,39 +30,18 @@ function useOpenAPITabsContext() {
 /**
  * The OpenAPI Tabs wrapper component.
  */
-export function OpenAPITabs(
-    props: React.PropsWithChildren<TabsProps & { items: Tab[]; stateKey?: string }>,
-) {
-    const { children, items, stateKey } = props;
+export function OpenAPITabs(props: React.PropsWithChildren<TabsProps & { items: Tab[] }>) {
+    const { children, items } = props;
+    const [selectedKey, setSelectedKey] = React.useState(items[0].key);
 
-    const [syncedTabs, setSyncedTabs] = useSyncedTabsGlobalState();
-    const tabFromState =
-        stateKey && stateKey in syncedTabs
-            ? items.find((tab) => tab.key === syncedTabs[stateKey])
-            : undefined;
-    const defaultTab = items[0]?.key;
-    const [selectedTabKey, setSelectedTabKey] = React.useState(tabFromState?.key ?? defaultTab);
-
-    const selectedTab = tabFromState ?? items.find((tab) => tab.key === selectedTabKey) ?? items[0];
-
-    const contextValue = { items, selectedTab };
-
-    const handleSelectionChange = (key: Key) => {
-        setSelectedTabKey(key);
-        if (stateKey) {
-            setSyncedTabs((state) => ({
-                ...state,
-                [stateKey]: key.toString(),
-            }));
-        }
-    };
+    const contextValue = { items, selectedKey, setSelectedKey };
 
     return (
         <OpenAPITabsContext.Provider value={contextValue}>
             <Tabs
                 className="openapi-tabs"
-                onSelectionChange={handleSelectionChange}
-                selectedKey={selectedTab.key}
+                onSelectionChange={setSelectedKey}
+                selectedKey={selectedKey}
             >
                 {children}
             </Tabs>
@@ -104,21 +83,23 @@ export function OpenAPITabsList() {
  * It renders the content of the selected tab.
  */
 export function OpenAPITabsPanels() {
-    const { selectedTab } = useOpenAPITabsContext();
+    const { selectedKey, items } = useOpenAPITabsContext();
 
-    if (!selectedTab) {
+    const tab = useMemo(() => items.find((tab) => tab.key === selectedKey), [items, selectedKey]);
+
+    if (!tab) {
         return null;
     }
 
     return (
         <TabPanel
-            key={`TabPanel-${selectedTab.key}`}
-            id={selectedTab.key.toString()}
+            key={`TabPanel-${tab.key}`}
+            id={tab.key.toString()}
             className="openapi-tabs-panel"
         >
-            {selectedTab.body}
-            {selectedTab.description ? (
-                <Markdown source={selectedTab.description} className="openapi-tabs-footer" />
+            {tab.body}
+            {tab.description ? (
+                <Markdown source={tab.description} className="openapi-tabs-footer" />
             ) : null}
         </TabPanel>
     );
