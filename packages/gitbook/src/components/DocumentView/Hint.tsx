@@ -66,6 +66,7 @@ const HINT_STYLES: {
         bodyColor: ['[&_a]:text-primary', '[&_a:hover]:text-primary-strong'],
         style: [
             'bg-tint',
+            'theme-muted:bg-tint-base',
             'border-tint',
             '[&_.can-override-bg]:bg-tint-active',
             '[&_.can-override-text]:text-tint-strong',

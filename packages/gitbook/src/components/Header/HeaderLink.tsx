@@ -129,18 +129,15 @@ function HeaderItemButton(
             size="medium"
             className={tcls(
                 {
-                    'button-primary':
-                        headerPreset != CustomizationHeaderPreset.Default &&
-                        `bg-header-link hover:bg-header-link
-                        text-header-background hover:text-header-background
-                        shadow-none hover:shadow-none`,
+                    'button-primary': `theme-bold:bg-header-link theme-bold:hover:bg-header-link
+                        theme-bold:text-header-background theme-bold:hover:text-header-background
+                        theme-bold:shadow-none theme-bold:hover:shadow-none`,
                     'button-secondary': tcls(
-                        headerPreset != CustomizationHeaderPreset.Default &&
-                            `bg-header-link/2 hover:bg-header-link/3
-                            text-header-link hover:text-header-link
-                            ring-header-link/4 hover:ring-header-link/5
-                            contrast-more:ring-header-link contrast-more:bg-header-background contrast-more:text-header-link contrast-more:hover:ring-header-link
-                            shadow-none hover:shadow-none`,
+                        `theme-bold:bg-header-link/2 theme-bold:hover:bg-header-link/3
+                            theme-bold:text-header-link theme-bold:hover:text-header-link
+                            theme-bold:ring-header-link/4 theme-bold:hover:ring-header-link/5
+                            theme-bold:contrast-more:ring-header-link theme-bold:contrast-more:bg-header-background theme-bold:contrast-more:text-header-link theme-bold:contrast-more:hover:ring-header-link
+                            theme-bold:shadow-none theme-bold:hover:shadow-none`,
                     ),
                 }[linkStyle],
             )}
@@ -164,9 +161,12 @@ function getHeaderLinkClassName(props: { headerPreset: CustomizationHeaderPreset
         'min-w-0',
         'contrast-more:underline',
 
-        props.headerPreset === CustomizationHeaderPreset.Default
-            ? ['text-tint', 'hover:text-primary', 'tint:hover:text-tint-strong']
-            : ['text-header-link'],
+        'text-tint',
+        'hover:text-primary',
+        'tint:hover:text-tint-strong',
+
+        'theme-bold:text-header-link',
+        'theme-bold:hover:text-header-link'
     );
 }
 

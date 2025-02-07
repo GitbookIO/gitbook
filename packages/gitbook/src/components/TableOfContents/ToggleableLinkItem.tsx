@@ -72,6 +72,8 @@ export function ToggleableLinkItem(
                         'text-primary-subtle',
                         'contrast-more:text-primary',
                         'sidebar-list-pill:bg-primary',
+                        'theme-muted:bg-primary-hover',
+                        '[html.sidebar-list-pill.theme-muted]:bg-primary',
 
                         'hover:bg-primary-hover',
                         'hover:text-primary',
