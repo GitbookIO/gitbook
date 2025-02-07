@@ -238,16 +238,6 @@ export async function resolveContentRef(
             }
         }
 
-        case 'snippet': {
-            return {
-                href: getGitbookAppHref(
-                    `/o/${contentRef.organization}/snippet/${contentRef.snippet}`,
-                ),
-                text: 'snippet',
-                active: false,
-            };
-        }
-
         case 'collection': {
             const collection = await ignoreAPIError(getCollection(contentRef.collection));
             if (!collection) {
