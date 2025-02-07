@@ -35,7 +35,7 @@
 }
 
 .openapi-description.openapi-markdown {
-    @apply prose-sm text-[15px];
+    @apply prose-sm text-[0.938rem];
 }
 
 .openapi-description.openapi-markdown code {
@@ -207,11 +207,11 @@
 }
 
 .openapi-schema-required {
-    @apply text-amber-600 text-[13px];
+    @apply text-amber-600 text-[0.813rem];
 }
 
 .openapi-schema-type {
-    @apply text-tint select-text text-[13px] font-mono;
+    @apply text-tint select-text text-[0.813rem] font-mono [word-spacing:-0.25rem];
 }
 
 .openapi-schema-type:only-child {
@@ -338,7 +338,7 @@
 }
 
 .openapi-response-description.openapi-markdown {
-    @apply prose-sm text-[13px] h-auto relative leading-[18px] text-tint !font-normal truncate select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply prose-sm text-[0.813rem] h-auto relative leading-[1.125rem] text-tint !font-normal truncate select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 .openapi-response-description.openapi-markdown::-webkit-scrollbar {
@@ -398,7 +398,7 @@
 }
 
 .openapi-path .openapi-method {
-    @apply text-[13px] m-0 px-1;
+    @apply text-[0.813rem] m-0 px-1;
 }
 
 .openapi-path-title {
@@ -504,7 +504,7 @@
 }
 
 .openapi-tabs-tab {
-    @apply hover:bg-primary-hover font-mono font-normal tabular-nums hover:text-primary cursor-pointer transition-all relative text-[13px] text-tint px-1 border border-transparent rounded;
+    @apply hover:bg-primary-hover font-mono font-normal tabular-nums hover:text-primary cursor-pointer transition-all relative text-[0.813rem] text-tint px-1 border border-transparent rounded;
 }
 
 .openapi-tabs-tab[aria-selected='true'] {
@@ -516,7 +516,7 @@
 }
 
 .openapi-tabs-footer {
-    @apply px-3 py-2 pt-2.5 border-t border-tint-subtle text-[13px] text-tint;
+    @apply px-3 py-2 pt-2.5 border-t border-tint-subtle text-[0.813rem] text-tint;
 }
 
 /* Disclosure group */
@@ -576,7 +576,7 @@
 
 /* Disclosure */
 .openapi-disclosure-trigger {
-    @apply transition-all duration-300 hover:text-tint-strong rounded-2xl border border-tint-subtle px-2.5 py-1 text-[13px] text-tint flex flex-row items-center gap-1.5 -outline-offset-1;
+    @apply transition-all duration-300 hover:text-tint-strong rounded-2xl border border-tint-subtle px-2.5 py-1 text-[0.813rem] text-tint flex flex-row items-center gap-1.5 -outline-offset-1;
 }
 
 .openapi-disclosure svg {

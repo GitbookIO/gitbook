@@ -409,6 +409,8 @@ export function getSchemaTitle(
         // check array AND schema.items as this is sometimes null despite what the type indicates
     } else if (schema.type === 'array' && !!schema.items) {
         type = `${getSchemaTitle(noReference(schema.items))}[]`;
+    } else if (Array.isArray(schema.type)) {
+        type = schema.type.join(' | ');
     } else if (schema.type || schema.properties) {
         type = schema.type ?? 'object';
 
