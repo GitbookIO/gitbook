@@ -1,6 +1,7 @@
 import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { generateSchemaExample } from './generateSchemaExample';
 import { OpenAPIContextProps } from './types';
+import { createStateKey } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { OpenAPIV3 } from '@scalar/openapi-types';
 import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
@@ -110,7 +111,7 @@ export function OpenAPIResponseExample(props: {
     }
 
     return (
-        <OpenAPITabs items={examples}>
+        <OpenAPITabs stateKey={createStateKey('response-example')} items={examples}>
             <InteractiveSection header={<OpenAPITabsList />} className="openapi-response-example">
                 <OpenAPITabsPanels />
             </InteractiveSection>
