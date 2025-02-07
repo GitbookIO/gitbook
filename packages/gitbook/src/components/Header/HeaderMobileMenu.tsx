@@ -50,7 +50,6 @@ export function HeaderMobileMenu(props: Partial<React.ButtonHTMLAttributes<HTMLB
                 'flex',
                 'flex-row',
                 'items-center',
-                'hover:bg-tint-hover',
                 'py-1',
                 'px-2',
                 'rounded',

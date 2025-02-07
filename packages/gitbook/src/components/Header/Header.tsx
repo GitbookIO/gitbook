@@ -49,7 +49,7 @@ export function Header(props: {
                 'shadow-[0px_1px_0px]',
                 'shadow-tint-12/2',
                 'bg-tint-base/9',
-                '[html.tint.sidebar-filled_&]:bg-tint-subtle/9',
+                'theme-muted:bg-tint-subtle/9',
                 'contrast-more:bg-tint-base',
                 withTopHeader ? null : 'lg:hidden mobile-only',
                 'text-sm',
@@ -58,12 +58,9 @@ export function Header(props: {
         >
             <div
                 className={tcls(
-                    !isCustomizationDefault &&
-                        withTopHeader && [
-                            'bg-header-background',
-                            'shadow-[0px_1px_0px]',
-                            'shadow-tint-12/2',
-                        ],
+                    'theme-bold:bg-header-background',
+                    'shadow-[0px_1px_0px]',
+                    'shadow-tint-12/2',
                 )}
             >
                 <div className={tcls('scroll-nojump')}>
@@ -93,10 +90,10 @@ export function Header(props: {
                                 className={tcls(
                                     'lg:hidden',
                                     '-ml-2',
-                                    customization.header.preset ===
-                                        CustomizationHeaderPreset.Default
-                                        ? ['text-tint-strong']
-                                        : 'text-header-link',
+                                    'text-tint-strong',
+                                    'theme-bold:text-header-link',
+                                    'hover:bg-tint-hover',
+                                    'theme-bold:hover:bg-header-link/3',
                                 )}
                             />
                             <HeaderLogo site={site} space={space} customization={customization} />

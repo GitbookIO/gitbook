@@ -222,7 +222,7 @@ export async function PageAside(props: {
             ) : null}
             <div
                 className={tcls(
-                    'pb-4 sticky bottom-0 bg-tint-base [html.tint.sidebar-filled_&]:bg-tint-subtle z-10 mt-auto flex flex-col page-api-block:xl:max-2xl:pb-0 page-api-block:xl:max-2xl:hidden page-api-block:xl:max-2xl:group-hover/aside:flex',
+                    'pb-4 sticky bottom-0 bg-tint-base theme-muted:bg-tint-subtle z-10 mt-auto flex flex-col page-api-block:xl:max-2xl:pb-0 page-api-block:xl:max-2xl:hidden page-api-block:xl:max-2xl:group-hover/aside:flex',
                     'page-api-block:xl:max-2xl:bg-transparent',
                 )}
             >
