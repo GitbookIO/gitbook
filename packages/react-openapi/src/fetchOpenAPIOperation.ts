@@ -2,7 +2,7 @@ import { toJSON, fromJSON } from 'flatted';
 
 import { OpenAPICustomSpecProperties, OpenAPIParseError } from './parser';
 import { OpenAPI, OpenAPIV3, OpenAPIV3_1 } from '@scalar/openapi-types';
-import { dereference, load } from '@scalar/openapi-parser';
+import { dereference, load, getListOfReferences } from '@scalar/openapi-parser';
 import { fetchUrls } from './parser/fetchUrls';
 import { checkIsReference } from './utils';
 
@@ -45,17 +45,23 @@ export async function fetchOpenAPIOperation(
     },
     fetcher: OpenAPIFetcher,
 ): Promise<OpenAPIOperationData | null> {
-    const refSchema = await fetcher.fetch(input.url);
+    let refSchema = await fetcher.fetch(input.url);
 
     // Get the prefix of the URL to resolve relative references
     const prefix = input.url.split('/').slice(0, -1).join('/');
 
-    // Load the schema and fetch any external references
-    const { filesystem } = await load(refSchema, {
-        plugins: [fetchUrls({ prefix })],
-    });
+    const references = getListOfReferences(refSchema);
 
-    const schema = (await memoDereferenceSchema(filesystem, input.url)) as OpenAPIV3.Document;
+    // If there are references, we need to load the schema and fetch the external references
+    if (references.length) {
+        const { filesystem } = await load(refSchema, {
+            plugins: [fetchUrls({ prefix })],
+        });
+
+        refSchema = filesystem;
+    }
+
+    const schema = (await memoDereferenceSchema(refSchema, input.url)) as OpenAPIV3.Document;
 
     let operation = getOperationByPathAndMethod(schema, input.path, input.method);
 
