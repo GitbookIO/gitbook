@@ -1,6 +1,7 @@
 import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { generateSchemaExample } from './generateSchemaExample';
 import { OpenAPIContextProps } from './types';
+import { checkIsReference, noReference } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { OpenAPIV3 } from '@scalar/openapi-types';
 import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
@@ -40,7 +41,7 @@ export function OpenAPIResponseExample(props: {
 
     const examples = responses
         .map(([key, value]) => {
-            const responseObject = value;
+            const responseObject = noReference(value);
             const mediaTypeObject = (() => {
                 if (!responseObject.content) {
                     return null;
@@ -60,28 +61,30 @@ export function OpenAPIResponseExample(props: {
                 };
             }
 
-            const example: OpenAPIV3.ExampleObject | null = (() => {
-                const { examples, example } = mediaTypeObject;
-                if (examples) {
-                    const firstKey = Object.keys(examples)[0];
-                    // @TODO handle multiple examples
-                    const firstExample = examples[firstKey];
-                    if (firstExample) {
-                        return firstExample;
+            const example = handleUnresolvedReference(
+                (() => {
+                    const { examples, example } = mediaTypeObject;
+                    if (examples) {
+                        const firstKey = Object.keys(examples)[0];
+                        // @TODO handle multiple examples
+                        const firstExample = noReference(examples[firstKey]);
+                        if (firstExample) {
+                            return firstExample;
+                        }
                     }
-                }
 
-                if (example) {
-                    return { value: example };
-                }
+                    if (example) {
+                        return { value: example };
+                    }
 
-                const schema = mediaTypeObject.schema;
-                if (!schema) {
-                    return null;
-                }
+                    const schema = noReference(mediaTypeObject.schema);
+                    if (!schema) {
+                        return null;
+                    }
 
-                return { value: generateSchemaExample(schema) };
-            })();
+                    return { value: generateSchemaExample(schema) };
+                })(),
+            );
 
             return {
                 key: key,
@@ -124,4 +127,17 @@ function OpenAPIEmptyResponseExample() {
             <p>No body</p>
         </pre>
     );
+}
+
+function handleUnresolvedReference(
+    input: OpenAPIV3.ExampleObject | null,
+): OpenAPIV3.ExampleObject | null {
+    const isReference = checkIsReference(input?.value);
+
+    if (isReference) {
+        // If we find a reference that wasn't resolved or needed to be resolved externally, render out the URL
+        return { value: input.value.$ref };
+    }
+
+    return input;
 }

@@ -2,9 +2,8 @@ import { toJSON, fromJSON } from 'flatted';
 
 import { OpenAPICustomSpecProperties, OpenAPIParseError } from './parser';
 import { OpenAPI, OpenAPIV3, OpenAPIV3_1 } from '@scalar/openapi-types';
-import { dereference, load } from '@scalar/openapi-parser';
-import { fetchUrls } from './parser/fetchUrls';
-import { checkIsReference } from './utils';
+import { noReference } from './utils';
+import { dereference } from '@scalar/openapi-parser';
 
 export interface OpenAPIFetcher {
     /**
@@ -46,16 +45,7 @@ export async function fetchOpenAPIOperation(
     fetcher: OpenAPIFetcher,
 ): Promise<OpenAPIOperationData | null> {
     const refSchema = await fetcher.fetch(input.url);
-
-    // Get the prefix of the URL to resolve relative references
-    const prefix = input.url.split('/').slice(0, -1).join('/');
-
-    // Load the schema and fetch any external references
-    const { filesystem } = await load(refSchema, {
-        plugins: [fetchUrls({ prefix })],
-    });
-
-    const schema = (await memoDereferenceSchema(filesystem, input.url)) as OpenAPIV3.Document;
+    const schema = await memoDereferenceSchema(refSchema, input.url);
 
     let operation = getOperationByPathAndMethod(schema, input.path, input.method);
 
@@ -80,8 +70,8 @@ export async function fetchOpenAPIOperation(
     for (const entry of security) {
         const securityKey = Object.keys(entry)[0];
         const securityScheme = schema.components?.securitySchemes?.[securityKey];
-        if (securityScheme && !checkIsReference(securityScheme)) {
-            securities.push([securityKey, securityScheme]);
+        if (securityScheme) {
+            securities.push([securityKey, noReference(securityScheme)]);
         }
     }
 
@@ -151,13 +141,12 @@ function getPathObject(
 function getPathObjectParameter(
     schema: OpenAPIV3.Document | OpenAPIV3_1.Document,
     path: string,
-):
-    | (OpenAPIV3.ReferenceObject | OpenAPIV3.ParameterObject)[]
-    | (OpenAPIV3.ParameterObject | OpenAPIV3_1.ReferenceObject)[]
-    | null {
+): OpenAPIV3.ParameterObject[] | OpenAPIV3_1.ParameterObject[] | null {
     const pathObject = getPathObject(schema, path);
     if (pathObject?.parameters) {
-        return pathObject.parameters;
+        return pathObject.parameters.map(noReference) as
+            | OpenAPIV3.ParameterObject[]
+            | OpenAPIV3_1.ParameterObject[];
     }
     return null;
 }
