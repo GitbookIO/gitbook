@@ -18,6 +18,8 @@ import {
     SiteSection,
     PublishedSiteContent,
     SiteSectionGroup,
+    ComputedContentSource,
+    RevisionPageDocument,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 import { headers } from 'next/headers';
@@ -682,6 +684,50 @@ export const getDocument = cache({
 });
 
 /**
+ * Get a computed document.
+ */
+export const getComputedDocument = cache({
+    name: 'api.getComputedDocument',
+    tag: (spaceId, source) =>
+        getAPICacheTag({
+            tag: 'computed-document',
+            space: spaceId,
+            integration: source.integration,
+        }),
+    getKeySuffix: getAPIContextId,
+    get: async (spaceId: string, source: ComputedContentSource, options: CacheFunctionOptions) => {
+        const apiCtx = await api();
+        const response = await apiCtx.client.spaces.getComputedDocument(
+            spaceId,
+            { source },
+            {},
+            {
+                signal: options.signal,
+                ...noCacheFetchOptions,
+            },
+        );
+        return cacheResponse(response, cacheTtl_7days);
+    },
+    // Temporarily allow for a longer timeout than the default 10s
+    // because GitBook's API currently re-normalizes all documents
+    // and it can take more than 10s...
+    timeout: 20 * 1000,
+});
+
+/**
+ * Get the document for a page.
+ */
+export async function getPageDocument(spaceId: string, page: RevisionPageDocument) {
+    if (page.documentId) {
+        return getDocument(spaceId, page.documentId);
+    } else if (page.computed) {
+        return getComputedDocument(spaceId, page.computed);
+    }
+
+    return null;
+}
+
+/**
  * Mimic the validation done on source server-side to reduce API usage.
  */
 function validateSiteRedirectSource(source: string) {
@@ -1209,6 +1255,12 @@ export function getAPICacheTag(
               space: string;
               document: string;
           }
+        // Immutable data related to a computed document
+        | {
+              tag: 'computed-document';
+              space: string;
+              integration: string;
+          }
         // All data related to the URL of a content
         | {
               tag: 'url';
@@ -1238,6 +1290,8 @@ export function getAPICacheTag(
             return `space:${spec.space}:revision:${spec.revision}`;
         case 'document':
             return `space:${spec.space}:document:${spec.document}`;
+        case 'computed-document':
+            return `space:${spec.space}:computed-document:${spec.integration}`;
         case 'collection':
             return `collection:${spec.collection}`;
         case 'site':
