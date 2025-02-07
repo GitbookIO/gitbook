@@ -39,6 +39,7 @@ export function Trademark(props: {
                 'sidebar-filled:bg-tint-subtle',
                 'theme-muted:bg-tint-subtle',
                 '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
+                '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
 
                 'before:hidden',
                 'lg:before:block',
@@ -52,7 +53,9 @@ export function Trademark(props: {
                 'before:to-tint-base',
                 'sidebar-filled:before:to-tint-subtle',
                 'theme-muted:before:to-tint-subtle',
+                'theme-bold-tint:before:to-tint-subtle',
                 '[html.sidebar-filled.theme-muted_&]:before:to-tint-base',
+                '[html.sidebar-filled.theme-bold.tint_&]:before:to-tint-base',
             )}
         >
             <TrademarkLink {...props} />

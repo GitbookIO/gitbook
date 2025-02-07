@@ -41,7 +41,9 @@ export function PageGroupItem(props: {
                     'from-tint-base',
                     'sidebar-filled:from-tint-subtle',
                     'theme-muted:from-tint-subtle',
+                    'theme-bold-tint:from-tint-subtle',
                     '[html.sidebar-filled.theme-muted_&]:from-tint-base',
+                    '[html.sidebar-filled.theme-bold.tint_&]:from-tint-base',
                     'to-transparent',
                 )}
             >
