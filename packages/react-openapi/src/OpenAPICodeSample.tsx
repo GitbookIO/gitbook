@@ -136,34 +136,28 @@ function getSecurityHeaders(securities: OpenAPIOperationData['securities']): {
     switch (security[1].type) {
         case 'http': {
             let scheme = security[1].scheme;
-            if (scheme === 'bearer') {
+            let format = security[1].bearerFormat ?? 'YOUR_SECRET_TOKEN';
+
+            if (scheme?.includes('bearer')) {
                 scheme = 'Bearer';
+            } else if (scheme?.includes('basic')) {
+                scheme = 'Basic';
+                format = 'username:password';
+            } else if (scheme?.includes('token')) {
+                scheme = 'Token';
             }
 
             return {
-                Authorization: scheme + ' ' + (security[1].bearerFormat ?? '<token>'),
+                Authorization: scheme + ' ' + format,
             };
         }
         case 'apiKey': {
             if (security[1].in !== 'header') return {};
 
             const name = security[1].name ?? 'Authorization';
-            let scheme = security[0];
-
-            switch (scheme) {
-                case 'bearerAuth':
-                    scheme = 'Bearer';
-                    break;
-                case 'token':
-                    scheme = 'Token';
-                    break;
-                case 'basic':
-                    scheme = 'Basic';
-                    break;
-            }
 
             return {
-                [name]: scheme + ' ' + '<apiKey>',
+                [name]: 'YOUR_API_KEY',
             };
         }
         default: {

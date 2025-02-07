@@ -53,10 +53,16 @@ export function OpenAPISecurities(props: {
 function getLabelForType(security: OpenAPIV3_1.SecuritySchemeObject) {
     switch (security.type) {
         case 'apiKey':
-            return <OpenAPISchemaName propertyName="apiKey" type="string" required />;
+            return (
+                <OpenAPISchemaName
+                    propertyName={security.name ?? 'apiKey'}
+                    type="string"
+                    required
+                />
+            );
         case 'http':
             if (security.scheme === 'basic') {
-                return 'Basic Auth';
+                return <OpenAPISchemaName propertyName="Authorization" type="string" required />;
             }
 
             if (security.scheme == 'bearer') {
