@@ -30,25 +30,22 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
         size: number = 0,
     ) => {
         const windowWidth = document.documentElement.clientWidth;
-        if (windowWidth < 768) { // if the screen is small don't offset the menu
+        if (windowWidth < 768) {
+            // if the screen is small don't offset the menu
             setOffset(0);
         } else if (trigger && value === itemValue) {
             const padding = 16;
             const viewportWidth =
-                size < MIN_ITEMS_FOR_COLS ? VIEWPORT_ITEM_WIDTH + padding : (VIEWPORT_ITEM_WIDTH * 2) + padding;
+                size < MIN_ITEMS_FOR_COLS
+                    ? VIEWPORT_ITEM_WIDTH + padding
+                    : VIEWPORT_ITEM_WIDTH * 2 + padding;
             const scrollLeft = scrollableViewRef.current?.scrollLeft ?? 0;
-            const triggerOffset = (trigger.offsetLeft - scrollLeft); // offset of the trigger from the left edge including scrolling
+            const triggerOffset = trigger.offsetLeft - scrollLeft; // offset of the trigger from the left edge including scrolling
             const bufferLeft = 2; // offset the menu viewport should not pass on the left side of window
             const bufferRight = windowWidth - (16 + viewportWidth); // offset the menu viewport should not pass on the right side of the window
             setOffset(
                 // constrain to within the window with some buffer on the left and right we don't want the menu to enter
-                Math.min(
-                    bufferRight,
-                    Math.max(
-                        bufferLeft,
-                        Math.round(triggerOffset)
-                    ),
-                ),
+                Math.min(bufferRight, Math.max(bufferLeft, Math.round(triggerOffset))),
             );
         } else if (!value) {
             setOffset(null);
@@ -61,7 +58,8 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
             onValueChange={setValue}
             className="w-full relative z-10 flex flex-nowrap items-center max-w-screen-2xl mx-auto page-full-width:max-w-full"
         >
-            <div ref={scrollableViewRef}
+            <div
+                ref={scrollableViewRef}
                 className="w-full hide-scroll overflow-x-scroll overflow-y-hidden pb-4 -mb-4" /* Positive padding / negative margin allows the navigation menu indicator to show in a scroll view */
             >
                 <NavigationMenu.List className="center m-0 flex list-none bg-transparent px-1 sm:px-3 md:px-5 gap-2">
@@ -136,7 +134,8 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
                 <NavigationMenu.Viewport
                     className="bg-tint rounded straight-corners:rounded-none shadow-1xs shadow-dark/1 dark:shadow-dark/4 relative mt-3 ml-4 md:mx-0 w-[calc(100vw_-_2rem)] md:w-[var(--radix-navigation-menu-viewport-width)] h-[var(--radix-navigation-menu-viewport-height)] origin-[top_center] overflow-hidden motion-safe:transition-[width,_height,_transform] duration-250 data-[state=closed]:duration-150 data-[state=closed]:motion-safe:animate-scaleOut data-[state=open]:motion-safe:animate-scaleIn"
                     style={{
-                        translate: undefined /* don't move this to a Tailwind class as Radix renders viewport incorrectly for a few frames */,
+                        translate:
+                            undefined /* don't move this to a Tailwind class as Radix renders viewport incorrectly for a few frames */,
                     }}
                 />
             </div>
