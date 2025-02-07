@@ -5,7 +5,7 @@ import { useId } from 'react';
 import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
 import type { OpenAPIClientContext } from './types';
-import { checkIsReference, noReference, resolveDescription } from './utils';
+import { checkIsReference, resolveDescription } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
 import { OpenAPIDisclosure } from './OpenAPIDisclosure';
@@ -278,9 +278,9 @@ export function OpenAPISchemaPresentation(props: OpenAPISchemaPropertyEntry) {
 function getSchemaProperties(schema: OpenAPIV3.SchemaObject): null | OpenAPISchemaPropertyEntry[] {
     if (schema.allOf) {
         return schema.allOf.reduce((acc, subSchema) => {
-            const properties = getSchemaProperties(noReference(subSchema)) ?? [
+            const properties = getSchemaProperties(subSchema) ?? [
                 {
-                    schema: noReference(subSchema),
+                    schema: subSchema,
                 },
             ];
             return [...acc, ...properties];
@@ -289,7 +289,7 @@ function getSchemaProperties(schema: OpenAPIV3.SchemaObject): null | OpenAPISche
 
     // check array AND schema.items as this is sometimes null despite what the type indicates
     if (schema.type === 'array' && !!schema.items) {
-        const items = noReference(schema.items);
+        const items = schema.items;
         const itemProperties = getSchemaProperties(items);
         if (itemProperties) {
             return itemProperties;
@@ -307,12 +307,7 @@ function getSchemaProperties(schema: OpenAPIV3.SchemaObject): null | OpenAPISche
         const result: OpenAPISchemaPropertyEntry[] = [];
 
         if (schema.properties) {
-            Object.entries(schema.properties).forEach(([propertyName, rawPropertySchema]) => {
-                const isReference = checkIsReference(rawPropertySchema);
-                const propertySchema: OpenAPIV3.SchemaObject = isReference
-                    ? { propertyName }
-                    : rawPropertySchema;
-
+            Object.entries(schema.properties).forEach(([propertyName, propertySchema]) => {
                 result.push({
                     propertyName,
                     required: Array.isArray(schema.required)
@@ -324,7 +319,7 @@ function getSchemaProperties(schema: OpenAPIV3.SchemaObject): null | OpenAPISche
         }
 
         if (schema.additionalProperties) {
-            const additionalProperties = noReference(schema.additionalProperties);
+            const additionalProperties = schema.additionalProperties;
 
             result.push({
                 propertyName: 'Other properties',
@@ -348,17 +343,11 @@ export function getSchemaAlternatives(
     const downAncestors = new Set(ancestors).add(schema);
 
     if (schema.anyOf) {
-        return [
-            flattenAlternatives('anyOf', schema.anyOf.map(noReference), downAncestors),
-            noReference(schema.discriminator),
-        ];
+        return [flattenAlternatives('anyOf', schema.anyOf, downAncestors), schema.discriminator];
     }
 
     if (schema.oneOf) {
-        return [
-            flattenAlternatives('oneOf', schema.oneOf.map(noReference), downAncestors),
-            noReference(schema.discriminator),
-        ];
+        return [flattenAlternatives('oneOf', schema.oneOf, downAncestors), schema.discriminator];
     }
 
     if (schema.allOf) {
@@ -396,8 +385,8 @@ export function getSchemaTitle(
 
     // Try using the discriminator
     if (discriminator?.propertyName && schema.properties) {
-        const discriminatorProperty = noReference(schema.properties[discriminator.propertyName]);
-        if (discriminatorProperty) {
+        const discriminatorProperty = schema.properties[discriminator.propertyName];
+        if (discriminatorProperty && !checkIsReference(discriminatorProperty)) {
             if (discriminatorProperty.enum) {
                 return discriminatorProperty.enum.map((value) => value.toString()).join(' | ');
             }
@@ -411,7 +400,7 @@ export function getSchemaTitle(
         type = 'enum';
         // check array AND schema.items as this is sometimes null despite what the type indicates
     } else if (schema.type === 'array' && !!schema.items) {
-        type = `${getSchemaTitle(noReference(schema.items))}[]`;
+        type = `${getSchemaTitle(schema.items)}[]`;
     } else if (Array.isArray(schema.type)) {
         type = schema.type.join(' | ');
     } else if (schema.type || schema.properties) {

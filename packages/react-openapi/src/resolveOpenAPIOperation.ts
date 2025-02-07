@@ -7,7 +7,6 @@ import {
     type OpenAPIV3_1,
     dereference,
 } from '@gitbook/openapi-parser';
-import { noReference } from './utils';
 import { OpenAPIOperationData } from './types';
 
 export { toJSON, fromJSON };
@@ -49,7 +48,7 @@ export async function resolveOpenAPIOperation(
         if (securityKey) {
             const securityScheme = schema.components?.securitySchemes?.[securityKey];
             if (securityScheme) {
-                securities.push([securityKey, noReference(securityScheme)]);
+                securities.push([securityKey, securityScheme]);
             }
         }
     }
@@ -116,12 +115,13 @@ function getPathObject(
 function getPathObjectParameter(
     schema: OpenAPIV3.Document | OpenAPIV3_1.Document,
     path: string,
-): OpenAPIV3.ParameterObject[] | OpenAPIV3_1.ParameterObject[] | null {
+):
+    | (OpenAPIV3.ReferenceObject | OpenAPIV3.ParameterObject)[]
+    | (OpenAPIV3.ParameterObject | OpenAPIV3_1.ReferenceObject)[]
+    | null {
     const pathObject = getPathObject(schema, path);
     if (pathObject?.parameters) {
-        return pathObject.parameters.map(noReference) as
-            | OpenAPIV3.ParameterObject[]
-            | OpenAPIV3_1.ParameterObject[];
+        return pathObject.parameters;
     }
     return null;
 }
