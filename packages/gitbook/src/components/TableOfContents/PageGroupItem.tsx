@@ -40,7 +40,7 @@ export function PageGroupItem(props: {
                     'from-70%', // We want the fade to start past the header, this is a good approximation.
                     'from-tint-base',
                     'sidebar-filled:from-tint-subtle',
-                    '[html.tint.sidebar-filled_&]:from-tint-base',
+                    'theme-muted:from-tint-base',
                     'to-transparent',
                 )}
             >

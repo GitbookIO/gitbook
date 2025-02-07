@@ -6,6 +6,7 @@ import {
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
     type CustomizationThemedColor,
+    CustomizationTheme,
     type CustomizationTint,
     type SiteCustomizationSettings,
 } from '@gitbook/api';
@@ -23,7 +24,6 @@ import {
     DEFAULT_TINT_COLOR,
     hexToRgb,
     LIGHT_BASE,
-    shadesOfColor,
 } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
 
@@ -65,6 +65,7 @@ export async function CustomizationRootLayout(props: {
                 customization.styling.corners === CustomizationCorners.Straight
                     ? ' straight-corners'
                     : '',
+                'theme' in customization.styling && `theme-${customization.styling.theme}`,
                 tintColor ? ' tint' : 'no-tint',
                 sidebarStyles.background && ` sidebar-${sidebarStyles.background}`,
                 sidebarStyles.list && ` sidebar-list-${sidebarStyles.list}`,
@@ -85,8 +86,8 @@ export async function CustomizationRootLayout(props: {
                         ${generateColorVariable('tint', tintColor ? tintColor.light : DEFAULT_TINT_COLOR, { mix: mixColor && { color: mixColor.color.light, ratio: mixColor.ratio.light } })}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR)}
 
-                        --header-background: ${hexToRgb(headerTheme.backgroundColor.light)};
-                        --header-link: ${hexToRgb(headerTheme.linkColor.light)};
+                        --header-background: ${hexToRgb(tintColor?.light ?? customization.styling.primaryColor.light)};
+                        --header-link: ${hexToRgb(customization.header.linkColor?.light ?? colorContrast(tintColor?.light ?? customization.styling.primaryColor.light))};
                     }
 
                     .dark {
@@ -94,8 +95,8 @@ export async function CustomizationRootLayout(props: {
                         ${generateColorVariable('tint', tintColor ? tintColor.dark : DEFAULT_TINT_COLOR, { darkMode: true, mix: mixColor && { color: mixColor?.color.dark, ratio: mixColor.ratio.dark } })}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR, { darkMode: true })}
 
-                        --header-background: ${hexToRgb(headerTheme.backgroundColor.dark)};
-                        --header-link: ${hexToRgb(headerTheme.linkColor.dark)};   
+                        --header-background: ${hexToRgb(tintColor?.dark ?? customization.styling.primaryColor.dark)};
+                        --header-link: ${hexToRgb(customization.header.linkColor?.dark ?? colorContrast(tintColor?.dark ?? customization.styling.primaryColor.dark))};
                     }
                 `}</style>
             </head>
@@ -105,7 +106,7 @@ export async function CustomizationRootLayout(props: {
                     `${fonts[customization.styling.font].className}`,
                     `${ibmPlexMono.variable}`,
                     'bg-tint-base',
-                    '[html.tint.sidebar-filled_&]:bg-tint-subtle', // TODO: Replace this with theme-muted:bg-tint-subtle once themes are available
+                    'theme-muted:bg-tint-subtle',
                 )}
             >
                 <IconsProvider
@@ -148,15 +149,18 @@ function getTintColor(
         customization.styling.theme === CustomizationTheme.Bold &&
         customization.header.preset === CustomizationHeaderPreset.Contrast
     ) {
-        return undefined;
+        return {
+            light: DARK_BASE,
+            dark: LIGHT_BASE,
+        };
     }
 
-    if (
-        customization.styling.theme === CustomizationTheme.Bold &&
-        customization.header.preset === CustomizationHeaderPreset.Bold
-    ) {
-        return customization.styling.primaryColor;
-    }
+    // if (
+    //     customization.styling.theme === CustomizationTheme.Bold &&
+    //     customization.header.preset === CustomizationHeaderPreset.Bold
+    // ) {
+    //     return customization.styling.primaryColor;
+    // }
 
     if (
         customization.styling.theme === CustomizationTheme.Bold &&
@@ -239,7 +243,9 @@ function generateColorVariable(
     const shades: Record<string, string> =
         typeof color === 'string'
             ? Object.fromEntries(
-                  colorScale(color, options).map((shade, index) => [index + 1, shade]),
+                  colorScale(color, options)
+                      .map((shade, index) => [index + 1, shade])
+                      .concat([['original', color]]),
               )
             : color;
 

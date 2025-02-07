@@ -34,7 +34,7 @@ export function AsideSectionHighlight({
                 'sidebar-list-line:rounded-l-none',
 
                 'sidebar-list-pill:bg-primary',
-                '[html.tint.sidebar-list-pill_&]:bg-primary-hover',
+                'theme-muted:bg-primary-hover',
 
                 'contrast-more:border',
                 'contrast-more:bg-primary',
