@@ -6,6 +6,7 @@ import { generateMediaTypeExample, generateSchemaExample } from './generateSchem
 import { InteractiveSection } from './InteractiveSection';
 import { getServersURL } from './OpenAPIServerURL';
 import { OpenAPIContextProps } from './types';
+import { createStateKey } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
 import { OpenAPIV3 } from '@scalar/openapi-types';
@@ -116,7 +117,7 @@ export function OpenAPICodeSample(props: {
     }
 
     return (
-        <OpenAPITabs items={samples}>
+        <OpenAPITabs stateKey={createStateKey('codesample')} items={samples}>
             <InteractiveSection header={<OpenAPITabsList />} className="openapi-codesample">
                 <OpenAPITabsPanels />
             </InteractiveSection>
