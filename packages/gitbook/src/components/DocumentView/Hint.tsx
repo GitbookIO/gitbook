@@ -67,6 +67,7 @@ const HINT_STYLES: {
         style: [
             'bg-tint',
             'theme-muted:bg-tint-base',
+            'theme-bold-tint:bg-tint-base',
             'border-tint',
             '[&_.can-override-bg]:bg-tint-active',
             '[&_.can-override-text]:text-tint-strong',
