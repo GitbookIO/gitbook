@@ -103,10 +103,8 @@ function LogoFallback(props: HeaderLogoProps) {
                     'ms-3',
                     'text-base/tight',
                     'lg:text-lg/tight',
-                    customization.header.preset === CustomizationHeaderPreset.Default ||
-                        customization.header.preset === CustomizationHeaderPreset.None
-                        ? 'text-tint-strong'
-                        : 'text-header-link',
+                    'text-tint-strong',
+                    'theme-bold:text-header-link',
                 )}
             >
                 {getContentTitle(space, customization, site)}

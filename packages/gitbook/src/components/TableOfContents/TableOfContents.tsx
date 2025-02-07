@@ -87,7 +87,8 @@ export function TableOfContents(props: {
                     'flex-grow',
 
                     'sidebar-filled:bg-tint-subtle',
-                    'theme-muted:bg-tint-base',
+                    'theme-muted:bg-tint-subtle',
+                    '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
 
                     'sidebar-filled:rounded-xl',
                     'straight-corners:rounded-none',

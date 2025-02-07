@@ -32,7 +32,7 @@ export function SiteSectionList(props: { sections: SectionsList; className: Clas
                     `text-tint text-sm
                     border-b border-tint-subtle -mx-5 relative
                     before:absolute before:contents[] before:left-0 before:right-2 before:bottom-0 before:h-12 before:pointer-events-none 
-                    before:bg-gradient-to-b from-transparent to-tint-base sidebar-filled:to-tint-subtle theme-muted:to-tint-base`,
+                    before:bg-gradient-to-b from-transparent to-tint-base sidebar-filled:to-tint-subtle theme-muted:to-tint-subtle [html.sidebar-filled.theme-muted_&]:to-tint-base`,
                     className,
                 )}
             >
