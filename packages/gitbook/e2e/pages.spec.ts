@@ -663,11 +663,11 @@ const testCases: TestsCase[] = [
             ...allThemes.flatMap((theme) => [
                 ...allTintColors.flatMap((tint) => [
                     ...allSidebarBackgroundStyles.flatMap((sidebarStyle) => ({
-                        name: `Theme: ${theme} - Tint ${tint.label} - Sidebar ${sidebarStyle} - Mode ${theme}`,
+                        name: `Theme ${theme} - Tint ${tint.label} - Sidebar ${sidebarStyle} - Mode ${themeMode}`,
                         url: getCustomizationURL({
                             styling: {
                                 theme,
-                                tint: { color: tint.value },
+                                ...(tint.value ? { tint: { color: tint.value } } : {}),
                                 sidebar: {
                                     background: sidebarStyle,
                                     list: CustomizationSidebarListStyle.Default,
@@ -681,6 +681,7 @@ const testCases: TestsCase[] = [
                                 toggeable: false,
                             },
                         }),
+                        run: waitForCookiesDialog,
                     })),
                 ]),
             ]),
