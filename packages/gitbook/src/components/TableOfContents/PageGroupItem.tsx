@@ -5,6 +5,7 @@ import { tcls } from '@/lib/tailwind';
 
 import { PagesList } from './PagesList';
 import { TOCPageIcon } from './TOCPageIcon';
+import { hasPageVisibleDescendant } from '@/lib/pages';
 
 export function PageGroupItem(props: {
     rootPages: RevisionPage[];
@@ -47,7 +48,7 @@ export function PageGroupItem(props: {
                 <TOCPageIcon page={page} />
                 {page.title}
             </div>
-            {page.pages && page.pages.length ? (
+            {hasPageVisibleDescendant(page) ? (
                 <PagesList
                     rootPages={rootPages}
                     pages={page.pages}

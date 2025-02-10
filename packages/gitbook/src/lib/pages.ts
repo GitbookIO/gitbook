@@ -122,6 +122,20 @@ export function getPagePath(
 }
 
 /**
+ * Test if a page has at least one descendant.
+ */
+export function hasPageVisibleDescendant(page: RevisionPageGroup | RevisionPageDocument): boolean {
+    return (
+        page.pages.length > 0 &&
+        page.pages.some(
+            (child) =>
+                (child.type === RevisionPageType.Link || child.type === RevisionPageType.Document) &&
+                !child.hidden,
+        )
+    );
+}
+
+/**
  * Resolve the first page document in a list of pages.
  */
 export function resolveFirstDocument(
