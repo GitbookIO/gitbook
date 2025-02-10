@@ -129,7 +129,8 @@ export function hasPageVisibleDescendant(page: RevisionPageGroup | RevisionPageD
         page.pages.length > 0 &&
         page.pages.some(
             (child) =>
-                (child.type === RevisionPageType.Link || child.type === RevisionPageType.Document) &&
+                (child.type === RevisionPageType.Link ||
+                    child.type === RevisionPageType.Document) &&
                 !child.hidden,
         )
     );

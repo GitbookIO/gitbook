@@ -1,11 +1,11 @@
 import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 
+import { hasPageVisibleDescendant } from '@/lib/pages';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { PagesList } from './PagesList';
 import { TOCPageIcon } from './TOCPageIcon';
-import { hasPageVisibleDescendant } from '@/lib/pages';
 
 export function PageGroupItem(props: {
     rootPages: RevisionPage[];
