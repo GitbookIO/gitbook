@@ -6,7 +6,7 @@ import {
 } from '@gitbook/api';
 
 import { getPageHref } from '@/lib/links';
-import { getPagePath } from '@/lib/pages';
+import { getPagePath, hasPageVisibleDescendant } from '@/lib/pages';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
@@ -39,7 +39,7 @@ export async function PageDocumentItem(props: {
                     },
                 }}
                 descendants={
-                    page.pages && page.pages.length ? (
+                    hasPageVisibleDescendant(page) ? (
                         <PagesList
                             rootPages={rootPages}
                             pages={page.pages}
