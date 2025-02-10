@@ -71,11 +71,13 @@ export function ToggleableLinkItem(
                         'before:bg-primary-solid',
                         'text-primary-subtle',
                         'contrast-more:text-primary',
+                        
                         'sidebar-list-pill:bg-primary',
-                        '[html.sidebar-list-pill.theme-muted]:bg-primary-hover',
-                        '[html.sidebar-list-pill.theme-bold.tint]:bg-primary-hover',
-                        '[html.sidebar-filled.sidebar-list-pill.theme-muted]:bg-primary',
-                        '[html.sidebar-filled.sidebar-list-pill.theme-bold.tint]:bg-primary',
+                        '[html.sidebar-list-pill.theme-muted_&]:bg-primary-hover',
+                        '[html.sidebar-list-pill.theme-gradient_&]:bg-primary-hover',
+                        '[html.sidebar-list-pill.theme-bold.tint_&]:bg-primary-hover',
+                        '[html.sidebar-filled.sidebar-list-pill.theme-muted_&]:bg-primary',
+                        '[html.sidebar-filled.sidebar-list-pill.theme-bold.tint_&]:bg-primary',
 
                         'hover:bg-primary-hover',
                         'hover:text-primary',

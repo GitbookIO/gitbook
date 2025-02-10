@@ -46,9 +46,13 @@ export function Header(props: {
                 'flex-none',
                 'shadow-[0px_1px_0px]',
                 'shadow-tint-12/2',
+
                 'bg-tint-base/9',
                 'theme-muted:bg-tint-subtle/9',
+                'theme-gradient:bg-gradient-primary',
+                'theme-gradient-tint:bg-gradient-tint',
                 'contrast-more:bg-tint-base',
+                
                 withTopHeader ? null : 'lg:hidden mobile-only',
                 'text-sm',
                 'backdrop-blur-lg',

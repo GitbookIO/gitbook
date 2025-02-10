@@ -133,7 +133,8 @@ function HeaderItemButton(
                         theme-bold:text-header-background theme-bold:hover:text-header-background
                         theme-bold:shadow-none theme-bold:hover:shadow-none`,
                     'button-secondary': tcls(
-                        `theme-bold:bg-header-link/2 theme-bold:hover:bg-header-link/3
+                        `theme-muted:bg-tint-base theme-gradient:bg-tint-base
+                            theme-bold:bg-header-link/2 theme-bold:hover:bg-header-link/3
                             theme-bold:text-header-link theme-bold:hover:text-header-link
                             theme-bold:ring-header-link/4 theme-bold:hover:ring-header-link/5
                             theme-bold:contrast-more:ring-header-link theme-bold:contrast-more:bg-header-background theme-bold:contrast-more:text-header-link theme-bold:contrast-more:hover:ring-header-link
