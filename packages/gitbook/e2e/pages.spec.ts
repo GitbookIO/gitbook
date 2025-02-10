@@ -688,7 +688,7 @@ const testCases: TestsCase[] = [
             // Deprecated header themes
             ...allDeprecatedThemePresets.flatMap((preset) => [
                 ...allSidebarBackgroundStyles.flatMap((sidebarStyle) => ({
-                    name: `With tint - Preset ${preset} - Sidebar ${sidebarStyle} - Theme mode ${themeMode}`,
+                    name: `With tint - Leagacy header preset ${preset} - Sidebar ${sidebarStyle} - Theme mode ${themeMode}`,
                     url: getCustomizationURL({
                         styling: {
                             tint: { color: { light: '#346DDB', dark: '#346DDB' } },
