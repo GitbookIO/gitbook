@@ -107,6 +107,9 @@ export async function CustomizationRootLayout(props: {
                     'bg-tint-base',
                     'theme-muted:bg-tint-subtle',
                     'theme-bold-tint:bg-tint-subtle',
+
+                    'theme-gradient:bg-gradient-primary',
+                    'theme-gradient-tint:bg-gradient-tint',
                 )}
             >
                 <IconsProvider
