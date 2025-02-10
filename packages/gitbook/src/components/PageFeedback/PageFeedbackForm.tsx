@@ -7,8 +7,7 @@ import { useLanguage } from '@/intl/client';
 import { t, tString } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 
-import { getVisitorId, useTrackEvent } from '../Insights';
-import { postPageFeedback } from './server-actions';
+import { useTrackEvent } from '../Insights';
 import { Button } from '../primitives';
 
 const MAX_COMMENT_LENGTH = 512;
@@ -29,10 +28,8 @@ export function PageFeedbackForm(props: {
     const [comment, setComment] = React.useState('');
     const [submitted, setSubmitted] = React.useState(false);
 
-    const onSubmitRating = async (rating: PageFeedbackRating) => {
+    const onSubmitRating = (rating: PageFeedbackRating) => {
         setRating(rating);
-        const visitorId = await getVisitorId();
-        await postPageFeedback({ pageId, visitorId, rating });
 
         trackEvent({
             type: 'page_post_feedback',
