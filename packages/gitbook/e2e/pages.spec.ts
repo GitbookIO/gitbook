@@ -663,11 +663,11 @@ const testCases: TestsCase[] = [
             ...allThemes.flatMap((theme) => [
                 ...allTintColors.flatMap((tint) => [
                     ...allSidebarBackgroundStyles.flatMap((sidebarStyle) => ({
-                        name: `Theme: ${theme} - Tint ${tint.label} - Sidebar ${sidebarStyle} - Mode ${theme}`,
+                        name: `Theme ${theme} - Tint ${tint.label} - Sidebar ${sidebarStyle} - Mode ${themeMode}`,
                         url: getCustomizationURL({
                             styling: {
                                 theme,
-                                tint: { color: tint.value },
+                                ...(tint.value ? { tint: { color: tint.value } } : {}),
                                 sidebar: {
                                     background: sidebarStyle,
                                     list: CustomizationSidebarListStyle.Default,
@@ -681,13 +681,14 @@ const testCases: TestsCase[] = [
                                 toggeable: false,
                             },
                         }),
+                        run: waitForCookiesDialog,
                     })),
                 ]),
             ]),
             // Deprecated header themes
             ...allDeprecatedThemePresets.flatMap((preset) => [
                 ...allSidebarBackgroundStyles.flatMap((sidebarStyle) => ({
-                    name: `With tint - Preset ${preset} - Sidebar ${sidebarStyle} - Theme mode ${themeMode}`,
+                    name: `With tint - Leagacy header preset ${preset} - Sidebar ${sidebarStyle} - Theme mode ${themeMode}`,
                     url: getCustomizationURL({
                         styling: {
                             tint: { color: { light: '#346DDB', dark: '#346DDB' } },
