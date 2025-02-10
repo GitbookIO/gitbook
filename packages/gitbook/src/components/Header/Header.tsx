@@ -52,7 +52,7 @@ export function Header(props: {
                 'theme-gradient:bg-gradient-primary',
                 'theme-gradient-tint:bg-gradient-tint',
                 'contrast-more:bg-tint-base',
-                
+
                 withTopHeader ? null : 'lg:hidden mobile-only',
                 'text-sm',
                 'backdrop-blur-lg',
