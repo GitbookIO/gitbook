@@ -688,7 +688,7 @@ const testCases: TestsCase[] = [
             // Deprecated header themes
             ...allDeprecatedThemePresets.flatMap((preset) => [
                 ...allSidebarBackgroundStyles.flatMap((sidebarStyle) => ({
-                    name: `With tint - Leagacy header preset ${preset} - Sidebar ${sidebarStyle} - Theme mode ${themeMode}`,
+                    name: `With tint - Legacy header preset ${preset} - Sidebar ${sidebarStyle} - Theme mode ${themeMode}`,
                     url: getCustomizationURL({
                         styling: {
                             tint: { color: { light: '#346DDB', dark: '#346DDB' } },
@@ -1510,6 +1510,27 @@ for (const testCase of testCases) {
  * Create a URL with customization settings.
  */
 function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettings>): string {
+    // We replicate the theme migration logic from the API to the tests, because the don't get these settings from the API.
+    // We can remove this once the migration to the new themes have been completed and the new theme styles are verified
+    // Map the theme preset (+ tint) to one of the new themes
+    const newTheme = (() => {
+        if (partial.styling?.theme) {
+            return partial.styling.theme;
+        }
+
+        switch (partial.header?.preset) {
+            case CustomizationHeaderPreset.None:
+            case CustomizationHeaderPreset.Default:
+                if (partial.styling?.tint) {
+                    return CustomizationTheme.Muted;
+                }
+
+                return CustomizationTheme.Clean;
+            default:
+                return CustomizationTheme.Bold;
+        }
+    })();
+
     /**
      * Default customization settings.
      *
@@ -1517,6 +1538,7 @@ function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettings>): s
      */
     const DEFAULT_CUSTOMIZATION: SiteCustomizationSettings = {
         styling: {
+            theme: newTheme,
             primaryColor: { light: '#346DDB', dark: '#346DDB' },
             corners: CustomizationCorners.Rounded,
             font: CustomizationFont.Inter,
