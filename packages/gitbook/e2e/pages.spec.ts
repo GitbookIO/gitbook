@@ -1519,6 +1519,11 @@ function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettings>): s
         }
 
         switch (partial.header?.preset) {
+            case CustomizationHeaderPreset.Bold:
+            case CustomizationHeaderPreset.Contrast:
+            case CustomizationHeaderPreset.Custom:
+                return CustomizationTheme.Bold;
+
             case CustomizationHeaderPreset.None:
             case CustomizationHeaderPreset.Default:
                 if (partial.styling?.tint) {
@@ -1527,7 +1532,7 @@ function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettings>): s
 
                 return CustomizationTheme.Clean;
             default:
-                return CustomizationTheme.Bold;
+                return CustomizationTheme.Clean;
         }
     })();
 
