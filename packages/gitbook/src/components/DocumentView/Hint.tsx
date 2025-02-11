@@ -21,6 +21,7 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
                 'transition-colors',
                 'rounded-md',
                 'straight-corners:rounded-none',
+                'text-sm',
                 hintStyle.style,
                 style,
             )}
@@ -29,8 +30,8 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
                 <Icon
                     icon={hintStyle.icon}
                     className={tcls(
-                        'size-5',
-                        'mr-4',
+                        'size-4',
+                        'mr-3',
                         'mt-0.5',
                         firstLine.lineHeight,
                         hintStyle.iconColor,
@@ -62,13 +63,22 @@ const HINT_STYLES: {
 } = {
     info: {
         icon: 'circle-info',
-        iconColor: ['text-primary'],
-        bodyColor: ['[&_a]:text-primary', '[&_a:hover]:text-primary-strong'],
+        iconColor: ['text-blue-500', 'dark:text-blue-400'],
+        bodyColor: [
+            'text-blue-950',
+            'dark:text-blue-50',
+            '[&_a]:text-blue-800',
+            '[&_a:hover]:text-blue-900',
+            'dark:[&_a]:text-blue-400',
+            'dark:[&_a:hover]:text-blue-300',
+            '[&_.can-override-bg]:bg-blue-500/3',
+            '[&_.can-override-text]:text-blue-800',
+            'dark:[&_.can-override-text]:text-blue-400',
+            'decoration-blue-800/6',
+            'dark:decoration-blue-400/6',
+        ],
         style: [
-            'bg-tint',
-            'border-tint',
-            '[&_.can-override-bg]:bg-tint-active',
-            '[&_.can-override-text]:text-tint-strong',
+            'bg-blue-500/2', 'border-blue-500/4'
         ],
     },
     warning: {
