@@ -116,7 +116,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                                 'theme-muted:hover:bg-primary-active',
                                 'theme-bold-tint:hover:bg-primary-active',
                                 'theme-gradient:hover:bg-primary-active',
-                                
+
                                 'tint:font-semibold',
                                 'contrast-more:font-semibold',
 
