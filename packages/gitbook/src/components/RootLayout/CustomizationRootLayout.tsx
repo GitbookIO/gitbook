@@ -140,38 +140,6 @@ export async function CustomizationRootLayout(props: {
 function getTintColor(
     customization: CustomizationSettings | SiteCustomizationSettings,
 ): CustomizationTint['color'] | undefined {
-    // ignore space customization (used for the PDF renderer)
-    if (!('theme' in customization.styling)) {
-        return undefined;
-    }
-
-    // These overridings of tint here are only temporary to start implementing the new themes in GBO
-    // while we fully support the new themes in the API/GBX. As soon as that happens we should port this logic to the API/GBX
-    // only when required for backward compatibility.
-    if (
-        customization.styling.theme === CustomizationTheme.Bold &&
-        customization.header.preset === CustomizationHeaderPreset.Contrast
-    ) {
-        return {
-            light: DARK_BASE,
-            dark: LIGHT_BASE,
-        };
-    }
-
-    // if (
-    //     customization.styling.theme === CustomizationTheme.Bold &&
-    //     customization.header.preset === CustomizationHeaderPreset.Bold
-    // ) {
-    //     return customization.styling.primaryColor;
-    // }
-
-    if (
-        customization.styling.theme === CustomizationTheme.Bold &&
-        customization.header.preset === CustomizationHeaderPreset.Custom
-    ) {
-        return customization.header.backgroundColor ?? customization.styling.primaryColor;
-    }
-
     if ('tint' in customization.styling && customization.styling.tint) {
         return {
             light: customization.styling.tint?.color.light ?? DEFAULT_TINT_COLOR,
