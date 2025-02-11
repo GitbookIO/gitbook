@@ -49,6 +49,7 @@ export function Header(props: {
 
                 'bg-tint-base/9',
                 'theme-muted:bg-tint-subtle/9',
+                'theme-bold-tint:bg-tint-subtle/9',
                 'theme-gradient:bg-gradient-primary',
                 'theme-gradient-tint:bg-gradient-tint',
                 'contrast-more:bg-tint-base',

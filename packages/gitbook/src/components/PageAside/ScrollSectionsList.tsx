@@ -115,6 +115,8 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
 
                                 'sidebar-list-default:border-tint',
                                 'sidebar-list-pill:hover:bg-primary-hover',
+                                '[html.sidebar-list-pill.theme-muted_&]:bg-primary-hover',
+                                '[html.sidebar-list-pill.theme-bold.tint_&]:bg-primary-hover',
                             ],
                         )}
                     >
