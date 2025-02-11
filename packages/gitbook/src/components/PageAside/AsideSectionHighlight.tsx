@@ -19,7 +19,7 @@ export function AsideSectionHighlight({
             layout
             layoutId="sections-line"
             className={tcls([
-                'border-primary',
+                'border-primary-9',
                 'tint:border-primary-11',
                 'sidebar-list-line:border-l-2',
 
@@ -34,7 +34,8 @@ export function AsideSectionHighlight({
                 'sidebar-list-line:rounded-l-none',
 
                 'sidebar-list-pill:bg-primary',
-                'theme-muted:bg-primary-hover',
+                '[html.theme-muted.sidebar-list-pill_&]:bg-primary-hover',
+                '[html.theme-gradient.sidebar-list-pill_&]:bg-primary-active',
 
                 'contrast-more:border',
                 'contrast-more:bg-primary',

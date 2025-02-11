@@ -18,10 +18,8 @@ import {
     colorContrast,
     colorScale,
     type ColorScaleOptions,
-    DARK_BASE,
     DEFAULT_TINT_COLOR,
     hexToRgb,
-    LIGHT_BASE,
 } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
 
@@ -43,12 +41,6 @@ export async function CustomizationRootLayout(props: {
     const language = getSpaceLanguage(customization);
     const tintColor = getTintColor(customization);
     const mixColor = getTintMixColor(customization.styling.primaryColor, tintColor);
-    console.log(
-        '===customization',
-        customization.header.preset,
-        'theme' in customization.styling && customization.styling.theme,
-        tintColor,
-    );
     const sidebarStyles = getSidebarStyles(customization);
 
     return (
