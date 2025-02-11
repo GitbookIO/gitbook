@@ -6,12 +6,10 @@ import {
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
     type CustomizationThemedColor,
-    CustomizationTheme,
     type CustomizationTint,
     type SiteCustomizationSettings,
 } from '@gitbook/api';
 import { IconsProvider, IconStyle } from '@gitbook/icons';
-import assertNever from 'assert-never';
 
 import { fontNotoColorEmoji, fonts, ibmPlexMono } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
@@ -86,7 +84,17 @@ export async function CustomizationRootLayout(props: {
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR)}
 
                         --header-background: ${hexToRgb(tintColor?.light ?? customization.styling.primaryColor.light)};
-                        --header-link: ${hexToRgb(customization.header.linkColor?.light ?? colorContrast(tintColor?.light ?? customization.styling.primaryColor.light))};
+                        --header-link: ${
+                            /** If the site still has a (deprecated) custom header link color set, we use that.
+                             * This value is no longer supported in the Customiser, and will eventually be unsupported. */
+                            hexToRgb(
+                                customization.header.linkColor?.light ??
+                                    colorContrast(
+                                        tintColor?.light ??
+                                            customization.styling.primaryColor.light,
+                                    ),
+                            )
+                        };
                     }
 
                     .dark {
