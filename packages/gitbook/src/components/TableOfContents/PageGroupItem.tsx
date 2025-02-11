@@ -1,5 +1,6 @@
 import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 
+import { hasPageVisibleDescendant } from '@/lib/pages';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
@@ -50,7 +51,7 @@ export function PageGroupItem(props: {
                 <TOCPageIcon page={page} />
                 {page.title}
             </div>
-            {page.pages && page.pages.length ? (
+            {hasPageVisibleDescendant(page) ? (
                 <PagesList
                     rootPages={rootPages}
                     pages={page.pages}

@@ -23,6 +23,7 @@ import {
     getSpaceCustomization,
     getSpaceContentData,
     getSiteData,
+    getPageDocument,
 } from '@/lib/api';
 import { getPagePDFContainerId, PageHrefContext, getAbsoluteHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
@@ -231,8 +232,7 @@ async function PDFPageDocument(props: {
     refContext: ContentRefContext;
 }) {
     const { space, page, refContext } = props;
-
-    const document = page.documentId ? await getDocument(space.id, page.documentId) : null;
+    const document = await getPageDocument(space.id, page);
 
     return (
         <PrintPage id={getPagePDFContainerId(page)}>

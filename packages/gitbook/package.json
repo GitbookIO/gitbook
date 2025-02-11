@@ -13,10 +13,10 @@
         "unit": "bun test {src,packages}",
         "generate": "gitbook-icons ./public/~gitbook/static/icons custom-icons && gitbook-math ./public/~gitbook/static/math",
         "copy:icons": "gitbook-icons ./public/~gitbook/static/icons",
-        "clean": "rm -rf ./.next && rm -rf ./public/~gitbook/static"
+        "clean": "rm -rf ./.next && rm -rf ./public/~gitbook/static/icons && rm -rf ./public/~gitbook/static/math"
     },
     "dependencies": {
-        "@gitbook/api": "^0.92.0",
+        "@gitbook/api": "^0.93.0",
         "@gitbook/cache-do": "workspace:*",
         "@gitbook/emoji-codepoints": "workspace:*",
         "@gitbook/icons": "workspace:*",

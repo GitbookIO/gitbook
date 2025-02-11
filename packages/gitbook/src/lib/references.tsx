@@ -17,6 +17,7 @@ import {
     SpaceContentPointer,
     getCollection,
     getDocument,
+    getPageDocument,
     getPublishedContentSite,
     getReusableContent,
     getRevisionFile,
@@ -161,9 +162,7 @@ export async function resolveContentRef(
                 text = '#' + anchor;
 
                 if (resolveAnchorText) {
-                    const document = page.documentId
-                        ? await getDocument(space.id, page.documentId)
-                        : null;
+                    const document = await getPageDocument(space.id, page);
                     if (document) {
                         const block = getBlockById(document, anchor);
                         if (block) {
@@ -237,16 +236,6 @@ export async function resolveContentRef(
             } else {
                 return null;
             }
-        }
-
-        case 'snippet': {
-            return {
-                href: getGitbookAppHref(
-                    `/o/${contentRef.organization}/snippet/${contentRef.snippet}`,
-                ),
-                text: 'snippet',
-                active: false,
-            };
         }
 
         case 'collection': {
