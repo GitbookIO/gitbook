@@ -75,18 +75,16 @@ export async function CustomizationRootLayout(props: {
                         ${generateColorVariable('tint', tintColor ? tintColor.light : DEFAULT_TINT_COLOR, { mix: mixColor && { color: mixColor.color.light, ratio: mixColor.ratio.light } })}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR)}
 
-                        --header-background: ${hexToRgb(tintColor?.light ?? customization.styling.primaryColor.light)};
-                        --header-link: ${
-                            /** If the site still has a (deprecated) custom header link color set, we use that.
-                             * This value is no longer supported in the Customiser, and will eventually be unsupported. */
+                        --header-background: ${
+                            /** If the site still has a (deprecated) custom header link or background set, we use that.
+                             * These values are no longer supported in the Customiser, and will eventually be unsupported in the front-end. */
                             hexToRgb(
-                                customization.header.linkColor?.light ??
-                                    colorContrast(
-                                        tintColor?.light ??
-                                            customization.styling.primaryColor.light,
-                                    ),
+                                customization.header.backgroundColor?.light ??
+                                    tintColor?.light ??
+                                    customization.styling.primaryColor.light,
                             )
                         };
+                        --header-link: ${hexToRgb(customization.header.linkColor?.light ?? colorContrast(tintColor?.light ?? customization.styling.primaryColor.light))};
                     }
 
                     .dark {
@@ -94,7 +92,7 @@ export async function CustomizationRootLayout(props: {
                         ${generateColorVariable('tint', tintColor ? tintColor.dark : DEFAULT_TINT_COLOR, { darkMode: true, mix: mixColor && { color: mixColor?.color.dark, ratio: mixColor.ratio.dark } })}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR, { darkMode: true })}
 
-                        --header-background: ${hexToRgb(tintColor?.dark ?? customization.styling.primaryColor.dark)};
+                        --header-background: ${hexToRgb(customization.header.backgroundColor?.dark ?? tintColor?.dark ?? customization.styling.primaryColor.dark)};
                         --header-link: ${hexToRgb(customization.header.linkColor?.dark ?? colorContrast(tintColor?.dark ?? customization.styling.primaryColor.dark))};
                     }
                 `}</style>
