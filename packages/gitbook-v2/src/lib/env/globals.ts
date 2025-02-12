@@ -65,6 +65,11 @@ export const GITBOOK_INTEGRATIONS_HOST =
     process.env.GITBOOK_INTEGRATIONS_HOST || 'integrations.gitbook.com';
 
 /**
+ * Hostname for fonts.
+ */
+export const GITBOOK_FONTS_URL = process.env.GITBOOK_FONTS_URL || 'https://fonts.gitbook.com';
+
+/**
  * Endpoint to use for resizing images.
  * It should be a Cloudflare domain with image resizing enabled.
  */

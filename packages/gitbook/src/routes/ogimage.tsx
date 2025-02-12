@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { ImageResponse } from 'next/og';
 
 import { type PageParams, fetchPageData } from '@/components/SitePage';
+import { getFontSourcesToPreload } from '@/fonts/custom';
 import { getAssetURL } from '@/lib/assets';
 import { filterOutNullable } from '@/lib/typescript';
 import type { GitBookSiteContext } from '@v2/lib/context';
@@ -59,20 +60,45 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
                 : page.description
             : '';
 
-    const fontFamily =
-        (typeof customization.styling.font === 'string'
-            ? googleFontsMap[customization.styling.font]
-            : null) ?? 'Inter';
+    // Load the fonts
+    const { fontFamily, fonts } = await (async () => {
+        // google fonts
+        if (typeof customization.styling.font === 'string') {
+            const fontFamily = googleFontsMap[customization.styling.font] ?? 'Inter';
 
-    const regularText = pageDescription;
-    const boldText = `${contentTitle}${pageTitle}`;
+            const regularText = pageDescription;
+            const boldText = `${contentTitle}${pageTitle}`;
 
-    const fonts = (
-        await Promise.all([
-            loadGoogleFont({ fontFamily, text: regularText, weight: 400 }),
-            loadGoogleFont({ fontFamily, text: boldText, weight: 700 }),
-        ])
-    ).filter(filterOutNullable);
+            const fonts = (
+                await Promise.all([
+                    loadGoogleFont({ fontFamily, text: regularText, weight: 400 }),
+                    loadGoogleFont({ fontFamily, text: boldText, weight: 700 }),
+                ])
+            ).filter(filterOutNullable);
+
+            return { fontFamily, fonts };
+        }
+
+        // custom fonts
+        // We only load the primary font weights for now
+        const primaryFontWeights = getFontSourcesToPreload(customization.styling.font);
+
+        const fonts = (
+            await Promise.all(
+                primaryFontWeights.map((face) => {
+                    const { weight, sources } = face;
+                    if (sources.length === 0) {
+                        return null;
+                    }
+                    const url = sources[0].url;
+
+                    return loadCustomFont({ url, weight });
+                })
+            )
+        ).filter(filterOutNullable);
+
+        return { fontFamily: 'CustomFont', fonts };
+    })();
 
     const theme = customization.themes.default;
     const useLightTheme = theme === 'light';
@@ -218,7 +244,6 @@ async function loadGoogleFont(input: { fontFamily: string; text: string; weight:
     url.searchParams.set('text', text);
 
     const result = await fetch(url.href);
-
     if (!result.ok) {
         return null;
     }
@@ -242,4 +267,21 @@ async function loadGoogleFont(input: { fontFamily: string; text: string; weight:
 
     // If for some reason we can't load the font, we'll just use the default one
     return null;
+}
+
+async function loadCustomFont(input: { url: string; weight: 400 | 700 }) {
+    const { url, weight } = input;
+    const response = await fetch(url);
+    if (!response.ok) {
+        return null;
+    }
+
+    const data = await response.arrayBuffer();
+
+    return {
+        name: 'CustomFont',
+        data,
+        style: 'normal' as const,
+        weight,
+    };
 }
