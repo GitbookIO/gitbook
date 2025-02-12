@@ -45,7 +45,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
             />
             <pre
                 className={tcls(
-                    '[grid-area:2/1] relative overflow-auto bg-tint ring-tint-subtle hide-scroll',
+                    '[grid-area:2/1] relative overflow-auto bg-tint theme-gradient:bg-tint-12/1 ring-tint-subtle hide-scroll',
                     'rounded-md straight-corners:rounded-sm',
                     title && 'rounded-ss-none',
                 )}

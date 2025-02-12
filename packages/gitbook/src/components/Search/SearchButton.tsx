@@ -34,6 +34,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
 
     return (
         <button
+            type="button"
             onClick={onClick}
             aria-label={tString(language, 'search')}
             className={tcls(

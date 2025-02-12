@@ -14,17 +14,17 @@ export const opacities = [0, 4, 8, 12, 16, 24, 40, 64, 72, 88, 96, 100];
 function generateVarShades(varName: string, filter: ColorCategory[] = []) {
     const result: { [key: string]: string } = {};
 
-    Object.entries(scale).forEach(([categoryName, category]) => {
+    for (const [categoryName, category] of Object.entries(scale)) {
         if (filter.length === 0 || filter.includes(categoryName as ColorCategory)) {
-            Object.entries(category).forEach(([key, value]) => {
+            for (const [key, value] of Object.entries(category)) {
                 if (filter.length > 0) {
                     result[key] = `rgb(var(--${varName}-${value}))`;
                 } else {
                     result[value] = `rgb(var(--${varName}-${value}))`;
                 }
-            });
+            }
         }
-    });
+    }
 
     return result;
 }
@@ -353,7 +353,7 @@ const config: Config = {
         opacity: opacity(),
     },
     plugins: [
-        plugin(function ({ addVariant }) {
+        plugin(({ addVariant }) => {
             /**
              * Variant when the Table of Content navigation is open.
              */
@@ -365,25 +365,41 @@ const config: Config = {
             addVariant('site-header', 'body:has(#site-header:not(.mobile-only)) &');
             addVariant('site-header-sections', 'body:has(#site-header:not(.mobile-only) > nav) &');
 
-            /**
-             * Variant for sidebar styles
-             */
-            addVariant('sidebar-default', 'html.sidebar-default &');
-            addVariant('sidebar-filled', 'html.sidebar-filled &');
-            addVariant('sidebar-list-default', 'html.sidebar-list-default &');
-            addVariant('sidebar-list-pill', 'html.sidebar-list-pill &');
-            addVariant('sidebar-list-line', 'html.sidebar-list-line &');
+            const customisationVariants = {
+                // Sidebar styles
+                sidebar: ['sidebar-default', 'sidebar-filled'],
 
-            /**
-             * Variant for tint colours
-             */
-            addVariant('tint', 'html.tint &');
-            addVariant('no-tint', 'html.no-tint &');
+                // List styles
+                list: ['sidebar-list-default', 'sidebar-list-pill', 'sidebar-list-line'],
 
-            /**
-             * Variant when the space is configured with straight corners.
-             */
-            addVariant('straight-corners', 'html.straight-corners &');
+                // Tint colours
+                tint: ['tint', 'no-tint'],
+
+                // Themes
+                theme: ['theme-clean', 'theme-muted', 'theme-bold', 'theme-gradient'],
+
+                // Corner styles
+                corner: ['straight-corners'],
+            };
+
+            for (const [category, variants] of Object.entries(customisationVariants)) {
+                for (const variant of variants) {
+                    addVariant(variant, `html.${variant} &`);
+
+                    if (category === 'tint') {
+                        /* Because we check for a class on the `html` element, like `html.$variant`, we cannot easily chain customisation variants "the Tailwind way". 
+                        Basically, when you write `theme-clean:tint:`, you're creating a CSS selector like `html.theme-clean html.tint &`.
+                        We need the selector to apply to the same element, like `html.$variant.$otherVariant` instead.
+                        Instead of relying on Tailwind variant chaining, we manually create a few additional variants for often-used combinations like theme+tint. */
+                        for (const themeVariant of customisationVariants.theme) {
+                            addVariant(
+                                `${themeVariant}-${variant}`, // theme-clean-tint, theme-clean-no-tint, theme-muted-tint, ...
+                                `html.${variant}.${themeVariant} &`, // html.theme-clean.tint, html.theme-clean.no-tint, ...
+                            );
+                        }
+                    }
+                }
+            }
 
             /**
              * Variant when the page contains a block that will be rendered in full-width mode.

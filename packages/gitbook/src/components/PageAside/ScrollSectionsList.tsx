@@ -88,6 +88,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                             'sidebar-list-line:rounded-l-none',
 
                             'hover:bg-tint-hover',
+                            'theme-gradient:hover:bg-tint-12/1',
                             'hover:text-tint-strong',
                             'contrast-more:hover:ring-1',
                             'contrast-more:hover:ring-inset',
@@ -109,12 +110,17 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                                 'hover:text-primary',
                                 'contrast-more:text-primary',
                                 'contrast-more:hover:text-primary-strong',
+                                'sidebar-list-line:ml-px',
+
                                 'hover:bg-primary-hover',
+                                'theme-muted:hover:bg-primary-active',
+                                'theme-bold-tint:hover:bg-primary-active',
+                                'theme-gradient:hover:bg-primary-active',
+
                                 'tint:font-semibold',
                                 'contrast-more:font-semibold',
 
                                 'sidebar-list-default:border-tint',
-                                'sidebar-list-pill:hover:bg-primary-hover',
                             ],
                         )}
                     >
