@@ -33,6 +33,37 @@ import '@gitbook/icons/style.css';
 import './globals.css';
 import { GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL } from '@v2/lib/env';
 
+const CUSTTOM_FONTS_WORKER_URL = 'https://public-valentino.gitbook.space/';
+
+interface FontFace {
+    weight: number;
+    url: string;
+}
+
+interface CustomFont {
+    fontFamily: string;
+    faces: FontFace[];
+}
+
+const regularFontWorkerUrl =
+    'https://public-valentino.gitbook.space/valentino/fonts/3ey8MCM8uEpKWRFnaFp2/nvidia_regular.woff2';
+const boldFontWorkerUrl =
+    'https://public-valentino.gitbook.space/valentino/fonts/3ey8MCM8uEpKWRFnaFp2/nvidia_bold.woff2';
+
+// // This would come from props/API
+// const nvidiaFont: CustomFont = {
+//     id: 'custom-font',
+//     name: 'CustomFont',
+//     links: {
+//         regular: regularFontWorkerUrl,
+//         bold: boldFontWorkerUrl,
+//     },
+//     display: 'swap',
+//     fallback: ['system-ui', 'arial'],
+// };
+//
+// const customFont = nvidiaFont;
+
 /**
  * Layout shared between the content and the PDF renderer.
  * It takes care of setting the theme and the language.
@@ -48,6 +79,18 @@ export async function CustomizationRootLayout(props: {
     const mixColor = getTintMixColor(customization.styling.primaryColor, tintColor);
     const sidebarStyles = getSidebarStyles(customization);
     const { infoColor, successColor, warningColor, dangerColor } = getSemanticColors(customization);
+
+    const hasCustomFont = typeof customization.styling.font !== 'string';
+    // Add custom font handling
+    const customFontCSS = hasCustomFont
+        ? generateCustomFontFaces(customization.styling.font as CustomFont)
+        : '';
+
+    const customFontLinks = hasCustomFont
+        ? customization.styling.font.faces.map((face) => face.url)
+        : [];
+
+    console.log('customFontLinks', customFontLinks, customization.styling.font);
 
     return (
         <html
@@ -74,6 +117,12 @@ export async function CustomizationRootLayout(props: {
                 {customization.privacyPolicy.url ? (
                     <link rel="privacy-policy" href={customization.privacyPolicy.url} />
                 ) : null}
+                {hasCustomFont && customFontLinks.length > 0
+                    ? customFontLinks.map((link) => (
+                          <link rel="preload" href={link} as="font" crossOrigin="anonymous" />
+                      ))
+                    : null}
+                {hasCustomFont ? <style>{customFontCSS}</style> : null}
                 <style
                     nonce={
                         //Since I can't get the nonce to work for inline styles, we need to allow unsafe-inline
@@ -119,6 +168,9 @@ export async function CustomizationRootLayout(props: {
             </head>
             <body
                 className={tcls(
+                    fontNotoColorEmoji.className,
+                    hasCustomFont ? 'font-sans' : fonts[customization.styling.font].className,
+                    `${ibmPlexMono.variable}`,
                     'bg-tint-base',
                     'theme-muted:bg-tint-subtle',
                     'theme-bold-tint:bg-tint-subtle',
@@ -254,6 +306,58 @@ function getSemanticColors(
     };
 }
 
+/**
+ * Define the custom font faces and set the --font-content to the custom font name
+ */
+function generateCustomFontFaces(customFont: CustomFont): string {
+    const { fontFamily, faces } = customFont;
+
+    const regularFont = faces.find((face) => face.weight === 400);
+    const boldFont = faces.find((face) => face.weight === 700);
+
+    if (!regularFont || !boldFont) {
+        throw new Error('Custom font must have a regular and a bold face');
+    }
+
+    const regular = `
+        @font-face {
+            font-family: ${fontFamily};
+            font-style: normal;
+            font-weight: ${regularFont.weight};
+            font-display: swap;
+            src: url(${regularFont.url});
+        }
+`;
+
+    // const semiBold = `
+    //        @font-face {
+    //            font-family: ${fontFamily};
+    //            font-style: normal;
+    //            font-weight: 600;
+    //            font-display: swap;
+    //            src: url(${boldFont.url});
+    //        }
+    //    `
+    // 	: "";
+
+    const bold = `
+        @font-face {
+            font-family: ${fontFamily};
+            font-style: normal;
+            font-weight: ${boldFont.weight};
+            font-display: swap;
+            src: url(${boldFont.url});
+        }
+    `;
+
+    return `
+        ${regular}
+        ${bold}
+        :root {
+            --font-content: ${fontFamily};
+        }
+    `;
+}
 type ColorInput = string;
 function generateColorVariable(
     name: string,
