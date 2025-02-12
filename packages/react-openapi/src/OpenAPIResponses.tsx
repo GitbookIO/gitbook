@@ -1,14 +1,12 @@
 import * as React from 'react';
 import classNames from 'classnames';
-import { createStateKey, noReference } from './utils';
+import { createStateKey } from './utils';
 import { OpenAPIResponse } from './OpenAPIResponse';
 import { OpenAPIClientContext } from './types';
 import { InteractiveSection } from './InteractiveSection';
 import { OpenAPIV3, OpenAPIV3_1 } from '@scalar/openapi-types';
 import { OpenAPIDisclosureGroup } from './OpenAPIDisclosureGroup';
 import { Markdown } from './Markdown';
-import { OpenAPIRootSchema, OpenAPISchemaProperties, OpenAPISchemaProperty } from './OpenAPISchema';
-import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 
 /**
  * Display an interactive response body.
