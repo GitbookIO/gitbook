@@ -63,7 +63,7 @@ export async function PageAside(props: {
                 'contrast-more:text-tint-strong',
                 'sticky',
                 // Without header
-                'lg:top:0',
+                'lg:top-0',
                 'lg:max-h-screen',
 
                 // With header
