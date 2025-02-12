@@ -28,6 +28,10 @@ export async function RecordCard(
         : null;
     const target = targetRef ? await context.resolveContentRef(targetRef) : null;
 
+    const coverIsLandscape =
+        cover?.file?.dimensions &&
+        cover.file?.dimensions?.width / cover.file?.dimensions?.height > 1;
+
     const body = (
         <div
             className={tcls(
@@ -50,14 +54,13 @@ export async function RecordCard(
                 // On mobile, check if we can display the cover responsively or not:
                 // - If the file has a landscape aspect ratio, we display it normally
                 // - If the file is square or portrait, we display it left with 40% of the card width
-                cover?.file?.dimensions &&
-                    cover.file?.dimensions?.width / cover.file?.dimensions?.height <= 1
-                    ? [
+                coverIsLandscape
+                    ? 'grid-rows-[auto,1fr]'
+                    : [
                           'grid-cols-[40%,_1fr]',
                           'min-[432px]:grid-cols-none',
                           'min-[432px]:grid-rows-[auto,1fr]',
-                      ]
-                    : 'grid-rows-[auto,1fr]',
+                      ],
             )}
         >
             {cover ? (
@@ -79,8 +82,9 @@ export async function RecordCard(
                         'w-full',
                         'h-full',
                         'object-cover',
-                        'min-[432px]:h-auto',
-                        'min-[432px]:aspect-video',
+                        coverIsLandscape
+                            ? ['h-auto', 'aspect-video']
+                            : ['min-[432px]:h-auto', 'min-[432px]:aspect-video'],
                     )}
                     priority={isOffscreen ? 'lazy' : 'high'}
                     preload
