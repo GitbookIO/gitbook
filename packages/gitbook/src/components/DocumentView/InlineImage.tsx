@@ -48,7 +48,7 @@ export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
                 }}
                 priority="lazy"
                 preload
-                style={[size === 'line' ? ['max-h-[1.1em]', 'h-[1.1em]', 'mb-[.1em]', 'w-auto'] : null]}
+                style={[size === 'line' ? ['max-h-[1lh]', 'h-[1lh]', 'w-auto'] : null]}
                 inline
                 zoom={!isInLink}
             />
