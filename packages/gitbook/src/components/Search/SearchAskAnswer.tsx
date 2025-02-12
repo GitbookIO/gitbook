@@ -52,7 +52,7 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
                 query,
             });
 
-            const response = streamAskQuestion(organizationId, siteId, siteSpaceId ?? null, query);
+            const response = streamAskQuestion({ pointer, question: query });
             const stream = iterateStreamResponse(response);
 
             // When we pass in "ask" mode, the query could still be updated by the client
