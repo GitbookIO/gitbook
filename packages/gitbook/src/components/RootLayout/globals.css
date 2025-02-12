@@ -121,6 +121,13 @@
         }
     }
 
+    .bg-gradient-primary {
+        @apply bg-gradient-to-bl from-primary-4 to-tint-base to-60% bg-fixed;
+    }
+    .bg-gradient-tint {
+        @apply bg-gradient-to-bl from-tint-4 to-tint-base to-60% bg-fixed;
+    }
+
     /**
      * Utility to prevent horizontal jumps when the vertical scrollbar appears
      * It should be used on main containers of the layout, while preserving horizontal delimiters.

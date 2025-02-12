@@ -1,13 +1,17 @@
 import { argosScreenshot } from '@argos-ci/playwright';
 import {
     CustomizationBackground,
+    CustomizationContentLink,
     CustomizationCorners,
     CustomizationFont,
+    CustomizationHeaderItem,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
     CustomizationLocale,
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
+    CustomizationTheme,
+    CustomizationThemedColor,
     CustomizationThemeMode,
     SiteCustomizationSettings,
 } from '@gitbook/api';
@@ -81,7 +85,26 @@ const allThemeModes: CustomizationThemeMode[] = [
     CustomizationThemeMode.Dark,
 ];
 
-const allThemePresets: CustomizationHeaderPreset[] = [
+const allTintColors: Array<{
+    label: string;
+    value: CustomizationThemedColor | undefined;
+}> = [
+    {
+        label: 'Off',
+        value: undefined,
+    },
+    { label: 'Primary', value: { light: '#346DDB', dark: '#346DDB' } },
+    { label: 'Custom', value: { light: '#C62C68', dark: '#EF96B8' } },
+];
+
+const allThemes: CustomizationTheme[] = [
+    CustomizationTheme.Clean,
+    CustomizationTheme.Muted,
+    CustomizationTheme.Bold,
+    CustomizationTheme.Gradient,
+];
+
+const allDeprecatedThemePresets: CustomizationHeaderPreset[] = [
     CustomizationHeaderPreset.Default,
     CustomizationHeaderPreset.Bold,
     CustomizationHeaderPreset.Contrast,
@@ -91,6 +114,23 @@ const allThemePresets: CustomizationHeaderPreset[] = [
 const allSidebarBackgroundStyles: CustomizationSidebarBackgroundStyle[] = [
     CustomizationSidebarBackgroundStyle.Default,
     CustomizationSidebarBackgroundStyle.Filled,
+];
+
+// Common customization settings
+
+const headerLinks: CustomizationHeaderItem[] = [
+    {
+        title: 'Secondary button',
+        to: { kind: 'url', url: 'https://www.gitbook.com' },
+        style: 'button-secondary',
+        links: [],
+    },
+    {
+        title: 'Primary button',
+        to: { kind: 'url', url: 'https://www.gitbook.com' },
+        style: 'button-primary',
+        links: [],
+    },
 ];
 
 async function waitForCookiesDialog(page: Page) {
@@ -561,23 +601,23 @@ const testCases: TestsCase[] = [
     {
         name: 'Customization',
         baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
-        tests: allThemeModes.flatMap((theme) => [
+        tests: allThemeModes.flatMap((themeMode) => [
             {
-                name: `Without header - Theme ${theme}`,
+                name: `Without header - Theme mode ${themeMode}`,
                 url: getCustomizationURL({
                     header: {
                         preset: CustomizationHeaderPreset.None,
                         links: [],
                     },
                     themes: {
-                        default: theme,
+                        default: themeMode,
                         toggeable: false,
                     },
                 }),
                 run: waitForCookiesDialog,
             },
             {
-                name: `With duotone icons - Theme ${theme}`,
+                name: `With duotone icons - Theme mode ${themeMode}`,
                 url:
                     'page-options/page-with-icon' +
                     getCustomizationURL({
@@ -585,66 +625,70 @@ const testCases: TestsCase[] = [
                             icons: CustomizationIconsStyle.Duotone,
                         },
                         themes: {
-                            default: theme,
+                            default: themeMode,
                             toggeable: false,
                         },
                     }),
                 run: waitForCookiesDialog,
             },
             {
-                name: `With header buttons - Theme ${theme}`,
+                name: `With header buttons - Theme mode ${themeMode}`,
                 url: getCustomizationURL({
                     header: {
                         preset: CustomizationHeaderPreset.Default,
-                        links: [
-                            {
-                                title: 'Secondary button',
-                                to: { kind: 'url', url: 'https://www.gitbook.com' },
-                                style: 'button-secondary',
-                            },
-                            {
-                                title: 'Primary button',
-                                to: { kind: 'url', url: 'https://www.gitbook.com' },
-                                style: 'button-primary',
-                            },
-                        ],
+                        links: headerLinks,
                     },
                     themes: {
-                        default: theme,
+                        default: themeMode,
                         toggeable: false,
                     },
                 }),
                 run: waitForCookiesDialog,
             },
             {
-                name: `Without tint - Default preset - Theme ${theme}`,
+                name: `Without tint - Default preset - Theme mode ${themeMode}`,
                 url: getCustomizationURL({
                     header: {
                         preset: CustomizationHeaderPreset.Default,
-                        links: [
-                            {
-                                title: 'Secondary button',
-                                to: { kind: 'url', url: 'https://www.gitbook.com' },
-                                style: 'button-secondary',
-                            },
-                            {
-                                title: 'Primary button',
-                                to: { kind: 'url', url: 'https://www.gitbook.com' },
-                                style: 'button-primary',
-                            },
-                        ],
+                        links: headerLinks,
                     },
                     themes: {
-                        default: theme,
+                        default: themeMode,
                         toggeable: false,
                     },
                 }),
                 run: waitForCookiesDialog,
             },
-            // Theme-specific tests
-            ...allThemePresets.flatMap((preset) => [
+            // New site themes
+            ...allThemes.flatMap((theme) => [
+                ...allTintColors.flatMap((tint) => [
+                    ...allSidebarBackgroundStyles.flatMap((sidebarStyle) => ({
+                        name: `Theme ${theme} - Tint ${tint.label} - Sidebar ${sidebarStyle} - Mode ${themeMode}`,
+                        url: getCustomizationURL({
+                            styling: {
+                                theme,
+                                ...(tint.value ? { tint: { color: tint.value } } : {}),
+                                sidebar: {
+                                    background: sidebarStyle,
+                                    list: CustomizationSidebarListStyle.Default,
+                                },
+                            },
+                            header: {
+                                links: headerLinks,
+                            },
+                            themes: {
+                                default: themeMode,
+                                toggeable: false,
+                            },
+                        }),
+                        run: waitForCookiesDialog,
+                    })),
+                ]),
+            ]),
+            // Deprecated header themes
+            ...allDeprecatedThemePresets.flatMap((preset) => [
                 ...allSidebarBackgroundStyles.flatMap((sidebarStyle) => ({
-                    name: `With tint - Preset ${preset} - Sidebar ${sidebarStyle} - Theme ${theme}`,
+                    name: `With tint - Legacy header preset ${preset} - Sidebar ${sidebarStyle} - Theme mode ${themeMode}`,
                     url: getCustomizationURL({
                         styling: {
                             tint: { color: { light: '#346DDB', dark: '#346DDB' } },
@@ -661,21 +705,10 @@ const testCases: TestsCase[] = [
                                       linkColor: { light: '#4DDE98', dark: '#0C693D' },
                                   }
                                 : {}),
-                            links: [
-                                {
-                                    title: 'Secondary button',
-                                    to: { kind: 'url', url: 'https://www.gitbook.com' },
-                                    style: 'button-secondary',
-                                },
-                                {
-                                    title: 'Primary button',
-                                    to: { kind: 'url', url: 'https://www.gitbook.com' },
-                                    style: 'button-primary',
-                                },
-                            ],
+                            links: headerLinks,
                         },
                         themes: {
-                            default: theme,
+                            default: themeMode,
                             toggeable: false,
                         },
                     }),
@@ -683,28 +716,17 @@ const testCases: TestsCase[] = [
                 })),
             ]),
             {
-                name: `With tint - Legacy background match - Theme ${theme}`,
+                name: `With tint - Legacy background match - Theme mode ${themeMode}`,
                 url: getCustomizationURL({
                     styling: {
                         background: CustomizationBackground.Match,
                     },
                     header: {
                         preset: CustomizationHeaderPreset.Default,
-                        links: [
-                            {
-                                title: 'Secondary button',
-                                to: { kind: 'url', url: 'https://www.gitbook.com' },
-                                style: 'button-secondary',
-                            },
-                            {
-                                title: 'Primary button',
-                                to: { kind: 'url', url: 'https://www.gitbook.com' },
-                                style: 'button-primary',
-                            },
-                        ],
+                        links: headerLinks,
                     },
                     themes: {
-                        default: theme,
+                        default: themeMode,
                         toggeable: false,
                     },
                 }),
@@ -1488,6 +1510,32 @@ for (const testCase of testCases) {
  * Create a URL with customization settings.
  */
 function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettings>): string {
+    // We replicate the theme migration logic from the API to the tests, because the don't get these settings from the API.
+    // We can remove this once the migration to the new themes have been completed and the new theme styles are verified
+    // Map the theme preset (+ tint) to one of the new themes
+    const newTheme = (() => {
+        if (partial.styling?.theme) {
+            return partial.styling.theme;
+        }
+
+        switch (partial.header?.preset) {
+            case CustomizationHeaderPreset.Bold:
+            case CustomizationHeaderPreset.Contrast:
+            case CustomizationHeaderPreset.Custom:
+                return CustomizationTheme.Bold;
+
+            case CustomizationHeaderPreset.None:
+            case CustomizationHeaderPreset.Default:
+                if (partial.styling?.tint) {
+                    return CustomizationTheme.Muted;
+                }
+
+                return CustomizationTheme.Clean;
+            default:
+                return CustomizationTheme.Clean;
+        }
+    })();
+
     /**
      * Default customization settings.
      *
@@ -1495,6 +1543,7 @@ function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettings>): s
      */
     const DEFAULT_CUSTOMIZATION: SiteCustomizationSettings = {
         styling: {
+            theme: newTheme,
             primaryColor: { light: '#346DDB', dark: '#346DDB' },
             corners: CustomizationCorners.Rounded,
             font: CustomizationFont.Inter,

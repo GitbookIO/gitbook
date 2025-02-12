@@ -10,7 +10,6 @@ import {
     type SiteCustomizationSettings,
 } from '@gitbook/api';
 import { IconsProvider, IconStyle } from '@gitbook/icons';
-import assertNever from 'assert-never';
 
 import { fontNotoColorEmoji, fonts, ibmPlexMono } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
@@ -19,11 +18,8 @@ import {
     colorContrast,
     colorScale,
     type ColorScaleOptions,
-    DARK_BASE,
     DEFAULT_TINT_COLOR,
     hexToRgb,
-    LIGHT_BASE,
-    shadesOfColor,
 } from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
 
@@ -42,7 +38,6 @@ export async function CustomizationRootLayout(props: {
 }) {
     const { customization, children } = props;
 
-    const headerTheme = generateHeaderTheme(customization);
     const language = getSpaceLanguage(customization);
     const tintColor = getTintColor(customization);
     const mixColor = getTintMixColor(customization.styling.primaryColor, tintColor);
@@ -59,6 +54,7 @@ export async function CustomizationRootLayout(props: {
                 customization.styling.corners === CustomizationCorners.Straight
                     ? ' straight-corners'
                     : '',
+                'theme' in customization.styling && `theme-${customization.styling.theme}`,
                 tintColor ? ' tint' : 'no-tint',
                 sidebarStyles.background && ` sidebar-${sidebarStyles.background}`,
                 sidebarStyles.list && ` sidebar-list-${sidebarStyles.list}`,
@@ -79,8 +75,16 @@ export async function CustomizationRootLayout(props: {
                         ${generateColorVariable('tint', tintColor ? tintColor.light : DEFAULT_TINT_COLOR, { mix: mixColor && { color: mixColor.color.light, ratio: mixColor.ratio.light } })}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR)}
 
-                        --header-background: ${hexToRgb(headerTheme.backgroundColor.light)};
-                        --header-link: ${hexToRgb(headerTheme.linkColor.light)};
+                        --header-background: ${
+                            /** If the site still has a (deprecated) custom header link or background set, we use that.
+                             * These values are no longer supported in the Customiser, and will eventually be unsupported in the front-end. */
+                            hexToRgb(
+                                customization.header.backgroundColor?.light ??
+                                    tintColor?.light ??
+                                    customization.styling.primaryColor.light,
+                            )
+                        };
+                        --header-link: ${hexToRgb(customization.header.linkColor?.light ?? colorContrast(tintColor?.light ?? customization.styling.primaryColor.light))};
                     }
 
                     .dark {
@@ -88,8 +92,8 @@ export async function CustomizationRootLayout(props: {
                         ${generateColorVariable('tint', tintColor ? tintColor.dark : DEFAULT_TINT_COLOR, { darkMode: true, mix: mixColor && { color: mixColor?.color.dark, ratio: mixColor.ratio.dark } })}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR, { darkMode: true })}
 
-                        --header-background: ${hexToRgb(headerTheme.backgroundColor.dark)};
-                        --header-link: ${hexToRgb(headerTheme.linkColor.dark)};   
+                        --header-background: ${hexToRgb(customization.header.backgroundColor?.dark ?? tintColor?.dark ?? customization.styling.primaryColor.dark)};
+                        --header-link: ${hexToRgb(customization.header.linkColor?.dark ?? colorContrast(tintColor?.dark ?? customization.styling.primaryColor.dark))};
                     }
                 `}</style>
             </head>
@@ -99,7 +103,11 @@ export async function CustomizationRootLayout(props: {
                     `${fonts[customization.styling.font].className}`,
                     `${ibmPlexMono.variable}`,
                     'bg-tint-base',
-                    '[html.tint.sidebar-filled_&]:bg-tint-subtle', // TODO: Replace this with theme-muted:bg-tint-subtle once themes are available
+                    'theme-muted:bg-tint-subtle',
+                    'theme-bold-tint:bg-tint-subtle',
+
+                    'theme-gradient:bg-gradient-primary',
+                    'theme-gradient-tint:bg-gradient-tint',
                 )}
             >
                 <IconsProvider
@@ -204,7 +212,9 @@ function generateColorVariable(
     const shades: Record<string, string> =
         typeof color === 'string'
             ? Object.fromEntries(
-                  colorScale(color, options).map((shade, index) => [index + 1, shade]),
+                  colorScale(color, options)
+                      .map((shade, index) => [index + 1, shade])
+                      .concat([['original', color]]),
               )
             : color;
 
@@ -217,86 +227,6 @@ function generateColorVariable(
             }`;
         })
         .join('\n');
-}
-
-function generateHeaderTheme(customization: CustomizationSettings | SiteCustomizationSettings): {
-    backgroundColor: { light: ColorInput; dark: ColorInput };
-    linkColor: { light: ColorInput; dark: ColorInput };
-} {
-    const tintColor = getTintColor(customization);
-
-    switch (customization.header.preset) {
-        case CustomizationHeaderPreset.None:
-        case CustomizationHeaderPreset.Default: {
-            return {
-                backgroundColor: {
-                    light: LIGHT_BASE,
-                    dark: DARK_BASE,
-                },
-                linkColor: {
-                    light: customization.styling.primaryColor.light,
-                    dark: customization.styling.primaryColor.dark,
-                },
-            };
-        }
-        case CustomizationHeaderPreset.Bold: {
-            return {
-                backgroundColor: {
-                    light: tintColor?.light ?? customization.styling.primaryColor.light,
-                    dark: tintColor?.dark ?? customization.styling.primaryColor.dark,
-                },
-                linkColor: {
-                    light: colorContrast(
-                        tintColor?.light ?? customization.styling.primaryColor.light,
-                        [LIGHT_BASE, DARK_BASE],
-                    ),
-                    dark: colorContrast(
-                        tintColor?.dark ?? customization.styling.primaryColor.dark,
-                        [LIGHT_BASE, DARK_BASE],
-                    ),
-                },
-            };
-        }
-        case CustomizationHeaderPreset.Contrast: {
-            return {
-                backgroundColor: {
-                    light: DARK_BASE,
-                    dark: LIGHT_BASE,
-                },
-                linkColor: {
-                    light: LIGHT_BASE,
-                    dark: DARK_BASE,
-                },
-            };
-        }
-        case CustomizationHeaderPreset.Custom: {
-            return {
-                backgroundColor: {
-                    light:
-                        customization.header.backgroundColor?.light ??
-                        tintColor?.light ??
-                        LIGHT_BASE,
-                    dark:
-                        customization.header.backgroundColor?.dark ?? tintColor?.dark ?? DARK_BASE,
-                },
-                linkColor: {
-                    light:
-                        customization.header.linkColor?.light ??
-                        (tintColor?.light &&
-                            colorContrast(tintColor.light, [LIGHT_BASE, DARK_BASE])) ??
-                        customization.styling.primaryColor.light,
-                    dark:
-                        customization.header.linkColor?.dark ??
-                        (tintColor?.dark &&
-                            colorContrast(tintColor.dark, [LIGHT_BASE, DARK_BASE])) ??
-                        customization.styling.primaryColor.dark,
-                },
-            };
-        }
-        default: {
-            assertNever(customization.header.preset);
-        }
-    }
 }
 
 const apiToIconsStyles: {
