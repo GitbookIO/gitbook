@@ -265,16 +265,13 @@ async function transformAnswer({
                 }
 
                 // Find the siteSpace in site spaces in case it is nested in a site section so we can resolve the URL appropriately
-                const siteSpace = siteSpaces?.find(
+                const spaceURL = siteSpaces?.find(
                     (siteSpace) => siteSpace.space.id === source.space,
-                );
-
-                const spaceURL = siteSpace?.urls.published;
+                )?.urls.published;
 
                 const href = spaceURL
                     ? await getURLWithSections(page.page.path, spaceURL)
                     : await getPageHref(pages, page.page);
-                console.log('SPACE', source.space, spaceURL);
 
                 return {
                     id: source.page,
