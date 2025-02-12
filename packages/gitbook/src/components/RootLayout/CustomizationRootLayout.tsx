@@ -32,6 +32,34 @@ import { ClientContexts } from './ClientContexts';
 import '@gitbook/icons/style.css';
 import './globals.css';
 
+interface FontUrls {
+    regular: string;
+    semiBold: string;
+    bold: string;
+}
+
+interface CustomFont {
+    id: string;
+    name: string;
+    links: FontUrls;
+    display?: string;
+    preload?: boolean;
+    fallback?: string[];
+}
+
+// This would come from props/API
+const customFont: CustomFont = {
+    id: 'custom-font',
+    name: 'CustomFont',
+    links: {
+        regular: 'https://fonts.gstatic.com/s/satisfy/v21/rP2Hp2yn6lkG50LoCZOIHTWEBlw.woff2',
+        semiBold: 'https://fonts.gstatic.com/s/satisfy/v21/rP2Hp2yn6lkG50LoCZOIHTWEBlw.woff2',
+        bold: 'https://fonts.gstatic.com/s/satisfy/v21/rP2Hp2yn6lkG50LoCZOIHTWEBlw.woff2',
+    },
+    display: 'swap',
+    fallback: ['system-ui', 'arial'],
+};
+
 /**
  * Layout shared between the content and the PDF renderer.
  * It takes care of setting the theme and the language.
@@ -47,6 +75,12 @@ export async function CustomizationRootLayout(props: {
     const tintColor = getTintColor(customization);
     const mixColor = getTintMixColor(customization.styling.primaryColor, tintColor);
     const sidebarStyles = getSidebarStyles(customization);
+
+    const hasCustomFont = true;
+    // Add custom font handling
+    const customFontCSS = hasCustomFont
+        ? generateCustomFontFaces(customFont.name, customFont.links)
+        : '';
 
     return (
         <html
@@ -68,6 +102,7 @@ export async function CustomizationRootLayout(props: {
                 {customization.privacyPolicy.url ? (
                     <link rel="privacy-policy" href={customization.privacyPolicy.url} />
                 ) : null}
+                {hasCustomFont ? <style>{customFontCSS}</style> : null}
                 <style
                     nonce={
                         //Since I can't get the nonce to work for inline styles, we need to allow unsafe-inline
@@ -96,7 +131,7 @@ export async function CustomizationRootLayout(props: {
             <body
                 className={tcls(
                     fontNotoColorEmoji.className,
-                    `${fonts[customization.styling.font].className}`,
+                    hasCustomFont ? 'font-sans' : fonts[customization.styling.font].className,
                     `${ibmPlexMono.variable}`,
                     'bg-tint-base',
                     '[html.tint.sidebar-filled_&]:bg-tint-subtle', // TODO: Replace this with theme-muted:bg-tint-subtle once themes are available
@@ -190,6 +225,37 @@ function getSidebarStyles(
     };
 }
 
+/**
+ * Define the custom font faces and set the --font-content to the custom font name
+ */
+function generateCustomFontFaces(fontFamily: string, urls: FontUrls) {
+    return `
+        @font-face {
+            font-family: ${fontFamily};
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url(${urls.regular});
+        }
+        @font-face {
+            font-family: ${fontFamily};
+            font-style: normal;
+            font-weight: 600;
+            font-display: swap;
+            src: url(${urls.semiBold});
+        }
+        @font-face {
+            font-family: ${fontFamily};
+            font-style: normal;
+            font-weight: 700;
+            font-display: swap;
+            src: url(${urls.bold});
+        }
+        :root {
+            --font-content: ${fontFamily};
+        }
+    `;
+}
 type ColorInput = string;
 function generateColorVariable(
     name: string,
