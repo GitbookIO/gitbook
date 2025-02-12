@@ -82,7 +82,7 @@ async function searchSiteContent(args: {
     ]);
     const siteStructure = siteData?.structure;
 
-    const siteSpaces = siteStructure ? getSiteStructureSiteSpaces(siteStructure) : null;
+    const siteSpaces = siteStructure ? extractSiteStructureSiteSpaces(siteStructure) : null;
 
     if (siteSpaces) {
         // We are searching all of this Site's content
@@ -160,7 +160,9 @@ export const streamAskQuestion = streamResponse(async function* ({
 }) {
     const { organizationId, siteId, siteSpaceId } = pointer;
     const [apiCtx, siteData] = await Promise.all([api.api(), api.getSiteData(pointer)]);
-    const siteSpaces = siteData?.structure ? getSiteStructureSiteSpaces(siteData.structure) : null;
+    const siteSpaces = siteData?.structure
+        ? extractSiteStructureSiteSpaces(siteData.structure)
+        : null;
 
     const stream = apiCtx.client.orgs.streamAskInSite(
         organizationId,
@@ -264,7 +266,7 @@ async function transformAnswer({
                     return null;
                 }
 
-                // Find the siteSpace in site spaces in case it is nested in a site section so we can resolve the URL appropriately
+                // Find the siteSpace in case it is nested in a site section so we can resolve the URL appropriately
                 const spaceURL = siteSpaces?.find(
                     (siteSpace) => siteSpace.space.id === source.space,
                 )?.urls.published;
@@ -368,7 +370,7 @@ async function getURLWithSections(path: string, spaceURL?: string) {
 /*
  * Gets all site spaces, in a site structure and overrides the title
  */
-function getSiteStructureSiteSpaces(siteStructure: SiteStructure) {
+function extractSiteStructureSiteSpaces(siteStructure: SiteStructure) {
     return siteStructure.type === 'siteSpaces'
         ? siteStructure.structure
         : getSiteStructureSections(siteStructure).reduce<SiteSpace[]>((prev, section) => {
