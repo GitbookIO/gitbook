@@ -57,7 +57,7 @@ export async function RecordCard(
                           'min-[432px]:grid-cols-none',
                           'min-[432px]:grid-rows-[auto,1fr]',
                       ]
-                    : null,
+                    : 'grid-rows-[auto,1fr]',
             )}
         >
             {cover ? (
