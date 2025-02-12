@@ -26,15 +26,15 @@ export function HeaderLinkMore(props: {
 }) {
     const { label, links, context, customization } = props;
 
-    const isCustomizationDefault =
-        customization.header.preset === CustomizationHeaderPreset.Default;
-
     const renderButton = () => (
         <button
+            type="button"
             className={tcls(
-                isCustomizationDefault
-                    ? ['text-tint', 'hover:text-primary', 'dark:hover:text-primary']
-                    : ['text-header-link', 'hover:text-header-link/8'],
+                'text-tint',
+                'hover:text-primary',
+                'dark:hover:text-primary',
+                'theme-bold:text-header-link',
+                'theme-bold:hover:text-header-link/8',
                 'flex',
                 'gap-1',
                 'items-center',

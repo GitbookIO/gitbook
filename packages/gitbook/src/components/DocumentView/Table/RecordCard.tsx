@@ -28,6 +28,10 @@ export async function RecordCard(
         : null;
     const target = targetRef ? await context.resolveContentRef(targetRef) : null;
 
+    const coverIsLandscape =
+        cover?.file?.dimensions &&
+        cover.file?.dimensions?.width / cover.file?.dimensions?.height > 1;
+
     const body = (
         <div
             className={tcls(
@@ -42,17 +46,21 @@ export async function RecordCard(
                 'rounded-[7px]',
                 'straight-corners:rounded-none',
                 'overflow-hidden',
-                '[&_.heading]:flip-heading-hash',
+                '[&_.heading>div:first-child]:hidden',
+                '[&_.heading>div]:text-[.8em]',
+                'md:[&_.heading>div]:text-[1em]',
                 '[&_.blocks:first-child_.heading:first-child_div]:mt-0', // Remove margin on first heading in card
 
-                cover
-                    ? [
-                          // On mobile, the cover is displayed on the left with 40% of the width
+                // On mobile, check if we can display the cover responsively or not:
+                // - If the file has a landscape aspect ratio, we display it normally
+                // - If the file is square or portrait, we display it left with 40% of the card width
+                coverIsLandscape
+                    ? 'grid-rows-[auto,1fr]'
+                    : [
                           'grid-cols-[40%,_1fr]',
                           'min-[432px]:grid-cols-none',
                           'min-[432px]:grid-rows-[auto,1fr]',
-                      ]
-                    : null,
+                      ],
             )}
         >
             {cover ? (
@@ -74,8 +82,9 @@ export async function RecordCard(
                         'w-full',
                         'h-full',
                         'object-cover',
-                        'min-[432px]:h-auto',
-                        'min-[432px]:aspect-video',
+                        coverIsLandscape
+                            ? ['h-auto', 'aspect-video']
+                            : ['min-[432px]:h-auto', 'min-[432px]:aspect-video'],
                     )}
                     priority={isOffscreen ? 'lazy' : 'high'}
                     preload

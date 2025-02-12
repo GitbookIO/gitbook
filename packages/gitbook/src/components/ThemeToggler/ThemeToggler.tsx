@@ -78,6 +78,8 @@ function ThemeButton(props: {
                 'ring-tint',
                 active && [
                     'bg-primary',
+                    'theme-muted:bg-primary-hover',
+                    'theme-bold-tint:bg-primary-hover',
                     'hover:bg-primary',
                     'text-primary-strong',
                     'contrast-more:text-primary-strong',

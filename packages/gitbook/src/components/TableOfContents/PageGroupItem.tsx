@@ -37,12 +37,15 @@ export function PageGroupItem(props: {
                     'font-semibold',
                     'uppercase',
 
-                    'bg-gradient-to-b',
-                    'from-70%', // We want the fade to start past the header, this is a good approximation.
-                    'from-tint-base',
-                    'sidebar-filled:from-tint-subtle',
-                    '[html.tint.sidebar-filled_&]:from-tint-base',
-                    'to-transparent',
+                    '[mask-image:linear-gradient(rgba(0,0,0,1)_70%,rgba(0,0,0,0))]', // Fade out effect of fixed page items. We want the fade to start past the header, this is a good approximation.
+                    'bg-tint-base',
+                    'sidebar-filled:bg-tint-subtle',
+                    'theme-muted:bg-tint-subtle',
+                    'theme-bold-tint:bg-tint-subtle',
+                    '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
+                    '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
+                    '[html.sidebar-default.theme-gradient_&]:bg-gradient-primary',
+                    '[html.sidebar-default.theme-gradient.tint_&]:bg-gradient-tint',
                 )}
             >
                 <TOCPageIcon page={page} />
