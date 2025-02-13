@@ -64,7 +64,7 @@ export async function fetchOpenAPIOperation(
     }
 
     const servers = 'servers' in schema ? (schema.servers ?? []) : [];
-    const security = operation.security ?? schema.security ?? [];
+    const security = flattenSecurities(operation.security ?? schema.security ?? []);
 
     // Resolve securities
     const securities: OpenAPIOperationData['securities'] = [];
@@ -178,4 +178,20 @@ function getOperationByPathAndMethod(
         return null;
     }
     return pathObject[normalizedMethod];
+}
+
+/**
+ * Flatten security objects in case they are nested.
+ * @example [{bearerAuth:[], basicAuth:[]}] => [{ bearerAuth: [] }, { basicAuth: [] }]
+ */
+function flattenSecurities(security: OpenAPIV3.SecurityRequirementObject[]) {
+    if (!Array.isArray(security) || security.length === 0) {
+        return [];
+    }
+
+    return security.flatMap((securityObject) => {
+        return Object.entries(securityObject).map(([authType, config]) => ({
+            [authType]: config,
+        }));
+    });
 }
