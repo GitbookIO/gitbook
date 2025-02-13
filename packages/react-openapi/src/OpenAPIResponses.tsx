@@ -1,5 +1,4 @@
 import type { OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser';
-import clsx from 'clsx';
 import { createStateKey, resolveDescription } from './utils';
 import { OpenAPIResponse } from './OpenAPIResponse';
 import { OpenAPIClientContext } from './types';
@@ -20,7 +19,7 @@ export function OpenAPIResponses(props: {
         <InteractiveSection
             stateKey={createStateKey('response', context.blockKey)}
             header="Responses"
-            className={clsx('openapi-responses')}
+            className="openapi-responses"
         >
             <OpenAPIDisclosureGroup
                 allowsMultipleExpanded

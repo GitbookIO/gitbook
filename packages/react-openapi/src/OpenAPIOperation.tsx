@@ -36,8 +36,8 @@ export function OpenAPIOperation(props: {
                 </h2>
                 {operation.deprecated && <div className="openapi-deprecated">Deprecated</div>}
             </div>
-            <div className={clsx('openapi-columns')}>
-                <div className={clsx('openapi-column-spec')}>
+            <div className="openapi-columns">
+                <div className="openapi-column-spec">
                     {operation['x-deprecated-sunset'] ? (
                         <div className="openapi-deprecated-sunset openapi-description openapi-markdown">
                             This operation is deprecated and will be sunset on{' '}
@@ -55,8 +55,8 @@ export function OpenAPIOperation(props: {
                     <OpenAPIPath data={data} context={context} />
                     <OpenAPISpec data={data} context={clientContext} />
                 </div>
-                <div className={clsx('openapi-column-preview')}>
-                    <div className={clsx('openapi-column-preview-body')}>
+                <div className="openapi-column-preview">
+                    <div className="openapi-column-preview-body">
                         <OpenAPICodeSample {...props} />
                         <OpenAPIResponseExample {...props} />
                     </div>

@@ -1,6 +1,5 @@
 'use client';
 
-import clsx from 'clsx';
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 
 /**
@@ -11,5 +10,5 @@ export function OpenAPIServerURLVariable(props: {
     variable: OpenAPIV3.ServerVariableObject;
 }) {
     const { variable } = props;
-    return <span className={clsx('openapi-url-var')}>{variable.default}</span>;
+    return <span className="openapi-url-var">{variable.default}</span>;
 }

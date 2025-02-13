@@ -1,4 +1,3 @@
-import clsx from 'clsx';
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { OpenAPISchemaProperties } from './OpenAPISchema';
 import { checkIsReference, noReference, resolveDescription } from './utils';
@@ -39,7 +38,7 @@ export function OpenAPIResponse(props: {
                     />
                 </OpenAPIDisclosure>
             ) : null}
-            <div className={clsx('openapi-responsebody')}>
+            <div className="openapi-responsebody">
                 <OpenAPISchemaProperties
                     id={`response-${context.blockKey}`}
                     properties={[

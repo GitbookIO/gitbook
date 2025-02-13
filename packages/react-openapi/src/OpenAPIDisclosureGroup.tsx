@@ -20,7 +20,6 @@ import {
     useDisclosureGroupState,
     useDisclosureState,
 } from 'react-stately';
-import clsx from 'clsx';
 import { createContext, useContext, useRef, useState } from 'react';
 
 const DisclosureGroupStateContext = createContext<DisclosureGroupState | null>(null);
@@ -106,11 +105,7 @@ function DisclosureItem(props: { group: TDisclosureGroup; icon?: React.ReactNode
                     <div className="openapi-disclosure-group-mediatype">
                         {group.tabs?.length > 1 ? (
                             <select
-                                className={clsx(
-                                    'openapi-section-select',
-                                    'openapi-select',
-                                    `openapi-disclosure-group-tabs-select`,
-                                )}
+                                className="openapi-section-select openapi-select openapi-disclosure-group-tabs-select"
                                 onClick={(event) => event.stopPropagation()}
                                 value={selectedTab?.id}
                                 onChange={(event) => {

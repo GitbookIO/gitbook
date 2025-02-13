@@ -119,7 +119,7 @@ export function OpenAPISchemaProperties(props: {
     }
 
     return (
-        <div id={id} className={clsx('openapi-schema-properties')}>
+        <div id={id} className="openapi-schema-properties">
             {properties.map((property) => (
                 <OpenAPISchemaProperty
                     key={property.propertyName}
@@ -232,7 +232,7 @@ export function OpenAPISchemaPresentation(props: OpenAPISchemaPropertyEntry) {
     const description = resolveDescription(schema);
 
     return (
-        <div className={clsx('openapi-schema-presentation')}>
+        <div className="openapi-schema-presentation">
             <OpenAPISchemaName
                 type={getSchemaTitle(schema)}
                 propertyName={propertyName}
