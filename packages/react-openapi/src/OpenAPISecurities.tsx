@@ -1,10 +1,10 @@
-import * as React from 'react';
-import { OpenAPIV3_1 } from '@scalar/openapi-types';
-import { OpenAPIClientContext } from './types';
+import type { OpenAPIV3_1 } from '@gitbook/openapi-parser';
+import type { OpenAPIClientContext } from './types';
 import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
 import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
+import { resolveDescription } from './utils';
 
 /**
  * Present securities authorization that can be used for this operation.
@@ -27,6 +27,7 @@ export function OpenAPISecurities(props: {
             toggleIcon={context.icons.chevronRight}
             className="openapi-securities"
             tabs={securities.map(([key, security]) => {
+                const description = resolveDescription(security);
                 return {
                     key: key,
                     label: key,
@@ -35,9 +36,9 @@ export function OpenAPISecurities(props: {
                             <div className="openapi-schema-presentation">
                                 {getLabelForType(security)}
 
-                                {security.description ? (
+                                {description ? (
                                     <Markdown
-                                        source={security.description}
+                                        source={description}
                                         className="openapi-securities-description"
                                     />
                                 ) : null}
@@ -66,11 +67,12 @@ function getLabelForType(security: OpenAPIV3_1.SecuritySchemeObject) {
             }
 
             if (security.scheme == 'bearer') {
+                const description = resolveDescription(security);
                 return (
                     <>
                         <OpenAPISchemaName propertyName="Authorization" type="string" required />
                         {/** Show a default description if none is provided */}
-                        {!security.description ? (
+                        {!description ? (
                             <Markdown
                                 source={`Bearer authentication header of the form Bearer ${`&lt;token&gt;`}.`}
                                 className="openapi-securities-description"

@@ -1,5 +1,4 @@
-import React from 'react';
-import classNames from 'classnames';
+import clsx from 'clsx';
 
 interface OpenAPISchemaNameProps {
     propertyName?: string | JSX.Element;
@@ -16,22 +15,15 @@ export function OpenAPISchemaName(props: OpenAPISchemaNameProps): JSX.Element {
     const { type, propertyName, required, deprecated } = props;
 
     return (
-        <div className={classNames('openapi-schema-name')}>
+        <div className={clsx('openapi-schema-name')}>
             {propertyName ? (
-                <span
-                    data-deprecated={deprecated}
-                    className={classNames('openapi-schema-propertyname')}
-                >
+                <span data-deprecated={deprecated} className={clsx('openapi-schema-propertyname')}>
                     {propertyName}
                 </span>
             ) : null}
-            {type ? <span className={classNames('openapi-schema-type')}>{type}</span> : null}
-            {required ? (
-                <span className={classNames('openapi-schema-required')}>required</span>
-            ) : null}
-            {deprecated ? (
-                <span className={classNames('openapi-deprecated')}>Deprecated</span>
-            ) : null}
+            {type ? <span className={clsx('openapi-schema-type')}>{type}</span> : null}
+            {required ? <span className={clsx('openapi-schema-required')}>required</span> : null}
+            {deprecated ? <span className={clsx('openapi-deprecated')}>Deprecated</span> : null}
         </div>
     );
 }

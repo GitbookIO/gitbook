@@ -1,6 +1,6 @@
 {
     "$schema": "https://turbo.build/schema.json",
-    "ui": "tui",
+    "ui": "stream",
     "globalEnv": ["NODE_ENV", "CI", "ARGOS_*", "GITHUB_*", "GITBOOK_*", "SENTRY_*"],
     "tasks": {
         // Prepare the package for all other tasks

@@ -1,6 +1,6 @@
-import { OpenAPIOperationData } from './fetchOpenAPIOperation';
+import type { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { ScalarApiButton } from './ScalarApiButton';
-import { OpenAPIContextProps } from './types';
+import type { OpenAPIContextProps } from './types';
 
 /**
  * Display the path of an operation.

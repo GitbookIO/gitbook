@@ -1,5 +1,6 @@
 {
-    "name": "@gitbook/react-openapi",
+    "name": "@gitbook/openapi-parser",
+    "description": "Modern OpenAPI parser written in TypeScript with support for OpenAPI 3.1, OpenAPI 3.0 and Swagger 2.0.",
     "type": "module",
     "exports": {
         ".": {
@@ -8,24 +9,20 @@
             "default": "./dist/index.js"
         }
     },
-    "version": "0.7.1",
+    "version": "0.0.0",
     "sideEffects": false,
     "dependencies": {
-        "@gitbook/openapi-parser": "workspace:*",
-        "@scalar/api-client-react": "1.0.87",
-        "@scalar/oas-utils": "^0.2.101",
-        "clsx": "^2.1.1",
-        "flatted": "^3.2.9",
-        "react-aria-components": "^1.6.0",
-        "react-aria": "^3.37.0",
-        "usehooks-ts": "^3.1.0"
+        "@scalar/openapi-parser": "^0.10.4",
+        "@scalar/openapi-types": "^0.1.6",
+        "swagger2openapi": "^7.0.8",
+        "yaml": "1.10.2"
     },
     "devDependencies": {
+        "@tsconfig/strictest": "^2.0.5",
+        "@tsconfig/node20": "^20.1.4",
+        "@types/swagger2openapi": "^7.0.4",
         "bun-types": "^1.1.20",
         "typescript": "^5.5.3"
-    },
-    "peerDependencies": {
-        "react": "*"
     },
     "scripts": {
         "build": "tsc --project tsconfig.build.json",

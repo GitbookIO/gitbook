@@ -1,14 +1,11 @@
-import * as React from 'react';
-import classNames from 'classnames';
-import { createStateKey, noReference } from './utils';
+import type { OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser';
+import clsx from 'clsx';
+import { createStateKey, resolveDescription } from './utils';
 import { OpenAPIResponse } from './OpenAPIResponse';
 import { OpenAPIClientContext } from './types';
 import { InteractiveSection } from './InteractiveSection';
-import { OpenAPIV3, OpenAPIV3_1 } from '@scalar/openapi-types';
 import { OpenAPIDisclosureGroup } from './OpenAPIDisclosureGroup';
 import { Markdown } from './Markdown';
-import { OpenAPIRootSchema, OpenAPISchemaProperties, OpenAPISchemaProperty } from './OpenAPISchema';
-import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 
 /**
  * Display an interactive response body.
@@ -23,7 +20,7 @@ export function OpenAPIResponses(props: {
         <InteractiveSection
             stateKey={createStateKey('response', context.blockKey)}
             header="Responses"
-            className={classNames('openapi-responses')}
+            className={clsx('openapi-responses')}
         >
             <OpenAPIDisclosureGroup
                 allowsMultipleExpanded
@@ -31,6 +28,7 @@ export function OpenAPIResponses(props: {
                 groups={Object.entries(responses).map(
                     ([statusCode, response]: [string, OpenAPIV3.ResponseObject]) => {
                         const content = Object.entries(response.content ?? {});
+                        const description = resolveDescription(response);
 
                         return {
                             id: statusCode,
@@ -42,9 +40,9 @@ export function OpenAPIResponses(props: {
                                     <span className="openapi-response-statuscode">
                                         {statusCode}
                                     </span>
-                                    {response.description ? (
+                                    {description ? (
                                         <Markdown
-                                            source={response.description}
+                                            source={description}
                                             className="openapi-response-description"
                                         />
                                     ) : null}

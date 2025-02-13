@@ -1,8 +1,7 @@
 'use client';
 
-import * as React from 'react';
-import classNames from 'classnames';
-import { OpenAPIV3 } from '@scalar/openapi-types';
+import clsx from 'clsx';
+import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 
 /**
  * Interactive component to show the value of a server variable and let the user change it.
@@ -12,5 +11,5 @@ export function OpenAPIServerURLVariable(props: {
     variable: OpenAPIV3.ServerVariableObject;
 }) {
     const { variable } = props;
-    return <span className={classNames('openapi-url-var')}>{variable.default}</span>;
+    return <span className={clsx('openapi-url-var')}>{variable.default}</span>;
 }

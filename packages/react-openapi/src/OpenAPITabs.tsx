@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import { createContext, useContext, useMemo, useState } from 'react';
 import { Key, Tab, TabList, TabPanel, Tabs, TabsProps } from 'react-aria-components';
 import { Markdown } from './Markdown';
 
@@ -17,10 +17,10 @@ type OpenAPITabsContextData = {
     setSelectedKey: (key: Key) => void;
 };
 
-const OpenAPITabsContext = React.createContext<OpenAPITabsContextData | null>(null);
+const OpenAPITabsContext = createContext<OpenAPITabsContextData | null>(null);
 
 function useOpenAPITabsContext() {
-    const context = React.useContext(OpenAPITabsContext);
+    const context = useContext(OpenAPITabsContext);
     if (!context) {
         throw new Error('OpenAPITabsContext is missing');
     }
@@ -32,7 +32,14 @@ function useOpenAPITabsContext() {
  */
 export function OpenAPITabs(props: React.PropsWithChildren<TabsProps & { items: Tab[] }>) {
     const { children, items } = props;
-    const [selectedKey, setSelectedKey] = React.useState(items[0].key);
+
+    const [selectedKey, setSelectedKey] = useState(() => {
+        const firstItem = items[0];
+        if (!firstItem) {
+            throw new Error('OpenAPITabs: at least one tab is required');
+        }
+        return firstItem.key;
+    });
 
     const contextValue = { items, selectedKey, setSelectedKey };
 

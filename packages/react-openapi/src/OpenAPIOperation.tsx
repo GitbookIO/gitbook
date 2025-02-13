@@ -1,13 +1,13 @@
-import * as React from 'react';
-import classNames from 'classnames';
+import clsx from 'clsx';
 
-import { OpenAPIOperationData } from './fetchOpenAPIOperation';
+import type { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { Markdown } from './Markdown';
 import { OpenAPICodeSample } from './OpenAPICodeSample';
 import { OpenAPIResponseExample } from './OpenAPIResponseExample';
 import { OpenAPISpec } from './OpenAPISpec';
-import { OpenAPIClientContext, OpenAPIContextProps } from './types';
+import { OpenAPIClientContext, type OpenAPIContextProps } from './types';
 import { OpenAPIPath } from './OpenAPIPath';
+import { resolveDescription } from './utils';
 
 /**
  * Display an interactive OpenAPI operation.
@@ -26,18 +26,18 @@ export function OpenAPIOperation(props: {
         blockKey: context.blockKey,
     };
 
-    const trimmedDescription = operation.description?.trim();
+    const description = resolveDescription(operation)?.trim();
 
     return (
-        <div className={classNames('openapi-operation', className)}>
+        <div className={clsx('openapi-operation', className)}>
             <div className="openapi-summary" id={context.id}>
                 <h2 className="openapi-summary-title" data-deprecated={operation.deprecated}>
                     {operation.summary}
                 </h2>
                 {operation.deprecated && <div className="openapi-deprecated">Deprecated</div>}
             </div>
-            <div className={classNames('openapi-columns')}>
-                <div className={classNames('openapi-column-spec')}>
+            <div className={clsx('openapi-columns')}>
+                <div className={clsx('openapi-column-spec')}>
                     {operation['x-deprecated-sunset'] ? (
                         <div className="openapi-deprecated-sunset openapi-description openapi-markdown">
                             This operation is deprecated and will be sunset on{' '}
@@ -47,16 +47,16 @@ export function OpenAPIOperation(props: {
                             {`.`}
                         </div>
                     ) : null}
-                    {trimmedDescription ? (
+                    {description ? (
                         <div className="openapi-intro">
-                            <Markdown className="openapi-description" source={trimmedDescription} />
+                            <Markdown className="openapi-description" source={description} />
                         </div>
                     ) : null}
                     <OpenAPIPath data={data} context={context} />
                     <OpenAPISpec data={data} context={clientContext} />
                 </div>
-                <div className={classNames('openapi-column-preview')}>
-                    <div className={classNames('openapi-column-preview-body')}>
+                <div className={clsx('openapi-column-preview')}>
+                    <div className={clsx('openapi-column-preview-body')}>
                         <OpenAPICodeSample {...props} />
                         <OpenAPIResponseExample {...props} />
                     </div>

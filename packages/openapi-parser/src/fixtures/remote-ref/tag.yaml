@@ -1,0 +1,13 @@
+components:
+    schemas:
+        Tag:
+            x-swagger-router-model: io.swagger.petstore.model.Tag
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                name:
+                    type: string
+            xml:
+                name: tag
+            type: object

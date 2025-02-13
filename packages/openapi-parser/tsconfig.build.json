@@ -1,0 +1,10 @@
+{
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "extends": ["./tsconfig.json"],
+    "exclude": ["**/*.test.ts"],
+    "compilerOptions": {
+        "declaration": true,
+        "noEmit": false,
+        "outDir": "dist"
+    }
+}

@@ -1,4 +1,4 @@
-import { OpenAPIV3 } from '@scalar/openapi-types';
+import type { AnyObject, OpenAPIV3 } from '@gitbook/openapi-parser';
 
 export function noReference<T>(input: T | OpenAPIV3.ReferenceObject): T {
     if (checkIsReference(input)) {
@@ -14,4 +14,15 @@ export function checkIsReference(input: unknown): input is OpenAPIV3.ReferenceOb
 
 export function createStateKey(key: string, scope?: string) {
     return scope ? `${scope}_${key}` : key;
+}
+
+/**
+ * Resolve the description of an object.
+ */
+export function resolveDescription(object: AnyObject) {
+    return 'x-description-html' in object && typeof object['x-description-html'] === 'string'
+        ? object['x-description-html']
+        : typeof object.description === 'string'
+          ? object.description
+          : undefined;
 }

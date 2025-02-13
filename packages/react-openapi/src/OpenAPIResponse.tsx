@@ -1,8 +1,8 @@
-import classNames from 'classnames';
-import { OpenAPIV3 } from '@scalar/openapi-types';
+import clsx from 'clsx';
+import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { OpenAPISchemaProperties } from './OpenAPISchema';
-import { checkIsReference, noReference } from './utils';
-import { OpenAPIClientContext } from './types';
+import { checkIsReference, noReference, resolveDescription } from './utils';
+import type { OpenAPIClientContext } from './types';
 import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 
 /**
@@ -19,7 +19,9 @@ export function OpenAPIResponse(props: {
     );
     const content = Object.entries(mediaType.schema ?? {});
 
-    if (content.length === 0 && !response.description && headers.length === 0) {
+    const description = resolveDescription(response);
+
+    if (content.length === 0 && !description && headers.length === 0) {
         return null;
     }
 
@@ -37,7 +39,7 @@ export function OpenAPIResponse(props: {
                     />
                 </OpenAPIDisclosure>
             ) : null}
-            <div className={classNames('openapi-responsebody')}>
+            <div className={clsx('openapi-responsebody')}>
                 <OpenAPISchemaProperties
                     id={`response-${context.blockKey}`}
                     properties={[

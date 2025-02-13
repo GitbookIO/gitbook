@@ -20,6 +20,7 @@
         "@gitbook/cache-do": "workspace:*",
         "@gitbook/emoji-codepoints": "workspace:*",
         "@gitbook/icons": "workspace:*",
+        "@gitbook/openapi-parser": "workspace:*",
         "@gitbook/react-contentkit": "workspace:*",
         "@gitbook/react-math": "workspace:*",
         "@gitbook/react-openapi": "workspace:*",

@@ -1,11 +1,11 @@
-import classNames from 'classnames';
-import { OpenAPIV3 } from '@scalar/openapi-types';
-import React, { useId } from 'react';
+import type { OpenAPIV3 } from '@gitbook/openapi-parser';
+import clsx from 'clsx';
+import { useId } from 'react';
 
 import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
-import { OpenAPIClientContext } from './types';
-import { checkIsReference, noReference } from './utils';
+import type { OpenAPIClientContext } from './types';
+import { checkIsReference, noReference, resolveDescription } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
 import { OpenAPIDisclosure } from './OpenAPIDisclosure';
@@ -49,7 +49,7 @@ export function OpenAPISchemaProperty(
 
     if ((properties && !!properties.length) || schema.type === 'object') {
         return (
-            <InteractiveSection id={id} className={classNames('openapi-schema', className)}>
+            <InteractiveSection id={id} className={clsx('openapi-schema', className)}>
                 <OpenAPISchemaPresentation {...props} />
                 <OpenAPIDisclosure context={context}>
                     {properties && properties.length > 0 ? (
@@ -66,10 +66,11 @@ export function OpenAPISchemaProperty(
 
     if (alternatives?.[0]?.length) {
         return (
-            <InteractiveSection id={id} className={classNames('openapi-schema', className)}>
+            <InteractiveSection id={id} className={clsx('openapi-schema', className)}>
                 <OpenAPISchemaPresentation {...props} />
                 {alternatives[0].map((alternative, index) => (
                     <OpenAPISchemaAlternative
+                        key={index}
                         schema={alternative}
                         circularRefs={circularRefs}
                         context={context}
@@ -80,7 +81,7 @@ export function OpenAPISchemaProperty(
     }
 
     return (
-        <InteractiveSection id={id} className={classNames('openapi-schema', className)}>
+        <InteractiveSection id={id} className={clsx('openapi-schema', className)}>
             <OpenAPISchemaPresentation {...props} />
             {(properties && properties.length > 0) ||
             (schema.enum && schema.enum.length > 0) ||
@@ -118,7 +119,7 @@ export function OpenAPISchemaProperties(props: {
     }
 
     return (
-        <div id={id} className={classNames('openapi-schema-properties')}>
+        <div id={id} className={clsx('openapi-schema-properties')}>
             {properties.map((property) => (
                 <OpenAPISchemaProperty
                     key={property.propertyName}
@@ -228,8 +229,10 @@ export function OpenAPISchemaPresentation(props: OpenAPISchemaPropertyEntry) {
         );
     };
 
+    const description = resolveDescription(schema);
+
     return (
-        <div className={classNames('openapi-schema-presentation')}>
+        <div className={clsx('openapi-schema-presentation')}>
             <OpenAPISchemaName
                 type={getSchemaTitle(schema)}
                 propertyName={propertyName}
@@ -244,8 +247,8 @@ export function OpenAPISchemaPresentation(props: OpenAPISchemaPropertyEntry) {
                     </span>
                 </div>
             ) : null}
-            {schema.description ? (
-                <Markdown source={schema.description} className="openapi-schema-description" />
+            {description ? (
+                <Markdown source={description} className="openapi-schema-description" />
             ) : null}
             {shouldDisplayExample(schema) ? (
                 <div className="openapi-schema-example">

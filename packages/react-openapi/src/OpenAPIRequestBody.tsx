@@ -1,9 +1,7 @@
-import * as React from 'react';
-
-import { OpenAPIV3 } from '@scalar/openapi-types';
+import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { OpenAPIRootSchema } from './OpenAPISchema';
 import { noReference } from './utils';
-import { OpenAPIClientContext } from './types';
+import type { OpenAPIClientContext } from './types';
 import { InteractiveSection } from './InteractiveSection';
 
 /**

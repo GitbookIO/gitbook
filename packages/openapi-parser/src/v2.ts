@@ -1,11 +1,10 @@
 import YAML from 'yaml';
-import swagger2openapi, { ConvertOutputOptions } from 'swagger2openapi';
+import swagger2openapi, { type ConvertOutputOptions } from 'swagger2openapi';
 
-import { OpenAPICustomSpecProperties } from './types';
-import { OpenAPIV3, OpenAPIV3_1 } from '@scalar/openapi-types';
 import { OpenAPIParseError } from './error';
 import { parseOpenAPIV3 } from './v3';
-import { AnyApiDefinitionFormat } from '@scalar/openapi-parser';
+import type { AnyApiDefinitionFormat } from '@scalar/openapi-parser';
+import type { Filesystem, OpenAPIV3xDocument } from './types';
 
 /**
  * Convert a Swagger 2.0 schema to an OpenAPI 3.0 schema.
@@ -13,12 +12,8 @@ import { AnyApiDefinitionFormat } from '@scalar/openapi-parser';
 export async function convertOpenAPIV2ToOpenAPIV3(input: {
     value: AnyApiDefinitionFormat;
     url: string;
-    parseMarkdown: (input: string) => Promise<string>;
-}): Promise<
-    | OpenAPIV3_1.Document<OpenAPICustomSpecProperties>
-    | OpenAPIV3.Document<OpenAPICustomSpecProperties>
-> {
-    const { value, url, parseMarkdown } = input;
+}): Promise<Filesystem<OpenAPIV3xDocument>> {
+    const { value, url } = input;
     // In this case we want the raw value to be able to convert it.
     const schema = typeof value === 'string' ? rawParseOpenAPI({ value, url }) : value;
     try {
@@ -34,7 +29,7 @@ export async function convertOpenAPIV2ToOpenAPIV3(input: {
             patch: true,
         })) as ConvertOutputOptions;
 
-        return parseOpenAPIV3({ url, value: convertResult.openapi, parseMarkdown });
+        return parseOpenAPIV3({ url, value: convertResult.openapi });
     } catch (error) {
         if (error instanceof Error && error.name === 'S2OError') {
             throw new OpenAPIParseError(

@@ -1,10 +1,9 @@
 import { ContentRef, DocumentBlockOpenAPI } from '@gitbook/api';
+import { parseOpenAPI, OpenAPIParseError, traverse } from '@gitbook/openapi-parser';
 import {
     OpenAPIOperationData,
     fetchOpenAPIOperation,
     OpenAPIFetcher,
-    parseOpenAPI,
-    OpenAPIParseError,
 } from '@gitbook/react-openapi';
 
 import { cache, noCacheFetchOptions, CacheFunctionOptions } from '@/lib/cache';
@@ -49,7 +48,7 @@ export async function fetchOpenAPIBlock(
 
 const fetcher: OpenAPIFetcher = {
     fetch: cache({
-        name: 'openapi.fetch.v4',
+        name: 'openapi.fetch.v5',
         get: async (url: string, options: CacheFunctionOptions) => {
             // Wrap the raw string to prevent invalid URLs from being passed to fetch.
             // This can happen if the URL has whitespace, which is currently handled differently by Cloudflare's implementation of fetch:
@@ -66,13 +65,30 @@ const fetcher: OpenAPIFetcher = {
             }
 
             const text = await response.text();
-            const data = await parseOpenAPI({ url, value: text, parseMarkdown });
+            const filesystem = await parseOpenAPI({ url, value: text });
+            const cache: Map<string, Promise<string>> = new Map();
+            const transformedFs = await traverse(filesystem, async (node) => {
+                if (
+                    'description' in node &&
+                    typeof node.description === 'string' &&
+                    node.description
+                ) {
+                    if (cache.has(node.description)) {
+                        node['x-description-html'] = await cache.get(node.description);
+                    } else {
+                        const promise = parseMarkdown(node.description);
+                        cache.set(node.description, promise);
+                        node['x-description-html'] = await promise;
+                    }
+                }
+                return node;
+            });
             return {
                 // Cache for 4 hours
                 ttl: 24 * 60 * 60,
                 // Revalidate every 2 hours
                 revalidateBefore: 22 * 60 * 60,
-                data,
+                data: transformedFs,
             };
         },
     }),

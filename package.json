@@ -15,8 +15,8 @@
     },
     "private": true,
     "scripts": {
-        "dev": "turbo run dev --ui=stream",
-        "dev:v2": "turbo run dev:v2 --ui=stream",
+        "dev": "turbo run dev",
+        "dev:v2": "turbo run dev:v2",
         "build": "turbo run build",
         "build:v2": "turbo run build:v2",
         "clean-deps": "rm -rf node_modules && rm -rf packages/*/node_modules",

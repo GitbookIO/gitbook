@@ -1,4 +1,4 @@
-import { OpenAPIV3 } from '@scalar/openapi-types';
+import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { noReference } from './utils';
 import { getExampleFromSchema } from '@scalar/oas-utils/spec-getters';
 
@@ -46,9 +46,12 @@ export function generateMediaTypeExample(
     }
 
     if (mediaType.examples) {
-        const example = mediaType.examples[Object.keys(mediaType.examples)[0]];
-        if (example) {
-            return noReference(example).value;
+        const key = Object.keys(mediaType.examples)[0];
+        if (key) {
+            const example = mediaType.examples[key];
+            if (example) {
+                return noReference(example).value;
+            }
         }
     }
 
