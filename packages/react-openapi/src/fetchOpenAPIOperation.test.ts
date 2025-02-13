@@ -1,12 +1,20 @@
 import { it, expect } from 'bun:test';
 
-import { fetchOpenAPIOperation, OpenAPIFetcher } from './fetchOpenAPIOperation';
-import { parseOpenAPI } from './parser';
+import { fetchOpenAPIOperation, type OpenAPIFetcher } from './fetchOpenAPIOperation';
+import { parseOpenAPI, traverse } from '@gitbook/openapi-parser';
 
 const fetcher: OpenAPIFetcher = {
     fetch: async (url) => {
         const response = await fetch(url);
-        return parseOpenAPI({ value: await response.text(), url, parseMarkdown: async (v) => v });
+        const text = await response.text();
+        const filesystem = await parseOpenAPI({ value: text, url });
+        const transformedFs = await traverse(filesystem, async (node) => {
+            if ('description' in node && typeof node.description === 'string' && node.description) {
+                node['x-description-html'] = node.description;
+            }
+            return node;
+        });
+        return transformedFs;
     },
 };
 

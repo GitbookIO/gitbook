@@ -144,7 +144,8 @@ export function parseHostAndPath(url: string) {
     } catch (e) {
         // If the URL was invalid do our best to parse the URL.
         // Check for the protocol part and pull it off to grab the host
-        const fullUrl = url.match(/\/\//) ? url.split('//')[1] : url;
+        const splitted = url.split('//');
+        const fullUrl = splitted[1] ? splitted[1] : url;
 
         // separate paths from the first element (host)
         const parts = fullUrl.split('/');

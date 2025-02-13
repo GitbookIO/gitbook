@@ -1,5 +1,8 @@
+/**
+ * Error thrown when the OpenAPI document is invalid.
+ */
 export class OpenAPIParseError extends Error {
-    public name = 'OpenAPIParseError';
+    public override name = 'OpenAPIParseError';
 
     constructor(
         message: string,

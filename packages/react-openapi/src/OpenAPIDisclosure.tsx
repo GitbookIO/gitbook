@@ -1,5 +1,5 @@
-import React from 'react';
-import { OpenAPIClientContext } from './types';
+import { useRef } from 'react';
+import type { OpenAPIClientContext } from './types';
 import { mergeProps, useButton, useDisclosure, useFocusRing } from 'react-aria';
 import { useDisclosureState } from 'react-stately';
 
@@ -15,8 +15,8 @@ interface Props {
  */
 export function OpenAPIDisclosure({ context, children, label }: Props): JSX.Element {
     const state = useDisclosureState({});
-    const panelRef = React.useRef<HTMLDivElement | null>(null);
-    const triggerRef = React.useRef<HTMLButtonElement | null>(null);
+    const panelRef = useRef<HTMLDivElement | null>(null);
+    const triggerRef = useRef<HTMLButtonElement | null>(null);
     const { buttonProps: triggerProps, panelProps } = useDisclosure({}, state, panelRef);
     const { buttonProps } = useButton(triggerProps, triggerRef);
     const { isFocusVisible, focusProps } = useFocusRing();

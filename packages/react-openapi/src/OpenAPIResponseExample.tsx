@@ -1,9 +1,9 @@
-import { OpenAPIOperationData } from './fetchOpenAPIOperation';
+import type { OpenAPIV3 } from '@gitbook/openapi-parser';
+import type { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { generateSchemaExample } from './generateSchemaExample';
-import { OpenAPIContextProps } from './types';
-import { checkIsReference, noReference } from './utils';
+import type { OpenAPIContextProps } from './types';
+import { checkIsReference, noReference, resolveDescription } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
-import { OpenAPIV3 } from '@scalar/openapi-types';
 import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
 import { InteractiveSection } from './InteractiveSection';
 
@@ -46,9 +46,10 @@ export function OpenAPIResponseExample(props: {
                 if (!responseObject.content) {
                     return null;
                 }
+                const key = Object.keys(responseObject.content)[0];
                 return (
                     responseObject.content['application/json'] ??
-                    responseObject.content[Object.keys(responseObject.content)[0]]
+                    (key ? responseObject.content[key] : null)
                 );
             })();
 
@@ -56,7 +57,7 @@ export function OpenAPIResponseExample(props: {
                 return {
                     key: key,
                     label: key,
-                    description: responseObject.description,
+                    description: resolveDescription(responseObject),
                     body: <OpenAPIEmptyResponseExample />,
                 };
             }
@@ -65,11 +66,13 @@ export function OpenAPIResponseExample(props: {
                 (() => {
                     const { examples, example } = mediaTypeObject;
                     if (examples) {
-                        const firstKey = Object.keys(examples)[0];
-                        // @TODO handle multiple examples
-                        const firstExample = noReference(examples[firstKey]);
-                        if (firstExample) {
-                            return firstExample;
+                        const key = Object.keys(examples)[0];
+                        if (key) {
+                            // @TODO handle multiple examples
+                            const firstExample = noReference(examples[key]);
+                            if (firstExample) {
+                                return firstExample;
+                            }
                         }
                     }
 
@@ -89,7 +92,7 @@ export function OpenAPIResponseExample(props: {
             return {
                 key: key,
                 label: key,
-                description: responseObject.description,
+                description: resolveDescription(responseObject),
                 body: example?.value ? (
                     <context.CodeBlock
                         code={

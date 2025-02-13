@@ -1,15 +1,15 @@
 'use client';
 
-import { OpenAPI } from '@scalar/openapi-types';
+import type { OpenAPI } from '@gitbook/openapi-parser';
 
-import { OpenAPIOperationData, fromJSON } from './fetchOpenAPIOperation';
+import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { InteractiveSection } from './InteractiveSection';
 import { OpenAPIRequestBody } from './OpenAPIRequestBody';
 import { OpenAPIResponses } from './OpenAPIResponses';
 import { OpenAPISchemaProperties } from './OpenAPISchema';
 import { OpenAPISecurities } from './OpenAPISecurities';
 import { OpenAPIClientContext } from './types';
-import { noReference } from './utils';
+import { noReference, resolveDescription } from './utils';
 
 /**
  * Client component to render the spec for the request and response.
@@ -31,30 +31,35 @@ export function OpenAPISpec(props: { data: OpenAPIOperationData; context: OpenAP
                 <OpenAPISecurities securities={securities} context={context} />
             ) : null}
 
-            {parameterGroups.map((group) => (
-                <InteractiveSection
-                    key={group.key}
-                    className="openapi-parameters"
-                    header={group.label}
-                >
-                    <OpenAPISchemaProperties
-                        properties={group.parameters.map((parameter) => ({
-                            propertyName: parameter.name,
-                            schema: {
-                                // Description of the parameter is defined at the parameter level
-                                // we use display it if the schema doesn't override it
-                                description: parameter.description,
-                                example: parameter.example,
-                                // Deprecated can be defined at the parameter level
-                                deprecated: parameter.deprecated,
-                                ...(noReference(parameter.schema) ?? {}),
-                            },
-                            required: parameter.required,
-                        }))}
-                        context={context}
-                    />
-                </InteractiveSection>
-            ))}
+            {parameterGroups.map((group) => {
+                return (
+                    <InteractiveSection
+                        key={group.key}
+                        className="openapi-parameters"
+                        header={group.label}
+                    >
+                        <OpenAPISchemaProperties
+                            properties={group.parameters.map((parameter) => {
+                                const description = resolveDescription(parameter);
+                                return {
+                                    propertyName: parameter.name,
+                                    schema: {
+                                        // Description of the parameter is defined at the parameter level
+                                        // we use display it if the schema doesn't override it
+                                        description: description,
+                                        example: parameter.example,
+                                        // Deprecated can be defined at the parameter level
+                                        deprecated: parameter.deprecated,
+                                        ...(noReference(parameter.schema) ?? {}),
+                                    },
+                                    required: parameter.required,
+                                };
+                            })}
+                            context={context}
+                        />
+                    </InteractiveSection>
+                );
+            })}
 
             {operation.requestBody ? (
                 <OpenAPIRequestBody

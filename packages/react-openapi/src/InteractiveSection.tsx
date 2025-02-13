@@ -1,7 +1,7 @@
 'use client';
 
-import classNames from 'classnames';
-import React, { useCallback } from 'react';
+import clsx from 'clsx';
+import { useCallback, useRef, useState, useSyncExternalStore } from 'react';
 import { mergeProps, useButton, useDisclosure, useFocusRing } from 'react-aria';
 import { useDisclosureState } from 'react-stately';
 
@@ -30,7 +30,7 @@ function useSyncedTabsGlobalState() {
         [],
     );
 
-    const tabs = React.useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+    const tabs = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 
     return [tabs, setSyncedTabs] as const;
 }
@@ -80,15 +80,15 @@ export function InteractiveSection(props: {
         stateKey && stateKey in syncedTabs
             ? tabs.find((tab) => tab.key === syncedTabs[stateKey])
             : undefined;
-    const [selectedTabKey, setSelectedTab] = React.useState(tabFromState?.key ?? defaultTab);
+    const [selectedTabKey, setSelectedTab] = useState(tabFromState?.key ?? defaultTab);
     const selectedTab: InteractiveSectionTab | undefined =
         tabFromState ?? tabs.find((tab) => tab.key === selectedTabKey) ?? tabs[0];
 
     const state = useDisclosureState({
         defaultExpanded: defaultOpened,
     });
-    const panelRef = React.useRef<HTMLDivElement | null>(null);
-    const triggerRef = React.useRef<HTMLButtonElement | null>(null);
+    const panelRef = useRef<HTMLDivElement | null>(null);
+    const triggerRef = useRef<HTMLButtonElement | null>(null);
     const { buttonProps: triggerProps, panelProps } = useDisclosure({}, state, panelRef);
     const { buttonProps } = useButton(triggerProps, triggerRef);
     const { isFocusVisible, focusProps } = useFocusRing();
@@ -96,7 +96,7 @@ export function InteractiveSection(props: {
     return (
         <div
             id={id}
-            className={classNames(
+            className={clsx(
                 'openapi-section',
                 toggeable ? 'openapi-section-toggeable' : null,
                 className,
@@ -110,10 +110,10 @@ export function InteractiveSection(props: {
                             state.toggle();
                         }
                     }}
-                    className={classNames('openapi-section-header', `${className}-header`)}
+                    className={clsx('openapi-section-header', `${className}-header`)}
                 >
                     <div
-                        className={classNames(
+                        className={clsx(
                             'openapi-section-header-content',
                             `${className}-header-content`,
                         )}
@@ -122,10 +122,7 @@ export function InteractiveSection(props: {
                             <button
                                 {...mergeProps(buttonProps, focusProps)}
                                 ref={triggerRef}
-                                className={classNames(
-                                    'openapi-section-toggle',
-                                    `${className}-toggle`,
-                                )}
+                                className={clsx('openapi-section-toggle', `${className}-toggle`)}
                                 style={{
                                     outline: isFocusVisible
                                         ? '2px solid rgb(var(--primary-color-500) / 0.4)'
@@ -138,7 +135,7 @@ export function InteractiveSection(props: {
                         {header}
                     </div>
                     <div
-                        className={classNames(
+                        className={clsx(
                             'openapi-section-header-controls',
                             `${className}-header-controls`,
                         )}
@@ -148,12 +145,12 @@ export function InteractiveSection(props: {
                     >
                         {tabs.length > 1 ? (
                             <select
-                                className={classNames(
+                                className={clsx(
                                     'openapi-section-select',
                                     'openapi-select',
                                     `${className}-tabs-select`,
                                 )}
-                                value={selectedTab.key}
+                                value={selectedTab?.key ?? ''}
                                 onChange={(event) => {
                                     setSelectedTab(event.target.value);
                                     if (stateKey) {
@@ -179,14 +176,14 @@ export function InteractiveSection(props: {
                 <div
                     ref={panelRef}
                     {...panelProps}
-                    className={classNames('openapi-section-body', `${className}-body`)}
+                    className={clsx('openapi-section-body', `${className}-body`)}
                 >
                     {children}
                     {selectedTab?.body}
                 </div>
             ) : null}
             {overlay ? (
-                <div className={classNames('openapi-section-overlay', `${className}-overlay`)}>
+                <div className={clsx('openapi-section-overlay', `${className}-overlay`)}>
                     {overlay}
                 </div>
             ) : null}

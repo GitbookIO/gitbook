@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { CodeSampleInput, codeSampleGenerators } from './code-samples';
 import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { generateMediaTypeExample, generateSchemaExample } from './generateSchemaExample';

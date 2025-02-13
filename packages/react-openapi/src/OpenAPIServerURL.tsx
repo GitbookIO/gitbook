@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { OpenAPIV3 } from '@scalar/openapi-types';
+import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { OpenAPIServerURLVariable } from './OpenAPIServerURLVariable';
 
 /**
@@ -9,6 +8,10 @@ export function OpenAPIServerURL(props: { servers: OpenAPIV3.ServerObject[] }) {
     const { servers } = props;
     const server = servers[0];
 
+    if (!server) {
+        return null;
+    }
+
     const parts = parseServerURL(server?.url ?? '');
 
     return (
@@ -17,16 +20,13 @@ export function OpenAPIServerURL(props: { servers: OpenAPIV3.ServerObject[] }) {
                 if (part.kind === 'text') {
                     return <span key={i}>{part.text}</span>;
                 } else {
-                    if (!server.variables?.[part.name]) {
+                    const variable = server.variables?.[part.name];
+                    if (!variable) {
                         return <span key={i}>{`{${part.name}}`}</span>;
                     }
 
                     return (
-                        <OpenAPIServerURLVariable
-                            key={i}
-                            name={part.name}
-                            variable={server.variables[part.name]}
-                        />
+                        <OpenAPIServerURLVariable key={i} name={part.name} variable={variable} />
                     );
                 }
             })}
@@ -39,6 +39,9 @@ export function OpenAPIServerURL(props: { servers: OpenAPIV3.ServerObject[] }) {
  */
 export function getServersURL(servers: OpenAPIV3.ServerObject[]): string {
     const server = servers[0];
+    if (!server) {
+        return '';
+    }
     const parts = parseServerURL(server?.url ?? '');
 
     return parts
@@ -56,10 +59,14 @@ function parseServerURL(url: string) {
     const parts = url.split(/{([^}]+)}/g);
     const result: Array<{ kind: 'variable'; name: string } | { kind: 'text'; text: string }> = [];
     for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+        if (!part) {
+            continue;
+        }
         if (i % 2 === 0) {
-            result.push({ kind: 'text', text: parts[i] });
+            result.push({ kind: 'text', text: part });
         } else {
-            result.push({ kind: 'variable', name: parts[i] });
+            result.push({ kind: 'variable', name: part });
         }
     }
     return result;

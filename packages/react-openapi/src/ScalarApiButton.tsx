@@ -1,7 +1,7 @@
 'use client';
 
 import { ApiClientModalProvider, useApiClientModal } from '@scalar/api-client-react';
-import React, { useImperativeHandle, useRef } from 'react';
+import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { useOpenAPIOperationContext } from './OpenAPIOperationContext';
@@ -19,7 +19,7 @@ export function ScalarApiButton({
     path: string;
     specUrl: string;
 }) {
-    const [isOpen, setIsOpen] = React.useState(false);
+    const [isOpen, setIsOpen] = useState(false);
     const controllerRef = useRef<ScalarModalControllerRef>(null);
     return (
         <div className="scalar scalar-activate">
@@ -96,7 +96,7 @@ function ScalarModalController(props: {
     const trackOpening = useEventCallback(() => {
         onOpenClient({ method: props.method, path: props.path });
     });
-    React.useEffect(() => {
+    useEffect(() => {
         if (openClient) {
             openClient();
             trackOpening();

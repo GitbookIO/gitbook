@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface Props {
     groups: TDisclosureGroup[];
     icon?: React.ReactNode;
@@ -22,9 +20,9 @@ import {
     useDisclosureGroupState,
     useDisclosureState,
 } from 'react-stately';
-import classNames from 'classnames';
+import { createContext, useContext, useRef, useState } from 'react';
 
-const DisclosureGroupStateContext = React.createContext<DisclosureGroupState | null>(null);
+const DisclosureGroupStateContext = createContext<DisclosureGroupState | null>(null);
 
 /**
  * Display an interactive OpenAPI disclosure group.
@@ -48,7 +46,7 @@ function DisclosureItem(props: { group: TDisclosureGroup; icon?: React.ReactNode
 
     const defaultId = useId();
     const id = group.id || defaultId;
-    const groupState = React.useContext(DisclosureGroupStateContext);
+    const groupState = useContext(DisclosureGroupStateContext);
     const isExpanded = groupState?.expandedKeys.has(id) || false;
     const state = useDisclosureState({
         isExpanded,
@@ -59,8 +57,8 @@ function DisclosureItem(props: { group: TDisclosureGroup; icon?: React.ReactNode
         },
     });
 
-    const panelRef = React.useRef<HTMLDivElement | null>(null);
-    const triggerRef = React.useRef<HTMLButtonElement | null>(null);
+    const panelRef = useRef<HTMLDivElement | null>(null);
+    const triggerRef = useRef<HTMLButtonElement | null>(null);
     const isDisabled = groupState?.isDisabled || !group.tabs?.length || false;
     const { buttonProps: triggerProps, panelProps } = useDisclosure(
         {
@@ -75,7 +73,7 @@ function DisclosureItem(props: { group: TDisclosureGroup; icon?: React.ReactNode
     const { isFocusVisible, focusProps } = useFocusRing();
 
     const defaultTab = group.tabs?.[0]?.id || '';
-    const [selectedTabKey, setSelectedTabKey] = React.useState(defaultTab);
+    const [selectedTabKey, setSelectedTabKey] = useState(defaultTab);
     const selectedTab = group.tabs?.find((tab) => tab.id === selectedTabKey);
 
     return (
@@ -107,11 +105,7 @@ function DisclosureItem(props: { group: TDisclosureGroup; icon?: React.ReactNode
                     <div className="openapi-disclosure-group-mediatype">
                         {group.tabs?.length > 1 ? (
                             <select
-                                className={classNames(
-                                    'openapi-section-select',
-                                    'openapi-select',
-                                    `openapi-disclosure-group-tabs-select`,
-                                )}
+                                className="openapi-section-select openapi-select openapi-disclosure-group-tabs-select"
                                 onClick={(event) => event.stopPropagation()}
                                 value={selectedTab?.id}
                                 onChange={(event) => {

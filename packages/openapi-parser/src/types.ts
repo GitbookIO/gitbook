@@ -1,4 +1,5 @@
-export type IconComponent = React.ComponentType<{ className?: string }>;
+import type { AnyObject } from '@scalar/openapi-parser';
+import type { OpenAPIV3, OpenAPIV3_1 } from '@scalar/openapi-types';
 
 /**
  * Custom properties that can be defined at the entire spec level.
@@ -15,6 +16,11 @@ export interface OpenAPICustomSpecProperties {
      * This option can be used to hide code samples for the entire spec.
      */
     'x-hideTryItPanel'?: boolean;
+
+    /**
+     * Description in HTML format.
+     */
+    'x-description-html'?: string;
 }
 
 /**
@@ -31,6 +37,11 @@ export interface OpenAPICustomOperationProperties {
      * https://redocly.com/docs/api-reference-docs/specification-extensions/x-hidetryitpanel/
      */
     'x-hideTryItPanel'?: boolean;
+
+    /**
+     * Description in HTML format.
+     */
+    'x-description-html'?: string;
 }
 
 /**
@@ -43,3 +54,23 @@ export interface OpenAPICustomCodeSample {
     label: string;
     source: string;
 }
+
+export type OpenAPIV3xDocument =
+    | OpenAPIV3_1.Document<OpenAPICustomSpecProperties>
+    | OpenAPIV3.Document<OpenAPICustomSpecProperties>;
+
+/**
+ * Not literally a filesystem, but a list of files with their content.
+ * This is an abstraction layer to handle multiple files in the browser (without access to the hard disk).
+ */
+export type Filesystem<T extends AnyObject = AnyObject> = FilesystemEntry<T>[];
+/**
+ * Holds all information about a single file (doesn’t have to be a literal file, see Filesystem).
+ */
+export type FilesystemEntry<T extends AnyObject> = {
+    dir: string;
+    isEntrypoint: boolean;
+    references: string[];
+    filename: string;
+    specification: T;
+};
