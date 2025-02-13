@@ -54,13 +54,15 @@ export async function RecordCard(
                 // On mobile, check if we can display the cover responsively or not:
                 // - If the file has a landscape aspect ratio, we display it normally
                 // - If the file is square or portrait, we display it left with 40% of the card width
-                coverIsLandscape
-                    ? 'grid-rows-[auto,1fr]'
-                    : [
-                          'grid-cols-[40%,_1fr]',
-                          'min-[432px]:grid-cols-none',
-                          'min-[432px]:grid-rows-[auto,1fr]',
-                      ],
+                cover
+                    ? coverIsLandscape
+                        ? 'grid-rows-[auto,1fr]'
+                        : [
+                              'grid-cols-[40%,_1fr]',
+                              'min-[432px]:grid-cols-none',
+                              'min-[432px]:grid-rows-[auto,1fr]',
+                          ]
+                    : null,
             )}
         >
             {cover ? (
