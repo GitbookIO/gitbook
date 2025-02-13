@@ -1,9 +1,10 @@
 'use client';
 
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { Key, Tab, TabList, TabPanel, Tabs, TabsProps } from 'react-aria-components';
 import { Markdown } from './Markdown';
 import { useSyncedTabsGlobalState } from './useSyncedTabsGlobalState';
+import { useIntersectionObserver } from 'usehooks-ts';
 
 export type Tab = {
     key: Key;
@@ -34,28 +35,58 @@ export function OpenAPITabs(
     props: React.PropsWithChildren<TabsProps & { items: Tab[]; stateKey?: string }>,
 ) {
     const { children, items, stateKey } = props;
-
-    const [syncedTabs, setSyncedTabs] = useSyncedTabsGlobalState();
-    const tabFromState =
-        stateKey && stateKey in syncedTabs
-            ? items.find((tab) => tab.key === syncedTabs[stateKey])
-            : undefined;
-    const defaultTab = items[0]?.key;
-    const [selectedTabKey, setSelectedTabKey] = useState(tabFromState?.key ?? defaultTab);
-
-    const selectedTab = tabFromState ?? items.find((tab) => tab.key === selectedTabKey) ?? items[0];
-
-    const contextValue = { items, selectedTab };
+    const isVisible = stateKey
+        ? useIntersectionObserver({
+              threshold: 0.1,
+              rootMargin: '200px',
+          })
+        : true;
+    const defaultTab = items[0];
+    const [syncedTabs, setSyncedTabs] = useSyncedTabsGlobalState<Tab>();
+    const [selectedTabKey, setSelectedTabKey] = useState(() => {
+        if (isVisible && stateKey && syncedTabs && syncedTabs.has(stateKey)) {
+            const tabFromState = syncedTabs.get(stateKey);
+            return tabFromState?.key ?? items[0]?.key;
+        }
+        return items[0]?.key;
+    });
 
     const handleSelectionChange = (key: Key) => {
         setSelectedTabKey(key);
         if (stateKey) {
-            setSyncedTabs((state) => ({
-                ...state,
-                [stateKey]: key.toString(),
-            }));
+            const tab = items.find((item) => item.key === key);
+
+            if (!tab) {
+                return;
+            }
+
+            setSyncedTabs((state) => {
+                const newState = new Map(state);
+                newState.set(stateKey, tab);
+                return newState;
+            });
         }
     };
+
+    useEffect(() => {
+        if (isVisible && stateKey && syncedTabs && syncedTabs.has(stateKey)) {
+            const tabFromState = syncedTabs.get(stateKey);
+
+            if (tabFromState && tabFromState?.key !== selectedTabKey) {
+                setSelectedTabKey(tabFromState.key);
+            }
+        }
+    }, [isVisible, stateKey, syncedTabs, selectedTabKey]);
+
+    const selectedTab = useMemo(
+        () =>
+            stateKey && syncedTabs && syncedTabs.has(stateKey)
+                ? (syncedTabs.get(stateKey) ?? defaultTab)
+                : (items.find((item) => item.key === selectedTabKey) ?? defaultTab),
+        [syncedTabs, stateKey, defaultTab],
+    );
+
+    const contextValue = useMemo(() => ({ items, selectedTab }), [items, selectedTab]);
 
     return (
         <OpenAPITabsContext.Provider value={contextValue}>

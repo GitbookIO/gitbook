@@ -70,7 +70,7 @@ export function OpenAPISchemaProperty(
                 <OpenAPISchemaPresentation {...props} />
                 {alternatives[0].map((alternative, index) => (
                     <OpenAPISchemaAlternative
-                        key={index}
+                        key={`alternative-${index}`}
                         schema={alternative}
                         circularRefs={circularRefs}
                         context={context}

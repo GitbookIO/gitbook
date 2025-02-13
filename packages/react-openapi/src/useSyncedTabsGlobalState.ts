@@ -1,27 +1,23 @@
 'use client';
 
-import React from 'react';
+import { create } from 'zustand';
 
-let globalState: Record<string, string> = {};
-const listeners = new Set<() => void>();
+interface SyncedTabsState<T> {
+    tabs: Map<string, T>;
+    setTabs: (updater: (tabs: Map<string, T>) => Map<string, T>) => void;
+}
 
-export function useSyncedTabsGlobalState() {
-    const subscribe = React.useCallback((callback: () => void) => {
-        listeners.add(callback);
-        return () => listeners.delete(callback);
-    }, []);
+const useSyncedTabsStore = create<SyncedTabsState<any>>()((set) => ({
+    tabs: new Map<string, any>(),
+    setTabs: (updater) =>
+        set((state) => ({
+            tabs: updater(new Map(state.tabs)), // Ensure a new Map is created for reactivity
+        })),
+}));
 
-    const getSnapshot = React.useCallback(() => globalState, []);
-
-    const setSyncedTabs = React.useCallback(
-        (updater: (tabs: Record<string, string>) => Record<string, string>) => {
-            globalState = updater(globalState);
-            listeners.forEach((listener) => listener());
-        },
-        [],
-    );
-
-    const tabs = React.useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
-
-    return [tabs, setSyncedTabs] as const;
+// Selector for better performance - only re-renders when tabs change
+export function useSyncedTabsGlobalState<T>() {
+    const tabs = useSyncedTabsStore((state) => state.tabs as Map<string, T>);
+    const setTabs = useSyncedTabsStore((state) => state.setTabs as SyncedTabsState<T>['setTabs']);
+    return [tabs, setTabs] as const;
 }
