@@ -64,7 +64,16 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                     />
                 </a>
             </div>
-            <div className={tcls('grid-area-1-1', 'z-[1]', textStyle.marginTop)}>
+            <div
+                className={tcls(
+                    'grid-area-1-1',
+                    'z-[1]',
+                    'justify-self-start',
+                    'text-left',
+                    textStyle.lineHeight,
+                    textStyle.marginTop,
+                )}
+            >
                 <Inlines {...rest} context={context} nodes={block.nodes} ancestorInlines={[]} />
             </div>
         </Tag>
