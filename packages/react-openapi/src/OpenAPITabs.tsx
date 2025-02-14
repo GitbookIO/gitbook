@@ -41,7 +41,7 @@ export function OpenAPITabs(
               rootMargin: '200px',
           })
         : true;
-    const defaultTab = items[0];
+    const defaultTab = items[0] as Tab;
     const [syncedTabs, setSyncedTabs] = useSyncedTabsGlobalState<Tab>();
     const [selectedTabKey, setSelectedTabKey] = useState(() => {
         if (isVisible && stateKey && syncedTabs && syncedTabs.has(stateKey)) {
@@ -50,6 +50,7 @@ export function OpenAPITabs(
         }
         return items[0]?.key;
     });
+    const [selectedTab, setSelectedTab] = useState<Tab>(defaultTab);
 
     const handleSelectionChange = (key: Key) => {
         setSelectedTabKey(key);
@@ -72,19 +73,15 @@ export function OpenAPITabs(
         if (isVisible && stateKey && syncedTabs && syncedTabs.has(stateKey)) {
             const tabFromState = syncedTabs.get(stateKey);
 
-            if (tabFromState && tabFromState?.key !== selectedTabKey) {
-                setSelectedTabKey(tabFromState.key);
+            if (!items.some((item) => item.key === tabFromState?.key)) {
+                return;
+            }
+
+            if (tabFromState && tabFromState?.key !== selectedTab?.key) {
+                setSelectedTab(tabFromState);
             }
         }
     }, [isVisible, stateKey, syncedTabs, selectedTabKey]);
-
-    const selectedTab = useMemo(
-        () =>
-            stateKey && syncedTabs && syncedTabs.has(stateKey)
-                ? (syncedTabs.get(stateKey) ?? defaultTab)
-                : (items.find((item) => item.key === selectedTabKey) ?? defaultTab),
-        [syncedTabs, stateKey, defaultTab],
-    );
 
     const contextValue = useMemo(() => ({ items, selectedTab }), [items, selectedTab]);
 

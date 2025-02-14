@@ -8,6 +8,7 @@ import {
     dereference,
 } from '@gitbook/openapi-parser';
 import { OpenAPIOperationData } from './types';
+import { checkIsReference } from './utils';
 
 export { toJSON, fromJSON };
 
@@ -47,7 +48,7 @@ export async function resolveOpenAPIOperation(
         const securityKey = Object.keys(entry)[0];
         if (securityKey) {
             const securityScheme = schema.components?.securitySchemes?.[securityKey];
-            if (securityScheme) {
+            if (securityScheme && !checkIsReference(securityScheme)) {
                 securities.push([securityKey, securityScheme]);
             }
         }
