@@ -30,6 +30,8 @@ export const es: TranslationLanguage = {
     was_this_helpful_neutral: 'No estoy seguro',
     was_this_helpful_negative: 'No',
     was_this_helpful_thank_you: '¡Gracias!',
+    was_this_helpful_comment: '¿Algo más que te gustaría añadir?',
+    submit: 'Enviar',
     annotation_button_label: 'Abrir anotación',
     code_copied: '¡Copiado!',
     code_copy: 'Copiar',

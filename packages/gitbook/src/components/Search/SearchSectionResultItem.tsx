@@ -28,21 +28,16 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                 'pl-6',
                 'sm:pl-12',
                 'pr-4',
-                'text-dark/8',
-                'dark:text-light/8',
-                'hover:bg-dark/1',
-                'dark:hover:bg-light/1',
+                'text-tint',
+                'hover:bg-tint-hover',
                 'font-normal',
                 'py-2',
                 'group',
                 active && [
                     'is-active',
-                    'bg-primary-50',
-                    'text-contrast-primary-50',
-                    'dark:bg-primary-800',
-                    'dark:text-contrast-primary-800',
-                    'hover:bg-primary-100/8',
-                    'dark:hover:bg-primary-700/7',
+                    'bg-primary',
+                    'text-contrast-primary',
+                    'hover:bg-primary-hover',
                 ],
             )}
         >
@@ -55,8 +50,7 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                     'flex-1',
                     'overflow-hidden',
                     'flex-col',
-                    'border-dark/2',
-                    'dark:border-light/2',
+                    'border-tint-subtle',
                 )}
             >
                 {item.title ? (
@@ -75,8 +69,8 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                     'p-2',
                     'rounded',
                     'straight-corners:rounded-none',
-                    'bg-primary',
-                    'text-contrast-primary',
+                    'bg-primary-solid',
+                    'text-contrast-primary-solid',
                     'hidden',
                     'sm:block',
                     active ? ['opacity-11', 'block'] : ['opacity-0'],

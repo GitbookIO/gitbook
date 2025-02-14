@@ -4,6 +4,7 @@ import {
     RevisionPageDocument,
     RevisionPageGroup,
     SiteCustomizationSettings,
+    SiteInsightsTrademarkPlacement,
     Space,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
@@ -22,6 +23,7 @@ import {
     getSpaceCustomization,
     getSpaceContentData,
     getSiteData,
+    getPageDocument,
 } from '@/lib/api';
 import { getPagePDFContainerId, PageHrefContext, getAbsoluteHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
@@ -96,10 +98,9 @@ export default async function PDFHTMLOutput(props: {
                             'items-center',
                             'justify-center',
                             'text-sm',
-                            'text-dark/6',
+                            'text-tint',
                             'hover:text-primary',
                             'p-4',
-                            'dark:text-light/5',
                             'rounded-full',
                             'bg-white',
                             'shadow-sm',
@@ -122,10 +123,9 @@ export default async function PDFHTMLOutput(props: {
                         'items-center',
                         'justify-center',
                         'text-sm',
-                        'text-dark/6',
+                        'text-tint',
                         'hover:text-primary',
                         'p-4',
-                        'dark:text-light/5',
                         'rounded-full',
                         'bg-white',
                         'shadow-sm',
@@ -146,7 +146,11 @@ export default async function PDFHTMLOutput(props: {
                 limit={pdfParams.limit ?? DEFAULT_LIMIT}
                 trademark={
                     customization.trademark.enabled ? (
-                        <TrademarkLink space={space} customization={customization} />
+                        <TrademarkLink
+                            space={space}
+                            customization={customization}
+                            placement={SiteInsightsTrademarkPlacement.Pdf}
+                        />
                     ) : null
                 }
             />
@@ -228,8 +232,7 @@ async function PDFPageDocument(props: {
     refContext: ContentRefContext;
 }) {
     const { space, page, refContext } = props;
-
-    const document = page.documentId ? await getDocument(space.id, page.documentId) : null;
+    const document = await getPageDocument(space.id, page);
 
     return (
         <PrintPage id={getPagePDFContainerId(page)}>

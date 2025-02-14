@@ -28,6 +28,10 @@ export async function RecordCard(
         : null;
     const target = targetRef ? await context.resolveContentRef(targetRef) : null;
 
+    const coverIsSquareOrPortrait =
+        cover?.file?.dimensions &&
+        cover.file?.dimensions?.width / cover.file?.dimensions?.height <= 1;
+
     const body = (
         <div
             className={tcls(
@@ -35,25 +39,28 @@ export async function RecordCard(
                 'z-0',
                 'relative',
                 'grid',
-                'bg-light-1',
-                'dark:bg-dark-1',
+                'bg-tint-base',
                 'w-[calc(100%+2px)]',
                 'h-[calc(100%+2px)]',
                 'inset-[-1px]',
                 'rounded-[7px]',
                 'straight-corners:rounded-none',
                 'overflow-hidden',
-                '[&_.heading]:flip-heading-hash',
+                '[&_.heading>div:first-child]:hidden',
+                '[&_.heading>div]:text-[.8em]',
+                'md:[&_.heading>div]:text-[1em]',
                 '[&_.blocks:first-child_.heading:first-child_div]:mt-0', // Remove margin on first heading in card
 
-                cover
+                // On mobile, check if we can display the cover responsively or not:
+                // - If the file has a landscape aspect ratio, we display it normally
+                // - If the file is square or portrait, we display it left with 40% of the card width
+                coverIsSquareOrPortrait
                     ? [
-                          // On mobile, the cover is displayed on the left with 40% of the width
                           'grid-cols-[40%,_1fr]',
                           'min-[432px]:grid-cols-none',
                           'min-[432px]:grid-rows-[auto,1fr]',
                       ]
-                    : null,
+                    : 'grid-rows-[auto,1fr]',
             )}
         >
             {cover ? (
@@ -75,8 +82,9 @@ export async function RecordCard(
                         'w-full',
                         'h-full',
                         'object-cover',
-                        'min-[432px]:h-auto',
-                        'min-[432px]:aspect-video',
+                        coverIsSquareOrPortrait
+                            ? ['min-[432px]:h-auto', 'min-[432px]:aspect-video']
+                            : ['h-auto', 'aspect-video'],
                     )}
                     priority={isOffscreen ? 'lazy' : 'high'}
                     preload
@@ -93,14 +101,8 @@ export async function RecordCard(
                     'p-4',
                     'text-sm',
                     target
-                        ? [
-                              'transition-colors',
-                              'text-dark/8',
-                              'dark:text-light/8',
-                              'group-hover:text-dark/10',
-                              'dark:group-hover:text-light/10',
-                          ]
-                        : ['text-dark/10', 'dark:text-light/10'],
+                        ? ['transition-colors', 'text-tint', 'group-hover:text-tint-strong']
+                        : ['text-tint-strong'],
                 )}
             >
                 {view.columns.map((column) => {
@@ -114,10 +116,7 @@ export async function RecordCard(
                         const ariaLabelledBy = `${block.key}-${column}-title`;
                         return (
                             <div key={column} className="flex flex-col gap-1">
-                                <div
-                                    id={ariaLabelledBy}
-                                    className="text-sm text-dark/8 dark:text-light/8"
-                                >
+                                <div id={ariaLabelledBy} className="text-sm text-tint">
                                     {definition.title}
                                 </div>
                                 <RecordColumnValue
@@ -139,11 +138,12 @@ export async function RecordCard(
         'group',
         'grid',
         'shadow-1xs',
-        'shadow-dark/[0.02]',
+        'shadow-tint-9/1',
         'rounded-md',
         'straight-corners:rounded-none',
         'dark:shadow-transparent',
         'z-0',
+
         'before:pointer-events-none',
         'before:grid-area-1-1',
         'before:transition-shadow',
@@ -151,23 +151,22 @@ export async function RecordCard(
         'before:h-full',
         'before:rounded-[inherit]',
         'before:ring-1',
-        'before:ring-dark/2',
+        'before:ring-tint-12/2',
         'before:z-10',
         'before:relative',
-        'before:dark:ring-light/2',
     ] as ClassValue;
 
     if (target && targetRef) {
         return (
             <Link
                 href={target.href}
-                className={tcls(style, [
-                    'hover:before:ring-dark/4',
-                    'dark:hover:before:ring-light/4',
-                ])}
+                className={tcls(style, 'hover:before:ring-tint-12/5')}
                 insights={{
-                    target: targetRef,
-                    position: SiteInsightsLinkPosition.Content,
+                    type: 'link_click',
+                    link: {
+                        target: targetRef,
+                        position: SiteInsightsLinkPosition.Content,
+                    },
                 }}
             >
                 {body}

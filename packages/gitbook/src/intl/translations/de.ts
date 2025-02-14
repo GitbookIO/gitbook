@@ -28,6 +28,8 @@ export const de = {
     was_this_helpful_neutral: 'Nicht sicher',
     was_this_helpful_negative: 'Nein',
     was_this_helpful_thank_you: 'Danke!',
+    was_this_helpful_comment: 'Möchten Sie etwas hinzufügen?',
+    submit: 'Absenden',
     annotation_button_label: 'Kommentar öffnen',
     code_copied: 'Kopiert!',
     code_copy: 'Kopieren',

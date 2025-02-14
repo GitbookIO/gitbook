@@ -6,7 +6,7 @@
     --scalar-color-1: color-mix(
         in srgb,
         rgb(var(--tint-color-300, 180 180 180)),
-        rgb(var(--dark-base, 23 23 23)) 96%
+        rgb(var(--tint-12, 23 23 23)) 96%
     );
     --scalar-color-2: color-mix(
         in srgb,
@@ -20,7 +20,7 @@
     );
     --scalar-color-accent: #007d9c;
 
-    --scalar-background-1: rgb(var(--light-base, 255 255 255));
+    --scalar-background-1: rgb(var(--tint-1, 255 255 255));
     --scalar-background-2: color-mix(
         in srgb,
         rgb(var(--tint-color-800, 30 30 30)),
@@ -43,7 +43,7 @@
     --scalar-color-green: #0a6355;
     --scalar-color-red: #dc1b19;
     --scalar-color-yellow: #ffc90d;
-    --scalar-color-blue: rgb(var(--primary-color-500, 52 109 219));
+    --scalar-color-blue: rgb(var(--primary-9, 52 109 219));
     --scalar-color-orange: #ff8d4d;
     --scalar-color-purple: #8250df;
 
@@ -59,7 +59,7 @@
         #eeeeed 0px 0 0 1px;
 
     --scalar-selection-background: rgba(96, 175, 255, 0.4);
-    --scalar-selection-color: rgb(var(--dark-base, 22 22 22));
+    --scalar-selection-color: rgb(var(--tint-12, 22 22 22));
 }
 .dark .scalar-modal-layout,
 .dark .scalar-app,
@@ -67,7 +67,7 @@
     --scalar-color-1: color-mix(
         in srgb,
         rgb(var(--tint-color-700, 70 70 70)),
-        rgb(var(--light-base, 255 255 255)) 100%
+        rgb(var(--tint-12, 255 255 255)) 100%
     );
     --scalar-color-2: color-mix(
         in srgb,
@@ -81,7 +81,7 @@
     );
     --scalar-color-accent: #50b7e0;
 
-    --scalar-background-1: rgb(var(--dark-base, 22 22 22));
+    --scalar-background-1: rgb(var(--tint-1, 22 22 22));
     --scalar-background-2: color-mix(
         in srgb,
         rgb(var(--tint-color-200, 200 200 200)),
@@ -103,7 +103,7 @@
     --scalar-color-green: #56b6c2;
     --scalar-color-red: rgb(245 124 97);
     --scalar-color-yellow: #edbe20;
-    --scalar-color-blue: rgb(var(--primary-color-400, 93 138 226));
+    --scalar-color-blue: rgb(var(--primary-9, 93 138 226));
     --scalar-color-orange: #d19a66;
     --scalar-color-purple: #5203d1;
 
@@ -119,7 +119,7 @@
         0 0 0 1px rgba(255, 255, 255, 0.1);
 
     --scalar-selection-background: rgba(96, 175, 255, 0.4);
-    --scalar-selection-color: rgb(var(--light-base, 255 255 255));
+    --scalar-selection-color: rgb(var(--tint-12, 255 255 255));
 }
 .scalar-modal-layout,
 .scalar-app,
@@ -263,32 +263,23 @@
 }
 .scalar-activate {
     width: fit-content;
-    margin: 0px 0.75rem 0.75rem auto;
     line-height: 24px;
     font-size: 0.75rem;
     cursor: pointer;
     font-size: 0.875rem;
-    font-weight: 600;
     display: flex;
     align-items: center;
     gap: 6px;
 }
 .scalar-activate-button {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-    color: var(--scalar-color-blue);
-    appearance: none;
-    outline: none;
-    border: none;
-    background: transparent;
-}
-.scalar-activate-button {
-    padding: 0 0.5rem;
-}
-.scalar-activate:hover .scalar-activate-button {
-    background: var(--scalar-background-3);
-    border-radius: 3px;
+    @apply flex gap-1.5 items-center;
+    @apply bg-primary-solid text-contrast-primary-solid hover:bg-primary-solid-hover hover:text-contrast-primary-solid-hover contrast-more:ring-1 rounded-md straight-corners:rounded-none place-self-start;
+    @apply ring-1 ring-tint hover:ring-tint-hover;
+    @apply shadow-sm shadow-tint dark:shadow-tint-1 hover:shadow-md active:shadow-none;
+    @apply contrast-more:ring-tint-12 contrast-more:hover:ring-2 contrast-more:hover:ring-tint-12;
+    @apply hover:scale-105 active:scale-100 transition-all;
+    @apply grow-0 shrink-0 truncate;
+    @apply text-sm px-2.5 py-1;
 }
 
 .scalar-app-loading {

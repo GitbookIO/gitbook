@@ -13,10 +13,26 @@ export function TOCPageIcon({ page }: { page: RevisionPage }) {
             page={page}
             style={tcls(
                 'text-base',
-                'text-dark/6',
-                'dark:text-light/6',
-                'group-aria-current-page/toclink:text-tint',
-                'group-aria-current-page/toclink:dark:text-tint-400',
+                'text-tint-strong/6',
+                'group-aria-current-page/toclink:text-primary-subtle',
+                'contrast-more:group-aria-current-page/toclink:text-primary',
+
+                !page.emoji
+                    ? [
+                          'theme-gradient:bg-gradient-to-b',
+                          'theme-bold:bg-gradient-to-b',
+                          'theme-gradient:bg-fixed',
+                          'theme-bold:bg-fixed',
+
+                          'no-tint:from-primary-7',
+                          'no-tint:to-primary-10',
+                          'tint:from-tint-7',
+                          'tint:to-tint-10',
+
+                          'group-aria-current-page/toclink:bg-none',
+                      ]
+                    : '',
+
                 'shrink-0',
             )}
         />

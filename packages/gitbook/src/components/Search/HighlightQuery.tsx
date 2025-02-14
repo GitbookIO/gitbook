@@ -16,19 +16,15 @@ export function HighlightQuery(props: {
         text,
         highlight = [
             'text-bold',
-            'bg-primary-100',
-            'text-contrast-primary-100',
-            'dark:bg-primary-700',
-            'dark:text-contrast-primary-700',
+            'bg-primary',
+            'text-contrast-primary',
             'px-0.5',
             '-mx-0.5',
             'py-0.5',
             'rounded',
             'straight-corners:rounded-sm',
-            'group-[.is-active]:bg-primary-200',
-            'group-[.is-active]:text-contrast-primary-200',
-            'dark:group-[.is-active]:bg-primary-700',
-            'dark:group-[.is-active]:text-contrast-primary-700',
+            'group-[.is-active]:bg-primary-active',
+            'group-[.is-active]:text-contrast-primary-active',
         ],
     } = props;
     const matches = matchString(text, query);

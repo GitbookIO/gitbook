@@ -129,24 +129,25 @@ function HeaderItemButton(
             size="medium"
             className={tcls(
                 {
-                    'button-primary':
-                        headerPreset != CustomizationHeaderPreset.Default &&
-                        `bg-header-link dark:bg-header-link hover:bg-header-link dark:hover:bg-header-link
-                        text-header-background dark:text-header-background hover:text-header-background dark:hover:text-header-background
-                        shadow-none hover:shadow-none`,
+                    'button-primary': `theme-bold:bg-header-link theme-bold:hover:bg-header-link
+                        theme-bold:text-header-background theme-bold:hover:text-header-background
+                        theme-bold:shadow-none theme-bold:hover:shadow-none`,
                     'button-secondary': tcls(
-                        headerPreset != CustomizationHeaderPreset.Default &&
-                            `bg-header-link/2 dark:bg-header-link/2 hover:bg-header-link/3 dark:hover:bg-header-link/3 
-                            text-header-link dark:text-header-link hover:text-header-link dark:hover:text-header-link
-                            ring-header-link/4 dark:ring-header-link/4 hover:ring-header-link/5 dark:hover:ring-header-link/5
-                            contrast-more:ring-header-link contrast-more:bg-header-background contrast-more:text-header-link contrast-more:hover:ring-header-link
-                            shadow-none hover:shadow-none`,
+                        `theme-muted:bg-tint-base theme-gradient:bg-tint-base
+                            theme-bold:bg-header-link/2 theme-bold:hover:bg-header-link/3
+                            theme-bold:text-header-link theme-bold:hover:text-header-link
+                            theme-bold:ring-header-link/4 theme-bold:hover:ring-header-link/5
+                            theme-bold:contrast-more:ring-header-link theme-bold:contrast-more:bg-header-background theme-bold:contrast-more:text-header-link theme-bold:contrast-more:hover:ring-header-link
+                            theme-bold:shadow-none theme-bold:hover:shadow-none`,
                     ),
                 }[linkStyle],
             )}
             insights={{
-                target: linkTarget,
-                position: SiteInsightsLinkPosition.Header,
+                type: 'link_click',
+                link: {
+                    target: linkTarget,
+                    position: SiteInsightsLinkPosition.Header,
+                },
             }}
             {...rest}
         >
@@ -158,13 +159,15 @@ function HeaderItemButton(
 function getHeaderLinkClassName(props: { headerPreset: CustomizationHeaderPreset }) {
     return tcls(
         'flex items-center shrink',
-        'hover:text-header-link-400 dark:hover:text-light',
         'min-w-0',
         'contrast-more:underline',
 
-        props.headerPreset === CustomizationHeaderPreset.Default
-            ? ['text-dark/8', 'dark:text-light/8']
-            : ['text-header-link-500 hover:text-header-link-400'],
+        'text-tint',
+        'hover:text-primary',
+        'tint:hover:text-tint-strong',
+
+        'theme-bold:text-header-link',
+        'theme-bold:hover:text-header-link',
     );
 }
 
@@ -175,8 +178,11 @@ function HeaderItemLink(props: Omit<HeaderLinkNavItemProps, 'linkStyle'>) {
             href={href}
             className={getHeaderLinkClassName({ headerPreset })}
             insights={{
-                target: linkTarget,
-                position: SiteInsightsLinkPosition.Header,
+                type: 'link_click',
+                link: {
+                    target: linkTarget,
+                    position: SiteInsightsLinkPosition.Header,
+                },
             }}
             {...rest}
         >
@@ -219,7 +225,13 @@ async function SubHeaderLink(props: {
     return (
         <DropdownMenuItem
             href={target.href}
-            insights={{ target: link.to, position: SiteInsightsLinkPosition.Header }}
+            insights={{
+                type: 'link_click',
+                link: {
+                    target: link.to,
+                    position: SiteInsightsLinkPosition.Header,
+                },
+            }}
         >
             {link.title}
         </DropdownMenuItem>

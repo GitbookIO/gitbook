@@ -1,0 +1,8 @@
+# next.js
+/.next/
+
+# vercel
+.vercel
+
+# cloudflare
+.open-next

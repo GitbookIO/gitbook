@@ -30,6 +30,8 @@ export const no: TranslationLanguage = {
     was_this_helpful_neutral: 'Ikke sikker',
     was_this_helpful_negative: 'Nei',
     was_this_helpful_thank_you: 'Takk!',
+    was_this_helpful_comment: 'Noe du vil legge til?',
+    submit: 'Send inn',
     annotation_button_label: 'Åpne merknad',
     code_copied: 'Kopiert!',
     code_copy: 'Kopier',

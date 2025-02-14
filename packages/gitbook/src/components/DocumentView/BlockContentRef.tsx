@@ -12,7 +12,7 @@ export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>
 
     const resolved = await context.resolveContentRef(block.data.ref, {
         resolveAnchorText: true,
-        iconStyle: ['text-xl', 'text-dark/6', 'dark:text-light/6'],
+        iconStyle: ['text-xl', 'text-tint'],
     });
 
     if (!resolved) {
@@ -35,8 +35,11 @@ export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>
             title={resolved.text}
             style={style}
             insights={{
-                target: block.data.ref,
-                position: SiteInsightsLinkPosition.Content,
+                type: 'link_click',
+                link: {
+                    target: block.data.ref,
+                    position: SiteInsightsLinkPosition.Content,
+                },
             }}
         />
     );

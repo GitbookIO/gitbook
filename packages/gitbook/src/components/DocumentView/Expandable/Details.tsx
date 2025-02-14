@@ -45,13 +45,10 @@ export function Details(props: {
             className={tcls(
                 className,
                 'group/expandable',
-                'shadow-dark/1',
-                'bg-gradient-to-t',
-                'from-light-1',
-                'to-light-1',
+                'bg-tint-base',
                 'border',
                 'border-b-0',
-                'border-dark-3/3',
+                'border-tint-subtle',
                 //all
                 '[&]:mt-[0px]',
                 //select first child
@@ -64,15 +61,6 @@ export function Details(props: {
                 '[&:not(:has(+_&))]:mb-5',
                 '[&:not(:has(+_&))]:rounded-b-lg',
                 '[&:not(:has(+_&))]:border-b',
-                /* '[&:not(:has(+_&))]:shadow-1xs', */
-
-                'dark:border-light-2/[0.06]',
-                'dark:from-dark-2',
-                'dark:to-dark-2',
-                'dark:shadow-none',
-
-                'group open:dark:to-dark-2/8',
-                'group open:to-light-1/6',
             )}
         >
             {children}

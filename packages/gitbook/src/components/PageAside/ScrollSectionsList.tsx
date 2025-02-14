@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import React from 'react';
 
 import { useScrollActiveId } from '@/components/hooks';
-import { DocumentSection } from '@/lib/document';
+import type { DocumentSection } from '@/lib/document-sections';
 import { tcls } from '@/lib/tailwind';
 
 import { AsideSectionHighlight } from './AsideSectionHighlight';
@@ -36,7 +36,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
     });
 
     return (
-        <ul className={tcls('sidebar-list-line:border-l', 'border-dark/2', 'dark:border-light/1')}>
+        <ul className={tcls('sidebar-list-line:border-l', 'border-tint-subtle')}>
             {sections.map((section) => (
                 <motion.li
                     key={section.id}
@@ -53,11 +53,11 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                         <AsideSectionHighlight
                             transition={springCurve}
                             className={tcls(
+                                'sidebar-list-default:hidden',
                                 section?.depth > 1
                                     ? [
                                           'sidebar-list-default:rounded-l-none',
                                           'sidebar-list-line:rounded-l-none',
-                                          'sidebar-list-default:border-l',
                                       ]
                                     : [
                                           'sidebar-list-default:ml-3',
@@ -87,8 +87,9 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                             'straight-corners:rounded-none',
                             'sidebar-list-line:rounded-l-none',
 
-                            'hover:bg-dark/1',
-                            'dark:hover:bg-light/1',
+                            'hover:bg-tint-hover',
+                            'theme-gradient:hover:bg-tint-12/1',
+                            'hover:text-tint-strong',
                             'contrast-more:hover:ring-1',
                             'contrast-more:hover:ring-inset',
                             'contrast-more:hover:ring-current',
@@ -101,22 +102,25 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
 
                                 'sidebar-list-default:rounded-l-none',
                                 'sidebar-list-default:border-l',
-                                'sidebar-list-default:border-dark/3',
-                                'dark:sidebar-list-default:border-light/3',
+                                'sidebar-list-default:border-tint',
                             ],
 
                             activeId === section.id && [
-                                'text-tint',
-                                'hover:text-tint',
-                                'dark:text-tint-400',
-                                'dark:hover:text-tint-400',
+                                'text-primary-subtle',
+                                'hover:text-primary',
+                                'contrast-more:text-primary',
+                                'contrast-more:hover:text-primary-strong',
+                                'sidebar-list-line:ml-px',
 
+                                'hover:bg-primary-hover',
+                                'theme-muted:hover:bg-primary-active',
+                                'theme-bold-tint:hover:bg-primary-active',
+                                'theme-gradient:hover:bg-primary-active',
+
+                                'tint:font-semibold',
                                 'contrast-more:font-semibold',
 
-                                'hover:bg-tint/3',
-                                'dark:hover:bg-tint-400/3',
-                                'sidebar-list-pill:hover:bg-transparent',
-                                'dark:sidebar-list-pill:hover:bg-transparent',
+                                'sidebar-list-default:border-tint',
                             ],
                         )}
                     >
@@ -128,7 +132,17 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                             </span>
                         ) : null}
 
-                        {section.title}
+                        <span
+                            className={tcls(
+                                section.deprecated && [
+                                    'line-through',
+                                    'opacity-50',
+                                    'contrast-more:opacity-60',
+                                ],
+                            )}
+                        >
+                            {section.title}
+                        </span>
                     </a>
                 </motion.li>
             ))}

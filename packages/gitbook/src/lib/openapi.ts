@@ -1,13 +1,8 @@
 import { ContentRef, DocumentBlockOpenAPI } from '@gitbook/api';
-import {
-    OpenAPIOperationData,
-    fetchOpenAPIOperation,
-    OpenAPIFetcher,
-    parseOpenAPIV3,
-    OpenAPIFetchError,
-} from '@gitbook/react-openapi';
+import { parseOpenAPI, OpenAPIParseError, traverse } from '@gitbook/openapi-parser';
+import { type OpenAPIOperationData, resolveOpenAPIOperation } from '@gitbook/react-openapi';
 
-import { cache, parseCacheResponse, noCacheFetchOptions, CacheFunctionOptions } from '@/lib/cache';
+import { cache, noCacheFetchOptions, CacheFunctionOptions } from '@/lib/cache';
 
 import { parseMarkdown } from './markdown';
 import { ResolvedContentRef } from './references';
@@ -20,7 +15,7 @@ export async function fetchOpenAPIBlock(
     resolveContentRef: (ref: ContentRef) => Promise<ResolvedContentRef | null>,
 ): Promise<
     | { data: OpenAPIOperationData | null; specUrl: string | null; error?: undefined }
-    | { error: OpenAPIFetchError; data?: undefined; specUrl?: undefined }
+    | { error: OpenAPIParseError; data?: undefined; specUrl?: undefined }
 > {
     const resolved = block.data.ref ? await resolveContentRef(block.data.ref) : null;
     if (!resolved || !block.data.path || !block.data.method) {
@@ -28,18 +23,15 @@ export async function fetchOpenAPIBlock(
     }
 
     try {
-        const data = await fetchOpenAPIOperation(
-            {
-                url: resolved.href,
-                path: block.data.path,
-                method: block.data.method,
-            },
-            fetcher,
-        );
+        const filesystem = await fetchFilesystem(resolved.href);
+        const data = await resolveOpenAPIOperation(filesystem, {
+            path: block.data.path,
+            method: block.data.method,
+        });
 
         return { data, specUrl: resolved.href };
     } catch (error) {
-        if (error instanceof OpenAPIFetchError) {
+        if (error instanceof OpenAPIParseError) {
             return { error };
         }
 
@@ -47,31 +39,44 @@ export async function fetchOpenAPIBlock(
     }
 }
 
-const fetcher: OpenAPIFetcher = {
-    fetch: cache({
-        name: 'openapi.fetch',
-        get: async (url: string, options: CacheFunctionOptions) => {
-            // Wrap the raw string to prevent invalid URLs from being passed to fetch.
-            // This can happen if the URL has whitespace, which is currently handled differently by Cloudflare's implementation of fetch:
-            // https://github.com/cloudflare/workerd/issues/1957
-            const response = await fetch(new URL(url), {
-                ...noCacheFetchOptions,
-                signal: options.signal,
-            });
+const fetchFilesystem = cache({
+    name: 'openapi.fetch.v5',
+    get: async (url: string, options: CacheFunctionOptions) => {
+        // Wrap the raw string to prevent invalid URLs from being passed to fetch.
+        // This can happen if the URL has whitespace, which is currently handled differently by Cloudflare's implementation of fetch:
+        // https://github.com/cloudflare/workerd/issues/1957
+        const response = await fetch(new URL(url), {
+            ...noCacheFetchOptions,
+            signal: options.signal,
+        });
 
-            if (!response.ok) {
-                throw new Error(
-                    `Failed to fetch OpenAPI file: ${response.status} ${response.statusText}`,
-                );
+        if (!response.ok) {
+            throw new Error(
+                `Failed to fetch OpenAPI file: ${response.status} ${response.statusText}`,
+            );
+        }
+
+        const text = await response.text();
+        const filesystem = await parseOpenAPI({ value: text, rootURL: url });
+        const cache: Map<string, Promise<string>> = new Map();
+        const transformedFs = await traverse(filesystem, async (node) => {
+            if ('description' in node && typeof node.description === 'string' && node.description) {
+                if (cache.has(node.description)) {
+                    node['x-description-html'] = await cache.get(node.description);
+                } else {
+                    const promise = parseMarkdown(node.description);
+                    cache.set(node.description, promise);
+                    node['x-description-html'] = await promise;
+                }
             }
-
-            const text = await response.text();
-            const data = await parseOpenAPIV3(url, text);
-            return {
-                ...parseCacheResponse(response),
-                data,
-            };
-        },
-    }),
-    parseMarkdown,
-};
+            return node;
+        });
+        return {
+            // Cache for 4 hours
+            ttl: 24 * 60 * 60,
+            // Revalidate every 2 hours
+            revalidateBefore: 22 * 60 * 60,
+            data: transformedFs,
+        };
+    },
+});

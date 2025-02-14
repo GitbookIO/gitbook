@@ -74,11 +74,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                     <Icon
                                         key={i}
                                         icon="star"
-                                        className={tcls(
-                                            'size-[15px]',
-                                            'text-primary-700/5',
-                                            'dark:text-primary-300/5',
-                                        )}
+                                        className={tcls('size-[15px]', 'text-primary/5')}
                                     />
                                 ))}
                             </span>
@@ -168,11 +164,14 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                 insights={
                                     ref.file
                                         ? {
-                                              target: {
-                                                  kind: 'file',
-                                                  file: ref.file.id,
+                                              type: 'link_click',
+                                              link: {
+                                                  target: {
+                                                      kind: 'file',
+                                                      file: ref.file.id,
+                                                  },
+                                                  position: SiteInsightsLinkPosition.Content,
                                               },
-                                              position: SiteInsightsLinkPosition.Content,
                                           }
                                         : undefined
                                 }
@@ -210,7 +209,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             const resolved = contentRef
                 ? await context.resolveContentRef(contentRef, {
                       resolveAnchorText: true,
-                      iconStyle: ['mr-2', 'text-dark/6', 'dark:text-light/6'],
+                      iconStyle: ['mr-2', 'text-tint-subtle'],
                   })
                 : null;
             return (
@@ -225,8 +224,11 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                             insights={
                                 contentRef
                                     ? {
-                                          target: contentRef,
-                                          position: SiteInsightsLinkPosition.Content,
+                                          type: 'link_click',
+                                          link: {
+                                              target: contentRef,
+                                              position: SiteInsightsLinkPosition.Content,
+                                          },
                                       }
                                     : undefined
                             }
@@ -260,8 +262,11 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                             key={index}
                             href={resolved.href}
                             insights={{
-                                target: contentRef,
-                                position: SiteInsightsLinkPosition.Content,
+                                type: 'link_click',
+                                link: {
+                                    target: contentRef,
+                                    position: SiteInsightsLinkPosition.Content,
+                                },
                             }}
                         >
                             {resolved.text}
@@ -292,10 +297,8 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                         'rounded',
                                         'py-1',
                                         'px-2',
-                                        'bg-primary-300/4',
-                                        'text-primary-800',
-                                        'dark:bg-primary-400/3',
-                                        'dark:text-primary-200',
+                                        'bg-primary',
+                                        'text-primary-strong',
                                     )}
                                 >
                                     {option.label}

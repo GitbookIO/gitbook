@@ -1,6 +1,5 @@
 import {
     ContentRef,
-    ContentRefSpace,
     Revision,
     RevisionFile,
     RevisionPageDocument,
@@ -18,6 +17,7 @@ import {
     SpaceContentPointer,
     getCollection,
     getDocument,
+    getPageDocument,
     getPublishedContentSite,
     getReusableContent,
     getRevisionFile,
@@ -31,6 +31,7 @@ import { getBlockById, getBlockTitle } from './document';
 import { getGitbookAppHref, getPageHref, PageHrefContext } from './links';
 import { getPagePath, resolvePageId } from './pages';
 import { ClassValue } from './tailwind';
+import { getSiteStructureSections } from './utils';
 
 export interface ResolvedContentRef {
     /** Text to render in the content ref */
@@ -161,9 +162,7 @@ export async function resolveContentRef(
                 text = '#' + anchor;
 
                 if (resolveAnchorText) {
-                    const document = page.documentId
-                        ? await getDocument(space.id, page.documentId)
-                        : null;
+                    const document = await getPageDocument(space.id, page);
                     if (document) {
                         const block = getBlockById(document, anchor);
                         if (block) {
@@ -239,16 +238,6 @@ export async function resolveContentRef(
             }
         }
 
-        case 'snippet': {
-            return {
-                href: getGitbookAppHref(
-                    `/o/${contentRef.organization}/snippet/${contentRef.snippet}`,
-                ),
-                text: 'snippet',
-                active: false,
-            };
-        }
-
         case 'collection': {
             const collection = await ignoreAPIError(getCollection(contentRef.collection));
             if (!collection) {
@@ -317,10 +306,13 @@ async function getBestTargetSpace(
         const siteSpaces =
             publishedContentSite.structure.type === 'siteSpaces'
                 ? publishedContentSite.structure.structure
-                : publishedContentSite.structure.structure.reduce<SiteSpace[]>((acc, section) => {
-                      acc.push(...section.siteSpaces);
-                      return acc;
-                  }, []);
+                : getSiteStructureSections(publishedContentSite.structure).reduce<SiteSpace[]>(
+                      (acc, section) => {
+                          acc.push(...section.siteSpaces);
+                          return acc;
+                      },
+                      [],
+                  );
         const spaces = parseSpacesFromSiteSpaces(siteSpaces);
         const foundSpace = spaces.find((space) => space.id === spaceId);
         if (foundSpace) {

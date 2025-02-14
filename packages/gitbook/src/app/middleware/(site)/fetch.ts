@@ -3,10 +3,10 @@ import { redirect } from 'next/navigation';
 
 import {
     getRevisionPageByPath,
-    getDocument,
     getSpaceContentData,
     getSiteData,
     getSiteRedirectBySource,
+    getPageDocument,
 } from '@/lib/api';
 import { resolvePagePath, resolvePageId } from '@/lib/pages';
 import { getSiteContentPointer } from '@/lib/pointer';
@@ -65,9 +65,7 @@ export async function fetchPageData(params: PagePathParams | PageIdParams) {
         shareKey: contentData.shareKey,
         params,
     });
-    const document = page?.page.documentId
-        ? await getDocument(contentData.space.id, page.page.documentId)
-        : null;
+    const document = page ? await getPageDocument(contentData.space.id, page.page) : null;
 
     return {
         ...contentData,

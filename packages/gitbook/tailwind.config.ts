@@ -3,7 +3,7 @@ import typography from '@tailwindcss/typography';
 import type { Config } from 'tailwindcss';
 import plugin from 'tailwindcss/plugin';
 
-import { hexToRgb, shadesOfColor } from './src/lib/colors';
+import { ColorCategory, hexToRgb, scale, shadesOfColor } from './src/lib/colors';
 
 export const shades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
 export const opacities = [0, 4, 8, 12, 16, 24, 40, 64, 72, 88, 96, 100];
@@ -11,14 +11,22 @@ export const opacities = [0, 4, 8, 12, 16, 24, 40, 64, 72, 88, 96, 100];
 /**
  * Generate a Tailwind color shades from a variable.
  */
-function generateVarShades(varName: string) {
-    return shades.reduce(
-        (acc, shade) => {
-            acc[shade] = `rgb(var(--${varName}-${shade}) / <alpha-value>)`;
-            return acc;
-        },
-        { DEFAULT: `rgb(var(--${varName}-500) / <alpha-value>)` } as Record<string, string>,
-    );
+function generateVarShades(varName: string, filter: ColorCategory[] = []) {
+    const result: { [key: string]: string } = {};
+
+    for (const [categoryName, category] of Object.entries(scale)) {
+        if (filter.length === 0 || filter.includes(categoryName as ColorCategory)) {
+            for (const [key, value] of Object.entries(category)) {
+                if (filter.length > 0) {
+                    result[key] = `rgb(var(--${varName}-${value}))`;
+                } else {
+                    result[value] = `rgb(var(--${varName}-${value}))`;
+                }
+            }
+        }
+    }
+
+    return result;
 }
 
 /**
@@ -75,37 +83,132 @@ const config: Config = {
             colors: {
                 // Dynamic colors matching the customization settings
 
-                /** primary-color used to accent elements, these colors remain unchanged when toggling between the CustomizationBackground options**/
-                primary: generateVarShades('primary-color'),
+                /** Scale based on the primary color, used for links and interactive elements. */
+                primary: generateVarShades('primary'),
+                /** Contrasting foreground color that can be used on top of `primary`. Black or white depending on shade. */
                 'contrast-primary': generateVarShades('contrast-primary'),
-                tint: generateVarShades('tint-color'),
+
+                /** The main color scale for non-interactive elements. Will either be a (slightly tinted) gray scale or a user-set value through Customisation. */
+                tint: generateVarShades('tint'),
+                /** Contrasting foreground color that can be used on top of `tint`. Black or white depending on shade. */
                 'contrast-tint': generateVarShades('contrast-tint'),
 
-                'header-background': generateVarShades('header-background'),
-                'header-link': generateVarShades('header-link'),
-                'header-button-text': generateVarShades('header-button-text'),
+                /** Will always be a neutral gray scale, without any tinting or overrides. Use only when `tint` somehow clashes. */
+                neutral: generateVarShades('neutral'),
+                /** Contrasting foreground color that can be used on top of `neutral`. Black or white depending on shade. */
+                'contrast-neutral': generateVarShades('contrast-neutral'),
 
-                light: {
-                    1: `color-mix(in srgb, var(--light-1), transparent calc(100% - 100% * <alpha-value>))`, //1 99%
-                    DEFAULT: `color-mix(in srgb, var(--light-DEFAULT), transparent calc(100% - 100% * <alpha-value>))`, //(default) 96%
-                    2: `color-mix(in srgb, var(--light-2), transparent calc(100% - 100% * <alpha-value>))`, //2 92%
-                    3: `color-mix(in srgb, var(--light-3), transparent calc(100% - 100% * <alpha-value>))`, //4 82%
-                    4: `color-mix(in srgb, var(--light-4), transparent calc(100% - 100% * <alpha-value>))`, //5 64%
-                },
-                dark: {
-                    1: `color-mix(in srgb, var(--dark-1), transparent calc(100% - 100% * <alpha-value>))`, //1 99%
-                    DEFAULT: `color-mix(in srgb, var(--dark-DEFAULT), transparent calc(100% - 100% * <alpha-value>))`, //(default) 96%
-                    2: `color-mix(in srgb, var(--dark-2), transparent calc(100% - 100% * <alpha-value>))`, //2 92%
-                    3: `color-mix(in srgb, var(--dark-3), transparent calc(100% - 100% * <alpha-value>))`, //4 82%
-                    4: `color-mix(in srgb, var(--dark-4), transparent calc(100% - 100% * <alpha-value>))`, //5 64%
-                },
+                'header-background': 'rgb(var(--header-background))',
+                'header-link': 'rgb(var(--header-link))',
                 yellow: generateShades('#f4e28d'),
                 teal: generateShades('#3f89a1'),
                 pomegranate: generateShades('#f25b3a'),
                 periwinkle: generateShades('#acc6ee'),
             },
+            backgroundColor: {
+                'mark-blue': '#89C6DA4D',
+                'mark-purple': '#DAD4FF4D',
+                'mark-orange': '#FFDCBC4D',
+                'mark-red': '#FFCCCB4D',
+                'mark-yellow': '#FFF0854D',
+                'mark-green': '#91EABF4D',
+                primary: generateVarShades('primary', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.components,
+                    ColorCategory.accents,
+                ]),
+                tint: generateVarShades('tint', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.components,
+                    ColorCategory.accents,
+                ]),
+                neutral: generateVarShades('neutral', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.components,
+                    ColorCategory.accents,
+                ]),
+            },
+            gradientColorStops: {
+                primary: generateVarShades('primary', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.components,
+                    ColorCategory.accents,
+                ]),
+                tint: generateVarShades('tint', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.components,
+                    ColorCategory.accents,
+                ]),
+                neutral: generateVarShades('neutral', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.components,
+                    ColorCategory.accents,
+                ]),
+            },
+            borderColor: {
+                primary: generateVarShades('primary', [ColorCategory.borders]),
+                tint: generateVarShades('tint', [ColorCategory.borders]),
+                neutral: generateVarShades('neutral', [ColorCategory.borders]),
+            },
+            ringColor: {
+                primary: generateVarShades('primary', [ColorCategory.borders]),
+                tint: generateVarShades('tint', [ColorCategory.borders]),
+                neutral: generateVarShades('neutral', [ColorCategory.borders]),
+            },
+            outlineColor: {
+                primary: generateVarShades('primary', [ColorCategory.borders]),
+                tint: generateVarShades('tint', [ColorCategory.borders]),
+                neutral: generateVarShades('neutral', [ColorCategory.borders]),
+            },
+            boxShadowColor: {
+                primary: generateVarShades('primary', [ColorCategory.borders]),
+                tint: generateVarShades('tint', [ColorCategory.borders]),
+                neutral: generateVarShades('neutral', [ColorCategory.borders]),
+            },
+            textColor: {
+                primary: generateVarShades('primary', [ColorCategory.text]),
+                'contrast-primary': generateVarShades('contrast-primary', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.accents,
+                ]),
+                tint: generateVarShades('tint', [ColorCategory.text]),
+                'contrast-tint': generateVarShades('contrast-tint', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.accents,
+                ]),
+                neutral: generateVarShades('neutral', [ColorCategory.text]),
+                'contrast-neutral': generateVarShades('contrast-neutral', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.accents,
+                ]),
+            },
+            textDecorationColor: {
+                primary: generateVarShades('primary', [ColorCategory.text]),
+                'contrast-primary': generateVarShades('contrast-primary', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.accents,
+                ]),
+                tint: generateVarShades('tint', [ColorCategory.text]),
+                'contrast-tint': generateVarShades('contrast-tint', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.accents,
+                ]),
+                neutral: generateVarShades('neutral', [ColorCategory.text]),
+                'contrast-neutral': generateVarShades('contrast-neutral', [
+                    ColorCategory.backgrounds,
+                    ColorCategory.accents,
+                ]),
+            },
             animation: {
                 present: 'present .5s ease-out both',
+                scaleIn: 'scaleIn 200ms ease',
+                scaleOut: 'scaleOut 200ms ease',
+                fadeIn: 'fadeIn 200ms ease',
+                fadeOut: 'fadeOut 200ms ease',
+                enterFromLeft: 'enterFromLeft 250ms ease',
+                enterFromRight: 'enterFromRight 250ms ease',
+                exitToLeft: 'exitToLeft 250ms ease',
+                exitToRight: 'exitToRight 250ms ease',
             },
             keyframes: {
                 pulseAlt: {
@@ -208,6 +311,34 @@ const config: Config = {
                         opacity: '0',
                     },
                 },
+                enterFromRight: {
+                    from: { opacity: '0', transform: 'translateX(200px)' },
+                    to: { opacity: '1', transform: 'translateX(0)' },
+                },
+                enterFromLeft: {
+                    from: { opacity: '0', transform: 'translateX(-200px)' },
+                    to: { opacity: '1', transform: 'translateX(0)' },
+                },
+                exitToRight: {
+                    from: { opacity: '1', transform: 'translateX(0)' },
+                    to: { opacity: '0', transform: 'translateX(200px)' },
+                },
+                exitToLeft: {
+                    from: { opacity: '1', transform: 'translateX(0)' },
+                    to: { opacity: '0', transform: 'translateX(-200px)' },
+                },
+                scaleIn: {
+                    from: { opacity: '0', transform: 'rotateX(-10deg) scale(0.9)' },
+                    to: { opacity: '1', transform: 'rotateX(0deg) scale(1)' },
+                },
+                scaleOut: {
+                    from: { opacity: '1', transform: 'rotateX(0deg) scale(1)' },
+                    to: { opacity: '0', transform: 'rotateX(-10deg) scale(0.95)' },
+                },
+                fadeOut: {
+                    from: { opacity: '1' },
+                    to: { opacity: '0' },
+                },
             },
             boxShadow: {
                 thinbottom: '0px 1px 0px rgba(0, 0, 0, 0.05)',
@@ -222,7 +353,7 @@ const config: Config = {
         opacity: opacity(),
     },
     plugins: [
-        plugin(function ({ addVariant }) {
+        plugin(({ addVariant }) => {
             /**
              * Variant when the Table of Content navigation is open.
              */
@@ -231,27 +362,44 @@ const config: Config = {
             /**
              * Variant when a header is displayed.
              */
-            addVariant('space-header', 'body:has(header) &');
+            addVariant('site-header', 'body:has(#site-header:not(.mobile-only)) &');
+            addVariant('site-header-sections', 'body:has(#site-header:not(.mobile-only) > nav) &');
 
-            /**
-             * Variant for sidebar styles
-             */
-            addVariant('sidebar-default', 'html.sidebar-default &');
-            addVariant('sidebar-filled', 'html.sidebar-filled &');
-            addVariant('sidebar-list-default', 'html.sidebar-list-default &');
-            addVariant('sidebar-list-pill', 'html.sidebar-list-pill &');
-            addVariant('sidebar-list-line', 'html.sidebar-list-line &');
+            const customisationVariants = {
+                // Sidebar styles
+                sidebar: ['sidebar-default', 'sidebar-filled'],
 
-            /**
-             * Variant for tint colours
-             */
-            addVariant('tint', 'html.tint &');
-            addVariant('no-tint', 'html.no-tint &');
+                // List styles
+                list: ['sidebar-list-default', 'sidebar-list-pill', 'sidebar-list-line'],
 
-            /**
-             * Variant when the space is configured with straight corners.
-             */
-            addVariant('straight-corners', 'html.straight-corners &');
+                // Tint colours
+                tint: ['tint', 'no-tint'],
+
+                // Themes
+                theme: ['theme-clean', 'theme-muted', 'theme-bold', 'theme-gradient'],
+
+                // Corner styles
+                corner: ['straight-corners'],
+            };
+
+            for (const [category, variants] of Object.entries(customisationVariants)) {
+                for (const variant of variants) {
+                    addVariant(variant, `html.${variant} &`);
+
+                    if (category === 'tint') {
+                        /* Because we check for a class on the `html` element, like `html.$variant`, we cannot easily chain customisation variants "the Tailwind way". 
+                        Basically, when you write `theme-clean:tint:`, you're creating a CSS selector like `html.theme-clean html.tint &`.
+                        We need the selector to apply to the same element, like `html.$variant.$otherVariant` instead.
+                        Instead of relying on Tailwind variant chaining, we manually create a few additional variants for often-used combinations like theme+tint. */
+                        for (const themeVariant of customisationVariants.theme) {
+                            addVariant(
+                                `${themeVariant}-${variant}`, // theme-clean-tint, theme-clean-no-tint, theme-muted-tint, ...
+                                `html.${variant}.${themeVariant} &`, // html.theme-clean.tint, html.theme-clean.no-tint, ...
+                            );
+                        }
+                    }
+                }
+            }
 
             /**
              * Variant when the page contains a block that will be rendered in full-width mode.
@@ -273,6 +421,13 @@ const config: Config = {
              * Variant when the page is displayed in print mode.
              */
             addVariant('print-mode', 'body:has(.print-mode) &');
+        }),
+        plugin(({ matchUtilities }) => {
+            matchUtilities({
+                perspective: (value) => ({
+                    perspective: value,
+                }),
+            });
         }),
         containerQueries,
         typography,

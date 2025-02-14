@@ -1,13 +1,11 @@
-import * as React from 'react';
-
 import { CodeSampleInput, codeSampleGenerators } from './code-samples';
-import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { generateMediaTypeExample, generateSchemaExample } from './generateSchemaExample';
 import { InteractiveSection } from './InteractiveSection';
 import { getServersURL } from './OpenAPIServerURL';
-import { ScalarApiButton } from './ScalarApiButton';
-import { OpenAPIContextProps } from './types';
+import type { OpenAPIContextProps, OpenAPIOperationData } from './types';
 import { noReference } from './utils';
+import { stringifyOpenAPI } from './stringifyOpenAPI';
+import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
 
 /**
  * Display code samples to execute the operation.
@@ -32,15 +30,15 @@ export function OpenAPICodeSample(props: {
             const example = param.schema
                 ? generateSchemaExample(noReference(param.schema))
                 : undefined;
-            if (example !== undefined) {
+            if (example !== undefined && param.name) {
                 headersObject[param.name] =
-                    typeof example !== 'string' ? JSON.stringify(example) : example;
+                    typeof example !== 'string' ? stringifyOpenAPI(example) : example;
             }
         } else if (param.in === 'query' && param.required) {
             const example = param.schema
                 ? generateSchemaExample(noReference(param.schema))
                 : undefined;
-            if (example !== undefined) {
+            if (example !== undefined && param.name) {
                 searchParams.append(
                     param.name,
                     String(Array.isArray(example) ? example[0] : example),
@@ -50,7 +48,10 @@ export function OpenAPICodeSample(props: {
     });
 
     const requestBody = noReference(data.operation.requestBody);
-    const requestBodyContent = requestBody ? Object.entries(requestBody.content)[0] : undefined;
+    const requestBodyContentEntries = requestBody?.content
+        ? Object.entries(requestBody.content)
+        : undefined;
+    const requestBodyContent = requestBodyContentEntries?.[0];
 
     const input: CodeSampleInput = {
         url:
@@ -108,21 +109,17 @@ export function OpenAPICodeSample(props: {
     const codeSamplesDisabled =
         data['x-codeSamples'] === false || data.operation['x-codeSamples'] === false;
     const samples = customCodeSamples ?? (!codeSamplesDisabled ? autoCodeSamples : []);
+
     if (samples.length === 0) {
         return null;
     }
 
     return (
-        <InteractiveSection
-            header="Request"
-            className="openapi-codesample"
-            tabs={samples}
-            overlay={
-                data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'] ? null : (
-                    <ScalarApiButton method={data.method} path={data.path} />
-                )
-            }
-        />
+        <OpenAPITabs items={samples}>
+            <InteractiveSection header={<OpenAPITabsList />} className="openapi-codesample">
+                <OpenAPITabsPanels />
+            </InteractiveSection>
+        </OpenAPITabs>
     );
 }
 
@@ -130,6 +127,7 @@ function getSecurityHeaders(securities: OpenAPIOperationData['securities']): {
     [key: string]: string;
 } {
     const security = securities[0];
+
     if (!security) {
         return {};
     }
@@ -137,12 +135,28 @@ function getSecurityHeaders(securities: OpenAPIOperationData['securities']): {
     switch (security[1].type) {
         case 'http': {
             let scheme = security[1].scheme;
-            if (scheme === 'bearer') {
+            let format = security[1].bearerFormat ?? 'YOUR_SECRET_TOKEN';
+
+            if (scheme?.includes('bearer')) {
                 scheme = 'Bearer';
+            } else if (scheme?.includes('basic')) {
+                scheme = 'Basic';
+                format = 'username:password';
+            } else if (scheme?.includes('token')) {
+                scheme = 'Token';
             }
 
             return {
-                Authorization: scheme + ' ' + (security[1].bearerFormat ?? '<token>'),
+                Authorization: scheme + ' ' + format,
+            };
+        }
+        case 'apiKey': {
+            if (security[1].in !== 'header') return {};
+
+            const name = security[1].name ?? 'Authorization';
+
+            return {
+                [name]: 'YOUR_API_KEY',
             };
         }
         default: {

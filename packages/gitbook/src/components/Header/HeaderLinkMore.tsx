@@ -26,20 +26,15 @@ export function HeaderLinkMore(props: {
 }) {
     const { label, links, context, customization } = props;
 
-    const isCustomizationDefault =
-        customization.header.preset === CustomizationHeaderPreset.Default;
-
     const renderButton = () => (
         <button
+            type="button"
             className={tcls(
-                isCustomizationDefault
-                    ? [
-                          'text-dark/8',
-                          'dark:text-light/8',
-                          'hover:text-primary',
-                          'dark:hover:text-primary',
-                      ]
-                    : ['text-header-link', 'hover:text-header-link/8'],
+                'text-tint',
+                'hover:text-primary',
+                'dark:hover:text-primary',
+                'theme-bold:text-header-link',
+                'theme-bold:hover:text-header-link/8',
                 'flex',
                 'gap-1',
                 'items-center',
@@ -75,15 +70,18 @@ async function MoreMenuLink(props: {
     return (
         <>
             {'links' in link && link.links.length > 0 && (
-                <hr className="first:hidden border-t border-light-3 dark:border-dark-3 my-1 -mx-2" />
+                <hr className="first:hidden border-t border-tint my-1 -mx-2" />
             )}
             <DropdownMenuItem
                 href={target?.href ?? null}
                 insights={
                     link.to
                         ? {
-                              target: link.to,
-                              position: SiteInsightsLinkPosition.Header,
+                              type: 'link_click',
+                              link: {
+                                  target: link.to,
+                                  position: SiteInsightsLinkPosition.Header,
+                              },
                           }
                         : undefined
                 }

@@ -6,7 +6,7 @@ import {
 } from '@gitbook/api';
 
 import { getPageHref } from '@/lib/links';
-import { getPagePath } from '@/lib/pages';
+import { getPagePath, hasPageVisibleDescendant } from '@/lib/pages';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
@@ -29,22 +29,24 @@ export async function PageDocumentItem(props: {
                 href={href}
                 pathname={getPagePath(rootPages, page)}
                 insights={{
-                    target: {
-                        kind: 'page',
-                        page: page.id,
+                    type: 'link_click',
+                    link: {
+                        target: {
+                            kind: 'page',
+                            page: page.id,
+                        },
+                        position: SiteInsightsLinkPosition.Sidebar,
                     },
-                    position: SiteInsightsLinkPosition.Sidebar,
                 }}
                 descendants={
-                    page.pages && page.pages.length ? (
+                    hasPageVisibleDescendant(page) ? (
                         <PagesList
                             rootPages={rootPages}
                             pages={page.pages}
                             style={tcls(
                                 'ml-5',
                                 'my-2',
-                                'border-dark/3',
-                                'dark:border-light/2',
+                                'border-tint-subtle',
                                 'sidebar-list-default:border-l',
                                 'sidebar-list-line:border-l',
                             )}

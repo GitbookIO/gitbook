@@ -1,5 +1,6 @@
 import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 
+import { hasPageVisibleDescendant } from '@/lib/pages';
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
@@ -36,21 +37,21 @@ export function PageGroupItem(props: {
                     'font-semibold',
                     'uppercase',
 
-                    'bg-gradient-to-b',
-                    'from-70%', // We want the fade to start past the header, this is a good approximation.
-                    'from-light',
-                    'sidebar-filled:from-light-2',
-                    '[html.tint.sidebar-filled_&]:from-light-1',
-                    'dark:from-dark',
-                    'dark:sidebar-filled:from-dark-1',
-                    'dark:[html.tint.sidebar-filled_&]:from-dark-1',
-                    'to-transparent',
+                    '[mask-image:linear-gradient(rgba(0,0,0,1)_70%,rgba(0,0,0,0))]', // Fade out effect of fixed page items. We want the fade to start past the header, this is a good approximation.
+                    'bg-tint-base',
+                    'sidebar-filled:bg-tint-subtle',
+                    'theme-muted:bg-tint-subtle',
+                    'theme-bold-tint:bg-tint-subtle',
+                    '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
+                    '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
+                    '[html.sidebar-default.theme-gradient_&]:bg-gradient-primary',
+                    '[html.sidebar-default.theme-gradient.tint_&]:bg-gradient-tint',
                 )}
             >
                 <TOCPageIcon page={page} />
                 {page.title}
             </div>
-            {page.pages && page.pages.length ? (
+            {hasPageVisibleDescendant(page) ? (
                 <PagesList
                     rootPages={rootPages}
                     pages={page.pages}

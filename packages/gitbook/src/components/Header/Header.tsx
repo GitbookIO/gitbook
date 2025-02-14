@@ -30,13 +30,11 @@ export function Header(props: {
     withTopHeader?: boolean;
 }) {
     const { context, space, site, spaces, sections, customization, withTopHeader } = props;
-    const isCustomizationDefault =
-        customization.header.preset === CustomizationHeaderPreset.Default;
-    const hasSiteSections = sections && sections.list.length > 1;
     const isMultiVariants = site && spaces.length > 1;
 
     return (
         <header
+            id="site-header"
             className={tcls(
                 'flex',
                 'flex-col',
@@ -46,27 +44,26 @@ export function Header(props: {
                 'z-10',
                 'w-full',
                 'flex-none',
-                'shadow-thinbottom',
-                'dark:shadow-light/2',
-                'bg-light',
-                'dark:bg-dark',
-                withTopHeader ? null : 'lg:hidden',
+                'shadow-[0px_1px_0px]',
+                'shadow-tint-12/2',
+
+                'bg-tint-base/9',
+                'theme-muted:bg-tint-subtle/9',
+                'theme-bold-tint:bg-tint-subtle/9',
+                'theme-gradient:bg-gradient-primary',
+                'theme-gradient-tint:bg-gradient-tint',
+                'contrast-more:bg-tint-base',
+
+                withTopHeader ? null : 'lg:hidden mobile-only',
                 'text-sm',
-                'bg-opacity-9',
-                'dark:bg-opacity-9',
                 'backdrop-blur-lg',
-                'contrast-more:bg-opacity-11',
-                'contrast-more:dark:bg-opacity-11',
             )}
         >
             <div
                 className={tcls(
-                    !isCustomizationDefault &&
-                        withTopHeader && [
-                            'bg-header-background',
-                            'shadow-thinbottom',
-                            'dark:shadow-light/2',
-                        ],
+                    'theme-bold:bg-header-background',
+                    'theme-bold:shadow-[0px_1px_0px]',
+                    'theme-bold:shadow-tint-12/2',
                 )}
             >
                 <div className={tcls('scroll-nojump')}>
@@ -96,10 +93,10 @@ export function Header(props: {
                                 className={tcls(
                                     'lg:hidden',
                                     '-ml-2',
-                                    customization.header.preset ===
-                                        CustomizationHeaderPreset.Default
-                                        ? ['text-dark', 'dark:text-light']
-                                        : 'text-header-link',
+                                    'text-tint-strong',
+                                    'theme-bold:text-header-link',
+                                    'hover:bg-tint-hover',
+                                    'theme-bold:hover:bg-header-link/3',
                                 )}
                             />
                             <HeaderLogo site={site} space={space} customization={customization} />
@@ -110,22 +107,18 @@ export function Header(props: {
                                 <SpacesDropdown
                                     space={space}
                                     spaces={spaces}
-                                    className={
-                                        !isCustomizationDefault
-                                            ? `bg-header-link/2 text-header-link ring-header-link/4 
-                                            dark:bg-header-link/2 dark:text-header-link dark:ring-header-link/4 
-                                            group-hover/dropdown:bg-header-link/3 group-hover/dropdown:text-header-link group-hover/dropdown:ring-header-link/6
-                                            dark:group-hover/dropdown:bg-header-link/3 dark:group-hover/dropdown:text-header-link dark:group-hover/dropdown:ring-header-link/6
-                                            group-focus-within/dropdown:bg-header-link/3 group-focus-within/dropdown:text-header-link group-focus-within/dropdown:ring-header-link/6
-                                            dark:group-focus-within/dropdown:bg-header-link/3 dark:group-focus-within/dropdown:text-header-link dark:group-focus-within/dropdown:ring-header-link/6
+                                    className={`theme-bold:bg-header-link/2 theme-bold:text-header-link theme-bold:ring-header-link/4
+                                            theme-bold:dark:bg-header-link/2 theme-bold:dark:text-header-link theme-bold:dark:ring-header-link/4 
+                                            theme-bold:group-hover/dropdown:bg-header-link/3 theme-bold:group-hover/dropdown:text-header-link theme-bold:group-hover/dropdown:ring-header-link/6
+                                            theme-bold:dark:group-hover/dropdown:bg-header-link/3 theme-bold:dark:group-hover/dropdown:text-header-link theme-bold:dark:group-hover/dropdown:ring-header-link/6
+                                            theme-bold:group-focus-within/dropdown:bg-header-link/3 theme-bold:group-focus-within/dropdown:text-header-link theme-bold:group-focus-within/dropdown:ring-header-link/6
+                                            theme-bold:dark:group-focus-within/dropdown:bg-header-link/3 theme-bold:dark:group-focus-within/dropdown:text-header-link theme-bold:dark:group-focus-within/dropdown:ring-header-link/6
                                             
-                                            contrast-more:bg-header-background contrast-more:text-header-link contrast-more:ring-header-link
-                                            contrast-more:group-hover/dropdown:text-header-link contrast-more:group-hover/dropdown:ring-header-link
-                                            contrast-more:dark:group-hover/dropdown:text-header-link contrast-more:dark:group-hover/dropdown:ring-header-link
-                                            contrast-more:group-focus-within/dropdown:text-header-link contrast-more:group-focus-within/dropdown:ring-header-link
-                                            contrast-more:dark:group-focus-within/dropdown:text-header-link contrast-more:dark:group-focus-within/dropdown:ring-header-link`
-                                            : ''
-                                    }
+                                            theme-bold:contrast-more:bg-header-background theme-bold:contrast-more:text-header-link theme-bold:contrast-more:ring-header-link
+                                            theme-bold:contrast-more:group-hover/dropdown:text-header-link theme-bold:contrast-more:group-hover/dropdown:ring-header-link
+                                            theme-bold:contrast-more:dark:group-hover/dropdown:text-header-link theme-bold:contrast-more:dark:group-hover/dropdown:ring-header-link
+                                            theme-bold:contrast-more:group-focus-within/dropdown:text-header-link theme-bold:contrast-more:group-focus-within/dropdown:ring-header-link
+                                            theme-bold:contrast-more:dark:group-focus-within/dropdown:text-header-link theme-bold:contrast-more:dark:group-focus-within/dropdown:ring-header-link`}
                                 />
                             </div>
                         )}
@@ -161,50 +154,31 @@ export function Header(props: {
                         >
                             <Suspense fallback={null}>
                                 <SearchButton
-                                    style={
-                                        !isCustomizationDefault && withTopHeader
-                                            ? [
-                                                  'bg-header-link/2',
-                                                  'dark:bg-header-link/2',
-                                                  'hover:bg-header-link/3',
-                                                  'dark:hover:bg-header-link/3',
+                                    style={[
+                                        'theme-bold:bg-header-link/2',
+                                        'theme-bold:hover:bg-header-link/3',
 
-                                                  'text-header-link/8',
-                                                  'dark:text-header-link/8',
-                                                  'hover:text-header-link',
-                                                  'dark:hover:text-header-link',
+                                        'theme-bold:text-header-link/8',
+                                        'theme-bold:hover:text-header-link',
 
-                                                  'ring-header-link/4',
-                                                  'dark:ring-header-link/4',
-                                                  'hover:ring-header-link/5',
-                                                  'dark:hover:ring-header-link/5',
+                                        'theme-bold:ring-header-link/4',
+                                        'theme-bold:hover:ring-header-link/5',
 
-                                                  '[&_svg]:text-header-link/10',
-                                                  'dark:[&_svg]:text-header-link/10',
-                                                  '[&_.shortcut]:text-header-link/8',
-                                                  'dark:[&_.shortcut]:text-header-link/8',
+                                        'theme-bold:[&_svg]:text-header-link/10',
+                                        'theme-bold:[&_.shortcut]:text-header-link/8',
 
-                                                  'contrast-more:bg-header-background',
-                                                  'contrast-more:text-header-link',
-                                                  'contrast-more:ring-header-link',
-                                                  'contrast-more:hover:bg-header-background',
-                                                  'contrast-more:hover:ring-header-link',
-                                                  'contrast-more:focus:text-header-link',
-                                                  'contrast-more:focus:bg-header-background',
-                                                  'contrast-more:focus:ring-header-link',
-                                                  'dark:contrast-more:bg-header-background',
-                                                  'dark:contrast-more:text-header-link',
-                                                  'dark:contrast-more:ring-header-link',
-                                                  'dark:contrast-more:hover:bg-header-background',
-                                                  'dark:contrast-more:hover:ring-header-link',
-                                                  'dark:contrast-more:focus:text-header-link',
-                                                  'dark:contrast-more:focus:bg-header-background',
-                                                  'dark:contrast-more:focus:ring-header-link',
+                                        'theme-bold:contrast-more:bg-header-background',
+                                        'theme-bold:contrast-more:text-header-link',
+                                        'theme-bold:contrast-more:ring-header-link',
+                                        'theme-bold:contrast-more:hover:bg-header-background',
+                                        'theme-bold:contrast-more:hover:ring-header-link',
+                                        'theme-bold:contrast-more:focus:text-header-link',
+                                        'theme-bold:contrast-more:focus:bg-header-background',
+                                        'theme-bold:contrast-more:focus:ring-header-link',
 
-                                                  'shadow-none',
-                                              ]
-                                            : null
-                                    }
+                                        'theme-bold:shadow-none',
+                                        'theme-bold:hover:shadow-none',
+                                    ]}
                                 >
                                     <span className={tcls('flex-1')}>
                                         {t(
@@ -221,18 +195,7 @@ export function Header(props: {
                     </div>
                 </div>
             </div>
-            {sections ? (
-                <div
-                    className={tcls(
-                        'scroll-nojump',
-                        'w-full',
-                        // Handle long section tabs, particularly on smaller screens.
-                        'overflow-x-auto hide-scroll',
-                    )}
-                >
-                    <SiteSectionTabs sections={sections} />
-                </div>
-            ) : null}
+            {sections ? <SiteSectionTabs sections={sections} /> : null}
         </header>
     );
 }

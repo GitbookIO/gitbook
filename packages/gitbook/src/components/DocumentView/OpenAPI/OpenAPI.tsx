@@ -17,12 +17,10 @@ import './scalar.css';
  * Render an OpenAPI block.
  */
 export async function OpenAPI(props: BlockProps<DocumentBlockOpenAPI>) {
-    const { block, style } = props;
+    const { style } = props;
     return (
         <div className={tcls('w-full', 'flex', 'flex-row', style, 'max-w-full')}>
-            <React.Suspense fallback={<OpenAPIFallback />}>
-                <OpenAPIBody {...props} />
-            </React.Suspense>
+            <OpenAPIBody {...props} />
         </div>
     );
 }
@@ -35,7 +33,7 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockOpenAPI>) {
         return (
             <div className={tcls('hidden')}>
                 <p>
-                    Error with {error.url}: {error.message}
+                    Error with {error.rootURL}: {error.message}
                 </p>
             </div>
         );
@@ -53,6 +51,7 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockOpenAPI>) {
                 icons: {
                     chevronDown: <Icon icon="chevron-down" />,
                     chevronRight: <Icon icon="chevron-right" />,
+                    plus: <Icon icon="plus" />,
                 },
                 CodeBlock: PlainCodeBlock,
                 defaultInteractiveOpened: context.mode === 'print',

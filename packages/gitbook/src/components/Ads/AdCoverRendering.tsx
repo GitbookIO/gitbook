@@ -1,3 +1,4 @@
+import { SiteInsightsAd } from '@gitbook/api';
 import * as React from 'react';
 
 import { hexToRgba } from '@/lib/colors';
@@ -5,27 +6,41 @@ import { getResizedImageURL } from '@/lib/images';
 import { tcls } from '@/lib/tailwind';
 
 import { AdCover } from './types';
+import { Link } from '../primitives';
 
 /**
  * Cover rendering for an ad.
  */
-export async function AdCoverRendering({ ad }: { ad: AdCover }) {
+export async function AdCoverRendering({
+    ad,
+    insightsAd,
+}: {
+    ad: AdCover;
+    insightsAd: SiteInsightsAd | null;
+}) {
     const largeImage = await getResizedImageURL(ad.largeImage, { width: 128, dpr: 2 });
 
     return (
-        <a
+        <Link
+            rel="sponsored noopener"
+            target="_blank"
+            insights={
+                insightsAd
+                    ? {
+                          type: 'ad_click',
+                          ad: insightsAd,
+                      }
+                    : undefined
+            }
             className={tcls(
                 'group/ad',
                 'relative',
                 'flex',
                 'flex-col',
                 'gap-4',
-                'bg-light-2',
-                'text-dark/7',
-                'dark:bg-dark-2',
-                'dark:text-light/7',
-                'hover:text-dark/9',
-                'dark:hover:text-light/9',
+                'bg-tint-subtle',
+                'text-tint',
+                'hover:text-tint-strong',
                 'rounded-lg',
                 'p-4',
                 'overflow-hidden',
@@ -33,8 +48,6 @@ export async function AdCoverRendering({ ad }: { ad: AdCover }) {
             )}
             style={{ backgroundColor: ad.backgroundColor, color: ad.textColor ?? '#ffffff' }}
             href={ad.statlink}
-            rel="sponsored noopener"
-            target="_blank"
         >
             <div
                 className={tcls(
@@ -106,6 +119,6 @@ export async function AdCoverRendering({ ad }: { ad: AdCover }) {
                     backgroundColor: hexToRgba(ad.backgroundColor, 0.8),
                 }}
             />
-        </a>
+        </Link>
     );
 }

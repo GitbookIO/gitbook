@@ -1,16 +1,14 @@
 'use client';
 
-import * as React from 'react';
-import { OpenAPIV3 } from 'openapi-types';
+import type { OpenAPI } from '@gitbook/openapi-parser';
 
-import { OpenAPIOperationData, fromJSON } from './fetchOpenAPIOperation';
 import { InteractiveSection } from './InteractiveSection';
 import { OpenAPIRequestBody } from './OpenAPIRequestBody';
 import { OpenAPIResponses } from './OpenAPIResponses';
 import { OpenAPISchemaProperties } from './OpenAPISchema';
 import { OpenAPISecurities } from './OpenAPISecurities';
-import { OpenAPIClientContext } from './types';
-import { noReference } from './utils';
+import type { OpenAPIClientContext, OpenAPIOperationData } from './types';
+import { noReference, resolveDescription } from './utils';
 
 /**
  * Client component to render the spec for the request and response.
@@ -18,13 +16,13 @@ import { noReference } from './utils';
  * We use a client component as rendering recursive JSON schema in the server is expensive
  * (the entire schema is rendered at once, while the client component only renders the visible part)
  */
-export function OpenAPISpec(props: { rawData: any; context: OpenAPIClientContext }) {
-    const { rawData, context } = props;
+export function OpenAPISpec(props: { data: OpenAPIOperationData; context: OpenAPIClientContext }) {
+    const { data, context } = props;
 
-    const parsedData = fromJSON(rawData) as OpenAPIOperationData;
-    const { operation, securities } = parsedData;
+    const { operation, securities } = data;
 
-    const parameterGroups = groupParameters((operation.parameters || []).map(noReference));
+    const parameters = operation.parameters ?? [];
+    const parameterGroups = groupParameters(parameters);
 
     return (
         <>
@@ -32,32 +30,35 @@ export function OpenAPISpec(props: { rawData: any; context: OpenAPIClientContext
                 <OpenAPISecurities securities={securities} context={context} />
             ) : null}
 
-            {parameterGroups.map((group) => (
-                <InteractiveSection
-                    key={group.key}
-                    className="openapi-parameters"
-                    toggeable
-                    toggleOpenIcon={context.icons.chevronRight}
-                    toggleCloseIcon={context.icons.chevronDown}
-                    header={group.label}
-                    defaultOpened={group.key === 'path' || context.defaultInteractiveOpened}
-                >
-                    <OpenAPISchemaProperties
-                        properties={group.parameters.map((parameter) => ({
-                            propertyName: parameter.name,
-                            schema: {
-                                // Description of the parameter is defined at the parameter level
-                                // we use display it if the schema doesn't override it
-                                description: parameter.description,
-                                example: parameter.example,
-                                ...(noReference(parameter.schema) ?? {}),
-                            },
-                            required: parameter.required,
-                        }))}
-                        context={context}
-                    />
-                </InteractiveSection>
-            ))}
+            {parameterGroups.map((group) => {
+                return (
+                    <InteractiveSection
+                        key={group.key}
+                        className="openapi-parameters"
+                        header={group.label}
+                    >
+                        <OpenAPISchemaProperties
+                            properties={group.parameters.map((parameter) => {
+                                const description = resolveDescription(parameter);
+                                return {
+                                    propertyName: parameter.name,
+                                    schema: {
+                                        // Description of the parameter is defined at the parameter level
+                                        // we use display it if the schema doesn't override it
+                                        description: description,
+                                        example: parameter.example,
+                                        // Deprecated can be defined at the parameter level
+                                        deprecated: parameter.deprecated,
+                                        ...(noReference(parameter.schema) ?? {}),
+                                    },
+                                    required: parameter.required,
+                                };
+                            })}
+                            context={context}
+                        />
+                    </InteractiveSection>
+                );
+            })}
 
             {operation.requestBody ? (
                 <OpenAPIRequestBody
@@ -72,33 +73,35 @@ export function OpenAPISpec(props: { rawData: any; context: OpenAPIClientContext
     );
 }
 
-function groupParameters(parameters: OpenAPIV3.ParameterObject[]): Array<{
+function groupParameters(parameters: OpenAPI.Parameters): Array<{
     key: string;
     label: string;
-    parameters: OpenAPIV3.ParameterObject[];
+    parameters: OpenAPI.Parameters;
 }> {
     const sorted = ['path', 'query', 'header'];
 
     const groups: Array<{
         key: string;
         label: string;
-        parameters: OpenAPIV3.ParameterObject[];
+        parameters: OpenAPI.Parameters;
     }> = [];
 
-    parameters.forEach((parameter) => {
-        const key = parameter.in;
-        const label = getParameterGroupName(parameter.in);
-        const group = groups.find((group) => group.key === key);
-        if (group) {
-            group.parameters.push(parameter);
-        } else {
-            groups.push({
-                key,
-                label,
-                parameters: [parameter],
-            });
-        }
-    });
+    parameters
+        .filter((parameter) => parameter.in)
+        .forEach((parameter) => {
+            const key = parameter.in;
+            const label = getParameterGroupName(parameter.in);
+            const group = groups.find((group) => group.key === key);
+            if (group) {
+                group.parameters.push(parameter);
+            } else {
+                groups.push({
+                    key,
+                    label,
+                    parameters: [parameter],
+                });
+            }
+        });
 
     groups.sort((a, b) => sorted.indexOf(a.key) - sorted.indexOf(b.key));
 

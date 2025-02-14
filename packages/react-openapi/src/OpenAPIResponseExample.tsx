@@ -1,9 +1,10 @@
-import * as React from 'react';
-import { InteractiveSection } from './InteractiveSection';
-import { OpenAPIOperationData } from './fetchOpenAPIOperation';
+import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { generateSchemaExample } from './generateSchemaExample';
-import { OpenAPIContextProps } from './types';
-import { createStateKey, noReference } from './utils';
+import type { OpenAPIContextProps, OpenAPIOperationData } from './types';
+import { checkIsReference, noReference, resolveDescription } from './utils';
+import { stringifyOpenAPI } from './stringifyOpenAPI';
+import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
+import { InteractiveSection } from './InteractiveSection';
 
 /**
  * Display an example of the response content.
@@ -38,50 +39,107 @@ export function OpenAPIResponseExample(props: {
     });
 
     const examples = responses
-        .map((response) => {
-            const responseObject = noReference(response[1]);
+        .map(([key, value]) => {
+            const responseObject = noReference(value);
+            const mediaTypeObject = (() => {
+                if (!responseObject.content) {
+                    return null;
+                }
+                const key = Object.keys(responseObject.content)[0];
+                return (
+                    responseObject.content['application/json'] ??
+                    (key ? responseObject.content[key] : null)
+                );
+            })();
 
-            const schema = noReference(
-                (
-                    responseObject.content?.['application/json'] ??
-                    responseObject.content?.[Object.keys(responseObject.content)[0]]
-                )?.schema,
+            if (!mediaTypeObject) {
+                return {
+                    key: key,
+                    label: key,
+                    description: resolveDescription(responseObject),
+                    body: <OpenAPIEmptyResponseExample />,
+                };
+            }
+
+            const example = handleUnresolvedReference(
+                (() => {
+                    const { examples, example } = mediaTypeObject;
+                    if (examples) {
+                        const key = Object.keys(examples)[0];
+                        if (key) {
+                            // @TODO handle multiple examples
+                            const firstExample = noReference(examples[key]);
+                            if (firstExample) {
+                                return firstExample;
+                            }
+                        }
+                    }
+
+                    if (example) {
+                        return { value: example };
+                    }
+
+                    const schema = noReference(mediaTypeObject.schema);
+                    if (!schema) {
+                        return null;
+                    }
+
+                    return { value: generateSchemaExample(schema) };
+                })(),
             );
 
-            if (!schema) {
-                return null;
-            }
-
-            const example = generateSchemaExample(schema);
-            if (example === undefined) {
-                return null;
-            }
-
             return {
-                key: `${response[0]}`,
-                label: `${response[0]}`,
-                body: (
+                key: key,
+                label: key,
+                description: resolveDescription(responseObject),
+                body: example?.value ? (
                     <context.CodeBlock
                         code={
-                            typeof example === 'string' ? example : JSON.stringify(example, null, 2)
+                            typeof example.value === 'string'
+                                ? example.value
+                                : stringifyOpenAPI(example.value, null, 2)
                         }
                         syntax="json"
                     />
+                ) : (
+                    <OpenAPIEmptyResponseExample />
                 ),
             };
         })
-        .filter((val): val is { key: string; label: string; body: any } => Boolean(val));
+        .filter((val): val is { key: string; label: string; body: any; description: string } =>
+            Boolean(val),
+        );
 
     if (examples.length === 0) {
         return null;
     }
 
     return (
-        <InteractiveSection
-            stateKey={createStateKey('response', context.blockKey)}
-            header="Response"
-            className="openapi-response-example"
-            tabs={examples}
-        />
+        <OpenAPITabs items={examples}>
+            <InteractiveSection header={<OpenAPITabsList />} className="openapi-response-example">
+                <OpenAPITabsPanels />
+            </InteractiveSection>
+        </OpenAPITabs>
     );
+}
+
+function OpenAPIEmptyResponseExample() {
+    return (
+        <pre className="openapi-response-example-empty">
+            <p>No body</p>
+        </pre>
+    );
+}
+
+function handleUnresolvedReference(
+    input: OpenAPIV3.ExampleObject | null,
+): OpenAPIV3.ExampleObject | null {
+    const isReference = checkIsReference(input?.value);
+
+    if (isReference) {
+        // If we find a reference that wasn't resolved or needed to be resolved externally, render out the URL
+        return { value: input.value.$ref };
+    }
+
+    return input;
 }

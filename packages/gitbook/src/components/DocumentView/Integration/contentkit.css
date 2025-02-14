@@ -47,10 +47,10 @@
 
 /** Card */
 .contentkit-card {
-    @apply flex flex-col border rounded border-dark/2 dark:border-light/2;
+    @apply flex flex-col border rounded border-tint-subtle;
 }
 .contentkit-card.contentkit-card-pressable {
-    @apply cursor-pointer hover:border-dark/3 hover:dark:border-light/3;
+    @apply cursor-pointer hover:border-tint-hover;
 }
 
 .contentkit-card-header {
@@ -62,7 +62,7 @@
 }
 
 .contentkit-card-title {
-    @apply text-base font-medium text-dark-2 dark:text-light-4;
+    @apply text-base font-medium text-tint-strong;
 }
 
 .contentkit-card-icon {
@@ -88,8 +88,8 @@
 /** Buttons */
 .contentkit-button {
     @apply flex gap-2 items-center justify-center px-2 py-1 rounded
-        border border-dark/2 dark:border-light/2 hover:border-dark/3 hover:dark:border-light/3
-        text-dark-2 dark:text-light-4 hover:text-dark-3 hover:dark:text-light-3;
+        border border-tint hover:border-tint-hover
+        text-tint hover:text-tint-strong;
 }
 
 .contentkit-button .contentkit-icon {
@@ -97,16 +97,16 @@
 }
 
 .contentkit-button .contentkit-button-label {
-    @apply text-sm font-medium text-dark-2 dark:text-light-4;
+    @apply text-sm font-medium text-tint-strong;
 }
 
 /** Modals */
 .contentkit-modal-backdrop {
-    @apply fixed inset-0 z-40 px-7 pb-11 pt-4 md:pt-[min(8vw,_6rem)] flex items-start justify-center backdrop-blur-2xl bg-dark/4 dark:bg-dark/8;
+    @apply fixed inset-0 z-40 px-7 pb-11 pt-4 md:pt-[min(8vw,_6rem)] flex items-start justify-center backdrop-blur-2xl bg-tint-12/4 dark:bg-tint-1/6;
 }
 .contentkit-modal {
-    @apply flex flex-col gap-6 relative z-50 bg-white dark:bg-dark-2
-        rounded shadow-lg opacity-0 transition-opacity duration-300 border border-dark/2 dark:border-light/2
+    @apply flex flex-col gap-6 relative z-50 bg-tint
+        rounded shadow-lg opacity-0 transition-opacity duration-300 border border-tint
         w-full max-w-[768px] max-h-[90vh] overflow-y-auto;
 }
 .contentkit-modal.contentkit-modal-opened {
@@ -118,7 +118,7 @@
 }
 
 .contentkit-modal-title {
-    @apply text-2xl font-medium text-dark-2 dark:text-light-4;
+    @apply text-2xl font-medium text-tint-strong;
 }
 
 .contentkit-modal-body {
@@ -142,12 +142,12 @@
 
 /** Text input */
 .contentkit-textinput {
-    @apply w-full px-2 py-1 rounded border border-dark/2 dark:border-light/2 text-sm text-dark-2 dark:text-light-4;
+    @apply w-full px-2 py-1 rounded border border-tint text-sm text-tint;
 }
 
 /** Dividers */
 .contentkit-divider {
-    @apply border-dark/2 dark:border-light/2;
+    @apply border-tint-subtle;
 }
 
 .contentkit-vstack > .contentkit-divider {

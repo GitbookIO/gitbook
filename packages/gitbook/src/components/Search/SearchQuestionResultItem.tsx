@@ -28,19 +28,15 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
             className={tcls(
                 'flex',
                 'px-4',
-                recommended ? ['py-2', 'text-dark/7', 'dark:text-light/8'] : 'py-4',
-                'hover:bg-dark/1',
-                'dark:hover:bg-light/1',
+                recommended ? ['py-2', 'text-tint'] : 'py-4',
+                'hover:bg-tint-hover',
                 'first:mt-0',
                 'last:pb-3',
                 active && [
                     'is-active',
-                    'bg-primary-50',
-                    'text-contrast-primary-50',
-                    'dark:bg-primary-800',
-                    'dark:text-contrast-primary-800',
-                    'hover:bg-primary-100/8',
-                    'dark:hover:bg-primary-700/7',
+                    'bg-primary',
+                    'text-contrast-primary',
+                    'hover:bg-primary-hover',
                 ],
             )}
             {...getLinkProp({
@@ -55,7 +51,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                     'shrink-0',
                     'mt-1.5',
                     'mr-4',
-                    active ? ['text-primary'] : ['text-dark/5', 'dark:text-light/5'],
+                    active ? ['text-primary'] : ['text-tint-subtle'],
                 )}
             />
             <div className="w-full">
@@ -64,7 +60,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                 ) : (
                     <>
                         <div className="font-medium">{t(language, 'search_ask', [question])}</div>
-                        <div className={tcls('text-sm', 'text-dark/8', 'dark:text-light/8')}>
+                        <div className={tcls('text-sm', 'text-tint')}>
                             {t(language, 'search_ask_description')}
                         </div>
                     </>
@@ -76,7 +72,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                     'rounded',
                     'self-center',
                     'straight-corners:rounded-none',
-                    active ? ['bg-primary', 'text-contrast-primary'] : ['opacity-6'],
+                    active ? ['bg-primary-solid', 'text-contrast-primary-solid'] : ['opacity-6'],
                 )}
             >
                 <Icon

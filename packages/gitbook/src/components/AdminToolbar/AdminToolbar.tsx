@@ -1,5 +1,6 @@
 import { Space } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
+import { headers } from 'next/headers';
 import React from 'react';
 
 import { getChangeRequest, getRevision, SiteContentPointer } from '@/lib/api';
@@ -25,14 +26,17 @@ function ToolbarLayout(props: { children: React.ReactNode }) {
                 'transform',
                 '-translate-x-1/2',
                 'rounded-full',
-                'bg-dark-1/9',
+
+                'bg-tint-12/9',
+                'dark:bg-tint-1/9',
+
                 'shadow-lg',
                 'min-h-10',
                 'min-w-40',
                 'p-2',
                 'max-w-md',
-                'border-dark-1',
-                'backdrop-blur-sm',
+                'border-tint-12/1',
+                'backdrop-blur-md',
             )}
         >
             <React.Suspense fallback={null}>{props.children}</React.Suspense>
@@ -43,8 +47,15 @@ function ToolbarLayout(props: { children: React.ReactNode }) {
 /**
  * Toolbar with information for the content admin when previewing a revision or change-request.
  */
-export function AdminToolbar(props: AdminToolbarProps) {
+export async function AdminToolbar(props: AdminToolbarProps) {
     const { content } = props;
+    const mode = await headers().get('x-gitbook-mode');
+
+    if (mode === 'multi-id') {
+        // We don't show the admin toolbar in multi-id mode, as it's used for previewing in the dashboard.
+        return null;
+    }
+
     if (content.changeRequestId) {
         return (
             <ChangeRequestToolbar
@@ -80,7 +91,7 @@ async function ChangeRequestToolbar(props: { spaceId: string; changeRequestId: s
                     <p>
                         #{changeRequest.number}: {changeRequest.subject ?? 'No subject'}
                     </p>
-                    <p className="text-xs text-light/8 dark:text-light/8">
+                    <p className="text-xs text-tint-2 dark:text-tint-11">
                         Change request updated <DateRelative value={changeRequest.updatedAt} />
                     </p>
                 </ToolbarBody>
@@ -118,7 +129,7 @@ async function RevisionToolbar(props: { spaceId: string; revisionId: string }) {
                         Revision created <DateRelative value={revision.createdAt} />
                     </p>
                     {revision.git ? (
-                        <p className="text-xs text-light/8 dark:text-light/8">
+                        <p className="text-xs text-tint-2 dark:text-tint-11">
                             {revision.git.message}
                         </p>
                     ) : null}

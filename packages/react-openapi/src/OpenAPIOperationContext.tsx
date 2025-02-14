@@ -1,5 +1,6 @@
 'use client';
-import * as React from 'react';
+
+import { createContext, useContext, useMemo } from 'react';
 import { useEventCallback } from 'usehooks-ts';
 
 interface OpenAPIOperationPointer {
@@ -11,7 +12,7 @@ interface OpenAPIOperationContextValue {
     onOpenClient: (pointer: OpenAPIOperationPointer) => void;
 }
 
-const OpenAPIOperationContext = React.createContext<OpenAPIOperationContextValue>({
+const OpenAPIOperationContext = createContext<OpenAPIOperationContextValue>({
     onOpenClient: () => {},
 });
 
@@ -27,7 +28,7 @@ export function OpenAPIOperationContextProvider(
         props.onOpenClient?.(pointer);
     });
 
-    const value = React.useMemo(() => ({ onOpenClient }), [onOpenClient]);
+    const value = useMemo(() => ({ onOpenClient }), [onOpenClient]);
 
     return (
         <OpenAPIOperationContext.Provider value={value}>
@@ -40,5 +41,5 @@ export function OpenAPIOperationContextProvider(
  * Hook to access the OpenAPIOperationContext.
  */
 export function useOpenAPIOperationContext() {
-    return React.useContext(OpenAPIOperationContext);
+    return useContext(OpenAPIOperationContext);
 }

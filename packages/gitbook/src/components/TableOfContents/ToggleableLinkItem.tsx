@@ -5,27 +5,11 @@ import { motion, stagger, useAnimate } from 'framer-motion';
 import { useSelectedLayoutSegment } from 'next/navigation';
 import React from 'react';
 
-import { ClassValue, tcls } from '@/lib/tailwind';
+import { tcls } from '@/lib/tailwind';
 
 import { useScrollToActiveTOCItem } from './TOCScroller';
-import { useIsMounted } from '../hooks';
+import { useToggleAnimation } from '../hooks';
 import { Link, LinkInsightsProps } from '../primitives';
-
-const show = {
-    opacity: 1,
-    height: 'auto',
-    display: 'block',
-};
-
-const hide = {
-    opacity: 0,
-    height: 0,
-    transitionEnd: {
-        display: 'none',
-    },
-};
-
-const staggerMenuItems = stagger(0.02, { ease: (p) => Math.pow(p, 2) });
 
 /**
  * Client component for a page document to toggle its children and be marked as active.
@@ -48,9 +32,7 @@ export function ToggleableLinkItem(
     const hasActiveDescendant =
         hasDescendants && (isActive || activeSegment.startsWith(pathname + '/'));
 
-    const [scope, animate] = useAnimate();
     const [isVisible, setIsVisible] = React.useState(hasActiveDescendant);
-    const isMounted = useIsMounted();
 
     // Update the visibility of the children, if we are navigating to a descendant.
     React.useEffect(() => {
@@ -61,34 +43,7 @@ export function ToggleableLinkItem(
         setIsVisible((prev) => prev || hasActiveDescendant);
     }, [hasActiveDescendant, hasDescendants]);
 
-    // Animate the visibility of the children
-    // only after the initial state.
-    React.useEffect(() => {
-        if (!isMounted || !hasDescendants) {
-            return;
-        }
-        try {
-            animate(scope.current, isVisible ? show : hide, {
-                duration: 0.1,
-            });
-
-            const selector = '& > ul > li';
-            if (isVisible)
-                animate(
-                    selector,
-                    { opacity: 1 },
-                    {
-                        delay: staggerMenuItems,
-                    },
-                );
-            else {
-                animate(selector, { opacity: 0 });
-            }
-        } catch (error) {
-            // The selector can crash in some browsers, we ignore it as the animation is not critical.
-            console.error(error);
-        }
-    }, [isVisible, isMounted, hasDescendants, animate, scope]);
+    const { show, hide, scope } = useToggleAnimation({ hasDescendants, isVisible });
 
     const linkRef = React.createRef<HTMLAnchorElement>();
     useScrollToActiveTOCItem({ linkRef, isActive });
@@ -101,84 +56,39 @@ export function ToggleableLinkItem(
                 insights={insights}
                 {...(isActive ? { 'aria-current': 'page' } : {})}
                 className={tcls(
-                    'group/toclink',
-                    'relative',
-                    'transition-colors',
-
-                    'flex',
-                    'flex-row',
-                    'justify-between',
-
-                    'p-1.5',
-                    'pl-3',
-                    'rounded-md',
-                    'straight-corners:rounded-none',
-
-                    'text-sm',
-                    'font-normal',
-                    'text-balance',
-                    'text-dark/8',
-                    'hover:text-dark/9',
-                    'hover:bg-dark/1',
-                    'hover:before:bg-dark/3',
-                    'dark:text-light/8',
-                    'dark:hover:text-light/9',
-                    'dark:hover:bg-light/1',
-                    'dark:hover:before:bg-light/3',
-                    'contrast-more:text-dark',
-                    'contrast-more:dark:text-light',
-
-                    'hover:contrast-more:text-dark',
-                    'dark:hover:contrast-more:text-light',
-                    'hover:contrast-more:ring-1',
-                    'hover:contrast-more:ring-dark',
-                    'dark:contrast-more:hover:ring-light',
-
-                    'before:contents[]',
-                    'before:absolute',
-                    'before:inset-y-0',
-                    'before:-left-px',
-
-                    '[&+div_a]:pl-5',
-                    'sidebar-list-line:before:w-px',
-                    'sidebar-list-default:[&+div_a]:before:w-px',
-                    'sidebar-list-default:[&+div_a]:rounded-l-none',
-                    'sidebar-list-line:rounded-l-none',
+                    'group/toclink relative transition-colors',
+                    'flex flex-row justify-between',
+                    'p-1.5 pl-3 rounded-md straight-corners:rounded-none',
+                    'text-sm font-normal text-balance text-tint-strong/7 hover:text-tint-strong hover:bg-tint-hover contrast-more:text-tint-strong',
+                    'hover:contrast-more:text-tint-strong hover:contrast-more:ring-1 hover:contrast-more:ring-tint-12',
+                    'before:contents[] before:absolute before:inset-y-0 before:-left-px',
+                    '[&+div_a]:pl-5 sidebar-list-line:before:w-px sidebar-list-default:[&+div_a]:before:w-px sidebar-list-default:[&+div_a]:rounded-l-none sidebar-list-line:rounded-l-none',
 
                     isActive && [
                         'font-semibold',
                         'sidebar-list-line:before:w-0.5',
 
-                        'before:bg-tint',
-                        'text-tint',
-                        'sidebar-list-pill:bg-tint/3',
-                        'sidebar-list-pill:text-tint',
+                        'before:bg-primary-solid',
+                        'text-primary-subtle',
+                        'contrast-more:text-primary',
 
-                        'hover:bg-tint/3',
-                        'hover:text-tint',
-                        'hover:before:bg-tint',
-                        'sidebar-list-pill:hover:bg-tint/4',
+                        'sidebar-list-pill:bg-primary',
+                        '[html.sidebar-list-pill.theme-muted_&]:bg-primary-hover',
+                        '[html.sidebar-list-pill.theme-bold.tint_&]:bg-primary-hover',
+                        '[html.sidebar-filled.sidebar-list-pill.theme-muted_&]:bg-primary',
+                        '[html.sidebar-filled.sidebar-list-pill.theme-bold.tint_&]:bg-primary',
 
-                        'contrast-more:text-tint',
-                        'contrast-more:hover:text-tint',
-                        'dark:contrast-more:text-tint-400',
-                        'dark:contrast-more:hover:text-tint-400',
-                        'contrast-more:bg-tint/3',
-                        'dark:contrast-more:bg-tint-400/3',
+                        'hover:bg-primary-hover',
+                        'hover:text-primary',
+                        'hover:before:bg-primary-solid-hover',
+                        'sidebar-list-pill:hover:bg-primary-hover',
+
+                        'contrast-more:text-primary',
+                        'contrast-more:hover:text-primary-strong',
+                        'contrast-more:bg-primary',
                         'contrast-more:ring-1',
-                        'contrast-more:ring-tint',
-                        'contrast-more:hover:ring-tint',
-                        'dark:contrast-more:ring-tint-400',
-                        'dark:contrast-more:hover:ring-tint-400',
-
-                        'dark:before:bg-tint-400',
-                        'dark:text-tint-400',
-                        'dark:sidebar-list-pill:bg-tint-400/3',
-                        'dark:sidebar-list-pill:text-tint-400',
-
-                        'dark:hover:bg-tint-400/3',
-                        'dark:hover:text-tint-400',
-                        'dark:hover:before:bg-tint-400',
+                        'contrast-more:ring-primary',
+                        'contrast-more:hover:ring-primary-hover',
                     ],
                 )}
             >
@@ -199,11 +109,9 @@ export function ToggleableLinkItem(
                             'after:-left-1',
                             'after:w-7',
                             'after:h-7',
-                            'hover:bg-dark/2',
+                            'hover:bg-tint-active',
                             'hover:text-current',
-                            'dark:hover:bg-light/2',
-                            'dark:hover:text-current',
-                            isActive ? ['hover:bg-tint/4', 'dark:hover:bg-tint/4'] : [],
+                            isActive ? ['hover:bg-tint-hover'] : [],
                         )}
                         onClick={(event) => {
                             event.preventDefault();

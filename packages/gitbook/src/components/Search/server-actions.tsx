@@ -1,7 +1,13 @@
 'use server';
 
-import { RevisionPage, SearchAIAnswer, SearchPageResult, SiteSpace, Space } from '@gitbook/api';
-import { captureException } from '@sentry/nextjs';
+import {
+    RevisionPage,
+    SearchAIAnswer,
+    SearchPageResult,
+    SiteSpace,
+    SiteStructure,
+    Space,
+} from '@gitbook/api';
 import * as React from 'react';
 import { assert } from 'ts-essentials';
 
@@ -11,6 +17,7 @@ import * as api from '@/lib/api';
 import { getAbsoluteHref, getPageHref } from '@/lib/links';
 import { AncestorRevisionPage, resolvePageId } from '@/lib/pages';
 import { filterOutNullable } from '@/lib/typescript';
+import { getSiteStructureSections } from '@/lib/utils';
 
 import { DocumentView } from '../DocumentView';
 
@@ -78,22 +85,7 @@ async function searchSiteContent(args: {
     ]);
     const siteStructure = siteData?.structure;
 
-    const siteSpaces = siteStructure
-        ? siteStructure.type === 'siteSpaces'
-            ? siteStructure.structure
-            : siteStructure.structure.reduce<SiteSpace[]>((prev, section) => {
-                  const sectionSiteSpaces = section.siteSpaces.map((siteSpace) => ({
-                      ...siteSpace,
-                      space: {
-                          ...siteSpace.space,
-                          title: section.title || siteSpace.space.title,
-                      },
-                  }));
-
-                  prev.push(...sectionSiteSpaces);
-                  return prev;
-              }, [])
-        : null;
+    const siteSpaces = siteStructure ? extractSiteStructureSiteSpaces(siteStructure) : null;
 
     if (siteSpaces) {
         // We are searching all of this Site's content
@@ -162,13 +154,19 @@ export async function searchSiteSpaceContent(
 /**
  * Server action to ask a question in a space.
  */
-export const streamAskQuestion = streamResponse(async function* (
-    organizationId: string,
-    siteId: string,
-    siteSpaceId: string | null,
-    question: string,
-) {
-    const apiCtx = await api.api();
+export const streamAskQuestion = streamResponse(async function* ({
+    pointer,
+    question,
+}: {
+    pointer: api.SiteContentPointer;
+    question: string;
+}) {
+    const { organizationId, siteId, siteSpaceId } = pointer;
+    const [apiCtx, siteData] = await Promise.all([api.api(), api.getSiteData(pointer)]);
+    const siteSpaces = siteData?.structure
+        ? extractSiteStructureSiteSpaces(siteData.structure)
+        : null;
+
     const stream = apiCtx.client.orgs.streamAskInSite(
         organizationId,
         siteId,
@@ -225,22 +223,34 @@ export const streamAskQuestion = streamResponse(async function* (
                 return map;
             }, new Map<string, RevisionPage[]>());
         });
-        yield await transformAnswer(chunk.answer, pages);
+        yield await transformAnswer({ answer: chunk.answer, spacePages: pages, siteSpaces });
     }
 });
 
 /**
- * List suggested questions for a space.
+ * Stream a list of suggested questions for the site.
  */
-export async function getRecommendedQuestions(spaceId: string): Promise<string[]> {
-    const data = await api.getRecommendedQuestionsInSpace(spaceId);
-    return data.questions;
-}
+export const streamRecommendedQuestions = streamResponse(async function* (
+    organizationId: string,
+    siteId: string,
+) {
+    const apiCtx = await api.api();
+    const stream = apiCtx.client.orgs.streamRecommendedQuestionsInSite(organizationId, siteId);
 
-async function transformAnswer(
-    answer: SearchAIAnswer,
-    spacePages: Map<string, RevisionPage[]>,
-): Promise<AskAnswerResult> {
+    for await (const chunk of stream) {
+        yield chunk;
+    }
+});
+
+async function transformAnswer({
+    answer,
+    spacePages,
+    siteSpaces,
+}: {
+    answer: SearchAIAnswer;
+    spacePages: Map<string, RevisionPage[]>;
+    siteSpaces: SiteSpace[] | null;
+}): Promise<AskAnswerResult> {
     const sources = (
         await Promise.all(
             answer.sources.map(async (source) => {
@@ -259,10 +269,19 @@ async function transformAnswer(
                     return null;
                 }
 
+                // Find the siteSpace in case it is nested in a site section so we can resolve the URL appropriately
+                const spaceURL = siteSpaces?.find(
+                    (siteSpace) => siteSpace.space.id === source.space,
+                )?.urls.published;
+
+                const href = spaceURL
+                    ? await getURLWithSections(page.page.path, spaceURL)
+                    : await getPageHref(pages, page.page);
+
                 return {
                     id: source.page,
                     title: page.page.title,
-                    href: await getPageHref(pages, page.page),
+                    href,
                 };
             }),
         )
@@ -294,28 +313,12 @@ async function transformSectionsAndPage(args: {
 }): Promise<[ComputedPageResult, ComputedSectionResult[]]> {
     const { item, space, spaceURL } = args;
 
-    // Resolve a relative path to an absolute URL
-    // if the search result is relative to another space, we use the space URL
-    const getURL = async (path: string, spaceURL?: string) => {
-        if (spaceURL) {
-            if (!spaceURL.endsWith('/')) {
-                spaceURL += '/';
-            }
-            if (path.startsWith('/')) {
-                path = path.slice(1);
-            }
-            return spaceURL + path;
-        } else {
-            return getAbsoluteHref(path);
-        }
-    };
-
     const sections = await Promise.all(
         item.sections?.map<Promise<ComputedSectionResult>>(async (section) => ({
             type: 'section',
             id: item.id + '/' + section.id,
             title: section.title,
-            href: await getURL(section.path, spaceURL),
+            href: await getURLWithSections(section.path, spaceURL),
             body: section.body,
         })) ?? [],
     );
@@ -326,7 +329,7 @@ async function transformSectionsAndPage(args: {
         type: 'page',
         id: item.id,
         title: item.title,
-        href: await getURL(item.path, spaceURL),
+        href: await getURLWithSections(item.path, spaceURL),
         spaceTitle: space?.title,
         ancestors: pageData.ancestors,
     };
@@ -352,4 +355,40 @@ async function transformPageResult(item: SearchPageResult, space?: Space) {
     });
 
     return [page, ...sections];
+}
+
+// Resolve a relative path to an absolute URL
+// if the search result is relative to another space, we use the space URL
+async function getURLWithSections(path: string, spaceURL?: string) {
+    if (spaceURL) {
+        if (!spaceURL.endsWith('/')) {
+            spaceURL += '/';
+        }
+        if (path.startsWith('/')) {
+            path = path.slice(1);
+        }
+        return spaceURL + path;
+    } else {
+        return getAbsoluteHref(path);
+    }
+}
+
+/*
+ * Gets all site spaces, in a site structure and overrides the title
+ */
+function extractSiteStructureSiteSpaces(siteStructure: SiteStructure) {
+    return siteStructure.type === 'siteSpaces'
+        ? siteStructure.structure
+        : getSiteStructureSections(siteStructure).reduce<SiteSpace[]>((prev, section) => {
+              const sectionSiteSpaces = section.siteSpaces.map((siteSpace) => ({
+                  ...siteSpace,
+                  space: {
+                      ...siteSpace.space,
+                      title: section.title || siteSpace.space.title,
+                  },
+              }));
+
+              prev.push(...sectionSiteSpaces);
+              return prev;
+          }, []);
 }

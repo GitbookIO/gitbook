@@ -1,14 +1,12 @@
-import * as React from 'react';
-import classNames from 'classnames';
-import { ApiClientModalProvider } from '@scalar/api-client-react';
+import clsx from 'clsx';
 
-import { OpenAPIOperationData, toJSON } from './fetchOpenAPIOperation';
 import { Markdown } from './Markdown';
 import { OpenAPICodeSample } from './OpenAPICodeSample';
 import { OpenAPIResponseExample } from './OpenAPIResponseExample';
-import { OpenAPIServerURL } from './OpenAPIServerURL';
 import { OpenAPISpec } from './OpenAPISpec';
-import { OpenAPIClientContext, OpenAPIContextProps } from './types';
+import type { OpenAPIClientContext, OpenAPIContextProps, OpenAPIOperationData } from './types';
+import { OpenAPIPath } from './OpenAPIPath';
+import { resolveDescription } from './utils';
 
 /**
  * Display an interactive OpenAPI operation.
@@ -19,7 +17,7 @@ export function OpenAPIOperation(props: {
     context: OpenAPIContextProps;
 }) {
     const { className, data, context } = props;
-    const { operation, servers, method, path } = data;
+    const { operation } = data;
 
     const clientContext: OpenAPIClientContext = {
         defaultInteractiveOpened: context.defaultInteractiveOpened,
@@ -27,46 +25,42 @@ export function OpenAPIOperation(props: {
         blockKey: context.blockKey,
     };
 
+    const description = resolveDescription(operation)?.trim();
+
     return (
-        <ApiClientModalProvider
-            configuration={{ spec: { url: context.specUrl } }}
-            initialRequest={{ path: data.path, method: data.method }}
-        >
-            <div className={classNames('openapi-operation', className)}>
-                <div className="openapi-intro">
-                    <h2 className="openapi-summary" id={context.id}>
-                        {operation.summary}
-                    </h2>
-                    {operation.description ? (
-                        <Markdown className="openapi-description" source={operation.description} />
-                    ) : null}
-                    <div className="openapi-target">
-                        <span
-                            className={classNames(
-                                'openapi-method',
-                                `openapi-method-${method.toLowerCase()}`,
-                            )}
-                        >
-                            {method.toUpperCase()}
-                        </span>
-                        <span className="openapi-url">
-                            <OpenAPIServerURL servers={servers} />
-                            {path}
-                        </span>
-                    </div>
-                </div>
-                <div className={classNames('openapi-columns')}>
-                    <div className={classNames('openapi-column-spec')}>
-                        <OpenAPISpec rawData={toJSON(data)} context={clientContext} />
-                    </div>
-                    <div className={classNames('openapi-column-preview')}>
-                        <div className={classNames('openapi-column-preview-body')}>
-                            <OpenAPICodeSample {...props} />
-                            <OpenAPIResponseExample {...props} />
+        <div className={clsx('openapi-operation', className)}>
+            <div className="openapi-summary" id={context.id}>
+                <h2 className="openapi-summary-title" data-deprecated={operation.deprecated}>
+                    {operation.summary}
+                </h2>
+                {operation.deprecated && <div className="openapi-deprecated">Deprecated</div>}
+            </div>
+            <div className="openapi-columns">
+                <div className="openapi-column-spec">
+                    {operation['x-deprecated-sunset'] ? (
+                        <div className="openapi-deprecated-sunset openapi-description openapi-markdown">
+                            This operation is deprecated and will be sunset on{' '}
+                            <span className="openapi-deprecated-sunset-date">
+                                {operation['x-deprecated-sunset']}
+                            </span>
+                            {`.`}
                         </div>
+                    ) : null}
+                    {description ? (
+                        <div className="openapi-intro">
+                            <Markdown className="openapi-description" source={description} />
+                        </div>
+                    ) : null}
+                    <OpenAPIPath data={data} context={context} />
+                    <OpenAPISpec data={data} context={clientContext} />
+                </div>
+                <div className="openapi-column-preview">
+                    <div className="openapi-column-preview-body">
+                        <OpenAPICodeSample {...props} />
+                        <OpenAPIResponseExample {...props} />
                     </div>
                 </div>
             </div>
-        </ApiClientModalProvider>
+        </div>
     );
 }

@@ -1,4 +1,4 @@
-export * from './fetchOpenAPIOperation';
+export * from './resolveOpenAPIOperation';
 export * from './OpenAPIOperation';
-export type { OpenAPIFetcher } from './types';
 export * from './OpenAPIOperationContext';
+export type { OpenAPIOperationData } from './types';

@@ -88,11 +88,9 @@ function Code(props: MarkedLeafProps<DocumentMarkCode>) {
                 'leading-normal',
                 'ring-1',
                 'ring-inset',
-                'ring-dark/1',
-                'bg-dark/[0.06]',
+                'ring-tint',
+                'bg-tint',
                 'rounded',
-                'dark:ring-light/1',
-                'dark:bg-light/1',
                 // Text size is proportional to the font-size of the parent element
                 'text-[.875em]',
                 // We ensure that the code is not making the parent bigger, especially in headings
@@ -130,10 +128,10 @@ const textColorToStyle: { [color in DocumentMarkColor['data']['text']]: ClassVal
 
 const backgroundColorToStyle: { [color in DocumentMarkColor['data']['background']]: ClassValue } = {
     default: [],
-    blue: ['bg-blue-200', 'dark:bg-blue-900'],
-    red: ['bg-red-200', 'dark:bg-red-900'],
-    green: ['bg-green-200', 'dark:bg-green-900'],
-    yellow: ['bg-yellow-100', 'dark:bg-yellow-900'],
-    purple: ['bg-purple-200', 'dark:bg-purple-900'],
-    orange: ['bg-orange-200', 'dark:bg-orange-900'],
+    blue: ['bg-mark-blue'],
+    red: ['bg-mark-red'],
+    green: ['bg-mark-green'],
+    yellow: ['bg-mark-yellow'],
+    purple: ['bg-mark-purple'],
+    orange: ['bg-mark-orange'],
 };

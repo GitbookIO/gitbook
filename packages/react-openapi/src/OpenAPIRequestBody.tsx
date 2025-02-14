@@ -1,11 +1,8 @@
-import * as React from 'react';
-
-import { OpenAPIV3 } from 'openapi-types';
+import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { OpenAPIRootSchema } from './OpenAPISchema';
 import { noReference } from './utils';
-import { OpenAPIClientContext } from './types';
+import type { OpenAPIClientContext } from './types';
 import { InteractiveSection } from './InteractiveSection';
-import { Markdown } from './Markdown';
 
 /**
  * Display an interactive request body.
@@ -34,14 +31,6 @@ export function OpenAPIRequestBody(props: {
                     };
                 },
             )}
-            defaultOpened={context.defaultInteractiveOpened}
-        >
-            {requestBody.description ? (
-                <Markdown
-                    source={requestBody.description}
-                    className="openapi-requestbody-description"
-                />
-            ) : null}
-        </InteractiveSection>
+        />
     );
 }

@@ -1,0 +1,37 @@
+.highlight-line {
+    @apply grid [grid-template-columns:subgrid] col-span-2 relative ring-1 ring-transparent hover:ring-tint-hover hover:z-[1] rounded;
+    @apply only:hover:ring-transparent;
+    @apply [counter-increment:line];
+
+    &.highlighted {
+        @apply bg-tint-active;
+        @apply first:rounded-t-md *:first:mt-1;
+        @apply last:rounded-b-md *:last:mb-1;
+        @apply rounded-none;
+    }
+
+    &:not(.highlighted) + .highlighted {
+        @apply rounded-t-md *:mt-1;
+    }
+
+    &.highlighted:has(+ :not(.highlighted)) {
+        @apply rounded-b-md *:mb-1;
+    }
+
+    &:not(.highlighted) + .highlighted:has(+ :not(.highlighted)) {
+        @apply rounded-md;
+    }
+}
+
+.highlight-line-number {
+    @apply text-sm text-right pr-3.5 rounded-l pl-2 sticky left-[-3px] bg-gradient-to-r from-80% from-tint to-transparent;
+    @apply before:text-tint before:content-[counter(line)];
+
+    .highlight-line.highlighted > & {
+        @apply before:text-tint bg-gradient-to-r from-80% from-tint-active to-transparent;
+    }
+}
+
+.highlight-line-content {
+    @apply ml-3 block text-sm;
+}

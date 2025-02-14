@@ -2,29 +2,31 @@ import {
     CustomizationCorners,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
-    CustomizationSettings,
+    type CustomizationSettings,
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
-    CustomizationTint,
-    SiteCustomizationSettings,
+    type CustomizationThemedColor,
+    type CustomizationTint,
+    type SiteCustomizationSettings,
 } from '@gitbook/api';
 import { IconsProvider, IconStyle } from '@gitbook/icons';
-import assertNever from 'assert-never';
-import colorContrast from 'postcss-color-contrast/js';
-import colors from 'tailwindcss/colors';
 
 import { fontNotoColorEmoji, fonts, ibmPlexMono } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
 import { getStaticFileURL } from '@/lib/assets';
-import { hexToRgb, shadesOfColor } from '@/lib/colors';
+import {
+    colorContrast,
+    colorScale,
+    type ColorScaleOptions,
+    DEFAULT_TINT_COLOR,
+    hexToRgb,
+} from '@/lib/colors';
 import { tcls } from '@/lib/tailwind';
 
 import { ClientContexts } from './ClientContexts';
 
 import '@gitbook/icons/style.css';
 import './globals.css';
-
-const DEFAULT_TINT_COLOR = '#787878';
 
 /**
  * Layout shared between the content and the PDF renderer.
@@ -36,9 +38,9 @@ export async function CustomizationRootLayout(props: {
 }) {
     const { customization, children } = props;
 
-    const headerTheme = generateHeaderTheme(customization);
     const language = getSpaceLanguage(customization);
     const tintColor = getTintColor(customization);
+    const mixColor = getTintMixColor(customization.styling.primaryColor, tintColor);
     const sidebarStyles = getSidebarStyles(customization);
 
     return (
@@ -52,9 +54,10 @@ export async function CustomizationRootLayout(props: {
                 customization.styling.corners === CustomizationCorners.Straight
                     ? ' straight-corners'
                     : '',
+                'theme' in customization.styling && `theme-${customization.styling.theme}`,
                 tintColor ? ' tint' : 'no-tint',
-                sidebarStyles.background && ' sidebar-' + sidebarStyles.background,
-                sidebarStyles.list && ' sidebar-list-' + sidebarStyles.list,
+                sidebarStyles.background && ` sidebar-${sidebarStyles.background}`,
+                sidebarStyles.list && ` sidebar-list-${sidebarStyles.list}`,
             )}
         >
             <head>
@@ -68,90 +71,29 @@ export async function CustomizationRootLayout(props: {
                     }
                 >{`
                     :root {
-                        ${generateColorVariable(
-                            'primary-color',
-                            customization.styling.primaryColor.light,
-                        )}
-                        ${
-                            // Generate the right contrast color for each shade of primary-color
-                            generateColorVariable(
-                                'contrast-primary',
-                                Object.fromEntries(
-                                    Object.entries(
-                                        shadesOfColor(customization.styling.primaryColor.light),
-                                    ).map(([index, color]) => [
-                                        index,
-                                        colorContrast(color, ['#000', '#fff']),
-                                    ]),
-                                ),
-                            )
-                        }
+                        ${generateColorVariable('primary', customization.styling.primaryColor.light)}
+                        ${generateColorVariable('tint', tintColor ? tintColor.light : DEFAULT_TINT_COLOR, { mix: mixColor && { color: mixColor.color.light, ratio: mixColor.ratio.light } })}
+                        ${generateColorVariable('neutral', DEFAULT_TINT_COLOR)}
 
-                        ${generateColorVariable('tint-color', tintColor?.light ?? customization.styling.primaryColor.light ?? DEFAULT_TINT_COLOR)}
-                        ${
-                            // Generate the right contrast color for each shade of tint-color
-                            generateColorVariable(
-                                'contrast-tint',
-                                Object.fromEntries(
-                                    Object.entries(
-                                        shadesOfColor(tintColor?.light || DEFAULT_TINT_COLOR),
-                                    ).map(([index, color]) => [
-                                        index,
-                                        colorContrast(color, ['#000', '#fff']),
-                                    ]),
-                                ),
+                        --header-background: ${
+                            /** If the site still has a (deprecated) custom header link or background set, we use that.
+                             * These values are no longer supported in the Customiser, and will eventually be unsupported in the front-end. */
+                            hexToRgb(
+                                customization.header.backgroundColor?.light ??
+                                    tintColor?.light ??
+                                    customization.styling.primaryColor.light,
                             )
-                        }
-
-                        ${generateColorVariable(
-                            'header-background',
-                            headerTheme.backgroundColor.light,
-                        )}
-                        ${generateColorVariable('header-link', headerTheme.linkColor.light)}
-                        ${generateColorVariable('header-button-text', colorContrast(headerTheme.linkColor.light as string, ['#000', '#fff']))}
+                        };
+                        --header-link: ${hexToRgb(customization.header.linkColor?.light ?? colorContrast(tintColor?.light ?? customization.styling.primaryColor.light))};
                     }
+
                     .dark {
-                        ${generateColorVariable(
-                            'primary-color',
-                            customization.styling.primaryColor.dark,
-                        )}
-                        ${
-                            // Generate the right contrast color for each shade of primary-color
-                            generateColorVariable(
-                                'contrast-primary',
-                                Object.fromEntries(
-                                    Object.entries(
-                                        shadesOfColor(customization.styling.primaryColor.dark),
-                                    ).map(([index, color]) => [
-                                        index,
-                                        colorContrast(color, ['#000', '#fff']),
-                                    ]),
-                                ),
-                            )
-                        }
+                        ${generateColorVariable('primary', customization.styling.primaryColor.dark, { darkMode: true })}
+                        ${generateColorVariable('tint', tintColor ? tintColor.dark : DEFAULT_TINT_COLOR, { darkMode: true, mix: mixColor && { color: mixColor?.color.dark, ratio: mixColor.ratio.dark } })}
+                        ${generateColorVariable('neutral', DEFAULT_TINT_COLOR, { darkMode: true })}
 
-                        ${generateColorVariable('tint-color', tintColor?.dark ?? customization.styling.primaryColor.dark ?? DEFAULT_TINT_COLOR)}
-                        ${
-                            // Generate the right contrast color for each shade of tint-color
-                            generateColorVariable(
-                                'contrast-tint',
-                                Object.fromEntries(
-                                    Object.entries(
-                                        shadesOfColor(tintColor?.dark || DEFAULT_TINT_COLOR),
-                                    ).map(([index, color]) => [
-                                        index,
-                                        colorContrast(color, ['#000', '#fff']),
-                                    ]),
-                                ),
-                            )
-                        }
-
-                        ${generateColorVariable(
-                            'header-background',
-                            headerTheme.backgroundColor.dark,
-                        )}
-                        ${generateColorVariable('header-link', headerTheme.linkColor.dark)}
-                        ${generateColorVariable('header-button-text', colorContrast(headerTheme.linkColor.dark as string, ['#000', '#fff']))}
+                        --header-background: ${hexToRgb(customization.header.backgroundColor?.dark ?? tintColor?.dark ?? customization.styling.primaryColor.dark)};
+                        --header-link: ${hexToRgb(customization.header.linkColor?.dark ?? colorContrast(tintColor?.dark ?? customization.styling.primaryColor.dark))};
                     }
                 `}</style>
             </head>
@@ -160,8 +102,12 @@ export async function CustomizationRootLayout(props: {
                     fontNotoColorEmoji.className,
                     `${fonts[customization.styling.font].className}`,
                     `${ibmPlexMono.variable}`,
-                    'bg-light',
-                    'dark:bg-dark',
+                    'bg-tint-base',
+                    'theme-muted:bg-tint-subtle',
+                    'theme-bold-tint:bg-tint-subtle',
+
+                    'theme-gradient:bg-gradient-primary',
+                    'theme-gradient-tint:bg-gradient-tint',
                 )}
             >
                 <IconsProvider
@@ -200,6 +146,38 @@ function getTintColor(
     }
 }
 
+function getTintMixColor(
+    primaryColor: CustomizationThemedColor,
+    tintColor: CustomizationTint['color'] | undefined,
+): {
+    color: CustomizationThemedColor;
+    ratio: { light: number; dark: number };
+} {
+    if (!tintColor) {
+        // Mix in a bit of the primary colour into neutral, to match with primary nicely.
+        return {
+            color: primaryColor,
+            ratio: {
+                light: 0.2,
+                dark: 0.1,
+            },
+        };
+    }
+
+    // Mix in neutral into the tint colour to offset it from the primary, and to make the effect less intense.
+    // If the tint colour differs from the primary colour, we use the tint colour fully without mixing.
+    return {
+        color: {
+            light: DEFAULT_TINT_COLOR,
+            dark: DEFAULT_TINT_COLOR,
+        },
+        ratio: {
+            light: tintColor.light.toUpperCase() === primaryColor.light.toUpperCase() ? 0.4 : 0,
+            dark: tintColor.dark.toUpperCase() === primaryColor.dark.toUpperCase() ? 0.4 : 0,
+        },
+    };
+}
+
 /**
  * Get the sidebar styles from the customization settings.
  * If it is a space customization, it will return the default styles.
@@ -220,101 +198,35 @@ function getSidebarStyles(
     };
 }
 
-type ColorInput = string | Record<string, string>;
-function generateColorVariable(name: string, color: ColorInput) {
-    const shades: Record<string, string> = typeof color === 'string' ? shadesOfColor(color) : color;
+type ColorInput = string;
+function generateColorVariable(
+    name: string,
+    color: ColorInput | Record<string, string>,
+    {
+        withContrast = true,
+        ...options // Pass any options along to the colorScale() function
+    }: ColorScaleOptions & {
+        withContrast?: boolean;
+    } = {},
+) {
+    const shades: Record<string, string> =
+        typeof color === 'string'
+            ? Object.fromEntries(
+                  colorScale(color, options)
+                      .map((shade, index) => [index + 1, shade])
+                      .concat([['original', color]]),
+              )
+            : color;
 
     return Object.entries(shades)
         .map(([key, value]) => {
-            // Check the original hex value
-            const rgbValue = hexToRgb(value);
-            return `--${name}-${key}: ${rgbValue};`;
+            const rgbValue = hexToRgb(value); // Check the original hex value
+            const contrastValue = withContrast ? hexToRgb(colorContrast(value)) : undefined; // Add contrast if needed
+            return `--${name}-${key}: ${rgbValue}; ${
+                contrastValue ? `--contrast-${name}-${key}: ${contrastValue};` : ''
+            }`;
         })
         .join('\n');
-}
-
-function generateHeaderTheme(customization: CustomizationSettings | SiteCustomizationSettings): {
-    backgroundColor: { light: ColorInput; dark: ColorInput };
-    linkColor: { light: ColorInput; dark: ColorInput };
-} {
-    const tintColor = getTintColor(customization);
-
-    switch (customization.header.preset) {
-        case CustomizationHeaderPreset.None:
-        case CustomizationHeaderPreset.Default: {
-            return {
-                backgroundColor: {
-                    light: colors.white,
-                    dark: colors.black,
-                },
-                linkColor: {
-                    light: customization.styling.primaryColor.light,
-                    dark: customization.styling.primaryColor.dark,
-                },
-            };
-        }
-        case CustomizationHeaderPreset.Bold: {
-            return {
-                backgroundColor: {
-                    light: tintColor?.light ?? customization.styling.primaryColor.light,
-                    dark: tintColor?.dark ?? customization.styling.primaryColor.dark,
-                },
-                linkColor: {
-                    light: colorContrast(
-                        tintColor?.light ?? customization.styling.primaryColor.light,
-                        [colors.white, colors.black],
-                        'aaa',
-                    ),
-                    dark: colorContrast(
-                        tintColor?.dark ?? customization.styling.primaryColor.dark,
-                        [colors.white, colors.black],
-                        'aaa',
-                    ),
-                },
-            };
-        }
-        case CustomizationHeaderPreset.Contrast: {
-            return {
-                backgroundColor: {
-                    light: colors.black,
-                    dark: colors.white,
-                },
-                linkColor: {
-                    light: colors.white,
-                    dark: colors.black,
-                },
-            };
-        }
-        case CustomizationHeaderPreset.Custom: {
-            return {
-                backgroundColor: {
-                    light:
-                        customization.header.backgroundColor?.light ??
-                        tintColor?.light ??
-                        colors.white,
-                    dark:
-                        customization.header.backgroundColor?.dark ??
-                        tintColor?.dark ??
-                        colors.black,
-                },
-                linkColor: {
-                    light:
-                        customization.header.linkColor?.light ??
-                        (tintColor?.light &&
-                            colorContrast(tintColor.light, [colors.white, colors.black], 'aaa')) ??
-                        customization.styling.primaryColor.light,
-                    dark:
-                        customization.header.linkColor?.dark ??
-                        (tintColor?.dark &&
-                            colorContrast(tintColor.dark, [colors.white, colors.black], 'aaa')) ??
-                        customization.styling.primaryColor.dark,
-                },
-            };
-        }
-        default: {
-            assertNever(customization.header.preset);
-        }
-    }
 }
 
 const apiToIconsStyles: {

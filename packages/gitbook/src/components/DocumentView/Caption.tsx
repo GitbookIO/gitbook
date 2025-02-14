@@ -42,7 +42,7 @@ export function Caption(
             'after:pointer-events-none',
             fit ? 'w-fit' : null,
             withBorder
-                ? 'rounded straight-corners:rounded-none after:border-dark/2 after:border after:rounded straight-corners:after:rounded-none dark:after:border-light/1 dark:after:mix-blend-plus-lighter after:pointer-events-none'
+                ? 'rounded straight-corners:rounded-none after:border-tint-subtle after:border after:rounded straight-corners:after:rounded-none dark:after:mix-blend-plus-lighter after:pointer-events-none'
                 : null,
         ],
         style,
@@ -62,15 +62,7 @@ export function Caption(
     return (
         <picture className={tcls('relative', style)}>
             <div className={tcls(wrapperStyle, 'mx-auto')}>{children}</div>
-            <figcaption
-                className={tcls(
-                    'text-sm',
-                    'text-center',
-                    'mt-2',
-                    'text-dark/7',
-                    'dark:text-light/7',
-                )}
-            >
+            <figcaption className={tcls('text-sm', 'text-center', 'mt-2', 'text-tint')}>
                 <Inlines
                     nodes={captionParagraph.nodes}
                     document={document}

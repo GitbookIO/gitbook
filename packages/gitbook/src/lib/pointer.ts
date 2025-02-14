@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 import { assert } from 'ts-essentials';
 
 import { SiteContentPointer, SpaceContentPointer } from './api';
+import { getSiteStructureSections } from './utils';
 
 /**
  * Get the current site content pointer from the headers
@@ -52,7 +53,7 @@ export function checkIsRootPointer(
 ): boolean {
     switch (siteStructure.type) {
         case 'sections': {
-            return siteStructure.structure.some(
+            return getSiteStructureSections(siteStructure).some(
                 (structure) =>
                     structure.default &&
                     structure.id === pointer.siteSectionId &&

@@ -1,4 +1,8 @@
-export type IconComponent = React.ComponentType<{ className?: string }>;
+import type {
+    OpenAPICustomOperationProperties,
+    OpenAPICustomSpecProperties,
+    OpenAPIV3,
+} from '@gitbook/openapi-parser';
 
 export interface OpenAPIContextProps extends OpenAPIClientContext {
     CodeBlock: React.ComponentType<{ code: string; syntax: string }>;
@@ -11,6 +15,7 @@ export interface OpenAPIClientContext {
     icons: {
         chevronDown: React.ReactNode;
         chevronRight: React.ReactNode;
+        plus: React.ReactNode;
     };
 
     /**
@@ -26,14 +31,16 @@ export interface OpenAPIClientContext {
     id?: string;
 }
 
-export interface OpenAPIFetcher {
-    /**
-     * Fetch an OpenAPI file by its URL. It should return a fully parsed OpenAPI v3 document.
-     */
-    fetch: (url: string) => Promise<any>;
+export interface OpenAPIOperationData extends OpenAPICustomSpecProperties {
+    path: string;
+    method: string;
 
-    /**
-     * Parse markdown to the react element to render.
-     */
-    parseMarkdown?: (input: string) => Promise<string>;
+    /** Servers to be used for this operation */
+    servers: OpenAPIV3.ServerObject[];
+
+    /** Spec of the operation */
+    operation: OpenAPIV3.OperationObject<OpenAPICustomOperationProperties>;
+
+    /** Securities that should be used for this operation */
+    securities: [string, OpenAPIV3.SecuritySchemeObject][];
 }

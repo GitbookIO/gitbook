@@ -1,8 +1,15 @@
-import { CustomizationSettings, SiteCustomizationSettings, Space } from '@gitbook/api';
+import {
+    CustomizationSettings,
+    SiteCustomizationSettings,
+    Space,
+    SiteInsightsTrademarkPlacement,
+} from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 
 import { t, getSpaceLanguage } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
+
+import { Link } from '../primitives';
 
 /**
  * Trademark link to the GitBook.
@@ -10,6 +17,7 @@ import { tcls } from '@/lib/tailwind';
 export function Trademark(props: {
     space: Space;
     customization: CustomizationSettings | SiteCustomizationSettings;
+    placement: SiteInsightsTrademarkPlacement;
 }) {
     return (
         <div
@@ -27,13 +35,11 @@ export function Trademark(props: {
                 'sidebar-filled:pl-2',
                 'sidebar-filled:pb-2',
 
-                'bg-light',
-                'sidebar-filled:bg-light-2',
-                '[html.tint.sidebar-filled_&]:bg-light-1',
-
-                'dark:bg-dark',
-                'dark:sidebar-filled:bg-dark-1',
-                'dark:[html.tint.sidebar-filled_&]:bg-dark-1',
+                'bg-tint-base',
+                'sidebar-filled:bg-tint-subtle',
+                'theme-muted:bg-tint-subtle',
+                '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
+                '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
 
                 'before:hidden',
                 'lg:before:block',
@@ -44,12 +50,12 @@ export function Trademark(props: {
                 'before:h-8',
                 'before:bg-gradient-to-b',
                 'before:from-transparent',
-                'before:to-light',
-                'sidebar-filled:before:to-light-2',
-                '[html.tint.sidebar-filled_&]:before:to-light-1',
-                'dark:before:to-dark',
-                'dark:sidebar-filled:before:to-dark-1',
-                'dark:[html.tint.sidebar-filled_&]:before:to-dark-1',
+                'before:to-tint-base',
+                'sidebar-filled:before:to-tint-subtle',
+                'theme-muted:before:to-tint-subtle',
+                'theme-bold-tint:before:to-tint-subtle',
+                '[html.sidebar-filled.theme-muted_&]:before:to-tint-base',
+                '[html.sidebar-filled.theme-bold.tint_&]:before:to-tint-base',
             )}
         >
             <TrademarkLink {...props} />
@@ -63,8 +69,9 @@ export function Trademark(props: {
 export function TrademarkLink(props: {
     space: Space;
     customization: CustomizationSettings | SiteCustomizationSettings;
+    placement: SiteInsightsTrademarkPlacement;
 }) {
-    const { space, customization } = props;
+    const { space, customization, placement } = props;
     const language = getSpaceLanguage(customization);
 
     const url = new URL('https://www.gitbook.com');
@@ -73,14 +80,13 @@ export function TrademarkLink(props: {
     url.searchParams.set('utm_campaign', space.id);
 
     return (
-        <a
+        <Link
             target="_blank"
             href={url.toString()}
             className={tcls(
                 'text-sm',
                 'font-semibold',
-                'text-dark/8',
-                'dark:text-light/8',
+                'text-tint',
 
                 'flex',
                 'flex-row',
@@ -92,21 +98,24 @@ export function TrademarkLink(props: {
                 'rounded-lg',
                 'straight-corners:rounded-none',
 
-                'hover:bg-dark/1',
-                'dark:hover:bg-light/1',
+                'hover:bg-tint',
+                'hover:text-tint-strong',
 
                 'ring-2',
                 'lg:ring-1',
                 'ring-inset',
-                'ring-dark/2',
-                'dark:ring-light/1',
+                'ring-tint-subtle',
 
                 'transition-colors',
                 'pointer-events-auto',
             )}
+            insights={{
+                type: 'trademark_click',
+                placement,
+            }}
         >
             <Icon icon="gitbook" className={tcls('size-5', 'mr-3')} />
             {t(language, 'powered_by_gitbook')}
-        </a>
+        </Link>
     );
 }

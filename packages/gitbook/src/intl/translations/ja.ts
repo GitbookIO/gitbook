@@ -30,6 +30,8 @@ export const ja: TranslationLanguage = {
     was_this_helpful_neutral: 'わかりません',
     was_this_helpful_negative: 'いいえ',
     was_this_helpful_thank_you: 'ありがとうございます！',
+    was_this_helpful_comment: '何か追加したいことはありますか?',
+    submit: '送信',
     annotation_button_label: '注釈を開く',
     code_copied: 'コピーしました！',
     code_copy: 'コピー',

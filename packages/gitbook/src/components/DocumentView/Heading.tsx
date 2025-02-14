@@ -45,7 +45,6 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                         'inline-flex',
                         'h-full',
                         'items-start',
-                        'dark:text-light/3',
                         'dark:shadow-none',
                         'dark:ring-0',
                         textStyle.lineHeight,
@@ -58,14 +57,23 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                             'h-[1lh]',
                             'transition-colors',
                             'text-transparent',
-                            'group-hover:text-dark/6',
-                            'dark:group-hover:text-light/5',
+                            'group-hover:text-tint-subtle',
+                            'contrast-more:group-hover:text-tint-strong',
                             'lg:w-4',
                         )}
                     />
                 </a>
             </div>
-            <div className={tcls('grid-area-1-1', 'z-[1]', textStyle.marginTop)}>
+            <div
+                className={tcls(
+                    'grid-area-1-1',
+                    'z-[1]',
+                    'justify-self-start',
+                    'text-left',
+                    textStyle.lineHeight,
+                    textStyle.marginTop,
+                )}
+            >
                 <Inlines {...rest} context={context} nodes={block.nodes} ancestorInlines={[]} />
             </div>
         </Tag>

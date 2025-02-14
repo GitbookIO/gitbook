@@ -68,7 +68,6 @@ export function PageBody(props: {
                         'page-api-block:max-w-[1654px]',
                         'page-api-block:mx-auto',
 
-                        page.layout.outline ? null : 'xl:mr-56',
                         page.layout.tableOfContents ? null : 'xl:ml-56',
                     ) +
                     (asFullWidth ? ' page-full-width' : '') +
@@ -120,27 +119,28 @@ export function PageBody(props: {
                     className={tcls(
                         'flex',
                         'flex-row',
+                        'flex-wrap',
+                        'gap-4',
                         'items-center',
                         'mt-6',
                         'max-w-3xl',
                         'mx-auto',
                         'page-api-block:ml-0',
+                        'text-tint',
+                        'contrast-more:text-tint-strong',
                     )}
                 >
                     {updatedAt ? (
-                        <p
-                            className={tcls(
-                                'flex-1',
-                                'text-sm',
-                                'text-dark/6',
-                                'dark:text-light/5',
-                            )}
-                        >
+                        <p className={tcls('text-sm mr-auto')}>
                             {t(language, 'page_last_modified', <DateRelative value={updatedAt} />)}
                         </p>
                     ) : null}
                     {withPageFeedback ? (
-                        <PageFeedbackForm orientation="horizontal" pageId={page.id} />
+                        <PageFeedbackForm
+                            className={page.layout.outline ? 'xl:hidden' : ''}
+                            orientation="horizontal"
+                            pageId={page.id}
+                        />
                     ) : null}
                 </div>
             </main>

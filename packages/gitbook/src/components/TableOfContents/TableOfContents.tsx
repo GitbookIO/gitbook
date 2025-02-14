@@ -4,6 +4,7 @@ import {
     RevisionPageDocument,
     RevisionPageGroup,
     SiteCustomizationSettings,
+    SiteInsightsTrademarkPlacement,
     Space,
 } from '@gitbook/api';
 import React from 'react';
@@ -15,18 +16,6 @@ import { tcls } from '@/lib/tailwind';
 import { PagesList } from './PagesList';
 import { TOCScrollContainer } from './TOCScroller';
 import { Trademark } from './Trademark';
-
-function getTopOffset(props: { sectionsHeader: boolean; topHeader: boolean }) {
-    if (props.topHeader && props.sectionsHeader) {
-        return 'lg:top-[6.75rem] lg:h-[calc(100vh_-_6.75rem)]';
-    }
-
-    if (props.topHeader) {
-        return 'lg:top-16 lg:h-[calc(100vh_-_4rem)]';
-    }
-
-    return 'lg:top-0 lg:h-screen';
-}
 
 export function TableOfContents(props: {
     space: Space;
@@ -45,8 +34,6 @@ export function TableOfContents(props: {
     const { innerHeader, space, customization, pages, ancestors, header, context, headerOffset } =
         props;
 
-    const topOffset = getTopOffset(headerOffset);
-
     return (
         <aside // Sidebar container, responsible for setting the right dimensions and position for the sidebar.
             data-testid="table-of-contents"
@@ -60,11 +47,19 @@ export function TableOfContents(props: {
                 'lg:basis-72',
 
                 'relative',
-                'lg:sticky',
-                'top-0',
-                'h-screen',
-                topOffset,
                 'z-[1]',
+                'lg:sticky',
+                // Without header
+                'lg:top-0',
+                'lg:h-screen',
+
+                // With header
+                'site-header:lg:top-16',
+                'site-header:lg:h-[calc(100vh_-_4rem)]',
+
+                // With header and sections
+                'site-header-sections:lg:top-[6.75rem]',
+                'site-header-sections:lg:h-[calc(100vh_-_6.75rem)]',
 
                 'pt-6',
                 'pb-4',
@@ -77,8 +72,7 @@ export function TableOfContents(props: {
                 'gap-4',
 
                 'navigation-open:border-b',
-                'border-dark/2',
-                'dark:border-light/2',
+                'border-tint-subtle',
             )}
         >
             {header && header}
@@ -92,10 +86,11 @@ export function TableOfContents(props: {
                     'flex-col',
                     'flex-grow',
 
-                    'sidebar-filled:bg-light-2',
-                    '[html.tint.sidebar-filled_&]:bg-light-1',
-                    'dark:sidebar-filled:bg-dark-1',
-                    'dark:[html.tint.sidebar-filled_&]:bg-dark-1',
+                    'sidebar-filled:bg-tint-subtle',
+                    'theme-muted:bg-tint-subtle',
+                    'theme-bold-tint:bg-tint-subtle',
+                    '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
+                    '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
 
                     'sidebar-filled:rounded-xl',
                     'straight-corners:rounded-none',
@@ -113,14 +108,11 @@ export function TableOfContents(props: {
 
                         'overflow-y-auto',
                         'lg:gutter-stable',
-                        'group-hover:[&::-webkit-scrollbar]:bg-dark/1',
-                        'group-hover:[&::-webkit-scrollbar-thumb]:bg-dark/3',
                         '[&::-webkit-scrollbar]:bg-transparent',
                         '[&::-webkit-scrollbar-thumb]:bg-transparent',
-                        'dark:[&::-webkit-scrollbar]:bg-transparent',
-                        'dark:[&::-webkit-scrollbar-thumb]:bg-transparent',
-                        'dark:group-hover:[&::-webkit-scrollbar]:bg-light/1',
-                        'dark:group-hover:[&::-webkit-scrollbar-thumb]:bg-light/3',
+                        'group-hover:[&::-webkit-scrollbar]:bg-tint-subtle',
+                        'group-hover:[&::-webkit-scrollbar-thumb]:bg-tint-7',
+                        'group-hover:[&::-webkit-scrollbar-thumb:hover]:bg-tint-8',
                     )}
                 >
                     <PagesList
@@ -128,14 +120,14 @@ export function TableOfContents(props: {
                         pages={pages}
                         ancestors={ancestors}
                         context={context}
-                        style={tcls(
-                            'sidebar-list-line:border-l',
-                            'border-dark/3',
-                            'dark:border-light/2',
-                        )}
+                        style={tcls('sidebar-list-line:border-l', 'border-tint-subtle')}
                     />
                     {customization.trademark.enabled ? (
-                        <Trademark space={space} customization={customization} />
+                        <Trademark
+                            space={space}
+                            customization={customization}
+                            placement={SiteInsightsTrademarkPlacement.Sidebar}
+                        />
                     ) : null}
                 </TOCScrollContainer>
             </div>
