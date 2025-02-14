@@ -1,5 +1,15 @@
 # @gitbook/react-contentkit
 
+## 0.6.0
+
+### Minor Changes
+
+-   ea1468c: Send redirectOnError param to getPublishedContent when token is pulled from cookie
+
+### Patch Changes
+
+-   648f0e9: Fix potential invalid URL error in react-contentkit
+
 ## 0.5.1
 
 ### Patch Changes

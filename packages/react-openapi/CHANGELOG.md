@@ -1,5 +1,46 @@
 # @gitbook/react-openapi
 
+## 1.0.0
+
+### Major Changes
+
+-   727bde2: Improve and split OpenAPI parser into its own package
+-   12c7862: Use `@scalar/openapi-parser` to be more resilient and perf on OpenAPI spec parsing:
+
+    -   `fetcher.fetch` must now returns a valid OpenAPI document
+    -   `parseOpenAPIV3` has been replaced by `parseOpenAPI`
+
+### Minor Changes
+
+-   162b4b7: Add in HTTP example code blocks
+-   e4e2f52: Add an optional client context to get a callback called when the Scalar client is opened for a block.
+-   eb7c22f: Revert scalar to 1.0.87 to mitigate an issue with ApiClientModalProvider
+-   160fca1: new OpenAPI blocks design
+-   e721f17: Use `@scalar/oas-utils` getExampleFromSchema to generate OpenAPI examples
+-   fe8acc9: Fix an issue where a missing OpenAPI example would crash the page.
+-   1823101: Fix internal properties appearing in OpenAPI docs.
+
+### Patch Changes
+
+-   d9029c7: Support apiKey in CodeSample security headers
+-   6e54a06: Support response examples
+-   0c03676: Better securities sample and headers
+-   3e5e458: Handle isArray schema type
+-   46edde9: Improve the OpenAPI package API
+-   d9c8d57: Do not dereference before caching OpenAPI spec.
+-   ccf2cff: Fix an issue where a response object using a special ref would crash the page.
+-   dda0cc6: Flatten OpenAPI security object
+-   f92e906: Prevent codemirror from loading multiple versions in scalar
+-   dff08ae: Improve performances by loading Scalar API Client only when the button is clicked
+-   fc7b16f: Updated scalar depdenency
+-   a652958: Fix error on unresolvable refs by replacing with property name and any type
+-   2f73db7: Support non primitive examples in OpenAPI block
+-   160fca1: Support deprecated and x-deprecated-sunset in OpenAPI spec
+-   b41d425: Improve OpenAPI rendering performances by caching markdown parsing
+-   Updated dependencies [46edde9]
+-   Updated dependencies [727bde2]
+    -   @gitbook/openapi-parser@1.0.0
+
 ## 0.7.1
 
 ### Patch Changes

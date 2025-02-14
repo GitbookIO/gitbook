@@ -1,6 +1,6 @@
 {
     "name": "gitbook-v2",
-    "version": "0.0.0",
+    "version": "0.1.0",
     "dependencies": {
         "next": "canary",
         "react": "^19.0.0",
