@@ -7,7 +7,7 @@ describe('#parseOpenAPI', () => {
     it('parses an OpenAPI document', async () => {
         const schema = await parseOpenAPI({
             value: spec,
-            url: 'https://example.com',
+            rootURL: null,
         });
         // Ensure the structure returned is not recursive (not dereferenced).
         JSON.stringify(schema);

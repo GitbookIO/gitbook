@@ -33,7 +33,7 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockOpenAPI>) {
         return (
             <div className={tcls('hidden')}>
                 <p>
-                    Error with {error.url}: {error.message}
+                    Error with {error.rootURL}: {error.message}
                 </p>
             </div>
         );

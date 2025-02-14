@@ -1,8 +1,7 @@
 import type { OpenAPIV3_1 } from '@gitbook/openapi-parser';
-import type { OpenAPIClientContext } from './types';
+import type { OpenAPIClientContext, OpenAPIOperationData } from './types';
 import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
-import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
 import { resolveDescription } from './utils';
 

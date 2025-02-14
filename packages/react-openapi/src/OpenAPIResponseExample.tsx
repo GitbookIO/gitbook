@@ -1,7 +1,6 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
-import type { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { generateSchemaExample } from './generateSchemaExample';
-import type { OpenAPIContextProps } from './types';
+import type { OpenAPIContextProps, OpenAPIOperationData } from './types';
 import { checkIsReference, noReference, resolveDescription } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
