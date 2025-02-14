@@ -253,6 +253,31 @@ jobs:
                   name: playwright-test-results
                   path: packages/gitbook/test-results/
                   retention-days: 3
+    visual-testing-customers:
+        runs-on: ubuntu-latest
+        name: Visual Testing Customers
+        needs: deploy
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+            - name: Setup Playwright
+              uses: ./.github/actions/setup-playwright
+            - name: Run Playwright tests
+              run: bun e2e-customers
+              env:
+                  BASE_URL: ${{needs.deploy.outputs.deployment-url}}
+                  ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
+                  ARGOS_BUILD_NAME: 'customers'
+            - uses: actions/upload-artifact@v4
+              if: ${{ !cancelled() }}
+              with:
+                  name: playwright-test-results-customers
+                  path: packages/gitbook/test-results/
+                  retention-days: 3
     pagespeed-testing:
         runs-on: ubuntu-latest
         name: PageSpeed Testing
