@@ -23,6 +23,9 @@ export async function SpaceIcon(
     return (
         <Image
             alt={alt ?? ''}
+            // The logo display is flaky and sometimes does not render,
+            // so we hide it to make visual testing usable
+            data-visual-test={icon ? undefined : 'blackout'}
             sources={
                 icon
                     ? {
