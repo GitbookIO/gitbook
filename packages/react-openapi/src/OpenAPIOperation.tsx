@@ -1,11 +1,10 @@
 import clsx from 'clsx';
 
-import type { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { Markdown } from './Markdown';
 import { OpenAPICodeSample } from './OpenAPICodeSample';
 import { OpenAPIResponseExample } from './OpenAPIResponseExample';
 import { OpenAPISpec } from './OpenAPISpec';
-import { OpenAPIClientContext, type OpenAPIContextProps } from './types';
+import type { OpenAPIClientContext, OpenAPIContextProps, OpenAPIOperationData } from './types';
 import { OpenAPIPath } from './OpenAPIPath';
 import { resolveDescription } from './utils';
 

@@ -1,61 +1,37 @@
 import { toJSON, fromJSON } from 'flatted';
 
 import {
-    type OpenAPICustomOperationProperties,
-    type OpenAPICustomSpecProperties,
     type OpenAPIV3xDocument,
     type Filesystem,
     type OpenAPIV3,
     type OpenAPIV3_1,
-    OpenAPIParseError,
     dereference,
 } from '@gitbook/openapi-parser';
 import { noReference } from './utils';
-
-export interface OpenAPIFetcher {
-    /**
-     * Fetch an OpenAPI file by its URL. It should return a fully parsed OpenAPI v3 document.
-     */
-    fetch: (url: string) => Promise<Filesystem<OpenAPIV3xDocument>>;
-}
-
-export interface OpenAPIOperationData extends OpenAPICustomSpecProperties {
-    path: string;
-    method: string;
-
-    /** Servers to be used for this operation */
-    servers: OpenAPIV3.ServerObject[];
-
-    /** Spec of the operation */
-    operation: OpenAPIV3.OperationObject<OpenAPICustomOperationProperties>;
-
-    /** Securities that should be used for this operation */
-    securities: [string, OpenAPIV3.SecuritySchemeObject][];
-}
+import { OpenAPIOperationData } from './types';
 
 export { toJSON, fromJSON };
 
 /**
  * Resolve an OpenAPI operation in a file and compile it to a more usable format.
  */
-export async function fetchOpenAPIOperation(
-    input: {
-        url: string;
+export async function resolveOpenAPIOperation(
+    filesystem: Filesystem<OpenAPIV3xDocument>,
+    operationDescriptor: {
         path: string;
         method: string;
     },
-    fetcher: OpenAPIFetcher,
 ): Promise<OpenAPIOperationData | null> {
-    const filesystem = await fetcher.fetch(input.url);
-    const schema = await memoDereferenceFilesystem(filesystem, input.url);
-    let operation = getOperationByPathAndMethod(schema, input.path, input.method);
+    const { path, method } = operationDescriptor;
+    const schema = await memoDereferenceFilesystem(filesystem);
+    let operation = getOperationByPathAndMethod(schema, path, method);
 
     if (!operation) {
         return null;
     }
 
     // Resolve common parameters
-    const commonParameters = getPathObjectParameter(schema, input.path);
+    const commonParameters = getPathObjectParameter(schema, path);
     if (commonParameters) {
         operation = {
             ...operation,
@@ -81,8 +57,8 @@ export async function fetchOpenAPIOperation(
     return {
         servers,
         operation,
-        method: input.method,
-        path: input.path,
+        method,
+        path,
         securities,
         'x-codeSamples':
             typeof schema['x-codeSamples'] === 'boolean' ? schema['x-codeSamples'] : undefined,
@@ -98,15 +74,12 @@ const dereferenceCache = new WeakMap<Filesystem, Promise<OpenAPIV3xDocument>>();
 /**
  * Memoized version of `dereferenceSchema`.
  */
-function memoDereferenceFilesystem(
-    filesystem: Filesystem,
-    url: string,
-): Promise<OpenAPIV3xDocument> {
+function memoDereferenceFilesystem(filesystem: Filesystem): Promise<OpenAPIV3xDocument> {
     if (dereferenceCache.has(filesystem)) {
         return dereferenceCache.get(filesystem) as Promise<OpenAPIV3xDocument>;
     }
 
-    const promise = dereferenceFilesystem(filesystem, url);
+    const promise = dereferenceFilesystem(filesystem);
     dereferenceCache.set(filesystem, promise);
     return promise;
 }
@@ -114,18 +87,11 @@ function memoDereferenceFilesystem(
 /**
  * Dereference an OpenAPI schema.
  */
-async function dereferenceFilesystem(
-    filesystem: Filesystem,
-    url: string,
-): Promise<OpenAPIV3xDocument> {
+async function dereferenceFilesystem(filesystem: Filesystem): Promise<OpenAPIV3xDocument> {
     const result = await dereference(filesystem);
 
     if (!result.schema) {
-        throw new OpenAPIParseError(
-            'Failed to dereference OpenAPI document',
-            url,
-            'failed-dereference',
-        );
+        throw new Error('Failed to dereference OpenAPI document');
     }
 
     return result.schema as OpenAPIV3xDocument;

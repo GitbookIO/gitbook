@@ -4,11 +4,11 @@ export const fetchUrlsDefaultConfiguration = {
     limit: 40,
 };
 
-export const fetchUrls: (customConfiguration: {
+export const fetchURLs: (customConfiguration: {
     /**
-     * Base URL to use for relative paths.
+     * Root URL to resolve relative URLs.
      */
-    baseUrl: string;
+    rootURL: string | null;
 
     /**
      * Limit the number of requests. Set to `false` to disable the limit.
@@ -53,7 +53,7 @@ export const fetchUrls: (customConfiguration: {
 
             try {
                 numberOfRequests++;
-                const url = getReferenceUrl(value, configuration.baseUrl);
+                const url = getReferenceUrl({ value, rootURL: configuration.rootURL });
                 const response = await fetch(url);
                 return await response.text();
             } catch (error: any) {
@@ -66,6 +66,7 @@ export const fetchUrls: (customConfiguration: {
 
 /**
  * Check if a path is relative.
+ * Meaning it does not start with http://, https://, www., data:, or #/.
  */
 function isRelativePath(path: string): boolean {
     // Exclude external URLs
@@ -76,9 +77,13 @@ function isRelativePath(path: string): boolean {
 /**
  * Get the reference URL.
  */
-function getReferenceUrl(value: string, baseUrl: string) {
+function getReferenceUrl(input: { value: string; rootURL: string | null }) {
+    const { value, rootURL } = input;
     if (isRelativePath(value)) {
-        return new URL(value, baseUrl).href;
+        if (!rootURL) {
+            throw new Error(`[fetchUrls] Cannot resolve relative path without rootURL (${value})`);
+        }
+        return new URL(value, rootURL).href;
     }
 
     return value;

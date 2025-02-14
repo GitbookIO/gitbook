@@ -34,7 +34,7 @@ describe('#createFileSystem', () => {
         const url = new URL('/root/spec.yaml', server.url).href;
         const filesystem = await createFileSystem({
             value: url,
-            baseUrl: url,
+            rootURL: url,
         });
         expect(filesystem).toHaveLength(4);
         expect(filesystem[0]!.isEntrypoint).toBe(true);

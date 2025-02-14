@@ -2,13 +2,12 @@
 
 import type { OpenAPI } from '@gitbook/openapi-parser';
 
-import { OpenAPIOperationData } from './fetchOpenAPIOperation';
 import { InteractiveSection } from './InteractiveSection';
 import { OpenAPIRequestBody } from './OpenAPIRequestBody';
 import { OpenAPIResponses } from './OpenAPIResponses';
 import { OpenAPISchemaProperties } from './OpenAPISchema';
 import { OpenAPISecurities } from './OpenAPISecurities';
-import { OpenAPIClientContext } from './types';
+import type { OpenAPIClientContext, OpenAPIOperationData } from './types';
 import { noReference, resolveDescription } from './utils';
 
 /**

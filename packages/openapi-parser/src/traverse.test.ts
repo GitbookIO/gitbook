@@ -35,7 +35,7 @@ describe('#traverse', () => {
     it('traverses a complete filesystem', async () => {
         const filesystem = await createFileSystem({
             value: JSON.parse(recursiveSpec),
-            baseUrl: 'https://example.com',
+            rootURL: 'https://example.com',
         });
 
         const transformedFilesystem = await traverse(filesystem, async (node) => {
