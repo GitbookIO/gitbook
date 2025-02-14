@@ -30,7 +30,7 @@ export async function RecordCard(
 
     const coverIsSquareOrPortrait =
         cover?.file?.dimensions &&
-        cover.file?.dimensions?.width / cover.file?.dimensions?.height < 1;
+        cover.file?.dimensions?.width / cover.file?.dimensions?.height <= 1;
 
     const body = (
         <div
