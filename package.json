@@ -27,6 +27,7 @@
         "format:check": "prettier ./ --ignore-unknown --list-different",
         "unit": "turbo run unit",
         "e2e": "turbo run e2e",
+        "e2e-customers": "turbo run e2e-customers",
         "changeset": "changeset",
         "release": "turbo run release && changeset publish",
         "release:preview": "turbo run release:preview",

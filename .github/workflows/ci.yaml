@@ -255,7 +255,7 @@ jobs:
                   retention-days: 3
     visual-testing-customers:
         runs-on: ubuntu-latest
-        name: Visual Testing
+        name: Visual Testing Customers
         needs: deploy
         steps:
             - name: Checkout
