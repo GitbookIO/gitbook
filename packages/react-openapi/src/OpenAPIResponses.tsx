@@ -1,10 +1,9 @@
 import type { OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser';
-import { resolveDescription } from './utils';
 import { OpenAPIResponse } from './OpenAPIResponse';
 import { OpenAPIClientContext } from './types';
 import { InteractiveSection } from './InteractiveSection';
 import { OpenAPIDisclosureGroup } from './OpenAPIDisclosureGroup';
-import { parse } from 'node-html-parser';
+import { Markdown } from './Markdown';
 
 /**
  * Display an interactive response body.
@@ -23,7 +22,7 @@ export function OpenAPIResponses(props: {
                 groups={Object.entries(responses).map(
                     ([statusCode, response]: [string, OpenAPIV3.ResponseObject]) => {
                         const content = Object.entries(response.content ?? {});
-                        const description = resolveDescription(response);
+                        const description = response.description;
 
                         return {
                             id: statusCode,
@@ -36,9 +35,10 @@ export function OpenAPIResponses(props: {
                                         {statusCode}
                                     </span>
                                     {description ? (
-                                        <div className="openapi-markdown openapi-response-description">
-                                            {htmlToText(description)}
-                                        </div>
+                                        <Markdown
+                                            source={description}
+                                            className="openapi-response-description"
+                                        />
                                     ) : null}
                                 </div>
                             ),
@@ -60,9 +60,4 @@ export function OpenAPIResponses(props: {
             />
         </InteractiveSection>
     );
-}
-
-function htmlToText(html: string): string {
-    const doc = parse(html);
-    return doc.textContent?.trim() || '';
 }
