@@ -1,5 +1,13 @@
 # @gitbook/react-openapi
 
+## 1.0.1
+
+### Patch Changes
+
+-   f8d4c76: Sync tabs across all OpenAPI blocks
+-   dddb4ec: Fix long tab group description
+-   f8d4c76: Support for OpenAPI references
+
 ## 1.0.0
 
 ### Major Changes

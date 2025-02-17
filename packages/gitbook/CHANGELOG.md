@@ -1,5 +1,15 @@
 # gitbook
 
+## 0.6.1
+
+### Patch Changes
+
+-   dddb4ec: Fix long tab group description
+-   Updated dependencies [f8d4c76]
+-   Updated dependencies [dddb4ec]
+-   Updated dependencies [f8d4c76]
+    -   @gitbook/react-openapi@1.0.1
+
 ## 0.6.0
 
 ### Minor Changes
