@@ -5,6 +5,9 @@ import { checkIsReference, createStateKey, resolveDescription } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
 import { InteractiveSection } from './InteractiveSection';
+import { Markdown } from './Markdown';
+import React from 'react';
+import { OpenAPIResponseMultipleExample } from './OpenAPIResponseMultipleExample';
 
 /**
  * Display an example of the response content.
@@ -61,18 +64,20 @@ export function OpenAPIResponseExample(props: {
                 };
             }
 
-            const example = handleUnresolvedReference(
+            const examples = handleUnresolvedReference(
                 (() => {
                     const { examples, example } = mediaTypeObject;
                     if (examples) {
-                        const key = Object.keys(examples)[0];
-                        if (key) {
-                            // @TODO handle multiple examples
-                            const firstExample = examples[key];
-                            if (firstExample) {
-                                return firstExample;
-                            }
+                        if (Array.isArray(examples)) {
+                            return examples.map((example) => ({
+                                value: example,
+                            }));
                         }
+
+                        return Object.entries(examples).map(([key, value]) => ({
+                            summary: key,
+                            value: value,
+                        }));
                     }
 
                     if (example) {
@@ -88,21 +93,23 @@ export function OpenAPIResponseExample(props: {
                 })(),
             );
 
+            if (!examples || (Array.isArray(examples) && examples.length === 0)) {
+                return {
+                    key: key,
+                    label: key,
+                    body: <OpenAPIEmptyResponseExample description={responseObject.description} />,
+                };
+            }
+
             return {
                 key: key,
                 label: key,
-                description: resolveDescription(responseObject),
-                body: example?.value ? (
-                    <context.CodeBlock
-                        code={
-                            typeof example.value === 'string'
-                                ? example.value
-                                : stringifyOpenAPI(example.value, null, 2)
-                        }
-                        syntax="json"
+                body: (
+                    <OpenAPIResponseExampleBody
+                        examples={examples}
+                        context={context}
+                        description={responseObject.description}
                     />
-                ) : (
-                    <OpenAPIEmptyResponseExample />
                 ),
             };
         })
@@ -123,17 +130,62 @@ export function OpenAPIResponseExample(props: {
     );
 }
 
-function OpenAPIEmptyResponseExample() {
+function OpenAPIEmptyResponseExample(props: { description?: string }) {
+    const { description } = props;
+
     return (
-        <pre className="openapi-response-example-empty">
-            <p>No body</p>
-        </pre>
+        <>
+            <pre className="openapi-response-example-empty">
+                <p>No body</p>
+            </pre>
+
+            {description ? <Markdown source={description} className="openapi-tabs-footer" /> : null}
+        </>
     );
 }
 
+function OpenAPIResponseExampleBody(props: {
+    examples: OpenAPIV3.ExampleObject[] | OpenAPIV3.ExampleObject;
+    context: OpenAPIContextProps;
+    description?: string;
+}) {
+    const { examples, context, description } = props;
+
+    if (!Array.isArray(examples)) {
+        return (
+            <>
+                <context.CodeBlock
+                    code={
+                        typeof examples.value === 'string'
+                            ? examples.value
+                            : stringifyOpenAPI(examples.value, null, 2)
+                    }
+                    syntax="json"
+                />
+
+                {description ? (
+                    <Markdown source={description} className="openapi-tabs-footer" />
+                ) : null}
+            </>
+        );
+    }
+
+    if (examples.length === 0) {
+        return <OpenAPIEmptyResponseExample />;
+    }
+
+    return <OpenAPIResponseMultipleExample examples={examples} context={context} />;
+}
+
 function handleUnresolvedReference(
-    input: OpenAPIV3.ExampleObject | null,
-): OpenAPIV3.ExampleObject | null {
+    input: OpenAPIV3.ExampleObject | OpenAPIV3.ExampleObject[] | null,
+): OpenAPIV3.ExampleObject | OpenAPIV3.ExampleObject[] | null {
+    if (Array.isArray(input)) {
+        return input.map(
+            (example) => handleUnresolvedReference(example) as OpenAPIV3.ExampleObject,
+        );
+    }
+
     const isReference = checkIsReference(input?.value);
 
     if (isReference) {

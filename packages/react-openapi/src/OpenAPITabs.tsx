@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { Key, Tab, TabList, TabPanel, Tabs, TabsProps } from 'react-aria-components';
-import { Markdown } from './Markdown';
 import { useSyncedTabsGlobalState } from './useSyncedTabsGlobalState';
 import { useIntersectionObserver } from 'usehooks-ts';
 
@@ -145,9 +144,6 @@ export function OpenAPITabsPanels() {
             className="openapi-tabs-panel"
         >
             {selectedTab.body}
-            {selectedTab.description ? (
-                <Markdown source={selectedTab.description} className="openapi-tabs-footer" />
-            ) : null}
         </TabPanel>
     );
 }
