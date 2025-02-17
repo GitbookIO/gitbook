@@ -31,7 +31,7 @@
     },
     "packages/gitbook": {
       "name": "gitbook",
-      "version": "0.5.0",
+      "version": "0.6.0",
       "dependencies": {
         "@gitbook/api": "^0.93.0",
         "@gitbook/cache-do": "workspace:*",
@@ -118,7 +118,7 @@
     },
     "packages/gitbook-v2": {
       "name": "gitbook-v2",
-      "version": "0.0.0",
+      "version": "0.1.0",
       "dependencies": {
         "@gitbook/api": "^0.93.0",
         "next": "canary",
@@ -151,7 +151,7 @@
     },
     "packages/openapi-parser": {
       "name": "@gitbook/openapi-parser",
-      "version": "0.0.0",
+      "version": "1.0.0",
       "dependencies": {
         "@scalar/openapi-parser": "^0.10.4",
         "@scalar/openapi-types": "^0.1.6",
@@ -175,7 +175,7 @@
     },
     "packages/react-contentkit": {
       "name": "@gitbook/react-contentkit",
-      "version": "0.5.1",
+      "version": "0.6.0",
       "dependencies": {
         "@gitbook/api": "^0.93.0",
         "assert-never": "^1.2.1",
@@ -207,7 +207,7 @@
     },
     "packages/react-openapi": {
       "name": "@gitbook/react-openapi",
-      "version": "0.7.1",
+      "version": "1.0.0",
       "dependencies": {
         "@gitbook/openapi-parser": "workspace:*",
         "@scalar/api-client-react": "1.0.87",
@@ -217,6 +217,7 @@
         "react-aria": "^3.37.0",
         "react-aria-components": "^1.6.0",
         "usehooks-ts": "^3.1.0",
+        "zustand": "^5.0.3",
       },
       "devDependencies": {
         "bun-types": "^1.1.20",
@@ -3424,6 +3425,8 @@
     "zhead": ["zhead@2.2.4", "", {}, "sha512-8F0OI5dpWIA5IGG5NHUg9staDwz/ZPxZtvGVf01j7vHqSyZ0raHY+78atOVxRqb73AotX22uV1pXt3gYSstGag=="],
 
     "zod": ["zod@3.23.8", "", {}, "sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g=="],
+
+    "zustand": ["zustand@5.0.3", "", { "peerDependencies": { "@types/react": ">=18.0.0", "immer": ">=9.0.6", "react": ">=18.0.0", "use-sync-external-store": ">=1.2.0" }, "optionalPeers": ["@types/react", "immer", "react", "use-sync-external-store"] }, "sha512-14fwWQtU3pH4dE0dOpdMiWjddcH+QzKIgk1cl8epwSE7yag43k/AD/m4L6+K7DytAOr9gGBe3/EXj9g7cdostg=="],
 
     "zwitch": ["zwitch@2.0.4", "", {}, "sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A=="],
 
