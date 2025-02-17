@@ -1,5 +1,165 @@
 # gitbook
 
+## 0.6.0
+
+### Minor Changes
+
+-   98245e5: Adapt code to pull token from customer backend generated custom cookies
+-   af3c6a9: Reintroduce a safety check around search whilst we continue investigating caching.
+-   95f2aa4: Track new events for site insights when ads are being clicked
+-   08acea6: Investigate an issue causing caches to return empty objects instead of null/undefined.
+-   1138d59: Add support for sidebar background styles
+-   9e18ae6: Overhaul colour scale & Tailwind colour classes
+-   e86e51f: Fix an issue where the redirects of potentially malicious images were not going through.
+-   7059c2b: Add support for computed content by fetching computed documents for pages.
+-   c71d159: Track events for site insights using the new dedicated API.
+-   eb7c22f: Revert scalar to 1.0.87 to mitigate an issue with ApiClientModalProvider
+-   ea1468c: Send redirectOnError param to getPublishedContent when token is pulled from cookie
+-   7ee9158: Restyle PageAside to use sidebar list styles
+-   dbba50c: Fix an issue where search and Ask AI triggers unnecessary renders when in a Visitor Authenticated site.
+-   1417279: Track clicks on links (header, footer, content) for site insights.
+-   9eca010: Improve the display of recommended questions by streaming them.
+-   160fca1: new OpenAPI blocks design
+-   71688a8: Introduction of new themes: Clean, Muted, Bold, and Gradient
+-   1823101: Fix internal properties appearing in OpenAPI docs.
+-   6a073e1: Add antialiasing for text rendering
+-   8126a83: Improve readability of tables with hover style and vertical dividers
+-   db74ea3: Image optimization endpoint redirects to underlying image URL if the signature is not the latest.
+-   99579ac: Fix a vulnerability issue for images using an older version of the image signing parameter.
+-   e4e2f52: Track an event into site insights when visitor is opening the Scalar API client.
+
+### Patch Changes
+
+-   d876399: Fix UI search without ask AI enabled and fix error with questions not returned from API
+-   c30bc24: Fix empty sitemap
+-   e90c96f: page outline on the right remains visible when scrolling, move mode toggler to PageAside
+-   5b4e710: Support llms.txt
+-   b6c3870: Add support for keyboard marks
+-   6059efe: Fix search no results error showing while there are results
+-   c77142a: Log component stack in Sentry
+-   1de9d1a: Apply antialiasing on any text that are not code inline/blocks to avoid contrast issues
+-   32aa1f9: Handle security issue with cookies on Safari
+-   d935fb1: Don't add extra page scroll when footer is not present
+-   53de5b1: Fix site section URL resolution in Ask AI sources
+-   24f5249: Fix vertical section overflow color
+-   1762f85: Reduce gap between subsequent header buttons
+-   c1e27cc: Fix pass Sentry release properly
+-   5ae1b88: Fix shrinking page icons
+-   8f046a9: Start using tint in more places, TOC and PageAside
+-   665b6be: Ignore invalid API calls to `getSiteRedirectFromSource` API
+
+    To reduce the load on the API and also avoid errors.
+
+-   26e6401: Remove KV cache backend and only rely on DO as an external cache backend
+-   8cfa67c: Fix default outline list styling
+-   d66c184: Ignore errors from event flushing
+-   6088fa5: Simplify search results logic to investigate a bug
+-   68287d3: Cache API spec for 24 hours, revalidated every 2 hours
+-   09c7c30: Try to fix error on og image generation
+-   ae99f87: Improve emoji setup, align with GitBook app
+-   2906e60: Downgrade to Next.js v14 to fix incompatibilities with next-on-pages causing multiple bugs.
+-   3a7210d: Fix zoom image view transition on Safari
+-   718a8a5: Position the variant picker in the ToC
+-   e5dc05e: Update footer styling and allow for more than 4 footer groups
+-   8276ba0: Make cookies access safer
+-   1b8a456: Fix Image blocks zoomable behaviour
+-   56c52e0: Handle Firefox security error on localStorage
+-   0510b6f: Add section description to SectionGroupTile
+-   1fcc807: Fix errors from customization not found
+-   46edde9: Improve the OpenAPI package API
+-   8af1abc: Improve contrast of search box placeholder
+-   92b7668: Improve header offset
+-   d9c8d57: Do not dereference before caching OpenAPI spec.
+-   94876e3: Fix regression issue with page icons for multi-line titles
+-   47971dc: Fix OG image generation for non-latin characters
+-   82dc9c4: Simplify the `useHash` algo used.
+-   128ad20: Ignore cache invalidation error from local backend
+-   ff05e20: Improvements to inline images in headings
+-   cb100d5: Allow only good values for theme query parameter. Avoid having a 500 error when we pass an invalid value.
+-   d5aaccd: Remove use of deprecatd API createSitesPageFeedback
+-   48ab59f: Improve colour contrast of list item decoration
+-   d2bc567: Set Sentry release
+-   37d13d8: Avoid error on fetch by passing a string URL
+-   d3e573c: Generate sitemap for all sections and spaces
+-   f7b801b: Add feedback form to page rating control
+-   d370a3f: Update the routes for changes/revisions in multi-id mode to match the normal mode
+-   46f63cb: Fix code format overriding inline link styles
+-   5950657: Fix emojis display
+-   528a053: Fix server actions stability leading to no results found sometimes on search
+-   eac1314: Lazy load iframely script to make page more responsive
+-   ad19060: Cards stand out slighly more on tinted and dark mode sites, and have better support for headings inside them
+-   6f54826: New highlight colors
+-   5c87ec7: Implement a safer way to interact with localStorage.
+
+    If it's disabled on the browser it should not throw error.
+
+-   02d876e: Fix search UI behaviour
+-   f4a90de: Fix two issues where pages would crash due Recoil not behaving correctly in RSC.
+-   5576906: Fix table of content displaying arrow next to page with only hidden pages
+-   aaab157: Visual fix for section group in Safari
+-   cbe6139: Fix dynamic tabs infinite loop
+-   65cc4af: Fix error when accessing a change request not found
+-   727bde2: Improve and split OpenAPI parser into its own package
+-   0b6ddca: Fix variant selector contrast for non-default themes
+-   87b8ea8: Fix issue leading to increase the storage write and the stability of the platform
+-   fde32e2: Force route handler to be dynamic to avoid errors
+-   a025118: Change card layout depending on cover aspect ratio
+-   300f7bf: Fix search loading state
+-   29d5979: Disable C/C++ highlight temporarily
+-   18953b2: Subtler tint color when based on the primary color, by mixing in some gray
+-   1c97536: Fix Sentry instrumentation
+-   b0bd871: Even safer localStorage
+-   b950a64: Avoid errors on legacy browsers
+-   38061bd: Add section groups to section tabs
+-   160fca1: Support deprecated and x-deprecated-sunset in OpenAPI spec
+-   0e601e2: Improve styling of header buttons with shadows and high-contrast styles
+-   6691492: Fix viewing PDF from space
+-   e8e64bf: Fix bullet list display on full size blocks
+-   16194c5: Vertical orientation for sections list on sites without header
+-   b41d425: Improve OpenAPI rendering performances by caching markdown parsing
+-   1f8e416: Improve performances by highlighting code client-side if the code block is offscreen
+-   1429384: Fix error when accessing some not found pages.
+-   21cbd9e: Change link color to primary-subtle
+-   5dab70f: Fix "Parser" language syntax highlighting
+-   deb8c54: Upgrade Next.js to v15, upgrade Shiki and use JS RegExp engine
+-   56331d2: Fix breadcrumbs emoji display + add contrast styles
+-   a6f6591: Fix server actions cache compromised. Leading to some bugs on frontend.
+-   44a20fe: Improve smoothness of scroll listener
+-   5664e5a: Fix variant dropdown styling in header
+-   6b50360: Fix view transition error on Safari
+-   741dd49: Bump `heading-3` font size to offset it from paragraphs
+-   5112e3e: Fix Sentry instrumentation server-side
+-   1de338c: Remove animation on section tabs. Page is reloaded (for technical reasons), so the animation is not accurate here.
+-   Updated dependencies [d9029c7]
+-   Updated dependencies [6e54a06]
+-   Updated dependencies [162b4b7]
+-   Updated dependencies [e4e2f52]
+-   Updated dependencies [0c03676]
+-   Updated dependencies [3e5e458]
+-   Updated dependencies [46edde9]
+-   Updated dependencies [d9c8d57]
+-   Updated dependencies [ccf2cff]
+-   Updated dependencies [dda0cc6]
+-   Updated dependencies [eb7c22f]
+-   Updated dependencies [ea1468c]
+-   Updated dependencies [648f0e9]
+-   Updated dependencies [160fca1]
+-   Updated dependencies [f92e906]
+-   Updated dependencies [e721f17]
+-   Updated dependencies [727bde2]
+-   Updated dependencies [dff08ae]
+-   Updated dependencies [fc7b16f]
+-   Updated dependencies [fe8acc9]
+-   Updated dependencies [1823101]
+-   Updated dependencies [a652958]
+-   Updated dependencies [2f73db7]
+-   Updated dependencies [160fca1]
+-   Updated dependencies [12c7862]
+-   Updated dependencies [b41d425]
+    -   @gitbook/react-openapi@1.0.0
+    -   @gitbook/openapi-parser@1.0.0
+    -   @gitbook/react-contentkit@0.6.0
+
 ## 0.5.0
 
 ### Minor Changes
