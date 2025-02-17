@@ -1,4 +1,6 @@
 import { stringifyOpenAPI } from './stringifyOpenAPI';
+import { HarRequest, snippetz } from '@scalar/snippetz';
+export type { Request as HarRequest } from 'har-format';
 
 export interface CodeSampleInput {
     method: string;
@@ -19,121 +21,56 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
         id: 'curl',
         label: 'cURL',
         syntax: 'bash',
-        generate: ({ method, url, headers, body }) => {
-            const separator = ' \\\n';
-
-            const lines: string[] = ['curl -L'];
-
-            if (method.toUpperCase() !== 'GET') {
-                lines.push(`--request ${method.toUpperCase()}`);
-            }
-
-            lines.push(`--url '${url}'`);
-
-            if (headers) {
-                Object.entries(headers).forEach(([key, value]) => {
-                    lines.push(`--header '${key}: ${value}'`);
-                });
-            }
-
-            if (body && Object.keys(body).length > 0) {
-                lines.push(`--data '${stringifyOpenAPI(body)}'`);
-            }
-
-            return lines.map((line, index) => (index > 0 ? indent(line, 2) : line)).join(separator);
+        generate: (props) => {
+            return snippetz().print('shell', 'curl', getSnippetzOptions(props)) ?? '';
         },
     },
     {
         id: 'javascript',
         label: 'JavaScript',
         syntax: 'javascript',
-        generate: ({ method, url, headers, body }) => {
-            let code = '';
-
-            code += `const response = await fetch('${url}', {
-    method: '${method.toUpperCase()}',\n`;
-
-            if (headers) {
-                code += indent(`headers: ${stringifyOpenAPI(headers, null, 2)},\n`, 4);
-            }
-
-            if (body) {
-                code += indent(`body: JSON.stringify(${stringifyOpenAPI(body, null, 2)}),\n`, 4);
-            }
-
-            code += `});\n`;
-            code += `const data = await response.json();`;
-
-            return code;
+        generate: (props) => {
+            return snippetz().print('js', 'fetch', getSnippetzOptions(props)) ?? '';
         },
     },
     {
         id: 'python',
         label: 'Python',
         syntax: 'python',
-        generate: ({ method, url, headers, body }) => {
-            let code = 'import requests\n\n';
-            code += `response = requests.${method.toLowerCase()}(\n`;
-            code += indent(`"${url}",\n`, 4);
-            if (headers) {
-                code += indent(`headers=${stringifyOpenAPI(headers)},\n`, 4);
-            }
-            if (body) {
-                code += indent(`json=${stringifyOpenAPI(body)}\n`, 4);
-            }
-            code += ')\n';
-            code += `data = response.json()`;
-            return code;
+        generate: (props) => {
+            return snippetz().print('python', 'requests', getSnippetzOptions(props)) ?? '';
         },
     },
     {
         id: 'http',
         label: 'HTTP',
         syntax: 'bash',
-        generate: ({ method, url, headers = {}, body }: CodeSampleInput) => {
-            const { host, path } = parseHostAndPath(url);
-
-            if (body) {
-                // if we had a body add a content length header
-                const bodyContent = body ? stringifyOpenAPI(body) : '';
-                // handle unicode chars with a text encoder
-                const encoder = new TextEncoder();
-
-                headers = {
-                    ...headers,
-                    'Content-Length': encoder.encode(bodyContent).length.toString(),
-                };
-            }
-
-            if (!headers.hasOwnProperty('Accept')) {
-                headers.Accept = '*/*';
-            }
-
-            const headerString = headers
-                ? Object.entries(headers)
-                      .map(([key, value]) =>
-                          key.toLowerCase() !== 'host' ? `${key}: ${value}` : ``,
-                      )
-                      .join('\n') + '\n'
-                : '';
-
-            const bodyString = body ? `\n${stringifyOpenAPI(body, null, 2)}` : '';
-
-            const httpRequest = `${method.toUpperCase()} ${decodeURI(path)} HTTP/1.1
-Host: ${host}
-${headerString}${bodyString}`;
-
-            return httpRequest;
+        generate: (props) => {
+            return snippetz().print('http', 'http1.1', getSnippetzOptions(props)) ?? '';
         },
     },
 ];
 
-function indent(code: string, spaces: number) {
-    const indent = ' '.repeat(spaces);
-    return code
-        .split('\n')
-        .map((line) => (line ? indent + line : ''))
-        .join('\n');
+function getSnippetzOptions({ method, url, headers, body }: CodeSampleInput): Partial<HarRequest> {
+    // Check if the URL is valid and parse it
+    try {
+        new URL(url);
+    } catch (e) {
+        url = 'http://api_url' + url;
+    }
+
+    return {
+        method,
+        url: url,
+        headers: Object.entries(headers ?? {}).map(([key, value]) => ({
+            name: key,
+            value,
+        })),
+        postData: {
+            mimeType: headers?.['Content-Type'] ?? '',
+            text: body ? stringifyOpenAPI(body, null, 2) : '',
+        },
+    };
 }
 
 export function parseHostAndPath(url: string) {
