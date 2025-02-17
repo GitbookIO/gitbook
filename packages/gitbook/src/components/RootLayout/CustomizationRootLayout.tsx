@@ -13,7 +13,11 @@ import {
     colorContrast,
     colorScale,
     type ColorScaleOptions,
+    DEFAULT_DANGER_COLOR,
+    DEFAULT_INFO_COLOR,
+    DEFAULT_SUCCESS_COLOR,
     DEFAULT_TINT_COLOR,
+    DEFAULT_WARNING_COLOR,
     hexToRgb,
 } from '@gitbook/colors';
 import { IconsProvider, IconStyle } from '@gitbook/icons';
@@ -85,6 +89,11 @@ export async function CustomizationRootLayout(props: {
                             )
                         };
                         --header-link: ${hexToRgb(customization.header.linkColor?.light ?? colorContrast(tintColor?.light ?? customization.styling.primaryColor.light))};
+
+                        ${generateColorVariable('info', DEFAULT_INFO_COLOR)}
+                        ${generateColorVariable('warning', DEFAULT_WARNING_COLOR)}
+                        ${generateColorVariable('danger', DEFAULT_DANGER_COLOR)}
+                        ${generateColorVariable('success', DEFAULT_SUCCESS_COLOR)}
                     }
 
                     .dark {
@@ -94,6 +103,11 @@ export async function CustomizationRootLayout(props: {
 
                         --header-background: ${hexToRgb(customization.header.backgroundColor?.dark ?? tintColor?.dark ?? customization.styling.primaryColor.dark)};
                         --header-link: ${hexToRgb(customization.header.linkColor?.dark ?? colorContrast(tintColor?.dark ?? customization.styling.primaryColor.dark))};
+
+                        ${generateColorVariable('info', DEFAULT_INFO_COLOR, { darkMode: true })}
+                        ${generateColorVariable('warning', DEFAULT_WARNING_COLOR, { darkMode: true })}
+                        ${generateColorVariable('danger', DEFAULT_DANGER_COLOR, { darkMode: true })}
+                        ${generateColorVariable('success', DEFAULT_SUCCESS_COLOR, { darkMode: true })}
                     }
                 `}</style>
             </head>
