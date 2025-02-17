@@ -51,15 +51,15 @@ export function OpenAPISchemaProperty(
         return (
             <InteractiveSection id={id} className={clsx('openapi-schema', className)}>
                 <OpenAPISchemaPresentation {...props} />
-                <OpenAPIDisclosure context={context}>
-                    {properties && properties.length > 0 ? (
+                {properties && properties.length > 0 ? (
+                    <OpenAPIDisclosure context={context}>
                         <OpenAPISchemaProperties
                             properties={properties}
                             circularRefs={circularRefs}
                             context={context}
                         />
-                    ) : null}
-                </OpenAPIDisclosure>
+                    </OpenAPIDisclosure>
+                ) : null}
             </InteractiveSection>
         );
     }
