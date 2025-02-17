@@ -338,7 +338,7 @@
 }
 
 .openapi-response-description.openapi-markdown {
-    @apply prose-sm text-[0.813rem] h-auto relative leading-[1.125rem] text-tint !font-normal truncate select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply text-left prose-sm text-[0.813rem] h-auto relative leading-[1.125rem] text-tint !font-normal truncate select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 .openapi-response-description.openapi-markdown::-webkit-scrollbar {
@@ -525,11 +525,11 @@
 }
 
 .openapi-disclosure-group-header {
-    @apply flex flex-row items-center justify-between gap-3;
+    @apply flex flex-row items-baseline justify-between gap-3 relative;
 }
 
 .openapi-disclosure-group-trigger {
-    @apply flex items-center relative flex-1 gap-2.5 py-2 truncate -outline-offset-1;
+    @apply flex items-baseline relative flex-1 gap-2.5 py-2 truncate -outline-offset-1;
 }
 
 .openapi-disclosure-group-trigger:disabled {
@@ -543,6 +543,10 @@
 
 .openapi-disclosure-group-trigger:disabled .openapi-disclosure-group-icon {
     @apply invisible;
+}
+
+.openapi-disclosure-group-trigger[aria-expanded='true'] .openapi-response-description {
+    @apply whitespace-normal;
 }
 
 .openapi-disclosure-group-icon > svg {
@@ -561,17 +565,16 @@
     @apply rotate-90;
 }
 
-.openapi-disclosure-group:hover .openapi-disclosure-group-mediatype,
-.openapi-disclosure-group[aria-expanded='true'] .openapi-disclosure-group-mediatype {
+.openapi-disclosure-group:hover .openapi-disclosure-group-mediatype {
     @apply opacity-11 flex;
 }
 
 .openapi-disclosure-group-mediatype {
-    @apply opacity-0 hidden transition-all duration-200 shrink-0;
+    @apply opacity-0 hidden text-xs transition-all duration-200 shrink-0 absolute right-0 top-2.5;
 }
 
 .openapi-disclosure-group-mediatype > span {
-    @apply text-xs text-tint-subtle;
+    @apply px-1 bg-tint-6 text-tint-12 rounded-full;
 }
 
 /* Disclosure */
