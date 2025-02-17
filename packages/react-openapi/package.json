@@ -19,7 +19,8 @@
         "react-aria-components": "^1.6.0",
         "react-aria": "^3.37.0",
         "usehooks-ts": "^3.1.0",
-        "zustand": "^5.0.3"
+        "zustand": "^5.0.3",
+        "node-html-parser": "^7.0.1"
     },
     "devDependencies": {
         "bun-types": "^1.1.20",

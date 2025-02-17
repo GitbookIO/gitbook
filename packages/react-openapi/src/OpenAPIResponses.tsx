@@ -4,6 +4,7 @@ import { OpenAPIResponse } from './OpenAPIResponse';
 import { OpenAPIClientContext } from './types';
 import { InteractiveSection } from './InteractiveSection';
 import { OpenAPIDisclosureGroup } from './OpenAPIDisclosureGroup';
+import { parse } from 'node-html-parser';
 
 /**
  * Display an interactive response body.
@@ -62,6 +63,6 @@ export function OpenAPIResponses(props: {
 }
 
 function htmlToText(html: string): string {
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    return doc.body.textContent?.trim() || '';
+    const doc = parse(html);
+    return doc.textContent?.trim() || '';
 }
