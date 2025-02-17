@@ -4,7 +4,6 @@ import { OpenAPIResponse } from './OpenAPIResponse';
 import { OpenAPIClientContext } from './types';
 import { InteractiveSection } from './InteractiveSection';
 import { OpenAPIDisclosureGroup } from './OpenAPIDisclosureGroup';
-import { Markdown } from './Markdown';
 
 /**
  * Display an interactive response body.
@@ -40,10 +39,9 @@ export function OpenAPIResponses(props: {
                                         {statusCode}
                                     </span>
                                     {description ? (
-                                        <Markdown
-                                            source={description}
-                                            className="openapi-response-description"
-                                        />
+                                        <div className="openapi-markdown openapi-response-description">
+                                            {htmlToText(description)}
+                                        </div>
                                     ) : null}
                                 </div>
                             ),
@@ -65,4 +63,9 @@ export function OpenAPIResponses(props: {
             />
         </InteractiveSection>
     );
+}
+
+function htmlToText(html: string): string {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    return doc.body.textContent?.trim() || '';
 }
