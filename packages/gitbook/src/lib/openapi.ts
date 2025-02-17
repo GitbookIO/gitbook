@@ -58,16 +58,15 @@ const fetchFilesystem = cache({
 
         const text = await response.text();
         const filesystem = await parseOpenAPI({ value: text, rootURL: url });
-        const cache: Map<string, Promise<string>> = new Map();
-        const transformedFs = await traverse(filesystem, async (node) => {
+        const parseMarkdownWithCache = createMarkdownParser();
+        const transformedFs = await traverse(filesystem, async (node, path) => {
             if ('description' in node && typeof node.description === 'string' && node.description) {
-                if (cache.has(node.description)) {
-                    node['x-description-html'] = await cache.get(node.description);
-                } else {
-                    const promise = parseMarkdown(node.description);
-                    cache.set(node.description, promise);
-                    node['x-description-html'] = await promise;
+                const lastKey = path && path[path.length - 1];
+                // Avoid parsing descriptions in examples.
+                if (lastKey === 'example') {
+                    return node;
                 }
+                node['x-description-html'] = await parseMarkdownWithCache(node.description);
             }
             return node;
         });
@@ -80,3 +79,17 @@ const fetchFilesystem = cache({
         };
     },
 });
+
+/**
+ * Create a markdown parser that caches the results of parsing.
+ */
+const createMarkdownParser = () => async (input: string) => {
+    const cache = new Map<string, Promise<string>>();
+    if (cache.has(input)) {
+        return cache.get(input) as Promise<string>;
+    }
+
+    const promise = parseMarkdown(input);
+    cache.set(input, promise);
+    return promise;
+};
