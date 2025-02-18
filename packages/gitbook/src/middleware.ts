@@ -528,8 +528,10 @@ async function lookupSiteOrSpaceInMultiIdMode(
     }
 
     // Extract the change request or revision ID from the path
-    const changeRequestId = eatPathId('~', 'changes');
-    const revisionId = eatPathId('~', 'revisions');
+    const changeRequestId = eatPathId('~changes');
+    const revisionId = eatPathId('~revisions');
+
+    console.log({ source, changeRequestId, revisionId });
 
     // Get the auth token from the URL query
     const AUTH_TOKEN_QUERY = 'token';
