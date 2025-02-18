@@ -49,7 +49,7 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                         className={tcls(
                             'w-3.5',
                             'h-[1em]',
-                            'mt-px',
+                            'mt-0.5',
                             'transition-colors',
                             'text-transparent',
                             'group-hover:text-tint-subtle',
