@@ -47,6 +47,13 @@ export const Link = React.forwardRef(function Link(
             });
         }
 
+        // When the page is embedded in an iframe, for security reasons other urls cannot be opened.
+        // In this case, we open the link in a new tab. 
+        if (isExternal && window.self !== window.top) {
+            event.preventDefault();
+            window.open(href, '_blank');
+        }
+
         domProps.onClick?.(event);
     };
 
