@@ -98,7 +98,7 @@ const HINT_STYLES: {
 } = {
     info: {
         icon: 'circle-info',
-        iconColor: 'text-info-subtle',
+        iconColor: 'text-info-subtle contrast-more:text-info',
         header: 'bg-info-active',
         body: [
             '[&_.can-override-bg]:bg-neutral-active',
@@ -109,7 +109,7 @@ const HINT_STYLES: {
     },
     warning: {
         icon: 'circle-exclamation',
-        iconColor: 'text-warning-subtle',
+        iconColor: 'text-warning-subtle contrast-more:text-warning',
         header: 'bg-warning-active',
         body: [
             // 'text-warning-strong',
@@ -124,7 +124,7 @@ const HINT_STYLES: {
     },
     danger: {
         icon: 'triangle-exclamation',
-        iconColor: 'text-danger-subtle',
+        iconColor: 'text-danger-subtle contrast-more:text-danger',
         header: 'bg-danger-active',
         body: [
             // 'text-danger-strong',
@@ -139,7 +139,7 @@ const HINT_STYLES: {
     },
     success: {
         icon: 'circle-check',
-        iconColor: 'text-success-subtle',
+        iconColor: 'text-success-subtle contrast-more:text-success',
         header: 'bg-success-active',
         body: [
             // 'text-success-strong',
