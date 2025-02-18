@@ -531,8 +531,6 @@ async function lookupSiteOrSpaceInMultiIdMode(
     const changeRequestId = eatPathId('~changes');
     const revisionId = eatPathId('~revisions');
 
-    console.log({ source, changeRequestId, revisionId });
-
     // Get the auth token from the URL query
     const AUTH_TOKEN_QUERY = 'token';
     const API_ENDPOINT_QUERY = 'api';
