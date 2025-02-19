@@ -102,6 +102,7 @@ const HINT_STYLES: {
         iconColor: 'text-info-subtle contrast-more:text-info',
         header: 'bg-info-active',
         body: [
+            'text-neutral-strong',
             '[&_.can-override-bg]:bg-neutral-active',
             '[&_.can-override-text]:text-neutral-strong',
         ],
@@ -113,7 +114,7 @@ const HINT_STYLES: {
         iconColor: 'text-warning-subtle contrast-more:text-warning',
         header: 'bg-warning-active',
         body: [
-            // 'text-warning-strong',
+            'text-neutral-strong',
             '[&_a]:text-warning',
             '[&_a:hover]:text-warning-strong',
             '[&_.can-override-bg]:bg-warning-active',
@@ -128,7 +129,7 @@ const HINT_STYLES: {
         iconColor: 'text-danger-subtle contrast-more:text-danger',
         header: 'bg-danger-active',
         body: [
-            // 'text-danger-strong',
+            'text-neutral-strong',
             '[&_a]:text-danger',
             '[&_a:hover]:text-danger-strong',
             '[&_.can-override-bg]:bg-danger-active',
@@ -143,7 +144,7 @@ const HINT_STYLES: {
         iconColor: 'text-success-subtle contrast-more:text-success',
         header: 'bg-success-active',
         body: [
-            // 'text-success-strong',
+            'text-neutral-strong',
             '[&_a]:text-success',
             '[&_a:hover]:text-success-strong',
             '[&_.can-override-bg]:bg-success-active',
