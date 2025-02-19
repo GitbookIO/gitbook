@@ -3,18 +3,21 @@ import { getExampleFromSchema } from '@scalar/oas-utils/spec-getters';
 
 type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue };
 
+type ScalarGetExampleFromSchemaOptions = NonNullable<Parameters<typeof getExampleFromSchema>[1]>;
+type GenerateSchemaExampleOptions = Pick<
+    ScalarGetExampleFromSchemaOptions,
+    'xml' | 'omitEmptyAndOptionalProperties' | 'mode'
+>;
+
 /**
  * Generate a JSON example from a schema
  */
 export function generateSchemaExample(
     schema: OpenAPIV3.SchemaObject,
-    options: {
-        onlyRequired?: boolean;
-    } = {},
+    options?: GenerateSchemaExampleOptions,
 ): JSONValue | undefined {
     return getExampleFromSchema(schema, {
         emptyString: 'text',
-        omitEmptyAndOptionalProperties: options.onlyRequired,
         variables: {
             'date-time': new Date().toISOString(),
             date: new Date().toISOString().split('T')[0],
@@ -28,6 +31,7 @@ export function generateSchemaExample(
             byte: 'Ynl0ZXM=',
             password: 'password',
         },
+        ...options,
     });
 }
 
@@ -36,9 +40,7 @@ export function generateSchemaExample(
  */
 export function generateMediaTypeExample(
     mediaType: OpenAPIV3.MediaTypeObject,
-    options: {
-        onlyRequired?: boolean;
-    } = {},
+    options?: GenerateSchemaExampleOptions,
 ): JSONValue | undefined {
     if (mediaType.example) {
         return mediaType.example;
