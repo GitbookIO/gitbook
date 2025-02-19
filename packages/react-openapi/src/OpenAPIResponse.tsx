@@ -1,6 +1,6 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { OpenAPISchemaProperties } from './OpenAPISchema';
-import { resolveDescription } from './utils';
+import { parameterToProperty, resolveDescription } from './utils';
 import type { OpenAPIClientContext } from './types';
 import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 
@@ -27,13 +27,11 @@ export function OpenAPIResponse(props: {
     return (
         <div className="openapi-response-body">
             {headers.length > 0 ? (
-                <OpenAPIDisclosure context={context} label={'Headers'}>
+                <OpenAPIDisclosure context={context} label="Headers">
                     <OpenAPISchemaProperties
-                        properties={headers.map(([name, header]) => ({
-                            propertyName: name,
-                            schema: header.schema ?? {},
-                            required: header.required,
-                        }))}
+                        properties={headers.map(([name, header]) => {
+                            return parameterToProperty({ name, ...header });
+                        })}
                         context={context}
                     />
                 </OpenAPIDisclosure>
@@ -41,11 +39,7 @@ export function OpenAPIResponse(props: {
             <div className="openapi-responsebody">
                 <OpenAPISchemaProperties
                     id={`response-${context.blockKey}`}
-                    properties={[
-                        {
-                            schema: mediaType.schema ?? {},
-                        },
-                    ]}
+                    properties={mediaType.schema ? [{ schema: mediaType.schema }] : []}
                     context={context}
                 />
             </div>
