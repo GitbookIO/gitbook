@@ -12,8 +12,9 @@ export function createStateKey(key: string, scope?: string) {
  * Resolve the description of an object.
  */
 export function resolveDescription(object: AnyObject) {
-    return 'x-description-html' in object && typeof object['x-description-html'] === 'string'
-        ? object['x-description-html']
+    return 'x-gitbook-description-html' in object &&
+        typeof object['x-gitbook-description-html'] === 'string'
+        ? object['x-gitbook-description-html']
         : typeof object.description === 'string'
           ? object.description
           : undefined;
