@@ -1,0 +1,41 @@
+openapi: 3.0.2
+info:
+    title: OpenAPI spec
+    version: 0.0.0
+servers:
+    - url: '/api/v3'
+paths:
+    '/pet':
+        put:
+            summary: Update an existing pet
+            description: |
+                Social platform
+            operationId: updatePet
+            requestBody:
+                description: Update an existent pet in the store
+                content:
+                    application/json:
+                        schema:
+                            required:
+                                - id
+                            type: object
+                            properties:
+                                id:
+                                    type: integer
+                                    format: int64
+                                    example: 10
+                required: true
+            responses:
+                '200':
+                    description: Successful operation
+                    content:
+                        application/json:
+                            schema:
+                                required:
+                                    - id
+                                type: object
+                                properties:
+                                    id:
+                                        type: integer
+                                        format: int64
+                                        example: 10

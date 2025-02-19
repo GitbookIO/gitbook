@@ -1,0 +1,133 @@
+// Bun Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`parseMarkdown should parse a simple table 1`] = `
+"<h2>Table</h2>
+<table>
+<thead>
+<tr>
+<th>a</th>
+<th align="left">b</th>
+<th align="right">c</th>
+<th align="center">d</th>
+</tr>
+</thead>
+</table>"
+`;
+
+exports[`parseMarkdown should parse a complex table 1`] = `
+"<p>Returns information for all non-fungible tokens for an account.</p>
+<h2>Ordering</h2>
+<p>When considering NFTs, their order is governed by a combination of their numerical <strong>token.Id</strong> and <strong>serialnumber</strong> values, with <strong>token.id</strong> being the parent column.
+A serialnumbers value governs its order within the given token.id</p>
+<p>In that regard, if a user acquired a set of NFTs in the order (2-2, 2-4 1-5, 1-1, 1-3, 3-3, 3-4), the following layouts illustrate the ordering expectations for ownership listing</p>
+<ol>
+<li><strong>All NFTs in ASC order</strong>: 1-1, 1-3, 1-5, 2-2, 2-4, 3-3, 3-4</li>
+<li><strong>All NFTs in DESC order</strong>: 3-4, 3-3, 2-4, 2-2, 1-5, 1-3, 1-1</li>
+<li><strong>NFTs above 1-1 in ASC order</strong>: 1-3, 1-5, 2-2, 2-4, 3-3, 3-4</li>
+<li><strong>NFTs below 3-3 in ASC order</strong>: 1-1, 1-3, 1-5, 2-2, 2-4</li>
+<li><strong>NFTs between 1-3 and 3-3 inclusive in DESC order</strong>: 3-4, 3-3, 2-4, 2-2, 1-5, 1-3</li>
+</ol>
+<p>Note: The default order for this API is currently DESC</p>
+<h2>Filtering</h2>
+<p>When filtering there are some restrictions enforced to ensure correctness and scalability.</p>
+<p><strong>The table below defines the restrictions and support for the NFT ownership endpoint</strong></p>
+<table>
+<thead>
+<tr>
+<th>Query Param</th>
+<th>Comparison Operator</th>
+<th>Support</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token.id</td>
+<td>eq</td>
+<td>Y</td>
+<td>Single occurrence only.</td>
+<td>?token.id=X</td>
+</tr>
+<tr>
+<td></td>
+<td>ne</td>
+<td>N</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>lt(e)</td>
+<td>Y</td>
+<td>Single occurrence only.</td>
+<td>?token.id=lte:X</td>
+</tr>
+<tr>
+<td></td>
+<td>gt(e)</td>
+<td>Y</td>
+<td>Single occurrence only.</td>
+<td>?token.id=gte:X</td>
+</tr>
+<tr>
+<td>serialnumber</td>
+<td>eq</td>
+<td>Y</td>
+<td>Single occurrence only. Requires the presence of a <strong>token.id</strong> query</td>
+<td>?serialnumber=Y</td>
+</tr>
+<tr>
+<td></td>
+<td>ne</td>
+<td>N</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>lt(e)</td>
+<td>Y</td>
+<td>Single occurrence only. Requires the presence of an <strong>lte</strong> or <strong>eq</strong> <strong>token.id</strong> query</td>
+<td>?token.id=lte:X&amp;serialnumber=lt:Y</td>
+</tr>
+<tr>
+<td></td>
+<td>gt(e)</td>
+<td>Y</td>
+<td>Single occurrence only. Requires the presence of an <strong>gte</strong> or <strong>eq</strong> <strong>token.id</strong> query</td>
+<td>?token.id=gte:X&amp;serialnumber=gt:Y</td>
+</tr>
+<tr>
+<td>spender.id</td>
+<td>eq</td>
+<td>Y</td>
+<td></td>
+<td>?spender.id=Z</td>
+</tr>
+<tr>
+<td></td>
+<td>ne</td>
+<td>N</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>lt(e)</td>
+<td>Y</td>
+<td></td>
+<td>?spender.id=lt:Z</td>
+</tr>
+<tr>
+<td></td>
+<td>gt(e)</td>
+<td>Y</td>
+<td></td>
+<td>?spender.id=gt:Z</td>
+</tr>
+</tbody>
+</table>
+<p>Note: When searching across a range for individual NFTs a <strong>serialnumber</strong> with an additional <strong>token.id</strong> query filter must be provided.
+Both filters must be a single occurrence of <strong>gt(e)</strong> or <strong>lt(e)</strong> which provide a lower and or upper boundary for search.</p>"
+`;
