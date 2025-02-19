@@ -3,7 +3,7 @@ import typography from '@tailwindcss/typography';
 import type { Config } from 'tailwindcss';
 import plugin from 'tailwindcss/plugin';
 
-import { ColorCategory, hexToRgb, scale, shadesOfColor } from './src/lib/colors';
+import { ColorCategory, hexToRgb, scale, shadesOfColor } from '@gitbook/colors';
 
 export const shades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
 export const opacities = [0, 4, 8, 12, 16, 24, 40, 64, 72, 88, 96, 100];

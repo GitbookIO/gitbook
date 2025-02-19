@@ -9,18 +9,18 @@ import {
     type CustomizationTint,
     type SiteCustomizationSettings,
 } from '@gitbook/api';
-import { IconsProvider, IconStyle } from '@gitbook/icons';
-
-import { fontNotoColorEmoji, fonts, ibmPlexMono } from '@/fonts';
-import { getSpaceLanguage } from '@/intl/server';
-import { getStaticFileURL } from '@/lib/assets';
 import {
     colorContrast,
     colorScale,
     type ColorScaleOptions,
     DEFAULT_TINT_COLOR,
     hexToRgb,
-} from '@/lib/colors';
+} from '@gitbook/colors';
+import { IconsProvider, IconStyle } from '@gitbook/icons';
+
+import { fontNotoColorEmoji, fonts, ibmPlexMono } from '@/fonts';
+import { getSpaceLanguage } from '@/intl/server';
+import { getStaticFileURL } from '@/lib/assets';
 import { tcls } from '@/lib/tailwind';
 
 import { ClientContexts } from './ClientContexts';
