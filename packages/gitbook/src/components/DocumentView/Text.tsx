@@ -15,31 +15,29 @@ import { ClassValue, tcls } from '@/lib/tailwind';
 export function Text(props: { text: DocumentText }) {
     const { text } = props;
 
-    return (
-        <>
-            {text.leaves.map((leaf, index) => {
-                return (
-                    <React.Fragment key={index}>
-                        {leaf.marks
-                            // Sort to have code marks at the end, so that they don't interfere with other marks
-                            .sort(
-                                (a, b) => (a.type === 'code' ? 1 : 0) - (b.type === 'code' ? 1 : 0),
-                            )
-                            .reduce<React.ReactNode>((children, mark, index) => {
-                                const Mark = MARK_STYLES[mark.type];
+    return text.leaves.map((leaf, index) => {
+        return (
+            <React.Fragment key={index}>
+                {leaf.marks
+                    // Sort to have code marks at the end, so that they don't interfere with other marks
+                    .sort((a, b) => (a.type === 'code' ? 1 : 0) - (b.type === 'code' ? 1 : 0))
+                    .reduce<React.ReactNode>((children, mark, index) => {
+                        const Mark = MARK_STYLES[mark.type];
 
-                                if (!Mark) {
-                                    return children;
-                                }
+                        if (!Mark) {
+                            return children;
+                        }
 
-                                // @ts-ignore
-                                return <Mark mark={mark}>{children}</Mark>;
-                            }, leaf.text)}
-                    </React.Fragment>
-                );
-            })}
-        </>
-    );
+                        return (
+                            // @ts-ignore
+                            <Mark key="mark" mark={mark}>
+                                {children}
+                            </Mark>
+                        );
+                    }, leaf.text)}
+            </React.Fragment>
+        );
+    });
 }
 
 const MARK_STYLES = {

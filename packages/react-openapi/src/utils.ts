@@ -16,9 +16,9 @@ export function createStateKey(key: string, scope?: string) {
 export function resolveDescription(object: AnyObject) {
     return 'x-gitbook-description-html' in object &&
         typeof object['x-gitbook-description-html'] === 'string'
-        ? object['x-gitbook-description-html']
+        ? object['x-gitbook-description-html'].trim()
         : typeof object.description === 'string'
-          ? object.description
+          ? object.description.trim()
           : undefined;
 }
 
