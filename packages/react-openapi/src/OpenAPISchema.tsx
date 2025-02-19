@@ -397,7 +397,7 @@ export function getSchemaTitle(
     let type = 'any';
 
     if (schema.enum) {
-        type = 'enum';
+        type = `${schema.type} · enum`;
         // check array AND schema.items as this is sometimes null despite what the type indicates
     } else if (schema.type === 'array' && !!schema.items) {
         type = `${getSchemaTitle(schema.items)}[]`;
@@ -407,7 +407,7 @@ export function getSchemaTitle(
         type = schema.type ?? 'object';
 
         if (schema.format) {
-            type += ` ${schema.format}`;
+            type += ` · ${schema.format}`;
         }
     } else if ('anyOf' in schema) {
         type = 'any of';
@@ -419,8 +419,20 @@ export function getSchemaTitle(
         type = 'not';
     }
 
+    if (schema.minimum || schema.minLength) {
+        type += ` · min: ${schema.minimum || schema.minLength}`;
+    }
+
+    if (schema.maximum || schema.maxLength) {
+        type += ` · max: ${schema.maximum || schema.maxLength}`;
+    }
+
+    if (schema.default) {
+        type += ` · default: ${schema.default}`;
+    }
+
     if (schema.nullable) {
-        type = `nullable ${type}`;
+        type = `${type} | nullable`;
     }
 
     return type;
