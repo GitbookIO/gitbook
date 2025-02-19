@@ -6,6 +6,7 @@ import type {
 
 export interface OpenAPIContextProps extends OpenAPIClientContext {
     CodeBlock: React.ComponentType<{ code: string; syntax: string }>;
+    renderHeading: (props: { deprecated: boolean; title: string }) => React.ReactNode;
 
     /** Spec url for the Scalar Api Client */
     specUrl: string;

@@ -3,12 +3,12 @@ import { Icon } from '@gitbook/icons';
 import { OpenAPIOperation } from '@gitbook/react-openapi';
 import React from 'react';
 
-import { LoadingPane } from '@/components/primitives';
 import { fetchOpenAPIBlock } from '@/lib/openapi/fetch';
 import { tcls } from '@/lib/tailwind';
 
 import { BlockProps } from '../Block';
 import { PlainCodeBlock } from '../CodeBlock';
+import { Heading } from '../Heading';
 
 import './style.css';
 import './scalar.css';
@@ -54,40 +54,36 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockOpenAPI>) {
                     plus: <Icon icon="plus" />,
                 },
                 CodeBlock: PlainCodeBlock,
+                renderHeading: (headingProps) => (
+                    <Heading
+                        document={props.document}
+                        ancestorBlocks={props.ancestorBlocks}
+                        isEstimatedOffscreen={props.isEstimatedOffscreen}
+                        context={props.context}
+                        style={headingProps.deprecated ? 'line-through' : undefined}
+                        block={{
+                            object: 'block',
+                            key: `${block.key}-heading`,
+                            meta: block.meta,
+                            data: {},
+                            type: 'heading-2',
+                            nodes: [
+                                {
+                                    key: `${block.key}-heading-text`,
+                                    object: 'text',
+                                    leaves: [
+                                        { text: headingProps.title, object: 'leaf', marks: [] },
+                                    ],
+                                },
+                            ],
+                        }}
+                    />
+                ),
                 defaultInteractiveOpened: context.mode === 'print',
                 id: block.meta?.id,
                 blockKey: block.key,
             }}
             className="openapi-block"
         />
-    );
-}
-
-function OpenAPIFallback() {
-    return (
-        <div
-            role="status"
-            aria-busy
-            className={'openapi-block ' + tcls('flex', 'flex-1', 'flex-col', 'gap-3')}
-        >
-            <LoadingPane
-                tile={12}
-                style={['rounded-md', 'h-[47px]', '[max-width:calc(48rem-1px)]']}
-            />
-            <LoadingPane
-                tile={12}
-                style={['rounded-md', 'h-[35px]', '[max-width:calc(48rem-1px)]']}
-            />
-            <div className={tcls('flex', 'gap-[25px]')}>
-                <div className={tcls('flex', 'flex-1', 'flex-col', 'gap-3')}>
-                    <LoadingPane tile={24} style={['rounded-md', 'aspect-[2.5/1]', 'w-full']} />
-                    <LoadingPane tile={24} style={['rounded-md', 'aspect-[2.5/1]', 'w-full']} />
-                </div>
-                <div className={tcls('flex', 'flex-1', 'flex-col', 'gap-3')}>
-                    <LoadingPane tile={24} style={['rounded-md', 'aspect-[4/1]', 'w-full']} />
-                    <LoadingPane tile={24} style={['rounded-md', 'aspect-[4/1]', 'w-full']} />
-                </div>
-            </div>
-        </div>
     );
 }

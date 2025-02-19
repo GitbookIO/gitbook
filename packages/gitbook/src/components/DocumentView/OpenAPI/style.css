@@ -1,7 +1,5 @@
 /* Layout Components */
 .openapi-operation {
-    content-visibility: auto;
-    contain-intrinsic-height: 600px;
     @apply flex-1 flex flex-col gap-4 mb-14;
 }
 
@@ -18,16 +16,8 @@
     @apply flex flex-col items-start justify-start gap-2;
 }
 
-.openapi-summary-title {
-    @apply font-semibold text-xl;
-}
-
-.openapi-summary-title[data-deprecated='true'] {
-    @apply line-through;
-}
-
 .openapi-deprecated {
-    @apply py-0.5 px-1.5 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded-full text-sm leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
+    @apply py-0.5 px-1.5 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded text-sm leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
 }
 
 .openapi-deprecated-sunset-date {

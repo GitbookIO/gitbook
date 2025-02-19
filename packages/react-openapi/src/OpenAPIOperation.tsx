@@ -25,14 +25,17 @@ export function OpenAPIOperation(props: {
         blockKey: context.blockKey,
     };
 
-    const description = resolveDescription(operation)?.trim();
+    const description = resolveDescription(operation);
 
     return (
         <div className={clsx('openapi-operation', className)}>
-            <div className="openapi-summary" id={context.id}>
-                <h2 className="openapi-summary-title" data-deprecated={operation.deprecated}>
-                    {operation.summary}
-                </h2>
+            <div className="openapi-summary">
+                {operation.summary
+                    ? context.renderHeading({
+                          deprecated: operation.deprecated ?? false,
+                          title: operation.summary,
+                      })
+                    : null}
                 {operation.deprecated && <div className="openapi-deprecated">Deprecated</div>}
             </div>
             <div className="openapi-columns">
