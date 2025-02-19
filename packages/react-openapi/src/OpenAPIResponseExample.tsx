@@ -2,9 +2,9 @@ import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { generateSchemaExample } from './generateSchemaExample';
 import type { OpenAPIContextProps, OpenAPIOperationData } from './types';
 import { checkIsReference, createStateKey, resolveDescription } from './utils';
-import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
 import { InteractiveSection } from './InteractiveSection';
+import { json2xml } from './json2xml';
 
 /**
  * Display an example of the response content.
@@ -38,84 +38,51 @@ export function OpenAPIResponseExample(props: {
         return Number(a) - Number(b);
     });
 
-    const examples = responses
-        .map(([key, value]) => {
-            const responseObject = value;
-            const mediaTypeObject = (() => {
-                if (!responseObject.content) {
-                    return null;
-                }
-                const key = Object.keys(responseObject.content)[0];
-                return (
-                    responseObject.content['application/json'] ??
-                    (key ? responseObject.content[key] : null)
-                );
-            })();
+    const tabs = responses
+        .map(([key, responseObject]) => {
+            const description = resolveDescription(responseObject);
 
-            if (!mediaTypeObject) {
+            if (checkIsReference(responseObject)) {
                 return {
                     key: key,
                     label: key,
-                    description: resolveDescription(responseObject),
-                    body: <OpenAPIEmptyResponseExample />,
+                    description,
+                    body: (
+                        <OpenAPIExample
+                            example={getExampleFromReference(responseObject)}
+                            context={context}
+                            syntax="json"
+                        />
+                    ),
                 };
             }
 
-            const example = handleUnresolvedReference(
-                (() => {
-                    const { examples, example } = mediaTypeObject;
-                    if (examples) {
-                        const key = Object.keys(examples)[0];
-                        if (key) {
-                            // @TODO handle multiple examples
-                            const firstExample = examples[key];
-                            if (firstExample) {
-                                return firstExample;
-                            }
-                        }
-                    }
-
-                    if (example) {
-                        return { value: example };
-                    }
-
-                    const schema = mediaTypeObject.schema;
-                    if (!schema) {
-                        return null;
-                    }
-
-                    return { value: generateSchemaExample(schema) };
-                })(),
-            );
+            if (!responseObject.content || Object.keys(responseObject.content).length === 0) {
+                return {
+                    key: key,
+                    label: key,
+                    description,
+                    body: <OpenAPIEmptyResponseExample />,
+                };
+            }
 
             return {
                 key: key,
                 label: key,
                 description: resolveDescription(responseObject),
-                body: example?.value ? (
-                    <context.CodeBlock
-                        code={
-                            typeof example.value === 'string'
-                                ? example.value
-                                : stringifyOpenAPI(example.value, null, 2)
-                        }
-                        syntax="json"
-                    />
-                ) : (
-                    <OpenAPIEmptyResponseExample />
-                ),
+                body: <OpenAPIResponse context={context} content={responseObject.content} />,
             };
         })
         .filter((val): val is { key: string; label: string; body: any; description: string } =>
             Boolean(val),
         );
 
-    if (examples.length === 0) {
+    if (tabs.length === 0) {
         return null;
     }
 
     return (
-        <OpenAPITabs stateKey={createStateKey('response-example')} items={examples}>
+        <OpenAPITabs stateKey={createStateKey('response-example')} items={tabs}>
             <InteractiveSection header={<OpenAPITabsList />} className="openapi-response-example">
                 <OpenAPITabsPanels />
             </InteractiveSection>
@@ -123,6 +90,179 @@ export function OpenAPIResponseExample(props: {
     );
 }
 
+function OpenAPIResponse(props: {
+    context: OpenAPIContextProps;
+    content: {
+        [media: string]: OpenAPIV3.MediaTypeObject;
+    };
+}) {
+    const { context, content } = props;
+
+    const entries = Object.entries(content);
+    const firstEntry = entries[0];
+
+    if (!firstEntry) {
+        throw new Error('One media type is required');
+    }
+
+    if (entries.length === 1) {
+        const [mediaType, mediaTypeObject] = firstEntry;
+        return (
+            <OpenAPIResponseMediaType
+                context={context}
+                mediaType={mediaType}
+                mediaTypeObject={mediaTypeObject}
+            />
+        );
+    }
+
+    const tabs = entries.map((entry) => {
+        const [mediaType, mediaTypeObject] = entry;
+        return {
+            key: mediaType,
+            label: mediaType,
+            body: (
+                <OpenAPIResponseMediaType
+                    context={context}
+                    mediaType={mediaType}
+                    mediaTypeObject={mediaTypeObject}
+                />
+            ),
+        };
+    });
+
+    return (
+        <OpenAPITabs stateKey={createStateKey('media-type-examples')} items={tabs}>
+            <InteractiveSection header={<OpenAPITabsList />} className="openapi-response-example">
+                <OpenAPITabsPanels />
+            </InteractiveSection>
+        </OpenAPITabs>
+    );
+}
+
+function OpenAPIResponseMediaType(props: {
+    mediaTypeObject: OpenAPIV3.MediaTypeObject;
+    mediaType: string;
+    context: OpenAPIContextProps;
+}) {
+    const { mediaTypeObject, mediaType } = props;
+    const examples = getExamplesFromMediaTypeObject({ mediaTypeObject, mediaType });
+    const syntax = getSyntaxFromMediaType(mediaType);
+    const firstExample = examples[0];
+
+    if (!firstExample) {
+        return <OpenAPIEmptyResponseExample />;
+    }
+
+    if (examples.length === 1) {
+        return <OpenAPIExample example={firstExample} context={props.context} syntax={syntax} />;
+    }
+
+    const tabs = examples.map((example) => {
+        return {
+            key: example.summary || 'Example',
+            label: example.summary || 'Example',
+            body: <OpenAPIExample example={firstExample} context={props.context} syntax={syntax} />,
+        };
+    });
+
+    return (
+        <OpenAPITabs stateKey={createStateKey('media-type-examples')} items={tabs}>
+            <InteractiveSection header={<OpenAPITabsList />} className="openapi-response-example">
+                <OpenAPITabsPanels />
+            </InteractiveSection>
+        </OpenAPITabs>
+    );
+}
+
+/**
+ * Display an example.
+ */
+function OpenAPIExample(props: {
+    example: OpenAPIV3.ExampleObject;
+    context: OpenAPIContextProps;
+    syntax: string;
+}) {
+    const { example, context, syntax } = props;
+    const code = stringifyExample({ example, xml: syntax === 'xml' });
+
+    if (code === null) {
+        return <OpenAPIEmptyResponseExample />;
+    }
+
+    return <context.CodeBlock code={code} syntax={syntax} />;
+}
+
+function stringifyExample(args: { example: OpenAPIV3.ExampleObject; xml: boolean }): string | null {
+    const { example, xml } = args;
+
+    if (!example.value) {
+        return null;
+    }
+
+    if (typeof example.value === 'string') {
+        return example.value;
+    }
+
+    if (xml) {
+        return json2xml(example.value);
+    }
+
+    return JSON.stringify(example.value, null, 2);
+}
+
+/**
+ * Get the syntax from a media type.
+ */
+function getSyntaxFromMediaType(mediaType: string): string {
+    if (mediaType.includes('json')) {
+        return 'json';
+    }
+
+    if (mediaType === 'application/xml') {
+        return 'xml';
+    }
+
+    return 'text';
+}
+
+/**
+ * Get examples from a media type object.
+ */
+function getExamplesFromMediaTypeObject(args: {
+    mediaType: string;
+    mediaTypeObject: OpenAPIV3.MediaTypeObject;
+}): OpenAPIV3.ExampleObject[] {
+    const { mediaTypeObject, mediaType } = args;
+    if (mediaTypeObject.examples) {
+        return Object.values(mediaTypeObject.examples).map((example) => {
+            return checkIsReference(example) ? getExampleFromReference(example) : example;
+        });
+    }
+
+    if (mediaTypeObject.example) {
+        return [{ value: mediaTypeObject.example }];
+    }
+
+    if (mediaTypeObject.schema) {
+        // @TODO normally we should use the name of the schema but we don't have it
+        const root = mediaTypeObject.schema.xml?.name ?? 'object';
+        return [
+            {
+                value: {
+                    [root]: generateSchemaExample(mediaTypeObject.schema, {
+                        xml: mediaType === 'application/xml',
+                    }),
+                },
+            },
+        ];
+    }
+    return [];
+}
+
+/**
+ * Empty response example.
+ */
 function OpenAPIEmptyResponseExample() {
     return (
         <pre className="openapi-response-example-empty">
@@ -131,15 +271,9 @@ function OpenAPIEmptyResponseExample() {
     );
 }
 
-function handleUnresolvedReference(
-    input: OpenAPIV3.ExampleObject | null,
-): OpenAPIV3.ExampleObject | null {
-    const isReference = checkIsReference(input?.value);
-
-    if (isReference) {
-        // If we find a reference that wasn't resolved or needed to be resolved externally, render out the URL
-        return { value: input.value.$ref };
-    }
-
-    return input;
+/**
+ * Generate an example from a reference object.
+ */
+function getExampleFromReference(ref: OpenAPIV3.ReferenceObject): OpenAPIV3.ExampleObject {
+    return { summary: 'Unresolved reference', value: { $ref: ref.$ref } };
 }

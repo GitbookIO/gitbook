@@ -1,0 +1,18 @@
+// Bun Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getUrlFromServerState indents correctly 1`] = `
+"<?xml version="1.0"?>
+<id>10</id>
+<name>doggie</name>
+<category>
+	<id>1</id>
+	<name>Dogs</name>
+</category>
+<photoUrls>string</photoUrls>
+<tags>
+	<id>0</id>
+	<name>string</name>
+</tags>
+<status>available</status>
+"
+`;
