@@ -46,13 +46,10 @@ export function OpenAPIResponseExample(props: {
                     return null;
                 }
                 const key = Object.keys(responseObject.content)[0];
-                return (
-                    responseObject.content['application/json'] ??
-                    (key ? responseObject.content[key] : null)
-                );
+                return [key, key ? responseObject.content[key] : null];
             })();
 
-            if (!mediaTypeObject) {
+            if (!mediaTypeObject || !mediaTypeObject[1]) {
                 return {
                     key: key,
                     label: key,
@@ -63,7 +60,7 @@ export function OpenAPIResponseExample(props: {
 
             const example = handleUnresolvedReference(
                 (() => {
-                    const { examples, example } = mediaTypeObject;
+                    const { examples, example } = mediaTypeObject[1];
                     if (examples) {
                         const key = Object.keys(examples)[0];
                         if (key) {
@@ -79,7 +76,7 @@ export function OpenAPIResponseExample(props: {
                         return { value: example };
                     }
 
-                    const schema = mediaTypeObject.schema;
+                    const schema = mediaTypeObject[1].schema;
                     if (!schema) {
                         return null;
                     }
@@ -99,7 +96,7 @@ export function OpenAPIResponseExample(props: {
                                 ? example.value
                                 : stringifyOpenAPI(example.value, null, 2)
                         }
-                        syntax="json"
+                        syntax={fetchSyntaxFromContentType(mediaTypeObject[0])}
                     />
                 ) : (
                     <OpenAPIEmptyResponseExample />
@@ -142,4 +139,12 @@ function handleUnresolvedReference(
     }
 
     return input;
+}
+
+function fetchSyntaxFromContentType(contentType: string) {
+    if (contentType.includes('json')) {
+        return 'json';
+    }
+
+    return contentType.split('/')[1] || 'json';
 }
