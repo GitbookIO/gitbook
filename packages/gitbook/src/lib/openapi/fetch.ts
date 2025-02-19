@@ -1,11 +1,11 @@
 import { ContentRef, DocumentBlockOpenAPI } from '@gitbook/api';
-import { parseOpenAPI, OpenAPIParseError, traverse } from '@gitbook/openapi-parser';
+import { parseOpenAPI, OpenAPIParseError } from '@gitbook/openapi-parser';
 import { type OpenAPIOperationData, resolveOpenAPIOperation } from '@gitbook/react-openapi';
 
 import { cache, noCacheFetchOptions, CacheFunctionOptions } from '@/lib/cache';
 
-import { parseMarkdown } from './markdown';
-import { ResolvedContentRef } from './references';
+import { enrichFilesystem } from './enrich';
+import { ResolvedContentRef } from '../references';
 
 /**
  * Fetch an OpenAPI specification for an operation.
@@ -58,38 +58,13 @@ const fetchFilesystem = cache({
 
         const text = await response.text();
         const filesystem = await parseOpenAPI({ value: text, rootURL: url });
-        const parseMarkdownWithCache = createMarkdownParser();
-        const transformedFs = await traverse(filesystem, async (node, path) => {
-            if ('description' in node && typeof node.description === 'string' && node.description) {
-                const lastKey = path && path[path.length - 1];
-                // Avoid parsing descriptions in examples.
-                if (lastKey === 'example') {
-                    return node;
-                }
-                node['x-description-html'] = await parseMarkdownWithCache(node.description);
-            }
-            return node;
-        });
+        const richFilesystem = await enrichFilesystem(filesystem);
         return {
             // Cache for 4 hours
             ttl: 24 * 60 * 60,
             // Revalidate every 2 hours
             revalidateBefore: 22 * 60 * 60,
-            data: transformedFs,
+            data: richFilesystem,
         };
     },
 });
-
-/**
- * Create a markdown parser that caches the results of parsing.
- */
-const createMarkdownParser = () => async (input: string) => {
-    const cache = new Map<string, Promise<string>>();
-    if (cache.has(input)) {
-        return cache.get(input) as Promise<string>;
-    }
-
-    const promise = parseMarkdown(input);
-    cache.set(input, promise);
-    return promise;
-};
