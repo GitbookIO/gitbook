@@ -19,6 +19,7 @@
     "dependencies": {
         "@gitbook/api": "^0.93.0",
         "@gitbook/cache-do": "workspace:*",
+        "@gitbook/colors": "workspace:*",
         "@gitbook/emoji-codepoints": "workspace:*",
         "@gitbook/icons": "workspace:*",
         "@gitbook/openapi-parser": "workspace:*",

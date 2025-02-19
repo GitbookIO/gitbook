@@ -1,7 +1,7 @@
 import { SiteInsightsAd } from '@gitbook/api';
+import { hexToRgba } from '@gitbook/colors';
 import * as React from 'react';
 
-import { hexToRgba } from '@/lib/colors';
 import { getResizedImageURL } from '@/lib/images';
 import { tcls } from '@/lib/tailwind';
 

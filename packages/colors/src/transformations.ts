@@ -1,3 +1,5 @@
+import { DARK_BASE, LIGHT_BASE, DEFAULT_TINT_COLOR } from './colors';
+
 type ColorShades = {
     [key: string]: string;
 };
@@ -6,9 +8,6 @@ type RGBColor = [number, number, number];
 type OKLABColor = { L: number; A: number; B: number };
 type OKLCHColor = { L: number; C: number; H: number };
 
-export const DARK_BASE = '#1d1d1d';
-export const LIGHT_BASE = '#ffffff';
-export const DEFAULT_TINT_COLOR = '#787878';
 const D65 = [95.047, 100.0, 108.883]; // Reference white (D65)
 
 export enum ColorCategory {
@@ -226,7 +225,7 @@ export function colorScale(
 /**
  * Convert a hex color to an RGB color set.
  */
-function hexToRgbArray(hex: string): RGBColor {
+export function hexToRgbArray(hex: string): RGBColor {
     const originalHex = hex;
 
     let value = hex.replace('#', '');
@@ -252,7 +251,7 @@ function hexToRgbArray(hex: string): RGBColor {
 /**
  * Convert a RGB color set to a hex color.
  */
-function rgbArrayToHex(rgb: RGBColor): string {
+export function rgbArrayToHex(rgb: RGBColor): string {
     return `#${rgb
         .map((channel) => {
             const component = channel.toString(16);
@@ -262,7 +261,7 @@ function rgbArrayToHex(rgb: RGBColor): string {
         .join('')}`;
 }
 
-function getColor(percentage: number, start: RGBColor, end: RGBColor) {
+export function getColor(percentage: number, start: RGBColor, end: RGBColor) {
     const rgb = end.map((channel, index) => {
         return Math.round(channel + percentage * (start[index] - channel));
     });
@@ -271,21 +270,21 @@ function getColor(percentage: number, start: RGBColor, end: RGBColor) {
 }
 
 // Utility constants and helper functions
-function rgbToLinear(rgb: RGBColor): [number, number, number] {
+export function rgbToLinear(rgb: RGBColor): [number, number, number] {
     return rgb.map((v) => {
         const scaled = v / 255;
         return scaled <= 0.04045 ? scaled / 12.92 : ((scaled + 0.055) / 1.055) ** 2.4;
     }) as [number, number, number];
 }
 
-function linearToRgb(linear: [number, number, number]): RGBColor {
+export function linearToRgb(linear: [number, number, number]): RGBColor {
     return linear.map((v) => {
         const scaled = v <= 0.0031308 ? 12.92 * v : 1.055 * v ** (1 / 2.4) - 0.055;
         return Math.round(Math.max(0, Math.min(1, scaled)) * 255);
     }) as RGBColor;
 }
 
-function rgbToOklab(rgb: RGBColor): OKLABColor {
+export function rgbToOklab(rgb: RGBColor): OKLABColor {
     const [r, g, b] = rgbToLinear(rgb);
 
     const l = 0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b;
@@ -303,7 +302,7 @@ function rgbToOklab(rgb: RGBColor): OKLABColor {
     };
 }
 
-function oklabToRgb(oklab: OKLABColor): RGBColor {
+export function oklabToRgb(oklab: OKLABColor): RGBColor {
     const { L, A, B } = oklab;
 
     const lRoot = L + 0.3963377774 * A + 0.2158037573 * B;
@@ -321,14 +320,14 @@ function oklabToRgb(oklab: OKLABColor): RGBColor {
     return linearToRgb([r, g, b]);
 }
 
-function oklabToOklch(oklab: OKLABColor): OKLCHColor {
+export function oklabToOklch(oklab: OKLABColor): OKLCHColor {
     const { L, A, B } = oklab;
     const C = Math.sqrt(A ** 2 + B ** 2);
     const H = (Math.atan2(B, A) * 180) / Math.PI;
     return { L, C, H: H < 0 ? H + 360 : H };
 }
 
-function oklchToOklab(oklch: OKLCHColor): OKLABColor {
+export function oklchToOklab(oklch: OKLCHColor): OKLABColor {
     const { L, C, H } = oklch;
     const rad = (H * Math.PI) / 180;
     return {
@@ -338,15 +337,15 @@ function oklchToOklab(oklch: OKLCHColor): OKLABColor {
     };
 }
 
-function rgbToOklch(rgb: RGBColor): OKLCHColor {
+export function rgbToOklch(rgb: RGBColor): OKLCHColor {
     return oklabToOklch(rgbToOklab(rgb));
 }
 
-function oklchToRgb(oklch: OKLCHColor): RGBColor {
+export function oklchToRgb(oklch: OKLCHColor): RGBColor {
     return oklabToRgb(oklchToOklab(oklch));
 }
 
-function rgbToXyz(rgb: RGBColor): [number, number, number] {
+export function rgbToXyz(rgb: RGBColor): [number, number, number] {
     const [r, g, b] = rgbToLinear(rgb);
     return [
         (r * 0.4124564 + g * 0.3575761 + b * 0.1804375) * 100,
@@ -355,7 +354,11 @@ function rgbToXyz(rgb: RGBColor): [number, number, number] {
     ];
 }
 
-function xyzToLab65(xyz: [number, number, number]): { L: number; A: number; B: number } {
+export function xyzToLab65(xyz: [number, number, number]): {
+    L: number;
+    A: number;
+    B: number;
+} {
     const [x, y, z] = xyz.map((v, i) => {
         const scaled = v / D65[i];
         return scaled > 0.008856 ? Math.cbrt(scaled) : 7.787 * scaled + 16 / 116;
@@ -368,7 +371,7 @@ function xyzToLab65(xyz: [number, number, number]): { L: number; A: number; B: n
     };
 }
 
-function rgbTolab65(rgb: RGBColor): { L: number; A: number; B: number } {
+export function rgbTolab65(rgb: RGBColor): { L: number; A: number; B: number } {
     return xyzToLab65(rgbToXyz(rgb));
 }
 
@@ -376,7 +379,7 @@ function rgbTolab65(rgb: RGBColor): { L: number; A: number; B: number } {
   Delta Phi Star perceptual lightness contrast by Andrew Somers:
   https://github.com/Myndex/deltaphistar 
 */
-const PHI = 0.5 + Math.sqrt(1.25);
+export const PHI = 0.5 + Math.sqrt(1.25);
 
 export function dpsContrast(a: RGBColor, b: RGBColor) {
     const dps = Math.abs(rgbTolab65(a).L ** PHI - rgbTolab65(b).L ** PHI);
@@ -387,7 +390,10 @@ export function dpsContrast(a: RGBColor, b: RGBColor) {
 export function colorContrast(background: string, foreground: string[] = [LIGHT_BASE, DARK_BASE]) {
     const bg = hexToRgbArray(background);
 
-    const best: { color?: RGBColor; contrast: number } = { color: undefined, contrast: 0 };
+    const best: { color?: RGBColor; contrast: number } = {
+        color: undefined,
+        contrast: 0,
+    };
     for (const color of foreground) {
         const c = hexToRgbArray(color);
 
