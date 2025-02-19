@@ -1,15 +1,12 @@
-import { DocumentBlockHeading, DocumentBlockHint } from '@gitbook/api';
-import { Icon, IconName } from '@gitbook/icons';
+import type { DocumentBlockHeading, DocumentBlockHint } from '@gitbook/api';
+import { Icon, type IconName } from '@gitbook/icons';
 import React from 'react';
 
-import { ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
-import { Block, BlockProps } from './Block';
+import { Block, type BlockProps } from './Block';
 import { Blocks } from './Blocks';
-import { Heading } from './Heading';
 import { getBlockTextStyle } from './spacing';
-
-const headingTypes = new Set<DocumentBlockHeading['type']>();
 
 export function Hint(props: BlockProps<DocumentBlockHint>) {
     const { block, style, ancestorBlocks, ...contextProps } = props;

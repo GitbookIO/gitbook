@@ -1,9 +1,9 @@
-import { DocumentBlockHeading } from '@gitbook/api';
+import type { DocumentBlockHeading } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 
 import { tcls } from '@/lib/tailwind';
 
-import { BlockProps } from './Block';
+import type { BlockProps } from './Block';
 import { Inlines } from './Inlines';
 import { getBlockTextStyle } from './spacing';
 
