@@ -13,8 +13,8 @@ import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 type CircularRefsIds = Map<OpenAPIV3.SchemaObject, string>;
 
 export interface OpenAPISchemaPropertyEntry {
-    propertyName?: string;
-    required?: boolean;
+    propertyName?: string | undefined;
+    required?: boolean | undefined;
     schema: OpenAPIV3.SchemaObject;
 }
 
@@ -47,7 +47,7 @@ export function OpenAPISchemaProperty(
         ? null
         : getSchemaAlternatives(schema, new Set(circularRefs.keys()));
 
-    if ((properties && !!properties.length) || schema.type === 'object') {
+    if ((properties && properties.length > 0) || schema.type === 'object') {
         return (
             <InteractiveSection id={id} className={clsx('openapi-schema', className)}>
                 <OpenAPISchemaPresentation {...props} />

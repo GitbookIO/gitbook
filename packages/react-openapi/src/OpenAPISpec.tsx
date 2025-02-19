@@ -8,7 +8,7 @@ import { OpenAPIResponses } from './OpenAPIResponses';
 import { OpenAPISchemaProperties } from './OpenAPISchema';
 import { OpenAPISecurities } from './OpenAPISecurities';
 import type { OpenAPIClientContext, OpenAPIOperationData } from './types';
-import { resolveDescription } from './utils';
+import { parameterToProperty } from './utils';
 
 /**
  * Client component to render the spec for the request and response.
@@ -38,22 +38,7 @@ export function OpenAPISpec(props: { data: OpenAPIOperationData; context: OpenAP
                         header={group.label}
                     >
                         <OpenAPISchemaProperties
-                            properties={group.parameters.map((parameter) => {
-                                const description = resolveDescription(parameter);
-                                return {
-                                    propertyName: parameter.name,
-                                    schema: {
-                                        // Description of the parameter is defined at the parameter level
-                                        // we use display it if the schema doesn't override it
-                                        description: description,
-                                        example: parameter.example,
-                                        // Deprecated can be defined at the parameter level
-                                        deprecated: parameter.deprecated,
-                                        ...(parameter.schema ?? {}),
-                                    },
-                                    required: parameter.required,
-                                };
-                            })}
+                            properties={group.parameters.map(parameterToProperty)}
                             context={context}
                         />
                     </InteractiveSection>
