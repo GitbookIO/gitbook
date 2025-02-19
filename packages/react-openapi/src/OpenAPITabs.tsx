@@ -1,8 +1,10 @@
 'use client';
 
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { Key, Tab, TabList, TabPanel, Tabs, TabsProps } from 'react-aria-components';
 import { Markdown } from './Markdown';
+import { useSyncedTabsGlobalState } from './useSyncedTabsGlobalState';
+import { useIntersectionObserver } from 'usehooks-ts';
 
 export type Tab = {
     key: Key;
@@ -13,8 +15,7 @@ export type Tab = {
 
 type OpenAPITabsContextData = {
     items: Tab[];
-    selectedKey: Key;
-    setSelectedKey: (key: Key) => void;
+    selectedTab: Tab;
 };
 
 const OpenAPITabsContext = createContext<OpenAPITabsContextData | null>(null);
@@ -30,25 +31,66 @@ function useOpenAPITabsContext() {
 /**
  * The OpenAPI Tabs wrapper component.
  */
-export function OpenAPITabs(props: React.PropsWithChildren<TabsProps & { items: Tab[] }>) {
-    const { children, items } = props;
-
-    const [selectedKey, setSelectedKey] = useState(() => {
-        const firstItem = items[0];
-        if (!firstItem) {
-            throw new Error('OpenAPITabs: at least one tab is required');
+export function OpenAPITabs(
+    props: React.PropsWithChildren<TabsProps & { items: Tab[]; stateKey?: string }>,
+) {
+    const { children, items, stateKey } = props;
+    const isVisible = stateKey
+        ? useIntersectionObserver({
+              threshold: 0.1,
+              rootMargin: '200px',
+          })
+        : true;
+    const defaultTab = items[0] as Tab;
+    const [syncedTabs, setSyncedTabs] = useSyncedTabsGlobalState<Tab>();
+    const [selectedTabKey, setSelectedTabKey] = useState(() => {
+        if (isVisible && stateKey && syncedTabs && syncedTabs.has(stateKey)) {
+            const tabFromState = syncedTabs.get(stateKey);
+            return tabFromState?.key ?? items[0]?.key;
         }
-        return firstItem.key;
+        return items[0]?.key;
     });
+    const [selectedTab, setSelectedTab] = useState<Tab>(defaultTab);
 
-    const contextValue = { items, selectedKey, setSelectedKey };
+    const handleSelectionChange = (key: Key) => {
+        setSelectedTabKey(key);
+        if (stateKey) {
+            const tab = items.find((item) => item.key === key);
+
+            if (!tab) {
+                return;
+            }
+
+            setSyncedTabs((state) => {
+                const newState = new Map(state);
+                newState.set(stateKey, tab);
+                return newState;
+            });
+        }
+    };
+
+    useEffect(() => {
+        if (isVisible && stateKey && syncedTabs && syncedTabs.has(stateKey)) {
+            const tabFromState = syncedTabs.get(stateKey);
+
+            if (!items.some((item) => item.key === tabFromState?.key)) {
+                return;
+            }
+
+            if (tabFromState && tabFromState?.key !== selectedTab?.key) {
+                setSelectedTab(tabFromState);
+            }
+        }
+    }, [isVisible, stateKey, syncedTabs, selectedTabKey]);
+
+    const contextValue = useMemo(() => ({ items, selectedTab }), [items, selectedTab]);
 
     return (
         <OpenAPITabsContext.Provider value={contextValue}>
             <Tabs
                 className="openapi-tabs"
-                onSelectionChange={setSelectedKey}
-                selectedKey={selectedKey}
+                onSelectionChange={handleSelectionChange}
+                selectedKey={selectedTab?.key}
             >
                 {children}
             </Tabs>
@@ -90,23 +132,21 @@ export function OpenAPITabsList() {
  * It renders the content of the selected tab.
  */
 export function OpenAPITabsPanels() {
-    const { selectedKey, items } = useOpenAPITabsContext();
+    const { selectedTab } = useOpenAPITabsContext();
 
-    const tab = useMemo(() => items.find((tab) => tab.key === selectedKey), [items, selectedKey]);
-
-    if (!tab) {
+    if (!selectedTab) {
         return null;
     }
 
     return (
         <TabPanel
-            key={`TabPanel-${tab.key}`}
-            id={tab.key.toString()}
+            key={`TabPanel-${selectedTab.key}`}
+            id={selectedTab.key.toString()}
             className="openapi-tabs-panel"
         >
-            {tab.body}
-            {tab.description ? (
-                <Markdown source={tab.description} className="openapi-tabs-footer" />
+            {selectedTab.body}
+            {selectedTab.description ? (
+                <Markdown source={selectedTab.description} className="openapi-tabs-footer" />
             ) : null}
         </TabPanel>
     );

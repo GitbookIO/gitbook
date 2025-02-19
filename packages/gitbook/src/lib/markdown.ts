@@ -1,22 +1,12 @@
-import rehypeSanitize from 'rehype-sanitize';
-import rehypeStringify from 'rehype-stringify';
-import remarkGfm from 'remark-gfm';
-import remarkParse from 'remark-parse';
-import remarkRehype from 'remark-rehype';
-import { unified } from 'unified';
+import { micromark } from 'micromark';
+import { gfmHtml, gfm } from 'micromark-extension-gfm';
 
 /**
  * Parse markdown and output HTML.
  */
-export async function parseMarkdown(markdown: string): Promise<string> {
-    const promise = unified()
-        .use(remarkParse)
-        .use(remarkGfm)
-        .use(remarkRehype)
-        .use(rehypeSanitize)
-        .use(rehypeStringify)
-        .process(markdown)
-        .then((file) => file.toString());
-
-    return promise;
+export function parseMarkdown(input: string): string {
+    return micromark(input, {
+        extensions: [gfm()],
+        htmlExtensions: [gfmHtml()],
+    });
 }

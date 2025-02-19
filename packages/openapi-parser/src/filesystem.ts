@@ -20,5 +20,6 @@ export async function createFileSystem(input: {
     const { filesystem } = await load(input.value, {
         plugins: [fetchURLs({ rootURL: input.rootURL })],
     });
+
     return filesystem;
 }

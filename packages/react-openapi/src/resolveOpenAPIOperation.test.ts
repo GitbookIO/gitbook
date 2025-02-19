@@ -9,7 +9,7 @@ async function fetchFilesystem(url: string) {
     const filesystem = await parseOpenAPI({ value: text, rootURL: url });
     const transformedFs = await traverse(filesystem, async (node) => {
         if ('description' in node && typeof node.description === 'string' && node.description) {
-            node['x-description-html'] = node.description;
+            node['x-gitbook-description-html'] = node.description;
         }
         return node;
     });

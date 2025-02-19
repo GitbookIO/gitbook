@@ -8,7 +8,7 @@ import { OpenAPIResponses } from './OpenAPIResponses';
 import { OpenAPISchemaProperties } from './OpenAPISchema';
 import { OpenAPISecurities } from './OpenAPISecurities';
 import type { OpenAPIClientContext, OpenAPIOperationData } from './types';
-import { noReference, resolveDescription } from './utils';
+import { resolveDescription } from './utils';
 
 /**
  * Client component to render the spec for the request and response.
@@ -49,7 +49,7 @@ export function OpenAPISpec(props: { data: OpenAPIOperationData; context: OpenAP
                                         example: parameter.example,
                                         // Deprecated can be defined at the parameter level
                                         deprecated: parameter.deprecated,
-                                        ...(noReference(parameter.schema) ?? {}),
+                                        ...(parameter.schema ?? {}),
                                     },
                                     required: parameter.required,
                                 };
@@ -61,13 +61,10 @@ export function OpenAPISpec(props: { data: OpenAPIOperationData; context: OpenAP
             })}
 
             {operation.requestBody ? (
-                <OpenAPIRequestBody
-                    requestBody={noReference(operation.requestBody)}
-                    context={context}
-                />
+                <OpenAPIRequestBody requestBody={operation.requestBody} context={context} />
             ) : null}
             {operation.responses ? (
-                <OpenAPIResponses responses={noReference(operation.responses)} context={context} />
+                <OpenAPIResponses responses={operation.responses} context={context} />
             ) : null}
         </>
     );

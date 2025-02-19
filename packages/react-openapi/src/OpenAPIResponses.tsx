@@ -1,5 +1,4 @@
 import type { OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser';
-import { createStateKey, resolveDescription } from './utils';
 import { OpenAPIResponse } from './OpenAPIResponse';
 import { OpenAPIClientContext } from './types';
 import { InteractiveSection } from './InteractiveSection';
@@ -16,18 +15,14 @@ export function OpenAPIResponses(props: {
     const { responses, context } = props;
 
     return (
-        <InteractiveSection
-            stateKey={createStateKey('response', context.blockKey)}
-            header="Responses"
-            className="openapi-responses"
-        >
+        <InteractiveSection header="Responses" className="openapi-responses">
             <OpenAPIDisclosureGroup
                 allowsMultipleExpanded
                 icon={context.icons.chevronRight}
                 groups={Object.entries(responses).map(
                     ([statusCode, response]: [string, OpenAPIV3.ResponseObject]) => {
                         const content = Object.entries(response.content ?? {});
-                        const description = resolveDescription(response);
+                        const description = response.description;
 
                         return {
                             id: statusCode,

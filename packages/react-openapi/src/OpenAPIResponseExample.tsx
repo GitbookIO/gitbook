@@ -1,7 +1,7 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { generateSchemaExample } from './generateSchemaExample';
 import type { OpenAPIContextProps, OpenAPIOperationData } from './types';
-import { checkIsReference, noReference, resolveDescription } from './utils';
+import { checkIsReference, createStateKey, resolveDescription } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
 import { InteractiveSection } from './InteractiveSection';
@@ -40,7 +40,7 @@ export function OpenAPIResponseExample(props: {
 
     const examples = responses
         .map(([key, value]) => {
-            const responseObject = noReference(value);
+            const responseObject = value;
             const mediaTypeObject = (() => {
                 if (!responseObject.content) {
                     return null;
@@ -68,7 +68,7 @@ export function OpenAPIResponseExample(props: {
                         const key = Object.keys(examples)[0];
                         if (key) {
                             // @TODO handle multiple examples
-                            const firstExample = noReference(examples[key]);
+                            const firstExample = examples[key];
                             if (firstExample) {
                                 return firstExample;
                             }
@@ -79,7 +79,7 @@ export function OpenAPIResponseExample(props: {
                         return { value: example };
                     }
 
-                    const schema = noReference(mediaTypeObject.schema);
+                    const schema = mediaTypeObject.schema;
                     if (!schema) {
                         return null;
                     }
@@ -115,7 +115,7 @@ export function OpenAPIResponseExample(props: {
     }
 
     return (
-        <OpenAPITabs items={examples}>
+        <OpenAPITabs stateKey={createStateKey('response-example')} items={examples}>
             <InteractiveSection header={<OpenAPITabsList />} className="openapi-response-example">
                 <OpenAPITabsPanels />
             </InteractiveSection>

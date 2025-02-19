@@ -1,7 +1,7 @@
 import { JSONDocument, ContentRef } from '@gitbook/api';
 
 import { getNodeText } from './document';
-import { fetchOpenAPIBlock } from './openapi';
+import { fetchOpenAPIBlock } from './openapi/fetch';
 import { ResolvedContentRef } from './references';
 
 export interface DocumentSection {

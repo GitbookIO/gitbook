@@ -1,7 +1,7 @@
 'use client';
 
 import clsx from 'clsx';
-import { useCallback, useRef, useState, useSyncExternalStore } from 'react';
+import { useRef, useState } from 'react';
 import { mergeProps, useButton, useDisclosure, useFocusRing } from 'react-aria';
 import { useDisclosureState } from 'react-stately';
 
@@ -9,30 +9,6 @@ interface InteractiveSectionTab {
     key: string;
     label: string;
     body: React.ReactNode;
-}
-
-let globalState: Record<string, string> = {};
-const listeners = new Set<() => void>();
-
-function useSyncedTabsGlobalState() {
-    const subscribe = useCallback((callback: () => void) => {
-        listeners.add(callback);
-        return () => listeners.delete(callback);
-    }, []);
-
-    const getSnapshot = useCallback(() => globalState, []);
-
-    const setSyncedTabs = useCallback(
-        (updater: (tabs: Record<string, string>) => Record<string, string>) => {
-            globalState = updater(globalState);
-            listeners.forEach((listener) => listener());
-        },
-        [],
-    );
-
-    const tabs = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
-
-    return [tabs, setSyncedTabs] as const;
 }
 
 /**
@@ -59,8 +35,6 @@ export function InteractiveSection(props: {
     children?: React.ReactNode;
     /** Children to display within the container */
     overlay?: React.ReactNode;
-    /** An optional key referencing a value in global state */
-    stateKey?: string;
 }) {
     const {
         id,
@@ -73,16 +47,11 @@ export function InteractiveSection(props: {
         children,
         overlay,
         toggleIcon = '▶',
-        stateKey,
     } = props;
-    const [syncedTabs, setSyncedTabs] = useSyncedTabsGlobalState();
-    const tabFromState =
-        stateKey && stateKey in syncedTabs
-            ? tabs.find((tab) => tab.key === syncedTabs[stateKey])
-            : undefined;
-    const [selectedTabKey, setSelectedTab] = useState(tabFromState?.key ?? defaultTab);
+
+    const [selectedTabKey, setSelectedTab] = useState(defaultTab);
     const selectedTab: InteractiveSectionTab | undefined =
-        tabFromState ?? tabs.find((tab) => tab.key === selectedTabKey) ?? tabs[0];
+        tabs.find((tab) => tab.key === selectedTabKey) ?? tabs[0];
 
     const state = useDisclosureState({
         defaultExpanded: defaultOpened,
@@ -153,12 +122,6 @@ export function InteractiveSection(props: {
                                 value={selectedTab?.key ?? ''}
                                 onChange={(event) => {
                                     setSelectedTab(event.target.value);
-                                    if (stateKey) {
-                                        setSyncedTabs((state) => ({
-                                            ...state,
-                                            [stateKey]: event.target.value,
-                                        }));
-                                    }
                                     state.expand();
                                 }}
                             >
