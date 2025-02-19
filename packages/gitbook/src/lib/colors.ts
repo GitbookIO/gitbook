@@ -9,7 +9,6 @@ type OKLCHColor = { L: number; C: number; H: number };
 export const DARK_BASE = '#1d1d1d';
 export const LIGHT_BASE = '#ffffff';
 export const DEFAULT_TINT_COLOR = '#787878';
-
 const D65 = [95.047, 100.0, 108.883]; // Reference white (D65)
 
 export enum ColorCategory {
