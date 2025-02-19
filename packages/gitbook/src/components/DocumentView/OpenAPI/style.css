@@ -463,7 +463,7 @@
 }
 
 .openapi-section-header-content {
-    @apply flex-1 text-base gap-1.5 flex w-full font-medium text-tint-strong;
+    @apply flex-1 overflow-hidden text-base gap-1.5 flex w-full font-medium text-tint-strong;
 }
 
 .openapi-section-header-controls {
@@ -500,11 +500,13 @@
 
 /* Tabs */
 .openapi-tabs-list {
-    @apply flex flex-row gap-3 py-1.5 px-2.5 border-b border-tint-subtle w-full;
+    @apply flex flex-row gap-1.5 py-1.5 px-2.5 border-b border-tint-subtle w-full overflow-x-scroll;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
 .openapi-tabs-tab {
-    @apply hover:bg-primary-hover font-mono font-normal tabular-nums hover:text-primary cursor-pointer transition-all relative text-[0.813rem] text-tint px-1 border border-transparent rounded;
+    @apply hover:bg-primary-hover whitespace-nowrap font-mono font-normal tabular-nums hover:text-primary cursor-pointer transition-all relative text-[0.813rem] text-tint px-1 border border-transparent rounded;
 }
 
 .openapi-tabs-tab[aria-selected='true'] {
