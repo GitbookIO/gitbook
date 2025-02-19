@@ -5,20 +5,17 @@ import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { useOpenAPIOperationContext } from './OpenAPIOperationContext';
-import { useEventCallback } from 'usehooks-ts';
+import { OpenAPIV3_1 } from '@gitbook/openapi-parser';
 
 /**
  * Button which launches the Scalar API Client
  */
-export function ScalarApiButton({
-    method,
-    path,
-    specUrl,
-}: {
-    method: string;
+export function ScalarApiButton(props: {
+    method: OpenAPIV3_1.HttpMethods;
     path: string;
     specUrl: string;
 }) {
+    const { method, path, specUrl } = props;
     const [isOpen, setIsOpen] = useState(false);
     const controllerRef = useRef<ScalarModalControllerRef>(null);
     return (
@@ -55,21 +52,18 @@ export function ScalarApiButton({
 }
 
 function ScalarModal(props: {
-    method: string;
+    method: OpenAPIV3_1.HttpMethods;
     path: string;
     specUrl: string;
     controllerRef: React.Ref<ScalarModalControllerRef>;
 }) {
+    const { method, path, specUrl, controllerRef } = props;
     return (
         <ApiClientModalProvider
-            configuration={{ spec: { url: props.specUrl } }}
-            initialRequest={{ path: props.path, method: props.method }}
+            configuration={{ spec: { url: specUrl } }}
+            initialRequest={{ path, method }}
         >
-            <ScalarModalController
-                method={props.method}
-                path={props.path}
-                controllerRef={props.controllerRef}
-            />
+            <ScalarModalController method={method} path={path} controllerRef={controllerRef} />
         </ApiClientModalProvider>
     );
 }
@@ -79,28 +73,26 @@ type ScalarModalControllerRef = {
 };
 
 function ScalarModalController(props: {
-    method: string;
+    method: OpenAPIV3_1.HttpMethods;
     path: string;
     controllerRef: React.Ref<ScalarModalControllerRef>;
 }) {
+    const { method, path, controllerRef } = props;
     const client = useApiClientModal();
     const openClient = client?.open;
     useImperativeHandle(
-        props.controllerRef,
+        controllerRef,
         () => ({ openClient: openClient ? () => openClient() : undefined }),
         [openClient],
     );
 
     // Open the client when the component is mounted.
     const { onOpenClient } = useOpenAPIOperationContext();
-    const trackOpening = useEventCallback(() => {
-        onOpenClient({ method: props.method, path: props.path });
-    });
     useEffect(() => {
         if (openClient) {
-            openClient();
-            trackOpening();
+            openClient({ method, path });
+            onOpenClient({ method, path });
         }
-    }, [openClient]);
+    }, [openClient, onOpenClient]);
     return null;
 }
