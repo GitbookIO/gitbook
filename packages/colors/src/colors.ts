@@ -14,7 +14,7 @@ export const DARK_BASE = '#1D1D1D';
 export const LIGHT_BASE = '#FFFFFF';
 
 /**
- *
+ * Used as the basis of all UI elements that are not colored by the primary color. Neutral gray by default, overridden by site customization.
  */
 export const DEFAULT_TINT_COLOR = '#787878';
 
