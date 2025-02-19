@@ -22,6 +22,16 @@
         "wrangler": "3.82.0",
       },
     },
+    "packages/colors": {
+      "name": "@gitbook/colors",
+      "version": "0.1.0",
+      "devDependencies": {
+        "typescript": "^5.5.3",
+      },
+      "peerDependencies": {
+        "react": "*",
+      },
+    },
     "packages/emoji-codepoints": {
       "name": "@gitbook/emoji-codepoints",
       "version": "0.2.0",
@@ -593,6 +603,8 @@
     "@gitbook/api": ["@gitbook/api@0.93.0", "", { "dependencies": { "event-iterator": "^2.0.0", "eventsource-parser": "^3.0.0" } }, "sha512-HOOEiKTtmkTpnaOj2OfV5dtvNN+R+z9kbAJSqh7LvaI86iMo/KvRHUa9vCq7gdrJhCLaeF0D5DAAYZZzK1Yz5Q=="],
 
     "@gitbook/cache-do": ["@gitbook/cache-do@workspace:packages/cache-do"],
+
+    "@gitbook/colors": ["@gitbook/colors@workspace:packages/colors"],
 
     "@gitbook/emoji-codepoints": ["@gitbook/emoji-codepoints@workspace:packages/emoji-codepoints"],
 
