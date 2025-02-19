@@ -106,7 +106,8 @@ const HINT_STYLES: {
             '[&_.can-override-bg]:bg-neutral-active',
             '[&_.can-override-text]:text-neutral-strong',
         ],
-        container: 'bg-neutral theme-muted:bg-neutral-base theme-bold-tint:bg-neutral-base theme-gradient:bg-neutral-12/1 border-neutral',
+        container:
+            'bg-neutral theme-muted:bg-neutral-base theme-bold-tint:bg-neutral-base theme-gradient:bg-neutral-12/1 border-neutral',
         containerWithHeader: 'border-info-solid bg-neutral-subtle theme-gradient:bg-neutral-12/1',
     },
     warning: {
