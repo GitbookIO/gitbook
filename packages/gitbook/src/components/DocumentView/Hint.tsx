@@ -107,8 +107,8 @@ const HINT_STYLES: {
             '[&_.can-override-text]:text-neutral-strong',
         ],
         container:
-            'bg-info theme-muted:bg-info-base theme-bold-tint:bg-info-base theme-gradient:bg-info-12/1 border-neutral',
-        containerWithHeader: 'border-info-solid bg-info-subtle theme-gradient:bg-info-12/1',
+            'bg-neutral theme-muted:bg-neutral-base theme-bold-tint:bg-neutral-base theme-gradient:bg-neutral-12/1 border-neutral',
+        containerWithHeader: 'border-info-solid bg-neutral-subtle theme-gradient:bg-neutral-12/1',
     },
     warning: {
         icon: 'circle-exclamation',
