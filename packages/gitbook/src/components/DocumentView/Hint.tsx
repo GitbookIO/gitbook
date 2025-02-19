@@ -74,6 +74,7 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
                 )}
                 style={[
                     'p-3',
+                    'empty:p-0',
                     '-row-end-1',
                     '-col-end-1',
                     'space-y-4',
