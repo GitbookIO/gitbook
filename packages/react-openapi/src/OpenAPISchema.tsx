@@ -419,15 +419,15 @@ export function getSchemaTitle(
         type = 'not';
     }
 
-    if(schema.minimum || schema.minLength){
+    if (schema.minimum || schema.minLength) {
         type += ` · min: ${schema.minimum || schema.minLength}`;
     }
 
-    if(schema.maximum || schema.maxLength){
+    if (schema.maximum || schema.maxLength) {
         type += ` · max: ${schema.maximum || schema.maxLength}`;
     }
 
-    if(schema.default){
+    if (schema.default) {
         type += ` · default: ${schema.default}`;
     }
 
