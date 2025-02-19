@@ -4,7 +4,7 @@ import { OpenAPIOperation } from '@gitbook/react-openapi';
 import React from 'react';
 
 import { LoadingPane } from '@/components/primitives';
-import { fetchOpenAPIBlock } from '@/lib/openapi';
+import { fetchOpenAPIBlock } from '@/lib/openapi/fetch';
 import { tcls } from '@/lib/tailwind';
 
 import { BlockProps } from '../Block';

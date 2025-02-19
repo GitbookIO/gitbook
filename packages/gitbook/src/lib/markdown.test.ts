@@ -9,7 +9,7 @@ describe('parseMarkdown', () => {
 | a | b  |  c |  d  |
 | - | :- | -: | :-: |`);
 
-        expect(result).toContain('<table>');
+        expect(result).toMatchSnapshot();
     });
 
     it('should parse a complex table', async () => {
@@ -52,6 +52,6 @@ When filtering there are some restrictions enforced to ensure correctness and sc
 Note: When searching across a range for individual NFTs a **serialnumber** with an additional **token.id** query filter must be provided.
 Both filters must be a single occurrence of **gt(e)** or **lt(e)** which provide a lower and or upper boundary for search.`);
 
-        expect(result).toContain('<table>');
+        expect(result).toMatchSnapshot();
     });
 });

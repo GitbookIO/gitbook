@@ -1,11 +1,11 @@
 import { ContentRef, DocumentBlockOpenAPI } from '@gitbook/api';
-import { parseOpenAPI, OpenAPIParseError, traverse } from '@gitbook/openapi-parser';
+import { parseOpenAPI, OpenAPIParseError } from '@gitbook/openapi-parser';
 import { type OpenAPIOperationData, resolveOpenAPIOperation } from '@gitbook/react-openapi';
 
 import { cache, noCacheFetchOptions, CacheFunctionOptions } from '@/lib/cache';
 
-import { parseMarkdown } from './markdown';
-import { ResolvedContentRef } from './references';
+import { enrichFilesystem } from './enrich';
+import { ResolvedContentRef } from '../references';
 
 /**
  * Fetch an OpenAPI specification for an operation.
@@ -40,7 +40,7 @@ export async function fetchOpenAPIBlock(
 }
 
 const fetchFilesystem = cache({
-    name: 'openapi.fetch.v5',
+    name: 'openapi.fetch.v6',
     get: async (url: string, options: CacheFunctionOptions) => {
         // Wrap the raw string to prevent invalid URLs from being passed to fetch.
         // This can happen if the URL has whitespace, which is currently handled differently by Cloudflare's implementation of fetch:
@@ -58,25 +58,13 @@ const fetchFilesystem = cache({
 
         const text = await response.text();
         const filesystem = await parseOpenAPI({ value: text, rootURL: url });
-        const cache: Map<string, Promise<string>> = new Map();
-        const transformedFs = await traverse(filesystem, async (node) => {
-            if ('description' in node && typeof node.description === 'string' && node.description) {
-                if (cache.has(node.description)) {
-                    node['x-description-html'] = await cache.get(node.description);
-                } else {
-                    const promise = parseMarkdown(node.description);
-                    cache.set(node.description, promise);
-                    node['x-description-html'] = await promise;
-                }
-            }
-            return node;
-        });
+        const richFilesystem = await enrichFilesystem(filesystem);
         return {
             // Cache for 4 hours
             ttl: 24 * 60 * 60,
             // Revalidate every 2 hours
             revalidateBefore: 22 * 60 * 60,
-            data: transformedFs,
+            data: richFilesystem,
         };
     },
 });

@@ -20,7 +20,7 @@ export interface OpenAPICustomSpecProperties {
     /**
      * Description in HTML format.
      */
-    'x-description-html'?: string;
+    'x-gitbook-description-html'?: string;
 }
 
 /**
@@ -41,7 +41,7 @@ export interface OpenAPICustomOperationProperties {
     /**
      * Description in HTML format.
      */
-    'x-description-html'?: string;
+    'x-gitbook-description-html'?: string;
 }
 
 /**
