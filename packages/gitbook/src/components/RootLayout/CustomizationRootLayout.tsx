@@ -47,6 +47,7 @@ export async function CustomizationRootLayout(props: {
     const mixColor = getTintMixColor(customization.styling.primaryColor, tintColor);
     const sidebarStyles = getSidebarStyles(customization);
     const { infoColor, successColor, warningColor, dangerColor } = getSemanticColors(customization);
+    const linkStyle = customization.styling.links ?? 'color';
 
     return (
         <html
@@ -63,6 +64,7 @@ export async function CustomizationRootLayout(props: {
                 tintColor ? ' tint' : 'no-tint',
                 sidebarStyles.background && ` sidebar-${sidebarStyles.background}`,
                 sidebarStyles.list && ` sidebar-list-${sidebarStyles.list}`,
+                linkStyle && ` links-${linkStyle}`,
             )}
         >
             <head>

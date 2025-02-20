@@ -161,10 +161,18 @@ function getHeaderLinkClassName(props: { headerPreset: CustomizationHeaderPreset
         'flex items-center shrink',
         'min-w-0',
         'contrast-more:underline',
+        'truncate',
 
         'text-tint',
-        'hover:text-primary',
-        'tint:hover:text-tint-strong',
+        'links-color:hover:text-primary',
+        'links-color:tint:hover:text-tint-strong',
+
+        'underline-offset-2',
+        'links-underline:hover:underline',
+        'links-underline:underline-offset-4',
+        'links-underline:decoration-primary-subtle',
+        'links-underline:decoration-[3px]',
+        'links-underline:py-0.5', // Prevent underline from being cut off at the bottom
 
         'theme-bold:text-header-link',
         'theme-bold:hover:text-header-link',
@@ -186,7 +194,7 @@ function HeaderItemLink(props: Omit<HeaderLinkNavItemProps, 'linkStyle'>) {
             }}
             {...rest}
         >
-            <span className="truncate min-w-0">{title}</span>
+            {title}
             {isDropdown ? <DropdownChevron /> : null}
         </Link>
     );
