@@ -142,7 +142,7 @@ export async function generateMetadata(): Promise<Metadata> {
                 },
             ],
         },
-        robots: (await isSpaceIndexable({ space, site })) ? 'index, follow' : 'noindex, nofollow',
+        robots: (await isSpaceIndexable(site)) ? 'index, follow' : 'noindex, nofollow',
     };
 }
 
