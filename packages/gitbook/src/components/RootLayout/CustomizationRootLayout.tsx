@@ -85,6 +85,11 @@ export async function CustomizationRootLayout(props: {
                             )
                         };
                         --header-link: ${hexToRgb(customization.header.linkColor?.light ?? colorContrast(tintColor?.light ?? customization.styling.primaryColor.light))};
+
+                        ${generateColorVariable('info', '#ff0000')}
+                        ${generateColorVariable('warning', '#ff0000')}
+                        ${generateColorVariable('danger', '#ff0000')}
+                        ${generateColorVariable('success', '#ff0000')}
                     }
 
                     .dark {
@@ -94,6 +99,11 @@ export async function CustomizationRootLayout(props: {
 
                         --header-background: ${hexToRgb(customization.header.backgroundColor?.dark ?? tintColor?.dark ?? customization.styling.primaryColor.dark)};
                         --header-link: ${hexToRgb(customization.header.linkColor?.dark ?? colorContrast(tintColor?.dark ?? customization.styling.primaryColor.dark))};
+
+                        ${generateColorVariable('info', '#ff0000', { darkMode: true })}
+                        ${generateColorVariable('warning', '#ff0000', { darkMode: true })}
+                        ${generateColorVariable('danger', '#ff0000', { darkMode: true })}
+                        ${generateColorVariable('success', '#ff0000', { darkMode: true })}
                     }
                 `}</style>
             </head>

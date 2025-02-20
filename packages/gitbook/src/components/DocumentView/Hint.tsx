@@ -1,10 +1,10 @@
-import { DocumentBlockHint } from '@gitbook/api';
-import { Icon, IconName } from '@gitbook/icons';
+import type { DocumentBlockHeading, DocumentBlockHint } from '@gitbook/api';
+import { Icon, type IconName } from '@gitbook/icons';
 import React from 'react';
 
-import { ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
-import { BlockProps } from './Block';
+import { Block, type BlockProps } from './Block';
 import { Blocks } from './Blocks';
 import { getBlockTextStyle } from './spacing';
 
@@ -13,41 +13,73 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
     const hintStyle = HINT_STYLES[block.data.style] ?? HINT_STYLES.info;
     const firstLine = getBlockTextStyle(block.nodes[0]);
 
+    const firstNode = block.nodes[0];
+    const hasHeading = ['heading-1', 'heading-2', 'heading-3'].includes(block.nodes[0].type);
+
     return (
         <div
             className={tcls(
                 'hint',
-                'p-4',
                 'transition-colors',
                 'rounded-md',
+                hasHeading ? 'rounded-l' : null,
                 'straight-corners:rounded-none',
-                hintStyle.style,
+                'overflow-hidden',
+                hasHeading ? ['border-l-2', hintStyle.containerWithHeader] : hintStyle.container,
+
+                'text-sm',
+
+                'grid',
+                'grid-cols-[auto_1fr]',
+                hasHeading ? 'grid-rows-[auto_auto]' : '',
+
                 style,
             )}
         >
-            <div className={tcls('flex', 'flex-row')}>
+            <div
+                className={tcls(
+                    'py-3',
+                    'pl-3',
+                    hasHeading ? hintStyle.header : null,
+                    hintStyle.iconColor,
+                )}
+            >
                 <Icon
                     icon={hintStyle.icon}
-                    className={tcls(
-                        'size-5',
-                        'mr-4',
-                        'mt-0.5',
-                        firstLine.lineHeight,
-                        hintStyle.iconColor,
-                    )}
-                />
-                <Blocks
-                    {...contextProps}
-                    ancestorBlocks={[...ancestorBlocks, block]}
-                    nodes={block.nodes}
-                    blockStyle={tcls(
-                        hintStyle.bodyColor,
-                        // render hash icon on the other side of the heading
-                        'flip-heading-hash',
-                    )}
-                    style={['flex-1', 'space-y-4', '[&_.hint]:border', '[&_pre]:border']}
+                    className={tcls('size-[1.2em]', 'mt-0.5', firstLine.lineHeight)}
                 />
             </div>
+            {hasHeading ? (
+                <Block
+                    style={tcls(
+                        'text-[1em] *:mt-0 p-3 flip-heading-hash',
+                        hasHeading ? hintStyle.header : null,
+                    )}
+                    ancestorBlocks={[...ancestorBlocks, block]}
+                    {...contextProps}
+                    block={firstNode}
+                />
+            ) : null}
+            <Blocks
+                {...contextProps}
+                ancestorBlocks={[...ancestorBlocks, block]}
+                nodes={hasHeading ? block.nodes.slice(1) : block.nodes}
+                blockStyle={tcls(
+                    hintStyle.body,
+                    // render hash icon on the other side of the heading
+                    'flip-heading-hash',
+                )}
+                style={[
+                    'p-3',
+                    'empty:p-0',
+                    '-row-end-1',
+                    '-col-end-1',
+                    'space-y-4',
+                    '[&_.hint]:border',
+                    '[&_pre]:border',
+                    '[&_pre]:border-neutral',
+                ]}
+            />
         </div>
     );
 }
@@ -55,77 +87,69 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
 const HINT_STYLES: {
     [style in DocumentBlockHint['data']['style']]: {
         icon: IconName;
-        iconColor: ClassValue;
-        bodyColor: ClassValue;
-        style: ClassValue;
+        iconColor?: ClassValue;
+        body?: ClassValue;
+        header?: ClassValue;
+        container?: ClassValue;
+        containerWithHeader?: ClassValue;
     };
 } = {
     info: {
         icon: 'circle-info',
-        iconColor: ['text-primary'],
-        bodyColor: ['[&_a]:text-primary', '[&_a:hover]:text-primary-strong'],
-        style: [
-            'bg-tint',
-            'print-mode:!bg-tint',
-            'theme-muted:bg-tint-base',
-            'theme-bold-tint:bg-tint-base',
-            'theme-gradient:bg-tint-12/1',
-            'border-tint',
-            '[&_.can-override-bg]:bg-tint-active',
-            '[&_.can-override-text]:text-tint-strong',
+        iconColor: 'text-info-subtle contrast-more:text-info',
+        header: 'bg-info-active',
+        body: [
+            'text-neutral-strong',
+            '[&_.can-override-bg]:bg-neutral-active',
+            '[&_.can-override-text]:text-neutral-strong',
         ],
+        container:
+            'bg-neutral theme-muted:bg-neutral-base theme-bold-tint:bg-neutral-base theme-gradient:bg-neutral-12/1 border-neutral',
+        containerWithHeader: 'border-info-solid bg-neutral-subtle theme-gradient:bg-neutral-12/1',
     },
     warning: {
         icon: 'circle-exclamation',
-        iconColor: ['text-amber-500', 'dark:text-orange-400'], // Darker shades of orange-* mismatch with lighter shades, so in light mode we use amber text on top of orange bg.
-        bodyColor: [
-            'text-orange-950',
-            'dark:text-orange-50',
-            '[&_a]:text-orange-800',
-            '[&_a:hover]:text-orange-900',
-            'dark:[&_a]:text-orange-400',
-            'dark:[&_a:hover]:text-orange-300',
-            '[&_.can-override-bg]:bg-orange-500/3',
-            '[&_.can-override-text]:text-orange-800',
-            'dark:[&_.can-override-text]:text-orange-400',
-            'decoration-orange-800/6',
-            'dark:decoration-orange-400/6',
+        iconColor: 'text-warning-subtle contrast-more:text-warning',
+        header: 'bg-warning-active',
+        body: [
+            'text-neutral-strong',
+            '[&_a]:text-warning',
+            '[&_a:hover]:text-warning-strong',
+            '[&_.can-override-bg]:bg-warning-active',
+            '[&_.can-override-text]:text-warning-strong',
+            'decoration-warning/6',
         ],
-        style: ['bg-orange-500/2', 'border-orange-500/4'],
+        container: 'bg-warning border-warning',
+        containerWithHeader: 'border-warning-solid bg-warning-subtle',
     },
     danger: {
         icon: 'triangle-exclamation',
-        iconColor: ['text-red-500', 'dark:text-red-400'],
-        bodyColor: [
-            'text-red-950',
-            'dark:text-red-50',
-            '[&_a]:text-red-800',
-            '[&_a:hover]:text-red-900',
-            'dark:[&_a]:text-red-400',
-            'dark:[&_a:hover]:text-red-300',
-            '[&_.can-override-bg]:bg-red-500/3',
-            '[&_.can-override-text]:text-red-400',
-            'decoration-red-800/6',
-            'dark:decoration-red-400/6',
+        iconColor: 'text-danger-subtle contrast-more:text-danger',
+        header: 'bg-danger-active',
+        body: [
+            'text-neutral-strong',
+            '[&_a]:text-danger',
+            '[&_a:hover]:text-danger-strong',
+            '[&_.can-override-bg]:bg-danger-active',
+            '[&_.can-override-text]:text-danger-strong',
+            'decoration-danger/6',
         ],
-        style: ['bg-red-500/2', 'border-red-500/4'],
+        container: 'bg-danger border-danger',
+        containerWithHeader: 'border-danger-solid bg-danger-subtle',
     },
     success: {
         icon: 'circle-check',
-        iconColor: ['text-green-500', 'dark:text-green-400'],
-        bodyColor: [
-            'text-green-950',
-            'dark:text-green-50',
-            '[&_a]:text-green-800',
-            '[&_a:hover]:text-green-900',
-            'dark:[&_a]:text-green-400',
-            'dark:[&_a:hover]:text-green-300',
-            '[&_.can-override-bg]:bg-green-500/3',
-            '[&_.can-override-text]:text-green-800',
-            'dark:[&_.can-override-text]:text-green-400',
-            'decoration-green-800/6',
-            'dark:decoration-green-400/6',
+        iconColor: 'text-success-subtle contrast-more:text-success',
+        header: 'bg-success-active',
+        body: [
+            'text-neutral-strong',
+            '[&_a]:text-success',
+            '[&_a:hover]:text-success-strong',
+            '[&_.can-override-bg]:bg-success-active',
+            '[&_.can-override-text]:text-success-strong',
+            'decoration-success/6',
         ],
-        style: ['bg-green-500/2', 'border-green-500/4'],
+        container: 'bg-success border-success',
+        containerWithHeader: 'border-success-solid bg-success-subtle',
     },
 };
