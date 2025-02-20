@@ -1067,55 +1067,6 @@ export async function getSpaceContentData(
 }
 
 /**
- * Search content in a space.
- */
-export const searchSpaceContent = cache({
-    name: 'api.searchSpaceContent',
-    tag: (spaceId) => getAPICacheTag({ tag: 'space', space: spaceId }),
-    getKeySuffix: getAPIContextId,
-    get: async (
-        spaceId: string,
-        /** The revision ID is used as a cache bust key, to avoid revalidating lot of cache entries by tags */
-        revisionId: string,
-        query: string,
-        options: CacheFunctionOptions,
-    ) => {
-        const apiCtx = await api();
-        const response = await apiCtx.client.spaces.searchSpaceContent(
-            spaceId,
-            { query },
-            {
-                ...noCacheFetchOptions,
-                signal: options.signal,
-            },
-        );
-        return cacheResponse(response);
-    },
-});
-
-/**
- * Search content accross all spaces in a parent (site or collection).
- */
-export const searchParentContent = cache({
-    name: 'api.searchParentContent',
-    tag: (spaceId) => getAPICacheTag({ tag: 'space', space: spaceId }),
-    getKeySuffix: getAPIContextId,
-    get: async (parentId: string, query: string, options: CacheFunctionOptions) => {
-        const apiCtx = await api();
-        const response = await apiCtx.client.search.searchContent(
-            { query },
-            {
-                ...noCacheFetchOptions,
-                signal: options.signal,
-            },
-        );
-        return cacheResponse(response, {
-            ttl: 60 * 60,
-        });
-    },
-});
-
-/**
  * Search content in a Site or specific SiteSpaces.
  */
 export const searchSiteContent = cache({
