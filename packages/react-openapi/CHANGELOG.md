@@ -1,5 +1,17 @@
 # @gitbook/react-openapi
 
+## 1.0.2
+
+### Patch Changes
+
+-   bb5c6a4: Support multiple response media types and examples
+-   a3f1fea: Fix display of OpenAPI header description
+-   6157583: Improve Markdown parsing
+-   7419ee7: Show additional fields in OpenAPI block
+-   82cd9f2: Add support for anchor links in OpenAPI blocks
+-   Updated dependencies [6157583]
+    -   @gitbook/openapi-parser@1.0.1
+
 ## 1.0.1
 
 ### Patch Changes

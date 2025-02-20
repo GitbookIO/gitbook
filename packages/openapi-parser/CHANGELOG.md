@@ -1,5 +1,11 @@
 # @gitbook/openapi-parser
 
+## 1.0.1
+
+### Patch Changes
+
+-   6157583: Improve Markdown parsing
+
 ## 1.0.0
 
 ### Major Changes

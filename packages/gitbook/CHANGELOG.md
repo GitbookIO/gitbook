@@ -1,5 +1,22 @@
 # gitbook
 
+## 0.6.2
+
+### Patch Changes
+
+-   359bb97: Fix opening external links when the GitBook page is embedded in an iframe
+-   6157583: Improve Markdown parsing
+-   82cd9f2: Add support for anchor links in OpenAPI blocks
+-   Updated dependencies [445baaa]
+-   Updated dependencies [bb5c6a4]
+-   Updated dependencies [a3f1fea]
+-   Updated dependencies [6157583]
+-   Updated dependencies [7419ee7]
+-   Updated dependencies [82cd9f2]
+    -   @gitbook/colors@0.2.0
+    -   @gitbook/react-openapi@1.0.2
+    -   @gitbook/openapi-parser@1.0.1
+
 ## 0.6.1
 
 ### Patch Changes
