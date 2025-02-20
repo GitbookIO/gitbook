@@ -21,7 +21,7 @@
 }
 
 .openapi-deprecated-sunset-date {
-    @apply font-semibold font-mono;
+    @apply font-semibold font-mono truncate;
 }
 
 .openapi-description.openapi-markdown {
@@ -169,6 +169,14 @@
     @apply mt-3;
 }
 
+.openapi-schema-items {
+    @apply pt-3;
+}
+
+.openapi-schema-items .openapi-schema-items-property {
+    @apply mt-3 flex flex-col gap-1.5;
+}
+
 /* Schema Presentation */
 .openapi-schema-presentation {
     @apply flex flex-col gap-1.5 font-normal;
@@ -181,7 +189,7 @@
 .openapi-schema-name {
     /* To make double click on the property name select only the name,
     we disable selection on the parent and re-enable it on the children. */
-    @apply select-none flex gap-2.5 items-baseline text-sm;
+    @apply select-none flex gap-x-2.5 items-baseline text-sm flex-wrap;
 }
 
 .openapi-schema-name .openapi-deprecated {
@@ -571,11 +579,15 @@
 
 /* Disclosure */
 .openapi-disclosure-trigger {
-    @apply transition-all duration-300 hover:text-tint-strong rounded-2xl border border-tint-subtle px-2.5 py-1 text-[0.813rem] text-tint flex flex-row items-center gap-1.5 -outline-offset-1;
+    @apply transition-all truncate duration-300 max-w-full hover:text-tint-strong rounded-2xl border border-tint-subtle px-2.5 py-1 text-[0.813rem] text-tint flex flex-row items-center gap-1.5 -outline-offset-1;
+}
+
+.openapi-disclosure-trigger span {
+    @apply truncate;
 }
 
 .openapi-disclosure svg {
-    @apply size-3 transition-transform duration-300;
+    @apply size-3 shrink-0 transition-transform duration-300;
 }
 
 .openapi-disclosure-trigger[aria-expanded='true'] svg {
