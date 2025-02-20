@@ -7,6 +7,7 @@ import {
     SiteSpace,
     Space,
 } from '@gitbook/api';
+import type { Filesystem } from '@gitbook/openapi-parser';
 import assertNever from 'assert-never';
 import React from 'react';
 
@@ -17,6 +18,8 @@ import {
     SpaceContentPointer,
     getCollection,
     getDocument,
+    getLatestOpenAPISpecVersion,
+    getLatestOpenAPISpecVersionContent,
     getPageDocument,
     getPublishedContentSite,
     getReusableContent,
@@ -50,6 +53,8 @@ export interface ResolvedContentRef {
     file?: RevisionFile;
     /** Resolved reusable content, if the ref points to reusable content on a revision. */
     reusableContent?: RevisionReusableContent;
+    /** Resolve OpenAPI spec filesystem. */
+    openAPIFilesystem?: Filesystem;
 }
 
 export interface ContentRefContext extends PageHrefContext {
@@ -269,6 +274,27 @@ export async function resolveContentRef(
                 text: reusableContent.title,
                 active: false,
                 reusableContent,
+            };
+        }
+
+        case 'openapi': {
+            if (!siteContext) {
+                return null;
+            }
+            const { organizationId } = siteContext;
+            const [openAPISpecVersion, openAPISpecVersionContent] = await Promise.all([
+                getLatestOpenAPISpecVersion(organizationId, contentRef.spec),
+                getLatestOpenAPISpecVersionContent(organizationId, contentRef.spec),
+            ]);
+
+            if (!openAPISpecVersion || !openAPISpecVersionContent) {
+                return null;
+            }
+            return {
+                href: openAPISpecVersion.url,
+                text: contentRef.spec,
+                active: false,
+                openAPIFilesystem: openAPISpecVersionContent as Filesystem,
             };
         }
 

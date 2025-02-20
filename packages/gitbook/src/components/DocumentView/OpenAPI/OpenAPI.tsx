@@ -3,7 +3,7 @@ import { Icon } from '@gitbook/icons';
 import { OpenAPIOperation } from '@gitbook/react-openapi';
 import React from 'react';
 
-import { fetchOpenAPIBlock } from '@/lib/openapi/fetch';
+import { resolveOpenAPIBlock } from '@/lib/openapi/fetch';
 import { tcls } from '@/lib/tailwind';
 
 import { BlockProps } from '../Block';
@@ -27,13 +27,17 @@ export async function OpenAPI(props: BlockProps<DocumentBlockOpenAPI>) {
 
 async function OpenAPIBody(props: BlockProps<DocumentBlockOpenAPI>) {
     const { block, context } = props;
-    const { data, specUrl, error } = await fetchOpenAPIBlock(block, context.resolveContentRef);
+
+    const { data, specUrl, error } = await resolveOpenAPIBlock({
+        block,
+        context: { resolveContentRef: context.resolveContentRef },
+    });
 
     if (error) {
         return (
-            <div className={tcls('hidden')}>
+            <div className="hidden">
                 <p>
-                    Error with {error.rootURL}: {error.message}
+                    Error with {specUrl}: {error.message}
                 </p>
             </div>
         );
