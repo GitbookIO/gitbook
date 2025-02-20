@@ -169,14 +169,6 @@
     @apply mt-3;
 }
 
-.openapi-schema-items {
-    @apply pt-3;
-}
-
-.openapi-schema-items .openapi-schema-items-property {
-    @apply mt-3 flex flex-col gap-1.5;
-}
-
 /* Schema Presentation */
 .openapi-schema-presentation {
     @apply flex flex-col gap-1.5 font-normal;
