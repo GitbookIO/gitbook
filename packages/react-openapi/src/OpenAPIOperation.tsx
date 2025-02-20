@@ -29,7 +29,7 @@ export function OpenAPIOperation(props: {
 
     return (
         <div className={clsx('openapi-operation', className)}>
-            <div className="openapi-summary">
+            <div className="openapi-summary" id={operation.summary ? undefined : context.id}>
                 {operation.summary
                     ? context.renderHeading({
                           deprecated: operation.deprecated ?? false,

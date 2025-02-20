@@ -7,23 +7,48 @@ import { cache, noCacheFetchOptions, CacheFunctionOptions } from '@/lib/cache';
 import { enrichFilesystem } from './enrich';
 import { ResolvedContentRef } from '../references';
 
+const weakmap = new WeakMap<DocumentBlockOpenAPI, ResolveOpenAPIBlockResult>();
+
 /**
- * Fetch an OpenAPI specification for an operation.
+ * Cache the result of resolving an OpenAPI block.
+ * It is important because the resolve is called in sections and in the block itself.
  */
-export async function fetchOpenAPIBlock(
-    block: DocumentBlockOpenAPI,
-    resolveContentRef: (ref: ContentRef) => Promise<ResolvedContentRef | null>,
-): Promise<
-    | { data: OpenAPIOperationData | null; specUrl: string | null; error?: undefined }
+export function resolveOpenAPIBlock(args: ResolveOpenAPIBlockArgs): ResolveOpenAPIBlockResult {
+    if (weakmap.has(args.block)) {
+        return weakmap.get(args.block)!;
+    }
+
+    const result = baseResolveOpenAPIBlock(args);
+    weakmap.set(args.block, result);
+    return result;
+}
+
+type ResolveOpenAPIBlockArgs = {
+    block: DocumentBlockOpenAPI;
+    context: { resolveContentRef: (ref: ContentRef) => Promise<ResolvedContentRef | null> };
+};
+type ResolveOpenAPIBlockResult = Promise<
+    | { error?: undefined; data: OpenAPIOperationData | null; specUrl: string | null }
     | { error: OpenAPIParseError; data?: undefined; specUrl?: undefined }
-> {
-    const resolved = block.data.ref ? await resolveContentRef(block.data.ref) : null;
-    if (!resolved || !block.data.path || !block.data.method) {
+>;
+/**
+ * Resolve OpenAPI block.
+ */
+async function baseResolveOpenAPIBlock(args: ResolveOpenAPIBlockArgs): ResolveOpenAPIBlockResult {
+    const { context, block } = args;
+    if (!block.data.path || !block.data.method) {
+        return { data: null, specUrl: null };
+    }
+
+    const resolved = block.data.ref ? await context.resolveContentRef(block.data.ref) : null;
+
+    if (!resolved) {
         return { data: null, specUrl: null };
     }
 
     try {
-        const filesystem = await fetchFilesystem(resolved.href);
+        const filesystem = resolved.openAPIFilesystem ?? (await fetchFilesystem(resolved.href));
+
         const data = await resolveOpenAPIOperation(filesystem, {
             path: block.data.path,
             method: block.data.method,
