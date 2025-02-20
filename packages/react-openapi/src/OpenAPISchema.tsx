@@ -242,10 +242,10 @@ export function OpenAPISchemaPresentation(props: OpenAPISchemaPropertyEntry) {
     return (
         <div className="openapi-schema-presentation">
             <OpenAPISchemaName
+                schema={schema}
                 type={getSchemaTitle(schema)}
                 propertyName={propertyName}
                 required={required}
-                deprecated={schema.deprecated}
             />
             {schema['x-deprecated-sunset'] ? (
                 <div className="openapi-deprecated-sunset openapi-schema-description openapi-markdown">
@@ -293,7 +293,7 @@ function getSchemaProperties(schema: OpenAPIV3.SchemaObject): null | OpenAPISche
         }
 
         // If the items are a primitive type, we don't need to display them
-        if (['string', 'number', 'boolean', 'integer'].includes(items.type)) {
+        if (['string', 'number', 'boolean', 'integer'].includes(items.type) && !items.enum) {
             return null;
         }
 
@@ -395,6 +395,8 @@ export function getSchemaTitle(
     if (schema.enum) {
         type = `${schema.type} · enum`;
         // check array AND schema.items as this is sometimes null despite what the type indicates
+    } else if (schema.type === 'array' && !!schema.items) {
+        type = `${getSchemaTitle(schema.items)}[]`;
     } else if (Array.isArray(schema.type)) {
         type = schema.type.join(' | ');
     } else if (schema.type || schema.properties) {
@@ -413,28 +415,6 @@ export function getSchemaTitle(
         type = 'not';
     }
 
-    // Indicate the type of the array
-    if (schema.type === 'array' && !!schema.items) {
-        type += ` · ${getSchemaTitle(schema.items)}[]`;
-    }
-
-    if (schema.minimum || schema.minLength) {
-        type += ` · min: ${schema.minimum || schema.minLength}`;
-    }
-
-    if (schema.maximum || schema.maxLength) {
-        type += ` · max: ${schema.maximum || schema.maxLength}`;
-    }
-
-    // If the schema has a default value, we display it
-    if (typeof schema.default !== 'undefined') {
-        type += ` · default: ${schema.default}`;
-    }
-
-    if (schema.nullable) {
-        type = `${type} | nullable`;
-    }
-
     return type;
 }
 
@@ -442,6 +422,11 @@ function getDisclosureLabel(schema: OpenAPIV3.SchemaObject): string | undefined 
     if (schema.type === 'array' && !!schema.items) {
         if (schema.items.oneOf) {
             return 'available items';
+        }
+
+        // Fallback to "child attributes" for enums and objects
+        if (schema.items.enum || schema.items.type === 'object') {
+            return;
         }
 
         return schema.items.title ?? schema.title ?? getSchemaTitle(schema.items);
