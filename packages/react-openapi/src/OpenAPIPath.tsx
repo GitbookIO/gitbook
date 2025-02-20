@@ -1,5 +1,6 @@
 import { ScalarApiButton } from './ScalarApiButton';
 import type { OpenAPIOperationData, OpenAPIContextProps } from './types';
+import { OpenAPIV3_1 } from '@gitbook/openapi-parser';
 
 /**
  * Display the path of an operation.
@@ -11,6 +12,7 @@ export function OpenAPIPath(props: {
     const { data, context } = props;
     const { method, path } = data;
     const { specUrl } = context;
+    const hideTryItPanel = data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'];
 
     return (
         <div className="openapi-path">
@@ -18,11 +20,15 @@ export function OpenAPIPath(props: {
             <div className="openapi-path-title" data-deprecated={data.operation.deprecated}>
                 <p>{formatPath(path)}</p>
             </div>
-            {data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'] ? null : (
+            {!hideTryItPanel && validateHttpMethod(method) && (
                 <ScalarApiButton method={method} path={path} specUrl={specUrl} />
             )}
         </div>
     );
+}
+
+function validateHttpMethod(method: string): method is OpenAPIV3_1.HttpMethods {
+    return ['get', 'post', 'put', 'delete', 'patch', 'head', 'options', 'trace'].includes(method);
 }
 
 // Format the path to highlight placeholders
