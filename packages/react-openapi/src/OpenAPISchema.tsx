@@ -227,7 +227,7 @@ export function OpenAPISchemaPresentation(props: OpenAPISchemaPropertyEntry) {
 
     const shouldDisplayExample = (schema: OpenAPIV3.SchemaObject): boolean => {
         return (
-            typeof schema.example === 'string' ||
+            (typeof schema.example === 'string' && !!schema.example) ||
             typeof schema.example === 'number' ||
             typeof schema.example === 'boolean' ||
             (Array.isArray(schema.example) && schema.example.length > 0) ||
