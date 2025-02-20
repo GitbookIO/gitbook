@@ -68,10 +68,7 @@ export function OpenAPISchemaProperty(
             <InteractiveSection id={id} className={clsx('openapi-schema', className)}>
                 <OpenAPISchemaPresentation {...props} />
                 {properties && properties.length > 0 ? (
-                    <OpenAPIDisclosure
-                        context={context}
-                        label={schema.type !== 'object' ? getDisclosureLabel(schema) : undefined}
-                    >
+                    <OpenAPIDisclosure context={context} label={getDisclosureLabel(schema)}>
                         <OpenAPISchemaProperties
                             properties={properties}
                             circularRefs={circularRefs}
@@ -295,6 +292,11 @@ function getSchemaProperties(schema: OpenAPIV3.SchemaObject): null | OpenAPISche
             return itemProperties;
         }
 
+        // If the items are a primitive type, we don't need to display them
+        if (['string', 'number', 'boolean', 'integer'].includes(items.type)) {
+            return null;
+        }
+
         return [
             {
                 propertyName: 'items',
@@ -393,8 +395,6 @@ export function getSchemaTitle(
     if (schema.enum) {
         type = `${schema.type} · enum`;
         // check array AND schema.items as this is sometimes null despite what the type indicates
-    } else if (schema.type === 'array' && !!schema.items) {
-        type = `${schema.title ?? getSchemaTitle(schema.items)}[]`;
     } else if (Array.isArray(schema.type)) {
         type = schema.type.join(' | ');
     } else if (schema.type || schema.properties) {
@@ -413,6 +413,11 @@ export function getSchemaTitle(
         type = 'not';
     }
 
+    // Indicate the type of the array
+    if (schema.type === 'array' && !!schema.items) {
+        type += ` · ${getSchemaTitle(schema.items)}[]`;
+    }
+
     if (schema.minimum || schema.minLength) {
         type += ` · min: ${schema.minimum || schema.minLength}`;
     }
@@ -421,6 +426,7 @@ export function getSchemaTitle(
         type += ` · max: ${schema.maximum || schema.maxLength}`;
     }
 
+    // If the schema has a default value, we display it
     if (typeof schema.default !== 'undefined') {
         type += ` · default: ${schema.default}`;
     }
@@ -438,12 +444,8 @@ function getDisclosureLabel(schema: OpenAPIV3.SchemaObject): string | undefined 
             return 'available items';
         }
 
-        return schema.title ?? schema.items.title ?? getSchemaTitle(schema.items);
+        return schema.items.title ?? schema.title ?? getSchemaTitle(schema.items);
     }
 
-    if (schema.title) {
-        return schema.title;
-    }
-
-    return undefined;
+    return schema.title;
 }
