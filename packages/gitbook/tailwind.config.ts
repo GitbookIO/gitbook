@@ -380,6 +380,9 @@ const config: Config = {
 
                 // Corner styles
                 corner: ['straight-corners'],
+
+                // Link styles
+                links: ['links-color', 'links-underline'],
             };
 
             for (const [category, variants] of Object.entries(customisationVariants)) {
