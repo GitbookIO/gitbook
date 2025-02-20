@@ -1,5 +1,14 @@
 # gitbook
 
+## 0.6.3
+
+### Patch Changes
+
+-   a820739: Remove unused search api method from gitbook/api/lib
+-   9f0de74: Add support for new OpenAPI ref
+-   Updated dependencies [9f0de74]
+    -   @gitbook/react-openapi@1.0.3
+
 ## 0.6.2
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @gitbook/react-openapi
 
+## 1.0.3
+
+### Patch Changes
+
+-   9f0de74: Fix ID not set when there is no operation summary
+
 ## 1.0.2
 
 ### Patch Changes
