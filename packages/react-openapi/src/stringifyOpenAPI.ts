@@ -6,7 +6,7 @@ export function stringifyOpenAPI(body: unknown, _?: null, indent?: number): stri
         body,
         (key, value) => {
             // Ignore internal keys
-            if (SYMBOL_GITBOOK_INTERNAL.test(key)) {
+            if (key.startsWith('x-gitbook-')) {
                 return undefined;
             }
 
@@ -15,6 +15,3 @@ export function stringifyOpenAPI(body: unknown, _?: null, indent?: number): stri
         indent,
     );
 }
-
-// Match all x-gitbook-* symbols
-export const SYMBOL_GITBOOK_INTERNAL = /x-gitbook-.*/;
