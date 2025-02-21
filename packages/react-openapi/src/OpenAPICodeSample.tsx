@@ -57,11 +57,7 @@ export function OpenAPICodeSample(props: {
             data.path +
             (searchParams.size ? `?${searchParams.toString()}` : ''),
         method: data.method,
-        body: requestBodyContent
-            ? generateMediaTypeExample(requestBodyContent[1], {
-                  omitEmptyAndOptionalProperties: true,
-              })
-            : undefined,
+        body: requestBodyContent ? generateMediaTypeExample(requestBodyContent[1]) : undefined,
         headers: {
             ...getSecurityHeaders(data.securities),
             ...headersObject,
