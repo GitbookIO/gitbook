@@ -476,7 +476,7 @@ const config: Config = {
                 corner: ['straight-corners'],
 
                 // Link styles
-                links: ['links-color', 'links-underline'],
+                links: ['links-default', 'links-accent'],
             };
 
             for (const [category, variants] of Object.entries(customisationVariants)) {

@@ -164,15 +164,15 @@ function getHeaderLinkClassName(props: { headerPreset: CustomizationHeaderPreset
         'truncate',
 
         'text-tint',
-        'links-color:hover:text-primary',
-        'links-color:tint:hover:text-tint-strong',
+        'links-default:hover:text-primary',
+        'links-default:tint:hover:text-tint-strong',
 
         'underline-offset-2',
-        'links-underline:hover:underline',
-        'links-underline:underline-offset-4',
-        'links-underline:decoration-primary-subtle',
-        'links-underline:decoration-[3px]',
-        'links-underline:py-0.5', // Prevent underline from being cut off at the bottom
+        'links-accent:hover:underline',
+        'links-accent:underline-offset-4',
+        'links-accent:decoration-primary-subtle',
+        'links-accent:decoration-[3px]',
+        'links-accent:py-0.5', // Prevent underline from being cut off at the bottom
 
         'theme-bold:text-header-link',
         'theme-bold:hover:text-header-link',
