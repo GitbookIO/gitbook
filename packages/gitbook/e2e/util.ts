@@ -14,18 +14,12 @@ import {
     CustomizationThemeMode,
     SiteCustomizationSettings,
 } from '@gitbook/api';
-import { test, expect, Page, BrowserContext } from '@playwright/test';
+import { BrowserContext, expect, Page, test } from '@playwright/test';
 import deepMerge from 'deepmerge';
 import rison from 'rison';
 import { DeepPartial } from 'ts-essentials';
 
 import { getContentTestURL } from '../tests/utils';
-import {
-    DEFAULT_HINT_DANGER_COLOR,
-    DEFAULT_HINT_INFO_COLOR,
-    DEFAULT_HINT_SUCCESS_COLOR,
-    DEFAULT_HINT_WARNING_COLOR,
-} from '@gitbook/colors';
 
 export interface Test {
     name: string;
@@ -228,10 +222,10 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
         styling: {
             theme: newTheme,
             primaryColor: { light: '#346DDB', dark: '#346DDB' },
-            infoColor: { light: DEFAULT_HINT_INFO_COLOR, dark: DEFAULT_HINT_INFO_COLOR },
-            successColor: { light: DEFAULT_HINT_SUCCESS_COLOR, dark: DEFAULT_HINT_SUCCESS_COLOR },
-            warningColor: { light: DEFAULT_HINT_WARNING_COLOR, dark: DEFAULT_HINT_WARNING_COLOR },
-            dangerColor: { light: DEFAULT_HINT_DANGER_COLOR, dark: DEFAULT_HINT_DANGER_COLOR },
+            infoColor: { light: '#787878', dark: '#787878' },
+            warningColor: { light: '#FE9A00', dark: '#FE9A00' },
+            dangerColor: { light: '#FB2C36', dark: '#FB2C36' },
+            successColor: { light: '#00C950', dark: '#00C950' },
             corners: CustomizationCorners.Rounded,
             font: CustomizationFont.Inter,
             background: CustomizationBackground.Plain,
