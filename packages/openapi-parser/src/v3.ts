@@ -19,24 +19,30 @@ export async function parseOpenAPIV3(input: {
     rootURL: string | null;
 }): Promise<Filesystem<OpenAPIV3xDocument>> {
     const { value, rootURL } = input;
-    const result = await validate(value);
 
-    // Spec is invalid, we stop here.
-    if (!result.specification) {
-        throw new OpenAPIParseError('Invalid OpenAPI document', {
-            code: 'invalid',
-            rootURL,
-        });
+    try {
+        const result = await validate(value);
+        // Spec is invalid, we stop here.
+        if (!result.specification) {
+            throw new OpenAPIParseError('Invalid OpenAPI document', {
+                code: 'invalid',
+                rootURL,
+            });
+        }
+
+        if (result.version === '2.0') {
+            throw new OpenAPIParseError('Only OpenAPI v3 is supported', {
+                code: 'parse-v2-in-v3',
+                rootURL,
+            });
+        }
+
+        const filesystem = await createFileSystem({ value: result.specification, rootURL });
+
+        return filesystem;
+    } catch (err) {
+        console.error(err);
+        console.trace();
+        throw err;
     }
-
-    if (result.version === '2.0') {
-        throw new OpenAPIParseError('Only OpenAPI v3 is supported', {
-            code: 'parse-v2-in-v3',
-            rootURL,
-        });
-    }
-
-    const filesystem = await createFileSystem({ value: result.specification, rootURL });
-
-    return filesystem;
 }
