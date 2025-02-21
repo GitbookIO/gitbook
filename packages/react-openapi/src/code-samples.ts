@@ -40,25 +40,29 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
 
             lines.push(`--url '${url}'`);
 
+            if (body) {
+                const bodyContent = BodyGenerators.getCurlBody(body, headers);
+
+                if (!bodyContent) {
+                    return '';
+                }
+
+                body = bodyContent.body;
+                headers = bodyContent.headers;
+            }
+
             if (headers) {
                 Object.entries(headers).forEach(([key, value]) => {
                     lines.push(`--header '${key}: ${value}'`);
                 });
             }
 
-            const contentType = (headers && headers['Content-Type']) || '';
-
-            if (body && Object.keys(body).length > 0) {
-                const bodyContent = BodyGenerators.getCurlBody(body, contentType);
-
-                if (!bodyContent) {
-                    return '';
-                }
-
-                if (Array.isArray(bodyContent)) {
-                    lines.push(...bodyContent);
+            if (body) {
+                if (Array.isArray(body)) {
+                    console.log(body);
+                    lines.push(...body);
                 } else {
-                    lines.push(bodyContent);
+                    lines.push(body);
                 }
             }
 
@@ -224,37 +228,50 @@ export function parseHostAndPath(url: string) {
 
 // Body Generators
 const BodyGenerators = {
-    getCurlBody(body: any, contentType: string): string | string[] | undefined {
-        if (!body) return undefined;
+    getCurlBody(body: any, headers?: Record<string, string>) {
+        if (!body || !headers) return undefined;
 
-        // If the content type is form data and the body is a plain object, convert it to curl form data
-        if (isFormData(contentType) && isPlainObject(body)) {
-            return Object.entries(body).map(([key, value]) => `--form '${key}=${String(value)}'`);
+        const contentType: string = headers['Content-Type'] || '';
+
+        if (isPDF(contentType)) {
+            body = `--data-binary '@${body}'`;
         }
 
-        const typeHandlers = {
-            pdf: () => `--data-binary '@${body}'`,
-            formUrlEncoded: () => {
-                const encoded = isPlainObject(body)
-                    ? Object.entries(body)
-                          .map(([key, value]) => `${key}=${String(value)}`)
-                          .join('&')
-                    : String(body);
-                return `--data '${encoded}'`;
-            },
-            text: () => `--data '${String(body).replace(/"/g, '')}'`,
-            xmlOrCsv: () => `--data-binary $'${stringifyOpenAPI(body).replace(/"/g, '')}'`,
-            default: () => `--data '${stringifyOpenAPI(body)}'`,
-        };
+        if (isFormData(contentType)) {
+            body = isPlainObject(body)
+                ? Object.entries(body).map(([key, value]) => `--form '${key}=${String(value)}'`)
+                : `--form 'file=@${body}'`;
+        }
 
-        if (isPDF(contentType)) return typeHandlers.pdf();
-        if (isFormUrlEncoded(contentType)) return typeHandlers.formUrlEncoded();
-        if (isText(contentType)) return typeHandlers.text();
+        if (isFormUrlEncoded(contentType)) {
+            body = isPlainObject(body)
+                ? `--data '${Object.entries(body)
+                      .map(([key, value]) => `${key}=${String(value)}`)
+                      .join('&')}'`
+                : String(body);
+        }
+
+        if (isText(contentType)) {
+            body = `--data '${String(body).replace(/"/g, '')}'`;
+        }
+
         if (isXML(contentType) || isCSV(contentType)) {
-            return typeHandlers.xmlOrCsv();
+            body = `--data-binary $'${stringifyOpenAPI(body).replace(/"/g, '')}'`;
         }
 
-        return typeHandlers.default();
+        if (isGraphQL(contentType)) {
+            body = `--data '${stringifyOpenAPI(body)}'`;
+            headers['Content-Type'] = 'application/json';
+        }
+
+        if (isPlainObject(body)) {
+            body = `--data '${stringifyOpenAPI(body)}'`;
+        }
+
+        return {
+            body,
+            headers,
+        };
     },
     getJavaScriptBody: (body: any, headers?: Record<string, string>) => {
         if (!body || !headers) return;
@@ -292,7 +309,7 @@ const BodyGenerators = {
                 Object.entries(body).forEach(([key, value]) => {
                     code += `const ${key} = \`${String(value)}\`;\n`;
                 });
-                body = 'JSON.stringify({ query, variables })';
+                body = 'JSON.stringify({ query })';
             } else {
                 code += `const query = \`${String(body)}\`;\n\n`;
                 body = 'JSON.stringify(query)';
