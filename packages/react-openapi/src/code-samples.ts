@@ -297,13 +297,13 @@ const BodyGenerators = {
         } else if (isGraphQL(contentType)) {
             if (isPlainObject(body)) {
                 Object.entries(body).forEach(([key, value]) => {
-                    code += `const ${key} = \`${String(value)}\`;\n`;
+                    code += `const ${key} = \`\n${indent(String(value), 4)}\`;\n\n`;
                 });
                 body = `JSON.stringify({ ${Object.keys(body).join(', ')} })`;
                 // Set Content-Type to application/json for GraphQL, recommended by GraphQL spec
                 headersCopy['Content-Type'] = 'application/json';
             } else {
-                code += `const query = \`${String(body)}\`;\n\n`;
+                code += `const query = \`\n${indent(String(body), 4)}\`;\n\n`;
                 body = 'JSON.stringify(query)';
             }
         } else if (isCSV(contentType)) {
