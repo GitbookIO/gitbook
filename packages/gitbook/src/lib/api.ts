@@ -211,42 +211,6 @@ export const getUserById = cache({
 /**
  * Get the latest version of an OpenAPI spec by its slug.
  */
-export const getLatestOpenAPISpecVersion = cache({
-    name: 'api.getLatestOpenApiSpecVersion',
-    tag: (organization, openAPISpec) =>
-        getAPICacheTag({
-            tag: 'openapi',
-            organization,
-            openAPISpec,
-        }),
-    get: async (organizationId: string, slug: string, options: CacheFunctionOptions) => {
-        try {
-            const apiCtx = await api();
-            const response = await apiCtx.client.orgs.getLatestOpenApiSpecVersion(
-                organizationId,
-                slug,
-                {
-                    ...noCacheFetchOptions,
-                    signal: options.signal,
-                },
-            );
-            return cacheResponse(response, { revalidateBefore: 60 * 60 });
-        } catch (error) {
-            if (checkHasErrorCode(error, 404)) {
-                return {
-                    revalidateBefore: 5,
-                    data: null,
-                };
-            }
-
-            throw error;
-        }
-    },
-});
-
-/**
- * Get the latest version of an OpenAPI spec by its slug.
- */
 export const getLatestOpenAPISpecVersionContent = cache({
     name: 'api.getLatestOpenApiSpecVersionContent',
     tag: (organization, openAPISpec) =>

@@ -18,7 +18,6 @@ import {
     SpaceContentPointer,
     getCollection,
     getDocument,
-    getLatestOpenAPISpecVersion,
     getLatestOpenAPISpecVersionContent,
     getPageDocument,
     getPublishedContentSite,
@@ -282,19 +281,19 @@ export async function resolveContentRef(
                 return null;
             }
             const { organizationId } = siteContext;
-            const [openAPISpecVersion, openAPISpecVersionContent] = await Promise.all([
-                getLatestOpenAPISpecVersion(organizationId, contentRef.spec),
-                getLatestOpenAPISpecVersionContent(organizationId, contentRef.spec),
-            ]);
+            const openAPISpecVersionContent = await getLatestOpenAPISpecVersionContent(
+                organizationId,
+                contentRef.spec,
+            );
 
-            if (!openAPISpecVersion || !openAPISpecVersionContent) {
+            if (!openAPISpecVersionContent) {
                 return null;
             }
             return {
-                href: openAPISpecVersion.url,
+                href: openAPISpecVersionContent.url,
                 text: contentRef.spec,
                 active: false,
-                openAPIFilesystem: openAPISpecVersionContent as Filesystem,
+                openAPIFilesystem: openAPISpecVersionContent.filesystem as Filesystem,
             };
         }
 

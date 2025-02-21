@@ -1,9 +1,9 @@
-import { DocumentBlockHeading } from '@gitbook/api';
+import type { DocumentBlockHeading } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 
 import { tcls } from '@/lib/tailwind';
 
-import { BlockProps } from './Block';
+import type { BlockProps } from './Block';
 import { Inlines } from './Inlines';
 import { getBlockTextStyle } from './spacing';
 
@@ -24,6 +24,7 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
         >
             <div
                 className={tcls(
+                    'hash',
                     'grid',
                     'grid-area-1-1',
                     'relative',
@@ -41,20 +42,14 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                 <a
                     href={`#${id}`}
                     aria-label="Direct link to heading"
-                    className={tcls(
-                        'inline-flex',
-                        'h-full',
-                        'items-start',
-                        'dark:shadow-none',
-                        'dark:ring-0',
-                        textStyle.lineHeight,
-                    )}
+                    className={tcls('inline-flex', 'h-full', 'items-start', textStyle.lineHeight)}
                 >
                     <Icon
                         icon="hashtag"
                         className={tcls(
                             'w-3.5',
-                            'h-[1lh]',
+                            'h-[1em]',
+                            'mt-0.5',
                             'transition-colors',
                             'text-transparent',
                             'group-hover:text-tint-subtle',
