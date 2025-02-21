@@ -27,8 +27,7 @@ export function isFormUrlEncoded(contentType?: string): boolean {
 }
 
 export function isFormData(contentType?: string): boolean {
-    const allowedTypes = ['multipart/form-data', 'application/zip', 'application/octet-stream'];
-    return !!contentType && allowedTypes.includes(contentType.toLowerCase());
+    return !!contentType && contentType.toLowerCase().includes('multipart/form-data');
 }
 
 export function isPlainObject(value: unknown): boolean {

@@ -59,7 +59,6 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
 
             if (body) {
                 if (Array.isArray(body)) {
-                    console.log(body);
                     lines.push(...body);
                 } else {
                     lines.push(body);
@@ -159,9 +158,7 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
                 // handle unicode chars with a text encoder
                 const encoder = new TextEncoder();
 
-                const contentType = (headers && headers['Content-Type']) || '';
-
-                const bodyString = BodyGenerators.getHTTPBody(body, contentType);
+                const bodyString = BodyGenerators.getHTTPBody(body, headers);
 
                 if (bodyString) {
                     body = bodyString;
@@ -231,7 +228,9 @@ const BodyGenerators = {
     getCurlBody(body: any, headers?: Record<string, string>) {
         if (!body || !headers) return undefined;
 
-        const contentType: string = headers['Content-Type'] || '';
+        // Copy headers to avoid mutating the original object
+        const headersCopy = { ...headers };
+        const contentType: string = headersCopy['Content-Type'] || '';
 
         if (isPDF(contentType)) {
             body = `--data-binary '@${body}'`;
@@ -261,7 +260,7 @@ const BodyGenerators = {
 
         if (isGraphQL(contentType)) {
             body = `--data '${stringifyOpenAPI(body)}'`;
-            headers['Content-Type'] = 'application/json';
+            headersCopy['Content-Type'] = 'application/json';
         }
 
         if (isPlainObject(body)) {
@@ -270,14 +269,17 @@ const BodyGenerators = {
 
         return {
             body,
-            headers,
+            headers: headersCopy,
         };
     },
     getJavaScriptBody: (body: any, headers?: Record<string, string>) => {
         if (!body || !headers) return;
 
         let code = '';
-        const contentType: string = headers['Content-Type'] || '';
+
+        // Copy headers to avoid mutating the original object
+        const headersCopy = { ...headers };
+        const contentType: string = headersCopy['Content-Type'] || '';
 
         if (isFormData(contentType)) {
             code += 'const formData = new FormData();\n\n';
@@ -304,12 +306,12 @@ const BodyGenerators = {
         }
 
         if (isGraphQL(contentType)) {
-            headers['Content-Type'] = 'application/json';
             if (isPlainObject(body)) {
                 Object.entries(body).forEach(([key, value]) => {
                     code += `const ${key} = \`${String(value)}\`;\n`;
                 });
                 body = 'JSON.stringify({ query })';
+                headersCopy['Content-Type'] = 'application/json';
             } else {
                 code += `const query = \`${String(body)}\`;\n\n`;
                 body = 'JSON.stringify(query)';
@@ -336,10 +338,11 @@ const BodyGenerators = {
         body =
             typeof body === 'object'
                 ? `JSON.stringify(${stringifyOpenAPI(body, null, 2)})`
-                : isText(headers?.['Content-Type'])
+                : isText(contentType)
                   ? stringifyOpenAPI(body, null, 2)
                   : body;
-        return { body, code, headers };
+
+        return { body, code, headers: headersCopy };
     },
     getPythonBody: (body: any, headers?: Record<string, string>) => {
         if (!body || !headers) return;
@@ -366,8 +369,10 @@ const BodyGenerators = {
 
         return { body, code, headers };
     },
-    getHTTPBody: (body: any, contentType: string) => {
-        if (!body) return undefined;
+    getHTTPBody: (body: any, headers?: Record<string, string>) => {
+        if (!body || !headers) return undefined;
+
+        const contentType: string = headers['Content-Type'] || '';
 
         const typeHandlers = {
             pdf: () => `${stringifyOpenAPI(body, null, 2)}`,
