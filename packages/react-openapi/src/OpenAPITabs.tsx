@@ -74,11 +74,17 @@ export function OpenAPITabs(
             const tabFromState = syncedTabs.get(stateKey);
 
             if (!items.some((item) => item.key === tabFromState?.key)) {
-                return;
+                return setSelectedTab(defaultTab);
             }
 
             if (tabFromState && tabFromState?.key !== selectedTab?.key) {
-                setSelectedTab(tabFromState);
+                const tabFromItems = items.find((item) => item.key === tabFromState.key);
+
+                if (!tabFromItems) {
+                    return;
+                }
+
+                setSelectedTab(tabFromItems);
             }
         }
     }, [isVisible, stateKey, syncedTabs, selectedTabKey]);
