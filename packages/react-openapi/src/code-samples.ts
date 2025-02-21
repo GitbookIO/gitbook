@@ -232,39 +232,30 @@ const BodyGenerators = {
         const headersCopy = { ...headers };
         const contentType: string = headersCopy['Content-Type'] || '';
 
-        if (isPDF(contentType)) {
-            body = `--data-binary '@${body}'`;
-        }
-
         if (isFormData(contentType)) {
             body = isPlainObject(body)
                 ? Object.entries(body).map(([key, value]) => `--form '${key}=${String(value)}'`)
                 : `--form 'file=@${body}'`;
-        }
-
-        if (isFormUrlEncoded(contentType)) {
+        } else if (isFormUrlEncoded(contentType)) {
             body = isPlainObject(body)
                 ? `--data '${Object.entries(body)
                       .map(([key, value]) => `${key}=${String(value)}`)
                       .join('&')}'`
                 : String(body);
-        }
-
-        if (isText(contentType)) {
+        } else if (isText(contentType)) {
             body = `--data '${String(body).replace(/"/g, '')}'`;
-        }
-
-        if (isXML(contentType) || isCSV(contentType)) {
+        } else if (isXML(contentType) || isCSV(contentType)) {
+            // We use --data-binary to avoid cURL converting newlines to \r\n
             body = `--data-binary $'${stringifyOpenAPI(body).replace(/"/g, '')}'`;
-        }
-
-        if (isGraphQL(contentType)) {
+        } else if (isGraphQL(contentType)) {
             body = `--data '${stringifyOpenAPI(body)}'`;
+            // Set Content-Type to application/json for GraphQL, recommended by GraphQL spec
             headersCopy['Content-Type'] = 'application/json';
-        }
-
-        if (isPlainObject(body)) {
-            body = `--data '${stringifyOpenAPI(body)}'`;
+        } else if (isPDF(contentType)) {
+            // We use --data-binary to avoid cURL converting newlines to \r\n
+            body = `--data-binary '@${String(body)}'`;
+        } else {
+            body = `--data '${stringifyOpenAPI(body, null, 2)}'`;
         }
 
         return {
@@ -293,10 +284,8 @@ const BodyGenerators = {
             }
             code += '\n';
             body = 'formData';
-        }
-
-        // Use URLSearchParams for form-urlencoded data
-        if (isFormUrlEncoded(contentType)) {
+        } else if (isFormUrlEncoded(contentType)) {
+            // Use URLSearchParams for form-urlencoded data
             code += 'const params = new URLSearchParams();\n\n';
             if (isPlainObject(body)) {
                 Object.entries(body).forEach(([key, value]) => {
@@ -305,44 +294,38 @@ const BodyGenerators = {
             }
             code += '\n';
             body = 'params.toString()';
-        }
-
-        if (isGraphQL(contentType)) {
+        } else if (isGraphQL(contentType)) {
             if (isPlainObject(body)) {
                 Object.entries(body).forEach(([key, value]) => {
                     code += `const ${key} = \`${String(value)}\`;\n`;
                 });
                 body = `JSON.stringify({ ${Object.keys(body).join(', ')} })`;
+                // Set Content-Type to application/json for GraphQL, recommended by GraphQL spec
                 headersCopy['Content-Type'] = 'application/json';
             } else {
                 code += `const query = \`${String(body)}\`;\n\n`;
                 body = 'JSON.stringify(query)';
             }
-        }
-
-        if (isCSV(contentType)) {
+        } else if (isCSV(contentType)) {
             code += 'const csv = `\n';
             code += indent(String(body), 4);
             code += '`;\n\n';
             body = 'csv';
-        }
-
-        if (isPDF(contentType)) {
+        } else if (isPDF(contentType)) {
+            // Use FormData to upload PDF files
             code += 'const formData = new FormData();\n\n';
             code += `formData.append("file", "${body}");\n\n`;
             body = 'formData';
+        } else if (isXML(contentType)) {
+            code += 'const xml = `\n';
+            code += indent(String(body), 4);
+            code += '`;\n\n';
+            body = 'xml';
+        } else if (isText(contentType)) {
+            body = stringifyOpenAPI(body, null, 2);
+        } else {
+            body = `JSON.stringify(${stringifyOpenAPI(body, null, 2)})`;
         }
-
-        if (isXML(contentType)) {
-            body = `\`${String(body)}\``;
-        }
-
-        body =
-            typeof body === 'object'
-                ? `JSON.stringify(${stringifyOpenAPI(body, null, 2)})`
-                : isText(contentType)
-                  ? stringifyOpenAPI(body, null, 2)
-                  : body;
 
         return { body, code, headers: headersCopy };
     },
