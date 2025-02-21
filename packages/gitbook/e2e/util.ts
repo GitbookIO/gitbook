@@ -20,6 +20,12 @@ import rison from 'rison';
 import { DeepPartial } from 'ts-essentials';
 
 import { getContentTestURL } from '../tests/utils';
+import {
+    DEFAULT_HINT_DANGER_COLOR,
+    DEFAULT_HINT_INFO_COLOR,
+    DEFAULT_HINT_SUCCESS_COLOR,
+    DEFAULT_HINT_WARNING_COLOR,
+} from '@gitbook/colors';
 
 export interface Test {
     name: string;
@@ -222,6 +228,10 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
         styling: {
             theme: newTheme,
             primaryColor: { light: '#346DDB', dark: '#346DDB' },
+            infoColor: { light: DEFAULT_HINT_INFO_COLOR, dark: DEFAULT_HINT_INFO_COLOR },
+            successColor: { light: DEFAULT_HINT_SUCCESS_COLOR, dark: DEFAULT_HINT_SUCCESS_COLOR },
+            warningColor: { light: DEFAULT_HINT_WARNING_COLOR, dark: DEFAULT_HINT_WARNING_COLOR },
+            dangerColor: { light: DEFAULT_HINT_DANGER_COLOR, dark: DEFAULT_HINT_DANGER_COLOR },
             corners: CustomizationCorners.Rounded,
             font: CustomizationFont.Inter,
             background: CustomizationBackground.Plain,

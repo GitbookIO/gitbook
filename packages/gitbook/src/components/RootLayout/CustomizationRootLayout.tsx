@@ -233,10 +233,22 @@ function getSemanticColors(
     }
 
     return {
-        infoColor: DEFAULT_HINT_INFO_COLOR,
-        successColor: DEFAULT_HINT_SUCCESS_COLOR,
-        warningColor: DEFAULT_HINT_WARNING_COLOR,
-        dangerColor: DEFAULT_HINT_DANGER_COLOR,
+        infoColor: {
+            light: DEFAULT_HINT_INFO_COLOR,
+            dark: DEFAULT_HINT_INFO_COLOR,
+        },
+        successColor: {
+            light: DEFAULT_HINT_SUCCESS_COLOR,
+            dark: DEFAULT_HINT_SUCCESS_COLOR,
+        },
+        warningColor: {
+            light: DEFAULT_HINT_WARNING_COLOR,
+            dark: DEFAULT_HINT_WARNING_COLOR,
+        },
+        dangerColor: {
+            light: DEFAULT_HINT_DANGER_COLOR,
+            dark: DEFAULT_HINT_DANGER_COLOR,
+        },
     };
 }
 
