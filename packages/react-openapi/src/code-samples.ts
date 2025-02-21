@@ -7,7 +7,7 @@ import {
     isCSV,
     isGraphQL,
     isPlainObject,
-} from './code-samples/contentTypeChecks';
+} from './contentTypeChecks';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 
 export interface CodeSampleInput {
