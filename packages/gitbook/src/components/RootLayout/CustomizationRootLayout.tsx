@@ -14,6 +14,10 @@ import {
     colorScale,
     type ColorScaleOptions,
     DEFAULT_TINT_COLOR,
+    DEFAULT_HINT_INFO_COLOR,
+    DEFAULT_HINT_SUCCESS_COLOR,
+    DEFAULT_HINT_DANGER_COLOR,
+    DEFAULT_HINT_WARNING_COLOR,
     hexToRgb,
 } from '@gitbook/colors';
 import { IconsProvider, IconStyle } from '@gitbook/icons';
@@ -42,6 +46,7 @@ export async function CustomizationRootLayout(props: {
     const tintColor = getTintColor(customization);
     const mixColor = getTintMixColor(customization.styling.primaryColor, tintColor);
     const sidebarStyles = getSidebarStyles(customization);
+    const { infoColor, successColor, warningColor, dangerColor } = getSemanticColors(customization);
 
     return (
         <html
@@ -86,10 +91,10 @@ export async function CustomizationRootLayout(props: {
                         };
                         --header-link: ${hexToRgb(customization.header.linkColor?.light ?? colorContrast(tintColor?.light ?? customization.styling.primaryColor.light))};
 
-                        ${generateColorVariable('info', '#ff0000')}
-                        ${generateColorVariable('warning', '#ff0000')}
-                        ${generateColorVariable('danger', '#ff0000')}
-                        ${generateColorVariable('success', '#ff0000')}
+                        ${generateColorVariable('info', infoColor.light)}
+                        ${generateColorVariable('warning', warningColor.light)}
+                        ${generateColorVariable('danger', dangerColor.light)}
+                        ${generateColorVariable('success', successColor.light)}
                     }
 
                     .dark {
@@ -100,10 +105,10 @@ export async function CustomizationRootLayout(props: {
                         --header-background: ${hexToRgb(customization.header.backgroundColor?.dark ?? tintColor?.dark ?? customization.styling.primaryColor.dark)};
                         --header-link: ${hexToRgb(customization.header.linkColor?.dark ?? colorContrast(tintColor?.dark ?? customization.styling.primaryColor.dark))};
 
-                        ${generateColorVariable('info', '#ff0000', { darkMode: true })}
-                        ${generateColorVariable('warning', '#ff0000', { darkMode: true })}
-                        ${generateColorVariable('danger', '#ff0000', { darkMode: true })}
-                        ${generateColorVariable('success', '#ff0000', { darkMode: true })}
+                        ${generateColorVariable('info', infoColor.dark, { darkMode: true })}
+                        ${generateColorVariable('warning', warningColor.dark, { darkMode: true })}
+                        ${generateColorVariable('danger', dangerColor.dark, { darkMode: true })}
+                        ${generateColorVariable('success', successColor.dark, { darkMode: true })}
                     }
                 `}</style>
             </head>
@@ -205,6 +210,33 @@ function getSidebarStyles(
     return {
         background: CustomizationSidebarBackgroundStyle.Default,
         list: CustomizationSidebarListStyle.Default,
+    };
+}
+
+/**
+ * Get the semnatic color customization settings.
+ * If it is a space customization, it will return the default styles.
+ */
+function getSemanticColors(
+    customization: CustomizationSettings | SiteCustomizationSettings,
+): Pick<
+    SiteCustomizationSettings['styling'],
+    'infoColor' | 'successColor' | 'warningColor' | 'dangerColor'
+> {
+    if ('infoColor' in customization.styling) {
+        return {
+            infoColor: customization.styling.infoColor,
+            successColor: customization.styling.successColor,
+            warningColor: customization.styling.warningColor,
+            dangerColor: customization.styling.dangerColor,
+        };
+    }
+
+    return {
+        infoColor: DEFAULT_HINT_INFO_COLOR,
+        successColor: DEFAULT_HINT_SUCCESS_COLOR,
+        warningColor: DEFAULT_HINT_WARNING_COLOR,
+        dangerColor: DEFAULT_HINT_DANGER_COLOR,
     };
 }
 
