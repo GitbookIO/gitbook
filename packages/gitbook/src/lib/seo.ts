@@ -31,7 +31,7 @@ export function isPageIndexable(
 /**
  * Return true if a space should be indexed by search engines.
  */
-export async function isSpaceIndexable({ space, site }: { space: Space; site: Site | null }) {
+export async function isSpaceIndexable(site: Site | null) {
     const headersList = await headers();
 
     if (

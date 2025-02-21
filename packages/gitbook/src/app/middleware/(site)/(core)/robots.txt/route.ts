@@ -12,15 +12,12 @@ export const runtime = 'edge';
  */
 export async function GET(req: NextRequest) {
     const pointer = await getSiteContentPointer();
-    const [site, space] = await Promise.all([
-        getSite(pointer.organizationId, pointer.siteId),
-        getSpace(pointer.spaceId, pointer.siteShareKey),
-    ]);
+    const site = await getSite(pointer.organizationId, pointer.siteId);
 
     const lines = [
         `User-agent: *`,
         'Disallow: /~gitbook/',
-        ...((await isSpaceIndexable({ space, site }))
+        ...((await isSpaceIndexable(site))
             ? [`Allow: /`, `Sitemap: ${await getAbsoluteHref(`/sitemap.xml`, true)}`]
             : [`Disallow: /`]),
     ];

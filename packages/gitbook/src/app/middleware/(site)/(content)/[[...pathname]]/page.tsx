@@ -164,8 +164,7 @@ export async function generateMetadata({
             ],
         },
         robots:
-            (await isSpaceIndexable({ space, site: site ?? null })) &&
-            isPageIndexable(ancestors, page)
+            (await isSpaceIndexable(site ?? null)) && isPageIndexable(ancestors, page)
                 ? 'index, follow'
                 : 'noindex, nofollow',
     };
