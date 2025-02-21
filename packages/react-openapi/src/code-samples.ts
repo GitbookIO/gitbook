@@ -185,7 +185,7 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
                       .join('\n') + '\n'
                 : '';
 
-            const bodyString = body ? `\n${stringifyOpenAPI(body, null, 2)}` : '';
+            const bodyString = body ? `\n${body}` : '';
 
             const httpRequest = `${method.toUpperCase()} ${decodeURI(path)} HTTP/1.1
 Host: ${host}
@@ -370,18 +370,18 @@ const BodyGenerators = {
         if (!body) return undefined;
 
         const typeHandlers = {
-            pdf: () => `\n${stringifyOpenAPI(body, null, 2)}`,
+            pdf: () => `${stringifyOpenAPI(body, null, 2)}`,
             formUrlEncoded: () => {
                 const encoded = isPlainObject(body)
                     ? Object.entries(body)
                           .map(([key, value]) => `${key}=${String(value)}`)
                           .join('&')
                     : String(body);
-                return `\n${encoded}`;
+                return `"${encoded}"`;
             },
-            text: () => `\n${String(body).replace(/"/g, '')}`,
-            xmlOrCsv: () => `\n${stringifyOpenAPI(body).replace(/"/g, '')}`,
-            default: () => `\n${stringifyOpenAPI(body)}`,
+            text: () => `"${String(body)}"`,
+            xmlOrCsv: () => `"${stringifyOpenAPI(body).replace(/"/g, '')}"`,
+            default: () => `${stringifyOpenAPI(body, null, 2)}`,
         };
 
         if (isPDF(contentType)) return typeHandlers.pdf();
