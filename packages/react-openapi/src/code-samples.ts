@@ -281,6 +281,7 @@ const BodyGenerators = {
         const headersCopy = { ...headers };
         const contentType: string = headersCopy['Content-Type'] || '';
 
+        // Use FormData for file uploads
         if (isFormData(contentType)) {
             code += 'const formData = new FormData();\n\n';
             if (isPlainObject(body)) {
@@ -294,6 +295,7 @@ const BodyGenerators = {
             body = 'formData';
         }
 
+        // Use URLSearchParams for form-urlencoded data
         if (isFormUrlEncoded(contentType)) {
             code += 'const params = new URLSearchParams();\n\n';
             if (isPlainObject(body)) {
@@ -310,7 +312,7 @@ const BodyGenerators = {
                 Object.entries(body).forEach(([key, value]) => {
                     code += `const ${key} = \`${String(value)}\`;\n`;
                 });
-                body = 'JSON.stringify({ query })';
+                body = `JSON.stringify({ ${Object.keys(body).join(', ')} })`;
                 headersCopy['Content-Type'] = 'application/json';
             } else {
                 code += `const query = \`${String(body)}\`;\n\n`;
