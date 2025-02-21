@@ -5,6 +5,7 @@ import { checkIsReference, createStateKey, resolveDescription } from './utils';
 import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
 import { InteractiveSection } from './InteractiveSection';
 import { json2xml } from './json2xml';
+import { stringifyOpenAPI } from './stringifyOpenAPI';
 
 /**
  * Display an example of the response content.
@@ -226,7 +227,7 @@ function stringifyExample(args: { example: OpenAPIV3.ExampleObject; xml: boolean
         return json2xml(example.value);
     }
 
-    return JSON.stringify(example.value, null, 2);
+    return stringifyOpenAPI(example.value, null, 2);
 }
 
 /**
