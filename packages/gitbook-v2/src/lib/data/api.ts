@@ -32,27 +32,44 @@ export function createDataFetcher(input: DataFetcherInput = commonInput): GitBoo
         //
         // API that are tied to the token
         //
-        getPublishedContentSite(organizationId, siteId) {
-            return getPublishedContentSite(input, organizationId, siteId);
+        getPublishedContentSite(params) {
+            return getPublishedContentSite(input, {
+                organizationId: params.organizationId,
+                siteId: params.siteId,
+                siteShareKey: params.siteShareKey,
+            });
         },
 
         //
         // API that are not tied to the token
         // where the data is the same for all users
         //
-        getUser(userId) {
-            return getUser(commonInput, userId);
+        getUserById(userId) {
+            return getUserById(commonInput, userId);
         },
         getPublishedContentByUrl(params) {
-            return getPublishedContentByUrl(commonInput, params);
+            return getPublishedContentByUrl(commonInput, {
+                url: params.url,
+                visitorAuthToken: params.visitorAuthToken,
+                redirectOnError: params.redirectOnError,
+            });
         },
     };
 }
 
-async function getUser(input: DataFetcherInput, userId: string) {
+async function getUserById(input: DataFetcherInput, userId: string) {
     'use cache';
-    const res = await getAPI(input).users.getUserById(userId);
-    return res.data;
+
+    try {
+        const res = await getAPI(input).users.getUserById(userId);
+        return res.data;
+    } catch (error) {
+        if (checkHasErrorCode(error, 404)) {
+            return null;
+        }
+
+        throw error;
+    }
 }
 
 async function getPublishedContentByUrl(
@@ -85,12 +102,17 @@ async function getPublishedContentByUrl(
 
 async function getPublishedContentSite(
     input: DataFetcherInput,
-    organizationId: string,
-    siteId: string,
+    params: {
+        organizationId: string;
+        siteId: string;
+        siteShareKey: string | undefined;
+    },
 ) {
     'use cache';
-    cacheTag(getSiteCacheTag(siteId));
-    const res = await getAPI(input).orgs.getPublishedContentSite(organizationId, siteId);
+    cacheTag(getSiteCacheTag(params.siteId));
+    const res = await getAPI(input).orgs.getPublishedContentSite(params.organizationId, params.siteId, {
+        shareKey: params.siteShareKey,
+    });
     return res.data;
 }
 
@@ -103,4 +125,8 @@ function getAPI(input: DataFetcherInput) {
     });
 
     return api;
+}
+
+function checkHasErrorCode(error: unknown, code: number) {
+    return error instanceof Error && 'code' in error && error.code === code;
 }

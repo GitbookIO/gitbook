@@ -13,7 +13,7 @@ export interface GitBookDataFetcher {
     /**
      * Get a user by its ID.
      */
-    getUser(userId: string): Promise<api.User>;
+    getUserById(userId: string): Promise<api.User | null>;
 
     /**
      * Get a published content by its URL.
@@ -27,8 +27,9 @@ export interface GitBookDataFetcher {
     /**
      * Get a published content site by its organization ID and site ID.
      */
-    getPublishedContentSite(
+    getPublishedContentSite(params: {
         organizationId: string,
         siteId: string,
-    ): Promise<api.PublishedContentSite>;
+        siteShareKey: string | undefined;
+    }): Promise<api.PublishedContentSite>;
 }

@@ -11,10 +11,7 @@ export async function SiteContentLayout({
     children: React.ReactNode;
 }) {
     const { dataFetcher } = context;
-    const { site } = await dataFetcher.getPublishedContentSite(
-        context.organizationId,
-        context.siteId,
-    );
+    const { site } = await dataFetcher.getPublishedContentSite(context);
 
     return (
         <html lang="en">

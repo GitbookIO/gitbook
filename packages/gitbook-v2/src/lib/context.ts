@@ -26,6 +26,11 @@ export interface GitBookSiteContext extends GitBookContext {
      * Site ID.
      */
     siteId: string;
+
+    /**
+     * Share key of the site.
+     */
+    siteShareKey: string | undefined;
 }
 
 /**
@@ -69,6 +74,7 @@ async function fetchSiteContext(
         }),
         siteId: data.site,
         organizationId: data.organization,
+        siteShareKey: data.shareKey,
     };
 }
 
