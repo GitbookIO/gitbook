@@ -1,5 +1,5 @@
-import { SiteContentPage } from '@/components/routes/SiteContentPage';
-import { createDynamicSiteContext } from '@/lib/context';
+import { SiteContentPage } from '@v2/components/routes/SiteContentPage';
+import { createDynamicSiteContext } from '@v2/lib/context';
 
 export default async function Page({ params }: { params: Promise<{ url: string[] }> }) {
     const { url } = await params;

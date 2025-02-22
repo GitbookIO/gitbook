@@ -1,16 +1,16 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { GitBookAPI } from '@gitbook/api';
-import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@/lib/env';
+import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
+import { createDataFetcher, GitBookDataFetcher } from '@v2/lib/data';
 
 /**
  * Generic context about rendering content.
  */
 export interface GitBookContext {
     /**
-     * API client to fetch data from GitBook.
+     * Data fetcher to fetch data from GitBook.
      */
-    api: GitBookAPI;
+    dataFetcher: GitBookDataFetcher;
 }
 
 /**
@@ -51,9 +51,9 @@ async function fetchSiteContext(
     urlParts: string[],
     baseContext: GitBookContext,
 ): Promise<GitBookSiteContext> {
-    const { api } = baseContext;
+    const { dataFetcher } = baseContext;
     const url = getURLFromParams(urlParts);
-    const { data } = await api.urls.getPublishedContentByUrl({
+    const data = await dataFetcher.getPublishedContentByUrl({
         url,
     });
 
@@ -63,10 +63,9 @@ async function fetchSiteContext(
 
     return {
         ...baseContext,
-        api: new GitBookAPI({
-            endpoint: api.endpoint,
-            authToken: data.apiToken,
-            userAgent: api.userAgent,
+        dataFetcher: createDataFetcher({
+            apiEndpoint: dataFetcher.apiEndpoint,
+            apiToken: data.apiToken,
         }),
         siteId: data.site,
         organizationId: data.organization,
@@ -77,14 +76,8 @@ async function fetchSiteContext(
  * Create the base context when rendering statically.
  */
 function createStaticContext(): GitBookContext {
-    const api = new GitBookAPI({
-        authToken: GITBOOK_API_TOKEN,
-        endpoint: GITBOOK_API_URL,
-        userAgent: GITBOOK_USER_AGENT,
-    });
-
     return {
-        api,
+        dataFetcher: createDataFetcher(),
     };
 }
 
@@ -95,14 +88,11 @@ function createStaticContext(): GitBookContext {
 async function createDynamicContext(): Promise<GitBookContext> {
     const headersSet = await headers();
 
-    const api = new GitBookAPI({
-        authToken: headersSet.get('x-gitbook-token') ?? GITBOOK_API_TOKEN,
-        endpoint: headersSet.get('x-gitbook-api') ?? GITBOOK_API_URL,
-        userAgent: GITBOOK_USER_AGENT,
-    });
-
     return {
-        api,
+        dataFetcher: createDataFetcher({
+            apiToken: headersSet.get('x-gitbook-token') ?? GITBOOK_API_TOKEN,
+            apiEndpoint: headersSet.get('x-gitbook-api') ?? GITBOOK_API_URL,
+        }),
     };
 }
 

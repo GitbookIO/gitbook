@@ -19,8 +19,8 @@
             }
         ],
         "paths": {
-            "@/*": ["./src/*"],
-            "@v1/*": ["../gitbook/src/*"]
+            "@v2/*": ["./src/*"],
+            "@/*": ["../gitbook/src/*"]
         }
     },
     "include": ["next-env.d.ts", ".next/types/**/*.ts", "**/*.ts", "**/*.tsx"],

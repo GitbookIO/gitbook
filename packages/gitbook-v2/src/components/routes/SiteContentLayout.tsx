@@ -1,4 +1,4 @@
-import { GitBookSiteContext } from '@/lib/context';
+import { GitBookSiteContext } from '@v2/lib/context';
 
 /**
  * Layout component to render the site content.
@@ -10,8 +10,8 @@ export async function SiteContentLayout({
     context: GitBookSiteContext;
     children: React.ReactNode;
 }) {
-    const { api } = context;
-    const { data: publishedSite } = await api.orgs.getPublishedContentSite(
+    const { dataFetcher } = context;
+    const { site } = await dataFetcher.getPublishedContentSite(
         context.organizationId,
         context.siteId,
     );
@@ -19,7 +19,7 @@ export async function SiteContentLayout({
     return (
         <html lang="en">
             <body>
-                <h1>{publishedSite.site.title}</h1>
+                <h1>{site.title}</h1>
                 {children}
             </body>
         </html>
