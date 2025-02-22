@@ -4,6 +4,7 @@ import {
     api,
     getPublishedContentByUrl,
     getPublishedContentSite,
+    getReusableContent,
     getRevisionFile,
     getUserById,
 } from './api';
@@ -42,6 +43,10 @@ export async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
 
         getRevisionFile(params) {
             return getRevisionFile(params.spaceId, params.revisionId, params.fileId);
+        },
+
+        getReusableContent(params) {
+            return getReusableContent(params.spaceId, params.revisionId, params.reusableContentId);
         },
     };
 }

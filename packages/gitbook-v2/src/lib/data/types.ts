@@ -41,4 +41,13 @@ export interface GitBookDataFetcher {
         revisionId: string;
         fileId: string;
     }): Promise<api.RevisionFile | null>;
+
+    /**
+     * Get a reusable content by its space ID, revision ID and reusable content ID.
+     */
+    getReusableContent(params: {
+        spaceId: string;
+        revisionId: string;
+        reusableContentId: string;
+    }): Promise<api.RevisionReusableContent | null>;
 }

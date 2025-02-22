@@ -46,6 +46,13 @@ export function createDataFetcher(input: DataFetcherInput = commonInput): GitBoo
                 fileId: params.fileId,
             });
         },
+        getReusableContent(params) {
+            return getReusableContent(input, {
+                spaceId: params.spaceId,
+                revisionId: params.revisionId,
+                reusableContentId: params.reusableContentId,
+            });
+        },
 
         //
         // API that are not tied to the token
@@ -104,6 +111,26 @@ async function getRevisionFile(
         throw error;
     }
 }
+
+async function getReusableContent(input: DataFetcherInput, params: {
+    spaceId: string;
+    revisionId: string;
+    reusableContentId: string;
+}) {
+    'use cache';
+
+    try {
+        const res = await getAPI(input).spaces.getReusableContentInRevisionById(params.spaceId, params.revisionId, params.reusableContentId);
+        return res.data;
+    } catch (error) {
+        if (checkHasErrorCode(error, 404)) {
+            return null;
+        }
+
+        throw error;
+    }
+}
+
 
 async function getPublishedContentByUrl(
     input: DataFetcherInput,

@@ -21,11 +21,8 @@ import {
     getLatestOpenAPISpecVersionContent,
     getPageDocument,
     getPublishedContentSite,
-    getReusableContent,
-    getRevisionFile,
     getSpace,
     getSpaceContentData,
-    getUserById,
     ignoreAPIError,
     parseSpacesFromSiteSpaces,
 } from './api';
@@ -282,11 +279,11 @@ export async function resolveContentRef(
         }
 
         case 'reusable-content': {
-            const reusableContent = await getReusableContent(
-                space.id,
+            const reusableContent = await dataFetcher.getReusableContent({
+                spaceId: space.id,
                 revisionId,
-                contentRef.reusableContent,
-            );
+                reusableContentId: contentRef.reusableContent,
+            });
             if (!reusableContent) {
                 return null;
             }
