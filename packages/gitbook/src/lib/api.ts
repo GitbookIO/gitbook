@@ -1025,53 +1025,6 @@ export async function getSpaceCustomization(): Promise<{
 }
 
 /**
- * Get the infos about a collection by its ID.
- */
-export const getCollection = cache({
-    name: 'api.getCollection',
-    tag: (collectionId) => getAPICacheTag({ tag: 'collection', collection: collectionId }),
-    get: async (collectionId: string, options: CacheFunctionOptions) => {
-        const apiCtx = await api();
-        const response = await apiCtx.client.collections.getCollectionById(collectionId, {
-            ...noCacheFetchOptions,
-            signal: options.signal,
-        });
-        return cacheResponse(response, {
-            revalidateBefore: 60 * 60,
-        });
-    },
-});
-
-/**
- * List all the spaces variants published in a collection.
- */
-export const getCollectionSpaces = cache({
-    name: 'api.getCollectionSpaces',
-    tag: (collectionId) => getAPICacheTag({ tag: 'collection', collection: collectionId }),
-    get: async (collectionId: string, options: CacheFunctionOptions) => {
-        const response = await getAll(async (params) => {
-            const apiCtx = await api();
-            const response = await apiCtx.client.collections.listSpacesInCollectionById(
-                collectionId,
-                params,
-                {
-                    ...noCacheFetchOptions,
-                    signal: options.signal,
-                },
-            );
-            return response;
-        });
-
-        return cacheResponse(response, {
-            revalidateBefore: 60 * 60,
-            data: response.data.items.filter(
-                (space) => space.visibility === ContentVisibility.InCollection,
-            ),
-        });
-    },
-});
-
-/**
  * Fetch all the content data about a space at once.
  * This function executes the requests in parallel and should be used as early as possible
  * instead of calling the individual functions.

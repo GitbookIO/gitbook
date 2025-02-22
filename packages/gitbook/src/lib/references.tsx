@@ -17,7 +17,6 @@ import { PageIcon } from '@/components/PageIcon';
 import {
     SiteContentPointer,
     SpaceContentPointer,
-    getCollection,
     getLatestOpenAPISpecVersionContent,
     getPageDocument,
     getPublishedContentSite,
@@ -262,18 +261,9 @@ export async function resolveContentRef(
         }
 
         case 'collection': {
-            const collection = await ignoreAPIError(getCollection(contentRef.collection));
-            if (!collection) {
-                return {
-                    href: getGitbookAppHref(`/s/${contentRef.collection}`),
-                    text: 'collection',
-                    active: false,
-                };
-            }
-
             return {
-                href: collection.urls.app,
-                text: collection.title,
+                href: getGitbookAppHref(`/home`),
+                text: 'collection',
                 active: false,
             };
         }
