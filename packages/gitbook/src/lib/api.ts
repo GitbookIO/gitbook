@@ -21,6 +21,7 @@ import {
     ComputedContentSource,
     RevisionPageDocument,
 } from '@gitbook/api';
+import { GitBookDataFetcher } from '@v2/lib/data/types';
 import assertNever from 'assert-never';
 import { headers } from 'next/headers';
 import rison from 'rison';
@@ -1030,20 +1031,31 @@ export async function getSpaceCustomization(): Promise<{
  * instead of calling the individual functions.
  */
 export async function getSpaceContentData(
+    dataFetcher: GitBookDataFetcher,
     pointer: SpaceContentPointer,
     shareKey: string | undefined,
 ) {
     const [space, changeRequest] = await Promise.all([
-        getSpace(pointer.spaceId, shareKey),
-        pointer.changeRequestId ? getChangeRequest(pointer.spaceId, pointer.changeRequestId) : null,
+        dataFetcher.getSpace({
+            spaceId: pointer.spaceId,
+            shareKey,
+        }),
+        pointer.changeRequestId
+            ? dataFetcher.getChangeRequest({
+                  spaceId: pointer.spaceId,
+                  changeRequestId: pointer.changeRequestId,
+              })
+            : null,
     ]);
 
     const contentTarget: ContentTarget = {
         spaceId: pointer.spaceId,
         revisionId: changeRequest?.revision ?? pointer.revisionId ?? space.revision,
     };
-    const pages = await getRevisionPages(space.id, contentTarget.revisionId, {
-        // We only care about the Git metadata when the Git sync is enabled
+    const pages = await dataFetcher.getRevisionPages({
+        spaceId: pointer.spaceId,
+        revisionId: contentTarget.revisionId,
+        // We only care about the Git metadata when the Git sync is enabled,
         // otherwise we can optimize performance by not fetching it
         metadata: !!space.gitSync,
     });

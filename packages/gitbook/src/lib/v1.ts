@@ -2,10 +2,14 @@ import type { GitBookDataFetcher } from '@v2/lib/data/types';
 
 import {
     api,
+    getChangeRequest,
+    getLatestOpenAPISpecVersionContent,
     getPublishedContentByUrl,
     getPublishedContentSite,
     getReusableContent,
     getRevisionFile,
+    getRevisionPages,
+    getSpace,
     getUserById,
 } from './api';
 
@@ -41,12 +45,30 @@ export async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
             return getPublishedContentSite(params);
         },
 
+        getSpace(params) {
+            return getSpace(params.spaceId, params.shareKey);
+        },
+
+        getChangeRequest(params) {
+            return getChangeRequest(params.spaceId, params.changeRequestId);
+        },
+
         getRevisionFile(params) {
             return getRevisionFile(params.spaceId, params.revisionId, params.fileId);
         },
 
+        getRevisionPages(params) {
+            return getRevisionPages(params.spaceId, params.revisionId, {
+                metadata: params.metadata,
+            });
+        },
+
         getReusableContent(params) {
             return getReusableContent(params.spaceId, params.revisionId, params.reusableContentId);
+        },
+
+        getLatestOpenAPISpecVersionContent(params) {
+            return getLatestOpenAPISpecVersionContent(params.organizationId, params.slug);
         },
     };
 }

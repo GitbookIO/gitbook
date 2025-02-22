@@ -32,6 +32,7 @@ import {
 } from '@/lib/visitor-token';
 
 import { joinPath } from './lib/paths';
+import { getDataFetcherV1 } from './lib/v1';
 import { waitUntil } from './lib/waitUntil';
 
 export const config = {
@@ -197,6 +198,7 @@ export async function middleware(request: NextRequest) {
                 // the cache will handle concurrent calls
                 waitUntil(
                     getSpaceContentData(
+                        await getDataFetcherV1(),
                         {
                             spaceId: resolved.space,
                             changeRequestId: resolved.changeRequest,

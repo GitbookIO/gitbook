@@ -10,6 +10,7 @@ import {
 } from '@/lib/api';
 import { resolvePagePath, resolvePageId } from '@/lib/pages';
 import { getSiteContentPointer } from '@/lib/pointer';
+import { getDataFetcherV1 } from '@/lib/v1';
 
 export interface PagePathParams {
     pathname?: string[];
@@ -27,7 +28,7 @@ export async function fetchContentData() {
 
     const [{ space, contentTarget, pages }, { customization, site, sections, spaces, scripts }] =
         await Promise.all([
-            getSpaceContentData(content, content.siteShareKey),
+            getSpaceContentData(await getDataFetcherV1(), content, content.siteShareKey),
             getSiteData(content),
         ]);
 

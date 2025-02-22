@@ -74,7 +74,11 @@ export default async function PDFHTMLOutput(props: {
     // Load the content,
     const [{ customization }, { space, contentTarget, pages: rootPages }] = await Promise.all([
         'siteId' in pointer ? getSiteData(pointer) : getSpaceCustomization(),
-        getSpaceContentData(pointer, 'siteId' in pointer ? pointer.siteShareKey : undefined),
+        getSpaceContentData(
+            dataFetcher,
+            pointer,
+            'siteId' in pointer ? pointer.siteShareKey : undefined,
+        ),
     ]);
     const language = getSpaceLanguage(customization);
 

@@ -1,8 +1,14 @@
 import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
 import { GitBookAPI } from '@gitbook/api';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
-import { GitBookDataFetcher } from './types';
-import { getHostnameCacheTag, getSiteCacheTag } from '../cache';
+import { GitBookDataFetcher, SpaceContentPointer } from './types';
+import {
+    getChangeRequestCacheTag,
+    getHostnameCacheTag,
+    getOpenAPISpecCacheTag,
+    getSiteCacheTag,
+    getSpaceCacheTag,
+} from '../cache';
 
 interface DataFetcherInput {
     /**
@@ -39,6 +45,13 @@ export function createDataFetcher(input: DataFetcherInput = commonInput): GitBoo
                 siteShareKey: params.siteShareKey,
             });
         },
+        getRevisionPages(params) {
+            return getRevisionPages(input, {
+                spaceId: params.spaceId,
+                revisionId: params.revisionId,
+                metadata: params.metadata,
+            });
+        },
         getRevisionFile(params) {
             return getRevisionFile(input, {
                 spaceId: params.spaceId,
@@ -51,6 +64,24 @@ export function createDataFetcher(input: DataFetcherInput = commonInput): GitBoo
                 spaceId: params.spaceId,
                 revisionId: params.revisionId,
                 reusableContentId: params.reusableContentId,
+            });
+        },
+        getLatestOpenAPISpecVersionContent(params) {
+            return getLatestOpenAPISpecVersionContent(input, {
+                organizationId: params.organizationId,
+                slug: params.slug,
+            });
+        },
+        getSpace(params) {
+            return getSpace(input, {
+                spaceId: params.spaceId,
+                shareKey: params.shareKey,
+            });
+        },
+        getChangeRequest(params) {
+            return getChangeRequest(input, {
+                spaceId: params.spaceId,
+                changeRequestId: params.changeRequestId,
             });
         },
 
@@ -86,6 +117,68 @@ async function getUserById(input: DataFetcherInput, userId: string) {
     }
 }
 
+async function getSpace(
+    input: DataFetcherInput,
+    params: {
+        spaceId: string;
+        shareKey: string | undefined;
+    },
+) {
+    'use cache';
+
+    cacheTag(getSpaceCacheTag(params.spaceId));
+
+    const res = await getAPI(input).spaces.getSpaceById(params.spaceId, {
+        shareKey: params.shareKey,
+    });
+    return res.data;
+}
+
+async function getChangeRequest(
+    input: DataFetcherInput,
+    params: {
+        spaceId: string;
+        changeRequestId: string;
+    },
+) {
+    'use cache';
+
+    try {
+        const res = await getAPI(input).spaces.getChangeRequestById(
+            params.spaceId,
+            params.changeRequestId,
+        );
+        cacheTag(getChangeRequestCacheTag(params.spaceId, res.data.id));
+        return res.data;
+    } catch (error) {
+        if (checkHasErrorCode(error, 404)) {
+            return null;
+        }
+
+        throw error;
+    }
+}
+
+async function getRevisionPages(
+    input: DataFetcherInput,
+    params: {
+        spaceId: string;
+        revisionId: string;
+        metadata: boolean;
+    },
+) {
+    'use cache';
+
+    const res = await getAPI(input).spaces.listPagesInRevisionById(
+        params.spaceId,
+        params.revisionId,
+        {
+            metadata: params.metadata,
+        },
+    );
+    return res.data.pages;
+}
+
 async function getRevisionFile(
     input: DataFetcherInput,
     params: {
@@ -112,15 +205,22 @@ async function getRevisionFile(
     }
 }
 
-async function getReusableContent(input: DataFetcherInput, params: {
-    spaceId: string;
-    revisionId: string;
-    reusableContentId: string;
-}) {
+async function getReusableContent(
+    input: DataFetcherInput,
+    params: {
+        spaceId: string;
+        revisionId: string;
+        reusableContentId: string;
+    },
+) {
     'use cache';
 
     try {
-        const res = await getAPI(input).spaces.getReusableContentInRevisionById(params.spaceId, params.revisionId, params.reusableContentId);
+        const res = await getAPI(input).spaces.getReusableContentInRevisionById(
+            params.spaceId,
+            params.revisionId,
+            params.reusableContentId,
+        );
         return res.data;
     } catch (error) {
         if (checkHasErrorCode(error, 404)) {
@@ -131,6 +231,31 @@ async function getReusableContent(input: DataFetcherInput, params: {
     }
 }
 
+async function getLatestOpenAPISpecVersionContent(
+    input: DataFetcherInput,
+    params: {
+        organizationId: string;
+        slug: string;
+    },
+) {
+    'use cache';
+
+    cacheTag(getOpenAPISpecCacheTag(params.organizationId, params.slug));
+
+    try {
+        const res = await getAPI(input).orgs.getLatestOpenApiSpecVersionContent(
+            params.organizationId,
+            params.slug,
+        );
+        return res.data;
+    } catch (error) {
+        if (checkHasErrorCode(error, 404)) {
+            return null;
+        }
+
+        throw error;
+    }
+}
 
 async function getPublishedContentByUrl(
     input: DataFetcherInput,

@@ -17,10 +17,7 @@ import { PageIcon } from '@/components/PageIcon';
 import {
     SiteContentPointer,
     SpaceContentPointer,
-    getLatestOpenAPISpecVersionContent,
     getPageDocument,
-    getPublishedContentSite,
-    getSpace,
     getSpaceContentData,
     ignoreAPIError,
     parseSpacesFromSiteSpaces,
@@ -230,7 +227,7 @@ export async function resolveContentRef(
             const targetSpace =
                 contentRef.space === space.id
                     ? space
-                    : await getBestTargetSpace(contentRef.space, siteContext);
+                    : await getBestTargetSpace(dataFetcher, contentRef.space, siteContext);
 
             if (!targetSpace) {
                 return {
@@ -290,10 +287,10 @@ export async function resolveContentRef(
                 return null;
             }
             const { organizationId } = siteContext;
-            const openAPISpecVersionContent = await getLatestOpenAPISpecVersionContent(
+            const openAPISpecVersionContent = await dataFetcher.getLatestOpenAPISpecVersionContent({
                 organizationId,
-                contentRef.spec,
-            );
+                slug: contentRef.spec,
+            });
 
             if (!openAPISpecVersionContent) {
                 return null;
@@ -316,16 +313,20 @@ export async function resolveContentRef(
  * It will try to return the space in the site context if it exists to avoid cross-site links.
  */
 async function getBestTargetSpace(
+    dataFetcher: GitBookDataFetcher,
     spaceId: string,
     siteContext: SiteContentPointer | null,
 ): Promise<Space | undefined> {
     const [fetchedSpace, publishedContentSite] = await Promise.all([
         ignoreAPIError(
-            getSpace(spaceId, siteContext?.siteShareKey ? siteContext.siteShareKey : undefined),
+            dataFetcher.getSpace({
+                spaceId,
+                shareKey: siteContext?.siteShareKey,
+            }),
         ),
         siteContext
             ? ignoreAPIError(
-                  getPublishedContentSite({
+                  dataFetcher.getPublishedContentSite({
                       organizationId: siteContext.organizationId,
                       siteId: siteContext.siteId,
                       siteShareKey: siteContext.siteShareKey,
@@ -369,8 +370,8 @@ async function resolveContentRefInSpace(
     };
 
     const [result, bestTargetSpace] = await Promise.all([
-        ignoreAPIError(getSpaceContentData(pointer, siteContext?.siteShareKey)),
-        getBestTargetSpace(spaceId, siteContext),
+        ignoreAPIError(getSpaceContentData(dataFetcher, pointer, siteContext?.siteShareKey)),
+        getBestTargetSpace(dataFetcher, spaceId, siteContext),
     ]);
     if (!result) {
         return null;
