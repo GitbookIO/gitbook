@@ -1,8 +1,15 @@
 import type { GitBookDataFetcher } from '@v2/lib/data/types';
-import { api, getPublishedContentByUrl, getPublishedContentSite, getRevisionFile, getUserById } from './api';
+
+import {
+    api,
+    getPublishedContentByUrl,
+    getPublishedContentSite,
+    getRevisionFile,
+    getUserById,
+} from './api';
 
 /*
- * Code that will be used until the migration to v2 is complete. 
+ * Code that will be used until the migration to v2 is complete.
  */
 
 /**
@@ -22,7 +29,11 @@ export async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
 
         // @ts-ignore - types are compatible enough, and this will not be called in v1 this way
         getPublishedContentByUrl(params) {
-            return getPublishedContentByUrl(params.url, params.visitorAuthToken, params.redirectOnError ? true : undefined);
+            return getPublishedContentByUrl(
+                params.url,
+                params.visitorAuthToken,
+                params.redirectOnError ? true : undefined,
+            );
         },
 
         getPublishedContentSite(params) {
@@ -32,5 +43,5 @@ export async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
         getRevisionFile(params) {
             return getRevisionFile(params.spaceId, params.revisionId, params.fileId);
         },
-    }
+    };
 }

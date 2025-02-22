@@ -8,6 +8,7 @@ import {
     Space,
 } from '@gitbook/api';
 import type { Filesystem } from '@gitbook/openapi-parser';
+import { GitBookDataFetcher } from '@v2/lib/data/types';
 import assertNever from 'assert-never';
 import React from 'react';
 
@@ -33,7 +34,6 @@ import { getGitbookAppHref, getPageHref, PageHrefContext } from './links';
 import { getPagePath, resolvePageId } from './pages';
 import { ClassValue } from './tailwind';
 import { getSiteStructureSections } from './utils';
-import { GitBookDataFetcher } from '@v2/lib/data/types';
 
 export interface ResolvedContentRef {
     /** Text to render in the content ref */
@@ -115,7 +115,15 @@ export async function resolveContentRef(
     options: ResolveContentRefOptions = {},
 ): Promise<ResolvedContentRef | null> {
     const { resolveAnchorText = false, iconStyle } = options;
-    const { dataFetcher, siteContext, space, revisionId, pages, page: activePage, ...linksContext } = context;
+    const {
+        dataFetcher,
+        siteContext,
+        space,
+        revisionId,
+        pages,
+        page: activePage,
+        ...linksContext
+    } = context;
 
     switch (contentRef.kind) {
         case 'url': {
@@ -147,7 +155,12 @@ export async function resolveContentRef(
         case 'anchor':
         case 'page': {
             if (contentRef.space && contentRef.space !== space.id) {
-                return resolveContentRefInSpace(dataFetcher, contentRef.space, siteContext, contentRef);
+                return resolveContentRefInSpace(
+                    dataFetcher,
+                    contentRef.space,
+                    siteContext,
+                    contentRef,
+                );
             }
 
             const resolvePageResult =

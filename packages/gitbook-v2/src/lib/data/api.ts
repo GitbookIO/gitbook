@@ -79,15 +79,22 @@ async function getUserById(input: DataFetcherInput, userId: string) {
     }
 }
 
-async function getRevisionFile(input: DataFetcherInput, params: {
-    spaceId: string;
-    revisionId: string;
-    fileId: string;
-}) {
+async function getRevisionFile(
+    input: DataFetcherInput,
+    params: {
+        spaceId: string;
+        revisionId: string;
+        fileId: string;
+    },
+) {
     'use cache';
 
     try {
-        const res = await getAPI(input).spaces.getFileInRevisionById(params.spaceId, params.revisionId, params.fileId);
+        const res = await getAPI(input).spaces.getFileInRevisionById(
+            params.spaceId,
+            params.revisionId,
+            params.fileId,
+        );
         return res.data;
     } catch (error) {
         if (checkHasErrorCode(error, 404)) {
@@ -136,9 +143,13 @@ async function getPublishedContentSite(
 ) {
     'use cache';
     cacheTag(getSiteCacheTag(params.siteId));
-    const res = await getAPI(input).orgs.getPublishedContentSite(params.organizationId, params.siteId, {
-        shareKey: params.siteShareKey,
-    });
+    const res = await getAPI(input).orgs.getPublishedContentSite(
+        params.organizationId,
+        params.siteId,
+        {
+            shareKey: params.siteShareKey,
+        },
+    );
     return res.data;
 }
 

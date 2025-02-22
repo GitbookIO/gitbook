@@ -10,10 +10,10 @@ import { getPagePath, resolveFirstDocument } from '@/lib/pages';
 import { ContentRefContext } from '@/lib/references';
 import { isSpaceIndexable, isPageIndexable } from '@/lib/seo';
 import { getContentTitle } from '@/lib/utils';
+import { getDataFetcherV1 } from '@/lib/v1';
 
 import { PageClientLayout } from './PageClientLayout';
 import { PagePathParams, fetchPageData, getPathnameParam, normalizePathname } from '../../fetch';
-import { getDataFetcherV1 } from '@/lib/v1';
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';

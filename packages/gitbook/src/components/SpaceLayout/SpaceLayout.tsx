@@ -22,12 +22,12 @@ import { api, ContentTarget, type SectionsList, SiteContentPointer } from '@/lib
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { shouldTrackEvents } from '@/lib/tracking';
+import { getDataFetcherV1 } from '@/lib/v1';
 import { getCurrentVisitorToken } from '@/lib/visitor-token';
 
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
 import { SiteSectionList } from '../SiteSections';
-import { getDataFetcherV1 } from '@/lib/v1';
 
 /**
  * Render the entire content of the space (header, table of contents, footer, and page content).

@@ -18,7 +18,6 @@ import { PolymorphicComponentProp } from '@/components/utils/types';
 import { getSpaceLanguage } from '@/intl/server';
 import { tString } from '@/intl/translate';
 import {
-    getDocument,
     getSpace,
     getSpaceCustomization,
     getSpaceContentData,
@@ -30,8 +29,10 @@ import { resolvePageId } from '@/lib/pages';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { PDFSearchParams, getPDFSearchParams } from '@/lib/urls';
+import { getDataFetcherV1 } from '@/lib/v1';
 
 import './pdf.css';
+
 import { PageControlButtons } from './PageControlButtons';
 import { getSiteOrSpacePointerForPDF } from './pointer';
 import { PrintButton } from './PrintButton';
@@ -61,6 +62,7 @@ export default async function PDFHTMLOutput(props: {
     searchParams: Promise<{ [key: string]: string }>;
 }) {
     const pointer = await getSiteOrSpacePointerForPDF();
+    const dataFetcher = await getDataFetcherV1();
 
     const searchParams = new URLSearchParams(await props.searchParams);
     const pdfParams = getPDFSearchParams(new URLSearchParams(searchParams));
@@ -172,6 +174,7 @@ export default async function PDFHTMLOutput(props: {
                             space={space}
                             page={page}
                             refContext={{
+                                dataFetcher,
                                 siteContext: 'siteId' in pointer ? pointer : null,
                                 space,
                                 revisionId: contentTarget.revisionId,

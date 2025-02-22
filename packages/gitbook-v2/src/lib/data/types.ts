@@ -28,8 +28,8 @@ export interface GitBookDataFetcher {
      * Get a published content site by its organization ID and site ID.
      */
     getPublishedContentSite(params: {
-        organizationId: string,
-        siteId: string,
+        organizationId: string;
+        siteId: string;
         siteShareKey: string | undefined;
     }): Promise<api.PublishedContentSite>;
 
