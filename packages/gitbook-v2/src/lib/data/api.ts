@@ -39,6 +39,13 @@ export function createDataFetcher(input: DataFetcherInput = commonInput): GitBoo
                 siteShareKey: params.siteShareKey,
             });
         },
+        getRevisionFile(params) {
+            return getRevisionFile(input, {
+                spaceId: params.spaceId,
+                revisionId: params.revisionId,
+                fileId: params.fileId,
+            });
+        },
 
         //
         // API that are not tied to the token
@@ -62,6 +69,25 @@ async function getUserById(input: DataFetcherInput, userId: string) {
 
     try {
         const res = await getAPI(input).users.getUserById(userId);
+        return res.data;
+    } catch (error) {
+        if (checkHasErrorCode(error, 404)) {
+            return null;
+        }
+
+        throw error;
+    }
+}
+
+async function getRevisionFile(input: DataFetcherInput, params: {
+    spaceId: string;
+    revisionId: string;
+    fileId: string;
+}) {
+    'use cache';
+
+    try {
+        const res = await getAPI(input).spaces.getFileInRevisionById(params.spaceId, params.revisionId, params.fileId);
         return res.data;
     } catch (error) {
         if (checkHasErrorCode(error, 404)) {

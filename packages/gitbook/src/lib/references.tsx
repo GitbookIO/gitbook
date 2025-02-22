@@ -17,7 +17,6 @@ import {
     SiteContentPointer,
     SpaceContentPointer,
     getCollection,
-    getDocument,
     getLatestOpenAPISpecVersionContent,
     getPageDocument,
     getPublishedContentSite,
@@ -34,6 +33,7 @@ import { getGitbookAppHref, getPageHref, PageHrefContext } from './links';
 import { getPagePath, resolvePageId } from './pages';
 import { ClassValue } from './tailwind';
 import { getSiteStructureSections } from './utils';
+import { GitBookDataFetcher } from '@v2/lib/data/types';
 
 export interface ResolvedContentRef {
     /** Text to render in the content ref */
@@ -57,6 +57,11 @@ export interface ResolvedContentRef {
 }
 
 export interface ContentRefContext extends PageHrefContext {
+    /**
+     * Data fetcher to use.
+     */
+    dataFetcher: GitBookDataFetcher;
+
     /**
      * Base URL to use to prepend to relative URLs.
      */
@@ -110,7 +115,7 @@ export async function resolveContentRef(
     options: ResolveContentRefOptions = {},
 ): Promise<ResolvedContentRef | null> {
     const { resolveAnchorText = false, iconStyle } = options;
-    const { siteContext, space, revisionId, pages, page: activePage, ...linksContext } = context;
+    const { dataFetcher, siteContext, space, revisionId, pages, page: activePage, ...linksContext } = context;
 
     switch (contentRef.kind) {
         case 'url': {
@@ -122,7 +127,11 @@ export async function resolveContentRef(
         }
 
         case 'file': {
-            const file = await getRevisionFile(space.id, revisionId, contentRef.file);
+            const file = await dataFetcher.getRevisionFile({
+                spaceId: space.id,
+                revisionId,
+                fileId: contentRef.file,
+            });
             if (file) {
                 return {
                     href: file.downloadURL,
@@ -138,7 +147,7 @@ export async function resolveContentRef(
         case 'anchor':
         case 'page': {
             if (contentRef.space && contentRef.space !== space.id) {
-                return resolveContentRefInSpace(contentRef.space, siteContext, contentRef);
+                return resolveContentRefInSpace(dataFetcher, contentRef.space, siteContext, contentRef);
             }
 
             const resolvePageResult =
@@ -230,7 +239,7 @@ export async function resolveContentRef(
         }
 
         case 'user': {
-            const user = await getUserById(contentRef.user);
+            const user = await dataFetcher.getUserById(contentRef.user);
             if (user) {
                 return {
                     href: `mailto:${user.email}`,
@@ -350,6 +359,7 @@ async function getBestTargetSpace(
 }
 
 async function resolveContentRefInSpace(
+    dataFetcher: GitBookDataFetcher,
     spaceId: string,
     siteContext: SiteContentPointer | null,
     contentRef: ContentRef,
@@ -376,6 +386,7 @@ async function resolveContentRefInSpace(
     }
 
     const resolved = await resolveContentRef(contentRef, {
+        dataFetcher,
         siteContext,
         space,
         revisionId: space.revision,

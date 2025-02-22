@@ -1,5 +1,5 @@
 import type { GitBookDataFetcher } from '@v2/lib/data/types';
-import { api, getPublishedContentByUrl, getPublishedContentSite, getUserById } from './api';
+import { api, getPublishedContentByUrl, getPublishedContentSite, getRevisionFile, getUserById } from './api';
 
 /*
  * Code that will be used until the migration to v2 is complete. 
@@ -27,6 +27,10 @@ export async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
 
         getPublishedContentSite(params) {
             return getPublishedContentSite(params);
+        },
+
+        getRevisionFile(params) {
+            return getRevisionFile(params.spaceId, params.revisionId, params.fileId);
         },
     }
 }

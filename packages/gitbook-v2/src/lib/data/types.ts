@@ -32,4 +32,13 @@ export interface GitBookDataFetcher {
         siteId: string,
         siteShareKey: string | undefined;
     }): Promise<api.PublishedContentSite>;
+
+    /**
+     * Get a revision file by its space ID, revision ID and file ID.
+     */
+    getRevisionFile(params: {
+        spaceId: string;
+        revisionId: string;
+        fileId: string;
+    }): Promise<api.RevisionFile | null>;
 }

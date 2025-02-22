@@ -13,6 +13,7 @@ import { getContentTitle } from '@/lib/utils';
 
 import { PageClientLayout } from './PageClientLayout';
 import { PagePathParams, fetchPageData, getPathnameParam, normalizePathname } from '../../fetch';
+import { getDataFetcherV1 } from '@/lib/v1';
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
@@ -70,6 +71,7 @@ export default async function Page(props: {
     const withPageFeedback = customization.feedback.enabled;
 
     const contentRefContext: ContentRefContext = {
+        dataFetcher: await getDataFetcherV1(),
         siteContext: contentPointer,
         space,
         revisionId: contentTarget.revisionId,

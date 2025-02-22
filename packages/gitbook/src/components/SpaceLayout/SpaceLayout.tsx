@@ -27,6 +27,7 @@ import { getCurrentVisitorToken } from '@/lib/visitor-token';
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
 import { SiteSectionList } from '../SiteSections';
+import { getDataFetcherV1 } from '@/lib/v1';
 
 /**
  * Render the entire content of the space (header, table of contents, footer, and page content).
@@ -59,6 +60,7 @@ export async function SpaceLayout(props: {
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
     const contentRefContext: ContentRefContext = {
+        dataFetcher: await getDataFetcherV1(),
         siteContext: content,
         space,
         revisionId: contentTarget.revisionId,
