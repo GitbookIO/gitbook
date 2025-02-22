@@ -1,4 +1,3 @@
-
 /**
  * Get the cache tag for a site.
  */

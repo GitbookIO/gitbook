@@ -1,7 +1,7 @@
-import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache'
-import { GitBookAPI } from "@gitbook/api";
-import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from "@v2/lib/env";
-import { GitBookDataFetcher } from "./types";
+import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
+import { GitBookAPI } from '@gitbook/api';
+import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
+import { GitBookDataFetcher } from './types';
 import { getHostnameCacheTag, getSiteCacheTag } from '../cache';
 
 interface DataFetcherInput {
@@ -50,17 +50,20 @@ export function createDataFetcher(input: DataFetcherInput = commonInput): GitBoo
 }
 
 async function getUser(input: DataFetcherInput, userId: string) {
-    'use cache'; 
+    'use cache';
     const res = await getAPI(input).users.getUserById(userId);
     return res.data;
 }
 
-async function getPublishedContentByUrl(input: DataFetcherInput, params: {
-    url: string;
-    visitorAuthToken?: string;
-    redirectOnError?: boolean;
-}) {
-    'use cache'; 
+async function getPublishedContentByUrl(
+    input: DataFetcherInput,
+    params: {
+        url: string;
+        visitorAuthToken?: string;
+        redirectOnError?: boolean;
+    },
+) {
+    'use cache';
 
     const { url, visitorAuthToken, redirectOnError } = params;
 
@@ -80,7 +83,11 @@ async function getPublishedContentByUrl(input: DataFetcherInput, params: {
     return res.data;
 }
 
-async function getPublishedContentSite(input: DataFetcherInput, organizationId: string, siteId: string) {
+async function getPublishedContentSite(
+    input: DataFetcherInput,
+    organizationId: string,
+    siteId: string,
+) {
     'use cache';
     cacheTag(getSiteCacheTag(siteId));
     const res = await getAPI(input).orgs.getPublishedContentSite(organizationId, siteId);

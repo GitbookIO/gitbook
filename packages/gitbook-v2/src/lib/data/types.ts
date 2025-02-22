@@ -27,5 +27,8 @@ export interface GitBookDataFetcher {
     /**
      * Get a published content site by its organization ID and site ID.
      */
-    getPublishedContentSite(organizationId: string, siteId: string): Promise<api.PublishedContentSite>;
+    getPublishedContentSite(
+        organizationId: string,
+        siteId: string,
+    ): Promise<api.PublishedContentSite>;
 }
