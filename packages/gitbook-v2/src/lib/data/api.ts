@@ -1,7 +1,7 @@
 import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
 import { GitBookAPI } from '@gitbook/api';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
-import { GitBookDataFetcher, SpaceContentPointer } from './types';
+import { GitBookDataFetcher } from './types';
 import {
     getChangeRequestCacheTag,
     getHostnameCacheTag,
