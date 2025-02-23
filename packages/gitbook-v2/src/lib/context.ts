@@ -1,11 +1,11 @@
-import { headers } from 'next/headers';
+import { ChangeRequest, RevisionPage, Site, SiteCustomizationSettings, SiteIntegrationScript, SiteSection, SiteSectionGroup, SiteSpace, SiteStructure, Space } from '@gitbook/api';
 import { redirect } from 'next/navigation';
-import { GITBOOK_API_TOKEN, GITBOOK_API_URL } from '@v2/lib/env';
+import { assert } from 'ts-essentials';
 import { createDataFetcher, GitBookDataFetcher } from '@v2/lib/data';
-import { Linker } from './links/types';
+import { GitBookSpaceLinker, appendPrefixToLinker } from './links';
 
 /**
- * Generic context about rendering content.
+ * Generic context when rendering content.
  */
 export interface GitBookContext {
     /**
@@ -14,111 +14,243 @@ export interface GitBookContext {
     dataFetcher: GitBookDataFetcher;
 
     /**
-     * Linker to generate links in the current site.
+     * Linker to generate links in the current space.
      */
-    linker: Linker;
-}
-
-/**
- * Context when rendering a site.
- */
-export interface GitBookSiteContext extends GitBookContext {
-    /**
-     * ID of the organization.
-     */
-    organizationId: string;
-
-    /**
-     * Site ID.
-     */
-    siteId: string;
-
-    /**
-     * Share key of the site.
-     */
-    siteShareKey: string | undefined;
+    linker: GitBookSpaceLinker;
 }
 
 /**
  * Context when rendering a space content.
  */
 export interface GitBookSpaceContext extends GitBookContext {
-    /**
-     * ID of the space.
-     */
-    spaceId: string;
+    space: Space;
+    changeRequest: ChangeRequest | null;
+
+    /** ID of the current revision. */
+    revisionId: string;
+
+    /** Pages of the space. */
+    pages: RevisionPage[];
+
+    /** Share key of the space. */
+    shareKey: string | undefined;
+}
+
+export interface SiteSections {
+    list: (SiteSectionGroup | SiteSection)[];
+    current: SiteSection;
 }
 
 /**
- * Create a site context, when rendering a static page.
+ * Context when rendering a site.
  */
-export async function createStaticSiteContext(url: string[]): Promise<GitBookSiteContext> {
-    const context = createStaticContext();
-    return fetchSiteContext(url, context);
-}
-
-/**
- * Create a site context, when rendering a dynamic page.
- */
-export async function createDynamicSiteContext(url: string[]): Promise<GitBookSiteContext> {
-    const context = await createDynamicContext();
-    return fetchSiteContext(url, context);
+export interface GitBookSiteContext extends GitBookSpaceContext {
+    organizationId: string;
+    site: Site;
+    sections: null | SiteSections;
+    customization: SiteCustomizationSettings;
+    structure: SiteStructure;
+    spaces: Space[];
+    scripts: SiteIntegrationScript[];
 }
 
 /**
  * Fetch the context of a site for a given URL and a base context.
  */
-async function fetchSiteContext(
-    urlParts: string[],
+export async function fetchSiteContext(
     baseContext: GitBookContext,
+    input: {
+        url: string;
+        visitorAuthToken: string | undefined;
+    }
 ): Promise<GitBookSiteContext> {
     const { dataFetcher } = baseContext;
-    const url = getURLFromParams(urlParts);
     const data = await dataFetcher.getPublishedContentByUrl({
-        url,
+        url: input.url,
+        visitorAuthToken: input.visitorAuthToken,
     });
 
     if ('redirect' in data) {
         redirect(data.redirect);
     }
 
-    return {
+    const context = await fetchSiteContextByIds({
         ...baseContext,
         dataFetcher: createDataFetcher({
             apiEndpoint: dataFetcher.apiEndpoint,
             apiToken: data.apiToken,
+        })
+    }, {
+        organization: data.organization,
+        site: data.site,
+        siteSection: data.siteSection,
+        siteSpace: data.siteSpace,
+        space: data.space,
+        shareKey: data.shareKey,
+        changeRequest: data.changeRequest,
+        revision: data.revision,
+    });
+
+    return {
+        ...context,
+        linker: appendPrefixToLinker(context.linker, data.basePath),
+    }
+}
+
+/**
+ * Fetch a site context by IDs.
+ */
+export async function fetchSiteContextByIds(
+    baseContext: GitBookContext,
+    ids: {
+        organization: string;
+        site: string;
+        siteSection: string | undefined;
+        siteSpace: string;
+        space: string;
+        shareKey: string | undefined;
+        changeRequest: string | undefined;
+        revision: string | undefined;
+    }
+): Promise<GitBookSiteContext> {
+    const { dataFetcher } = baseContext;
+
+    const [{
+        site: orgSite,
+        structure: siteStructure,
+        customizations,
+        scripts,
+    }, spaceContext] = await Promise.all([
+        dataFetcher.getPublishedContentSite({
+            organizationId: ids.organization,
+            siteId: ids.site,
+            siteShareKey: ids.shareKey,
         }),
-        siteId: data.site,
-        organizationId: data.organization,
-        siteShareKey: data.shareKey,
+        fetchSpaceContextByIds(baseContext, ids),
+    ]);
+
+    const siteSectionsAndGroups =
+        siteStructure.type === 'sections' && siteStructure.structure
+            ? siteStructure.structure
+            : null;
+
+    const siteSpaces =
+        siteStructure.type === 'siteSpaces' && siteStructure.structure
+            ? parseSpacesFromSiteSpaces(siteStructure.structure)
+            : null;
+    // override the title with the customization title
+    const site = {
+        ...orgSite,
+        ...(customizations.site?.title ? { title: customizations.site.title } : {}),
+    };
+
+    const sections =
+        ids.siteSection && siteSectionsAndGroups
+            ? parseSiteSectionsList(ids.siteSection, siteSectionsAndGroups)
+            : null;
+    const spaces =
+        siteSpaces ?? (sections ? parseSpacesFromSiteSpaces(sections.current.siteSpaces) : []);
+
+    const customization = (() => {
+        if (ids.siteSpace) {
+            const siteSpaceSettings = customizations.siteSpaces[ids.siteSpace];
+            if (siteSpaceSettings) {
+                return siteSpaceSettings;
+            }
+            // We got the pointer from an API and customizations from another.
+            // It's possible that the two are unsynced leading to not found customizations for the space.
+            // It's better to fallback on customization of the site that displaying an error.
+            console.warn('Customization not found for site space', ids.siteSpace);
+        }
+        return customizations.site;
+    })();
+
+    return {
+        ...spaceContext,
+        organizationId: ids.organization,
+        site,
+        customization,
+        structure: siteStructure,
+        sections,
+        spaces,
+        scripts,
     };
 }
 
 /**
- * Create the base context when rendering statically.
+ * Fetch a space context by IDs.
  */
-function createStaticContext(): GitBookContext {
+async function fetchSpaceContextByIds(
+    baseContext: GitBookContext,
+    ids: {
+        space: string;
+        shareKey: string | undefined;
+        changeRequest: string | undefined;
+        revision: string | undefined;
+    }
+): Promise<GitBookSpaceContext> {
+    const { dataFetcher } = baseContext;
+
+    const [space, changeRequest] = await Promise.all([
+        dataFetcher.getSpace({
+            spaceId: ids.space,
+            shareKey: ids.shareKey,
+        }),
+        ids.changeRequest
+            ? dataFetcher.getChangeRequest({
+                  spaceId: ids.space,
+                  changeRequestId: ids.changeRequest,
+              })
+            : null,
+    ]);
+
+    const revisionId = changeRequest?.revision ?? ids.revision ?? space.revision;
+
+    const pages = await dataFetcher.getRevisionPages({
+        spaceId: ids.space,
+        revisionId,
+        // We only care about the Git metadata when the Git sync is enabled,
+        // otherwise we can optimize performance by not fetching it
+        metadata: !!space.gitSync,
+    });
+
     return {
-        dataFetcher: createDataFetcher(),
+        ...baseContext,
+        space,
+        pages,
+        changeRequest,
+        revisionId,
+        shareKey: ids.shareKey,
     };
 }
+
 
 /**
- * Create the base context when rendering dynamically.
- * The context will depend on the request.
+ * Parse the site spaces into a list of spaces with their title and urls.
  */
-async function createDynamicContext(): Promise<GitBookContext> {
-    const headersSet = await headers();
-
-    return {
-        dataFetcher: createDataFetcher({
-            apiToken: headersSet.get('x-gitbook-token') ?? GITBOOK_API_TOKEN,
-            apiEndpoint: headersSet.get('x-gitbook-api') ?? GITBOOK_API_URL,
-        }),
-    };
+function parseSpacesFromSiteSpaces(siteSpaces: SiteSpace[]) {
+    const spaces: Record<string, Space> = {};
+    siteSpaces.forEach((siteSpace) => {
+        spaces[siteSpace.space.id] = {
+            ...siteSpace.space,
+            title: siteSpace.title ?? siteSpace.space.title,
+            urls: {
+                ...siteSpace.space.urls,
+                published: siteSpace.urls.published,
+            },
+        };
+    });
+    return Object.values(spaces);
 }
 
-function getURLFromParams(input: string[]) {
-    const url = new URL('https://' + input.join('/'));
-    return url.toString();
+function parseSiteSectionsList(
+    siteSectionId: string,
+    sectionsAndGroups: (SiteSectionGroup | SiteSection)[],
+) {
+    const sections = sectionsAndGroups.flatMap((item) =>
+        item.object === 'site-section-group' ? item.sections : item,
+    );
+    const section = sections.find((section) => section.id === siteSectionId);
+    assert(section, 'A section must be defined when there are multiple sections');
+    return { list: sectionsAndGroups, current: section } satisfies SiteSections;
 }

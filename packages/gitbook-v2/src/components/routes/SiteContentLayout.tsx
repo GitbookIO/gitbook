@@ -10,8 +10,7 @@ export async function SiteContentLayout({
     context: GitBookSiteContext;
     children: React.ReactNode;
 }) {
-    const { dataFetcher } = context;
-    const { site } = await dataFetcher.getPublishedContentSite(context);
+    const { site } = context;
 
     return (
         <html lang="en">

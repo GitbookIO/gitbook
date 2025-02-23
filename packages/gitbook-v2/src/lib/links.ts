@@ -1,0 +1,84 @@
+import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
+import { getPagePath } from '@/lib/pages';
+
+/**
+ * Generic interface to generate links based on a given context.
+ */
+export interface GitBookSpaceLinker {
+    /**
+     * Generate an absolute path for a relative path in the current space content.
+     */
+    toPathInSpace(relativePath: string): string;
+
+    /**
+     * Generate an absolute path for a page in the current space.
+     */
+    toPathForPage(input: {
+        pages: RevisionPage[];
+        page: RevisionPageDocument | RevisionPageGroup;
+        anchor?: string;
+    }): string;
+
+    /**
+     * Generate an absolute URL for a given path.
+     */
+    toAbsoluteURL(absolutePath: string): string;
+}
+
+/**
+ * Create a linker to resolve links in a context being served on a specific URL.
+ */
+export function createSpaceLinker(
+    /** Where the top of the space is served on */
+    servedOn: {
+        host: string;
+        pathname: string;
+    }
+): GitBookSpaceLinker {
+    if (servedOn.host.includes('/')) {
+        throw new Error('Host cannot include a slash');
+    }
+
+    const linker: GitBookSpaceLinker = {
+        toPathInSpace(relativePath: string): string {
+            return joinPaths(servedOn.pathname, relativePath);
+        },
+
+        toAbsoluteURL(absolutePath: string): string {
+            return `https://${joinPaths(servedOn.host, absolutePath)}`;
+        },
+
+        toPathForPage({ pages, page, anchor }) {
+            return linker.toPathInSpace(getPagePath(pages, page)) + (anchor ? '#' + anchor : '');
+        }
+    };
+
+    return linker;
+}
+
+/**
+ * Append a prefix to a linker.
+ */
+export function appendPrefixToLinker(linker: GitBookSpaceLinker, prefix: string): GitBookSpaceLinker {
+    const linkerWithPrefix: GitBookSpaceLinker = {
+        toPathInSpace(relativePath: string): string {
+            return linker.toPathInSpace(joinPaths(prefix, relativePath));
+        },
+
+        toAbsoluteURL(absolutePath: string): string {
+            return linker.toAbsoluteURL(joinPaths(prefix, absolutePath));
+        },
+
+        toPathForPage({ pages, page, anchor }) {
+            return linkerWithPrefix.toPathInSpace(getPagePath(pages, page)) + (anchor ? '#' + anchor : '');
+        }
+    };
+
+    return linkerWithPrefix;
+}
+
+function joinPaths(prefix: string, path: string): string {
+    const prefixPath = prefix.endsWith('/') ? prefix : prefix + '/';
+    const suffixPath = path.startsWith('/') ? path.slice(1) : path;
+    return prefixPath + suffixPath;
+}

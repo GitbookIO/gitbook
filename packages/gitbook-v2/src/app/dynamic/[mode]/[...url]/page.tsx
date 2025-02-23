@@ -1,9 +1,8 @@
 import { SiteContentPage } from '@v2/components/routes/SiteContentPage';
-import { createDynamicSiteContext } from '@v2/lib/context';
+import { getDynamicSiteContext, RouteParams } from '@v2/app/utils';
 
-export default async function Page({ params }: { params: Promise<{ url: string[] }> }) {
-    const { url } = await params;
-    const context = await createDynamicSiteContext(url);
+export default async function Page({ params }: { params: Promise<RouteParams> }) {
+    const context = await getDynamicSiteContext(await params);
 
     return <SiteContentPage context={context} />;
 }

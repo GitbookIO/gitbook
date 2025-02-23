@@ -1,21 +1,20 @@
 import { unstable_cacheTag as cacheTag } from 'next/cache';
 import { SiteContentLayout } from '@v2/components/routes/SiteContentLayout';
 import { getSiteCacheTag } from '@v2/lib/cache';
-import { createStaticSiteContext } from '@v2/lib/context';
+import { getStaticSiteContext, RouteParams } from '@v2/app/utils';
 
 export default async function RootLayout({
     params,
     children,
 }: {
-    params: Promise<{ url: string[] }>;
+    params: Promise<RouteParams>;
     children: React.ReactNode;
 }) {
     'use cache';
 
-    const { url } = await params;
-    const context = await createStaticSiteContext(url);
+    const context = await getStaticSiteContext(await params);
 
-    cacheTag(getSiteCacheTag(context.siteId));
+    cacheTag(getSiteCacheTag(context.site.id));
 
     return <SiteContentLayout context={context}>{children}</SiteContentLayout>;
 }
