@@ -9,6 +9,7 @@ import {
 } from '@gitbook/api';
 import type { Filesystem } from '@gitbook/openapi-parser';
 import { GitBookDataFetcher } from '@v2/lib/data/types';
+import { Linker } from '@v2/lib/links/types';
 import assertNever from 'assert-never';
 import React from 'react';
 
@@ -23,7 +24,7 @@ import {
     parseSpacesFromSiteSpaces,
 } from './api';
 import { getBlockById, getBlockTitle } from './document';
-import { getGitbookAppHref, getPageHref, PageHrefContext } from './links';
+import { getGitbookAppHref } from './links';
 import { getPagePath, resolvePageId } from './pages';
 import { ClassValue } from './tailwind';
 import { getSiteStructureSections } from './utils';
@@ -49,11 +50,16 @@ export interface ResolvedContentRef {
     openAPIFilesystem?: Filesystem;
 }
 
-export interface ContentRefContext extends PageHrefContext {
+export interface ContentRefContext {
     /**
      * Data fetcher to use.
      */
     dataFetcher: GitBookDataFetcher;
+
+    /**
+     * Linker to use to generate links.
+     */
+    linker: Linker;
 
     /**
      * Base URL to use to prepend to relative URLs.
@@ -109,13 +115,13 @@ export async function resolveContentRef(
 ): Promise<ResolvedContentRef | null> {
     const { resolveAnchorText = false, iconStyle } = options;
     const {
+        linker,
         dataFetcher,
         siteContext,
         space,
         revisionId,
         pages,
         page: activePage,
-        ...linksContext
     } = context;
 
     switch (contentRef.kind) {
@@ -149,6 +155,7 @@ export async function resolveContentRef(
         case 'page': {
             if (contentRef.space && contentRef.space !== space.id) {
                 return resolveContentRefInSpace(
+                    linker,
                     dataFetcher,
                     contentRef.space,
                     siteContext,
@@ -211,7 +218,7 @@ export async function resolveContentRef(
                 }
             } else {
                 // Page in the current content
-                href = await getPageHref(pages, page, linksContext, anchor);
+                href = linker.toPathForPage({ page, pages, anchor });
             }
 
             return {
@@ -360,6 +367,7 @@ async function getBestTargetSpace(
 }
 
 async function resolveContentRefInSpace(
+    linker: Linker,
     dataFetcher: GitBookDataFetcher,
     spaceId: string,
     siteContext: SiteContentPointer | null,
@@ -387,6 +395,7 @@ async function resolveContentRefInSpace(
     }
 
     const resolved = await resolveContentRef(contentRef, {
+        linker,
         dataFetcher,
         siteContext,
         space,

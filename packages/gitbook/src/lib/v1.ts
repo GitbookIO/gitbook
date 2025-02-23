@@ -1,4 +1,6 @@
+import { RevisionPageType } from '@gitbook/api';
 import type { GitBookDataFetcher } from '@v2/lib/data/types';
+import type { Linker } from '@v2/lib/links/types';
 
 import {
     api,
@@ -12,6 +14,8 @@ import {
     getSpace,
     getUserById,
 } from './api';
+import { getBasePath, getBaseUrl, getPagePDFContainerId } from './links';
+import { getPagePath } from './pages';
 
 /*
  * Code that will be used until the migration to v2 is complete.
@@ -71,4 +75,55 @@ export async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
             return getLatestOpenAPISpecVersionContent(params.organizationId, params.slug);
         },
     };
+}
+
+/**
+ * Linker to generate links in the current site.
+ */
+export async function getLinkerV1(
+    options: {
+        /**
+         * If defined, we are generating a PDF of the specific page IDs,
+         * and these pages will be rendered in the same HTML output.
+         */
+        pdf?: string[];
+    } = {},
+): Promise<Linker> {
+    const { pdf } = options;
+
+    const basePath = await getBasePath();
+    const basePathWithHost = await getBaseUrl();
+
+    const linker: Linker = {
+        toPathInSite(relativePath) {
+            throw new Error('Not implemented in v1');
+        },
+
+        toPathInSpace(relativePath) {
+            return `${basePath}${relativePath.startsWith('/') ? relativePath.slice(1) : relativePath}`;
+        },
+
+        toPathForPage({ page, pages, anchor }) {
+            if (pdf) {
+                if (pdf.includes(page.id)) {
+                    return '#' + getPagePDFContainerId(page, anchor);
+                } else {
+                    if (page.type === RevisionPageType.Group) {
+                        return '#';
+                    }
+
+                    // Use an absolute URL to the page
+                    return page.urls.app;
+                }
+            }
+
+            return linker.toPathInSpace(getPagePath(pages, page)) + (anchor ? '#' + anchor : '');
+        },
+
+        toAbsoluteURL(relativePath) {
+            return `${basePathWithHost}${relativePath.startsWith('/') ? relativePath.slice(1) : relativePath}`;
+        },
+    };
+
+    return linker;
 }

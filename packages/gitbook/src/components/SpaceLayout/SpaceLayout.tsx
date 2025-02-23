@@ -22,7 +22,7 @@ import { api, ContentTarget, type SectionsList, SiteContentPointer } from '@/lib
 import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { shouldTrackEvents } from '@/lib/tracking';
-import { getDataFetcherV1 } from '@/lib/v1';
+import { getDataFetcherV1, getLinkerV1 } from '@/lib/v1';
 import { getCurrentVisitorToken } from '@/lib/visitor-token';
 
 import { SpacesDropdown } from '../Header/SpacesDropdown';
@@ -61,6 +61,7 @@ export async function SpaceLayout(props: {
 
     const contentRefContext: ContentRefContext = {
         dataFetcher: await getDataFetcherV1(),
+        link: await getLinkerV1(),
         siteContext: content,
         space,
         revisionId: contentTarget.revisionId,

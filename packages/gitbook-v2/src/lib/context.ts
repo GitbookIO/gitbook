@@ -1,7 +1,8 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
+import { GITBOOK_API_TOKEN, GITBOOK_API_URL } from '@v2/lib/env';
 import { createDataFetcher, GitBookDataFetcher } from '@v2/lib/data';
+import { Linker } from './links/types';
 
 /**
  * Generic context about rendering content.
@@ -11,6 +12,11 @@ export interface GitBookContext {
      * Data fetcher to fetch data from GitBook.
      */
     dataFetcher: GitBookDataFetcher;
+
+    /**
+     * Linker to generate links in the current site.
+     */
+    linker: Linker;
 }
 
 /**
@@ -31,6 +37,16 @@ export interface GitBookSiteContext extends GitBookContext {
      * Share key of the site.
      */
     siteShareKey: string | undefined;
+}
+
+/**
+ * Context when rendering a space content.
+ */
+export interface GitBookSpaceContext extends GitBookContext {
+    /**
+     * ID of the space.
+     */
+    spaceId: string;
 }
 
 /**

@@ -10,7 +10,7 @@ import { getPagePath, resolveFirstDocument } from '@/lib/pages';
 import { ContentRefContext } from '@/lib/references';
 import { isSpaceIndexable, isPageIndexable } from '@/lib/seo';
 import { getContentTitle } from '@/lib/utils';
-import { getDataFetcherV1 } from '@/lib/v1';
+import { getDataFetcherV1, getLinkerV1 } from '@/lib/v1';
 
 import { PageClientLayout } from './PageClientLayout';
 import { PagePathParams, fetchPageData, getPathnameParam, normalizePathname } from '../../fetch';
@@ -72,6 +72,7 @@ export default async function Page(props: {
 
     const contentRefContext: ContentRefContext = {
         dataFetcher: await getDataFetcherV1(),
+        linker: await getLinkerV1(),
         siteContext: contentPointer,
         space,
         revisionId: contentTarget.revisionId,

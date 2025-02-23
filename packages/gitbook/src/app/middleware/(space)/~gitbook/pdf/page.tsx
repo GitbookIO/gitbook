@@ -29,7 +29,7 @@ import { resolvePageId } from '@/lib/pages';
 import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { PDFSearchParams, getPDFSearchParams } from '@/lib/urls';
-import { getDataFetcherV1 } from '@/lib/v1';
+import { getDataFetcherV1, getLinkerV1 } from '@/lib/v1';
 
 import './pdf.css';
 
@@ -87,6 +87,11 @@ export default async function PDFHTMLOutput(props: {
     const pageIds = pages.map(
         ({ page }) => [page.id, getPagePDFContainerId(page)] as [string, string],
     );
+
+    const linker = await getLinkerV1({
+        pdf: pages.map(({ page }) => page.id),
+    });
+
     const linksContext: PageHrefContext = {
         pdf: pages.map(({ page }) => page.id),
     };
@@ -178,13 +183,13 @@ export default async function PDFHTMLOutput(props: {
                             space={space}
                             page={page}
                             refContext={{
+                                linker,
                                 dataFetcher,
                                 siteContext: 'siteId' in pointer ? pointer : null,
                                 space,
                                 revisionId: contentTarget.revisionId,
                                 pages: rootPages,
                                 page,
-                                ...linksContext,
                             }}
                         />
                     </React.Suspense>

@@ -1,15 +1,6 @@
 import type * as api from '@gitbook/api';
 
 /**
- * Pointer to a relative content, it might change overtime, the pointer is relative in the content history.
- */
-export interface SpaceContentPointer {
-    spaceId: string;
-    changeRequestId?: string;
-    revisionId?: string;
-}
-
-/**
  * Generic fetcher for GitBook data.
  * It is used between v1 and v2.
  */
