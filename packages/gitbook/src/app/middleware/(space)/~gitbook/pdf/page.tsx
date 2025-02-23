@@ -9,6 +9,7 @@ import {
     Space,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
+import { GitBookSpaceLinker } from '@v2/lib/links';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import * as React from 'react';
@@ -37,7 +38,6 @@ import './pdf.css';
 import { PageControlButtons } from './PageControlButtons';
 import { getSiteOrSpacePointerForPDF } from './pointer';
 import { PrintButton } from './PrintButton';
-import { GitBookSpaceLinker } from '@v2/lib/links';
 
 const DEFAULT_LIMIT = 100;
 

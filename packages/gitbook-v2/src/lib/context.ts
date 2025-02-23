@@ -1,4 +1,15 @@
-import { ChangeRequest, RevisionPage, Site, SiteCustomizationSettings, SiteIntegrationScript, SiteSection, SiteSectionGroup, SiteSpace, SiteStructure, Space } from '@gitbook/api';
+import {
+    ChangeRequest,
+    RevisionPage,
+    Site,
+    SiteCustomizationSettings,
+    SiteIntegrationScript,
+    SiteSection,
+    SiteSectionGroup,
+    SiteSpace,
+    SiteStructure,
+    Space,
+} from '@gitbook/api';
 import { redirect } from 'next/navigation';
 import { assert } from 'ts-essentials';
 import { createDataFetcher, GitBookDataFetcher } from '@v2/lib/data';
@@ -62,7 +73,7 @@ export async function fetchSiteContext(
     input: {
         url: string;
         visitorAuthToken: string | undefined;
-    }
+    },
 ): Promise<GitBookSiteContext> {
     const { dataFetcher } = baseContext;
     const data = await dataFetcher.getPublishedContentByUrl({
@@ -74,27 +85,30 @@ export async function fetchSiteContext(
         redirect(data.redirect);
     }
 
-    const context = await fetchSiteContextByIds({
-        ...baseContext,
-        dataFetcher: createDataFetcher({
-            apiEndpoint: dataFetcher.apiEndpoint,
-            apiToken: data.apiToken,
-        })
-    }, {
-        organization: data.organization,
-        site: data.site,
-        siteSection: data.siteSection,
-        siteSpace: data.siteSpace,
-        space: data.space,
-        shareKey: data.shareKey,
-        changeRequest: data.changeRequest,
-        revision: data.revision,
-    });
+    const context = await fetchSiteContextByIds(
+        {
+            ...baseContext,
+            dataFetcher: createDataFetcher({
+                apiEndpoint: dataFetcher.apiEndpoint,
+                apiToken: data.apiToken,
+            }),
+        },
+        {
+            organization: data.organization,
+            site: data.site,
+            siteSection: data.siteSection,
+            siteSpace: data.siteSpace,
+            space: data.space,
+            shareKey: data.shareKey,
+            changeRequest: data.changeRequest,
+            revision: data.revision,
+        },
+    );
 
     return {
         ...context,
         linker: appendPrefixToLinker(context.linker, data.basePath),
-    }
+    };
 }
 
 /**
@@ -111,23 +125,19 @@ export async function fetchSiteContextByIds(
         shareKey: string | undefined;
         changeRequest: string | undefined;
         revision: string | undefined;
-    }
+    },
 ): Promise<GitBookSiteContext> {
     const { dataFetcher } = baseContext;
 
-    const [{
-        site: orgSite,
-        structure: siteStructure,
-        customizations,
-        scripts,
-    }, spaceContext] = await Promise.all([
-        dataFetcher.getPublishedContentSite({
-            organizationId: ids.organization,
-            siteId: ids.site,
-            siteShareKey: ids.shareKey,
-        }),
-        fetchSpaceContextByIds(baseContext, ids),
-    ]);
+    const [{ site: orgSite, structure: siteStructure, customizations, scripts }, spaceContext] =
+        await Promise.all([
+            dataFetcher.getPublishedContentSite({
+                organizationId: ids.organization,
+                siteId: ids.site,
+                siteShareKey: ids.shareKey,
+            }),
+            fetchSpaceContextByIds(baseContext, ids),
+        ]);
 
     const siteSectionsAndGroups =
         siteStructure.type === 'sections' && siteStructure.structure
@@ -187,7 +197,7 @@ async function fetchSpaceContextByIds(
         shareKey: string | undefined;
         changeRequest: string | undefined;
         revision: string | undefined;
-    }
+    },
 ): Promise<GitBookSpaceContext> {
     const { dataFetcher } = baseContext;
 
@@ -223,7 +233,6 @@ async function fetchSpaceContextByIds(
         shareKey: ids.shareKey,
     };
 }
-
 
 /**
  * Parse the site spaces into a list of spaces with their title and urls.

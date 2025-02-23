@@ -1,8 +1,8 @@
-import { fetchSiteContext } from "@v2/lib/context";
-import { createDataFetcher } from "@v2/lib/data";
-import { GITBOOK_API_TOKEN, GITBOOK_API_URL } from "@v2/lib/env";
-import { createSpaceLinker } from "@v2/lib/links";
-import { headers } from "next/headers";
+import { fetchSiteContext } from '@v2/lib/context';
+import { createDataFetcher } from '@v2/lib/data';
+import { GITBOOK_API_TOKEN, GITBOOK_API_URL } from '@v2/lib/env';
+import { createSpaceLinker } from '@v2/lib/links';
+import { headers } from 'next/headers';
 
 export type RouteParamMode = 'url-host' | 'url';
 
@@ -20,13 +20,16 @@ export function getStaticSiteContext(params: RouteParams) {
     const dataFetcher = createDataFetcher();
     const linker = createLinker('static', params);
 
-    return fetchSiteContext({
-        dataFetcher,
-        linker,
-    }, {
-        url,
-        visitorAuthToken: undefined,
-    });
+    return fetchSiteContext(
+        {
+            dataFetcher,
+            linker,
+        },
+        {
+            url,
+            visitorAuthToken: undefined,
+        },
+    );
 }
 
 /**
@@ -44,13 +47,16 @@ export async function getDynamicSiteContext(params: RouteParams) {
 
     const linker = createLinker('dynamic', params);
 
-    return fetchSiteContext({
-        dataFetcher,
-        linker,
-    }, {
-        url,
-        visitorAuthToken: headersSet.get('x-gitbook-visitor-token'),
-    });
+    return fetchSiteContext(
+        {
+            dataFetcher,
+            linker,
+        },
+        {
+            url,
+            visitorAuthToken: headersSet.get('x-gitbook-visitor-token'),
+        },
+    );
 }
 
 function getURLFromParams(input: string[]) {

@@ -33,7 +33,7 @@ export function createSpaceLinker(
     servedOn: {
         host: string;
         pathname: string;
-    }
+    },
 ): GitBookSpaceLinker {
     if (servedOn.host.includes('/')) {
         throw new Error('Host cannot include a slash');
@@ -50,7 +50,7 @@ export function createSpaceLinker(
 
         toPathForPage({ pages, page, anchor }) {
             return linker.toPathInSpace(getPagePath(pages, page)) + (anchor ? '#' + anchor : '');
-        }
+        },
     };
 
     return linker;
@@ -59,7 +59,10 @@ export function createSpaceLinker(
 /**
  * Append a prefix to a linker.
  */
-export function appendPrefixToLinker(linker: GitBookSpaceLinker, prefix: string): GitBookSpaceLinker {
+export function appendPrefixToLinker(
+    linker: GitBookSpaceLinker,
+    prefix: string,
+): GitBookSpaceLinker {
     const linkerWithPrefix: GitBookSpaceLinker = {
         toPathInSpace(relativePath: string): string {
             return linker.toPathInSpace(joinPaths(prefix, relativePath));
@@ -70,8 +73,11 @@ export function appendPrefixToLinker(linker: GitBookSpaceLinker, prefix: string)
         },
 
         toPathForPage({ pages, page, anchor }) {
-            return linkerWithPrefix.toPathInSpace(getPagePath(pages, page)) + (anchor ? '#' + anchor : '');
-        }
+            return (
+                linkerWithPrefix.toPathInSpace(getPagePath(pages, page)) +
+                (anchor ? '#' + anchor : '')
+            );
+        },
     };
 
     return linkerWithPrefix;

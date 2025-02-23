@@ -9,7 +9,7 @@ import {
 } from '@gitbook/api';
 import type { Filesystem } from '@gitbook/openapi-parser';
 import { GitBookDataFetcher } from '@v2/lib/data/types';
-import { Linker } from '@v2/lib/links/types';
+import { GitBookSpaceLinker } from '@v2/lib/links';
 import assertNever from 'assert-never';
 import React from 'react';
 
@@ -59,7 +59,7 @@ export interface ContentRefContext {
     /**
      * Linker to use to generate links.
      */
-    linker: Linker;
+    linker: GitBookSpaceLinker;
 
     /**
      * Base URL to use to prepend to relative URLs.
@@ -367,7 +367,7 @@ async function getBestTargetSpace(
 }
 
 async function resolveContentRefInSpace(
-    linker: Linker,
+    linker: GitBookSpaceLinker,
     dataFetcher: GitBookDataFetcher,
     spaceId: string,
     siteContext: SiteContentPointer | null,
