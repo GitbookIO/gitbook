@@ -61,7 +61,7 @@ export async function SpaceLayout(props: {
 
     const contentRefContext: ContentRefContext = {
         dataFetcher: await getDataFetcherV1(),
-        link: await getLinkerV1(),
+        linker: await getLinkerV1(),
         siteContext: content,
         space,
         revisionId: contentTarget.revisionId,
