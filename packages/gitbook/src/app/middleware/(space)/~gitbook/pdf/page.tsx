@@ -3,6 +3,7 @@ import {
     Revision,
     RevisionPageDocument,
     RevisionPageGroup,
+    RevisionPageType,
     SiteCustomizationSettings,
     SiteInsightsTrademarkPlacement,
     Space,
@@ -36,6 +37,7 @@ import './pdf.css';
 import { PageControlButtons } from './PageControlButtons';
 import { getSiteOrSpacePointerForPDF } from './pointer';
 import { PrintButton } from './PrintButton';
+import { GitBookSpaceLinker } from '@v2/lib/links';
 
 const DEFAULT_LIMIT = 100;
 
@@ -88,12 +90,21 @@ export default async function PDFHTMLOutput(props: {
         ({ page }) => [page.id, getPagePDFContainerId(page)] as [string, string],
     );
 
-    const linker = await getLinkerV1({
-        pdf: pages.map(({ page }) => page.id),
-    });
+    const baseLinker = await getLinkerV1();
+    const linker: GitBookSpaceLinker = {
+        ...baseLinker,
+        toPathForPage(input) {
+            if (pages.some((p) => p.page.id === input.page.id)) {
+                return '#' + getPagePDFContainerId(input.page, input.anchor);
+            } else {
+                if (input.page.type === RevisionPageType.Group) {
+                    return '#';
+                }
 
-    const linksContext: PageHrefContext = {
-        pdf: pages.map(({ page }) => page.id),
+                // Use an absolute URL to the page
+                return input.page.urls.app;
+            }
+        },
     };
 
     return (
