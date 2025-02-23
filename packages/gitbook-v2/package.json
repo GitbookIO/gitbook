@@ -9,7 +9,7 @@
         "@gitbook/api": "^0.95.0"
     },
     "devDependencies": {
-        "@opennextjs/cloudflare": "^0.4.3"
+        "@opennextjs/cloudflare": "^0.5.3"
     },
     "scripts": {
         "dev:v2": "next",

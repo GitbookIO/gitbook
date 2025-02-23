@@ -49,7 +49,7 @@ jobs:
                   SENTRY_RELEASE: ${{ github.sha }}
             - id: deploy
               name: Deploy to Cloudflare
-              uses: cloudflare/wrangler-action@v3.11.0
+              uses: cloudflare/wrangler-action@v3.14.0
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -173,7 +173,7 @@ jobs:
                   SENTRY_RELEASE: ${{ github.sha }}
             - id: deploy
               name: Deploy to Cloudflare
-              uses: cloudflare/wrangler-action@v3.11.0
+              uses: cloudflare/wrangler-action@v3.14.0
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
