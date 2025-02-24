@@ -1,5 +1,8 @@
+import { CustomizationRootLayout } from '@/components/RootLayout';
+import { SiteLayout } from '@/components/SiteLayout';
 import { getDynamicSiteContext, RouteParams } from '@v2/app/utils';
-import { SiteContentLayout } from '@v2/components/routes/SiteContentLayout';
+import { GITBOOK_DISABLE_TRACKING } from '@v2/lib/env';
+import { getThemeFromMiddleware } from '@v2/lib/middleware';
 
 export default async function RootLayout({
     params,
@@ -9,5 +12,11 @@ export default async function RootLayout({
     children: React.ReactNode;
 }) {
     const context = await getDynamicSiteContext(await params);
-    return <SiteContentLayout context={context}>{children}</SiteContentLayout>;
+    const forcedTheme = await getThemeFromMiddleware();
+
+    return (
+        <CustomizationRootLayout customization={context.customization}>
+            <SiteLayout nonce="TODO" context={context} forcedTheme={forcedTheme} withTracking={!GITBOOK_DISABLE_TRACKING}>{children}</SiteLayout>
+        </CustomizationRootLayout>
+    );
 }

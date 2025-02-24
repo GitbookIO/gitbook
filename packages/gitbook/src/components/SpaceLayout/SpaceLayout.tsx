@@ -9,9 +9,7 @@ import { SearchButton, SearchModal } from '@/components/Search';
 import { TableOfContents } from '@/components/TableOfContents';
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
-import { api } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
-import { shouldTrackEvents } from '@/lib/tracking';
 import { getSitePointerFromContext } from '@/lib/v1';
 import { getCurrentVisitorToken } from '@/lib/visitor-token';
 
@@ -24,10 +22,15 @@ import { SiteSectionList } from '../SiteSections';
  */
 export async function SpaceLayout(props: {
     context: GitBookSiteContext;
+
+    /** Whether to enable tracking of events into site insights. */
+    withTracking: boolean;
+
+    /** The children of the layout. */
     children: React.ReactNode;
 }) {
-    const { context, children } = props;
-    const { space, siteSpace, customization, site, sections, siteSpaces } = context;
+    const { context, withTracking, children } = props;
+    const { siteSpace, customization, site, sections, siteSpaces } = context;
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
@@ -40,9 +43,7 @@ export async function SpaceLayout(props: {
             'sidebar' in customization.styling &&
             customization.styling.sidebar.background === CustomizationSidebarBackgroundStyle.Filled,
     };
-    const apiHost = (await api()).client.endpoint;
     const visitorAuthToken = await getCurrentVisitorToken();
-    const enabled = await shouldTrackEvents();
 
     const withFooter =
         customization.themes.toggeable ||
@@ -52,8 +53,8 @@ export async function SpaceLayout(props: {
 
     return (
         <InsightsProvider
-            enabled={enabled}
-            apiHost={apiHost}
+            enabled={withTracking}
+            apiHost={context.dataFetcher.apiEndpoint}
             visitorAuthToken={visitorAuthToken}
             {...getSitePointerFromContext(context)}
         >
