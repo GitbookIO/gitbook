@@ -260,12 +260,7 @@ export function OpenAPISchemaPresentation(props: OpenAPISchemaPropertyEntry) {
             ) : null}
             {shouldDisplayExample(schema) ? (
                 <div className="openapi-schema-example">
-                    Example:{' '}
-                    <code>
-                        {typeof schema.example === 'string'
-                            ? schema.example
-                            : stringifyOpenAPI(schema.example)}
-                    </code>
+                    Example: <code>{formatExample(schema.example)}</code>
                 </div>
             ) : null}
             {schema.pattern ? (
@@ -433,4 +428,17 @@ function getDisclosureLabel(schema: OpenAPIV3.SchemaObject): string | undefined 
     }
 
     return schema.title;
+}
+
+function formatExample(example: any): string {
+    if (typeof example === 'string') {
+        return example
+            .replace(/\n/g, ' ') // Replace newlines with spaces
+            .replace(/\s+/g, ' ') // Collapse multiple spaces/newlines into a single space
+            .replace(/([\{\}:,])\s+/g, '$1 ') // Ensure a space after {, }, :, and ,
+            .replace(/\s+([\{\}:,])/g, ' $1') // Ensure a space before {, }, :, and ,
+            .trim();
+    }
+
+    return stringifyOpenAPI(example);
 }
