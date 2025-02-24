@@ -40,6 +40,7 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
                 className={tcls(
                     'py-3',
                     'pl-3',
+                    '-mt-px', // Bump icon up 1px for optical alignment with heading
                     hasHeading ? hintStyle.header : null,
                     hintStyle.iconColor,
                 )}

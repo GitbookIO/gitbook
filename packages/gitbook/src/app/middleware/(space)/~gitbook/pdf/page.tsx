@@ -249,8 +249,8 @@ async function PDFPageDocument(props: {
             {document ? (
                 <DocumentView
                     document={document}
-                    style={'mt-6 space-y-6'}
-                    blockStyle={['max-w-full']}
+                    style="mt-6 space-y-6"
+                    blockStyle="max-w-full"
                     context={{
                         mode: 'print',
                         contentContext: {
