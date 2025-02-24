@@ -11,11 +11,13 @@
         "server-only": "^0.0.1"
     },
     "devDependencies": {
+        "gitbook": "*",
         "@opennextjs/cloudflare": "^0.5.3",
         "tailwindcss": "^3.4.0",
         "postcss": "^8"
     },
     "scripts": {
+        "generate": "rm -f ./public && ln -s ../gitbook/public ./public",
         "dev:v2": "next",
         "build": "next build",
         "build:v2": "next build",
