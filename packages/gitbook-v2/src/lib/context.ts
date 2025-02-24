@@ -84,6 +84,9 @@ export type GitBookSiteContext = GitBookSpaceContext & {
 
     /** Scripts to load for the site. */
     scripts: SiteIntegrationScript[];
+
+    /** Visitor token used to fetch the site */
+    visitorAuthToken: string | null;
 };
 
 /**
@@ -132,6 +135,7 @@ export async function fetchSiteContext(
             shareKey: data.shareKey,
             changeRequest: data.changeRequest,
             revision: data.revision,
+            visitorAuthToken: input.visitorAuthToken,
         },
     );
 
@@ -155,6 +159,7 @@ export async function fetchSiteContextByIds(
         shareKey: string | undefined;
         changeRequest: string | undefined;
         revision: string | undefined;
+        visitorAuthToken: string | null;
     },
 ): Promise<GitBookSiteContext> {
     const { dataFetcher } = baseContext;
@@ -216,6 +221,7 @@ export async function fetchSiteContextByIds(
         structure: siteStructure,
         sections,
         scripts,
+        visitorAuthToken: ids.visitorAuthToken,
     };
 }
 

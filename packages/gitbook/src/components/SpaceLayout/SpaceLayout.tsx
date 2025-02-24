@@ -11,7 +11,6 @@ import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 import { getSitePointerFromContext } from '@/lib/v1';
-import { getCurrentVisitorToken } from '@/lib/visitor-token';
 
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
@@ -20,7 +19,7 @@ import { SiteSectionList } from '../SiteSections';
 /**
  * Render the entire layout of the space (header, table of contents, footer).
  */
-export async function SpaceLayout(props: {
+export function SpaceLayout(props: {
     context: GitBookSiteContext;
 
     /** Whether to enable tracking of events into site insights. */
@@ -43,7 +42,6 @@ export async function SpaceLayout(props: {
             'sidebar' in customization.styling &&
             customization.styling.sidebar.background === CustomizationSidebarBackgroundStyle.Filled,
     };
-    const visitorAuthToken = await getCurrentVisitorToken();
 
     const withFooter =
         customization.themes.toggeable ||
@@ -55,7 +53,7 @@ export async function SpaceLayout(props: {
         <InsightsProvider
             enabled={withTracking}
             apiHost={context.dataFetcher.apiEndpoint}
-            visitorAuthToken={visitorAuthToken}
+            visitorAuthToken={context.visitorAuthToken}
             {...getSitePointerFromContext(context)}
         >
             <Header withTopHeader={withTopHeader} context={context} />

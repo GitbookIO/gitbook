@@ -193,6 +193,7 @@ export async function middleware(request: NextRequest) {
                           shareKey: resolved.shareKey,
                           changeRequest: resolved.changeRequest,
                           revision: resolved.revision,
+                          visitorAuthToken: resolved.visitorToken ?? null,
                       })
                     : null;
 

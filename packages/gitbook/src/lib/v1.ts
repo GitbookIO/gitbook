@@ -26,6 +26,7 @@ import {
     SpaceContentPointer,
 } from './api';
 import { getBasePath, getHost } from './links';
+import { headers } from 'next/headers';
 
 /*
  * Code that will be used until the migration to v2 is complete.
@@ -130,6 +131,8 @@ export async function getV1BaseContext(): Promise<GitBookBaseContext> {
  */
 export async function fetchV1ContextForSitePointer(pointer: SiteContentPointer) {
     const baseContext = await getV1BaseContext();
+    const headersList = await headers();
+
     return fetchSiteContextByIds(baseContext, {
         organization: pointer.organizationId,
         site: pointer.siteId,
@@ -139,6 +142,7 @@ export async function fetchV1ContextForSitePointer(pointer: SiteContentPointer) 
         shareKey: pointer.siteShareKey,
         changeRequest: pointer.changeRequestId,
         revision: pointer.revisionId,
+        visitorAuthToken: headersList.get('x-gitbook-visitor-token')
     });
 }
 
