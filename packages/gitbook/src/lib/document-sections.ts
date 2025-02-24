@@ -2,7 +2,7 @@ import { JSONDocument, ContentRef, Space } from '@gitbook/api';
 
 import { getDocument } from './api';
 import { getNodeText } from './document';
-import { fetchOpenAPIBlock } from './openapi/fetch';
+import { resolveOpenAPIBlock } from './openapi/fetch';
 import { ResolvedContentRef } from './references';
 
 export interface DocumentSection {
@@ -40,7 +40,10 @@ export async function getDocumentSections(
         }
 
         if (block.type === 'swagger' && block.meta?.id) {
-            const { data: operation } = await fetchOpenAPIBlock(block, resolveContentRef);
+            const { data: operation } = await resolveOpenAPIBlock({
+                block,
+                context: { resolveContentRef },
+            });
             if (operation) {
                 sections.push({
                     id: block.meta.id,

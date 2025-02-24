@@ -8,6 +8,8 @@ import { ColorCategory, hexToRgb, scale, shadesOfColor } from '@gitbook/colors';
 export const shades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
 export const opacities = [0, 4, 8, 12, 16, 24, 40, 64, 72, 88, 96, 100];
 
+export const semanticColors = ['info', 'warning', 'danger', 'success'];
+
 /**
  * Generate a Tailwind color shades from a variable.
  */
@@ -100,6 +102,18 @@ const config: Config = {
 
                 'header-background': 'rgb(var(--header-background))',
                 'header-link': 'rgb(var(--header-link))',
+
+                // Add each semantic color
+                ...Object.fromEntries(
+                    semanticColors.map((color) => [color, generateVarShades(color)]),
+                ),
+                ...Object.fromEntries(
+                    semanticColors.map((color) => [
+                        `contrast-${color}`,
+                        generateVarShades(`contrast-${color}`),
+                    ]),
+                ),
+
                 yellow: generateShades('#f4e28d'),
                 teal: generateShades('#3f89a1'),
                 pomegranate: generateShades('#f25b3a'),
@@ -127,6 +141,17 @@ const config: Config = {
                     ColorCategory.components,
                     ColorCategory.accents,
                 ]),
+                // Semantic colors
+                ...Object.fromEntries(
+                    semanticColors.map((color) => [
+                        color,
+                        generateVarShades(color, [
+                            ColorCategory.backgrounds,
+                            ColorCategory.components,
+                            ColorCategory.accents,
+                        ]),
+                    ]),
+                ),
             },
             gradientColorStops: {
                 primary: generateVarShades('primary', [
@@ -144,26 +169,71 @@ const config: Config = {
                     ColorCategory.components,
                     ColorCategory.accents,
                 ]),
+                // Semantic colors
+                ...Object.fromEntries(
+                    semanticColors.map((color) => [
+                        color,
+                        generateVarShades(color, [
+                            ColorCategory.backgrounds,
+                            ColorCategory.components,
+                            ColorCategory.accents,
+                        ]),
+                    ]),
+                ),
             },
             borderColor: {
-                primary: generateVarShades('primary', [ColorCategory.borders]),
-                tint: generateVarShades('tint', [ColorCategory.borders]),
-                neutral: generateVarShades('neutral', [ColorCategory.borders]),
+                primary: generateVarShades('primary', [
+                    ColorCategory.borders,
+                    ColorCategory.accents,
+                ]),
+                tint: generateVarShades('tint', [ColorCategory.borders, ColorCategory.accents]),
+                neutral: generateVarShades('neutral', [
+                    ColorCategory.borders,
+                    ColorCategory.accents,
+                ]),
+                // Semantic colors
+                ...Object.fromEntries(
+                    semanticColors.map((color) => [
+                        color,
+                        generateVarShades(color, [ColorCategory.borders, ColorCategory.accents]),
+                    ]),
+                ),
             },
             ringColor: {
                 primary: generateVarShades('primary', [ColorCategory.borders]),
                 tint: generateVarShades('tint', [ColorCategory.borders]),
                 neutral: generateVarShades('neutral', [ColorCategory.borders]),
+                // Semantic colors
+                ...Object.fromEntries(
+                    semanticColors.map((color) => [
+                        color,
+                        generateVarShades(color, [ColorCategory.borders]),
+                    ]),
+                ),
             },
             outlineColor: {
                 primary: generateVarShades('primary', [ColorCategory.borders]),
                 tint: generateVarShades('tint', [ColorCategory.borders]),
                 neutral: generateVarShades('neutral', [ColorCategory.borders]),
+                // Semantic colors
+                ...Object.fromEntries(
+                    semanticColors.map((color) => [
+                        color,
+                        generateVarShades(color, [ColorCategory.borders]),
+                    ]),
+                ),
             },
             boxShadowColor: {
                 primary: generateVarShades('primary', [ColorCategory.borders]),
                 tint: generateVarShades('tint', [ColorCategory.borders]),
                 neutral: generateVarShades('neutral', [ColorCategory.borders]),
+                // Semantic colors
+                ...Object.fromEntries(
+                    semanticColors.map((color) => [
+                        color,
+                        generateVarShades(color, [ColorCategory.borders]),
+                    ]),
+                ),
             },
             textColor: {
                 primary: generateVarShades('primary', [ColorCategory.text]),
@@ -181,6 +251,18 @@ const config: Config = {
                     ColorCategory.backgrounds,
                     ColorCategory.accents,
                 ]),
+                ...Object.fromEntries(
+                    semanticColors.flatMap((color) => [
+                        [color, generateVarShades(color, [ColorCategory.text])],
+                        [
+                            `contrast-${color}`,
+                            generateVarShades(`contrast-${color}`, [
+                                ColorCategory.backgrounds,
+                                ColorCategory.accents,
+                            ]),
+                        ],
+                    ]),
+                ),
             },
             textDecorationColor: {
                 primary: generateVarShades('primary', [ColorCategory.text]),
@@ -198,6 +280,18 @@ const config: Config = {
                     ColorCategory.backgrounds,
                     ColorCategory.accents,
                 ]),
+                ...Object.fromEntries(
+                    semanticColors.flatMap((color) => [
+                        [color, generateVarShades(color, [ColorCategory.text])],
+                        [
+                            `contrast-${color}`,
+                            generateVarShades(`contrast-${color}`, [
+                                ColorCategory.backgrounds,
+                                ColorCategory.accents,
+                            ]),
+                        ],
+                    ]),
+                ),
             },
             animation: {
                 present: 'present .5s ease-out both',

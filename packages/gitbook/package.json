@@ -17,7 +17,7 @@
         "clean": "rm -rf ./.next && rm -rf ./public/~gitbook/static/icons && rm -rf ./public/~gitbook/static/math"
     },
     "dependencies": {
-        "@gitbook/api": "^0.93.0",
+        "@gitbook/api": "^0.95.0",
         "@gitbook/cache-do": "workspace:*",
         "@gitbook/colors": "workspace:*",
         "@gitbook/emoji-codepoints": "workspace:*",

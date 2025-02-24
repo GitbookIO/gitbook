@@ -1,13 +1,14 @@
-import { DocumentBlockOpenAPI } from '@gitbook/api';
+import { DocumentBlockOpenAPI, JSONDocument } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import { OpenAPIOperation } from '@gitbook/react-openapi';
 import React from 'react';
 
-import { fetchOpenAPIBlock } from '@/lib/openapi/fetch';
+import { resolveOpenAPIBlock } from '@/lib/openapi/fetch';
 import { tcls } from '@/lib/tailwind';
 
 import { BlockProps } from '../Block';
 import { PlainCodeBlock } from '../CodeBlock';
+import { DocumentView } from '../DocumentView';
 import { Heading } from '../Heading';
 
 import './style.css';
@@ -27,13 +28,17 @@ export async function OpenAPI(props: BlockProps<DocumentBlockOpenAPI>) {
 
 async function OpenAPIBody(props: BlockProps<DocumentBlockOpenAPI>) {
     const { block, context } = props;
-    const { data, specUrl, error } = await fetchOpenAPIBlock(block, context.resolveContentRef);
+
+    const { data, specUrl, error } = await resolveOpenAPIBlock({
+        block,
+        context: { resolveContentRef: context.resolveContentRef },
+    });
 
     if (error) {
         return (
-            <div className={tcls('hidden')}>
+            <div className="hidden">
                 <p>
-                    Error with {error.rootURL}: {error.message}
+                    Error with {specUrl}: {error.message}
                 </p>
             </div>
         );
@@ -53,7 +58,15 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockOpenAPI>) {
                     chevronRight: <Icon icon="chevron-right" />,
                     plus: <Icon icon="plus" />,
                 },
-                CodeBlock: PlainCodeBlock,
+                renderCodeBlock: (codeProps) => <PlainCodeBlock {...codeProps} />,
+                renderDocument: (documentProps) => (
+                    <DocumentView
+                        document={documentProps.document as JSONDocument}
+                        context={props.context}
+                        style="space-y-6"
+                        blockStyle="max-w-full"
+                    />
+                ),
                 renderHeading: (headingProps) => (
                     <Heading
                         document={props.document}

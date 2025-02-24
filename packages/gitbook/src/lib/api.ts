@@ -209,6 +209,42 @@ export const getUserById = cache({
 });
 
 /**
+ * Get the latest version of an OpenAPI spec by its slug.
+ */
+export const getLatestOpenAPISpecVersionContent = cache({
+    name: 'api.getLatestOpenApiSpecVersionContent',
+    tag: (organization, openAPISpec) =>
+        getAPICacheTag({
+            tag: 'openapi',
+            organization,
+            openAPISpec,
+        }),
+    get: async (organizationId: string, slug: string, options: CacheFunctionOptions) => {
+        try {
+            const apiCtx = await api();
+            const response = await apiCtx.client.orgs.getLatestOpenApiSpecVersionContent(
+                organizationId,
+                slug,
+                {
+                    ...noCacheFetchOptions,
+                    signal: options.signal,
+                },
+            );
+            return cacheResponse(response, { revalidateBefore: 60 * 60 });
+        } catch (error) {
+            if (checkHasErrorCode(error, 404)) {
+                return {
+                    revalidateBefore: 5,
+                    data: null,
+                };
+            }
+
+            throw error;
+        }
+    },
+});
+
+/**
  * Resolve a URL to the content to render.
  */
 export const getPublishedContentByUrl = cache({
@@ -1226,6 +1262,12 @@ export function getAPICacheTag(
         | {
               tag: 'site';
               site: string;
+          }
+        // All data related to an OpenAPI spec
+        | {
+              tag: 'openapi';
+              organization: string;
+              openAPISpec: string;
           },
 ): string {
     switch (spec.tag) {
@@ -1249,6 +1291,8 @@ export function getAPICacheTag(
             return `site:${spec.site}`;
         case 'integration':
             return `integration:${spec.integration}`;
+        case 'openapi':
+            return `organization:${spec.organization}:openapi:${spec.openAPISpec}`;
         default:
             assertNever(spec);
     }

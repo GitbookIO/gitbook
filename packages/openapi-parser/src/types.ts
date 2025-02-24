@@ -42,6 +42,11 @@ export interface OpenAPICustomOperationProperties {
      * Description in HTML format.
      */
     'x-gitbook-description-html'?: string;
+
+    /**
+     * Description in Document format.
+     */
+    'x-gitbook-description-document'?: object;
 }
 
 /**
