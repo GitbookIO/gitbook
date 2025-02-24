@@ -50,7 +50,7 @@ export async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
         getPublishedContentByUrl(params) {
             return getPublishedContentByUrl(
                 params.url,
-                params.visitorAuthToken,
+                params.visitorAuthToken ?? undefined,
                 params.redirectOnError ? true : undefined,
             );
         },

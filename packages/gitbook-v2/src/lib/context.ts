@@ -100,13 +100,15 @@ export async function fetchSiteContext(
     baseContext: GitBookBaseContext,
     input: {
         url: string;
-        visitorAuthToken: string | undefined;
+        visitorAuthToken: string | null;
+        redirectOnError: boolean;
     },
 ): Promise<GitBookSiteContext> {
     const { dataFetcher } = baseContext;
     const data = await dataFetcher.getPublishedContentByUrl({
         url: input.url,
         visitorAuthToken: input.visitorAuthToken,
+        redirectOnError: input.redirectOnError,
     });
 
     if ('redirect' in data) {

@@ -358,8 +358,8 @@ async function getPublishedContentByUrl(
     input: DataFetcherInput,
     params: {
         url: string;
-        visitorAuthToken?: string;
-        redirectOnError?: boolean;
+        visitorAuthToken: string | null;
+        redirectOnError: boolean;
     },
 ) {
     'use cache';
@@ -371,7 +371,7 @@ async function getPublishedContentByUrl(
 
     const res = await getAPI(input).urls.getPublishedContentByUrl({
         url,
-        visitorAuthToken,
+        visitorAuthToken: visitorAuthToken ?? undefined,
         redirectOnError,
     });
 

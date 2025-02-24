@@ -20,8 +20,8 @@ export interface GitBookDataFetcher {
      */
     getPublishedContentByUrl(params: {
         url: string;
-        visitorAuthToken?: string;
-        redirectOnError?: boolean;
+        visitorAuthToken: string | null;
+        redirectOnError: boolean;
     }): Promise<api.PublishedSiteContentLookup>;
 
     /**

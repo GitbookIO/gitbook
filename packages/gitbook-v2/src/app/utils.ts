@@ -27,7 +27,8 @@ export function getStaticSiteContext(params: RouteParams) {
         },
         {
             url,
-            visitorAuthToken: undefined,
+            visitorAuthToken: null,
+            redirectOnError: false,
         },
     );
 }
@@ -55,6 +56,9 @@ export async function getDynamicSiteContext(params: RouteParams) {
         {
             url,
             visitorAuthToken: headersSet.get('x-gitbook-visitor-token'),
+
+            // TODO: set it only when the token comes from the cookies.
+            redirectOnError: true,
         },
     );
 }
