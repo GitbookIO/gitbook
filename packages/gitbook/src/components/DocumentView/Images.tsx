@@ -11,6 +11,7 @@ import { ClassValue, tcls } from '@/lib/tailwind';
 import { BlockProps } from './Block';
 import { Caption } from './Caption';
 import { DocumentContext } from './DocumentView';
+import { resolveContentRef } from '@/lib/references';
 
 export function Images(props: BlockProps<DocumentBlockImages>) {
     const { document, block, ancestorBlocks, style, context, isEstimatedOffscreen } = props;
@@ -70,8 +71,8 @@ async function ImageBlock(props: {
     const { block, context, isEstimatedOffscreen } = props;
 
     const [src, darkSrc] = await Promise.all([
-        context.resolveContentRef(block.data.ref),
-        block.data.refDark ? context.resolveContentRef(block.data.refDark) : null,
+        context.contentContext ? resolveContentRef(block.data.ref, context.contentContext) : null,
+        block.data.refDark && context.contentContext ? resolveContentRef(block.data.refDark, context.contentContext) : null,
     ]);
 
     if (!src) {

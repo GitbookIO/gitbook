@@ -255,12 +255,7 @@ async function PDFPageDocument(props: {
                     blockStyle={['max-w-full']}
                     context={{
                         mode: 'print',
-                        content: {
-                            spaceId: space.id,
-                            revisionId: context.revisionId,
-                        },
-                        contentRefContext: context,
-                        resolveContentRef: (ref) => resolveContentRef(ref, context),
+                        contentContext: context,
                         getId: (id) => getPagePDFContainerId(page, id),
                     }}
                 />

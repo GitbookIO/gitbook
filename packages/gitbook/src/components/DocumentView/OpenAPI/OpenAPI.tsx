@@ -28,9 +28,13 @@ export async function OpenAPI(props: BlockProps<DocumentBlockOpenAPI>) {
 async function OpenAPIBody(props: BlockProps<DocumentBlockOpenAPI>) {
     const { block, context } = props;
 
+    if (!context.contentContext) {
+        return null;
+    }
+
     const { data, specUrl, error } = await resolveOpenAPIBlock({
         block,
-        context: { resolveContentRef: context.resolveContentRef },
+        context: context.contentContext,
     });
 
     if (error) {

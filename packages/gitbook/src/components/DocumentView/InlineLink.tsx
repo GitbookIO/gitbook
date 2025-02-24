@@ -3,11 +3,12 @@ import { DocumentInlineLink, SiteInsightsLinkPosition } from '@gitbook/api';
 import { InlineProps } from './Inline';
 import { Inlines } from './Inlines';
 import { Link } from '../primitives';
+import { resolveContentRef } from '@/lib/references';
 
 export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
     const { inline, document, context, ancestorInlines } = props;
 
-    const resolved = await context.resolveContentRef(inline.data.ref);
+    const resolved = context.contentContext ? await resolveContentRef(inline.data.ref, context.contentContext) : null;
 
     if (!resolved) {
         return (

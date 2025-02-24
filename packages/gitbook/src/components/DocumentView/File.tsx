@@ -11,7 +11,7 @@ import { Link } from '../primitives';
 export async function File(props: BlockProps<DocumentBlockFile>) {
     const { block, context } = props;
 
-    const contentRef = await context.resolveContentRef(block.data.ref);
+    const contentRef = context.contentContext ? await resolveContentRef(block.data.ref, context.contentContext) : null;
     const file = contentRef?.file;
 
     if (!file) {

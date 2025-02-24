@@ -20,6 +20,7 @@ import { getColumnAlignment, VerticalAlignment } from './utils';
 import { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { FileIcon } from '../FileIcon';
+import { resolveContentRef } from '@/lib/references';
 
 /**
  * Render the value for a column in a record.
@@ -141,10 +142,10 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
         case 'files':
             const files = await Promise.all(
                 (value as string[]).map((fileId) =>
-                    context.resolveContentRef({
+                    context.contentContext ? resolveContentRef({
                         kind: 'file',
                         file: fileId,
-                    }),
+                    }, context.contentContext) : null,
                 ),
             );
 
@@ -206,8 +207,8 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             );
         case 'content-ref': {
             const contentRef = value ? (value as ContentRef) : null;
-            const resolved = contentRef
-                ? await context.resolveContentRef(contentRef, {
+            const resolved = contentRef && context.contentContext
+                ? await resolveContentRef(contentRef, context.contentContext, {
                       resolveAnchorText: true,
                       iconStyle: ['mr-2', 'text-tint-subtle'],
                   })
@@ -246,7 +247,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                         kind: 'user',
                         user: userId,
                     };
-                    const resolved = await context.resolveContentRef(contentRef);
+                    const resolved = context.contentContext ? await resolveContentRef(contentRef, context.contentContext) : null;
                     if (!resolved) {
                         return null;
                     }

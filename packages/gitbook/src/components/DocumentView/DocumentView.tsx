@@ -1,11 +1,11 @@
 import { ContentRef, JSONDocument } from '@gitbook/api';
 
-import { ContentTarget } from '@/lib/api';
-import { ContentRefContext, ResolveContentRefOptions, ResolvedContentRef } from '@/lib/references';
+import { ResolveContentRefOptions, ResolvedContentRef } from '@/lib/references';
 import { ClassValue } from '@/lib/tailwind';
 
 import { BlockSkeleton } from './Block';
 import { Blocks } from './Blocks';
+import { GitBookAnyContext } from '@v2/lib/context';
 
 export interface DocumentContext {
     /**
@@ -16,22 +16,9 @@ export interface DocumentContext {
 
     /**
      * Space content being rendered.
-     */
-    content?: ContentTarget;
-
-    /**
-     * The context for resolving content refs.
      * If null, content refs cannot be resolved.
      */
-    contentRefContext: ContentRefContext | null;
-
-    /**
-     * Resolve a content reference.
-     */
-    resolveContentRef: (
-        ref: ContentRef,
-        options?: ResolveContentRefOptions,
-    ) => Promise<ResolvedContentRef | null>;
+    contentContext?: GitBookAnyContext;
 
     /**
      * Transform an ID to be added to the DOM.
