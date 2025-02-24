@@ -54,6 +54,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                         {customization.footer.logo ? (
                             <Image
                                 alt="Logo"
+                                resize={context.imageResizer}
                                 sources={{
                                     light: {
                                         src: customization.footer.logo.light,

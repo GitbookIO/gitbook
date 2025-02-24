@@ -82,6 +82,7 @@ export async function RecordCard(
                             width: view.cardSize === 'medium' ? 245 : 376,
                         },
                     ]}
+                    resize={context.contentContext?.imageResizer}
                     className={tcls(
                         'min-w-0',
                         'w-full',

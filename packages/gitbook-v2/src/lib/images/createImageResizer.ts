@@ -1,12 +1,10 @@
 import 'server-only';
 
-import { noCacheFetchOptions } from '@/lib/cache/http';
+import type { ImageResizer } from "./types";
+import { generateImageSignature, SignatureVersion } from './signatures';
+import { GitBookSpaceLinker } from '../links';
 
-import { generateImageSignature } from './image-signatures';
-import { getRootUrl } from './links';
-import { getImageAPIUrl } from './urls';
-
-export interface CloudflareImageJsonFormat {
+interface CloudflareImageJsonFormat {
     width: number;
     height: number;
     original: {
@@ -28,6 +26,75 @@ export interface CloudflareImageOptions {
     dpr?: number;
     anim?: boolean;
     quality?: number;
+}
+
+/**
+ * Create an image resizer for a rendering context.
+ */
+export function createImageResizer({ host, linker }: {
+    /** The linker to use to create URLs. */
+    linker: GitBookSpaceLinker;
+    /** The host name of the current site. */
+    host: string;
+}): ImageResizer {
+    return {
+        resize: (urlInput) => {
+            if (!checkIsSizableImageURL(urlInput)) {
+                return null;
+            }
+
+            let cachedSignature: {
+                signature: string;
+                version: SignatureVersion;
+            } | null = null;
+        
+            return async (options) => {
+                cachedSignature ??= await generateImageSignature({
+                    host,
+                    url: urlInput,
+                });
+
+                const url = new URL(linker.toAbsoluteURL('/~gitbook/image'));
+                url.searchParams.set('url', getImageAPIUrl(urlInput));
+
+                if (options.width) {
+                    url.searchParams.set('width', options.width.toString());
+                }
+                if (options.height) {
+                    url.searchParams.set('height', options.height.toString());
+                }
+                if (options.dpr) {
+                    url.searchParams.set('dpr', options.dpr.toString());
+                }
+                if (options.quality) {
+                    url.searchParams.set('quality', options.quality.toString());
+                }
+        
+                url.searchParams.set('sign', cachedSignature.signature);
+                url.searchParams.set('sv', cachedSignature.version);
+
+                return url.toString();
+            };
+        },
+
+        getImageSize: async (input, options) => {
+            if (!checkIsSizableImageURL(input)) {
+                return null;
+            }
+
+            return getImageSize(input, options);
+        },
+    };
+}
+
+/**
+ * Create an image resizer that doesn't do any resizing.
+ */
+export function createNoopImageResizer(): ImageResizer {
+    return {
+        resize: () => null,
+        getImageSize: async (input) => null,
+    };
 }
 
 /**
@@ -72,64 +139,6 @@ export function checkIsSizableImageURL(input: string): boolean {
     }
 
     return true;
-}
-
-interface ResizeImageOptions {
-    width?: number;
-    height?: number;
-    dpr?: number;
-    quality?: number;
-}
-
-/**
- * Create a function to get resized image URLs for a given image URL.
- */
-export async function getResizedImageURLFactory(
-    input: string,
-): Promise<((options: ResizeImageOptions) => string) | null> {
-    if (!checkIsSizableImageURL(input)) {
-        return null;
-    }
-
-    const [{ signature, version }, rootUrl] = await Promise.all([
-        generateImageSignature(input),
-        getRootUrl(),
-    ]);
-
-    return (options) => {
-        const url = new URL('/~gitbook/image', rootUrl);
-        url.searchParams.set('url', getImageAPIUrl(input));
-
-        if (options.width) {
-            url.searchParams.set('width', options.width.toString());
-        }
-        if (options.height) {
-            url.searchParams.set('height', options.height.toString());
-        }
-        if (options.dpr) {
-            url.searchParams.set('dpr', options.dpr.toString());
-        }
-        if (options.quality) {
-            url.searchParams.set('quality', options.quality.toString());
-        }
-
-        url.searchParams.set('sign', signature);
-        url.searchParams.set('sv', version);
-
-        return url.toString();
-    };
-}
-
-/**
- * Create a new URL for an image with resized parameters.
- * The URL is signed and verified by the server.
- */
-export async function getResizedImageURL(
-    input: string,
-    options: ResizeImageOptions,
-): Promise<string> {
-    const factory = await getResizedImageURLFactory(input);
-    return factory?.(options) ?? input;
 }
 
 /**
@@ -205,7 +214,6 @@ export async function resizeImage(
                             : `image/${resizeOptions.format || 'jpeg'}`,
                 },
                 signal,
-                ...noCacheFetchOptions,
             },
         );
 
@@ -225,4 +233,22 @@ function stringifyOptions(options: CloudflareImageOptions): string {
     return Object.entries({ ...options }).reduce((rest, [key, value]) => {
         return `${rest}${rest ? ',' : ''}${key}=${value}`;
     }, '');
+}
+
+/**
+ * Because of a bug in Cloudflare, 127.0.0.1 is replaced by localhost.
+ * We protect against it by converting to a special token, and then parsing
+ * the token in the image API.
+ */
+const GITBOOK_LOCALHOST_TOKEN = '$GITBOOK_LOCALHOST$';
+
+/**
+ * Prepare a URL for the GitBook Open Image API.
+ */
+export function getImageAPIUrl(url: string): string {
+    return url.replaceAll('127.0.0.1', GITBOOK_LOCALHOST_TOKEN);
+}
+
+export function parseImageAPIURL(url: string): string {
+    return url.replaceAll(GITBOOK_LOCALHOST_TOKEN, '127.0.0.1');
 }

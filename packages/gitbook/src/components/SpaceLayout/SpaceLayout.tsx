@@ -83,7 +83,7 @@ export function SpaceLayout(props: {
                                     'dark:shadow-light/1',
                                 )}
                             >
-                                <HeaderLogo site={site} customization={customization} />
+                                <HeaderLogo context={context} />
                             </div>
                         )
                     }

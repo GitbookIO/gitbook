@@ -187,6 +187,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                         style={['max-h-[1lh]', 'h-[1lh]']}
                                         alt={ref.text}
                                         sizes={[{ width: 24 }]}
+                                        resize={context.contentContext?.imageResizer}
                                         sources={{
                                             light: {
                                                 src: ref.href,

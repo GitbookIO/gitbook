@@ -16,6 +16,7 @@ import { assert } from 'ts-essentials';
 import { getSiteStructureSections } from '@/lib/sites';
 import { createDataFetcher, GitBookDataFetcher } from '@v2/lib/data';
 import { GitBookSpaceLinker, appendPrefixToLinker } from './links';
+import { ImageResizer } from './images';
 
 /**
  * Generic context when rendering content.
@@ -30,6 +31,11 @@ export type GitBookBaseContext = {
      * Linker to generate links in the current space.
      */
     linker: GitBookSpaceLinker;
+
+    /**
+     * Image resizer to resize images.
+     */
+    imageResizer: ImageResizer;
 };
 
 /**

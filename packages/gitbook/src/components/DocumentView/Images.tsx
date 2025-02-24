@@ -86,6 +86,7 @@ async function ImageBlock(props: {
             <Image
                 alt={block.data.alt ?? ''}
                 sizes={imageBlockSizes}
+                resize={context.contentContext?.imageResizer}
                 sources={{
                     light: {
                         src: src.href,

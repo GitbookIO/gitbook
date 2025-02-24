@@ -1,15 +1,14 @@
 import { CustomizationSettings, Site, SiteCustomizationSettings } from '@gitbook/api';
 
 import { Image } from '@/components/utils';
-import { getAbsoluteHref } from '@/lib/links';
 import { tcls } from '@/lib/tailwind';
 
 import { Link } from '../primitives';
 import { SpaceIcon } from '../Space/SpaceIcon';
+import { GitBookSiteContext } from '@v2/lib/context';
 
 interface HeaderLogoProps {
-    site: Site;
-    customization: CustomizationSettings | SiteCustomizationSettings;
+    context: GitBookSiteContext;
 }
 
 /**
@@ -17,17 +16,18 @@ interface HeaderLogoProps {
  */
 
 export async function HeaderLogo(props: HeaderLogoProps) {
-    const { customization } = props;
-    const href = await getAbsoluteHref('');
+    const { context } = props;
+    const { customization, linker } = context;
 
     return (
         <Link
-            href={href}
+            href={linker.toAbsoluteURL('')}
             className={tcls('group/headerlogo', 'min-w-0', 'shrink', 'flex', 'items-center')}
         >
             {customization.header.logo ? (
                 <Image
                     alt="Logo"
+                    resize={context.imageResizer}
                     sources={{
                         light: {
                             src: customization.header.logo.light,
@@ -70,7 +70,8 @@ export async function HeaderLogo(props: HeaderLogoProps) {
 }
 
 function LogoFallback(props: HeaderLogoProps) {
-    const { site, customization } = props;
+    const { context } = props;
+    const { customization, site } = context;
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : undefined;
     const customEmoji = 'emoji' in customization.favicon ? customization.favicon.emoji : undefined;
 
@@ -83,6 +84,7 @@ function LogoFallback(props: HeaderLogoProps) {
                 sizes={[{ width: 32 }]}
                 style={['object-contain', 'size-8']}
                 fetchPriority="high"
+                resize={context.imageResizer}
             />
             <div
                 className={tcls(

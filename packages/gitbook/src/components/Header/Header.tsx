@@ -89,7 +89,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                     'theme-bold:hover:bg-header-link/3',
                                 )}
                             />
-                            <HeaderLogo site={site} customization={customization} />
+                            <HeaderLogo context={context} />
                         </div>
 
                         {isMultiVariants && (

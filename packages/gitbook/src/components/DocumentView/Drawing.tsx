@@ -27,6 +27,7 @@ export async function Drawing(props: BlockProps<DocumentBlockDrawing>) {
                         size: resolved.file?.dimensions,
                     },
                 }}
+                resize={context.contentContext?.imageResizer}
                 alt="Drawing"
                 sizes={imageBlockSizes}
                 zoom

@@ -1,12 +1,12 @@
 import { DocumentInlineImage } from '@gitbook/api';
 import assertNever from 'assert-never';
 
-import { getImageSize } from '@/lib/images';
 import { resolveContentRef, ResolvedContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { InlineProps } from './Inline';
 import { Image } from '../utils';
+import { GitBookBaseContext } from '@v2/lib/context';
 
 export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
     const { inline, context, ancestorInlines } = props;
@@ -24,7 +24,7 @@ export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
     }
 
     const isInLink = ancestorInlines.some((ancestor) => ancestor.type === 'link');
-    const sizes = await getImageSizes(size, src);
+    const sizes = await getImageSizes(context.contentContext, size, src);
 
     return (
         /* Ensure images dont expand to the size of the container where this Image may be nested in. Now it's always nested in a size-restricted container */
@@ -36,6 +36,7 @@ export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
             <Image
                 alt={inline.data.caption ?? ''}
                 sizes={sizes}
+                resize={context.contentContext?.imageResizer}
                 sources={{
                     light: {
                         src: src.href,
@@ -58,12 +59,14 @@ export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
     );
 }
 
-async function getImageSizes(size: 'original' | 'line', src: ResolvedContentRef) {
+async function getImageSizes(
+    context: GitBookBaseContext | undefined,
+    size: 'original' | 'line', src: ResolvedContentRef) {
     switch (size) {
         case 'line': {
             const imageSize =
                 src.file?.dimensions ??
-                (await getImageSize(src.href, {
+                (await context?.imageResizer.getImageSize(src.href, {
                     dpr: 3,
                 }));
             // We estimate that the maximum height of the line will be 40px
