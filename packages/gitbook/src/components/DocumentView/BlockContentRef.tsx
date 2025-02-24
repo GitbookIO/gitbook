@@ -1,11 +1,9 @@
 import { DocumentBlockContentRef, SiteInsightsLinkPosition } from '@gitbook/api';
 
 import { Card } from '@/components/primitives';
-import { getSpaceCustomization, ignoreAPIError } from '@/lib/api';
 import { resolveContentRef, ResolvedContentRef } from '@/lib/references';
 
 import { BlockProps } from './Block';
-import { SpaceIcon } from '../Space/SpaceIcon';
 
 export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>) {
     const { block, context, style } = props;
@@ -57,22 +55,8 @@ async function SpaceRefCard(
         return null;
     }
 
-    const { customization: spaceCustomization } = await getSpaceCustomization();
-    const customFavicon = spaceCustomization?.favicon;
-    const customEmoji = customFavicon && 'emoji' in customFavicon ? customFavicon.emoji : undefined;
-    const customIcon = customFavicon && 'icon' in customFavicon ? customFavicon.icon : undefined;
-
     return (
         <Card
-            leadingIcon={
-                <SpaceIcon
-                    icon={customIcon}
-                    emoji={customEmoji}
-                    alt=""
-                    sizes={[{ width: 24 }]}
-                    style={['object-contain', 'size-6']}
-                />
-            }
             href={resolved.href}
             title={resolved.text}
             postTitle={resolved.subText}

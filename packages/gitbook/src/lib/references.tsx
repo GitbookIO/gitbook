@@ -8,12 +8,12 @@ import React from 'react';
 
 import { PageIcon } from '@/components/PageIcon';
 
-import { ignoreAPIError, parseSpacesFromSiteSpaces } from './api';
+import { ignoreAPIError } from './api';
 import { getBlockById, getBlockTitle } from './document';
 import { getGitbookAppHref } from './links';
 import { resolvePageId } from './pages';
 import { ClassValue } from './tailwind';
-import { getSiteStructureSections } from './utils';
+import { findSiteSpaceById } from './sites';
 
 export interface ResolvedContentRef {
     /** Text to render in the content ref */
@@ -150,8 +150,8 @@ export async function resolveContentRef(
 
         case 'space': {
             const targetSpace =
-                contentRef.space === space.id
-                    ? space
+                contentRef.space === context.space.id
+                    ? { space: context.space, siteSpace: 'siteSpace' in context ? context.siteSpace : null }
                     : await getBestTargetSpace(context, contentRef.space);
 
             if (!targetSpace) {
@@ -163,8 +163,8 @@ export async function resolveContentRef(
             }
 
             return {
-                href: targetSpace.urls.published ?? targetSpace.urls.app,
-                text: targetSpace.title,
+                href: targetSpace.siteSpace?.urls.published ?? targetSpace.space.urls.published ?? targetSpace.space.urls.app,
+                text: targetSpace.siteSpace?.title ?? targetSpace.space.title,
                 active: contentRef.space === space.id,
             };
         }
@@ -236,7 +236,7 @@ export async function resolveContentRef(
 async function getBestTargetSpace(
     context: GitBookAnyContext,
     spaceId: string,
-): Promise<Space | undefined> {
+): Promise<{ space: Space; siteSpace: SiteSpace | null } | undefined> {
     const { dataFetcher } = context;
 
     const [fetchedSpace, publishedContentSite] = await Promise.all([
@@ -260,25 +260,14 @@ async function getBestTargetSpace(
     // In the context of sites, we try to find our target space in the site structure.
     // because the url of this space will be in the same site.
     if (publishedContentSite) {
-        const siteSpaces =
-            publishedContentSite.structure.type === 'siteSpaces'
-                ? publishedContentSite.structure.structure
-                : getSiteStructureSections(publishedContentSite.structure).reduce<SiteSpace[]>(
-                      (acc, section) => {
-                          acc.push(...section.siteSpaces);
-                          return acc;
-                      },
-                      [],
-                  );
-        const spaces = parseSpacesFromSiteSpaces(siteSpaces);
-        const foundSpace = spaces.find((space) => space.id === spaceId);
-        if (foundSpace) {
-            return foundSpace;
+        const siteSpace = findSiteSpaceById(publishedContentSite.structure, spaceId);
+        if (siteSpace) {
+            return { space: siteSpace.space, siteSpace };
         }
     }
 
     // Else we try return the fetched space from the API.
-    return fetchedSpace ?? undefined;
+    return fetchedSpace ? { space: fetchedSpace, siteSpace: null } : undefined;
 }
 
 async function resolveContentRefInSpace(
@@ -301,10 +290,10 @@ async function resolveContentRefInSpace(
         return null;
     }
 
-    const space = bestTargetSpace ?? spaceContext.space;
+    const space = bestTargetSpace?.space ?? spaceContext.space;
 
     // Resolve URLs relative to the space.
-    const baseURL = new URL(space.urls.published ?? space.urls.app);
+    const baseURL = new URL(bestTargetSpace?.siteSpace?.urls.published ?? space.urls.published ?? space.urls.app);
     const linker = createSpaceLinker({
         host: baseURL.host,
         pathname: baseURL.pathname,

@@ -13,6 +13,7 @@ import {
 } from '@gitbook/api';
 import { redirect } from 'next/navigation';
 import { assert } from 'ts-essentials';
+import { getSiteStructureSections } from '@/lib/sites';
 import { createDataFetcher, GitBookDataFetcher } from '@v2/lib/data';
 import { GitBookSpaceLinker, appendPrefixToLinker } from './links';
 
@@ -65,11 +66,23 @@ export type SiteSections = {
  */
 export type GitBookSiteContext = GitBookSpaceContext & {
     site: Site;
+
+    /** Current site space. */
     siteSpace: SiteSpace;
+
+    /** All site spaces in the current section / or entire site */
+    siteSpaces: SiteSpace[];
+
+    /** Sections of the site. */
     sections: null | SiteSections;
+
+    /** Customizations of the site. */
     customization: SiteCustomizationSettings;
+
+    /** Structure of the site. */
     structure: SiteStructure;
-    spaces: Space[];
+
+    /** Scripts to load for the site. */
     scripts: SiteIntegrationScript[];
 };
 
@@ -154,27 +167,17 @@ export async function fetchSiteContextByIds(
             fetchSpaceContextByIds(baseContext, ids),
         ]);
 
-    const siteSectionsAndGroups =
-        siteStructure.type === 'sections' && siteStructure.structure
-            ? siteStructure.structure
-            : null;
-
-    const siteSpaces =
-        siteStructure.type === 'siteSpaces' && siteStructure.structure
-            ? parseSpacesFromSiteSpaces(siteStructure.structure)
-            : null;
     // override the title with the customization title
+    // TODO: remove this hack once we have a proper way to handle site customizations
     const site = {
         ...orgSite,
         ...(customizations.site?.title ? { title: customizations.site.title } : {}),
     };
 
     const sections =
-        ids.siteSection && siteSectionsAndGroups
-            ? parseSiteSectionsList(ids.siteSection, siteSectionsAndGroups)
+        ids.siteSection
+            ? parseSiteSectionsList(siteStructure, ids.siteSection)
             : null;
-    const spaces =
-        siteSpaces ?? (sections ? parseSpacesFromSiteSpaces(sections.current.siteSpaces) : []);
 
     const siteSpace = (
         siteStructure.type === 'siteSpaces' && siteStructure.structure
@@ -184,6 +187,8 @@ export async function fetchSiteContextByIds(
     if (!siteSpace) {
         throw new Error('Site space not found');
     }
+
+    const siteSpaces = siteStructure.type === 'siteSpaces' ? siteStructure.structure : sections.current.siteSpaces;
 
     const customization = (() => {
         if (ids.siteSpace) {
@@ -199,19 +204,15 @@ export async function fetchSiteContextByIds(
         return customizations.site;
     })();
 
-    // we grab the space attached to the parent as it contains overriden customizations
-    const spaceRelativeToParent = spaces?.find((space) => space.id === ids.space);
-
     return {
         ...spaceContext,
         organizationId: ids.organization,
-        space: spaceRelativeToParent ?? spaceContext.space,
         site,
+        siteSpaces,
         siteSpace,
         customization,
         structure: siteStructure,
         sections,
-        spaces,
         scripts,
     };
 }
@@ -264,32 +265,12 @@ export async function fetchSpaceContextByIds(
     };
 }
 
-/**
- * Parse the site spaces into a list of spaces with their title and urls.
- */
-function parseSpacesFromSiteSpaces(siteSpaces: SiteSpace[]) {
-    const spaces: Record<string, Space> = {};
-    siteSpaces.forEach((siteSpace) => {
-        spaces[siteSpace.space.id] = {
-            ...siteSpace.space,
-            title: siteSpace.title ?? siteSpace.space.title,
-            urls: {
-                ...siteSpace.space.urls,
-                published: siteSpace.urls.published,
-            },
-        };
-    });
-    return Object.values(spaces);
-}
-
 function parseSiteSectionsList(
+    structure: SiteStructure,
     siteSectionId: string,
-    sectionsAndGroups: (SiteSectionGroup | SiteSection)[],
 ) {
-    const sections = sectionsAndGroups.flatMap((item) =>
-        item.object === 'site-section-group' ? item.sections : item,
-    );
+    const sections = getSiteStructureSections(structure);
     const section = sections.find((section) => section.id === siteSectionId);
     assert(section, 'A section must be defined when there are multiple sections');
-    return { list: sectionsAndGroups, current: section } satisfies SiteSections;
+    return { list: sections, current: section } satisfies SiteSections;
 }

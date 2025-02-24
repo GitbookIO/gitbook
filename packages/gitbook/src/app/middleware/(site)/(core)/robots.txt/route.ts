@@ -1,9 +1,9 @@
 import { NextRequest } from 'next/server';
 
-import { getSpace, getSite } from '@/lib/api';
+import { getSite } from '@/lib/api';
 import { getAbsoluteHref } from '@/lib/links';
 import { getSiteContentPointer } from '@/lib/pointer';
-import { isSpaceIndexable } from '@/lib/seo';
+import { isSiteIndexable } from '@/lib/seo';
 
 export const runtime = 'edge';
 
@@ -12,15 +12,12 @@ export const runtime = 'edge';
  */
 export async function GET(req: NextRequest) {
     const pointer = await getSiteContentPointer();
-    const [site, space] = await Promise.all([
-        getSite(pointer.organizationId, pointer.siteId),
-        getSpace(pointer.spaceId, pointer.siteShareKey),
-    ]);
+    const site = await getSite(pointer.organizationId, pointer.siteId);
 
     const lines = [
         `User-agent: *`,
         'Disallow: /~gitbook/',
-        ...((await isSpaceIndexable({ space, site }))
+        ...((await isSiteIndexable(site))
             ? [`Allow: /`, `Sitemap: ${await getAbsoluteHref(`/sitemap.xml`, true)}`]
             : [`Disallow: /`]),
     ];

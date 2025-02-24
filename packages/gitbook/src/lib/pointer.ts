@@ -3,7 +3,7 @@ import { headers } from 'next/headers';
 import { assert } from 'ts-essentials';
 
 import { SiteContentPointer, SpaceContentPointer } from './api';
-import { getSiteStructureSections } from './utils';
+import { getSiteStructureSections } from './sites';
 
 /**
  * Get the current site content pointer from the headers

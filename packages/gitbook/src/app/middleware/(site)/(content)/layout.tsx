@@ -13,8 +13,7 @@ import { assetsDomain } from '@/lib/assets';
 import { buildVersion } from '@/lib/build';
 import { getContentSecurityPolicyNonce } from '@/lib/csp';
 import { getAbsoluteHref, getBaseUrl } from '@/lib/links';
-import { isSpaceIndexable } from '@/lib/seo';
-import { getContentTitle } from '@/lib/utils';
+import { isSiteIndexable } from '@/lib/seo';
 
 import { ClientContexts } from './ClientContexts';
 import { RocketLoaderDetector } from './RocketLoaderDetector';
@@ -98,7 +97,7 @@ export async function generateMetadata(): Promise<Metadata> {
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
 
     return {
-        title: getContentTitle(space, customization, site),
+        title: site.title,
         generator: `GitBook (${buildVersion()})`,
         metadataBase: new URL(await getBaseUrl()),
         icons: {
@@ -119,7 +118,7 @@ export async function generateMetadata(): Promise<Metadata> {
                 },
             ],
         },
-        robots: (await isSpaceIndexable({ space, site })) ? 'index, follow' : 'noindex, nofollow',
+        robots: (await isSiteIndexable(site)) ? 'index, follow' : 'noindex, nofollow',
     };
 }
 

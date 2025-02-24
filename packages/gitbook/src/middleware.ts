@@ -32,8 +32,9 @@ import {
 } from '@/lib/visitor-token';
 
 import { joinPath } from './lib/paths';
-import { getDataFetcherV1 } from './lib/v1';
+import { getDataFetcherV1, getV1BaseContext } from './lib/v1';
 import { waitUntil } from './lib/waitUntil';
+import { fetchSiteContextByIds } from '@v2/lib/context';
 
 export const config = {
     matcher:
@@ -184,30 +185,18 @@ export async function middleware(request: NextRequest) {
             contextId,
         },
         async () => {
-            const [siteData] = await Promise.all([
-                'site' in resolved
-                    ? getSiteData({
-                          organizationId: resolved.organization,
-                          siteId: resolved.site,
-                          siteSectionId: resolved.siteSection,
-                          siteSpaceId: resolved.siteSpace,
-                          siteShareKey: resolved.shareKey,
-                      })
-                    : null,
-                // Start fetching everything as soon as possible, but do not block the middleware on it
-                // the cache will handle concurrent calls
-                waitUntil(
-                    getSpaceContentData(
-                        await getDataFetcherV1(),
-                        {
-                            spaceId: resolved.space,
-                            changeRequestId: resolved.changeRequest,
-                            revisionId: resolved.revision,
-                        },
-                        'site' in resolved ? resolved.shareKey : undefined,
-                    ),
-                ),
-            ]);
+            const siteData = 'site' in resolved
+                ? await fetchSiteContextByIds(await getV1BaseContext() ,{
+                    organization: resolved.organization,
+                    site: resolved.site,
+                    siteSection: resolved.siteSection,
+                    siteSpace: resolved.siteSpace,
+                    space: resolved.space,
+                    shareKey: resolved.shareKey,
+                    changeRequest: resolved.changeRequest,
+                    revision: resolved.revision,
+                    })
+                : null;
 
             const scripts = siteData?.scripts ?? [];
             return getContentSecurityPolicy(scripts, nonce);

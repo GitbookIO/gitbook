@@ -8,8 +8,7 @@ import { PageAside } from '@/components/PageAside';
 import { PageBody, PageCover } from '@/components/PageBody';
 import { getAbsoluteHref } from '@/lib/links';
 import { getPagePath, resolveFirstDocument } from '@/lib/pages';
-import { isSpaceIndexable, isPageIndexable } from '@/lib/seo';
-import { getContentTitle } from '@/lib/utils';
+import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 
 import { PageClientLayout } from './PageClientLayout';
 import { PagePathParams, fetchPageData, getPathnameParam, normalizePathname } from '../../fetch';
@@ -134,10 +133,10 @@ export async function generateMetadata({
     }
 
     const { page, ancestors } = pageTarget;
-    const { space, site, customization, pages } = context;
+    const { site, customization, pages } = context;
 
     return {
-        title: [page.title, getContentTitle(space, customization, site ?? null)]
+        title: [page.title, site.title]
             .filter(Boolean)
             .join(' | '),
         description: page.description ?? '',
@@ -152,8 +151,7 @@ export async function generateMetadata({
             ],
         },
         robots:
-            (await isSpaceIndexable({ space, site: site ?? null })) &&
-            isPageIndexable(ancestors, page)
+            (await isSiteIndexable(site)) && isPageIndexable(ancestors, page)
                 ? 'index, follow'
                 : 'noindex, nofollow',
     };

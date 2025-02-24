@@ -8,7 +8,6 @@ import React from 'react';
 import { googleFontsMap } from '@/fonts';
 import { getAbsoluteHref } from '@/lib/links';
 import { filterOutNullable } from '@/lib/typescript';
-import { getContentTitle } from '@/lib/utils';
 
 import { PageIdParams, fetchPageData } from '../../../../fetch';
 
@@ -68,7 +67,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<PageId
     // Compute all text to load only the necessary fonts
     const contentTitle = customization.header.logo
         ? ''
-        : getContentTitle(space, customization, site ?? null);
+        : site.title;
     const pageTitle = page
         ? page.title.length > 64
             ? page.title.slice(0, 64) + '...'

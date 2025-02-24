@@ -27,12 +27,12 @@ export async function SpaceLayout(props: {
     children: React.ReactNode;
 }) {
     const { context, children } = props;
-    const { space, customization, site, sections, spaces } = context;
+    const { space, siteSpace, customization, site, sections, siteSpaces } = context;
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
     const withSections = Boolean(sections && sections.list.length > 0);
-    const withVariants = Boolean(site && spaces.length > 1);
+    const isMultiVariants = Boolean(siteSpaces.length > 1);
     const headerOffset = {
         sectionsHeader: withSections,
         topHeader: withTopHeader,
@@ -86,7 +86,6 @@ export async function SpaceLayout(props: {
                             >
                                 <HeaderLogo
                                     site={site}
-                                    space={space}
                                     customization={customization}
                                 />
                             </div>
@@ -117,10 +116,10 @@ export async function SpaceLayout(props: {
                                     sections={sections}
                                 />
                             )}
-                            {withVariants && (
+                            {isMultiVariants && (
                                 <SpacesDropdown
-                                    space={space}
-                                    spaces={spaces}
+                                    siteSpace={siteSpace}
+                                    siteSpaces={siteSpaces}
                                     className={tcls('w-full')}
                                 />
                             )}
@@ -136,9 +135,9 @@ export async function SpaceLayout(props: {
             <React.Suspense fallback={null}>
                 <SearchModal
                     revisionId={context.revisionId}
-                    spaceTitle={customization.title ?? space.title}
+                    spaceTitle={siteSpace.title}
                     withAsk={customization.aiSearch.enabled}
-                    isMultiVariants={Boolean(site && spaces.length > 1)}
+                    isMultiVariants={isMultiVariants}
                     pointer={getSitePointerFromContext(context)}
                 />
             </React.Suspense>

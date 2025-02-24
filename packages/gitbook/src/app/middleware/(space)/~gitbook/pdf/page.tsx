@@ -21,7 +21,6 @@ import { TrademarkLink } from '@/components/TableOfContents/Trademark';
 import { PolymorphicComponentProp } from '@/components/utils/types';
 import { getSpaceLanguage } from '@/intl/server';
 import { tString } from '@/intl/translate';
-import { getSpace, getSpaceCustomization, getSiteData } from '@/lib/api';
 import { getPagePDFContainerId, getAbsoluteHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
@@ -30,7 +29,7 @@ import { defaultCustomizationForSpace } from '@/lib/utils';
 
 import './pdf.css';
 import { PageControlButtons } from './PageControlButtons';
-import { getSiteOrSpacePointerForPDF, getV1ContextForPDF } from './pointer';
+import { getV1ContextForPDF } from './pointer';
 import { PrintButton } from './PrintButton';
 
 const DEFAULT_LIMIT = 100;
@@ -39,14 +38,10 @@ export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
-    const pointer = await getSiteOrSpacePointerForPDF();
-    const [space, { customization }] = await Promise.all([
-        getSpace(pointer.spaceId, 'siteId' in pointer ? pointer.siteShareKey : undefined),
-        'siteId' in pointer ? getSiteData(pointer) : getSpaceCustomization(),
-    ]);
+    const context = await getV1ContextForPDF();
 
     return {
-        title: customization.title ?? space.title,
+        title: 'site' in context ? context.site.title : context.space.title,
         robots: 'noindex, nofollow',
     };
 }

@@ -1,11 +1,8 @@
 import {
-    Collection,
-    ContentVisibility,
     RevisionPageDocument,
     RevisionPageGroup,
     Site,
     SiteVisibility,
-    Space,
 } from '@gitbook/api';
 import { headers } from 'next/headers';
 
@@ -31,7 +28,7 @@ export function isPageIndexable(
 /**
  * Return true if a space should be indexed by search engines.
  */
-export async function isSpaceIndexable({ space, site }: { space: Space; site: Site | null }) {
+export async function isSiteIndexable(site: Site) {
     const headersList = await headers();
 
     if (
@@ -57,6 +54,6 @@ export async function isSpaceIndexable({ space, site }: { space: Space; site: Si
     return false;
 }
 
-function shouldIndexVisibility(visibility: ContentVisibility | SiteVisibility) {
-    return visibility === ContentVisibility.Public;
+function shouldIndexVisibility(visibility: SiteVisibility) {
+    return visibility === SiteVisibility.Public;
 }

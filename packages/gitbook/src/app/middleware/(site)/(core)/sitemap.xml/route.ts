@@ -6,7 +6,7 @@ import { getPublishedContentSite } from '@/lib/api';
 import { joinPath } from '@/lib/paths';
 import { checkIsRootPointer, getSiteContentPointer } from '@/lib/pointer';
 import { filterOutNullable } from '@/lib/typescript';
-import { getSiteStructureSections } from '@/lib/utils';
+import { getSiteStructureSections } from '@/lib/sites';
 
 export const runtime = 'edge';
 

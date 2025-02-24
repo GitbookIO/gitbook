@@ -1,22 +1,18 @@
 import {
-    CustomizationHeaderPreset,
     CustomizationSettings,
     Site,
     SiteCustomizationSettings,
-    Space,
 } from '@gitbook/api';
 
 import { Image } from '@/components/utils';
 import { getAbsoluteHref } from '@/lib/links';
 import { tcls } from '@/lib/tailwind';
-import { getContentTitle } from '@/lib/utils';
 
 import { Link } from '../primitives';
 import { SpaceIcon } from '../Space/SpaceIcon';
 
 interface HeaderLogoProps {
-    site: Site | null;
-    space: Space;
+    site: Site;
     customization: CustomizationSettings | SiteCustomizationSettings;
 }
 
@@ -78,7 +74,7 @@ export async function HeaderLogo(props: HeaderLogoProps) {
 }
 
 function LogoFallback(props: HeaderLogoProps) {
-    const { site, space, customization } = props;
+    const { site, customization } = props;
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : undefined;
     const customEmoji = 'emoji' in customization.favicon ? customization.favicon.emoji : undefined;
 
@@ -107,7 +103,7 @@ function LogoFallback(props: HeaderLogoProps) {
                     'theme-bold:text-header-link',
                 )}
             >
-                {getContentTitle(space, customization, site)}
+                {site.title}
             </div>
         </>
     );

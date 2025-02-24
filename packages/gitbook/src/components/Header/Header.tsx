@@ -19,8 +19,8 @@ import { HeaderMobileMenu } from './HeaderMobileMenu';
  */
 export function Header(props: { context: GitBookSiteContext; withTopHeader?: boolean }) {
     const { context, withTopHeader } = props;
-    const { site, space, spaces, sections, customization } = context;
-    const isMultiVariants = site && spaces.length > 1;
+    const { site, siteSpace, siteSpaces, sections, customization } = context;
+    const isMultiVariants = siteSpaces.length > 1;
 
     return (
         <header
@@ -89,14 +89,14 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                     'theme-bold:hover:bg-header-link/3',
                                 )}
                             />
-                            <HeaderLogo site={site} space={space} customization={customization} />
+                            <HeaderLogo site={site} customization={customization} />
                         </div>
 
                         {isMultiVariants && (
                             <div className="hidden page-no-toc:flex mr-auto">
                                 <SpacesDropdown
-                                    space={space}
-                                    spaces={spaces}
+                                    siteSpace={siteSpace}
+                                    siteSpaces={siteSpaces}
                                     className={`theme-bold:bg-header-link/2 theme-bold:text-header-link theme-bold:ring-header-link/4
                                             theme-bold:dark:bg-header-link/2 theme-bold:dark:text-header-link theme-bold:dark:ring-header-link/4 
                                             theme-bold:group-hover/dropdown:bg-header-link/3 theme-bold:group-hover/dropdown:text-header-link theme-bold:group-hover/dropdown:ring-header-link/6

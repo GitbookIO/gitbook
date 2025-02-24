@@ -5,7 +5,6 @@ import {
     SearchAIAnswer,
     SearchPageResult,
     SiteSpace,
-    SiteStructure,
     Space,
 } from '@gitbook/api';
 import * as React from 'react';
@@ -13,12 +12,14 @@ import { assert } from 'ts-essentials';
 
 import { streamResponse } from '@/lib/actions';
 import * as api from '@/lib/api';
-import { getAbsoluteHref, getPageHref } from '@/lib/links';
+import { getAbsoluteHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
 import { filterOutNullable } from '@/lib/typescript';
-import { getSiteStructureSections } from '@/lib/utils';
 
 import { DocumentView } from '../DocumentView';
+import { fetchV1ContextForSitePointer } from '@/lib/v1';
+import { GitBookSiteContext } from '@v2/lib/context';
+import { findSiteSpaceById } from '@/lib/sites';
 
 export type OrderedComputedResult = ComputedPageResult | ComputedSectionResult;
 
@@ -78,23 +79,19 @@ async function searchSiteContent(args: {
 
     const [searchResults, siteData] = await Promise.all([
         api.searchSiteContent(pointer.organizationId, pointer.siteId, query, scope, cacheBust),
-        needsStructure ? api.getSiteData(pointer) : null,
+        needsStructure ? fetchV1ContextForSitePointer(pointer) : null,
     ]);
     const siteStructure = siteData?.structure;
 
-    const siteSpaces = siteStructure ? extractSiteStructureSiteSpaces(siteStructure) : null;
-
-    if (siteSpaces) {
+    if (siteStructure) {
         // We are searching all of this Site's content
         return (
             await Promise.all(
                 searchResults.items.map(async (spaceItem) => {
-                    const siteSpace = siteSpaces.find(
-                        (siteSpace) => siteSpace.space.id === spaceItem.id,
-                    );
+                    const siteSpace = findSiteSpaceById(siteStructure, spaceItem.id);
 
                     return Promise.all(
-                        spaceItem.pages.map((item) => transformSitePageResult(item, siteSpace)),
+                        spaceItem.pages.map((item) => transformSitePageResult(item, siteSpace ?? undefined)),
                     );
                 }),
             )
@@ -159,10 +156,7 @@ export const streamAskQuestion = streamResponse(async function* ({
     question: string;
 }) {
     const { organizationId, siteId, siteSpaceId } = pointer;
-    const [apiCtx, siteData] = await Promise.all([api.api(), api.getSiteData(pointer)]);
-    const siteSpaces = siteData?.structure
-        ? extractSiteStructureSiteSpaces(siteData.structure)
-        : null;
+    const [apiCtx, context] = await Promise.all([api.api(), fetchV1ContextForSitePointer(pointer)]);
 
     const stream = apiCtx.client.orgs.streamAskInSite(
         organizationId,
@@ -198,7 +192,11 @@ export const streamAskQuestion = streamResponse(async function* ({
                 if (!spacePromises.has(source.space)) {
                     spacePromises.set(
                         source.space,
-                        api.getRevisionPages(source.space, source.revision, { metadata: false }),
+                        context.dataFetcher.getRevisionPages({
+                            spaceId: source.space,
+                            revisionId: source.revision,
+                            metadata: false,
+                        }),
                     );
                 }
 
@@ -220,7 +218,7 @@ export const streamAskQuestion = streamResponse(async function* ({
                 return map;
             }, new Map<string, RevisionPage[]>());
         });
-        yield await transformAnswer({ answer: chunk.answer, spacePages: pages, siteSpaces });
+        yield await transformAnswer(context, { answer: chunk.answer, spacePages: pages });
     }
 });
 
@@ -239,15 +237,16 @@ export const streamRecommendedQuestions = streamResponse(async function* (
     }
 });
 
-async function transformAnswer({
-    answer,
-    spacePages,
-    siteSpaces,
-}: {
-    answer: SearchAIAnswer;
-    spacePages: Map<string, RevisionPage[]>;
-    siteSpaces: SiteSpace[] | null;
-}): Promise<AskAnswerResult> {
+async function transformAnswer(
+    context: GitBookSiteContext,
+    {
+        answer,
+        spacePages,
+    }: {
+        answer: SearchAIAnswer;
+        spacePages: Map<string, RevisionPage[]>;
+    }
+): Promise<AskAnswerResult> {
     const sources = (
         await Promise.all(
             answer.sources.map(async (source) => {
@@ -267,13 +266,15 @@ async function transformAnswer({
                 }
 
                 // Find the siteSpace in case it is nested in a site section so we can resolve the URL appropriately
-                const spaceURL = siteSpaces?.find(
-                    (siteSpace) => siteSpace.space.id === source.space,
-                )?.urls.published;
+                const siteSpace = findSiteSpaceById(context.structure, source.space);
+                const spaceURL = siteSpace?.urls.published;
 
                 const href = spaceURL
                     ? await getURLWithSections(page.page.path, spaceURL)
-                    : await getPageHref(pages, page.page);
+                    : context.linker.toPathForPage({
+                          pages,
+                          page: page.page,
+                      });
 
                 return {
                     id: source.page,
@@ -364,24 +365,4 @@ async function getURLWithSections(path: string, spaceURL?: string) {
     } else {
         return getAbsoluteHref(path);
     }
-}
-
-/*
- * Gets all site spaces, in a site structure and overrides the title
- */
-function extractSiteStructureSiteSpaces(siteStructure: SiteStructure) {
-    return siteStructure.type === 'siteSpaces'
-        ? siteStructure.structure
-        : getSiteStructureSections(siteStructure).reduce<SiteSpace[]>((prev, section) => {
-              const sectionSiteSpaces = section.siteSpaces.map((siteSpace) => ({
-                  ...siteSpace,
-                  space: {
-                      ...siteSpace.space,
-                      title: section.title || siteSpace.space.title,
-                  },
-              }));
-
-              prev.push(...sectionSiteSpaces);
-              return prev;
-          }, []);
 }
