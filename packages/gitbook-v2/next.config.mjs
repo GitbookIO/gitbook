@@ -17,7 +17,7 @@ const nextConfig = {
         GITBOOK_ICONS_URL: process.env.GITBOOK_ICONS_URL,
         GITBOOK_ICONS_TOKEN: process.env.GITBOOK_ICONS_TOKEN,
         NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: process.env.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY,
-    }
+    },
 };
 
 export default nextConfig;
