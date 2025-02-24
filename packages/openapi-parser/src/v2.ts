@@ -1,21 +1,15 @@
 import { OpenAPIParseError } from './error';
-import { upgrade, type AnyApiDefinitionFormat } from '@scalar/openapi-parser';
+import { upgrade } from '@scalar/openapi-parser';
 import type { Filesystem, OpenAPIV3xDocument } from './types';
 import { createFileSystem } from './filesystem';
+import { ParseOpenAPIInput } from './parse';
 
 /**
  * Convert a Swagger 2.0 schema to an OpenAPI 3.0 schema.
  */
-export async function convertOpenAPIV2ToOpenAPIV3(input: {
-    /**
-     * The API definition to parse.
-     */
-    value: AnyApiDefinitionFormat;
-    /**
-     * The root URL of the specified OpenAPI document.
-     */
-    rootURL: string | null;
-}): Promise<Filesystem<OpenAPIV3xDocument>> {
+export async function convertOpenAPIV2ToOpenAPIV3(
+    input: ParseOpenAPIInput,
+): Promise<Filesystem<OpenAPIV3xDocument>> {
     const { value, rootURL } = input;
     try {
         const result = upgrade(value);

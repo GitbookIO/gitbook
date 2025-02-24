@@ -43,7 +43,7 @@ export const fetchURLs: (customConfiguration: {
             return true;
         },
         async get(value?: any) {
-            // Limit ht enumber of requests
+            // Limit the number of requests
             if (configuration?.limit !== false && numberOfRequests >= configuration?.limit) {
                 console.warn(
                     `[fetchUrls] Maximum number of requests reeached (${configuration?.limit}), skipping request`,
