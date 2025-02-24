@@ -14,9 +14,11 @@ import {
     getRevisionPages,
     getSpace,
     getUserById,
+    SiteContentPointer,
+    SpaceContentPointer,
 } from './api';
-import { getBasePath, getBaseUrl, getHost, getPagePDFContainerId } from './links';
-import { getPagePath } from './pages';
+import { getBasePath, getHost } from './links';
+import { fetchSiteContextByIds, fetchSpaceContextByIds, GitBookBaseContext } from '@v2/lib/context';
 
 /*
  * Code that will be used until the migration to v2 is complete.
@@ -93,5 +95,45 @@ export async function getLinkerV1(): Promise<GitBookSpaceLinker> {
     return createSpaceLinker({
         host: await getHost(),
         pathname: await getBasePath(),
+    });
+}
+
+/**
+ * Get the base context for the V1.
+ */
+export async function getV1BaseContext(): Promise<GitBookBaseContext> {
+    return {
+        linker: await getLinkerV1(),
+        dataFetcher: await getDataFetcherV1(),
+    }
+}
+
+/**
+ * Fetch the context for a site pointer.
+ */
+export async function fetchV1ContextForSitePointer(pointer: SiteContentPointer) {
+    const baseContext = await getV1BaseContext();
+    return fetchSiteContextByIds(baseContext, {
+        organization: pointer.organizationId,
+        site: pointer.siteId,
+        siteSection: pointer.siteSectionId,
+        siteSpace: pointer.siteSpaceId,
+        space: pointer.spaceId,
+        shareKey: pointer.siteShareKey,
+        changeRequest: pointer.changeRequestId,
+        revision: pointer.revisionId,
+    });
+}
+
+/**
+ * Fetch the context for a space pointer.
+ */
+export async function fetchV1ContextForSpacePointer(pointer: SpaceContentPointer) {
+    const baseContext = await getV1BaseContext();
+    return fetchSpaceContextByIds(baseContext, {
+        space: pointer.spaceId,
+        shareKey: undefined,
+        changeRequest: pointer.changeRequestId,
+        revision: pointer.revisionId,
     });
 }

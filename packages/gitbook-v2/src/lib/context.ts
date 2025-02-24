@@ -19,7 +19,7 @@ import { GitBookSpaceLinker, appendPrefixToLinker } from './links';
 /**
  * Generic context when rendering content.
  */
-export interface GitBookBaseContext {
+export type GitBookBaseContext = {
     /**
      * Data fetcher to fetch data from GitBook.
      */
@@ -39,7 +39,7 @@ export type GitBookAnyContext = GitBookSpaceContext | GitBookPageContext | GitBo
 /**
  * Context when rendering a space content.
  */
-export interface GitBookSpaceContext extends GitBookBaseContext {
+export type GitBookSpaceContext =  GitBookBaseContext & {
     organizationId: string;
 
     space: Space;
@@ -58,11 +58,11 @@ export interface GitBookSpaceContext extends GitBookBaseContext {
 /**
  * Context when rendering a page.
  */
-export interface GitBookPageContext extends GitBookSpaceContext {
+export type GitBookPageContext = GitBookSpaceContext & {
     page: RevisionPageDocument;
 }
 
-export interface SiteSections {
+export type SiteSections = {
     list: (SiteSectionGroup | SiteSection)[];
     current: SiteSection;
 }
@@ -70,7 +70,7 @@ export interface SiteSections {
 /**
  * Context when rendering a site.
  */
-export interface GitBookSiteContext extends GitBookSpaceContext {
+export type GitBookSiteContext = GitBookSpaceContext & {
     site: Site;
     sections: null | SiteSections;
     customization: SiteCustomizationSettings;
@@ -134,7 +134,7 @@ export async function fetchSiteContextByIds(
         organization: string;
         site: string;
         siteSection: string | undefined;
-        siteSpace: string;
+        siteSpace: string | undefined;
         space: string;
         shareKey: string | undefined;
         changeRequest: string | undefined;

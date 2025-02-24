@@ -22,7 +22,6 @@ import { tString } from '@/intl/translate';
 import {
     getSpace,
     getSpaceCustomization,
-    getSpaceContentData,
     getSiteData,
 } from '@/lib/api';
 import { getPagePDFContainerId, getAbsoluteHref } from '@/lib/links';
@@ -30,15 +29,15 @@ import { resolvePageId } from '@/lib/pages';
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { PDFSearchParams, getPDFSearchParams } from '@/lib/urls';
-import { getDataFetcherV1, getLinkerV1 } from '@/lib/v1';
 
 import './pdf.css';
 
 import { PageControlButtons } from './PageControlButtons';
-import { getSiteOrSpacePointerForPDF } from './pointer';
+import { getSiteOrSpacePointerForPDF, getV1ContextForPDF } from './pointer';
 import { PrintButton } from './PrintButton';
 import { getPageDocument } from '@v2/lib/data';
-import { GitBookAnyContext } from '@v2/lib/context';
+import { GitBookPageContext } from '@v2/lib/context';
+import { defaultCustomizationForSpace } from '@/lib/utils';
 
 const DEFAULT_LIMIT = 100;
 
@@ -64,9 +63,6 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PDFHTMLOutput(props: {
     searchParams: Promise<{ [key: string]: string }>;
 }) {
-    const pointer = await getSiteOrSpacePointerForPDF();
-    const dataFetcher = await getDataFetcherV1();
-
     const searchParams = new URLSearchParams(await props.searchParams);
     const pdfParams = getPDFSearchParams(new URLSearchParams(searchParams));
 
@@ -74,26 +70,21 @@ export default async function PDFHTMLOutput(props: {
     let currentPDFUrl = await getAbsoluteHref('~gitbook/pdf', true);
     currentPDFUrl += '?' + searchParams.toString();
 
-    // Load the content,
-    const [{ customization }, { space, contentTarget, pages: rootPages }] = await Promise.all([
-        'siteId' in pointer ? getSiteData(pointer) : getSpaceCustomization(),
-        getSpaceContentData(
-            dataFetcher,
-            pointer,
-            'siteId' in pointer ? pointer.siteShareKey : undefined,
-        ),
-    ]);
+    // Fetch the context
+    const context = await getV1ContextForPDF();
+
+    const customization = 'customization' in context ? context.customization : defaultCustomizationForSpace();
     const language = getSpaceLanguage(customization);
 
     // Compute the pages to render
-    const { pages, total } = selectPages(rootPages, pdfParams);
+    const { pages, total } = selectPages(context.pages, pdfParams);
     const pageIds = pages.map(
         ({ page }) => [page.id, getPagePDFContainerId(page)] as [string, string],
     );
 
-    const baseLinker = await getLinkerV1();
+    // Build a linker that create anchor links for the pages rendered in the PDF page.
     const linker: GitBookSpaceLinker = {
-        ...baseLinker,
+        ...context.linker,
         toPathForPage(input) {
             if (pages.some((p) => p.page.id === input.page.id)) {
                 return '#' + getPagePDFContainerId(input.page, input.anchor);
@@ -170,7 +161,7 @@ export default async function PDFHTMLOutput(props: {
                 trademark={
                     customization.trademark.enabled ? (
                         <TrademarkLink
-                            space={space}
+                            space={context.space}
                             customization={customization}
                             placement={SiteInsightsTrademarkPlacement.Pdf}
                         />
@@ -178,10 +169,10 @@ export default async function PDFHTMLOutput(props: {
                 }
             />
 
-            {pdfParams.only ? null : <PDFSpaceIntro space={space} customization={customization} />}
+            {pdfParams.only ? null : <PDFSpaceIntro space={context.space} customization={customization} />}
             {pages.map(({ page }) =>
                 page.type === 'group' ? (
-                    <PDFPageGroup key={page.id} space={space} page={page} />
+                    <PDFPageGroup key={page.id} space={context.space} page={page} />
                 ) : (
                     <React.Suspense
                         key={page.id}
@@ -192,16 +183,9 @@ export default async function PDFHTMLOutput(props: {
                         }
                     >
                         <PDFPageDocument
-                            space={space}
-                            page={page}
-                            refContext={{
-                                linker,
-                                dataFetcher,
-                                siteContext: 'siteId' in pointer ? pointer : null,
-                                space,
-                                revisionId: contentTarget.revisionId,
-                                pages: rootPages,
-                                page,
+                            context={{
+                                ...context,
+                                page
                             }}
                         />
                     </React.Suspense>
@@ -251,11 +235,10 @@ async function PDFPageGroup(props: { space: Space; page: RevisionPageGroup }) {
 }
 
 async function PDFPageDocument(props: {
-    space: Space;
-    page: RevisionPageDocument;
-    context: GitBookAnyContext;
+    context: GitBookPageContext;
 }) {
-    const { space, page, context } = props;
+    const { context } = props;
+    const { space, page } = context;
     const document = await getPageDocument(context.dataFetcher, space.id, page);
 
     return (
