@@ -25,7 +25,7 @@ export async function SiteLayout(props: {
     context: GitBookSiteContext;
     forcedTheme?: CustomizationThemeMode | null;
     withTracking: boolean;
-    children: React.ReactNode
+    children: React.ReactNode;
 }) {
     const { context, nonce, forcedTheme, withTracking, children } = props;
 
@@ -52,7 +52,9 @@ export async function SiteLayout(props: {
                     (customization.themes.toggeable ? undefined : customization.themes.default)
                 }
             >
-                <SpaceLayout context={context} withTracking={withTracking}>{children}</SpaceLayout>
+                <SpaceLayout context={context} withTracking={withTracking}>
+                    {children}
+                </SpaceLayout>
 
                 {scripts.length > 0 ? (
                     <>
@@ -77,9 +79,7 @@ export async function SiteLayout(props: {
     );
 }
 
-export async function generateSiteLayoutViewport(
-    context: GitBookSiteContext
-): Promise<Viewport> {
+export async function generateSiteLayoutViewport(context: GitBookSiteContext): Promise<Viewport> {
     const { customization } = context;
     return {
         colorScheme: customization.themes.toggeable
@@ -90,9 +90,7 @@ export async function generateSiteLayoutViewport(
     };
 }
 
-export async function generateSiteLayoutMetadata(
-    context: GitBookSiteContext
-): Promise<Metadata> {
+export async function generateSiteLayoutMetadata(context: GitBookSiteContext): Promise<Metadata> {
     const { site, customization } = context;
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
 

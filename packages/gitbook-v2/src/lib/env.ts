@@ -19,5 +19,5 @@ export const GITBOOK_USER_AGENT = process.env.GITBOOK_USER_AGENT ?? 'GitBook-Ope
  * This is used to disable tracking in development mode.
  */
 export const GITBOOK_DISABLE_TRACKING = Boolean(
-    !!process.env.GITBOOK_DISABLE_TRACKING || process.env.NODE_ENV !== 'production'
+    !!process.env.GITBOOK_DISABLE_TRACKING || process.env.NODE_ENV !== 'production',
 );

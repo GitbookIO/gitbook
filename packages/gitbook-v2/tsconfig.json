@@ -26,7 +26,14 @@
             "bun-types" // add Bun global
         ]
     },
-    "include": ["next-env.d.ts", ".next/types/**/*.ts", "**/*.ts", "**/*.tsx", "../gitbook/types/**/*.d.ts", "../gitbook/cf-env.d.ts"],
+    "include": [
+        "next-env.d.ts",
+        ".next/types/**/*.ts",
+        "**/*.ts",
+        "**/*.tsx",
+        "../gitbook/types/**/*.d.ts",
+        "../gitbook/cf-env.d.ts"
+    ],
     "exclude": [
         "node_modules",
         "packages/openapi-parser",

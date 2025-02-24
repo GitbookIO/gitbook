@@ -1,11 +1,11 @@
 import { CustomizationSettings, Site, SiteCustomizationSettings } from '@gitbook/api';
+import { GitBookSiteContext } from '@v2/lib/context';
 
 import { Image } from '@/components/utils';
 import { tcls } from '@/lib/tailwind';
 
 import { Link } from '../primitives';
 import { SpaceIcon } from '../Space/SpaceIcon';
-import { GitBookSiteContext } from '@v2/lib/context';
 
 interface HeaderLogoProps {
     context: GitBookSiteContext;

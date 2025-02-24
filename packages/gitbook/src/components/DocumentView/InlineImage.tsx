@@ -1,4 +1,5 @@
 import { DocumentInlineImage } from '@gitbook/api';
+import { GitBookBaseContext } from '@v2/lib/context';
 import assertNever from 'assert-never';
 
 import { resolveContentRef, ResolvedContentRef } from '@/lib/references';
@@ -6,7 +7,6 @@ import { tcls } from '@/lib/tailwind';
 
 import { InlineProps } from './Inline';
 import { Image } from '../utils';
-import { GitBookBaseContext } from '@v2/lib/context';
 
 export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
     const { inline, context, ancestorInlines } = props;
@@ -61,7 +61,9 @@ export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
 
 async function getImageSizes(
     context: GitBookBaseContext | undefined,
-    size: 'original' | 'line', src: ResolvedContentRef) {
+    size: 'original' | 'line',
+    src: ResolvedContentRef,
+) {
     switch (size) {
         case 'line': {
             const imageSize =

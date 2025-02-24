@@ -2,7 +2,11 @@ import { getThemeFromMiddleware } from '@v2/lib/middleware';
 import { Metadata, Viewport } from 'next';
 import React from 'react';
 
-import { generateSiteLayoutMetadata, generateSiteLayoutViewport, SiteLayout } from '@/components/SiteLayout';
+import {
+    generateSiteLayoutMetadata,
+    generateSiteLayoutViewport,
+    SiteLayout,
+} from '@/components/SiteLayout';
 import { getContentSecurityPolicyNonce } from '@/lib/csp';
 import { shouldTrackEvents } from '@/lib/tracking';
 
@@ -21,7 +25,16 @@ export default async function ContentLayout(props: { children: React.ReactNode }
     const context = await fetchContentData();
     const queryStringTheme = await getThemeFromMiddleware();
 
-    return <SiteLayout context={context} nonce={nonce} forcedTheme={queryStringTheme} withTracking={await shouldTrackEvents()}>{children}</SiteLayout>
+    return (
+        <SiteLayout
+            context={context}
+            nonce={nonce}
+            forcedTheme={queryStringTheme}
+            withTracking={await shouldTrackEvents()}
+        >
+            {children}
+        </SiteLayout>
+    );
 }
 
 export async function generateViewport(): Promise<Viewport> {

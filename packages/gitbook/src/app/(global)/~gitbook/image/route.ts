@@ -1,5 +1,3 @@
-import { NextRequest, NextResponse } from 'next/server';
-
 import {
     resizeImage,
     checkIsSizableImageURL,
@@ -10,6 +8,8 @@ import {
     verifyImageSignature,
     parseImageAPIURL,
 } from '@v2/lib/images';
+import { NextRequest, NextResponse } from 'next/server';
+
 import { getHost } from '@/lib/links';
 
 export const runtime = 'edge';
@@ -42,10 +42,13 @@ export async function GET(request: NextRequest) {
     }
 
     // Verify the signature
-    const verified = await verifyImageSignature({
-        url,
-        host: await getHost(),
-    }, { signature, version: signatureVersion });
+    const verified = await verifyImageSignature(
+        {
+            url,
+            host: await getHost(),
+        },
+        { signature, version: signatureVersion },
+    );
     if (!verified) {
         return new Response(`Invalid signature "${signature ?? ''}" for "${url}"`, { status: 400 });
     }

@@ -5,7 +5,9 @@ import {
     GitBookSiteContext,
 } from '@v2/lib/context';
 import type { GitBookDataFetcher } from '@v2/lib/data/types';
+import { createImageResizer } from '@v2/lib/images';
 import { createSpaceLinker } from '@v2/lib/links';
+import { headers } from 'next/headers';
 
 import {
     api,
@@ -26,8 +28,6 @@ import {
     SpaceContentPointer,
 } from './api';
 import { getBasePath, getHost } from './links';
-import { headers } from 'next/headers';
-import { createImageResizer } from '@v2/lib/images';
 
 /*
  * Code that will be used until the migration to v2 is complete.
@@ -149,7 +149,7 @@ export async function fetchV1ContextForSitePointer(pointer: SiteContentPointer) 
         shareKey: pointer.siteShareKey,
         changeRequest: pointer.changeRequestId,
         revision: pointer.revisionId,
-        visitorAuthToken: headersList.get('x-gitbook-visitor-token')
+        visitorAuthToken: headersList.get('x-gitbook-visitor-token'),
     });
 }
 

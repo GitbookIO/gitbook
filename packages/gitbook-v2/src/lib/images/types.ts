@@ -1,14 +1,13 @@
-
 export type GetImageSizeOptions = {
     dpr?: number;
-}
+};
 
 export type ResizeImageOptions = GetImageSizeOptions & {
     width?: number;
     height?: number;
     dpr?: number;
     quality?: number;
-}
+};
 
 interface ImageSize {
     width: number;

@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
+import { type ImageResizer, checkIsHttpURL } from '@v2/lib/images';
 import ReactDOM from 'react-dom';
 
-import  { type ImageResizer, checkIsHttpURL } from '@v2/lib/images';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { PolymorphicComponentProp } from './types';
@@ -200,7 +200,7 @@ async function ImagePictureSized(
         priority = 'normal',
         inline = false,
         zoom = false,
-        resize,
+        resize = false,
         preload = false,
         inlineStyle,
         ...rest

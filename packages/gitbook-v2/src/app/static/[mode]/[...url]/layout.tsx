@@ -20,7 +20,9 @@ export default async function RootLayout({
 
     return (
         <CustomizationRootLayout customization={context.customization}>
-            <SiteLayout nonce="TODO" context={context} withTracking={!GITBOOK_DISABLE_TRACKING}>{children}</SiteLayout>
+            <SiteLayout nonce="TODO" context={context} withTracking={!GITBOOK_DISABLE_TRACKING}>
+                {children}
+            </SiteLayout>
         </CustomizationRootLayout>
     );
 }

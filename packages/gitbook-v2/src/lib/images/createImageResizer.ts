@@ -1,6 +1,6 @@
 import 'server-only';
 
-import type { ImageResizer } from "./types";
+import type { ImageResizer } from './types';
 import { generateImageSignature, SignatureVersion } from './signatures';
 import { GitBookSpaceLinker } from '../links';
 
@@ -31,7 +31,10 @@ export interface CloudflareImageOptions {
 /**
  * Create an image resizer for a rendering context.
  */
-export function createImageResizer({ host, linker }: {
+export function createImageResizer({
+    host,
+    linker,
+}: {
     /** The linker to use to create URLs. */
     linker: GitBookSpaceLinker;
     /** The host name of the current site. */
@@ -47,7 +50,7 @@ export function createImageResizer({ host, linker }: {
                 signature: string;
                 version: SignatureVersion;
             } | null = null;
-        
+
             return async (options) => {
                 cachedSignature ??= await generateImageSignature({
                     host,
@@ -69,7 +72,7 @@ export function createImageResizer({ host, linker }: {
                 if (options.quality) {
                     url.searchParams.set('quality', options.quality.toString());
                 }
-        
+
                 url.searchParams.set('sign', cachedSignature.signature);
                 url.searchParams.set('sv', cachedSignature.version);
 

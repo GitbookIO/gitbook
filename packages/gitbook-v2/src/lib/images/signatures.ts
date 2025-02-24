@@ -63,7 +63,7 @@ const generateSignatureV2: SignFn = async (input) => {
         .filter(Boolean)
         .join(':');
     return fnv1a(all, { utf8Buffer: fnv1aUtf8Buffer }).toString(16);
-}
+};
 
 // Reused buffer for FNV-1a hashing in the v1 algorithm
 const fnv1aUtf8BufferV1 = new Uint8Array(512);
@@ -76,7 +76,7 @@ const fnv1aUtf8BufferV1 = new Uint8Array(512);
 const generateSignatureV1: SignFn = async (input) => {
     const all = [input.url, process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY].filter(Boolean).join(':');
     return fnv1a(all, { utf8Buffer: fnv1aUtf8BufferV1 }).toString(16);
-}
+};
 
 /**
  * Initial algorithm used to generate a signature for an image. It didn't use any versioning in the URL.
@@ -91,17 +91,16 @@ const generateSignatureV0: SignFn = async (input) => {
     const hashArray = Array.from(new Uint8Array(hash));
     const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
     return hashHex;
-}
+};
 
 /**
  * A mapping of signature versions to signature functions.
  */
-const IMAGE_SIGNATURE_FUNCTIONS: Record<SignatureVersion, SignFn> =
-    {
-        '0': generateSignatureV0,
-        '1': generateSignatureV1,
-        '2': generateSignatureV2,
-    };
+const IMAGE_SIGNATURE_FUNCTIONS: Record<SignatureVersion, SignFn> = {
+    '0': generateSignatureV0,
+    '1': generateSignatureV1,
+    '2': generateSignatureV2,
+};
 
 export function isSignatureVersion(input: string): input is SignatureVersion {
     return Object.keys(IMAGE_SIGNATURE_FUNCTIONS).includes(input);

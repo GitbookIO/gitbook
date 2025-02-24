@@ -1,5 +1,5 @@
-import { CustomizationThemeMode } from "@gitbook/api";
-import { headers } from "next/headers";
+import { CustomizationThemeMode } from '@gitbook/api';
+import { headers } from 'next/headers';
 
 enum MiddlewareHeaders {
     Theme = 'x-gitbook-theme',
