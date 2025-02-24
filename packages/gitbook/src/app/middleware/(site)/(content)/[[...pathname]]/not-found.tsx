@@ -1,16 +1,12 @@
 import { TrackPageViewEvent } from '@/components/Insights';
 import { getSpaceLanguage, t } from '@/intl/server';
-import { getSiteData, getSpaceContentData } from '@/lib/api';
 import { getSiteContentPointer } from '@/lib/pointer';
 import { tcls } from '@/lib/tailwind';
-import { getDataFetcherV1 } from '@/lib/v1';
+import { fetchV1ContextForSitePointer } from '@/lib/v1';
 
 export default async function NotFound() {
     const pointer = await getSiteContentPointer();
-    const [{ space }, { customization }] = await Promise.all([
-        getSpaceContentData(await getDataFetcherV1(), pointer, pointer.siteShareKey),
-        getSiteData(pointer),
-    ]);
+    const { space, customization } = await fetchV1ContextForSitePointer(pointer);
 
     const language = getSpaceLanguage(customization);
 
