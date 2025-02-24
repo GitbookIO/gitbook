@@ -174,10 +174,7 @@ export async function fetchSiteContextByIds(
         ...(customizations.site?.title ? { title: customizations.site.title } : {}),
     };
 
-    const sections =
-        ids.siteSection
-            ? parseSiteSectionsList(siteStructure, ids.siteSection)
-            : null;
+    const sections = ids.siteSection ? parseSiteSectionsList(siteStructure, ids.siteSection) : null;
 
     const siteSpace = (
         siteStructure.type === 'siteSpaces' && siteStructure.structure
@@ -188,7 +185,10 @@ export async function fetchSiteContextByIds(
         throw new Error('Site space not found');
     }
 
-    const siteSpaces = siteStructure.type === 'siteSpaces' ? siteStructure.structure : sections.current.siteSpaces;
+    const siteSpaces =
+        siteStructure.type === 'siteSpaces'
+            ? siteStructure.structure
+            : (sections?.current.siteSpaces ?? []);
 
     const customization = (() => {
         if (ids.siteSpace) {
@@ -265,10 +265,7 @@ export async function fetchSpaceContextByIds(
     };
 }
 
-function parseSiteSectionsList(
-    structure: SiteStructure,
-    siteSectionId: string,
-) {
+function parseSiteSectionsList(structure: SiteStructure, siteSectionId: string) {
     const sections = getSiteStructureSections(structure);
     const section = sections.find((section) => section.id === siteSectionId);
     assert(section, 'A section must be defined when there are multiple sections');

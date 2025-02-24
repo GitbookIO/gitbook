@@ -1,9 +1,4 @@
-import {
-    RevisionPageDocument,
-    RevisionPageGroup,
-    Site,
-    SiteVisibility,
-} from '@gitbook/api';
+import { RevisionPageDocument, RevisionPageGroup, Site, SiteVisibility } from '@gitbook/api';
 import { headers } from 'next/headers';
 
 /**

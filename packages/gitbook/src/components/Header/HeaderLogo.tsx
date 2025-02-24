@@ -1,8 +1,4 @@
-import {
-    CustomizationSettings,
-    Site,
-    SiteCustomizationSettings,
-} from '@gitbook/api';
+import { CustomizationSettings, Site, SiteCustomizationSettings } from '@gitbook/api';
 
 import { Image } from '@/components/utils';
 import { getAbsoluteHref } from '@/lib/links';

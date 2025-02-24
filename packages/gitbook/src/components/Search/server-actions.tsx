@@ -1,12 +1,7 @@
 'use server';
 
-import {
-    RevisionPage,
-    SearchAIAnswer,
-    SearchPageResult,
-    SiteSpace,
-    Space,
-} from '@gitbook/api';
+import { RevisionPage, SearchAIAnswer, SearchPageResult, SiteSpace, Space } from '@gitbook/api';
+import { GitBookSiteContext } from '@v2/lib/context';
 import * as React from 'react';
 import { assert } from 'ts-essentials';
 
@@ -14,12 +9,11 @@ import { streamResponse } from '@/lib/actions';
 import * as api from '@/lib/api';
 import { getAbsoluteHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
+import { findSiteSpaceById } from '@/lib/sites';
 import { filterOutNullable } from '@/lib/typescript';
+import { fetchV1ContextForSitePointer } from '@/lib/v1';
 
 import { DocumentView } from '../DocumentView';
-import { fetchV1ContextForSitePointer } from '@/lib/v1';
-import { GitBookSiteContext } from '@v2/lib/context';
-import { findSiteSpaceById } from '@/lib/sites';
 
 export type OrderedComputedResult = ComputedPageResult | ComputedSectionResult;
 
@@ -91,7 +85,9 @@ async function searchSiteContent(args: {
                     const siteSpace = findSiteSpaceById(siteStructure, spaceItem.id);
 
                     return Promise.all(
-                        spaceItem.pages.map((item) => transformSitePageResult(item, siteSpace ?? undefined)),
+                        spaceItem.pages.map((item) =>
+                            transformSitePageResult(item, siteSpace ?? undefined),
+                        ),
                     );
                 }),
             )
@@ -245,7 +241,7 @@ async function transformAnswer(
     }: {
         answer: SearchAIAnswer;
         spacePages: Map<string, RevisionPage[]>;
-    }
+    },
 ): Promise<AskAnswerResult> {
     const sources = (
         await Promise.all(

@@ -12,8 +12,8 @@ import { ignoreAPIError } from './api';
 import { getBlockById, getBlockTitle } from './document';
 import { getGitbookAppHref } from './links';
 import { resolvePageId } from './pages';
-import { ClassValue } from './tailwind';
 import { findSiteSpaceById } from './sites';
+import { ClassValue } from './tailwind';
 
 export interface ResolvedContentRef {
     /** Text to render in the content ref */
@@ -151,7 +151,10 @@ export async function resolveContentRef(
         case 'space': {
             const targetSpace =
                 contentRef.space === context.space.id
-                    ? { space: context.space, siteSpace: 'siteSpace' in context ? context.siteSpace : null }
+                    ? {
+                          space: context.space,
+                          siteSpace: 'siteSpace' in context ? context.siteSpace : null,
+                      }
                     : await getBestTargetSpace(context, contentRef.space);
 
             if (!targetSpace) {
@@ -163,7 +166,10 @@ export async function resolveContentRef(
             }
 
             return {
-                href: targetSpace.siteSpace?.urls.published ?? targetSpace.space.urls.published ?? targetSpace.space.urls.app,
+                href:
+                    targetSpace.siteSpace?.urls.published ??
+                    targetSpace.space.urls.published ??
+                    targetSpace.space.urls.app,
                 text: targetSpace.siteSpace?.title ?? targetSpace.space.title,
                 active: contentRef.space === space.id,
             };
@@ -293,7 +299,9 @@ async function resolveContentRefInSpace(
     const space = bestTargetSpace?.space ?? spaceContext.space;
 
     // Resolve URLs relative to the space.
-    const baseURL = new URL(bestTargetSpace?.siteSpace?.urls.published ?? space.urls.published ?? space.urls.app);
+    const baseURL = new URL(
+        bestTargetSpace?.siteSpace?.urls.published ?? space.urls.published ?? space.urls.app,
+    );
     const linker = createSpaceLinker({
         host: baseURL.host,
         pathname: baseURL.pathname,

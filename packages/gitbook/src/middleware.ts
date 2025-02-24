@@ -1,5 +1,6 @@
 import { ContentAPITokenPayload, CustomizationThemeMode, GitBookAPI } from '@gitbook/api';
 import { setTag, setContext } from '@sentry/nextjs';
+import { fetchSiteContextByIds } from '@v2/lib/context';
 import assertNever from 'assert-never';
 import jwt from 'jsonwebtoken';
 import type { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
@@ -11,12 +12,10 @@ import {
     getPublishedContentByUrl,
     api,
     getSpace,
-    getSpaceContentData,
     userAgent,
     withAPI,
     DEFAULT_API_ENDPOINT,
     getPublishedContentSite,
-    getSiteData,
     validateSerializedCustomization,
 } from '@/lib/api';
 import { race } from '@/lib/async';
@@ -32,9 +31,7 @@ import {
 } from '@/lib/visitor-token';
 
 import { joinPath } from './lib/paths';
-import { getDataFetcherV1, getV1BaseContext } from './lib/v1';
-import { waitUntil } from './lib/waitUntil';
-import { fetchSiteContextByIds } from '@v2/lib/context';
+import { getV1BaseContext } from './lib/v1';
 
 export const config = {
     matcher:
@@ -185,18 +182,19 @@ export async function middleware(request: NextRequest) {
             contextId,
         },
         async () => {
-            const siteData = 'site' in resolved
-                ? await fetchSiteContextByIds(await getV1BaseContext() ,{
-                    organization: resolved.organization,
-                    site: resolved.site,
-                    siteSection: resolved.siteSection,
-                    siteSpace: resolved.siteSpace,
-                    space: resolved.space,
-                    shareKey: resolved.shareKey,
-                    changeRequest: resolved.changeRequest,
-                    revision: resolved.revision,
-                    })
-                : null;
+            const siteData =
+                'site' in resolved
+                    ? await fetchSiteContextByIds(await getV1BaseContext(), {
+                          organization: resolved.organization,
+                          site: resolved.site,
+                          siteSection: resolved.siteSection,
+                          siteSpace: resolved.siteSpace,
+                          space: resolved.space,
+                          shareKey: resolved.shareKey,
+                          changeRequest: resolved.changeRequest,
+                          revision: resolved.revision,
+                      })
+                    : null;
 
             const scripts = siteData?.scripts ?? [];
             return getContentSecurityPolicy(scripts, nonce);

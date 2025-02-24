@@ -65,9 +65,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<PageId
     }
 
     // Compute all text to load only the necessary fonts
-    const contentTitle = customization.header.logo
-        ? ''
-        : site.title;
+    const contentTitle = customization.header.logo ? '' : site.title;
     const pageTitle = page
         ? page.title.length > 64
             ? page.title.slice(0, 64) + '...'

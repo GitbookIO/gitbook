@@ -1,4 +1,4 @@
-import { SiteSection, SiteSpace, SiteStructure } from "@gitbook/api";
+import { SiteSection, SiteSpace, SiteStructure } from '@gitbook/api';
 
 /**
  * Get all sections from a site structure.
@@ -37,7 +37,10 @@ export function findSiteSpaceById(siteStructure: SiteStructure, spaceId: string)
     }
 
     for (const section of siteStructure.structure) {
-        const siteSpace = section.object === 'site-section' ? findSiteSpaceByIdInSiteSpaces(section.siteSpaces, spaceId) : findSiteSpaceByIdInSections(section.sections, spaceId);
+        const siteSpace =
+            section.object === 'site-section'
+                ? findSiteSpaceByIdInSiteSpaces(section.siteSpaces, spaceId)
+                : findSiteSpaceByIdInSections(section.sections, spaceId);
         if (siteSpace) {
             return siteSpace;
         }
@@ -48,7 +51,8 @@ export function findSiteSpaceById(siteStructure: SiteStructure, spaceId: string)
 
 function findSiteSpaceByIdInSections(sections: SiteSection[], spaceId: string): SiteSpace | null {
     for (const section of sections) {
-        const siteSpace = section.siteSpaces.find((siteSpace) => siteSpace.space.id === spaceId) ?? null;
+        const siteSpace =
+            section.siteSpaces.find((siteSpace) => siteSpace.space.id === spaceId) ?? null;
         if (siteSpace) {
             return siteSpace;
         }

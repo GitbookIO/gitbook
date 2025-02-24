@@ -84,10 +84,7 @@ export async function SpaceLayout(props: {
                                     'dark:shadow-light/1',
                                 )}
                             >
-                                <HeaderLogo
-                                    site={site}
-                                    customization={customization}
-                                />
+                                <HeaderLogo site={site} customization={customization} />
                             </div>
                         )
                     }

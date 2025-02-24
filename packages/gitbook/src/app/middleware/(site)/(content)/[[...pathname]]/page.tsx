@@ -136,9 +136,7 @@ export async function generateMetadata({
     const { site, customization, pages } = context;
 
     return {
-        title: [page.title, site.title]
-            .filter(Boolean)
-            .join(' | '),
+        title: [page.title, site.title].filter(Boolean).join(' | '),
         description: page.description ?? '',
         alternates: {
             // Trim trailing slashes in canonical URL to match the redirect behavior

@@ -5,7 +5,11 @@ import { tcls } from '@/lib/tailwind';
 import { Dropdown, DropdownChevron, DropdownMenu } from './Dropdown';
 import { SpacesDropdownMenuItem } from './SpacesDropdownMenuItem';
 
-export function SpacesDropdown(props: { siteSpace: SiteSpace; siteSpaces: SiteSpace[]; className?: string }) {
+export function SpacesDropdown(props: {
+    siteSpace: SiteSpace;
+    siteSpaces: SiteSpace[];
+    className?: string;
+}) {
     const { siteSpace, siteSpaces, className } = props;
 
     return (

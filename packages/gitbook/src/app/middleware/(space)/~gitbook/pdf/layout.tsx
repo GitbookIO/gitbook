@@ -1,7 +1,7 @@
 import { CustomizationRootLayout } from '@/components/RootLayout';
+import { defaultCustomizationForSpace } from '@/lib/utils';
 
 import { getV1ContextForPDF } from './pointer';
-import { defaultCustomizationForSpace } from '@/lib/utils';
 
 /**
  * Layout to be used for the site root. It fetches the customization data for the
@@ -13,6 +13,12 @@ export default async function PDFRootLayout(props: { children: React.ReactNode }
     const context = await getV1ContextForPDF();
 
     return (
-        <CustomizationRootLayout customization={'customization' in context ? context.customization : defaultCustomizationForSpace()}>{children}</CustomizationRootLayout>
+        <CustomizationRootLayout
+            customization={
+                'customization' in context ? context.customization : defaultCustomizationForSpace()
+            }
+        >
+            {children}
+        </CustomizationRootLayout>
     );
 }
