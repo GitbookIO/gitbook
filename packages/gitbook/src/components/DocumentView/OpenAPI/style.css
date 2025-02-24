@@ -381,7 +381,7 @@
 
 /* Code Sample */
 .openapi-codesample {
-    @apply border rounded bg-tint border-tint-subtle;
+    @apply border rounded bg-tint-2 border-tint-subtle;
 }
 
 .openapi-codesample-header {
@@ -424,7 +424,7 @@
 } */
 
 .openapi-path-title em {
-    @apply not-italic text-primary font-medium;
+    @apply not-italic text-primary-subtle font-medium;
 }
 
 .openapi-path-separator {
@@ -437,7 +437,7 @@
 
 /* Response Example */
 .openapi-response-example {
-    @apply border rounded bg-tint border-tint-subtle;
+    @apply border rounded bg-tint-2 border-tint-subtle;
 }
 
 .openapi-response-example-empty {
@@ -506,11 +506,11 @@
 }
 
 .openapi-tabs-tab {
-    @apply hover:bg-primary-hover whitespace-nowrap font-mono font-normal tabular-nums hover:text-primary cursor-pointer transition-all relative text-[0.813rem] text-tint px-1 border border-transparent rounded;
+    @apply hover:bg-primary-hover whitespace-nowrap font-mono font-normal tabular-nums hover:text-primary-subtle cursor-pointer transition-all relative text-[0.813rem] text-tint px-1 border border-transparent rounded;
 }
 
 .openapi-tabs-tab[aria-selected='true'] {
-    @apply text-primary after:absolute after:-bottom-2 after:left-0 after:w-full after:h-px after:bg-primary-solid after:transition-all;
+    @apply text-primary-subtle after:absolute after:-bottom-2 after:left-0 after:w-full after:h-px after:bg-primary-solid after:transition-all;
 }
 
 .openapi-tabs-panel {
