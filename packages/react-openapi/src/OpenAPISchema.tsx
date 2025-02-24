@@ -59,6 +59,9 @@ export function OpenAPISchemaProperty(
                         context={context}
                     />
                 ))}
+                {parentCircularRef ? (
+                    <OpenAPISchemaCircularRef id={parentCircularRef} schema={schema} />
+                ) : null}
             </InteractiveSection>
         );
     }
@@ -75,6 +78,9 @@ export function OpenAPISchemaProperty(
                             context={context}
                         />
                     </OpenAPIDisclosure>
+                ) : null}
+                {parentCircularRef ? (
+                    <OpenAPISchemaCircularRef id={parentCircularRef} schema={schema} />
                 ) : null}
             </InteractiveSection>
         );
