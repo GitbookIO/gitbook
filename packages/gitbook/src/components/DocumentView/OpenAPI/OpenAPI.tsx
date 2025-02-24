@@ -1,4 +1,4 @@
-import { DocumentBlockOpenAPI } from '@gitbook/api';
+import { DocumentBlockOpenAPI, JSONDocument } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import { OpenAPIOperation } from '@gitbook/react-openapi';
 import React from 'react';
@@ -8,6 +8,7 @@ import { tcls } from '@/lib/tailwind';
 
 import { BlockProps } from '../Block';
 import { PlainCodeBlock } from '../CodeBlock';
+import { DocumentView } from '../DocumentView';
 import { Heading } from '../Heading';
 
 import './style.css';
@@ -57,7 +58,15 @@ async function OpenAPIBody(props: BlockProps<DocumentBlockOpenAPI>) {
                     chevronRight: <Icon icon="chevron-right" />,
                     plus: <Icon icon="plus" />,
                 },
-                CodeBlock: PlainCodeBlock,
+                renderCodeBlock: (codeProps) => <PlainCodeBlock {...codeProps} />,
+                renderDocument: (documentProps) => (
+                    <DocumentView
+                        document={documentProps.document as JSONDocument}
+                        context={props.context}
+                        style="space-y-6"
+                        blockStyle="max-w-full"
+                    />
+                ),
                 renderHeading: (headingProps) => (
                     <Heading
                         document={props.document}

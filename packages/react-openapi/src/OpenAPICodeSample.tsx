@@ -72,7 +72,10 @@ export function OpenAPICodeSample(props: {
     const autoCodeSamples = codeSampleGenerators.map((generator) => ({
         key: `default-${generator.id}`,
         label: generator.label,
-        body: <context.CodeBlock code={generator.generate(input)} syntax={generator.syntax} />,
+        body: context.renderCodeBlock({
+            code: generator.generate(input),
+            syntax: generator.syntax,
+        }),
     }));
 
     // Use custom samples if defined
@@ -95,7 +98,10 @@ export function OpenAPICodeSample(props: {
                 .map((sample) => ({
                     key: `redocly-${sample.lang}`,
                     label: sample.label,
-                    body: <context.CodeBlock code={sample.source} syntax={sample.lang} />,
+                    body: context.renderCodeBlock({
+                        code: sample.source,
+                        syntax: sample.lang,
+                    }),
                 }));
         }
     });

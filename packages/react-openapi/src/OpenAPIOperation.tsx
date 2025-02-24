@@ -7,6 +7,7 @@ import { OpenAPISpec } from './OpenAPISpec';
 import type { OpenAPIClientContext, OpenAPIContextProps, OpenAPIOperationData } from './types';
 import { OpenAPIPath } from './OpenAPIPath';
 import { resolveDescription } from './utils';
+import { OpenAPICustomOperationProperties, OpenAPIV3 } from '@gitbook/openapi-parser';
 
 /**
  * Display an interactive OpenAPI operation.
@@ -24,8 +25,6 @@ export function OpenAPIOperation(props: {
         icons: context.icons,
         blockKey: context.blockKey,
     };
-
-    const description = resolveDescription(operation);
 
     return (
         <div className={clsx('openapi-operation', className)}>
@@ -49,11 +48,7 @@ export function OpenAPIOperation(props: {
                             {`.`}
                         </div>
                     ) : null}
-                    {description ? (
-                        <div className="openapi-intro">
-                            <Markdown className="openapi-description" source={description} />
-                        </div>
-                    ) : null}
+                    <OpenAPIOperationDescription operation={operation} context={context} />
                     <OpenAPIPath data={data} context={context} />
                     <OpenAPISpec data={data} context={clientContext} />
                 </div>
@@ -64,6 +59,33 @@ export function OpenAPIOperation(props: {
                     </div>
                 </div>
             </div>
+        </div>
+    );
+}
+
+function OpenAPIOperationDescription(props: {
+    operation: OpenAPIV3.OperationObject<OpenAPICustomOperationProperties>;
+    context: OpenAPIContextProps;
+}) {
+    const { operation } = props;
+    if (operation['x-gitbook-description-document']) {
+        return (
+            <div className="openapi-intro">
+                {props.context.renderDocument({
+                    document: operation['x-gitbook-description-document'],
+                })}
+            </div>
+        );
+    }
+
+    const description = resolveDescription(operation);
+    if (!description) {
+        return null;
+    }
+
+    return (
+        <div className="openapi-intro">
+            <Markdown className="openapi-description" source={description} />
         </div>
     );
 }
