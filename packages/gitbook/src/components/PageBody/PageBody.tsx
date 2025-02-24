@@ -81,7 +81,7 @@ export function PageBody(props: {
                         />
                     </React.Suspense>
                 ) : (
-                    <PageBodyBlankslate page={page} rootPages={context.pages} context={context} />
+                    <PageBodyBlankslate page={page} context={context} />
                 )}
 
                 {page.layout.pagination && customization.pagination.enabled ? (

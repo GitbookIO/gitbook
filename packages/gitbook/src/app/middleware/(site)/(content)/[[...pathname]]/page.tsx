@@ -188,7 +188,10 @@ async function getPageDataWithFallback(args: {
     }
 
     return {
-        context,
+        context: {
+            ...context,
+            page: pageTarget?.page,
+        },
         pageTarget,
     };
 }

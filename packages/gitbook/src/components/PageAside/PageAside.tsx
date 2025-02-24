@@ -248,7 +248,7 @@ export async function PageAside(props: {
 async function PageAsideSections(props: { document: JSONDocument; context: GitBookSiteContext }) {
     const { document, context } = props;
 
-    const sections = await getDocumentSections(document, (ref) => resolveContentRef(ref, context));
+    const sections = await getDocumentSections(context, document);
 
     return sections.length > 1 ? <ScrollSectionsList sections={sections} /> : null;
 }

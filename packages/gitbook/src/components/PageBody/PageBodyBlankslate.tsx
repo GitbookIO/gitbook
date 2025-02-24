@@ -1,13 +1,8 @@
-import {
-    RevisionPage,
-    RevisionPageDocument,
-    RevisionPageType,
-    SiteInsightsLinkPosition,
-} from '@gitbook/api';
+import { RevisionPageDocument, RevisionPageType, SiteInsightsLinkPosition } from '@gitbook/api';
+import { GitBookAnyContext } from '@v2/lib/context';
 
 import { Card } from '@/components/primitives';
-import { getPageHref } from '@/lib/links';
-import { ContentRefContext, resolveContentRef } from '@/lib/references';
+import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { PageIcon } from '../PageIcon';
@@ -17,10 +12,9 @@ import { PageIcon } from '../PageIcon';
  */
 export async function PageBodyBlankslate(props: {
     page: RevisionPageDocument;
-    rootPages: RevisionPage[];
-    context: ContentRefContext;
+    context: GitBookAnyContext;
 }) {
-    const { page, rootPages, context } = props;
+    const { page, context } = props;
 
     const pages = page.pages.filter((child) =>
         child.type === RevisionPageType.Document ? !child.hidden : true,
@@ -59,7 +53,7 @@ export async function PageBodyBlankslate(props: {
                     />
                 );
             } else {
-                const href = await getPageHref(rootPages, child);
+                const href = context.linker.toPathForPage({ pages: context.pages, page: child });
                 return <Card key={child.id} title={child.title} leadingIcon={icon} href={href} />;
             }
         }),

@@ -30,7 +30,10 @@ export async function fetchPageData(params: PagePathParams | PageIdParams) {
     const pageTarget = await resolvePage(context, params);
 
     return {
-        context,
+        context: {
+            ...context,
+            page: pageTarget?.page,
+        },
         pageTarget,
     };
 }

@@ -34,7 +34,7 @@ export type GitBookBaseContext = {
 /**
  * Any context when rendering content.
  */
-export type GitBookAnyContext = GitBookSpaceContext | GitBookSiteContext;
+export type GitBookAnyContext = GitBookSpaceContext | GitBookSiteContext | GitBookPageContext;
 
 /**
  * Context when rendering a space content.
@@ -71,6 +71,13 @@ export type GitBookSiteContext = GitBookSpaceContext & {
     structure: SiteStructure;
     spaces: Space[];
     scripts: SiteIntegrationScript[];
+};
+
+/**
+ * Context when rendering a page.
+ */
+export type GitBookPageContext = (GitBookSpaceContext | GitBookSiteContext) & {
+    page: RevisionPageDocument;
 };
 
 /**
@@ -172,8 +179,11 @@ export async function fetchSiteContextByIds(
     const siteSpace = (
         siteStructure.type === 'siteSpaces' && siteStructure.structure
             ? siteStructure.structure
-            : sections.current.siteSpaces
-    ).find((siteSpace) => siteSpace.id === ids.siteSpace);
+            : sections?.current.siteSpaces
+    )?.find((siteSpace) => siteSpace.id === ids.siteSpace);
+    if (!siteSpace) {
+        throw new Error('Site space not found');
+    }
 
     const customization = (() => {
         if (ids.siteSpace) {

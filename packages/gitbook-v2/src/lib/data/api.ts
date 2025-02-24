@@ -19,7 +19,7 @@ interface DataFetcherInput {
     /**
      * API token.
      */
-    apiToken: string;
+    apiToken: string | null;
 }
 
 const commonInput: DataFetcherInput = {
@@ -442,7 +442,7 @@ async function getSiteRedirectBySource(
 function getAPI(input: DataFetcherInput) {
     const { apiEndpoint, apiToken } = input;
     const api = new GitBookAPI({
-        authToken: apiToken,
+        authToken: apiToken ?? undefined,
         endpoint: apiEndpoint,
         userAgent: GITBOOK_USER_AGENT,
     });

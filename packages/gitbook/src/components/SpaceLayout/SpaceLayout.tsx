@@ -27,7 +27,7 @@ export async function SpaceLayout(props: {
     children: React.ReactNode;
 }) {
     const { context, children } = props;
-    const { space, customization, pages, site, sections, spaces } = context;
+    const { space, customization, site, sections, spaces } = context;
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
@@ -57,15 +57,7 @@ export async function SpaceLayout(props: {
             visitorAuthToken={visitorAuthToken}
             {...getSitePointerFromContext(context)}
         >
-            <Header
-                withTopHeader={withTopHeader}
-                context={context}
-                space={space}
-                site={site}
-                spaces={spaces}
-                sections={sections}
-                customization={customization}
-            />
+            <Header withTopHeader={withTopHeader} context={context} />
             <div
                 className={tcls(
                     'flex',

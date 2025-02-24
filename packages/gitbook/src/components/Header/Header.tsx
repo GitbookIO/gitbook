@@ -1,11 +1,8 @@
-import { CustomizationSettings, Site, SiteCustomizationSettings, Space } from '@gitbook/api';
-import { CustomizationHeaderPreset } from '@gitbook/api';
+import { GitBookSiteContext } from '@v2/lib/context';
 import { Suspense } from 'react';
 
 import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '@/components/layout';
 import { t, getSpaceLanguage } from '@/intl/server';
-import type { SectionsList } from '@/lib/api';
-import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { HeaderLink } from './HeaderLink';
@@ -20,16 +17,9 @@ import { HeaderMobileMenu } from './HeaderMobileMenu';
 /**
  * Render the header for the space.
  */
-export function Header(props: {
-    space: Space;
-    site: Site | null;
-    spaces: Space[];
-    sections: SectionsList | null;
-    context: ContentRefContext;
-    customization: CustomizationSettings | SiteCustomizationSettings;
-    withTopHeader?: boolean;
-}) {
-    const { context, space, site, spaces, sections, customization, withTopHeader } = props;
+export function Header(props: { context: GitBookSiteContext; withTopHeader?: boolean }) {
+    const { context, withTopHeader } = props;
+    const { site, space, spaces, sections, customization } = context;
     const isMultiVariants = site && spaces.length > 1;
 
     return (
@@ -126,20 +116,12 @@ export function Header(props: {
                         {customization.header.links.length > 0 && (
                             <HeaderLinks>
                                 {customization.header.links.map((link, index) => {
-                                    return (
-                                        <HeaderLink
-                                            key={index}
-                                            link={link}
-                                            context={context}
-                                            customization={customization}
-                                        />
-                                    );
+                                    return <HeaderLink key={index} link={link} context={context} />;
                                 })}
                                 <HeaderLinkMore
                                     label={t(getSpaceLanguage(customization), 'more')}
                                     links={customization.header.links}
                                     context={context}
-                                    customization={customization}
                                 />
                             </HeaderLinks>
                         )}

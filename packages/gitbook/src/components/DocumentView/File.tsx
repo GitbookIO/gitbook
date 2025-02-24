@@ -1,6 +1,7 @@
 import { DocumentBlockFile, SiteInsightsLinkPosition } from '@gitbook/api';
 
 import { getSimplifiedContentType } from '@/lib/files';
+import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { BlockProps } from './Block';
