@@ -43,15 +43,13 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
             if (body) {
                 const bodyContent = BodyGenerators.getCurlBody(body, headers);
 
-                if (!bodyContent) {
-                    return '';
+                if (bodyContent) {
+                    body = bodyContent.body;
+                    headers = bodyContent.headers;
                 }
-
-                body = bodyContent.body;
-                headers = bodyContent.headers;
             }
 
-            if (headers) {
+            if (headers && Object.keys(headers).length > 0) {
                 Object.entries(headers).forEach(([key, value]) => {
                     lines.push(`--header '${key}: ${value}'`);
                 });
@@ -78,20 +76,18 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
             if (body) {
                 const lines = BodyGenerators.getJavaScriptBody(body, headers);
 
-                if (!lines) {
-                    return '';
+                if (lines) {
+                    // add the generated code to the top
+                    code += lines.code;
+                    body = lines.body;
+                    headers = lines.headers;
                 }
-
-                // add the generated code to the top
-                code += lines.code;
-                body = lines.body;
-                headers = lines.headers;
             }
 
             code += `const response = await fetch('${url}', {
     method: '${method.toUpperCase()}',\n`;
 
-            if (headers) {
+            if (headers && Object.keys(headers).length > 0) {
                 code += indent(`headers: ${stringifyOpenAPI(headers, null, 2)},\n`, 4);
             }
 
@@ -115,20 +111,18 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
             if (body) {
                 const lines = BodyGenerators.getPythonBody(body, headers);
 
-                if (!lines) {
-                    return '';
-                }
-
                 // add the generated code to the top
-                code += lines.code;
-                body = lines.body;
-                headers = lines.headers;
+                if (lines) {
+                    code += lines.code;
+                    body = lines.body;
+                    headers = lines.headers;
+                }
             }
 
             code += `response = requests.${method.toLowerCase()}(\n`;
             code += indent(`"${url}",\n`, 4);
 
-            if (headers) {
+            if (headers && Object.keys(headers).length > 0) {
                 code += indent(`headers=${stringifyOpenAPI(headers)},\n`, 4);
             }
 
