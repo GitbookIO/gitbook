@@ -5,15 +5,14 @@ import React from 'react';
 
 import { PageAside } from '@/components/PageAside';
 import { PageBody, PageCover } from '@/components/PageBody';
-import { PageHrefContext, getAbsoluteHref, getPageHref } from '@/lib/links';
+import { getAbsoluteHref } from '@/lib/links';
 import { getPagePath, resolveFirstDocument } from '@/lib/pages';
-import { ContentRefContext } from '@/lib/references';
 import { isSpaceIndexable, isPageIndexable } from '@/lib/seo';
 import { getContentTitle } from '@/lib/utils';
-import { getDataFetcherV1, getLinkerV1 } from '@/lib/v1';
 
 import { PageClientLayout } from './PageClientLayout';
 import { PagePathParams, fetchPageData, getPathnameParam, normalizePathname } from '../../fetch';
+import { getPageDocument } from '@v2/lib/data';
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
@@ -31,36 +30,33 @@ export default async function Page(props: {
     const searchParams = await rawSearchParams;
 
     const {
-        content: contentPointer,
-        contentTarget,
-        sections,
-        space,
-        site,
-        customization,
-        pages,
-        page,
-        ancestors,
-        document,
+        context,
+        pageTarget,
     } = await getPageDataWithFallback({
         pagePathParams: params,
         searchParams,
         redirectOnFallback: true,
     });
 
-    const linksContext: PageHrefContext = {};
     const rawPathname = getPathnameParam(params);
-    if (!page) {
+    if (!pageTarget) {
         const pathname = normalizePathname(rawPathname);
         if (pathname !== rawPathname) {
             // If the pathname was not normalized, redirect to the normalized version
             // before trying to resolve the page again
-            redirect(await getAbsoluteHref(pathname));
+            redirect(context.linker.toAbsoluteURL(pathname));
         } else {
             notFound();
         }
-    } else if (getPagePath(pages, page) !== rawPathname) {
-        redirect(await getPageHref(pages, page, linksContext));
+    } else if (getPagePath(context.pages, pageTarget.page) !== rawPathname) {
+        redirect(context.linker.toPathForPage({
+            pages: context.pages,
+            page: pageTarget.page,
+        }));
     }
+
+    const { customization,  sections } = context;
+    const { page, ancestors } = pageTarget;
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
     const withFullPageCover = !!(
@@ -70,43 +66,28 @@ export default async function Page(props: {
     );
     const withPageFeedback = customization.feedback.enabled;
 
-    const contentRefContext: ContentRefContext = {
-        dataFetcher: await getDataFetcherV1(),
-        linker: await getLinkerV1(),
-        siteContext: contentPointer,
-        space,
-        revisionId: contentTarget.revisionId,
-        pages,
-        page,
-    };
-
     const withSections = Boolean(sections && sections.list.length > 0);
     const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
+
+    const document = await getPageDocument(context.dataFetcher, context.space.id, page);
 
     return (
         <>
             {withFullPageCover && page.cover ? (
-                <PageCover as="full" page={page} cover={page.cover} context={contentRefContext} />
+                <PageCover as="full" page={page} cover={page.cover} context={context} />
             ) : null}
             {/* We use a flex row reverse to render the aside first because the page is streamed. */}
             <div className="flex flex-row-reverse justify-end grow">
                 <PageAside
-                    space={space}
-                    site={site}
-                    customization={customization}
                     page={page}
                     document={document}
                     withHeaderOffset={headerOffset}
                     withFullPageCover={withFullPageCover}
                     withPageFeedback={withPageFeedback}
-                    context={contentRefContext}
+                    context={context}
                 />
                 <PageBody
-                    space={space}
-                    pointer={contentPointer}
-                    contentTarget={contentTarget}
-                    customization={customization}
-                    context={contentRefContext}
+                    context={context}
                     page={page}
                     ancestors={ancestors}
                     document={document}
@@ -125,7 +106,9 @@ export async function generateViewport({
 }: {
     params: Promise<PagePathParams>;
 }): Promise<Viewport> {
-    const { customization } = await fetchPageData(await params);
+    const { context } = await fetchPageData(await params);
+    const { customization } = context;
+
     return {
         colorScheme: customization.themes.toggeable
             ? customization.themes.default === CustomizationThemeMode.Dark
@@ -142,14 +125,17 @@ export async function generateMetadata({
     params: Promise<PagePathParams>;
     searchParams: Promise<{ fallback?: string }>;
 }): Promise<Metadata> {
-    const { space, pages, page, customization, site, ancestors } = await getPageDataWithFallback({
+    const { context, pageTarget } = await getPageDataWithFallback({
         pagePathParams: await params,
         searchParams: await searchParams,
     });
 
-    if (!page) {
+    if (!pageTarget) {
         notFound();
     }
+
+    const { page, ancestors } = pageTarget;
+    const { space, site, customization, pages } = context;
 
     return {
         title: [page.title, getContentTitle(space, customization, site ?? null)]
@@ -184,23 +170,24 @@ async function getPageDataWithFallback(args: {
 }) {
     const { pagePathParams, searchParams, redirectOnFallback = false } = args;
 
-    const { pages, page: targetPage, ...otherPageData } = await fetchPageData(pagePathParams);
+    let { context, pageTarget } = await fetchPageData(pagePathParams);
 
-    let page = targetPage;
     const canFallback = !!searchParams.fallback;
-    if (!page && canFallback) {
-        const rootPage = resolveFirstDocument(pages, []);
+    if (!pageTarget && canFallback) {
+        const rootPage = resolveFirstDocument(context.pages, []);
 
         if (redirectOnFallback && rootPage?.page) {
-            redirect(await getPageHref(pages, rootPage?.page));
+            redirect(context.linker.toPathForPage({
+                pages: context.pages,
+                page: rootPage?.page,
+            }));
         }
 
-        page = rootPage?.page;
+        pageTarget = rootPage;
     }
 
     return {
-        ...otherPageData,
-        pages,
-        page,
+        context,
+        pageTarget,
     };
 }

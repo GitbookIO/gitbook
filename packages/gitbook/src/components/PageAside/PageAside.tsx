@@ -1,10 +1,7 @@
 import {
-    CustomizationSettings,
     JSONDocument,
     RevisionPageDocument,
-    Site,
     SiteAdsStatus,
-    SiteCustomizationSettings,
     SiteInsightsAdPlacement,
     Space,
 } from '@gitbook/api';
@@ -15,7 +12,7 @@ import urlJoin from 'url-join';
 import { t, getSpaceLanguage } from '@/intl/server';
 import { getDocumentSections } from '@/lib/document-sections';
 import { getAbsoluteHref } from '@/lib/links';
-import { ContentRefContext, resolveContentRef } from '@/lib/references';
+import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { getPDFUrlSearchParams } from '@/lib/urls';
 
@@ -23,22 +20,21 @@ import { ScrollSectionsList } from './ScrollSectionsList';
 import { Ad } from '../Ads';
 import { PageFeedbackForm } from '../PageFeedback';
 import { ThemeToggler } from '../ThemeToggler';
+import { GitBookSiteContext } from '@v2/lib/context';
 
 /**
  * Aside listing the headings in the document.
  */
 export async function PageAside(props: {
-    space: Space;
-    site: Site | undefined;
-    customization: CustomizationSettings | SiteCustomizationSettings;
     page: RevisionPageDocument;
     document: JSONDocument | null;
-    context: ContentRefContext;
+    context: GitBookSiteContext;
     withHeaderOffset: { sectionsHeader: boolean; topHeader: boolean };
     withFullPageCover: boolean;
     withPageFeedback: boolean;
 }) {
-    const { space, site, page, document, customization, withPageFeedback, context } = props;
+    const { page, document, withPageFeedback, context } = props;
+    const { customization, site, space } = context;
     const language = getSpaceLanguage(customization);
 
     const pdfHref = await getAbsoluteHref(
@@ -249,7 +245,7 @@ export async function PageAside(props: {
     );
 }
 
-async function PageAsideSections(props: { document: JSONDocument; context: ContentRefContext }) {
+async function PageAsideSections(props: { document: JSONDocument; context: GitBookSiteContext }) {
     const { document, context } = props;
 
     const sections = await getDocumentSections(document, (ref) => resolveContentRef(ref, context));

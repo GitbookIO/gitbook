@@ -10,15 +10,17 @@ import {
     getPublishedContentByUrl,
     getPublishedContentSite,
     getReusableContent,
+    getRevision,
     getRevisionFile,
     getRevisionPages,
+    getSiteRedirectBySource,
     getSpace,
     getUserById,
     SiteContentPointer,
     SpaceContentPointer,
 } from './api';
 import { getBasePath, getHost } from './links';
-import { fetchSiteContextByIds, fetchSpaceContextByIds, GitBookBaseContext } from '@v2/lib/context';
+import { fetchSiteContextByIds, fetchSpaceContextByIds, GitBookBaseContext, GitBookSiteContext } from '@v2/lib/context';
 
 /*
  * Code that will be used until the migration to v2 is complete.
@@ -60,6 +62,12 @@ export async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
             return getChangeRequest(params.spaceId, params.changeRequestId);
         },
 
+        getRevision(params) {
+            return getRevision(params.spaceId, params.revisionId, {
+                metadata: params.metadata,
+            });
+        },
+
         getRevisionFile(params) {
             return getRevisionFile(params.spaceId, params.revisionId, params.fileId);
         },
@@ -84,6 +92,10 @@ export async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
 
         getLatestOpenAPISpecVersionContent(params) {
             return getLatestOpenAPISpecVersionContent(params.organizationId, params.slug);
+        },
+
+        getSiteRedirectBySource(params) {
+            return getSiteRedirectBySource(params);
         },
     };
 }
@@ -136,4 +148,20 @@ export async function fetchV1ContextForSpacePointer(pointer: SpaceContentPointer
         changeRequest: pointer.changeRequestId,
         revision: pointer.revisionId,
     });
+}
+
+/**
+ * Get the site pointer (ids) from a site context.
+ */
+export function getSitePointerFromContext(context: GitBookSiteContext): SiteContentPointer {
+    return {
+        organizationId: context.organizationId,
+        siteId: context.site.id,
+        siteSectionId: context.sections?.current?.id,
+        siteSpaceId: context.siteSpace.id,
+        spaceId: context.space.id,
+        revisionId: context.revisionId,
+        changeRequestId: context.changeRequest?.id,
+        siteShareKey: context.shareKey,
+    }
 }

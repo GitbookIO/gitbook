@@ -1,25 +1,22 @@
 import {
     RevisionPage,
-    RevisionPageDocument,
-    RevisionPageGroup,
     RevisionPageType,
 } from '@gitbook/api';
 
-import { ContentRefContext } from '@/lib/references';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { PageDocumentItem } from './PageDocumentItem';
 import { PageGroupItem } from './PageGroupItem';
 import { PageLinkItem } from './PageLinkItem';
+import { GitBookSiteContext } from '@v2/lib/context';
 
 export function PagesList(props: {
+    context: GitBookSiteContext;
     rootPages: RevisionPage[];
     pages: RevisionPage[];
-    ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
-    context: ContentRefContext;
     style?: ClassValue;
 }) {
-    const { rootPages, pages, ancestors, context, style } = props;
+    const { rootPages, pages, context, style } = props;
 
     return (
         <ul className={tcls('flex', 'flex-col', 'gap-y-0.5', style)}>
@@ -44,7 +41,6 @@ export function PagesList(props: {
                             key={page.id}
                             rootPages={rootPages}
                             page={page}
-                            ancestors={ancestors}
                             context={context}
                         />
                     );
@@ -55,7 +51,6 @@ export function PagesList(props: {
                         key={page.id}
                         rootPages={rootPages}
                         page={page}
-                        ancestors={ancestors}
                         context={context}
                     />
                 );

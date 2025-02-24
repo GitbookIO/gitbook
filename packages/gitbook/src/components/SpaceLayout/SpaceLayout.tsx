@@ -1,13 +1,6 @@
 import {
     CustomizationHeaderPreset,
-    CustomizationSettings,
     CustomizationSidebarBackgroundStyle,
-    Revision,
-    RevisionPageDocument,
-    RevisionPageGroup,
-    Site,
-    SiteCustomizationSettings,
-    Space,
 } from '@gitbook/api';
 import React from 'react';
 
@@ -18,55 +11,31 @@ import { SearchButton, SearchModal } from '@/components/Search';
 import { TableOfContents } from '@/components/TableOfContents';
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
-import { api, ContentTarget, type SectionsList, SiteContentPointer } from '@/lib/api';
-import { ContentRefContext } from '@/lib/references';
+import { api } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 import { shouldTrackEvents } from '@/lib/tracking';
-import { getDataFetcherV1, getLinkerV1 } from '@/lib/v1';
+import { getSitePointerFromContext } from '@/lib/v1';
 import { getCurrentVisitorToken } from '@/lib/visitor-token';
 
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
 import { SiteSectionList } from '../SiteSections';
+import { GitBookSiteContext } from '@v2/lib/context';
 
 /**
- * Render the entire content of the space (header, table of contents, footer, and page content).
+ * Render the entire layout of the space (header, table of contents, footer).
  */
 export async function SpaceLayout(props: {
-    content: SiteContentPointer;
-    contentTarget: ContentTarget;
-    space: Space;
-    site: Site | null;
-    sections: SectionsList | null;
-    spaces: Space[];
-    customization: CustomizationSettings | SiteCustomizationSettings;
-    pages: Revision['pages'];
-    ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
+    context: GitBookSiteContext;
     children: React.ReactNode;
 }) {
     const {
-        space,
-        contentTarget,
-        site,
-        sections,
-        spaces,
-        content,
-        pages,
-        customization,
-        ancestors,
+        context,
         children,
     } = props;
+    const { space, customization, pages, site, sections, spaces } = context;
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
-
-    const contentRefContext: ContentRefContext = {
-        dataFetcher: await getDataFetcherV1(),
-        linker: await getLinkerV1(),
-        siteContext: content,
-        space,
-        revisionId: contentTarget.revisionId,
-        pages,
-    };
 
     const withSections = Boolean(sections && sections.list.length > 0);
     const withVariants = Boolean(site && spaces.length > 1);
@@ -92,15 +61,15 @@ export async function SpaceLayout(props: {
             enabled={enabled}
             apiHost={apiHost}
             visitorAuthToken={visitorAuthToken}
-            {...content}
+            {...getSitePointerFromContext(context)}
         >
             <Header
                 withTopHeader={withTopHeader}
+                context={context}
                 space={space}
                 site={site}
                 spaces={spaces}
                 sections={sections}
-                context={contentRefContext}
                 customization={customization}
             />
             <div
@@ -116,12 +85,7 @@ export async function SpaceLayout(props: {
                 )}
             >
                 <TableOfContents
-                    space={space}
-                    customization={customization}
-                    content={content}
-                    pages={pages}
-                    ancestors={ancestors}
-                    context={contentRefContext}
+                    context={context}
                     header={
                         withTopHeader ? null : (
                             <div
@@ -182,16 +146,16 @@ export async function SpaceLayout(props: {
             </div>
 
             {withFooter ? (
-                <Footer space={space} context={contentRefContext} customization={customization} />
+                <Footer context={context} />
             ) : null}
 
             <React.Suspense fallback={null}>
                 <SearchModal
-                    revisionId={contentTarget.revisionId}
+                    revisionId={context.revisionId}
                     spaceTitle={customization.title ?? space.title}
                     withAsk={customization.aiSearch.enabled}
                     isMultiVariants={Boolean(site && spaces.length > 1)}
-                    pointer={content}
+                    pointer={getSitePointerFromContext(context)}
                 />
             </React.Suspense>
         </InsightsProvider>

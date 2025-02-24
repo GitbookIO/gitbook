@@ -45,6 +45,21 @@ export function createDataFetcher(input: DataFetcherInput = commonInput): GitBoo
                 siteShareKey: params.siteShareKey,
             });
         },
+        getSiteRedirectBySource(params) {
+            return getSiteRedirectBySource(input, {
+                organizationId: params.organizationId,
+                siteId: params.siteId,
+                siteShareKey: params.siteShareKey,
+                source: params.source,
+            });
+        },
+        getRevision(params) {
+            return getRevision(input, {
+                spaceId: params.spaceId,
+                revisionId: params.revisionId,
+                metadata: params.metadata,
+            });
+        },
         getRevisionPages(params) {
             return getRevisionPages(input, {
                 spaceId: params.spaceId,
@@ -57,6 +72,13 @@ export function createDataFetcher(input: DataFetcherInput = commonInput): GitBoo
                 spaceId: params.spaceId,
                 revisionId: params.revisionId,
                 fileId: params.fileId,
+            });
+        },
+        getRevisionPageByPath(params) {
+            return getRevisionPageByPath(input, {
+                spaceId: params.spaceId,
+                revisionId: params.revisionId,
+                path: params.path,
             });
         },
         getReusableContent(params) {
@@ -171,6 +193,26 @@ async function getChangeRequest(
     }
 }
 
+async function getRevision(
+    input: DataFetcherInput,
+    params: {
+        spaceId: string;
+        revisionId: string;
+        metadata: boolean;
+    },
+) {
+    'use cache';
+
+    const res = await getAPI(input).spaces.getRevisionById(
+        params.spaceId,
+        params.revisionId,
+        {
+            metadata: params.metadata,
+        },
+    );
+    return res.data;
+}
+
 async function getRevisionPages(
     input: DataFetcherInput,
     params: {
@@ -216,6 +258,26 @@ async function getRevisionFile(
         throw error;
     }
 }
+
+async function getRevisionPageByPath(
+    input: DataFetcherInput,
+    params: {
+        spaceId: string;
+        revisionId: string;
+        path: string;
+    },
+) {
+    'use cache';
+
+    const res = await getAPI(input).spaces.getPageInRevisionByPath(
+        params.spaceId,
+        params.revisionId,
+        params.path,
+    );
+
+    return res.data;
+}
+
 
 async function getDocument(
     input: DataFetcherInput,
@@ -343,6 +405,43 @@ async function getPublishedContentSite(
         },
     );
     return res.data;
+}
+
+async function getSiteRedirectBySource(
+    input: DataFetcherInput,
+    params: {
+        organizationId: string;
+        siteId: string;
+        siteShareKey: string | undefined;
+        source: string;
+    },
+) {
+    'use cache';
+
+    try {
+        const res = await getAPI(input).orgs.getSiteRedirectBySource(
+            params.organizationId,
+            params.siteId,
+            {
+                shareKey: params.siteShareKey,
+                source: params.source,
+            },
+        );
+
+        return res.data;
+    } catch (error) {
+        // 422 is returned when the source is invalid
+        // we don't want to throw but just return null
+        if (checkHasErrorCode(error, 422)) {
+            return null;
+        }
+
+        if (checkHasErrorCode(error, 404)) {
+            return null;
+        }
+
+        throw error;
+    }
 }
 
 function getAPI(input: DataFetcherInput) {

@@ -1,16 +1,9 @@
-import { RevisionPage } from '@gitbook/api';
 import { redirect } from 'next/navigation';
 
-import {
-    getRevisionPageByPath,
-    getSpaceContentData,
-    getSiteData,
-    getSiteRedirectBySource,
-} from '@/lib/api';
 import { resolvePagePath, resolvePageId } from '@/lib/pages';
 import { getSiteContentPointer } from '@/lib/pointer';
-import { getDataFetcherV1 } from '@/lib/v1';
-import { getPageDocument } from '@v2/lib/data';
+import { fetchV1ContextForSitePointer } from '@/lib/v1';
+import { GitBookSiteContext } from '@v2/lib/context';
 
 export interface PagePathParams {
     pathname?: string[];
@@ -24,30 +17,8 @@ export interface PageIdParams {
  * Fetch all the data needed to render the content layout.
  */
 export async function fetchContentData() {
-    const content = await getSiteContentPointer();
-
-    const [{ space, contentTarget, pages }, { customization, site, sections, spaces, scripts }] =
-        await Promise.all([
-            getSpaceContentData(await getDataFetcherV1(), content, content.siteShareKey),
-            getSiteData(content),
-        ]);
-
-    // we grab the space attached to the parent as it contains overriden customizations
-    const spaceRelativeToParent = spaces?.find((space) => space.id === content.spaceId);
-
-    return {
-        content,
-        contentTarget,
-        space: spaceRelativeToParent ?? space,
-        pages,
-        site,
-        sections,
-        spaces,
-        shareKey: content.siteShareKey,
-        customization,
-        scripts,
-        ancestors: [],
-    };
+    const pointer = await getSiteContentPointer();
+    return fetchV1ContextForSitePointer(pointer);
 }
 
 /**
@@ -55,27 +26,12 @@ export async function fetchContentData() {
  * Optimized to fetch in parallel as much as possible.
  */
 export async function fetchPageData(params: PagePathParams | PageIdParams) {
-    const contentData = await fetchContentData();
-
-    const page = await resolvePage({
-        organizationId: contentData.space.organization,
-        siteId: contentData.site.id,
-        spaceId: contentData.contentTarget.spaceId,
-        revisionId: contentData.contentTarget.revisionId,
-        pages: contentData.pages,
-        shareKey: contentData.shareKey,
-        params,
-    });
-    const document = page ? await getPageDocument(
-        await getDataFetcherV1(),
-        contentData.space.id,
-        page.page
-    ) : null;
+    const context = await fetchContentData();
+    const pageTarget = await resolvePage(context, params);
 
     return {
-        ...contentData,
-        ...page,
-        document,
+        context,
+        pageTarget,
     };
 }
 
@@ -83,16 +39,11 @@ export async function fetchPageData(params: PagePathParams | PageIdParams) {
  * Resolve a page from the params.
  * If the path can't be found, we try to resolve it from the API to handle redirects.
  */
-async function resolvePage(input: {
-    organizationId: string;
-    siteId: string;
-    spaceId: string;
-    revisionId: string;
-    shareKey: string | undefined;
-    pages: RevisionPage[];
-    params: PagePathParams | PageIdParams;
-}) {
-    const { organizationId, siteId, spaceId, revisionId, pages, shareKey, params } = input;
+async function resolvePage(
+    context: GitBookSiteContext,
+    params: PagePathParams | PageIdParams
+) {
+    const { organizationId, site, space, revisionId, pages, shareKey } = context;
 
     if ('pageId' in params) {
         return resolvePageId(pages, params.pageId);
@@ -112,17 +63,21 @@ async function resolvePage(input: {
         // If page can't be found, we try with the API, in case we have a redirect at space level.
         // We use the raw pathname to handle special/malformed redirects setup by users in the GitSync.
         // The page rendering will take care of redirecting to a normalized pathname.
-        const resolved = await getRevisionPageByPath(spaceId, revisionId, rawPathname);
+        const resolved = await context.dataFetcher.getRevisionPageByPath({
+            spaceId: space.id,
+            revisionId,
+            path: rawPathname,
+        });
         if (resolved) {
             return resolvePageId(pages, resolved.id);
         }
 
         // If a page still can't be found, we try with the API, in case we have a redirect at site level.
-        const resolvedSiteRedirect = await getSiteRedirectBySource({
+        const resolvedSiteRedirect = await context.dataFetcher.getSiteRedirectBySource({
             organizationId,
-            siteId,
+            siteId: site.id,
             source: rawPathname.startsWith('/') ? rawPathname : `/${rawPathname}`,
-            siteShareKey: input.shareKey,
+            siteShareKey: shareKey,
         });
         if (resolvedSiteRedirect) {
             return redirect(resolvedSiteRedirect.target);

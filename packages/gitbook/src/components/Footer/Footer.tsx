@@ -1,23 +1,21 @@
-import { CustomizationSettings, SiteCustomizationSettings, Space } from '@gitbook/api';
 import React from 'react';
 
 import { Image } from '@/components/utils';
 import { partition } from '@/lib/arrays';
-import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { FooterLinksGroup } from './FooterLinksGroup';
 import { CONTAINER_STYLE } from '../layout';
 import { ThemeToggler } from '../ThemeToggler';
+import { GitBookSiteContext } from '@v2/lib/context';
 
 const FOOTER_COLUMNS = 4;
 
 export function Footer(props: {
-    space: Space;
-    context: ContentRefContext;
-    customization: CustomizationSettings | SiteCustomizationSettings;
+    context: GitBookSiteContext;
 }) {
-    const { context, customization } = props;
+    const { context } = props;
+    const { customization } = context;
 
     return (
         <>

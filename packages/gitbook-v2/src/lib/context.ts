@@ -34,7 +34,7 @@ export type GitBookBaseContext = {
 /**
  * Any context when rendering content.
  */
-export type GitBookAnyContext = GitBookSpaceContext | GitBookPageContext | GitBookSiteContext;
+export type GitBookAnyContext = GitBookSpaceContext | GitBookSiteContext;
 
 /**
  * Context when rendering a space content.
@@ -55,13 +55,6 @@ export type GitBookSpaceContext =  GitBookBaseContext & {
     shareKey: string | undefined;
 }
 
-/**
- * Context when rendering a page.
- */
-export type GitBookPageContext = GitBookSpaceContext & {
-    page: RevisionPageDocument;
-}
-
 export type SiteSections = {
     list: (SiteSectionGroup | SiteSection)[];
     current: SiteSection;
@@ -72,6 +65,7 @@ export type SiteSections = {
  */
 export type GitBookSiteContext = GitBookSpaceContext & {
     site: Site;
+    siteSpace: SiteSpace;
     sections: null | SiteSections;
     customization: SiteCustomizationSettings;
     structure: SiteStructure;
@@ -175,6 +169,10 @@ export async function fetchSiteContextByIds(
     const spaces =
         siteSpaces ?? (sections ? parseSpacesFromSiteSpaces(sections.current.siteSpaces) : []);
 
+    const siteSpace = (siteStructure.type === 'siteSpaces' && siteStructure.structure ?
+        siteStructure.structure : sections.current.siteSpaces).find((siteSpace) => siteSpace.id === ids.siteSpace)
+        
+
     const customization = (() => {
         if (ids.siteSpace) {
             const siteSpaceSettings = customizations.siteSpaces[ids.siteSpace];
@@ -189,10 +187,15 @@ export async function fetchSiteContextByIds(
         return customizations.site;
     })();
 
+    // we grab the space attached to the parent as it contains overriden customizations
+    const spaceRelativeToParent = spaces?.find((space) => space.id === ids.space);
+
     return {
         ...spaceContext,
         organizationId: ids.organization,
+        space: spaceRelativeToParent ?? spaceContext.space,
         site,
+        siteSpace,
         customization,
         structure: siteStructure,
         sections,

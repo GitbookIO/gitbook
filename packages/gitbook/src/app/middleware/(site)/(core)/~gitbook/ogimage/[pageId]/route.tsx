@@ -56,7 +56,9 @@ async function loadGoogleFont(input: { fontFamily: string; text: string; weight:
  * Render the OpenGraph image for a space.
  */
 export async function GET(req: NextRequest, { params }: { params: Promise<PageIdParams> }) {
-    const { space, page, customization, site } = await fetchPageData(await params);
+    const { context, pageTarget } = await fetchPageData(await params);
+    const { customization, site, space } = context;
+    const page = pageTarget?.page;
 
     // If user configured a custom social preview, we redirect to it.
     if (customization.socialPreview.url) {

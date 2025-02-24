@@ -1,14 +1,13 @@
 import {
     RevisionPage,
     RevisionPageDocument,
-    RevisionPageGroup,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
 
 import { getPageHref } from '@/lib/links';
 import { getPagePath, hasPageVisibleDescendant } from '@/lib/pages';
-import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
+import { GitBookSiteContext } from '@v2/lib/context';
 
 import { PagesList } from './PagesList';
 import { TOCPageIcon } from './TOCPageIcon';
@@ -17,10 +16,9 @@ import { ToggleableLinkItem } from './ToggleableLinkItem';
 export async function PageDocumentItem(props: {
     rootPages: RevisionPage[];
     page: RevisionPageDocument;
-    ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
-    context: ContentRefContext;
+    context: GitBookSiteContext;
 }) {
-    const { rootPages, page, ancestors, context } = props;
+    const { rootPages, page, context } = props;
     const href = await getPageHref(rootPages, page);
 
     return (
@@ -50,7 +48,6 @@ export async function PageDocumentItem(props: {
                                 'sidebar-list-default:border-l',
                                 'sidebar-list-line:border-l',
                             )}
-                            ancestors={ancestors}
                             context={context}
                         />
                     ) : null

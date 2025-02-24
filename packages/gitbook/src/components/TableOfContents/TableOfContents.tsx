@@ -1,29 +1,17 @@
 import {
-    CustomizationSettings,
-    Revision,
-    RevisionPageDocument,
-    RevisionPageGroup,
-    SiteCustomizationSettings,
     SiteInsightsTrademarkPlacement,
-    Space,
 } from '@gitbook/api';
 import React from 'react';
 
-import { SiteContentPointer } from '@/lib/api';
-import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { PagesList } from './PagesList';
 import { TOCScrollContainer } from './TOCScroller';
 import { Trademark } from './Trademark';
+import { GitBookSiteContext } from '@v2/lib/context';
 
 export function TableOfContents(props: {
-    space: Space;
-    customization: CustomizationSettings | SiteCustomizationSettings;
-    content: SiteContentPointer;
-    context: ContentRefContext;
-    pages: Revision['pages'];
-    ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
+    context: GitBookSiteContext;
     header?: React.ReactNode; // Displayed outside the scrollable TOC as a sticky header
     headerOffset: {
         sectionsHeader: boolean;
@@ -31,8 +19,9 @@ export function TableOfContents(props: {
     };
     innerHeader?: React.ReactNode; // Displayed outside the scrollable TOC, directly above the page list
 }) {
-    const { innerHeader, space, customization, pages, ancestors, header, context, headerOffset } =
+    const { innerHeader, context, header, headerOffset } =
         props;
+    const { space, customization, pages } = context;
 
     return (
         <aside // Sidebar container, responsible for setting the right dimensions and position for the sidebar.
@@ -118,7 +107,6 @@ export function TableOfContents(props: {
                     <PagesList
                         rootPages={pages}
                         pages={pages}
-                        ancestors={ancestors}
                         context={context}
                         style={tcls('sidebar-list-line:border-l', 'border-tint-subtle')}
                     />

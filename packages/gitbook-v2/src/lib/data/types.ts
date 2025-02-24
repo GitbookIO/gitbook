@@ -47,6 +47,15 @@ export interface GitBookDataFetcher {
     }): Promise<api.ChangeRequest | null>;
 
     /**
+     * Get the revision by its space ID and revision ID.
+     */
+    getRevision(params: {
+        spaceId: string;
+        revisionId: string;
+        metadata: boolean;
+    }): Promise<api.Revision>;
+
+    /**
      * Get the revision pages by its space ID and revision ID.
      */
     getRevisionPages(params: {
@@ -63,6 +72,15 @@ export interface GitBookDataFetcher {
         revisionId: string;
         fileId: string;
     }): Promise<api.RevisionFile | null>;
+
+    /**
+     * Get a revision page by its path.
+     */
+    getRevisionPageByPath(params: {
+        spaceId: string;
+        revisionId: string;
+        path: string;
+    }): Promise<api.RevisionPageDocument | api.RevisionPageGroup | null>;
 
     /**
      * Get a document by its space ID and document ID.
@@ -96,4 +114,14 @@ export interface GitBookDataFetcher {
         organizationId: string;
         slug: string;
     }): Promise<api.OpenAPISpecContent | null>;
+
+    /**
+     * Get a site redirect by its source path.
+     */
+    getSiteRedirectBySource(params: {
+        organizationId: string;
+        siteId: string;
+        siteShareKey: string | undefined;
+        source: string;
+    }): Promise<{ redirect: api.SiteRedirect | null, target: string } | null>;
 }

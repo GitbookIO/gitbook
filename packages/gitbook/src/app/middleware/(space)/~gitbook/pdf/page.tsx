@@ -26,7 +26,6 @@ import {
 } from '@/lib/api';
 import { getPagePDFContainerId, getAbsoluteHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
-import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { PDFSearchParams, getPDFSearchParams } from '@/lib/urls';
 
@@ -36,7 +35,7 @@ import { PageControlButtons } from './PageControlButtons';
 import { getSiteOrSpacePointerForPDF, getV1ContextForPDF } from './pointer';
 import { PrintButton } from './PrintButton';
 import { getPageDocument } from '@v2/lib/data';
-import { GitBookPageContext } from '@v2/lib/context';
+import { GitBookSpaceContext } from '@v2/lib/context';
 import { defaultCustomizationForSpace } from '@/lib/utils';
 
 const DEFAULT_LIMIT = 100;
@@ -71,20 +70,20 @@ export default async function PDFHTMLOutput(props: {
     currentPDFUrl += '?' + searchParams.toString();
 
     // Fetch the context
-    const context = await getV1ContextForPDF();
+    const baseContext = await getV1ContextForPDF();
 
-    const customization = 'customization' in context ? context.customization : defaultCustomizationForSpace();
+    const customization = 'customization' in baseContext ? baseContext.customization : defaultCustomizationForSpace();
     const language = getSpaceLanguage(customization);
 
     // Compute the pages to render
-    const { pages, total } = selectPages(context.pages, pdfParams);
+    const { pages, total } = selectPages(baseContext.pages, pdfParams);
     const pageIds = pages.map(
         ({ page }) => [page.id, getPagePDFContainerId(page)] as [string, string],
     );
 
     // Build a linker that create anchor links for the pages rendered in the PDF page.
     const linker: GitBookSpaceLinker = {
-        ...context.linker,
+        ...baseContext.linker,
         toPathForPage(input) {
             if (pages.some((p) => p.page.id === input.page.id)) {
                 return '#' + getPagePDFContainerId(input.page, input.anchor);
@@ -99,13 +98,18 @@ export default async function PDFHTMLOutput(props: {
         },
     };
 
+    const context: GitBookSpaceContext = {
+        ...baseContext,
+        linker,
+    };
+
     return (
         <div className="print-mode">
             {pdfParams.back !== 'false' ? (
                 <div className={tcls('fixed', 'left-12', 'top-12', 'print:hidden', 'z-50')}>
                     <a
                         title={tString(language, 'pdf_goback')}
-                        href={pdfParams.back ?? (await getAbsoluteHref(''))}
+                        href={pdfParams.back ?? context.linker.toAbsoluteURL('')}
                         className={tcls(
                             'flex',
                             'flex-row',
@@ -183,10 +187,8 @@ export default async function PDFHTMLOutput(props: {
                         }
                     >
                         <PDFPageDocument
-                            context={{
-                                ...context,
-                                page
-                            }}
+                            page={page}
+                            context={context}
                         />
                     </React.Suspense>
                 ),
@@ -235,10 +237,11 @@ async function PDFPageGroup(props: { space: Space; page: RevisionPageGroup }) {
 }
 
 async function PDFPageDocument(props: {
-    context: GitBookPageContext;
+    page: RevisionPageDocument;
+    context: GitBookSpaceContext;
 }) {
-    const { context } = props;
-    const { space, page } = context;
+    const { page, context } = props;
+    const { space } = context;
     const document = await getPageDocument(context.dataFetcher, space.id, page);
 
     return (
@@ -255,7 +258,10 @@ async function PDFPageDocument(props: {
                     blockStyle={['max-w-full']}
                     context={{
                         mode: 'print',
-                        contentContext: context,
+                        contentContext: {
+                            ...context,
+                            page,
+                        },
                         getId: (id) => getPagePDFContainerId(page, id),
                     }}
                 />

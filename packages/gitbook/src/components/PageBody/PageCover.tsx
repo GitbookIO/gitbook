@@ -1,10 +1,11 @@
 import { RevisionPageDocument, RevisionPageDocumentCover } from '@gitbook/api';
 
 import { Image, ImageSize } from '@/components/utils';
-import { ContentRefContext, resolveContentRef } from '@/lib/references';
+import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import defaultPageCover from './default-page-cover.svg';
+import { GitBookSiteContext } from '@v2/lib/context';
 
 const PAGE_COVER_SIZE: ImageSize = { width: 1990, height: 480 };
 
@@ -15,7 +16,7 @@ export async function PageCover(props: {
     as: 'hero' | 'full';
     page: RevisionPageDocument;
     cover: RevisionPageDocumentCover;
-    context: ContentRefContext;
+    context: GitBookSiteContext;
 }) {
     const { as, page, cover, context } = props;
     const resolved = cover.ref ? await resolveContentRef(cover.ref, context) : null;

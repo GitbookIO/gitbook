@@ -9,7 +9,6 @@ import { AdminToolbar } from '@/components/AdminToolbar';
 import { CookiesToast } from '@/components/Cookies';
 import { LoadIntegrations } from '@/components/Integrations';
 import { SpaceLayout } from '@/components/SpaceLayout';
-import { api } from '@/lib/api';
 import { assetsDomain } from '@/lib/assets';
 import { buildVersion } from '@/lib/build';
 import { getContentSecurityPolicyNonce } from '@/lib/csp';
@@ -31,21 +30,11 @@ export default async function ContentLayout(props: { children: React.ReactNode }
     const { children } = props;
 
     const nonce = await getContentSecurityPolicyNonce();
-    const {
-        content,
-        space,
-        contentTarget,
-        customization,
-        pages,
-        site,
-        spaces,
-        ancestors,
-        scripts,
-        sections,
-    } = await fetchContentData();
+    const context = await fetchContentData();
 
-    const apiCtx = await api();
-    ReactDOM.preconnect(apiCtx.client.endpoint);
+    const { scripts, customization } = context;
+
+    ReactDOM.preconnect(context.dataFetcher.apiEndpoint);
     if (assetsDomain) {
         ReactDOM.preconnect(assetsDomain);
     }
@@ -69,15 +58,7 @@ export default async function ContentLayout(props: { children: React.ReactNode }
                 }
             >
                 <SpaceLayout
-                    space={space}
-                    contentTarget={contentTarget}
-                    site={site}
-                    spaces={spaces}
-                    sections={sections}
-                    customization={customization}
-                    pages={pages}
-                    ancestors={ancestors}
-                    content={content}
+                    context={context}
                 >
                     {children}
                 </SpaceLayout>
@@ -99,7 +80,7 @@ export default async function ContentLayout(props: { children: React.ReactNode }
 
                 <RocketLoaderDetector nonce={nonce} />
 
-                <AdminToolbar space={space} content={content} />
+                <AdminToolbar context={context} />
             </ClientContexts>
         </NuqsAdapter>
     );
