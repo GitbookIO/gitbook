@@ -65,6 +65,22 @@ export interface GitBookDataFetcher {
     }): Promise<api.RevisionFile | null>;
 
     /**
+     * Get a document by its space ID and document ID.
+     */
+    getDocument(params: {   
+        spaceId: string;
+        documentId: string;
+    }): Promise<api.JSONDocument>;
+
+    /**
+     * Get a computed document by its space ID and computed source.
+     */
+    getComputedDocument(params: {
+        spaceId: string;
+        source: api.ComputedContentSource;
+    }): Promise<api.JSONDocument>;
+
+    /**
      * Get a reusable content by its space ID, revision ID and reusable content ID.
      */
     getReusableContent(params: {

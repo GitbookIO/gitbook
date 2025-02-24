@@ -6,11 +6,11 @@ import {
     getSpaceContentData,
     getSiteData,
     getSiteRedirectBySource,
-    getPageDocument,
 } from '@/lib/api';
 import { resolvePagePath, resolvePageId } from '@/lib/pages';
 import { getSiteContentPointer } from '@/lib/pointer';
 import { getDataFetcherV1 } from '@/lib/v1';
+import { getPageDocument } from '@v2/lib/data';
 
 export interface PagePathParams {
     pathname?: string[];
@@ -66,7 +66,11 @@ export async function fetchPageData(params: PagePathParams | PageIdParams) {
         shareKey: contentData.shareKey,
         params,
     });
-    const document = page ? await getPageDocument(contentData.space.id, page.page) : null;
+    const document = page ? await getPageDocument(
+        await getDataFetcherV1(),
+        contentData.space.id,
+        page.page
+    ) : null;
 
     return {
         ...contentData,

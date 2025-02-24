@@ -752,19 +752,6 @@ export const getComputedDocument = cache({
 });
 
 /**
- * Get the document for a page.
- */
-export async function getPageDocument(spaceId: string, page: RevisionPageDocument) {
-    if (page.documentId) {
-        return getDocument(spaceId, page.documentId);
-    } else if (page.computed) {
-        return getComputedDocument(spaceId, page.computed);
-    }
-
-    return null;
-}
-
-/**
  * Mimic the validation done on source server-side to reduce API usage.
  */
 function validateSiteRedirectSource(source: string) {
@@ -1029,6 +1016,8 @@ export async function getSpaceCustomization(): Promise<{
  * Fetch all the content data about a space at once.
  * This function executes the requests in parallel and should be used as early as possible
  * instead of calling the individual functions.
+ * 
+ * @deprecated - use 'fetchSpaceContextByIds' from v2
  */
 export async function getSpaceContentData(
     dataFetcher: GitBookDataFetcher,

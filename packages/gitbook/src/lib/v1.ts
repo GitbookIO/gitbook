@@ -1,10 +1,11 @@
-import { RevisionPageType } from '@gitbook/api';
 import type { GitBookDataFetcher } from '@v2/lib/data/types';
 import { createSpaceLinker, GitBookSpaceLinker } from '@v2/lib/links';
 
 import {
     api,
     getChangeRequest,
+    getComputedDocument,
+    getDocument,
     getLatestOpenAPISpecVersionContent,
     getPublishedContentByUrl,
     getPublishedContentSite,
@@ -59,6 +60,14 @@ export async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
 
         getRevisionFile(params) {
             return getRevisionFile(params.spaceId, params.revisionId, params.fileId);
+        },
+
+        getDocument(params) {
+            return getDocument(params.spaceId, params.documentId);
+        },
+
+        getComputedDocument(params) {
+            return getComputedDocument(params.spaceId, params.source);
         },
 
         getRevisionPages(params) {

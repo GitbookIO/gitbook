@@ -24,11 +24,10 @@ import {
     getSpaceCustomization,
     getSpaceContentData,
     getSiteData,
-    getPageDocument,
 } from '@/lib/api';
-import { getPagePDFContainerId, PageHrefContext, getAbsoluteHref } from '@/lib/links';
+import { getPagePDFContainerId, getAbsoluteHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
-import { ContentRefContext, resolveContentRef } from '@/lib/references';
+import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { PDFSearchParams, getPDFSearchParams } from '@/lib/urls';
 import { getDataFetcherV1, getLinkerV1 } from '@/lib/v1';
@@ -38,6 +37,8 @@ import './pdf.css';
 import { PageControlButtons } from './PageControlButtons';
 import { getSiteOrSpacePointerForPDF } from './pointer';
 import { PrintButton } from './PrintButton';
+import { getPageDocument } from '@v2/lib/data';
+import { GitBookAnyContext } from '@v2/lib/context';
 
 const DEFAULT_LIMIT = 100;
 
@@ -252,10 +253,10 @@ async function PDFPageGroup(props: { space: Space; page: RevisionPageGroup }) {
 async function PDFPageDocument(props: {
     space: Space;
     page: RevisionPageDocument;
-    refContext: ContentRefContext;
+    context: GitBookAnyContext;
 }) {
-    const { space, page, refContext } = props;
-    const document = await getPageDocument(space.id, page);
+    const { space, page, context } = props;
+    const document = await getPageDocument(context.dataFetcher, space.id, page);
 
     return (
         <PrintPage id={getPagePDFContainerId(page)}>
@@ -273,10 +274,10 @@ async function PDFPageDocument(props: {
                         mode: 'print',
                         content: {
                             spaceId: space.id,
-                            revisionId: refContext.revisionId,
+                            revisionId: context.revisionId,
                         },
-                        contentRefContext: refContext,
-                        resolveContentRef: (ref) => resolveContentRef(ref, refContext),
+                        contentRefContext: context,
+                        resolveContentRef: (ref) => resolveContentRef(ref, context),
                         getId: (id) => getPagePDFContainerId(page, id),
                     }}
                 />

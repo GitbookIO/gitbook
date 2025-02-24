@@ -1,6 +1,7 @@
 import {
     ChangeRequest,
     RevisionPage,
+    RevisionPageDocument,
     Site,
     SiteCustomizationSettings,
     SiteIntegrationScript,
@@ -18,7 +19,7 @@ import { GitBookSpaceLinker, appendPrefixToLinker } from './links';
 /**
  * Generic context when rendering content.
  */
-export interface GitBookContext {
+export interface GitBookBaseContext {
     /**
      * Data fetcher to fetch data from GitBook.
      */
@@ -31,9 +32,16 @@ export interface GitBookContext {
 }
 
 /**
+ * Any context when rendering content.
+ */
+export type GitBookAnyContext = GitBookSpaceContext | GitBookPageContext | GitBookSiteContext;
+
+/**
  * Context when rendering a space content.
  */
-export interface GitBookSpaceContext extends GitBookContext {
+export interface GitBookSpaceContext extends GitBookBaseContext {
+    organizationId: string;
+
     space: Space;
     changeRequest: ChangeRequest | null;
 
@@ -47,6 +55,13 @@ export interface GitBookSpaceContext extends GitBookContext {
     shareKey: string | undefined;
 }
 
+/**
+ * Context when rendering a page.
+ */
+export interface GitBookPageContext extends GitBookSpaceContext {
+    page: RevisionPageDocument;
+}
+
 export interface SiteSections {
     list: (SiteSectionGroup | SiteSection)[];
     current: SiteSection;
@@ -56,7 +71,6 @@ export interface SiteSections {
  * Context when rendering a site.
  */
 export interface GitBookSiteContext extends GitBookSpaceContext {
-    organizationId: string;
     site: Site;
     sections: null | SiteSections;
     customization: SiteCustomizationSettings;
@@ -69,7 +83,7 @@ export interface GitBookSiteContext extends GitBookSpaceContext {
  * Fetch the context of a site for a given URL and a base context.
  */
 export async function fetchSiteContext(
-    baseContext: GitBookContext,
+    baseContext: GitBookBaseContext,
     input: {
         url: string;
         visitorAuthToken: string | undefined;
@@ -115,7 +129,7 @@ export async function fetchSiteContext(
  * Fetch a site context by IDs.
  */
 export async function fetchSiteContextByIds(
-    baseContext: GitBookContext,
+    baseContext: GitBookBaseContext,
     ids: {
         organization: string;
         site: string;
@@ -190,8 +204,8 @@ export async function fetchSiteContextByIds(
 /**
  * Fetch a space context by IDs.
  */
-async function fetchSpaceContextByIds(
-    baseContext: GitBookContext,
+export async function fetchSpaceContextByIds(
+    baseContext: GitBookBaseContext,
     ids: {
         space: string;
         shareKey: string | undefined;
@@ -226,6 +240,7 @@ async function fetchSpaceContextByIds(
 
     return {
         ...baseContext,
+        organizationId: space.organization,
         space,
         pages,
         changeRequest,

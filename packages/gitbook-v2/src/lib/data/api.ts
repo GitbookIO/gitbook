@@ -1,5 +1,5 @@
 import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
-import { GitBookAPI } from '@gitbook/api';
+import { ComputedContentSource, GitBookAPI } from '@gitbook/api';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
 import { GitBookDataFetcher } from './types';
 import {
@@ -82,6 +82,18 @@ export function createDataFetcher(input: DataFetcherInput = commonInput): GitBoo
             return getChangeRequest(input, {
                 spaceId: params.spaceId,
                 changeRequestId: params.changeRequestId,
+            });
+        },
+        getDocument(params) {
+            return getDocument(input, {
+                spaceId: params.spaceId,
+                documentId: params.documentId,
+            });
+        },
+        getComputedDocument(params) {
+            return getComputedDocument(input, {
+                spaceId: params.spaceId,
+                source: params.source,
             });
         },
 
@@ -203,6 +215,34 @@ async function getRevisionFile(
 
         throw error;
     }
+}
+
+async function getDocument(
+    input: DataFetcherInput,
+    params: {
+        spaceId: string;
+        documentId: string;
+    },
+) {
+    'use cache';
+
+    const res = await getAPI(input).spaces.getDocumentById(params.spaceId, params.documentId);
+    return res.data;
+}
+
+async function getComputedDocument(
+    input: DataFetcherInput,
+    params: {
+        spaceId: string;
+        source: ComputedContentSource;
+    },
+) {
+    'use cache';
+
+    const res = await getAPI(input).spaces.getComputedDocument(params.spaceId, {
+        source: params.source,
+    });
+    return res.data;
 }
 
 async function getReusableContent(
