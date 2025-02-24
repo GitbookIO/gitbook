@@ -35,7 +35,7 @@ export function generateSchemaExample(
             },
             ...options,
         },
-        4, // Max depth for circular references
+        3, // Max depth for circular references
     );
 }
 
