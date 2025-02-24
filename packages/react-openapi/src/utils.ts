@@ -13,7 +13,11 @@ export function createStateKey(key: string, scope?: string) {
 /**
  * Resolve the description of an object.
  */
-export function resolveDescription(object: AnyObject) {
+export function resolveDescription(object: OpenAPIV3.SchemaObject | AnyObject) {
+    if ('items' in object && object.items) {
+        return resolveDescription(object.items);
+    }
+
     return 'x-gitbook-description-html' in object &&
         typeof object['x-gitbook-description-html'] === 'string'
         ? object['x-gitbook-description-html'].trim()

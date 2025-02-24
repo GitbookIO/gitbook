@@ -47,23 +47,6 @@ export function OpenAPISchemaProperty(
         ? null
         : getSchemaAlternatives(schema, new Set(circularRefs.keys()));
 
-    if ((properties && properties.length > 0) || schema.type === 'object') {
-        return (
-            <InteractiveSection id={id} className={clsx('openapi-schema', className)}>
-                <OpenAPISchemaPresentation {...props} />
-                {properties && properties.length > 0 ? (
-                    <OpenAPIDisclosure context={context}>
-                        <OpenAPISchemaProperties
-                            properties={properties}
-                            circularRefs={circularRefs}
-                            context={context}
-                        />
-                    </OpenAPIDisclosure>
-                ) : null}
-            </InteractiveSection>
-        );
-    }
-
     if (alternatives?.[0]?.length) {
         return (
             <InteractiveSection id={id} className={clsx('openapi-schema', className)}>
@@ -76,6 +59,23 @@ export function OpenAPISchemaProperty(
                         context={context}
                     />
                 ))}
+            </InteractiveSection>
+        );
+    }
+
+    if ((properties && properties.length > 0) || schema.type === 'object') {
+        return (
+            <InteractiveSection id={id} className={clsx('openapi-schema', className)}>
+                <OpenAPISchemaPresentation {...props} />
+                {properties && properties.length > 0 ? (
+                    <OpenAPIDisclosure context={context} label={getDisclosureLabel(schema)}>
+                        <OpenAPISchemaProperties
+                            properties={properties}
+                            circularRefs={circularRefs}
+                            context={context}
+                        />
+                    </OpenAPIDisclosure>
+                ) : null}
             </InteractiveSection>
         );
     }
@@ -166,16 +166,24 @@ function OpenAPISchemaAlternative(props: {
     const { schema, circularRefs, context } = props;
     const id = useId();
     const subProperties = getSchemaProperties(schema);
+    const description = resolveDescription(schema);
 
     return (
-        <OpenAPIDisclosure context={context}>
-            <OpenAPISchemaProperties
-                id={id}
-                properties={subProperties ?? [{ schema }]}
-                circularRefs={subProperties ? new Map(circularRefs).set(schema, id) : circularRefs}
-                context={context}
-            />
-        </OpenAPIDisclosure>
+        <>
+            {description ? (
+                <Markdown source={description} className="openapi-schema-description" />
+            ) : null}
+            <OpenAPIDisclosure context={context} label={getDisclosureLabel(schema)}>
+                <OpenAPISchemaProperties
+                    id={id}
+                    properties={subProperties ?? [{ schema }]}
+                    circularRefs={
+                        subProperties ? new Map(circularRefs).set(schema, id) : circularRefs
+                    }
+                    context={context}
+                />
+            </OpenAPIDisclosure>
+        </>
     );
 }
 
@@ -219,7 +227,7 @@ export function OpenAPISchemaPresentation(props: OpenAPISchemaPropertyEntry) {
 
     const shouldDisplayExample = (schema: OpenAPIV3.SchemaObject): boolean => {
         return (
-            typeof schema.example === 'string' ||
+            (typeof schema.example === 'string' && !!schema.example) ||
             typeof schema.example === 'number' ||
             typeof schema.example === 'boolean' ||
             (Array.isArray(schema.example) && schema.example.length > 0) ||
@@ -234,10 +242,10 @@ export function OpenAPISchemaPresentation(props: OpenAPISchemaPropertyEntry) {
     return (
         <div className="openapi-schema-presentation">
             <OpenAPISchemaName
+                schema={schema}
                 type={getSchemaTitle(schema)}
                 propertyName={propertyName}
                 required={required}
-                deprecated={schema.deprecated}
             />
             {schema['x-deprecated-sunset'] ? (
                 <div className="openapi-deprecated-sunset openapi-schema-description openapi-markdown">
@@ -276,23 +284,17 @@ export function OpenAPISchemaPresentation(props: OpenAPISchemaPropertyEntry) {
  * Get the sub-properties of a schema.
  */
 function getSchemaProperties(schema: OpenAPIV3.SchemaObject): null | OpenAPISchemaPropertyEntry[] {
-    if (schema.allOf) {
-        return schema.allOf.reduce((acc, subSchema) => {
-            const properties = getSchemaProperties(subSchema) ?? [
-                {
-                    schema: subSchema,
-                },
-            ];
-            return [...acc, ...properties];
-        }, [] as OpenAPISchemaPropertyEntry[]);
-    }
-
     // check array AND schema.items as this is sometimes null despite what the type indicates
     if (schema.type === 'array' && !!schema.items) {
         const items = schema.items;
         const itemProperties = getSchemaProperties(items);
         if (itemProperties) {
             return itemProperties;
+        }
+
+        // If the items are a primitive type, we don't need to display them
+        if (['string', 'number', 'boolean', 'integer'].includes(items.type) && !items.enum) {
+            return null;
         }
 
         return [
@@ -351,8 +353,7 @@ export function getSchemaAlternatives(
     }
 
     if (schema.allOf) {
-        // allOf is managed in `getSchemaProperties`
-        return null;
+        return [flattenAlternatives('allOf', schema.allOf, downAncestors), schema.discriminator];
     }
 
     return null;
@@ -378,11 +379,6 @@ export function getSchemaTitle(
     /** If the title is inferred in a oneOf with discriminator, we can use it to optimize the title */
     discriminator?: OpenAPIV3.DiscriminatorObject,
 ): string {
-    if (schema.title) {
-        // If the schema has a title, use it
-        return schema.title;
-    }
-
     // Try using the discriminator
     if (discriminator?.propertyName && schema.properties) {
         const discriminatorProperty = schema.properties[discriminator.propertyName];
@@ -419,21 +415,22 @@ export function getSchemaTitle(
         type = 'not';
     }
 
-    if (schema.minimum || schema.minLength) {
-        type += ` · min: ${schema.minimum || schema.minLength}`;
-    }
-
-    if (schema.maximum || schema.maxLength) {
-        type += ` · max: ${schema.maximum || schema.maxLength}`;
-    }
-
-    if (schema.default) {
-        type += ` · default: ${schema.default}`;
-    }
-
-    if (schema.nullable) {
-        type = `${type} | nullable`;
-    }
-
     return type;
+}
+
+function getDisclosureLabel(schema: OpenAPIV3.SchemaObject): string | undefined {
+    if (schema.type === 'array' && !!schema.items) {
+        if (schema.items.oneOf) {
+            return 'available items';
+        }
+
+        // Fallback to "child attributes" for enums and objects
+        if (schema.items.enum || schema.items.type === 'object') {
+            return;
+        }
+
+        return schema.items.title ?? schema.title ?? getSchemaTitle(schema.items);
+    }
+
+    return schema.title;
 }
