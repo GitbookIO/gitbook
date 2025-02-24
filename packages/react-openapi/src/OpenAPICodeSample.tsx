@@ -1,12 +1,12 @@
 import { CodeSampleInput, codeSampleGenerators } from './code-samples';
 import { generateMediaTypeExample, generateSchemaExample } from './generateSchemaExample';
 import { InteractiveSection } from './InteractiveSection';
-import { getServersURL } from './OpenAPIServerURL';
 import type { OpenAPIContextProps, OpenAPIOperationData } from './types';
 import { createStateKey } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
 import { checkIsReference } from './utils';
+import { getDefaultServerURL } from './util/server';
 
 /**
  * Display code samples to execute the operation.
@@ -53,7 +53,7 @@ export function OpenAPICodeSample(props: {
 
     const input: CodeSampleInput = {
         url:
-            getServersURL(data.servers) +
+            getDefaultServerURL(data.servers) +
             data.path +
             (searchParams.size ? `?${searchParams.toString()}` : ''),
         method: data.method,
