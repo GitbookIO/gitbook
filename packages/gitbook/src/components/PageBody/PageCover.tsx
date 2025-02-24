@@ -1,11 +1,11 @@
 import { RevisionPageDocument, RevisionPageDocumentCover } from '@gitbook/api';
+import { GitBookSiteContext } from '@v2/lib/context';
 
 import { Image, ImageSize } from '@/components/utils';
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import defaultPageCover from './default-page-cover.svg';
-import { GitBookSiteContext } from '@v2/lib/context';
 
 const PAGE_COVER_SIZE: ImageSize = { width: 1990, height: 480 };
 

@@ -1,4 +1,5 @@
 import { Icon } from '@gitbook/icons';
+import { GitBookSiteContext } from '@v2/lib/context';
 import { headers } from 'next/headers';
 import React from 'react';
 
@@ -7,7 +8,6 @@ import { tcls } from '@/lib/tailwind';
 import { RefreshChangeRequestButton } from './RefreshChangeRequestButton';
 import { Toolbar, ToolbarBody, ToolbarButton, ToolbarButtonGroups } from './Toolbar';
 import { DateRelative } from '../primitives';
-import { GitBookSiteContext } from '@v2/lib/context';
 
 interface AdminToolbarProps {
     context: GitBookSiteContext;
@@ -55,11 +55,7 @@ export async function AdminToolbar(props: AdminToolbarProps) {
     }
 
     if (context.changeRequest) {
-        return (
-            <ChangeRequestToolbar
-            context={context}
-            />
-        );
+        return <ChangeRequestToolbar context={context} />;
     }
 
     if (context.revisionId !== context.space.revision) {

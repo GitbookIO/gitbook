@@ -85,10 +85,7 @@ export interface GitBookDataFetcher {
     /**
      * Get a document by its space ID and document ID.
      */
-    getDocument(params: {   
-        spaceId: string;
-        documentId: string;
-    }): Promise<api.JSONDocument>;
+    getDocument(params: { spaceId: string; documentId: string }): Promise<api.JSONDocument>;
 
     /**
      * Get a computed document by its space ID and computed source.
@@ -123,5 +120,5 @@ export interface GitBookDataFetcher {
         siteId: string;
         siteShareKey: string | undefined;
         source: string;
-    }): Promise<{ redirect: api.SiteRedirect | null, target: string } | null>;
+    }): Promise<{ redirect: api.SiteRedirect | null; target: string } | null>;
 }

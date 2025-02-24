@@ -29,7 +29,7 @@ export type GitBookBaseContext = {
      * Linker to generate links in the current space.
      */
     linker: GitBookSpaceLinker;
-}
+};
 
 /**
  * Any context when rendering content.
@@ -39,7 +39,7 @@ export type GitBookAnyContext = GitBookSpaceContext | GitBookSiteContext;
 /**
  * Context when rendering a space content.
  */
-export type GitBookSpaceContext =  GitBookBaseContext & {
+export type GitBookSpaceContext = GitBookBaseContext & {
     organizationId: string;
 
     space: Space;
@@ -53,12 +53,12 @@ export type GitBookSpaceContext =  GitBookBaseContext & {
 
     /** Share key of the space. */
     shareKey: string | undefined;
-}
+};
 
 export type SiteSections = {
     list: (SiteSectionGroup | SiteSection)[];
     current: SiteSection;
-}
+};
 
 /**
  * Context when rendering a site.
@@ -71,7 +71,7 @@ export type GitBookSiteContext = GitBookSpaceContext & {
     structure: SiteStructure;
     spaces: Space[];
     scripts: SiteIntegrationScript[];
-}
+};
 
 /**
  * Fetch the context of a site for a given URL and a base context.
@@ -169,9 +169,11 @@ export async function fetchSiteContextByIds(
     const spaces =
         siteSpaces ?? (sections ? parseSpacesFromSiteSpaces(sections.current.siteSpaces) : []);
 
-    const siteSpace = (siteStructure.type === 'siteSpaces' && siteStructure.structure ?
-        siteStructure.structure : sections.current.siteSpaces).find((siteSpace) => siteSpace.id === ids.siteSpace)
-        
+    const siteSpace = (
+        siteStructure.type === 'siteSpaces' && siteStructure.structure
+            ? siteStructure.structure
+            : sections.current.siteSpaces
+    ).find((siteSpace) => siteSpace.id === ids.siteSpace);
 
     const customization = (() => {
         if (ids.siteSpace) {

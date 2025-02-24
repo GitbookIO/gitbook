@@ -5,11 +5,11 @@ import { OpenAPIOperationContextProvider } from '@gitbook/react-openapi';
 import * as React from 'react';
 import { useEventCallback, useDebounceCallback } from 'usehooks-ts';
 
+import { SiteContentPointer } from '@/lib/api';
 import * as cookies from '@/lib/cookies';
 
 import { getSession } from './sessions';
 import { getVisitorId } from './visitorId';
-import { SiteContentPointer } from '@/lib/api';
 
 export type InsightsEventName = api.SiteInsightsEvent['type'];
 

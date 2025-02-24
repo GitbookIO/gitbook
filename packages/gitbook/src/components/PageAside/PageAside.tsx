@@ -6,6 +6,7 @@ import {
     Space,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
+import { GitBookSiteContext } from '@v2/lib/context';
 import React from 'react';
 import urlJoin from 'url-join';
 
@@ -20,7 +21,6 @@ import { ScrollSectionsList } from './ScrollSectionsList';
 import { Ad } from '../Ads';
 import { PageFeedbackForm } from '../PageFeedback';
 import { ThemeToggler } from '../ThemeToggler';
-import { GitBookSiteContext } from '@v2/lib/context';
 
 /**
  * Aside listing the headings in the document.

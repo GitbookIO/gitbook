@@ -1,11 +1,11 @@
 import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
+import { GitBookSiteContext } from '@v2/lib/context';
 
 import { hasPageVisibleDescendant } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 
 import { PagesList } from './PagesList';
 import { TOCPageIcon } from './TOCPageIcon';
-import { GitBookSiteContext } from '@v2/lib/context';
 
 export function PageGroupItem(props: {
     rootPages: RevisionPage[];
@@ -51,11 +51,7 @@ export function PageGroupItem(props: {
                 {page.title}
             </div>
             {hasPageVisibleDescendant(page) ? (
-                <PagesList
-                    rootPages={rootPages}
-                    pages={page.pages}
-                    context={context}
-                />
+                <PagesList rootPages={rootPages} pages={page.pages} context={context} />
             ) : null}
         </li>
     );

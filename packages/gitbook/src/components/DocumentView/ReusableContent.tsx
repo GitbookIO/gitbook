@@ -1,8 +1,9 @@
 import { DocumentBlockReusableContent } from '@gitbook/api';
 
+import { resolveContentRef } from '@/lib/references';
+
 import { BlockProps } from './Block';
 import { UnwrappedBlocks } from './Blocks';
-import { resolveContentRef } from '@/lib/references';
 
 export async function ReusableContent(props: BlockProps<DocumentBlockReusableContent>) {
     const { block, context, ancestorBlocks } = props;
@@ -18,7 +19,7 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
 
     const document = await context.contentContext.dataFetcher.getDocument({
         spaceId: context.contentContext.space.id,
-        documentId: resolved.reusableContent.document
+        documentId: resolved.reusableContent.document,
     });
 
     if (!document) {

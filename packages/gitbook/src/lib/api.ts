@@ -1016,7 +1016,7 @@ export async function getSpaceCustomization(): Promise<{
  * Fetch all the content data about a space at once.
  * This function executes the requests in parallel and should be used as early as possible
  * instead of calling the individual functions.
- * 
+ *
  * @deprecated - use 'fetchSpaceContextByIds' from v2
  */
 export async function getSpaceContentData(

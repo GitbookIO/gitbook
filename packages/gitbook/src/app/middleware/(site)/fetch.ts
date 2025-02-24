@@ -1,9 +1,9 @@
+import { GitBookSiteContext } from '@v2/lib/context';
 import { redirect } from 'next/navigation';
 
 import { resolvePagePath, resolvePageId } from '@/lib/pages';
 import { getSiteContentPointer } from '@/lib/pointer';
 import { fetchV1ContextForSitePointer } from '@/lib/v1';
-import { GitBookSiteContext } from '@v2/lib/context';
 
 export interface PagePathParams {
     pathname?: string[];
@@ -39,10 +39,7 @@ export async function fetchPageData(params: PagePathParams | PageIdParams) {
  * Resolve a page from the params.
  * If the path can't be found, we try to resolve it from the API to handle redirects.
  */
-async function resolvePage(
-    context: GitBookSiteContext,
-    params: PagePathParams | PageIdParams
-) {
+async function resolvePage(context: GitBookSiteContext, params: PagePathParams | PageIdParams) {
     const { organizationId, site, space, revisionId, pages, shareKey } = context;
 
     if ('pageId' in params) {

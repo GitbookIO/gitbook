@@ -203,13 +203,9 @@ async function getRevision(
 ) {
     'use cache';
 
-    const res = await getAPI(input).spaces.getRevisionById(
-        params.spaceId,
-        params.revisionId,
-        {
-            metadata: params.metadata,
-        },
-    );
+    const res = await getAPI(input).spaces.getRevisionById(params.spaceId, params.revisionId, {
+        metadata: params.metadata,
+    });
     return res.data;
 }
 
@@ -277,7 +273,6 @@ async function getRevisionPageByPath(
 
     return res.data;
 }
-
 
 async function getDocument(
     input: DataFetcherInput,

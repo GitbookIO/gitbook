@@ -1,12 +1,12 @@
 import { ContentRef, DocumentBlockOpenAPI } from '@gitbook/api';
 import { parseOpenAPI, OpenAPIParseError } from '@gitbook/openapi-parser';
 import { type OpenAPIOperationData, resolveOpenAPIOperation } from '@gitbook/react-openapi';
+import { GitBookAnyContext } from '@v2/lib/context';
 
 import { cache, noCacheFetchOptions, CacheFunctionOptions } from '@/lib/cache';
 
 import { enrichFilesystem } from './enrich';
 import { resolveContentRef } from '../references';
-import { GitBookAnyContext } from '@v2/lib/context';
 
 const weakmap = new WeakMap<DocumentBlockOpenAPI, ResolveOpenAPIBlockResult>();
 

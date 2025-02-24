@@ -1,12 +1,12 @@
 import { RevisionPageLink, SiteInsightsLinkPosition } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
+import { GitBookSiteContext } from '@v2/lib/context';
 
 import { Link } from '@/components/primitives';
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { TOCPageIcon } from './TOCPageIcon';
-import { GitBookSiteContext } from '@v2/lib/context';
 
 export async function PageLinkItem(props: { page: RevisionPageLink; context: GitBookSiteContext }) {
     const { page, context } = props;

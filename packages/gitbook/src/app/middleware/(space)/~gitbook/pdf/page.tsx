@@ -9,6 +9,8 @@ import {
     Space,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
+import { GitBookSpaceContext } from '@v2/lib/context';
+import { getPageDocument } from '@v2/lib/data';
 import { GitBookSpaceLinker } from '@v2/lib/links';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -19,24 +21,17 @@ import { TrademarkLink } from '@/components/TableOfContents/Trademark';
 import { PolymorphicComponentProp } from '@/components/utils/types';
 import { getSpaceLanguage } from '@/intl/server';
 import { tString } from '@/intl/translate';
-import {
-    getSpace,
-    getSpaceCustomization,
-    getSiteData,
-} from '@/lib/api';
+import { getSpace, getSpaceCustomization, getSiteData } from '@/lib/api';
 import { getPagePDFContainerId, getAbsoluteHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import { PDFSearchParams, getPDFSearchParams } from '@/lib/urls';
+import { defaultCustomizationForSpace } from '@/lib/utils';
 
 import './pdf.css';
-
 import { PageControlButtons } from './PageControlButtons';
 import { getSiteOrSpacePointerForPDF, getV1ContextForPDF } from './pointer';
 import { PrintButton } from './PrintButton';
-import { getPageDocument } from '@v2/lib/data';
-import { GitBookSpaceContext } from '@v2/lib/context';
-import { defaultCustomizationForSpace } from '@/lib/utils';
 
 const DEFAULT_LIMIT = 100;
 
@@ -72,7 +67,8 @@ export default async function PDFHTMLOutput(props: {
     // Fetch the context
     const baseContext = await getV1ContextForPDF();
 
-    const customization = 'customization' in baseContext ? baseContext.customization : defaultCustomizationForSpace();
+    const customization =
+        'customization' in baseContext ? baseContext.customization : defaultCustomizationForSpace();
     const language = getSpaceLanguage(customization);
 
     // Compute the pages to render
@@ -173,7 +169,9 @@ export default async function PDFHTMLOutput(props: {
                 }
             />
 
-            {pdfParams.only ? null : <PDFSpaceIntro space={context.space} customization={customization} />}
+            {pdfParams.only ? null : (
+                <PDFSpaceIntro space={context.space} customization={customization} />
+            )}
             {pages.map(({ page }) =>
                 page.type === 'group' ? (
                     <PDFPageGroup key={page.id} space={context.space} page={page} />
@@ -186,10 +184,7 @@ export default async function PDFHTMLOutput(props: {
                             </PrintPage>
                         }
                     >
-                        <PDFPageDocument
-                            page={page}
-                            context={context}
-                        />
+                        <PDFPageDocument page={page} context={context} />
                     </React.Suspense>
                 ),
             )}

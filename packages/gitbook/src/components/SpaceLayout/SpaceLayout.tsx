@@ -1,7 +1,5 @@
-import {
-    CustomizationHeaderPreset,
-    CustomizationSidebarBackgroundStyle,
-} from '@gitbook/api';
+import { CustomizationHeaderPreset, CustomizationSidebarBackgroundStyle } from '@gitbook/api';
+import { GitBookSiteContext } from '@v2/lib/context';
 import React from 'react';
 
 import { Footer } from '@/components/Footer';
@@ -20,7 +18,6 @@ import { getCurrentVisitorToken } from '@/lib/visitor-token';
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
 import { SiteSectionList } from '../SiteSections';
-import { GitBookSiteContext } from '@v2/lib/context';
 
 /**
  * Render the entire layout of the space (header, table of contents, footer).
@@ -29,10 +26,7 @@ export async function SpaceLayout(props: {
     context: GitBookSiteContext;
     children: React.ReactNode;
 }) {
-    const {
-        context,
-        children,
-    } = props;
+    const { context, children } = props;
     const { space, customization, pages, site, sections, spaces } = context;
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
@@ -145,9 +139,7 @@ export async function SpaceLayout(props: {
                 <div className={tcls('flex-1', 'flex', 'flex-col')}>{children}</div>
             </div>
 
-            {withFooter ? (
-                <Footer context={context} />
-            ) : null}
+            {withFooter ? <Footer context={context} /> : null}
 
             <React.Suspense fallback={null}>
                 <SearchModal

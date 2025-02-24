@@ -1,23 +1,14 @@
-import {
-    ContentRef,
-    RevisionFile,
-    RevisionReusableContent,
-    SiteSpace,
-    Space,
-} from '@gitbook/api';
+import { ContentRef, RevisionFile, RevisionReusableContent, SiteSpace, Space } from '@gitbook/api';
 import type { Filesystem } from '@gitbook/openapi-parser';
 import { fetchSpaceContextByIds, type GitBookAnyContext } from '@v2/lib/context';
-import { createSpaceLinker } from '@v2/lib/links';
 import { getPageDocument } from '@v2/lib/data';
+import { createSpaceLinker } from '@v2/lib/links';
 import assertNever from 'assert-never';
 import React from 'react';
 
 import { PageIcon } from '@/components/PageIcon';
 
-import {
-    ignoreAPIError,
-    parseSpacesFromSiteSpaces,
-} from './api';
+import { ignoreAPIError, parseSpacesFromSiteSpaces } from './api';
 import { getBlockById, getBlockTitle } from './document';
 import { getGitbookAppHref } from './links';
 import { resolvePageId } from './pages';
@@ -67,13 +58,7 @@ export async function resolveContentRef(
     options: ResolveContentRefOptions = {},
 ): Promise<ResolvedContentRef | null> {
     const { resolveAnchorText = false, iconStyle } = options;
-    const {
-        linker,
-        dataFetcher,
-        space,
-        revisionId,
-        pages,
-    } = context;
+    const { linker, dataFetcher, space, revisionId, pages } = context;
 
     const activePage = 'page' in context ? context.page : undefined;
 
@@ -107,11 +92,7 @@ export async function resolveContentRef(
         case 'anchor':
         case 'page': {
             if (contentRef.space && contentRef.space !== space.id) {
-                return resolveContentRefInSpace(
-                    contentRef.space,
-                    context,
-                    contentRef,
-                );
+                return resolveContentRefInSpace(contentRef.space, context, contentRef);
             }
 
             const resolvePageResult =
@@ -306,12 +287,14 @@ async function resolveContentRefInSpace(
     contentRef: ContentRef,
 ) {
     const [spaceContext, bestTargetSpace] = await Promise.all([
-        ignoreAPIError(fetchSpaceContextByIds(context, {
-            space: spaceId,
-            shareKey: context?.shareKey,
-            changeRequest: undefined,
-            revision: undefined,
-        })),
+        ignoreAPIError(
+            fetchSpaceContextByIds(context, {
+                space: spaceId,
+                shareKey: context?.shareKey,
+                changeRequest: undefined,
+                revision: undefined,
+            }),
+        ),
         getBestTargetSpace(context, spaceId),
     ]);
     if (!spaceContext) {
@@ -321,11 +304,11 @@ async function resolveContentRefInSpace(
     const space = bestTargetSpace ?? spaceContext.space;
 
     // Resolve URLs relative to the space.
-    const baseURL = new URL(space.urls.published ?? space.urls.app)
+    const baseURL = new URL(space.urls.published ?? space.urls.app);
     const linker = createSpaceLinker({
         host: baseURL.host,
         pathname: baseURL.pathname,
-    })
+    });
 
     const resolved = await resolveContentRef(contentRef, {
         ...spaceContext,

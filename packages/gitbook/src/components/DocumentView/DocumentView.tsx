@@ -1,11 +1,11 @@
 import { ContentRef, JSONDocument } from '@gitbook/api';
+import { GitBookAnyContext } from '@v2/lib/context';
 
 import { ResolveContentRefOptions, ResolvedContentRef } from '@/lib/references';
 import { ClassValue } from '@/lib/tailwind';
 
 import { BlockSkeleton } from './Block';
 import { Blocks } from './Blocks';
-import { GitBookAnyContext } from '@v2/lib/context';
 
 export interface DocumentContext {
     /**

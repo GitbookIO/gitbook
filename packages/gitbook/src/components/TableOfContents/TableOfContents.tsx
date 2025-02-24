@@ -1,6 +1,5 @@
-import {
-    SiteInsightsTrademarkPlacement,
-} from '@gitbook/api';
+import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
+import { GitBookSiteContext } from '@v2/lib/context';
 import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
@@ -8,7 +7,6 @@ import { tcls } from '@/lib/tailwind';
 import { PagesList } from './PagesList';
 import { TOCScrollContainer } from './TOCScroller';
 import { Trademark } from './Trademark';
-import { GitBookSiteContext } from '@v2/lib/context';
 
 export function TableOfContents(props: {
     context: GitBookSiteContext;
@@ -19,8 +17,7 @@ export function TableOfContents(props: {
     };
     innerHeader?: React.ReactNode; // Displayed outside the scrollable TOC, directly above the page list
 }) {
-    const { innerHeader, context, header, headerOffset } =
-        props;
+    const { innerHeader, context, header, headerOffset } = props;
     const { space, customization, pages } = context;
 
     return (

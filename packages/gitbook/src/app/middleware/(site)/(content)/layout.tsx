@@ -57,11 +57,7 @@ export default async function ContentLayout(props: { children: React.ReactNode }
                     (customization.themes.toggeable ? undefined : customization.themes.default)
                 }
             >
-                <SpaceLayout
-                    context={context}
-                >
-                    {children}
-                </SpaceLayout>
+                <SpaceLayout context={context}>{children}</SpaceLayout>
 
                 {scripts.length > 0 ? (
                     <>

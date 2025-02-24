@@ -14,7 +14,9 @@ export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
 
     const [src, darkSrc] = await Promise.all([
         context.contentContext ? resolveContentRef(inline.data.ref, context.contentContext) : null,
-        inline.data.refDark && context.contentContext ? resolveContentRef(inline.data.refDark, context.contentContext) : null,
+        inline.data.refDark && context.contentContext
+            ? resolveContentRef(inline.data.refDark, context.contentContext)
+            : null,
     ]);
 
     if (!src) {

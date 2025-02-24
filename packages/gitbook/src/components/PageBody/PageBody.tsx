@@ -1,7 +1,5 @@
-import {
-    JSONDocument,
-    RevisionPageDocument,
-} from '@gitbook/api';
+import { JSONDocument, RevisionPageDocument } from '@gitbook/api';
+import { GitBookSiteContext } from '@v2/lib/context';
 import React from 'react';
 
 import { getSpaceLanguage } from '@/intl/server';
@@ -19,7 +17,6 @@ import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
 import { TrackPageViewEvent } from '../Insights';
 import { PageFeedbackForm } from '../PageFeedback';
 import { DateRelative } from '../primitives';
-import { GitBookSiteContext } from '@v2/lib/context';
 
 export function PageBody(props: {
     context: GitBookSiteContext;
@@ -28,13 +25,7 @@ export function PageBody(props: {
     document: JSONDocument | null;
     withPageFeedback: boolean;
 }) {
-    const {
-        page,
-        context,
-        ancestors,
-        document,
-        withPageFeedback,
-    } = props;
+    const { page, context, ancestors, document, withPageFeedback } = props;
     const { space, customization } = context;
 
     const asFullWidth = document ? hasFullWidthBlock(document) : false;

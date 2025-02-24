@@ -1,3 +1,4 @@
+import { GitBookSiteContext } from '@v2/lib/context';
 import React from 'react';
 
 import { Image } from '@/components/utils';
@@ -7,13 +8,10 @@ import { tcls } from '@/lib/tailwind';
 import { FooterLinksGroup } from './FooterLinksGroup';
 import { CONTAINER_STYLE } from '../layout';
 import { ThemeToggler } from '../ThemeToggler';
-import { GitBookSiteContext } from '@v2/lib/context';
 
 const FOOTER_COLUMNS = 4;
 
-export function Footer(props: {
-    context: GitBookSiteContext;
-}) {
+export function Footer(props: { context: GitBookSiteContext }) {
     const { context } = props;
     const { customization } = context;
 

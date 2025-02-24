@@ -1,4 +1,5 @@
 import { CustomizationHeaderPreset, CustomizationThemeMode } from '@gitbook/api';
+import { getPageDocument } from '@v2/lib/data';
 import { Metadata, Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import React from 'react';
@@ -12,7 +13,6 @@ import { getContentTitle } from '@/lib/utils';
 
 import { PageClientLayout } from './PageClientLayout';
 import { PagePathParams, fetchPageData, getPathnameParam, normalizePathname } from '../../fetch';
-import { getPageDocument } from '@v2/lib/data';
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
@@ -29,10 +29,7 @@ export default async function Page(props: {
     const params = await rawParams;
     const searchParams = await rawSearchParams;
 
-    const {
-        context,
-        pageTarget,
-    } = await getPageDataWithFallback({
+    const { context, pageTarget } = await getPageDataWithFallback({
         pagePathParams: params,
         searchParams,
         redirectOnFallback: true,
@@ -49,13 +46,15 @@ export default async function Page(props: {
             notFound();
         }
     } else if (getPagePath(context.pages, pageTarget.page) !== rawPathname) {
-        redirect(context.linker.toPathForPage({
-            pages: context.pages,
-            page: pageTarget.page,
-        }));
+        redirect(
+            context.linker.toPathForPage({
+                pages: context.pages,
+                page: pageTarget.page,
+            }),
+        );
     }
 
-    const { customization,  sections } = context;
+    const { customization, sections } = context;
     const { page, ancestors } = pageTarget;
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
@@ -177,10 +176,12 @@ async function getPageDataWithFallback(args: {
         const rootPage = resolveFirstDocument(context.pages, []);
 
         if (redirectOnFallback && rootPage?.page) {
-            redirect(context.linker.toPathForPage({
-                pages: context.pages,
-                page: rootPage?.page,
-            }));
+            redirect(
+                context.linker.toPathForPage({
+                    pages: context.pages,
+                    page: rootPage?.page,
+                }),
+            );
         }
 
         pageTarget = rootPage;

@@ -10,10 +10,12 @@ import { SpaceIcon } from '../Space/SpaceIcon';
 export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>) {
     const { block, context, style } = props;
 
-    const resolved = context.contentContext ? await resolveContentRef(block.data.ref, context.contentContext,{
-        resolveAnchorText: true,
-        iconStyle: ['text-xl', 'text-tint'],
-    }) : null;
+    const resolved = context.contentContext
+        ? await resolveContentRef(block.data.ref, context.contentContext, {
+              resolveAnchorText: true,
+              iconStyle: ['text-xl', 'text-tint'],
+          })
+        : null;
 
     if (!resolved) {
         return null;

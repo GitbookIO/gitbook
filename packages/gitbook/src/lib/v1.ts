@@ -1,3 +1,9 @@
+import {
+    fetchSiteContextByIds,
+    fetchSpaceContextByIds,
+    GitBookBaseContext,
+    GitBookSiteContext,
+} from '@v2/lib/context';
 import type { GitBookDataFetcher } from '@v2/lib/data/types';
 import { createSpaceLinker, GitBookSpaceLinker } from '@v2/lib/links';
 
@@ -20,7 +26,6 @@ import {
     SpaceContentPointer,
 } from './api';
 import { getBasePath, getHost } from './links';
-import { fetchSiteContextByIds, fetchSpaceContextByIds, GitBookBaseContext, GitBookSiteContext } from '@v2/lib/context';
 
 /*
  * Code that will be used until the migration to v2 is complete.
@@ -117,7 +122,7 @@ export async function getV1BaseContext(): Promise<GitBookBaseContext> {
     return {
         linker: await getLinkerV1(),
         dataFetcher: await getDataFetcherV1(),
-    }
+    };
 }
 
 /**
@@ -163,5 +168,5 @@ export function getSitePointerFromContext(context: GitBookSiteContext): SiteCont
         revisionId: context.revisionId,
         changeRequestId: context.changeRequest?.id,
         siteShareKey: context.shareKey,
-    }
+    };
 }

@@ -1,14 +1,11 @@
-import {
-    RevisionPage,
-    RevisionPageType,
-} from '@gitbook/api';
+import { RevisionPage, RevisionPageType } from '@gitbook/api';
+import { GitBookSiteContext } from '@v2/lib/context';
 
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { PageDocumentItem } from './PageDocumentItem';
 import { PageGroupItem } from './PageGroupItem';
 import { PageLinkItem } from './PageLinkItem';
-import { GitBookSiteContext } from '@v2/lib/context';
 
 export function PagesList(props: {
     context: GitBookSiteContext;
