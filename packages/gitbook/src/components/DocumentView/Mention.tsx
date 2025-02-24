@@ -10,7 +10,7 @@ export async function Mention(props: InlineProps<DocumentInlineMention>) {
 
     const resolved = context.contentContext ? await resolveContentRef(inline.data.ref, context.contentContext, {
         resolveAnchorText: true,
-    });
+    }) : null;
 
     if (!resolved) {
         return null;
