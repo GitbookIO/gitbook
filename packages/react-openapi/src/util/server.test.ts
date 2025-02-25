@@ -50,9 +50,9 @@ describe('#getDefaultServerURL', () => {
         expect(result).toBe('https://user.example.com/v1');
     });
 
-    it('returns null if no servers are provided', () => {
+    it('returns empty string if no servers are provided', () => {
         const servers: OpenAPIV3.ServerObject[] = [];
         const result = getDefaultServerURL(servers);
-        expect(result).toBeNull();
+        expect(result).toBe('');
     });
 });
