@@ -1,10 +1,12 @@
 import { SitePageNotFound } from '@/components/SitePage';
-import { getStaticSiteContext, RouteParams } from '@v2/app/utils';
+import { getStaticSiteContext } from '@v2/app/utils';
+import { getURLFromMiddleware, getURLModeFromMiddleware } from '@v2/lib/middleware';
 
-export default async function NotFound({ params }: { params: Promise<RouteParams> }) {
-    // TODO: how to make it work as not-found doesn't get any props?
-
-    const { context } = await getStaticSiteContext(await params);
+export default async function NotFound() {
+    const { context } = await getStaticSiteContext({
+        url: await getURLFromMiddleware(),
+        mode: await getURLModeFromMiddleware(),
+    });
 
     return <SitePageNotFound context={context} />;
 }

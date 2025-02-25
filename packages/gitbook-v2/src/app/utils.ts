@@ -8,7 +8,7 @@ import { headers } from 'next/headers';
 export type RouteParamMode = 'url-host' | 'url';
 
 export interface RouteParams {
-    url: string[];
+    url: string | string[];
     mode: string;
 }
 
@@ -19,7 +19,7 @@ export function getStaticSiteContext(params: RouteParams) {
     const url = getURLFromParams(params.url);
 
     const dataFetcher = createDataFetcher();
-    const linker = createLinker('static', params);
+    const linker = createLinker(params);
     const imageResizer = createNoopImageResizer();
 
     return fetchSiteContextByURL(
@@ -49,7 +49,7 @@ export async function getDynamicSiteContext(params: RouteParams) {
         apiEndpoint: headersSet.get('x-gitbook-api') ?? GITBOOK_API_URL,
     });
 
-    const linker = createLinker('dynamic', params);
+    const linker = createLinker(params);
     const imageResizer = createNoopImageResizer();
 
     return fetchSiteContextByURL(
@@ -68,8 +68,8 @@ export async function getDynamicSiteContext(params: RouteParams) {
     );
 }
 
-function getURLFromParams(input: string[]) {
-    const url = new URL('https://' + input.join('/'));
+function getURLFromParams(input: string | string[]) {
+    const url = new URL('https://' + (Array.isArray(input) ? input.join('/') : input));
     return url.toString();
 }
 
@@ -81,7 +81,7 @@ function getModeFromParams(mode: string): RouteParamMode {
     return 'url';
 }
 
-function createLinker(routeType: 'static' | 'dynamic', params: RouteParams) {
+function createLinker(params: RouteParams) {
     const mode = getModeFromParams(params.mode);
 
     if (mode === 'url-host') {
@@ -93,6 +93,6 @@ function createLinker(routeType: 'static' | 'dynamic', params: RouteParams) {
 
     return createSpaceLinker({
         host: '',
-        pathname: `/${routeType}/${mode}/${params.url[0]}`,
+        pathname: `/url/${params.url[0]}`,
     });
 }
