@@ -40,7 +40,7 @@
       "name": "gitbook",
       "version": "0.6.2",
       "dependencies": {
-        "@gitbook/api": "^0.95.0",
+        "@gitbook/api": "^0.96.0",
         "@gitbook/cache-do": "workspace:*",
         "@gitbook/colors": "workspace:*",
         "@gitbook/emoji-codepoints": "workspace:*",
@@ -124,7 +124,7 @@
       "name": "gitbook-v2",
       "version": "0.1.0",
       "dependencies": {
-        "@gitbook/api": "^0.95.0",
+        "@gitbook/api": "^0.96.0",
         "@sindresorhus/fnv1a": "^3.1.0",
         "next": "canary",
         "react": "^19.0.0",
@@ -184,7 +184,7 @@
       "name": "@gitbook/react-contentkit",
       "version": "0.6.0",
       "dependencies": {
-        "@gitbook/api": "^0.95.0",
+        "@gitbook/api": "^0.96.0",
         "assert-never": "^1.2.1",
         "classnames": "^2.5.1",
       },
@@ -598,7 +598,7 @@
 
     "@fortawesome/fontawesome-svg-core": ["@fortawesome/fontawesome-svg-core@6.6.0", "", { "dependencies": { "@fortawesome/fontawesome-common-types": "6.6.0" } }, "sha512-KHwPkCk6oRT4HADE7smhfsKudt9N/9lm6EJ5BVg0tD1yPA5hht837fB87F8pn15D8JfTqQOjhKTktwmLMiD7Kg=="],
 
-    "@gitbook/api": ["@gitbook/api@0.95.0", "", { "dependencies": { "event-iterator": "^2.0.0", "eventsource-parser": "^3.0.0" } }, "sha512-9KAbt27Ile6cqAch7QEbiJHALQHojYlhsPzilgdQ5wpHgLwsrd7Smd58A3/8bWBKq4KV0vP4rh3oYhIw+LlWFw=="],
+    "@gitbook/api": ["@gitbook/api@0.96.0", "", { "dependencies": { "event-iterator": "^2.0.0", "eventsource-parser": "^3.0.0" } }, "sha512-JN6k0PlpyQQhtr8sNnbKIWQ7n9gCFqhrDo33v/41d41M1wgz+eowm1jdiYtX0tsXBH7D1YHmBMbNnDI8jQwbwA=="],
 
     "@gitbook/cache-do": ["@gitbook/cache-do@workspace:packages/cache-do"],
 

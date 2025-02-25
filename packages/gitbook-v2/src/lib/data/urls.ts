@@ -29,18 +29,25 @@ export async function getPublishedContentByURL(input: {
             endpoint: GITBOOK_API_URL,
             userAgent: GITBOOK_USER_AGENT,
         });
+
+        console.time('lookup');
         const callResult = await tryCatch(
             api.urls.getPublishedContentByUrl(
                 {
                     url: alternative.url,
                     visitorAuthToken: input.visitorAuthToken ?? undefined,
                     redirectOnError: input.redirectOnError,
+                    cache: true,
                 },
                 {
                     signal,
+                    headers: {
+                        'x-gitbook-force-cache': 'true',
+                    }
                 },
             ),
         );
+        console.timeEnd('lookup');
 
         if (callResult.error) {
             if (alternative.primary) {
