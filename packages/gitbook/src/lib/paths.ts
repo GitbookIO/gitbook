@@ -1,4 +1,3 @@
-
 /**
  * Join path parts and normalize the result.
  */

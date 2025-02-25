@@ -10,7 +10,7 @@ export const config = {
     matcher: ['/((?!_next/|_static/|_vercel|[\\w-]+\\.\\w+).*)'],
 };
 
-type URLWithMode = { url: URL; mode: 'url' | 'url-host' }
+type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
 
 export async function middleware(request: NextRequest) {
     const extracted = extractURL(request);
@@ -28,13 +28,11 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
     const dynamicHeaders = getDynamicHeaders(request);
     const { url, mode } = urlWithMode;
 
-    const result = await getPublishedContentByURL(
-        {
-            url: url.toString(),
-            visitorAuthToken: null,
-            redirectOnError: false,
-        },
-    );
+    const result = await getPublishedContentByURL({
+        url: url.toString(),
+        visitorAuthToken: null,
+        redirectOnError: false,
+    });
 
     if (result.error) {
         if (result.error instanceof GitBookAPIError) {
@@ -55,8 +53,6 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
         return NextResponse.redirect(data.redirect);
     }
 
-    console.log(data);
-
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set(MiddlewareHeaders.URL, url);
     requestHeaders.set(MiddlewareHeaders.URLMode, mode);
@@ -74,15 +70,9 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
         encodeURIComponent(removeTrailingSlash(data.pathname)),
     ].join('/');
 
-
-    console.log('rewrite to', route)
-
-    return NextResponse.rewrite(
-        new URL('/' + route, request.url),
-        {
-            headers: requestHeaders,
-        },
-    );
+    return NextResponse.rewrite(new URL('/' + route, request.url), {
+        headers: requestHeaders,
+    });
 }
 
 /**

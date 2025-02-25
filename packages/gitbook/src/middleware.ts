@@ -1,6 +1,7 @@
 import { ContentAPITokenPayload, CustomizationThemeMode, GitBookAPI } from '@gitbook/api';
 import { setTag, setContext } from '@sentry/nextjs';
 import { fetchSiteContextByIds } from '@v2/lib/context';
+import { getURLLookupAlternatives, normalizeURL } from '@v2/lib/data';
 import assertNever from 'assert-never';
 import jwt from 'jsonwebtoken';
 import type { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
@@ -21,7 +22,6 @@ import {
 import { race } from '@/lib/async';
 import { buildVersion } from '@/lib/build';
 import { createContentSecurityPolicyNonce, getContentSecurityPolicy } from '@/lib/csp';
-import { getURLLookupAlternatives, normalizeURL } from '@v2/lib/data';
 import { setMiddlewareHeader } from '@/lib/middleware';
 import {
     VisitorTokenLookup,

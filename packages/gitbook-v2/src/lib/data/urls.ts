@@ -1,19 +1,20 @@
-import { race, tryCatch } from "@/lib/async";
-import { joinPath } from "@/lib/paths";
-import { GitBookAPI, type GitBookAPIError, type PublishedSiteContentLookup } from "@gitbook/api";
-import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from "@v2/lib/env";
+import { race, tryCatch } from '@/lib/async';
+import { joinPath } from '@/lib/paths';
+import { GitBookAPI, type GitBookAPIError, type PublishedSiteContentLookup } from '@gitbook/api';
+import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
 
 /**
  * Lookup a content by its URL using the GitBook API.
  * To optimize caching, we try multiple lookup alternatives and return the first one that matches.
  */
-export async function getPublishedContentByURL(
-    input: {
-        url: string;
-        visitorAuthToken: string | null;
-        redirectOnError: boolean;
-    }
-): Promise<{ data: PublishedSiteContentLookup; error?: undefined } | { data?: undefined; error: Error | GitBookAPIError }> {
+export async function getPublishedContentByURL(input: {
+    url: string;
+    visitorAuthToken: string | null;
+    redirectOnError: boolean;
+}): Promise<
+    | { data: PublishedSiteContentLookup; error?: undefined }
+    | { data?: undefined; error: Error | GitBookAPIError }
+> {
     const lookupURL = new URL(input.url);
     const url = stripURLSearch(lookupURL);
     const lookup = getURLLookupAlternatives(url);
@@ -28,16 +29,18 @@ export async function getPublishedContentByURL(
             endpoint: GITBOOK_API_URL,
             userAgent: GITBOOK_USER_AGENT,
         });
-        const callResult = await tryCatch(api.urls.getPublishedContentByUrl(
-            {
-                url: alternative.url,
-                visitorAuthToken: input.visitorAuthToken ?? undefined,
-                redirectOnError: input.redirectOnError,
-            },
-            {
-                signal,
-            },
-        ));
+        const callResult = await tryCatch(
+            api.urls.getPublishedContentByUrl(
+                {
+                    url: alternative.url,
+                    visitorAuthToken: input.visitorAuthToken ?? undefined,
+                    redirectOnError: input.redirectOnError,
+                },
+                {
+                    signal,
+                },
+            ),
+        );
 
         if (callResult.error) {
             if (alternative.primary) {
@@ -48,7 +51,9 @@ export async function getPublishedContentByURL(
             return null;
         }
 
-        const { data: { data } } = callResult;
+        const {
+            data: { data },
+        } = callResult;
 
         if ('redirect' in data) {
             if (alternative.primary) {
@@ -95,7 +100,7 @@ export async function getPublishedContentByURL(
                 basePath: joinPath(data.basePath, lookup.basePath ?? ''),
                 pathname: joinPath(data.pathname, alternative.extraPath),
             };
-            return { data: siteResult};
+            return { data: siteResult };
         }
 
         return null;

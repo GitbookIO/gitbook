@@ -12,11 +12,11 @@ export type RouteLayoutParams = {
 
     /** URL encoded site URL */
     siteURL: string;
-}
+};
 
-export type RouteParams = RouteLayoutParams &{
+export type RouteParams = RouteLayoutParams & {
     pagePath: string;
-}
+};
 
 /**
  * Get the static context when rendering statically a site.
