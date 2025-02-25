@@ -2,7 +2,7 @@ import { ContentRef, RevisionFile, RevisionReusableContent, SiteSpace, Space } f
 import type { Filesystem } from '@gitbook/openapi-parser';
 import { fetchSpaceContextByIds, type GitBookAnyContext } from '@v2/lib/context';
 import { getPageDocument } from '@v2/lib/data';
-import { createSpaceLinker } from '@v2/lib/links';
+import { createLinker } from '@v2/lib/links';
 import assertNever from 'assert-never';
 import React from 'react';
 
@@ -302,7 +302,7 @@ async function resolveContentRefInSpace(
     const baseURL = new URL(
         bestTargetSpace?.siteSpace?.urls.published ?? space.urls.published ?? space.urls.app,
     );
-    const linker = createSpaceLinker({
+    const linker = createLinker({
         host: baseURL.host,
         pathname: baseURL.pathname,
     });

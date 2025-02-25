@@ -1,6 +1,6 @@
 import { unstable_cacheTag as cacheTag } from 'next/cache';
 import { getSiteCacheTag } from '@v2/lib/cache';
-import { getStaticSiteContext, RouteParams } from '@v2/app/utils';
+import { getPagePathFromParams, getStaticSiteContext, RouteParams } from '@v2/app/utils';
 import {
     generateSitePageMetadata,
     generateSitePageViewport,
@@ -17,7 +17,9 @@ type PageProps = {
 export default async function Page(props: PageProps) {
     'use cache';
 
-    const { context, pathname } = await getStaticSiteContext(await props.params);
+    const params = await props.params;
+    const context = await getStaticSiteContext(params);
+    const pathname = getPagePathFromParams(params);
 
     cacheTag(getSiteCacheTag(context.site.id));
 
@@ -25,12 +27,15 @@ export default async function Page(props: PageProps) {
 }
 
 export async function generateViewport(props: PageProps): Promise<Viewport> {
-    const { context } = await getStaticSiteContext(await props.params);
+    const context = await getStaticSiteContext(await props.params);
     return generateSitePageViewport(context);
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
-    const { context, pathname } = await getStaticSiteContext(await props.params);
+    const params = await props.params;
+    const context = await getStaticSiteContext(params);
+    const pathname = getPagePathFromParams(params);
+
     return generateSitePageMetadata({
         context,
         pageParams: { pathname },

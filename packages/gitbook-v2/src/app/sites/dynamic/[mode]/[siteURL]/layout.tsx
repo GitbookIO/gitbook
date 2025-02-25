@@ -1,6 +1,6 @@
 import { CustomizationRootLayout } from '@/components/RootLayout';
 import { SiteLayout } from '@/components/SiteLayout';
-import { getDynamicSiteContext, RouteParams } from '@v2/app/utils';
+import { getDynamicSiteContext, RouteLayoutParams } from '@v2/app/utils';
 import { GITBOOK_DISABLE_TRACKING } from '@v2/lib/env';
 import { getThemeFromMiddleware } from '@v2/lib/middleware';
 
@@ -8,10 +8,10 @@ export default async function RootLayout({
     params,
     children,
 }: {
-    params: Promise<RouteParams>;
+    params: Promise<RouteLayoutParams>;
     children: React.ReactNode;
 }) {
-    const { context } = await getDynamicSiteContext(await params);
+    const context = await getDynamicSiteContext(await params);
     const forcedTheme = await getThemeFromMiddleware();
 
     return (

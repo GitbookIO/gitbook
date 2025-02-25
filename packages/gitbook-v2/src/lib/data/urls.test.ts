@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'bun:test';
 
-import { getURLLookupAlternatives, normalizeURL } from './middleware';
+import { getURLLookupAlternatives, normalizeURL } from './urls';
 
 describe('getURLLookupAlternatives', () => {
     it('should return all URLs up to the root', () => {

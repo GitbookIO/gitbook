@@ -23,6 +23,7 @@
         "build:v2": "next build",
         "start": "next start",
         "build:v2:cloudflare": "opennextjs-cloudflare",
-        "dev:v2:cloudflare": "wrangler dev --port 8771"
+        "dev:v2:cloudflare": "wrangler dev --port 8771",
+        "unit": "bun test"
     }
 }

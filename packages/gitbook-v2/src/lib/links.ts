@@ -28,7 +28,7 @@ export interface GitBookSpaceLinker {
 /**
  * Create a linker to resolve links in a context being served on a specific URL.
  */
-export function createSpaceLinker(
+export function createLinker(
     /** Where the top of the space is served on */
     servedOn: {
         host: string;

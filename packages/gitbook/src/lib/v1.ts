@@ -6,7 +6,7 @@ import {
 } from '@v2/lib/context';
 import type { GitBookDataFetcher } from '@v2/lib/data/types';
 import { createImageResizer } from '@v2/lib/images';
-import { createSpaceLinker } from '@v2/lib/links';
+import { createLinker } from '@v2/lib/links';
 import { headers } from 'next/headers';
 
 import {
@@ -40,7 +40,7 @@ export async function getV1BaseContext(): Promise<GitBookBaseContext> {
     const host = await getHost();
     const basePath = await getBasePath();
 
-    const linker = createSpaceLinker({
+    const linker = createLinker({
         host,
         pathname: basePath,
     });

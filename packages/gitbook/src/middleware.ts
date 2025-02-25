@@ -21,7 +21,8 @@ import {
 import { race } from '@/lib/async';
 import { buildVersion } from '@/lib/build';
 import { createContentSecurityPolicyNonce, getContentSecurityPolicy } from '@/lib/csp';
-import { getURLLookupAlternatives, normalizeURL, setMiddlewareHeader } from '@/lib/middleware';
+import { getURLLookupAlternatives, normalizeURL } from '@v2/lib/data';
+import { setMiddlewareHeader } from '@/lib/middleware';
 import {
     VisitorTokenLookup,
     getVisitorAuthCookieName,

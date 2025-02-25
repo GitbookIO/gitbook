@@ -112,7 +112,7 @@ export async function fetchSiteContextByURL(
         visitorAuthToken: string | null;
         redirectOnError: boolean;
     },
-): Promise<{ context: GitBookSiteContext; pathname: string }> {
+): Promise<GitBookSiteContext> {
     const { dataFetcher } = baseContext;
     const data = await dataFetcher.getPublishedContentByUrl({
         url: input.url,
@@ -150,10 +150,7 @@ export async function fetchSiteContextByURL(
         linker: appendPrefixToLinker(context.linker, data.basePath),
     };
 
-    return {
-        context: siteContext,
-        pathname: data.pathname,
-    };
+    return siteContext;
 }
 
 /**
