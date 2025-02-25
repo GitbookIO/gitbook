@@ -9,7 +9,9 @@ import { googleFontsMap } from '@/fonts';
 import { getAbsoluteHref } from '@/lib/links';
 import { filterOutNullable } from '@/lib/typescript';
 
-import { PageIdParams, fetchPageData } from '../../../../fetch';
+import { PageIdParams, fetchPageData } from '@/components/SitePage';
+import { getSiteContentPointer } from '@/lib/pointer';
+import { fetchV1ContextForSitePointer } from '@/lib/v1';
 
 export const runtime = 'edge';
 
@@ -55,8 +57,11 @@ async function loadGoogleFont(input: { fontFamily: string; text: string; weight:
  * Render the OpenGraph image for a space.
  */
 export async function GET(req: NextRequest, { params }: { params: Promise<PageIdParams> }) {
-    const { context, pageTarget } = await fetchPageData(await params);
-    const { customization, site, space } = context;
+    const pointer = await getSiteContentPointer();
+    const baseContext = await fetchV1ContextForSitePointer(pointer);
+
+    const { context, pageTarget } = await fetchPageData(baseContext, await params);
+    const { customization, site } = context;
     const page = pageTarget?.page;
 
     // If user configured a custom social preview, we redirect to it.

@@ -2,8 +2,6 @@ import { GitBookSiteContext } from '@v2/lib/context';
 import { redirect } from 'next/navigation';
 
 import { resolvePagePath, resolvePageId } from '@/lib/pages';
-import { getSiteContentPointer } from '@/lib/pointer';
-import { fetchV1ContextForSitePointer } from '@/lib/v1';
 
 export interface PagePathParams {
     pathname?: string[];
@@ -13,20 +11,16 @@ export interface PageIdParams {
     pageId: string;
 }
 
-/**
- * Fetch all the data needed to render the content layout.
- */
-export async function fetchContentData() {
-    const pointer = await getSiteContentPointer();
-    return fetchV1ContextForSitePointer(pointer);
-}
+export type PageParams = PagePathParams | PageIdParams;
 
 /**
- * Fetch all the data needed to render the content.
+ * Fetch all the data needed to render the site page.
  * Optimized to fetch in parallel as much as possible.
  */
-export async function fetchPageData(params: PagePathParams | PageIdParams) {
-    const context = await fetchContentData();
+export async function fetchPageData(
+    context: GitBookSiteContext,
+    params: PageParams
+) {
     const pageTarget = await resolvePage(context, params);
 
     return {
