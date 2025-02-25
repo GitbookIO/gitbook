@@ -13,9 +13,7 @@
     "sideEffects": false,
     "dependencies": {
         "@scalar/openapi-parser": "^0.10.4",
-        "@scalar/openapi-types": "^0.1.6",
-        "swagger2openapi": "^7.0.8",
-        "yaml": "1.10.2"
+        "@scalar/openapi-types": "^0.1.6"
     },
     "devDependencies": {
         "@tsconfig/strictest": "^2.0.5",
