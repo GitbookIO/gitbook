@@ -91,15 +91,6 @@ export function normalizeVisitorAuthURL(url: URL): URL {
 }
 
 /**
- * Get the visitor token from the request context.
- */
-export async function getCurrentVisitorToken(): Promise<string | null> {
-    const headersList = await headers();
-    const visitorToken = headersList.get('x-gitbook-visitor-token');
-    return visitorToken;
-}
-
-/**
  * Get all possible basePaths for a given URL. This is used to find the visitor
  * authentication cookie token.
  * It returns the longest one first, and the shortest one last.

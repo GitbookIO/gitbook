@@ -1,11 +1,12 @@
 import { ContentRef, DocumentBlockOpenAPI } from '@gitbook/api';
 import { parseOpenAPI, OpenAPIParseError } from '@gitbook/openapi-parser';
 import { type OpenAPIOperationData, resolveOpenAPIOperation } from '@gitbook/react-openapi';
+import { GitBookAnyContext } from '@v2/lib/context';
 
 import { cache, noCacheFetchOptions, CacheFunctionOptions } from '@/lib/cache';
 
 import { enrichFilesystem } from './enrich';
-import { ResolvedContentRef } from '../references';
+import { resolveContentRef } from '../references';
 
 const weakmap = new WeakMap<DocumentBlockOpenAPI, ResolveOpenAPIBlockResult>();
 
@@ -25,7 +26,7 @@ export function resolveOpenAPIBlock(args: ResolveOpenAPIBlockArgs): ResolveOpenA
 
 type ResolveOpenAPIBlockArgs = {
     block: DocumentBlockOpenAPI;
-    context: { resolveContentRef: (ref: ContentRef) => Promise<ResolvedContentRef | null> };
+    context: GitBookAnyContext;
 };
 type ResolveOpenAPIBlockResult = Promise<
     | { error?: undefined; data: OpenAPIOperationData | null; specUrl: string | null }
@@ -40,7 +41,7 @@ async function baseResolveOpenAPIBlock(args: ResolveOpenAPIBlockArgs): ResolveOp
         return { data: null, specUrl: null };
     }
 
-    const resolved = block.data.ref ? await context.resolveContentRef(block.data.ref) : null;
+    const resolved = block.data.ref ? await resolveContentRef(block.data.ref, context) : null;
 
     if (!resolved) {
         return { data: null, specUrl: null };

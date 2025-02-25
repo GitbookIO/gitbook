@@ -6,6 +6,7 @@ import {
 } from '@gitbook/api';
 
 import { Image, ImageResponsiveSize } from '@/components/utils';
+import { resolveContentRef } from '@/lib/references';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { BlockProps } from './Block';
@@ -70,8 +71,10 @@ async function ImageBlock(props: {
     const { block, context, isEstimatedOffscreen } = props;
 
     const [src, darkSrc] = await Promise.all([
-        context.resolveContentRef(block.data.ref),
-        block.data.refDark ? context.resolveContentRef(block.data.refDark) : null,
+        context.contentContext ? resolveContentRef(block.data.ref, context.contentContext) : null,
+        block.data.refDark && context.contentContext
+            ? resolveContentRef(block.data.refDark, context.contentContext)
+            : null,
     ]);
 
     if (!src) {
@@ -83,6 +86,7 @@ async function ImageBlock(props: {
             <Image
                 alt={block.data.alt ?? ''}
                 sizes={imageBlockSizes}
+                resize={context.contentContext?.imageResizer}
                 sources={{
                     light: {
                         src: src.href,

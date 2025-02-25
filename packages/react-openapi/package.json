@@ -30,7 +30,7 @@
         "react": "*"
     },
     "scripts": {
-        "build": "tsc --project tsconfig.build.json",
+        "build": "rm -rf ./dist && tsc --project tsconfig.build.json",
         "typecheck": "tsc --noEmit",
         "unit": "bun test",
         "dev": "bun run build -- --watch",

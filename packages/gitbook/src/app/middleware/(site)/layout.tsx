@@ -1,6 +1,6 @@
 import { CustomizationRootLayout } from '@/components/RootLayout';
-import { getSiteData } from '@/lib/api';
 import { getSiteContentPointer } from '@/lib/pointer';
+import { fetchV1ContextForSitePointer } from '@/lib/v1';
 
 /**
  * Layout to be used for the site root. It fetches the customization data for the site
@@ -10,7 +10,7 @@ export default async function SiteRootLayout(props: { children: React.ReactNode 
     const { children } = props;
 
     const pointer = await getSiteContentPointer();
-    const { customization } = await getSiteData(pointer);
+    const { customization } = await fetchV1ContextForSitePointer(pointer);
 
     return (
         <CustomizationRootLayout customization={customization}>{children}</CustomizationRootLayout>

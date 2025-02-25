@@ -41,13 +41,13 @@ const outputContext: ContentKitServerContext = {
 export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegration>) {
     const { block, context, style } = props;
 
-    if (!context.content?.spaceId) {
+    if (!context.contentContext?.space) {
         throw new Error('integration block requires a content.spaceId');
     }
 
     const contentKitContext: ContentKitContext = {
         type: 'document',
-        spaceId: context.content.spaceId,
+        spaceId: context.contentContext?.space.id,
         editable: false,
         theme: 'light', // TODO: how to handle this without moving rendering to the client side?
     };

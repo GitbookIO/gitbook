@@ -1,11 +1,8 @@
-import { CustomizationSettings, Site, SiteCustomizationSettings, Space } from '@gitbook/api';
-import { CustomizationHeaderPreset } from '@gitbook/api';
+import { GitBookSiteContext } from '@v2/lib/context';
 import { Suspense } from 'react';
 
 import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '@/components/layout';
 import { t, getSpaceLanguage } from '@/intl/server';
-import type { SectionsList } from '@/lib/api';
-import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { HeaderLink } from './HeaderLink';
@@ -20,17 +17,10 @@ import { HeaderMobileMenu } from './HeaderMobileMenu';
 /**
  * Render the header for the space.
  */
-export function Header(props: {
-    space: Space;
-    site: Site | null;
-    spaces: Space[];
-    sections: SectionsList | null;
-    context: ContentRefContext;
-    customization: CustomizationSettings | SiteCustomizationSettings;
-    withTopHeader?: boolean;
-}) {
-    const { context, space, site, spaces, sections, customization, withTopHeader } = props;
-    const isMultiVariants = site && spaces.length > 1;
+export function Header(props: { context: GitBookSiteContext; withTopHeader?: boolean }) {
+    const { context, withTopHeader } = props;
+    const { site, siteSpace, siteSpaces, sections, customization } = context;
+    const isMultiVariants = siteSpaces.length > 1;
 
     return (
         <header
@@ -99,14 +89,14 @@ export function Header(props: {
                                     'theme-bold:hover:bg-header-link/3',
                                 )}
                             />
-                            <HeaderLogo site={site} space={space} customization={customization} />
+                            <HeaderLogo context={context} />
                         </div>
 
                         {isMultiVariants && (
                             <div className="hidden page-no-toc:flex mr-auto">
                                 <SpacesDropdown
-                                    space={space}
-                                    spaces={spaces}
+                                    siteSpace={siteSpace}
+                                    siteSpaces={siteSpaces}
                                     className={`theme-bold:bg-header-link/2 theme-bold:text-header-link theme-bold:ring-header-link/4
                                             theme-bold:dark:bg-header-link/2 theme-bold:dark:text-header-link theme-bold:dark:ring-header-link/4 
                                             theme-bold:group-hover/dropdown:bg-header-link/3 theme-bold:group-hover/dropdown:text-header-link theme-bold:group-hover/dropdown:ring-header-link/6
@@ -126,20 +116,12 @@ export function Header(props: {
                         {customization.header.links.length > 0 && (
                             <HeaderLinks>
                                 {customization.header.links.map((link, index) => {
-                                    return (
-                                        <HeaderLink
-                                            key={index}
-                                            link={link}
-                                            context={context}
-                                            customization={customization}
-                                        />
-                                    );
+                                    return <HeaderLink key={index} link={link} context={context} />;
                                 })}
                                 <HeaderLinkMore
                                     label={t(getSpaceLanguage(customization), 'more')}
                                     links={customization.header.links}
                                     context={context}
-                                    customization={customization}
                                 />
                             </HeaderLinks>
                         )}

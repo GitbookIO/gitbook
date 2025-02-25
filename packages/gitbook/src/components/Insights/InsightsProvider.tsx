@@ -5,6 +5,7 @@ import { OpenAPIOperationContextProvider } from '@gitbook/react-openapi';
 import * as React from 'react';
 import { useEventCallback, useDebounceCallback } from 'usehooks-ts';
 
+import { SiteContentPointer } from '@/lib/api';
 import * as cookies from '@/lib/cookies';
 
 import { getSession } from './sessions';
@@ -15,14 +16,7 @@ export type InsightsEventName = api.SiteInsightsEvent['type'];
 /**
  * Global context for all events in the session.
  */
-interface InsightsEventContext {
-    organizationId: string;
-    siteId: string;
-    siteSectionId: string | undefined;
-    siteSpaceId: string | undefined;
-    spaceId: string;
-    siteShareKey: string | undefined;
-}
+type InsightsEventContext = SiteContentPointer;
 
 /**
  * Context for an event on a page.

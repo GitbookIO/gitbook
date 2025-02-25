@@ -2,7 +2,6 @@ import 'server-only';
 import { AsyncLocalStorage } from 'node:async_hooks';
 
 import {
-    ContentVisibility,
     CustomizationSettings,
     GitBookAPI,
     GitBookAPIError,
@@ -19,12 +18,12 @@ import {
     PublishedSiteContent,
     SiteSectionGroup,
     ComputedContentSource,
-    RevisionPageDocument,
 } from '@gitbook/api';
+import { GitBookDataFetcher } from '@v2/lib/data/types';
 import assertNever from 'assert-never';
 import { headers } from 'next/headers';
 import rison from 'rison';
-import { assert, DeepPartial } from 'ts-essentials';
+import { assert } from 'ts-essentials';
 
 import { batch } from './async';
 import { buildVersion } from './build';
@@ -35,7 +34,6 @@ import {
     noCacheFetchOptions,
     parseCacheResponse,
 } from './cache';
-import { defaultCustomizationForSpace } from './utils';
 
 /**
  * Pointer to a relative content, it might change overtime, the pointer is relative in the content history.
@@ -751,19 +749,6 @@ export const getComputedDocument = cache({
 });
 
 /**
- * Get the document for a page.
- */
-export async function getPageDocument(spaceId: string, page: RevisionPageDocument) {
-    if (page.documentId) {
-        return getDocument(spaceId, page.documentId);
-    } else if (page.computed) {
-        return getComputedDocument(spaceId, page.computed);
-    }
-
-    return null;
-}
-
-/**
  * Mimic the validation done on source server-side to reduce API usage.
  */
 function validateSiteRedirectSource(source: string) {
@@ -916,75 +901,6 @@ function parseSiteSectionsList(
 }
 
 /**
- * This function fetches the published content site data to render the published
- * experience for the site (structure, customizations, scripts etc)
- */
-export async function getSiteData(
-    pointer: Pick<
-        SiteContentPointer,
-        'organizationId' | 'siteId' | 'siteSectionId' | 'siteSpaceId' | 'siteShareKey'
-    >,
-) {
-    const {
-        site: orgSite,
-        structure: siteStructure,
-        customizations,
-        scripts,
-    } = await getPublishedContentSite({
-        organizationId: pointer.organizationId,
-        siteId: pointer.siteId,
-        siteShareKey: pointer.siteShareKey,
-    });
-
-    const siteSectionsAndGroups =
-        siteStructure.type === 'sections' && siteStructure.structure
-            ? siteStructure.structure
-            : null;
-
-    const siteSpaces =
-        siteStructure.type === 'siteSpaces' && siteStructure.structure
-            ? parseSpacesFromSiteSpaces(siteStructure.structure)
-            : null;
-    // override the title with the customization title
-    const site = {
-        ...orgSite,
-        ...(customizations.site?.title ? { title: customizations.site.title } : {}),
-    };
-
-    const sections =
-        pointer.siteSectionId && siteSectionsAndGroups
-            ? parseSiteSectionsList(pointer.siteSectionId, siteSectionsAndGroups)
-            : null;
-    const spaces =
-        siteSpaces ?? (sections ? parseSpacesFromSiteSpaces(sections.current.siteSpaces) : []);
-
-    const settings = (() => {
-        if (pointer.siteSpaceId) {
-            const siteSpaceSettings = customizations.siteSpaces[pointer.siteSpaceId];
-            if (siteSpaceSettings) {
-                return siteSpaceSettings;
-            }
-            // We got the pointer from an API and customizations from another.
-            // It's possible that the two are unsynced leading to not found customizations for the space.
-            // It's better to fallback on customization of the site that displaying an error.
-            console.warn('Customization not found for site space', pointer.siteSpaceId);
-        }
-        return customizations.site;
-    })();
-
-    const customization = await getActiveCustomizationSettings(settings);
-
-    return {
-        customization,
-        site,
-        structure: siteStructure,
-        sections,
-        spaces,
-        scripts,
-    };
-}
-
-/**
  * Validate that the customization settings passed are valid.
  */
 export function validateSerializedCustomization(raw: string): boolean {
@@ -997,100 +913,38 @@ export function validateSerializedCustomization(raw: string): boolean {
 }
 
 /**
- * Get the customization settings for a space from the API.
- */
-export async function getSpaceCustomization(): Promise<{
-    customization: CustomizationSettings;
-}> {
-    const headersList = await headers();
-    const raw = defaultCustomizationForSpace();
-
-    const extend = headersList.get('x-gitbook-customization');
-    if (extend) {
-        try {
-            const parsed = rison.decode_object<Partial<CustomizationSettings>>(extend);
-            return { customization: { ...raw, ...parsed } };
-        } catch (error) {
-            console.error(
-                `Failed to parse x-gitbook-customization header (ignored): ${
-                    (error as Error).stack ?? (error as Error).message ?? error
-                }`,
-            );
-        }
-    }
-
-    return {
-        customization: raw,
-    };
-}
-
-/**
- * Get the infos about a collection by its ID.
- */
-export const getCollection = cache({
-    name: 'api.getCollection',
-    tag: (collectionId) => getAPICacheTag({ tag: 'collection', collection: collectionId }),
-    get: async (collectionId: string, options: CacheFunctionOptions) => {
-        const apiCtx = await api();
-        const response = await apiCtx.client.collections.getCollectionById(collectionId, {
-            ...noCacheFetchOptions,
-            signal: options.signal,
-        });
-        return cacheResponse(response, {
-            revalidateBefore: 60 * 60,
-        });
-    },
-});
-
-/**
- * List all the spaces variants published in a collection.
- */
-export const getCollectionSpaces = cache({
-    name: 'api.getCollectionSpaces',
-    tag: (collectionId) => getAPICacheTag({ tag: 'collection', collection: collectionId }),
-    get: async (collectionId: string, options: CacheFunctionOptions) => {
-        const response = await getAll(async (params) => {
-            const apiCtx = await api();
-            const response = await apiCtx.client.collections.listSpacesInCollectionById(
-                collectionId,
-                params,
-                {
-                    ...noCacheFetchOptions,
-                    signal: options.signal,
-                },
-            );
-            return response;
-        });
-
-        return cacheResponse(response, {
-            revalidateBefore: 60 * 60,
-            data: response.data.items.filter(
-                (space) => space.visibility === ContentVisibility.InCollection,
-            ),
-        });
-    },
-});
-
-/**
  * Fetch all the content data about a space at once.
  * This function executes the requests in parallel and should be used as early as possible
  * instead of calling the individual functions.
+ *
+ * @deprecated - use 'fetchSpaceContextByIds' from v2
  */
 export async function getSpaceContentData(
+    dataFetcher: GitBookDataFetcher,
     pointer: SpaceContentPointer,
     shareKey: string | undefined,
 ) {
     const [space, changeRequest] = await Promise.all([
-        getSpace(pointer.spaceId, shareKey),
-        pointer.changeRequestId ? getChangeRequest(pointer.spaceId, pointer.changeRequestId) : null,
+        dataFetcher.getSpace({
+            spaceId: pointer.spaceId,
+            shareKey,
+        }),
+        pointer.changeRequestId
+            ? dataFetcher.getChangeRequest({
+                  spaceId: pointer.spaceId,
+                  changeRequestId: pointer.changeRequestId,
+              })
+            : null,
     ]);
 
     const contentTarget: ContentTarget = {
         spaceId: pointer.spaceId,
         revisionId: changeRequest?.revision ?? pointer.revisionId ?? space.revision,
     };
-    const pages = await getRevisionPages(space.id, contentTarget.revisionId, {
-        // We only care about the Git metadata when the Git sync is enabled
+    const pages = await dataFetcher.getRevisionPages({
+        spaceId: pointer.spaceId,
+        revisionId: contentTarget.revisionId,
+        // We only care about the Git metadata when the Git sync is enabled,
         // otherwise we can optimize performance by not fetching it
         metadata: !!space.gitSync,
     });

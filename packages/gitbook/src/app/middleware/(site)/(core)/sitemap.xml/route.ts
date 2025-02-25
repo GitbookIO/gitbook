@@ -5,8 +5,8 @@ import jsontoxml from 'jsontoxml';
 import { getPublishedContentSite } from '@/lib/api';
 import { joinPath } from '@/lib/paths';
 import { checkIsRootPointer, getSiteContentPointer } from '@/lib/pointer';
+import { getSiteStructureSections } from '@/lib/sites';
 import { filterOutNullable } from '@/lib/typescript';
-import { getSiteStructureSections } from '@/lib/utils';
 
 export const runtime = 'edge';
 

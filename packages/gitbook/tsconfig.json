@@ -19,7 +19,8 @@
             }
         ],
         "paths": {
-            "@/*": ["./src/*"]
+            "@/*": ["./src/*"],
+            "@v2/*": ["../gitbook-v2/src/*"]
         },
         "types": [
             "bun-types" // add Bun global

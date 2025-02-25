@@ -10,7 +10,7 @@ import { getPagePath } from '@/lib/pages';
 import { joinPath } from '@/lib/paths';
 import { checkIsRootPointer, getSiteContentPointer } from '@/lib/pointer';
 import { getIndexablePages } from '@/lib/sitemap';
-import { getSiteStructureSections } from '@/lib/utils';
+import { getSiteStructureSections } from '@/lib/sites';
 
 export const runtime = 'edge';
 

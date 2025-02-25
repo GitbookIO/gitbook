@@ -1,8 +1,9 @@
 import { SiteInsightsAd } from '@gitbook/api';
 import { hexToRgba } from '@gitbook/colors';
+import { GitBookBaseContext } from '@v2/lib/context';
+import { getResizedImageURL } from '@v2/lib/images';
 import * as React from 'react';
 
-import { getResizedImageURL } from '@/lib/images';
 import { tcls } from '@/lib/tailwind';
 
 import { AdCover } from './types';
@@ -14,11 +15,16 @@ import { Link } from '../primitives';
 export async function AdCoverRendering({
     ad,
     insightsAd,
+    context,
 }: {
     ad: AdCover;
     insightsAd: SiteInsightsAd | null;
+    context: GitBookBaseContext;
 }) {
-    const largeImage = await getResizedImageURL(ad.largeImage, { width: 128, dpr: 2 });
+    const largeImage = await getResizedImageURL(context.imageResizer, ad.largeImage, {
+        width: 128,
+        dpr: 2,
+    });
 
     return (
         <Link
