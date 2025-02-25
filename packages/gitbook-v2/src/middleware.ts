@@ -54,7 +54,6 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
     }
 
     const requestHeaders = new Headers(request.headers);
-    requestHeaders.set(MiddlewareHeaders.URL, url);
     requestHeaders.set(MiddlewareHeaders.URLMode, mode);
     if (dynamicHeaders) {
         for (const [key, value] of Object.entries(dynamicHeaders)) {

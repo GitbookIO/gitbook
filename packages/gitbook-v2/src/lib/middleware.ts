@@ -2,22 +2,8 @@ import { CustomizationThemeMode } from '@gitbook/api';
 import { headers } from 'next/headers';
 
 export enum MiddlewareHeaders {
-    URL = 'x-gitbook-url',
     URLMode = 'x-gitbook-url-mode',
     Theme = 'x-gitbook-theme',
-}
-
-/**
- * Get the URL from the middleware headers.
- */
-export async function getURLFromMiddleware() {
-    const headersList = await headers();
-    const url = headersList.get(MiddlewareHeaders.URL);
-    if (!url) {
-        throw new Error('URL is not set by the middleware');
-    }
-
-    return url;
 }
 
 /**
