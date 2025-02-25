@@ -2,8 +2,6 @@
 .vercel
 .open-next
 
-# Typescript
-
 # Generated
 packages/emoji-codepoints/index.ts
 packages/gitbook/public/~gitbook/static/
