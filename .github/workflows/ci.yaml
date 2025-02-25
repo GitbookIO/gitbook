@@ -226,8 +226,8 @@ jobs:
 
                       | Site | v1 | v2 |
                       | --- | --- | --- |
-                      | GitBook | [${{ needs.deploy.outputs.deployment-url }}/docs.gitbook.com](${{ needs.deploy.outputs.deployment-url }}/docs.gitbook.com) | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}/static/url/docs.gitbook.com](${{ needs.deploy-v2-vercel.outputs.deployment-url }}/static/url/docs.gitbook.com) |
-                      | E2E | [${{ needs.deploy.outputs.deployment-url }}/gitbook.gitbook.io/test-gitbook-open](${{ needs.deploy.outputs.deployment-url }}/gitbook.gitbook.io/test-gitbook-open) | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}/static/url/gitbook.gitbook.io/test-gitbook-open](${{ needs.deploy-v2-vercel.outputs.deployment-url }}/static/url/gitbook.gitbook.io/test-gitbook-open) |
+                      | GitBook | [${{ needs.deploy.outputs.deployment-url }}/docs.gitbook.com](${{ needs.deploy.outputs.deployment-url }}/docs.gitbook.com) | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/docs.gitbook.com](${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/docs.gitbook.com) |
+                      | E2E | [${{ needs.deploy.outputs.deployment-url }}/gitbook.gitbook.io/test-gitbook-open](${{ needs.deploy.outputs.deployment-url }}/gitbook.gitbook.io/test-gitbook-open) | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/gitbook.gitbook.io/test-gitbook-open](${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/gitbook.gitbook.io/test-gitbook-open) |
                   edit-mode: replace
     visual-testing:
         runs-on: ubuntu-latest
