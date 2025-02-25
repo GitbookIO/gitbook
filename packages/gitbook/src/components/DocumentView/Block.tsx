@@ -99,7 +99,7 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
             case 'image':
             case 'code-line':
             case 'tabs-item':
-                throw new Error('Blocks should be directly rendered by parent');
+                throw new Error(`Blocks (${block.type}) should be directly rendered by parent`);
             case 'integration':
                 return <IntegrationBlock {...props} block={block} />;
             case 'reusable-content':
@@ -168,7 +168,7 @@ export function BlockSkeleton(props: { block: DocumentBlock; style: ClassValue }
         case 'code-line':
         case 'tabs-item':
         case 'stepper-step':
-            throw new Error('Blocks should be directly rendered by parent');
+            throw new Error(`Blocks (${block.type}) should be directly rendered by parent`);
         default:
             return nullIfNever(block);
     }
