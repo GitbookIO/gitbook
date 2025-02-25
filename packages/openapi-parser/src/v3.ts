@@ -14,7 +14,7 @@ export async function parseOpenAPIV3(
 ): Promise<Filesystem<OpenAPIV3xDocument>> {
     const { value, rootURL, trust } = input;
     const specification = trust
-        ? trustedValidate({ value, rootURL })
+        ? await trustedValidate({ value, rootURL })
         : await untrustedValidate({ value, rootURL });
 
     const filesystem = await createFileSystem({ value: specification, rootURL });
@@ -54,17 +54,15 @@ async function untrustedValidate(input: ValidateOpenAPIV3Input) {
  * It assumes the specification is already a valid specification.
  * It's faster than `untrustedValidate`.
  */
-function trustedValidate(input: ValidateOpenAPIV3Input) {
+async function trustedValidate(input: ValidateOpenAPIV3Input) {
     const { value, rootURL } = input;
     const result = (() => {
         if (typeof value === 'string') {
             try {
                 return JSON.parse(value);
             } catch (error) {
-                throw new OpenAPIParseError('Invalid JSON', {
-                    code: 'invalid',
-                    rootURL,
-                });
+                /** In case of an invalid JSON, we fallback to untrusted validation. */
+                return untrustedValidate(input);
             }
         }
         return value;
