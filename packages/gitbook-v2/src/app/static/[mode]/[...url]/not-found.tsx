@@ -3,10 +3,12 @@ import { getStaticSiteContext } from '@v2/app/utils';
 import { getURLFromMiddleware, getURLModeFromMiddleware } from '@v2/lib/middleware';
 
 export default async function NotFound() {
-    const { context } = await getStaticSiteContext({
-        url: await getURLFromMiddleware(),
-        mode: await getURLModeFromMiddleware(),
-    });
+    return <div>Not Found (TODO</div>;
 
-    return <SitePageNotFound context={context} />;
+    // const { context } = await getStaticSiteContext({
+    //     url: await getURLFromMiddleware(),
+    //     mode: await getURLModeFromMiddleware(),
+    // });
+
+    // return <SitePageNotFound context={context} />;
 }
