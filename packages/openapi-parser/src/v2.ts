@@ -13,7 +13,7 @@ export async function convertOpenAPIV2ToOpenAPIV3(
     const { value, rootURL } = input;
     try {
         const result = upgrade(value);
-        return createFileSystem({ value: result, rootURL });
+        return createFileSystem({ value: result.specification, rootURL });
     } catch (error) {
         throw new OpenAPIParseError('Failed to convert Swagger 2.0 to OpenAPI 3.0', {
             code: 'v2-conversion',

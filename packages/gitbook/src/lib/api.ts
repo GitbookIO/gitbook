@@ -34,7 +34,6 @@ import {
     noCacheFetchOptions,
     parseCacheResponse,
 } from './cache';
-import { defaultCustomizationForSpace } from './utils';
 
 /**
  * Pointer to a relative content, it might change overtime, the pointer is relative in the content history.
