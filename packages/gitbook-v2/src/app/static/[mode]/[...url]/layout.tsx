@@ -14,7 +14,7 @@ export default async function RootLayout({
 }) {
     'use cache';
 
-    const context = await getStaticSiteContext(await params);
+    const { context } = await getStaticSiteContext(await params);
 
     cacheTag(getSiteCacheTag(context.site.id));
 

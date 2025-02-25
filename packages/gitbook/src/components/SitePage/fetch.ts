@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { resolvePagePath, resolvePageId } from '@/lib/pages';
 
 export interface PagePathParams {
-    pathname?: string[];
+    pathname?: string | string[];
 }
 
 export interface PageIdParams {
@@ -83,7 +83,16 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
  */
 export function getPathnameParam(params: PagePathParams): string {
     const { pathname } = params;
-    return pathname ? pathname.map((part) => decodeURIComponent(part)).join('/') : '';
+
+    if (!pathname) {
+        return '';
+    }
+
+    if (typeof pathname === 'string') {
+        return pathname.startsWith('/') ? pathname.slice(1) : pathname;
+    }
+
+    return pathname.map((part) => decodeURIComponent(part)).join('/');
 }
 
 /**

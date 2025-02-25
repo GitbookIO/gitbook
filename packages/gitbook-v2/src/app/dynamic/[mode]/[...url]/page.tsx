@@ -1,8 +1,8 @@
-import { SiteContentPage } from '@v2/components/routes/SiteContentPage';
 import { getDynamicSiteContext, RouteParams } from '@v2/app/utils';
+import { SitePage } from '@/components/SitePage';
 
 export default async function Page({ params }: { params: Promise<RouteParams> }) {
-    const context = await getDynamicSiteContext(await params);
+    const { context, pathname } = await getDynamicSiteContext(await params);
 
-    return <SiteContentPage context={context} />;
+    return <SitePage context={context} pageParams={{ pathname }} redirectOnFallback={true} />;
 }

@@ -105,14 +105,14 @@ export type GitBookPageContext = (GitBookSpaceContext | GitBookSiteContext) & {
 /**
  * Fetch the context of a site for a given URL and a base context.
  */
-export async function fetchSiteContext(
+export async function fetchSiteContextByURL(
     baseContext: GitBookBaseContext,
     input: {
         url: string;
         visitorAuthToken: string | null;
         redirectOnError: boolean;
     },
-): Promise<GitBookSiteContext> {
+): Promise<{ context: GitBookSiteContext; pathname: string; }> {
     const { dataFetcher } = baseContext;
     const data = await dataFetcher.getPublishedContentByUrl({
         url: input.url,
@@ -145,10 +145,15 @@ export async function fetchSiteContext(
         },
     );
 
-    return {
+    const siteContext = {
         ...context,
         linker: appendPrefixToLinker(context.linker, data.basePath),
     };
+    
+    return {
+        context: siteContext,
+        pathname: data.pathname,
+    }
 }
 
 /**

@@ -11,7 +11,7 @@ export default async function RootLayout({
     params: Promise<RouteParams>;
     children: React.ReactNode;
 }) {
-    const context = await getDynamicSiteContext(await params);
+    const { context } = await getDynamicSiteContext(await params);
     const forcedTheme = await getThemeFromMiddleware();
 
     return (
