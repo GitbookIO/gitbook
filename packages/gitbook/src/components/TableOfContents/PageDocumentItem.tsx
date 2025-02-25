@@ -15,7 +15,7 @@ export async function PageDocumentItem(props: {
     context: GitBookSiteContext;
 }) {
     const { rootPages, page, context } = props;
-    const href = await getPageHref(rootPages, page);
+    const href = context.linker.toPathForPage({ pages: rootPages, page });
 
     return (
         <li className={tcls('flex', 'flex-col')}>
