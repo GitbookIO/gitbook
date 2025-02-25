@@ -82,13 +82,7 @@ const fetchFilesystem = cache({
         }
 
         const text = await response.text();
-        const filesystem = await parseOpenAPI({
-            value: text,
-            rootURL: url,
-            // If we fetch the OpenAPI specification
-            // it's the legacy system, it means the spec can be trusted here.
-            trust: true,
-        });
+        const filesystem = await parseOpenAPI({ value: text, rootURL: url });
         const richFilesystem = await enrichFilesystem(filesystem);
         return {
             // Cache for 4 hours
