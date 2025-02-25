@@ -30,7 +30,7 @@ export async function getPublishedContentByURL(input: {
             userAgent: GITBOOK_USER_AGENT,
         });
 
-        console.time('lookup');
+        console.time(`lookup:${alternative.url}`);
         const callResult = await tryCatch(
             api.urls.getPublishedContentByUrl(
                 {
@@ -43,11 +43,11 @@ export async function getPublishedContentByURL(input: {
                     signal,
                     headers: {
                         'x-gitbook-force-cache': 'true',
-                    }
+                    },
                 },
             ),
         );
-        console.timeEnd('lookup');
+        console.timeEnd(`lookup:${alternative.url}`);
 
         if (callResult.error) {
             if (alternative.primary) {
