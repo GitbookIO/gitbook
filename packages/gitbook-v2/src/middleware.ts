@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { MiddlewareHeaders } from './lib/middleware';
-import { getPublishedContentByURL } from '@v2/lib/data';
 import { GitBookAPIError } from '@gitbook/api';
+
+import { removeTrailingSlash } from '@/lib/paths';
+import { MiddlewareHeaders } from '@v2/lib/middleware';
+import { getPublishedContentByURL } from '@v2/lib/data';
 
 export const config = {
     matcher: ['/((?!_next/|_static/|_vercel|[\\w-]+\\.\\w+).*)'],
@@ -69,7 +71,7 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
         dynamicHeaders ? 'dynamic' : 'static',
         mode,
         encodeURIComponent(url.host + data.basePath),
-        encodeURIComponent(data.pathname),
+        encodeURIComponent(removeTrailingSlash(data.pathname)),
     ].join('/');
 
 

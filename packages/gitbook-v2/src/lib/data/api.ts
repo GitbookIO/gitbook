@@ -265,10 +265,11 @@ async function getRevisionPageByPath(
 ) {
     'use cache';
 
+    const encodedPath = encodeURIComponent(params.path);
     const res = await getAPI(input).spaces.getPageInRevisionByPath(
         params.spaceId,
         params.revisionId,
-        params.path,
+        encodedPath,
     );
 
     return res.data;
