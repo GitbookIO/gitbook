@@ -2,7 +2,7 @@ import { DocumentInlineLink, SiteInsightsLinkPosition } from '@gitbook/api';
 
 import { InlineProps } from './Inline';
 import { Inlines } from './Inlines';
-import { Link } from '../primitives';
+import { Link, StyledLink } from '../primitives';
 
 export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
     const { inline, document, context, ancestorInlines } = props;
@@ -23,9 +23,8 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
     }
 
     return (
-        <Link
+        <StyledLink
             href={resolved.href}
-            className="underline underline-offset-2 text-primary-subtle hover:text-primary contrast-more:text-primary contrast-more:hover:text-primary-strong transition-colors"
             insights={{
                 type: 'link_click',
                 link: {
@@ -40,6 +39,6 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
                 nodes={inline.nodes}
                 ancestorInlines={[...ancestorInlines, inline]}
             />
-        </Link>
+        </StyledLink>
     );
 }

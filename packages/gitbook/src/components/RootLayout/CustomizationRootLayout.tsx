@@ -63,6 +63,7 @@ export async function CustomizationRootLayout(props: {
                 tintColor ? ' tint' : 'no-tint',
                 sidebarStyles.background && ` sidebar-${sidebarStyles.background}`,
                 sidebarStyles.list && ` sidebar-list-${sidebarStyles.list}`,
+                customization.styling.links && ` links-${customization.styling.links}`,
             )}
         >
             <head>

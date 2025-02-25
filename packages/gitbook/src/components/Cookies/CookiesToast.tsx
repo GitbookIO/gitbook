@@ -3,7 +3,7 @@
 import { Icon } from '@gitbook/icons';
 import * as React from 'react';
 
-import { Button } from '@/components/primitives';
+import { Button, StyledLink } from '@/components/primitives';
 import { useLanguage } from '@/intl/client';
 import { t, tString } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
@@ -64,18 +64,9 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                 {t(
                     language,
                     'cookies_prompt',
-                    <a
-                        href={privacyPolicy}
-                        className={tcls(
-                            'text-primary-subtle',
-                            'hover:text-primary',
-                            'contrast-more:text-primary',
-                            'contrast-more:hover:text-primary-strong',
-                            'underline',
-                        )}
-                    >
+                    <StyledLink href={privacyPolicy}>
                         {t(language, 'cookies_prompt_privacy')}
-                    </a>,
+                    </StyledLink>,
                 )}
             </p>
             <button
