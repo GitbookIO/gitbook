@@ -38,22 +38,21 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
         >
             <div
                 className={tcls(
-                    'py-3',
-                    'pl-3',
-                    '-mt-px', // Bump icon up 1px for optical alignment with heading
+                    'py-4',
+                    'pl-4',
                     hasHeading ? hintStyle.header : null,
                     hintStyle.iconColor,
                 )}
             >
                 <Icon
                     icon={hintStyle.icon}
-                    className={tcls('size-[1.2em]', 'mt-0.5', firstLine.lineHeight)}
+                    className={tcls('size-[1.2em]', 'mt-px', firstLine.lineHeight)}
                 />
             </div>
             {hasHeading ? (
                 <Block
                     style={tcls(
-                        'text-[1em] *:mt-0 p-3 flip-heading-hash',
+                        'text-[1em] *:mt-0 p-4 pl-3 flip-heading-hash',
                         hasHeading ? hintStyle.header : null,
                     )}
                     ancestorBlocks={[...ancestorBlocks, block]}
@@ -71,11 +70,12 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
                     'flip-heading-hash',
                 )}
                 style={[
-                    'p-3',
+                    'p-4',
+                    'pl-3',
                     'empty:p-0',
                     '-row-end-1',
                     '-col-end-1',
-                    'space-y-4',
+                    'space-y-3',
                     '[&_.hint]:border',
                     '[&_pre]:border',
                     '[&_pre]:border-neutral',
