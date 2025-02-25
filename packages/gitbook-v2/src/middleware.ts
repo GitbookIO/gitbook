@@ -15,14 +15,19 @@ export function middleware(request: NextRequest) {
     const dynamicHeaders = getDynamicHeaders(request);
     const { url, mode } = extracted;
 
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set(MiddlewareHeaders.URL, url);
+    requestHeaders.set(MiddlewareHeaders.URLMode, mode);
+    if (dynamicHeaders) {
+        for (const [key, value] of Object.entries(dynamicHeaders)) {
+            requestHeaders.set(key, value);
+        }
+    }
+
     return NextResponse.rewrite(
         new URL(`/${dynamicHeaders ? 'dynamic' : 'static'}/${mode}/${url}`, request.url),
         {
-            headers: {
-                ...dynamicHeaders,
-                [MiddlewareHeaders.URL]: url,
-                [MiddlewareHeaders.URLMode]: mode,
-            },
+            headers: requestHeaders,
         },
     );
 }
