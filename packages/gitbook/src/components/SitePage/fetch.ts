@@ -17,10 +17,7 @@ export type PageParams = PagePathParams | PageIdParams;
  * Fetch all the data needed to render the site page.
  * Optimized to fetch in parallel as much as possible.
  */
-export async function fetchPageData(
-    context: GitBookSiteContext,
-    params: PageParams
-) {
+export async function fetchPageData(context: GitBookSiteContext, params: PageParams) {
     const pageTarget = await resolvePage(context, params);
 
     return {

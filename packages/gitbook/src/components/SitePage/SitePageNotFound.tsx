@@ -1,14 +1,13 @@
+import { GitBookSiteContext } from '@v2/lib/context';
+
 import { TrackPageViewEvent } from '@/components/Insights';
 import { getSpaceLanguage, t } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
-import { GitBookSiteContext } from '@v2/lib/context';
 
 /**
  * Component that displays a "page not found" message.
  */
-export function SitePageNotFound(props: {
-    context: GitBookSiteContext;
-}) {
+export function SitePageNotFound(props: { context: GitBookSiteContext }) {
     const { context } = props;
     const { space, customization } = context;
 

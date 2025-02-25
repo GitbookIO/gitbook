@@ -1,4 +1,5 @@
 import { CustomizationHeaderPreset, CustomizationThemeMode } from '@gitbook/api';
+import { GitBookSiteContext } from '@v2/lib/context';
 import { getPageDocument } from '@v2/lib/data';
 import { Metadata, Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
@@ -10,9 +11,14 @@ import { getAbsoluteHref } from '@/lib/links';
 import { getPagePath, resolveFirstDocument } from '@/lib/pages';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 
+import {
+    fetchPageData,
+    getPathnameParam,
+    normalizePathname,
+    PageParams,
+    PagePathParams,
+} from './fetch';
 import { PageClientLayout } from './PageClientLayout';
-import { GitBookSiteContext } from '@v2/lib/context';
-import { fetchPageData, getPathnameParam, normalizePathname, PageParams, PagePathParams } from './fetch';
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
@@ -149,16 +155,15 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
 /**
  * Fetches the page data matching the requested pathname and fallback to root page when page is not found.
  */
-async function getPageDataWithFallback(
-    args: {
-        context: GitBookSiteContext,
-        pagePathParams: PagePathParams;
-        fallback?: boolean;
-        redirectOnFallback?: boolean;
-    }) {
-    const { context: baseContext,pagePathParams, fallback, redirectOnFallback = false } = args;
+async function getPageDataWithFallback(args: {
+    context: GitBookSiteContext;
+    pagePathParams: PagePathParams;
+    fallback?: boolean;
+    redirectOnFallback?: boolean;
+}) {
+    const { context: baseContext, pagePathParams, fallback, redirectOnFallback = false } = args;
 
-    let { context, pageTarget } = await fetchPageData(baseContext,pagePathParams);
+    let { context, pageTarget } = await fetchPageData(baseContext, pagePathParams);
 
     const canFallback = !!fallback;
     if (!pageTarget && canFallback) {

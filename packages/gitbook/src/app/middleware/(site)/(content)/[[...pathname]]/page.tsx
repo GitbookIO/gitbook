@@ -1,9 +1,14 @@
 import { Metadata, Viewport } from 'next';
 import React from 'react';
 
+import {
+    generateSitePageMetadata,
+    generateSitePageViewport,
+    SitePage,
+    PagePathParams,
+} from '@/components/SitePage';
 import { getSiteContentPointer } from '@/lib/pointer';
 import { fetchV1ContextForSitePointer } from '@/lib/v1';
-import { generateSitePageMetadata, generateSitePageViewport, SitePage, PagePathParams } from '@/components/SitePage';
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
@@ -11,14 +16,14 @@ export const dynamic = 'force-dynamic';
 type PageProps = {
     params: Promise<PagePathParams>;
     searchParams: Promise<{ fallback?: string }>;
-}
+};
 
 /**
  * Fetch and render a page.
  */
 export default async function Page(props: PageProps) {
     const sitePageProps = await getSitePageProps(props);
-    return <SitePage {...sitePageProps} />
+    return <SitePage {...sitePageProps} />;
 }
 
 export async function generateViewport(): Promise<Viewport> {
@@ -31,7 +36,7 @@ export async function generateViewport(): Promise<Viewport> {
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
     const sitePageProps = await getSitePageProps(props);
     return generateSitePageMetadata(sitePageProps);
-} 
+}
 
 async function getSitePageProps(props: PageProps) {
     const { params: rawParams, searchParams: rawSearchParams } = props;

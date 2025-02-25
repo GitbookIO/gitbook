@@ -5,12 +5,11 @@ import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 import React from 'react';
 
+import { PageIdParams, fetchPageData } from '@/components/SitePage';
 import { googleFontsMap } from '@/fonts';
 import { getAbsoluteHref } from '@/lib/links';
-import { filterOutNullable } from '@/lib/typescript';
-
-import { PageIdParams, fetchPageData } from '@/components/SitePage';
 import { getSiteContentPointer } from '@/lib/pointer';
+import { filterOutNullable } from '@/lib/typescript';
 import { fetchV1ContextForSitePointer } from '@/lib/v1';
 
 export const runtime = 'edge';

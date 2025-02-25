@@ -8,9 +8,8 @@ import {
     SiteLayout,
 } from '@/components/SiteLayout';
 import { getContentSecurityPolicyNonce } from '@/lib/csp';
-import { shouldTrackEvents } from '@/lib/tracking';
-
 import { getSiteContentPointer } from '@/lib/pointer';
+import { shouldTrackEvents } from '@/lib/tracking';
 import { fetchV1ContextForSitePointer } from '@/lib/v1';
 
 export const runtime = 'edge';
