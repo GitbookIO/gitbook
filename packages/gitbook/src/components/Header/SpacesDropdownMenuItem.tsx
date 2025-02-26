@@ -1,18 +1,24 @@
 'use client';
 
 import type { Space } from '@gitbook/api';
-import { useSelectedLayoutSegment } from 'next/navigation';
 
+import { joinPath } from '@/lib/paths';
+import { useCurrentPagePath } from '../hooks';
 import { DropdownMenuItem } from './Dropdown';
 
 function useVariantSpaceHref(variantSpaceUrl: string) {
-    const currentPathname = useSelectedLayoutSegment() ?? '';
-    const targetUrl = new URL(variantSpaceUrl);
-    targetUrl.pathname += `/${currentPathname}`;
-    targetUrl.pathname = targetUrl.pathname.replace(/\/{2,}/g, '/').replace(/\/$/, '');
-    targetUrl.searchParams.set('fallback', 'true');
+    const currentPathname = useCurrentPagePath();
 
-    return targetUrl.toString();
+    if (URL.canParse(variantSpaceUrl)) {
+        const targetUrl = new URL(variantSpaceUrl);
+        targetUrl.pathname = joinPath(targetUrl.pathname, currentPathname);
+        targetUrl.searchParams.set('fallback', 'true');
+
+        return targetUrl.toString();
+    }
+
+    // Fallback when the URL path is a relative path (in development mode)
+    return `${joinPath(variantSpaceUrl, currentPathname)}?fallback=true`;
 }
 
 export function SpacesDropdownMenuItem(props: {

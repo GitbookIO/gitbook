@@ -1,24 +1,27 @@
 'use client';
 
-import type { SiteSection, SiteSectionGroup } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
 import { motion } from 'framer-motion';
 import React from 'react';
 
-import type { SectionsList } from '@/lib/api';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
 import { TOCScrollContainer, useScrollToActiveTOCItem } from '../TableOfContents/TOCScroller';
 import { useIsMounted, useToggleAnimation } from '../hooks';
 import { Link } from '../primitives';
 import { SectionIcon } from './SectionIcon';
+import type {
+    ClientSiteSection,
+    ClientSiteSectionGroup,
+    ClientSiteSections,
+} from './encodeClientSiteSections';
 
 const MAX_ITEMS = 5; // If there are more sections than this, they'll be shown below the fold in a scrollview.
 
 /**
  * A list of items representing site sections for multi-section sites
  */
-export function SiteSectionList(props: { sections: SectionsList; className: ClassValue }) {
+export function SiteSectionList(props: { sections: ClientSiteSections; className: ClassValue }) {
     const {
         sections: { list: sectionsAndGroups, current: currentSection },
         className,
@@ -63,7 +66,7 @@ export function SiteSectionList(props: { sections: SectionsList; className: Clas
 }
 
 export function SiteSectionListItem(props: {
-    section: SiteSection;
+    section: ClientSiteSection;
     isActive: boolean;
     className?: string;
 }) {
@@ -77,7 +80,7 @@ export function SiteSectionListItem(props: {
 
     return (
         <Link
-            href={section.urls.published ?? ''}
+            href={section.url}
             ref={linkRef}
             aria-current={isActive && 'page'}
             className={tcls(
@@ -111,8 +114,8 @@ export function SiteSectionListItem(props: {
 }
 
 export function SiteSectionGroupItem(props: {
-    group: SiteSectionGroup;
-    currentSection: SiteSection;
+    group: ClientSiteSectionGroup;
+    currentSection: ClientSiteSection;
 }) {
     const { group, currentSection } = props;
 

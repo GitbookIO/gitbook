@@ -94,11 +94,19 @@ function createLinkerFromParams(params: RouteLayoutParams) {
     }
 
     const gitbookURL = new URL(GITBOOK_URL);
-    return createLinker({
+    const linker = createLinker({
         protocol: gitbookURL.protocol,
         host: gitbookURL.host,
         pathname: `/url/${url.host}`,
     });
+
+    // Create link in the same format for links to other sites/sections.
+    linker.toLinkForContent = (rawURL: string) => {
+        const urlObject = new URL(rawURL);
+        return `/url/${urlObject.host}${urlObject.pathname}`;
+    };
+
+    return linker;
 }
 
 function getSiteURLFromParams(params: RouteLayoutParams) {

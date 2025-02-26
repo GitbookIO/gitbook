@@ -6,7 +6,7 @@ import { getSpaceLanguage, t } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
 
 import { SearchButton } from '../Search';
-import { SiteSectionTabs } from '../SiteSections';
+import { SiteSectionTabs, encodeClientSiteSections } from '../SiteSections';
 import { HeaderLink } from './HeaderLink';
 import { HeaderLinkMore } from './HeaderLinkMore';
 import { HeaderLinks } from './HeaderLinks';
@@ -95,6 +95,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                         {isMultiVariants && (
                             <div className="mr-auto page-no-toc:flex hidden">
                                 <SpacesDropdown
+                                    context={context}
                                     siteSpace={siteSpace}
                                     siteSpaces={siteSpaces}
                                     className={
@@ -168,7 +169,9 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                     </div>
                 </div>
             </div>
-            {sections ? <SiteSectionTabs sections={sections} /> : null}
+            {sections ? (
+                <SiteSectionTabs sections={encodeClientSiteSections(context, sections)} />
+            ) : null}
         </header>
     );
 }

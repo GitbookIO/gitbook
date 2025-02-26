@@ -27,9 +27,9 @@ import { tcls } from '@/lib/tailwind';
 import { type PDFSearchParams, getPDFSearchParams } from '@/lib/urls';
 import { defaultCustomizationForSpace } from '@/lib/utils';
 
-import './pdf.css';
 import { PageControlButtons } from './PageControlButtons';
 import { PrintButton } from './PrintButton';
+import './pdf.css';
 import { getV1ContextForPDF } from './pointer';
 
 const DEFAULT_LIMIT = 100;
@@ -99,7 +99,7 @@ export default async function PDFHTMLOutput(props: {
                 <div className={tcls('fixed', 'left-12', 'top-12', 'print:hidden', 'z-50')}>
                     <a
                         title={tString(language, 'pdf_goback')}
-                        href={pdfParams.back ?? context.linker.toAbsoluteURL('')}
+                        href={pdfParams.back ?? linker.toAbsoluteURL(linker.toPathInSpace(''))}
                         className={tcls(
                             'flex',
                             'flex-row',

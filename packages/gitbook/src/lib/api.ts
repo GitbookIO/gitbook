@@ -12,10 +12,6 @@ import {
     type RequestRenderIntegrationUI,
     type RevisionFile,
     type RevisionReusableContent,
-    type SiteSection,
-    type SiteSectionGroup,
-    type SiteSpace,
-    type Space,
 } from '@gitbook/api';
 import type { GitBookDataFetcher } from '@v2/lib/data/types';
 import assertNever from 'assert-never';
@@ -861,26 +857,6 @@ export const getPublishedContentSite = cache({
         });
     },
 });
-
-export type SectionsList = { list: (SiteSectionGroup | SiteSection)[]; current: SiteSection };
-
-/**
- * Parse the site spaces into a list of spaces with their title and urls.
- */
-export function parseSpacesFromSiteSpaces(siteSpaces: SiteSpace[]) {
-    const spaces: Record<string, Space> = {};
-    siteSpaces.forEach((siteSpace) => {
-        spaces[siteSpace.space.id] = {
-            ...siteSpace.space,
-            title: siteSpace.title ?? siteSpace.space.title,
-            urls: {
-                ...siteSpace.space.urls,
-                published: siteSpace.urls.published,
-            },
-        };
-    });
-    return Object.values(spaces);
-}
 
 /**
  * Fetch all the content data about a space at once.
