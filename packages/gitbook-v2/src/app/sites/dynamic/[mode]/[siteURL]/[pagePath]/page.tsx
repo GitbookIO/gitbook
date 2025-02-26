@@ -11,7 +11,7 @@ type PageProps = {
     searchParams: Promise<{ fallback?: string }>;
 };
 
-export default async function Page(props: { params: Promise<RouteParams> }) {
+export default async function Page(props: PageProps) {
     const params = await props.params;
     const context = await getDynamicSiteContext(params);
     const pathname = getPagePathFromParams(params);
@@ -25,10 +25,9 @@ export async function generateViewport(props: PageProps): Promise<Viewport> {
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
-    const params = await props.params;
+    const [params, searchParams] = await Promise.all([props.params, props.searchParams]);
     const context = await getDynamicSiteContext(params);
     const pathname = getPagePathFromParams(params);
-    const searchParams = await props.searchParams;
 
     return generateSitePageMetadata({
         context,

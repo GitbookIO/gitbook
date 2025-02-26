@@ -5,7 +5,7 @@ import { CustomizationRootLayout } from '@/components/RootLayout';
 import { SiteLayout } from '@/components/SiteLayout';
 import { GITBOOK_DISABLE_TRACKING } from '@v2/lib/env';
 
-export default async function RootLayout({
+export default async function SiteStaticLayout({
     params,
     children,
 }: {

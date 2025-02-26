@@ -97,7 +97,7 @@ function createLinkerFromParams(params: RouteLayoutParams) {
     return createLinker({
         protocol: gitbookURL.protocol,
         host: gitbookURL.host,
-        pathname: `/url/${url.host}${url.pathname}`,
+        pathname: `/url/${url.host}`,
     });
 }
 

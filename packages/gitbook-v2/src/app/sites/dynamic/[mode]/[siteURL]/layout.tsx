@@ -4,7 +4,7 @@ import { getDynamicSiteContext, RouteLayoutParams } from '@v2/app/utils';
 import { GITBOOK_DISABLE_TRACKING } from '@v2/lib/env';
 import { getThemeFromMiddleware } from '@v2/lib/middleware';
 
-export default async function RootLayout({
+export default async function SiteDynamicLayout({
     params,
     children,
 }: {
