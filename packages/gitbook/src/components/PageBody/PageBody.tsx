@@ -1,18 +1,11 @@
-import {
-    CustomizationSettings,
-    JSONDocument,
-    RevisionPageDocument,
-    SiteCustomizationSettings,
-    Space,
-} from '@gitbook/api';
+import { JSONDocument, RevisionPageDocument } from '@gitbook/api';
+import { GitBookSiteContext } from '@v2/lib/context';
 import React from 'react';
 
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
-import { ContentTarget, SiteContentPointer, api } from '@/lib/api';
 import { hasFullWidthBlock, isNodeEmpty } from '@/lib/document';
 import { AncestorRevisionPage } from '@/lib/pages';
-import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { PageBodyBlankslate } from './PageBodyBlankslate';
@@ -26,26 +19,14 @@ import { PageFeedbackForm } from '../PageFeedback';
 import { DateRelative } from '../primitives';
 
 export function PageBody(props: {
-    space: Space;
-    pointer: SiteContentPointer;
-    contentTarget: ContentTarget;
-    customization: CustomizationSettings | SiteCustomizationSettings;
+    context: GitBookSiteContext;
     page: RevisionPageDocument;
     ancestors: AncestorRevisionPage[];
     document: JSONDocument | null;
-    context: ContentRefContext;
     withPageFeedback: boolean;
 }) {
-    const {
-        space,
-        contentTarget,
-        customization,
-        context,
-        page,
-        ancestors,
-        document,
-        withPageFeedback,
-    } = props;
+    const { page, context, ancestors, document, withPageFeedback } = props;
+    const { space, customization } = context;
 
     const asFullWidth = document ? hasFullWidthBlock(document) : false;
     const language = getSpaceLanguage(customization);
@@ -95,15 +76,12 @@ export function PageBody(props: {
                             blockStyle={['page-api-block:ml-0']}
                             context={{
                                 mode: 'default',
-                                content: contentTarget,
-                                contentRefContext: context,
-                                resolveContentRef: (ref, options) =>
-                                    resolveContentRef(ref, context, options),
+                                contentContext: context,
                             }}
                         />
                     </React.Suspense>
                 ) : (
-                    <PageBodyBlankslate page={page} rootPages={context.pages} context={context} />
+                    <PageBodyBlankslate page={page} context={context} />
                 )}
 
                 {page.layout.pagination && customization.pagination.enabled ? (
@@ -145,7 +123,7 @@ export function PageBody(props: {
                 </div>
             </main>
 
-            <TrackPageViewEvent pageId={page.id} revisionId={space.revision} />
+            <TrackPageViewEvent pageId={page.id} />
         </>
     );
 }

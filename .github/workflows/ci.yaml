@@ -39,7 +39,7 @@ jobs:
                   echo "SENTRY_ENVIRONMENT=preview" >> $GITHUB_ENV
               if: 1 && !startsWith(github.ref, 'refs/heads/main')
             - name: Build Next.js with next-on-pages
-              run: bun run turbo build:cloudflare
+              run: bun run turbo gitbook#build:cloudflare
               env:
                   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
                   NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
@@ -49,7 +49,7 @@ jobs:
                   SENTRY_RELEASE: ${{ github.sha }}
             - id: deploy
               name: Deploy to Cloudflare
-              uses: cloudflare/wrangler-action@v3.11.0
+              uses: cloudflare/wrangler-action@v3.14.0
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -103,7 +103,8 @@ jobs:
               run: |
                   echo "VERCEL_ENVIRONMENT=production" >> $GITHUB_ENV
                   echo "SENTRY_ENVIRONMENT=production" >> $GITHUB_ENV
-                  echo "GITBOOK_ASSETS_PREFIX=https://static.gitbook.com" >> $GITHUB_ENV
+                  echo "GITBOOK_URL=https://open-2v.gitbook.com" >> $GITHUB_ENV
+                  echo "GITBOOK_ASSETS_PREFIX=https://static-2v.gitbook.com" >> $GITHUB_ENV
               if: startsWith(github.ref, 'refs/heads/main')
             - name: Sets env vars for preview
               run: |
@@ -124,7 +125,7 @@ jobs:
             - name: Deploy Project Artifacts to Vercel
               id: deploy
               run: |
-                  DEPLOYMENT_URL=$(bun run vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+                  DEPLOYMENT_URL=$(bun run vercel deploy --prebuilt --target=$VERCEL_ENVIRONMENT $([ "$VERCEL_ENVIRONMENT" = "production" ] && echo "--prod") --token=${{ secrets.VERCEL_TOKEN }})
                   echo "deployment-url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
             - name: Outputs
               run: |
@@ -156,7 +157,8 @@ jobs:
             - name: Sets env vars for production
               run: |
                   echo "SENTRY_ENVIRONMENT=production" >> $GITHUB_ENV
-                  echo "GITBOOK_ASSETS_PREFIX=https://static.gitbook.com" >> $GITHUB_ENV
+                  echo "GITBOOK_URL=https://open-2c.gitbook.com" >> $GITHUB_ENV
+                  echo "GITBOOK_ASSETS_PREFIX=https://static-2c.gitbook.com" >> $GITHUB_ENV
               if: startsWith(github.ref, 'refs/heads/main')
             - name: Sets env vars for preview
               run: |
@@ -173,7 +175,7 @@ jobs:
                   SENTRY_RELEASE: ${{ github.sha }}
             - id: deploy
               name: Deploy to Cloudflare
-              uses: cloudflare/wrangler-action@v3.11.0
+              uses: cloudflare/wrangler-action@v3.14.0
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -226,8 +228,8 @@ jobs:
 
                       | Site | v1 | v2 |
                       | --- | --- | --- |
-                      | GitBook | [${{ needs.deploy.outputs.deployment-url }}/docs.gitbook.com](${{ needs.deploy.outputs.deployment-url }}/docs.gitbook.com) | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}/static/url/docs.gitbook.com](${{ needs.deploy-v2-vercel.outputs.deployment-url }}/static/url/docs.gitbook.com) |
-                      | E2E | [${{ needs.deploy.outputs.deployment-url }}/gitbook.gitbook.io/test-gitbook-open](${{ needs.deploy.outputs.deployment-url }}/gitbook.gitbook.io/test-gitbook-open) | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}/static/url/gitbook.gitbook.io/test-gitbook-open](${{ needs.deploy-v2-vercel.outputs.deployment-url }}/static/url/gitbook.gitbook.io/test-gitbook-open) |
+                      | GitBook | [${{ needs.deploy.outputs.deployment-url }}/docs.gitbook.com](${{ needs.deploy.outputs.deployment-url }}/docs.gitbook.com) | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/docs.gitbook.com](${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/docs.gitbook.com) |
+                      | E2E | [${{ needs.deploy.outputs.deployment-url }}/gitbook.gitbook.io/test-gitbook-open](${{ needs.deploy.outputs.deployment-url }}/gitbook.gitbook.io/test-gitbook-open) | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/gitbook.gitbook.io/test-gitbook-open](${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/gitbook.gitbook.io/test-gitbook-open) |
                   edit-mode: replace
     visual-testing:
         runs-on: ubuntu-latest

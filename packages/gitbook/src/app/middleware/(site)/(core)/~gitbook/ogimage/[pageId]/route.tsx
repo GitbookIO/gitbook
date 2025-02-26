@@ -5,12 +5,12 @@ import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 import React from 'react';
 
+import { PageIdParams, fetchPageData } from '@/components/SitePage';
 import { googleFontsMap } from '@/fonts';
 import { getAbsoluteHref } from '@/lib/links';
+import { getSiteContentPointer } from '@/lib/pointer';
 import { filterOutNullable } from '@/lib/typescript';
-import { getContentTitle } from '@/lib/utils';
-
-import { PageIdParams, fetchPageData } from '../../../../fetch';
+import { fetchV1ContextForSitePointer } from '@/lib/v1';
 
 export const runtime = 'edge';
 
@@ -56,7 +56,12 @@ async function loadGoogleFont(input: { fontFamily: string; text: string; weight:
  * Render the OpenGraph image for a space.
  */
 export async function GET(req: NextRequest, { params }: { params: Promise<PageIdParams> }) {
-    const { space, page, customization, site } = await fetchPageData(await params);
+    const pointer = await getSiteContentPointer();
+    const baseContext = await fetchV1ContextForSitePointer(pointer);
+
+    const { context, pageTarget } = await fetchPageData(baseContext, await params);
+    const { customization, site } = context;
+    const page = pageTarget?.page;
 
     // If user configured a custom social preview, we redirect to it.
     if (customization.socialPreview.url) {
@@ -64,9 +69,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<PageId
     }
 
     // Compute all text to load only the necessary fonts
-    const contentTitle = customization.header.logo
-        ? ''
-        : getContentTitle(space, customization, site ?? null);
+    const contentTitle = customization.header.logo ? '' : site.title;
     const pageTitle = page
         ? page.title.length > 64
             ? page.title.slice(0, 64) + '...'

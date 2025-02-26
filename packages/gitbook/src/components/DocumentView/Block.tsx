@@ -96,10 +96,6 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
                 return <Drawing {...props} block={block} />;
             case 'content-ref':
                 return <BlockContentRef {...props} block={block} />;
-            case 'image':
-            case 'code-line':
-            case 'tabs-item':
-                throw new Error('Blocks should be directly rendered by parent');
             case 'integration':
                 return <IntegrationBlock {...props} block={block} />;
             case 'reusable-content':
@@ -108,6 +104,10 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
                 return <Stepper {...props} block={block} />;
             case 'stepper-step':
                 return <StepperStep {...props} block={block} />;
+            case 'image':
+            case 'code-line':
+            case 'tabs-item':
+                throw new Error(`Blocks (${block.type}) should be directly rendered by parent`);
             default:
                 return nullIfNever(block);
         }
@@ -149,6 +149,7 @@ export function BlockSkeleton(props: { block: DocumentBlock; style: ClassValue }
         case 'code':
         case 'hint':
         case 'tabs':
+        case 'stepper-step':
             return <SkeletonParagraph id={id} style={style} />;
         case 'expandable':
         case 'table':
@@ -167,8 +168,7 @@ export function BlockSkeleton(props: { block: DocumentBlock; style: ClassValue }
         case 'image':
         case 'code-line':
         case 'tabs-item':
-        case 'stepper-step':
-            throw new Error('Blocks should be directly rendered by parent');
+            throw new Error(`Blocks (${block.type}) should be directly rendered by parent`);
         default:
             return nullIfNever(block);
     }

@@ -15,21 +15,21 @@ export type InsightsEventName = api.SiteInsightsEvent['type'];
 /**
  * Global context for all events in the session.
  */
-interface InsightsEventContext {
+type InsightsEventContext = {
     organizationId: string;
     siteId: string;
-    siteSectionId: string | undefined;
-    siteSpaceId: string | undefined;
+    siteSectionId: string | null;
+    siteSpaceId: string | null;
+    siteShareKey: string | null;
     spaceId: string;
-    siteShareKey: string | undefined;
-}
+    revisionId: string;
+};
 
 /**
  * Context for an event on a page.
  */
-interface InsightsEventPageContext {
+export interface InsightsEventPageContext {
     pageId: string | null;
-    revisionId: string;
 }
 
 /**
@@ -275,8 +275,8 @@ function transformEvents(input: {
         siteSpace: input.context.siteSpaceId ?? null,
         space: input.context.spaceId,
         siteShareKey: input.context.siteShareKey ?? null,
+        revision: input.context.revisionId,
         page: input.pageContext.pageId,
-        revision: input.pageContext.revisionId,
     };
 
     return input.events.map((partialEvent) => {

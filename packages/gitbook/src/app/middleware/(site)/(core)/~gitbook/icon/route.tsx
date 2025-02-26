@@ -3,11 +3,10 @@ import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 import React from 'react';
 
-import { getSite, getSiteData, getSpace } from '@/lib/api';
 import { getEmojiForCode } from '@/lib/emojis';
 import { getSiteContentPointer } from '@/lib/pointer';
 import { tcls } from '@/lib/tailwind';
-import { getContentTitle } from '@/lib/utils';
+import { fetchV1ContextForSitePointer } from '@/lib/v1';
 
 export const runtime = 'edge';
 
@@ -36,14 +35,9 @@ export async function GET(req: NextRequest) {
     const size = SIZES[options.size];
 
     const pointer = await getSiteContentPointer();
-    const spaceId = pointer.spaceId;
 
-    const [space, { customization }] = await Promise.all([
-        getSpace(spaceId, pointer.siteShareKey),
-        getSiteData(pointer),
-    ]);
-    const site = await getSite(pointer.organizationId, pointer.siteId);
-    const contentTitle = getContentTitle(space, customization, site);
+    const { site, customization } = await fetchV1ContextForSitePointer(pointer);
+    const contentTitle = site.title;
 
     return new ImageResponse(
         (

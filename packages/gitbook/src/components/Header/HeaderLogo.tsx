@@ -1,23 +1,14 @@
-import {
-    CustomizationHeaderPreset,
-    CustomizationSettings,
-    Site,
-    SiteCustomizationSettings,
-    Space,
-} from '@gitbook/api';
+import { CustomizationSettings, Site, SiteCustomizationSettings } from '@gitbook/api';
+import { GitBookSiteContext } from '@v2/lib/context';
 
 import { Image } from '@/components/utils';
-import { getAbsoluteHref } from '@/lib/links';
 import { tcls } from '@/lib/tailwind';
-import { getContentTitle } from '@/lib/utils';
 
 import { Link } from '../primitives';
 import { SpaceIcon } from '../Space/SpaceIcon';
 
 interface HeaderLogoProps {
-    site: Site | null;
-    space: Space;
-    customization: CustomizationSettings | SiteCustomizationSettings;
+    context: GitBookSiteContext;
 }
 
 /**
@@ -25,17 +16,18 @@ interface HeaderLogoProps {
  */
 
 export async function HeaderLogo(props: HeaderLogoProps) {
-    const { customization } = props;
-    const href = await getAbsoluteHref('');
+    const { context } = props;
+    const { customization, linker } = context;
 
     return (
         <Link
-            href={href}
+            href={linker.toAbsoluteURL(linker.toPathInSpace(''))}
             className={tcls('group/headerlogo', 'min-w-0', 'shrink', 'flex', 'items-center')}
         >
             {customization.header.logo ? (
                 <Image
                     alt="Logo"
+                    resize={context.imageResizer}
                     sources={{
                         light: {
                             src: customization.header.logo.light,
@@ -78,7 +70,8 @@ export async function HeaderLogo(props: HeaderLogoProps) {
 }
 
 function LogoFallback(props: HeaderLogoProps) {
-    const { site, space, customization } = props;
+    const { context } = props;
+    const { customization, site } = context;
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : undefined;
     const customEmoji = 'emoji' in customization.favicon ? customization.favicon.emoji : undefined;
 
@@ -91,6 +84,7 @@ function LogoFallback(props: HeaderLogoProps) {
                 sizes={[{ width: 32 }]}
                 style={['object-contain', 'size-8']}
                 fetchPriority="high"
+                resize={context.imageResizer}
             />
             <div
                 className={tcls(
@@ -107,7 +101,7 @@ function LogoFallback(props: HeaderLogoProps) {
                     'theme-bold:text-header-link',
                 )}
             >
-                {getContentTitle(space, customization, site)}
+                {site.title}
             </div>
         </>
     );

@@ -4,7 +4,7 @@
         "lib": ["dom", "dom.iterable", "esnext"],
         "allowJs": true,
         "skipLibCheck": true,
-        "strict": false,
+        "strict": true,
         "noEmit": true,
         "incremental": true,
         "module": "esnext",
@@ -19,10 +19,26 @@
             }
         ],
         "paths": {
-            "@/*": ["./src/*"],
-            "@v1/*": ["../gitbook/src/*"]
-        }
+            "@v2/*": ["./src/*"],
+            "@/*": ["../gitbook/src/*"]
+        },
+        "types": [
+            "bun-types" // add Bun global
+        ]
     },
-    "include": ["next-env.d.ts", ".next/types/**/*.ts", "**/*.ts", "**/*.tsx"],
-    "exclude": ["node_modules"]
+    "include": [
+        "next-env.d.ts",
+        ".next/types/**/*.ts",
+        "**/*.ts",
+        "**/*.tsx",
+        "../gitbook/types/**/*.d.ts",
+        "../gitbook/cf-env.d.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "packages/openapi-parser",
+        "packages/react-openapi",
+        "packages/react-math",
+        "packages/gitbook"
+    ]
 }

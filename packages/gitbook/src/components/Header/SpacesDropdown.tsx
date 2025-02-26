@@ -1,12 +1,16 @@
-import { Space } from '@gitbook/api';
+import { SiteSpace, Space } from '@gitbook/api';
 
 import { tcls } from '@/lib/tailwind';
 
 import { Dropdown, DropdownChevron, DropdownMenu } from './Dropdown';
 import { SpacesDropdownMenuItem } from './SpacesDropdownMenuItem';
 
-export function SpacesDropdown(props: { space: Space; spaces: Space[]; className?: string }) {
-    const { space, spaces, className } = props;
+export function SpacesDropdown(props: {
+    siteSpace: SiteSpace;
+    siteSpaces: SiteSpace[];
+    className?: string;
+}) {
+    const { siteSpace, siteSpaces, className } = props;
 
     return (
         <Dropdown
@@ -56,21 +60,21 @@ export function SpacesDropdown(props: { space: Space; spaces: Space[]; className
                         className,
                     )}
                 >
-                    <span className={tcls('line-clamp-2', 'grow')}>{space.title}</span>
+                    <span className={tcls('line-clamp-2', 'grow')}>{siteSpace.title}</span>
                     <DropdownChevron />
                 </div>
             )}
         >
             <DropdownMenu>
-                {spaces.map((otherSpace, index) => (
+                {siteSpaces.map((otherSiteSpace, index) => (
                     <SpacesDropdownMenuItem
-                        key={`${otherSpace.id}-${index}`}
+                        key={`${otherSiteSpace.id}-${index}`}
                         variantSpace={{
-                            id: otherSpace.id,
-                            title: otherSpace.title,
-                            url: otherSpace.urls.published ?? otherSpace.urls.app,
+                            id: otherSiteSpace.id,
+                            title: otherSiteSpace.title,
+                            url: otherSiteSpace.urls.published ?? otherSiteSpace.space.urls.app,
                         }}
-                        active={otherSpace.id === space.id}
+                        active={otherSiteSpace.id === siteSpace.id}
                     />
                 ))}
             </DropdownMenu>

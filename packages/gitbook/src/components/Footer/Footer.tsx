@@ -1,9 +1,8 @@
-import { CustomizationSettings, SiteCustomizationSettings, Space } from '@gitbook/api';
+import { GitBookSiteContext } from '@v2/lib/context';
 import React from 'react';
 
 import { Image } from '@/components/utils';
 import { partition } from '@/lib/arrays';
-import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { FooterLinksGroup } from './FooterLinksGroup';
@@ -12,12 +11,9 @@ import { ThemeToggler } from '../ThemeToggler';
 
 const FOOTER_COLUMNS = 4;
 
-export function Footer(props: {
-    space: Space;
-    context: ContentRefContext;
-    customization: CustomizationSettings | SiteCustomizationSettings;
-}) {
-    const { context, customization } = props;
+export function Footer(props: { context: GitBookSiteContext }) {
+    const { context } = props;
+    const { customization } = context;
 
     return (
         <>
@@ -58,6 +54,7 @@ export function Footer(props: {
                         {customization.footer.logo ? (
                             <Image
                                 alt="Logo"
+                                resize={context.imageResizer}
                                 sources={{
                                     light: {
                                         src: customization.footer.logo.light,

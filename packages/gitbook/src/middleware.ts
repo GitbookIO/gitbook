@@ -1,5 +1,7 @@
 import { ContentAPITokenPayload, CustomizationThemeMode, GitBookAPI } from '@gitbook/api';
 import { setTag, setContext } from '@sentry/nextjs';
+import { fetchSiteContextByIds } from '@v2/lib/context';
+import { getURLLookupAlternatives, normalizeURL } from '@v2/lib/data';
 import assertNever from 'assert-never';
 import jwt from 'jsonwebtoken';
 import type { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
@@ -11,18 +13,16 @@ import {
     getPublishedContentByUrl,
     api,
     getSpace,
-    getSpaceContentData,
     userAgent,
     withAPI,
     DEFAULT_API_ENDPOINT,
     getPublishedContentSite,
-    getSiteData,
-    validateSerializedCustomization,
 } from '@/lib/api';
 import { race } from '@/lib/async';
 import { buildVersion } from '@/lib/build';
 import { createContentSecurityPolicyNonce, getContentSecurityPolicy } from '@/lib/csp';
-import { getURLLookupAlternatives, normalizeURL, setMiddlewareHeader } from '@/lib/middleware';
+import { validateSerializedCustomization } from '@/lib/customization';
+import { setMiddlewareHeader } from '@/lib/middleware';
 import {
     VisitorTokenLookup,
     getVisitorAuthCookieName,
@@ -32,7 +32,7 @@ import {
 } from '@/lib/visitor-token';
 
 import { joinPath } from './lib/paths';
-import { waitUntil } from './lib/waitUntil';
+import { getV1BaseContext } from './lib/v1';
 
 export const config = {
     matcher:
@@ -183,29 +183,20 @@ export async function middleware(request: NextRequest) {
             contextId,
         },
         async () => {
-            const [siteData] = await Promise.all([
+            const siteData =
                 'site' in resolved
-                    ? getSiteData({
-                          organizationId: resolved.organization,
-                          siteId: resolved.site,
-                          siteSectionId: resolved.siteSection,
-                          siteSpaceId: resolved.siteSpace,
-                          siteShareKey: resolved.shareKey,
+                    ? await fetchSiteContextByIds(await getV1BaseContext(), {
+                          organization: resolved.organization,
+                          site: resolved.site,
+                          siteSection: resolved.siteSection,
+                          siteSpace: resolved.siteSpace,
+                          space: resolved.space,
+                          shareKey: resolved.shareKey,
+                          changeRequest: resolved.changeRequest,
+                          revision: resolved.revision,
+                          visitorAuthToken: resolved.visitorToken ?? null,
                       })
-                    : null,
-                // Start fetching everything as soon as possible, but do not block the middleware on it
-                // the cache will handle concurrent calls
-                waitUntil(
-                    getSpaceContentData(
-                        {
-                            spaceId: resolved.space,
-                            changeRequestId: resolved.changeRequest,
-                            revisionId: resolved.revision,
-                        },
-                        'site' in resolved ? resolved.shareKey : undefined,
-                    ),
-                ),
-            ]);
+                    : null;
 
             const scripts = siteData?.scripts ?? [];
             return getContentSecurityPolicy(scripts, nonce);

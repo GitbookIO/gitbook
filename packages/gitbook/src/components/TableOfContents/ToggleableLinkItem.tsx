@@ -1,14 +1,13 @@
 'use client';
 
 import { Icon } from '@gitbook/icons';
-import { motion, stagger, useAnimate } from 'framer-motion';
-import { useSelectedLayoutSegment } from 'next/navigation';
+import { motion } from 'framer-motion';
 import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
 import { useScrollToActiveTOCItem } from './TOCScroller';
-import { useToggleAnimation } from '../hooks';
+import { useCurrentPagePath, useToggleAnimation } from '../hooks';
 import { Link, LinkInsightsProps } from '../primitives';
 
 /**
@@ -24,13 +23,12 @@ export function ToggleableLinkItem(
 ) {
     const { href, children, descendants, pathname, insights } = props;
 
-    const rawActiveSegment = useSelectedLayoutSegment() ?? '';
-    const activeSegment = decodeURIComponent(rawActiveSegment);
+    const currentPagePath = useCurrentPagePath();
 
-    const isActive = activeSegment === pathname;
+    const isActive = currentPagePath === pathname;
     const hasDescendants = !!descendants;
     const hasActiveDescendant =
-        hasDescendants && (isActive || activeSegment.startsWith(pathname + '/'));
+        hasDescendants && (isActive || currentPagePath.startsWith(pathname + '/'));
 
     const [isVisible, setIsVisible] = React.useState(hasActiveDescendant);
 
