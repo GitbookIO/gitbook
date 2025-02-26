@@ -1,4 +1,4 @@
-import { type Revision, type RevisionPageDocument, SiteInsightsLinkPosition } from '@gitbook/api';
+import { type RevisionPageDocument, SiteInsightsLinkPosition } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
 import type React from 'react';
 
@@ -14,7 +14,6 @@ import { Link, type LinkInsightsProps } from '../primitives';
  */
 export async function PageFooterNavigation(props: {
     context: GitBookSiteContext;
-    pages: Revision['pages'];
     page: RevisionPageDocument;
 }) {
     const { context, page } = props;
