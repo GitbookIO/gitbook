@@ -125,7 +125,7 @@ jobs:
             - name: Deploy Project Artifacts to Vercel
               id: deploy
               run: |
-                  DEPLOYMENT_URL=$(bun run vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+                  DEPLOYMENT_URL=$(bun run vercel deploy --prebuilt --target=$VERCEL_ENVIRONMENT $([ "$VERCEL_ENVIRONMENT" = "production" ] && echo "--prod") --token=${{ secrets.VERCEL_TOKEN }})
                   echo "deployment-url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
             - name: Outputs
               run: |
