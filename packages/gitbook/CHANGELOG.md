@@ -1,5 +1,26 @@
 # gitbook
 
+## 0.6.3
+
+### Patch Changes
+
+-   a820739: Remove unused search api method from gitbook/api/lib
+-   a054554: Implement a trusted mode to speed up OpenAPI spec validation
+-   66d0fc0: Update design for hint block: use semantic colors (info, warning, danger, success) and add alternative styling for hints with headings
+-   9f0de74: Add support for new OpenAPI ref
+-   da55fac: Render GitBook blocks in OpenAPI operation description
+-   Updated dependencies [c808bb1]
+-   Updated dependencies [dc2dbc5]
+-   Updated dependencies [f1d1d2f]
+-   Updated dependencies [e24206e]
+-   Updated dependencies [a054554]
+-   Updated dependencies [05e1d8c]
+-   Updated dependencies [b4a12d6]
+-   Updated dependencies [9f0de74]
+-   Updated dependencies [da55fac]
+    -   @gitbook/openapi-parser@2.0.0
+    -   @gitbook/react-openapi@1.0.3
+
 ## 0.6.2
 
 ### Patch Changes
