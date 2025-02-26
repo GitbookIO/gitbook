@@ -1,17 +1,17 @@
-import type {
-    DocumentInline,
+import {
+    DocumentInlineImage,
     DocumentInlineAnnotation,
     DocumentInlineEmoji,
-    DocumentInlineImage,
     DocumentInlineLink,
     DocumentInlineMath,
     DocumentInlineMention,
+    DocumentInline,
     JSONDocument,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 
 import { Annotation } from './Annotation/Annotation';
-import type { DocumentContextProps } from './DocumentView';
+import { DocumentContextProps } from './DocumentView';
 import { Emoji } from './Emoji';
 import { InlineImage } from './InlineImage';
 import { InlineLink } from './InlineLink';

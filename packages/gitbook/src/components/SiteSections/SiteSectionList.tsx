@@ -5,13 +5,13 @@ import { Icon, type IconName } from '@gitbook/icons';
 import { motion } from 'framer-motion';
 import React from 'react';
 
-import type { SectionsList } from '@/lib/api';
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { SectionsList } from '@/lib/api';
+import { ClassValue, tcls } from '@/lib/tailwind';
 
-import { TOCScrollContainer, useScrollToActiveTOCItem } from '../TableOfContents/TOCScroller';
-import { useIsMounted, useToggleAnimation } from '../hooks';
 import { Link } from '../primitives';
 import { SectionIcon } from './SectionIcon';
+import { useIsMounted, useToggleAnimation } from '../hooks';
+import { TOCScrollContainer, useScrollToActiveTOCItem } from '../TableOfContents/TOCScroller';
 
 const MAX_ITEMS = 5; // If there are more sections than this, they'll be shown below the fold in a scrollview.
 
@@ -33,7 +33,7 @@ export function SiteSectionList(props: { sections: SectionsList; className: Clas
                     border-b border-tint-subtle -mx-5 relative
                     before:absolute before:contents[] before:left-0 before:right-2 before:bottom-0 before:h-12 before:pointer-events-none 
                     before:bg-gradient-to-b from-transparent to-tint-base sidebar-filled:to-tint-subtle theme-muted:to-tint-subtle theme-bold-tint:to-tint-subtle [html.sidebar-filled.theme-muted_&]:to-tint-base [html.sidebar-filled.theme-bold.tint_&]:to-tint-base`,
-                    className
+                    className,
                 )}
             >
                 <TOCScrollContainer
@@ -92,7 +92,7 @@ export function SiteSectionListItem(props: {
                     ? `text-primary-subtle hover:text-primary contrast-more:text-primary contrast-more:hover:text-primary-strong font-semibold
                 hover:bg-primary-hover contrast-more:hover:ring-1 contrast-more:hover:ring-primary-hover`
                     : null,
-                className
+                className,
             )}
             {...otherProps}
         >
@@ -110,7 +110,7 @@ export function SiteSectionListItem(props: {
                         shadow-md shadow-primary
                         contrast-more:ring-2 contrast-more:ring-primary
                         text-primary-subtle contrast-more:text-primary tint:bg-primary-solid tint:text-contrast-primary-solid`
-                        : null
+                        : null,
                 )}
             >
                 {section.icon ? (
@@ -180,7 +180,7 @@ export function SiteSectionGroupItem(props: {
                         shadow-md shadow-primary
                         contrast-more:ring-2 contrast-more:ring-primary
                         text-primary contrast-more:text-primary-strong tint:bg-primary-solid tint:text-contrast-primary-solid`
-                            : null
+                            : null,
                     )}
                 >
                     {group.icon ? (
@@ -210,7 +210,7 @@ export function SiteSectionGroupItem(props: {
                         'after:h-7',
                         'hover:bg-tint-active',
                         'hover:text-current',
-                        isActiveGroup ? ['hover:bg-tint-hover'] : []
+                        isActiveGroup ? ['hover:bg-tint-hover'] : [],
                     )}
                 >
                     <Icon
@@ -227,7 +227,7 @@ export function SiteSectionGroupItem(props: {
                             'group-hover:opacity-11',
                             'contrast-more:opacity-11',
 
-                            isVisible ? ['rotate-90'] : ['rotate-0']
+                            isVisible ? ['rotate-90'] : ['rotate-0'],
                         )}
                     />
                 </span>

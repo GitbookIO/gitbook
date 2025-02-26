@@ -3,7 +3,7 @@
 import type * as api from '@gitbook/api';
 import { OpenAPIOperationContextProvider } from '@gitbook/react-openapi';
 import * as React from 'react';
-import { useDebounceCallback, useEventCallback } from 'usehooks-ts';
+import { useEventCallback, useDebounceCallback } from 'usehooks-ts';
 
 import * as cookies from '@/lib/cookies';
 
@@ -56,7 +56,7 @@ export type TrackEventInput<EventName extends InsightsEventName = InsightsEventN
 type TrackEventCallback = <EventName extends InsightsEventName>(
     event: TrackEventInput<EventName>,
     ctx?: InsightsEventPageContext,
-    options?: InsightsEventOptions
+    options?: InsightsEventOptions,
 ) => void;
 
 const InsightsContext = React.createContext<TrackEventCallback>(() => {});
@@ -117,7 +117,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
                     visitorId,
                     sessionId: session.id,
                     visitorAuthToken,
-                })
+                }),
             );
 
             // Reset the events for the next flush
@@ -153,7 +153,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
         (
             event: TrackEventInput<InsightsEventName>,
             ctx?: InsightsEventPageContext,
-            options?: InsightsEventOptions
+            options?: InsightsEventOptions,
         ) => {
             console.log('Logging event', event, ctx);
 
@@ -182,7 +182,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
                     flushBatchedEvents();
                 }
             }
-        }
+        },
     );
 
     /**

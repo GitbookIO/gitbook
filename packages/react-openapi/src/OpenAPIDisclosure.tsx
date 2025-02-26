@@ -1,7 +1,7 @@
 import { useRef } from 'react';
+import type { OpenAPIClientContext } from './types';
 import { mergeProps, useButton, useDisclosure, useFocusRing } from 'react-aria';
 import { useDisclosureState } from 'react-stately';
-import type { OpenAPIClientContext } from './types';
 
 interface Props {
     context: OpenAPIClientContext;

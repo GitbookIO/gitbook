@@ -1,12 +1,7 @@
-import { type Mock, beforeEach, describe, expect, it, mock } from 'bun:test';
+import { beforeEach, describe, expect, it, Mock, mock } from 'bun:test';
 import hash from 'object-hash';
 
-import {
-    type CacheDefinition,
-    type CacheFunction,
-    type CacheFunctionOptions,
-    cache,
-} from './cache';
+import { CacheDefinition, CacheFunction, CacheFunctionOptions, cache } from './cache';
 
 describe('cache', () => {
     const impl = mock((arg: string) => 'test-' + arg);

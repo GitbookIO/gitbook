@@ -39,7 +39,7 @@ export async function GET() {
             }
 
             return { url };
-        })
+        }),
     );
 
     const xml = jsontoxml(
@@ -55,7 +55,7 @@ export async function GET() {
         {
             xmlHeader: true,
             prettyPrint: true,
-        }
+        },
     );
 
     return new Response(xml, {

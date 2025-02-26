@@ -1,6 +1,6 @@
 'use client';
 
-import type { Space } from '@gitbook/api';
+import { Space } from '@gitbook/api';
 import { useSelectedLayoutSegment } from 'next/navigation';
 
 import { DropdownMenuItem } from './Dropdown';

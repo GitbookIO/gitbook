@@ -6,16 +6,16 @@ import React from 'react';
 import { Loading } from '@/components/primitives';
 import { useLanguage } from '@/intl/client';
 import { t } from '@/intl/translate';
-import type { TranslationLanguage } from '@/intl/translations';
+import { TranslationLanguage } from '@/intl/translations';
 import { iterateStreamResponse } from '@/lib/actions';
-import type { SiteContentPointer } from '@/lib/api';
+import { SiteContentPointer } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
+import { AskAnswerResult, AskAnswerSource, streamAskQuestion } from './server-actions';
+import { useSearch, useSearchLink } from './useSearch';
 import { useTrackEvent } from '../Insights';
 import { Link } from '../primitives';
 import { useSearchAskContext } from './SearchAskContext';
-import { type AskAnswerResult, type AskAnswerSource, streamAskQuestion } from './server-actions';
-import { useSearch, useSearchLink } from './useSearch';
 
 export type SearchAskState =
     | {
@@ -180,7 +180,7 @@ function AnswerFollowupQuestions(props: { followupQuestions: string[] }) {
                         'straight-corners:rounded-none',
                         'text-tint',
                         'hover:bg-tint-hover',
-                        'focus-within:bg-tint-hover'
+                        'focus-within:bg-tint-hover',
                     )}
                     {...getSearchLinkProps({
                         query: question,
@@ -216,7 +216,7 @@ function AnswerSources(props: {
                 'py-4',
                 'px-4',
                 'border-t',
-                'border-subtle'
+                'border-subtle',
             )}
         >
             <span>
@@ -235,7 +235,7 @@ function AnswerSources(props: {
                             'hover:underline',
                             'links-accent:decoration-[3px]',
                             'links-accent:underline-offset-4',
-                            'focus-within:text-primary'
+                            'focus-within:text-primary',
                         )}
                         href={source.href}
                         prefetch={false}

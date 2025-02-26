@@ -1,5 +1,5 @@
 import {
-    type DocumentBlock,
+    DocumentBlock,
     DocumentBlockCode,
     DocumentBlockListItem,
     DocumentBlocksEssentials,

@@ -1,9 +1,5 @@
-import {
-    type RevisionPageDocument,
-    RevisionPageType,
-    SiteInsightsLinkPosition,
-} from '@gitbook/api';
-import type { GitBookAnyContext } from '@v2/lib/context';
+import { RevisionPageDocument, RevisionPageType, SiteInsightsLinkPosition } from '@gitbook/api';
+import { GitBookAnyContext } from '@v2/lib/context';
 
 import { Card } from '@/components/primitives';
 import { resolveContentRef } from '@/lib/references';
@@ -21,7 +17,7 @@ export async function PageBodyBlankslate(props: {
     const { page, context } = props;
 
     const pages = page.pages.filter((child) =>
-        child.type === RevisionPageType.Document ? !child.hidden : true
+        child.type === RevisionPageType.Document ? !child.hidden : true,
     );
     if (!pages.length) {
         return null;
@@ -33,7 +29,7 @@ export async function PageBodyBlankslate(props: {
 
             if (child.type === RevisionPageType.Computed) {
                 throw new Error(
-                    'Unexpected computed page, it should have been computed in the API'
+                    'Unexpected computed page, it should have been computed in the API',
                 );
             } else if (child.type === RevisionPageType.Link) {
                 const resolved = await resolveContentRef(child.target, context);
@@ -60,7 +56,7 @@ export async function PageBodyBlankslate(props: {
                 const href = context.linker.toPathForPage({ pages: context.pages, page: child });
                 return <Card key={child.id} title={child.title} leadingIcon={icon} href={href} />;
             }
-        })
+        }),
     );
 
     return (
@@ -72,7 +68,7 @@ export async function PageBodyBlankslate(props: {
                 'mx-auto',
                 'gap-4',
                 'grid-cols-1',
-                'sm:grid-cols-2'
+                'sm:grid-cols-2',
             )}
         >
             {pageElements}

@@ -1,13 +1,13 @@
-import type { SiteInsightsAd } from '@gitbook/api';
+import { SiteInsightsAd } from '@gitbook/api';
 import { hexToRgba } from '@gitbook/colors';
-import type { GitBookBaseContext } from '@v2/lib/context';
+import { GitBookBaseContext } from '@v2/lib/context';
 import { getResizedImageURL } from '@v2/lib/images';
 import * as React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
+import { AdCover } from './types';
 import { Link } from '../primitives';
-import type { AdCover } from './types';
 
 /**
  * Cover rendering for an ad.
@@ -50,7 +50,7 @@ export async function AdCoverRendering({
                 'rounded-lg',
                 'p-4',
                 'overflow-hidden',
-                'shadow-sm'
+                'shadow-sm',
             )}
             style={{ backgroundColor: ad.backgroundColor, color: ad.textColor ?? '#ffffff' }}
             href={ad.statlink}
@@ -62,7 +62,7 @@ export async function AdCoverRendering({
                     'bg-center',
                     'bg-cover',
                     'bg-no-repeat',
-                    'z-0'
+                    'z-0',
                 )}
                 style={{
                     backgroundImage: `url(${largeImage})`,
@@ -78,7 +78,7 @@ export async function AdCoverRendering({
                         'shadow-md',
                         'max-h-32',
                         'group-hover/ad:max-h-16',
-                        'transition-all'
+                        'transition-all',
                     )}
                 />
             </div>
@@ -94,7 +94,7 @@ export async function AdCoverRendering({
                         'opacity-0',
                         'group-hover/ad:h-16',
                         'group-hover/ad:opacity-10',
-                        'transition-all'
+                        'transition-all',
                     )}
                 >
                     {ad.description}
@@ -109,7 +109,7 @@ export async function AdCoverRendering({
                         'rounded-md',
                         'bg-white',
                         'py-2',
-                        'px-4'
+                        'px-4',
                     )}
                     style={{
                         backgroundColor: ad.ctaBackgroundColor,

@@ -1,6 +1,6 @@
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { ClassValue, tcls } from '@/lib/tailwind';
 
-import { Link, type LinkProps } from '../primitives/Link';
+import { Link, LinkProps } from '../primitives/Link';
 
 /**
  * Styled version of Link component.
@@ -29,7 +29,7 @@ export function StyledLink(props: Omit<LinkProps, 'style'> & { style?: ClassValu
 
                 'transition-all',
                 'duration-100',
-                style
+                style,
             )}
         >
             {props.children}

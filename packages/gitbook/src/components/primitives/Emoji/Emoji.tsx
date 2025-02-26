@@ -1,5 +1,5 @@
 import { getEmojiForCode } from '@/lib/emojis';
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { ClassValue, tcls } from '@/lib/tailwind';
 
 /**
  * Render an emoji by its codepoint.

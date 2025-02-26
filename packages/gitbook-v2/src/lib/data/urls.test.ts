@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'bun:test';
+import { describe, it, expect } from 'bun:test';
 
 import { getURLLookupAlternatives, normalizeURL } from './urls';
 
@@ -68,7 +68,7 @@ describe('getURLLookupAlternatives', () => {
 
     it('should not match before the variant for a variant url', () => {
         expect(
-            getURLLookupAlternatives(new URL('https://test.gitbook.io/v/variant/space'))
+            getURLLookupAlternatives(new URL('https://test.gitbook.io/v/variant/space')),
         ).toEqual({
             revision: undefined,
             changeRequest: undefined,
@@ -85,7 +85,7 @@ describe('getURLLookupAlternatives', () => {
 
     it('should not match before the variant for a variant in a share link', () => {
         expect(
-            getURLLookupAlternatives(new URL('https://test.gitbook.io/sharelink/v/variant/space'))
+            getURLLookupAlternatives(new URL('https://test.gitbook.io/sharelink/v/variant/space')),
         ).toEqual({
             revision: undefined,
             changeRequest: undefined,
@@ -103,8 +103,8 @@ describe('getURLLookupAlternatives', () => {
     it('should not match before a revision in a variant', () => {
         expect(
             getURLLookupAlternatives(
-                new URL('https://test.gitbook.io/v/variant/~/revisions/id/rest')
-            )
+                new URL('https://test.gitbook.io/v/variant/~/revisions/id/rest'),
+            ),
         ).toEqual({
             revision: 'id',
             changeRequest: undefined,
@@ -121,7 +121,7 @@ describe('getURLLookupAlternatives', () => {
 
     it('should not match before a revision ID', () => {
         expect(
-            getURLLookupAlternatives(new URL('https://docs.mycompany.com/~/revisions/id/a/b/c'))
+            getURLLookupAlternatives(new URL('https://docs.mycompany.com/~/revisions/id/a/b/c')),
         ).toEqual({
             revision: 'id',
             changeRequest: undefined,
@@ -138,7 +138,7 @@ describe('getURLLookupAlternatives', () => {
 
     it('should not match before a change request ID', () => {
         expect(
-            getURLLookupAlternatives(new URL('https://docs.mycompany.com/~/changes/id/hello'))
+            getURLLookupAlternatives(new URL('https://docs.mycompany.com/~/changes/id/hello')),
         ).toEqual({
             revision: undefined,
             changeRequest: 'id',
@@ -195,7 +195,7 @@ describe('getURLLookupAlternatives', () => {
 
     it('should match a variant in a share-link', () => {
         expect(
-            getURLLookupAlternatives(new URL('https://test.gitbook.io/sharelink/v/variant/space'))
+            getURLLookupAlternatives(new URL('https://test.gitbook.io/sharelink/v/variant/space')),
         ).toEqual({
             revision: undefined,
             changeRequest: undefined,
@@ -213,8 +213,8 @@ describe('getURLLookupAlternatives', () => {
     it('should match a revision in a variant in a share-link', () => {
         expect(
             getURLLookupAlternatives(
-                new URL('https://test.gitbook.io/sharelink/v/variant/~/revisions/id/a/b/c')
-            )
+                new URL('https://test.gitbook.io/sharelink/v/variant/~/revisions/id/a/b/c'),
+            ),
         ).toEqual({
             revision: 'id',
             changeRequest: undefined,
@@ -232,8 +232,8 @@ describe('getURLLookupAlternatives', () => {
     it('should match a change request in a variant in a share-link', () => {
         expect(
             getURLLookupAlternatives(
-                new URL('https://test.gitbook.io/sharelink/v/variant/~/changes/id/a/b/c')
-            )
+                new URL('https://test.gitbook.io/sharelink/v/variant/~/changes/id/a/b/c'),
+            ),
         ).toEqual({
             revision: undefined,
             changeRequest: 'id',
@@ -367,13 +367,13 @@ describe('getURLLookupAlternatives', () => {
 describe('normalizeURL', () => {
     it('should remove trailing slashes', () => {
         expect(normalizeURL(new URL('https://docs.mycompany.com/hello/'))).toEqual(
-            new URL('https://docs.mycompany.com/hello')
+            new URL('https://docs.mycompany.com/hello'),
         );
     });
 
     it('should remove duplicate slashes', () => {
         expect(normalizeURL(new URL('https://docs.mycompany.com//hello//there'))).toEqual(
-            new URL('https://docs.mycompany.com/hello/there')
+            new URL('https://docs.mycompany.com/hello/there'),
         );
     });
 });

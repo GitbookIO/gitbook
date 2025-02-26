@@ -1,11 +1,11 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
-import { InteractiveSection } from './InteractiveSection';
-import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
 import { generateSchemaExample } from './generateSchemaExample';
-import { json2xml } from './json2xml';
-import { stringifyOpenAPI } from './stringifyOpenAPI';
 import type { OpenAPIContextProps, OpenAPIOperationData } from './types';
 import { checkIsReference, createStateKey, resolveDescription } from './utils';
+import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
+import { InteractiveSection } from './InteractiveSection';
+import { json2xml } from './json2xml';
+import { stringifyOpenAPI } from './stringifyOpenAPI';
 
 /**
  * Display an example of the response content.
@@ -75,7 +75,7 @@ export function OpenAPIResponseExample(props: {
             };
         })
         .filter((val): val is { key: string; label: string; body: any; description: string } =>
-            Boolean(val)
+            Boolean(val),
         );
 
     if (tabs.length === 0) {

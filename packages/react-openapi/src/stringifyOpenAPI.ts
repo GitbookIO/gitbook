@@ -12,6 +12,6 @@ export function stringifyOpenAPI(body: unknown, _?: null, indent?: number): stri
 
             return value;
         },
-        indent
+        indent,
     );
 }

@@ -1,4 +1,4 @@
-import type { SiteSection, SiteSpace, SiteStructure } from '@gitbook/api';
+import { SiteSection, SiteSpace, SiteStructure } from '@gitbook/api';
 import assertNever from 'assert-never';
 import jsontoxml from 'jsontoxml';
 
@@ -46,7 +46,7 @@ export async function GET() {
         {
             xmlHeader: true,
             prettyPrint: true,
-        }
+        },
     );
 
     return new Response(xml, {
@@ -75,7 +75,7 @@ async function getUrlsFromSiteStructure(siteStructure: SiteStructure): Promise<s
  */
 async function getUrlsFromSiteSections(siteSections: SiteSection[]): Promise<string[]> {
     const urls = await Promise.all(
-        siteSections.map(async (siteSection) => getUrlsFromSiteSpaces(siteSection.siteSpaces), [])
+        siteSections.map(async (siteSection) => getUrlsFromSiteSpaces(siteSection.siteSpaces), []),
     );
     return urls.flat();
 }
@@ -92,7 +92,7 @@ async function getUrlsFromSiteSpaces(siteSpaces: SiteSpace[]): Promise<string[]>
             const url = new URL(siteSpace.urls.published);
             url.pathname = joinPath(url.pathname, 'sitemap-pages.xml');
             return url.toString();
-        }, [])
+        }, []),
     );
     return urls.filter(filterOutNullable);
 }

@@ -3,9 +3,9 @@ import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
-import { Link } from '../primitives';
 import { HighlightQuery } from './HighlightQuery';
 import type { ComputedPageResult } from './server-actions';
+import { Link } from '../primitives';
 
 export const SearchPageResultItem = React.forwardRef(function SearchPageResultItem(
     props: {
@@ -13,7 +13,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
         item: ComputedPageResult;
         active: boolean;
     },
-    ref: React.Ref<HTMLAnchorElement>
+    ref: React.Ref<HTMLAnchorElement>,
 ) {
     const { query, item, active } = props;
 
@@ -36,7 +36,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                 'group',
                 active
                     ? ['is-active', 'bg-primary', 'text-contrast-primary', 'hover:bg-primary-hover']
-                    : null
+                    : null,
             )}
         >
             <div className="size-4">
@@ -54,7 +54,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                             'font-normal',
                             'uppercase',
                             'tracking-wider',
-                            'mb-1'
+                            'mb-1',
                         )}
                     >
                         {item.spaceTitle}
@@ -67,7 +67,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                     'p-2',
                     'rounded',
                     'straight-corners:rounded-none',
-                    active ? ['bg-primary-solid', 'text-contrast-primary-solid'] : ['opacity-6']
+                    active ? ['bg-primary-solid', 'text-contrast-primary-solid'] : ['opacity-6'],
                 )}
             >
                 <Icon

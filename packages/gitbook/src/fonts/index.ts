@@ -1,12 +1,11 @@
 import { CustomizationFont } from '@gitbook/api';
 import {
-    Fira_Sans_Extra_Condensed,
-    IBM_Plex_Mono,
-    IBM_Plex_Serif,
     Inter,
+    Fira_Sans_Extra_Condensed,
+    IBM_Plex_Serif,
+    IBM_Plex_Mono,
     Lato,
     Merriweather,
-    Noto_Color_Emoji,
     Noto_Sans,
     Open_Sans,
     Overpass,
@@ -16,6 +15,7 @@ import {
     Roboto_Slab,
     Source_Sans_3,
     Ubuntu,
+    Noto_Color_Emoji,
 } from 'next/font/google';
 import localFont from 'next/font/local';
 

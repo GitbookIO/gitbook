@@ -1,4 +1,4 @@
-@import "@scalar/api-client-react/style.css";
+@import '@scalar/api-client-react/style.css';
 
 .light .scalar-modal-layout,
 .light .scalar-app,
@@ -13,7 +13,11 @@
         var(--scalar-color-1),
         transparent calc(100% - 100% * 0.72)
     );
-    --scalar-color-3: color-mix(in srgb, var(--scalar-color-1), transparent calc(100% - 100% * 0.4));
+    --scalar-color-3: color-mix(
+        in srgb,
+        var(--scalar-color-1),
+        transparent calc(100% - 100% * 0.4)
+    );
     --scalar-color-accent: #007d9c;
 
     --scalar-background-1: rgb(var(--tint-1, 255 255 255));
@@ -70,7 +74,11 @@
         var(--scalar-color-1),
         transparent calc(100% - 100% * 0.64)
     );
-    --scalar-color-3: color-mix(in srgb, var(--scalar-color-1), transparent calc(100% - 100% * 0.4));
+    --scalar-color-3: color-mix(
+        in srgb,
+        var(--scalar-color-1),
+        transparent calc(100% - 100% * 0.4)
+    );
     --scalar-color-accent: #50b7e0;
 
     --scalar-background-1: rgb(var(--tint-1, 22 22 22));
@@ -107,8 +115,8 @@
     --scalar-button-1-hover: #e7e7e7;
 
     --scalar-shadow-1: 0 1px 3px 0 rgb(0, 0, 0, 0.1);
-    --scalar-shadow-2: rgba(15, 15, 15, 0.2) 0px 3px 6px, rgba(15, 15, 15, 0.4) 0px 9px 24px, 0 0 0
-        1px rgba(255, 255, 255, 0.1);
+    --scalar-shadow-2: rgba(15, 15, 15, 0.2) 0px 3px 6px, rgba(15, 15, 15, 0.4) 0px 9px 24px,
+        0 0 0 1px rgba(255, 255, 255, 0.1);
 
     --scalar-selection-background: rgba(96, 175, 255, 0.4);
     --scalar-selection-color: rgb(var(--tint-12, 255 255 255));

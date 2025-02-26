@@ -1,6 +1,6 @@
-import type { GitBookSiteContext, GitBookSpaceContext } from '@v2/lib/context';
+import { GitBookSiteContext, GitBookSpaceContext } from '@v2/lib/context';
 
-import type { SiteContentPointer, SpaceContentPointer } from '@/lib/api';
+import { SiteContentPointer, SpaceContentPointer } from '@/lib/api';
 import { getSiteContentPointer, getSpacePointer } from '@/lib/pointer';
 import { fetchV1ContextForSitePointer, fetchV1ContextForSpacePointer } from '@/lib/v1';
 

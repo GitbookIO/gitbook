@@ -1,4 +1,4 @@
-import type { DocumentBlock, JSONDocument } from '@gitbook/api';
+import { DocumentBlock, JSONDocument } from '@gitbook/api';
 import memoize from 'memoizee/weak';
 
 /**
@@ -15,7 +15,7 @@ export function isBlockOffscreen(
         block: DocumentBlock;
         ancestorBlocks: DocumentBlock[];
     },
-    screenHeight = 500
+    screenHeight: number = 500,
 ): boolean {
     let current = block;
 

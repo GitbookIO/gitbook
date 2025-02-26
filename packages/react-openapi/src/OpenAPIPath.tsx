@@ -1,5 +1,5 @@
 import { ScalarApiButton } from './ScalarApiButton';
-import type { OpenAPIContextProps, OpenAPIOperationData } from './types';
+import type { OpenAPIOperationData, OpenAPIContextProps } from './types';
 
 /**
  * Display the path of an operation.
@@ -58,7 +58,7 @@ function formatPath(path: string) {
             }
             return [...acc, part];
         },
-        [] as (string | JSX.Element)[]
+        [] as (string | JSX.Element)[],
     );
 
     return <span>{formattedPath}</span>;

@@ -4,11 +4,11 @@ import { useId } from 'react';
 
 import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
-import { OpenAPIDisclosure } from './OpenAPIDisclosure';
-import { OpenAPISchemaName } from './OpenAPISchemaName';
-import { stringifyOpenAPI } from './stringifyOpenAPI';
 import type { OpenAPIClientContext } from './types';
 import { checkIsReference, resolveDescription } from './utils';
+import { stringifyOpenAPI } from './stringifyOpenAPI';
+import { OpenAPISchemaName } from './OpenAPISchemaName';
+import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 
 type CircularRefsIds = Map<OpenAPIV3.SchemaObject, string>;
 
@@ -27,7 +27,7 @@ export function OpenAPISchemaProperty(
         circularRefs?: CircularRefsIds;
         context: OpenAPIClientContext;
         className?: string;
-    }
+    },
 ) {
     const {
         schema,
@@ -341,7 +341,7 @@ function getSchemaProperties(schema: OpenAPIV3.SchemaObject): null | OpenAPISche
  */
 export function getSchemaAlternatives(
     schema: OpenAPIV3.SchemaObject,
-    ancestors: Set<OpenAPIV3.SchemaObject> = new Set()
+    ancestors: Set<OpenAPIV3.SchemaObject> = new Set(),
 ): null | [OpenAPIV3.SchemaObject[], OpenAPIV3.DiscriminatorObject | undefined] {
     const downAncestors = new Set(ancestors).add(schema);
 
@@ -363,7 +363,7 @@ export function getSchemaAlternatives(
 function flattenAlternatives(
     alternativeType: 'oneOf' | 'allOf' | 'anyOf',
     alternatives: OpenAPIV3.SchemaObject[],
-    ancestors: Set<OpenAPIV3.SchemaObject>
+    ancestors: Set<OpenAPIV3.SchemaObject>,
 ): OpenAPIV3.SchemaObject[] {
     return alternatives.reduce((acc, alternative) => {
         if (!!alternative[alternativeType] && !ancestors.has(alternative)) {
@@ -378,7 +378,7 @@ export function getSchemaTitle(
     schema: OpenAPIV3.SchemaObject,
 
     /** If the title is inferred in a oneOf with discriminator, we can use it to optimize the title */
-    discriminator?: OpenAPIV3.DiscriminatorObject
+    discriminator?: OpenAPIV3.DiscriminatorObject,
 ): string {
     // Try using the discriminator
     if (discriminator?.propertyName && schema.properties) {

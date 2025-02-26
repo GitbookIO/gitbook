@@ -1,8 +1,8 @@
-import { ContentRef, type JSONDocument } from '@gitbook/api';
-import type { GitBookAnyContext } from '@v2/lib/context';
+import { ContentRef, JSONDocument } from '@gitbook/api';
+import { GitBookAnyContext } from '@v2/lib/context';
 
 import { ResolveContentRefOptions, ResolvedContentRef } from '@/lib/references';
-import type { ClassValue } from '@/lib/tailwind';
+import { ClassValue } from '@/lib/tailwind';
 
 import { BlockSkeleton } from './Block';
 import { Blocks } from './Blocks';
@@ -48,7 +48,7 @@ export function DocumentView(
 
         /** Style passed to all blocks */
         blockStyle?: ClassValue;
-    }
+    },
 ) {
     const { document, style, blockStyle = [], context } = props;
 

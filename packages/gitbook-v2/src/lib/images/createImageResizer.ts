@@ -1,8 +1,8 @@
 import 'server-only';
 
-import type { GitBookSpaceLinker } from '../links';
-import { type SignatureVersion, generateImageSignature } from './signatures';
 import type { ImageResizer } from './types';
+import { generateImageSignature, SignatureVersion } from './signatures';
+import { GitBookSpaceLinker } from '../links';
 
 interface CloudflareImageJsonFormat {
     width: number;
@@ -149,7 +149,7 @@ export function checkIsSizableImageURL(input: string): boolean {
  */
 export async function getImageSize(
     input: string,
-    defaultSize: Partial<CloudflareImageOptions> = {}
+    defaultSize: Partial<CloudflareImageOptions> = {},
 ): Promise<{ width: number; height: number } | null> {
     if (!isImageResizingEnabled() || !checkIsSizableImageURL(input)) {
         return null;
@@ -175,7 +175,7 @@ export async function getImageSize(
         console.error(
             `failed to fetch image size for ${input}: ${
                 (error as Error).stack ?? (error as Error).message ?? error
-            }`
+            }`,
         );
         return null;
     }
@@ -188,7 +188,7 @@ export async function resizeImage(
     input: string,
     options: CloudflareImageOptions & {
         signal?: AbortSignal;
-    }
+    },
 ): Promise<Response> {
     const { signal, ...resizeOptions } = options;
 
@@ -206,7 +206,7 @@ export async function resizeImage(
     if (process.env.GITBOOK_IMAGE_RESIZE_URL) {
         const response = await fetch(
             `${process.env.GITBOOK_IMAGE_RESIZE_URL}${stringifyOptions(
-                resizeOptions
+                resizeOptions,
             )}/${encodeURIComponent(input)}`,
             {
                 headers: {
@@ -217,7 +217,7 @@ export async function resizeImage(
                             : `image/${resizeOptions.format || 'jpeg'}`,
                 },
                 signal,
-            }
+            },
         );
 
         return response;

@@ -1,7 +1,7 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
-import { InteractiveSection } from './InteractiveSection';
 import { OpenAPIRootSchema } from './OpenAPISchema';
 import type { OpenAPIClientContext } from './types';
+import { InteractiveSection } from './InteractiveSection';
 import { checkIsReference } from './utils';
 
 /**
@@ -33,7 +33,7 @@ export function OpenAPIRequestBody(props: {
                             />
                         ),
                     };
-                }
+                },
             )}
         />
     );

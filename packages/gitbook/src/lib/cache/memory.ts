@@ -1,6 +1,6 @@
-import { getGlobalContext } from '../waitUntil';
-import type { CacheBackend, CacheEntry, CacheEntryLookup } from './types';
+import { CacheBackend, CacheEntry, CacheEntryLookup } from './types';
 import { NON_IMMUTABLE_LOCAL_CACHE_MAX_AGE_SECONDS, isCacheEntryImmutable } from './utils';
+import { getGlobalContext } from '../waitUntil';
 
 export const memoryCache: CacheBackend = {
     name: 'memory',
@@ -30,7 +30,7 @@ export const memoryCache: CacheBackend = {
                 ? null
                 : Math.min(
                       Date.now() + NON_IMMUTABLE_LOCAL_CACHE_MAX_AGE_SECONDS * 1000,
-                      entry.meta.expiresAt
+                      entry.meta.expiresAt,
                   );
 
         const meta = { ...entry.meta };

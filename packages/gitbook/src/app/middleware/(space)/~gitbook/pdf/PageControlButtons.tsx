@@ -50,7 +50,7 @@ export function PageControlButtons(props: {
                     'flex-col',
                     'gap-2',
                     'print:hidden',
-                    'z-50'
+                    'z-50',
                 )}
             >
                 {singlePageMode ? null : (
@@ -84,7 +84,7 @@ export function PageControlButtons(props: {
                     'items-end',
                     'gap-2',
                     'print:hidden',
-                    'z-50'
+                    'z-50',
                 )}
             >
                 {total !== pageIds.length ? (
@@ -102,7 +102,7 @@ export function PageControlButtons(props: {
                             'border',
                             'rounded-md',
                             'p-4',
-                            'max-w-sm'
+                            'max-w-sm',
                         )}
                     >
                         <Icon
@@ -140,7 +140,7 @@ export function PageControlButtons(props: {
                         'rounded-full',
                         'shadow-sm',
                         'border-slate-300',
-                        'border'
+                        'border',
                     )}
                 >
                     {t(language, 'pdf_page_of', activeIndex, pageIds.length)}

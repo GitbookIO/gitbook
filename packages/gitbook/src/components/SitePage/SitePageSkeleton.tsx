@@ -16,7 +16,7 @@ export function SitePageSkeleton() {
                 'lg:px-16',
                 'xl:mr-56',
                 'items-center',
-                'lg:items-start'
+                'lg:items-start',
             )}
         >
             <div className={tcls('flex-1', 'max-w-3xl', 'mx-auto', 'page-full-width:mx-0')}>

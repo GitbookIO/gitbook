@@ -1,9 +1,4 @@
-import {
-    type RevisionPageDocument,
-    type RevisionPageGroup,
-    type Site,
-    SiteVisibility,
-} from '@gitbook/api';
+import { RevisionPageDocument, RevisionPageGroup, Site, SiteVisibility } from '@gitbook/api';
 import { headers } from 'next/headers';
 
 /**
@@ -11,7 +6,7 @@ import { headers } from 'next/headers';
  */
 export function isPageIndexable(
     ancestors: Array<RevisionPageDocument | RevisionPageGroup>,
-    page: RevisionPageDocument | RevisionPageGroup
+    page: RevisionPageDocument | RevisionPageGroup,
 ): boolean {
     // @ts-ignore - noIndex and noRobotsIndex are not in the type
     // until we fix the deprecated APIs

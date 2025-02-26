@@ -1,9 +1,9 @@
 'use client';
 
-import NextLink, { type LinkProps as NextLinkProps } from 'next/link';
+import NextLink, { LinkProps as NextLinkProps } from 'next/link';
 import React from 'react';
 
-import { type TrackEventInput, useTrackEvent } from '../Insights';
+import { useTrackEvent, TrackEventInput } from '../Insights';
 
 // Props from Next, which includes NextLinkProps and all the things anchor elements support.
 type BaseLinkProps = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, keyof NextLinkProps> &
@@ -31,7 +31,7 @@ export type LinkProps = Omit<BaseLinkProps, 'href'> &
  */
 export const Link = React.forwardRef(function Link(
     props: LinkProps,
-    ref: React.Ref<HTMLAnchorElement>
+    ref: React.Ref<HTMLAnchorElement>,
 ) {
     const { href, prefetch, children, insights, ...domProps } = props;
     const trackEvent = useTrackEvent();

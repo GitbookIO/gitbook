@@ -1,8 +1,8 @@
 'use client';
 
-import type { CustomizationThemeMode } from '@gitbook/api';
+import { CustomizationThemeMode } from '@gitbook/api';
 import { ThemeProvider } from 'next-themes';
-import type React from 'react';
+import React from 'react';
 
 export function ClientContexts(props: {
     nonce?: string;

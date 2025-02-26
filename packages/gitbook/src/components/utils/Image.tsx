@@ -2,10 +2,10 @@
 import { type ImageResizer, checkIsHttpURL } from '@v2/lib/images';
 import ReactDOM from 'react-dom';
 
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { ClassValue, tcls } from '@/lib/tailwind';
 
+import { PolymorphicComponentProp } from './types';
 import { ZoomImage } from './ZoomImage';
-import type { PolymorphicComponentProp } from './types';
 
 export type ImageSize = { width: number; height: number };
 
@@ -114,7 +114,7 @@ export function Image(
                 dark?: ImageSource | null;
             };
         } & ImageCommonProps
-    >
+    >,
 ) {
     const { sources, style, inline = false, ...rest } = props;
 
@@ -128,7 +128,7 @@ export function Image(
                     rest.className,
                     inline ? 'inline' : 'block',
                     sources.dark ? 'dark:hidden' : null,
-                    style
+                    style,
                 )}
             />
             {sources.dark ? (
@@ -143,7 +143,7 @@ export function Image(
                         rest.className,
                         'hidden',
                         inline ? 'dark:inline' : 'dark:block',
-                        style
+                        style,
                     )}
                 />
             ) : null}
@@ -157,7 +157,7 @@ function ImagePicture(
         {
             source: ImageSource;
         } & ImageCommonProps
-    >
+    >,
 ) {
     const { source, ...rest } = props;
     const { size } = source;
@@ -175,7 +175,7 @@ async function ImagePictureUnsized(
         {
             source: ImageSource;
         } & ImageCommonProps
-    >
+    >,
 ) {
     const { source, resize, ...rest } = props;
 
@@ -189,7 +189,7 @@ async function ImagePictureSized(
         {
             source: ImageSourceSized;
         } & ImageCommonProps
-    >
+    >,
 ) {
     const {
         source,

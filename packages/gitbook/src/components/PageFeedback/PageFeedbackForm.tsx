@@ -1,7 +1,7 @@
 'use client';
 
 import { PageFeedbackRating } from '@gitbook/api';
-import React, { type ButtonHTMLAttributes } from 'react';
+import React, { ButtonHTMLAttributes } from 'react';
 
 import { useLanguage } from '@/intl/client';
 import { t, tString } from '@/intl/translate';
@@ -138,7 +138,7 @@ function RatingButton(
         label: string;
         onClick: () => void;
         active: boolean;
-    } & ButtonHTMLAttributes<HTMLButtonElement>
+    } & ButtonHTMLAttributes<HTMLButtonElement>,
 ) {
     const { rating, label, onClick, active, ...attr } = props;
 
@@ -157,7 +157,7 @@ function RatingButton(
                 'contrast-more:hover:ring-1 ring-tint',
                 active
                     ? 'bg-primary-active text-primary-strong disabled:hover:bg-primary-active disabled:hover:text-primary-strong contrast-more:ring-2 contrast-more:hover:ring-2'
-                    : 'disabled:opacity-7 disabled:contrast-more:ring-0'
+                    : 'disabled:opacity-7 disabled:contrast-more:ring-0',
             )}
             type="button"
             {...attr}

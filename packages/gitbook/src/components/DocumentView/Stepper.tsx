@@ -1,6 +1,6 @@
-import type { DocumentBlockStepper } from '@gitbook/api';
+import { DocumentBlockStepper } from '@gitbook/api';
 
-import type { BlockProps } from './Block';
+import { BlockProps } from './Block';
 import { Blocks } from './Blocks';
 
 export function Stepper(props: BlockProps<DocumentBlockStepper>) {

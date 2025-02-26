@@ -1,19 +1,19 @@
-import type { DocumentBlock, JSONDocument } from '@gitbook/api';
+import { DocumentBlock, JSONDocument } from '@gitbook/api';
 import React from 'react';
 
 import {
-    SkeletonCard,
-    SkeletonHeading,
-    SkeletonImage,
     SkeletonParagraph,
+    SkeletonHeading,
+    SkeletonCard,
+    SkeletonImage,
     SkeletonSmall,
 } from '@/components/primitives';
-import type { ClassValue } from '@/lib/tailwind';
+import { ClassValue } from '@/lib/tailwind';
 
 import { BlockContentRef } from './BlockContentRef';
 import { CodeBlock } from './CodeBlock';
 import { Divider } from './Divider';
-import type { DocumentContextProps } from './DocumentView';
+import { DocumentContextProps } from './DocumentView';
 import { Drawing } from './Drawing';
 import { Embed } from './Embed';
 import { Expandable } from './Expandable';

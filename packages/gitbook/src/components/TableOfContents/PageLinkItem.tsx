@@ -1,6 +1,6 @@
-import { type RevisionPageLink, SiteInsightsLinkPosition } from '@gitbook/api';
+import { RevisionPageLink, SiteInsightsLinkPosition } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import type { GitBookSiteContext } from '@v2/lib/context';
+import { GitBookSiteContext } from '@v2/lib/context';
 
 import { Link } from '@/components/primitives';
 import { resolveContentRef } from '@/lib/references';
@@ -33,7 +33,7 @@ export async function PageLinkItem(props: { page: RevisionPageLink; context: Git
                     'before:content-none',
                     'font-normal',
                     'hover:bg-tint',
-                    'hover:text-tint-strong'
+                    'hover:text-tint-strong',
                 )}
                 insights={{
                     type: 'link_click',
@@ -57,7 +57,7 @@ export async function PageLinkItem(props: { page: RevisionPageLink; context: Git
                         'transition-colors',
                         '[&>path]:transition-[opacity]',
                         '[&>path]:[opacity:0.40]',
-                        'group-hover:[&>path]:[opacity:1]'
+                        'group-hover:[&>path]:[opacity:1]',
                     )}
                 />
             </Link>

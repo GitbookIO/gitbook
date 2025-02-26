@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'bun:test';
 import { dereference } from '@scalar/openapi-parser';
-import { createFileSystem } from './filesystem';
 import { traverse } from './traverse';
+import { createFileSystem } from './filesystem';
 
 const recursiveSpec = await Bun.file(
-    new URL('./fixtures/recursive-spec.json', import.meta.url)
+    new URL('./fixtures/recursive-spec.json', import.meta.url),
 ).text();
 
 describe('#traverse', () => {
@@ -17,7 +17,7 @@ describe('#traverse', () => {
             JSON.stringify(result);
         } catch (error) {
             expect((error as Error).message).toBe(
-                'JSON.stringify cannot serialize cyclic structures.'
+                'JSON.stringify cannot serialize cyclic structures.',
             );
         }
 

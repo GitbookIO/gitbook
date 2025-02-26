@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'bun:test';
-import type { NextRequest } from 'next/server';
+import { it, describe, expect } from 'bun:test';
+import { NextRequest } from 'next/server';
 
 import {
     getVisitorAuthCookieName,
@@ -75,7 +75,7 @@ describe('getVisitorAuthToken', () => {
 });
 
 function assertVisitorAuthCookieValue(
-    value: unknown
+    value: unknown,
 ): asserts value is { source: 'visitor-auth-cookie'; basePath: string; token: string } {
     if (
         value &&

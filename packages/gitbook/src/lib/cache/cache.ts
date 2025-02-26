@@ -1,12 +1,12 @@
 import hash from 'object-hash';
 
-import { captureException } from '../../sentry';
-import { race, singletonMap } from '../async';
-import { type TraceSpan, trace } from '../tracing';
-import { waitUntil } from '../waitUntil';
 import { cacheBackends } from './backends';
 import { memoryCache } from './memory';
-import type { CacheBackend, CacheEntry } from './types';
+import { CacheBackend, CacheEntry } from './types';
+import { captureException } from '../../sentry';
+import { race, singletonMap } from '../async';
+import { TraceSpan, trace } from '../tracing';
+import { waitUntil } from '../waitUntil';
 
 export type CacheFunctionOptions = {
     signal: AbortSignal | undefined;
@@ -74,7 +74,7 @@ export interface CacheDefinition<Args extends any[], Result> {
  * We don't use the next.js cache because it has a 2MB limit.
  */
 export function cache<Args extends any[], Result>(
-    cacheDef: CacheDefinition<Args, Result>
+    cacheDef: CacheDefinition<Args, Result>,
 ): CacheFunction<Args, Result> {
     // We stop everything after 10s to avoid pending requests
     const timeout = cacheDef.timeout ?? 1000 * 10;
@@ -118,9 +118,9 @@ export function cache<Args extends any[], Result>(
                     }
 
                     return cacheEntry;
-                }
+                },
             );
-        }
+        },
     );
 
     const fetchValue = singletonMap(
@@ -156,8 +156,8 @@ export function cache<Args extends any[], Result>(
                         ) {
                             captureException(
                                 new Error(
-                                    `Cache entry ${key} from ${backendName} is an empty object`
-                                )
+                                    `Cache entry ${key} from ${backendName} is an empty object`,
+                                ),
                             );
                             return null;
                         }
@@ -183,7 +183,7 @@ export function cache<Args extends any[], Result>(
 
                         // If no entry is found in the cache backends, we fallback to the fetch
                         fallbackOnNull: true,
-                    }
+                    },
                 );
             }
 
@@ -211,9 +211,9 @@ export function cache<Args extends any[], Result>(
                         savedEntry,
                         cacheBackends.filter(
                             (backend) =>
-                                backend.name !== backendName && backend.replication === 'local'
-                        )
-                    )
+                                backend.name !== backendName && backend.replication === 'local',
+                        ),
+                    ),
                 );
             }
 
@@ -225,8 +225,8 @@ export function cache<Args extends any[], Result>(
                     `cache: ${key} ${cacheStatus}${
                         cacheStatus === 'hit' ? ` on ${backendName}` : ''
                     } in total ${totalDuration.toFixed(0)}ms, fetch in ${fetchDuration.toFixed(
-                        0
-                    )}ms, read in ${readCacheDuration.toFixed(0)}ms`
+                        0,
+                    )}ms, read in ${readCacheDuration.toFixed(0)}ms`,
                 );
             }
 
@@ -236,7 +236,7 @@ export function cache<Args extends any[], Result>(
             }
 
             return savedEntry.data;
-        }
+        },
     );
 
     // During development, for now it fetches data twice between the middleware and the handler.
@@ -256,7 +256,7 @@ export function cache<Args extends any[], Result>(
             async (span) => {
                 signal?.throwIfAborted();
                 return fetchValue(key, signal, span, ...args);
-            }
+            },
         );
     };
 
@@ -338,7 +338,7 @@ async function setCacheEntry(entry: CacheEntry, backend: CacheBackend | CacheBac
         async () => {
             const backends = Array.isArray(backend) ? backend : [backend];
             await Promise.all(backends.map((backend) => backend.set(entry)));
-        }
+        },
     );
 }
 
@@ -358,7 +358,7 @@ function isCacheFunctionOptions(arg: any): arg is CacheFunctionOptions {
 }
 
 function extractCacheFunctionOptions<Args extends any[]>(
-    args: Args | [...Args, CacheFunctionOptions]
+    args: Args | [...Args, CacheFunctionOptions],
 ): [Args, CacheFunctionOptions] {
     const lastArg = args[args.length - 1];
     if (isCacheFunctionOptions(lastArg)) {

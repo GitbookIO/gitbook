@@ -1,4 +1,4 @@
-import type { ClassValue } from '@/lib/tailwind';
+import { ClassValue } from '@/lib/tailwind';
 
 /**
  * Height of the desktop header.

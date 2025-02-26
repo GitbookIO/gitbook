@@ -1,13 +1,13 @@
 import clsx from 'clsx';
 
-import type { OpenAPICustomOperationProperties, OpenAPIV3 } from '@gitbook/openapi-parser';
 import { Markdown } from './Markdown';
 import { OpenAPICodeSample } from './OpenAPICodeSample';
-import { OpenAPIPath } from './OpenAPIPath';
 import { OpenAPIResponseExample } from './OpenAPIResponseExample';
 import { OpenAPISpec } from './OpenAPISpec';
 import type { OpenAPIClientContext, OpenAPIContextProps, OpenAPIOperationData } from './types';
+import { OpenAPIPath } from './OpenAPIPath';
 import { resolveDescription } from './utils';
+import { OpenAPICustomOperationProperties, OpenAPIV3 } from '@gitbook/openapi-parser';
 
 /**
  * Display an interactive OpenAPI operation.

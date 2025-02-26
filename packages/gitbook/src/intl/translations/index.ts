@@ -1,4 +1,4 @@
-import type { CustomizationLocale } from '@gitbook/api';
+import { CustomizationLocale } from '@gitbook/api';
 
 import { de } from './de';
 import { en } from './en';
@@ -8,7 +8,7 @@ import { ja } from './ja';
 import { nl } from './nl';
 import { no } from './no';
 import { pt_br } from './pt-br';
-import type { TranslationLanguage } from './types';
+import { TranslationLanguage } from './types';
 import { zh } from './zh';
 
 export * from './types';

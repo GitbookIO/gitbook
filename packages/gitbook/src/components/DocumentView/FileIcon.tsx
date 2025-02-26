@@ -1,6 +1,6 @@
 import { Icon } from '@gitbook/icons';
 
-import type { SimplifiedFileType } from '@/lib/files';
+import { SimplifiedFileType } from '@/lib/files';
 
 /**
  * Render an appropriate icon for a file.

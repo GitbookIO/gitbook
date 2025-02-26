@@ -1,4 +1,4 @@
-import type { ContentKitDynamicBinding } from '@gitbook/api';
+import { ContentKitDynamicBinding } from '@gitbook/api';
 
 /**
  * Get a value from the state.
@@ -21,7 +21,7 @@ export function getStateStringValue(state: object, key: string): string | undefi
  */
 export function resolveDynamicBinding<T extends {}>(
     state: object,
-    value: ContentKitDynamicBinding | T
+    value: ContentKitDynamicBinding | T,
 ): T {
     if (
         typeof value === 'string' ||

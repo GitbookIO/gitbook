@@ -1,6 +1,6 @@
-import type { DocumentBlockQuote } from '@gitbook/api';
+import { DocumentBlockQuote } from '@gitbook/api';
 
-import type { BlockProps } from './Block';
+import { BlockProps } from './Block';
 import { Blocks } from './Blocks';
 
 export function Quote(props: BlockProps<DocumentBlockQuote>) {

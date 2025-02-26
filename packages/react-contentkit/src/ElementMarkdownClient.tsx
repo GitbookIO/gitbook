@@ -1,10 +1,10 @@
 'use client';
-import type { ContentKitMarkdown } from '@gitbook/api';
+import { ContentKitMarkdown } from '@gitbook/api';
 import React from 'react';
 
-import { useContentKitClientContext } from './context';
+import { ContentKitClientElementProps } from './types';
 import { resolveDynamicBinding } from './dynamic';
-import type { ContentKitClientElementProps } from './types';
+import { useContentKitClientContext } from './context';
 
 /**
  * Client component to render the default markdown output and then update it on state update.
@@ -14,7 +14,7 @@ export function ElementMarkdownClient(
         initialMarkdown: string | undefined;
         renderMarkdown: (markdown: string) => React.ReactNode | Promise<React.ReactNode>;
         children: React.ReactNode;
-    }
+    },
 ) {
     const {
         element,

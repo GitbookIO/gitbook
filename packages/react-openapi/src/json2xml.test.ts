@@ -19,7 +19,7 @@ describe('getUrlFromServerState', () => {
         });
 
         expect(xml).toBe(
-            '<?xml version="1.0"?>\n<urls>\n\t<url>https://example.com</url>\n\t<url>https://example.com</url>\n</urls>\n'
+            '<?xml version="1.0"?>\n<urls>\n\t<url>https://example.com</url>\n\t<url>https://example.com</url>\n</urls>\n',
         );
     });
 

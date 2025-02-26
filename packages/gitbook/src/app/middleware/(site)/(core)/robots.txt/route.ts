@@ -1,4 +1,4 @@
-import type { NextRequest } from 'next/server';
+import { NextRequest } from 'next/server';
 
 import { getSite } from '@/lib/api';
 import { getAbsoluteHref } from '@/lib/links';

@@ -1,6 +1,6 @@
-import type { DocumentInline, DocumentText, JSONDocument } from '@gitbook/api';
+import { DocumentInline, DocumentText, JSONDocument } from '@gitbook/api';
 
-import type { DocumentContextProps } from './DocumentView';
+import { DocumentContextProps } from './DocumentView';
 import { Inline } from './Inline';
 import { Text } from './Text';
 
@@ -20,7 +20,7 @@ export function Inlines<T extends DocumentInline | DocumentText>(
          * Nodes to render
          */
         nodes: T[];
-    }
+    },
 ) {
     const { nodes, document, ancestorInlines, ...contextProps } = props;
 

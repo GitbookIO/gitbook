@@ -21,7 +21,7 @@ export function setMiddlewareHeader(response: Response, name: string, value: str
  * Wrap some middleware with a the storage to store headers.
  */
 export async function withMiddlewareHeadersStorage(
-    handler: () => Promise<Response>
+    handler: () => Promise<Response>,
 ): Promise<Response> {
     const responseHeadersLocalStorage =
         // @ts-ignore

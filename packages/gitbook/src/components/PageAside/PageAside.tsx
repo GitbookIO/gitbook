@@ -1,26 +1,26 @@
 import {
-    type JSONDocument,
-    type RevisionPageDocument,
+    JSONDocument,
+    RevisionPageDocument,
     SiteAdsStatus,
     SiteInsightsAdPlacement,
-    type Space,
+    Space,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import type { GitBookSiteContext } from '@v2/lib/context';
+import { GitBookSiteContext } from '@v2/lib/context';
 import React from 'react';
 import urlJoin from 'url-join';
 
-import { getSpaceLanguage, t } from '@/intl/server';
+import { t, getSpaceLanguage } from '@/intl/server';
 import { getDocumentSections } from '@/lib/document-sections';
 import { getAbsoluteHref } from '@/lib/links';
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { getPDFUrlSearchParams } from '@/lib/urls';
 
+import { ScrollSectionsList } from './ScrollSectionsList';
 import { Ad } from '../Ads';
 import { PageFeedbackForm } from '../PageFeedback';
 import { ThemeToggler } from '../ThemeToggler';
-import { ScrollSectionsList } from './ScrollSectionsList';
 
 /**
  * Aside listing the headings in the document.
@@ -41,7 +41,7 @@ export async function PageAside(props: {
         `~gitbook/pdf?${getPDFUrlSearchParams({
             page: page.id,
             only: true,
-        }).toString()}`
+        }).toString()}`,
     );
     return (
         <aside
@@ -86,7 +86,7 @@ export async function PageAside(props: {
                 'page-api-block:xl:max-2xl:rounded-md',
                 'page-api-block:xl:max-2xl:h-auto',
                 'page-api-block:xl:max-2xl:my-8',
-                'page-api-block:p-2'
+                'page-api-block:p-2',
             )}
         >
             {page.layout.outline ? (
@@ -102,7 +102,7 @@ export async function PageAside(props: {
 
                             'flex-row',
                             'items-center',
-                            'gap-2'
+                            'gap-2',
                         )}
                     >
                         <Icon icon="block-quote" className={tcls('size-3')} />
@@ -113,7 +113,7 @@ export async function PageAside(props: {
                                 'size-3',
                                 'opacity-6',
                                 'ml-auto',
-                                'page-api-block:xl:max-2xl:group-hover/aside:hidden'
+                                'page-api-block:xl:max-2xl:group-hover/aside:hidden',
                             )}
                         />
                     </div>
@@ -138,7 +138,7 @@ export async function PageAside(props: {
                             'page-api-block:xl:max-2xl:py-0',
                             // Hide it for api page, until hovered
                             'page-api-block:xl:max-2xl:hidden',
-                            'page-api-block:xl:max-2xl:group-hover/aside:flex'
+                            'page-api-block:xl:max-2xl:group-hover/aside:flex',
                         )}
                     >
                         {document ? (
@@ -158,7 +158,7 @@ export async function PageAside(props: {
                                 'py-4',
                                 'first:pt-0',
                                 'page-api-block:xl:max-2xl:px-3',
-                                'empty:hidden'
+                                'empty:hidden',
                             )}
                         >
                             {withPageFeedback ? (
@@ -180,7 +180,7 @@ export async function PageAside(props: {
                                             'links-accent:hover:underline-offset-4',
                                             'links-accent:hover:decoration-[3px]',
                                             'links-accent:hover:decoration-primary-subtle',
-                                            'py-2'
+                                            'py-2',
                                         )}
                                     >
                                         <Icon
@@ -209,7 +209,7 @@ export async function PageAside(props: {
                                             'links-accent:hover:underline-offset-4',
                                             'links-accent:hover:decoration-[3px]',
                                             'links-accent:hover:decoration-primary-subtle',
-                                            'py-2'
+                                            'py-2',
                                         )}
                                     >
                                         <Icon
@@ -227,7 +227,7 @@ export async function PageAside(props: {
             <div
                 className={tcls(
                     'pb-4 sticky bottom-0 bg-tint-base theme-muted:bg-tint-subtle theme-bold-tint:bg-tint-subtle theme-gradient:bg-gradient-primary theme-gradient-tint:bg-gradient-tint z-10 mt-auto flex flex-col page-api-block:xl:max-2xl:pb-0 page-api-block:xl:max-2xl:hidden page-api-block:xl:max-2xl:group-hover/aside:flex',
-                    'page-api-block:xl:max-2xl:bg-transparent'
+                    'page-api-block:xl:max-2xl:bg-transparent',
                 )}
             >
                 {/* Mode Switcher */}

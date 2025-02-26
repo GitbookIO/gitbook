@@ -1,8 +1,8 @@
-import type { SiteStructure } from '@gitbook/api';
+import { SiteStructure } from '@gitbook/api';
 import { headers } from 'next/headers';
 import { assert } from 'ts-essentials';
 
-import type { SiteContentPointer, SpaceContentPointer } from './api';
+import { SiteContentPointer, SpaceContentPointer } from './api';
 import { getSiteStructureSections } from './sites';
 
 /**
@@ -20,7 +20,7 @@ export async function getSiteContentPointer(): Promise<SiteContentPointer> {
     const organizationId = headersList.get('x-gitbook-content-organization');
     assert(
         organizationId,
-        'x-gitbook-content-organization should be set in the headers by the middleware'
+        'x-gitbook-content-organization should be set in the headers by the middleware',
     );
 
     const siteSectionId = headersList.get('x-gitbook-content-site-section') ?? undefined;
@@ -49,7 +49,7 @@ export async function getSiteContentPointer(): Promise<SiteContentPointer> {
  */
 export function checkIsRootPointer(
     pointer: SiteContentPointer,
-    siteStructure: SiteStructure
+    siteStructure: SiteStructure,
 ): boolean {
     switch (siteStructure.type) {
         case 'sections': {
@@ -58,13 +58,13 @@ export function checkIsRootPointer(
                     structure.default &&
                     structure.id === pointer.siteSectionId &&
                     structure.siteSpaces.some(
-                        (siteSpace) => siteSpace.default && siteSpace.id === pointer.siteSpaceId
-                    )
+                        (siteSpace) => siteSpace.default && siteSpace.id === pointer.siteSpaceId,
+                    ),
             );
         }
         case 'siteSpaces': {
             return siteStructure.structure.some(
-                (siteSpace) => siteSpace.default && siteSpace.id === pointer.siteSpaceId
+                (siteSpace) => siteSpace.default && siteSpace.id === pointer.siteSpaceId,
             );
         }
     }

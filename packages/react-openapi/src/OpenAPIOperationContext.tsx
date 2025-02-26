@@ -20,7 +20,7 @@ const OpenAPIOperationContext = createContext<OpenAPIOperationContextValue>({
  * Provider for the OpenAPIOperationContext.
  */
 export function OpenAPIOperationContextProvider(
-    props: React.PropsWithChildren<Partial<OpenAPIOperationContextValue>>
+    props: React.PropsWithChildren<Partial<OpenAPIOperationContextValue>>,
 ) {
     const { children } = props;
 

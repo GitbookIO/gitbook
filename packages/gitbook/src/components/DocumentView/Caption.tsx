@@ -1,4 +1,4 @@
-import type {
+import {
     DocumentBlockDrawing,
     DocumentBlockEmbed,
     DocumentBlockFile,
@@ -7,9 +7,9 @@ import type {
 } from '@gitbook/api';
 
 import { getNodeFragmentByName, isNodeEmpty } from '@/lib/document';
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { ClassValue, tcls } from '@/lib/tailwind';
 
-import type { DocumentContextProps } from './DocumentView';
+import { DocumentContextProps } from './DocumentView';
 import { Inlines } from './Inlines';
 
 /**
@@ -24,7 +24,7 @@ export function Caption(
         wrapperStyle?: ClassValue;
         block: DocumentBlockImage | DocumentBlockDrawing | DocumentBlockEmbed | DocumentBlockFile;
         withBorder?: boolean;
-    } & DocumentContextProps
+    } & DocumentContextProps,
 ) {
     const {
         children,

@@ -1,7 +1,7 @@
 import { CustomizationHeaderPreset, CustomizationThemeMode } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
+import { GitBookSiteContext } from '@v2/lib/context';
 import { getPageDocument } from '@v2/lib/data';
-import type { Metadata, Viewport } from 'next';
+import { Metadata, Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import React from 'react';
 
@@ -11,14 +11,14 @@ import { getAbsoluteHref } from '@/lib/links';
 import { getPagePath, resolveFirstDocument } from '@/lib/pages';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 
-import { PageClientLayout } from './PageClientLayout';
 import {
-    PageParams,
-    type PagePathParams,
     fetchPageData,
     getPathnameParam,
     normalizePathname,
+    PageParams,
+    PagePathParams,
 } from './fetch';
+import { PageClientLayout } from './PageClientLayout';
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
@@ -56,7 +56,7 @@ export async function SitePage(props: SitePageProps) {
             context.linker.toPathForPage({
                 pages: context.pages,
                 page: pageTarget.page,
-            })
+            }),
         );
     }
 
@@ -174,7 +174,7 @@ async function getPageDataWithFallback(args: {
                 context.linker.toPathForPage({
                     pages: context.pages,
                     page: rootPage?.page,
-                })
+                }),
             );
         }
 

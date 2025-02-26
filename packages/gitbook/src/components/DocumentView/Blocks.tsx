@@ -1,9 +1,9 @@
-import type { DocumentBlock, JSONDocument } from '@gitbook/api';
+import { DocumentBlock, JSONDocument } from '@gitbook/api';
 
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { tcls, ClassValue } from '@/lib/tailwind';
 
 import { Block } from './Block';
-import type { DocumentContextProps } from './DocumentView';
+import { DocumentContextProps } from './DocumentView';
 import { isBlockOffscreen } from './utils';
 
 /**
@@ -19,7 +19,7 @@ export function Blocks<TBlock extends DocumentBlock, Tag extends React.ElementTy
 
         /** Props to pass to the wrapper element */
         wrapperProps?: React.ComponentProps<Tag>;
-    }
+    },
 ) {
     const { tag: Tag = 'div', style, wrapperProps, ...blocksProps } = props;
 

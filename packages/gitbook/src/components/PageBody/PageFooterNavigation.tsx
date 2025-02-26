@@ -1,20 +1,20 @@
 import {
-    type CustomizationSettings,
-    type Revision,
-    type RevisionPageDocument,
-    type SiteCustomizationSettings,
+    CustomizationSettings,
+    Revision,
+    RevisionPageDocument,
+    SiteCustomizationSettings,
     SiteInsightsLinkPosition,
-    type Space,
+    Space,
 } from '@gitbook/api';
-import { Icon, type IconName } from '@gitbook/icons';
-import type React from 'react';
+import { Icon, IconName } from '@gitbook/icons';
+import React from 'react';
 
-import { getSpaceLanguage, t } from '@/intl/server';
+import { t, getSpaceLanguage } from '@/intl/server';
 import { getPageHref } from '@/lib/links';
 import { resolvePrevNextPages } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 
-import { Link, type LinkInsightsProps } from '../primitives';
+import { Link, LinkInsightsProps } from '../primitives';
 
 /**
  * Show cards to go to previous/next pages at the bottom.
@@ -42,7 +42,7 @@ export async function PageFooterNavigation(props: {
                 'max-w-3xl',
                 'mx-auto',
                 'page-api-block:ml-0',
-                'text-tint'
+                'text-tint',
             )}
         >
             {previous ? (
@@ -93,7 +93,7 @@ function NavigationCard(
         title: string;
         href: string;
         reversed?: boolean;
-    } & LinkInsightsProps
+    } & LinkInsightsProps,
 ) {
     const { icon, label, title, href, reversed, insights } = props;
 
@@ -119,7 +119,7 @@ function NavigationCard(
                 'hover:border-primary',
                 'text-pretty',
                 'md:p-4',
-                'md:text-base'
+                'md:text-base',
             )}
         >
             <span className={tcls('flex', 'flex-col', 'flex-1', reversed ? 'text-right' : null)}>
@@ -138,7 +138,7 @@ function NavigationCard(
                     'text-tint-subtle',
                     'contrast-more:text-tint-strong',
                     'group-hover:text-primary',
-                    'md:block'
+                    'md:block',
                 )}
             />
         </Link>

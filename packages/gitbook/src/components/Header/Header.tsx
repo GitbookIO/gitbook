@@ -1,18 +1,18 @@
-import type { GitBookSiteContext } from '@v2/lib/context';
+import { GitBookSiteContext } from '@v2/lib/context';
 import { Suspense } from 'react';
 
 import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '@/components/layout';
-import { getSpaceLanguage, t } from '@/intl/server';
+import { t, getSpaceLanguage } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
 
-import { SearchButton } from '../Search';
-import { SiteSectionTabs } from '../SiteSections';
 import { HeaderLink } from './HeaderLink';
 import { HeaderLinkMore } from './HeaderLinkMore';
 import { HeaderLinks } from './HeaderLinks';
 import { HeaderLogo } from './HeaderLogo';
-import { HeaderMobileMenu } from './HeaderMobileMenu';
 import { SpacesDropdown } from './SpacesDropdown';
+import { SearchButton } from '../Search';
+import { SiteSectionTabs } from '../SiteSections';
+import { HeaderMobileMenu } from './HeaderMobileMenu';
 
 /**
  * Render the header for the space.
@@ -46,14 +46,14 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
 
                 withTopHeader ? null : 'lg:hidden mobile-only',
                 'text-sm',
-                'backdrop-blur-lg'
+                'backdrop-blur-lg',
             )}
         >
             <div
                 className={tcls(
                     'theme-bold:bg-header-background',
                     'theme-bold:shadow-[0px_1px_0px]',
-                    'theme-bold:shadow-tint-12/2'
+                    'theme-bold:shadow-tint-12/2',
                 )}
             >
                 <div className={tcls('scroll-nojump')}>
@@ -69,14 +69,14 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                             'min-h-16',
                             'sm:h-16',
                             isMultiVariants && 'page-no-toc:max-[400px]:flex-wrap',
-                            CONTAINER_STYLE
+                            CONTAINER_STYLE,
                         )}
                     >
                         <div
                             className={tcls(
                                 'flex max-w-full',
                                 isMultiVariants && 'page-no-toc:max-[400px]:w-full',
-                                'shrink min-w-0 gap-2 lg:gap-4 justify-start items-center'
+                                'shrink min-w-0 gap-2 lg:gap-4 justify-start items-center',
                             )}
                         >
                             <HeaderMobileMenu
@@ -86,7 +86,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                     'text-tint-strong',
                                     'theme-bold:text-header-link',
                                     'hover:bg-tint-hover',
-                                    'theme-bold:hover:bg-header-link/3'
+                                    'theme-bold:hover:bg-header-link/3',
                                 )}
                             />
                             <HeaderLogo context={context} />
@@ -131,7 +131,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                 'md:min-w-56',
                                 'grow-0',
                                 'shrink-0',
-                                'justify-self-end'
+                                'justify-self-end',
                             )}
                         >
                             <Suspense fallback={null}>
@@ -167,7 +167,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                             getSpaceLanguage(customization),
                                             customization.aiSearch.enabled
                                                 ? 'search_or_ask'
-                                                : 'search'
+                                                : 'search',
                                         )}
                                         ...
                                     </span>

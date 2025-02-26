@@ -10,7 +10,7 @@ export type StreamResponseChunk<T> = {
  * See https://github.com/vercel/next.js/discussions/51282
  */
 export function streamResponse<T, P extends any[]>(
-    createGenerator: (...args: P) => AsyncGenerator<T>
+    createGenerator: (...args: P) => AsyncGenerator<T>,
 ) {
     return async (...args: Parameters<typeof createGenerator>) => {
         const generator = createGenerator(...args);
@@ -23,17 +23,19 @@ export function streamResponse<T, P extends any[]>(
  */
 export function iterateStreamResponse<T>(streamResponse: Promise<StreamResponseChunk<T>>) {
     return {
-        [Symbol.asyncIterator]: () => ({
-            current: streamResponse,
-            async next() {
-                const { iteratorResult, next } = await this.current;
+        [Symbol.asyncIterator]: function () {
+            return {
+                current: streamResponse,
+                async next() {
+                    const { iteratorResult, next } = await this.current;
 
-                if (next) this.current = next;
-                else iteratorResult.done = true;
+                    if (next) this.current = next;
+                    else iteratorResult.done = true;
 
-                return iteratorResult;
-            },
-        }),
+                    return iteratorResult;
+                },
+            };
+        },
     };
 }
 

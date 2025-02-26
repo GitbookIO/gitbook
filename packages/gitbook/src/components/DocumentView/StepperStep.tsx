@@ -1,9 +1,9 @@
-import type { DocumentBlockStepperStep } from '@gitbook/api';
+import { DocumentBlockStepperStep } from '@gitbook/api';
 import { assert } from 'ts-essentials';
 
 import { tcls } from '@/lib/tailwind';
 
-import type { BlockProps } from './Block';
+import { BlockProps } from './Block';
 import { Blocks } from './Blocks';
 
 export function StepperStep(props: BlockProps<DocumentBlockStepperStep>) {
@@ -35,7 +35,7 @@ export function StepperStep(props: BlockProps<DocumentBlockStepperStep>) {
                 <div
                     className={tcls(
                         'can-override-bg can-override-text flex size-[calc(1.75rem+1px)] items-center justify-center rounded-full bg-primary-subtle tabular-nums',
-                        'font-medium text-primary'
+                        'font-medium text-primary',
                     )}
                 >
                     {index + 1}

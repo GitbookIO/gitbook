@@ -1,9 +1,9 @@
 import {
-    type CustomizationContentLink,
-    type CustomizationFooterGroup,
+    CustomizationContentLink,
+    CustomizationFooterGroup,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
-import type { GitBookAnyContext } from '@v2/lib/context';
+import { GitBookAnyContext } from '@v2/lib/context';
 
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -56,7 +56,7 @@ async function FooterLink(props: { link: CustomizationContentLink; context: GitB
                 'links-accent:hover:underline',
                 'links-accent:underline-offset-4',
                 'links-accent:decoration-primary-subtle',
-                'links-accent:decoration-[3px]'
+                'links-accent:decoration-[3px]',
             )}
             insights={{
                 type: 'link_click',

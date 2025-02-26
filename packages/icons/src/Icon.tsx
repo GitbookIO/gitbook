@@ -2,9 +2,9 @@
 
 import * as React from 'react';
 
-import { getIconAssetURL, useIcons } from './IconsProvider';
+import { IconName, IconStyle } from './types';
 import { getIconStyle } from './getIconStyle';
-import type { IconName, IconStyle } from './types';
+import { getIconAssetURL, useIcons } from './IconsProvider';
 
 /**
  * Props for the icon component.
@@ -39,7 +39,7 @@ export type IconProps = React.SVGProps<SVGSVGElement> & {
  */
 export const Icon = React.forwardRef(function Icon(
     props: IconProps,
-    ref: React.Ref<SVGSVGElement>
+    ref: React.Ref<SVGSVGElement>,
 ) {
     const context = useIcons();
     const {

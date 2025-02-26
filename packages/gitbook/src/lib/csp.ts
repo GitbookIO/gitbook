@@ -1,4 +1,4 @@
-import type { SpaceIntegrationScript } from '@gitbook/api';
+import { SpaceIntegrationScript } from '@gitbook/api';
 import { merge } from 'content-security-policy-merger';
 import { headers } from 'next/headers';
 import { assert } from 'ts-essentials';

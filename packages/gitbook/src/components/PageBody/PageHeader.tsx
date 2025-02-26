@@ -1,9 +1,9 @@
-import type { RevisionPage, RevisionPageDocument } from '@gitbook/api';
+import { RevisionPage, RevisionPageDocument } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import { Fragment } from 'react';
 
 import { getPageHref } from '@/lib/links';
-import type { AncestorRevisionPage } from '@/lib/pages';
+import { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 
 import { PageIcon } from '../PageIcon';
@@ -39,7 +39,7 @@ export async function PageHeader(props: {
                                 'items-center',
                                 'gap-1.5',
                                 'contrast-more:underline',
-                                'contrast-more:decoration-current'
+                                'contrast-more:decoration-current',
                             )}
                         >
                             <PageIcon
@@ -54,7 +54,7 @@ export async function PageHeader(props: {
                     )}
                 </Fragment>
             );
-        })
+        }),
     );
 
     return (

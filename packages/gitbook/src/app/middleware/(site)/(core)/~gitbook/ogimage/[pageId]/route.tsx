@@ -2,10 +2,10 @@ import { CustomizationHeaderPreset } from '@gitbook/api';
 import { colorContrast } from '@gitbook/colors';
 import { redirect } from 'next/navigation';
 import { ImageResponse } from 'next/og';
-import type { NextRequest } from 'next/server';
+import { NextRequest } from 'next/server';
 import React from 'react';
 
-import { type PageIdParams, fetchPageData } from '@/components/SitePage';
+import { PageIdParams, fetchPageData } from '@/components/SitePage';
 import { googleFontsMap } from '@/fonts';
 import { getAbsoluteHref } from '@/lib/links';
 import { getSiteContentPointer } from '@/lib/pointer';
@@ -122,7 +122,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<PageId
                 title: customization.header.linkColor?.[theme] || colors.title,
                 body: colorContrast(
                     customization.header.backgroundColor?.[theme] || colors.background,
-                    [baseColors.light, baseColors.dark]
+                    [baseColors.light, baseColors.dark],
                 ),
             };
             gridAsset = colors.body == baseColors.light ? gridWhite : gridBlack;
@@ -162,69 +162,71 @@ export async function GET(req: NextRequest, { params }: { params: Promise<PageId
         if ('emoji' in customization.favicon)
             return (
                 <span tw="text-4xl mr-4">
-                    {String.fromCodePoint(Number.parseInt('0x' + customization.favicon.emoji))}
+                    {String.fromCodePoint(parseInt('0x' + customization.favicon.emoji))}
                 </span>
             );
         const src = await getAbsoluteHref(
             `~gitbook/icon?size=medium&theme=${customization.themes.default}`,
-            true
+            true,
         );
         return <img src={src} alt="Icon" width={40} height={40} tw="mr-4" />;
     })();
 
     return new ImageResponse(
-        <div
-            tw={`justify-between p-20 relative w-full h-full flex flex-col bg-[${colors.background}] text-[${colors.body}]`}
-            style={{
-                fontFamily,
-            }}
-        >
-            {/* Gradient */}
+        (
             <div
-                tw="absolute inset-0"
+                tw={`justify-between p-20 relative w-full h-full flex flex-col bg-[${colors.background}] text-[${colors.body}]`}
                 style={{
-                    backgroundImage: `radial-gradient(ellipse 100% 100% at top right , ${colors.gradient}, ${colors.gradient}00)`,
-                    opacity: 0.5,
+                    fontFamily,
                 }}
-            ></div>
+            >
+                {/* Gradient */}
+                <div
+                    tw="absolute inset-0"
+                    style={{
+                        backgroundImage: `radial-gradient(ellipse 100% 100% at top right , ${colors.gradient}, ${colors.gradient}00)`,
+                        opacity: 0.5,
+                    }}
+                ></div>
 
-            {/* Grid */}
-            <img tw="absolute inset-0 w-[100vw] h-[100vh]" src={gridAsset} alt="Grid" />
+                {/* Grid */}
+                <img tw="absolute inset-0 w-[100vw] h-[100vh]" src={gridAsset} alt="Grid" />
 
-            {/* Logo */}
-            {customization.header.logo ? (
-                <img
-                    alt="Logo"
-                    height={60}
-                    src={
-                        useLightTheme
-                            ? customization.header.logo.light
-                            : customization.header.logo.dark
-                    }
-                />
-            ) : (
-                <div tw="flex">
-                    {favicon}
-                    <h3 tw="text-4xl my-0 font-bold">{contentTitle}</h3>
+                {/* Logo */}
+                {customization.header.logo ? (
+                    <img
+                        alt="Logo"
+                        height={60}
+                        src={
+                            useLightTheme
+                                ? customization.header.logo.light
+                                : customization.header.logo.dark
+                        }
+                    />
+                ) : (
+                    <div tw="flex">
+                        {favicon}
+                        <h3 tw="text-4xl my-0 font-bold">{contentTitle}</h3>
+                    </div>
+                )}
+
+                {/* Title and description */}
+                <div tw="flex flex-col">
+                    <h1
+                        tw={`text-8xl my-0 tracking-tight leading-none text-left text-[${colors.title}] font-bold`}
+                    >
+                        {pageTitle}
+                    </h1>
+                    {pageDescription ? (
+                        <h2 tw="text-4xl mb-0 mt-8 w-[75%] font-normal">{pageDescription}</h2>
+                    ) : null}
                 </div>
-            )}
-
-            {/* Title and description */}
-            <div tw="flex flex-col">
-                <h1
-                    tw={`text-8xl my-0 tracking-tight leading-none text-left text-[${colors.title}] font-bold`}
-                >
-                    {pageTitle}
-                </h1>
-                {pageDescription ? (
-                    <h2 tw="text-4xl mb-0 mt-8 w-[75%] font-normal">{pageDescription}</h2>
-                ) : null}
             </div>
-        </div>,
+        ),
         {
             width: 1200,
             height: 630,
             fonts: fonts.length ? fonts : undefined,
-        }
+        },
     );
 }

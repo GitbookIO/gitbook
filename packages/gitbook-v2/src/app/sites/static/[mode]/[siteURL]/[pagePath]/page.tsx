@@ -1,12 +1,12 @@
+import { unstable_cacheTag as cacheTag } from 'next/cache';
+import { getSiteCacheTag } from '@v2/lib/cache';
+import { getPagePathFromParams, getStaticSiteContext, RouteParams } from '@v2/app/utils';
 import {
-    SitePage,
     generateSitePageMetadata,
     generateSitePageViewport,
+    SitePage,
 } from '@/components/SitePage';
-import { type RouteParams, getPagePathFromParams, getStaticSiteContext } from '@v2/app/utils';
-import { getSiteCacheTag } from '@v2/lib/cache';
-import type { Metadata, Viewport } from 'next';
-import { unstable_cacheTag as cacheTag } from 'next/cache';
+import { Metadata, Viewport } from 'next';
 
 export const dynamic = 'force-static';
 

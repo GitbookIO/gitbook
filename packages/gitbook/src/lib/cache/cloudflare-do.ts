@@ -1,7 +1,7 @@
-import { type CacheLocationId, CacheObjectStub } from '@gitbook/cache-do/api';
+import { CacheObjectStub, CacheLocationId } from '@gitbook/cache-do/api';
 
+import { CacheBackend, CacheEntry, CacheEntryLookup } from './types';
 import { trace } from '../tracing';
-import type { CacheBackend, CacheEntry, CacheEntryLookup } from './types';
 
 /**
  * Cache implementation using the custom Cloudflare Durable Object.
@@ -27,7 +27,7 @@ export const cloudflareDOCache: CacheBackend = {
                 }
 
                 return (await stub.get<CacheEntry>(key)) ?? null;
-            }
+            },
         );
     },
     async set(entry) {
@@ -48,7 +48,7 @@ export const cloudflareDOCache: CacheBackend = {
                 }
 
                 await stub.set<CacheEntry>(key, entry, entry.meta.expiresAt);
-            }
+            },
         );
     },
     async del(entries) {
@@ -68,7 +68,7 @@ export const cloudflareDOCache: CacheBackend = {
                 keys.forEach((key) => {
                     entries.push({ key, tag });
                 });
-            })
+            }),
         );
 
         return { entries };

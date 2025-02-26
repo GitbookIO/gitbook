@@ -1,4 +1,4 @@
-import type { DocumentBlockOpenAPI, JSONDocument } from '@gitbook/api';
+import { DocumentBlockOpenAPI, JSONDocument } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import { OpenAPIOperation } from '@gitbook/react-openapi';
 import React from 'react';
@@ -6,7 +6,7 @@ import React from 'react';
 import { resolveOpenAPIBlock } from '@/lib/openapi/fetch';
 import { tcls } from '@/lib/tailwind';
 
-import type { BlockProps } from '../Block';
+import { BlockProps } from '../Block';
 import { PlainCodeBlock } from '../CodeBlock';
 import { DocumentView } from '../DocumentView';
 import { Heading } from '../Heading';

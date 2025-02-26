@@ -2,10 +2,10 @@ import type { DocumentBlockCode } from '@gitbook/api';
 
 import { getNodeFragmentByType } from '@/lib/document';
 
-import type { BlockProps } from '../Block';
-import { Blocks } from '../Blocks';
+import { BlockProps } from '../Block';
 import { ClientCodeBlock } from './ClientCodeBlock';
-import { type RenderedInline, getInlines } from './highlight';
+import { getInlines, RenderedInline } from './highlight';
+import { Blocks } from '../Blocks';
 
 /**
  * Render a code block, can be client-side or server-side.

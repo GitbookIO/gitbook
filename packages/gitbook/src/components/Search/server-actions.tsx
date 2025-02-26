@@ -1,14 +1,8 @@
 'use server';
 
-import type {
-    RevisionPage,
-    SearchAIAnswer,
-    SearchPageResult,
-    SiteSpace,
-    Space,
-} from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
-import type * as React from 'react';
+import { RevisionPage, SearchAIAnswer, SearchPageResult, SiteSpace, Space } from '@gitbook/api';
+import { GitBookSiteContext } from '@v2/lib/context';
+import * as React from 'react';
 import { assert } from 'ts-essentials';
 
 import { streamResponse } from '@/lib/actions';
@@ -92,10 +86,10 @@ async function searchSiteContent(args: {
 
                     return Promise.all(
                         spaceItem.pages.map((item) =>
-                            transformSitePageResult(item, siteSpace ?? undefined)
-                        )
+                            transformSitePageResult(item, siteSpace ?? undefined),
+                        ),
                     );
-                })
+                }),
             )
         ).flat(2);
     }
@@ -104,7 +98,7 @@ async function searchSiteContent(args: {
         await Promise.all(
             searchResults.items.map((spaceItem) => {
                 return Promise.all(spaceItem.pages.map((item) => transformPageResult(item)));
-            })
+            }),
         )
     ).flat(2);
 }
@@ -114,7 +108,7 @@ async function searchSiteContent(args: {
  */
 export async function searchAllSiteContent(
     query: string,
-    pointer: api.SiteContentPointer
+    pointer: api.SiteContentPointer,
 ): Promise<OrderedComputedResult[]> {
     return await searchSiteContent({
         pointer,
@@ -129,7 +123,7 @@ export async function searchAllSiteContent(
 export async function searchSiteSpaceContent(
     query: string,
     pointer: api.SiteContentPointer,
-    revisionId: string
+    revisionId: string,
 ): Promise<OrderedComputedResult[]> {
     const siteSpaceId = pointer.siteSpaceId;
     assert(siteSpaceId, 'Expected siteSpaceId for searchSiteSpaceContent');
@@ -177,7 +171,7 @@ export const streamAskQuestion = streamResponse(async function* ({
                 includedSiteSpaces: siteSpaceId ? [siteSpaceId] : undefined,
             },
         },
-        { format: 'document' }
+        { format: 'document' },
     );
 
     const spacePromises = new Map<string, Promise<RevisionPage[]>>();
@@ -198,7 +192,7 @@ export const streamAskQuestion = streamResponse(async function* ({
                             spaceId: source.space,
                             revisionId: source.revision,
                             metadata: false,
-                        })
+                        }),
                     );
                 }
 
@@ -211,7 +205,7 @@ export const streamAskQuestion = streamResponse(async function* ({
             spaces.map(async (space) => {
                 const pages = await spacePromises.get(space);
                 return { space, pages };
-            })
+            }),
         ).then((results) => {
             return results.reduce((map, result) => {
                 if (result.pages) {
@@ -229,7 +223,7 @@ export const streamAskQuestion = streamResponse(async function* ({
  */
 export const streamRecommendedQuestions = streamResponse(async function* (
     organizationId: string,
-    siteId: string
+    siteId: string,
 ) {
     const apiCtx = await api.api();
     const stream = apiCtx.client.orgs.streamRecommendedQuestionsInSite(organizationId, siteId);
@@ -247,7 +241,7 @@ async function transformAnswer(
     }: {
         answer: SearchAIAnswer;
         spacePages: Map<string, RevisionPage[]>;
-    }
+    },
 ): Promise<AskAnswerResult> {
     const sources = (
         await Promise.all(
@@ -283,7 +277,7 @@ async function transformAnswer(
                     title: page.page.title,
                     href,
                 };
-            })
+            }),
         )
     ).filter(filterOutNullable);
 
@@ -319,7 +313,7 @@ async function transformSectionsAndPage(args: {
             title: section.title,
             href: await getURLWithSections(section.path, spaceURL),
             body: section.body,
-        })) ?? []
+        })) ?? [],
     );
 
     const page: ComputedPageResult = {

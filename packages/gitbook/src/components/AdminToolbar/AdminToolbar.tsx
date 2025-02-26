@@ -1,13 +1,13 @@
 import { Icon } from '@gitbook/icons';
-import type { GitBookSiteContext } from '@v2/lib/context';
+import { GitBookSiteContext } from '@v2/lib/context';
 import { headers } from 'next/headers';
 import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
-import { DateRelative } from '../primitives';
 import { RefreshChangeRequestButton } from './RefreshChangeRequestButton';
 import { Toolbar, ToolbarBody, ToolbarButton, ToolbarButtonGroups } from './Toolbar';
+import { DateRelative } from '../primitives';
 
 interface AdminToolbarProps {
     context: GitBookSiteContext;
@@ -34,7 +34,7 @@ function ToolbarLayout(props: { children: React.ReactNode }) {
                 'p-2',
                 'max-w-md',
                 'border-tint-12/1',
-                'backdrop-blur-md'
+                'backdrop-blur-md',
             )}
         >
             <React.Suspense fallback={null}>{props.children}</React.Suspense>

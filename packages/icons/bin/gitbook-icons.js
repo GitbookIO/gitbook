@@ -1,7 +1,7 @@
 #!/usr/bin/env node
+import fs from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
-import fs from 'fs/promises';
 
 import { getKitPath } from './kit.js';
 
@@ -13,7 +13,7 @@ const allStyles = ['brands', 'duotone', 'solid', 'regular', 'light', 'thin', 'cu
 async function main() {
     const outputFolder = path.resolve(process.cwd(), process.argv[2] ?? 'public/icons');
     const stylesToCopy = (process.argv[3] ? process.argv[3].split(',') : allStyles).filter(
-        (style) => allStyles.includes(style)
+        (style) => allStyles.includes(style),
     );
     const source = getKitPath();
 
@@ -42,7 +42,7 @@ async function main() {
             if (existsSync(spritePath)) {
                 return fs.cp(
                     path.join(source, `sprites/${style}.svg`),
-                    path.join(outputFolder, 'sprites', style + '.svg')
+                    path.join(outputFolder, 'sprites', style + '.svg'),
                 );
             }
         }),

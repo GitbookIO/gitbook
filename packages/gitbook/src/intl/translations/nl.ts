@@ -1,4 +1,4 @@
-import type { TranslationLanguage } from './types';
+import { TranslationLanguage } from './types';
 
 export const nl: TranslationLanguage = {
     locale: 'nl',

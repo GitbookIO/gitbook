@@ -6,8 +6,8 @@ import { useScrollActiveId } from '@/components/hooks';
 import type { DocumentSection } from '@/lib/document-sections';
 import { tcls } from '@/lib/tailwind';
 
-import { HEADER_HEIGHT_DESKTOP } from '../layout';
 import { AsideSectionHighlight } from './AsideSectionHighlight';
+import { HEADER_HEIGHT_DESKTOP } from '../layout';
 
 /**
  * The threshold at which we consider a section as intersecting the viewport.
@@ -46,7 +46,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                         'relative',
                         'h-fit',
                         'mt-2',
-                        section.depth > 1 && ['ml-3', 'my-0', 'sidebar-list-line:ml-0']
+                        section.depth > 1 && ['ml-3', 'my-0', 'sidebar-list-line:ml-0'],
                     )}
                 >
                     {activeId === section.id ? (
@@ -62,7 +62,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                                     : [
                                           'sidebar-list-default:ml-3',
                                           'contrast-more:sidebar-list-default:ml-0',
-                                      ]
+                                      ],
                             )}
                         />
                     ) : null}
@@ -121,7 +121,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                                 'contrast-more:font-semibold',
 
                                 'sidebar-list-default:border-tint',
-                            ]
+                            ],
                         )}
                     >
                         {section.tag ? (
@@ -138,7 +138,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                                     'line-through',
                                     'opacity-50',
                                     'contrast-more:opacity-60',
-                                ]
+                                ],
                             )}
                         >
                             {section.title}

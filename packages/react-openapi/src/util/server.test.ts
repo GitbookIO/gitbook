@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'bun:test';
-import type { OpenAPIV3 } from '@gitbook/openapi-parser';
-import { getDefaultServerURL, interpolateServerURL } from './server';
+import { describe, it, expect } from 'bun:test';
+import { interpolateServerURL, getDefaultServerURL } from './server';
+import { OpenAPIV3 } from '@gitbook/openapi-parser';
 
 describe('#interpolateServerURL', () => {
     it('interpolates the server URL with the default values of the variables', () => {

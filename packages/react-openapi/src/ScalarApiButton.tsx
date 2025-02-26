@@ -4,8 +4,8 @@ import { ApiClientModalProvider, useApiClientModal } from '@scalar/api-client-re
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import { useEventCallback } from 'usehooks-ts';
 import { useOpenAPIOperationContext } from './OpenAPIOperationContext';
+import { useEventCallback } from 'usehooks-ts';
 
 /**
  * Button which launches the Scalar API Client
@@ -48,7 +48,7 @@ export function ScalarApiButton({
                         path={path}
                         specUrl={specUrl}
                     />,
-                    document.body
+                    document.body,
                 )}
         </div>
     );
@@ -88,7 +88,7 @@ function ScalarModalController(props: {
     useImperativeHandle(
         props.controllerRef,
         () => ({ openClient: openClient ? () => openClient() : undefined }),
-        [openClient]
+        [openClient],
     );
 
     // Open the client when the component is mounted.

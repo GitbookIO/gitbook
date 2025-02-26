@@ -1,11 +1,11 @@
-import type { Metadata, Viewport } from 'next';
+import { Metadata, Viewport } from 'next';
 import React from 'react';
 
 import {
-    type PagePathParams,
-    SitePage,
     generateSitePageMetadata,
     generateSitePageViewport,
+    SitePage,
+    PagePathParams,
 } from '@/components/SitePage';
 import { getSiteContentPointer } from '@/lib/pointer';
 import { fetchV1ContextForSitePointer } from '@/lib/v1';

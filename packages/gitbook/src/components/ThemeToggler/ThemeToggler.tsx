@@ -1,6 +1,6 @@
 'use client';
 
-import { Icon, type IconName } from '@gitbook/icons';
+import { Icon, IconName } from '@gitbook/icons';
 import { useTheme } from 'next-themes';
 import React from 'react';
 
@@ -85,7 +85,7 @@ function ThemeButton(props: {
                     'contrast-more:text-primary-strong',
                     'contrast-more:ring-1',
                     'ring-primary',
-                ]
+                ],
             )}
         >
             <Icon icon={icon} className={tcls('size-4')} />

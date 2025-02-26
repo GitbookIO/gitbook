@@ -1,4 +1,4 @@
-import type { CacheEntryMeta } from './types';
+import { CacheEntryMeta } from './types';
 
 /**
  * For mutable entries, we limit the cache to 30 seconds

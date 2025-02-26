@@ -1,16 +1,12 @@
-import type {
-    DocumentBlockCode,
-    DocumentBlockCodeLine,
-    DocumentInlineAnnotation,
-} from '@gitbook/api';
+import { DocumentBlockCode, DocumentBlockCodeLine, DocumentInlineAnnotation } from '@gitbook/api';
 import {
-    type ThemedToken,
+    createdBundledHighlighter,
+    ThemedToken,
     createCssVariablesTheme,
     createSingletonShorthands,
-    createdBundledHighlighter,
 } from 'shiki/core';
 import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
-import { type BundledLanguage, bundledLanguages } from 'shiki/langs';
+import { BundledLanguage, bundledLanguages } from 'shiki/langs';
 
 import { plainHighlight } from './plain-highlight';
 
@@ -43,7 +39,7 @@ const highlighter = createSingletonShorthands(
             createJavaScriptRegexEngine({
                 forgiving: true,
             }),
-    })
+    }),
 );
 
 /**
@@ -64,7 +60,7 @@ export async function preloadHighlight(block: DocumentBlockCode) {
  */
 export async function highlight(
     block: DocumentBlockCode,
-    inlines: RenderedInline[]
+    inlines: RenderedInline[],
 ): Promise<HighlightLine[]> {
     const langName = getBlockLang(block);
     if (!langName) {
@@ -163,7 +159,7 @@ export function getInlines(block: DocumentBlockCode) {
 
 function matchTokenAndInlines(
     eat: () => PositionedToken | null,
-    allInlines: RenderedInline[]
+    allInlines: RenderedInline[],
 ): HighlightToken[] {
     const initialToken = eat();
     if (!initialToken) {
@@ -171,7 +167,7 @@ function matchTokenAndInlines(
     }
 
     const inlines = allInlines.filter(
-        ({ inline }) => inline.start >= initialToken.start && inline.start < initialToken.end
+        ({ inline }) => inline.start >= initialToken.start && inline.start < initialToken.end,
     );
     let token = initialToken;
     const result: HighlightToken[] = [];
@@ -259,7 +255,7 @@ function getPlainCodeBlock(code: DocumentBlockCode, inlines?: InlineIndexed[]): 
 function getPlainCodeBlockLine(
     parent: DocumentBlockCodeLine | DocumentInlineAnnotation,
     index: number,
-    inlines?: InlineIndexed[]
+    inlines?: InlineIndexed[],
 ): string {
     let content = '';
 
@@ -287,7 +283,7 @@ function getPlainCodeBlockLine(
 function slicePositionedToken(
     token: PositionedToken,
     relativeStart: number,
-    relativeLength: number
+    relativeLength: number,
 ): PositionedToken {
     return {
         ...token,
@@ -299,7 +295,7 @@ function slicePositionedToken(
 
 function splitPositionedTokenAt(
     token: PositionedToken,
-    absoluteIndex: number
+    absoluteIndex: number,
 ): [PositionedToken | null, PositionedToken | null] {
     if (absoluteIndex < token.start || absoluteIndex > token.end) {
         throw new Error(`index (${absoluteIndex}) out of bound (${token.start}:${token.end})`);
@@ -309,7 +305,7 @@ function splitPositionedTokenAt(
     const after = slicePositionedToken(
         token,
         absoluteIndex - token.start,
-        token.end - absoluteIndex
+        token.end - absoluteIndex,
     );
 
     return [

@@ -1,6 +1,7 @@
-import { type ComputedContentSource, GitBookAPI } from '@gitbook/api';
-import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
 import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
+import { ComputedContentSource, GitBookAPI } from '@gitbook/api';
+import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
+import { GitBookDataFetcher } from './types';
 import {
     getChangeRequestCacheTag,
     getHostnameCacheTag,
@@ -8,7 +9,6 @@ import {
     getSiteCacheTag,
     getSpaceCacheTag,
 } from '../cache';
-import type { GitBookDataFetcher } from './types';
 
 interface DataFetcherInput {
     /**
@@ -156,7 +156,7 @@ async function getSpace(
     params: {
         spaceId: string;
         shareKey: string | undefined;
-    }
+    },
 ) {
     'use cache';
 
@@ -173,14 +173,14 @@ async function getChangeRequest(
     params: {
         spaceId: string;
         changeRequestId: string;
-    }
+    },
 ) {
     'use cache';
 
     try {
         const res = await getAPI(input).spaces.getChangeRequestById(
             params.spaceId,
-            params.changeRequestId
+            params.changeRequestId,
         );
         cacheTag(getChangeRequestCacheTag(params.spaceId, res.data.id));
         return res.data;
@@ -199,7 +199,7 @@ async function getRevision(
         spaceId: string;
         revisionId: string;
         metadata: boolean;
-    }
+    },
 ) {
     'use cache';
 
@@ -215,7 +215,7 @@ async function getRevisionPages(
         spaceId: string;
         revisionId: string;
         metadata: boolean;
-    }
+    },
 ) {
     'use cache';
 
@@ -224,7 +224,7 @@ async function getRevisionPages(
         params.revisionId,
         {
             metadata: params.metadata,
-        }
+        },
     );
     return res.data.pages;
 }
@@ -235,7 +235,7 @@ async function getRevisionFile(
         spaceId: string;
         revisionId: string;
         fileId: string;
-    }
+    },
 ) {
     'use cache';
 
@@ -243,7 +243,7 @@ async function getRevisionFile(
         const res = await getAPI(input).spaces.getFileInRevisionById(
             params.spaceId,
             params.revisionId,
-            params.fileId
+            params.fileId,
         );
         return res.data;
     } catch (error) {
@@ -261,7 +261,7 @@ async function getRevisionPageByPath(
         spaceId: string;
         revisionId: string;
         path: string;
-    }
+    },
 ) {
     'use cache';
 
@@ -271,7 +271,7 @@ async function getRevisionPageByPath(
         const res = await getAPI(input).spaces.getPageInRevisionByPath(
             params.spaceId,
             params.revisionId,
-            encodedPath
+            encodedPath,
         );
 
         return res.data;
@@ -289,7 +289,7 @@ async function getDocument(
     params: {
         spaceId: string;
         documentId: string;
-    }
+    },
 ) {
     'use cache';
 
@@ -302,7 +302,7 @@ async function getComputedDocument(
     params: {
         spaceId: string;
         source: ComputedContentSource;
-    }
+    },
 ) {
     'use cache';
 
@@ -318,7 +318,7 @@ async function getReusableContent(
         spaceId: string;
         revisionId: string;
         reusableContentId: string;
-    }
+    },
 ) {
     'use cache';
 
@@ -326,7 +326,7 @@ async function getReusableContent(
         const res = await getAPI(input).spaces.getReusableContentInRevisionById(
             params.spaceId,
             params.revisionId,
-            params.reusableContentId
+            params.reusableContentId,
         );
         return res.data;
     } catch (error) {
@@ -343,7 +343,7 @@ async function getLatestOpenAPISpecVersionContent(
     params: {
         organizationId: string;
         slug: string;
-    }
+    },
 ) {
     'use cache';
 
@@ -352,7 +352,7 @@ async function getLatestOpenAPISpecVersionContent(
     try {
         const res = await getAPI(input).orgs.getLatestOpenApiSpecVersionContent(
             params.organizationId,
-            params.slug
+            params.slug,
         );
         return res.data;
     } catch (error) {
@@ -370,7 +370,7 @@ async function getPublishedContentByUrl(
         url: string;
         visitorAuthToken: string | null;
         redirectOnError: boolean;
-    }
+    },
 ) {
     'use cache';
 
@@ -398,7 +398,7 @@ async function getPublishedContentSite(
         organizationId: string;
         siteId: string;
         siteShareKey: string | undefined;
-    }
+    },
 ) {
     'use cache';
     cacheTag(getSiteCacheTag(params.siteId));
@@ -407,7 +407,7 @@ async function getPublishedContentSite(
         params.siteId,
         {
             shareKey: params.siteShareKey,
-        }
+        },
     );
     return res.data;
 }
@@ -419,7 +419,7 @@ async function getSiteRedirectBySource(
         siteId: string;
         siteShareKey: string | undefined;
         source: string;
-    }
+    },
 ) {
     'use cache';
 
@@ -430,7 +430,7 @@ async function getSiteRedirectBySource(
             {
                 shareKey: params.siteShareKey,
                 source: params.source,
-            }
+            },
         );
 
         return res.data;

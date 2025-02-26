@@ -1,5 +1,5 @@
+import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 import { getPagePath } from '@/lib/pages';
-import type { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 
 /**
  * Generic interface to generate links based on a given context.
@@ -34,7 +34,7 @@ export function createLinker(
         protocol?: string;
         host: string;
         pathname: string;
-    }
+    },
 ): GitBookSpaceLinker {
     if (servedOn.host.includes('/')) {
         throw new Error('Host cannot include a slash');
@@ -62,7 +62,7 @@ export function createLinker(
  */
 export function appendPrefixToLinker(
     linker: GitBookSpaceLinker,
-    prefix: string
+    prefix: string,
 ): GitBookSpaceLinker {
     const linkerWithPrefix: GitBookSpaceLinker = {
         toPathInSpace(relativePath: string): string {

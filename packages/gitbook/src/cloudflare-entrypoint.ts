@@ -10,7 +10,7 @@ import { withMiddlewareHeadersStorage } from './lib/middleware';
 export default {
     async fetch(request, env, ctx) {
         const response = await withMiddlewareHeadersStorage(() =>
-            nextOnPagesHandler.fetch(request, env, ctx)
+            nextOnPagesHandler.fetch(request, env, ctx),
         );
 
         return response;

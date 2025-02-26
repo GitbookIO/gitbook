@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
-import type { Server } from 'bun';
 import { createFileSystem } from './filesystem';
+import { Server } from 'bun';
 
 async function serveFixture(fixture: string) {
     return new Response(await Bun.file(new URL(`./fixtures/${fixture}`, import.meta.url)).bytes(), {

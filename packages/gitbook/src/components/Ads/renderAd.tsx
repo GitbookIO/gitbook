@@ -1,6 +1,6 @@
 'use server';
 
-import type { SiteInsightsAd, SiteInsightsAdPlacement } from '@gitbook/api';
+import { SiteInsightsAd, SiteInsightsAdPlacement } from '@gitbook/api';
 import { headers } from 'next/headers';
 
 import { getV1BaseContext } from '@/lib/v1';
@@ -9,7 +9,7 @@ import { AdClassicRendering } from './AdClassicRendering';
 import { AdCoverRendering } from './AdCoverRendering';
 import { AdPixels } from './AdPixels';
 import adRainbow from './assets/ad-rainbow.svg';
-import type { AdItem, AdsResponse } from './types';
+import { AdItem, AdsResponse } from './types';
 
 type FetchAdOptions = FetchLiveAdOptions | FetchPlaceholderAdOptions;
 

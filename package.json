@@ -32,7 +32,9 @@
         "download:env": "op read op://gitbook-x-dev/gitbook-open/.env.local >> .env.local",
         "clean": "turbo run clean"
     },
-    "workspaces": ["packages/*"],
+    "workspaces": [
+        "packages/*"
+    ],
     "patchedDependencies": {
         "decode-named-character-reference@1.0.2": "patches/decode-named-character-reference@1.0.2.patch",
         "@vercel/next@4.4.2": "patches/@vercel%2Fnext@4.4.2.patch"

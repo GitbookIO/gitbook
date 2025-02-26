@@ -1,9 +1,9 @@
 import type { OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser';
-import { InteractiveSection } from './InteractiveSection';
-import { Markdown } from './Markdown';
-import { OpenAPIDisclosureGroup } from './OpenAPIDisclosureGroup';
 import { OpenAPIResponse } from './OpenAPIResponse';
-import type { OpenAPIClientContext } from './types';
+import { OpenAPIClientContext } from './types';
+import { InteractiveSection } from './InteractiveSection';
+import { OpenAPIDisclosureGroup } from './OpenAPIDisclosureGroup';
+import { Markdown } from './Markdown';
 
 /**
  * Display an interactive response body.
@@ -55,7 +55,7 @@ export function OpenAPIResponses(props: {
                                 ),
                             })),
                         };
-                    }
+                    },
                 )}
             />
         </InteractiveSection>

@@ -1,7 +1,7 @@
-import { UseQueryStatesOptions, parseAsBoolean, parseAsString, useQueryStates } from 'nuqs';
+import { useQueryStates, parseAsBoolean, parseAsString, UseQueryStatesOptions } from 'nuqs';
 import React from 'react';
 
-import type { LinkProps } from '../primitives';
+import { LinkProps } from '../primitives';
 
 export interface SearchState {
     query: string;
@@ -17,7 +17,7 @@ const keyMap = {
 };
 
 export type UpdateSearchState = (
-    update: React.SetStateAction<SearchState | null>
+    update: React.SetStateAction<SearchState | null>,
 ) => Promise<URLSearchParams>;
 
 /**
@@ -63,7 +63,7 @@ export function useSearch(): [SearchState | null, UpdateSearchState] {
                 });
             }
         },
-        [setRawState]
+        [setRawState],
     );
 
     return [state, setState];
@@ -96,6 +96,6 @@ export function useSearchLink(): (query: Partial<SearchState>) => LinkProps {
                 },
             };
         },
-        [setSearch]
+        [setSearch],
     );
 }

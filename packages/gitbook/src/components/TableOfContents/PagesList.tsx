@@ -1,7 +1,7 @@
-import { type RevisionPage, RevisionPageType } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
+import { RevisionPage, RevisionPageType } from '@gitbook/api';
+import { GitBookSiteContext } from '@v2/lib/context';
 
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { PageDocumentItem } from './PageDocumentItem';
 import { PageGroupItem } from './PageGroupItem';
@@ -20,7 +20,7 @@ export function PagesList(props: {
             {pages.map((page) => {
                 if (page.type === RevisionPageType.Computed) {
                     throw new Error(
-                        'Unexpected computed page, it should have been computed in the API'
+                        'Unexpected computed page, it should have been computed in the API',
                     );
                 }
 

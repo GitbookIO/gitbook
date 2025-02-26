@@ -1,8 +1,8 @@
-import type { DocumentBlockParagraph } from '@gitbook/api';
+import { DocumentBlockParagraph } from '@gitbook/api';
 
 import { tcls } from '@/lib/tailwind';
 
-import type { BlockProps } from './Block';
+import { BlockProps } from './Block';
 import { Inlines } from './Inlines';
 
 export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {

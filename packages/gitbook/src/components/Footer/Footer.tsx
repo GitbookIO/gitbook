@@ -1,13 +1,13 @@
-import type { GitBookSiteContext } from '@v2/lib/context';
+import { GitBookSiteContext } from '@v2/lib/context';
 import React from 'react';
 
 import { Image } from '@/components/utils';
 import { partition } from '@/lib/arrays';
 import { tcls } from '@/lib/tailwind';
 
-import { ThemeToggler } from '../ThemeToggler';
-import { CONTAINER_STYLE } from '../layout';
 import { FooterLinksGroup } from './FooterLinksGroup';
+import { CONTAINER_STYLE } from '../layout';
+import { ThemeToggler } from '../ThemeToggler';
 
 const FOOTER_COLUMNS = 4;
 
@@ -32,7 +32,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                             !customization.footer.logo &&
                             customization.footer.groups?.length == 0
                             ? 'xl:hidden'
-                            : null
+                            : null,
                     )}
                 >
                     <div className="hidden lg:block basis-72 page-no-toc:hidden" />
@@ -47,7 +47,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                             'flex-1',
                             'max-w-3xl',
                             'page-full-width:max-w-none',
-                            'mx-auto'
+                            'mx-auto',
                         )}
                     >
                         {/* Footer Logo */}
@@ -101,7 +101,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                                     'flex flex-col sm:flex-row mx-auto grow gap-10 sm:gap-6 order-3 w-full',
                                     !customization.footer.logo &&
                                         customization.footer.groups.length < 2 &&
-                                        'sm:order-1 sm:flex-1 sm:w-auto sm:items-start sm:max-w-3xl self-center sm:text-start'
+                                        'sm:order-1 sm:flex-1 sm:w-auto sm:items-start sm:max-w-3xl self-center sm:text-start',
                                 )}
                             >
                                 {partition(customization.footer.groups, FOOTER_COLUMNS).map(
@@ -118,7 +118,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                                                 />
                                             ))}
                                         </div>
-                                    )
+                                    ),
                                 )}
                             </div>
                         ) : null}
@@ -128,7 +128,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                             className={tcls(
                                 'mx-auto w-full grow text-xs text-tint items-center text-center order-4 flex flex-col gap-2 empty:hidden',
                                 customization.footer.groups.length == 0 &&
-                                    'sm:order-1 sm:flex-1 sm:w-auto sm:items-start sm:max-w-3xl self-center sm:text-start'
+                                    'sm:order-1 sm:flex-1 sm:w-auto sm:items-start sm:max-w-3xl self-center sm:text-start',
                             )}
                         >
                             {customization.footer.copyright ? (

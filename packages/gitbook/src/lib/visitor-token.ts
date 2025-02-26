@@ -43,7 +43,7 @@ export type VisitorTokenLookup =
  */
 export function getVisitorToken(
     request: NextRequest,
-    url: URL | NextRequest['nextUrl']
+    url: URL | NextRequest['nextUrl'],
 ): VisitorTokenLookup {
     const fromUrl = url.searchParams.get(VISITOR_AUTH_PARAM);
 
@@ -104,7 +104,7 @@ function getUrlBasePathCombinations(url: URL | NextRequest['nextUrl']): string[]
         // For backwards compatibility, we also add the base path with the `/v/` prefix if it's not already there
         if (parts.length > 1 && index >= 1 && ![parts[0], parts[1]].includes('v')) {
             baseNames.push(
-                '/' + parts.slice(0, 1) + '/v/' + parts.slice(1, index + 1).join('/') + '/'
+                '/' + parts.slice(0, 1) + '/v/' + parts.slice(1, index + 1).join('/') + '/',
             );
         }
     }
@@ -119,7 +119,7 @@ function getUrlBasePathCombinations(url: URL | NextRequest['nextUrl']): string[]
  */
 function getVisitorAuthTokenFromCookies(
     request: NextRequest,
-    url: URL | NextRequest['nextUrl']
+    url: URL | NextRequest['nextUrl'],
 ): VisitorAuthCookieValue | undefined {
     const urlBasePaths = getUrlBasePathCombinations(url);
     // Try to find a visitor authentication token for the current URL. The request
@@ -145,7 +145,7 @@ function getVisitorAuthTokenFromCookies(
  */
 function getVisitorCustomTokenFromCookies(request: NextRequest): string | undefined {
     const visitorCustomCookie = Array.from(request.cookies).find(
-        ([, cookie]) => cookie.name === VISITOR_TOKEN_COOKIE
+        ([, cookie]) => cookie.name === VISITOR_TOKEN_COOKIE,
     );
     return visitorCustomCookie ? visitorCustomCookie[1].value : undefined;
 }
@@ -155,7 +155,7 @@ function getVisitorCustomTokenFromCookies(request: NextRequest): string | undefi
  */
 function findVisitorAuthCookieForBasePath(
     request: NextRequest,
-    basePath: string
+    basePath: string,
 ): VisitorAuthCookieValue | undefined {
     return Array.from(request.cookies).reduce<VisitorAuthCookieValue | undefined>(
         (acc, [name, cookie]) => {
@@ -167,6 +167,6 @@ function findVisitorAuthCookieForBasePath(
             }
             return acc;
         },
-        undefined
+        undefined,
     );
 }

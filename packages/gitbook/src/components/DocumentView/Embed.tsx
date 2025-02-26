@@ -1,13 +1,13 @@
-import type * as gitbookAPI from '@gitbook/api';
+import * as gitbookAPI from '@gitbook/api';
 import Script from 'next/script';
 import ReactDOM from 'react-dom';
 
 import { Card } from '@/components/primitives';
-import { getEmbedByUrl, getEmbedByUrlInSpace } from '@/lib/api';
+import { getEmbedByUrlInSpace, getEmbedByUrl } from '@/lib/api';
 import { getContentSecurityPolicyNonce } from '@/lib/csp';
 import { tcls } from '@/lib/tailwind';
 
-import type { BlockProps } from './Block';
+import { BlockProps } from './Block';
 import { Caption } from './Caption';
 import { IntegrationBlock } from './Integration';
 
@@ -65,7 +65,7 @@ export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
 function createIntegrationBlock(
     url: string,
     integration: string,
-    block: gitbookAPI.IntegrationBlock
+    block: gitbookAPI.IntegrationBlock,
 ): gitbookAPI.DocumentBlockIntegration {
     return {
         object: 'block',

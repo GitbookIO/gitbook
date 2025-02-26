@@ -2,10 +2,10 @@
 
 import React from 'react';
 
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { ClassValue, tcls } from '@/lib/tailwind';
 
 const TOCScrollContainerRefContext = React.createContext<React.RefObject<HTMLDivElement> | null>(
-    null
+    null,
 );
 
 function useTOCScrollContainerRefContext() {

@@ -1,7 +1,7 @@
+import fs from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
 import url from 'url';
-import fs from 'fs/promises';
 
 import { getKitPath } from './kit.js';
 
@@ -11,7 +11,7 @@ import { getKitPath } from './kit.js';
 async function main() {
     const source = getKitPath();
     const icons = JSON.parse(
-        await fs.readFile(path.join(source, 'metadata/icon-families.json'), 'utf8')
+        await fs.readFile(path.join(source, 'metadata/icon-families.json'), 'utf8'),
     );
 
     // Only these families have exceptions

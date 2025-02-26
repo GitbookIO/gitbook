@@ -47,7 +47,7 @@ export function useToggleAnimation({
                     { opacity: 1 },
                     {
                         delay: staggerMenuItems,
-                    }
+                    },
                 );
             else {
                 animate(selector, { opacity: 0 });

@@ -1,8 +1,8 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
-import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 import { OpenAPISchemaProperties } from './OpenAPISchema';
-import type { OpenAPIClientContext } from './types';
 import { parameterToProperty, resolveDescription } from './utils';
+import type { OpenAPIClientContext } from './types';
+import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 
 /**
  * Display an interactive response body.
@@ -14,7 +14,7 @@ export function OpenAPIResponse(props: {
 }) {
     const { response, context, mediaType } = props;
     const headers = Object.entries(response.headers ?? {}).map(
-        ([name, header]) => [name, header ?? {}] as const
+        ([name, header]) => [name, header ?? {}] as const,
     );
     const content = Object.entries(mediaType.schema ?? {});
 

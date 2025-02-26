@@ -1,8 +1,8 @@
-import type { DocumentBlockReusableContent } from '@gitbook/api';
+import { DocumentBlockReusableContent } from '@gitbook/api';
 
 import { resolveContentRef } from '@/lib/references';
 
-import type { BlockProps } from './Block';
+import { BlockProps } from './Block';
 import { UnwrappedBlocks } from './Blocks';
 
 export async function ReusableContent(props: BlockProps<DocumentBlockReusableContent>) {

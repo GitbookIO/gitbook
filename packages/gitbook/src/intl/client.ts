@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import type { TranslationLanguage } from './translations';
+import { TranslationLanguage } from './translations';
 
 export * from './translate';
 

@@ -1,12 +1,12 @@
-import type { SiteInsightsAd } from '@gitbook/api';
-import type { GitBookBaseContext } from '@v2/lib/context';
+import { SiteInsightsAd } from '@gitbook/api';
+import { GitBookBaseContext } from '@v2/lib/context';
 import { getResizedImageURL } from '@v2/lib/images';
 import * as React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
+import { AdItem } from './types';
 import { Link } from '../primitives';
-import type { AdItem } from './types';
 
 /**
  * Classic rendering for an ad.
@@ -48,7 +48,7 @@ export async function AdClassicRendering({
                 'text-tint',
                 'hover:text-tint-strong',
                 'rounded-lg',
-                'p-4'
+                'p-4',
             )}
             href={ad.statlink}
         >

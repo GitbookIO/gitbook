@@ -1,4 +1,4 @@
-import type { ImageResizer, ResizeImageOptions } from './types';
+import { ImageResizer, ResizeImageOptions } from './types';
 
 /**
  * Quick utility to get a resized image URL.
@@ -6,7 +6,7 @@ import type { ImageResizer, ResizeImageOptions } from './types';
 export async function getResizedImageURL(
     resizer: ImageResizer,
     url: string,
-    options: ResizeImageOptions
+    options: ResizeImageOptions,
 ) {
     const getURL = resizer.resize(url);
     if (!getURL) {

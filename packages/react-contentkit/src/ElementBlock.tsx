@@ -1,10 +1,10 @@
-import type { ContentKitBlock } from '@gitbook/api';
-import type React from 'react';
+import { ContentKitBlock } from '@gitbook/api';
+import React from 'react';
 
-import type { ContentKitServerElementProps } from './types';
+import { ContentKitServerElementProps } from './types';
 
 export function ElementBlock(
-    props: React.PropsWithChildren<ContentKitServerElementProps<ContentKitBlock>>
+    props: React.PropsWithChildren<ContentKitServerElementProps<ContentKitBlock>>,
 ) {
     const { element, children } = props;
 

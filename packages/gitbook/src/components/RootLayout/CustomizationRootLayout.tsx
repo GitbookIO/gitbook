@@ -10,17 +10,17 @@ import {
     type SiteCustomizationSettings,
 } from '@gitbook/api';
 import {
-    type ColorScaleOptions,
-    DEFAULT_HINT_DANGER_COLOR,
-    DEFAULT_HINT_INFO_COLOR,
-    DEFAULT_HINT_SUCCESS_COLOR,
-    DEFAULT_HINT_WARNING_COLOR,
-    DEFAULT_TINT_COLOR,
     colorContrast,
     colorScale,
+    type ColorScaleOptions,
+    DEFAULT_TINT_COLOR,
+    DEFAULT_HINT_INFO_COLOR,
+    DEFAULT_HINT_SUCCESS_COLOR,
+    DEFAULT_HINT_DANGER_COLOR,
+    DEFAULT_HINT_WARNING_COLOR,
     hexToRgb,
 } from '@gitbook/colors';
-import { IconStyle, IconsProvider } from '@gitbook/icons';
+import { IconsProvider, IconStyle } from '@gitbook/icons';
 
 import { fontNotoColorEmoji, fonts, ibmPlexMono } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
@@ -63,7 +63,7 @@ export async function CustomizationRootLayout(props: {
                 tintColor ? ' tint' : 'no-tint',
                 sidebarStyles.background && `sidebar-${sidebarStyles.background}`,
                 sidebarStyles.list && `sidebar-list-${sidebarStyles.list}`,
-                'links' in customization.styling && `links-${customization.styling.links}`
+                'links' in customization.styling && `links-${customization.styling.links}`,
             )}
         >
             <head>
@@ -87,7 +87,7 @@ export async function CustomizationRootLayout(props: {
                             hexToRgb(
                                 customization.header.backgroundColor?.light ??
                                     tintColor?.light ??
-                                    customization.styling.primaryColor.light
+                                    customization.styling.primaryColor.light,
                             )
                         };
                         --header-link: ${hexToRgb(customization.header.linkColor?.light ?? colorContrast(tintColor?.light ?? customization.styling.primaryColor.light))};
@@ -123,7 +123,7 @@ export async function CustomizationRootLayout(props: {
                     'theme-bold-tint:bg-tint-subtle',
 
                     'theme-gradient:bg-gradient-primary',
-                    'theme-gradient-tint:bg-gradient-tint'
+                    'theme-gradient-tint:bg-gradient-tint',
                 )}
             >
                 <IconsProvider
@@ -152,7 +152,7 @@ export async function CustomizationRootLayout(props: {
  * If the tint color is not set or it is a space customization, it will return the default color.
  */
 function getTintColor(
-    customization: CustomizationSettings | SiteCustomizationSettings
+    customization: CustomizationSettings | SiteCustomizationSettings,
 ): CustomizationTint['color'] | undefined {
     if ('tint' in customization.styling && customization.styling.tint) {
         return {
@@ -164,7 +164,7 @@ function getTintColor(
 
 function getTintMixColor(
     primaryColor: CustomizationThemedColor,
-    tintColor: CustomizationTint['color'] | undefined
+    tintColor: CustomizationTint['color'] | undefined,
 ): {
     color: CustomizationThemedColor;
     ratio: { light: number; dark: number };
@@ -199,7 +199,7 @@ function getTintMixColor(
  * If it is a space customization, it will return the default styles.
  */
 function getSidebarStyles(
-    customization: CustomizationSettings | SiteCustomizationSettings
+    customization: CustomizationSettings | SiteCustomizationSettings,
 ): SiteCustomizationSettings['styling']['sidebar'] {
     if ('sidebar' in customization.styling) {
         return {
@@ -219,7 +219,7 @@ function getSidebarStyles(
  * If it is a space customization, it will return the default styles.
  */
 function getSemanticColors(
-    customization: CustomizationSettings | SiteCustomizationSettings
+    customization: CustomizationSettings | SiteCustomizationSettings,
 ): Pick<
     SiteCustomizationSettings['styling'],
     'infoColor' | 'successColor' | 'warningColor' | 'dangerColor'
@@ -262,14 +262,14 @@ function generateColorVariable(
         ...options // Pass any options along to the colorScale() function
     }: ColorScaleOptions & {
         withContrast?: boolean;
-    } = {}
+    } = {},
 ) {
     const shades: Record<string, string> =
         typeof color === 'string'
             ? Object.fromEntries(
                   colorScale(color, options)
                       .map((shade, index) => [index + 1, shade])
-                      .concat([['original', color]])
+                      .concat([['original', color]]),
               )
             : color;
 

@@ -10,9 +10,9 @@ import React from 'react';
 
 import {
     ContentKitClientContext,
-    type ContentKitClientContextType,
-    type ContentKitRenderUpdate,
-    type ContentKitSecurity,
+    ContentKitClientContextType,
+    ContentKitRenderUpdate,
+    ContentKitSecurity,
 } from './context';
 import { resolveDynamicBinding } from './dynamic';
 
@@ -104,7 +104,7 @@ export function ContentKit(props: {
                 state: prev.state,
             }));
         },
-        [setCurrent, current, render, onComplete]
+        [setCurrent, current, render, onComplete],
     );
 
     const renderer = React.useMemo<ContentKitClientContextType>(() => {
