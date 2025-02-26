@@ -17,7 +17,6 @@ export default async function SiteDynamicLayout({
     return (
         <CustomizationRootLayout customization={context.customization}>
             <SiteLayout
-                nonce="TODO"
                 context={context}
                 forcedTheme={forcedTheme}
                 withTracking={!GITBOOK_DISABLE_TRACKING}

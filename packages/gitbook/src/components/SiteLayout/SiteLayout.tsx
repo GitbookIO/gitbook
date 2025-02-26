@@ -21,7 +21,7 @@ import { RocketLoaderDetector } from './RocketLoaderDetector';
  * Layout when rendering a site.
  */
 export async function SiteLayout(props: {
-    nonce: string;
+    nonce?: string;
     context: GitBookSiteContext;
     forcedTheme?: CustomizationThemeMode | null;
     withTracking: boolean;

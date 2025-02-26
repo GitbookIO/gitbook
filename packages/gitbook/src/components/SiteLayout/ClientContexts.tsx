@@ -5,7 +5,7 @@ import { ThemeProvider } from 'next-themes';
 import React from 'react';
 
 export function ClientContexts(props: {
-    nonce: string;
+    nonce?: string;
     forcedTheme: CustomizationThemeMode | undefined;
     children: React.ReactNode;
 }) {
@@ -18,7 +18,7 @@ export function ClientContexts(props: {
      * This is a workaround for it, until next-themes fixes it in their library. There is already
      * a PR: https://github.com/pacocoursey/next-themes/pull/223
      */
-    const nonce = typeof window === 'undefined' ? props.nonce : '';
+    const nonce = typeof window === 'undefined' || !props.nonce ? props.nonce : '';
 
     return (
         <ThemeProvider nonce={nonce} attribute="class" enableSystem forcedTheme={forcedTheme}>
