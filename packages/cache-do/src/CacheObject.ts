@@ -1,5 +1,5 @@
-import { decode, encode } from '@msgpack/msgpack';
 import { DurableObject } from 'cloudflare:workers';
+import { decode, encode } from '@msgpack/msgpack';
 import { LRUMap } from 'lru_map';
 
 export interface CacheObjectDescriptor {

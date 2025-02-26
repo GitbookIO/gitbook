@@ -41,11 +41,13 @@ export function ClientCodeBlock(props: ClientBlockProps) {
                 // We use requestIdleCallback to avoid blocking the main thread
                 // when scrolling.
                 if (typeof requestIdleCallback === 'function') {
-                    requestIdleCallback(() => highlight(block, inlines).then(result => {
-                        if (!canceled) {
-                            setLines(result);
-                        }
-                    }));
+                    requestIdleCallback(() =>
+                        highlight(block, inlines).then((result) => {
+                            if (!canceled) {
+                                setLines(result);
+                            }
+                        })
+                    );
                 } else {
                     highlight(block, inlines).then((result) => {
                         if (!canceled) {
