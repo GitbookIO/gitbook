@@ -114,7 +114,7 @@ jobs:
             - name: Pull Vercel Environment Information
               run: bun run vercel pull --yes --environment=$VERCEL_ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }}
             - name: Build Project Artifacts
-              run: bun run vercel build --environment=$VERCEL_ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }}
+              run: bun run vercel build --target=$VERCEL_ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }}
               env:
                   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
                   NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
