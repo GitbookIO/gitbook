@@ -37,7 +37,7 @@ import './globals.css';
  * It takes care of setting the theme and the language.
  */
 export async function CustomizationRootLayout(props: {
-    customization: SiteCustomizationSettings | CustomizationSettings;
+    customization: SiteCustomizationSettings;
     children: React.ReactNode;
 }) {
     const { customization, children } = props;
@@ -61,9 +61,9 @@ export async function CustomizationRootLayout(props: {
                     : '',
                 'theme' in customization.styling && `theme-${customization.styling.theme}`,
                 tintColor ? ' tint' : 'no-tint',
-                sidebarStyles.background && ` sidebar-${sidebarStyles.background}`,
-                sidebarStyles.list && ` sidebar-list-${sidebarStyles.list}`,
-                customization.styling.links && ` links-${customization.styling.links}`,
+                sidebarStyles.background && `sidebar-${sidebarStyles.background}`,
+                sidebarStyles.list && `sidebar-list-${sidebarStyles.list}`,
+                customization.styling.links && `links-${customization.styling.links}`,
             )}
         >
             <head>
