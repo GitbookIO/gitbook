@@ -233,6 +233,8 @@ function AnswerSources(props: {
                             'items-center',
                             'text-tint',
                             'hover:underline',
+                            'links-accent:decoration-[3px]',
+                            'links-accent:underline-offset-4',
                             'focus-within:text-primary',
                         )}
                         href={source.href}

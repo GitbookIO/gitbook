@@ -231,11 +231,11 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
             font: CustomizationFont.Inter,
             background: CustomizationBackground.Plain,
             icons: CustomizationIconsStyle.Regular,
+            links: CustomizationLinksStyle.Default,
             sidebar: {
                 background: CustomizationSidebarBackgroundStyle.Default,
                 list: CustomizationSidebarListStyle.Default,
             },
-            links: CustomizationLinksStyle.Default,
         },
         internationalization: {
             locale: CustomizationLocale.En,
