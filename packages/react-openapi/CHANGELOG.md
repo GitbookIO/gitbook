@@ -1,5 +1,21 @@
 # @gitbook/react-openapi
 
+## 1.0.3
+
+### Patch Changes
+
+-   dc2dbc5: Update OpenAPI code examples to support multiple content-type
+-   f1d1d2f: Return empty string if no server provided
+-   05e1d8c: Hide x-gitbook-\* symbols in OpenAPI blocks
+-   b4a12d6: Fix circularRef in schema + examples OpenAPI
+-   9f0de74: Fix ID not set when there is no operation summary
+-   da55fac: Render GitBook blocks in OpenAPI operation description
+-   Updated dependencies [c808bb1]
+-   Updated dependencies [e24206e]
+-   Updated dependencies [a054554]
+-   Updated dependencies [da55fac]
+    -   @gitbook/openapi-parser@2.0.0
+
 ## 1.0.2
 
 ### Patch Changes
