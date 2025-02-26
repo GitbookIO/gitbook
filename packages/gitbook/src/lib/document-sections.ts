@@ -1,5 +1,6 @@
-import { JSONDocument, ContentRef } from '@gitbook/api';
+import { JSONDocument, ContentRef, Space } from '@gitbook/api';
 
+import { getDocument } from './api';
 import { getNodeText } from './document';
 import { resolveOpenAPIBlock } from './openapi/fetch';
 import { ResolvedContentRef } from './references';
@@ -16,6 +17,7 @@ export interface DocumentSection {
  * Extract a list of sections from a document.
  */
 export async function getDocumentSections(
+    space: Space,
     document: JSONDocument,
     resolveContentRef: (ref: ContentRef) => Promise<ResolvedContentRef | null>,
 ): Promise<DocumentSection[]> {
@@ -51,6 +53,31 @@ export async function getDocumentSections(
                     deprecated: operation.operation.deprecated,
                 });
             }
+        }
+
+        if (block.type === 'reusable-content') {
+            const resolved = await resolveContentRef(block.data.ref);
+            const documentId = resolved?.reusableContent?.document;
+            if (!documentId) {
+                throw new Error(`Expected a document ID for reusable content block`);
+            }
+
+            const document = await getDocument(space.id, documentId);
+            if (!document) {
+                throw new Error(`Document not found for reusable content block`);
+            }
+
+            const resuableContentSections = await getDocumentSections(
+                space,
+                document,
+                resolveContentRef,
+            );
+            sections.push(
+                ...resuableContentSections.map((section) => ({
+                    ...section,
+                    depth: section.depth + depth,
+                })),
+            );
         }
     }
 
