@@ -1,4 +1,4 @@
-import { LoadPlugin } from '@scalar/openapi-parser';
+import type { LoadPlugin } from '@scalar/openapi-parser';
 
 export const fetchUrlsDefaultConfiguration = {
     limit: 40,
@@ -45,9 +45,6 @@ export const fetchURLs: (customConfiguration: {
         async get(value?: any) {
             // Limit the number of requests
             if (configuration?.limit !== false && numberOfRequests >= configuration?.limit) {
-                console.warn(
-                    `[fetchUrls] Maximum number of requests reeached (${configuration?.limit}), skipping request`,
-                );
                 return undefined;
             }
 
@@ -56,8 +53,7 @@ export const fetchURLs: (customConfiguration: {
                 const url = getReferenceUrl({ value, rootURL: configuration.rootURL });
                 const response = await fetch(url);
                 return await response.text();
-            } catch (error: any) {
-                console.error('[fetchUrls]', error.message, `(${value})`);
+            } catch (_error: any) {
                 return undefined;
             }
         },

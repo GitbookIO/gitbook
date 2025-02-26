@@ -1,10 +1,10 @@
-import { DocumentInlineLink, SiteInsightsLinkPosition } from '@gitbook/api';
+import { type DocumentInlineLink, SiteInsightsLinkPosition } from '@gitbook/api';
 
 import { resolveContentRef } from '@/lib/references';
 
-import { InlineProps } from './Inline';
+import { StyledLink } from '../primitives';
+import type { InlineProps } from './Inline';
 import { Inlines } from './Inlines';
-import { Link, StyledLink } from '../primitives';
 
 export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
     const { inline, document, context, ancestorInlines } = props;

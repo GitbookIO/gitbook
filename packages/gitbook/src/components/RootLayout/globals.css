@@ -78,7 +78,7 @@
         mask-image: linear-gradient(to bottom, white, white);
     }
     .grid-area-1-1 {
-        grid-area: 1/1;
+        grid-area: 1 / 1;
     }
     .gutter-stable {
         scrollbar-gutter: stable;
@@ -92,7 +92,7 @@
     }
     .triangle:before,
     .triangle:after {
-        content: '';
+        content: "";
         position: absolute;
         background-color: inherit;
     }

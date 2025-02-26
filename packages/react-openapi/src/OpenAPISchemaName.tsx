@@ -1,8 +1,9 @@
-import { OpenAPIV3 } from '@gitbook/openapi-parser';
+import type { OpenAPIV3 } from '@gitbook/openapi-parser';
+import type React from 'react';
 
 interface OpenAPISchemaNameProps {
     schema?: OpenAPIV3.SchemaObject;
-    propertyName?: string | JSX.Element;
+    propertyName?: string | React.JSX.Element;
     required?: boolean;
     type?: string;
 }
@@ -11,7 +12,7 @@ interface OpenAPISchemaNameProps {
  * Display the schema name row.
  * It includes the property name, type, required and deprecated status.
  */
-export function OpenAPISchemaName(props: OpenAPISchemaNameProps): JSX.Element {
+export function OpenAPISchemaName(props: OpenAPISchemaNameProps) {
     const { schema, type, propertyName, required } = props;
 
     const additionalItems = schema && getAdditionalItems(schema);
@@ -52,7 +53,7 @@ function getAdditionalItems(schema: OpenAPIV3.SchemaObject): string {
     }
 
     if (schema.nullable) {
-        additionalItems = ` | nullable`;
+        additionalItems = ' | nullable';
     }
 
     return additionalItems;

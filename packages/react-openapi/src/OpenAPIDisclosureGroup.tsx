@@ -13,14 +13,14 @@ type TDisclosureGroup = {
     }[];
 };
 
+import { createContext, useContext, useRef, useState } from 'react';
 import { mergeProps, useButton, useDisclosure, useFocusRing, useId } from 'react-aria';
 import {
-    DisclosureGroupProps,
-    DisclosureGroupState,
+    type DisclosureGroupProps,
+    type DisclosureGroupState,
     useDisclosureGroupState,
     useDisclosureState,
 } from 'react-stately';
-import { createContext, useContext, useRef, useState } from 'react';
 
 const DisclosureGroupStateContext = createContext<DisclosureGroupState | null>(null);
 
@@ -67,7 +67,7 @@ function DisclosureItem(props: { group: TDisclosureGroup; icon?: React.ReactNode
             isDisabled,
         },
         state,
-        panelRef,
+        panelRef
     );
     const { buttonProps } = useButton(triggerProps, triggerRef);
     const { isFocusVisible, focusProps } = useFocusRing();
@@ -119,7 +119,7 @@ function DisclosureItem(props: { group: TDisclosureGroup; icon?: React.ReactNode
                                     </option>
                                 ))}
                             </select>
-                        ) : !!group.tabs[0] ? (
+                        ) : group.tabs[0] ? (
                             <span>{group.tabs[0].label}</span>
                         ) : null}
                     </div>

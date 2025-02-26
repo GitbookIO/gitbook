@@ -1,16 +1,16 @@
-import {
+import type {
     DocumentMarkBold,
     DocumentMarkCode,
     DocumentMarkColor,
     DocumentMarkItalic,
+    DocumentMarkKeyboard,
     DocumentMarkStrikethrough,
     DocumentText,
     DocumentTextMark,
-    DocumentMarkKeyboard,
 } from '@gitbook/api';
 import React from 'react';
 
-import { ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 export function Text(props: { text: DocumentText }) {
     const { text } = props;
@@ -21,7 +21,7 @@ export function Text(props: { text: DocumentText }) {
                 {leaf.marks
                     // Sort to have code marks at the end, so that they don't interfere with other marks
                     .sort((a, b) => (a.type === 'code' ? 1 : 0) - (b.type === 'code' ? 1 : 0))
-                    .reduce<React.ReactNode>((children, mark, index) => {
+                    .reduce<React.ReactNode>((children, mark, _index) => {
                         const Mark = MARK_STYLES[mark.type];
 
                         if (!Mark) {
@@ -92,7 +92,7 @@ function Code(props: MarkedLeafProps<DocumentMarkCode>) {
                 // Text size is proportional to the font-size of the parent element
                 'text-[.875em]',
                 // We ensure that the code is not making the parent bigger, especially in headings
-                'leading-[calc(max(1.20em,1.25rem))]',
+                'leading-[calc(max(1.20em,1.25rem))]'
             )}
         >
             {props.children}

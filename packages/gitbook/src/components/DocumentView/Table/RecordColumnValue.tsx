@@ -1,7 +1,7 @@
 import {
-    ContentRef,
-    ContentRefUser,
-    DocumentBlockTable,
+    type ContentRef,
+    type ContentRefUser,
+    type DocumentBlockTable,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
@@ -16,11 +16,11 @@ import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { filterOutNullable } from '@/lib/typescript';
 
-import { TableRecordKV } from './Table';
-import { getColumnAlignment, VerticalAlignment } from './utils';
-import { BlockProps } from '../Block';
+import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { FileIcon } from '../FileIcon';
+import type { TableRecordKV } from './Table';
+import { type VerticalAlignment, getColumnAlignment } from './utils';
 
 /**
  * Render the value for a column in a record.
@@ -32,7 +32,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
         record: TableRecordKV;
         column: string;
         verticalAlignment?: VerticalAlignment;
-    },
+    }
 ) {
     const {
         tag: Tag = 'div',
@@ -62,7 +62,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                     aria-labelledby={ariaLabelledBy}
                 />
             );
-        case 'rating':
+        case 'rating': {
             const rating = value as number;
             const max = definition.max;
 
@@ -100,6 +100,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                     ) : null}
                 </Tag>
             );
+        }
         case 'number':
             return (
                 <Tag
@@ -107,7 +108,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                     aria-labelledby={ariaLabelledBy}
                 >{`${value}`}</Tag>
             );
-        case 'text':
+        case 'text': {
             // @ts-ignore
             const fragment = getNodeFragmentByName(block, value);
             if (!fragment) {
@@ -139,7 +140,8 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                     }}
                 />
             );
-        case 'files':
+        }
+        case 'files': {
             const files = await Promise.all(
                 (value as string[]).map((fileId) =>
                     context.contentContext
@@ -148,10 +150,10 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                   kind: 'file',
                                   file: fileId,
                               },
-                              context.contentContext,
+                              context.contentContext
                           )
-                        : null,
-                ),
+                        : null
+                )
             );
 
             return (
@@ -211,6 +213,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                     })}
                 </Tag>
             );
+        }
         case 'content-ref': {
             const contentRef = value ? (value as ContentRef) : null;
             const resolved =
@@ -262,7 +265,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                     }
 
                     return [contentRef, resolved] as const;
-                }),
+                })
             );
 
             return (
@@ -291,7 +294,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                     <span className={tcls('inline-flex', 'gap-2', 'flex-wrap')}>
                         {(value as string[]).map((selectId) => {
                             const option = definition.options.find(
-                                (option) => option.value === selectId,
+                                (option) => option.value === selectId
                             );
 
                             if (!option) {
@@ -308,7 +311,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                         'py-1',
                                         'px-2',
                                         'bg-primary',
-                                        'text-primary-strong',
+                                        'text-primary-strong'
                                     )}
                                 >
                                     {option.label}

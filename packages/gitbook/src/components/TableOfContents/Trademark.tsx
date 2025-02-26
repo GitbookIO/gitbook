@@ -1,12 +1,12 @@
-import {
+import type {
     CustomizationSettings,
     SiteCustomizationSettings,
-    Space,
     SiteInsightsTrademarkPlacement,
+    Space,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 
-import { t, getSpaceLanguage } from '@/intl/server';
+import { getSpaceLanguage, t } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
 
 import { Link } from '../primitives';
@@ -55,7 +55,7 @@ export function Trademark(props: {
                 'theme-muted:before:to-tint-subtle',
                 'theme-bold-tint:before:to-tint-subtle',
                 '[html.sidebar-filled.theme-muted_&]:before:to-tint-base',
-                '[html.sidebar-filled.theme-bold.tint_&]:before:to-tint-base',
+                '[html.sidebar-filled.theme-bold.tint_&]:before:to-tint-base'
             )}
         >
             <TrademarkLink {...props} />
@@ -107,7 +107,7 @@ export function TrademarkLink(props: {
                 'ring-tint-subtle',
 
                 'transition-colors',
-                'pointer-events-auto',
+                'pointer-events-auto'
             )}
             insights={{
                 type: 'trademark_click',

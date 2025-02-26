@@ -1,13 +1,13 @@
-import { GitBookSiteContext } from '@v2/lib/context';
+import type { GitBookSiteContext } from '@v2/lib/context';
 import React from 'react';
 
 import { Image } from '@/components/utils';
 import { partition } from '@/lib/arrays';
 import { tcls } from '@/lib/tailwind';
 
-import { FooterLinksGroup } from './FooterLinksGroup';
-import { CONTAINER_STYLE } from '../layout';
 import { ThemeToggler } from '../ThemeToggler';
+import { CONTAINER_STYLE } from '../layout';
+import { FooterLinksGroup } from './FooterLinksGroup';
 
 const FOOTER_COLUMNS = 4;
 
@@ -17,7 +17,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
 
     return (
         <>
-            <hr className="border-t border-tint-subtle" />
+            <hr className="border-tint-subtle border-t" />
             <div className="scroll-nojump">
                 <footer
                     className={tcls(
@@ -30,12 +30,12 @@ export function Footer(props: { context: GitBookSiteContext }) {
                         customization.themes.toggeable &&
                             !customization.footer.copyright &&
                             !customization.footer.logo &&
-                            customization.footer.groups?.length == 0
+                            customization.footer.groups?.length === 0
                             ? 'xl:hidden'
-                            : null,
+                            : null
                     )}
                 >
-                    <div className="hidden lg:block basis-72 page-no-toc:hidden" />
+                    <div className="hidden page-no-toc:hidden basis-72 lg:block" />
                     <div
                         className={tcls(
                             'py-8',
@@ -47,7 +47,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                             'flex-1',
                             'max-w-3xl',
                             'page-full-width:max-w-none',
-                            'mx-auto',
+                            'mx-auto'
                         )}
                     >
                         {/* Footer Logo */}
@@ -87,7 +87,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
 
                         {/* Mode Switcher */}
                         {customization.themes.toggeable ? (
-                            <div className="flex items-center justify-end ml-auto order-2 xl:hidden">
+                            <div className="order-2 ml-auto flex items-center justify-end xl:hidden">
                                 <React.Suspense fallback={null}>
                                     <ThemeToggler />
                                 </React.Suspense>
@@ -98,10 +98,10 @@ export function Footer(props: { context: GitBookSiteContext }) {
                         {customization.footer.groups?.length > 0 ? (
                             <div
                                 className={tcls(
-                                    'flex flex-col sm:flex-row mx-auto grow gap-10 sm:gap-6 order-3 w-full',
+                                    'order-3 mx-auto flex w-full grow flex-col gap-10 sm:flex-row sm:gap-6',
                                     !customization.footer.logo &&
                                         customization.footer.groups.length < 2 &&
-                                        'sm:order-1 sm:flex-1 sm:w-auto sm:items-start sm:max-w-3xl self-center sm:text-start',
+                                        'self-center sm:order-1 sm:w-auto sm:max-w-3xl sm:flex-1 sm:items-start sm:text-start'
                                 )}
                             >
                                 {partition(customization.footer.groups, FOOTER_COLUMNS).map(
@@ -118,7 +118,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                                                 />
                                             ))}
                                         </div>
-                                    ),
+                                    )
                                 )}
                             </div>
                         ) : null}
@@ -126,9 +126,9 @@ export function Footer(props: { context: GitBookSiteContext }) {
                         {/* Legal */}
                         <div
                             className={tcls(
-                                'mx-auto w-full grow text-xs text-tint items-center text-center order-4 flex flex-col gap-2 empty:hidden',
-                                customization.footer.groups.length == 0 &&
-                                    'sm:order-1 sm:flex-1 sm:w-auto sm:items-start sm:max-w-3xl self-center sm:text-start',
+                                'order-4 mx-auto flex w-full grow flex-col items-center gap-2 text-center text-tint text-xs empty:hidden',
+                                customization.footer.groups.length === 0 &&
+                                    'self-center sm:order-1 sm:w-auto sm:max-w-3xl sm:flex-1 sm:items-start sm:text-start'
                             )}
                         >
                             {customization.footer.copyright ? (
@@ -136,7 +136,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                             ) : null}
                         </div>
                     </div>
-                    <div className="hidden lg:block xl:basis-56 page-no-toc:hidden" />
+                    <div className="hidden page-no-toc:hidden lg:block xl:basis-56" />
                 </footer>
             </div>
         </>

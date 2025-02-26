@@ -1,4 +1,4 @@
-import {
+import type {
     ContentKitDescendantElement,
     ContentKitInlineElement,
     ContentKitRootElement,
@@ -6,20 +6,20 @@ import {
 import React from 'react';
 
 import { ElementBlock } from './ElementBlock';
-import { ElementWebframe } from './ElementWebframe';
-import { ContentKitServerContext } from './types';
+import { ElementBox } from './ElementBox';
+import { ElementButton } from './ElementButton';
 import { ElementCard } from './ElementCard';
-import { ElementIcon } from './ElementIcon';
 import { ElementCodeBlock } from './ElementCodeBlock';
+import { ElementDivider } from './ElementDivider';
+import { ElementIcon } from './ElementIcon';
 import { ElementImage } from './ElementImage';
+import { ElementMarkdown } from './ElementMarkdown';
+import { ElementModal } from './ElementModal';
 import { ElementStack } from './ElementStack';
 import { ElementText } from './ElementText';
-import { ElementButton } from './ElementButton';
-import { ElementModal } from './ElementModal';
-import { ElementBox } from './ElementBox';
-import { ElementMarkdown } from './ElementMarkdown';
 import { ElementTextInput } from './ElementTextInput';
-import { ElementDivider } from './ElementDivider';
+import { ElementWebframe } from './ElementWebframe';
+import type { ContentKitServerContext } from './types';
 
 export function Element(props: {
     element: ContentKitDescendantElement | ContentKitRootElement | ContentKitInlineElement;
@@ -191,7 +191,7 @@ function Elements(props: {
 function ensureStackElements(
     type: 'hstack' | 'vstack',
     elements: ContentKitDescendantElement[],
-    align?: 'start' | 'center' | 'end',
+    align?: 'start' | 'center' | 'end'
 ): ContentKitDescendantElement[] {
     if (elements.length === 1) {
         return elements;

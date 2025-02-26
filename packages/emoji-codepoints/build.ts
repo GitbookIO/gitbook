@@ -17,12 +17,11 @@ Object.entries(emojis).forEach(([key, value]) => {
     if (emoji && key !== emoji) {
         output[key] = emoji;
     } else if (!emoji) {
-        console.log('No emoji for', key);
     }
 });
 
 fs.mkdirSync(path.resolve(__dirname, 'dist'), { recursive: true });
 fs.writeFileSync(
     path.resolve(__dirname, 'dist/index.ts'),
-    `export const emojiCodepoints: Record<string, string> = ${JSON.stringify(output, null, 4)};`,
+    `export const emojiCodepoints: Record<string, string> = ${JSON.stringify(output, null, 4)};`
 );

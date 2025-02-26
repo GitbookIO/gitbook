@@ -1,24 +1,24 @@
 import {
-    CustomizationContentLink,
-    CustomizationHeaderPreset,
-    CustomizationHeaderItem,
-    ContentRef,
+    type ContentRef,
+    type CustomizationContentLink,
+    type CustomizationHeaderItem,
+    type CustomizationHeaderPreset,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
-import { GitBookSiteContext } from '@v2/lib/context';
+import type { GitBookSiteContext } from '@v2/lib/context';
 import assertNever from 'assert-never';
 
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
+import { Button, Link } from '../primitives';
 import {
     Dropdown,
-    DropdownButtonProps,
+    type DropdownButtonProps,
     DropdownChevron,
     DropdownMenu,
     DropdownMenuItem,
 } from './Dropdown';
-import { Button, Link } from '../primitives';
 
 export async function HeaderLink(props: {
     context: GitBookSiteContext;
@@ -108,7 +108,7 @@ function HeaderLinkNavItem(props: HeaderLinkNavItemProps) {
 function HeaderItemButton(
     props: Omit<HeaderLinkNavItemProps, 'linkStyle'> & {
         linkStyle: 'button-secondary' | 'button-primary';
-    },
+    }
 ) {
     const { linkTarget, linkStyle, headerPreset, title, href, isDropdown, ...rest } = props;
     const variant = (() => {
@@ -128,18 +128,12 @@ function HeaderItemButton(
             size="medium"
             className={tcls(
                 {
-                    'button-primary': `theme-bold:bg-header-link theme-bold:hover:bg-header-link
-                        theme-bold:text-header-background theme-bold:hover:text-header-background
-                        theme-bold:shadow-none theme-bold:hover:shadow-none`,
+                    'button-primary':
+                        'theme-bold:bg-header-link theme-bold:text-header-background theme-bold:shadow-none theme-bold:hover:bg-header-link theme-bold:hover:text-header-background theme-bold:hover:shadow-none',
                     'button-secondary': tcls(
-                        `theme-muted:bg-tint-base theme-gradient:bg-tint-base
-                            theme-bold:bg-header-link/2 theme-bold:hover:bg-header-link/3
-                            theme-bold:text-header-link theme-bold:hover:text-header-link
-                            theme-bold:ring-header-link/4 theme-bold:hover:ring-header-link/5
-                            theme-bold:contrast-more:ring-header-link theme-bold:contrast-more:bg-header-background theme-bold:contrast-more:text-header-link theme-bold:contrast-more:hover:ring-header-link
-                            theme-bold:shadow-none theme-bold:hover:shadow-none`,
+                        'theme-bold:bg-header-link/2 theme-gradient:bg-tint-base theme-muted:bg-tint-base theme-bold:text-header-link theme-bold:shadow-none theme-bold:ring-header-link/4 theme-bold:hover:bg-header-link/3 theme-bold:hover:text-header-link theme-bold:hover:shadow-none theme-bold:hover:ring-header-link/5 theme-bold:contrast-more:bg-header-background theme-bold:contrast-more:text-header-link theme-bold:contrast-more:ring-header-link theme-bold:contrast-more:hover:ring-header-link'
                     ),
-                }[linkStyle],
+                }[linkStyle]
             )}
             insights={{
                 type: 'link_click',
@@ -155,7 +149,7 @@ function HeaderItemButton(
     );
 }
 
-function getHeaderLinkClassName(props: { headerPreset: CustomizationHeaderPreset }) {
+function getHeaderLinkClassName(_props: { headerPreset: CustomizationHeaderPreset }) {
     return tcls(
         'flex items-center shrink',
         'min-w-0',
@@ -174,7 +168,7 @@ function getHeaderLinkClassName(props: { headerPreset: CustomizationHeaderPreset
         'links-accent:py-0.5', // Prevent underline from being cut off at the bottom
 
         'theme-bold:text-header-link',
-        'theme-bold:hover:text-header-link',
+        'theme-bold:hover:text-header-link'
     );
 }
 
@@ -203,7 +197,7 @@ function HeaderItemDropdown(
     props: {
         headerPreset: CustomizationHeaderPreset;
         title: string;
-    } & DropdownButtonProps<HTMLElement>,
+    } & DropdownButtonProps<HTMLElement>
 ) {
     const { headerPreset, title, ...rest } = props;
     return (

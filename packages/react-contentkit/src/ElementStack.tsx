@@ -1,13 +1,13 @@
-import { ContentKitHStack, ContentKitVStack } from '@gitbook/api';
-import React from 'react';
+import type { ContentKitHStack, ContentKitVStack } from '@gitbook/api';
+import type React from 'react';
 
-import { ContentKitServerElementProps } from './types';
 import classNames from 'classnames';
+import type { ContentKitServerElementProps } from './types';
 
 export function ElementStack(
     props: React.PropsWithChildren<
         ContentKitServerElementProps<ContentKitHStack | ContentKitVStack>
-    >,
+    >
 ) {
     const { element, children } = props;
 
@@ -16,7 +16,7 @@ export function ElementStack(
             className={classNames(
                 'contentkit-stack',
                 `contentkit-${element.type}`,
-                `contentkit-stack-align-${element.align ?? 'start'}`,
+                `contentkit-stack-align-${element.align ?? 'start'}`
             )}
         >
             {children}

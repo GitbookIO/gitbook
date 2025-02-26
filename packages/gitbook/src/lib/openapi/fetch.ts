@@ -1,12 +1,12 @@
-import { ContentRef, DocumentBlockOpenAPI } from '@gitbook/api';
-import { parseOpenAPI, OpenAPIParseError } from '@gitbook/openapi-parser';
+import type { DocumentBlockOpenAPI } from '@gitbook/api';
+import { OpenAPIParseError, parseOpenAPI } from '@gitbook/openapi-parser';
 import { type OpenAPIOperationData, resolveOpenAPIOperation } from '@gitbook/react-openapi';
-import { GitBookAnyContext } from '@v2/lib/context';
+import type { GitBookAnyContext } from '@v2/lib/context';
 
-import { cache, noCacheFetchOptions, CacheFunctionOptions } from '@/lib/cache';
+import { type CacheFunctionOptions, cache, noCacheFetchOptions } from '@/lib/cache';
 
-import { enrichFilesystem } from './enrich';
 import { resolveContentRef } from '../references';
+import { enrichFilesystem } from './enrich';
 
 const weakmap = new WeakMap<DocumentBlockOpenAPI, ResolveOpenAPIBlockResult>();
 
@@ -78,7 +78,7 @@ const fetchFilesystem = cache({
 
         if (!response.ok) {
             throw new Error(
-                `Failed to fetch OpenAPI file: ${response.status} ${response.statusText}`,
+                `Failed to fetch OpenAPI file: ${response.status} ${response.statusText}`
             );
         }
 

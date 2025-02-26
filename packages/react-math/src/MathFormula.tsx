@@ -39,10 +39,13 @@ export function MathFormula(props: MathFormulaProps) {
         formula,
         inline = false,
         className,
-        fallback = React.createElement(props.inline ? 'span' : 'div', {
-            className: props.className,
-            children: props.formula,
-        }),
+        fallback = React.createElement(
+            props.inline ? 'span' : 'div',
+            {
+                className: props.className,
+            },
+            props.formula
+        ),
         assetsUrl,
     } = props;
 

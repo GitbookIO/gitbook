@@ -1,5 +1,5 @@
-import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 import { getPagePath } from '@/lib/pages';
+import type { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 
 /**
  * Generic interface to generate links based on a given context.
@@ -34,7 +34,7 @@ export function createLinker(
         protocol?: string;
         host: string;
         pathname: string;
-    },
+    }
 ): GitBookSpaceLinker {
     if (servedOn.host.includes('/')) {
         throw new Error('Host cannot include a slash');
@@ -50,7 +50,7 @@ export function createLinker(
         },
 
         toPathForPage({ pages, page, anchor }) {
-            return linker.toPathInSpace(getPagePath(pages, page)) + (anchor ? '#' + anchor : '');
+            return linker.toPathInSpace(getPagePath(pages, page)) + (anchor ? `#${anchor}` : '');
         },
     };
 
@@ -62,7 +62,7 @@ export function createLinker(
  */
 export function appendPrefixToLinker(
     linker: GitBookSpaceLinker,
-    prefix: string,
+    prefix: string
 ): GitBookSpaceLinker {
     const linkerWithPrefix: GitBookSpaceLinker = {
         toPathInSpace(relativePath: string): string {
@@ -76,7 +76,7 @@ export function appendPrefixToLinker(
         toPathForPage({ pages, page, anchor }) {
             return (
                 linkerWithPrefix.toPathInSpace(getPagePath(pages, page)) +
-                (anchor ? '#' + anchor : '')
+                (anchor ? `#${anchor}` : '')
             );
         },
     };
@@ -85,7 +85,7 @@ export function appendPrefixToLinker(
 }
 
 function joinPaths(prefix: string, path: string): string {
-    const prefixPath = prefix.endsWith('/') ? prefix : prefix + '/';
+    const prefixPath = prefix.endsWith('/') ? prefix : `${prefix}/`;
     const suffixPath = path.startsWith('/') ? path.slice(1) : path;
     return prefixPath + suffixPath;
 }

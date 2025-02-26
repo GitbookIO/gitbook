@@ -1,6 +1,6 @@
-import { MaybePromise } from 'p-map';
+import type { MaybePromise } from 'p-map';
 
-import { waitUntil, getRequestContext } from './waitUntil';
+import { getRequestContext, waitUntil } from './waitUntil';
 
 /**
  * Execute a function for each input in parallel and return the first result.
@@ -69,17 +69,17 @@ export async function race<I, R>(
          * @default false
          */
         fallbackOnNull?: boolean;
-    } = {},
+    } = {}
 ): Promise<R | null> {
     const { signal, timeout, blockTimeout, blockFallback, fallbackOnNull = false } = options;
     const result = await new Promise<R | null>((resolve, reject) => {
         let resolved = false;
         let pending = inputs.length;
-        let timeoutId: Timer | null = null;
+        let timeoutId: ReturnType<typeof setTimeout> | null = null;
         let blockFallbackStarted = false;
         let blockFallbackRunning = false;
         let blockFallbackError: Error | null = null;
-        let blockTimeoutId: Timer | null = null;
+        let blockTimeoutId: ReturnType<typeof setTimeout> | null = null;
         const abort = new AbortController();
 
         const done = () => {
@@ -145,8 +145,8 @@ export async function race<I, R>(
                             blockFallbackError = error;
                             blockFallbackRunning = false;
                         }
-                    },
-                ),
+                    }
+                )
             );
         };
 
@@ -182,7 +182,7 @@ export async function race<I, R>(
                         (error) => {
                             // Ignore errors
                             logIgnoredError(`input ${inputIndex} failed with`, error);
-                        },
+                        }
                     )
                     .finally(() => {
                         pending -= 1;
@@ -197,7 +197,7 @@ export async function race<I, R>(
                                 }
                             }
                         }
-                    }),
+                    })
             );
         });
     });
@@ -213,12 +213,10 @@ export async function race<I, R>(
  * Log and ignore an error.
  * It skips the error if it's an AbortError.
  */
-function logIgnoredError(message: string, error: Error) {
+function logIgnoredError(_message: string, error: Error) {
     if (error.name === 'AbortError' || process.env.NODE_ENV === 'test') {
         return;
     }
-
-    console.error(`${message}: ${error.stack ?? error.message ?? error}`);
 }
 
 const UndefinedSymbol = Symbol('Undefined');
@@ -264,7 +262,7 @@ type SingletonFunction<Key extends string, Args extends any[], Result> = ((
  * Create a map of singleton operations in a safe way for Cloudflare worker
  */
 export function singletonMap<Key extends string, Args extends any[], Result>(
-    execute: (key: Key, ...args: Args) => Promise<Result>,
+    execute: (key: Key, ...args: Args) => Promise<Result>
 ): SingletonFunction<Key, Args, Result> {
     const states = new WeakMap<object, Map<string, Promise<Result>>>();
 
@@ -284,7 +282,7 @@ export function singletonMap<Key extends string, Args extends any[], Result>(
         }
 
         const promise = execute(key, ...args).finally(() => {
-            current!.delete(key);
+            current?.delete(key);
         });
         current.set(key, promise);
 
@@ -321,12 +319,12 @@ export function batch<Args extends any[], R>(
          * Skip the batching for a single call.
          */
         skip?: (...args: Args) => MaybePromise<boolean>;
-    },
+    }
 ): (...args: Args) => Promise<R> {
     const { delay, groupBy = () => 'default', skip = () => false } = options;
 
     const groups = new Map<string, Array<[Args, (r: R) => void, (error: Error) => void]>>();
-    let timeoutId: Timer | null = null;
+    let _timeoutId: ReturnType<typeof setTimeout> | null = null;
 
     return async (...args) => {
         if (await skip(...args)) {
@@ -341,7 +339,7 @@ export function batch<Args extends any[], R>(
 
             executions.push([args, resolve, reject]);
             if (executions.length === 1) {
-                timeoutId = setTimeout(() => {
+                _timeoutId = setTimeout(() => {
                     const currentExecutions = executions.splice(0, executions.length);
                     const batchArgs = currentExecutions.map(([args]) => args);
                     fn(batchArgs).then(
@@ -354,7 +352,7 @@ export function batch<Args extends any[], R>(
                             currentExecutions.forEach(([, , reject]) => {
                                 reject(error);
                             });
-                        },
+                        }
                     );
                 }, delay);
             }
@@ -386,7 +384,7 @@ export type AsyncMutexFunction<T> = ((fn: () => Promise<T>) => Promise<T>) & {
      */
     runBlocking: <ReturnType>(
         fn: () => Promise<ReturnType>,
-        options?: MutexOperationOptions,
+        options?: MutexOperationOptions
     ) => Promise<ReturnType>;
 };
 
@@ -475,7 +473,7 @@ export function asyncMutexFunction<T>(): AsyncMutexFunction<T> {
  * Try catch a promise and return the result or the error.
  */
 export async function tryCatch<T>(
-    promise: Promise<T>,
+    promise: Promise<T>
 ): Promise<{ data: T; error?: undefined } | { data?: undefined; error: Error }> {
     try {
         return { data: await promise };

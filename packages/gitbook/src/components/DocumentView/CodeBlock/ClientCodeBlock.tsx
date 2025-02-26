@@ -5,9 +5,9 @@ import { useEffect, useRef, useState } from 'react';
 
 import { useHasBeenInViewport } from '@/components/hooks/useHasBeenInViewport';
 
-import type { HighlightLine, RenderedInline } from './highlight';
 import type { BlockProps } from '../Block';
 import { CodeBlockRenderer } from './CodeBlockRenderer';
+import type { HighlightLine, RenderedInline } from './highlight';
 import { plainHighlight } from './plain-highlight';
 
 type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> & {
@@ -36,7 +36,7 @@ export function ClientCodeBlock(props: ClientBlockProps) {
     // Highlight the block when it's in the viewport.
     useEffect(() => {
         if (hasBeenInViewport) {
-            let canceled = false;
+            let _canceled = false;
             import('./highlight').then(({ highlight }) => {
                 // We use requestIdleCallback to avoid blocking the main thread
                 // when scrolling.
@@ -47,7 +47,7 @@ export function ClientCodeBlock(props: ClientBlockProps) {
                 }
             });
             return () => {
-                canceled = true;
+                _canceled = true;
             };
         }
     }, [hasBeenInViewport, block, inlines]);

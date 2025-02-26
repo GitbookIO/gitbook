@@ -36,7 +36,7 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                     'group-focus:opacity-[0]',
                     'md:group-hover:md:opacity-[1]',
                     'md:group-focus:md:opacity-[1]',
-                    textStyle.marginTop,
+                    textStyle.marginTop
                 )}
             >
                 <a
@@ -54,7 +54,7 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                             'text-transparent',
                             'group-hover:text-tint-subtle',
                             'contrast-more:group-hover:text-tint-strong',
-                            'lg:w-4',
+                            'lg:w-4'
                         )}
                     />
                 </a>
@@ -66,7 +66,7 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                     'justify-self-start',
                     'text-left',
                     textStyle.lineHeight,
-                    textStyle.marginTop,
+                    textStyle.marginTop
                 )}
             >
                 <Inlines {...rest} context={context} nodes={block.nodes} ancestorInlines={[]} />

@@ -29,7 +29,7 @@ export function KaTeX(props: {
                 <Tag className={className} dangerouslySetInnerHTML={{ __html: html }} />
             </>
         );
-    } catch (error) {
+    } catch (_error) {
         return <>{props.fallback}</>;
     }
 }

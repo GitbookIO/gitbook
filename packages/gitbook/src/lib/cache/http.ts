@@ -1,6 +1,6 @@
 import parseCacheControl from 'parse-cache-control';
 
-import { CacheResult } from './cache';
+import type { CacheResult } from './cache';
 
 /**
  * Options to pass to the `fetch` call to disable the Next data-cache when wrapped in `cache()`.
@@ -21,7 +21,7 @@ export function parseCacheResponse(response: Response): {
     tags: string[];
 } {
     const ageHeader = response.headers.get('age');
-    const age = ageHeader ? parseInt(ageHeader, 10) : 0;
+    const age = ageHeader ? Number.parseInt(ageHeader, 10) : 0;
 
     const cacheControlHeader = response.headers.get('cache-control');
     const cacheControl = cacheControlHeader ? parseCacheControl(cacheControlHeader) : null;
@@ -34,7 +34,7 @@ export function parseCacheResponse(response: Response): {
         tags,
     };
 
-    if (cacheControl && cacheControl['max-age']) {
+    if (cacheControl?.['max-age']) {
         entry.ttl = Math.max(0, cacheControl['max-age'] - age - 60);
     }
 
@@ -46,7 +46,7 @@ export function parseCacheResponse(response: Response): {
  */
 export function cacheResponse<Result, DefaultData = Result>(
     response: Response & { data: Result },
-    defaultEntry: Partial<CacheResult<DefaultData>> = {},
+    defaultEntry: Partial<CacheResult<DefaultData>> = {}
 ): CacheResult<DefaultData extends Result ? Result : DefaultData> {
     const parsed = parseCacheResponse(response);
 

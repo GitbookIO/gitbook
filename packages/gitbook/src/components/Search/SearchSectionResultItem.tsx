@@ -3,9 +3,9 @@ import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
+import { Link } from '../primitives';
 import { HighlightQuery } from './HighlightQuery';
 import type { ComputedSectionResult } from './server-actions';
-import { Link } from '../primitives';
 
 export const SearchSectionResultItem = React.forwardRef(function SearchSectionResultItem(
     props: {
@@ -13,7 +13,7 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
         item: ComputedSectionResult;
         active: boolean;
     },
-    ref: React.Ref<HTMLAnchorElement>,
+    ref: React.Ref<HTMLAnchorElement>
 ) {
     const { query, item, active } = props;
 
@@ -38,7 +38,7 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                     'bg-primary',
                     'text-contrast-primary',
                     'hover:bg-primary-hover',
-                ],
+                ]
             )}
         >
             <div
@@ -50,7 +50,7 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                     'flex-1',
                     'overflow-hidden',
                     'flex-col',
-                    'border-tint-subtle',
+                    'border-tint-subtle'
                 )}
             >
                 {item.title ? (
@@ -73,7 +73,7 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                     'text-contrast-primary-solid',
                     'hidden',
                     'sm:block',
-                    active ? ['opacity-11', 'block'] : ['opacity-0'],
+                    active ? ['opacity-11', 'block'] : ['opacity-0']
                 )}
             >
                 <Icon icon="arrow-turn-down-left" className={tcls('size-4')} />

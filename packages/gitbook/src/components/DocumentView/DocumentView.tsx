@@ -1,8 +1,6 @@
-import { ContentRef, JSONDocument } from '@gitbook/api';
-import { GitBookAnyContext } from '@v2/lib/context';
-
-import { ResolveContentRefOptions, ResolvedContentRef } from '@/lib/references';
-import { ClassValue } from '@/lib/tailwind';
+import type { ClassValue } from '@/lib/tailwind';
+import type { JSONDocument } from '@gitbook/api';
+import type { GitBookAnyContext } from '@v2/lib/context';
 
 import { BlockSkeleton } from './Block';
 import { Blocks } from './Blocks';
@@ -48,7 +46,7 @@ export function DocumentView(
 
         /** Style passed to all blocks */
         blockStyle?: ClassValue;
-    },
+    }
 ) {
     const { document, style, blockStyle = [], context } = props;
 
@@ -76,12 +74,12 @@ export function DocumentViewSkeleton(props: { document: JSONDocument; blockStyle
 
     return (
         <div className="flex flex-col gap-4">
-            {document.nodes.map((block, index) => (
+            {document.nodes.map((block, _index) => (
                 <BlockSkeleton
                     key={block.key!}
                     block={block}
                     style={[
-                        'w-full mx-auto decoration-primary/6',
+                        'mx-auto w-full decoration-primary/6',
                         block.data && 'fullWidth' in block.data && block.data.fullWidth
                             ? 'max-w-screen-xl'
                             : 'max-w-3xl',

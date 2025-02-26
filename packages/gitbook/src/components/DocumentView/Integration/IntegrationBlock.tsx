@@ -1,6 +1,10 @@
-import { ContentKitContext, DocumentBlockIntegration } from '@gitbook/api';
+import type { ContentKitContext, DocumentBlockIntegration } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import { ContentKit, ContentKitOutput, ContentKitServerContext } from '@gitbook/react-contentkit';
+import {
+    ContentKit,
+    ContentKitOutput,
+    type ContentKitServerContext,
+} from '@gitbook/react-contentkit';
 
 import { ignoreAPIError, renderIntegrationUi } from '@/lib/api';
 import { INTEGRATIONS_HOST } from '@/lib/csp';
@@ -61,7 +65,7 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
 
     const initialOutput = await ignoreAPIError(
         renderIntegrationUi(block.data.integration, initialInput),
-        true,
+        true
     );
     if (!initialOutput || initialOutput.type === 'complete') {
         return null;

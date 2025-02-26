@@ -1,7 +1,6 @@
-import { ContentKitImage } from '@gitbook/api';
-import React from 'react';
+import type { ContentKitImage } from '@gitbook/api';
 
-import { ContentKitServerElementProps } from './types';
+import type { ContentKitServerElementProps } from './types';
 
 export function ElementImage(props: ContentKitServerElementProps<ContentKitImage>) {
     const { element } = props;

@@ -1,8 +1,8 @@
 import {
+    type GitBookBaseContext,
+    type GitBookSiteContext,
     fetchSiteContextByIds,
     fetchSpaceContextByIds,
-    GitBookBaseContext,
-    GitBookSiteContext,
 } from '@v2/lib/context';
 import type { GitBookDataFetcher } from '@v2/lib/data/types';
 import { createImageResizer } from '@v2/lib/images';
@@ -10,6 +10,8 @@ import { createLinker } from '@v2/lib/links';
 import { headers } from 'next/headers';
 
 import {
+    type SiteContentPointer,
+    type SpaceContentPointer,
     api,
     getChangeRequest,
     getComputedDocument,
@@ -25,8 +27,6 @@ import {
     getSiteRedirectBySource,
     getSpace,
     getUserById,
-    SiteContentPointer,
-    SpaceContentPointer,
 } from './api';
 import { getDynamicCustomizationSettings } from './customization';
 import { getBasePath, getHost } from './links';
@@ -81,7 +81,7 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
             return getPublishedContentByUrl(
                 params.url,
                 params.visitorAuthToken ?? undefined,
-                params.redirectOnError ? true : undefined,
+                params.redirectOnError ? true : undefined
             );
         },
 

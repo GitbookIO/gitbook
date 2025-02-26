@@ -1,17 +1,17 @@
-import {
+import type {
     DocumentBlockListOrdered,
     DocumentBlockListTasks,
     DocumentBlockListUnordered,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 
-import { BlockProps } from './Block';
+import type { BlockProps } from './Block';
 import { Blocks } from './Blocks';
 
 export function List(
     props: BlockProps<
         DocumentBlockListUnordered | DocumentBlockListOrdered | DocumentBlockListTasks
-    >,
+    >
 ) {
     const { block, style, ancestorBlocks, ...contextProps } = props;
 
@@ -30,7 +30,7 @@ function getListTag(
     type:
         | DocumentBlockListUnordered['type']
         | DocumentBlockListOrdered['type']
-        | DocumentBlockListTasks['type'],
+        | DocumentBlockListTasks['type']
 ) {
     switch (type) {
         case 'list-ordered':

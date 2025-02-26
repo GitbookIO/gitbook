@@ -1,4 +1,4 @@
-import { twMerge, ClassNameValue } from 'tailwind-merge';
+import { type ClassNameValue, twMerge } from 'tailwind-merge';
 
 export type { ClassNameValue as ClassValue };
 

@@ -1,6 +1,5 @@
-import type { DocumentBlockHeading, DocumentBlockHint } from '@gitbook/api';
+import type { DocumentBlockHint } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
-import React from 'react';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
@@ -33,7 +32,7 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
                 'grid-cols-[auto_1fr]',
                 hasHeading ? 'grid-rows-[auto_auto]' : '',
 
-                style,
+                style
             )}
         >
             <div
@@ -42,7 +41,7 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
                     'pl-3',
                     '-mt-px', // Bump icon up 1px for optical alignment with heading
                     hasHeading ? hintStyle.header : null,
-                    hintStyle.iconColor,
+                    hintStyle.iconColor
                 )}
             >
                 <Icon
@@ -53,8 +52,8 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
             {hasHeading ? (
                 <Block
                     style={tcls(
-                        'text-[1em] *:mt-0 p-3 flip-heading-hash',
-                        hasHeading ? hintStyle.header : null,
+                        'flip-heading-hash p-3 text-[1em] *:mt-0',
+                        hasHeading ? hintStyle.header : null
                     )}
                     ancestorBlocks={[...ancestorBlocks, block]}
                     {...contextProps}
@@ -68,7 +67,7 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
                 blockStyle={tcls(
                     hintStyle.body,
                     // render hash icon on the other side of the heading
-                    'flip-heading-hash',
+                    'flip-heading-hash'
                 )}
                 style={[
                     'p-3',

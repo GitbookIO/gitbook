@@ -11,7 +11,7 @@ export function getEmojiForCode(code: string): string {
     code = code.toLowerCase();
     const fullCode = emojiCodepoints[code] ?? code;
 
-    const codePoints = fullCode.split('-').map((elt) => parseInt(elt, 16));
+    const codePoints = fullCode.split('-').map((elt) => Number.parseInt(elt, 16));
 
     try {
         return String.fromCodePoint(...codePoints);

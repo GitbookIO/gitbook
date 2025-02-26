@@ -1,12 +1,12 @@
 import {
+    isCSV,
     isFormData,
-    isPDF,
     isFormUrlEncoded,
+    isGraphQL,
+    isPDF,
+    isPlainObject,
     isText,
     isXML,
-    isCSV,
-    isGraphQL,
-    isPlainObject,
 } from './contentTypeChecks';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 
@@ -95,8 +95,8 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
                 code += indent(`body: ${body}\n`, 4);
             }
 
-            code += `});\n\n`;
-            code += `const data = await response.json();`;
+            code += '});\n\n';
+            code += 'const data = await response.json();';
 
             return code;
         },
@@ -135,7 +135,7 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
             }
 
             code += ')\n\n';
-            code += `data = response.json()`;
+            code += 'data = response.json()';
             return code;
         },
     },
@@ -169,11 +169,11 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
             }
 
             const headerString = headers
-                ? Object.entries(headers)
+                ? `${Object.entries(headers)
                       .map(([key, value]) =>
-                          key.toLowerCase() !== 'host' ? `${key}: ${value}` : ``,
+                          key.toLowerCase() !== 'host' ? `${key}: ${value}` : ''
                       )
-                      .join('\n') + '\n'
+                      .join('\n')}\n`
                 : '';
 
             const bodyString = body ? `\n${body}` : '';
@@ -200,7 +200,7 @@ export function parseHostAndPath(url: string) {
         const urlObj = new URL(url);
         const path = urlObj.pathname || '/';
         return { host: urlObj.host, path };
-    } catch (e) {
+    } catch (_e) {
         // If the URL was invalid do our best to parse the URL.
         // Check for the protocol part and pull it off to grab the host
         const splitted = url.split('//');
@@ -211,7 +211,7 @@ export function parseHostAndPath(url: string) {
         // pull off the host (mutates)
         const host = parts.shift();
         // add a leading slash and join the paths again
-        const path = '/' + parts.join('/');
+        const path = `/${parts.join('/')}`;
 
         return { host, path };
     }
@@ -332,7 +332,7 @@ const BodyGenerators = {
             code += 'files = {\n';
             if (isPlainObject(body)) {
                 Object.entries(body).forEach(([key, value]) => {
-                    code += indent(`"${key}": "${String(value)}",`, 4) + '\n';
+                    code += `${indent(`"${key}": "${String(value)}",`, 4)}\n`;
                 });
             }
             code += '}\n\n';
@@ -341,7 +341,7 @@ const BodyGenerators = {
 
         if (isPDF(contentType)) {
             code += 'files = {\n';
-            code += indent(`"file": "${body}",`, 4) + '\n';
+            code += `${indent(`"file": "${body}",`, 4)}\n`;
             code += '}\n\n';
             body = 'files';
         }

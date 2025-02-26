@@ -11,6 +11,7 @@ html:has(.zoomModal) {
 }
 
 .zoomModal {
+    /** Unstyled */
 }
 
 .zoomModal img {

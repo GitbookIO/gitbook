@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'bun:test';
 import { dereference } from '@scalar/openapi-parser';
-import { traverse } from './traverse';
 import { createFileSystem } from './filesystem';
+import { traverse } from './traverse';
 
 const recursiveSpec = await Bun.file(
-    new URL('./fixtures/recursive-spec.json', import.meta.url),
+    new URL('./fixtures/recursive-spec.json', import.meta.url)
 ).text();
 
 describe('#traverse', () => {
@@ -17,19 +17,19 @@ describe('#traverse', () => {
             JSON.stringify(result);
         } catch (error) {
             expect((error as Error).message).toBe(
-                'JSON.stringify cannot serialize cyclic structures.',
+                'JSON.stringify cannot serialize cyclic structures.'
             );
         }
 
         const specification = await traverse(result.specification!, async (node) => {
-            if ('description' in node && node['description']) {
-                node['description'] = 'Hello, world!';
+            if ('description' in node && node.description) {
+                node.description = 'Hello, world!';
                 return node;
             }
             return node;
         });
 
-        expect(specification.info!.description).toBe('Hello, world!');
+        expect(specification.info?.description).toBe('Hello, world!');
     });
 
     it('traverses a complete filesystem', async () => {
@@ -39,13 +39,13 @@ describe('#traverse', () => {
         });
 
         const transformedFilesystem = await traverse(filesystem, async (node) => {
-            if ('description' in node && node['description']) {
-                node['description'] = 'Hello, world!';
+            if ('description' in node && node.description) {
+                node.description = 'Hello, world!';
                 return node;
             }
             return node;
         });
 
-        expect(transformedFilesystem[0]!.specification['info']!.description).toBe('Hello, world!');
+        expect(transformedFilesystem[0]?.specification.info?.description).toBe('Hello, world!');
     });
 });

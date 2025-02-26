@@ -11,7 +11,7 @@ export const GITBOOK_URL =
 /**
  * GitBook app URL.
  */
-export const GITBOOK_APP_URL = process.env.NEXT_PUBLIC_GITBOOK_APP_URL ?? `https://app.gitbook.com`;
+export const GITBOOK_APP_URL = process.env.NEXT_PUBLIC_GITBOOK_APP_URL ?? 'https://app.gitbook.com';
 
 /**
  * Default GitBook API URL endpoint.
@@ -34,5 +34,5 @@ export const GITBOOK_USER_AGENT = process.env.GITBOOK_USER_AGENT ?? 'GitBook-Ope
  * This is used to disable tracking in development mode.
  */
 export const GITBOOK_DISABLE_TRACKING = Boolean(
-    !!process.env.GITBOOK_DISABLE_TRACKING || process.env.NODE_ENV !== 'production',
+    !!process.env.GITBOOK_DISABLE_TRACKING || process.env.NODE_ENV !== 'production'
 );

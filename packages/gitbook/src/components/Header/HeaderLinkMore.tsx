@@ -1,11 +1,11 @@
 import {
-    CustomizationContentLink,
-    CustomizationHeaderItem,
+    type CustomizationContentLink,
+    type CustomizationHeaderItem,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import { GitBookSiteContext } from '@v2/lib/context';
-import React from 'react';
+import type { GitBookSiteContext } from '@v2/lib/context';
+import type React from 'react';
 
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -34,7 +34,7 @@ export function HeaderLinkMore(props: {
                 'theme-bold:hover:text-header-link/8',
                 'flex',
                 'gap-1',
-                'items-center',
+                'items-center'
             )}
         >
             <span className="sr-only">{label}</span>
@@ -44,7 +44,7 @@ export function HeaderLinkMore(props: {
     );
 
     return (
-        <div className={`${styles.linkEllipsis} items-center z-20`}>
+        <div className={`${styles.linkEllipsis} z-20 items-center`}>
             <Dropdown button={renderButton} className="-translate-x-48 md:translate-x-0">
                 <DropdownMenu>
                     {links.map((link, index) => (
@@ -67,7 +67,7 @@ async function MoreMenuLink(props: {
     return (
         <>
             {'links' in link && link.links.length > 0 && (
-                <hr className="first:hidden border-t border-tint my-1 -mx-2" />
+                <hr className="-mx-2 my-1 border-tint border-t first:hidden" />
             )}
             <DropdownMenuItem
                 href={target?.href ?? null}

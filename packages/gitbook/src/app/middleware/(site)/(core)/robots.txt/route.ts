@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 import { getSite } from '@/lib/api';
 import { getAbsoluteHref } from '@/lib/links';
@@ -10,16 +10,16 @@ export const runtime = 'edge';
 /**
  * Generate a robots.txt for the current space.
  */
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
     const pointer = await getSiteContentPointer();
     const site = await getSite(pointer.organizationId, pointer.siteId);
 
     const lines = [
-        `User-agent: *`,
+        'User-agent: *',
         'Disallow: /~gitbook/',
         ...((await isSiteIndexable(site))
-            ? [`Allow: /`, `Sitemap: ${await getAbsoluteHref(`/sitemap.xml`, true)}`]
-            : [`Disallow: /`]),
+            ? ['Allow: /', `Sitemap: ${await getAbsoluteHref('/sitemap.xml', true)}`]
+            : ['Disallow: /']),
     ];
     const content = lines.join('\n');
 

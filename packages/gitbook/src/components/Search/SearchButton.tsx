@@ -1,14 +1,13 @@
 'use client';
 
 import { Icon } from '@gitbook/icons';
-import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
-import { useLanguage, tString } from '@/intl/client';
-import { ClassValue, tcls } from '@/lib/tailwind';
+import { tString, useLanguage } from '@/intl/client';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
-import { useSearch } from './useSearch';
 import { useTrackEvent } from '../Insights';
+import { useSearch } from './useSearch';
 
 /**
  * Button to open the search modal.
@@ -86,7 +85,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
 
                 'md:justify-start',
                 'md:w-full',
-                style,
+                style
             )}
         >
             <Icon
@@ -126,7 +125,7 @@ const Shortcut = () => {
                 'text-tint',
                 'contrast-more:text-tint-strong',
                 'whitespace-nowrap',
-                `[font-feature-settings:"calt",_"case"]`,
+                `[font-feature-settings:"calt",_"case"]`
             )}
         >
             {operatingSystem === 'mac' ? '⌘' : 'Ctrl +'} K

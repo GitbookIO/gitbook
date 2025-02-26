@@ -1,5 +1,5 @@
 import stylesMap from './data/styles-map.json';
-import { IconName, IconStyle } from './types';
+import type { IconName, IconStyle } from './types';
 
 const cache = new Map<IconName, Map<IconStyle, [string, IconName]>>();
 
@@ -27,7 +27,7 @@ export function getIconStyle(style: IconStyle, icon: IconName): [string, IconNam
     if (!cache.has(icon)) {
         cache.set(icon, new Map());
     }
-    cache.get(icon)!.set(style, result);
+    cache.get(icon)?.set(style, result);
 
     return result;
 }

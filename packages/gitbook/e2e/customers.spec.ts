@@ -1,4 +1,4 @@
-import { runTestCases, TestsCase, waitForCookiesDialog } from './util';
+import { type TestsCase, runTestCases } from './util';
 
 /** A list of test cases to run on the customers' docs sites. */
 const testCases: TestsCase[] = [

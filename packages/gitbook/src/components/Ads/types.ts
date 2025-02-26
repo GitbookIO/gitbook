@@ -47,5 +47,5 @@ export interface AdCover extends AdGeneric {
 export type AdItem = AdClassic | AdCover;
 
 export interface AdsResponse {
-    ads: Array<AdItem | {}>;
+    ads: Array<AdItem | Record<string, never>>;
 }

@@ -10,13 +10,13 @@ export function partition(
     /**
      * Amount of parts you want to split into
      */
-    parts: number,
+    parts: number
 ) {
-    let rest = array.length % parts;
-    let size = Math.floor(array.length / parts);
+    const rest = array.length % parts;
+    const size = Math.floor(array.length / parts);
     let j = 0;
 
     return Array.from({ length: Math.min(array.length, parts) }, (_, i) =>
-        array.slice(j, (j += size + (i < rest ? 1 : 0))),
+        array.slice(j, (j += size + (i < rest ? 1 : 0)))
     );
 }

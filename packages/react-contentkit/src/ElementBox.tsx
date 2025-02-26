@@ -1,10 +1,10 @@
-import { ContentKitBox } from '@gitbook/api';
-import React from 'react';
+import type { ContentKitBox } from '@gitbook/api';
+import type React from 'react';
 
-import { ContentKitServerElementProps } from './types';
+import type { ContentKitServerElementProps } from './types';
 
 export function ElementBox(
-    props: React.PropsWithChildren<ContentKitServerElementProps<ContentKitBox>>,
+    props: React.PropsWithChildren<ContentKitServerElementProps<ContentKitBox>>
 ) {
     const { element, children } = props;
 

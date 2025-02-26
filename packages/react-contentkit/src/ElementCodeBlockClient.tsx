@@ -1,7 +1,7 @@
-import { ContentKitCodeBlock } from '@gitbook/api';
-import React from 'react';
+import type { ContentKitCodeBlock } from '@gitbook/api';
+import type React from 'react';
 
-import { ContentKitClientElementProps } from './types';
+import type { ContentKitClientElementProps } from './types';
 
 export function ElementCodeBlockClient(
     props: ContentKitClientElementProps<ContentKitCodeBlock> & {
@@ -9,9 +9,9 @@ export function ElementCodeBlockClient(
          * Render a code block on the server as a fallback and swap only when needed.
          */
         children: React.ReactNode;
-    },
+    }
 ) {
-    const { element, children } = props;
+    const { children } = props;
 
     return <>{children}</>;
 }

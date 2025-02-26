@@ -1,17 +1,17 @@
 'use client';
 
-import { ContentKitModal } from '@gitbook/api';
+import type { ContentKitModal } from '@gitbook/api';
 import React from 'react';
 
-import { ContentKitClientElementProps } from './types';
 import classNames from 'classnames';
 import { useContentKitClientContext } from './context';
+import type { ContentKitClientElementProps } from './types';
 
 export function ElementModal(
     props: ContentKitClientElementProps<ContentKitModal> & {
         subtitle: React.ReactNode | null;
         children: React.ReactNode;
-    },
+    }
 ) {
     const { element, subtitle, children } = props;
     const clientContext = useContentKitClientContext();
@@ -38,7 +38,7 @@ export function ElementModal(
             <div
                 className={classNames(
                     'contentkit-modal',
-                    opened ? 'contentkit-modal-opened' : null,
+                    opened ? 'contentkit-modal-opened' : null
                 )}
                 onClick={(event) => {
                     event.stopPropagation();

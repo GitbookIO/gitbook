@@ -11,6 +11,6 @@ describe('#convertOpenAPIV2ToOpenAPIV3', () => {
         });
         // Ensure the structure returned is not recursive (not dereferenced).
         JSON.stringify(schema);
-        expect(schema[0]!.specification.openapi).toBe('3.1.1');
+        expect(schema[0]?.specification.openapi).toBe('3.1.1');
     });
 });

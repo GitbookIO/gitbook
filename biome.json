@@ -17,7 +17,8 @@
             "**/.turbo/**/*",
             "**/.vercel/**/*",
             "**/.cache/**/*",
-			"**/.wrangler/**/*"
+            "**/.wrangler/**/*",
+            "packages/openapi-parser/src/fixtures/**/*"
         ]
     },
     "formatter": {
@@ -40,6 +41,9 @@
             "recommended": true,
             "performance": {
                 "noDelete": "warn"
+            },
+            "security": {
+                "noDangerouslySetInnerHtml": "off"
             },
             "complexity": {
                 "noForEach": "off",
@@ -109,35 +113,54 @@
             "bracketSpacing": true
         }
     },
-	"overrides": [
-		{
-			"include": ["packages/cache-do/**/*"],
-			"javascript": {
-				"globals": [
-					"DurableObjectLocationHint",
-					"DurableObjectNamespace",
-					"DurableObjectStub",
-					"ContinentCode"
-				]
-			}
-		},
-		{
-			"include": ["packages/gitbook/**/*", "packages/gitbook-v2/**/*", "packages/react-openapi/**/*", "packages/react-math/**/*",
-			"packages/react-contentkit/**/*", "packages/icons/**/*"
-		],
-			"javascript": {
-				"globals": [
-					"React"
-				]
-			}
-		},
-		{
-			"include": ["*.css"],
-			"javascript": {
-				"globals": [
-					"theme"
-				]
-			}
-		}
-	]
+    "overrides": [
+        {
+            "include": [
+                "packages/gitbook/**/*",
+                "packages/gitbook-v2/**/*",
+                "packages/react-openapi/**/*",
+                "packages/react-math/**/*",
+                "packages/react-contentkit/**/*",
+                "packages/icons/**/*"
+            ],
+            "javascript": {
+                "globals": ["React"]
+            }
+        },
+        {
+            "include": ["packages/gitbook/**/*"],
+            "javascript": {
+                "globals": ["React", "GitBookIntegrationEvent"]
+            }
+        },
+        {
+            "include": ["*.css"],
+            "javascript": {
+                "globals": ["theme"]
+            }
+        },
+        {
+            "include": ["*.test.ts", "packages/gitbook/tests/**/*"],
+            "javascript": {
+                "globals": ["Bun"]
+            }
+        },
+        {
+            "include": [
+                "packages/cache-do/**/*",
+                "packages/gitbook/cf-env.d.ts",
+                "packages/gitbook/src/cloudflare-entrypoint.ts"
+            ],
+            "javascript": {
+                "globals": [
+                    "DurableObjectLocationHint",
+                    "DurableObjectNamespace",
+                    "DurableObjectStub",
+                    "ContinentCode",
+                    "Fetcher",
+                    "ExportedHandler"
+                ]
+            }
+        }
+    ]
 }

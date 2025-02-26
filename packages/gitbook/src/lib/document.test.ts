@@ -26,7 +26,7 @@ describe('isNodeEmpty', () => {
                         ],
                     },
                 ],
-            }),
+            })
         ).toEqual(true);
     });
 
@@ -50,7 +50,7 @@ describe('isNodeEmpty', () => {
                         },
                     },
                 ],
-            }),
+            })
         ).toEqual(false);
     });
 });
@@ -123,7 +123,7 @@ describe('#getBlockTitle', () => {
                     },
                 ],
                 meta: { id: 'expandable-block' },
-            }),
+            })
         ).toEqual('Title of expandable block');
     });
 });

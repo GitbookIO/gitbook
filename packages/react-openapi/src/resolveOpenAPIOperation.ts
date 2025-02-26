@@ -1,13 +1,13 @@
-import { toJSON, fromJSON } from 'flatted';
+import { fromJSON, toJSON } from 'flatted';
 
 import {
-    type OpenAPIV3xDocument,
     type Filesystem,
     type OpenAPIV3,
     type OpenAPIV3_1,
+    type OpenAPIV3xDocument,
     dereference,
 } from '@gitbook/openapi-parser';
-import { OpenAPIOperationData } from './types';
+import type { OpenAPIOperationData } from './types';
 import { checkIsReference } from './utils';
 
 export { toJSON, fromJSON };
@@ -20,7 +20,7 @@ export async function resolveOpenAPIOperation(
     operationDescriptor: {
         path: string;
         method: string;
-    },
+    }
 ): Promise<OpenAPIOperationData | null> {
     const { path, method } = operationDescriptor;
     const schema = await memoDereferenceFilesystem(filesystem);
@@ -102,7 +102,7 @@ async function dereferenceFilesystem(filesystem: Filesystem): Promise<OpenAPIV3x
  */
 function getPathObject(
     schema: OpenAPIV3.Document | OpenAPIV3_1.Document,
-    path: string,
+    path: string
 ): OpenAPIV3.PathItemObject | OpenAPIV3_1.PathItemObject | null {
     if (schema.paths?.[path]) {
         return schema.paths[path];
@@ -115,7 +115,7 @@ function getPathObject(
  */
 function getPathObjectParameter(
     schema: OpenAPIV3.Document | OpenAPIV3_1.Document,
-    path: string,
+    path: string
 ):
     | (OpenAPIV3.ReferenceObject | OpenAPIV3.ParameterObject)[]
     | (OpenAPIV3.ParameterObject | OpenAPIV3_1.ReferenceObject)[]
@@ -133,7 +133,7 @@ function getPathObjectParameter(
 function getOperationByPathAndMethod(
     schema: OpenAPIV3.Document | OpenAPIV3_1.Document,
     path: string,
-    method: string,
+    method: string
 ): OpenAPIV3.OperationObject | null {
     // Types are buffy for OpenAPIV3_1.OperationObject, so we use v3
     const pathObject = getPathObject(schema, path);

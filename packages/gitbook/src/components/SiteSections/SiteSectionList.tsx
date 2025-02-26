@@ -5,13 +5,13 @@ import { Icon, type IconName } from '@gitbook/icons';
 import { motion } from 'framer-motion';
 import React from 'react';
 
-import { SectionsList } from '@/lib/api';
-import { ClassValue, tcls } from '@/lib/tailwind';
+import type { SectionsList } from '@/lib/api';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
+import { TOCScrollContainer, useScrollToActiveTOCItem } from '../TableOfContents/TOCScroller';
+import { useIsMounted, useToggleAnimation } from '../hooks';
 import { Link } from '../primitives';
 import { SectionIcon } from './SectionIcon';
-import { useIsMounted, useToggleAnimation } from '../hooks';
-import { TOCScrollContainer, useScrollToActiveTOCItem } from '../TableOfContents/TOCScroller';
 
 const MAX_ITEMS = 5; // If there are more sections than this, they'll be shown below the fold in a scrollview.
 
@@ -29,16 +29,13 @@ export function SiteSectionList(props: { sections: SectionsList; className: Clas
             <nav
                 aria-label="Sections"
                 className={tcls(
-                    `text-tint text-sm
-                    border-b border-tint-subtle -mx-5 relative
-                    before:absolute before:contents[] before:left-0 before:right-2 before:bottom-0 before:h-12 before:pointer-events-none 
-                    before:bg-gradient-to-b from-transparent to-tint-base sidebar-filled:to-tint-subtle theme-muted:to-tint-subtle theme-bold-tint:to-tint-subtle [html.sidebar-filled.theme-muted_&]:to-tint-base [html.sidebar-filled.theme-bold.tint_&]:to-tint-base`,
-                    className,
+                    '-mx-5 before:contents[] relative border-tint-subtle border-b from-transparent sidebar-filled:to-tint-subtle theme-bold-tint:to-tint-subtle theme-muted:to-tint-subtle to-tint-base text-sm text-tint before:pointer-events-none before:absolute before:right-2 before:bottom-0 before:left-0 before:h-12 before:bg-gradient-to-b [html.sidebar-filled.theme-bold.tint_&]:to-tint-base [html.sidebar-filled.theme-muted_&]:to-tint-base',
+                    className
                 )}
             >
                 <TOCScrollContainer
                     style={{ maxHeight: `${MAX_ITEMS * 3 + 2}rem` }}
-                    className="overflow-y-auto px-2 pb-6 gutter-stable"
+                    className="gutter-stable overflow-y-auto px-2 pb-6"
                 >
                     {sectionsAndGroups.map((item) => {
                         if (item.object === 'site-section-group') {
@@ -84,39 +81,26 @@ export function SiteSectionListItem(props: {
             ref={linkRef}
             aria-current={isActive && 'page'}
             className={tcls(
-                `flex flex-row items-center gap-3 px-3 py-2
-            hover:bg-tint-hover contrast-more:hover:ring-1 contrast-more:hover:ring-tint
-            hover:text-tint-strong
-            rounded-md straight-corners:rounded-none transition-all group/section-link`,
+                'group/section-link flex flex-row items-center gap-3 rounded-md straight-corners:rounded-none px-3 py-2 transition-all hover:bg-tint-hover hover:text-tint-strong contrast-more:hover:ring-1 contrast-more:hover:ring-tint',
                 isActive
-                    ? `text-primary-subtle hover:text-primary contrast-more:text-primary contrast-more:hover:text-primary-strong font-semibold
-                hover:bg-primary-hover contrast-more:hover:ring-1 contrast-more:hover:ring-primary-hover`
+                    ? 'font-semibold text-primary-subtle hover:bg-primary-hover hover:text-primary contrast-more:text-primary contrast-more:hover:text-primary-strong contrast-more:hover:ring-1 contrast-more:hover:ring-primary-hover'
                     : null,
-                className,
+                className
             )}
             {...otherProps}
         >
             <div
                 className={tcls(
-                    `shrink-0 size-8 flex items-center justify-center
-                    bg-tint-subtle shadow-sm shadow-tint
-                    dark:shadow-none rounded-md straight-corners:rounded-none leading-none
-                    ring-1 ring-tint-subtle
-                    text-tint contrast-more:text-tint-strong
-                    group-hover/section-link:scale-110 group-active/section-link:scale-90 group-active/section-link:shadow-none group-hover/section-link:ring-tint-hover
-                    transition-transform text-lg`,
+                    'flex size-8 shrink-0 items-center justify-center rounded-md straight-corners:rounded-none bg-tint-subtle text-lg text-tint leading-none shadow-sm shadow-tint ring-1 ring-tint-subtle transition-transform group-hover/section-link:scale-110 group-hover/section-link:ring-tint-hover group-active/section-link:scale-90 group-active/section-link:shadow-none contrast-more:text-tint-strong dark:shadow-none',
                     isActive
-                        ? `bg-primary ring-primary group-hover/section-link:ring-primary-hover,
-                        shadow-md shadow-primary
-                        contrast-more:ring-2 contrast-more:ring-primary
-                        text-primary-subtle contrast-more:text-primary tint:bg-primary-solid tint:text-contrast-primary-solid`
-                        : null,
+                        ? 'bg-primary tint:bg-primary-solid text-primary-subtle tint:text-contrast-primary-solid shadow-md shadow-primary ring-primary group-hover/section-link:ring-primary-hover, contrast-more:text-primary contrast-more:ring-2 contrast-more:ring-primary'
+                        : null
                 )}
             >
                 {section.icon ? (
                     <SectionIcon icon={section.icon as IconName} isActive={isActive} />
                 ) : (
-                    <span className={`opacity-8 text-sm ${isActive && 'opacity-10'}`}>
+                    <span className={`text-sm opacity-8 ${isActive && 'opacity-10'}`}>
                         {section.title.substring(0, 2)}
                     </span>
                 )}
@@ -155,38 +139,24 @@ export function SiteSectionGroupItem(props: {
                     event.stopPropagation();
                     setIsVisible((prev) => !prev);
                 }}
-                className={`w-full flex flex-row items-center gap-3 px-3 py-2
-            hover:bg-tint-hover contrast-more:hover:ring-1 contrast-more:hover:ring-tint
-            hover:text-tint-strong
-            rounded-md straight-corners:rounded-none transition-all group/section-link 
-            ${
-                isActiveGroup
-                    ? `text-primary hover:text-primary-strong contrast-more:text-primary-strong font-semibold
-                hover:bg-primary-hover contrast-more:hover:ring-1 contrast-more:hover:ring-primary-hover`
-                    : null
-            }`}
+                className={`group/section-link flex w-full flex-row items-center gap-3 rounded-md straight-corners:rounded-none px-3 py-2 transition-all hover:bg-tint-hover hover:text-tint-strong contrast-more:hover:ring-1 contrast-more:hover:ring-tint ${
+                    isActiveGroup
+                        ? 'font-semibold text-primary hover:bg-primary-hover hover:text-primary-strong contrast-more:text-primary-strong contrast-more:hover:ring-1 contrast-more:hover:ring-primary-hover'
+                        : null
+                }`}
             >
                 <div
                     className={tcls(
-                        `shrink-0 size-8 flex items-center justify-center
-                    bg-tint-subtle shadow-sm shadow-tint
-                    dark:shadow-none rounded-md straight-corners:rounded-none leading-none
-                    ring-1 ring-tint-subtle
-                    text-tint contrast-more:text-tint-strong
-                    group-hover/section-link:scale-110 group-active/section-link:scale-90 group-active/section-link:shadow-none group-hover/section-link:ring-tint-hover
-                    transition-transform text-lg`,
+                        'flex size-8 shrink-0 items-center justify-center rounded-md straight-corners:rounded-none bg-tint-subtle text-lg text-tint leading-none shadow-sm shadow-tint ring-1 ring-tint-subtle transition-transform group-hover/section-link:scale-110 group-hover/section-link:ring-tint-hover group-active/section-link:scale-90 group-active/section-link:shadow-none contrast-more:text-tint-strong dark:shadow-none',
                         isActiveGroup
-                            ? `bg-primary ring-primary group-hover/section-link:ring-primary-hover,
-                        shadow-md shadow-primary
-                        contrast-more:ring-2 contrast-more:ring-primary
-                        text-primary contrast-more:text-primary-strong tint:bg-primary-solid tint:text-contrast-primary-solid`
-                            : null,
+                            ? 'bg-primary tint:bg-primary-solid text-primary tint:text-contrast-primary-solid shadow-md shadow-primary ring-primary group-hover/section-link:ring-primary-hover, contrast-more:text-primary-strong contrast-more:ring-2 contrast-more:ring-primary'
+                            : null
                     )}
                 >
                     {group.icon ? (
                         <SectionIcon icon={group.icon as IconName} isActive={isActiveGroup} />
                     ) : (
-                        <span className={`opacity-8 text-sm ${isActiveGroup && 'opacity-10'}`}>
+                        <span className={`text-sm opacity-8 ${isActiveGroup && 'opacity-10'}`}>
                             {group.title.substring(0, 2)}
                         </span>
                     )}
@@ -210,7 +180,7 @@ export function SiteSectionGroupItem(props: {
                         'after:h-7',
                         'hover:bg-tint-active',
                         'hover:text-current',
-                        isActiveGroup ? ['hover:bg-tint-hover'] : [],
+                        isActiveGroup ? ['hover:bg-tint-hover'] : []
                     )}
                 >
                     <Icon
@@ -227,7 +197,7 @@ export function SiteSectionGroupItem(props: {
                             'group-hover:opacity-11',
                             'contrast-more:opacity-11',
 
-                            isVisible ? ['rotate-90'] : ['rotate-0'],
+                            isVisible ? ['rotate-90'] : ['rotate-0']
                         )}
                     />
                 </span>

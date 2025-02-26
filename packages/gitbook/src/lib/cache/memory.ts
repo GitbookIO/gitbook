@@ -1,6 +1,6 @@
-import { CacheBackend, CacheEntry, CacheEntryLookup } from './types';
-import { NON_IMMUTABLE_LOCAL_CACHE_MAX_AGE_SECONDS, isCacheEntryImmutable } from './utils';
 import { getGlobalContext } from '../waitUntil';
+import type { CacheBackend, CacheEntry, CacheEntryLookup } from './types';
+import { NON_IMMUTABLE_LOCAL_CACHE_MAX_AGE_SECONDS, isCacheEntryImmutable } from './utils';
 
 export const memoryCache: CacheBackend = {
     name: 'memory',
@@ -15,9 +15,8 @@ export const memoryCache: CacheBackend = {
 
         if (memoryEntry.meta.expiresAt > Date.now()) {
             return memoryEntry;
-        } else {
-            memoryCache.delete(entry.key);
         }
+        memoryCache.delete(entry.key);
 
         return null;
     },
@@ -30,7 +29,7 @@ export const memoryCache: CacheBackend = {
                 ? null
                 : Math.min(
                       Date.now() + NON_IMMUTABLE_LOCAL_CACHE_MAX_AGE_SECONDS * 1000,
-                      entry.meta.expiresAt,
+                      entry.meta.expiresAt
                   );
 
         const meta = { ...entry.meta };

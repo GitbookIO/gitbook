@@ -1,17 +1,17 @@
 'use client';
 
+import type { ContentKitButton } from '@gitbook/api';
 import React from 'react';
-import { ContentKitButton } from '@gitbook/api';
 
-import { ContentKitClientElementProps } from './types';
 import classNames from 'classnames';
 import { useContentKitClientContext } from './context';
+import type { ContentKitClientElementProps } from './types';
 
 export function ElementButton(
     props: ContentKitClientElementProps<ContentKitButton> & {
         icon: React.ReactNode | null;
         trailingIcon: React.ReactNode | null;
-    },
+    }
 ) {
     const { element, icon, trailingIcon } = props;
     const clientContext = useContentKitClientContext();
@@ -28,7 +28,7 @@ export function ElementButton(
             className={classNames(
                 'contentkit-button',
                 `contentkit-button-style-${element.style ?? 'secondary'}`,
-                loading ? 'contentkit-button-loading' : null,
+                loading ? 'contentkit-button-loading' : null
             )}
             onClick={(event) => {
                 if (element.disabled || loading) {

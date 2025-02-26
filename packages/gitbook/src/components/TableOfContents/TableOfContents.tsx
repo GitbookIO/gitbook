@@ -1,6 +1,6 @@
 import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
-import { GitBookSiteContext } from '@v2/lib/context';
-import React from 'react';
+import type { GitBookSiteContext } from '@v2/lib/context';
+import type React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
@@ -11,13 +11,9 @@ import { Trademark } from './Trademark';
 export function TableOfContents(props: {
     context: GitBookSiteContext;
     header?: React.ReactNode; // Displayed outside the scrollable TOC as a sticky header
-    headerOffset: {
-        sectionsHeader: boolean;
-        topHeader: boolean;
-    };
     innerHeader?: React.ReactNode; // Displayed outside the scrollable TOC, directly above the page list
 }) {
-    const { innerHeader, context, header, headerOffset } = props;
+    const { innerHeader, context, header } = props;
     const { space, customization, pages } = context;
 
     return (
@@ -58,7 +54,7 @@ export function TableOfContents(props: {
                 'gap-4',
 
                 'navigation-open:border-b',
-                'border-tint-subtle',
+                'border-tint-subtle'
             )}
         >
             {header && header}
@@ -79,7 +75,7 @@ export function TableOfContents(props: {
                     '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
 
                     'sidebar-filled:rounded-xl',
-                    'straight-corners:rounded-none',
+                    'straight-corners:rounded-none'
                 )}
             >
                 {innerHeader && <div className={tcls('px-5 *:my-4')}>{innerHeader}</div>}
@@ -98,7 +94,7 @@ export function TableOfContents(props: {
                         '[&::-webkit-scrollbar-thumb]:bg-transparent',
                         'group-hover:[&::-webkit-scrollbar]:bg-tint-subtle',
                         'group-hover:[&::-webkit-scrollbar-thumb]:bg-tint-7',
-                        'group-hover:[&::-webkit-scrollbar-thumb:hover]:bg-tint-8',
+                        'group-hover:[&::-webkit-scrollbar-thumb:hover]:bg-tint-8'
                     )}
                 >
                     <PagesList

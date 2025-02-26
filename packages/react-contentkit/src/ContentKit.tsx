@@ -10,9 +10,9 @@ import React from 'react';
 
 import {
     ContentKitClientContext,
-    ContentKitClientContextType,
-    ContentKitRenderUpdate,
-    ContentKitSecurity,
+    type ContentKitClientContextType,
+    type ContentKitRenderUpdate,
+    type ContentKitSecurity,
 } from './context';
 import { resolveDynamicBinding } from './dynamic';
 
@@ -86,16 +86,12 @@ export function ContentKit(props: {
                     ...update.state,
                 },
             };
-
-            console.log('transition to input', newInput);
             const result = await render(newInput);
             const output = result.output;
 
             if (output.type === 'complete') {
                 return onComplete?.(output.returnValue);
             }
-
-            console.log('and got output', output, 'for', newInput);
 
             setCurrent((prev) => ({
                 input: newInput,
@@ -104,7 +100,7 @@ export function ContentKit(props: {
                 state: prev.state,
             }));
         },
-        [setCurrent, current, render, onComplete],
+        [setCurrent, current, render, onComplete]
     );
 
     const renderer = React.useMemo<ContentKitClientContextType>(() => {
@@ -127,8 +123,6 @@ export function ContentKit(props: {
                 if (bubble) {
                     onAction?.(action);
                 }
-
-                console.log('action', action);
                 switch (action.action) {
                     case '@ui.modal.open': {
                         const modalInput: RequestRenderIntegrationUI = {

@@ -2,9 +2,9 @@
 
 import { Icon } from '@gitbook/icons';
 import { usePathname } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
-import { useLanguage, tString } from '@/intl/client';
+import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
 import { useScrollListener } from '../hooks/useScrollListener';
@@ -55,7 +55,7 @@ export function HeaderMobileMenu(props: Partial<React.ButtonHTMLAttributes<HTMLB
                 'rounded',
                 'straight-corners:rounded-sm',
                 'page-no-toc:hidden',
-                props.className,
+                props.className
             )}
         >
             <Icon icon="bars" className={tcls('size-4', 'text-inherit')} />

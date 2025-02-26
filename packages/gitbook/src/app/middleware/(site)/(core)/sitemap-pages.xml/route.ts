@@ -24,7 +24,7 @@ export async function GET() {
     const urls = await Promise.all(
         pages.map(async ({ page, depth }) => {
             // Decay priority with depth
-            const priority = Math.pow(2, -0.25 * depth);
+            const priority = 2 ** (-0.25 * depth);
             // Normalize to keep 2 decimals
             const normalizedPriority = Math.floor(100 * priority) / 100;
             const lastModified = page.updatedAt || page.createdAt;
@@ -39,7 +39,7 @@ export async function GET() {
             }
 
             return { url };
-        }),
+        })
     );
 
     const xml = jsontoxml(
@@ -55,7 +55,7 @@ export async function GET() {
         {
             xmlHeader: true,
             prettyPrint: true,
-        },
+        }
     );
 
     return new Response(xml, {

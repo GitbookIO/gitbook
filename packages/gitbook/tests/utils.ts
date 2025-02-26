@@ -4,7 +4,6 @@
 export function getTargetURL() {
     const targetUrl = Bun.argv[2];
     if (!targetUrl) {
-        console.error('No target URL provided');
         process.exit(1);
     }
 

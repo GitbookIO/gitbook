@@ -1,11 +1,11 @@
 'use client';
 
-import { ContentKitWebFrame } from '@gitbook/api';
+import type { ContentKitWebFrame } from '@gitbook/api';
 import React from 'react';
 
 import { useContentKitClientContext } from './context';
-import { ContentKitClientElementProps } from './types';
 import { resolveDynamicBinding } from './dynamic';
+import type { ContentKitClientElementProps } from './types';
 
 export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWebFrame>) {
     const { element } = props;
@@ -37,15 +37,15 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
                     return;
                 }
 
-                iframeRef.current.contentWindow!.postMessage(
+                iframeRef.current.contentWindow?.postMessage(
                     message,
-                    `${target.protocol}//${target.host}`,
+                    `${target.protocol}//${target.host}`
                 );
             } else {
                 messagesQueueRef.current.push(message);
             }
         },
-        [renderer.security],
+        [renderer.security]
     );
 
     //
@@ -93,7 +93,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
                             maxHeight: height,
                         });
                     }
-                } catch (err) {
+                } catch (_err) {
                     return;
                 }
             }
@@ -151,7 +151,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
 
     return (
         <div
-            className={`contentkit-webframe`}
+            className={'contentkit-webframe'}
             style={{
                 aspectRatio: size.aspectRatio || element.aspectRatio || undefined,
                 maxWidth: size.maxWidth || undefined,

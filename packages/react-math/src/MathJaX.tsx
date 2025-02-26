@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-declare var MathJax: {
+declare let MathJax: {
     startup: {
         promise: Promise<void>;
     };
@@ -71,34 +71,33 @@ function loadMathJaxScript(url: string) {
         if (typeof window === 'undefined') {
             resolve();
             return;
-        } else {
-            // @ts-ignore
-            window.MathJax = {
-                tex: {
-                    inlineMath: [],
-                },
-                options: {
-                    enableMenu: false,
-                },
-                startup: {
-                    elements: null,
-                    typeset: false,
-                },
-            };
-
-            const script = document.createElement('script');
-            script.src = url;
-            script.id = 'MathJax-script';
-            script.async = true;
-            document.head.appendChild(script);
-
-            script.onload = () => {
-                resolve();
-            };
-            script.onerror = () => {
-                reject(new Error('Failed to load MathJax'));
-            };
         }
+        // @ts-ignore
+        window.MathJax = {
+            tex: {
+                inlineMath: [],
+            },
+            options: {
+                enableMenu: false,
+            },
+            startup: {
+                elements: null,
+                typeset: false,
+            },
+        };
+
+        const script = document.createElement('script');
+        script.src = url;
+        script.id = 'MathJax-script';
+        script.async = true;
+        document.head.appendChild(script);
+
+        script.onload = () => {
+            resolve();
+        };
+        script.onerror = () => {
+            reject(new Error('Failed to load MathJax'));
+        };
     });
 
     return mathJaxPromise;
@@ -107,6 +106,6 @@ function loadMathJaxScript(url: string) {
 function typeset(code: () => void | Promise<void>) {
     MathJax.startup.promise = MathJax.startup.promise
         .then(() => MathJax.typesetPromise(code()))
-        .catch((err) => console.log('Typeset failed: ' + err.message));
+        .catch((_err) => {});
     return MathJax.startup.promise;
 }

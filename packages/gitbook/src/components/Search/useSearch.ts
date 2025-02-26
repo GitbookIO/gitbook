@@ -1,7 +1,7 @@
-import { useQueryStates, parseAsBoolean, parseAsString, UseQueryStatesOptions } from 'nuqs';
+import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs';
 import React from 'react';
 
-import { LinkProps } from '../primitives';
+import type { LinkProps } from '../primitives';
 
 export interface SearchState {
     query: string;
@@ -17,7 +17,7 @@ const keyMap = {
 };
 
 export type UpdateSearchState = (
-    update: React.SetStateAction<SearchState | null>,
+    update: React.SetStateAction<SearchState | null>
 ) => Promise<URLSearchParams>;
 
 /**
@@ -55,15 +55,14 @@ export function useSearch(): [SearchState | null, UpdateSearchState] {
                     ask: null,
                     global: null,
                 });
-            } else {
-                return setRawState({
-                    q: update.query,
-                    ask: update.ask ? true : null,
-                    global: update.global ? true : null,
-                });
             }
+            return setRawState({
+                q: update.query,
+                ask: update.ask ? true : null,
+                global: update.global ? true : null,
+            });
         },
-        [setRawState],
+        [setRawState]
     );
 
     return [state, setState];
@@ -82,7 +81,7 @@ export function useSearchLink(): (query: Partial<SearchState>) => LinkProps {
             query.ask ? searchParams.set('ask', 'on') : searchParams.delete('ask');
             query.global ? searchParams.set('global', 'on') : searchParams.delete('global');
             return {
-                href: '?' + searchParams.toString(),
+                href: `?${searchParams.toString()}`,
                 prefetch: false,
                 onClick: (event) => {
                     event.preventDefault();
@@ -96,6 +95,6 @@ export function useSearchLink(): (query: Partial<SearchState>) => LinkProps {
                 },
             };
         },
-        [setSearch],
+        [setSearch]
     );
 }

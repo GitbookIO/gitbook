@@ -42,27 +42,25 @@ async function fetchVisitorID(): Promise<string> {
     if (existingTrackingCookie) {
         // If the cookie already exists, we'll just use that. Avoids a server request.
         return existingTrackingCookie;
-    } else {
-        // No tracking deviceId set, we'll need to consolidate with the server.
-        const proposed = generateRandomId();
+    }
+    // No tracking deviceId set, we'll need to consolidate with the server.
+    const proposed = generateRandomId();
 
-        const url = new URL(process.env.NEXT_PUBLIC_GITBOOK_APP_URL ?? `https://app.gitbook.com`);
-        url.pathname = '/__session';
-        url.searchParams.set('proposed', proposed);
+    const url = new URL(process.env.NEXT_PUBLIC_GITBOOK_APP_URL ?? 'https://app.gitbook.com');
+    url.pathname = '/__session';
+    url.searchParams.set('proposed', proposed);
 
-        try {
-            const resp = await fetch(url, {
-                method: 'GET', // Use GET to play nicely with SameSite cookies.
-                credentials: 'include', // Make sure to send/receive cookies.
-                cache: 'no-cache',
-                mode: 'cors', // Need to use cors as we are on a different domain.
-            });
+    try {
+        const resp = await fetch(url, {
+            method: 'GET', // Use GET to play nicely with SameSite cookies.
+            credentials: 'include', // Make sure to send/receive cookies.
+            cache: 'no-cache',
+            mode: 'cors', // Need to use cors as we are on a different domain.
+        });
 
-            const { deviceId } = (await resp.json()) as { deviceId: string };
-            return deviceId;
-        } catch (error) {
-            console.error('Failed to fetch visitor session ID', error);
-            return proposed;
-        }
+        const { deviceId } = (await resp.json()) as { deviceId: string };
+        return deviceId;
+    } catch (_error) {
+        return proposed;
     }
 }

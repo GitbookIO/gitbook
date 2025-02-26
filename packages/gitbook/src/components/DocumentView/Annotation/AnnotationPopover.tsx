@@ -1,9 +1,9 @@
 'use client';
 
 import * as Popover from '@radix-ui/react-popover';
-import React from 'react';
+import type React from 'react';
 
-import { useLanguage, tString } from '@/intl/client';
+import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
 export function AnnotationPopover(props: { children: React.ReactNode; body: React.ReactNode }) {
@@ -20,7 +20,7 @@ export function AnnotationPopover(props: { children: React.ReactNode; body: Reac
                         'decoration-dotted',
                         'decoration-1',
                         'underline',
-                        'underline-offset-2',
+                        'underline-offset-2'
                     )}
                 >
                     {children}
@@ -43,7 +43,7 @@ export function AnnotationPopover(props: { children: React.ReactNode; body: Reac
                         '-outline-offset-2',
                         'outline-2',
                         'outline-primary/8',
-                        'z-20',
+                        'z-20'
                     )}
                     sideOffset={4}
                 >
@@ -56,7 +56,7 @@ export function AnnotationPopover(props: { children: React.ReactNode; body: Reac
                                 'z-[2]',
                                 'fill-tint-3', // Same as bg-tint
                                 'stroke-tint-7', // Same as ring-tint
-                                '[paint-order:stroke_fill]',
+                                '[paint-order:stroke_fill]'
                             )}
                             fill="none"
                             xmlns="http://www.w3.org/2000/svg"

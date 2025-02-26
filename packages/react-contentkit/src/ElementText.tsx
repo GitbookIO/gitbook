@@ -1,11 +1,11 @@
-import { ContentKitText } from '@gitbook/api';
-import React from 'react';
+import type { ContentKitText } from '@gitbook/api';
+import type React from 'react';
 
-import { ContentKitServerElementProps } from './types';
 import classNames from 'classnames';
+import type { ContentKitServerElementProps } from './types';
 
 export function ElementText(
-    props: React.PropsWithChildren<ContentKitServerElementProps<ContentKitText>>,
+    props: React.PropsWithChildren<ContentKitServerElementProps<ContentKitText>>
 ) {
     const { element, children } = props;
 
@@ -13,7 +13,7 @@ export function ElementText(
         <span
             className={classNames(
                 'contentkit-text',
-                element.style ? `contentkit-text-${element.style}` : null,
+                element.style ? `contentkit-text-${element.style}` : null
             )}
         >
             {children}

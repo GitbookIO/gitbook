@@ -18,7 +18,7 @@ export function TrackPageViewEvent(props: InsightsEventPageContext) {
             },
             {
                 pageId,
-            },
+            }
         );
     }, [pageId, trackEvent]);
 

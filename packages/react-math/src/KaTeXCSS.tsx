@@ -3,7 +3,7 @@
 /**
  * Dummy component to lazy load the KaTeX CSS.
  */
-export default function KaTeXCSS(props: {}) {
+export default function KaTeXCSS() {
     // Load the CSS as soon as possible (this is why we don't use an effect hook here)
     // We lazy load the CSS to avoidNext bundling it in the main bundle
     loadCSS();

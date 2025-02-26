@@ -1,36 +1,36 @@
 import {
-    CustomizationSettings,
-    Revision,
-    RevisionPageDocument,
-    RevisionPageGroup,
+    type CustomizationSettings,
+    type Revision,
+    type RevisionPageDocument,
+    type RevisionPageGroup,
     RevisionPageType,
-    SiteCustomizationSettings,
+    type SiteCustomizationSettings,
     SiteInsightsTrademarkPlacement,
-    Space,
+    type Space,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import { GitBookSpaceContext } from '@v2/lib/context';
+import type { GitBookSpaceContext } from '@v2/lib/context';
 import { getPageDocument } from '@v2/lib/data';
-import { GitBookSpaceLinker } from '@v2/lib/links';
-import { Metadata } from 'next';
+import type { GitBookSpaceLinker } from '@v2/lib/links';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import * as React from 'react';
 
 import { DocumentView } from '@/components/DocumentView';
 import { TrademarkLink } from '@/components/TableOfContents/Trademark';
-import { PolymorphicComponentProp } from '@/components/utils/types';
+import type { PolymorphicComponentProp } from '@/components/utils/types';
 import { getSpaceLanguage } from '@/intl/server';
 import { tString } from '@/intl/translate';
-import { getPagePDFContainerId, getAbsoluteHref } from '@/lib/links';
+import { getAbsoluteHref, getPagePDFContainerId } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
-import { PDFSearchParams, getPDFSearchParams } from '@/lib/urls';
+import { type PDFSearchParams, getPDFSearchParams } from '@/lib/urls';
 import { defaultCustomizationForSpace } from '@/lib/utils';
 
 import './pdf.css';
 import { PageControlButtons } from './PageControlButtons';
-import { getV1ContextForPDF } from './pointer';
 import { PrintButton } from './PrintButton';
+import { getV1ContextForPDF } from './pointer';
 
 const DEFAULT_LIMIT = 100;
 
@@ -57,7 +57,7 @@ export default async function PDFHTMLOutput(props: {
 
     // Build current PDF URL and preserve all search params
     let currentPDFUrl = await getAbsoluteHref('~gitbook/pdf', true);
-    currentPDFUrl += '?' + searchParams.toString();
+    currentPDFUrl += `?${searchParams.toString()}`;
 
     // Fetch the context
     const baseContext = await getV1ContextForPDF();
@@ -69,7 +69,7 @@ export default async function PDFHTMLOutput(props: {
     // Compute the pages to render
     const { pages, total } = selectPages(baseContext.pages, pdfParams);
     const pageIds = pages.map(
-        ({ page }) => [page.id, getPagePDFContainerId(page)] as [string, string],
+        ({ page }) => [page.id, getPagePDFContainerId(page)] as [string, string]
     );
 
     // Build a linker that create anchor links for the pages rendered in the PDF page.
@@ -77,15 +77,14 @@ export default async function PDFHTMLOutput(props: {
         ...baseContext.linker,
         toPathForPage(input) {
             if (pages.some((p) => p.page.id === input.page.id)) {
-                return '#' + getPagePDFContainerId(input.page, input.anchor);
-            } else {
-                if (input.page.type === RevisionPageType.Group) {
-                    return '#';
-                }
-
-                // Use an absolute URL to the page
-                return input.page.urls.app;
+                return `#${getPagePDFContainerId(input.page, input.anchor)}`;
             }
+            if (input.page.type === RevisionPageType.Group) {
+                return '#';
+            }
+
+            // Use an absolute URL to the page
+            return input.page.urls.app;
         },
     };
 
@@ -115,7 +114,7 @@ export default async function PDFHTMLOutput(props: {
                             'shadow-sm',
                             'hover:shadow-md',
                             'border-slate-300',
-                            'border',
+                            'border'
                         )}
                     >
                         <Icon icon="arrow-left" className={tcls('size-6')} />
@@ -140,7 +139,7 @@ export default async function PDFHTMLOutput(props: {
                         'shadow-sm',
                         'hover:shadow-md',
                         'border-slate-300',
-                        'border',
+                        'border'
                     )}
                 >
                     <Icon icon="print" className={tcls('size-6')} />
@@ -181,7 +180,7 @@ export default async function PDFHTMLOutput(props: {
                     >
                         <PDFPageDocument page={page} context={context} />
                     </React.Suspense>
-                ),
+                )
             )}
         </div>
     );
@@ -217,7 +216,7 @@ async function PDFPageGroup(props: { space: Space; page: RevisionPageGroup }) {
                     'flex',
                     'items-center',
                     'justify-center',
-                    'py-12',
+                    'py-12'
                 )}
             >
                 <h1 className={tcls('text-5xl', 'font-bold')}>{page.title}</h1>
@@ -266,7 +265,7 @@ function PrintPage(
         {
             isFirst?: boolean;
         }
-    >,
+    >
 ) {
     const { children, isFirst, className, ...rest } = props;
 
@@ -289,7 +288,7 @@ function PrintPage(
                 'min-h-[29.7cm]',
                 'print:min-h-0',
                 isFirst ? null : 'break-before-page',
-                'break-anywhere',
+                'break-anywhere'
             )}
         >
             {children}
@@ -304,11 +303,11 @@ type FlatPageEntry = { page: RevisionPageDocument | RevisionPageGroup; depth: nu
  */
 function selectPages(
     rootPages: Revision['pages'],
-    params: PDFSearchParams,
+    params: PDFSearchParams
 ): { pages: FlatPageEntry[]; total: number } {
     const flattenPage = (
         page: RevisionPageDocument | RevisionPageGroup,
-        depth: number,
+        depth: number
     ): FlatPageEntry[] => {
         return [
             { page, depth },

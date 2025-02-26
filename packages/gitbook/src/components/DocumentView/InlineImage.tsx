@@ -1,12 +1,12 @@
-import { DocumentInlineImage } from '@gitbook/api';
-import { GitBookBaseContext } from '@v2/lib/context';
+import type { DocumentInlineImage } from '@gitbook/api';
+import type { GitBookBaseContext } from '@v2/lib/context';
 import assertNever from 'assert-never';
 
-import { resolveContentRef, ResolvedContentRef } from '@/lib/references';
+import { type ResolvedContentRef, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
-import { InlineProps } from './Inline';
 import { Image } from '../utils';
+import type { InlineProps } from './Inline';
 
 export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
     const { inline, context, ancestorInlines } = props;
@@ -30,7 +30,7 @@ export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
         /* Ensure images dont expand to the size of the container where this Image may be nested in. Now it's always nested in a size-restricted container */
         <span
             className={tcls(
-                size !== 'line' ? ['inline-flex', 'max-w-[300px]', 'align-middle'] : null,
+                size !== 'line' ? ['inline-flex', 'max-w-[300px]', 'align-middle'] : null
             )}
         >
             <Image
@@ -62,7 +62,7 @@ export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
 async function getImageSizes(
     context: GitBookBaseContext | undefined,
     size: 'original' | 'line',
-    src: ResolvedContentRef,
+    src: ResolvedContentRef
 ) {
     switch (size) {
         case 'line': {

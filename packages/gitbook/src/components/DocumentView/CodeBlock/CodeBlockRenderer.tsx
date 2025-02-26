@@ -4,10 +4,10 @@ import { forwardRef, useId } from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
-import { CopyCodeButton } from './CopyCodeButton';
-import type { HighlightLine, HighlightToken } from './highlight';
 import { AnnotationPopover } from '../Annotation/AnnotationPopover';
 import type { BlockProps } from '../Block';
+import { CopyCodeButton } from './CopyCodeButton';
+import type { HighlightLine, HighlightToken } from './highlight';
 
 import './theme.css';
 import './CodeBlockRenderer.css';
@@ -21,7 +21,7 @@ type CodeBlockRendererProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'sty
  */
 export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
     props: CodeBlockRendererProps,
-    ref: React.ForwardedRef<HTMLDivElement>,
+    ref: React.ForwardedRef<HTMLDivElement>
 ) {
     const { block, style, lines } = props;
 
@@ -32,29 +32,29 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
 
     return (
         <div ref={ref} className={tcls('group/codeblock grid grid-flow-col', style)}>
-            <div className="flex items-center justify-start [grid-area:1/1] text-sm gap-2">
+            <div className="flex items-center justify-start gap-2 text-sm [grid-area:1/1]">
                 {title ? (
-                    <div className="text-xs tracking-wide text-tint leading-none inline-flex items-center justify-center bg-tint rounded-t straight-corners:rounded-t-s px-3 py-2">
+                    <div className="inline-flex items-center justify-center rounded-t straight-corners:rounded-t-s bg-tint px-3 py-2 text-tint text-xs leading-none tracking-wide">
                         {title}
                     </div>
                 ) : null}
             </div>
             <CopyCodeButton
                 codeId={id}
-                style="group-hover/codeblock:opacity-[1] transition-opacity duration-75 opacity-0 text-xs [grid-area:2/1] z-[2] justify-self-end backdrop-blur-md leading-none self-start ring-1 ring-tint text-tint bg-transparent rounded-md mr-2 mt-2 p-1 hover:ring-tint-hover"
+                style="z-[2] mt-2 mr-2 self-start justify-self-end rounded-md bg-transparent p-1 text-tint text-xs leading-none opacity-0 ring-1 ring-tint backdrop-blur-md transition-opacity duration-75 [grid-area:2/1] hover:ring-tint-hover group-hover/codeblock:opacity-[1]"
             />
             <pre
                 className={tcls(
-                    '[grid-area:2/1] relative overflow-auto bg-tint theme-gradient:bg-tint-12/1 ring-tint-subtle hide-scroll',
+                    'hide-scroll relative overflow-auto bg-tint theme-gradient:bg-tint-12/1 ring-tint-subtle [grid-area:2/1]',
                     'rounded-md straight-corners:rounded-sm',
-                    title && 'rounded-ss-none',
+                    title && 'rounded-ss-none'
                 )}
             >
                 <code
                     id={id}
                     className={tcls(
-                        'min-w-full inline-grid grid-cols-[auto_1fr] p-2 [count-reset:line]',
-                        withWrap && 'whitespace-pre-wrap',
+                        'inline-grid min-w-full grid-cols-[auto_1fr] p-2 [count-reset:line]',
+                        withWrap && 'whitespace-pre-wrap'
                     )}
                 >
                     {lines.map((line, index) => (

@@ -1,5 +1,6 @@
+import type React from 'react';
 import { ScalarApiButton } from './ScalarApiButton';
-import type { OpenAPIOperationData, OpenAPIContextProps } from './types';
+import type { OpenAPIContextProps, OpenAPIOperationData } from './types';
 
 /**
  * Display the path of an operation.
@@ -7,7 +8,7 @@ import type { OpenAPIOperationData, OpenAPIContextProps } from './types';
 export function OpenAPIPath(props: {
     data: OpenAPIOperationData;
     context: OpenAPIContextProps;
-}): JSX.Element {
+}) {
     const { data, context } = props;
     const { method, path } = data;
     const { specUrl } = context;
@@ -30,7 +31,7 @@ function formatPath(path: string) {
     // Matches placeholders like {id}, {userId}, etc.
     const regex = /\{(\w+)\}/g;
 
-    const parts: (string | JSX.Element)[] = [];
+    const parts: (string | React.JSX.Element)[] = [];
     let lastIndex = 0;
 
     // Replace placeholders with <em> tags
@@ -48,17 +49,17 @@ function formatPath(path: string) {
     const formattedPath = parts.reduce(
         (acc, part, index) => {
             if (typeof part === 'string' && index > 0 && part === '/') {
-                return [
-                    ...acc,
+                acc.push(
                     <span className="openapi-path-separator" key={`sep-${index}`}>
                         /
-                    </span>,
-                    part,
-                ];
+                    </span>
+                );
             }
-            return [...acc, part];
+
+            acc.push(part);
+            return acc;
         },
-        [] as (string | JSX.Element)[],
+        [] as (string | React.JSX.Element)[]
     );
 
     return <span>{formattedPath}</span>;

@@ -8,8 +8,6 @@ it('should have the GitBook custom icon', () => {
 
         if (process.env.CI) {
             throw new Error(message);
-        } else {
-            console.warn(message);
         }
     }
 });

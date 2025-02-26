@@ -1,8 +1,8 @@
 import type { OpenAPIV3_1 } from '@gitbook/openapi-parser';
-import type { OpenAPIClientContext, OpenAPIOperationData } from './types';
 import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
+import type { OpenAPIClientContext, OpenAPIOperationData } from './types';
 import { resolveDescription } from './utils';
 
 /**
@@ -65,7 +65,7 @@ function getLabelForType(security: OpenAPIV3_1.SecuritySchemeObject) {
                 return <OpenAPISchemaName propertyName="Authorization" type="string" required />;
             }
 
-            if (security.scheme == 'bearer') {
+            if (security.scheme === 'bearer') {
                 const description = resolveDescription(security);
                 return (
                     <>
@@ -73,7 +73,7 @@ function getLabelForType(security: OpenAPIV3_1.SecuritySchemeObject) {
                         {/** Show a default description if none is provided */}
                         {!description ? (
                             <Markdown
-                                source={`Bearer authentication header of the form Bearer ${`&lt;token&gt;`}.`}
+                                source={`Bearer authentication header of the form Bearer ${'&lt;token&gt;'}.`}
                                 className="openapi-securities-description"
                             />
                         ) : null}

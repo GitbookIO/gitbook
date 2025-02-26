@@ -1,10 +1,10 @@
+import { GitBookAPIError } from '@gitbook/api';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { GitBookAPIError } from '@gitbook/api';
 
 import { removeTrailingSlash } from '@/lib/paths';
-import { MiddlewareHeaders } from '@v2/lib/middleware';
 import { getPublishedContentByURL } from '@v2/lib/data';
+import { MiddlewareHeaders } from '@v2/lib/middleware';
 
 export const config = {
     matcher: ['/((?!_next/|_static/|_vercel|[\\w-]+\\.\\w+).*)'],
@@ -40,11 +40,10 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
                 {
                     error: result.error.message,
                 },
-                { status: result.error.code },
+                { status: result.error.code }
             );
-        } else {
-            throw result.error;
         }
+        throw result.error;
     }
 
     const { data } = result;
@@ -69,7 +68,7 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
         encodeURIComponent(removeTrailingSlash(data.pathname) || '/'),
     ].join('/');
 
-    return NextResponse.rewrite(new URL('/' + route, request.url), {
+    return NextResponse.rewrite(new URL(`/${route}`, request.url), {
         headers: requestHeaders,
     });
 }
@@ -102,7 +101,7 @@ function extractURL(request: NextRequest): URLWithMode | null {
 /**
  * Evaluate if a request is dynamic or static.
  */
-function getDynamicHeaders(request: NextRequest): null | Record<string, string> {
+function getDynamicHeaders(_request: NextRequest): null | Record<string, string> {
     // TODO:
     // - check token in query string
     // - check token in cookies

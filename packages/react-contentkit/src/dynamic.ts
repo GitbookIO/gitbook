@@ -1,4 +1,4 @@
-import { ContentKitDynamicBinding } from '@gitbook/api';
+import type { ContentKitDynamicBinding } from '@gitbook/api';
 
 /**
  * Get a value from the state.
@@ -21,7 +21,7 @@ export function getStateStringValue(state: object, key: string): string | undefi
  */
 export function resolveDynamicBinding<T extends {}>(
     state: object,
-    value: ContentKitDynamicBinding | T,
+    value: ContentKitDynamicBinding | T
 ): T {
     if (
         typeof value === 'string' ||
@@ -35,7 +35,7 @@ export function resolveDynamicBinding<T extends {}>(
 
     if (Array.isArray(value)) {
         // @ts-ignore
-        return value.map((v) => resolveDynamicBinding(localState, v));
+        return value.map((v) => resolveDynamicBinding(state, v));
     }
 
     if ('$state' in value && typeof value.$state === 'string') {

@@ -1,5 +1,5 @@
-import { RevisionPageDocument } from '@gitbook/api';
-import { GitBookDataFetcher } from './types';
+import type { RevisionPageDocument } from '@gitbook/api';
+import type { GitBookDataFetcher } from './types';
 
 /**
  * Get the document for a page.
@@ -7,11 +7,12 @@ import { GitBookDataFetcher } from './types';
 export async function getPageDocument(
     dataFetcher: GitBookDataFetcher,
     spaceId: string,
-    page: RevisionPageDocument,
+    page: RevisionPageDocument
 ) {
     if (page.documentId) {
         return dataFetcher.getDocument({ spaceId, documentId: page.documentId });
-    } else if (page.computed) {
+    }
+    if (page.computed) {
         return dataFetcher.getComputedDocument({ spaceId, source: page.computed });
     }
 

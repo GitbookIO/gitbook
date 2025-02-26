@@ -1,12 +1,12 @@
 import hash from 'object-hash';
 
-import { cacheBackends } from './backends';
-import { memoryCache } from './memory';
-import { CacheBackend, CacheEntry } from './types';
 import { captureException } from '../../sentry';
 import { race, singletonMap } from '../async';
-import { TraceSpan, trace } from '../tracing';
+import { type TraceSpan, trace } from '../tracing';
 import { waitUntil } from '../waitUntil';
+import { cacheBackends } from './backends';
+import { memoryCache } from './memory';
+import type { CacheBackend, CacheEntry } from './types';
 
 export type CacheFunctionOptions = {
     signal: AbortSignal | undefined;
@@ -74,7 +74,7 @@ export interface CacheDefinition<Args extends any[], Result> {
  * We don't use the next.js cache because it has a 2MB limit.
  */
 export function cache<Args extends any[], Result>(
-    cacheDef: CacheDefinition<Args, Result>,
+    cacheDef: CacheDefinition<Args, Result>
 ): CacheFunction<Args, Result> {
     // We stop everything after 10s to avoid pending requests
     const timeout = cacheDef.timeout ?? 1000 * 10;
@@ -85,7 +85,7 @@ export function cache<Args extends any[], Result>(
             return await trace(
                 {
                     name: key,
-                    operation: `cache.revalidate`,
+                    operation: 'cache.revalidate',
                 },
                 async (span) => {
                     // Fetch upstream
@@ -118,16 +118,16 @@ export function cache<Args extends any[], Result>(
                     }
 
                     return cacheEntry;
-                },
+                }
             );
-        },
+        }
     );
 
     const fetchValue = singletonMap(
         async (key: string, signal: AbortSignal | undefined, span: TraceSpan, ...args: Args) => {
             const timeStart = now();
             let readCacheDuration = 0;
-            let fetchDuration = 0;
+            let _fetchDuration = 0;
 
             let result: readonly [CacheEntry, string] | null = null;
             const tag = cacheDef.tag?.(...args);
@@ -156,8 +156,8 @@ export function cache<Args extends any[], Result>(
                         ) {
                             captureException(
                                 new Error(
-                                    `Cache entry ${key} from ${backendName} is an empty object`,
-                                ),
+                                    `Cache entry ${key} from ${backendName} is an empty object`
+                                )
                             );
                             return null;
                         }
@@ -177,13 +177,13 @@ export function cache<Args extends any[], Result>(
                             const upstream = await revalidate(key, fallbackOps.signal, ...args);
 
                             readCacheDuration = timeFetch - timeStart;
-                            fetchDuration = now() - timeFetch;
+                            _fetchDuration = now() - timeFetch;
                             return [upstream, 'fetch'] as const;
                         },
 
                         // If no entry is found in the cache backends, we fallback to the fetch
                         fallbackOnNull: true,
-                    },
+                    }
                 );
             }
 
@@ -211,23 +211,16 @@ export function cache<Args extends any[], Result>(
                         savedEntry,
                         cacheBackends.filter(
                             (backend) =>
-                                backend.name !== backendName && backend.replication === 'local',
-                        ),
-                    ),
+                                backend.name !== backendName && backend.replication === 'local'
+                        )
+                    )
                 );
             }
 
-            const totalDuration = now() - timeStart;
+            const _totalDuration = now() - timeStart;
 
             // Log
             if (process.env.SILENT !== 'true') {
-                console.log(
-                    `cache: ${key} ${cacheStatus}${
-                        cacheStatus === 'hit' ? ` on ${backendName}` : ''
-                    } in total ${totalDuration.toFixed(0)}ms, fetch in ${fetchDuration.toFixed(
-                        0,
-                    )}ms, read in ${readCacheDuration.toFixed(0)}ms`,
-                );
             }
 
             if (savedEntry.meta.revalidatesAt && savedEntry.meta.revalidatesAt < Date.now()) {
@@ -236,7 +229,7 @@ export function cache<Args extends any[], Result>(
             }
 
             return savedEntry.data;
-        },
+        }
     );
 
     // During development, for now it fetches data twice between the middleware and the handler.
@@ -251,12 +244,12 @@ export function cache<Args extends any[], Result>(
         return await trace(
             {
                 name: key,
-                operation: `cache.get`,
+                operation: 'cache.get',
             },
             async (span) => {
                 signal?.throwIfAborted();
                 return fetchValue(key, signal, span, ...args);
-            },
+            }
         );
     };
 
@@ -332,13 +325,13 @@ function hashValue(arg: any): string {
 async function setCacheEntry(entry: CacheEntry, backend: CacheBackend | CacheBackend[]) {
     return await trace(
         {
-            operation: `cache.setCacheEntry`,
+            operation: 'cache.setCacheEntry',
             name: entry.meta.key,
         },
         async () => {
             const backends = Array.isArray(backend) ? backend : [backend];
             await Promise.all(backends.map((backend) => backend.set(entry)));
-        },
+        }
     );
 }
 
@@ -358,7 +351,7 @@ function isCacheFunctionOptions(arg: any): arg is CacheFunctionOptions {
 }
 
 function extractCacheFunctionOptions<Args extends any[]>(
-    args: Args | [...Args, CacheFunctionOptions],
+    args: Args | [...Args, CacheFunctionOptions]
 ): [Args, CacheFunctionOptions] {
     const lastArg = args[args.length - 1];
     if (isCacheFunctionOptions(lastArg)) {

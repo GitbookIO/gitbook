@@ -1,10 +1,4 @@
-import {
-    DocumentBlock,
-    DocumentBlockCode,
-    DocumentBlockListItem,
-    DocumentBlocksEssentials,
-} from '@gitbook/api';
-import { assertNever } from 'assert-never';
+import type { DocumentBlock } from '@gitbook/api';
 
 /**
  * Get the line height of a block

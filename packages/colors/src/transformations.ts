@@ -1,4 +1,4 @@
-import { DARK_BASE, LIGHT_BASE, DEFAULT_TINT_COLOR } from './colors';
+import { DARK_BASE, DEFAULT_TINT_COLOR, LIGHT_BASE } from './colors';
 
 type ColorShades = {
     [key: string]: string;
@@ -178,7 +178,7 @@ export function colorScale(
         background = darkMode ? DARK_BASE : LIGHT_BASE,
         foreground = darkMode ? LIGHT_BASE : DARK_BASE,
         mix,
-    }: ColorScaleOptions = {},
+    }: ColorScaleOptions = {}
 ) {
     const baseColor = rgbToOklch(hexToRgbArray(hex));
     const mixColor = mix?.color ? rgbToOklch(hexToRgbArray(mix.color)) : null;
