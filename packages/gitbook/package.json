@@ -29,7 +29,7 @@
         "@radix-ui/react-checkbox": "^1.0.4",
         "@radix-ui/react-navigation-menu": "^1.2.3",
         "@radix-ui/react-popover": "^1.0.7",
-        "@sentry/nextjs": "8.35.0",
+        "@sentry/nextjs": "8.49.0",
         "@sindresorhus/fnv1a": "^3.1.0",
         "@tailwindcss/container-queries": "^0.1.1",
         "@tailwindcss/typography": "^0.5.16",
