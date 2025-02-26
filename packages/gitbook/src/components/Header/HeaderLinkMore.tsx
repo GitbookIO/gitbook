@@ -1,15 +1,13 @@
 import {
     CustomizationContentLink,
     CustomizationHeaderItem,
-    CustomizationHeaderPreset,
-    CustomizationSettings,
-    SiteCustomizationSettings,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
+import { GitBookSiteContext } from '@v2/lib/context';
 import React from 'react';
 
-import { ContentRefContext, resolveContentRef } from '@/lib/references';
+import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { Dropdown, DropdownChevron, DropdownMenu, DropdownMenuItem } from './Dropdown';
@@ -21,10 +19,9 @@ import styles from './headerLinks.module.css';
 export function HeaderLinkMore(props: {
     label: React.ReactNode;
     links: CustomizationHeaderItem[];
-    context: ContentRefContext;
-    customization: CustomizationSettings | SiteCustomizationSettings;
+    context: GitBookSiteContext;
 }) {
-    const { label, links, context, customization } = props;
+    const { label, links, context } = props;
 
     const renderButton = () => (
         <button
@@ -60,7 +57,7 @@ export function HeaderLinkMore(props: {
 }
 
 async function MoreMenuLink(props: {
-    context: ContentRefContext;
+    context: GitBookSiteContext;
     link: CustomizationHeaderItem | CustomizationContentLink;
 }) {
     const { context, link } = props;

@@ -236,6 +236,7 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
                 background: CustomizationSidebarBackgroundStyle.Default,
                 list: CustomizationSidebarListStyle.Default,
             },
+            links: CustomizationLinksStyle.Default,
         },
         internationalization: {
             locale: CustomizationLocale.En,

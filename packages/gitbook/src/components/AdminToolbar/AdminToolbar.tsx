@@ -1,9 +1,8 @@
-import { Space } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
+import { GitBookSiteContext } from '@v2/lib/context';
 import { headers } from 'next/headers';
 import React from 'react';
 
-import { getChangeRequest, getRevision, SiteContentPointer } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
 import { RefreshChangeRequestButton } from './RefreshChangeRequestButton';
@@ -11,8 +10,7 @@ import { Toolbar, ToolbarBody, ToolbarButton, ToolbarButtonGroups } from './Tool
 import { DateRelative } from '../primitives';
 
 interface AdminToolbarProps {
-    content: SiteContentPointer;
-    space: Space;
+    context: GitBookSiteContext;
 }
 
 function ToolbarLayout(props: { children: React.ReactNode }) {
@@ -48,7 +46,7 @@ function ToolbarLayout(props: { children: React.ReactNode }) {
  * Toolbar with information for the content admin when previewing a revision or change-request.
  */
 export async function AdminToolbar(props: AdminToolbarProps) {
-    const { content } = props;
+    const { context } = props;
     const mode = await headers().get('x-gitbook-mode');
 
     if (mode === 'multi-id') {
@@ -56,26 +54,20 @@ export async function AdminToolbar(props: AdminToolbarProps) {
         return null;
     }
 
-    if (content.changeRequestId) {
-        return (
-            <ChangeRequestToolbar
-                spaceId={content.spaceId}
-                changeRequestId={content.changeRequestId}
-            />
-        );
+    if (context.changeRequest) {
+        return <ChangeRequestToolbar context={context} />;
     }
 
-    if (content.revisionId) {
-        return <RevisionToolbar spaceId={content.spaceId} revisionId={content.revisionId} />;
+    if (context.revisionId !== context.space.revision) {
+        return <RevisionToolbar context={context} />;
     }
 
     return null;
 }
 
-async function ChangeRequestToolbar(props: { spaceId: string; changeRequestId: string }) {
-    const { spaceId, changeRequestId } = props;
-
-    const changeRequest = await getChangeRequest(spaceId, changeRequestId);
+async function ChangeRequestToolbar(props: { context: GitBookSiteContext }) {
+    const { context } = props;
+    const { space, changeRequest } = context;
 
     if (!changeRequest) {
         return null;
@@ -100,8 +92,8 @@ async function ChangeRequestToolbar(props: { spaceId: string; changeRequestId: s
                         <Icon icon="arrow-up-right-from-square" className="size-4" />
                     </ToolbarButton>
                     <RefreshChangeRequestButton
-                        spaceId={spaceId}
-                        changeRequestId={changeRequestId}
+                        spaceId={space.id}
+                        changeRequestId={changeRequest.id}
                         revisionId={changeRequest.revision}
                         updatedAt={new Date(changeRequest.updatedAt).getTime()}
                     />
@@ -111,10 +103,13 @@ async function ChangeRequestToolbar(props: { spaceId: string; changeRequestId: s
     );
 }
 
-async function RevisionToolbar(props: { spaceId: string; revisionId: string }) {
-    const { spaceId, revisionId } = props;
+async function RevisionToolbar(props: { context: GitBookSiteContext }) {
+    const { context } = props;
+    const { space, revisionId } = context;
 
-    const revision = await getRevision(spaceId, revisionId, {
+    const revision = await context.dataFetcher.getRevision({
+        spaceId: space.id,
+        revisionId,
         metadata: true,
     });
 

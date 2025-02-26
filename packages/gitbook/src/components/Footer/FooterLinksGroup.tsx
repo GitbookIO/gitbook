@@ -3,15 +3,16 @@ import {
     CustomizationFooterGroup,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
+import { GitBookAnyContext } from '@v2/lib/context';
 
-import { ContentRefContext, resolveContentRef } from '@/lib/references';
+import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { Link } from '../primitives';
 
 export function FooterLinksGroup(props: {
     group: CustomizationFooterGroup;
-    context: ContentRefContext;
+    context: GitBookAnyContext;
 }) {
     const { group, context } = props;
 
@@ -31,7 +32,7 @@ export function FooterLinksGroup(props: {
     );
 }
 
-async function FooterLink(props: { link: CustomizationContentLink; context: ContentRefContext }) {
+async function FooterLink(props: { link: CustomizationContentLink; context: GitBookAnyContext }) {
     const { link, context } = props;
     const resolved = await resolveContentRef(link.to, context);
 

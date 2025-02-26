@@ -17,8 +17,8 @@ export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
 
     ReactDOM.preload('https://cdn.iframe.ly/embed.js', { as: 'script', nonce });
 
-    const embed = await (context.content
-        ? getEmbedByUrlInSpace(context.content.spaceId, block.data.url)
+    const embed = await (context.contentContext?.space
+        ? getEmbedByUrlInSpace(context.contentContext.space.id, block.data.url)
         : getEmbedByUrl(block.data.url));
 
     return (

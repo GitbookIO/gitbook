@@ -1,5 +1,7 @@
 import { DocumentBlockDrawing } from '@gitbook/api';
 
+import { resolveContentRef } from '@/lib/references';
+
 import { BlockProps } from './Block';
 import { Caption } from './Caption';
 import { imageBlockSizes } from './Images';
@@ -8,7 +10,10 @@ import { Image } from '../utils';
 export async function Drawing(props: BlockProps<DocumentBlockDrawing>) {
     const { block, context } = props;
 
-    const resolved = block.data.ref ? await context.resolveContentRef(block.data.ref) : null;
+    const resolved =
+        block.data.ref && context.contentContext
+            ? await resolveContentRef(block.data.ref, context.contentContext)
+            : null;
     if (!resolved) {
         return null;
     }
@@ -22,6 +27,7 @@ export async function Drawing(props: BlockProps<DocumentBlockDrawing>) {
                         size: resolved.file?.dimensions,
                     },
                 }}
+                resize={context.contentContext?.imageResizer}
                 alt="Drawing"
                 sizes={imageBlockSizes}
                 zoom

@@ -1,15 +1,14 @@
 import {
     CustomizationContentLink,
-    CustomizationSettings,
     CustomizationHeaderPreset,
-    SiteCustomizationSettings,
     CustomizationHeaderItem,
     ContentRef,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
+import { GitBookSiteContext } from '@v2/lib/context';
 import assertNever from 'assert-never';
 
-import { ContentRefContext, resolveContentRef } from '@/lib/references';
+import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import {
@@ -22,11 +21,11 @@ import {
 import { Button, Link } from '../primitives';
 
 export async function HeaderLink(props: {
-    context: ContentRefContext;
+    context: GitBookSiteContext;
     link: CustomizationHeaderItem;
-    customization: CustomizationSettings | SiteCustomizationSettings;
 }) {
-    const { context, link, customization } = props;
+    const { context, link } = props;
+    const { customization } = context;
 
     const target = link.to ? await resolveContentRef(link.to, context) : null;
     const headerPreset = customization.header.preset;
@@ -219,7 +218,7 @@ function HeaderItemDropdown(
 }
 
 async function SubHeaderLink(props: {
-    context: ContentRefContext;
+    context: GitBookSiteContext;
     link: CustomizationContentLink;
 }) {
     const { context, link } = props;

@@ -12,6 +12,7 @@ import { StyledLink } from '@/components/primitives';
 import { Image } from '@/components/utils';
 import { getNodeFragmentByName } from '@/lib/document';
 import { getSimplifiedContentType } from '@/lib/files';
+import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { filterOutNullable } from '@/lib/typescript';
 
@@ -141,10 +142,15 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
         case 'files':
             const files = await Promise.all(
                 (value as string[]).map((fileId) =>
-                    context.resolveContentRef({
-                        kind: 'file',
-                        file: fileId,
-                    }),
+                    context.contentContext
+                        ? resolveContentRef(
+                              {
+                                  kind: 'file',
+                                  file: fileId,
+                              },
+                              context.contentContext,
+                          )
+                        : null,
                 ),
             );
 
@@ -181,6 +187,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                         style={['max-h-[1lh]', 'h-[1lh]']}
                                         alt={ref.text}
                                         sizes={[{ width: 24 }]}
+                                        resize={context.contentContext?.imageResizer}
                                         sources={{
                                             light: {
                                                 src: ref.href,
@@ -206,12 +213,13 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             );
         case 'content-ref': {
             const contentRef = value ? (value as ContentRef) : null;
-            const resolved = contentRef
-                ? await context.resolveContentRef(contentRef, {
-                      resolveAnchorText: true,
-                      iconStyle: ['mr-2', 'text-tint-subtle'],
-                  })
-                : null;
+            const resolved =
+                contentRef && context.contentContext
+                    ? await resolveContentRef(contentRef, context.contentContext, {
+                          resolveAnchorText: true,
+                          iconStyle: ['mr-2', 'text-tint-subtle'],
+                      })
+                    : null;
             return (
                 <Tag
                     className={tcls('text-base', 'text-balance', 'flex', 'items-center')}
@@ -246,7 +254,9 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                         kind: 'user',
                         user: userId,
                     };
-                    const resolved = await context.resolveContentRef(contentRef);
+                    const resolved = context.contentContext
+                        ? await resolveContentRef(contentRef, context.contentContext)
+                        : null;
                     if (!resolved) {
                         return null;
                     }

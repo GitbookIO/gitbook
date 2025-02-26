@@ -1,14 +1,5 @@
-import {
-    CustomizationHeaderPreset,
-    CustomizationSettings,
-    CustomizationSidebarBackgroundStyle,
-    Revision,
-    RevisionPageDocument,
-    RevisionPageGroup,
-    Site,
-    SiteCustomizationSettings,
-    Space,
-} from '@gitbook/api';
+import { CustomizationHeaderPreset, CustomizationSidebarBackgroundStyle } from '@gitbook/api';
+import { GitBookSiteContext } from '@v2/lib/context';
 import React from 'react';
 
 import { Footer } from '@/components/Footer';
@@ -18,55 +9,32 @@ import { SearchButton, SearchModal } from '@/components/Search';
 import { TableOfContents } from '@/components/TableOfContents';
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
-import { api, ContentTarget, type SectionsList, SiteContentPointer } from '@/lib/api';
-import { ContentRefContext } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
-import { shouldTrackEvents } from '@/lib/tracking';
-import { getCurrentVisitorToken } from '@/lib/visitor-token';
+import { getSitePointerFromContext } from '@/lib/v1';
 
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
 import { SiteSectionList } from '../SiteSections';
 
 /**
- * Render the entire content of the space (header, table of contents, footer, and page content).
+ * Render the entire layout of the space (header, table of contents, footer).
  */
-export async function SpaceLayout(props: {
-    content: SiteContentPointer;
-    contentTarget: ContentTarget;
-    space: Space;
-    site: Site | null;
-    sections: SectionsList | null;
-    spaces: Space[];
-    customization: CustomizationSettings | SiteCustomizationSettings;
-    pages: Revision['pages'];
-    ancestors: Array<RevisionPageDocument | RevisionPageGroup>;
+export function SpaceLayout(props: {
+    context: GitBookSiteContext;
+
+    /** Whether to enable tracking of events into site insights. */
+    withTracking: boolean;
+
+    /** The children of the layout. */
     children: React.ReactNode;
 }) {
-    const {
-        space,
-        contentTarget,
-        site,
-        sections,
-        spaces,
-        content,
-        pages,
-        customization,
-        ancestors,
-        children,
-    } = props;
+    const { context, withTracking, children } = props;
+    const { siteSpace, customization, site, sections, siteSpaces } = context;
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
-    const contentRefContext: ContentRefContext = {
-        siteContext: content,
-        space,
-        revisionId: contentTarget.revisionId,
-        pages,
-    };
-
     const withSections = Boolean(sections && sections.list.length > 0);
-    const withVariants = Boolean(site && spaces.length > 1);
+    const isMultiVariants = Boolean(siteSpaces.length > 1);
     const headerOffset = {
         sectionsHeader: withSections,
         topHeader: withTopHeader,
@@ -74,9 +42,6 @@ export async function SpaceLayout(props: {
             'sidebar' in customization.styling &&
             customization.styling.sidebar.background === CustomizationSidebarBackgroundStyle.Filled,
     };
-    const apiHost = (await api()).client.endpoint;
-    const visitorAuthToken = await getCurrentVisitorToken();
-    const enabled = await shouldTrackEvents();
 
     const withFooter =
         customization.themes.toggeable ||
@@ -86,20 +51,18 @@ export async function SpaceLayout(props: {
 
     return (
         <InsightsProvider
-            enabled={enabled}
-            apiHost={apiHost}
-            visitorAuthToken={visitorAuthToken}
-            {...content}
+            enabled={withTracking}
+            apiHost={context.dataFetcher.apiEndpoint}
+            visitorAuthToken={context.visitorAuthToken}
+            organizationId={context.organizationId}
+            siteId={context.site.id}
+            siteSectionId={context.sections?.current?.id ?? null}
+            siteSpaceId={context.siteSpace.id}
+            siteShareKey={context.shareKey ?? null}
+            revisionId={context.revisionId}
+            spaceId={context.space.id}
         >
-            <Header
-                withTopHeader={withTopHeader}
-                space={space}
-                site={site}
-                spaces={spaces}
-                sections={sections}
-                context={contentRefContext}
-                customization={customization}
-            />
+            <Header withTopHeader={withTopHeader} context={context} />
             <div
                 className={tcls(
                     'flex',
@@ -113,12 +76,7 @@ export async function SpaceLayout(props: {
                 )}
             >
                 <TableOfContents
-                    space={space}
-                    customization={customization}
-                    content={content}
-                    pages={pages}
-                    ancestors={ancestors}
-                    context={contentRefContext}
+                    context={context}
                     header={
                         withTopHeader ? null : (
                             <div
@@ -131,11 +89,7 @@ export async function SpaceLayout(props: {
                                     'dark:shadow-light/1',
                                 )}
                             >
-                                <HeaderLogo
-                                    site={site}
-                                    space={space}
-                                    customization={customization}
-                                />
+                                <HeaderLogo context={context} />
                             </div>
                         )
                     }
@@ -164,10 +118,10 @@ export async function SpaceLayout(props: {
                                     sections={sections}
                                 />
                             )}
-                            {withVariants && (
+                            {isMultiVariants && (
                                 <SpacesDropdown
-                                    space={space}
-                                    spaces={spaces}
+                                    siteSpace={siteSpace}
+                                    siteSpaces={siteSpaces}
                                     className={tcls('w-full')}
                                 />
                             )}
@@ -178,17 +132,15 @@ export async function SpaceLayout(props: {
                 <div className={tcls('flex-1', 'flex', 'flex-col')}>{children}</div>
             </div>
 
-            {withFooter ? (
-                <Footer space={space} context={contentRefContext} customization={customization} />
-            ) : null}
+            {withFooter ? <Footer context={context} /> : null}
 
             <React.Suspense fallback={null}>
                 <SearchModal
-                    revisionId={contentTarget.revisionId}
-                    spaceTitle={customization.title ?? space.title}
+                    revisionId={context.revisionId}
+                    spaceTitle={siteSpace.title}
                     withAsk={customization.aiSearch.enabled}
-                    isMultiVariants={Boolean(site && spaces.length > 1)}
-                    pointer={content}
+                    isMultiVariants={isMultiVariants}
+                    pointer={getSitePointerFromContext(context)}
                 />
             </React.Suspense>
         </InsightsProvider>

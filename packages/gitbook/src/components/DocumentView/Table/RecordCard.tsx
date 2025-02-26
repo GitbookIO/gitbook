@@ -3,6 +3,7 @@ import React from 'react';
 
 import { Link } from '@/components/primitives';
 import { Image } from '@/components/utils';
+import { resolveContentRef } from '@/lib/references';
 import { ClassValue, tcls } from '@/lib/tailwind';
 
 import { RecordColumnValue } from './RecordColumnValue';
@@ -19,14 +20,18 @@ export async function RecordCard(
     const coverFile = view.coverDefinition
         ? getRecordValue<string[]>(record[1], view.coverDefinition)?.[0]
         : null;
-    const cover = coverFile
-        ? await context.resolveContentRef({ kind: 'file', file: coverFile })
-        : null;
+    const cover =
+        coverFile && context.contentContext
+            ? await resolveContentRef({ kind: 'file', file: coverFile }, context.contentContext)
+            : null;
 
     const targetRef = view.targetDefinition
         ? (record[1].values[view.targetDefinition] as ContentRef)
         : null;
-    const target = targetRef ? await context.resolveContentRef(targetRef) : null;
+    const target =
+        targetRef && context.contentContext
+            ? await resolveContentRef(targetRef, context.contentContext)
+            : null;
 
     const coverIsSquareOrPortrait =
         cover?.file?.dimensions &&
@@ -77,6 +82,7 @@ export async function RecordCard(
                             width: view.cardSize === 'medium' ? 245 : 376,
                         },
                     ]}
+                    resize={context.contentContext?.imageResizer}
                     className={tcls(
                         'min-w-0',
                         'w-full',

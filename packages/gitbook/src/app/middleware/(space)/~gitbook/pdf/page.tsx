@@ -3,11 +3,15 @@ import {
     Revision,
     RevisionPageDocument,
     RevisionPageGroup,
+    RevisionPageType,
     SiteCustomizationSettings,
     SiteInsightsTrademarkPlacement,
     Space,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
+import { GitBookSpaceContext } from '@v2/lib/context';
+import { getPageDocument } from '@v2/lib/data';
+import { GitBookSpaceLinker } from '@v2/lib/links';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import * as React from 'react';
@@ -17,23 +21,15 @@ import { TrademarkLink } from '@/components/TableOfContents/Trademark';
 import { PolymorphicComponentProp } from '@/components/utils/types';
 import { getSpaceLanguage } from '@/intl/server';
 import { tString } from '@/intl/translate';
-import {
-    getDocument,
-    getSpace,
-    getSpaceCustomization,
-    getSpaceContentData,
-    getSiteData,
-    getPageDocument,
-} from '@/lib/api';
-import { getPagePDFContainerId, PageHrefContext, getAbsoluteHref } from '@/lib/links';
+import { getPagePDFContainerId, getAbsoluteHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
-import { ContentRefContext, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { PDFSearchParams, getPDFSearchParams } from '@/lib/urls';
+import { defaultCustomizationForSpace } from '@/lib/utils';
 
 import './pdf.css';
 import { PageControlButtons } from './PageControlButtons';
-import { getSiteOrSpacePointerForPDF } from './pointer';
+import { getV1ContextForPDF } from './pointer';
 import { PrintButton } from './PrintButton';
 
 const DEFAULT_LIMIT = 100;
@@ -42,14 +38,10 @@ export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
-    const pointer = await getSiteOrSpacePointerForPDF();
-    const [space, { customization }] = await Promise.all([
-        getSpace(pointer.spaceId, 'siteId' in pointer ? pointer.siteShareKey : undefined),
-        'siteId' in pointer ? getSiteData(pointer) : getSpaceCustomization(),
-    ]);
+    const context = await getV1ContextForPDF();
 
     return {
-        title: customization.title ?? space.title,
+        title: 'site' in context ? context.site.title : context.space.title,
         robots: 'noindex, nofollow',
     };
 }
@@ -60,8 +52,6 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PDFHTMLOutput(props: {
     searchParams: Promise<{ [key: string]: string }>;
 }) {
-    const pointer = await getSiteOrSpacePointerForPDF();
-
     const searchParams = new URLSearchParams(await props.searchParams);
     const pdfParams = getPDFSearchParams(new URLSearchParams(searchParams));
 
@@ -69,20 +59,39 @@ export default async function PDFHTMLOutput(props: {
     let currentPDFUrl = await getAbsoluteHref('~gitbook/pdf', true);
     currentPDFUrl += '?' + searchParams.toString();
 
-    // Load the content,
-    const [{ customization }, { space, contentTarget, pages: rootPages }] = await Promise.all([
-        'siteId' in pointer ? getSiteData(pointer) : getSpaceCustomization(),
-        getSpaceContentData(pointer, 'siteId' in pointer ? pointer.siteShareKey : undefined),
-    ]);
+    // Fetch the context
+    const baseContext = await getV1ContextForPDF();
+
+    const customization =
+        'customization' in baseContext ? baseContext.customization : defaultCustomizationForSpace();
     const language = getSpaceLanguage(customization);
 
     // Compute the pages to render
-    const { pages, total } = selectPages(rootPages, pdfParams);
+    const { pages, total } = selectPages(baseContext.pages, pdfParams);
     const pageIds = pages.map(
         ({ page }) => [page.id, getPagePDFContainerId(page)] as [string, string],
     );
-    const linksContext: PageHrefContext = {
-        pdf: pages.map(({ page }) => page.id),
+
+    // Build a linker that create anchor links for the pages rendered in the PDF page.
+    const linker: GitBookSpaceLinker = {
+        ...baseContext.linker,
+        toPathForPage(input) {
+            if (pages.some((p) => p.page.id === input.page.id)) {
+                return '#' + getPagePDFContainerId(input.page, input.anchor);
+            } else {
+                if (input.page.type === RevisionPageType.Group) {
+                    return '#';
+                }
+
+                // Use an absolute URL to the page
+                return input.page.urls.app;
+            }
+        },
+    };
+
+    const context: GitBookSpaceContext = {
+        ...baseContext,
+        linker,
     };
 
     return (
@@ -91,7 +100,7 @@ export default async function PDFHTMLOutput(props: {
                 <div className={tcls('fixed', 'left-12', 'top-12', 'print:hidden', 'z-50')}>
                     <a
                         title={tString(language, 'pdf_goback')}
-                        href={pdfParams.back ?? (await getAbsoluteHref(''))}
+                        href={pdfParams.back ?? context.linker.toAbsoluteURL('')}
                         className={tcls(
                             'flex',
                             'flex-row',
@@ -147,7 +156,7 @@ export default async function PDFHTMLOutput(props: {
                 trademark={
                     customization.trademark.enabled ? (
                         <TrademarkLink
-                            space={space}
+                            space={context.space}
                             customization={customization}
                             placement={SiteInsightsTrademarkPlacement.Pdf}
                         />
@@ -155,10 +164,12 @@ export default async function PDFHTMLOutput(props: {
                 }
             />
 
-            {pdfParams.only ? null : <PDFSpaceIntro space={space} customization={customization} />}
+            {pdfParams.only ? null : (
+                <PDFSpaceIntro space={context.space} customization={customization} />
+            )}
             {pages.map(({ page }) =>
                 page.type === 'group' ? (
-                    <PDFPageGroup key={page.id} space={space} page={page} />
+                    <PDFPageGroup key={page.id} space={context.space} page={page} />
                 ) : (
                     <React.Suspense
                         key={page.id}
@@ -168,18 +179,7 @@ export default async function PDFHTMLOutput(props: {
                             </PrintPage>
                         }
                     >
-                        <PDFPageDocument
-                            space={space}
-                            page={page}
-                            refContext={{
-                                siteContext: 'siteId' in pointer ? pointer : null,
-                                space,
-                                revisionId: contentTarget.revisionId,
-                                pages: rootPages,
-                                page,
-                                ...linksContext,
-                            }}
-                        />
+                        <PDFPageDocument page={page} context={context} />
                     </React.Suspense>
                 ),
             )}
@@ -227,12 +227,12 @@ async function PDFPageGroup(props: { space: Space; page: RevisionPageGroup }) {
 }
 
 async function PDFPageDocument(props: {
-    space: Space;
     page: RevisionPageDocument;
-    refContext: ContentRefContext;
+    context: GitBookSpaceContext;
 }) {
-    const { space, page, refContext } = props;
-    const document = await getPageDocument(space.id, page);
+    const { page, context } = props;
+    const { space } = context;
+    const document = await getPageDocument(context.dataFetcher, space.id, page);
 
     return (
         <PrintPage id={getPagePDFContainerId(page)}>
@@ -248,12 +248,10 @@ async function PDFPageDocument(props: {
                     blockStyle="max-w-full"
                     context={{
                         mode: 'print',
-                        content: {
-                            spaceId: space.id,
-                            revisionId: refContext.revisionId,
+                        contentContext: {
+                            ...context,
+                            page,
                         },
-                        contentRefContext: refContext,
-                        resolveContentRef: (ref) => resolveContentRef(ref, refContext),
                         getId: (id) => getPagePDFContainerId(page, id),
                     }}
                 />

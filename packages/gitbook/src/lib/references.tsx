@@ -1,39 +1,19 @@
-import {
-    ContentRef,
-    Revision,
-    RevisionFile,
-    RevisionPageDocument,
-    RevisionReusableContent,
-    SiteSpace,
-    Space,
-} from '@gitbook/api';
+import { ContentRef, RevisionFile, RevisionReusableContent, SiteSpace, Space } from '@gitbook/api';
 import type { Filesystem } from '@gitbook/openapi-parser';
+import { fetchSpaceContextByIds, type GitBookAnyContext } from '@v2/lib/context';
+import { getPageDocument } from '@v2/lib/data';
+import { createLinker } from '@v2/lib/links';
 import assertNever from 'assert-never';
 import React from 'react';
 
 import { PageIcon } from '@/components/PageIcon';
 
-import {
-    SiteContentPointer,
-    SpaceContentPointer,
-    getCollection,
-    getDocument,
-    getLatestOpenAPISpecVersionContent,
-    getPageDocument,
-    getPublishedContentSite,
-    getReusableContent,
-    getRevisionFile,
-    getSpace,
-    getSpaceContentData,
-    getUserById,
-    ignoreAPIError,
-    parseSpacesFromSiteSpaces,
-} from './api';
+import { ignoreAPIError } from './api';
 import { getBlockById, getBlockTitle } from './document';
-import { getGitbookAppHref, getPageHref, PageHrefContext } from './links';
-import { getPagePath, resolvePageId } from './pages';
+import { getGitbookAppHref } from './links';
+import { resolvePageId } from './pages';
+import { findSiteSpaceById } from './sites';
 import { ClassValue } from './tailwind';
-import { getSiteStructureSections } from './utils';
 
 export interface ResolvedContentRef {
     /** Text to render in the content ref */
@@ -56,38 +36,6 @@ export interface ResolvedContentRef {
     openAPIFilesystem?: Filesystem;
 }
 
-export interface ContentRefContext extends PageHrefContext {
-    /**
-     * Base URL to use to prepend to relative URLs.
-     */
-    baseUrl?: string;
-
-    /**
-     * Site in which we are resolving the content reference.
-     * If `null`, the site is not known (e.g. PDF generation in a private space).
-     */
-    siteContext: SiteContentPointer | null;
-    /**
-     * Space in which we are resolving the content reference.
-     */
-    space: Space;
-
-    /**
-     * Revision in which we are resolving the content reference.
-     */
-    revisionId: string;
-
-    /**
-     * Pages in the revision.
-     */
-    pages: Revision['pages'];
-
-    /**
-     * Page in which the content reference is being resolved.
-     */
-    page?: RevisionPageDocument;
-}
-
 export interface ResolveContentRefOptions {
     /**
      * Should the content ref be rendered as text.
@@ -106,11 +54,13 @@ export interface ResolveContentRefOptions {
  */
 export async function resolveContentRef(
     contentRef: ContentRef,
-    context: ContentRefContext,
+    context: GitBookAnyContext,
     options: ResolveContentRefOptions = {},
 ): Promise<ResolvedContentRef | null> {
     const { resolveAnchorText = false, iconStyle } = options;
-    const { siteContext, space, revisionId, pages, page: activePage, ...linksContext } = context;
+    const { linker, dataFetcher, space, revisionId, pages } = context;
+
+    const activePage = 'page' in context ? context.page : undefined;
 
     switch (contentRef.kind) {
         case 'url': {
@@ -122,7 +72,11 @@ export async function resolveContentRef(
         }
 
         case 'file': {
-            const file = await getRevisionFile(space.id, revisionId, contentRef.file);
+            const file = await dataFetcher.getRevisionFile({
+                spaceId: space.id,
+                revisionId,
+                fileId: contentRef.file,
+            });
             if (file) {
                 return {
                     href: file.downloadURL,
@@ -138,7 +92,7 @@ export async function resolveContentRef(
         case 'anchor':
         case 'page': {
             if (contentRef.space && contentRef.space !== space.id) {
-                return resolveContentRefInSpace(contentRef.space, siteContext, contentRef);
+                return resolveContentRefInSpace(contentRef.space, context, contentRef);
             }
 
             const resolvePageResult =
@@ -156,7 +110,6 @@ export async function resolveContentRef(
             let anchor = contentRef.kind === 'page' ? undefined : contentRef.anchor;
             const isCurrentPage = page.id === activePage?.id;
 
-            let href = '';
             let text = '';
             let icon: React.ReactNode | undefined = undefined;
             let emoji: string | undefined = undefined;
@@ -166,7 +119,7 @@ export async function resolveContentRef(
                 text = '#' + anchor;
 
                 if (resolveAnchorText) {
-                    const document = await getPageDocument(space.id, page);
+                    const document = await getPageDocument(dataFetcher, space.id, page);
                     if (document) {
                         const block = getBlockById(document, anchor);
                         if (block) {
@@ -186,21 +139,8 @@ export async function resolveContentRef(
                 icon = <PageIcon page={page} style={iconStyle} />;
             }
 
-            // Compute the href for the link
-            if (context.baseUrl) {
-                // Page in another content
-                href = new URL(getPagePath(pages, page), context.baseUrl).toString();
-
-                if (anchor) {
-                    href += '#' + anchor;
-                }
-            } else {
-                // Page in the current content
-                href = await getPageHref(pages, page, linksContext, anchor);
-            }
-
             return {
-                href,
+                href: linker.toPathForPage({ page, pages, anchor }),
                 text,
                 emoji,
                 icon,
@@ -210,9 +150,12 @@ export async function resolveContentRef(
 
         case 'space': {
             const targetSpace =
-                contentRef.space === space.id
-                    ? space
-                    : await getBestTargetSpace(contentRef.space, siteContext);
+                contentRef.space === context.space.id
+                    ? {
+                          space: context.space,
+                          siteSpace: 'siteSpace' in context ? context.siteSpace : null,
+                      }
+                    : await getBestTargetSpace(context, contentRef.space);
 
             if (!targetSpace) {
                 return {
@@ -223,14 +166,17 @@ export async function resolveContentRef(
             }
 
             return {
-                href: targetSpace.urls.published ?? targetSpace.urls.app,
-                text: targetSpace.title,
+                href:
+                    targetSpace.siteSpace?.urls.published ??
+                    targetSpace.space.urls.published ??
+                    targetSpace.space.urls.app,
+                text: targetSpace.siteSpace?.title ?? targetSpace.space.title,
                 active: contentRef.space === space.id,
             };
         }
 
         case 'user': {
-            const user = await getUserById(contentRef.user);
+            const user = await dataFetcher.getUserById(contentRef.user);
             if (user) {
                 return {
                     href: `mailto:${user.email}`,
@@ -243,28 +189,19 @@ export async function resolveContentRef(
         }
 
         case 'collection': {
-            const collection = await ignoreAPIError(getCollection(contentRef.collection));
-            if (!collection) {
-                return {
-                    href: getGitbookAppHref(`/s/${contentRef.collection}`),
-                    text: 'collection',
-                    active: false,
-                };
-            }
-
             return {
-                href: collection.urls.app,
-                text: collection.title,
+                href: getGitbookAppHref(`/home`),
+                text: 'collection',
                 active: false,
             };
         }
 
         case 'reusable-content': {
-            const reusableContent = await getReusableContent(
-                space.id,
+            const reusableContent = await dataFetcher.getReusableContent({
+                spaceId: space.id,
                 revisionId,
-                contentRef.reusableContent,
-            );
+                reusableContentId: contentRef.reusableContent,
+            });
             if (!reusableContent) {
                 return null;
             }
@@ -277,14 +214,10 @@ export async function resolveContentRef(
         }
 
         case 'openapi': {
-            if (!siteContext) {
-                return null;
-            }
-            const { organizationId } = siteContext;
-            const openAPISpecVersionContent = await getLatestOpenAPISpecVersionContent(
-                organizationId,
-                contentRef.spec,
-            );
+            const openAPISpecVersionContent = await dataFetcher.getLatestOpenAPISpecVersionContent({
+                organizationId: context.organizationId,
+                slug: contentRef.spec,
+            });
 
             if (!openAPISpecVersionContent) {
                 return null;
@@ -307,19 +240,24 @@ export async function resolveContentRef(
  * It will try to return the space in the site context if it exists to avoid cross-site links.
  */
 async function getBestTargetSpace(
+    context: GitBookAnyContext,
     spaceId: string,
-    siteContext: SiteContentPointer | null,
-): Promise<Space | undefined> {
+): Promise<{ space: Space; siteSpace: SiteSpace | null } | undefined> {
+    const { dataFetcher } = context;
+
     const [fetchedSpace, publishedContentSite] = await Promise.all([
         ignoreAPIError(
-            getSpace(spaceId, siteContext?.siteShareKey ? siteContext.siteShareKey : undefined),
+            dataFetcher.getSpace({
+                spaceId,
+                shareKey: context?.shareKey,
+            }),
         ),
-        siteContext
+        'site' in context
             ? ignoreAPIError(
-                  getPublishedContentSite({
-                      organizationId: siteContext.organizationId,
-                      siteId: siteContext.siteId,
-                      siteShareKey: siteContext.siteShareKey,
+                  dataFetcher.getPublishedContentSite({
+                      organizationId: context.organizationId,
+                      siteId: context.site.id,
+                      siteShareKey: context.shareKey,
                   }),
               )
             : null,
@@ -328,59 +266,51 @@ async function getBestTargetSpace(
     // In the context of sites, we try to find our target space in the site structure.
     // because the url of this space will be in the same site.
     if (publishedContentSite) {
-        const siteSpaces =
-            publishedContentSite.structure.type === 'siteSpaces'
-                ? publishedContentSite.structure.structure
-                : getSiteStructureSections(publishedContentSite.structure).reduce<SiteSpace[]>(
-                      (acc, section) => {
-                          acc.push(...section.siteSpaces);
-                          return acc;
-                      },
-                      [],
-                  );
-        const spaces = parseSpacesFromSiteSpaces(siteSpaces);
-        const foundSpace = spaces.find((space) => space.id === spaceId);
-        if (foundSpace) {
-            return foundSpace;
+        const siteSpace = findSiteSpaceById(publishedContentSite.structure, spaceId);
+        if (siteSpace) {
+            return { space: siteSpace.space, siteSpace };
         }
     }
 
     // Else we try return the fetched space from the API.
-    return fetchedSpace ?? undefined;
+    return fetchedSpace ? { space: fetchedSpace, siteSpace: null } : undefined;
 }
 
 async function resolveContentRefInSpace(
     spaceId: string,
-    siteContext: SiteContentPointer | null,
+    context: GitBookAnyContext,
     contentRef: ContentRef,
 ) {
-    const pointer: SpaceContentPointer = {
-        spaceId,
-    };
-
-    const [result, bestTargetSpace] = await Promise.all([
-        ignoreAPIError(getSpaceContentData(pointer, siteContext?.siteShareKey)),
-        getBestTargetSpace(spaceId, siteContext),
+    const [spaceContext, bestTargetSpace] = await Promise.all([
+        ignoreAPIError(
+            fetchSpaceContextByIds(context, {
+                space: spaceId,
+                shareKey: context?.shareKey,
+                changeRequest: undefined,
+                revision: undefined,
+            }),
+        ),
+        getBestTargetSpace(context, spaceId),
     ]);
-    if (!result) {
+    if (!spaceContext) {
         return null;
     }
 
-    const { pages } = result;
-    const space = bestTargetSpace ?? result.space;
+    const space = bestTargetSpace?.space ?? spaceContext.space;
 
-    // Base URL to use to prepend to relative URLs.
-    let baseUrl = space.urls.published ?? space.urls.app;
-    if (!baseUrl.endsWith('/')) {
-        baseUrl += '/';
-    }
+    // Resolve URLs relative to the space.
+    const baseURL = new URL(
+        bestTargetSpace?.siteSpace?.urls.published ?? space.urls.published ?? space.urls.app,
+    );
+    const linker = createLinker({
+        host: baseURL.host,
+        pathname: baseURL.pathname,
+    });
 
     const resolved = await resolveContentRef(contentRef, {
-        siteContext,
+        ...spaceContext,
         space,
-        revisionId: space.revision,
-        pages,
-        baseUrl,
+        linker,
     });
 
     if (!resolved) {

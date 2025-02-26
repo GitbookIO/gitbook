@@ -6,17 +6,24 @@
         "next": "canary",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
-        "@gitbook/api": "^0.93.0"
+        "@gitbook/api": "^0.96.0",
+        "@sindresorhus/fnv1a": "^3.1.0",
+        "server-only": "^0.0.1"
     },
     "devDependencies": {
-        "@opennextjs/cloudflare": "^0.4.3"
+        "gitbook": "*",
+        "@opennextjs/cloudflare": "^0.5.3",
+        "tailwindcss": "^3.4.0",
+        "postcss": "^8"
     },
     "scripts": {
-        "dev:v2": "next",
+        "generate": "rm -rf ./public && cp -r ../gitbook/public ./public",
+        "dev:v2": "env-cmd --silent -f ../../.env.local next",
         "build": "next build",
         "build:v2": "next build",
         "start": "next start",
         "build:v2:cloudflare": "opennextjs-cloudflare",
-        "dev:v2:cloudflare": "wrangler dev --port 8771"
+        "dev:v2:cloudflare": "wrangler dev --port 8771",
+        "unit": "bun test"
     }
 }
