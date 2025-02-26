@@ -1,5 +1,17 @@
 # @gitbook/openapi-parser
 
+## 2.0.0
+
+### Major Changes
+
+-   e24206e: Use Scalar parser to upgrade OpenAPI spec v2
+
+### Patch Changes
+
+-   c808bb1: Fallback to untrusted validation in case JSON spec is invalid
+-   a054554: Implement a trusted mode to speed up OpenAPI spec validation
+-   da55fac: Render GitBook blocks in OpenAPI operation description
+
 ## 1.0.1
 
 ### Patch Changes
