@@ -36,7 +36,63 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true
+			"recommended": true,
+			"performance": {
+                "noDelete": "warn"
+            },
+			"complexity": {
+                "noForEach": "off",
+                "noUselessFragments": "warn"
+            },
+			"correctness": {
+                "noUndeclaredVariables": "error",
+                "noUnusedVariables": "error",
+                "useArrayLiterals": "error",
+                "useHookAtTopLevel": "error",
+                "noUnusedImports": "error",
+                "noVoidElementsWithChildren": "warn",
+                "useJsxKeyInIterable": "warn",
+                "useExhaustiveDependencies": "warn"
+            },
+            "style": {
+                "noNonNullAssertion": "warn",
+                "noParameterAssign": "off",
+                "useThrowOnlyError": "error"
+            },
+            "suspicious": {
+                "noConsole": "error",
+                "noExplicitAny": "warn",
+                "noImplicitAnyLet": "warn",
+                "noConfusingVoidType": "warn",
+                "noControlCharactersInRegex": "warn",
+                "noPrototypeBuiltins": "warn",
+                "noAssignInExpressions": "warn",
+                "noArrayIndexKey": "warn"
+            },
+            "a11y": {
+                "useSemanticElements": "warn",
+                "useKeyWithClickEvents": "warn",
+                "noSvgWithoutTitle": "warn",
+                "useButtonType": "warn",
+                "useIframeTitle": "warn",
+                "useAltText": "warn",
+                "noPositiveTabindex": "warn",
+                "useFocusableInteractive": "warn",
+                "useAriaPropsForRole": "warn",
+                "useValidAnchor": "warn",
+                "noLabelWithoutControl": "warn",
+                "noNoninteractiveTabindex": "warn"
+            },
+            "nursery": {
+                "useSortedClasses": {
+                    "level": "error",
+                    "fix": "safe",
+                    "options": {
+                        "attributes": ["class", "className", "style"],
+                        "functions": ["clsx", "tw"]
+                    }
+                }
+            }
 		}
 	},
 	"javascript": {
