@@ -125,7 +125,6 @@ export function Ad({
 function AdSponsoredLink(props: { spaceId: string }) {
     const { spaceId } = props;
     const language = useLanguage();
-    const _trackEvent = useTrackEvent();
 
     const viaUrl = new URL('https://www.gitbook.com');
     viaUrl.searchParams.set('utm_source', 'content');

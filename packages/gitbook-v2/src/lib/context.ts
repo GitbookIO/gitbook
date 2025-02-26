@@ -211,7 +211,13 @@ export async function fetchSiteContextByIds(
             if (siteSpaceSettings) {
                 return siteSpaceSettings;
             }
+
+            // We got the pointer from an API and customizations from another.
+            // It's possible that the two are unsynced leading to not found customizations for the space.
+            // It's better to fallback on customization of the site that displaying an error.
+            console.warn('Customization not found for site space', ids.siteSpace);
         }
+
         return customizations.site;
     })();
 

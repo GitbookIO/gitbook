@@ -52,7 +52,10 @@ export function useToggleAnimation({
             else {
                 animate(selector, { opacity: 0 });
             }
-        } catch (_error) {}
+        } catch (error) {
+            // The selector can crash in some browsers, we ignore it as the animation is not critical.
+            console.error(error);
+        }
     }, [isVisible, isMounted, hasDescendants, animate, scope]);
 
     return { show, hide, scope };

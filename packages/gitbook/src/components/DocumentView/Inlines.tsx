@@ -26,7 +26,7 @@ export function Inlines<T extends DocumentInline | DocumentText>(
 
     return (
         <>
-            {nodes.map((node, _index) => {
+            {nodes.map((node) => {
                 if (node.object === 'text') {
                     return <Text key={node.key} text={node} />;
                 }

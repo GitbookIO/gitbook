@@ -36,18 +36,26 @@ export function ClientCodeBlock(props: ClientBlockProps) {
     // Highlight the block when it's in the viewport.
     useEffect(() => {
         if (hasBeenInViewport) {
-            let _canceled = false;
+            let canceled = false;
             import('./highlight').then(({ highlight }) => {
                 // We use requestIdleCallback to avoid blocking the main thread
                 // when scrolling.
                 if (typeof requestIdleCallback === 'function') {
-                    requestIdleCallback(() => highlight(block, inlines).then(setLines));
+                    requestIdleCallback(() => highlight(block, inlines).then(result => {
+                        if (!canceled) {
+                            setLines(result);
+                        }
+                    }));
                 } else {
-                    highlight(block, inlines).then(setLines);
+                    highlight(block, inlines).then((result) => {
+                        if (!canceled) {
+                            setLines(result);
+                        }
+                    });
                 }
             });
             return () => {
-                _canceled = true;
+                canceled = true;
             };
         }
     }, [hasBeenInViewport, block, inlines]);

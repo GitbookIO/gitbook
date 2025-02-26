@@ -1,5 +1,5 @@
-import { DurableObject } from 'cloudflare:workers';
 import { decode, encode } from '@msgpack/msgpack';
+import { DurableObject } from 'cloudflare:workers';
 import { LRUMap } from 'lru_map';
 
 export interface CacheObjectDescriptor {
@@ -210,10 +210,10 @@ export class CacheObject extends DurableObject {
      * Time and log an operation.
      */
     async logOperation<T>(
-        _log: Record<string, unknown>,
+        log: Record<string, unknown>,
         fn: (update: (log: Record<string, unknown>) => void) => Promise<T>
     ): Promise<T> {
-        const _objectId = this.ctx.id.name ?? this.ctx.id.toString();
+        const objectId = this.ctx.id.name ?? this.ctx.id.toString();
         const update: Record<string, unknown> = {};
         const start = performance.now();
         try {
@@ -221,7 +221,8 @@ export class CacheObject extends DurableObject {
                 Object.assign(update, arg);
             });
         } finally {
-            const _duration = performance.now() - start;
+            const duration = performance.now() - start;
+            console.log({ ...log, ...update, objectId, duration });
         }
     }
 }

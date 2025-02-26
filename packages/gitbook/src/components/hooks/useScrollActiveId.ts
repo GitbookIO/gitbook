@@ -61,7 +61,9 @@ export function useScrollActiveId(
                 if (element) {
                     observer.observe(element);
                 }
-            } catch (_error) {}
+            } catch (error) {
+                console.error('Failed to observe section', error);
+            }
         });
 
         return () => {

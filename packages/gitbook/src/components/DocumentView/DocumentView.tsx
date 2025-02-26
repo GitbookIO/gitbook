@@ -74,7 +74,7 @@ export function DocumentViewSkeleton(props: { document: JSONDocument; blockStyle
 
     return (
         <div className="flex flex-col gap-4">
-            {document.nodes.map((block, _index) => (
+            {document.nodes.map((block) => (
                 <BlockSkeleton
                     key={block.key!}
                     block={block}

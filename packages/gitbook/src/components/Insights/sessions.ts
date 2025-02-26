@@ -39,7 +39,9 @@ export function getSession(): Session {
             touchSession();
             return currentSession;
         }
-    } catch (_error) {}
+    } catch (error) {
+        console.error('Error parsing session', error);
+    }
 
     currentSession = {
         id: generateRandomId(),
