@@ -1,4 +1,21 @@
 /**
+ * Main host on which GitBook is running.
+ */
+export const GITBOOK_URL =
+    process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
+        : ((process.env.NEXT_PUBLIC_VERCEL_URL
+              ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+              : undefined) ??
+          process.env.NEXT_PUBLIC_GITBOOK_URL ??
+          '');
+
+/**
+ * GitBook app URL.
+ */
+export const GITBOOK_APP_URL = process.env.NEXT_PUBLIC_GITBOOK_APP_URL ?? `https://app.gitbook.com`;
+
+/**
  * Default GitBook API URL endpoint.
  */
 export const GITBOOK_API_URL = process.env.GITBOOK_API_URL ?? 'https://api.gitbook.com';

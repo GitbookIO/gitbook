@@ -1,6 +1,6 @@
 import { fetchSiteContextByURL } from '@v2/lib/context';
 import { createDataFetcher } from '@v2/lib/data';
-import { GITBOOK_API_TOKEN, GITBOOK_API_URL } from '@v2/lib/env';
+import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_URL } from '@v2/lib/env';
 import { createNoopImageResizer } from '@v2/lib/images';
 import { createLinker } from '@v2/lib/links';
 import { headers } from 'next/headers';
@@ -93,8 +93,10 @@ function createLinkerFromParams(params: RouteLayoutParams) {
         });
     }
 
+    const gitbookURL = new URL(GITBOOK_URL);
     return createLinker({
-        host: '',
+        protocol: gitbookURL.protocol,
+        host: gitbookURL.host,
         pathname: `/url/${url.host}${url.pathname}`,
     });
 }

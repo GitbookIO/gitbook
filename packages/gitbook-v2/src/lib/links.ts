@@ -31,6 +31,7 @@ export interface GitBookSpaceLinker {
 export function createLinker(
     /** Where the top of the space is served on */
     servedOn: {
+        protocol?: string;
         host: string;
         pathname: string;
     },
@@ -45,7 +46,7 @@ export function createLinker(
         },
 
         toAbsoluteURL(absolutePath: string): string {
-            return `https://${joinPaths(servedOn.host, absolutePath)}`;
+            return `${servedOn.protocol ?? 'https'}://${joinPaths(servedOn.host, absolutePath)}`;
         },
 
         toPathForPage({ pages, page, anchor }) {
