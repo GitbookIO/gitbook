@@ -23,6 +23,11 @@ export interface GitBookSpaceLinker {
      * Generate an absolute URL for a given path.
      */
     toAbsoluteURL(absolutePath: string): string;
+
+    /**
+     * Generate a link (URL or path) for a GitBook content URL (url of another site)
+     */
+    toLinkForContent(url: string): string;
 }
 
 /**
@@ -52,6 +57,10 @@ export function createLinker(
         toPathForPage({ pages, page, anchor }) {
             return linker.toPathInSpace(getPagePath(pages, page)) + (anchor ? `#${anchor}` : '');
         },
+
+        toLinkForContent(url: string): string {
+            return url;
+        },
     };
 
     return linker;
@@ -78,6 +87,10 @@ export function appendPrefixToLinker(
                 linkerWithPrefix.toPathInSpace(getPagePath(pages, page)) +
                 (anchor ? `#${anchor}` : '')
             );
+        },
+
+        toLinkForContent(url: string): string {
+            return linker.toLinkForContent(url);
         },
     };
 

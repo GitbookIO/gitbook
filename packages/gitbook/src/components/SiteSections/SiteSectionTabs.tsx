@@ -6,17 +6,17 @@ import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import React from 'react';
 
 import { Link } from '@/components/primitives';
-import type { SectionsList } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
 import { SectionIcon } from './SectionIcon';
+import type { ClientSiteSection, ClientSiteSections } from './encodeClientSiteSections';
 
 const VIEWPORT_ITEM_WIDTH = 240; /* width of the tile (w-60) */
 const MIN_ITEMS_FOR_COLS = 4; /* number of items to switch to 2 columns */
 /**
  * A set of navigational links representing site sections for multi-section sites
  */
-export function SiteSectionTabs(props: { sections: SectionsList }) {
+export function SiteSectionTabs(props: { sections: ClientSiteSections }) {
     const {
         sections: { list: sectionsAndGroups, current: currentSection },
     } = props;
@@ -102,7 +102,7 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
                                 ) : (
                                     <NavigationMenu.Link asChild>
                                         <SectionTab
-                                            url={sectionOrGroup.urls.published ?? ''}
+                                            url={sectionOrGroup.url}
                                             isActive={isActive}
                                             title={title}
                                             icon={icon ? (icon as IconName) : undefined}
@@ -213,7 +213,10 @@ function ActiveTabIndicator() {
 /**
  * A list of section tiles grouped in the dropdown for a section group
  */
-function SectionGroupTileList(props: { sections: SiteSection[]; currentSection: SiteSection }) {
+function SectionGroupTileList(props: {
+    sections: ClientSiteSection[];
+    currentSection: ClientSiteSection;
+}) {
     const { sections, currentSection } = props;
     return (
         <ul
@@ -236,13 +239,13 @@ function SectionGroupTileList(props: { sections: SiteSection[]; currentSection: 
 /**
  * A section tile shown in the dropdown for a section group
  */
-function SectionGroupTile(props: { section: SiteSection; isActive: boolean }) {
+function SectionGroupTile(props: { section: ClientSiteSection; isActive: boolean }) {
     const { section, isActive } = props;
-    const { urls, icon, title } = section;
+    const { url, icon, title } = section;
     return (
         <li className="flex w-full md:w-60">
             <Link
-                href={urls.published ?? ''}
+                href={url}
                 className={tcls(
                     'flex min-h-12 w-full select-none flex-col gap-2 rounded p-3 transition-colors hover:bg-tint-hover',
                     isActive

@@ -14,7 +14,7 @@ import { getSitePointerFromContext } from '@/lib/v1';
 
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
-import { SiteSectionList } from '../SiteSections';
+import { SiteSectionList, encodeClientSiteSections } from '../SiteSections';
 
 /**
  * Render the entire layout of the space (header, table of contents, footer).
@@ -108,7 +108,7 @@ export function SpaceLayout(props: {
                             {!withTopHeader && withSections && sections && (
                                 <SiteSectionList
                                     className={tcls('hidden', 'lg:block')}
-                                    sections={sections}
+                                    sections={encodeClientSiteSections(context, sections)}
                                 />
                             )}
                             {isMultiVariants && (
