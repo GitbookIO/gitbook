@@ -13,7 +13,7 @@
         "moduleResolution": "bundler",
         "resolveJsonModule": true,
         "isolatedModules": true,
-        "jsx": "react",
+        "jsx": "react-jsx",
         "incremental": true
     },
     "include": ["src/**/*.ts", "src/**/*.tsx"],
