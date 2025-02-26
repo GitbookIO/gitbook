@@ -7,7 +7,6 @@ import React from 'react';
 
 import { PageAside } from '@/components/PageAside';
 import { PageBody, PageCover } from '@/components/PageBody';
-import { getAbsoluteHref } from '@/lib/links';
 import { getPagePath, resolveFirstDocument } from '@/lib/pages';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 
@@ -124,23 +123,25 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
     }
 
     const { page, ancestors } = pageTarget;
-    const { site, customization, pages } = context;
+    const { site, customization, pages, linker } = context;
 
     return {
         title: [page.title, site.title].filter(Boolean).join(' | '),
         description: page.description ?? '',
         alternates: {
             // Trim trailing slashes in canonical URL to match the redirect behavior
-            canonical: (await getAbsoluteHref(getPagePath(pages, page), true)).replace(/\/+$/, ''),
+            canonical: linker
+                .toAbsoluteURL(linker.toPathForPage({ pages, page }))
+                .replace(/\/+$/, ''),
         },
         openGraph: {
             images: [
                 customization.socialPreview.url ??
-                    (await getAbsoluteHref(`~gitbook/ogimage/${page.id}`, true)),
+                    linker.toAbsoluteURL(linker.toPathInSpace(`~gitbook/ogimage/${page.id}`)),
             ],
         },
         robots:
-            (await isSiteIndexable(site)) && isPageIndexable(ancestors, page)
+            (await isSiteIndexable(context)) && isPageIndexable(ancestors, page)
                 ? 'index, follow'
                 : 'noindex, nofollow',
     };

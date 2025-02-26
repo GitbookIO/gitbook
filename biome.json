@@ -58,7 +58,8 @@
                 "noUnusedImports": "error",
                 "noVoidElementsWithChildren": "warn",
                 "useJsxKeyInIterable": "warn",
-                "useExhaustiveDependencies": "warn"
+                "useExhaustiveDependencies": "warn",
+                "noUnknownFunction": "warn"
             },
             "style": {
                 "noNonNullAssertion": "warn",

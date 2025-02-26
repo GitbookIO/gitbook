@@ -1,61 +1,25 @@
-import type { RevisionPage, RevisionPageDocument } from '@gitbook/api';
+import type { RevisionPageDocument } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import { Fragment } from 'react';
 
-import { getPageHref } from '@/lib/links';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
+import type { GitBookSiteContext } from '@v2/lib/context';
 
 import { PageIcon } from '../PageIcon';
 import { StyledLink } from '../primitives';
 
 export async function PageHeader(props: {
+    context: GitBookSiteContext;
     page: RevisionPageDocument;
     ancestors: AncestorRevisionPage[];
-    pages: RevisionPage[];
 }) {
-    const { page, ancestors, pages } = props;
+    const { context, page, ancestors } = props;
+    const { pages, linker } = context;
 
     if (!page.layout.title && !page.layout.description) {
         return null;
     }
-
-    const ancestorElements = await Promise.all(
-        ancestors.map(async (breadcrumb, index) => {
-            const href = await getPageHref(pages, breadcrumb);
-            return (
-                <Fragment key={breadcrumb.id}>
-                    <li key={breadcrumb.id}>
-                        <StyledLink
-                            href={href}
-                            style={tcls(
-                                'no-underline',
-                                'hover:underline',
-                                'text-xs',
-                                'tracking-wide',
-                                'font-semibold',
-                                'uppercase',
-                                'flex',
-                                'items-center',
-                                'gap-1.5',
-                                'contrast-more:underline',
-                                'contrast-more:decoration-current'
-                            )}
-                        >
-                            <PageIcon
-                                page={breadcrumb}
-                                style="flex size-4 items-center justify-center text-base leading-none"
-                            />
-                            {breadcrumb.title}
-                        </StyledLink>
-                    </li>
-                    {index !== ancestors.length - 1 && (
-                        <Icon icon="chevron-right" className={tcls('size-3', 'text-tint-subtle')} />
-                    )}
-                </Fragment>
-            );
-        })
-    );
 
     return (
         <header
@@ -64,7 +28,43 @@ export async function PageHeader(props: {
             {ancestors.length > 0 && (
                 <nav>
                     <ol className={tcls('flex', 'flex-wrap', 'items-center', 'gap-2')}>
-                        {ancestorElements}
+                        {ancestors.map((breadcrumb, index) => {
+                            const href = linker.toPathForPage({ pages, page: breadcrumb });
+                            return (
+                                <Fragment key={breadcrumb.id}>
+                                    <li key={breadcrumb.id}>
+                                        <StyledLink
+                                            href={href}
+                                            style={tcls(
+                                                'no-underline',
+                                                'hover:underline',
+                                                'text-xs',
+                                                'tracking-wide',
+                                                'font-semibold',
+                                                'uppercase',
+                                                'flex',
+                                                'items-center',
+                                                'gap-1.5',
+                                                'contrast-more:underline',
+                                                'contrast-more:decoration-current'
+                                            )}
+                                        >
+                                            <PageIcon
+                                                page={breadcrumb}
+                                                style="flex size-4 items-center justify-center text-base leading-none"
+                                            />
+                                            {breadcrumb.title}
+                                        </StyledLink>
+                                    </li>
+                                    {index !== ancestors.length - 1 && (
+                                        <Icon
+                                            icon="chevron-right"
+                                            className={tcls('size-3', 'text-tint-subtle')}
+                                        />
+                                    )}
+                                </Fragment>
+                            );
+                        })}
                     </ol>
                 </nav>
             )}

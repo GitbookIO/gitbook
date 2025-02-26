@@ -12,7 +12,6 @@ import urlJoin from 'url-join';
 
 import { getSpaceLanguage, t } from '@/intl/server';
 import { getDocumentSections } from '@/lib/document-sections';
-import { getAbsoluteHref } from '@/lib/links';
 import { tcls } from '@/lib/tailwind';
 import { getPDFUrlSearchParams } from '@/lib/urls';
 
@@ -24,7 +23,7 @@ import { ScrollSectionsList } from './ScrollSectionsList';
 /**
  * Aside listing the headings in the document.
  */
-export async function PageAside(props: {
+export function PageAside(props: {
     page: RevisionPageDocument;
     document: JSONDocument | null;
     context: GitBookSiteContext;
@@ -36,7 +35,7 @@ export async function PageAside(props: {
     const { customization, site, space } = context;
     const language = getSpaceLanguage(customization);
 
-    const pdfHref = await getAbsoluteHref(
+    const pdfHref = context.linker.toPathInSpace(
         `~gitbook/pdf?${getPDFUrlSearchParams({
             page: page.id,
             only: true,

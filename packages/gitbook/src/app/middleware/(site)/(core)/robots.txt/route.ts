@@ -1,9 +1,8 @@
 import type { NextRequest } from 'next/server';
 
-import { getSite } from '@/lib/api';
-import { getAbsoluteHref } from '@/lib/links';
 import { getSiteContentPointer } from '@/lib/pointer';
 import { isSiteIndexable } from '@/lib/seo';
+import { fetchV1ContextForSitePointer } from '@/lib/v1';
 
 export const runtime = 'edge';
 
@@ -12,13 +11,14 @@ export const runtime = 'edge';
  */
 export async function GET(_req: NextRequest) {
     const pointer = await getSiteContentPointer();
-    const site = await getSite(pointer.organizationId, pointer.siteId);
+    const context = await fetchV1ContextForSitePointer(pointer);
+    const { linker } = context;
 
     const lines = [
         'User-agent: *',
         'Disallow: /~gitbook/',
-        ...((await isSiteIndexable(site))
-            ? ['Allow: /', `Sitemap: ${await getAbsoluteHref('/sitemap.xml', true)}`]
+        ...((await isSiteIndexable(context))
+            ? ['Allow: /', `Sitemap: ${linker.toAbsoluteURL(linker.toPathInSpace('/sitemap.xml'))}`]
             : ['Disallow: /']),
     ];
     const content = lines.join('\n');
