@@ -22,7 +22,7 @@ export function getContentTestURL(input: string, baseUrl: string = getTargetURL(
     const url = new URL(baseUrl);
     const contentUrl = new URL(input);
 
-    url.pathname = `${contentUrl.host}${contentUrl.pathname}`;
+    url.pathname = `${url.pathname.replace(/\/$/, '')}/${contentUrl.host}${contentUrl.pathname}`;
     url.search = contentUrl.search;
 
     return url.toString();
