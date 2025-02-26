@@ -60,7 +60,7 @@ export function PageBody(props: {
                     <PageCover as="hero" page={page} cover={page.cover} context={context} />
                 ) : null}
 
-                <PageHeader page={page} ancestors={ancestors} pages={context.pages} />
+                <PageHeader context={context} page={page} ancestors={ancestors} />
                 {document && !isNodeEmpty(document) ? (
                     <React.Suspense
                         fallback={

@@ -116,6 +116,6 @@ export async function generateSiteLayoutMetadata(context: GitBookSiteContext): P
                 },
             ],
         },
-        robots: (await isSiteIndexable(site)) ? 'index, follow' : 'noindex, nofollow',
+        robots: (await isSiteIndexable(context)) ? 'index, follow' : 'noindex, nofollow',
     };
 }

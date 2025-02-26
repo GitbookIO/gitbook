@@ -1,9 +1,5 @@
-import {
-    type RevisionPageDocument,
-    type RevisionPageGroup,
-    type Site,
-    SiteVisibility,
-} from '@gitbook/api';
+import { type RevisionPageDocument, type RevisionPageGroup, SiteVisibility } from '@gitbook/api';
+import type { GitBookSiteContext } from '@v2/lib/context';
 import { headers } from 'next/headers';
 
 /**
@@ -28,7 +24,7 @@ export function isPageIndexable(
 /**
  * Return true if a space should be indexed by search engines.
  */
-export async function isSiteIndexable(site: Site) {
+export async function isSiteIndexable(context: GitBookSiteContext) {
     const headersList = await headers();
 
     if (
@@ -39,19 +35,11 @@ export async function isSiteIndexable(site: Site) {
     }
 
     // Prevent indexation of preview of revisions / change-requests
-    if (
-        headersList.get('x-gitbook-content-revision') ||
-        headersList.get('x-gitbook-content-changerequest')
-    ) {
+    if (context.changeRequest || context.revisionId !== context.space.revision) {
         return false;
     }
 
-    if (site) {
-        return shouldIndexVisibility(site.visibility);
-    }
-
-    // space with no site should not be indexed
-    return false;
+    return shouldIndexVisibility(context.site.visibility);
 }
 
 function shouldIndexVisibility(visibility: SiteVisibility) {

@@ -9,6 +9,7 @@ import {
 import { headers } from 'next/headers';
 
 import { getPagePath } from './pages';
+import { assertIsNotV2 } from './v2';
 
 export interface PageHrefContext {
     /**
@@ -23,6 +24,7 @@ export interface PageHrefContext {
  * The value will start and finish with /
  */
 export async function getBasePath(): Promise<string> {
+    assertIsNotV2();
     const headersList = await headers();
     let path = headersList.get('x-gitbook-basepath') ?? '/';
 
@@ -41,6 +43,7 @@ export async function getBasePath(): Promise<string> {
  * Return the current host for the current request.
  */
 export async function getHost(): Promise<string> {
+    assertIsNotV2();
     const headersList = await headers();
     return headersList.get('x-gitbook-host') ?? headersList.get('host') ?? '';
 }
@@ -52,6 +55,7 @@ export async function getHost(): Promise<string> {
  * The URL will end with "/".
  */
 export async function getRootUrl(): Promise<string> {
+    assertIsNotV2();
     const [headersList, host] = await Promise.all([headers(), getHost()]);
     const protocol = headersList.get('x-forwarded-proto') ?? 'https';
     let path = headersList.get('x-gitbook-origin-basepath') ?? '/';
@@ -72,6 +76,7 @@ export async function getRootUrl(): Promise<string> {
  * The URL will end with "/".
  */
 export async function getBaseUrl(): Promise<string> {
+    assertIsNotV2();
     const [headersList, host, basePath] = await Promise.all([headers(), getHost(), getBasePath()]);
     const protocol = headersList.get('x-forwarded-proto') ?? 'https';
     return `${protocol}://${host}${basePath}`;
@@ -81,6 +86,7 @@ export async function getBaseUrl(): Promise<string> {
  * Create an absolute href in the current content.
  */
 export async function getAbsoluteHref(href: string, withHost = false): Promise<string> {
+    assertIsNotV2();
     const base = withHost ? await getBaseUrl() : await getBasePath();
     return `${base}${href.startsWith('/') ? href.slice(1) : href}`;
 }
@@ -105,6 +111,7 @@ export async function getPageHref(
     /** Anchor to link to in the page. */
     anchor?: string
 ): Promise<string> {
+    assertIsNotV2();
     const { pdf } = context;
 
     if (pdf) {

@@ -5,11 +5,13 @@ import { assert } from 'ts-essentials';
 
 import { assetsDomain } from './assets';
 import { filterOutNullable } from './typescript';
+import { assertIsNotV2 } from './v2';
 
 /**
  * Get the current nonce for the current request.
  */
 export async function getContentSecurityPolicyNonce(): Promise<string> {
+    assertIsNotV2();
     const headersList = await headers();
     const nonce = headersList.get('x-nonce');
     assert(nonce, 'x-nonce should be set in the headers by the middleware');
