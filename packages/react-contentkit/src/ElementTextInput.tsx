@@ -12,6 +12,8 @@ export function ElementTextInput(props: ContentKitClientElementProps<ContentKitT
     const { element } = props;
     const clientContext = useContentKitClientContext();
 
+    console.log(props);
+
     const value =
         getStateStringValue(clientContext.state, element.state) ?? element.initialValue ?? '';
 
@@ -29,6 +31,7 @@ export function ElementTextInput(props: ContentKitClientElementProps<ContentKitT
                 value={value}
                 placeholder={element.placeholder}
                 onChange={onChange}
+                rows={4}
             />
         );
     }

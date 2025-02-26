@@ -13,6 +13,7 @@ import { ElementCodeBlock } from './ElementCodeBlock';
 import { ElementDivider } from './ElementDivider';
 import { ElementIcon } from './ElementIcon';
 import { ElementImage } from './ElementImage';
+import { ElementInput } from './ElementInput';
 import { ElementMarkdown } from './ElementMarkdown';
 import { ElementModal } from './ElementModal';
 import { ElementStack } from './ElementStack';
@@ -152,6 +153,8 @@ export function Element(props: {
             return <ElementCodeBlock element={element} context={context} state={state} />;
         case 'webframe':
             return <ElementWebframe element={element} />;
+        case 'input':
+            return <ElementInput element={element} context={context} state={state} />;
         default:
             return (
                 <pre
@@ -191,7 +194,7 @@ function Elements(props: {
 function ensureStackElements(
     type: 'hstack' | 'vstack',
     elements: ContentKitDescendantElement[],
-    align?: 'start' | 'center' | 'end'
+    align?: 'start' | 'center' | 'end',
 ): ContentKitDescendantElement[] {
     if (elements.length === 1) {
         return elements;
