@@ -17,11 +17,11 @@ import {
     withAPI,
     DEFAULT_API_ENDPOINT,
     getPublishedContentSite,
-    validateSerializedCustomization,
 } from '@/lib/api';
 import { race } from '@/lib/async';
 import { buildVersion } from '@/lib/build';
 import { createContentSecurityPolicyNonce, getContentSecurityPolicy } from '@/lib/csp';
+import { validateSerializedCustomization } from '@/lib/customization';
 import { setMiddlewareHeader } from '@/lib/middleware';
 import {
     VisitorTokenLookup,

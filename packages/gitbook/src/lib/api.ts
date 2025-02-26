@@ -2,7 +2,6 @@ import 'server-only';
 import { AsyncLocalStorage } from 'node:async_hooks';
 
 import {
-    CustomizationSettings,
     GitBookAPI,
     GitBookAPIError,
     HttpResponse,
@@ -10,7 +9,6 @@ import {
     PublishedSiteContentLookup,
     RequestRenderIntegrationUI,
     RevisionFile,
-    SiteCustomizationSettings,
     RevisionReusableContent,
     SiteSpace,
     Space,
@@ -22,8 +20,6 @@ import {
 import { GitBookDataFetcher } from '@v2/lib/data/types';
 import assertNever from 'assert-never';
 import { headers } from 'next/headers';
-import rison from 'rison';
-import { assert } from 'ts-essentials';
 
 import { batch } from './async';
 import { buildVersion } from './build';
@@ -888,30 +884,6 @@ export function parseSpacesFromSiteSpaces(siteSpaces: SiteSpace[]) {
     return Object.values(spaces);
 }
 
-function parseSiteSectionsList(
-    siteSectionId: string,
-    sectionsAndGroups: (SiteSectionGroup | SiteSection)[],
-) {
-    const sections = sectionsAndGroups.flatMap((item) =>
-        item.object === 'site-section-group' ? item.sections : item,
-    );
-    const section = sections.find((section) => section.id === siteSectionId);
-    assert(section, 'A section must be defined when there are multiple sections');
-    return { list: sectionsAndGroups, current: section } satisfies SectionsList;
-}
-
-/**
- * Validate that the customization settings passed are valid.
- */
-export function validateSerializedCustomization(raw: string): boolean {
-    try {
-        rison.decode_object(raw);
-        return true;
-    } catch {
-        return false;
-    }
-}
-
 /**
  * Fetch all the content data about a space at once.
  * This function executes the requests in parallel and should be used as early as possible
@@ -1228,30 +1200,4 @@ async function getAll<T, E>(
     }
 
     throw new Error('Unreachable');
-}
-
-/**
- * Selects the customization settings from the x-gitbook-customization header if present,
- * otherwise returns the original API-provided settings.
- */
-async function getActiveCustomizationSettings(
-    settings: SiteCustomizationSettings,
-): Promise<SiteCustomizationSettings> {
-    const headersList = await headers();
-    const extend = headersList.get('x-gitbook-customization');
-    if (extend) {
-        try {
-            const parsedSettings = rison.decode_object<SiteCustomizationSettings>(extend);
-
-            return parsedSettings;
-        } catch (error) {
-            console.error(
-                `Failed to parse x-gitbook-customization header (ignored): ${
-                    (error as Error).stack ?? (error as Error).message ?? error
-                }`,
-            );
-        }
-    }
-
-    return settings;
 }

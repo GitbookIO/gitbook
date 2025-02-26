@@ -4,6 +4,7 @@ import { headers } from 'next/headers';
 export enum MiddlewareHeaders {
     URLMode = 'x-gitbook-url-mode',
     Theme = 'x-gitbook-theme',
+    Customization = 'x-gitbook-customization',
 }
 
 /**

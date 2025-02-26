@@ -27,6 +27,7 @@ import {
     SiteContentPointer,
     SpaceContentPointer,
 } from './api';
+import { getDynamicCustomizationSettings } from './customization';
 import { getBasePath, getHost } from './links';
 
 /*
@@ -140,7 +141,7 @@ export async function fetchV1ContextForSitePointer(pointer: SiteContentPointer) 
     const baseContext = await getV1BaseContext();
     const headersList = await headers();
 
-    return fetchSiteContextByIds(baseContext, {
+    const context = await fetchSiteContextByIds(baseContext, {
         organization: pointer.organizationId,
         site: pointer.siteId,
         siteSection: pointer.siteSectionId,
@@ -151,6 +152,10 @@ export async function fetchV1ContextForSitePointer(pointer: SiteContentPointer) 
         revision: pointer.revisionId,
         visitorAuthToken: headersList.get('x-gitbook-visitor-token'),
     });
+
+    context.customization = await getDynamicCustomizationSettings(context.customization);
+
+    return context;
 }
 
 /**
