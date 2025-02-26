@@ -5,8 +5,18 @@ import type {
 } from '@gitbook/openapi-parser';
 
 export interface OpenAPIContextProps extends OpenAPIClientContext {
-    CodeBlock: React.ComponentType<{ code: string; syntax: string }>;
+    /**
+     * Render a code block.
+     */
+    renderCodeBlock: (props: { code: string; syntax: string }) => React.ReactNode;
+    /**
+     * Render the heading of the operation.
+     */
     renderHeading: (props: { deprecated: boolean; title: string }) => React.ReactNode;
+    /**
+     * Render the document of the operation.
+     */
+    renderDocument: (props: { document: object }) => React.ReactNode;
 
     /** Spec url for the Scalar Api Client */
     specUrl: string;

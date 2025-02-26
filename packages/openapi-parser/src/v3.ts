@@ -1,23 +1,33 @@
-import { type AnyApiDefinitionFormat, validate } from '@scalar/openapi-parser';
+import { validate } from '@scalar/openapi-parser';
 import { OpenAPIParseError } from './error';
 import { createFileSystem } from './filesystem';
 import type { Filesystem, OpenAPIV3xDocument } from './types';
+import type { ParseOpenAPIInput } from './parse';
 
 /**
  * Parse a raw string into an OpenAPI document.
  * It will also convert Swagger 2.0 to OpenAPI 3.0.
  * It can throw an `OpenAPIFetchError` if the document is invalid.
  */
-export async function parseOpenAPIV3(input: {
-    /**
-     * The API definition to parse.
-     */
-    value: AnyApiDefinitionFormat;
-    /**
-     * The root URL of the specified OpenAPI document.
-     */
-    rootURL: string | null;
-}): Promise<Filesystem<OpenAPIV3xDocument>> {
+export async function parseOpenAPIV3(
+    input: ParseOpenAPIInput,
+): Promise<Filesystem<OpenAPIV3xDocument>> {
+    const { value, rootURL, trust } = input;
+    const specification = trust
+        ? await trustedValidate({ value, rootURL })
+        : await untrustedValidate({ value, rootURL });
+
+    const filesystem = await createFileSystem({ value: specification, rootURL });
+
+    return filesystem;
+}
+
+type ValidateOpenAPIV3Input = Pick<ParseOpenAPIInput, 'value' | 'rootURL'>;
+
+/**
+ * Validate an untrusted OpenAPI v3 document.
+ */
+async function untrustedValidate(input: ValidateOpenAPIV3Input) {
     const { value, rootURL } = input;
     const result = await validate(value);
 
@@ -36,7 +46,34 @@ export async function parseOpenAPIV3(input: {
         });
     }
 
-    const filesystem = await createFileSystem({ value: result.specification, rootURL });
+    return result.specification;
+}
 
-    return filesystem;
+/**
+ * Validate a trusted OpenAPI v3 document.
+ * It assumes the specification is already a valid specification.
+ * It's faster than `untrustedValidate`.
+ */
+async function trustedValidate(input: ValidateOpenAPIV3Input) {
+    const { value, rootURL } = input;
+    const result = (() => {
+        if (typeof value === 'string') {
+            try {
+                return JSON.parse(value);
+            } catch (error) {
+                /** In case of an invalid JSON, we fallback to untrusted validation. */
+                return untrustedValidate(input);
+            }
+        }
+        return value;
+    })();
+
+    if ('swagger' in result && result.swagger) {
+        throw new OpenAPIParseError('Only OpenAPI v3 is supported', {
+            code: 'parse-v2-in-v3',
+            rootURL,
+        });
+    }
+
+    return result;
 }

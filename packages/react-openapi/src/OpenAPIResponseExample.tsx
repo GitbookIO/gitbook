@@ -209,7 +209,7 @@ function OpenAPIExample(props: {
         return <OpenAPIEmptyResponseExample />;
     }
 
-    return <context.CodeBlock code={code} syntax={syntax} />;
+    return context.renderCodeBlock({ code, syntax });
 }
 
 function stringifyExample(args: { example: OpenAPIV3.ExampleObject; xml: boolean }): string | null {

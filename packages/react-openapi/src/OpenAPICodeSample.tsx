@@ -1,12 +1,12 @@
 import { CodeSampleInput, codeSampleGenerators } from './code-samples';
 import { generateMediaTypeExample, generateSchemaExample } from './generateSchemaExample';
 import { InteractiveSection } from './InteractiveSection';
-import { getServersURL } from './OpenAPIServerURL';
 import type { OpenAPIContextProps, OpenAPIOperationData } from './types';
 import { createStateKey } from './utils';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
 import { checkIsReference } from './utils';
+import { getDefaultServerURL } from './util/server';
 
 /**
  * Display code samples to execute the operation.
@@ -53,7 +53,7 @@ export function OpenAPICodeSample(props: {
 
     const input: CodeSampleInput = {
         url:
-            getServersURL(data.servers) +
+            getDefaultServerURL(data.servers) +
             data.path +
             (searchParams.size ? `?${searchParams.toString()}` : ''),
         method: data.method,
@@ -72,7 +72,10 @@ export function OpenAPICodeSample(props: {
     const autoCodeSamples = codeSampleGenerators.map((generator) => ({
         key: `default-${generator.id}`,
         label: generator.label,
-        body: <context.CodeBlock code={generator.generate(input)} syntax={generator.syntax} />,
+        body: context.renderCodeBlock({
+            code: generator.generate(input),
+            syntax: generator.syntax,
+        }),
     }));
 
     // Use custom samples if defined
@@ -95,7 +98,10 @@ export function OpenAPICodeSample(props: {
                 .map((sample) => ({
                     key: `redocly-${sample.lang}`,
                     label: sample.label,
-                    body: <context.CodeBlock code={sample.source} syntax={sample.lang} />,
+                    body: context.renderCodeBlock({
+                        code: sample.source,
+                        syntax: sample.lang,
+                    }),
                 }));
         }
     });
