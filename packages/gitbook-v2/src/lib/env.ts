@@ -10,6 +10,13 @@ export const GITBOOK_URL =
           process.env.NEXT_PUBLIC_GITBOOK_URL ??
           '');
 
+console.log({
+    GITBOOK_URL,
+    NEXT_PUBLIC_GITBOOK_URL: process.env.NEXT_PUBLIC_GITBOOK_URL,
+    NEXT_PUBLIC_VERCEL_URL: process.env.NEXT_PUBLIC_VERCEL_URL,
+    NODE_ENV: process.env.NODE_ENV,
+});
+
 /**
  * GitBook app URL.
  */
