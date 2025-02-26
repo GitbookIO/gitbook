@@ -1,0 +1,12 @@
+{
+	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+    "extends": ["../../biome.json"],
+	"javascript": {
+		"globals": [
+			"DurableObjectLocationHint",
+			"DurableObjectNamespace",
+            "DurableObjectStub",
+            "ContinentCode"
+		]
+	}
+}

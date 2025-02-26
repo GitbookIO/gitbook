@@ -1,4 +1,4 @@
-import type { CacheObject, CacheObjectDescriptor } from './CacheObject';
+import type { CacheObject } from './CacheObject';
 
 export type CacheLocationId = ContinentCode;
 const allLocations: CacheLocationId[] = ['AF', 'AS', 'NA', 'SA', 'AN', 'EU', 'OC'];
