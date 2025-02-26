@@ -46,7 +46,7 @@ export function createLinker(
         },
 
         toAbsoluteURL(absolutePath: string): string {
-            return `${servedOn.protocol ?? 'https'}://${joinPaths(servedOn.host, absolutePath)}`;
+            return `${servedOn.protocol ?? 'https:'}//${joinPaths(servedOn.host, absolutePath)}`;
         },
 
         toPathForPage({ pages, page, anchor }) {
