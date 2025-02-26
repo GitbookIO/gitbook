@@ -103,7 +103,8 @@ jobs:
               run: |
                   echo "VERCEL_ENVIRONMENT=production" >> $GITHUB_ENV
                   echo "SENTRY_ENVIRONMENT=production" >> $GITHUB_ENV
-                  echo "GITBOOK_ASSETS_PREFIX=https://static.gitbook.com" >> $GITHUB_ENV
+                  echo "GITBOOK_URL=https://open-2v.gitbook.com" >> $GITHUB_ENV
+                  echo "GITBOOK_ASSETS_PREFIX=https://static-2v.gitbook.com" >> $GITHUB_ENV
               if: startsWith(github.ref, 'refs/heads/main')
             - name: Sets env vars for preview
               run: |
@@ -156,7 +157,8 @@ jobs:
             - name: Sets env vars for production
               run: |
                   echo "SENTRY_ENVIRONMENT=production" >> $GITHUB_ENV
-                  echo "GITBOOK_ASSETS_PREFIX=https://static.gitbook.com" >> $GITHUB_ENV
+                  echo "GITBOOK_URL=https://open-2c.gitbook.com" >> $GITHUB_ENV
+                  echo "GITBOOK_ASSETS_PREFIX=https://static-2c.gitbook.com" >> $GITHUB_ENV
               if: startsWith(github.ref, 'refs/heads/main')
             - name: Sets env vars for preview
               run: |
