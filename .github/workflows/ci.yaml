@@ -114,7 +114,7 @@ jobs:
             - name: Pull Vercel Environment Information
               run: bun run vercel pull --yes --environment=$VERCEL_ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }}
             - name: Build Project Artifacts
-              run: bun run vercel build --token=${{ secrets.VERCEL_TOKEN }}
+              run: bun run vercel build --environment=$VERCEL_ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }}
               env:
                   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
                   NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
@@ -125,7 +125,7 @@ jobs:
             - name: Deploy Project Artifacts to Vercel
               id: deploy
               run: |
-                  DEPLOYMENT_URL=$(bun run vercel deploy --prebuilt --target=$VERCEL_ENVIRONMENT $([ "$VERCEL_ENVIRONMENT" = "production" ] && echo "--prod") --token=${{ secrets.VERCEL_TOKEN }})
+                  DEPLOYMENT_URL=$(bun run vercel deploy --prebuilt --target=$VERCEL_ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }})
                   echo "deployment-url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
             - name: Outputs
               run: |
