@@ -4,13 +4,13 @@ export type AsProp<Tag extends React.ElementType> = { as?: Tag };
 
 export type PolymorphicComponentProp<
     Tag extends React.ElementType,
-    Props extends Record<string, unknown> = Record<string, never>,
+    Props = {},
 > = React.PropsWithChildren<Props & AsProp<Tag>> &
     Omit<React.ComponentPropsWithoutRef<Tag>, keyof (AsProp<Tag> & Props)>;
 
 export type PolymorphicComponentPropWithRef<
     Tag extends React.ElementType,
-    Props extends Record<string, unknown> = Record<string, never>,
+    Props = {},
 > = PolymorphicComponentProp<Tag, Props> & { ref?: PolymorphicRef<Tag> };
 
 /*

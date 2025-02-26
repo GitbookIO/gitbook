@@ -116,7 +116,6 @@ export function PageBody(props: {
                     {withPageFeedback ? (
                         <PageFeedbackForm
                             className={page.layout.outline ? 'xl:hidden' : ''}
-                            orientation="horizontal"
                             pageId={page.id}
                         />
                     ) : null}

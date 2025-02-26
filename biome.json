@@ -47,7 +47,8 @@
             },
             "complexity": {
                 "noForEach": "off",
-                "noUselessFragments": "warn"
+                "noUselessFragments": "warn",
+                "noBannedTypes": "warn"
             },
             "correctness": {
                 "noUndeclaredVariables": "error",
