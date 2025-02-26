@@ -6,6 +6,7 @@ import {
     CustomizationHeaderItem,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
+    CustomizationLinksStyle,
     CustomizationLocale,
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
@@ -230,6 +231,7 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
             font: CustomizationFont.Inter,
             background: CustomizationBackground.Plain,
             icons: CustomizationIconsStyle.Regular,
+            links: CustomizationLinksStyle.Default,
             sidebar: {
                 background: CustomizationSidebarBackgroundStyle.Default,
                 list: CustomizationSidebarListStyle.Default,
