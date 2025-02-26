@@ -266,13 +266,22 @@ async function getRevisionPageByPath(
     'use cache';
 
     const encodedPath = encodeURIComponent(params.path);
-    const res = await getAPI(input).spaces.getPageInRevisionByPath(
-        params.spaceId,
-        params.revisionId,
-        encodedPath,
-    );
 
-    return res.data;
+    try {
+        const res = await getAPI(input).spaces.getPageInRevisionByPath(
+            params.spaceId,
+            params.revisionId,
+            encodedPath,
+        );
+
+        return res.data;
+    } catch (error) {
+        if (checkHasErrorCode(error, 404)) {
+            return null;
+        }
+
+        throw error;
+    }
 }
 
 async function getDocument(
